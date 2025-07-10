@@ -1,10 +1,10 @@
 bietlejuice.enrich_b:
-  - bietlejuice.enrich_a:load-enrich-table-one
+  - bietlejuice.enrich_a:load-enrich-table-one:first-run-of-day
 bietlejuice.dw_c:
-  - bietlejuice.enrich_a:create-external-table-enrich-table-one
-  - bietlejuice.enrich_b:create-external-table-enrich-table-two
+  - bietlejuice.enrich_a:create-external-table-enrich-table-one:first-run-of-day
+  - bietlejuice.enrich_b:create-external-table-enrich-table-two:first-run-of-day
 bietlejuice.dw_e:
-  - bietlejuice.enrich_a:load-enrich-table-one
-  - bietlejuice.enrich_b:load-enrich-table-two
-  - bietlejuice.dw_c:load-into-redshift-public-fact-table-one
-  - bietlejuice.dw_d:load-into-redshift-public-dim-table-three
+  - bietlejuice.enrich_a:load-enrich-table-one:first-run-of-day
+  - bietlejuice.enrich_b:load-enrich-table-two:first-run-of-day
+  - bietlejuice.dw_c:load-into-redshift-public-fact-table-one:first-run-of-day
+  - bietlejuice.dw_d:load-into-redshift-public-dim-table-three:first-run-of-day

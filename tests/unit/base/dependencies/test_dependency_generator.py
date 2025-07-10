@@ -11,14 +11,18 @@ class TestDependencyGenerator:
     def test_will_return_correct_dependencies(
         self, dependency_generator: DependencyGenerator
     ):
-        manual_modifications = {"dag1": {"add": ["dag10:task10"]}}
+        manual_modifications = {"dag1": {"add": ["dag10:task10:first-run-of-day"]}}
 
         generated_dependencies = dependency_generator.generate_dependencies(
             manual_modifications
         )
         expected_dependencies = {
-            "dag1": ["dag0:task0", "dag10:task10"],
-            "dag2": ["dag0:task0", "dag1:task1", "dag4:task2"],
+            "dag1": ["dag0:task0:first-run-of-day", "dag10:task10:first-run-of-day"],
+            "dag2": [
+                "dag0:task0:first-run-of-day",
+                "dag1:task1:first-run-of-day",
+                "dag4:task2:first-run-of-day",
+            ],
         }
 
         assert generated_dependencies == expected_dependencies
@@ -52,11 +56,14 @@ class TestDependencyGenerator:
 
         expected_return = {
             "dag_a": [
-                "task_that_generated_table_a",
-                "other_task_that_generated_table_a",
-                "task_that_generated_table_b",
+                "task_that_generated_table_a:first-run-of-day",
+                "other_task_that_generated_table_a:first-run-of-day",
+                "task_that_generated_table_b:first-run-of-day",
             ],
-            "dag_b": ["task_that_generated_table_c", "task_that_generated_table_d"],
+            "dag_b": [
+                "task_that_generated_table_c:first-run-of-day",
+                "task_that_generated_table_d:first-run-of-day",
+            ],
         }
 
         # act

@@ -1,961 +1,963 @@
 ---
 bietlejuice.dw_agent_contract:
   add:
-    - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+    - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   remove:
-    - bietlejuice.dw_losses:load-dw-losses-fact-delay
+    - bietlejuice.dw_losses:load-dw-losses-fact-delay:first-run-of-day
 bietlejuice.dw_braze_events_user_dispatch:
   remove:
-    - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
-    - bietlejuice.braze_details:load-clean-canvas-details-owners
-    - bietlejuice.braze_details:load-clean-canvas-details-tenants
-    - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-affiliates-events
+    - bietlejuice.braze_details:load-clean-canvas-details-indica-ai:first-run-of-day
+    - bietlejuice.braze_details:load-clean-canvas-details-owners:first-run-of-day
+    - bietlejuice.braze_details:load-clean-canvas-details-tenants:first-run-of-day
+    - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-affiliates-events:first-run-of-day
 bietlejuice.dw_call:
   remove:
-    - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
+    - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification:first-run-of-day
 bietlejuice.dw_casa_mineira_portal:
   remove:
-    - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
+    - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency:first-run-of-day
 bietlejuice.dw_charging_payment_quintocred:
   remove:
-    - bietlejuice.velo_asaas:load-clean-payments
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-test-proposals
+    - bietlejuice.velo_asaas:load-clean-payments:first-run-of-day
+    - bietlejuice.gsheets_fintech:done-clean-quintocred-test-proposals:first-run-of-day
 bietlejuice.dw_chattermill:
   override: []
 bietlejuice.dw_country:
   override: []
 bietlejuice.dw_crm:
   add:
-    - bietlejuice.ebdb_inspections:load-clean-inspection
-    - bietlejuice.heimdall:load-clean-activity
+    - bietlejuice.ebdb_inspections:load-clean-inspection:first-run-of-day
+    - bietlejuice.heimdall:load-clean-activity:first-run-of-day
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_contract:load-dw-rent-dim-contract
-    - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-    - bietlejuice.dw_offer:load-dw-rent-dim-offer
-    - bietlejuice.ebdb:load-clean-rent-flow
-    - bietlejuice.ebdb_contract:load-clean-contract
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_offer:load-clean-offer
-    - bietlejuice.enrich_crm:load-enrich-tasks
-    - bietlejuice.enrich_crm:load-enrich-workflows-transitions
-    - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-resolutions-flow
-    - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-users-flow
-    - bietlejuice.enrich_heimdall:load-enrich-activity
-    - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+    - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
+    - bietlejuice.ebdb:load-clean-rent-flow:first-run-of-day
+    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day
+    - bietlejuice.enrich_crm:load-enrich-tasks:first-run-of-day
+    - bietlejuice.enrich_crm:load-enrich-workflows-transitions:first-run-of-day
+    - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-resolutions-flow:first-run-of-day
+    - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-users-flow:first-run-of-day
+    - bietlejuice.enrich_heimdall:load-enrich-activity:first-run-of-day
+    - bietlejuice.enrich_inspections:load-enrich-inspection-booking:first-run-of-day
 bietlejuice.dw_customer_support:
   remove:
-    - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
+    - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics:first-run-of-day
 bietlejuice.dw_datamarts_cross:
   add:
-    - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
-    - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-    - bietlejuice.dw_user:load-dw-public-dim-partner
-    - bietlejuice.dw_user:load-dw-public-dim-partner-agent
-    - bietlejuice.dw_user:load-dw-public-dim-user
-    - bietlejuice.enrich_big_agent:load-enrich-agency
-    - bietlejuice.enrich_big_agent:load-enrich-agent
-    - bietlejuice.enrich_big_agent:load-enrich-enrollment
-    - bietlejuice.enrich_big_agent:load-enrich-house
-    - bietlejuice.enrich_big_agent:load-enrich-program
-    - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
+    - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
+    - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status:first-run-of-day
+    - bietlejuice.dw_user:load-dw-public-dim-partner:first-run-of-day
+    - bietlejuice.dw_user:load-dw-public-dim-partner-agent:first-run-of-day
+    - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
+    - bietlejuice.enrich_big_agent:load-enrich-agency:first-run-of-day
+    - bietlejuice.enrich_big_agent:load-enrich-agent:first-run-of-day
+    - bietlejuice.enrich_big_agent:load-enrich-enrollment:first-run-of-day
+    - bietlejuice.enrich_big_agent:load-enrich-house:first-run-of-day
+    - bietlejuice.enrich_big_agent:load-enrich-program:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_lead:load-dw-public-dim-lead
-    - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
-    - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job
-    - bietlejuice.dw_offer:load-dw-rent-dim-offer
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep
-    - bietlejuice.ebdb_visit:load-clean-booking
-    - bietlejuice.ebdb_house:load-clean-house
+    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+    - bietlejuice.dw_lead:load-dw-public-dim-lead:first-run-of-day
+    - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job:first-run-of-day
+    - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job:first-run-of-day
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
+    - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+    - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep:first-run-of-day
+    - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
 bietlejuice.dw_datamarts_for_sale:
   add:
-    - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
-    - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-    - bietlejuice.ebdb_location:load-clean-map-region
-    - bietlejuice.ebdb_location:load-clean-polygon-region
+    - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
+    - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-map-region:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-polygon-region:first-run-of-day
   remove:
-    - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations
-    - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
-    - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
-    - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
-    - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-dim-nps-answer
-    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-dim-nps-campaign
-    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-fact-nps-dispatches
-    - bietlejuice.ebdb_condo:load-clean-amenities
-    - bietlejuice.ebdb_condo:load-clean-condo-amenities
-    - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
-    - bietlejuice.ebdb_contract:load-clean-work-contract
-    - bietlejuice.enrich_sale_firestore:load-enrich-monday
-    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
-    - bietlejuice.kodak:load-clean-photo-sphere-aud
-    - bietlejuice.kodak:load-clean-video-aud
+    - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations:first-run-of-day
+    - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review:first-run-of-day
+    - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
+    - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
+    - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
+    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-dim-nps-answer:first-run-of-day
+    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-dim-nps-campaign:first-run-of-day
+    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-fact-nps-dispatches:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-condo-amenities:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-info-condo-amenities:first-run-of-day
+    - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
+    - bietlejuice.kodak:load-clean-photo-sphere-aud:first-run-of-day
+    - bietlejuice.kodak:load-clean-video-aud:first-run-of-day
 bietlejuice.dw_datamarts_for_sale_cross:
   add:
-    - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
+    - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region:first-run-of-day
   remove:
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.enrich_3p:load-enrich-houses-3p
-    - bietlejuice.enrich_3p:load-enrich-houses-3p-bh
-    - bietlejuice.enrich_offer:load-enrich-sale-offer
-    - bietlejuice.enrich_sale_firestore:load-enrich-monday
-    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
-    - bietlejuice.sales_flow:load-clean-sales-flow-aud
+    - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+    - bietlejuice.enrich_3p:load-enrich-houses-3p:first-run-of-day
+    - bietlejuice.enrich_3p:load-enrich-houses-3p-bh:first-run-of-day
+    - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
+    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
+    - bietlejuice.sales_flow:load-clean-sales-flow-aud:first-run-of-day
 bietlejuice.dw_datamarts_growth_cross:
   remove:
-    - bietlejuice.gsheets_growth:done-clean-costs-targets
-    - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-targets
-    - bietlejuice.enrich_marketing_costs_offline:load-enrich-offline-manual-costs
-    - bietlejuice.enrich_marketing_manual_daily_costs:load-enrich-daily-costs
-    - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets
-    - bietlejuice.gsheets_growth:done-clean-indicaai-tax-costs
-    - bietlejuice.gsheets_growth:done-clean-rental-tof-monthly-targets
-    - bietlejuice.gsheets_growth:done-clean-sale-nbp-source-targets
+    - bietlejuice.gsheets_growth:done-clean-costs-targets:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-targets:first-run-of-day
+    - bietlejuice.enrich_marketing_costs_offline:load-enrich-offline-manual-costs:first-run-of-day
+    - bietlejuice.enrich_marketing_manual_daily_costs:load-enrich-daily-costs:first-run-of-day
+    - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-indicaai-tax-costs:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-rental-tof-monthly-targets:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-sale-nbp-source-targets:first-run-of-day
 bietlejuice.dw_datamarts_spark.static:
   override: []
 bietlejuice.dw_date:
   add:
-    - bietlejuice.enrich_public_date:load-enrich-aux-date
+    - bietlejuice.enrich_public_date:load-enrich-aux-date:first-run-of-day
 bietlejuice.dw_fintech_snapshot_quintocred:
   remove:
-    - bietlejuice.dw_fintech_snapshot:load-dw-charging-payment-quintocred-fact-payment-full
-    - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-no-renewal
-    - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-renewal
+    - bietlejuice.dw_fintech_snapshot:load-dw-charging-payment-quintocred-fact-payment-full:first-run-of-day
+    - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-no-renewal:first-run-of-day
+    - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-renewal:first-run-of-day
 bietlejuice.dw_recon_quintocred:
   remove:
-    - bietlejuice.dw_fintech_snapshot_quintocred:load-dw-fintech-snapshot-quintocred-quintocred-ifrs-occurrence
+    - bietlejuice.dw_fintech_snapshot_quintocred:load-dw-fintech-snapshot-quintocred-quintocred-ifrs-occurrence:first-run-of-day
 bietlejuice.dw_losses:
   add:
-    - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations
+    - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations:first-run-of-day
   remove:
-    - bietlejuice.enrich_losses:load-enrich-provision-factor
+    - bietlejuice.enrich_losses:load-enrich-provision-factor:first-run-of-day
 bietlejuice.dw_collection_recovery_quintoandar:
   remove:
-    - bietlejuice.enrich_recupera:load-enrich-collection
-    - bietlejuice.enrich_recupera:load-enrich-contract-advisory-distribution
-    - bietlejuice.enrich_recupera:load-enrich-installment
-    - bietlejuice.enrich_recupera:load-enrich-negotiation
-    - bietlejuice.recupera:load-clean-complementary-records
-    - bietlejuice.recupera:load-clean-complementary-records-written-down
-    - bietlejuice.recupera:load-clean-creditor-pending
-    - bietlejuice.recupera:load-clean-operators
-    - bietlejuice.paschoalotto:load-clean-agreement-detail
-    - bietlejuice.paschoalotto:load-clean-contract
-    - bietlejuice.paschoalotto:load-clean-debt
-    - bietlejuice.paschoalotto:load-clean-user
+    - bietlejuice.enrich_recupera:load-enrich-collection:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-contract-advisory-distribution:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
+    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
+    - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
+    - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
+    - bietlejuice.recupera:load-clean-operators:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-agreement-detail:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-contract:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-debt:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
 bietlejuice.dw_collection_recovery_quintocred:
   remove:
-    - bietlejuice.paschoalotto:load-clean-agreement-detail
-    - bietlejuice.paschoalotto:load-clean-contract
-    - bietlejuice.paschoalotto:load-clean-debt
-    - bietlejuice.paschoalotto:load-clean-user
+    - bietlejuice.paschoalotto:load-clean-agreement-detail:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-contract:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-debt:first-run-of-day
+    - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
 bietlejuice.dw_offboarding:
   add:
-    - bietlejuice.enrich_inspections:load-enrich-repair-request
+    - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
 bietlejuice.dw_offer:
   remove:
-    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
 bietlejuice.dw_operator_performance:
   remove:
-    - bietlejuice.paschoalotto:load-clean-user
-    - bietlejuice.webhelp:load-clean-login
+    - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
+    - bietlejuice.webhelp:load-clean-login:first-run-of-day
 bietlejuice.dw_photo_jobs:
   remove:
-    - bietlejuice.ebdb_visit:load-clean-booking
-    - bietlejuice.ebdb:load-clean-inspection
-    - bietlejuice.ebdb_house:load-clean-house
+    - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+    - bietlejuice.ebdb:load-clean-inspection:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
 bietlejuice.dw_revenue_lines:
   remove:
-    - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
-    - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee
-    - bietlejuice.enrich_revenue_lines:load-enrich-management-fee
-    - bietlejuice.enrich_revenue_lines:load-enrich-service-fee
-    - bietlejuice.dw_contract:load-dw-rent-dim-contract
+    - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
+    - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-fee:first-run-of-day
+    - bietlejuice.enrich_revenue_lines:load-enrich-management-fee:first-run-of-day
+    - bietlejuice.enrich_revenue_lines:load-enrich-service-fee:first-run-of-day
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
 bietlejuice.dw_sale_events:
   add:
-    - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+    - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
 bietlejuice.dw_sale_flows:
   remove:
-    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
 bietlejuice.dw_sale_listings:
   add:
-    - bietlejuice.ebdb_house:load-clean-house
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   remove:
-    - bietlejuice.enrich_sale_stranded_listings_status:load-enrich-stranded-status
+    - bietlejuice.enrich_sale_stranded_listings_status:load-enrich-stranded-status:first-run-of-day
 bietlejuice.dw_sale_offer_users:
   remove:
-    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users
+    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users:first-run-of-day
 bietlejuice.dw_sale_offers:
   remove:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
 bietlejuice.dw_sale_visits:
   remove:
-    - bietlejuice.ebdb_user:load-clean-user
-    - bietlejuice.enrich_booking:load-enrich-booking
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
 bietlejuice.dw_table_snapshot:
   remove:
-    - bietlejuice.enrich_airflow:load-enrich-dag
+    - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
 bietlejuice.dw_tenant_documentation:
   remove:
-    - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request-aud
+    - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request-aud:first-run-of-day
 bietlejuice.dw_user_affiliate:
   remove:
-    - bietlejuice.ebdb:load-clean-partner-agent
+    - bietlejuice.ebdb:load-clean-partner-agent:first-run-of-day
 bietlejuice.enrich_access_logs:
   remove:
-    - bietlejuice.istio:load-clean-istio
-    - bietlejuice.opa:load-clean-opa
+    - bietlejuice.istio:load-clean-istio:first-run-of-day
+    - bietlejuice.opa:load-clean-opa:first-run-of-day
 bietlejuice.enrich_accounting_funnel:
   remove:
-    - bietlejuice.sap:load-clean-users
-    - bietlejuice.sap:load-clean-chart-of-accounts
+    - bietlejuice.sap:load-clean-users:first-run-of-day
+    - bietlejuice.sap:load-clean-chart-of-accounts:first-run-of-day
 bietlejuice.enrich_airflow:
   override: []
 bietlejuice.enrich_app_installed:
   remove:
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
+    - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_booking:
   remove:
-    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
 bietlejuice.enrich_braze_events:
   remove:
-    - bietlejuice.braze_events:load-clean-events-indica-ai
+    - bietlejuice.braze_events:load-clean-events-indica-ai:first-run-of-day
 bietlejuice.enrich_braze_events_dispatches:
   remove:
-    - bietlejuice.enrich_braze_events:load-enrich-events-affiliates
+    - bietlejuice.enrich_braze_events:load-enrich-events-affiliates:first-run-of-day
 bietlejuice.enrich_braze_events_dispatches_user:
   remove:
-    - bietlejuice.enrich_braze_events:load-enrich-events-affiliates
-    - bietlejuice.enrich_braze_events_dispatches:load-enrich-email-affiliates
-    - bietlejuice.enrich_braze_events_dispatches:load-enrich-inapp-affiliates
-    - bietlejuice.enrich_braze_events_dispatches:load-enrich-push-affiliates
-    - bietlejuice.enrich_braze_events_dispatches:load-enrich-sms-affiliates
-    - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-affiliates
+    - bietlejuice.enrich_braze_events:load-enrich-events-affiliates:first-run-of-day
+    - bietlejuice.enrich_braze_events_dispatches:load-enrich-email-affiliates:first-run-of-day
+    - bietlejuice.enrich_braze_events_dispatches:load-enrich-inapp-affiliates:first-run-of-day
+    - bietlejuice.enrich_braze_events_dispatches:load-enrich-push-affiliates:first-run-of-day
+    - bietlejuice.enrich_braze_events_dispatches:load-enrich-sms-affiliates:first-run-of-day
+    - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-affiliates:first-run-of-day
 bietlejuice.enrich_braze_events_user_centric:
   remove:
-    - bietlejuice.enrich_braze_events:load-enrich-events-affiliates
+    - bietlejuice.enrich_braze_events:load-enrich-events-affiliates:first-run-of-day
 bietlejuice.enrich_braze_webhook_notification:
   add:
-    - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
-    - bietlejuice.braze_details:load-clean-campaign-details-owners
-    - bietlejuice.braze_details:load-clean-campaign-details-tenants
+    - bietlejuice.braze_details:load-clean-campaign-details-indica-ai:first-run-of-day
+    - bietlejuice.braze_details:load-clean-campaign-details-owners:first-run-of-day
+    - bietlejuice.braze_details:load-clean-campaign-details-tenants:first-run-of-day
   remove:
-    - bietlejuice.braze_details:load-clean-canvas-details-indica-ai
-    - bietlejuice.braze_details:load-clean-canvas-details-owners
-    - bietlejuice.braze_details:load-clean-canvas-details-tenants
+    - bietlejuice.braze_details:load-clean-canvas-details-indica-ai:first-run-of-day
+    - bietlejuice.braze_details:load-clean-canvas-details-owners:first-run-of-day
+    - bietlejuice.braze_details:load-clean-canvas-details-tenants:first-run-of-day
 bietlejuice.enrich_buyer_prospect:
   remove:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-    - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-    - bietlejuice.enrich_offer:load-enrich-sale-offer
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
+    - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
   remove:
-    - bietlejuice.casa_mineira_facebook_insights:load-clean-facebook-insights
-    - bietlejuice.enrich_region:load-enrich-region
-    - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
-    - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
+    - bietlejuice.casa_mineira_facebook_insights:load-clean-facebook-insights:first-run-of-day
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags:first-run-of-day
+    - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns:first-run-of-day
 bietlejuice.enrich_chattermill:
   override: []
 bietlejuice.enrich_chatbot:
-  remove:
-    - bietlejuice.copilot_service:load-clean-message
-    - bietlejuice.copilot_service:load-clean-session
   add:
-    - bietlejuice.copilot_service:load-clean-message:first-run-of-day
-    - bietlejuice.copilot_service:load-clean-session:first-run-of-day
-    - bietlejuice.enrich_customer_support:load-enrich-tickets
+    - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
 bietlejuice.enrich_collections_quintoandar:
   remove:
-    - bietlejuice.paschoalotto:load-clean-user
-    - bietlejuice.recupera:load-clean-operators
-    - bietlejuice.recupera:load-clean-complementary-records
-    - bietlejuice.recupera:load-clean-complementary-records-written-down
-    - bietlejuice.recupera:load-clean-creditor-pending
-    - bietlejuice.enrich_recupera:load-enrich-installment
-    - bietlejuice.enrich_recupera:load-enrich-negotiation
-    - bietlejuice.webhelp:load-clean-login
-    - bietlejuice.grb:load-clean-operators
+    - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
+    - bietlejuice.recupera:load-clean-operators:first-run-of-day
+    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
+    - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
+    - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
+    - bietlejuice.webhelp:load-clean-login:first-run-of-day
+    - bietlejuice.grb:load-clean-operators:first-run-of-day
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
-    - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a028a
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a
-    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes:first-run-of-day
+    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a028a:first-run-of-day
+    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a:first-run-of-day
+    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a:first-run-of-day
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_content_funnel:
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.ebdb_visit:load-clean-visit
-bietlejuice.enrich_copilot_service:
-  remove:
-    - bietlejuice.copilot_service:load-clean-message
-    - bietlejuice.copilot_service:load-clean-message-flow
-    - bietlejuice.copilot_service:load-clean-session
-    - bietlejuice.copilot_service:load-clean-state
-  add:
-    - bietlejuice.copilot_service:load-clean-message:first-run-of-day
-    - bietlejuice.copilot_service:load-clean-message-flow:first-run-of-day
-    - bietlejuice.copilot_service:load-clean-session:first-run-of-day
-    - bietlejuice.copilot_service:load-clean-state:first-run-of-day
+    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+    - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+    - bietlejuice.ebdb_visit:load-clean-visit:first-run-of-day
 bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:
   remove:
-    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa
-    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft
-    - bietlejuice.enrich_viva_real_crawler_listings:load-enrich-viva-real
-    - bietlejuice.enrich_zap_imoveis_crawler_listings:load-enrich-zap-imoveis
+    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa:first-run-of-day
+    - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft:first-run-of-day
+    - bietlejuice.enrich_viva_real_crawler_listings:load-enrich-viva-real:first-run-of-day
+    - bietlejuice.enrich_zap_imoveis_crawler_listings:load-enrich-zap-imoveis:first-run-of-day
 bietlejuice.enrich_credit_analysis:
   remove:
-    - bietlejuice.sorting_hat:load-clean-credit-analysis-version
+    - bietlejuice.sorting_hat:load-clean-credit-analysis-version:first-run-of-day
 bietlejuice.enrich_crm_tasks_flows:
   add:
-    - bietlejuice.enrich_crm:load-enrich-tasks-actions
+    - bietlejuice.enrich_crm:load-enrich-tasks-actions:first-run-of-day
   remove:
-    - bietlejuice.enrich_heimdall:load-enrich-activity
+    - bietlejuice.enrich_heimdall:load-enrich-activity:first-run-of-day
 bietlejuice.enrich_crm_tasks_history_flows:
   add:
-    - bietlejuice.enrich_crm:load-enrich-tasks-actions
+    - bietlejuice.enrich_crm:load-enrich-tasks-actions:first-run-of-day
 bietlejuice.enrich_customer_demand:
   add:
-    - bietlejuice.ebdb_user:load-clean-user
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   remove:
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
+    - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_ebdb_photo_jobs:
   add:
-    - bietlejuice.ebdb_location:load-clean-map-region
-    - bietlejuice.ebdb_location:load-clean-country
-    - bietlejuice.ebdb_location:load-clean-state
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.ebdb_location:load-clean-map-region:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   remove:
-    - bietlejuice.ebdb:load-clean-inspection-aud
-    - bietlejuice.enrich_ebdb_country:load-enrich-house
+    - bietlejuice.ebdb:load-clean-inspection-aud:first-run-of-day
+    - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
 bietlejuice.enrich_ebdb_user:
   add:
-    - bietlejuice.ebdb_user:load-clean-user-merge
+    - bietlejuice.ebdb_user:load-clean-user-merge:first-run-of-day
 bietlejuice.enrich_employee:
   remove:
-    - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping
+    - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
   remove:
-    - bietlejuice.enrich_losses:load-enrich-provision
+    - bietlejuice.enrich_losses:load-enrich-provision:first-run-of-day
 bietlejuice.enrich_firestore:
   remove:
-    - bietlejuice.firestore:load-clean-rent-offer
+    - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_golden_set:
   remove:
-    - bietlejuice.enrich_vespucio:load-enrich-dejavu
+    - bietlejuice.enrich_vespucio:load-enrich-dejavu:first-run-of-day
 bietlejuice.enrich_supply_leads:
   remove:
-    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_static_files_ss:
   override: []
 bietlejuice.enrich_greenseer:
   add:
-    - bietlejuice.enrich_customer_support:load-enrich-tickets
+    - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
 bietlejuice.enrich_growth_costs_sharing_rules:
   remove:
-    - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead
-    - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
-    - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
+    - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead:first-run-of-day
+    - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking:first-run-of-day
+    - bietlejuice.dw_supply:load-dw-growth-fact-supply-events:first-run-of-day
 bietlejuice.enrich_growth_costs_sharing_rules_test:
   remove:
-    - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead
-    - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
-    - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
+    - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead:first-run-of-day
+    - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking:first-run-of-day
+    - bietlejuice.dw_supply:load-dw-growth-fact-supply-events:first-run-of-day
 bietlejuice.enrich_growth_media_platform_metrics:
   remove:
-    - bietlejuice.criteo_temp:load-clean-criteo-region-lookup
+    - bietlejuice.criteo_temp:load-clean-criteo-region-lookup:first-run-of-day
 bietlejuice.enrich_growth_taxonomy:
   remove:
-    - bietlejuice.ebdb_visit:load-clean-visit-origin
-    - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
-    - bietlejuice.enrich_booking:load-enrich-booking
+    - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day
+    - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit:first-run-of-day
+    - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
 bietlejuice.enrich_health_metrics:
   override: []
 bietlejuice.enrich_hr_system_custom:
   add:
-    - bietlejuice.enrich_pin:load-enrich-managers-history
+    - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
 bietlejuice.enrich_house_feature_inference:
   add:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
-    - bietlejuice.enrich_ebdb_country:load-enrich-house
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
+    - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
 bietlejuice.enrich_label_studio:
   remove:
-    - bietlejuice.label_studio:load-clean-annotations
+    - bietlejuice.label_studio:load-clean-annotations:first-run-of-day
 bietlejuice.enrich_lead:
   remove:
-    - bietlejuice.ebdb:load-clean-ownerlead
+    - bietlejuice.ebdb:load-clean-ownerlead:first-run-of-day
 bietlejuice.enrich_listing_flow:
   remove:
-    - bietlejuice.ebdb:load-clean-affiliate-data
-    - bietlejuice.ebdb:load-clean-photographer-job-aud
-    - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-data
-    - bietlejuice.ebdb_house_properties:load-clean-house-guarantees-aud
-    - bietlejuice.rene_descartes:load-clean-lead-rejection
-    - bietlejuice.wololo:load-clean-context-discard
-    - bietlejuice.wololo:load-clean-conversion
+    - bietlejuice.ebdb:load-clean-affiliate-data:first-run-of-day
+    - bietlejuice.ebdb:load-clean-photographer-job-aud:first-run-of-day
+    - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-data:first-run-of-day
+    - bietlejuice.ebdb_house_properties:load-clean-house-guarantees-aud:first-run-of-day
+    - bietlejuice.rene_descartes:load-clean-lead-rejection:first-run-of-day
+    - bietlejuice.wololo:load-clean-context-discard:first-run-of-day
+    - bietlejuice.wololo:load-clean-conversion:first-run-of-day
 bietlejuice.enrich_listing_temp:
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_contract:load-dw-rent-dim-contract
-    - bietlejuice.dw_offer:load-dw-rent-dim-offer
-    - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
-    - bietlejuice.ebdb_house:load-clean-house-aud
-    - bietlejuice.ebdb_house:load-clean-house-special-condition
-    - bietlejuice.ebdb_house_properties:load-clean-occupant-type
-    - bietlejuice.ebdb_house_properties:load-clean-special-condition
-    - bietlejuice.ebdb_house_properties:load-clean-special-condition-aud
-    - bietlejuice.ebdb_user:load-clean-user-revision-entity
-    - bietlejuice.enrich_ebdb_listing:load-enrich-business-context-history
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-status-version-order
-    - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
-    - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
-    - bietlejuice.enrich_ebdb_rental_administration:load-enrich-rental-administrator-change-history
-    - bietlejuice.enrich_kill_queue:load-enrich-reservation
+    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+    - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
+    - bietlejuice.dw_proposal:load-dw-rent-dim-proposal:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house-aud:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house-special-condition:first-run-of-day
+    - bietlejuice.ebdb_house_properties:load-clean-occupant-type:first-run-of-day
+    - bietlejuice.ebdb_house_properties:load-clean-special-condition:first-run-of-day
+    - bietlejuice.ebdb_house_properties:load-clean-special-condition-aud:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user-revision-entity:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-business-context-history:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house-status-version-order:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing:first-run-of-day
+    - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow:first-run-of-day
+    - bietlejuice.enrich_ebdb_rental_administration:load-enrich-rental-administrator-change-history:first-run-of-day
+    - bietlejuice.enrich_kill_queue:load-enrich-reservation:first-run-of-day
 bietlejuice.enrich_lost_listings:
   add:
-    - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-    - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-    - bietlejuice.ebdb_condo:load-clean-amenities
-    - bietlejuice.ebdb_condo:load-clean-condo-amenities
-    - bietlejuice.ebdb_condo:load-clean-info-amenities
-    - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
-    - bietlejuice.ebdb_house:load-clean-house-maintenance-condition
-    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
+    - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-condo-amenities:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-info-amenities:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-info-condo-amenities:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house-maintenance-condition:first-run-of-day
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_marketing_automatic_daily_costs:
   remove:
-    - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-braze-consolidated-metrics
+    - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-braze-consolidated-metrics:first-run-of-day
 bietlejuice.enrich_marketing_costs_sharing_rules:
   remove:
-    - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+    - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows:first-run-of-day
 bietlejuice.enrich_marketing_manual_daily_costs:
   remove:
-    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
+    - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules:first-run-of-day
 bietlejuice.enrich_nps_answer_drivers:
   add:
-    - bietlejuice.enrich_tracksale:load-enrich-answer
+    - bietlejuice.enrich_tracksale:load-enrich-answer:first-run-of-day
   remove:
-    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_offboarding:
   add:
-    - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
+    - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house:first-run-of-day
 bietlejuice.enrich_offer:
   remove:
-    - bietlejuice.enrich_sale_firestore:load-enrich-monday
-    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
-    - bietlejuice.enrich_firestore:load-enrich-rent-offer
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
+    - bietlejuice.enrich_firestore:load-enrich-rent-offer:first-run-of-day
 bietlejuice.enrich_olos_dialer:
   remove:
-    - bietlejuice.olos_dialer:load-clean-mailing
+    - bietlejuice.olos_dialer:load-clean-mailing:first-run-of-day
 bietlejuice.enrich_olx_crawler_listings:
   remove:
-    - bietlejuice.listings_olx:load-clean-olx
+    - bietlejuice.listings_olx:load-clean-olx:first-run-of-day
 bietlejuice.enrich_open_external_data:
   override: []
 bietlejuice.enrich_open_external_data_addresses:
   # We need to remove these dependencies because our IPTU/ITBI extraction routines run on the 15th and 30th of the month.
   # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.
   remove:
-    - bietlejuice.iptu_sp:load-clean-iptu-sp
-    - bietlejuice.itbi_sp:load-clean-itbi-sp
-    - bietlejuice.itbi_bh:load-clean-itbi-bh
+    - bietlejuice.iptu_sp:load-clean-iptu-sp:first-run-of-day
+    - bietlejuice.itbi_sp:load-clean-itbi-sp:first-run-of-day
+    - bietlejuice.itbi_bh:load-clean-itbi-bh:first-run-of-day
 bietlejuice.enrich_pipeline:
   # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
   # our intention to run this DAG the same amount of times.
   remove:
-    - bietlejuice.enrich_airflow:load-enrich-dag
-    - bietlejuice.enrich_airflow:load-enrich-dag-run
-    - bietlejuice.enrich_airflow:load-enrich-log
-    - bietlejuice.dag_inventory:load-clean-table
-    - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list
-    - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler
+    - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
+    - bietlejuice.enrich_airflow:load-enrich-dag-run:first-run-of-day
+    - bietlejuice.enrich_airflow:load-enrich-log:first-run-of-day
+    - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
+    - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list:first-run-of-day
+    - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler:first-run-of-day
 bietlejuice.enrich_recupera:
   add:
-    - bietlejuice.recupera:load-clean-records
-    - bietlejuice.recupera:load-clean-operational-records
-    - bietlejuice.recupera:load-clean-status
-    - bietlejuice.recupera:load-clean-historical-records
-    - bietlejuice.recupera:load-clean-complementary-records
-    - bietlejuice.recupera:load-clean-installment
-    - bietlejuice.recupera:load-clean-installments-indicators
-    - bietlejuice.recupera:load-clean-records-distributed-channels
+    - bietlejuice.recupera:load-clean-records:first-run-of-day
+    - bietlejuice.recupera:load-clean-operational-records:first-run-of-day
+    - bietlejuice.recupera:load-clean-status:first-run-of-day
+    - bietlejuice.recupera:load-clean-historical-records:first-run-of-day
+    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
+    - bietlejuice.recupera:load-clean-installment:first-run-of-day
+    - bietlejuice.recupera:load-clean-installments-indicators:first-run-of-day
+    - bietlejuice.recupera:load-clean-records-distributed-channels:first-run-of-day
 bietlejuice.enrich_rede_lead_crawler:
   remove:
-    - bietlejuice.growth_lab:load-clean-supply-recurrence
+    - bietlejuice.growth_lab:load-clean-supply-recurrence:first-run-of-day
 bietlejuice.enrich_rede_supply:
   remove:
-    - bietlejuice.ebdb_user:load-clean-user
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
 bietlejuice.enrich_rental_historical_follow_up:
   add:
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
 bietlejuice.enrich_rental_management:
   add:
-    - bietlejuice.rental_management:load-clean-invoice
-    - bietlejuice.rental_management:load-clean-condo-monitoring-actions
-    - bietlejuice.rental_management:load-clean-condo-monitoring-eligibility
+    - bietlejuice.rental_management:load-clean-invoice:first-run-of-day
+    - bietlejuice.rental_management:load-clean-condo-monitoring-actions:first-run-of-day
+    - bietlejuice.rental_management:load-clean-condo-monitoring-eligibility:first-run-of-day
 bietlejuice.enrich_repairs:
   remove:
-    - bietlejuice.repairs:load-clean-repair-expense
-    - bietlejuice.repairs:load-clean-repair-expense-group
-    - bietlejuice.repairs:load-clean-repair-request
-    - bietlejuice.repairs:load-clean-repair-request-item
+    - bietlejuice.repairs:load-clean-repair-expense:first-run-of-day
+    - bietlejuice.repairs:load-clean-repair-expense-group:first-run-of-day
+    - bietlejuice.repairs:load-clean-repair-request:first-run-of-day
+    - bietlejuice.repairs:load-clean-repair-request-item:first-run-of-day
 bietlejuice.enrich_reverses_monitoring:
   add:
-    - bietlejuice.reverse_atento:load-reverse-backlog-metric
-    - bietlejuice.reverse_atento:load-reverse-csat-front
-    - bietlejuice.reverse_atento:load-reverse-demand-metric
-    - bietlejuice.reverse_atento:load-reverse-email
-    - bietlejuice.reverse_atento:load-reverse-fcr-metric
-    - bietlejuice.reverse_atento:load-reverse-general-metric
-    - bietlejuice.reverse_atento:load-reverse-recontact-mx
-    - bietlejuice.reverse_atento:load-reverse-recontact
-    - bietlejuice.reverse_atento:load-reverse-speech-call
-    - bietlejuice.reverse_atento:load-reverse-speech-chat
-    - bietlejuice.reverse_atento:load-reverse-taxonomy
-    - bietlejuice.reverse_atento:load-reverse-tickets-transferred
-    - bietlejuice.reverse_atento:load-reverse-tmr
-    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
-    - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
-    - bietlejuice.reverse_webhelp:load-reverse-csat-front
-    - bietlejuice.reverse_webhelp:load-reverse-demand-metric
-    - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
-    - bietlejuice.reverse_webhelp:load-reverse-general-metric
-    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
-    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
-    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
-    - bietlejuice.reverse_webhelp:load-reverse-speech-call
-    - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomy
-    - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
-    - bietlejuice.reverse_webhelp:load-reverse-recontact
+    - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-csat-front:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-demand-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-email:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-fcr-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-general-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-recontact-mx:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-recontact:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-speech-call:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-speech-chat:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-taxonomy:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-tickets-transferred:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-tmr:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-csat-front:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-demand-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-fcr-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-general-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-speech-call:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-speech-chat:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-taxonomy:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-recontact:first-run-of-day
 bietlejuice.enrich_databricks_usage_costs:
   add:
-    - bietlejuice.gsheets_platform:done-clean-databricks-contract-details
+    - bietlejuice.gsheets_platform:done-clean-databricks-contract-details:first-run-of-day
   remove:
-    - bietlejuice.gsheets_platform:load-clean-databricks-contract-details
+    - bietlejuice.gsheets_platform:load-clean-databricks-contract-details:first-run-of-day
 bietlejuice.enrich_data_quality:
   remove:
-    - bietlejuice.dag_inventory:load-clean-table
-    - bietlejuice.inmetro:load-clean-data-validations
+    - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
+    - bietlejuice.inmetro:load-clean-data-validations:first-run-of-day
 bietlejuice.enrich_demand_score_report:
   add:
-    - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
+    - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   add:
-    - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
+    - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_revenue_lines:
   add:
-    - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
-    - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+    - bietlejuice.owner_fees:load-clean-contract-brokerage-fee:first-run-of-day
+    - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   remove:
-    - bietlejuice.dw_contract:load-dw-rent-dim-contract
-    - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
-    - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
-    - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
-    - bietlejuice.dw_reservation:load-dw-rent-dim-reservation
-    - bietlejuice.ebdb:load-clean-contract
-    - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-    - bietlejuice.enrich_kill_queue:load-enrich-reservation
-    - bietlejuice.enrich_retsuko:load-enrich-invoice
-    - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
-    - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-    - bietlejuice.fastforward:load-clean-gateway-loan-installment
-    - bietlejuice.fastforward:load-clean-lra-installment-option
-    - bietlejuice.owner_fees:load-clean-contract
-    - bietlejuice.rental_guarantee:load-clean-charge
-    - bietlejuice.rental_guarantee:load-clean-guarantee
-    - bietlejuice.retsuko:load-clean-contract
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+    - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice:first-run-of-day
+    - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
+    - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries:first-run-of-day
+    - bietlejuice.dw_reservation:load-dw-rent-dim-reservation:first-run-of-day
+    - bietlejuice.ebdb:load-clean-contract:first-run-of-day
+    - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
+    - bietlejuice.enrich_kill_queue:load-enrich-reservation:first-run-of-day
+    - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
+    - bietlejuice.enrich_retsuko:load-enrich-invoice-entry:first-run-of-day
+    - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
+    - bietlejuice.fastforward:load-clean-gateway-loan-installment:first-run-of-day
+    - bietlejuice.fastforward:load-clean-lra-installment-option:first-run-of-day
+    - bietlejuice.owner_fees:load-clean-contract:first-run-of-day
+    - bietlejuice.rental_guarantee:load-clean-charge:first-run-of-day
+    - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
+    - bietlejuice.retsuko:load-clean-contract:first-run-of-day
 
 bietlejuice.enrich_robin_hood:
   add:
-    - bietlejuice.robin_hood:load-clean-tax
+    - bietlejuice.robin_hood:load-clean-tax:first-run-of-day
 bietlejuice.enrich_sale_closing_flows:
   add:
-    - bietlejuice.monopoly:load-clean-sale
+    - bietlejuice.monopoly:load-clean-sale:first-run-of-day
   remove:
-    - bietlejuice.firestore:load-clean-sale-offer
-    - bietlejuice.enrich_sale_firestore:load-enrich-monday
+    - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day
+    - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
 bietlejuice.enrich_sale_crawlers_listings:
   remove:
-    - bietlejuice.ebdb_location:load-clean-map-region
-    - bietlejuice.ebdb_location:load-clean-polygon-region
-    - bietlejuice.enrich_region:load-enrich-region
-    - bietlejuice.listings.em_casa:load-clean-em-casa
-    - bietlejuice.listings.loft:load-clean-loft
+    - bietlejuice.ebdb_location:load-clean-map-region:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-polygon-region:first-run-of-day
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+    - bietlejuice.listings.em_casa:load-clean-em-casa:first-run-of-day
+    - bietlejuice.listings.loft:load-clean-loft:first-run-of-day
 bietlejuice.enrich_sale_firestore:
   remove:
-    - bietlejuice.firestore:load-clean-monday
-    - bietlejuice.firestore:load-clean-sale-offer
+    - bietlejuice.firestore:load-clean-monday:first-run-of-day
+    - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day
 bietlejuice.enrich_sale_lead_flows:
   add:
-    - bietlejuice.ebdb_contract:load-clean-contract
-    - bietlejuice.hub_services:load-clean-business-unit
+    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   remove:
-    - bietlejuice.casa_mineira_crm:load-clean-neighborhood
-    - bietlejuice.enrich_booking:load-enrich-booking
-    - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+    - bietlejuice.casa_mineira_crm:load-clean-neighborhood:first-run-of-day
+    - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
+    - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
 bietlejuice.enrich_sale_listings:
   remove:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_house:load-clean-house-aud
-    - bietlejuice.ebdb_listing:load-clean-listing-business-context
-    - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
-    - bietlejuice.ebdb_user:load-clean-user-revision-entity
-    - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house-aud:first-run-of-day
+    - bietlejuice.ebdb_listing:load-clean-listing-business-context:first-run-of-day
+    - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user-revision-entity:first-run-of-day
+    - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
 bietlejuice.enrich_sale_listings_lenses:
   add:
-    - bietlejuice.ebdb_listing:load-clean-listing-sale-model
+    - bietlejuice.ebdb_listing:load-clean-listing-sale-model:first-run-of-day
   remove:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_listing:load-clean-listing-sale-model-aud
-    - bietlejuice.ebdb_user:load-clean-user-revision-entity
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house
-    - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_listing:load-clean-listing-sale-model-aud:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user-revision-entity:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+    - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
 bietlejuice.enrich_sale_offer:
   remove:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
-    - bietlejuice.enrich_region:load-enrich-region
-    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-status
-    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users
-    - bietlejuice.monopoly:load-clean-sale-revision
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-status:first-run-of-day
+    - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users:first-run-of-day
+    - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
 bietlejuice.enrich_sale_offer_flows:
   remove:
-    - bietlejuice.ebdb_user:load-clean-user
-    - bietlejuice.sales_flow:load-clean-brokerage
-    - bietlejuice.sales_flow:load-clean-rescission
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.sales_flow:load-clean-brokerage:first-run-of-day
+    - bietlejuice.sales_flow:load-clean-rescission:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_status:
   remove:
-    - bietlejuice.enrich_region:load-enrich-region
-    - bietlejuice.enrich_sale_stranded_listings_thresholds:load-enrich-thresholds
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+    - bietlejuice.enrich_sale_stranded_listings_thresholds:load-enrich-thresholds:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_thresholds:
   remove:
-    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_sale_visit_hubs:
   add:
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
+    - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_satisfaction_rating:
   remove:
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
+    - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_seo_funnel:
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking
-    - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.ebdb_visit:load-clean-visit
+    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+    - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+    - bietlejuice.ebdb_visit:load-clean-visit:first-run-of-day
 bietlejuice.enrich_ss_logic_model:
   remove:
-    - bietlejuice.ebdb:load-clean-contract
-    - bietlejuice.enrich_customer_support:load-enrich-email
+    - bietlejuice.ebdb:load-clean-contract:first-run-of-day
+    - bietlejuice.enrich_customer_support:load-enrich-email:first-run-of-day
 bietlejuice.enrich_static_files:
   override: []
 bietlejuice.enrich_superset:
   add:
-    - bietlejuice.superset_entities:load-clean-sql-metrics
-    - bietlejuice.superset_entities:load-clean-table-columns
-    - bietlejuice.superset_entities:load-clean-table-schema
-    - bietlejuice.superset_entities:load-clean-tables
+    - bietlejuice.superset_entities:load-clean-sql-metrics:first-run-of-day
+    - bietlejuice.superset_entities:load-clean-table-columns:first-run-of-day
+    - bietlejuice.superset_entities:load-clean-table-schema:first-run-of-day
+    - bietlejuice.superset_entities:load-clean-tables:first-run-of-day
   remove:
-    - bietlejuice.superset_internal:load-clean-sql-metrics
-    - bietlejuice.superset_internal:load-clean-table-columns
-    - bietlejuice.superset_internal:load-clean-table-schema
-    - bietlejuice.superset_internal:load-clean-tables
+    - bietlejuice.superset_internal:load-clean-sql-metrics:first-run-of-day
+    - bietlejuice.superset_internal:load-clean-table-columns:first-run-of-day
+    - bietlejuice.superset_internal:load-clean-table-schema:first-run-of-day
+    - bietlejuice.superset_internal:load-clean-tables:first-run-of-day
 bietlejuice.enrich_supply_outbound_flows:
   remove:
-    - bietlejuice.wololo:load-clean-prospect
+    - bietlejuice.wololo:load-clean-prospect:first-run-of-day
 bietlejuice.enrich_survicate:
   remove:
-    - bietlejuice.ebdb_contract:load-clean-contract
+    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
 bietlejuice.enrich_talk_to_agent:
   override: []
 bietlejuice.enrich_top_of_funnel_demand:
   remove:
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
 bietlejuice.enrich_top_of_funnel_supply:
   remove:
-    - bietlejuice.enrich_region:load-enrich-region
+    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_tracked_events:
   remove:
-    - bietlejuice.enrich_greenseer:load-enrich-sessions
-    - bietlejuice.greenseer:load-clean-session
+    - bietlejuice.enrich_greenseer:load-enrich-sessions:first-run-of-day
+    - bietlejuice.greenseer:load-clean-session:first-run-of-day
 bietlejuice.enrich_tracksale:
   remove:
-    - bietlejuice.ebdb_visit:load-clean-booking
-    - bietlejuice.ebdb_contract:load-clean-contract
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_offer:load-clean-offer
-    - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
-    - bietlejuice.tracksale:load-clean-campaign
-    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
+    - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
+    - bietlejuice.tracksale:load-clean-campaign:first-run-of-day
+    - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_tracksale_dispatches:
   remove:
-    - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
+    - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
 bietlejuice.dw_quintocred_ifrs:
   remove:
-    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
-    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
-    - bietlejuice.velo_omie:load-clean-bank-account
-    - bietlejuice.velo_omie:load-clean-categories
-    - bietlejuice.velo_omie:load-clean-projects
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows:first-run-of-day
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-bank-account:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-categories:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-projects:first-run-of-day
 bietlejuice.enrich_velo:
   add:
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy
-    - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy:first-run-of-day
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy:first-run-of-day
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy:first-run-of-day
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy:first-run-of-day
+    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy:first-run-of-day
+    - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy:first-run-of-day
   remove:
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-excluded-proposals
-    - bietlejuice.velo_omie:load-clean-bank-account
-    - bietlejuice.velo_omie:load-clean-categories
-    - bietlejuice.velo_omie:load-clean-clients
-    - bietlejuice.velo_omie:load-clean-country
-    - bietlejuice.velo_omie:load-clean-projects
-    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
-    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories
-    - bietlejuice.velo:load-clean-fiancavelo-packvalues
-    - bietlejuice.velo:load-clean-fiancavelo-propose
-    - bietlejuice.velo:load-clean-fiancavelo-activator
-    - bietlejuice.velo:load-clean-clientes-company
-    - bietlejuice.velo:load-clean-fiancavelo-activator
-    - bietlejuice.velo:load-clean-fiancavelo-billingtype
-    - bietlejuice.velo:load-clean-fiancavelo-gateway
-    - bietlejuice.velo:load-clean-fiancavelo-occurrence
-    - bietlejuice.velo:load-clean-fiancavelo-packvalues
-    - bietlejuice.velo:load-clean-fiancavelo-payment
-    - bietlejuice.velo:load-clean-fiancavelo-plans
-    - bietlejuice.velo:load-clean-fiancavelo-propose
-    - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
-    - bietlejuice.velo_asaas:load-clean-payments
+    - bietlejuice.gsheets_fintech:done-clean-quintocred-excluded-proposals:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-bank-account:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-categories:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-clients:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-country:first-run-of-day
+    - bietlejuice.velo_omie:load-clean-projects:first-run-of-day
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows:first-run-of-day
+    - bietlejuice.enrich_velo_omie:load-enrich-cash-flows-categories:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-packvalues:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-propose:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-activator:first-run-of-day
+    - bietlejuice.velo:load-clean-clientes-company:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-activator:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-billingtype:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-gateway:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-occurrence:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-packvalues:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-payment:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-plans:first-run-of-day
+    - bietlejuice.velo:load-clean-fiancavelo-propose:first-run-of-day
+    - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
+    - bietlejuice.velo_asaas:load-clean-payments:first-run-of-day
 bietlejuice.enrich_vespucio_pipeline:
   add:
-    - bietlejuice.clustering_image_model:load-clean-clustering-image
-    - bietlejuice.ebdb_condo:load-clean-amenities
-    - bietlejuice.ebdb_condo:load-clean-condo
-    - bietlejuice.ebdb_condo:load-clean-condo-contact
-    - bietlejuice.ebdb_condo:load-clean-info-amenities
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_location:load-clean-country
-    - bietlejuice.ebdb_location:load-clean-state
-    - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities
-    - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
-    - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
-    # - bietlejuice.sindico_net:load-clean-condominium
+    - bietlejuice.clustering_image_model:load-clean-clustering-image:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-condo:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-condo-contact:first-run-of-day
+    - bietlejuice.ebdb_condo:load-clean-info-amenities:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
+    - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities:first-run-of-day
+    - bietlejuice.enrich_house_feature_inference:load-enrich-description-features:first-run-of-day
+    - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities:first-run-of-day
+    # - bietlejuice.sindico_net:load-clean-condominium:first-run-of-day
 bietlejuice.enrich_viva_real_crawler_listings:
   remove:
-    - bietlejuice.listings.viva_real:load-clean-viva-real
+    - bietlejuice.listings.viva_real:load-clean-viva-real:first-run-of-day
 bietlejuice.enrich_zap_imoveis_crawler_listings:
   remove:
-    - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
+    - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis:first-run-of-day
 bietlejuice.reverse_atento_access:
   add:
-    - bietlejuice.reverse_atento:load-reverse-backlog-metric
-    - bietlejuice.reverse_atento:load-reverse-csat-front
-    - bietlejuice.reverse_atento:load-reverse-demand-metric
-    - bietlejuice.reverse_atento:load-reverse-email
-    - bietlejuice.reverse_atento:load-reverse-fcr-metric
-    - bietlejuice.reverse_atento:load-reverse-general-metric
-    - bietlejuice.reverse_atento:load-reverse-recontact-mx
-    - bietlejuice.reverse_atento:load-reverse-recontact
-    - bietlejuice.reverse_atento:load-reverse-speech-call
-    - bietlejuice.reverse_atento:load-reverse-speech-chat
-    - bietlejuice.reverse_atento:load-reverse-taxonomy
-    - bietlejuice.reverse_atento:load-reverse-tickets-transferred
-    - bietlejuice.reverse_atento:load-reverse-tmr
-    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-csat-front:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-demand-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-email:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-fcr-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-general-metric:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-recontact-mx:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-recontact:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-speech-call:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-speech-chat:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-taxonomy:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-tickets-transferred:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-tmr:first-run-of-day
+    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht:first-run-of-day
 bietlejuice.reverse_birdie:
   remove:
-    - bietlejuice.dw_chattermill:load-dw-chattermill-dim-answer-category
-    - bietlejuice.dw_chattermill:load-dw-chattermill-fact-answer-category
+    - bietlejuice.dw_chattermill:load-dw-chattermill-dim-answer-category:first-run-of-day
+    - bietlejuice.dw_chattermill:load-dw-chattermill-fact-answer-category:first-run-of-day
 bietlejuice.reverse_birdie_access:
   add:
-    - bietlejuice.reverse_birdie:load-reverse-dsat-bot
-    - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship
-    - bietlejuice.reverse_birdie:load-reverse-end-of-process
-    - bietlejuice.reverse_birdie:load-reverse-dsat-visits
-    - bietlejuice.reverse_birdie:load-reverse-new-surveys
-    - bietlejuice.reverse_birdie:load-reverse-lost
-    - bietlejuice.reverse_birdie:load-reverse-dsat-new-surveys
-    - bietlejuice.reverse_birdie:load-reverse-dsat-financing
-    - bietlejuice.reverse_birdie:load-reverse-dsat-diligence
-    - bietlejuice.reverse_birdie:load-reverse-onboarding
-    - bietlejuice.reverse_birdie:load-reverse-ongoing
-    - bietlejuice.reverse_birdie:load-reverse-offboarding
-    - bietlejuice.reverse_birdie:load-reverse-pp-multi
+    - bietlejuice.reverse_birdie:load-reverse-dsat-bot:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-end-of-process:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-dsat-visits:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-new-surveys:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-lost:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-dsat-new-surveys:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-dsat-financing:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-dsat-diligence:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-onboarding:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-ongoing:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-offboarding:first-run-of-day
+    - bietlejuice.reverse_birdie:load-reverse-pp-multi:first-run-of-day
 bietlejuice.reverse_dashboard_governance:
   add:
-    - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
-    - bietlejuice.enrich_superset:load-enrich-slices
-    - bietlejuice.enrich_superset:load-enrich-dashboards
-    - bietlejuice.enrich_superset:load-enrich-tables
+    - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata:first-run-of-day
+    - bietlejuice.enrich_superset:load-enrich-slices:first-run-of-day
+    - bietlejuice.enrich_superset:load-enrich-dashboards:first-run-of-day
+    - bietlejuice.enrich_superset:load-enrich-tables:first-run-of-day
 bietlejuice.enrich_anonymization:
   add:
-    - bietlejuice.documentation_metrics:load-clean-columns-documentation
-    - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation
+    - bietlejuice.documentation_metrics:load-clean-columns-documentation:first-run-of-day
+    - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation:first-run-of-day
 bietlejuice.enrich_anonymization_validation:
   add:
-    - bietlejuice.gsheets_governance:done-clean-anonymization-manual-validation
+    - bietlejuice.gsheets_governance:done-clean-anonymization-manual-validation:first-run-of-day
   remove:
-    - bietlejuice.gsheets_governance:load-clean-anonymization-manual-validation
+    - bietlejuice.gsheets_governance:load-clean-anonymization-manual-validation:first-run-of-day
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []
 bietlejuice.reverse_demand_score_access:
   add:
-    - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
+    - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
 bietlejuice.reverse_demand_classifieds_ranking_access:
   add:
-    - bietlejuice.reverse_demand_classifieds_ranking:load-reverse-house-classified-ranking-score
+    - bietlejuice.reverse_demand_classifieds_ranking:load-reverse-house-classified-ranking-score:first-run-of-day
 bietlejuice.reverse_dsat_report_access:
   add:
-    - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
+    - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report:first-run-of-day
 bietlejuice.reverse_rent_listings_report_access:
   add:
-    - bietlejuice.reverse_rent_listings_report_load:load-reverse-listing-similar-score
-    - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent
-    - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-traffic
-    - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-visit-scheduled
+    - bietlejuice.reverse_rent_listings_report_load:load-reverse-listing-similar-score:first-run-of-day
+    - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent:first-run-of-day
+    - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-traffic:first-run-of-day
+    - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-visit-scheduled:first-run-of-day
 bietlejuice.reverse_sale_listings_report_access:
   add:
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-accepted
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-sent
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-published
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-signed-contract
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-traffic
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-confirmed
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-scheduled
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-ongoing-listings
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-accepted:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-sent:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-published:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-signed-contract:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-traffic:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-confirmed:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-scheduled:first-run-of-day
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-ongoing-listings:first-run-of-day
 bietlejuice.reverse_sale_unavailable_listings_access:
   add:
-    - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
+    - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings:first-run-of-day
 bietlejuice.enrich_atlas_pricing_report:
   remove:
-    - bietlejuice.dw_smart_price:load-dw-quintoandar-fact-listing-price-changes
+    - bietlejuice.dw_smart_price:load-dw-quintoandar-fact-listing-price-changes:first-run-of-day
 bietlejuice.iaf:
   remove:
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-iaf-occurrences
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-iaf-qualifies-calls
+    - bietlejuice.gsheets_fintech:done-clean-quintocred-iaf-occurrences:first-run-of-day
+    - bietlejuice.gsheets_fintech:done-clean-quintocred-iaf-qualifies-calls:first-run-of-day
 bietlejuice.reverse_atlas_pricing_report_access:
   add:
-    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
-    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
-    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
+    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement:first-run-of-day
+    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history:first-run-of-day
+    - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region:first-run-of-day
 bietlejuice.reverse_regions_polygon:
   override: []
 bietlejuice.reverse_robbyson_access:
   add:
-    - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
-    - bietlejuice.dw_operator_performance:load-dw-operator-performance-fact-operator-performance
+    - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
+    - bietlejuice.dw_operator_performance:load-dw-operator-performance-fact-operator-performance:first-run-of-day
 bietlejuice.reverse_tiers_access:
   add:
-    - bietlejuice.reverse_tiers:load-reverse-tiers
+    - bietlejuice.reverse_tiers:load-reverse-tiers:first-run-of-day
 bietlejuice.reverse_anonymization:
   remove:
-    - bietlejuice.astro:load-clean-dag
+    - bietlejuice.astro:load-clean-dag:first-run-of-day
 bietlejuice.reverse_tracksale:
   remove:
-    - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
-    - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
-    - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-    - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
+    - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
+    - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
+    - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits:first-run-of-day
+    - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
 bietlejuice.reverse_webhelp_access:
   add:
-    - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
-    - bietlejuice.reverse_webhelp:load-reverse-csat-front
-    - bietlejuice.reverse_webhelp:load-reverse-demand-metric
-    - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
-    - bietlejuice.reverse_webhelp:load-reverse-general-metric
-    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
-    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
-    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
-    - bietlejuice.reverse_webhelp:load-reverse-speech-call
-    - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomy
-    - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
-    - bietlejuice.reverse_webhelp:load-reverse-recontact
+    - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-csat-front:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-demand-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-fcr-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-general-metric:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-speech-call:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-speech-chat:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-taxonomy:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-recontact:first-run-of-day
 bietlejuice.reverse_supply_access:
   add:
-    - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry
+    - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry:first-run-of-day
 bietlejuice.survicate_survey_attributes:
   add:
-    - bietlejuice.survicate_surveys:load-raw-surveys
+    - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
 bietlejuice.survicate_respondent_attributes:
   add:
-    - bietlejuice.survicate_survey_attributes:load-raw-survey-responses
+    - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.enrich_wordpress_baroes:
   remove:
-    - bietlejuice.wordpress_baroes:load-clean-meulugar-data
+    - bietlejuice.wordpress_baroes:load-clean-meulugar-data:first-run-of-day
 bietlejuice.enrich_velo_omie:
   override: []
 
 bietlejuice.enrich_trino:
   remove:
-    - bietlejuice.enrich_people_public:load-enrich-org-chart
-    - bietlejuice.gsheets_governance:load-clean-cost-center-directory
+    - bietlejuice.enrich_people_public:load-enrich-org-chart:first-run-of-day
+    - bietlejuice.gsheets_governance:load-clean-cost-center-directory:first-run-of-day
 
 bietlejuice.enrich_trino_costs:
   remove:
-    - bietlejuice.enrich_people_public:load-enrich-org-chart
-    - bietlejuice.gsheets_governance:load-clean-cost-center-directory
+    - bietlejuice.enrich_people_public:load-enrich-org-chart:first-run-of-day
+    - bietlejuice.gsheets_governance:load-clean-cost-center-directory:first-run-of-day
 
 bietlejuice.dw_agent:
   remove:
-    - bietlejuice.sirena:load-clean-agents
-    - bietlejuice.sirena:load-clean-prospects
-    - bietlejuice.enrich_sirena:load-enrich-messages
+    - bietlejuice.sirena:load-clean-agents:first-run-of-day
+    - bietlejuice.sirena:load-clean-prospects:first-run-of-day
+    - bietlejuice.enrich_sirena:load-enrich-messages:first-run-of-day
 
 bietlejuice.reverse_neighborhood_price_range_access:
   add:
-    - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range
+    - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range:first-run-of-day
 
 bietlejuice.enrich_pin:
   remove:
-    - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
-    - bietlejuice.pin_hr_review:load-clean-meeting
-    - bietlejuice.pin_performance:load-clean-evaluation
-    - bietlejuice.pin_performance:load-clean-evaluation-item
-    - bietlejuice.pin_performance:load-clean-evaluation-participant
-    - bietlejuice.pin_performance:load-clean-evaluation-rating
-    - bietlejuice.pin_performance:load-clean-evaluation-role
-    - bietlejuice.pin_performance:load-clean-evaluation-section
-    - bietlejuice.pin_performance:load-clean-evaluation-step
-    - bietlejuice.pin_performance:load-clean-role-definition-translation
-    - bietlejuice.pin_performance:load-clean-section-definition-translation
-    - bietlejuice.pin_performance:load-clean-task-role-base
-    - bietlejuice.pin_performance:load-clean-task-role-translation
-    - bietlejuice.pin_performance:load-clean-template-definition-base
-    - bietlejuice.pin_performance:load-clean-template-definition-translation
-    - bietlejuice.pin_performance:load-clean-template-period-translation
-    - bietlejuice.pin_performance:load-clean-template-role
-    - bietlejuice.pin_performance:load-clean-template-section
-    - bietlejuice.pin_questionnaires:load-clean-question-response
-    - bietlejuice.pin_questionnaires:load-clean-questionnaire-participant
-    - bietlejuice.pin_questionnaires:load-clean-questionnaire-response
-    - bietlejuice.pin_talent:load-clean-profile-base
-    - bietlejuice.pin_talent:load-clean-profile-item
-    - bietlejuice.pin_talent:load-clean-profile-type-sections-translation
-    - bietlejuice.pin_talent:load-clean-rating-level-base
-    - bietlejuice.pin_talent:load-clean-rating-level-translation
-    - bietlejuice.pin_talent:load-clean-rating-model-base
-    - bietlejuice.pin_talent:load-clean-rating-model-translation
-    - bietlejuice.pin_talent:load-clean-review-period-base
-    - bietlejuice.pin_talent:load-clean-review-period-translation
+    - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
+    - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation-item:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation-participant:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation-rating:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation-role:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation-section:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-evaluation-step:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-role-definition-translation:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-section-definition-translation:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-task-role-base:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-task-role-translation:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-template-definition-base:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-template-definition-translation:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-template-period-translation:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-template-role:first-run-of-day
+    - bietlejuice.pin_performance:load-clean-template-section:first-run-of-day
+    - bietlejuice.pin_questionnaires:load-clean-question-response:first-run-of-day
+    - bietlejuice.pin_questionnaires:load-clean-questionnaire-participant:first-run-of-day
+    - bietlejuice.pin_questionnaires:load-clean-questionnaire-response:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-profile-base:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-profile-item:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-profile-type-sections-translation:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-rating-level-base:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-rating-level-translation:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-rating-model-base:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-rating-model-translation:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-review-period-base:first-run-of-day
+    - bietlejuice.pin_talent:load-clean-review-period-translation:first-run-of-day
 bietlejuice.enrich_recommendations:
   override: []
 bietlejuice.enrich_agreement_hourly:
   remove:
-    - bietlejuice.trato_feito:load-clean-debtor
+    - bietlejuice.trato_feito_hourly:load-clean-installment:first-run-of-day
+    - bietlejuice.trato_feito_hourly:load-clean-negotiation:first-run-of-day
+    - bietlejuice.trato_feito_hourly:load-clean-payment:first-run-of-day
+    - bietlejuice.trato_feito:load-clean-debtor:first-run-of-day
+  add:
+    - bietlejuice.trato_feito_hourly:load-clean-installment
+    - bietlejuice.trato_feito_hourly:load-clean-negotiation
+    - bietlejuice.trato_feito_hourly:load-clean-payment
+bietlejuice.dw_pipeline:
+  remove:
+    - bietlejuice.enrich_pipeline:load-enrich-dag-run:first-run-of-day
+    - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information:first-run-of-day
+    - bietlejuice.enrich_pipeline:load-enrich-dag:first-run-of-day
+    - bietlejuice.enrich_pipeline:load-enrich-line:first-run-of-day
+  add:
+    - bietlejuice.enrich_pipeline:load-enrich-dag-run
+    - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information
+    - bietlejuice.enrich_pipeline:load-enrich-dag
+    - bietlejuice.enrich_pipeline:load-enrich-line

@@ -113,7 +113,7 @@ class DependencyGenerator:
                     mapped_tasks_for_table = []
                 tasks.extend(
                     [
-                        task["full_task_name"]
+                        f"{task['full_task_name']}:first-run-of-day"
                         for task in mapped_tasks_for_table
                         if task["dag"] != dag and task["full_task_name"] not in tasks
                     ]

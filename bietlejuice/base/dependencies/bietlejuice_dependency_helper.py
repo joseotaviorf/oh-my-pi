@@ -28,7 +28,7 @@ class BietlejuiceDependencyHelper:
         if ("wonka" in task_name) or ("quintoml" in task_name):
             # Temporary workaround for bypassing this function
             # in case Wonka DAGs are used as dependencies
-            dag_name, _ = task_name.split(":")
+            dag_name = task_name.split(":")[0]
             return dag_name, None
 
         if ":load-into-redshift" in task_name:

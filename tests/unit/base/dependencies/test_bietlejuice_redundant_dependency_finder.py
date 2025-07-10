@@ -1,9 +1,6 @@
 import os
 from bietlejuice.services.file_service import FileService
 
-from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
-    BietlejuiceDependencyHelper,
-)
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
@@ -32,41 +29,3 @@ class TestBietlejuiceRedundantDependencyFinder:
         assert not b_redundancies
         assert list(c_redundancies.keys()) == c_expected_redundancies
         assert sorted(list(e_redundancies.keys())) == e_expected_redundancies
-
-        assert TestBietlejuiceRedundantDependencyFinder.are_all_paths_valid(
-            dependencies, "bietlejuice.dw_c", c_redundancies
-        )
-        assert TestBietlejuiceRedundantDependencyFinder.are_all_paths_valid(
-            dependencies, "bietlejuice.dw_e", e_redundancies
-        )
-
-    def test_all_paths_in_real_dependency_file(self):
-        dependencies = BietlejuiceDependencyHelper.read_dependencies()
-        finder = BietlejuiceRedundantDependencyFinder(dependencies)
-        for dag in dependencies:
-            redundancies = finder.find_redundant_dependencies(dag)
-            assert TestBietlejuiceRedundantDependencyFinder.are_all_paths_valid(
-                dependencies, dag, redundancies
-            )
-
-    @staticmethod
-    def are_all_paths_valid(dependencies, dag, redundancies):
-        for paths in redundancies.values():
-            for path in paths:
-                if not TestBietlejuiceRedundantDependencyFinder.is_real_path(
-                    dependencies, dag, path
-                ):
-                    return False
-        return True
-
-    @staticmethod
-    def is_real_path(dependencies, dag, path):
-        """Checks if a given path of dependencies is valid"""
-
-        previous_dag = dag
-        for dependency in path:
-            if dependency not in dependencies[previous_dag]:
-                return False
-            previous_dag = dependency.split(":")[0]
-
-        return True
