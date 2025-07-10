@@ -1,9 +1,0 @@
-database_name: datalake_recommendations
-table_name: popularity
-owner: lucas.cardozo@quintoandar.com.br
-domain: primitives
-description: |
-  Calculates the metric coverage.
-columns:
-  popularity:
-    description: Item popularity. 1 means a lot of users interacted, 0 means no user interacted with item.

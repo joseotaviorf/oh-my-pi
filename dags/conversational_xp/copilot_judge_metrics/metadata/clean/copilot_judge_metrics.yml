@@ -1,0 +1,64 @@
+---
+database_name: datalake_copilot_judge_metrics_clean
+table_name: copilot_judge_metrics
+owner: daniel.adriano@quintoandar.com.br
+domain: Conversational XP
+description: "This table contains LLM-as-a-judge evaluation metrics for the copilot system. It stores the results of automated evaluations where a judge model assesses the quality of copilot responses based on various criteria, providing scores and explanations for performance monitoring and improvement."
+
+columns:
+  date:
+    description: "The date when the evaluation was performed (YYYY-MM-DD format)"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.date
+  base_model_purpose:
+    description: "The purpose or intended use case of the base model being evaluated"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.base_model_purpose
+  evaluation_steps:
+    description: "The specific steps or methodology used during the evaluation process"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_steps
+  grading_criteria:
+    description: "The criteria or rubric used by the judge to evaluate the copilot response"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.grading_criteria
+  evaluation_input:
+    description: "The input data or context provided to the copilot for evaluation"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_input
+  score:
+    description: "The numerical score assigned by the judge to the copilot response"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.score
+  score_reason:
+    description: "The explanation or reasoning provided by the judge for the assigned score"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.score_reason
+  metadata:
+    description: "Additional metadata and context information about the evaluation"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.metadata
+  evaluation_model:
+    description: "The name or identifier of the judge model used for evaluation"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_model
+  task_name:
+    description: "The name or identifier of the specific task being evaluated"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.task_name
+  evaluation_type:
+    description: "The type or category of evaluation being performed"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_type
+  year:
+    description: "The year extracted from the evaluation date (used for partitioning)"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.year
+  month:
+    description: "The month extracted from the evaluation date (used for partitioning)"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.month
+  day:
+    description: "The day extracted from the evaluation date (used for partitioning)"
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.day

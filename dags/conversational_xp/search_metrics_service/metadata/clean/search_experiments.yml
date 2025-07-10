@@ -1,0 +1,184 @@
+---
+database_name: datalake_search
+table_name: search_experiments
+owner: joao.fidalgo@quintoandar.com.br
+domain: Conversational XP
+description: "This table contains A/B experiment results and statistical analysis for search functionality, including conversion rates, confidence intervals, and significance testing."
+
+columns:
+  business_context:
+    description: "Business context for the experiment (e.g., rent, sale)"
+    lineage:
+      - datalake_search.search_experiments.business_context
+  dimension_name:
+    description: "Name of the dimension being tested in the experiment"
+    lineage:
+      - datalake_search.search_experiments.dimension_name
+  dimension_value:
+    description: "Value of the dimension being tested"
+    lineage:
+      - datalake_search.search_experiments.dimension_value
+  metric_name:
+    description: "Name of the metric being measured in the experiment"
+    lineage:
+      - datalake_search.search_experiments.metric_name
+  baseline:
+    description: "Control group identifier for the A/B test"
+    lineage:
+      - datalake_search.search_experiments.baseline
+  treatment:
+    description: "Treatment group identifier for the A/B test"
+    lineage:
+      - datalake_search.search_experiments.treatment
+  date:
+    description: "Date of the experiment measurement"
+    lineage:
+      - datalake_search.search_experiments.date
+  hypothesis_test:
+    description: "Type of statistical hypothesis test performed"
+    lineage:
+      - datalake_search.search_experiments.hypothesis_test
+  params:
+    description: "Parameters used for the statistical test"
+    lineage:
+      - datalake_search.search_experiments.params
+  begin_date:
+    description: "Start date of the experiment"
+    lineage:
+      - datalake_search.search_experiments.begin_date
+  last_processed_date:
+    description: "Last date the experiment data was processed"
+    lineage:
+      - datalake_search.search_experiments.last_processed_date
+  is_last_date:
+    description: "Boolean indicating if this is the latest data point"
+    lineage:
+      - datalake_search.search_experiments.is_last_date
+  total_days:
+    description: "Total number of days the experiment has been running"
+    lineage:
+      - datalake_search.search_experiments.total_days
+  filter_contamination:
+    description: "Boolean indicating if contamination filtering was applied"
+    lineage:
+      - datalake_search.search_experiments.filter_contamination
+  filter_pre_existing_users:
+    description: "Boolean indicating if pre-existing users were filtered out"
+    lineage:
+      - datalake_search.search_experiments.filter_pre_existing_users
+  filter_is_stable:
+    description: "Boolean indicating if stability filtering was applied"
+    lineage:
+      - datalake_search.search_experiments.filter_is_stable
+  baseline_observations:
+    description: "Number of observations in the baseline group"
+    lineage:
+      - datalake_search.search_experiments.baseline_observations
+  baseline_conversions:
+    description: "Number of conversions in the baseline group"
+    lineage:
+      - datalake_search.search_experiments.baseline_conversions
+  treatment_observations:
+    description: "Number of observations in the treatment group"
+    lineage:
+      - datalake_search.search_experiments.treatment_observations
+  treatment_conversions:
+    description: "Number of conversions in the treatment group"
+    lineage:
+      - datalake_search.search_experiments.treatment_conversions
+  binary_or_continuous:
+    description: "Type of metric: binary (conversion) or continuous"
+    lineage:
+      - datalake_search.search_experiments.binary_or_continuous
+  baseline_conversion_rate:
+    description: "Conversion rate for the baseline group"
+    lineage:
+      - datalake_search.search_experiments.baseline_conversion_rate
+  treatment_conversion_rate:
+    description: "Conversion rate for the treatment group"
+    lineage:
+      - datalake_search.search_experiments.treatment_conversion_rate
+  conversion_rate_diff_abs:
+    description: "Absolute difference in conversion rates between groups"
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_abs
+  conversion_rate_diff_rel:
+    description: "Relative difference in conversion rates between groups"
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_rel
+  ci_lower_bound:
+    description: "Lower bound of the confidence interval"
+    lineage:
+      - datalake_search.search_experiments.ci_lower_bound
+  ci_upper_bound:
+    description: "Upper bound of the confidence interval"
+    lineage:
+      - datalake_search.search_experiments.ci_upper_bound
+  mde:
+    description: "Minimum Detectable Effect for the experiment"
+    lineage:
+      - datalake_search.search_experiments.mde
+  significance:
+    description: "Statistical significance level (p-value)"
+    lineage:
+      - datalake_search.search_experiments.significance
+  has_significance:
+    description: "Boolean indicating if the result is statistically significant"
+    lineage:
+      - datalake_search.search_experiments.has_significance
+  prob_treatment_win:
+    description: "Probability that the treatment group outperforms baseline"
+    lineage:
+      - datalake_search.search_experiments.prob_treatment_win
+  decision:
+    description: "Experiment decision based on statistical analysis"
+    lineage:
+      - datalake_search.search_experiments.decision
+  baseline_observations_marginal:
+    description: "Marginal observations in baseline group (filtered)"
+    lineage:
+      - datalake_search.search_experiments.baseline_observations_marginal
+  baseline_conversions_marginal:
+    description: "Marginal conversions in baseline group (filtered)"
+    lineage:
+      - datalake_search.search_experiments.baseline_conversions_marginal
+  treatment_observations_marginal:
+    description: "Marginal observations in treatment group (filtered)"
+    lineage:
+      - datalake_search.search_experiments.treatment_observations_marginal
+  treatment_conversions_marginal:
+    description: "Marginal conversions in treatment group (filtered)"
+    lineage:
+      - datalake_search.search_experiments.treatment_conversions_marginal
+  baseline_conversion_rate_marginal:
+    description: "Marginal conversion rate for baseline group"
+    lineage:
+      - datalake_search.search_experiments.baseline_conversion_rate_marginal
+  treatment_conversion_rate_marginal:
+    description: "Marginal conversion rate for treatment group"
+    lineage:
+      - datalake_search.search_experiments.treatment_conversion_rate_marginal
+  conversion_rate_diff_abs_marginal:
+    description: "Marginal absolute difference in conversion rates"
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_abs_marginal
+  conversion_rate_diff_rel_marginal:
+    description: "Marginal relative difference in conversion rates"
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_rel_marginal
+  ci_lower_bound_rel_marginal:
+    description: "Lower bound of marginal relative confidence interval"
+    lineage:
+      - datalake_search.search_experiments.ci_lower_bound_rel_marginal
+  ci_upper_bound_rel_marginal:
+    description: "Upper bound of marginal relative confidence interval"
+    lineage:
+      - datalake_search.search_experiments.ci_upper_bound_rel_marginal
+  significance_marginal:
+    description: "Statistical significance for marginal analysis"
+    lineage:
+      - datalake_search.search_experiments.significance_marginal
+  exp_name:
+    description: "Name of the A/B experiment"
+    lineage:
+      - datalake_search.search_experiments.exp_name

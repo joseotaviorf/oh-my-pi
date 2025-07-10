@@ -1,0 +1,13 @@
+database_name: datalake_recommendations
+table_name: diversity
+owner: lucas.cardozo@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Calculates the metric diversity.
+columns:
+  diversity_at_3:
+    description: "Diversity score at position 3"
+  diversity_at_5:
+    description: "Diversity score at position 5"
+  diversity_at_10:
+    description: "Diversity score at position 10"

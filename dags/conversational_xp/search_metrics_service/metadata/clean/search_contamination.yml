@@ -1,0 +1,28 @@
+---
+database_name: datalake_search
+table_name: search_contamination
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: "This table tracks contamination rates in search A/B experiments, measuring how many users switched between control and treatment groups during the experiment period."
+
+columns:
+  exp_name:
+    description: "Name of the A/B experiment being tracked"
+    lineage:
+      - datalake_search.search_contamination.business_context
+  execution_date:
+    description: "Date when the contamination analysis was executed"
+    lineage:
+      - datalake_search.search_contamination.date
+  user_contamination_percentage:
+    description: "Percentage of users who switched between experiment groups"
+    lineage:
+      - datalake_search.search_contamination.user_contamination_percentage
+  abs_contaminated_users:
+    description: "Absolute number of users who swapped between A/B test groups"
+    lineage:
+      - datalake_search.search_contamination.abs_contaminated_users
+  abs_users:
+    description: "Total absolute number of users in the experiment"
+    lineage:
+      - datalake_search.search_contamination.abs_users

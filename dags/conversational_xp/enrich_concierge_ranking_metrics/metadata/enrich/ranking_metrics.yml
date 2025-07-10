@@ -1,7 +1,7 @@
 database_name: datalake_concierge_ranking_metrics
 table_name: ranking_metrics
 owner: rafael.guedes@quintoandar.com.br
-domain: conversational_xp
+domain: Conversational XP
 description: "This table stores the ranking metrics for the concierge"
 columns:
   ts_created:

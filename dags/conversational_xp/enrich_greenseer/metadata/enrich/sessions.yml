@@ -1,6 +1,6 @@
 database_name: datalake_greenseer
 table_name: sessions
-domain: Support and Services
+domain: Conversational XP
 owner: data-ae-ss@quintoandar.com.br
 description:
   This table presents session data from the chatbots along with retention attempt data
