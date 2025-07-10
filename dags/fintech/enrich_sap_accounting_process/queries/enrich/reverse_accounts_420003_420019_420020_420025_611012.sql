@@ -158,8 +158,8 @@ SELECT
   CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
   CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
   FALSE AS is_completeness,
-  CAST(NULL AS BOOLEAN) AS is_correctness,
-  CAST(NULL AS BOOLEAN) AS is_temporality,
+  FALSE AS is_correctness,
+  FALSE AS is_temporality,
   FALSE AS is_compliance,
   'reverse failure' AS accounting_process_status,
   MIN(CASE
