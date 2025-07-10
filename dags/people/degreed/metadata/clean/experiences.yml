@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: experiences
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table contains records of users' professional and learning experiences,
   such as job roles, projects, and mentorships. Each row represents a specific

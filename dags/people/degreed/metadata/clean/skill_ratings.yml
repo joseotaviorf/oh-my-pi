@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: skill_ratings
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table stores skill ratings provided by users for themselves or by others
   (e.g., managers). Each row represents a single rating for a specific skill by a

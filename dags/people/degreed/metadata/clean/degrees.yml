@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: degrees
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table stores information about academic degrees that users have earned
   and registered on the Degreed platform. Each row represents a single degree

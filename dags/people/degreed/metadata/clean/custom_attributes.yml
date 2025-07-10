@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: custom_attributes
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Defines the schema for custom attributes available in the organization. This table
   lists the types of custom data points that can be associated with users, but

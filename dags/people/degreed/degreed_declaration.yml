@@ -4,7 +4,8 @@ dag:
   documentation:
     dag_purpose: |
       This DAG aims to ingest data from the Degreed API (Learning Hub).
-
+  schedule_interval: 0 3 * * *
+  
 cluster:
   type: databricks_13_3_min_memory_people_cluster
   access_control_list:
@@ -40,14 +41,6 @@ workflow:
     load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
     load_end_date: "{{ data_interval_start | ds }}"
   tables_customization:
-    accomplishments:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - scope: "accomplishments:read"
-          base_filters:
-            "filter[start_date]": "load_start_date"
-            "filter[end_date]": "load_end_date"
-            "limit": "1000"
     certifiable_skills:
       extraction_type: full
       extra_spark_job_arguments:
@@ -56,6 +49,7 @@ workflow:
             "limit": "1000"
     certificates:
       extraction_type: incremental
+      merge_on: ["id"]
       extra_spark_job_arguments:
         - scope: "certificates:read"
           base_filters:
@@ -64,6 +58,7 @@ workflow:
             "limit": "1000"
     completions:
       extraction_type: incremental
+      merge_on: ["id"]
       extra_spark_job_arguments:
         - scope: "completions:read"
           base_filters:
@@ -101,6 +96,7 @@ workflow:
             "limit": "1000"
     logins:
       extraction_type: incremental
+      merge_on: ["id"]
       extra_spark_job_arguments:
         - scope: "logins:read"
           base_filters:

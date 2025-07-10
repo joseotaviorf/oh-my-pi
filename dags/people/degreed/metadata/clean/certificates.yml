@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: certificates
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table stores all certificates that have been awarded to users and
   recorded within the Degreed platform. Each row represents a single certificate

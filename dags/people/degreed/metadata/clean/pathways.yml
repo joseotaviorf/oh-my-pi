@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: pathways
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table contains all learning pathways created within the organization.
   Pathways are curated collections of content (like courses, articles, and videos)

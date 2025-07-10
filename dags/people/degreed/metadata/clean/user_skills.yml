@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: user_skills
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table maps users to the skills they are tracking, developing, or have
   added to their profile. Each row represents a single skill associated with a user.

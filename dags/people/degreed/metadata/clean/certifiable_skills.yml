@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: certifiable_skills
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Contains a list of all skills that can be officially certified within the
   organization's Degreed instance. These are skills that can be formally

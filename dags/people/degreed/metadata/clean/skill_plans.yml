@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: skill_plans
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Contains details about Skill Plans, which are guided learning paths of content
   that track a learner's completion progress. Each row represents a single skill plan.

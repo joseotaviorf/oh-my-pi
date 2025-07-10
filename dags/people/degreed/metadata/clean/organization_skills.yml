@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: organization_skills
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table serves as a master list of all skills defined and available within
   the organization's Degreed instance. Each row represents a single, unique skill.

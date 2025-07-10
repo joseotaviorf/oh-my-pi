@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: completions
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table holds records of all content completions within the organization.
   A completion signifies that a user has finished a piece of learning content,

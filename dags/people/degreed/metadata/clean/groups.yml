@@ -2,7 +2,7 @@
 database_name: datalake_degreed_clean
 table_name: groups
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   This table contains information about all collaborative groups within the
   organization's Degreed platform. Each row represents a single group, which can
