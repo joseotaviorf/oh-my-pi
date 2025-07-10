@@ -1,14 +1,14 @@
 ---
-table_name: dw_performance.dim_committee_meeting
+table_name: dw_performance.dim_performance_variation
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 1
+    greater_than: 4
     severity_level: Error
 column_level_validations:
-  sk_performance_rating:
+  sk_performance_trend:
     has_completeness:
-      greater_than: 0.7
+      greater_than: 0.9
       severity_level: Warning
     is_unique:
       severity_level: Warning

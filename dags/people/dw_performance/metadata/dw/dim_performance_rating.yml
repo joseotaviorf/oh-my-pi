@@ -1,0 +1,25 @@
+---
+database_name: dw_performance
+table_name: dim_performance_rating
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: >
+  Dimension that stores all unique combinations of performance ratings for Behavior, Impact, and Leadership. 
+  This table is generated from the performance calibration data and is used to analyze combined performance profiles.
+columns:
+  sk_performance_rating:
+    description: "Surrogate key for the performance rating dimension. It is an MD5 hash generated from the concatenation of the behavior, impact, and leadership rating descriptions."
+    lineage: 
+        - datalake_pin.performance_calibration.rating_description_from_calibration
+  behavior:
+    description: "The performance rating description for the 'Behavior' section of a performance review."
+    lineage: 
+        - datalake_pin.performance_calibration.rating_description_from_calibration
+  impact:
+    description: "The performance rating description for the 'Impact' section of a performance review."
+    lineage: 
+        - datalake_pin.performance_calibration.rating_description_from_calibration
+  leadership:
+    description: "The performance rating description for the 'Leadership' section of a performance review."
+    lineage: 
+        - datalake_pin.performance_calibration.rating_description_from_calibration

@@ -1,0 +1,32 @@
+--- 
+database_name: dw_performance
+table_name: dim_performance_variation
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: >
+  Dimension that stores all possible trend combinations for the performance pillars: 
+  Behavior, Impact, and Leadership. It is used to analyze variations in performance assessments over time.
+columns:
+  sk_performance_trend:
+    description: "Surrogate key for the performance trend dimension. It is an MD5 hash generated from the combination of the behavior, impact, and leadership trend values."
+  behavior:
+    description: "Describes the trend in the 'Behavior' performance pillar."
+    categories:
+      "Increased": "Indicates that the performance rating has increased."
+      "Decreased": "Indicates that the performance rating has decreased."
+      "Maintained": "Indicates that the performance rating has remained stable."
+      "-1": "Indicates that a trend comparison is not applicable or data is unavailable."
+  impact:
+    description: "Describes the trend in the 'Impact' performance pillar."
+    categories:
+      "Increased": "Indicates that the performance rating has increased."
+      "Decreased": "Indicates that the performance rating has decreased."
+      "Maintained": "Indicates that the performance rating has remained stable."
+      "-1": "Indicates that a trend comparison is not applicable or data is unavailable."
+  leadership:
+    description: "Describes the trend in the 'Leadership' performance pillar."
+    categories:
+      "Increased": "Indicates that the performance rating has increased."
+      "Decreased": "Indicates that the performance rating has decreased."
+      "Maintained": "Indicates that the performance rating has remained stable."
+      "-1": "Indicates that a trend comparison is not applicable or data is unavailable."

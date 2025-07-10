@@ -700,10 +700,6 @@ bietlejuice.dw_performance:
   - bietlejuice.enrich_performance:load-enrich-talent-review
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
   - bietlejuice.pin_hr_review:load-clean-meeting
-  - bietlejuice.pin_talent:load-clean-rating-level-base
-  - bietlejuice.pin_talent:load-clean-rating-level-translation
-  - bietlejuice.pin_talent:load-clean-rating-model-base
-  - bietlejuice.pin_talent:load-clean-rating-model-translation
 bietlejuice.dw_person:
   - bietlejuice.enrich_person:load-enrich-person-sks
   - bietlejuice.person:load-clean-contact-info
