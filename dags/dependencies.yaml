@@ -154,6 +154,7 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction-data:first-run-of-day
   - bietlejuice.trato_feito:load-clean-eviction:first-run-of-day
 bietlejuice.dw_collection_recovery_quintoandar:
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-agency-timeline:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-installment:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-negotiation:first-run-of-day
@@ -161,7 +162,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-agencies:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-collection:first-run-of-day
-  - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-queue-timeline:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-debt:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-installment:first-run-of-day
@@ -1515,6 +1515,7 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-invoice-payment-option-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-pending-invoices-page-viewed-events:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+  - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-installment:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-negotiation:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-users:first-run-of-day

@@ -1,0 +1,24 @@
+---
+database_name: datalake_collections_quintoandar
+table_name: agency_timeline
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Timeline view of contract-agency assignments with one row per day, generated from contract agency distribution data. Each row represents which agency is responsible for a contract on a specific date.
+columns:
+  id_contract:
+    description: "Unique identifier for the contract that is assigned to an agency."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.id_contract
+  id_agency:
+    description: "Identifier for the agency responsible for the contract on the given date."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.id_agency
+  main_agency_name:
+    description: "Name of the main agency responsible for the contract on the given date."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.main_agency_name
+  dt_reference:
+    description: "Date reference for the agency assignment. Generated as a timeline with one row per day from dt_start_interval to dt_end_interval."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.dt_start_interval
+      - datalake_cyber.contract_agency_distribution.dt_end_interval

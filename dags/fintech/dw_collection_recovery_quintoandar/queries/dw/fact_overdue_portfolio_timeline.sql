@@ -13,16 +13,6 @@ SELECT DISTINCT
     n.down_payment_net_amount_paid != 0
   QUALIFY ROW_NUMBER() OVER(PARTITION BY ip.id_invoice, ip.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, ip.ts_paid))) = 1
 ),
-cyber_agencies AS (
-  SELECT
-    id_contract,
-    id_agency,
-    main_agency_name,
-    dt_start_interval,
-    dt_end_interval
-  FROM datalake_cyber.contract_agency_distribution
-  WHERE creditor = 'QuintoAndar'
-),
 add_all_dimensions AS (
 SELECT
     CONCAT(o.id_invoice, o.id_contract, DATE_FORMAT(o.dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
@@ -87,9 +77,9 @@ LEFT JOIN
       ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
 LEFT JOIN
-    cyber_agencies AS cad
+    datalake_collections_quintoandar.agency_timeline AS cad
       ON o.id_contract = cad.id_contract
-      AND o.dt_reference BETWEEN cad.dt_start_interval AND cad.dt_end_interval
+      AND o.dt_reference = cad.dt_reference
 LEFT JOIN
     datalake_cyber.queue_timeline AS q
       ON o.id_contract = q.id_contract_external
@@ -113,7 +103,7 @@ get_last_valid_partner AS (
     eviction_queue,
     eviction_queue_description
   FROM add_all_dimensions
-  WHERE dt_reference BETWEEN DATE_ADD(max_dt_invoice_paid,-1) AND max_dt_invoice_paid
+  WHERE dt_reference >= DATE_ADD(max_dt_invoice_paid,-1) AND dt_reference <= max_dt_invoice_paid
   AND (advisory IS NULL OR advisory NOT IN ("DBAIXAS", "DCARGA")) -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
 )
