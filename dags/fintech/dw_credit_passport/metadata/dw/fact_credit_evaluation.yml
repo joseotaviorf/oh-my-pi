@@ -40,15 +40,6 @@ columns:
       CANCELLED: when the credit evaluation was cancelled.
     lineage:
     - datalake_docx_clean.credit_evaluation.status
-  credit_evaluation_result:
-    description: Result of the credit analysis.
-    categories:
-      PRE_APPROVED: when the credit evaluation was pre approved.
-      PRE_REJECTED: when the credit evaluation was pre rejected. The user may redo the credit evaluation if he/she wishes to move forward to the next step.
-      PRE_APPROVED_WITH_GUARANTEE: when the credit evaluation was approved with a paid guarantee.
-      RESULT_PENDING: when the result for the credit analysis is not available (i.e. credit evaluation not sent, processing, on hold...)
-    lineage:
-    - datalake_docx_clean.credit_evaluation.result
   pre_evaluation_result:
     description: Result of the credit pre evaluation process, such as early credit evaluation or pre offer credit passport flow.
     lineage:

@@ -275,6 +275,7 @@ bietlejuice.dw_credit_passport:
   - bietlejuice.docx:load-clean-credit-evaluation-aud
   - bietlejuice.docx:load-clean-credit-evaluation-proponent
   - bietlejuice.docx:load-clean-group-member
+  - bietlejuice.rental_guarantee:load-clean-guarantee
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine
   - bietlejuice.sorting_hat:load-clean-policy-report
   - bietlejuice.sorting_hat:load-clean-proponent

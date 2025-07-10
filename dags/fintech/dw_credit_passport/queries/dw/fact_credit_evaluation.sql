@@ -84,21 +84,17 @@ SELECT DISTINCT
   ce.id_city AS sk_city,
   ce.scope,
   ce.status AS credit_evaluation_status,
-  CASE
-    WHEN ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED') THEN 'REASON_PENDING'
-    ELSE ce.result
-  END AS credit_evaluation_result,
   COALESCE(
-    ce.early_result_guarantee_type, get_json_object(ce.early_result, '$[0].result')
+    ce.early_result_guarantee_type, GET_JSON_OBJECT(ce.early_result, '$[0].result')
   ) AS pre_evaluation_result,
   CASE
     WHEN (ce.reason = 'PRE_APPROVAL_POLICY' AND ce.result = 'PRE_APPROVED') OR ce.result = 'PRE_APPROVED' THEN 'FREE'
-    WHEN ce.early_result_guarantee_type = 'FREE' OR get_json_object(ce.early_result, '$[0].result') = 'FREE' THEN 'FREE'
+    WHEN ce.early_result_guarantee_type = 'FREE' OR GET_JSON_OBJECT(ce.early_result, '$[0].result') = 'FREE' THEN 'FREE'
     WHEN ce.reason = 'PRE_APPROVAL_POLICY' AND ce.result = 'PRE_APPROVED_WITH_GUARANTEE' THEN 'PAID'
-    WHEN ce.early_result_guarantee_type = 'PRO_GUARANTOR' OR get_json_object(ce.early_result, '$[0].result') IN (
-      'PRO_GUARANTOR', 'THIRD_PARTY_GUARANTEE', 'STANDALONE', 'PRO_GUARANTOR_OR_DEPOSIT', 'DEPOSIT', 'INSURANCE_OR_DEPOSIT', 'RENTAL_GUARANTEE'
-      ) THEN 'PAID'
-    WHEN ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED') THEN 'REASON_PENDING'
+    WHEN ce.early_result_guarantee_type = 'PRO_GUARANTOR' OR GET_JSON_OBJECT(ce.early_result, '$[0].result') IN ('PRO_GUARANTOR', 'THIRD_PARTY_GUARANTEE', 'STANDALONE', 'PRO_GUARANTOR_OR_DEPOSIT', 'DEPOSIT', 'INSURANCE_OR_DEPOSIT', 'RENTAL_GUARANTEE') THEN 'PAID'
+    WHEN ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED') THEN 'DECISION_PENDING'
+    WHEN ce.result = 'PRE_REJECTED' AND ce.reason IS NULL AND g.guarantee_type IS NOT NULL THEN 'PAID'
+    WHEN ce.result = 'PRE_REJECTED' AND ce.reason IS NULL AND g.guarantee_type IS NULL THEN ce.result
   ELSE ce.reason
   END AS decision_reason,
   ce.type AS documentation_policy_type,
@@ -137,10 +133,10 @@ SELECT DISTINCT
     THEN
       'MULTI_TENANT'
   END group_type,
-  get_json_object(pr.raw_data, '$.variant') AS variant,
-  get_json_object(pr.result, '$.policy_dti') AS policy_dti,
-  get_json_object(pr.result, '$.analysis_category') AS category,
-  get_json_object(pr.result, '$.risk_category_canon') AS risk_category_canon,
+  GET_JSON_OBJECT(pr.raw_data, '$.variant') AS variant,
+  GET_JSON_OBJECT(pr.result, '$.policy_dti') AS policy_dti,
+  GET_JSON_OBJECT(pr.result, '$.analysis_category') AS category,
+  GET_JSON_OBJECT(pr.result, '$.risk_category_canon') AS risk_category_canon,
   COALESCE(pp.total_proposal_proponents, gp.total_group_proponents) AS number_of_proponents,
   ce.is_automatic,
   IF(
@@ -174,3 +170,5 @@ FROM
     LEFT JOIN datalake_credit_analysis.credit_engine AS cen
       ON ce.id = cen.id_credit_evaluation
       AND cen.group_name = 'PRE_APPROVAL_LIMIT_POLICY'
+    LEFT JOIN datalake_rental_guarantee_clean.guarantee AS g
+      ON ce.id_proposal = g.id_documentation_ebdb
