@@ -1,7 +1,7 @@
 dag:
   name: checkout
   schedule_start_date: 2020,10,1
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 3,8,12 * * *
   owner: Data Fintech
 workflow:
   type: cdc

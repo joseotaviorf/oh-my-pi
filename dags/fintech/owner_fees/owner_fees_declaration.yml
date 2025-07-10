@@ -1,7 +1,7 @@
 dag:
   name: owner_fees
   schedule_start_date: 2020, 8, 10
-  schedule_interval: 0 5 * * *
+  schedule_interval: 0 5,8,12 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |

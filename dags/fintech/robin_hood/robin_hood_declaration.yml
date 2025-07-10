@@ -1,6 +1,6 @@
 dag:
   name: robin_hood
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 3,8,12 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: "This DAG creates the full tables for Robin Hood, a digital wallet that has two main features: users financial data management and management of payment requests."

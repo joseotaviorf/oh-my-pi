@@ -1,7 +1,7 @@
 dag:
   name: fastforward
   schedule_start_date: 2020, 7, 27
-  schedule_interval: 0 4 * * *
+  schedule_interval: 0 4,8,12 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |

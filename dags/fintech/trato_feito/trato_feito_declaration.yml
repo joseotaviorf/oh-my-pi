@@ -1,6 +1,6 @@
 dag:
   name: trato_feito
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 3,8,12 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |

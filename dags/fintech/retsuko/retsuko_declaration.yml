@@ -1,7 +1,7 @@
 dag:
   name: retsuko
   schedule_start_date: 2021, 2, 20
-  schedule_interval: 30 7 * * *
+  schedule_interval: 30 7,12 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |

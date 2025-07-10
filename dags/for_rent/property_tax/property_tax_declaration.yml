@@ -1,7 +1,7 @@
 dag:
   name: property_tax
   schedule_start_date: 2020, 7, 20
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 3,8,12 * * *
   owner: Data ForRent
   documentation:
     dag_purpose: This DAG brings [PropertyTax](https://github.com/quintoandar/property-tax) data, service responsible for updating municipal taxes for ongoing contracts.

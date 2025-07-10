@@ -4,7 +4,7 @@ dag:
   documentation:
     dag_purpose: |
       Extraction of Docx tables into data lake, in which the data is related to the credit evaluation process. Docx is the backend application for documents and credit simulation.
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0 0,8,12 * * *
 workflow:
   type: cdc
   layer: raw

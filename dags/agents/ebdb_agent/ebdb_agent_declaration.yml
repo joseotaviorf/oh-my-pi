@@ -1,7 +1,7 @@
 dag:
   name: ebdb_agent
   owner: Data Agents
-  schedule_interval: 20 21 * * *
+  schedule_interval: 20 21,8,12 * * *
   documentation:
     dag_purpose: |
       Extraction of EBDB tables related to agents into data lake. EBDB is the main database for QuintoAndar.
