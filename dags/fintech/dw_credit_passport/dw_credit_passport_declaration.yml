@@ -6,6 +6,9 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: credit_passport
+  inner_dependencies:
+    fact_credit_passport_flows:
+      - fact_credit_evaluation
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new

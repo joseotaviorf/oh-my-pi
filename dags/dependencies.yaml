@@ -279,6 +279,10 @@ bietlejuice.dw_credit_passport:
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine
   - bietlejuice.sorting_hat:load-clean-policy-report
   - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.docx:load-clean-group
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.enrich_docx:load-enrich-credit-evaluation-events
+  - bietlejuice.sorting_hat:load-clean-analysis-request
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal

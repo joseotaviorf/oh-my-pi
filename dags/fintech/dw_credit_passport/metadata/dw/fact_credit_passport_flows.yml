@@ -1,0 +1,123 @@
+---
+database_name: dw_credit_passport
+table_name: fact_credit_passport_flows
+description: This fact table contains all the information related to Credit Passport flows, tracking the funnel steps from the start of an evaluation to contract signature.
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+columns:
+  sk_credit_evaluation:
+    description: Unique identifier of a credit evaluation from DocX.
+    lineage:
+      - datalake_docx.credit_evaluation_events.id_credit_evaluation
+  sk_credit_passport:
+    description: Identifier of the credit passport evaluation. This connects passport evaluations to subsequent proposal evaluations. When the user has not submitted a proposal, this ID is equal to the sk_credit_evaluation.
+    lineage:
+      - datalake_docx_clean.credit_evaluation.early_result
+      - datalake_sorting_hat_clean.analysis_request.id_external
+  sk_group:
+    description: ID group related to the credit passport. A group can have more than one credit evaluation, since the user may submit two or more proposals.
+    lineage:
+      - datalake_docx.credit_evaluation_events.id_group
+  sk_user:
+    description: ID user who authenticated into 5A platform and submitted the credit evaluation.
+    lineage:
+      - datalake_docx.credit_evaluation_events.id_user
+  sk_city:
+    description: ID city whithin the credit passport was submitted.
+    lineage:
+      - datalake_docx.credit_evaluation_events.id_city
+  sk_proposal:
+    description: ID proposal related submitted by the user. This ID can be null (-1) if the credit evaluation was done before offer approval (such as early credit or credit passport pre offer flow).
+    lineage:
+      - datalake_docx.credit_evaluation_events.id_proposal
+  sk_contract:
+    description: ID contract related to the proposal, from the rent flows fact table.
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract
+  credit_evaluation_source:
+    description: The credit evaluation source. This column indicates the origin of the credit evaluation.
+    lineage:
+      - datalake_docx.credit_evaluation_events.credit_evaluation_source
+  decision_reason:
+    description: The credit analysis decision reason in case of rejection or evaluation positive (FREE or PAID).
+    lineage:
+      - dw_credit_passport.fact_credit_evaluation.decision_reason
+  documentation_policy_type:
+    description: The documentation policy type requested to the user. This column is NULL for early credit, pre evaluation through credit passport or if the credit evaluation is still being processed.
+    categories:
+      LIGHT_APPROVAL: when no further documents is requested to the user
+      REGULAR: when the documentation policy is FULL or FLEX.
+    lineage:
+      - dw_credit_passport.fact_credit_evaluation.documentation_policy_type
+  funnel_step:
+    description: The highest funnel step achieved by the user in the credit acquisition flow.
+    categories:
+      'A. evaluation_started': when the credit evaluation process has started
+      'B. evaluation_positive': when the credit evaluation was approved
+      'C. sufficient_credit_limit': when the credit limit is sufficient for the property that the user is trying to rent
+      'D. document_sent': when documents have been sent for credit analysis
+      'E. credit_analysis_approved': when the credit analysis was approved
+      'F. contract_created': when the contract was created
+      'G. contract_signed': when the contract was signed
+  offer_approved:
+    description: Boolean indicating if the offer was approved.
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
+  evaluation_started:
+    description: Boolean indicating if the credit evaluation process has started.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_credit_evaluation_created
+  evaluation_positive:
+    description: Boolean indicating if the credit evaluation was approved.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_evaluation_positive
+  evaluation_negative:
+    description: Boolean indicating if the credit evaluation was rejected.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_evaluation_negative
+  bypass:
+    description: Boolean indicating if the credit evaluation was bypassed.
+    lineage:
+      - dw_credit_passport.fact_credit_evaluation.is_bypass
+  sufficient_credit_limit:
+    description: Boolean indicating if the credit limit is sufficient for the proposal value.
+    lineage:
+      - datalake_docx.credit_evaluation_events.is_value_within_pre_approved_limit
+  document_sent:
+    description: Boolean indicating if documents have been sent for analysis.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_docs_analysis
+  credit_analysis_approved:
+    description: Boolean indicating if the credit analysis was approved.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_credit_analysis_approved
+  contract_created:
+    description: Boolean indicating if the contract was created.
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract_created_date
+  contract_signed:
+    description: Boolean indicating if the contract was signed.
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
+  is_group_active:
+    description: Boolean indicating if the group is active.
+    lineage:
+      - datalake_docx_clean.group.is_active
+  is_user_version:
+    description: Boolean indicating if this is the most recent credit evaluation version for the user.
+  is_maximum_funnel_step:
+    description: Boolean indicating if this record represents the maximum funnel step achieved by the user.
+  dt_credit_passport:
+    description: Date when the credit passport was created.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_credit_evaluation_created
+  ts_expired:
+    description: Timestamp indicating when the credit passport expires.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_expired
+  ts_credit_evaluation_created:
+    description: Timestamp indicating when the credit evaluation was created.
+    lineage:
+      - datalake_docx.credit_evaluation_events.ts_credit_evaluation_created
+  ts_load:
+    description: Timestamp indicating when the data was refreshed.
