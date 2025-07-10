@@ -19,7 +19,7 @@ workflow:
     - "{table_name}"
     - "{partitions}"
     - "{schema}"
-    - "https://quintoandar--qa.sandbox.my.salesforce.com"
+    - "https://quintoandar--forno.sandbox.my.salesforce.com"
     - "https://quintoandar.my.salesforce.com"
 
   default_extraction_type: incremental

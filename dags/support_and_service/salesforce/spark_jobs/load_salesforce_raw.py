@@ -57,16 +57,20 @@ def parse_arguments():
 
     return environment, bucket, load_start_date, load_end_date, table_name, partitions, schema, forno_endpoint, prod_endpoint, query
 
-def get_access_token(endpoint):
-
+def get_access_token(endpoint, env):
     # Initializing clients
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    api_credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE)
-    )
+    if env == "forno":
+      api_credentials = json.loads(
+          dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE_FORNO)
+      )
+    elif env == "prod":
+      api_credentials = json.loads(
+          dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE)
+      )
 
     req_url = f'{endpoint}/services/oauth2/token'
 
@@ -621,9 +625,9 @@ def main():
     query += f" WHERE LastModifiedDate >= {load_start_timstamp} AND LastModifiedDate <= {load_end_timstamp}"
 
     if environment == 'forno':
-        access_token, instance_url = get_access_token(forno_endpoint)
+        access_token, instance_url = get_access_token(forno_endpoint, environment)
     elif environment == 'prod':
-        access_token, instance_url = get_access_token(prod_endpoint)
+        access_token, instance_url = get_access_token(prod_endpoint, environment)
 
     headers = {
         'Authorization': f'Bearer {access_token}',
