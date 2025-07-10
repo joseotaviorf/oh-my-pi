@@ -75,6 +75,16 @@ columns:
     - datalake_amplitude_clean.events.user_properties
     description: Column up_rc_beakman_owners_listing_performance_sale_toggle from
       Amplitude events
+  up_rc_beakman_owners_listing_performance_wave_one_rent_toggle:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Column up_rc_beakman_owners_listing_performance_sale_toggle from
+      Amplitude events
+  up_rc_beakman_owners_listing_performance_wave_one_sale_toggle:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Column up_rc_beakman_owners_listing_performance_sale_toggle from
+      Amplitude events
   ep_business_context:
     lineage:
     - datalake_amplitude_clean.events.event_properties
