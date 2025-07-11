@@ -6,11 +6,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
 from pyspark.sql import DataFrame
+from pyspark.sql.utils import AnalysisException
 from pyspark.sql.types import StructType, StructField, StringType
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import (
-    spark
-)
+from bietlejuice.base.spark import spark
 
 
 JOB_NAME = "botcity_audit_logs_load"
@@ -71,6 +70,14 @@ def clean_df(data_frame: 'DataFrame') -> 'DataFrame':
 
 
 def load_data_frame(path):
+    """
+    Loads BotCity audit logs from the given path.
+    Returns an empty DataFrame if no files are found.
+
+    :param path: S3 path to load data from (e.g. s3://datalake-botcity-audit-logs/year=2025/month=07/day=10/)
+    :return: DataFrame with audit logs data or empty DataFrame
+    """
+    logger.info(f"m=load_data_frame, audit_logs_path={path}, msg=Attempting to load audit logs from path")
     botcity_audit_logs_schema = StructType([
         StructField("user", StructType([
             StructField("email", StringType(), True),
@@ -92,7 +99,17 @@ def load_data_frame(path):
         ]), True)
     ])
 
-    return spark.read.format('json').load(path, schema=botcity_audit_logs_schema)
+    try:
+        df = spark.read.format('json').load(path, schema=botcity_audit_logs_schema)
+        logger.info(f"m=load_data_frame, audit_logs_path={path}, msg=Successfully loaded audit logs from path")
+        return df
+    except AnalysisException as e:
+        if ("PATH_NOT_FOUND" in str(e)):
+            logger.warning(f"m=load_data_frame, path={path}, msg=No audit log files found for the specified date, returning empty DataFrame, error={e}")
+            return spark.createDataFrame([], schema=botcity_audit_logs_schema)
+        else:
+            logger.error(f"m=load_data_frame, path={path}, msg=Unexpected AnalysisException, error={e}")
+            raise e
 
 
 def main():
@@ -114,7 +131,18 @@ def main():
         f'month={args.execution_date.month:02}',
         f'day={args.execution_date.day:02}',
     )
+
     raw_data_frame = load_data_frame(audit_logs_path)
+
+    if raw_data_frame.count() == 0:
+        logger.warning(
+            f"m=__main__, audit_logs_path={audit_logs_path}, "
+            f"execution_date={args.execution_date}, msg=No audit logs found for the specified date. "
+            f"Skipping data processing and load."
+        )
+        return
+
+    logger.info(f"m=__main__, records_count={raw_data_frame.count()}, msg=Processing audit logs")
     clean_data_frame = clean_df(raw_data_frame)
 
     DeltaLoader().load_table(
