@@ -71,7 +71,7 @@ dags_out_of_pattern:
         "wonka.house_user_rent_flows",
         "wonka.house_agg_rent_flows",
         "wonka.house_visit",
-        "wonka.user_visit",
+        "wonka.user_visits",
         "wonka.user_search_profile_clustering",
         "wonka.user_bc_h3_7_city_agg_search_filters",
         "wonka.group_agent_main_user_to_device_id",

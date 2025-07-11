@@ -76,7 +76,7 @@ wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
 wonka.user_search_profile_clustering:
   - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
-wonka.user_visit:
+wonka.user_visits:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 wonka.group_agent_main_user_to_device_id:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-login-confirmation-viewed-events
