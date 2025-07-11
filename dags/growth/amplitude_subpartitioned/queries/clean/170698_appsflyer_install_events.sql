@@ -1,4 +1,4 @@
-SELECT 
+SELECT
       id_amplitude,
     ids_amplitude_attributed,
     id_app,
@@ -68,5 +68,5 @@ SELECT
     day
 FROM datalake_amplitude_clean.events
 WHERE
-    id_app = '170698' AND event_type = 'appsflyer_install'
+    id_app = '170698' AND event_type = '[AppsFlyer] Install'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
