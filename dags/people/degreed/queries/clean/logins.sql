@@ -1,7 +1,7 @@
 SELECT
     id,
     relationships[0].user.data.id AS id_user,
-    employee_id AS email_employee,
+    attributes.employee_id AS email_employee,
     TO_TIMESTAMP(attributes.logged_in_at) AS ts_logged,
     NOW() AS ts_load
 FROM 
