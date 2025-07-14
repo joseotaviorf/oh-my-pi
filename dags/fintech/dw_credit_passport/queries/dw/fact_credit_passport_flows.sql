@@ -36,6 +36,14 @@ WITH get_all_passport_events AS (
     AND cee.is_credit_passport = TRUE
     AND cee.ts_credit_evaluation_created >= DATE '2025-06-02'
 ),
+get_user_first_touchpoint AS (
+  SELECT
+    id_user,
+    IF(credit_evaluation_source = 'PRE_OFFER_PASSPORT_FLOW', 'listing', 'offer') AS user_first_touchpoint
+  FROM
+    get_all_passport_events
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY ts_credit_evaluation_created ASC) = 1
+),
 get_all_proposal_events AS (
   SELECT DISTINCT
     cee.id_credit_evaluation,
@@ -146,6 +154,7 @@ join_events AS (
     COALESCE(
       gpe.credit_evaluation_source, gpfs.credit_evaluation_source
     ) AS credit_evaluation_source,
+    ft.user_first_touchpoint,
     gpfs.documentation_policy_type,
     COALESCE(gpfs.decision_reason, gpe.decision_reason) AS decision_reason,
     COALESCE(gpfs.offer_approved, 0) AS offer_approved,
@@ -168,8 +177,10 @@ join_events AS (
     get_all_passport_events AS gpe
       LEFT JOIN get_proposal_funnel_step AS gpfs
         ON (gpe.id_credit_evaluation = gpfs.id_credit_passport)
+      LEFT JOIN get_user_first_touchpoint AS ft
+        ON (ft.id_user = gpe.id_user)
 ),
-add_user_version AS (
+add_group_last_credit_evaluation AS (
   SELECT
     id_credit_evaluation AS sk_credit_evaluation,
     CAST(COALESCE(id_credit_passport, id_credit_evaluation) AS BIGINT) AS sk_credit_passport,
@@ -179,6 +190,7 @@ add_user_version AS (
     id_proposal AS sk_proposal,
     sk_contract,
     credit_evaluation_source,
+    user_first_touchpoint,
     decision_reason,
     documentation_policy_type,
     CASE
@@ -208,7 +220,7 @@ add_user_version AS (
       THEN
         TRUE
       ELSE FALSE
-    END as is_user_version,
+    END as is_group_last_credit_evaluation,
     dt_credit_passport,
     ts_expired,
     ts_credit_evaluation_created
@@ -225,6 +237,7 @@ add_maximum_funnel_step AS (
     sk_proposal,
     sk_contract,
     credit_evaluation_source,
+    user_first_touchpoint,
     decision_reason,
     documentation_policy_type,
     funnel_step,
@@ -239,17 +252,17 @@ add_maximum_funnel_step AS (
     contract_created,
     contract_signed,
     is_group_active,
-    is_user_version,
+    is_group_last_credit_evaluation,
     CASE
       WHEN ROW_NUMBER() OVER (PARTITION BY sk_user ORDER BY funnel_step DESC, ts_credit_evaluation_created DESC) = 1 THEN TRUE
       ELSE FALSE
-    END AS is_maximum_funnel_step,
+    END AS is_user_version,
     dt_credit_passport,
     ts_expired,
     ts_credit_evaluation_created,
     NOW() AS ts_load
   FROM
-    add_user_version
+    add_group_last_credit_evaluation
 )
   SELECT
     sk_credit_evaluation,
@@ -260,6 +273,7 @@ add_maximum_funnel_step AS (
     sk_proposal,
     sk_contract,
     credit_evaluation_source,
+    user_first_touchpoint,
     decision_reason,
     documentation_policy_type,
     funnel_step,
@@ -275,7 +289,7 @@ add_maximum_funnel_step AS (
     contract_signed,
     is_group_active,
     is_user_version,
-    is_maximum_funnel_step,
+    is_group_last_credit_evaluation,
     dt_credit_passport,
     ts_expired,
     ts_credit_evaluation_created,

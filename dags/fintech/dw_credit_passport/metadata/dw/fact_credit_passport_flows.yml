@@ -27,7 +27,7 @@ columns:
     lineage:
       - datalake_docx.credit_evaluation_events.id_city
   sk_proposal:
-    description: ID proposal related submitted by the user. This ID can be null (-1) if the credit evaluation was done before offer approval (such as early credit or credit passport pre offer flow).
+    description: ID proposal submitted by the user. This ID can be null (-1) if the credit evaluation was done before offer approval (such as credit passport pre offer flow).
     lineage:
       - datalake_docx.credit_evaluation_events.id_proposal
   sk_contract:
@@ -36,6 +36,16 @@ columns:
       - dw_rent.fact_listing_rent_flows.sk_contract
   credit_evaluation_source:
     description: The credit evaluation source. This column indicates the origin of the credit evaluation.
+    categories:
+      PRE_OFFER_PASSPORT_FLOW: when the credit evaluation was submitted before offer approval
+      POST_OFFER_PASSPORT_FLOW: when the credit evaluation was submitted after offer approval
+    lineage:
+      - datalake_docx.credit_evaluation_events.credit_evaluation_source
+  user_first_touchpoint:
+    description: The first touchpoint of the user in the credit passport flow.
+    categories:
+      listing: when the user accessed the credit passport through the listing page
+      offer: when the user accessed the credit passport through the offer page
     lineage:
       - datalake_docx.credit_evaluation_events.credit_evaluation_source
   decision_reason:
@@ -43,7 +53,7 @@ columns:
     lineage:
       - dw_credit_passport.fact_credit_evaluation.decision_reason
   documentation_policy_type:
-    description: The documentation policy type requested to the user. This column is NULL for early credit, pre evaluation through credit passport or if the credit evaluation is still being processed.
+    description: The documentation policy type requested to the user. This column is NULL for credit passport or if the proposal credit evaluation is still being processed.
     categories:
       LIGHT_APPROVAL: when no further documents is requested to the user
       REGULAR: when the documentation policy is FULL or FLEX.
@@ -60,52 +70,52 @@ columns:
       'F. contract_created': when the contract was created
       'G. contract_signed': when the contract was signed
   offer_approved:
-    description: Boolean indicating if the offer was approved.
+    description: Integer indicating if the offer was approved (1) or not (0).
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
   evaluation_started:
-    description: Boolean indicating if the credit evaluation process has started.
+    description: Integer indicating if the credit evaluation process has started (1) or not (0).
     lineage:
       - datalake_docx.credit_evaluation_events.ts_credit_evaluation_created
   evaluation_positive:
-    description: Boolean indicating if the credit evaluation was approved.
+    description: Integer indicating if the credit evaluation was approved (1) or not (0).
     lineage:
       - datalake_docx.credit_evaluation_events.ts_evaluation_positive
   evaluation_negative:
-    description: Boolean indicating if the credit evaluation was rejected.
+    description: Integer indicating if the credit evaluation was rejected (1) or not (0).
     lineage:
       - datalake_docx.credit_evaluation_events.ts_evaluation_negative
   bypass:
-    description: Boolean indicating if the credit evaluation was bypassed.
+    description: Integer indicating if the credit evaluation was bypassed (1) or not (0).
     lineage:
       - dw_credit_passport.fact_credit_evaluation.is_bypass
   sufficient_credit_limit:
-    description: Boolean indicating if the credit limit is sufficient for the proposal value.
+    description: Integer indicating if the credit limit is sufficient for the proposal value (1) or not (0).
     lineage:
       - datalake_docx.credit_evaluation_events.is_value_within_pre_approved_limit
   document_sent:
-    description: Boolean indicating if documents have been sent for analysis.
+    description: Integer indicating if documents have been sent for analysis (1) or not (0).
     lineage:
       - datalake_docx.credit_evaluation_events.ts_docs_analysis
   credit_analysis_approved:
-    description: Boolean indicating if the credit analysis was approved.
+    description: Integer indicating if the credit analysis was approved (1) or not (0).
     lineage:
       - datalake_docx.credit_evaluation_events.ts_credit_analysis_approved
   contract_created:
-    description: Boolean indicating if the contract was created.
+    description: Integer indicating if the contract was created (1) or not (0).
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_created_date
   contract_signed:
-    description: Boolean indicating if the contract was signed.
+    description: Integer indicating if the contract was signed (1) or not (0).
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
   is_group_active:
     description: Boolean indicating if the group is active.
     lineage:
       - datalake_docx_clean.group.is_active
+  is_group_last_credit_evaluation:
+    description: Boolean indicating if this is the most recent credit evaluation version for the user within a group.
   is_user_version:
-    description: Boolean indicating if this is the most recent credit evaluation version for the user.
-  is_maximum_funnel_step:
     description: Boolean indicating if this record represents the maximum funnel step achieved by the user.
   dt_credit_passport:
     description: Date when the credit passport was created.
