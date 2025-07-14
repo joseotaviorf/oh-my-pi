@@ -54,6 +54,9 @@ workflow:
     170698_chat_screen_page_viewed_events:
       run_optimize: false
       run_vacuum: false
+    170698_concierge_trigger_events:
+      run_optimize: false
+      run_vacuum: false
     170698_contract_page_viewed_events:
       run_optimize: false
       run_vacuum: false
