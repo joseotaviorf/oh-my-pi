@@ -33,7 +33,7 @@ SELECT DISTINCT
     pr.max_points,
     pr.ts_created,
     pr.ts_updated,
-    ad.year
+    ad.year,
     ad.bimester
 FROM
     points_rule AS pr
