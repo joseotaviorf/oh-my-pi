@@ -128,6 +128,7 @@ sap_gateway AS (
 sap_ledger AS (
 SELECT 
   hash,
+  id_transaction,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -145,13 +146,13 @@ WHERE
 )
 
 SELECT
-  ('RE-RTSK-RRA'||'-'||COALESCE(sl.id_finance_entity_entry, sl.id_finance_entity)||'-'||sl.account_number) AS id_accounting_process, 
+  ('RE-RTSK-RRA-' || sl.id_transaction || '-' || sl.account_number) AS id_accounting_process,
   sl.id_business_entity,
   sl.id_finance_entity,
   sl.id_finance_entity_entry,
   se.version,
   'for rent' AS business_unit,
-  'S4' AS source_name,
+  's4' AS source_name,
   'revenue accounting' AS accounting_type,
   sl.account_number,
   r.accounting_name,
@@ -161,7 +162,7 @@ SELECT
   FALSE AS is_correctness,
   FALSE AS is_temporality,
   FALSE AS is_compliance,
-  'reverse failure' AS accounting_process_status,
+  'reverse straw failure' AS accounting_process_status,
   MIN(CASE
     WHEN r.id_external IS NULL AND se.id_finance_entity IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
     WHEN r.id_external IS NULL AND se.id_finance_entity IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
@@ -184,6 +185,5 @@ LEFT JOIN
   retsuko_final r
     ON COALESCE(se.id_finance_entity, REGEXP_REPLACE(sl.id_finance_entity, '[^0-9]', '')) = r.id_external AND r.account_number = sl.account_number
 WHERE 
-  sl.account_number IN ('420003', '420019', '420020', '420025', '611012') 
-  AND r.id_external IS NULL
+  r.id_external IS NULL
 GROUP BY ALL
