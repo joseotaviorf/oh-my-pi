@@ -19,7 +19,7 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 
 # Pipeline inputs
@@ -62,14 +62,14 @@ QUERY_PATH = DAGPackagesPathService.get_dag_path(SOURCE) + "/queries/raw/"
 # Regex to identify the task that initializes the cluster
 # Matches create-cluster, execute-job-cluster, create-cluster-1, execute-job-cluster-1, etc.
 INIT_CLUSTER_REGEX = r"^(?:create|execute-job)-cluster(?:-\d+)?$"
-opsgenie_callback = OpsgenieCallback()
+jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_LIFE_CYCLE,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": opsgenie_callback.task_failure_alert,
+        "on_failure_callback": jiraops_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,

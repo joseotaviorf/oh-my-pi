@@ -12,7 +12,7 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 
 DAG_NAME = "services_integration_validations"
@@ -57,14 +57,14 @@ custom_libraries = [
         f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
     },
 ]
-opsgenie_callback = OpsgenieCallback()
+jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_AVAILABILITY,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": opsgenie_callback.task_failure_alert,
+        "on_failure_callback": jiraops_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
