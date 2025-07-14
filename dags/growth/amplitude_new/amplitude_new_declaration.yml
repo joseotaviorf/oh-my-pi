@@ -9,6 +9,7 @@ workflow:
   type: custom_ingestion
   layer: raw
   load_spark_job: load_amplitude_new_raw
+  custom_schema: amplitude_events
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
