@@ -1,33 +1,57 @@
 database_name: datalake_repairs_clean
 table_name: repair_request_item
+description: |
+  This table contains the repair request items for the repairs service.
+  The table contains data related to repair requests and associated expenses.
+  It includes details such as the description of the repair item, urgency status, and timestamps for creation and updates.
+  This data can be used to track repair requests over time, analyze trends in repair expenses, and assess the urgency of various requests.
+domain: For Rent
 columns:
   id:
+    description: The unique identifier for the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.id
   id_expense:
+    description: The unique identifier for the expense associated with the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.expense_id
   id_repair_request:
+    description: The unique identifier for the repair request associated with the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.repair_request_id
+  id_diagnosis:
+    description: The unique identifier for the diagnosis associated with the repair request item.
+    lineage:
+      - datalake_repairs_raw.repair_request_item.diagnosis_id
   repair_item_description:
+    description: The description of the repair item.
     lineage:
       - datalake_repairs_raw.repair_request_item.description
   is_urgent:
+    description: Indicates whether the repair request item is urgent.
     lineage:
       - datalake_repairs_raw.repair_request_item.is_urgent
+  responsible:
+    description: The responsible for the repair request item.
+    lineage:
+      - datalake_repairs_raw.repair_request_item.responsible
   ts_created:
+    description: The timestamp for the creation of the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.created_at
   ts_updated:
+    description: The timestamp for the update of the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.updated_at
   year:
+    description: The year of the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.year
   month:
+    description: The month of the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.month
   day:
+    description: The day of the repair request item.
     lineage:
       - datalake_repairs_raw.repair_request_item.day
