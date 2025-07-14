@@ -91,17 +91,24 @@ front_tickets_list AS (
       THEN 1
       ELSE 0
     END AS recontact_flag,
-    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) THEN LAG(rc.sk_ticket) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) ELSE NULL END AS sk_ticket_previous_contact,
-    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) THEN LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user,rc.team ORDER BY rc.ts_started) ELSE NULL END AS ts_started_previous_contact,
-    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) THEN LAG(rc.channel) OVER(PARTITION BY rc.sk_user,rc.team ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_channel,
-    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) THEN LAG(rc.theme) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_taxonomy,
+    CASE
+      WHEN rc.theme is null then 0
+      WHEN DATE_DIFF(DAY, LAG(DATE(rc.ts_started)) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started), DATE(rc.ts_started)) <= 3 
+      AND LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) != rc.ts_started 
+      THEN 1
+      ELSE 0
+    END AS recontact_flag_taxo,
+    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) THEN LAG(rc.sk_ticket) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) ELSE NULL END AS sk_ticket_previous_contact,
+    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) THEN LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user,rc.team, rc.theme ORDER BY rc.ts_started) ELSE NULL END AS ts_started_previous_contact,
+    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) THEN LAG(rc.channel) OVER(PARTITION BY rc.sk_user,rc.team, rc.theme ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_channel,
+    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) THEN LAG(rc.theme) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_taxonomy,
     rc.csat_score,
-    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) THEN LAG(rc.csat_score) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_csat,
+    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) THEN LAG(rc.csat_score) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_csat,
     rc.total_minutes_handling_time,
     rc.total_minutes_queue_time,
     rc.total_minutes_talk_time,
     rc.email,
-    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) THEN LAG(rc.email) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_email,
+    CASE WHEN rc.ts_started != LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) THEN LAG(rc.email) OVER(PARTITION BY rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started) ELSE NULL END AS previous_contact_email,
     rc.department,
     LEAD(rc.sk_ticket) OVER(PARTITION BY rc.sk_user ORDER BY rc.ts_started) AS sk_ticket_contact_later,
     LAG(rc.total_minutes_handling_time) OVER(PARTITION BY rc.sk_user ORDER BY rc.ts_started) AS total_minutes_handling_time_previous_contact,
@@ -122,7 +129,7 @@ front_tickets_list AS (
       ) THEN 'front'
     END AS unificador_front,
     rc.ts_started,
-    ROW_NUMBER() OVER(PARTITION BY rc.sk_ticket, rc.sk_user, rc.team ORDER BY rc.ts_started DESC) AS rn
+    ROW_NUMBER() OVER(PARTITION BY rc.sk_ticket, rc.sk_user, rc.team, rc.theme ORDER BY rc.ts_started DESC) AS rn
   FROM
     front_tickets_list AS rc
   WHERE
@@ -198,6 +205,7 @@ SELECT
       ELSE NULL
     END), '') AS ticket_back,
   recontact_flag,
+  recontact_flag_taxo,
   rc.search_window_from,
   rc.search_window_until,
   rc.ts_started_previous_contact AS ts_started_first_contact,
