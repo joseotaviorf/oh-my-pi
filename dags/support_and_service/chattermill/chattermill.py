@@ -14,7 +14,7 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 
 # ENV setup
@@ -75,14 +75,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 DAG_OWNER = DAGOwnerEnum.DATA_SS
-jiraops_callback = JiraOpsCallback()
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": jiraops_callback.task_failure_alert,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,

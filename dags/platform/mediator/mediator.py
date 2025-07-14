@@ -13,7 +13,7 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 from dags import DAG_PACKAGES_ROOT
 
 DAGS_CROSS_DEPENDENCIES_FILE_NAME = "mediator-dependencies.yaml"
@@ -60,7 +60,7 @@ def extract_skip_list(dependencies_dict):
 
     return list(force_skip_list)
 
-jiraops_callback = JiraOpsCallback()
+opsgenie_callback = OpsgenieCallback()
 # Define tasks
 DAG_NAME = "mediator"
 DAG_ID = f"airflow.{DAG_NAME}"
@@ -70,7 +70,7 @@ mediator_dag = DAG(
         "owner": DAGOwnerEnum.DATA_LIFE_CYCLE,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": jiraops_callback.task_failure_alert,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=datetime(2020, 5, 8, 0, 0, 0),
     schedule_interval="@continuous",

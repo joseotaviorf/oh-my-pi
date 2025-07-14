@@ -1,5 +1,5 @@
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.jiraops.jiraops_client import JiraOpsClient
+from bietlejuice.base.opsgenie.opsgenie_client import OpsgenieClient
 from datetime import datetime, timedelta, timezone
 
 from airflow.decorators import task, dag
@@ -56,7 +56,7 @@ def has_successful_dag_runs_since_date(dag_id: str, date: datetime.date, session
 @task
 def notify_unfinished_dags(dag_ids: list, expected_times: dict) -> None:
     """
-    Notify JiraOps about unfinished DAGs.
+    Notify Opsgenie about unfinished DAGs.
     """
 
     if not dag_ids:
@@ -66,29 +66,30 @@ def notify_unfinished_dags(dag_ids: list, expected_times: dict) -> None:
     unfinished_dags = [dag_id for dag_id in dag_ids if dag_id is not None]
     print(f"Unfinished DAGs: {unfinished_dags}")
     
-    message = f"DAGs not finished by SLA"
+    summary_message = f"DAGs not finished by SLA"
     current_datetime = datetime.now()
-    description = f"The following DAGs have not finished by SLA:\n"
+    full_description = f"The following DAGs have not finished by SLA:\n"
     for dag_id in unfinished_dags:
-        description += f"- {dag_id} (Expected finish time: {expected_times[dag_id]})\n"
-    description += f"Current time: {current_datetime.strftime('%Y-%m-%d %H:%M:%S %z')}."
+        full_description += f"- {dag_id} (Expected finish time: {expected_times[dag_id]})\n"
+    full_description += f"Current time: {current_datetime.strftime('%Y-%m-%d %H:%M:%S %z')}."
 
     resource_name = f"labels {{workflow_name={DAG_ID}}}"
 
-    jiraops_credentials = Variable.get("JIRA_OPS_ONCALL_APIKEY")
-    client = JiraOpsClient(jiraops_credentials)
-    response = client.create_alert(
-        message=message,
-        description=description,
-        tags=[DAG_ID],
+    opsgenie_api_key = Variable.get("OPSGENIE_TEST_APIKEY")
+    client = OpsgenieClient(opsgenie_api_key, "googlestackdriver")
+    response = client.create_incident(
+        resource_name=resource_name,
+        summary_message=summary_message,
+        full_description=full_description,
+        issue_summary=full_description,
+        resource_labels={"workflow_name": DAG_ID},
     )
 
-    try:
+    if response.status_code == 200:
+        print("The incident was created successfully.")
+        print("Response JSON:", response.json())
+    else:
         response.raise_for_status()
-        print("Alert created successfully.")
-    except Exception as e:
-        print(f"Failed to send request to JiraOps. Status code: {response.status_code}")
-        print(f"Error message: {e}")
 
 
 @dag(dag_id=DAG_ID, schedule="*/30 * * * *", start_date=datetime(2025, 4, 1))

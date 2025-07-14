@@ -17,7 +17,7 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
@@ -76,14 +76,14 @@ LIBRARIES = [
 
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
 DAG_OWNER = DAGOwnerEnum.DATA_GROWTH
-jiraops_callback = JiraOpsCallback()
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": jiraops_callback.task_failure_alert,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=DatasetService.get_dag_datasets(DAG_ID),

@@ -16,7 +16,7 @@ from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTas
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 # Pipeline inputs
@@ -49,14 +49,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 
 ENV = os.environ.get("ENVIRONMENT")
-jiraops_callback = JiraOpsCallback()
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": jiraops_callback.task_failure_alert,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
