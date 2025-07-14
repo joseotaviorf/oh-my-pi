@@ -13,4 +13,4 @@ SELECT
     updated_at AS ts_updated,
     NOW() AS ts_load
 FROM
-    datalake_trato_feito_raw.communication_audience
+    datalake_trato_feito_raw.audience

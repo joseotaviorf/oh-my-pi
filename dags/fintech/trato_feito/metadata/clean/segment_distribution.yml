@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: segment_distribution
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Segment Distribution table that replaces the former COMMS table, linking customers to communication segments and audiences.
 columns:
   id_segment_distribution:
@@ -13,10 +13,10 @@ columns:
     description: "Identifier of the communication segment the customer belongs to"
     lineage:
       - datalake_trato_feito_raw.segment_distribution.segment_id
-  id_communication_audience:
+  id_audience:
     description: "Identifier of the communication audience associated with the segment"
     lineage:
-      - datalake_trato_feito_raw.segment_distribution.communication_audience_id
+      - datalake_trato_feito_raw.segment_distribution.audience_id
   id_contract:
     description: "Contract ID"
     lineage:

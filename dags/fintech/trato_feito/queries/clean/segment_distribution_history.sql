@@ -1,7 +1,7 @@
 SELECT
     CAST(id AS BIGINT) AS id_segment_distribution_history,
     CAST(segment_id AS BIGINT) AS id_segment,
-    CAST(communication_audience_id AS BIGINT) AS id_communication_audience,
+    CAST(audience_id AS BIGINT) AS id_audience,
     contract_id AS id_contract,
     rev,
     revtype,
@@ -11,7 +11,7 @@ SELECT
     active AS is_active,
     active_mod AS has_active_modified,
     segment_id_mod AS has_id_segment_modified,
-    communication_audience_id_mod AS has_id_communication_audience_modified,
+    audience_id_mod AS has_id_audience_modified,
     contract_id_mod AS has_id_contract_modified,
     customer_document_type_mod AS has_customer_document_type_modified,
     customer_document_value_mod AS has_customer_document_value_modified,

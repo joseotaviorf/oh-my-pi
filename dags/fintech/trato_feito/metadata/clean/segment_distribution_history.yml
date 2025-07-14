@@ -2,8 +2,8 @@
 database_name: datalake_trato_feito_clean
 table_name: segment_distribution_history
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: null
+domain: Fintech
+description: Segment Distribution History that stores historical link between customers to communication segments and audiences.
 columns:
   id_segment_distribution_history:
     description: "Primary key of the entity.Auto-generated using IDENTITY strategy. Cannot be updated or null"
@@ -13,24 +13,24 @@ columns:
     description: "Identifier for the segment. Can be null. Represents which segment the customer belongs to"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.segment_id
-  id_communication_audience:
+  id_audience:
     description: "Identifier for the communication audience. Can be null. Used for targeting specific communication grou"
     lineage:
-      - datalake_trato_feito_raw.segment_distribution_history.communication_audience_id
+      - datalake_trato_feito_raw.segment_distribution_history.audience_id
   id_contract:
     description: "Identifier for the associated contract. Can be null. Links the segment distribution to a specific contract"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.contract_id
   rev:
-    description: ""
+    description: "Revision number of the entity"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.rev
   revtype:
-    description: ""
+    description: "Type of revision (INSERT, UPDATE, DELETE)"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.revtype
   revend:
-    description: ""
+    description: "End revision number of the entity"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.revend
   customer_document_type:
@@ -46,35 +46,35 @@ columns:
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.active
   has_active_modified:
-    description: ""
+    description: "Flag indicating if the segment distribution is currently active. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.active_mod
   has_id_segment_modified:
-    description: ""
+    description: "Flag indicating if the segment identifier has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.segment_id_mod
-  has_id_communication_audience_modified:
-    description: ""
+  has_id_audience_modified:
+    description: "Flag indicating if the audience identifier has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
-      - datalake_trato_feito_raw.segment_distribution_history.communication_audience_id_mod
+      - datalake_trato_feito_raw.segment_distribution_history.audience_id_mod
   has_id_contract_modified:
-    description: ""
+    description: "Flag indicating if the contract identifier has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.contract_id_mod
   has_customer_document_type_modified:
-    description: ""
+    description: "Flag indicating if the customer document type has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.customer_document_type_mod
   has_customer_document_value_modified:
-    description: ""
+    description: "Flag indicating if the customer document value has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.customer_document_value_mod
   has_ts_entered_segment_modified:
-    description: ""
+    description: "Flag indicating if the timestamp of when the customer entered the segment has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.entered_segment_at_mod
   has_dt_last_appearance_modified:
-    description: ""
+    description: "Flag indicating if the last date when the customer appeared in this segment has been modified. Default value is false. Used to track if the customer is currently in this segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution_history.last_appearance_date_mod
   dt_last_appearance:
