@@ -3954,6 +3954,8 @@ bietlejuice.reverse_dsat_report_load:
   - bietlejuice.enrich_survicate:load-enrich-response-content:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-questions:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-responses:first-run-of-day
+bietlejuice.reverse_integration_cloudzero:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
 bietlejuice.reverse_kyc:
   - bietlejuice.docx:load-clean-document-type:first-run-of-day
   - bietlejuice.docx:load-clean-document:first-run-of-day

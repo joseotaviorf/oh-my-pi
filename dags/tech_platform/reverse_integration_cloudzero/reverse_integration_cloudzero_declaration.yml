@@ -1,0 +1,31 @@
+dag:
+  name: reverse_integration_cloudzero
+  schedule_start_date: 2025, 1, 1
+  owner: Tech Platform Dev Foundation
+  documentation:
+    dag_purpose: |
+      Query Databricks for contracts count and send to CloudZero API for cost monitoring.
+      This DAG retrieves the number of ongoing rental contracts from Databricks and
+      sends this metric to CloudZero for unit cost analysis.
+workflow:
+  type: load_access
+  layer: reverse
+  custom_schema: integration_cloudzero
+  load_spark_job: load_contracts_to_cloudzero
+  spark_job_arguments:
+    - "{environment}"
+    - "{{ data_interval_start | ds }}"
+  execution_timeout_hours: 2
+  tables_customization:
+    contracts_count: {}
+cluster:
+  type: databricks_13_3_min_general_cluster
+  access_control_list:
+    group_name: data-platform-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
