@@ -8,7 +8,7 @@ from airflow.operators.python_operator import PythonOperator
 from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 DAG_NAME = "databricks_jobs_deletion"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -40,14 +40,14 @@ def delete_databricks_jobs(
     )
     ThreadPool(processes=5).map(databricks_hook.delete_job, list(jobs_id_list.keys()))
 
-opsgenie_callback = OpsgenieCallback()
+jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_LIFE_CYCLE,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": opsgenie_callback.task_failure_alert,
+        "on_failure_callback": jiraops_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
