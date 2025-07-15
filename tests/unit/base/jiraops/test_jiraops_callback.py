@@ -1,3 +1,4 @@
+import json
 import pytest
 import datetime
 from unittest.mock import patch, MagicMock
@@ -19,11 +20,13 @@ def get_mock_variable(key):
     if key == "environment":
         return "prod"
     elif key == "JIRA_OPS_ONCALL_APIKEY":
-        return {
-            "username": "test_username",
-            "token": "test_token",
-            "cloud_id": "test_cloud_id",
-        }
+        return json.dumps(
+            {
+                "username": "test_username",
+                "token": "test_token",
+                "cloud_id": "test_cloud_id",
+            }
+        )
     return None
 
 

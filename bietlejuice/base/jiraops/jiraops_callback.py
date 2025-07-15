@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from airflow.models import Variable
@@ -22,7 +23,7 @@ class JiraOpsCallback:
             return
         logger.info(f"DAG [{dag_id}]: Failed task {task_id}, creating alert...")
 
-        jiraops_credentials = Variable.get("JIRA_OPS_ONCALL_APIKEY")
+        jiraops_credentials = json.loads(Variable.get("JIRA_OPS_ONCALL_APIKEY"))
 
         message = f"DAG: {dag_id} - Task: {task_id}"
 
