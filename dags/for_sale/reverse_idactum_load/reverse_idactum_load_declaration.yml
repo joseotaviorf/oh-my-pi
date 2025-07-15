@@ -1,0 +1,23 @@
+dag:
+  name: reverse_idactum_load
+  schedule_start_date: 2025, 01, 01
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG collects several cases of possible "bypass" and sends them to the Idactum partner to process the information and determine whether or not the bypass occurred.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: idactum
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

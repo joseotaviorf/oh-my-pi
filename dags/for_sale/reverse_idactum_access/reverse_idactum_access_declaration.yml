@@ -1,0 +1,25 @@
+dag:
+  name: reverse_idactum_access
+  schedule_start_date: 2025, 01, 01
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG collects data on possible "ByPass" and sends it to Idactum. Idactum is our partner for identifying possible "ByPass".
+workflow:
+  layer: reverse
+  type: access
+  load_spark_job: load_s3_data_into_external_bucket
+  spark_job_arguments:
+  - "{dag_name}"
+  - "{environment}"
+  - "{bucket}"
+  - "idactum"
+  tables_customization:
+    external_bucket: {}
+cluster:
+  type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
