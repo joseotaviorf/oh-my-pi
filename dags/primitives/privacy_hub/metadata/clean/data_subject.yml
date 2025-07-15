@@ -1,0 +1,58 @@
+---
+database_name: datalake_privacy_hub_clean
+table_name: data_subject
+domain: Primitives
+description: Clean data subject information from the privacy hub containing personal data subjects and their associated metadata.
+columns:
+  id:
+    description: Unique identifier for the data subject record.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.id
+  id_external:
+    description: External identifier for the data subject used for cross-system references.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.external_id
+  id_data_controller:
+    description: Identifier of the data controller responsible for the data subject's personal data.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.data_controller_id
+  id_data_subject_category:
+    description: Identifier of the category that classifies the type of data subject.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.data_subject_category_id
+  purpose_acceptances:
+    description: Information about the purposes for which the data subject has provided consent.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.purpose_acceptances
+  version:
+    description: Version number of the data subject record for tracking changes over time.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.version
+  is_deleted:
+    description: Flag indicating whether the data subject record has been marked as deleted.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.deleted
+  is_onetrust_migrated:
+    description: Flag indicating whether the data subject record has been migrated to OneTrust.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.onetrust_migrated
+  ts_updated_at:
+    description: Timestamp when the data subject record was last updated.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.updated_at
+  ts_created_at:
+    description: Timestamp when the data subject record was first created.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.created_at
+  year:
+    description: Year component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.updated_at
+  month:
+    description: Month component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.updated_at
+  day:
+    description: Day component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.data_subject.updated_at

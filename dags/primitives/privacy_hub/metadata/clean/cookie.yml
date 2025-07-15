@@ -1,0 +1,58 @@
+---
+database_name: datalake_privacy_hub_clean
+table_name: cookie
+domain: Primitives
+description: Clean cookie data from the privacy hub containing information about cookies defined and managed on websites.
+columns:
+  id:
+    description: Unique identifier for the cookie record.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.id
+  id_cookie_definition:
+    description: Identifier of the cookie definition that this cookie is based on.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.cookie_definition_id
+  id_website:
+    description: Identifier of the website where the cookie is used or deployed.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.website_id
+  owner_email:
+    description: Email address of the owner or person responsible for managing this cookie.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.owner_email
+  version:
+    description: Version number of the cookie record for tracking changes over time.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.version
+  category:
+    description: Category or classification of the cookie based on its purpose or functionality.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.category
+  is_overwritten:
+    description: Flag indicating whether the cookie configuration has been overwritten from its original definition.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.is_overwritten
+  ts_last_seen_at:
+    description: Timestamp when the cookie was last detected or seen on the website.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.last_seen
+  ts_updated_at:
+    description: Timestamp when the cookie record was last updated.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.updated_at
+  ts_created_at:
+    description: Timestamp when the cookie record was first created.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.created_at
+  year:
+    description: Year component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.updated_at
+  month:
+    description: Month component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.updated_at
+  day:
+    description: Day component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.cookie.updated_at

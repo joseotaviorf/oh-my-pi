@@ -1,0 +1,74 @@
+---
+database_name: datalake_privacy_hub_clean
+table_name: transaction
+domain: Primitives
+description: Clean transaction records from the privacy hub containing privacy-related transactions and consent management activities.
+columns:
+  id:
+    description: Unique identifier for the transaction record.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.id
+  id_data_subject:
+    description: Identifier of the data subject associated with this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.data_subject_id
+  id_request:
+    description: Identifier of the request that initiated this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.request_id
+  id_operator:
+    description: Identifier of the operator who performed or managed this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.operator_id
+  origin:
+    description: Origin or source system from which the transaction was initiated.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.origin
+  document_alias:
+    description: Alias or reference name for the document associated with this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.document_alias
+  document_version:
+    description: Version number of the document associated with this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.document_version
+  purpose_alias:
+    description: Alias or reference name for the purpose of data processing in this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.purpose_alias
+  purpose_status:
+    description: Status of the purpose processing for this transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.purpose_status
+  type:
+    description: Type or category of the transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.type
+  result:
+    description: Result or outcome of the transaction processing.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.result
+  custom_attributes:
+    description: Additional custom attributes or metadata associated with the transaction.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.custom_attributes
+  ts_created_at:
+    description: Timestamp when the transaction record was first created.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.created_at
+  ts_updated_at:
+    description: Timestamp when the transaction record was last updated.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.updated_at
+  year:
+    description: Year component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.updated_at
+  month:
+    description: Month component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.updated_at
+  day:
+    description: Day component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.transaction.updated_at

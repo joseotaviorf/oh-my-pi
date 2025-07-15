@@ -1,0 +1,58 @@
+---
+database_name: datalake_privacy_hub_clean
+table_name: intercepted_cookie
+domain: Primitives
+description: Clean intercepted cookie data from the privacy hub containing information about cookies detected on websites.
+columns:
+  id:
+    description: Unique identifier for the intercepted cookie record.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.id
+  id_website:
+    description: Identifier of the website where the cookie was intercepted.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.website_id
+  name:
+    description: Name or identifier of the intercepted cookie.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.name
+  script_url:
+    description: URL of the script that set or manages the intercepted cookie.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.script_url
+  domain:
+    description: Domain from which the cookie originates or is accessible.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.domain
+  ttl:
+    description: Time-to-live value indicating how long the cookie remains valid.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.ttl
+  version:
+    description: Version number of the intercepted cookie record for tracking changes.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.version
+  is_catalogued:
+    description: Flag indicating whether the intercepted cookie has been catalogued or classified.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.is_catalogued
+  ts_updated_at:
+    description: Timestamp when the intercepted cookie record was last updated.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.updated_at
+  ts_created_at:
+    description: Timestamp when the intercepted cookie record was first created.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.created_at
+  year:
+    description: Year component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.updated_at
+  month:
+    description: Month component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.updated_at
+  day:
+    description: Day component extracted from the updated_at timestamp for partitioning.
+    lineage:
+      - datalake_privacy_hub_raw.intercepted_cookie.updated_at
