@@ -23,7 +23,7 @@ SELECT
     CAST(REPLACE(NULLIF(fator_qualifieds_aux_2, ''), ',', '') AS FLOAT) AS fator_qualifieds_aux_2,
     CAST(REPLACE(NULLIF(fator_available_qualifieds_aux_2, ''), ',', '') AS FLOAT) AS fator_available_qualifieds_aux_2,
     CAST(REPLACE(NULLIF(fator_opportunities_aux_2, ''), ',', '') AS FLOAT) AS fator_opportunities_aux_2, 
-    CAST(REPLACE(NULLIF(first_listinfator_first_listings_aux_2gs_fs, ''), ',', '') AS FLOAT) AS fator_first_listings_aux_2,
+    CAST(REPLACE(NULLIF(fator_first_listings_aux_2, ''), ',', '') AS FLOAT) AS fator_first_listings_aux_2,
     CAST(REPLACE(NULLIF(volume_prospects_unique, ''), ',', '') AS FLOAT) AS volume_prospects_unique,
     CAST(REPLACE(NULLIF(volume_qualifieds_unique, ''), ',', '') AS FLOAT) AS volume_qualifieds_unique,
     CAST(REPLACE(NULLIF(volume_available_qualifieds_unique, ''), ',', '') AS FLOAT) AS volume_available_qualifieds_unique,
