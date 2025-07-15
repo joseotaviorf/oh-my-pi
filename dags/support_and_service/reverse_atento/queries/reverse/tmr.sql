@@ -46,7 +46,7 @@ tmr_by_message AS (
     CASE
       WHEN
         next_ts_created IS NOT NULL
-      THEN DATEDIFF(next_ts_created, ts_created) / 1440.0
+      THEN DATEDIFF(MINUTE, ts_created, next_ts_created)
       ELSE NULL
     END AS minutes_diff_for_answer
   FROM
