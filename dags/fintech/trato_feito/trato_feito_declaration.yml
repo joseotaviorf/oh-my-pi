@@ -22,7 +22,7 @@ workflow:
         count: "id"
     audience:
       raw_primary_keys: [id]
-      clean_primary_keys: [id]
+      clean_primary_keys: [id_communication_audience]
     bill:
       get_table_metrics:
         count: "id"
