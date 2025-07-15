@@ -1,0 +1,27 @@
+SELECT
+    period_of_service_id AS id_period_of_service,
+    business_group_id AS id_business_group,
+    person_id AS id_person,
+    legal_entity_id AS id_legal_entity,
+    action_occurrence_id AS id_action_occurrence,
+    legislation_code,
+    period_type AS worker_type,
+    rehire_recommendation,
+    revoke_user_access = 'A' AS is_user_access_revoked,
+    primary_flag = 'Y' AS is_primary,
+    on_military_service = 'Y' AS is_on_military_service,
+    fast_path_employee = 'Y' AS is_fast_path_employee,
+    created_by,
+    last_updated_by AS updated_by,
+    CAST(object_version_number AS INT) AS object_version_number,
+    TO_DATE(date_start) AS dt_started,
+    TO_DATE(actual_termination_date) AS dt_actual_termination,
+    TO_DATE(notified_termination_date) AS dt_notified_termination,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_pin_core_raw.per_periods_of_service

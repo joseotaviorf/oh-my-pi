@@ -1,0 +1,89 @@
+---
+database_name: datalake_pin_core_clean
+table_name: entity_profile
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: "Stores profile information for legal entities, which can represent companies, organizations, or other business-related parties. This table includes identifiers, names, flags for specific roles (like transacting entity or legal employer, and audit timestamps."
+columns:
+  id_legal_entity:
+    description: "Unique identifier for the legal entity."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.legal_entity_id
+  id_party:
+    description: "Identifier for the associated party related to the legal entity."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.party_id
+  id_geography:
+    description: "Identifier for the geography associated with the legal entity."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.geography_id
+  id_enterprise:
+    description: "Identifier for the enterprise to which the legal entity belongs."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.enterprise_id
+  id_business_legal_entity:
+    description: "A business-specific identifier for the legal entity."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.legal_entity_identifier
+  legal_entity_name:
+    description: "The official name of the legal entity, in uppercase."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.name
+  attribute_category:
+    description: "A category for classifying attributes of the legal entity."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.attribute_category
+  legal_information_context:
+    description: "The context in which the legal information is applicable."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.le_information_context
+  is_transacting_entity:
+    description: "Boolean flag that is true if the entity is authorized to perform transactions."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.transacting_entity_flag 
+  is_payroll_statutory_unit:
+    description: "Boolean flag that is true if the entity is considered a Payroll Statutory Unit (PSU."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.psu_flag
+  is_legal_employer:
+    description: "Boolean flag that is true if the entity is registered as a legal employer."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.legal_employer_flag
+  created_by:
+    description: "The user or process that created the record."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.created_by
+  updated_by:
+    description: "The user or process that last updated the record."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.last_updated_by
+  object_version_number:
+    description: "The version number of the record, used for concurrency control."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.object_version_number
+  dt_effective_started:
+    description: "The date from which this version of the record becomes effective."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.effective_from
+  ts_created:
+    description: "The timestamp when the original record was created in the source system."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.creation_date
+  ts_updated:
+    description: "The timestamp when the record was last updated in the source system."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.last_update_date
+  ts_load:
+    description: "The timestamp when the record was loaded into this clean table."
+  year:
+    description: "Year extracted from the ts_updated column, useful for data partitioning and filtering."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.year
+  month:
+    description: "Month extracted from the ts_updated column, useful for data partitioning and filtering."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.month
+  day:
+    description: "Day extracted from the ts_updated column, useful for data partitioning and filtering."
+    lineage:
+      - datalake_pin_core_raw.xle_entity_profiles.day

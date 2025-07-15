@@ -180,6 +180,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_periods_of_service:
+      clean_table_name: periods_of_service
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_person_names_f:
       clean_table_name: person_name
       extra_spark_job_arguments:
@@ -192,6 +197,11 @@ workflow:
           date_column_to_partition: last_update_date
     per_users:
       clean_table_name: user
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    xle_entity_profiles:
+      clean_table_name: entity_profile
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
