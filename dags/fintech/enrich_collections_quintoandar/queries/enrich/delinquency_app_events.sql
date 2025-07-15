@@ -30,6 +30,29 @@ overdue_invoices_events AS (
     FROM_JSON(ep_id_contracts, 'array<bigint>') AS id_contract,
     FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_family,
+    "rm_pending_invoices_page_viewed" AS event_name,
+    "Pending Invoices" AS funnel_step,
+    3 AS level,
+    "Triggers when user accesses the pending invoices page (overdue and upcoming)" AS event_description,
+    TRUE AS is_active,
+    year,
+    month,
+    day,
+    ts_event
+  FROM
+    datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+  UNION ALL
+
+  SELECT
+    id_amplitude,
+    id_session,
+    id_user,
+    FROM_JSON(ep_id_contracts, 'array<bigint>') AS id_contract,
+    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
+    device_family,
     "overdue_invoices_page_viewed" AS event_name,
     "Overdue Self Service Viewed" AS funnel_step,
     3 AS level,
@@ -171,29 +194,6 @@ SELECT
   day,
   ts_event
 FROM explode_overdue_invoices_events
-
-UNION ALL
-
-SELECT
-  id_amplitude,
-  id_session,
-  id_user,
-  CAST(ep_id_contract AS BIGINT) AS id_contract,
-  CAST(NULL AS BIGINT) AS id_invoice,
-  device_family,
-  "rm_pending_invoices_page_viewed" AS event_name,
-  "Pending Invoices" AS funnel_step,
-  3 AS level,
-  "Triggers when user accesses the pending invoices page (overdue and upcoming)" AS event_description,
-  TRUE AS is_active,
-  year,
-  month,
-  day,
-  ts_event
-FROM
-  datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events
-WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
 UNION ALL
 
