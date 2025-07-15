@@ -1,5 +1,5 @@
 dag:
-  name: awesomeapi_currency_rates
+  name: currency
   owner: Data People
   schedule_interval: 0 3 * * *
   documentation:
@@ -24,7 +24,7 @@ workflow:
   type: custom_ingestion
   bucket_config_name: people_bucket
   default_extraction_type: incremental
-  load_spark_job: load_awesomeapi_currency_rates_raw
+  load_spark_job: load_currency_raw
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
@@ -41,7 +41,7 @@ workflow:
     load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
     load_end_date: "{{ data_interval_start | ds }}"
   tables_customization:
-    currency_closing_rates:
+    closing_rates:
       merge_on: ["currency_pair", "ts_created"]
       extra_spark_job_arguments:
         - currencies:

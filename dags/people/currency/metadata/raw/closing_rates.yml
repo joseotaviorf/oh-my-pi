@@ -1,8 +1,8 @@
 ---
-database_name: datalake_awesomeapi_currency_rates_raw
-table_name: currency_closing_rates
+database_name: datalake_currency_raw
+table_name: closing_rates
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: |
   Stores exchange rate data.
   Data is extracted from [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas).

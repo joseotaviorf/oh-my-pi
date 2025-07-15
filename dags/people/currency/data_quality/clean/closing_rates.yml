@@ -1,5 +1,5 @@
 ---
-table_name: datalake_awesomeapi_currency_rates_clean.currency_closing_rates
+table_name: datalake_currency_clean.closing_rates
 alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:

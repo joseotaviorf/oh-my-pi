@@ -78,7 +78,7 @@ exchange_rates AS (
     currency_from,
     bid_price AS conversion_rate
   FROM
-    datalake_awesomeapi_currency_rates_clean.currency_closing_rates
+    datalake_currency_clean.closing_rates
   WHERE
     currency_to = 'BRL'
   QUALIFY ROW_NUMBER() OVER (PARTITION BY currency_from ORDER BY dt_created DESC) = 1

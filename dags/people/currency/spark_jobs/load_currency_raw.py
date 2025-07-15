@@ -13,7 +13,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 
-JOB_NAME = "load_awesomeapi_currency_rates_raw"
+JOB_NAME = "load_currency_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 DATABRICKS_SCOPE = "people"
 API_URL = "https://economia.awesomeapi.com.br/json/daily"

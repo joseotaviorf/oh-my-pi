@@ -12,7 +12,6 @@ expected_times_to_finish:
   bietlejuice.arquivo_confidencial_integration_report: 07:20
   bietlejuice.atta: 01:29
   bietlejuice.authx_scim: 05:17
-  bietlejuice.awesomeapi_currency_rates: 07:22
   bietlejuice.batch_inference: '12:57'
   bietlejuice.betopera: 07:27
   bietlejuice.big_agent: 04:30
@@ -36,6 +35,7 @@ expected_times_to_finish:
   bietlejuice.criteo_campaigns: 06:18
   bietlejuice.criteo_temp: 09:35
   bietlejuice.crm: 04:24
+  bietlejuice.currency: 07:22
   bietlejuice.cyber: '11:45'
   bietlejuice.cyber_complement: '11:35'
   bietlejuice.cypress_reports: 07:27

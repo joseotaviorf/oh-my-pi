@@ -13,6 +13,6 @@ SELECT
     TIMESTAMP(create_date) AS ts_created,
     NOW() AS ts_load
 FROM
-    datalake_awesomeapi_currency_rates_raw.currency_closing_rates
+    datalake_currency_raw.closing_rates
 WHERE
     DATE(create_date) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
