@@ -2,7 +2,7 @@ from datetime import datetime
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from pendulum import timezone
 import os
-from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 from airflow.utils.helpers import chain
 from airflow.models import DAG
@@ -24,7 +24,7 @@ DAG_NAME = f"reverse_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2022, 2, 8, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 
-opsgenie_callback = OpsgenieCallback()
+jiraops_callback = JiraOpsCallback()
 config_service = ConfigurationService(DAG_NAME)
 
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -70,7 +70,7 @@ dag = DAG(
         "owner": DAGOwnerEnum.DEFAULT_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": opsgenie_callback.task_failure_alert,
+        "on_failure_callback": jiraops_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=DatasetService.get_dag_datasets(DAG_ID),
