@@ -4150,8 +4150,14 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-reviewer:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-repair-request:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-report-inspections:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-report-review:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-reviewer-approval:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
@@ -4166,10 +4172,19 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.enrich_terminator:load-enrich-termination:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-inspection-aud:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-inspection:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-item-group:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-repair-request:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-reviewer:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-room:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-task:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-workflow:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination:first-run-of-day
 bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-csat-front:first-run-of-day
