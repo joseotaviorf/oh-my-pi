@@ -74,7 +74,6 @@ workflow:
     rollout_cyber_contract: {}
     blocklist: {}
     comms: {}
-    audience: {}
     communication_sequence: {}
     communication_step: {}
     segment: {}
