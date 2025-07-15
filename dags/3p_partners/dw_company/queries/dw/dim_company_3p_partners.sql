@@ -9,6 +9,7 @@ SELECT
   COALESCE(cm.company_cluster, 'Unknown') AS company_cluster,
   COALESCE(cm.company_cluster_performance, 'Unknown') AS company_performance_cluster,
   COALESCE(a.country, 'Unknown') AS company_country,
+  COALESCE(cs.creci, '-1') AS company_creci,
   COALESCE(ci.company_name, 'Unknown') AS company_integrator_partner,
   c.company_name,
   COALESCE(a.neighborhood, 'Unknown') AS company_neigborhood,

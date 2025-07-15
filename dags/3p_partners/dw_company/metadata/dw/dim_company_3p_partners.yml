@@ -44,6 +44,10 @@ columns:
     lineage: 
       - datalake_company_clean.address.country
     description: Country where the company is located, registered in the company's address entity.
+  company_creci:
+    lineage: 
+      - datalake_company.company_sks.creci
+    description: CRECI document of the company, registered in the HubSpot's entity.
   company_integrator_partner:
     lineage: 
       - datalake_company_clean.company.company_name

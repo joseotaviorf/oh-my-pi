@@ -2,6 +2,7 @@ SELECT
   c.id_company,
   c.id_hubspot_owner,
   c.cnpj,
+  REGEXP_REPLACE(c.creci, '[^a-zA-Z0-9]', '') AS creci,
   c.company_cluster,
   c.name AS company_name,
   c.cluster_performance AS company_cluster_performance,

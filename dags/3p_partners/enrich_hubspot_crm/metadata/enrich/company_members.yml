@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_hubspot.company.cnpj
     description: CNPJ of the Brasil company, cleaned to have only numbers.
+  creci:
+    lineage:
+      - datalake_hubspot.company.creci
+    description: CRECI document of the company, cleaned to have only numbers and letters.
   company_cluster:
     lineage:
       - datalake_hubspot.company.company_cluster
