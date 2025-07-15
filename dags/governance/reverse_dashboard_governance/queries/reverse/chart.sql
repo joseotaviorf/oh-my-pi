@@ -1,3 +1,12 @@
+WITH slices_duplicated_rows AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER(PARTITION BY id ORDER BY s.ts_changed DESC) AS row_number
+    FROM
+        datalake_superset.slices s
+    WHERE
+        DATE_DIFF(DAY, ts_changed, current_timestamp) <= 7
+)
 SELECT
     ARRAY('datahub') AS vendor,
     CAST(s.id AS STRING) AS id_chart,
@@ -19,6 +28,6 @@ SELECT
     s.entity_status AS status,
     s.last_90d_views
 FROM
-    datalake_superset.slices s
+    slices_duplicated_rows AS s
 WHERE
-  DATE_DIFF(DAY, ts_changed, current_timestamp) <= 7
+    row_number = 1
