@@ -15,7 +15,7 @@ from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTas
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 
 # Pipeline inputs
@@ -62,14 +62,14 @@ def get_date_param(dag_run, execution_date, date_param_name):
         return date_param
     return execution_date
 
-opsgenie_callback = OpsgenieCallback()
+jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": opsgenie_callback.task_failure_alert,
+        "on_failure_callback": jiraops_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
