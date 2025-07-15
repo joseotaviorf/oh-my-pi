@@ -20,6 +20,9 @@ workflow:
     accounting_installment:
       get_table_metrics:
         count: "id"
+    audience:
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     bill:
       get_table_metrics:
         count: "id"
