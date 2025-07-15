@@ -30,15 +30,15 @@ SELECT
   tr.id_meeting AS sk_committee_meeting,
   COALESCE(DATE_FORMAT(tr.dt_committee_meeting, 'yyyyMMdd'), -1) AS sk_committee_meeting_date,
   MD5(CONCAT(
-    COALESCE(tr.id_criticality_rating_level_initial, -1)
-    COALESCE(tr.id_potential_rating_level_initial, -1)
-    COALESCE(tr.id_risk_loss_rating_level_initial, -1)
+    COALESCE(tr.id_criticality_rating_level_initial, -1),
+    COALESCE(tr.id_potential_rating_level_initial, -1),
+    COALESCE(tr.id_risk_loss_rating_level_initial, -1),
     COALESCE(tr.id_readiness_rating_level_initial, -1)
   )) AS sk_talent_rating_from_manager,
   MD5(CONCAT(
-    COALESCE(tr.id_criticality_rating_level_calibrated, -1)
-    COALESCE(tr.id_potential_rating_level_calibrated, -1)
-    COALESCE(tr.id_risk_loss_rating_level_calibrated, -1)
+    COALESCE(tr.id_criticality_rating_level_calibrated, -1),
+    COALESCE(tr.id_potential_rating_level_calibrated, -1),
+    COALESCE(tr.id_risk_loss_rating_level_calibrated, -1),
     COALESCE(tr.id_readiness_rating_level_calibrated, -1)
   )) AS sk_talent_rating_from_calibration,
   MD5(CONCAT(
@@ -134,7 +134,7 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_pin.talent_review AS tr
-LEFT JOIN
+INNER JOIN
   rating_change AS rc
     ON tr.id_period_of_service = rc.id_period_of_service 
     AND tr.id_meeting = rc.id_meeting

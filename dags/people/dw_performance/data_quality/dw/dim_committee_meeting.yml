@@ -6,7 +6,7 @@ table_level_validations:
     greater_than: 1
     severity_level: Error
 column_level_validations:
-  sk_performance_rating:
+  sk_meeting:
     has_completeness:
       greater_than: 0.7
       severity_level: Warning
