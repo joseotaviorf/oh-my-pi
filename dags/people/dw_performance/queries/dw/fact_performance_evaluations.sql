@@ -28,19 +28,19 @@ SELECT
     pc.id_evaluation AS sk_evaluation,
     pc.id_period_of_service AS sk_assignment,
     pc.id_person AS sk_employee,
-    DATE_FORMAT(pc.dt_evaluation_occurred, 'yyyyMMdd') AS sk_evaluation_date,
+    COALESCE(DATE_FORMAT(pc.dt_evaluation_occurred, 'yyyyMMdd'), -1) AS sk_evaluation_date,
     MD5(CONCAT(
-        MAX(pc.id_rating_level_from_manager) FILTER (WHERE pc.section_name = 'Behavior'),
-        MAX(pc.id_rating_level_from_manager) FILTER (WHERE pc.section_name = 'Impact'),
-        MAX(pc.id_rating_level_from_manager) FILTER (WHERE pc.section_name = 'Leadership')
+        COALESCE(MAX(pc.id_rating_level_from_manager) FILTER (WHERE pc.section_name = 'Behavior'), -1),
+        COALESCE(MAX(pc.id_rating_level_from_manager) FILTER (WHERE pc.section_name = 'Impact'), -1),
+        COALESCE(MAX(pc.id_rating_level_from_manager) FILTER (WHERE pc.section_name = 'Leadership'), -1)
     )) AS sk_performance_rating_from_manager,
     MD5(CONCAT(
-        MAX(pc.id_rating_level_from_calibration) FILTER (WHERE pc.section_name = 'Behavior'),
-        MAX(pc.id_rating_level_from_calibration) FILTER (WHERE pc.section_name = 'Impact'),
-        MAX(pc.id_rating_level_from_calibration) FILTER (WHERE pc.section_name = 'Leadership')
+        COALESCE(MAX(pc.id_rating_level_from_calibration) FILTER (WHERE pc.section_name = 'Behavior'), -1),
+        COALESCE(MAX(pc.id_rating_level_from_calibration) FILTER (WHERE pc.section_name = 'Impact'), -1),
+        COALESCE(MAX(pc.id_rating_level_from_calibration) FILTER (WHERE pc.section_name = 'Leadership'), -1)
     )) AS sk_performance_rating_from_calibration,
-    MD5(CONCAT(
-        CASE
+    MD5(
+        COALESCE(CASE
             WHEN b_cot.calibrated_rating_diff_from_previous IS NULL THEN '-1'
             WHEN b_cot.calibrated_rating_diff_from_previous = 0 THEN 'Maintained'
             WHEN b_cot.calibrated_rating_diff_from_previous < 0 THEN 'Decreased'

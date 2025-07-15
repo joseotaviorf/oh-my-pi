@@ -30,16 +30,16 @@ SELECT
   tr.id_meeting AS sk_committee_meeting,
   COALESCE(DATE_FORMAT(tr.dt_committee_meeting, 'yyyyMMdd'), -1) AS sk_committee_meeting_date,
   MD5(CONCAT(
-    COALESCE(tr.id_criticality_rating_level_initial, -1),
-    COALESCE(tr.id_potential_rating_level_initial, -1),
-    COALESCE(tr.id_risk_loss_rating_level_initial, -1),
-    COALESCE(tr.id_readiness_rating_level_initial, -1)
+    COALESCE(tr.initial_criticality, -1),
+    COALESCE(tr.initial_potential, -1),
+    COALESCE(tr.initial_risk_of_loss, -1),
+    COALESCE(tr.initial_readiness, -1)
   )) AS sk_talent_rating_from_manager,
   MD5(CONCAT(
-    COALESCE(tr.id_criticality_rating_level_calibrated, -1),
-    COALESCE(tr.id_potential_rating_level_calibrated, -1),
-    COALESCE(tr.id_risk_loss_rating_level_calibrated, -1),
-    COALESCE(tr.id_readiness_rating_level_calibrated, -1)
+    COALESCE(tr.calibrated_criticality, -1),
+    COALESCE(tr.calibrated_potential, -1),
+    COALESCE(tr.calibrated_risk_of_loss, -1),
+    COALESCE(tr.calibrated_readiness, -1)
   )) AS sk_talent_rating_from_calibration,
   MD5(CONCAT(
     CASE
