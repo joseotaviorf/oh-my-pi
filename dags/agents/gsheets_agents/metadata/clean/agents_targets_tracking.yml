@@ -1,7 +1,7 @@
 database_name: datalake_gsheets_clean
 table_name: agents_targets_tracking
 description: Clean table with information about the targets associated with each region. For each region, we can have targets for new agents and old agents.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   city_group:
@@ -89,6 +89,26 @@ columns:
     lineage:
       - datalake_gsheets_raw.agents_targets_tracking.tgt_share_3mais_vcs_mesmocr
     description: Target share visits completed visit flow of tp with agent.
+  tgt_vbs_tf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_vbs_tf
+    description: Target visits booked total flow.
+  tgt_vbba_tf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_vbba_tf
+    description: Target visits booked by agent total flow.
+  tgt_share_vbba_tf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_vbba_tf
+    description: Target share visits booked by agent total flow.
+  tgt_canc_noshow_tf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_canc_noshow_tf
+    description: Target no show total flow.
+  tgt_share_canc_noshow_tf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_canc_noshow_tf
+    description: Target share no show of visits booked total flow.
   dt_month_reference:
     lineage:
       - datalake_gsheets_raw.agents_targets_tracking.mes
