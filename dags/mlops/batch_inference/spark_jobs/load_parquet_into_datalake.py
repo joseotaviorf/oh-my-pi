@@ -1,8 +1,6 @@
-import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from pyspark.sql.utils import AnalysisException
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -25,25 +23,23 @@ def main():
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("source_root_path", help="name of the source")
     parser.add_argument(
         "date_to_ingest",
         help="Date to be used in filtering the files. Format: '%Y-%m-%d'",
     )
-    parser.add_argument("table_name", help="name of the output table")
 
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    source_root_path = args.source_root_path
     date_to_ingest = args.date_to_ingest
-    table_name = args.table_name
 
     config_service = ConfigurationService(source)
 
     raw_partition_cols = config_service.get_config("partition_cols")
     format = config_service.get_config("format")
+    source_root_path = config_service.get_config("source_root_path")
+    table_name = config_service.get_config("table_name")
 
     logger.info(
         f"""
@@ -55,36 +51,24 @@ def main():
 
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
-    s3_loader = S3Loader()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-    format_options = SparkTableStorageFormat.PARQUET
 
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
+    df = s3_consumer.get_data_from_file(
+        f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
+        format
+    )
 
-    try:
-        df = s3_consumer.get_data_from_file(
-            f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
-            format
-        )
-    except AnalysisException as e:
-        logger.info(
-            f"""
-            m=__main__, msg=No data found for date_to_ingest={date_to_ingest}, source={source},
-            source_root_path={source_root_path}, table_name={table_name}.
-
-            Exception: {e}
-            """
-        )
-        return
+    path = f"{database_location}{table_name}"
+    logger.info(f"m=__main__, msg=Loading data into {path}...")
 
     df = (
         SparkDataFrameService()
@@ -93,26 +77,15 @@ def main():
         .output()
     )
 
-    s3_loader.load_df(
-        df=df,
-        s3_path=f"{database_location}{table_name}",
-        format_options=format_options,
-        partitions=raw_partition_cols,
+    (
+        df.write
+          .format("parquet")
+          .mode("overwrite")
+          .option("path", path)
+          .partitionBy(raw_partition_cols)
+          .toTable(database_name + "." + table_name)
     )
-    spark_metastore_loader.update_metastore(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
-        partitions=raw_partition_cols,
-    )
-    spark_metastore_service.create_new_partitions_from_df(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        partition_cols=raw_partition_cols,
-    )
+
 
 if __name__ == "__main__":
     main()
