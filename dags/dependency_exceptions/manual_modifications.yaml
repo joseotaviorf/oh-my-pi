@@ -871,6 +871,8 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-recontact:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-offboarding-perspective-metrics:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-nps-offboarding:first-run-of-day
 bietlejuice.reverse_supply_access:
   add:
     - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry:first-run-of-day

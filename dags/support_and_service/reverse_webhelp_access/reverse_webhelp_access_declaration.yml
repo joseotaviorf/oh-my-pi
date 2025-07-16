@@ -40,6 +40,9 @@ workflow:
     nps_offboarding:
       extra_spark_job_arguments:
       - cx
+    offboarding_perspective_metrics:
+      extra_spark_job_arguments:
+      - services
     repair_tickets:
       extra_spark_job_arguments:
       - services
