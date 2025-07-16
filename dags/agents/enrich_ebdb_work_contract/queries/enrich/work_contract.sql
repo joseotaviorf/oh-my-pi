@@ -39,10 +39,10 @@ work_contract_aux AS (
       pa.id_company_hubspot,
       IF(wc.contract_name = bus.hub_name_wc, bus.hub_name_teams, NULL) AS hub_name_teams,
       wc.contract_name,
-      COALESCE(pa.current_tag, NULLIF(REGEXP_EXTRACT(wc.contract_name, '(?<=\\[3P\\-)(.+?)(?=\\])'), '')) AS 3p_partner,
-      wc.contract_name LIKE '%[3P-%]%' AS is_3p_contract,
-      wc.contract_name LIKE '%[3P-%]%' AND partner_state IS DISTINCT FROM 'MG' AS is_3p_5a_contract,
-      wc.contract_name LIKE '%[3P-%]%' AND partner_state IS NOT DISTINCT FROM 'MG' AS is_3p_bh_contract,
+      COALESCE(pa.current_tag, NULLIF(REGEXP_EXTRACT(wc.contract_name, '(?i)(?<=\\[3P\\-)(.+?)(?=\\])'), '')) AS 3p_partner,
+      wc.contract_name LIKE '%[3P-%]%' OR wc.contract_name LIKE '%[3p-%]%' AS is_3p_contract,
+      wc.contract_name LIKE '%[3P-%]%' OR wc.contract_name LIKE '%[3p-%]%' AND partner_state IS DISTINCT FROM 'MG' AS is_3p_5a_contract,
+      wc.contract_name LIKE '%[3P-%]%' OR wc.contract_name LIKE '%[3p-%]%' AND partner_state IS NOT DISTINCT FROM 'MG' AS is_3p_bh_contract,
       wc.ts_created,
       wc.ts_updated
   FROM
@@ -52,7 +52,7 @@ work_contract_aux AS (
           ON bus.hub_name_wc = wc.contract_name
   LEFT JOIN
       partner_agencies AS pa
-          ON REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(wc.contract_name, '(?<=\\[3P\\-)(.+?)(?=\\])'), '')), ' ', '') = pa.extracted_3p_tag
+          ON REPLACE(UPPER(NULLIF(REGEXP_EXTRACT(wc.contract_name, '(?i)(?<=\\[3P\\-)(.+?)(?=\\])'), '')), ' ', '') = pa.extracted_3p_tag
 ),
 hubspot_company_name_history AS (
   SELECT DISTINCT
