@@ -120,7 +120,7 @@ SELECT
   DATE_TRUNC('day', date(cm.chat_ts_created)) AS dt_created,
   cm.department,
   event.message_to AS analyst,
-  ROUND(AVG(event.minutes_diff_for_answer), 3) AS avg_tmr,
+  CAST(AVG(event.minutes_diff_for_answer) AS DECIMAL(15,3)) AS avg_tmr,
   COUNT(DISTINCT
     CASE
       WHEN event.minutes_diff_for_answer <= 5
