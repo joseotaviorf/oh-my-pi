@@ -37,7 +37,7 @@ workflow:
     pii_scan_results:
       - columns_sample_data
 cluster:
-  type: databricks_13_3_med_memory_2_workers_cluster
+  type: databricks_13_3_high_mem_driver_high_mem_nodes_3_workers
   custom_libraries:
     - pypi:
         package: "presidio_analyzer==2.2.357"
