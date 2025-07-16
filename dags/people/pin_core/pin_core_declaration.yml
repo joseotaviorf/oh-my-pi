@@ -145,6 +145,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_ext_app_identifiers:
+      clean_table_name: external_application_identifier
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_grades_f:
       clean_table_name: grade
       extra_spark_job_arguments:

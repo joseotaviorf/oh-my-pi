@@ -1,0 +1,62 @@
+database_name: datalake_employee_registration
+table_name: identifier_mapping
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: >
+  Consolidated table that maps all identifiers for an active employee
+  (person, assignment, registration) in a single location. 
+  It serves as a crosswalk table to unify data from different HR systems 
+  and HCM tables.
+
+columns:
+  id_assignment:
+    description: "Unique identifier for the work contract."
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_assignment
+  id_period_of_service:
+    description: "Identifier that groups all contracts for the same period of service."
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_period_of_service
+  id_person:
+    description: "Unique identifier for the person, shared across all their contracts."
+    lineage:
+      - datalake_pin_core_clean.all_people.id_person
+  legacy_registration:
+    description: "Employee registration number, unified from new and legacy systems."
+    lineage:
+      - datalake_hr_system_custom_clean.workers_registration.registration
+      - datalake_gsheets_people_clean.legacy_registration.legacy_registration
+  assignment_number:
+    description: "The assignment registration number."
+    lineage:
+      - datalake_pin_core_clean.all_assignments.assignment_number
+  person_number:
+    description: "The person's identification number in the main HR system."
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  first_name:
+    description: "The employee's first name."
+    lineage:
+      - datalake_pin_core_clean.person_name.first_name
+  last_name:
+    description: "The employee's last name."
+    lineage:
+      - datalake_pin_core_clean.person_name.last_name
+  full_name:
+    description: "The employee's full name."
+    lineage:
+      - datalake_pin_core_clean.person_name.full_name
+  work_email:
+    description: "The employee's primary work email (W1), in lowercase."
+    lineage:
+      - datalake_pin_core_clean.email_address.email_address
+  personal_email:
+    description: "The employee's personal email (H1), in lowercase."
+    lineage:
+      - datalake_pin_core_clean.email_address.email_address
+  is_user_test:
+    description: "Boolean (TRUE/FALSE) indicating if the employee is a test user (has an ID_ONDA1 identifier)."
+    lineage:
+      - datalake_pin_core_clean.external_application_identifier.id_person
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.

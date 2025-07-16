@@ -2042,6 +2042,13 @@ bietlejuice.enrich_employee:
   - bietlejuice.gsheets_people:done-clean-codex-cost-informations:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
   - bietlejuice.hr_system:load-clean-salaries:first-run-of-day
+bietlejuice.enrich_employee_registration:
+  - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
+  - bietlejuice.pin_core:load-clean-external-application-identifier:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference:first-run-of-day
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day
