@@ -68,6 +68,8 @@ wonka.searched_house_offer_submitted:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-offer-submitted-events
 wonka.searched_house_visit_schedule_confirmed:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events
+wonka.searched_house_visit_intent_clicked:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-intent-clicked-events
 wonka.user_bc_h3_7_city_agg_search_filters:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
