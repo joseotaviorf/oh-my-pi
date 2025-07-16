@@ -16,7 +16,7 @@ WITH csat_zendesk AS (
   FROM
     datalake_zendesk_clean.tickets
   WHERE
-    year >= YEAR(DATE('{load_start_date}') - INTERVAL 3 YEAR) 
+    year >= YEAR(DATE('{load_start_date}') - INTERVAL 3 YEAR)
   UNION ALL
   SELECT
     id_ticket,
@@ -28,7 +28,7 @@ WITH csat_zendesk AS (
   FROM
     datalake_survicate.zendesk_email_surveys
   WHERE
-    year >= YEAR(DATE('{load_start_date}') - INTERVAL 3 YEAR) 
+    year >= YEAR(DATE('{load_start_date}') - INTERVAL 3 YEAR)
     AND id_ticket IS NOT NULL
     AND COALESCE(CAST(user_comment AS STRING), CAST(csat_score AS STRING), CAST(is_solved AS STRING)) IS NOT NULL
 )
@@ -54,7 +54,7 @@ SELECT DISTINCT
   NULL AS first_csat_comment,
   NULL AS last_csat_comment,
   TRUE AS is_answered,
-  e.csat_1 = 1 AS is_solved,
+  FIRST(e.csat_1 = 1) OVER(PARTITION BY t.id_ticket ORDER BY e.ts_created DESC) AS is_solved,
   MIN(e.ts_created) OVER(PARTITION BY t.id_ticket) AS ts_first_response,
   MAX(e.ts_created) OVER(PARTITION BY t.id_ticket) AS ts_last_response
 FROM
