@@ -1,4 +1,0 @@
----
-raw_alerts_table_name: alerts
-raw_logs_table_name: logs
-raw_partition_cols: [year, month, day]
