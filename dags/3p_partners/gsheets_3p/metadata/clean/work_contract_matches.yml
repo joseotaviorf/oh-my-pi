@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: work_contract_matches
 description: Support table for Work Contract when the contract name not match with ectracted_3p_tag and company name from Hubspot or company_name and trade_name from Company entities.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_hubspot:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: hubspot_acquisition_funnel_hunting
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 description: This table contains the acquisition funnel data from HubSpot for hunting, it includes information about the company, account manager, stage of the funnel, and various timestamps related to the acquisition process. This table only provides data up to January 2025, before the process is fully automated via Hubspot.
 columns:

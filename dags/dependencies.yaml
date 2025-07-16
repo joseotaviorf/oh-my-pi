@@ -2026,7 +2026,7 @@ bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
-  - bietlejuice.gsheets_rede:done-clean-work-contract-matches:first-run-of-day
+  - bietlejuice.gsheets_3p:done-clean-work-contract-matches:first-run-of-day
   - bietlejuice.hubspot:load-clean-company:first-run-of-day
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs:first-run-of-day
@@ -4030,6 +4030,7 @@ bietlejuice.reverse_nazare:
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
+  - bietlejuice.gsheets_3p:done-clean-forbrokers-3p-partner-conditions:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-advance-base:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-associate-executive-bonus:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-business-rules-bonus:first-run-of-day
@@ -4037,7 +4038,6 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_fintech:done-clean-hub-bonus:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-negotiation-executive-bonus:first-run-of-day
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers:first-run-of-day
-  - bietlejuice.gsheets_rede:done-clean-forbrokers-3p-partner-conditions:first-run-of-day
 bietlejuice.reverse_neighborhood_price_range_access:
   - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range:first-run-of-day
 bietlejuice.reverse_neighborhood_price_range_load:
