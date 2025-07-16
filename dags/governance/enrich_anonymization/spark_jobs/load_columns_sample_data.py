@@ -217,48 +217,46 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
 
+    sample_error = []
+    df_lake_sample = spark_client.create_dataframe([], create_table_schema())
+
     df_tables_to_sample = get_columns_to_sample(spark_client, load_start_date, load_end_date)
+    list_tables_to_sample = df_tables_to_sample.collect()
 
-sample_error = []
-df_lake_sample = spark_client.create_dataframe([], create_table_schema())
+    index = 0
+    size = len(list_tables_to_sample)
+    for column in list_tables_to_sample:
 
-df_tables_to_sample = get_columns_to_sample(spark_client, load_start_date, load_end_date)
-list_tables_to_sample = df_tables_to_sample.collect()
+        table_id = f"{column.database_name}.{column.table_name}"
+        entity_id = f"{table_id}.{column.column_name}"
 
-index = 0
-size = len(list_tables_to_sample)
-for column in list_tables_to_sample:
+        if table_id not in skip_list:
 
-    table_id = f"{column.database_name}.{column.table_name}"
-    entity_id = f"{table_id}.{column.column_name}"
+            try:
+                df_sample = get_sample_data(spark_client, column, execution_date, partition_cols)
+                df_lake_sample = df_lake_sample.union(df_sample)
 
-    if table_id not in skip_list:
+            except AnalysisException as exc:
+                error_class = exc.getErrorClass()
+                if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
+                    logging.warning(f"Table {entity_id} not found.")
+                elif error_class in [INSUFFICIENT_PERMISSIONS]:
+                    logging.warning(f"Insufficient permission to read table {entity_id}.")
+                else:
+                    logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
+                sample_error.append(create_sample_error_register(column, exc, load_start_date))
 
-        try:
-            df_sample = get_sample_data(spark_client, column, execution_date, partition_cols)
-            df_lake_sample = df_lake_sample.union(df_sample)
+            except Exception as exc:
+                logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
+                sample_error.append(create_sample_error_register(column, exc, load_start_date))
 
-        except AnalysisException as exc:
-            error_class = exc.getErrorClass()
-            if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
-                logging.warning(f"Table {entity_id} not found.")
-            elif error_class in [INSUFFICIENT_PERMISSIONS]:
-                logging.warning(f"Insufficient permission to read table {entity_id}.")
-            else:
-                logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
-            sample_error.append(create_sample_error_register(column, exc, load_start_date))
-
-        except Exception as exc:
-            logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
-            sample_error.append(create_sample_error_register(column, exc, load_start_date))
-
-df_errors = get_df_error(spark_client, sample_error, create_table_schema())
-df_load_sample = df_lake_sample.union(df_errors)
-df_load_sample = (
-    SparkDataFrameService()
-    .input(df_load_sample)
-    .create_year_month_day_columns_from_date(execution_date)
-    .optimize_partitions_by_partition_columns(partition_cols)
-    .output()
-)
-load_table(df_load_sample, env, datalake_bucket, schema, table_name, merge_on)
+    df_errors = get_df_error(spark_client, sample_error, create_table_schema())
+    df_load_sample = df_lake_sample.union(df_errors)
+    df_load_sample = (
+        SparkDataFrameService()
+        .input(df_load_sample)
+        .create_year_month_day_columns_from_date(execution_date)
+        .optimize_partitions_by_partition_columns(partition_cols)
+        .output()
+    )
+    load_table(df_load_sample, env, datalake_bucket, schema, table_name, merge_on)

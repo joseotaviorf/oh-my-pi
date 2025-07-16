@@ -103,3 +103,4 @@ recognizers:
     supported_entity: "BIRTH_DATE"
 skip_list:
   - datalake_amplitude_clean.events
+  - datalake_amplitude_events_clean.events
