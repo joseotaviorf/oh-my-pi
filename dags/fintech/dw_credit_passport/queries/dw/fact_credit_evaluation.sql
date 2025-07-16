@@ -148,6 +148,7 @@ SELECT DISTINCT
   IF(ce.scope = 'CITY', TRUE, FALSE) is_credit_passport,
   IF(eval.rank = 1, TRUE, FALSE) AS is_most_recent_evaluation,
   IF(ce.result = 'BYPASSED', TRUE, FALSE) is_bypass,
+  p.is_retenant,
   ce.ts_created,
   ce.ts_updated,
   ce.ts_expires AS ts_expired,
@@ -172,3 +173,6 @@ FROM
       AND cen.group_name = 'PRE_APPROVAL_LIMIT_POLICY'
     LEFT JOIN datalake_rental_guarantee_clean.guarantee AS g
       ON ce.id_proposal = g.id_documentation_ebdb
+    LEFT JOIN datalake_sorting_hat.policy_report AS p
+      ON p.id_external = ce.id
+      AND p.external_source = 'CREDIT_EVALUATION'

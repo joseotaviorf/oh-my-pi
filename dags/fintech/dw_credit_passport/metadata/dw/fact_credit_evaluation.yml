@@ -2,7 +2,7 @@
 database_name: dw_credit_passport
 table_name: fact_credit_evaluation
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This fact table contains all the information related to a Credit Evaluation.
 columns:
   sk_credit_evaluation:
@@ -118,6 +118,10 @@ columns:
     description: Boolean indicating if the credit evaluation refers to a credit passport (pre offer or pos offer).
   is_most_recent_evaluation:
     description: Boolean indicating if the credit evaluation is the most recent submitted by an user or group.
+  is_retenant:
+    description: Boolean indicating if the user previously had a contract with Quinto Andar (retenants).
+    lineage:
+    - datalake_sorting_hat.policy_report.is_retenant
   ts_created:
     description: Timestamp indicating when the credit evaluation was created in the data source.
     lineage:
