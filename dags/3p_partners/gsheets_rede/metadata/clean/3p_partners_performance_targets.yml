@@ -1,108 +1,22 @@
+---
 database_name: datalake_gsheets_clean
 table_name: 3p_partners_performance_targets
 domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
+description: This table contains the performance targets for the 3P Partners Operations team.
 columns:
-  account_manager:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.account_manager
-    description: This column defines the comercial responsible related to the target.
   broker:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.broker
     description: The broker related to the target. In some cases won't be specified because the target is related to a go to market operation. Is analogous to the hubspot_company_tag in the table dw_public.dim_company_3p_partners.
-  business_model:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.business_model
-    description: "The type of Marketplace operation targeted. Ex: Supply, Demand, Clientes QA"
-  commercial_division:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.commercial_division
-    description: This is a categorical field that defines which commercial team is realted to this target.
   company_cluster:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.company_cluster
     description: This column is related to the company_cluster present in dw_public.dim_company_3p_partners. it corresponds to the clusterization of brokers in the marketplace operations.
-  contract_signed_high_ticket:
+  account_manager:
     lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.contract_signed_high_ticket
-    description: The number of signed high ticket contracts targeted.
-  contract_signed_total:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.contract_signed_total
-    description: The number of signed contracts targeted.
-  expert:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.expert
-    description: The designated marketplace SV expert to the broker.
-  first_listing_first_batch:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_first_batch
-    description: The number of expected published listings that came from the first 30 days of leads being sent by the broker.
-  first_listing_high_ticket:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_high_ticket
-    description: The number of expected publishings of high ticket houses.
-  first_listing_recurrent:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_recurrent
-    description: The number of expected published listings that came after the first 30 days of leads being sent by the broker.
-  first_listing_total:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_total
-    description: The number of expected publishings.
-  input_metric_1_name:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_1_name
-    description: The name of the first input metric mesured. Input metrics are bizops indicators in the brokers that can be postively influenced by the account managers.
-  input_metric_1_value:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_1_value
-    description: The targeted value of the first input metric.
-  input_metric_2_name:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_2_name
-    description: The name of the second input metric mesured.
-  input_metric_2_value:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_2_value
-    description: The targeted value of the second input metric.
-  input_metric_3_name:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_3_name
-    description: The name of the third input metric mesured.
-  input_metric_3_value:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_3_value
-    description: The targeted value of the third input metric.
-  input_metric_4_name:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_4_name
-    description: The name of the fourth input metric mesured.
-  input_metric_4_value:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_4_value
-    description: The targeted value of the fourth input metric.
-  input_metric_5_name:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_name
-    description: The name of the fifth input metric mesured.
-  input_metric_5_value:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_value
-    description: The targeted value of the fifth input metric.
-  offer_accepted:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.offer_accepted
-    description: The number of accepted offers targeted.
-  offer_sent:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.offer_sent
-    description: The number of sent offers targeted.
-  ongoing_listing:
-    lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.ongoing_listing
-    description: The number of expected ongoing listings.
+      - datalake_gsheets_raw.3p_partners_performance_targets.account_manager
+    description: This column defines the comercial responsible related to the target.
   ops_squad:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.ops_squad
@@ -111,6 +25,18 @@ columns:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.secretaria_vendas
     description: The designated marketplace SV analyst to the broker.
+  expert:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.expert
+    description: The designated marketplace SV expert to the broker.
+  commercial_division:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.commercial_division
+    description: This is a categorical field that defines which commercial team is realted to this target.
+  business_model:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.business_model
+    description: "The type of Marketplace operation targeted. Ex: Supply, Demand, Clientes QA"
   visit_booked:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.visit_booked
@@ -119,13 +45,65 @@ columns:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.visit_confirmed
     description: The number of completed visits targeted.
-  dt_day:
+  offer_sent:
     lineage:
-      - datalake_gsheets_raw.3p_partners_performance_targets.day
-    description: The corresponding day written in the yyyy-mm-dd format.
+      - datalake_gsheets_raw.3p_partners_performance_targets.offer_sent
+    description: The number of sent offers targeted.
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.offer_accepted
+    description: The number of accepted offers targeted.
+  contract_signed_total:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.contract_signed_total
+    description: The number of signed contracts targeted.
+  contract_signed_high_ticket:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.contract_signed_high_ticket
+    description: The number of signed high ticket contracts targeted.
+  ongoing_listing:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.ongoing_listing
+    description: The number of expected ongoing listings.
+  first_listing_total:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_total
+    description: The number of expected publishings.
+  first_listing_first_batch:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_first_batch
+    description: The number of expected published listings that came from the first 30 days of leads being sent by the broker.
+  first_listing_recurrent:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_recurrent
+    description: The number of expected published listings that came after the first 30 days of leads being sent by the broker.
+  first_listing_high_ticket:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_high_ticket
+    description: The number of expected publishings of high ticket houses.
+  leads_total:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_total
+    description: The total number of leads targeted.
+  leads_first_batch:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_first_batch
+    description: The number of expected leads that came from the first 30 days of leads being sent by the broker.
+  leads_recurrent:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_recurrent
+    description: The number of expected leads that came after the first 30 days of leads being sent by the broker.
+  leads_high_ticket:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_high_ticket
+    description: The number of expected high ticket leads targeted.
   dt_month:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.month
     description: The corresponding month written in the yyyy-mm-dd format.
+  dt_day:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.day
+    description: The corresponding day written in the yyyy-mm-dd format.
   ts_load:
     description: Date when the table data was updated.

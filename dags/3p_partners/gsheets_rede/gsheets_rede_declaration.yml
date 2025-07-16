@@ -1,7 +1,7 @@
 dag:
   name: gsheets_rede
   schedule_interval: 20 00 * * *
-  owner: Data Rede
+  owner: Data 3P Partners
 cluster:
   type: databricks_12_2_min_general_cluster
   access_control_list:
