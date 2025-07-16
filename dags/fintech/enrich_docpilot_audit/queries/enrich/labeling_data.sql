@@ -314,8 +314,6 @@ income_document_joined AS (
   FROM
     credit_audit_sample AS cas
     LEFT JOIN income_document_deduped AS ide ON ide.id_proposal = cas.id_proposal
-  WHERE
-    cas.type != 'LIGHT_APPROVAL'
 ),
 data_joined AS (
   SELECT
