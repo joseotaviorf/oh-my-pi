@@ -2,7 +2,7 @@
 database_name: datalake_pin
 table_name: managers_history
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: This table contains information about the reporting structure between employees and their line managers.
 columns:
   id_assignment:
@@ -24,19 +24,19 @@ columns:
   id_period_of_service:
     description: Foreign key referencing the period of service ID of the employee's assignment.
     lineage:
-      - datalake_hr_system.employee_ids. id_period_of_service
+      - datalake_employee_registration.identifier_mapping. id_period_of_service
   id_manager_period_of_service:
     description: Foreign key referencing the period of service ID of the line manager's assignment.
     lineage:
-      - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
   assignment_number:
     description: Unique code identifying the employee's assignment.
     lineage:
-      - datalake_hr_system.employee_ids.assignment_number
+      - datalake_employee_registration.identifier_mapping.assignment_number
   manager_assignment_number:
     description: Unique code identifying the line manager's assignment.
     lineage:
-      - datalake_hr_system.employee_ids.assignment_number
+      - datalake_employee_registration.identifier_mapping.assignment_number
   employee_name:
     description: Name of the employee.
     lineage:

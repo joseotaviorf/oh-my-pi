@@ -27,7 +27,7 @@ LEFT JOIN
     ON o.codigo_dff = r.template_code
     AND r.active_status = 'A'
 LEFT JOIN 
-  datalake_hr_system.employee_ids AS e 
+  datalake_employee_registration.identifier_mapping AS e 
     ON e.id_assignment = r.id_assignment
 WHERE
   o.classification_code = 'DEPARTMENT'

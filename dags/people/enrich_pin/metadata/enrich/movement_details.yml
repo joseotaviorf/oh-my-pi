@@ -2,7 +2,7 @@
 database_name: datalake_pin
 table_name: movement_detail
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "Records the details of each movement event or significant change in an employee's assignment history, such as hires, promotions, transfers, or terminations."
 columns:
   id_person:

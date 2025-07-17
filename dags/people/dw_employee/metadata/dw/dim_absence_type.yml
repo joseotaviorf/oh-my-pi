@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: dim_absence_type
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Dimension table that categorizes types of absence (e.g., vacation, sick absence, maternity absence), including information such as the maximum allowed duration.
 columns:
   sk_absence_type:

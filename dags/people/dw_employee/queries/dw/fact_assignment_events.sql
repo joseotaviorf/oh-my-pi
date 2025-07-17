@@ -10,7 +10,7 @@ SELECT
 FROM
   datalake_hr_system_clean.salaries AS s
 LEFT JOIN
-  datalake_hr_system.employee_ids AS ei
+  datalake_employee_registration.identifier_mapping AS ei
     ON s.id_assignment = ei.id_assignment
 
 UNION ALL

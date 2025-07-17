@@ -12,7 +12,7 @@ columns:
   id_period_of_service:
     description: 'Unique identifier for the period of service of an employee.'
     lineage:
-      - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
   id_evaluation:
     description: 'Unique identifier for a specific performance evaluation. Primary key of the evaluation.'
     lineage:
@@ -36,11 +36,11 @@ columns:
   id_person:
     description: 'Unique identifier for the person (employee).'
     lineage:
-      - datalake_hr_system.employee_ids.id_person
+      - datalake_employee_registration.identifier_mapping.id_person
   assignment_number:
     description: 'Unique identifier for the period of service of an employee.'
     lineage:
-      - datalake_hr_system.employee_ids.assignment_number
+      - datalake_employee_registration.identifier_mapping.assignment_number
   section_name:
     description: 'Name of the performance review section being evaluated.'
     lineage:

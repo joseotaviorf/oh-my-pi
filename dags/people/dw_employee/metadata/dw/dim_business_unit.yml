@@ -1,8 +1,8 @@
 ---
 database_name: dw_employee
 table_name: dim_business_unit
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Dimension table for business unit.
 columns:
   sk_business_unit:
@@ -10,16 +10,7 @@ columns:
     lineage:
     - datalake_pin.movement_details.id_business_unit
   business_unit_name:
-    description: 'Business unit name'
-    categories:
-     "Atta": ""
-     "Benvi PT": ""
-     "Classifieds Latam": ""
-     "Deel - QuintoAndar": 
-     "Inmuebles24 FULL": ""
-     "QuintoAndar MG": ""
-     "QuintoAndar SC": ""
-     "QuintoAndar SP": ""
+    description: 'Name of the business unit. Possible values include: Atta, Benvi PT, Classifieds Latam, Deel - QuintoAndar, Inmuebles24 FULL, QuintoAndar MG, QuintoAndar SC, and QuintoAndar SP.'
     lineage:
     - datalake_pin.movement_details.business_unit_name
   legal_employer_name:

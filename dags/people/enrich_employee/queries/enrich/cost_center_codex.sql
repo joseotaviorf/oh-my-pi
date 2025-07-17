@@ -26,7 +26,7 @@ employee_ids AS (
       TRIM(REGEXP_REPLACE(REGEXP_REPLACE(full_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
     ) AS full_name
   FROM
-    datalake_hr_system.employee_ids
+    datalake_employee_registration.identifier_mapping
   WHERE
     person_number IS NOT NULL
     AND assignment_type IN ('E', 'C')
@@ -57,7 +57,7 @@ employee_ids_enrich AS (
   FROM
     datalake_gsheets_people_clean.email_employee_mapping AS emp_map
   INNER JOIN
-    datalake_hr_system.employee_ids AS emp_ids
+    datalake_employee_registration.identifier_mapping AS emp_ids
       ON emp_map.person_number = emp_ids.person_number
 ),
 codex_unified AS (

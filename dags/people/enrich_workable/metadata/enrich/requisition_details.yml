@@ -2,7 +2,7 @@
 database_name: datalake_workable
 table_name: requisition_details
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: Table that prepare data for dim_requisition and fact_requistions
 columns:
   id_requisition:
@@ -24,19 +24,19 @@ columns:
   sk_hierarchy:
     description: 'Surrogate key of the hierarchy of the requisition, links to dw_employee.dim_hierarchy.'
     lineage:
-    - datalake_hr_system.employee_ids.id_hierarchy
+    - datalake_employee_registration.identifier_mapping.id_hierarchy
   sk_owner:
     description: 'Surrogate key of the owner of the requisition, links to dw_employee.dim_employee.'
     lineage:
-    - datalake_hr_system.employee_ids.id_person
+    - datalake_employee_registration.identifier_mapping.id_person
   sk_hiring_manager:
     description: 'Surrogate key of the hiring manager of the requisition, links to dw_employee.dim_employee.'
     lineage:
-    - datalake_hr_system.employee_ids.id_person
+    - datalake_employee_registration.identifier_mapping.id_person
   sk_business_partner:
     description: 'Surrogate key of the business partner of the requisition, links to dw_employee.dim_employee.'
     lineage:
-    - datalake_hr_system.employee_ids.id_person
+    - datalake_employee_registration.identifier_mapping.id_person
   requisition_code:
     description: 'Requisition code.'
     lineage:

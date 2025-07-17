@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: dim_employee
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: Dimension table with information about workers
 columns:
   sk_employee:

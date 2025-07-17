@@ -13,15 +13,15 @@ columns:
   assignment_number:
     description: Unique identifier for an employee's assignment.
     lineage:
-      - datalake_hr_system.employee_ids.assignment_number
+      - datalake_employee_registration.identifier_mapping.assignment_number
   id_period_of_service:
     description: Identifier for an employee's period of service relevant to the talent assessment.
     lineage:
-      - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
   id_person:
     description: Identifier of the person.
     lineage:
-      - datalake_hr_system.employee_ids.id_person
+      - datalake_employee_registration.identifier_mapping.id_person
   id_meeting:
     description: Unique identifier for the talent review meeting.
     lineage:

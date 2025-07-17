@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: dim_vacation_status
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Dimension table that stores the different possible statuses related to an employee's vacation balance.
 columns:
   sk_vacation_status:

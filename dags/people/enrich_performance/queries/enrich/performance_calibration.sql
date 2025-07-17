@@ -107,7 +107,7 @@ SELECT
 FROM
   datalake_pin_performance_clean.evaluation AS e
 INNER JOIN 
-  datalake_hr_system.employee_ids AS employees 
+  datalake_employee_registration.identifier_mapping AS employees 
     ON employees.id_assignment = e.id_assignment
 INNER JOIN
   datalake_pin_performance_clean.evaluation_section AS es

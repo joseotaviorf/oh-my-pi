@@ -2,13 +2,13 @@
 database_name: dw_employee
 table_name: dim_product_tech
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "Dimension table with information about information about which teams product and tech employees are part of."
 columns:
   sk_assignment:
     description: "Surrogate key for the assignment."
     lineage:
-      - datalake_hr_system.employee_ids.sk_employee
+      - datalake_employee_registration.identifier_mapping.sk_employee
   line:
     description: 'Line of the employee'
     lineage:

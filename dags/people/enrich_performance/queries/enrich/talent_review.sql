@@ -59,7 +59,7 @@ SELECT
   hrd.ts_updated,
   NOW() AS ts_load
 FROM
-  datalake_hr_system.employee_ids AS ei
+  datalake_employee_registration.identifier_mapping AS ei
 LEFT JOIN
   datalake_pin_talent_clean.profile_base AS hpb
     ON hpb.id_person = ei.id_person

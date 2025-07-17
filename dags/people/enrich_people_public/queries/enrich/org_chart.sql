@@ -44,7 +44,7 @@ assignment_cte AS (
     manager_cte AS m 
       ON m.id_assignment = md.id_assignment
   LEFT JOIN
-    datalake_hr_system.employee_ids AS em
+    datalake_employee_registration.identifier_mapping AS em
       ON em.id_assignment = m.id_manager_assignment
   LEFT JOIN 
     datalake_hr_system_clean.jobs AS j
@@ -92,7 +92,7 @@ SELECT
   s.team_10 AS product_and_tech_team_10,
   NOW() AS ts_load
 FROM
-  datalake_hr_system.employee_ids AS e
+  datalake_employee_registration.identifier_mapping AS e
 INNER JOIN
   assignment_cte AS a
     ON e.id_assignment = a.id_assignment

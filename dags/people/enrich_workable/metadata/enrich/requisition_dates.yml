@@ -2,7 +2,7 @@
 database_name: datalake_workable
 table_name: requisition_dates
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: Table that stores unify date rules for requisitions.
 columns:
   id:

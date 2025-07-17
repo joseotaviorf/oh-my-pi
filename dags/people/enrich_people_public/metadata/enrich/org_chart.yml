@@ -2,21 +2,21 @@
 database_name: datalake_people_public
 table_name: org_chart
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "Information about team structures based on the organizational chart."
 columns:
   assignment_number:
     description: "Registration number of the worker."
     lineage:
-      - datalake_hr_system.employee_ids.assignment_number
+      - datalake_employee_registration.identifier_mapping.assignment_number
   full_name:
     description: "Full name of the worker, if has social name it is the same."
     lineage:
-      - datalake_hr_system.employee_ids.full_name
+      - datalake_employee_registration.identifier_mapping.full_name
   work_email:
     description: "Corporate email of the employee."
     lineage:
-      - datalake_hr_system.employee_ids.work_email
+      - datalake_employee_registration.identifier_mapping.work_email
   assignment_status_type:
     description: "Assignment status type for the worker."
     lineage:
@@ -27,11 +27,11 @@ columns:
   manager_name:
     description: "Full name of the manager."
     lineage:
-      - datalake_hr_system.employee_ids.full_name
+      - datalake_employee_registration.identifier_mapping.full_name
   manager_email:
     description: "Corporate email of the manager."
     lineage:
-      - datalake_hr_system.employee_ids.work_email
+      - datalake_employee_registration.identifier_mapping.work_email
   assignment_name:
     description: "Name of the job of the worker."
     lineage:

@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: fact_employees
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "This table provides a consolidated view of employees, considering only their last work relationship (is_last_work_relationship = TRUE) and excluding pending workers (worker_type <> 'P')."
 columns:
   sk_assignment:

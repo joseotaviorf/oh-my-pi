@@ -23,7 +23,7 @@ WITH
       COALESCE(wr.dt_termination, CURRENT_DATE + 30) AS dt_termination,
       NOW() AS ts_load
     FROM
-      datalake_hr_system.employee_ids AS ei
+      datalake_employee_registration.identifier_mapping AS ei
     LEFT JOIN 
       datalake_hr_system.work_relationships AS wr
         ON ei.id_period_of_service = wr.id_period_of_service

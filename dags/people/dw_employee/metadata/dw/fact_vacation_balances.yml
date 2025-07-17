@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: fact_vacation_balances
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Fact table that records employee vacation balances, including accrued days, used days, and the available balance.
 columns:
   sk_vacation_balance:
@@ -12,11 +12,11 @@ columns:
   sk_employee:
     description: Foreign key to the employee dimension, identifying the employee.
     lineage:
-      - datalake_hr_system.employee_ids.id_person
+      - datalake_employee_registration.identifier_mapping.id_person
   sk_assignment:
     description: Foreign key to the assignment dimension, identifying the period of service to which the vacation balance refers.
     lineage:
-      - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
   sk_accrual_started_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the start date of the vacation accrual period.
     lineage:

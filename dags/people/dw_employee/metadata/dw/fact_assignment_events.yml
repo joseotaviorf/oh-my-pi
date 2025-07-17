@@ -2,18 +2,18 @@
 database_name: dw_employee
 table_name: fact_assignment_events
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "Records key events in the lifecycle of employee assignments, capturing changes such as salary adjustments, role changes, cost center assignments, and team transfers. It enables analysis of various employee-related events, like promotions and department changes."
 columns:
   sk_employee:
     description: "Unique identifier for the person related to the assignment."
     lineage:
-      - datalake_hr_system.employee_ids.id_person
+      - datalake_employee_registration.identifier_mapping.id_person
       - datalake_pin.movement_details.id_person
   sk_assignment:
     description: "Unique identifier for the period of service related to the assignment."
     lineage:
-      - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
       - datalake_pin.movement_details.id_period_of_service
   sk_started_date:
     description: "Started date of the event."

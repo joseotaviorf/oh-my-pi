@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: fact_absence_requests
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Fact table that records all employee absence requests, including details such as start and end dates, requested days, and request status.
 columns:
   sk_absence_request:

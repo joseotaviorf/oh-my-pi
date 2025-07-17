@@ -1,7 +1,7 @@
 database_name: dw_employee
 table_name: dim_assignment
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: "Table with data about the assignments of the employees."
 columns:
   sk_assignment:
@@ -11,11 +11,11 @@ columns:
   assignment_number:
     description: "Unique identifier for the assignment."
     lineage:
-      - datalake_hr_system.employee_ids.assignment_number
+      - datalake_employee_registration.identifier_mapping.assignment_number
   legacy_registration:
     description: "Legacy employee registration at TMF."
     lineage:
-      - datalake_hr_system.employee_ids.legacy_registration
+      - datalake_employee_registration.identifier_mapping.legacy_registration
   legislation_code:
     description: "Legislation code associated with the assignment."
     lineage:

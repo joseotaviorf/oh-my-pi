@@ -2,7 +2,7 @@
 database_name: enrich_hr_system
 table_name: assignments_metrics
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Metrics about assignments. Used to generate fact tables in dw_employee.
 columns:
   sk_assignment:

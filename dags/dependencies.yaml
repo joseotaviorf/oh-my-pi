@@ -508,10 +508,10 @@ bietlejuice.dw_demand:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results:first-run-of-day
 bietlejuice.dw_employee:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids:first-run-of-day
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-disability:first-run-of-day
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-employee-info:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
@@ -2031,10 +2031,10 @@ bietlejuice.enrich_ebdb_work_contract:
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs:first-run-of-day
 bietlejuice.enrich_employee:
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-disability:first-run-of-day
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-salary-metrics:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships:first-run-of-day
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
@@ -2666,13 +2666,13 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
 bietlejuice.enrich_people_public:
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids:first-run-of-day
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.hr_system:load-clean-jobs:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
 bietlejuice.enrich_performance:
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids:first-run-of-day
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-item:first-run-of-day
@@ -2697,7 +2697,7 @@ bietlejuice.enrich_person:
   - bietlejuice.person:load-clean-preference-settings:first-run-of-day
   - bietlejuice.person:load-clean-right-to-be-forgotten:first-run-of-day
 bietlejuice.enrich_pin:
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids:first-run-of-day
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
   - bietlejuice.hr_system:load-clean-workers:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
@@ -3648,7 +3648,7 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round:first-run-of-day
 bietlejuice.enrich_workable:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids:first-run-of-day
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids:first-run-of-day
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
   - bietlejuice.workable_redshift:load-clean-activities:first-run-of-day

@@ -35,7 +35,7 @@ SELECT
 FROM
   datalake_pin_core_clean.assignment_extra_info AS aei
 INNER JOIN 
-  datalake_hr_system.employee_ids AS ei
+  datalake_employee_registration.identifier_mapping AS ei
     ON ei.id_assignment = aei.id_assignment
 LEFT JOIN
   vacation AS v

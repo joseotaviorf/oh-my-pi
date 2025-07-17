@@ -1,7 +1,8 @@
+---
 database_name: datalake_hr_system
 table_name: cost_center_codex
 owner: gabriel.berger@quintoandar.com.br
-domain: people
+domain: People
 description: 'Table containing consolidated information from the CODEX database about cost centers.'
 columns:
   id_cost_center:
@@ -32,7 +33,7 @@ columns:
   vertical:
     description: "Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product)."
     lineage:
-    - 'Derived from datalake_gsheets_people_clean.codex_cost_centers.structure'
+    - datalake_gsheets_people_clean.codex_cost_centers.structure
   structure:
     description: 'Structure to which the cost center belongs.'
     lineage:
@@ -53,32 +54,32 @@ columns:
     description: 'Person number (PIN id) of the second highest manager (L1) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l1
-    - datalake_hr_system.employee_ids.person_number
+    - datalake_employee_registration.identifier_mapping.person_number
   owner_l2_person_number:
     description: 'Person number (PIN id) of the third highest manager (L2) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l2
-    - datalake_hr_system.employee_ids.person_number
+    - datalake_employee_registration.identifier_mapping.person_number
   owner_l3_person_number:
     description: 'Person number (PIN id) of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l3
-    - datalake_hr_system.employee_ids.person_number
+    - datalake_employee_registration.identifier_mapping.person_number
   owner_l1_full_name:
     description: 'Full name of the second highest manager (L1) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l1
-    - datalake_hr_system.employee_ids.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   owner_l2_full_name:
     description: 'Full name of the third highest manager (L2) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l2
-    - datalake_hr_system.employee_ids.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   owner_l3_full_name:
     description: 'Full name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l3
-    - datalake_hr_system.employee_ids.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   owner_l1_email:
     description: 'Email of the second highest manager (L1) in the hierarchy responsible for the cost center.'
     lineage:
@@ -113,14 +114,12 @@ columns:
     - datalake_gsheets_people_clean.codex_cost_centers.status
   is_legacy_code:
     description: 'Boolean flag indicating if the id_cost_center for this row is a legacy identifier (TRUE) or a current identifier (FALSE).'
-    lineage:
-    - 'Constant value assigned based on SQL view definition'
   is_outdated_in_system:
     description: "Flag indicating if a cost center's attributes are synchronized between the source of truth (cost_center_codex) and the PIN system (organizations). Derived from comparing multiple attributes between the cost_center_codex and organizations tables."
     categories:
-    - "TRUE": "At least one attribute in the PIN system (organizations table) differs from the source of truth (cost_center_codex). The record is outdated and requires an update."
-    - "FALSE": "All compared attributes are perfectly synchronized between the source of truth (cost_center_codex) and the PIN system (organizations)."
-    - "NULL": "The cost center exists in the source of truth (cost_center_codex) but was not found in the PIN system (organizations), so its synchronization status is unknown."
+      "TRUE": "At least one attribute in the PIN system (organizations table) differs from the source of truth (cost_center_codex). The record is outdated and requires an update."
+      "FALSE": "All compared attributes are perfectly synchronized between the source of truth (cost_center_codex) and the PIN system (organizations)."
+      "NULL": "The cost center exists in the source of truth (cost_center_codex) but was not found in the PIN system (organizations), so its synchronization status is unknown."
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.business
     - datalake_gsheets_people_clean.codex_cost_centers.product
@@ -144,4 +143,4 @@ columns:
     - datalake_hr_system_clean.organizations.owner_leadership_layer_2_name
     - datalake_hr_system_clean.organizations.owner_leadership_layer_3_name
     - datalake_hr_system_clean.organizations.headcount_type
-    - datalake_hr_system.employee_ids.full_name
+    - datalake_employee_registration.identifier_mapping.full_name

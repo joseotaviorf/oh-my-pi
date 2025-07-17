@@ -33,7 +33,7 @@ LEFT JOIN
   salaries AS s
     ON a.id_assignment = s.id_assignment
 LEFT JOIN
-  datalake_hr_system.employee_ids AS ei
+  datalake_employee_registration.identifier_mapping AS ei
     ON ei.id_period_of_service = wr.id_period_of_service
 LEFT JOIN
   datalake_hr_system_clean.actions_lov AS al

@@ -2,7 +2,7 @@
 database_name: datalake_workable
 table_name: cost_center
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: Table that conciliates cost center data from Workable and HR System.
 columns:
   id_cost_center:

@@ -12,7 +12,7 @@ ranked_managers AS (
     FROM
         datalake_hr_system.management_hierarchy AS mh
     INNER JOIN
-        datalake_hr_system.employee_ids AS ei
+        datalake_employee_registration.identifier_mapping AS ei
             ON ei.id_assignment = mh.id_manager_assignment
 ),
 managers_long AS (

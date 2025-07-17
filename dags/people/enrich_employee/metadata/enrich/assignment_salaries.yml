@@ -1,6 +1,8 @@
 ---
 database_name: datalake_hr_system
 table_name: assignment_salaries
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: "Table that stores salary variations and related assignment details. This table tracks salary changes over time, including action reasons, salary amounts, and assignment periods."
 columns:
   id_person:

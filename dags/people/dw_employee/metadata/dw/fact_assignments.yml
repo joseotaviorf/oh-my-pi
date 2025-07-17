@@ -2,7 +2,7 @@
 database_name: dw_employee
 table_name: fact_assignments
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "Table storing detailed information about employee assignments, sourced from assignment_metrics and hierarchy_ids."
 columns:
   sk_assignment:

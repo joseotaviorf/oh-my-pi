@@ -2,8 +2,8 @@
 database_name: dw_employee
 table_name: dim_disability
 owner: leonardo.soares@quintoandar.com.br
-domain: people
-description: null
+domain: People
+description: Dimension table that stores employee disability information.
 columns:
   sk_disability:
     description: 'Surrogate key for the dimension table employee_disability.'

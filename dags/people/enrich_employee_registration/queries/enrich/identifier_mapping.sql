@@ -7,6 +7,8 @@ current_people AS (
         datalake_pin_core_clean.all_people
     WHERE 
         dt_effective_ended >= DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_effective_ended DESC) = 1
 ),
 current_assignments AS (
     SELECT 
@@ -20,6 +22,8 @@ current_assignments AS (
     WHERE
         assignment_type IN ('E', 'C', 'P')
         AND dt_effective_ended >= DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_ended DESC) = 1
 ),
 current_names AS (
     SELECT 
@@ -32,6 +36,8 @@ current_names AS (
     WHERE
         name_type = 'GLOBAL'
         AND dt_effective_ended >= DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_effective_ended DESC) = 1
 ),
 work_emails AS (
     SELECT 
@@ -42,6 +48,8 @@ work_emails AS (
     WHERE
         email_type = 'W1'
         AND (dt_ended >= DATE('{load_end_date}') OR dt_ended IS NULL)
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) = 1
 ),
 personal_emails AS (
     SELECT 
@@ -52,6 +60,8 @@ personal_emails AS (
     WHERE
         email_type = 'H1'
         AND (dt_ended >= DATE('{load_end_date}') OR dt_ended IS NULL)
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_ended DESC) = 1
 ),
 test_users AS (
     SELECT 
@@ -86,7 +96,7 @@ INNER JOIN
 INNER JOIN 
     current_names AS n 
         ON p.id_person = n.id_person
-INNER JOIN 
+LEFT JOIN 
     work_emails AS we 
         ON p.id_person = we.id_person
 LEFT JOIN 

@@ -2,7 +2,7 @@
 database_name: datalake_hr_system
 table_name: hierarchy_ids
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "Contains the hierarchy key of employees by sk_assignment."
 columns:
   sk_assignment:

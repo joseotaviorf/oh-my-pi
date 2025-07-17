@@ -2,7 +2,7 @@
 database_name: datalake_workable
 table_name: info_source
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: Table that stores info source data.
 columns:
   id_candidate:

@@ -1,8 +1,8 @@
 ---
 database_name: dw_employee
 table_name: dim_cost_center
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Dimension table for cost center.
 columns:
   sk_cost_center:
@@ -12,11 +12,11 @@ columns:
   sk_business_partner:
     description: "Unique identifier for the business partner related to the assignment."
     lineage:
-      - datalake_hr_system.employee_ids.id_person
+      - datalake_employee_registration.identifier_mapping.id_person
   sk_business_partner_assignment:
     description: "Unique identifier for the business partner’s assignment."
     lineage:
-      - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
   cost_center_name:
     description: "Cost center name"
     lineage:
