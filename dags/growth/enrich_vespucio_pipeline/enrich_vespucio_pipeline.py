@@ -32,7 +32,7 @@ DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 ENV = os.environ.get("ENVIRONMENT")
-EXECUTION_HOURS_TIMEOUT = 2.0
+EXECUTION_HOURS_TIMEOUT = 3.0
 
 config_service = ConfigurationService(DAG_NAME)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
