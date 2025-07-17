@@ -7,7 +7,7 @@ SELECT
     environment,
     htmlPath AS html_path,
     CAST(input AS STRING) AS input,
-    CAST(output AS STRING) AS output,
+    `output` AS output,
     latency,
     name,
     observations,
