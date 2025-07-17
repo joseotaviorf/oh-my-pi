@@ -15,7 +15,7 @@ class JiraOpsClient:
         self.cloud_id = credentials.get("cloud_id")
 
     def create_alert(
-        self, message: str, description: str, tags: list[str]
+        self, message: str, description: str, tags: list[str], extra_properties: dict
     ) -> requests.Response:
         """
         Create an alert in JiraOps using the provided payload.
@@ -44,6 +44,7 @@ class JiraOpsClient:
                 {"id": "og-7c6d473a-9c80-4513-af76-9f2861cf966a", "type": "team"}
             ],
             "tags": tags,
+            "extraProperties": extra_properties,
         }
 
         response = requests.post(

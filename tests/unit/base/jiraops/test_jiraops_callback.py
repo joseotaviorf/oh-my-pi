@@ -65,7 +65,11 @@ def test_task_failure_alert_prod_environment(
     mock_airflow_variables, mock_jiraops_client, jiraops_callback
 ):
     mock_client_class, mock_client_instance = mock_jiraops_client
-    mock_context = {"task_instance": MagicMock(task_id="test_task", dag_id="test_dag")}
+    mock_context = {
+        "task_instance": MagicMock(
+            task_id="test_task", dag_id="test_dag", task=MagicMock(owner="testOwner")
+        )
+    }
 
     jiraops_callback.task_failure_alert(mock_context)
 
@@ -85,6 +89,15 @@ def test_task_failure_alert_prod_environment(
     )
     expected_tags = ["test_dag", "test_task", "task failed"]
 
+    expected_extra_properties = {
+        "DAG": "test_dag",
+        "Task": "test_task",
+        "DAGOwner": "testOwner",
+    }
+
     mock_client_instance.create_alert.assert_called_once_with(
-        message=expected_message, description=expected_description, tags=expected_tags
+        message=expected_message,
+        description=expected_description,
+        tags=expected_tags,
+        extra_properties=expected_extra_properties,
     )

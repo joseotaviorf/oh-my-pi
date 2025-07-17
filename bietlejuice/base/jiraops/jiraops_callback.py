@@ -17,6 +17,7 @@ class JiraOpsCallback:
         task_instance = context.get("task_instance")
         dag_id = task_instance.dag_id
         task_id = task_instance.task_id
+        dag_owner = str(task_instance.task.owner)
 
         if Variable.get("environment") != "prod":
             logger.info("Skipping alert creation, since the environment is not Prod.")
@@ -29,12 +30,14 @@ class JiraOpsCallback:
 
         current_datetime = datetime.now()
         description = f"DAG: {dag_id} - Task: {task_id} Failed at: {current_datetime.strftime('%Y-%m-%d %H:%M:%S %z')}".strip()
+        extra_properties = {"DAG": dag_id, "Task": task_id, "DAGOwner": dag_owner}
 
         client = JiraOpsClient(jiraops_credentials)
         response = client.create_alert(
             message=message,
             description=description,
             tags=[dag_id, task_id, "task failed"],
+            extra_properties=extra_properties,
         )
 
         try:
