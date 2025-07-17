@@ -4061,7 +4061,6 @@ bietlejuice.reverse_rent_listings_report_load:
   - bietlejuice.enrich_similarity_score:load-enrich-house-metrics-score:first-run-of-day
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
-  - bietlejuice.dw_operator_performance:load-dw-operator-performance-fact-operator-performance:first-run-of-day
 bietlejuice.reverse_sale_listings_report_access:
   - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score:first-run-of-day
   - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-accepted:first-run-of-day
