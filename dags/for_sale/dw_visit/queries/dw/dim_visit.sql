@@ -18,9 +18,11 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.cancellation_reason,
   v.cancellation_on_behalf_of,
   v.cancellation_channel,
+  v.cancellation_author_role,
   v.method AS entry_method,
   v.entry_model_type AS entry_method_type,
   v.visit_model,
+  v.visit_schedule_type,
   v.visit_request_channel,
   v.is_fixed_agent AS is_visit_with_fixed_agent,
   v.is_confirmed AS is_visit_confirmed,
@@ -30,6 +32,10 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.is_reschedule AS is_visit_reschedule,
   v.is_registered_by_agent AS is_visit_registered_by_agent,
   v.is_cancelled_by_expiration AS is_visit_cancelled_by_expiration,
+  v.is_stalled AS is_visit_stalled,
+  v.has_fup_collected AS has_visit_fup_collected,
+  v.has_finisher_status AS has_visit_finisher_status,
+  v.has_more_one_agent AS has_visit_more_one_agent,
   v.ts_created AS dt_created,
   v.ts_updated AS dt_updated,
   v.ts_visit,
@@ -42,6 +48,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.ts_visit_unsuccessful,
   v.ts_visit_done,
   v.ts_visit_fup_collected,
+  v.ts_visit_stalled,
+  v.ts_first_visit,
   NOW() AS ts_load
 FROM
   datalake_visit.visits AS v

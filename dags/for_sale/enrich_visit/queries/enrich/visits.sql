@@ -14,6 +14,7 @@ WITH
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_FITTED') AS ts_visit_fitted,
             MIN(author_user_role) FILTER (WHERE event_type = 'VISIT_REGISTERED') AS author_role_visit_registered,
             MIN(ts_created) FILTER (WHERE event_type = 'FOLLOW_UP_COLLECTED') AS ts_visit_fup_collected,
+            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_STALLED') AS ts_visit_stalled,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
             MAX(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_answer,
@@ -53,6 +54,17 @@ WITH
         WHERE
             is_3p_contract
         GROUP BY 1,2,3
+    ),
+    visit_by_history AS (
+        SELECT
+            id_visit,
+            COUNT(DISTINCT id_agent) AS nbr_agent,
+            MIN_BY(id_agent, rev) AS id_first_associated_agent,
+            MAX_BY(id_agent, rev) AS id_last_associated_agent,
+            MIN_by(ts_visit, rev) AS ts_first_visit
+        FROM
+            datalake_ebdb_clean.visit_aud
+        GROUP BY 1
     )
 SELECT
     visit.id AS id_visit,
@@ -68,6 +80,8 @@ SELECT
     visit_demand.id_company_demand,
     -1 AS id_follow_up,
     -1 AS id_entrance_type,
+    vbh.id_first_associated_agent,
+    vbh.id_last_associated_agent,
     visit.code,
     v_origin.name AS visit_origin,
     v_origin.description AS visit_origin_description,
@@ -96,19 +110,30 @@ SELECT
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
     visit_cancellation.channel AS cancellation_channel,
+    visit_cancellation.author_user_role AS cancellation_author_role,
     CASE
         WHEN visit_log.ts_visit_registered IS NOT NULL THEN 'REGISTERED'
         WHEN visit_log.ts_visit_fitted IS NOT NULL THEN 'FITTED'
         ELSE 'STANDARD'
     END AS visit_model,
+    CASE
+        WHEN visit.ts_visit = vbh.ts_first_visit THEN 'NOT_CHANGED'
+        WHEN visit.ts_visit > vbh.ts_first_visit THEN 'POSTPONED'
+        ELSE 'EARLY'
+    END AS visit_schedule_type,
     visit_log.visit_request_channel,
     CASE
       WHEN visit_log.nbr_reschedule IS NULL THEN 0
       ELSE visit_log.nbr_reschedule
     END AS nbr_reschedule,
+    vbh.nbr_agent,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_last_event) AS journey_days,
     DATEDIFF(HOUR, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS hours_waiting_for_answers,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS days_waiting_for_answers,
+    CASE
+        WHEN vbh.nbr_agent > 1 THEN TRUE
+        ELSE FALSE
+    END AS has_more_one_agent,
     IF(visit_log.ts_visit_confirmed IS NOT NULL, TRUE, FALSE) AS is_confirmed,
     visit_log.ts_visit_registered IS NOT NULL AS is_registered,
     IF(visit_log.ts_visit_done IS NOT NULL, TRUE, FALSE) AS is_completed,
@@ -116,9 +141,12 @@ SELECT
     IF(visit_cancellation.ts_created IS NOT NULL, TRUE, FALSE) AS is_canceled,
     IF(visit_log.ts_visit_unsuccessful IS NOT NULL, TRUE, FALSE) AS is_unsuccessful,
     IF(visit_log.author_role_visit_registered = 'AGENT', TRUE, FALSE) AS is_registered_by_agent,
+    IF(visit_log.ts_visit_fup_collected IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
+    IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
     IF(visit_demand.id_visit IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
     FALSE AS is_3p_supply,
     visit.is_fixed_agent,
+    IF(computed_status IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
     CASE
         WHEN visit_log.ts_visit_tenant_answer IS NOT NULL
              OR visit_log.ts_visit_pending_tenant_answer IS NOT NULL THEN TRUE
@@ -163,7 +191,9 @@ SELECT
     visit_log.ts_visit_fup_collected,
     visit_cancellation.ts_created AS ts_visit_canceled,
     visit_log.ts_visit_done,
-    visit_log.ts_visit_unsuccessful
+    visit_log.ts_visit_unsuccessful,
+    visit_log.ts_visit_stalled,
+    vbh.ts_first_visit
 FROM
     datalake_ebdb_clean.visit AS visit
 LEFT JOIN
@@ -194,5 +224,8 @@ LEFT JOIN
         ON visit.id_house = entry_model.id_house
         AND visit.ts_visit >= entry_model.ts_entrance_started
         AND visit.ts_visit < COALESCE(entry_model.ts_entrance_ended, NOW())
+LEFT JOIN
+    visit_by_history AS vbh
+        ON visit.id = vbh.id_visit
 WHERE
     DATE(visit.ts_created) >= '2024-11-01'

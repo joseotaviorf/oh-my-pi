@@ -3606,6 +3606,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-user-visit-preferences:first-run-of-day
+  - bietlejuice.ebdb_visit:load-clean-visit-aud:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-checkin:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-fitting:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day

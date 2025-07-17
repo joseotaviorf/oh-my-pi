@@ -89,6 +89,10 @@ columns:
     lineage:
       - datalake_visit.visits.cancellatin_channel
     description: What the channel for the cancellation of this visit
+  cancellation_author_role:
+    lineage:
+      - datalake_visit.visits.cancellation_author_role
+    description: Role of user who cancelled the visit
   entry_method:
     lineage:
       - datalake_visit.visit_schedule.method
@@ -109,6 +113,14 @@ columns:
       REGISTERED: When the visit is registered after after it has occurred
       FITTED: When the visit is fitted. It is already confirmed
       STANDARD: When the visit follows the standard flow
+  visit_schedule_type:
+    lineage:
+      - datalake_visit.visits.visit_schedule_type
+    description: Type of visit schedule based on the time of first schedule and last schedule.
+    categories:
+      NOT_CHANGED: When the schedule has not been changed (first = last)
+      POSTPONED: When the visit was postponed (last > first)
+      EARLY: When the visit was earlier (last < first)
   visit_request_channel:
     lineage:
       - datalake_visit.visits.visit_request_channel
@@ -145,6 +157,22 @@ columns:
     lineage:
       - datalake_visit.visits.is_cancelled_by_expiration
     description: True if the visit was cancelled due to expired time
+  is_visit_stalled:
+    lineage:
+      - datalake_visit.visits.is_stalled
+    description: If the visit is stalled.
+  has_visit_finisher_status:
+    lineage:
+      - datalake_visit.visits.has_finisher_status
+    description: True when the visit has a finisher status
+  has_visit_fup_collected:
+    lineage:
+      - datalake_visit.visits.has_fup_collected
+    description: True when the visit has a follow up collected
+  has_visit_more_one_agent:
+    lineage:
+      - datalake_visit.visits.has_more_one_agent
+    description: True when the visit has more than one associated agent.
   dt_created:
     lineage:
       - datalake_visit.visits.ts_created
@@ -193,5 +221,13 @@ columns:
     lineage:
       - datalake_visit.visits.ts_visit_fup_collected
     description: Timestamp with the follow up collected date of this visit.
+  ts_visit_stalled:
+    lineage:
+      - datalake_visit.visits.ts_visit_stalled
+    description: Timestamp when the visit was stalled.
+  ts_first_visit:
+    lineage:
+      - datalake_visit.visits.ts_first_visit
+    description: Timestamp when the visit was first scheduled.
   ts_load:
     description: Timestamp of the ingestion data.

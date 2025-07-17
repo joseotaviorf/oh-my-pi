@@ -2,7 +2,7 @@ database_name: datalake_visit
 table_name: visit_cancellation_unified
 description: This data model unifies visit cancellation data. Until 2024 coming from visit_cancellation_details and after 2024 coming from visit_status_log.
   Each row is an unique visit.
-domain: Data ForSale
+domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_visit:
@@ -30,6 +30,10 @@ columns:
       - datalake_ebdb_clean.visit_status_log.reason
       - datalake_ebdb_clean.visit_cancellation_details.reason
     description: Reason why the visit was cancelled.
+  author_user_role:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.author_user_role
+    description: Role of user who cancelled the visit.
   is_cancelled_by_expiration:
     description: True if the visit was cancelled due to expired time.
   ts_created:
