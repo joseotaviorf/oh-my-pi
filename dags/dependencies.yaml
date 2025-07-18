@@ -1527,7 +1527,6 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.enrich_proposal:load-enrich-proposal:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
-  - bietlejuice.meetcall:load-clean-operators:first-run-of-day
   - bietlejuice.trato_feito:load-clean-client:first-run-of-day
   - bietlejuice.trato_feito:load-clean-contract:first-run-of-day
   - bietlejuice.trato_feito:load-clean-debt:first-run-of-day
