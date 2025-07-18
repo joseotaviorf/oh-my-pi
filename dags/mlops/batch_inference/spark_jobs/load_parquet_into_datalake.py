@@ -83,7 +83,7 @@ def main():
           .mode("overwrite")
           .option("path", path)
           .partitionBy(raw_partition_cols)
-          .toTable(database_name + "." + table_name)
+          .saveAsTable(database_name + "." + table_name)
     )
 
 
