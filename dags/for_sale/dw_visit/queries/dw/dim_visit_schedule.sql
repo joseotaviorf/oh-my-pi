@@ -29,6 +29,7 @@ SELECT
   ts_schedule_confirmed,
   ts_schedule_completed,
   ts_schedule_unsuccessful,
-  ts_schedule_canceled
+  ts_schedule_canceled,
+  ts_schedule_visit
 FROM
   datalake_visit.visit_schedules

@@ -146,3 +146,7 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_canceled
     description: Timestamp of the canceled event (VISIT_REQUEST_CANCELED or VISIT_REQUEST_CANCELED).
+  ts_schedule_visit:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_visit
+    description: Timestamp when the visit was scheduled for each id_schedule.

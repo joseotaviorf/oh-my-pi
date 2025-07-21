@@ -92,6 +92,53 @@ schedule AS (
       ON vsl.id_schedule = fs.id_schedule AND vsl.id_visit = fs.id_visit
   GROUP BY 1, 2
 ),
+visit_aud AS (
+  SELECT
+    va.id_visit,
+    va.ts_visit,
+    ure.ts_revision AS ts_created
+  FROM
+    datalake_ebdb_clean.visit_aud AS va
+  LEFT JOIN
+    datalake_ebdb_user.user_revision_entity AS ure
+      ON va.rev = ure.id
+),
+schedule_enriched AS (
+  SELECT
+    schedule.id_visit,
+    schedule.id_schedule,
+    schedule.id_user_creator,
+    schedule.user_role_creator,
+    schedule.id_user_cancelation,
+    schedule.channel_creation,
+    schedule.ts_event_tenant,
+    schedule.ts_schedule_created,
+    schedule.ts_schedule_requested,
+    schedule.ts_schedule_rescheduled,
+    schedule.ts_schedule_confirmed,
+    schedule.ts_schedule_completed,
+    schedule.ts_schedule_unsuccessful,
+    schedule.ts_schedule_canceled,
+    schedule.schedule_origin,
+    schedule.id_succeed_schedule,
+    schedule.last_confirm_answer_supply,
+    schedule.last_confirm_answer_demand,
+    schedule.last_confirm_answer_agent,
+    schedule.last_confirm_answer_tenant_living,
+    schedule.channel_confirmed_supply,
+    schedule.channel_confirmed_demand,
+    schedule.channel_confirmed_agent,
+    schedule.channel_confirmed_tenant_living,
+    va.ts_visit AS ts_schedule_visit
+  FROM
+    schedule
+  LEFT JOIN
+    visit_aud AS va
+      ON va.id_visit = schedule.id_visit
+      AND va.ts_created > schedule.ts_schedule_created
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY schedule.id_schedule ORDER BY va.ts_created) = 1
+),
 visit_model AS (
   SELECT
     id_visit,
@@ -160,7 +207,7 @@ schedule_aux AS (
     v.dt_visit,
     s.ts_schedule_created AS ts_created
   FROM
-    schedule AS s
+    schedule_enriched AS s
   INNER JOIN
     datalake_ebdb_clean.visit AS v
       ON s.id_visit = v.id
@@ -342,11 +389,7 @@ filtered_visit AS (
     dt_visit,
     id_real_estate_agent_rating,
     vo_create.name AS first_update_source,
-    TO_UTC_TIMESTAMP(
-      (CAST(dt_visit AS TIMESTAMP) + FLOOR((slot * 15 / 60) + 8) * INTERVAL 1 HOURS + ABS(slot * 15 % 60) * INTERVAL 1 MINUTES
-      ),
-    COALESCE(ct.default_timezone, 'UTC')
-  ) AS ts_visit,
+    v.ts_visit,
     v.ts_created
   FROM
     datalake_ebdb_clean.visit AS v
@@ -451,11 +494,12 @@ SELECT DISTINCT
   s.ts_schedule_completed,
   s.ts_schedule_unsuccessful,
   s.ts_schedule_canceled,
+  s.ts_schedule_visit,
   v_cin.ts_checkin AS ts_visit_checkin,
   br.dt_creation AS ts_buyer_review_rating,
   NOW() AS ts_load
 FROM
-  schedule AS s
+  schedule_enriched AS s
 INNER JOIN
   filtered_visit AS v
     ON s.id_visit = v.id

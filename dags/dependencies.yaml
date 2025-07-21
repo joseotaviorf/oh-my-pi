@@ -3595,6 +3595,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes:first-run-of-day
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy:first-run-of-day
