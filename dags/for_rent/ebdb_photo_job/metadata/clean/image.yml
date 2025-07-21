@@ -1,27 +1,63 @@
+---
 database_name: datalake_ebdb_clean
 table_name: image
+description: |
+  This table contains metadata for house listing photos from the EBDB (main QuintoAndar database).
+  Each row represents a single photo associated with a house listing, including the filename and display properties.
+  
+  **Photo URL Construction & Watermarks:**
+  Photos can be accessed via URLs constructed from the 'name' field. By default, all photos contain QuintoAndar watermarks.
+  
+  - **Watermarked photos**: https://www.quintoandar.com.br/img/xlg/{name}
+  - **Non-watermarked photos**: https://www.quintoandar.com.br/img/xlg/original{name}
+  
+  **Important**: As of July 2025, approximately 27-33% of 1P listings have original non-watermarked versions available,
+  assuming the non-watermarked version exists only if the URL with "original" prefix returns a valid image.
+  
+  **Use Cases:**
+  - Analyzing photo availability and coverage for listings
+  - Determining watermark presence for business reporting
+  - Constructing photo URLs for applications and analysis
+  - Understanding photo sequence and primary image designation
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
 columns:
   id_image:
     lineage:
       - datalake_ebdb_raw.imagem.id
+    description: Unique identifier for the image record
   name:
     lineage:
       - datalake_ebdb_raw.imagem.nome
+    description: |
+      Watermarked image filename used for URL construction. This field is critical for accessing photos.
+      
+      **URL Construction Examples:**
+      - Watermarked: https://www.quintoandar.com.br/img/xlg/894866119-17.517785680626563IMG9026.jpg
+      - Non-watermarked: https://www.quintoandar.com.br/img/xlg/original894866119-17.517785680626563IMG9026.jpg
+      
+      Note: Non-watermarked versions may not exist for all images. Only ~27-33% of 1P listings have original versions.
   is_principal:
     lineage:
       - datalake_ebdb_raw.imagem.principal
+    description: Boolean flag indicating if this is the main/primary photo for the house listing. Each house should have one primary photo.
   id_house:
     lineage:
       - datalake_ebdb_raw.imagem.imovel_id
+    description: Foreign key to the house/property.
   subtitle:
     lineage:
       - datalake_ebdb_raw.imagem.legenda
+    description: Caption or subtitle text for the image, typically describing what the photo shows (e.g., "Living room", "Kitchen").
   sequence:
     lineage:
       - datalake_ebdb_raw.imagem.ordem
+    description: Display order/position of this image in the photo gallery for the house. Lower numbers appear first.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.imagem.atualizadoem
+    description: Timestamp when the image record was last updated in the source system.
   ts_created:
     lineage:
       - datalake_ebdb_raw.imagem.criadoem
+    description: Timestamp when the image record was originally created in the source system.
