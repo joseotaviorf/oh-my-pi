@@ -1,0 +1,65 @@
+---
+database_name: datalake_employment
+table_name: employee_details
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: >
+  Consolidated table with details about employee work assignments. 
+  It includes identification information, current contract status, important dates 
+  (start, projected and actual termination), and dismissal type. 
+
+columns:
+  id_period_of_service:
+    description: 'Unique identifier for the employee''s period of service.'
+    lineage:
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
+  id_assignment:
+    description: 'Unique identifier for the work assignment.'
+    lineage:
+      - datalake_employee_registration.identifier_mapping.id_assignment
+  assignment_number:
+    description: 'The work assignment number.'
+    lineage:
+      - datalake_employee_registration.identifier_mapping.assignment_number
+  legacy_registration:
+    description: 'Legacy employee registration number, if applicable.'
+    lineage:
+      - datalake_employee_registration.identifier_mapping.legacy_registration
+  legislation_code:
+    description: 'Legislation code applicable to the work assignment.'
+    lineage:
+      - datalake_pin_core_clean.all_assignments.legislation_code
+  assignment_type:
+    description: 'Type of assignment (e.g., E for Employee, C for Contingent, P for Pending).'
+    lineage:
+      - datalake_employee_registration.identifier_mapping.assignment_type
+  assignment_status_type:
+    description: 'Current status of the work assignment (e.g., ACTIVE, INACTIVE).'
+    lineage:
+      - datalake_pin_core_clean.all_assignments.assignment_status_type
+  dismissal_type:
+    description: 'Description of the employee''s dismissal type (e.g., TERMINATION, RESIGNATION). Null if there is no dismissal.'
+    lineage:
+      - datalake_hr_system_clean.actions_lov.description
+  is_active:
+    description: 'Boolean flag indicating if the assignment is active (TRUE) or not (FALSE).'
+    lineage:
+      - datalake_pin_core_clean.all_assignments.assignment_status_type
+  dt_projected_started:
+    description: 'Projected start date for the employee''s activities, usually for future hires.'
+    lineage:
+      - datalake_pin_core_clean.all_assignments.dt_projected_started
+  dt_started:
+    description: 'Effective start date of the work assignment.'
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_actual_termination:
+    description: 'Actual termination date of the work assignment.'
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  dt_notified_termination:
+    description: 'Date on which the termination was notified.'
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_notified_termination
+  ts_load:
+    description: 'Timestamp of when the record was loaded or updated in the table.'

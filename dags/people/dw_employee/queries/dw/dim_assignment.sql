@@ -1,49 +1,53 @@
-WITH
+WITH 
 salaries AS (
   SELECT
     id_assignment,
-    currency_code,
     action_reason
   FROM
     datalake_hr_system_clean.salaries
   WHERE
     dt_from <= DATE('{load_start_date}')
-    AND assignment_number NOT LIKE 'P%'
   QUALIFY
-    DENSE_RANK() OVER (PARTITION BY id_assignment ORDER BY dt_from DESC, ts_last_update DESC) = 1
+    ROW_NUMBER() OVER (
+      PARTITION BY id_assignment 
+      ORDER BY dt_from DESC, ts_last_update DESC
+    ) = 1
+),
+unions AS (
+  SELECT 
+    wr.PeriodOfServiceId AS id_period_of_service,
+    a.UnionName AS union_name
+  FROM
+    datalake_hr_system_clean.workers AS w
+  LATERAL VIEW OUTER
+    EXPLODE(w.work_relationships) AS wr
+  LATERAL VIEW OUTER
+    EXPLODE(wr.assignments) AS a
+  WHERE
+    TO_DATE(w.dt_effective, 'yyyyMMdd') <= DATE('{load_end_date}')
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY wr.PeriodOfServiceId 
+      ORDER BY w.dt_effective DESC
+    ) = 1
 )
 
 SELECT
-  wr.id_period_of_service AS sk_assignment,
-  ei.assignment_number,
-  ei.legacy_registration,
-  wr.legislation_code,
-  wr.worker_type,
-  a.assignment_status_type_code,
-  a.assignment_status_type,
-  COALESCE(a.union_name, '-1') AS union_name,
-  IF(wr.dt_termination IS NOT NULL, al.description, -1) AS dismissal_type,
-  s.action_reason AS reason_last_salary_increase
-FROM
-  datalake_hr_system.work_relationships AS wr
-LEFT JOIN
-  datalake_hr_system.assignment_effective_status AS a
-    ON wr.id_period_of_service = a.id_period_of_service
+  ed.id_period_of_service AS sk_assignment,
+  ed.assignment_number,
+  ed.legacy_registration,
+  ed.legislation_code,
+  ed.assignment_type AS worker_type,
+  ed.assignment_status_type,
+  COALESCE(u.union_name, -1) AS union_name,
+  ed.dismissal_type,
+  s.action_reason AS reason_last_salary_increase,
+  NOW() AS ts_load
+FROM 
+  datalake_employment.employee_details AS ed 
+LEFT JOIN 
+  unions AS u
+    ON u.id_period_of_service = ed.id_period_of_service
 LEFT JOIN
   salaries AS s
-    ON a.id_assignment = s.id_assignment
-LEFT JOIN
-  datalake_employee_registration.identifier_mapping AS ei
-    ON ei.id_period_of_service = wr.id_period_of_service
-LEFT JOIN
-  datalake_hr_system_clean.actions_lov AS al
-    ON al.action_code = a.action_code
-WHERE
-  (
-    wr.dt_start <= DATE('{load_start_date}')
-    AND wr.worker_type IN ('E', 'C')
-  )
-  OR (
-    a.dt_projected_start > DATE('{load_start_date}')
-    AND wr.worker_type = 'P'
-  )
+    ON s.id_assignment = ed.id_assignment
