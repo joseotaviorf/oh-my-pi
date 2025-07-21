@@ -3,7 +3,9 @@ from airflow.utils.context import Context
 from airflow.utils.types import DagRunType
 from airflow.utils.db import create_session
 from airflow.models.dataset import DatasetEvent
+from airflow.models import Variable
 from sqlalchemy.exc import SQLAlchemyError
+import requests
 
 from bietlejuice.base.airflow.datasets.dataset_parser import DatasetParser
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
@@ -19,6 +21,35 @@ from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 
 
 class DatasetService:
+    @staticmethod
+    def format_alert_message(context):
+        return {
+            "cardsV2": [
+                {
+                    "cardId": "dataset_service_alert",
+                    "card": {
+                        "header": {
+                            "title": f"🚨 Dataset Alerts 🚨",
+                            "subtitle": f"{context['task_instance'].dag_id}:{context['task_instance'].task_id}",
+                            "imageUrl": "https://media.licdn.com/dms/image/v2/D560BAQGNzZcOWa-Afw/company-logo_200_200/B56ZXuOuLWGoAM-/0/1743458591974/astronomer_logo?e=2147483647&v=beta&t=ubbCJrPu9UU_FD1IR4IND8n7C98VulEVuInTFpEgR_s",
+                            "imageType": "CIRCLE",
+                        },
+                        "sections": [
+                            {
+                                "widgets": [
+                                    {
+                                        "textParagraph": {
+                                            "text": f"The task <b>'{context['task_instance'].task_id}'</b> from the DAG <b>'{context['task_instance'].dag_id}'</b> and run_id <b>'{context['task_instance'].run_id}'</b> couldn't generate the Dataset event."
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                    },
+                }
+            ]
+        }
+
     @staticmethod
     def format_dataset_alias(dag_id: str, task_id: str) -> str:
         """Based on Dataset name, format into dataset alias pattern."""
@@ -269,57 +300,77 @@ class DatasetService:
         - If this is a run that will impact downstream dependents, we update the dataset without a suffix. We
         also update the dataset with a ":first-run-of-day" suffix if this is the first run of the day for this DAG.
         """
+        try:
+            if cls._has_updated_dataset_before(context):
+                # If the dataset was updated before, we should not update it again.
+                print("Dataset was updated before, skipping update.")
+                return
 
-        if cls._has_updated_dataset_before(context):
-            # If the dataset was updated before, we should not update it again.
-            print("Dataset was updated before, skipping update.")
-            return
+            is_first_run_of_date = cls._is_first_run_of_date(context)
 
-        is_first_run_of_date = cls._is_first_run_of_date(context)
+            dataset_alias = context["outlets"][0].name
+            dataset_name = DatasetService.transform_alias_into_dataset_name(
+                dataset_alias=dataset_alias
+            )
 
-        dataset_alias = context["outlets"][0].name
-        dataset_name = DatasetService.transform_alias_into_dataset_name(
-            dataset_alias=dataset_alias
-        )
-
-        if DatasetService.is_reprocessing_run(context):
-            reprocessing_date = DatasetService.find_reprocessing_date(context)
-            if reprocessing_date < datetime.now().date().isoformat():
+            if DatasetService.is_reprocessing_run(context):
+                reprocessing_date = DatasetService.find_reprocessing_date(context)
+                if reprocessing_date < datetime.now().date().isoformat():
+                    print(
+                        f"Reprocessing date is in the past ({reprocessing_date}), skipping dataset update."
+                    )
+                else:
+                    print(
+                        "This is a reprocessing run, updating the dataset with ':reprocessing' suffix."
+                    )
+                    context["outlet_events"][dataset_alias].add(
+                        Dataset(f"{dataset_name}:reprocessing"),
+                        extra={
+                            # The downstream DAGs can use this to know which DAG initially triggered the reprocessing
+                            # This is useful to avoid triggering the same DAG multiple times, and for debugging purposes
+                            "reprocessing_source": DatasetService.find_reprocessing_source(
+                                context
+                            ),
+                            "reprocessing_date": reprocessing_date,
+                        },
+                    )
+            elif DatasetService._is_impacting_downstream_dependents(context):
                 print(
-                    f"Reprocessing date is in the past ({reprocessing_date}), skipping dataset update."
+                    "This run will impact downstream dependents, updating the dataset without a suffix."
                 )
+                context["outlet_events"][dataset_alias].add(Dataset(dataset_name))
+                if is_first_run_of_date:
+                    # Let's imagine we have a DAG A that is intraday,
+                    # DAG B depends on DAG A, but DAG B only needs to run once (it is not intraday).
+                    # It can use the dataset with a suffix of ":first-run-of-day" to trigger the DAG only once.
+                    print(
+                        "This is the first run of the day, updating the dataset with ':first-run-of-day' suffix."
+                    )
+                    context["outlet_events"][dataset_alias].add(
+                        Dataset(f"{dataset_name}:first-run-of-day")
+                    )
+
+            cls._update_xcoms(context)
+        except Exception as e:
+            webhook_url = Variable.get("DLC_GCHAT_DATASET_EVENTS", None)
+            payload = DatasetService.format_alert_message(context)
+            print(f"m=update_dataset, msg=Dataset has failed to update. error={e}")
+
+            if webhook_url:
+                print("Sending msg to GChat...")
+                response = requests.post(webhook_url, json=payload)
+                try:
+                    response.raise_for_status()
+                except Exception as e:
+                    print(
+                        f"m=send_message, msg=Gchat message was not sent, check"
+                        f" the webhook url: {webhook_url}, payload: yes,"
+                        f" error: {e}"
+                    )
             else:
                 print(
-                    "This is a reprocessing run, updating the dataset with ':reprocessing' suffix."
+                    "Webhook token DLC_GCHAT_DATASET_EVENTS is not configured in Airflow Variables."
                 )
-                context["outlet_events"][dataset_alias].add(
-                    Dataset(f"{dataset_name}:reprocessing"),
-                    extra={
-                        # The downstream DAGs can use this to know which DAG initially triggered the reprocessing
-                        # This is useful to avoid triggering the same DAG multiple times, and for debugging purposes
-                        "reprocessing_source": DatasetService.find_reprocessing_source(
-                            context
-                        ),
-                        "reprocessing_date": reprocessing_date,
-                    },
-                )
-        elif DatasetService._is_impacting_downstream_dependents(context):
-            print(
-                "This run will impact downstream dependents, updating the dataset without a suffix."
-            )
-            context["outlet_events"][dataset_alias].add(Dataset(dataset_name))
-            if is_first_run_of_date:
-                # Let's imagine we have a DAG A that is intraday,
-                # DAG B depends on DAG A, but DAG B only needs to run once (it is not intraday).
-                # It can use the dataset with a suffix of ":first-run-of-day" to trigger the DAG only once.
-                print(
-                    "This is the first run of the day, updating the dataset with ':first-run-of-day' suffix."
-                )
-                context["outlet_events"][dataset_alias].add(
-                    Dataset(f"{dataset_name}:first-run-of-day")
-                )
-
-        cls._update_xcoms(context)
 
     @staticmethod
     def _has_updated_dataset_before(context: Context) -> bool:
