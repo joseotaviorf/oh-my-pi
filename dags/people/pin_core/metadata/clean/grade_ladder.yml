@@ -1,0 +1,125 @@
+---
+database_name: datalake_pin_core_clean
+table_name: grade_ladder
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: 'Table that stores the history of grade ladders with steps. Contains information about the progression structure, status, and effective dates of the ladders.'
+columns:
+  id_grade_ladder:
+    description: 'Primary key for the grade ladder.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.grade_ladder_id
+  id_action_occurrence:
+    description: 'Identifier of the action occurrence that resulted in this record.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.action_occurrence_id
+  id_grade_set:
+    description: 'Identifier of the grade set to which this ladder belongs.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.grade_set_id
+  id_business_group:
+    description: 'Identifier of the business group.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.business_group_id
+  id_legislative_data_group:
+    description: 'Identifier of the legislative data group.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.legislative_data_group_id
+  id_prog_action:
+    description: 'Default progression action to be used.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.prog_action_id
+  id_prog_action_reason:
+    description: 'Default progression action reason to be used.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.prog_action_reason_id
+  id_salary_action:
+    description: 'Default salary action to be used.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.salary_action_id
+  id_salary_action_reason:
+    description: 'Default salary action reason to be used.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.salary_action_reason_id
+  grade_type:
+    description: 'Type of grade, for example, GRADE or STEP.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.grade_type
+  auto_progression_code:
+    description: 'Code that defines the type of automatic progression.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.auto_progression_code
+  progression_style_code:
+    description: 'Progression style, such as grade progression or grade point progression.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.progression_style_code
+  progression_date_code:
+    description: 'Code that defines the progression date.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.progression_date_code
+  auto_salary_change_code:
+    description: 'Code that defines the type of automatic salary change.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.auto_sal_change_code
+  salary_change_date_code:
+    description: 'Code that defines the salary change date.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.salary_change_date_code
+  salary_calculation_method_code:
+    description: 'Salary calculation method, such as grade step rate or increment.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.salary_calc_method_code
+  rate_change_date_code:
+    description: 'Code that defines the salary rate change date.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.rate_change_date_code
+  created_by:
+    description: 'User who created the record in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.created_by
+  updated_by:
+    description: 'User who last updated the record in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.last_updated_by
+  object_version_number:
+    description: 'Object version number, used for concurrency control and auditing.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.object_version_number
+  is_active:
+    description: 'Flag that indicates if the grade ladder is active.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.active_status
+  is_salary_updated:
+    description: 'Flag that indicates if the salary should be updated during progression.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.update_salary_flag
+  dt_effective_started:
+    description: 'Effective start date of the grade ladder record.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.effective_start_date
+  dt_effective_ended:
+    description: 'Effective end date of the grade ladder record.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.effective_end_date
+  ts_created:
+    description: 'Timestamp of when the record was created in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.creation_date
+  ts_updated:
+    description: 'Timestamp of the last update of the record in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.last_update_date
+  ts_load:
+    description: 'Timestamp of when the record was loaded into the clean layer.'
+  year:
+    description: 'Partition year, referring to the last update date in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.year
+  month:
+    description: 'Partition month, referring to the last update date in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.month
+  day:
+    description: 'Partition day, referring to the last update date in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_grade_ladders_f.day

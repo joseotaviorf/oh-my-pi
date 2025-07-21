@@ -90,6 +90,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_action_reasons_tl:
+      clean_table_name: action_reason_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_actions_b:
       clean_table_name: action_base
       extra_spark_job_arguments:
@@ -160,6 +165,16 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_grade_ladders_f:
+      clean_table_name: grade_ladder
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_grade_ladders_f_tl:
+      clean_table_name: grade_ladder_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date     
     per_job_family_f:
       clean_table_name: job_family
       extra_spark_job_arguments:

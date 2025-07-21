@@ -1,0 +1,61 @@
+---
+database_name: datalake_pin_core_clean
+table_name: action_reason_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: 'Stores the translated text for action reasons in multiple languages. This table provides the descriptive name for a given action reason ID.'
+columns:
+  id_action_reason:
+    description: 'Primary key for the action reason.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.action_reason_id
+  id_business_group:
+    description: 'Identifier of the business group.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.business_group_id
+  action_reason:
+    description: 'The translated text of the action reason.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.action_reason
+  language:
+    description: 'The language code for the translation.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.language
+  source_language:
+    description: 'The source language from which the text was translated.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.source_lang
+  object_version_number:
+    description: 'Object version number, used for concurrency control and auditing.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.object_version_number
+  created_by:
+    description: 'User who created the record in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.created_by
+  updated_by:
+    description: 'User who last updated the record in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.last_updated_by
+  ts_created:
+    description: 'Timestamp of when the record was created in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.creation_date
+  ts_updated:
+    description: 'Timestamp of the last update of the record in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.last_update_date
+  ts_load:
+    description: 'Timestamp of when the record was loaded into the clean layer.'
+  year:
+    description: 'Partition year, referring to the last update date in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.year
+  month:
+    description: 'Partition month, referring to the last update date in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.month
+  day:
+    description: 'Partition day, referring to the last update date in the source.'
+    lineage:
+      - datalake_pin_core_raw.per_action_reasons_tl.day
