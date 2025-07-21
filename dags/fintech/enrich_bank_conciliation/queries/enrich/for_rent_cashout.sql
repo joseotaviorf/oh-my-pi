@@ -1,24 +1,22 @@
 WITH de_para_company_use AS (
     SELECT DISTINCT  
           hash,
-          get_json_object(sap_payload, '$.U_ExternalPaymentId') AS external_payment_id 
+          id_external_payment
     FROM
-            datalake_sap_gateway_clean.sync_sap_job 
-    WHERE
-            erp_solution = 'S4'
+            datalake_sap_gateway.sap_payload
 ),
 
 francesinha AS (
     SELECT
-        UPPER(REPLACE(company_use, '|', '!')) AS company_use,
+        IF(
+              LENGTH(company_use) IN (8,9,10,11,12,13,14,15,16) 
+                  AND company_use NOT LIKE '%MT%' 
+                  AND dt_paid > '2025-06-23', 
+              LEFT(REPLACE(company_use, '|', '!'), LENGTH(company_use) -2), 
+              REPLACE(company_use, '|', '!')
+          ) AS company_use,
         our_number,
-        CASE 
-            WHEN bank_account = 426887 THEN 426887
-            WHEN bank_account = 79952 THEN 79952
-            WHEN bank_account = 433065 THEN 433065
-            WHEN bank_account = 502307 THEN 502307
-            WHEN bank_account = 502331 THEN 502331
-        END AS bank_account,
+        bank_account,
         dt_paid,
         occurrence_code AS last_occurrence_code,
         IF(occurrence_code = '00', paid_amount, 0.00) AS paid_amount
@@ -26,8 +24,8 @@ francesinha AS (
         datalake_nexxera.cnab_payments
     WHERE
         occurrence_code IN ('00', 'DV')
-    AND
-        is_latest_attempt IS TRUE
+    -- AND
+    --     is_latest_attempt IS TRUE
     AND
         bank_account IN (426887, 79952, 433065, 502307, 502331)
 ),
@@ -55,7 +53,7 @@ cap AS (
 
 sap AS (
     SELECT DISTINCT
-        COALESCE(UPPER(l.id_external_payment), UPPER(dp.external_payment_id))  AS company_use,
+        COALESCE(UPPER(l.id_external_payment), UPPER(dp.id_external_payment))  AS company_use,
         l.account_number,
         l.dt_reference AS dt_paid,
         l.dt_tax,
