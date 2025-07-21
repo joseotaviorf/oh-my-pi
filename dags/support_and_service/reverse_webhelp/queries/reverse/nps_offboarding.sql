@@ -169,6 +169,7 @@ SELECT DISTINCT
     ELSE NULL
   END spoc_class,
   med.created_date med_created_dt,
+  med.sk_ticket AS med_sk_ticket,
   IF(spc.agent_email LIKE '%webhelp%', spc.agent_email, NULL) spoc_agent_email,
   ans.comment,
   YEAR(CURRENT_DATE - 1) AS year,
