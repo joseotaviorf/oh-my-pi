@@ -97,6 +97,46 @@ columns:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.leads_high_ticket
     description: The number of expected high ticket leads targeted.
+  input_metric_1_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_1_name
+    description: The name of the first custom input metric defined for this target.
+  input_metric_1_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_1_value
+    description: The value of the first custom input metric defined for this target.
+  input_metric_2_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_2_name
+    description: The name of the second custom input metric defined for this target.
+  input_metric_2_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_2_value
+    description: The value of the second custom input metric defined for this target.
+  input_metric_3_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_3_name
+    description: The name of the third custom input metric defined for this target.
+  input_metric_3_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_3_value
+    description: The value of the third custom input metric defined for this target.
+  input_metric_4_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_4_name
+    description: The name of the fourth custom input metric defined for this target.
+  input_metric_4_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_4_value
+    description: The value of the fourth custom input metric defined for this target.
+  input_metric_5_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_name
+    description: The name of the fifth custom input metric defined for this target.
+  input_metric_5_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_value
+    description: The value of the fifth custom input metric defined for this target.
   dt_month:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.month
