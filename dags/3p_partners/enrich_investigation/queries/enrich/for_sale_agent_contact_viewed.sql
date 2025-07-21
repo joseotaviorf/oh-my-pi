@@ -1,4 +1,21 @@
-WITH agent_data AS (
+WITH amplitude_events AS (
+  SELECT
+    CASE 
+      WHEN LENGTH(TRY_CAST(GET_JSON_OBJECT(ea.event_properties, '$.houseId') AS INT)) < 9 THEN 892700000 + TRY_CAST(GET_JSON_OBJECT(ea.event_properties, '$.houseId') AS INT)
+      ELSE TRY_CAST(GET_JSON_OBJECT(ea.event_properties, '$.houseId') AS INT)
+    END AS id_house,
+    ea.id_user,
+    ea.ts_event,
+    ea.year,
+    ea.month,
+    ea.day
+    FROM
+      datalake_amplitude_agents_app.agents_native_events AS ea
+    WHERE
+      MAKE_DATE(ea.year, ea.month, ea.day) BETWEEN {'load_start_date'} AND {'load_end_date'}
+      AND ea.event_type = "owner_contact_success_page_viewed"
+),
+agent_data AS (
   SELECT
     uad.id AS id_agent,
     at.types AS agent_type,
@@ -30,9 +47,12 @@ SELECT
   FIRST(ad.is_3p_agent) AS is_3p_agent,
   FIRST(ad.is_rent_agent) AS is_rent_agent,
   FIRST(ad.is_sale_agent) AS is_sale_agent,
-  FIRST(ea.ts_event) AS ts_first_pp_contact_view
+  FIRST(ea.ts_event) AS ts_first_pp_contact_view,
+  ea.year,
+  ea.month,
+  ea.day
 FROM  
-  datalake_amplitude_agents_app.agents_native_events AS ea
+  amplitude_events AS ea
 LEFT JOIN
   datalake_ebdb_clean.user AS u
     ON ea.id_user = u.id
@@ -41,10 +61,6 @@ INNER JOIN
     ON u.id_agent = ad.id_agent
 INNER JOIN
   datalake_ebdb_clean.house AS h
-    ON TRY_CAST(GET_JSON_OBJECT(ea.event_properties, '$.houseId') AS INT) = h.id
+    ON ea.id_house = h.id
     AND h.is_for_sale
-WHERE
-  ea.ts_event BETWEEN {'load_start_date'} AND {'load_end_date'}
-    AND ea.event_type="owner_contact_success_page_viewed"
-GROUP BY
-  ALL
+GROUP BY ALL
