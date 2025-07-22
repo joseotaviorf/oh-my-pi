@@ -31,8 +31,9 @@ WITH taxonomy_demand AS (
         td.platform AS mkt_platform
     FROM
         datalake_gsheets_clean.taxonomy_demand AS td
-    JOIN taxonomy_min_ids AS td_min
-        ON td.id = td_min.id
+    JOIN
+        taxonomy_min_ids AS td_min
+            ON td.id = td_min.id
 ),
 booking AS (
     SELECT-- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
@@ -106,13 +107,16 @@ booking AS (
         b.ts_booking_local_tz AS ts_scheduling_local,
         b.ts_first_canceled AS dt_cancel,
         b.ts_first_canceled_local_tz AS ts_cancel_local,
+        b.ts_first_canceled_unevaluated AS ts_cancel_unevaluated,
+        b.ts_first_canceled_unevaluated_local_tz AS ts_cancel_unevaluated_local,
         b.ts_created AS dt_created,
         b.ts_created_local_tz AS ts_created_local,
         b.ts_updated AS dt_updated
     FROM
         datalake_booking.booking AS b
-            LEFT JOIN datalake_booking.booking_cancellation AS bc
-                ON b.id = bc.id_booking
+    LEFT JOIN
+        datalake_booking.booking_cancellation AS bc
+            ON b.id = bc.id_booking
 )
 SELECT
     b.sk_booking,
@@ -193,13 +197,16 @@ SELECT
     b.ts_scheduling_local,
     b.dt_cancel,
     b.ts_cancel_local,
+    b.ts_cancel_unevaluated,
+    b.ts_cancel_unevaluated_local,
     b.dt_created,
     b.ts_created_local,
     b.dt_updated,
     NOW() AS ts_load
 FROM
     booking b
-    LEFT JOIN taxonomy_demand td
+LEFT JOIN
+    taxonomy_demand td
         ON LOWER(COALESCE(td.app_type, '')) = LOWER(COALESCE(b.app_type, ''))
         AND LOWER(COALESCE(td.utm_source, '')) = LOWER(COALESCE(b.utm_source, ''))
         AND LOWER(COALESCE(td.utm_medium, '')) = LOWER(COALESCE(b.utm_medium, ''))

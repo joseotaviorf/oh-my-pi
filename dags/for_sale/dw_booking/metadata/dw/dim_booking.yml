@@ -805,6 +805,19 @@ columns:
       - datalake_booking.booking.ts_first_canceled_local_tz
     description: >
       Date of visit cancelation on local timezone, based on the country of the booking.
+      This column may have a null value, because there's a comparison between the date of the booking and the date of the cancellation.
+      If the date of the booking is greater than the date of the cancellation, the column will be null.
+      So use the ts_first_canceled_unevaluated_local column to get the date of the cancellation.
+  ts_cancel_unevaluated:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated
+    description: >
+      Timestamp of visit cancelation on UTC.
+  ts_cancel_unevaluated_local:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
+    description: >
+      Date of visit cancelation on local timezone, based on the country of the booking.
   dt_created:
     lineage:
       - datalake_booking.booking.ts_created
