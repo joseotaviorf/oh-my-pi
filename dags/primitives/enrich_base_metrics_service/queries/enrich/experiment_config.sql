@@ -228,6 +228,27 @@ FROM VALUES
                                                 )
                                 )
         )
+    ),
+    -- Geo-embeddings on CG experiment
+    (
+        "ab_beakman_search_services_location_embedding_on_cg_experiment",
+        named_struct(
+            'begin_date', DATE('2025-07-19'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
     )
 
 AS experiment_config(experiment_name, config)
