@@ -15,77 +15,28 @@ workflow:
   tables_customization:
     AnalysisMachine:
       clean_table_name: analysis_machine
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     AnalysisRequestData:
       clean_table_name: analysis_request_data
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     AnalysisRequestProponentData:
       clean_table_name: analysis_request_proponent_data
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     AnalysisRequest:
       clean_table_name: analysis_request
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     AnalysisStateGroup:
       clean_table_name: analysis_state_group
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     AnalysisState:
       clean_table_name: analysis_state
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     ChecklistGroup:
       clean_table_name: checklist_group
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     ChecklistItem:
       clean_table_name: checklist_item
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     ChecklistDecision:
       clean_table_name: checklist_decision
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     Checklist:
       clean_table_name: checklist
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     ExternalScore:
       clean_table_name: external_score
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
-        avg: value
     PolicyReport:
       clean_table_name: policy_report
-      get_table_metrics:
-        count: id
-        max: created_at
-        min: created_at
     Variant:
       clean_table_name: variant
     CreditAnalysis:
