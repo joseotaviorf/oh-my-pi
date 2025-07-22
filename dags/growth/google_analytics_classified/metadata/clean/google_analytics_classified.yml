@@ -1,0 +1,187 @@
+---
+database_name: datalake_google_analytics_classified_clean
+table_name: google_analytics_classified
+owner: data.growth@quintoandar.com.br
+domain: Growth
+description: Raw GA4 event-level data from classified sites, including user behavior, session info, and marketing attribution for analytics and reporting purposes.
+columns:
+  id_user_pseudo:
+    description: Pseudo user ID assigned by GA4.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.user_pseudo_id
+  id_session:
+    description: Unique identifier for the session.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.unique_session_id
+  id_event_campaign:
+    description: Alias for event_campaign_id.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_campaign_id
+  id_lead:
+    description: Unique identifier for the lead.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.lead_id
+  id_property:
+    description: Unique identifier of the GA4 property.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.property_id
+  id_stream:
+    description: Identifier of the data stream.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.stream_id
+  id_user_custom:
+    description: Alias for user_id_custom.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.user_id_custom
+  id_session_campaign:
+    description: Alias for session_campaign_id.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_campaign_id
+  id_session_gads_ad_group:
+    description: Alias for session_gads_ad_group_id.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_gads_ad_group_id
+  ga_num:
+    description: Alias for GA4 session number.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.ga_session_number  
+  platform:
+    description: Platform where the event was triggered (e.g., web, app).
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.platform
+  ses_src:
+    description: Alias for session_source.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_source
+  ses_medium:
+    description: Alias for session_medium.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_medium
+  ses_cmp_name:
+    description: Alias for session_campaign_name.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_campaign_name
+  ses_ad_content:
+    description: Alias for session_ad_content.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_ad_content
+  ses_add_term:
+    description: Alias for session_ad_term.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_ad_term
+  ses_src_platform:
+    description: Alias for session_source_platform.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_source_platform
+  ses_creative_format:
+    description: Alias for session_creative_format.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_creative_format
+  ses_mkt_tactic:
+    description: Alias for session_marketing_tactic.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_marketing_tactic
+  ses_gads_ad_grp_name:
+    description: Alias for session_gads_ad_group_name.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_gads_ad_group_name
+  ses_ga4_def_channel_grp:
+    description: Alias for session_ga4_default_channel_group.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.session_ga4_default_channel_group
+  ev_name:
+    description: Alias for event_name.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_name
+  ev_cmp_name:
+    description: Alias for event_campaign_name.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_campaign_name
+  ev_src:
+    description: Alias for event_source.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_source
+  ev_medium:
+    description: Alias for event_medium.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_medium
+  ev_term:
+    description: Alias for event_term.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_term
+  ev_content:
+    description: Alias for event_content.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_content
+  ev_src_platform:
+    description: Alias for event_source_platform.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_source_platform
+  ev_creative_format:
+    description: Alias for event_creative_format.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_creative_format
+  ev_mkt_tactics:
+    description: Alias for event_marketing_tactic.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_marketing_tactic
+  ev_gclid:
+    description: Alias for event_gclid.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_gclid
+  site:
+    description: Name of the site where the event was tracked.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.site
+  city:
+    description: City from where the event was triggered.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.city
+  country:
+    description: Country from where the event was triggered.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.country
+  region:
+    description: Region or state from where the event was triggered.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.region
+  hostname:
+    description: Hostname from which the user visited the site.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.hostname
+  device:
+    description: Type of device used (e.g., mobile, desktop).
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.device
+  lead_type:
+    description: Type of lead generated (if applicable).
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.lead_type
+  page_location:
+    description: Full URL of the page where the event occurred.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.page_location
+  site_section:
+    description: Section of the site (e.g., home, blog, product).
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.site_section
+  operation_type:
+    description: Type of user operation (e.g., click, submit).
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.operation_type
+  evt_total:
+    description: Alias for total_events.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.total_events
+  ts_event:
+    description: Date when the event occurred.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_date
+  ts_event_timestamp_utc:
+    description: Timestamp of the event in UTC.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.event_timestamp_utc
+  ts_last_update:
+    description: Timestamp of the last update.
+    lineage: 
+      - datalake_google_analytics_classified_raw.google_analytics_classified_gcp_raw.last_update

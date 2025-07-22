@@ -2042,6 +2042,8 @@ bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all:first-run-of-day
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set:first-run-of-day
+bietlejuice.enrich_google_analytics_classified:
+  - bietlejuice.google_analytics_classified:load-clean-google-analytics-classified:first-run-of-day
 bietlejuice.enrich_google_search_console:
   - bietlejuice.google_search_console:load-clean-report-by-page-and-query:first-run-of-day
 bietlejuice.enrich_google_search_console_classified:
