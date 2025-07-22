@@ -10,7 +10,7 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
     lineage:
-      - datalake_sale_visit.sale_visit.id_agent
+      - datalake_demand_flows.prospect_daily_results.id_agent
     description: Agent unique identifier.
   id_user:
     lineage:
@@ -38,15 +38,15 @@ columns:
     lineage:
       - datalake_demand_flows.prospect_daily_results.event_name
     description: Name of the demand prospect conversion event.
-  ts_event:
+  dt_event:
     lineage:
-      - datalake_sale_visit.sale_visit.ts_booking_created
+      - datalake_demand_flows.prospect_daily_results.ts_event
     description: Timestamp in witch the interaction with the prospect happened.
   year:
     lineage:
-      - datalake_sale_visit.sale_visit.year
+      - datalake_quintoandar.aux_date.year
     description: Year of event happened.
   bimester:
     lineage:
-      - datalake_sale_visit.sale_visit.bimester
+      - datalake_quintoandar.aux_date.bimester
     description: Bimester of event happened.

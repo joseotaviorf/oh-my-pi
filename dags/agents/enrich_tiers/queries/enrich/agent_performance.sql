@@ -150,6 +150,7 @@ agent_prospects AS (
             AND mp.bimester = ap.bimester
     WHERE
         mp.profile = "Broker"
+        AND ap.business_context = 'sale'
 ),
 union_agent_prospects AS (
     SELECT
