@@ -12,7 +12,7 @@ WITH amplitude_events AS (
     FROM
       datalake_amplitude_agents_app.agents_native_events AS ea
     WHERE
-      MAKE_DATE(ea.year, ea.month, ea.day) BETWEEN {'load_start_date'} AND {'load_end_date'}
+      MAKE_DATE(ea.year, ea.month, ea.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
       AND ea.event_type = "owner_contact_success_page_viewed"
 ),
 agent_data AS (
