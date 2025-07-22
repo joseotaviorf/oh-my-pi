@@ -1,0 +1,79 @@
+database_name: datalake_amplitude_clean
+table_name: 440441_sale_offer_list_details_button_clicked_events
+domain: Growth
+owner: rodrigo.cardoso@quintoandar.com.br
+description: This table contains sale_offer_list_details_button_clicked events from app 440441.
+  It tracks user interactions and includes relevant metadata and user properties.
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.events.id_amplitude
+    description: Unique identification number for a triggered amplitude event
+  uuid:
+    lineage:
+    - datalake_amplitude_clean.events.uuid
+    description: unique triggered event id
+  id_event:
+    lineage:
+    - datalake_amplitude_clean.events.id_event
+    description: identification number for an amplitude event
+  id_user:
+    lineage:
+    - datalake_amplitude_clean.events.id_user
+    description: Unique identification number for an user
+  id_house:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Unique identification number for a 5A house, extracted from an event property
+  id_offer:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Unique identification for an offer, extracted from an event property
+  offer_status:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: status of an offer flow
+  country:
+    lineage:
+    - datalake_amplitude_clean.events.country
+    description: Country where the event trigger device was on the action moment
+  region:
+    lineage:
+    - datalake_amplitude_clean.events.region
+    description: region where the event trigger device was on the action moment
+  city:
+    lineage:
+    - datalake_amplitude_clean.events.city
+    description: City where the event trigger device was on the action moment
+  device_type:
+    lineage:
+    - datalake_amplitude_clean.events.device_type
+    description: device type
+  os_name:
+    lineage:
+    - datalake_amplitude_clean.events.os_name
+    description: device operational system name
+  platform:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: platform where the event was triggered off (mobile or desktop)
+  login_status:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: user login status
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
+    description: timestamp of a triggered event
+  year:
+    lineage:
+    - datalake_amplitude_clean.events.year
+    description: triggered event year
+  month:
+    lineage:
+    - datalake_amplitude_clean.events.month
+    description: triggered event month
+  day:
+    lineage:
+    - datalake_amplitude_clean.events.day
+    description: triggered event day
