@@ -1,6 +1,5 @@
 WITH base AS (
     SELECT
-        ROW_NUMBER() OVER (ORDER BY MIN(ts_event) ASC) AS id_line,
         REPLACE(REPLACE(owners, 'airflow, ', ''), ', airflow', '') AS line_name,
         MIN(ts_event) AS ts_line_first_event
     FROM
@@ -9,13 +8,27 @@ WITH base AS (
         datalake_airflow.dag AS d
             ON d.id_dag = l.id_dag
             AND d.id_dag LIKE 'bietlejuice%'
-    GROUP BY 2
+    GROUP BY 
+        line_name
 )
 SELECT
-    id_line,
+    MD5(line_name) AS id_line,
     line_name,
-    IF(line_name IN ('Data ForRent', 'Data Growth', 'Data Fintech', 'Data Rede', 'Data ForSale', 'Data SS',
-        'Data Engineering', 'Data Agents', 'Data Bedrock', 'Data International', 'Data People'), TRUE, FALSE) AS is_data_line,
+    line_name IN (
+        'Data 3P Partners',
+        'Data Agents',
+        'Data Bedrock',
+        'Data Engineering',
+        'Data Fintech',
+        'Data ForRent',
+        'Data ForSale',
+        'Data Growth',
+        'Data International',
+        'Data People',
+        'Data Primitives',
+        'Data Rede',
+        'Data SS'
+    ) AS is_data_line,
     TIMESTAMP(ts_line_first_event) AS ts_line_first_event
 FROM
     base
