@@ -10,7 +10,7 @@ francesinha AS (
     SELECT
         IF(
               LENGTH(company_use) IN (8,9,10,11,12,13,14,15,16) 
-                  AND company_use NOT LIKE '%MT%' 
+                  AND company_use NOT LIKE '%|%' 
                   AND dt_paid > '2025-06-23', 
               LEFT(REPLACE(company_use, '|', '!'), LENGTH(company_use) -2), 
               REPLACE(company_use, '|', '!')
