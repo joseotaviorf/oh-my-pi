@@ -1,9 +1,9 @@
 WITH aud_ts AS (
   SELECT /*+ RANGE_JOIN(aud, 50000) */
-    COALESCE(um.id_user, aud.id_user) AS id_owner,
-    LAG(aud.id_account_manager) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev, aud.id DESC) AS id_previous_account_manager,
+    aud.id_user AS id_owner,
+    LAG(aud.id_account_manager) OVER (PARTITION BY aud.id_user ORDER BY aud.rev, aud.id DESC) AS id_previous_account_manager,
     aud.id_account_manager,
-    LAG(aud.is_active) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev, aud.id DESC) AS previous_status,
+    LAG(aud.is_active) OVER (PARTITION BY aud.id_user ORDER BY aud.rev, aud.id DESC) AS previous_status,
     aud.is_active,
     TIMESTAMP(FROM_UNIXTIME(ure.ts_revision/1000)) AS ts_event
   FROM
@@ -11,9 +11,8 @@ WITH aud_ts AS (
   JOIN
     datalake_ebdb_clean.user_revision_entity AS ure
       ON aud.rev = ure.id
-  LEFT JOIN
-    datalake_ebdb_user.user_merge AS um
-      ON ARRAY_CONTAINS(um.predecessor_user_list, aud.id_user)
+  WHERE
+    aud.id_user IS NOT NULL
 ),
 
 pro_owner_dates AS (

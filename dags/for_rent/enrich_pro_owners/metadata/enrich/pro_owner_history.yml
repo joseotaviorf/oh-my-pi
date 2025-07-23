@@ -10,7 +10,6 @@ columns:
   id_owner:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.id_user
-      - datalake_ebdb_user.user_merge.id_user
     description: Id user of the owner.
   id_account_manager:
     lineage:
