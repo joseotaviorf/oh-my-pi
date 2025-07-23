@@ -249,6 +249,27 @@ FROM VALUES
                                                 )
                                 )
         )
+    ),
+     -- Demand balancer v1 map and SSR rent experiment
+    (
+        "ab_beakman_search_services_demand_concentration_v1_map_and_ssr_rent_experimen",
+        named_struct(
+            'begin_date', DATE('2025-07-23'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
     )
 
 AS experiment_config(experiment_name, config)
