@@ -17,7 +17,13 @@ columns:
     lineage:
       - datalake_booking.booking.id
       - datalake_ebdb_rent_flow.rent_flow.id_booking
+      - datalake_ebdb_clean.visit_status_log.id_schedule
     description: "Id of the booking."
+  id_visit:
+    lineage:
+      - datalake_booking.booking.id_visit
+      - datalake_ebdb_clean.visit_status_log.id_visit
+    description: "Id of the visit."
   id_offer:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_offer_context

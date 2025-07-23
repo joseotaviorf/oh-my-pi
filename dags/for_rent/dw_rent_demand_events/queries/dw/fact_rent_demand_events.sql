@@ -25,6 +25,7 @@ SELECT
     rde.id_event || '.' || rde.id_event_type || '.' || rde.id_tenant_prospect AS pk_rent_demand_event,
     rde.id_event AS sk_event,
     COALESCE(rde.id_booking, -1) AS sk_booking,
+    COALESCE(rde.id_visit, -1) AS sk_visit,
     COALESCE(rde.id_offer, -1) AS sk_offer,
     COALESCE(rde.id_proposal, -1) AS sk_proposal,
     COALESCE(rde.id_contract, -1) AS sk_contract,

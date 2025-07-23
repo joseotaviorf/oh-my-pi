@@ -25,6 +25,10 @@ columns:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_booking
     description: Id of the booking.
+  sk_visit:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_visit
+    description: Id of the visit.
   sk_offer:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_offer

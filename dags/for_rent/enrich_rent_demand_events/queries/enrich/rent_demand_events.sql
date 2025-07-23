@@ -26,6 +26,17 @@ WITH rent_flow_house_listing AS (
       **/
     END AS id_booking,
     CASE
+      WHEN bk.type = 'Visita'
+        AND (bk.ts_created IS NOT NULL OR (bk.dt_booking IS NOT NULL AND bk.is_visit_completed = TRUE AND bk.visit_fup IN ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez'))) THEN bk.id_visit
+      ELSE NULL
+      /** Same conditions to accept a booking:
+        -    Booking type must be Visit, always
+        -    Booking creation date not null (which indicates VB event)
+        -    Booking date not null + visit completed + some visit fups (which indicates VC event)
+        -    Other bookings not following these rules shouldn't be present at any time
+      **/
+    END AS id_visit,
+    CASE
       WHEN rf.id_offer_context REGEXP '[0-1]{{2}}$' THEN NULL
       WHEN off.ts_first_sent IS NOT NULL OR (off.status IN ('Aprovada', 'ACCEPTED') AND off.ts_analyzed IS NOT NULL) THEN rf.id_offer_context
       ELSE NULL
@@ -107,6 +118,7 @@ rent_demand_events AS (
   SELECT --visits_booked
     bk.id AS id_event,
     bk.id AS id_booking,
+    bk.id_visit,
     rf.id_offer,
     rf.id_proposal,
     rf.id_contract,
@@ -145,6 +157,7 @@ rent_demand_events AS (
   SELECT --visits_completed
     bk.id AS id_event,
     bk.id AS id_booking,
+    bk.id_visit,
     rf.id_offer,
     rf.id_proposal,
     rf.id_contract,
@@ -188,6 +201,7 @@ rent_demand_events AS (
   SELECT --offer_submitted
     off.id_offer_context AS id_event,
     rf.id_booking,
+    rf.id_visit,
     off.id_offer_context AS id_offer,
     rf.id_proposal,
     rf.id_contract,
@@ -229,6 +243,7 @@ rent_demand_events AS (
   SELECT --offer_accepted
     off.id_offer_context AS id_event,
     rf.id_booking,
+    rf.id_visit,
     off.id_offer_context AS id_offer,
     rf.id_proposal,
     rf.id_contract,
@@ -267,6 +282,7 @@ rent_demand_events AS (
   SELECT --evaluation_started
     pp.id AS id_event,
     rf.id_booking,
+    rf.id_visit,
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
@@ -307,6 +323,7 @@ rent_demand_events AS (
   SELECT --evaluation_positive
     pp.id AS id_event,
     rf.id_booking,
+    rf.id_visit,
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
@@ -347,6 +364,7 @@ rent_demand_events AS (
   SELECT --document_sent
     pp.id AS id_event,
     rf.id_booking,
+    rf.id_visit,
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
@@ -392,6 +410,7 @@ rent_demand_events AS (
   SELECT --credit_approved
     pp.id AS id_event,
     rf.id_booking,
+    rf.id_visit,
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
@@ -432,6 +451,7 @@ rent_demand_events AS (
   SELECT --contract_signed
     ct.id AS id_event,
     rf.id_booking,
+    rf.id_visit,
     rf.id_offer,
     rf.id_proposal,
     ct.id AS id_contract,
@@ -476,6 +496,7 @@ rent_demand_events AS (
   SELECT -- Contract Created (CC)
     ct.id AS id_event,
     rf.id_booking,
+    rf.id_visit,
     rf.id_offer,
     rf.id_proposal,
     ct.id AS id_contract,
@@ -518,7 +539,8 @@ rent_demand_events AS (
   UNION ALL
   SELECT --visits_requested
     vsl.id_visit AS id_event,
-    NULL AS id_booking,
+    vsl.id_schedule AS id_booking,
+    vsl.id_visit,
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
@@ -550,7 +572,8 @@ rent_demand_events AS (
   UNION ALL
   SELECT --visits_scheduled
     vsl.id_visit AS id_event,
-    NULL AS id_booking,
+    vsl.id_schedule AS id_booking,
+    vsl.id_visit,
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
@@ -582,7 +605,8 @@ rent_demand_events AS (
   UNION ALL
   SELECT --visits_rescheduled
     vsl.id_visit AS id_event,
-    NULL AS id_booking,
+    vsl.id_schedule AS id_booking,
+    vsl.id_visit,
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
@@ -614,7 +638,8 @@ rent_demand_events AS (
   UNION ALL
   SELECT --visits_done
     vsl.id_visit AS id_event,
-    NULL AS id_booking,
+    vsl.id_schedule AS id_booking,
+    vsl.id_visit,
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
@@ -666,6 +691,7 @@ SELECT DISTINCT
   **/
   rde.id_event,
   rde.id_booking,
+  rde.id_visit,
   rde.id_offer,
   rde.id_proposal,
   rde.id_contract,
