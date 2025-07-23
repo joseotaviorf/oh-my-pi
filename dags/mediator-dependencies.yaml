@@ -27,8 +27,3 @@ quintoml.growth.sale_discount_model.inference:
 quintoml.search.search_monitoring.inference:
   - bietlejuice.enrich_base_metrics_service:load-enrich-global-metrics
   - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions
-wonka.group_user_most_viewed:
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-user-merge
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
-  - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.ebdb_location:load-clean-region
