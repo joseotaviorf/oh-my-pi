@@ -5,6 +5,7 @@ SELECT
     imovel_id AS id_house,
     legenda AS subtitle,
     ordem AS sequence,
+    has_original,
     atualizadoEm AS ts_updated,
     criadoEm AS ts_created
 FROM

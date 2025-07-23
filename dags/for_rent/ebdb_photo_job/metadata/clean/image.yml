@@ -53,6 +53,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.imagem.ordem
     description: Display order/position of this image in the photo gallery for the house. Lower numbers appear first.
+  has_original:
+    lineage:
+      - datalake_ebdb_raw.imagem.has_original
+    description: Boolean flag indicating if the image has an original version. If True, the image has an original version without watermark. If False (or null), the image does not have an original version or the original version is not available. The path of the original image is https://www.quintoandar.com.br/img/xlg/original{name}.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.imagem.atualizadoem
