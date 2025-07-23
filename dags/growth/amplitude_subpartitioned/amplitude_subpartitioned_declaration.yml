@@ -321,6 +321,9 @@ workflow:
     183047_mortgage_home_viewed_events:
       run_optimize: false
       run_vacuum: false
+    183047_native_home_section_properties_list_events:
+      run_optimize: false
+      run_vacuum: false
     183047_offer_accepted_new_events:
       run_optimize: false
       run_vacuum: false
@@ -355,6 +358,9 @@ workflow:
       run_optimize: false
       run_vacuum: false
     183047_property_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_list_success_page_viewed_events:
       run_optimize: false
       run_vacuum: false
     183047_relisting_early_visits_confirmed_events:
