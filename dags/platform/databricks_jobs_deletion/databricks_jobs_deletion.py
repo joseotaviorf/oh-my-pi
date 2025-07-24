@@ -16,7 +16,7 @@ MAIN_START_DATE = datetime(2023, 7, 15, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 20 * * *"
 
 PROJECT_TO_JOB_NAME_REGEX_MAPPING = {"bietlejuice": "^bietlejuice-", "wonka": "^wonka-"}
-JOBS_REMOVAL_TIMEDELTA = timedelta(days=7)
+JOBS_REMOVAL_TIMEDELTA = timedelta(days=4)
 
 
 def delete_databricks_jobs(
