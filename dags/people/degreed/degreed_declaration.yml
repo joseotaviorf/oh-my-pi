@@ -7,7 +7,7 @@ dag:
   schedule_interval: 0 3 * * *
   
 cluster:
-  type: databricks_13_3_min_memory_people_cluster
+  type: databricks_13_3_large_driver_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
