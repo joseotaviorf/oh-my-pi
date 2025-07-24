@@ -1,8 +1,21 @@
+WITH time_solved as (
+  SELECT
+    sk_ticket,
+    MIN(DATE(ts_solved)) AS dt_solved
+  FROM
+      dw_customer_support.fact_tickets
+  GROUP BY 1
+)
 SELECT
   bmt.sk_task AS sk_ticket,
   bmt.sk_agent,
   bmt.origin AS channel,
-  bmt.status,
+  CASE 
+    WHEN ts.dt_solved IS NULL THEN bmt.status
+    WHEN ts.dt_solved > DATE(bmt.dt_metric_reference) THEN bmt.status
+    WHEN ts.dt_solved <= DATE(bmt.dt_metric_reference) THEN dit.status
+    ELSE bmt.status 
+  END AS status,
   da.agent_organization,
   da.email AS agent_email,
   dd.department,
@@ -20,8 +33,16 @@ SELECT
   bmt.days_worked_with_days_offs,
   bmt.days_off,
   bmt.is_daily_backlog,
-  bmt.is_backlog_within_sla AS is_backlog_in_time,
-  bmt.is_backlog_with_exceed_sla AS is_backlog_not_in_time,
+  CASE
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) <= tf.sla_target THEN 1
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) > tf.sla_target THEN 0
+      ELSE NULL
+    END AS is_backlog_in_time,
+  CASE
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) > tf.sla_target THEN 1
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) <= tf.sla_target THEN 0
+      ELSE NULL
+    END AS is_backlog_not_in_time,
   bmt.dt_metric_reference,
   bmt.ts_started,
   bmt.ts_solved,
@@ -42,11 +63,14 @@ LEFT JOIN
   dw_customer_support.dim_analyst AS da
     ON bmt.sk_agent = da.sk_analyst
 LEFT JOIN
-  dw_customer_support.dim_ticket dit
+  dw_customer_support.dim_ticket AS dit
     ON dit.sk_ticket = bmt.sk_task
 LEFT JOIN
   dw_customer_support.fact_tickets AS tf
     ON tf.sk_ticket = bmt.sk_task
+LEFT JOIN
+  time_solved SD ts 
+    ON CAST(ts.sk_ticket AS STRING) = bmt.sk_task
 WHERE
   DATE(bmt.dt_metric_reference) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE
