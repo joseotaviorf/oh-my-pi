@@ -151,6 +151,8 @@ class Tables:
 
     stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
     stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
+    extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
+    extract_step_houses = "vespucio_pipeline_delta.extract_step_houses"
     geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
     geocode_step_condos = "vespucio_pipeline_delta.geocode_step_condos"
     geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
@@ -317,21 +319,33 @@ source_tasks = [
     ),
 ]
 
+stage_step_task = create_task(
+    entry_point="core_stage_step",
+    parameters=[
+        f"--input_source_ebdb_condos={Tables.source_ebdb_condo}",
+        f"--input_source_navent_condos={Tables.source_navent_condo}",
+        f"--input_source_kodak_metadata_condos={Tables.source_kodak_metadata_condo}",
+        f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
+        f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed}",
+        f"--input_source_union_houses={Tables.source_union_houses}",
+        f"--overwrite_schema",
+        f"--output_staged_condos={Tables.stage_step_condos}",
+        f"--output_staged_houses={Tables.stage_step_houses}",
+    ],
+)
+
+extract_step_task = create_task(
+    entry_point="core_extract_step",
+    parameters=[
+        f"--input_staged_condos={Tables.stage_step_condos}",
+        f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--overwrite_schema",
+        f"--output_extracted_condos={Tables.extract_step_condos}",
+        f"--output_extracted_houses={Tables.extract_step_houses}",
+    ],
+)
+
 core_tasks = [
-    create_task(
-        entry_point="core_stage_step",
-        parameters=[
-            f"--input_source_ebdb_condos={Tables.source_ebdb_condo}",
-            f"--input_source_navent_condos={Tables.source_navent_condo}",
-            f"--input_source_kodak_metadata_condos={Tables.source_kodak_metadata_condo}",
-            f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
-            f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed}",
-            f"--input_source_union_houses={Tables.source_union_houses}",
-            f"--overwrite_schema",
-            f"--output_staged_condos={Tables.stage_step_condos}",
-            f"--output_staged_houses={Tables.stage_step_houses}",
-        ],
-    ),
     create_task(
         entry_point="core_geocode_step",
         parameters=[
@@ -658,7 +672,10 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 
 execute_job_cluster_task >> source_tasks
 
-source_tasks >> core_tasks[0]
+source_tasks >> stage_step_task
+stage_step_task >> extract_step_task
+stage_step_task >> core_tasks[0]
+
 chain(*core_tasks)
 
 core_tasks[-1] >> images_and_relations_tasks
