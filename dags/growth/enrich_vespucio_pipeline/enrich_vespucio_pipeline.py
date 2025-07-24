@@ -168,8 +168,7 @@ class Tables:
     merge_step_condos = "vespucio_pipeline_delta.merge_step_condos"
     merge_step_houses = "vespucio_pipeline_delta.merge_step_houses"
     images_step_houses = "vespucio_pipeline_delta.images_step_houses"
-    link_step_condos = "vespucio_pipeline_delta.link_step_condos"
-    link_step_houses = "vespucio_pipeline_delta.link_step_houses"
+    link_step = "vespucio_pipeline_delta.link_step"
     compound_predict_step_houses = (
         "vespucio_pipeline_delta.compound_predict_step_houses"
     )
@@ -446,11 +445,12 @@ images_and_relations_tasks = [
     create_task(
         entry_point="core_link_step",
         parameters=[
-            f"--input_merged_condos={Tables.merge_step_condos}",
-            f"--input_merged_houses={Tables.merge_step_houses}",
+            f"--input_staged_condos={Tables.stage_step_condos}",
+            f"--input_staged_houses={Tables.stage_step_houses}",
+            f"--input_clustered_condos={Tables.cluster_step_condos}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
             f"--overwrite_schema",
-            f"--output_linked_condos={Tables.link_step_condos}",
-            f"--output_linked_houses={Tables.link_step_houses}",
+            f"--output_linked={Tables.link_step}",
         ],
     ),
 ]
@@ -459,8 +459,8 @@ predict_and_join_task = [
     create_task(
         entry_point="core_compound_predict_step",
         parameters=[
-            f"--input_linked_condos={Tables.link_step_condos}",
-            f"--input_linked_houses={Tables.link_step_houses}",
+            f"--input_linked={Tables.link_step}",
+            f"--input_merged_houses={Tables.merge_step_houses}",
             f"--overwrite_schema",
             f"--output_compound_predicted_houses={Tables.compound_predict_step_houses}",
         ],
@@ -469,7 +469,9 @@ predict_and_join_task = [
         entry_point="core_join_compound_step",
         parameters=[
             f"--input_images_houses={Tables.images_step_houses}",
-            f"--input_linked_houses={Tables.link_step_houses}",
+            f"--input_linked={Tables.link_step}",
+            f"--input_merged_houses={Tables.merge_step_houses}",
+            f"--input_merged_condos={Tables.merge_step_condos}",
             f"--input_source_predicted_houses={Tables.source_predict_step_houses}",
             f"--input_compound_predicted_houses={Tables.compound_predict_step_houses}",
             f"--overwrite_schema",
@@ -483,7 +485,8 @@ after_join_tasks = [
         entry_point="core_listing_step",
         parameters=[
             f"--input_house_compounds={Tables.house_compounds}",
-            f"--input_linked_condos={Tables.link_step_condos}",
+            f"--input_linked={Tables.link_step}",
+            f"--input_merged_condos={Tables.merge_step_condos}",
             f"--overwrite_schema",
             f"--output_listings_houses={Tables.listings}",
         ],
@@ -491,7 +494,8 @@ after_join_tasks = [
     create_task(
         entry_point="core_condo_plans_step",
         parameters=[
-            f"--input_linked_condos={Tables.link_step_condos}",
+            f"--input_linked={Tables.link_step}",
+            f"--input_merged_condos={Tables.merge_step_condos}",
             f"--input_house_compounds={Tables.house_compounds}",
             "--overwrite_schema",
             f"--output_condo_compounds={Tables.condo_compounds}",
@@ -571,6 +575,18 @@ plugin_tasks = [
             f"--output_avg_price_by_neighborhood_slug=avg_price_by_neighborhood_slug",
             f"--redis_host=redis.pwa-tenants-link-service.quintoandar.com.br",
             f"--redis_port=6379",
+        ],
+    ),
+    create_task(
+        entry_point="plugins_property_search_indexer",
+        parameters=[
+            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
+            f"--update_alias",
+            f"--delete_old_indices",
+            f"--input_house_compounds={Tables.house_compounds}",
+            f"--output_index_prefix=vespucio_prod",
+            "--number_of_shards=3",
+            "--number_of_replicas=2",
         ],
     ),
     # create_task(
