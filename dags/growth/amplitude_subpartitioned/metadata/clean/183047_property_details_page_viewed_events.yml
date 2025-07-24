@@ -229,7 +229,7 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.day
     description: Column day from Amplitude events
-owner: eduardo.soares@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains property_details_page_viewed events from app 183047.
+description: This table contains property_details_page_viewed and property_address_details_page_viewed events from app 183047.
   It tracks user interactions and includes relevant metadata and user properties.

@@ -59,5 +59,5 @@ SELECT
 FROM
     datalake_amplitude_clean.events
 WHERE
-    id_app = '183047' AND event_type = 'property_details_page_viewed'
+    id_app = '183047' AND event_type IN ('property_details_page_viewed', 'property_address_details_page_viewed') 
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
