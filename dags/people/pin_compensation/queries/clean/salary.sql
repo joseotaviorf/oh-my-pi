@@ -1,0 +1,28 @@
+SELECT
+    person_id AS id_person,
+    assignment_id AS id_assignment,
+    salary_id AS id_salary,
+    job_id AS id_job,
+    grade_id AS id_grade,
+    legal_entity_id AS id_legal_entity,
+    business_unit_id AS id_business_unit,
+    currency_code,
+    salary_basis_code,
+    created_by AS created_by,
+    last_updated_by AS updated_by,
+    CAST(object_version_number AS INT) AS object_version_number,
+    CAST(salary_amount AS DECIMAL(18, 2)) AS salary_amount,
+    CAST(annual_salary AS DECIMAL(18, 2)) AS annual_salary,
+    CAST(adjustment_amount AS DECIMAL(18, 2)) AS adjustment_amount,
+    CAST(adjustment_percent AS DECIMAL(10, 2)) AS adjustment_percent,
+    TO_DATE(date_from) AS dt_started,
+    TO_DATE(date_to) AS dt_ended,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    COALESCE(salary_approved = 'Y', FALSE) AS is_salary_approved,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_pin_compensation_raw.cmp_salary

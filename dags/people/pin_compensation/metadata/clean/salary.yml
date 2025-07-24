@@ -1,0 +1,105 @@
+---
+database_name: datalake_pin_compensation_clean
+table_name: salary
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: 'Stores the historical and current salary records for each persons assignment. Each record represents a specific salary amount for a defined period.'
+columns:
+  id_person:
+    description: 'Unique identifier for the person.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.person_id
+  id_assignment:
+    description: 'Unique identifier for the persons job assignment.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.assignment_id
+  id_salary:
+    description: 'Unique identifier for the salary record. This is the primary key.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.salary_id
+  id_job:
+    description: 'Identifier for the job associated with this salary record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.job_id
+  id_grade:
+    description: 'Identifier for the grade associated with this salary record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.grade_id
+  id_legal_entity:
+    description: 'Identifier for the legal entity that employs the person.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.legal_entity_id
+  id_business_unit:
+    description: 'Identifier for the business unit associated with the assignment.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.business_unit_id
+  currency_code:
+    description: 'The currency code for the salary amount (e.g., BRL, USD).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.currency_code
+  salary_basis_code:
+    description: 'Code indicating the frequency or basis of the salary (e.g., MONTHLY).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.salary_basis_code
+  created_by:
+    description: 'Identifier of the user who created the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.created_by
+  updated_by:
+    description: 'Identifier of the user who made the last update to the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.last_updated_by
+  object_version_number:
+    description: 'Version number of the record, used for concurrency control and change auditing.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.object_version_number
+  salary_amount:
+    description: 'The bases salary amount for the specified frequency (e.g., monthly salary).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.salary_amount
+  annual_salary:
+    description: 'The calculated total annual salary.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.annual_salary
+  adjustment_amount:
+    description: 'The monetary amount of the last salary adjustment.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.adjustment_amount
+  adjustment_percent:
+    description: 'The percentage of the last salary adjustment.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.adjustment_percent
+  dt_started:
+    description: 'The start date for which this salary record is effective.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.date_from
+  dt_ended:
+    description: 'The end date for which this salary record is effective.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.date_to
+  ts_created:
+    description: 'Timestamp of when the record was created in the source system.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.creation_date
+  ts_updated:
+    description: 'Timestamp of the last update to the record in the source system.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.last_update_date
+  is_salary_approved:
+    description: 'A boolean flag indicating if the salary has been approved.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.salary_approved
+  ts_load:
+    description: 'Timestamp that indicates when the data was loaded into the clean table, logging the ETL process execution.'
+  year:
+    description: 'Partitioning column representing the year of the salary record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.year
+  month:
+    description: 'Partitioning column representing the month of the salary record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.month
+  day:
+    description: 'Partitioning column representing the day of the salary record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary.day

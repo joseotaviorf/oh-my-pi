@@ -1,0 +1,93 @@
+---
+database_name: datalake_pin_compensation_clean
+table_name: salary_bases
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: 'Master table containing the definitions for different salary bases. It holds the core configuration for how salaries are structured and calculated.'
+columns:
+  id_salary_basis:
+    description: 'Unique identifier for the salary basis. This is the primary key.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.salary_basis_id
+  id_element_type:
+    description: 'Identifier for the associated payroll element type.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.element_type_id
+  id_input_value:
+    description: 'Identifier for the associated input value used in payroll calculations.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.input_value_id
+  id_grade_rate:
+    description: 'Identifier for the associated grade rate, linking the salary basis to a pay scale.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.grade_rate_id
+  id_legislative_data_group:
+    description: 'Identifier for the legislative data group, used for legal and regulatory compliance.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.legislative_data_group_id
+  created_by:
+    description: 'Identifier of the user who created the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.created_by
+  updated_by:
+    description: 'Identifier of the user who made the last update to the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.last_updated_by
+  salary_basis_name:
+    description: 'The descriptive name of the salary basis (e.g., "bases Salarial Eng SP").'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.name
+  salary_basis_code_internal:
+    description: 'The internal code or short name for the salary basis.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.code
+  salary_basis_code:
+    description: 'The payment frequency of the salary basis (e.g., MONTHLY, HOURLY).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.salary_basis_code
+  fte_impact:
+    description: 'Indicates how Full-Time Equivalent (FTE) adjustments impact the salary.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.fte_impact
+  salary_basis_type:
+    description: 'The type of the salary basis (e.g., U for User-defined).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.salary_basis_type
+  object_version_number:
+    description: 'Version number of the record, used for concurrency control and change auditing.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.object_version_number
+  annualization_factor:
+    description: 'The factor used to convert the salary amount to an annual figure (e.g., 12 for monthly).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.salary_annualization_factor
+  is_active:
+    description: 'A boolean flag indicating if the salary basis is currently active (True) or inactive (False).'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.status
+  dt_available_from:
+    description: 'The date from which this salary basis is effective and available for use.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.available_from_date
+  ts_created:
+    description: 'Timestamp of when the record was created in the source system.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.creation_date
+  ts_updated:
+    description: 'Timestamp of the last update to the record in the source system.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.last_update_date
+  ts_load:
+    description: 'Timestamp that indicates when the data was loaded into the clean table, logging the ETL process execution.'
+  year:
+    description: 'Partitioning column representing the year of the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.year
+  month:
+    description: 'Partitioning column representing the month of the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.month
+  day:
+    description: 'Partitioning column representing the day of the record.'
+    lineage:
+      - datalake_pin_compensation_raw.cmp_salary_bases.day
