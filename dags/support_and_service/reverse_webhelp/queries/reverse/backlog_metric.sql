@@ -34,13 +34,13 @@ SELECT
   bmt.days_off,
   bmt.is_daily_backlog,
   CASE
-      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) <= tf.sla_target THEN 1
-      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) > tf.sla_target THEN 0
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) <= tf.sla_target THEN true
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) > tf.sla_target THEN false
       ELSE NULL
     END AS is_backlog_in_time,
   CASE
-      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) > tf.sla_target THEN 1
-      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) <= tf.sla_target THEN 0
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) > tf.sla_target THEN true
+      WHEN LEAST(bmt.days_worked, tf.days_elapsed_business) <= tf.sla_target THEN false
       ELSE NULL
     END AS is_backlog_not_in_time,
   bmt.dt_metric_reference,
