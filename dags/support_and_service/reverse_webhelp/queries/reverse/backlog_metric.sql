@@ -69,7 +69,7 @@ LEFT JOIN
   dw_customer_support.fact_tickets AS tf
     ON tf.sk_ticket = bmt.sk_task
 LEFT JOIN
-  time_solved SD ts 
+  time_solved AS ts 
     ON CAST(ts.sk_ticket AS STRING) = bmt.sk_task
 WHERE
   DATE(bmt.dt_metric_reference) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
