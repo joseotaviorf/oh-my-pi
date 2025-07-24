@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import paramiko
 
@@ -99,8 +99,8 @@ class SFTPHandler:
     def list_files(
         self,
         hcm_tablename: str,
-        start_date: datetime.date,
-        end_date: datetime.date,
+        start_date: Optional[datetime.date] = None,
+        end_date: Optional[datetime.date] = None,
         default_remote_dir: str = "/home/users/integracao.datalake",
     ) -> List[str]:
         """
