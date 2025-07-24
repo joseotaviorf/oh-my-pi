@@ -1,45 +1,63 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_contact
+domain: For Sale
+description: This table contains lead contact information.
 columns:
   id:
     lineage:
       - datalake_classified_leads_raw.lead_contact.id
+    description: Primary key of table.
   id_property:
     lineage:
       - datalake_classified_leads_raw.lead_contact.property_id
+    description: ID of property.
   id_lead_reply_email:
     lineage:
       - datalake_classified_leads_raw.lead_contact.lead_reply_email_id
+    description: FK from id_lead_reply_email table.
   id_lead_reply_whatsapp:
     lineage:
       - datalake_classified_leads_raw.lead_contact.lead_reply_whatsapp_id
+    description: FK from id_lead_reply_whatsapp table.
   id_external_lead:
     lineage:
       - datalake_classified_leads_raw.lead_contact.external_lead_id
+    description: ID of external lead.
   origin_partner:
     lineage:
       - datalake_classified_leads_raw.lead_contact.origin_partner
+    description: Origin partner of lead.
   user_ddd:
     lineage:
       - datalake_classified_leads_raw.lead_contact.userddd
+    description: DDD of user.
   user_email:
     lineage:
       - datalake_classified_leads_raw.lead_contact.user_email
+    description: Email of user.
   user_message:
     lineage:
       - datalake_classified_leads_raw.lead_contact.user_message
+    description: Message of user.
   user_name:
     lineage:
       - datalake_classified_leads_raw.lead_contact.user_name
+    description: Name of user.
   user_phone_number:
     lineage:
       - datalake_classified_leads_raw.lead_contact.user_phone_number
+    description: Phone number of user.
   business_context:
     lineage:
       - datalake_classified_leads_raw.lead_contact.business_context
+    description: Which is the context of lead.
   publication_type:
     lineage:
       - datalake_classified_leads_raw.lead_contact.publication_type
+    description: Type of publication.
   ts_received:
     lineage:
       - datalake_classified_leads_raw.lead_contact.received_at
+    description: Timestamp of received.
+  ts_load:
+    description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.

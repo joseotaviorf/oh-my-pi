@@ -1,12 +1,23 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_reply_whatsapp
+domain: For Sale
+description: This table contains lead reply from whatsapp information
 columns:
+  id_pk:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_whatsapp.pk_id
+    description: Sequential key of the table.
   id:
     lineage:
       - datalake_classified_leads_raw.lead_reply_whatsapp.id
+    description: Original PK of table (doesn't work as PK).
   id_lead:
     lineage:
       - datalake_classified_leads_raw.lead_reply_whatsapp.lead_id
+    description: ID of lead.
   user_phone_number:
     lineage:
       - datalake_classified_leads_raw.lead_reply_whatsapp.user_phone_number
+    description: Phone number of user.
+  ts_load:
+    description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.

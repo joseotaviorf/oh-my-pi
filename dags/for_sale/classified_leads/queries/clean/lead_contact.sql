@@ -12,5 +12,6 @@ SELECT
     user_phone_number,
     business_context,
     publication_type,
-    received_at as ts_received
+    received_at as ts_received,
+    NOW() AS ts_load
 FROM datalake_classified_leads_raw.lead_contact

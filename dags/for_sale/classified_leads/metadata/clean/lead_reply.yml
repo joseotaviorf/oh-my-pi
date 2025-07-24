@@ -1,9 +1,15 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_reply
+domain: For Sale
+description: This table contains lead reply information.
 columns:
   id:
     lineage:
       - datalake_classified_leads_raw.lead_reply.id
+    description: Primary key of table.
   ts_sent_at:
     lineage:
       - datalake_classified_leads_raw.lead_reply.sent_at
+    description: Timestamp of when record was sent.
+  ts_load:
+    description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.
