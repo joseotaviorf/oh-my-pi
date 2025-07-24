@@ -202,6 +202,7 @@ errors_base AS (
 
 assertions_base AS (
   SELECT
+    ('RTSK-RRA'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||COALESCE(account_number, '')) AS id_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
@@ -225,7 +226,7 @@ assertions_base AS (
 )
 
 SELECT
-  ('RTSK-RRA'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||account_number) AS id_accounting_process,
+  id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY id_accounting_process ORDER BY dt_sap_created) AS id_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,

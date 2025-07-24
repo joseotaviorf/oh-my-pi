@@ -247,37 +247,6 @@ FROM
 UNION ALL
 
 SELECT
-    CONCAT('BANK-QC-',id_finance_entity) AS sk_accounting_process,
-    id_business_entity,
-    id_finance_entity,
-    id_external_payment AS id_finance_entity_entry,
-    'quintocred' AS version,
-    'quintocred' AS business_unit,
-    billing_source AS source_name,
-    'bank' AS accounting_type,
-    sap_account_number AS account_number,
-    'quintocred' AS accounting_name,
-    bank_amount AS source_amount,
-    sap_amount,
-    is_completeness_compliance AS is_completeness,
-    is_correctness_compliance AS is_correctness,
-    is_temporality_compliance AS is_temporality,
-    is_compliance,
-    'straw' AS type,
-    CAST(NULL AS STRING) AS accounting_process_status,
-    CAST(NULL AS STRING) AS error_description,
-    CAST(NULL AS INTEGER) AS accrual_year_month,
-    dt_bank_paid AS dt_source_trigger,
-    dt_sap_reference,
-    dt_sap_created,
-    COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
-    NOW() AS ts_load
-FROM
-    datalake_sap_accounting_process.quintocred_bank_settlement
-
-UNION ALL
-
-SELECT
     CONCAT('BANK-QA-FR-',id_finance_entity) AS sk_accounting_process,
     id_business_entity,
     id_finance_entity,

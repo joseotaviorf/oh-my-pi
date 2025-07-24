@@ -146,7 +146,7 @@ WHERE
 )
 
 SELECT
-  ('RE-RTSK-RRA-' || sl.id_transaction || '-' || sl.account_number) AS id_accounting_process,
+  ('RE-RTSK-RRA-' || sl.id_transaction || '-' || COALESCE(sl.account_number, '')) AS id_accounting_process,
   sl.id_business_entity,
   sl.id_finance_entity,
   sl.id_finance_entity_entry,

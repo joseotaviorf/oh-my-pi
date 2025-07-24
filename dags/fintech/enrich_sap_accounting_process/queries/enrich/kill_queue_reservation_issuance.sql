@@ -90,7 +90,7 @@ WITH sap_gateway AS (
 
 , df_final AS (
     SELECT
-        ('KK-I'||'-'||COALESCE(df.id_finance_entity, df.id_business_entity||df.accrual_year_month)||'-'|| account_number) AS id_accounting_process,
+        ('KK-I'||'-'||COALESCE(df.id_finance_entity, df.id_business_entity||df.accrual_year_month)||'-'|| COALESCE(df.account_number, '')) AS id_accounting_process,
         df.id_business_entity,
         df.id_finance_entity,
         df.id_finance_entity_entry,
