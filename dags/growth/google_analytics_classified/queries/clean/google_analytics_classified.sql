@@ -43,8 +43,11 @@ SELECT
   CAST(total_events AS INTEGER) AS ev_total,
   event_date AS ts_event,
   event_timestamp_utc AS ts_event_timestamp_utc,
-  last_update AS ts_last_update
+  last_update AS ts_last_update,
+  year,
+  month,
+  day
 FROM
   datalake_google_analytics_classified_raw.google_analytics_classified
 WHERE 
-  DATE(event_date) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

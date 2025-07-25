@@ -1,5 +1,5 @@
 project: "xcbic-prd"
-raw_partition_cols: [event_date]
+raw_partition_cols: [year, month, day]
 source: google_analytics_classified
 source_table_name: ga4_attribution_model_events
 source_database_name: google_analytics

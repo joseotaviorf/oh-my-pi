@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -35,14 +35,6 @@ if __name__ == "__main__":
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
   
-    parser.add_argument(
-    "--table-privileges",
-    type=lambda arg: None if not arg else arg,
-    help="JSON string mapping principals to table privileges",
-    required=False,
-    default=None,
-    
-    )
     args = parser.parse_args()
 
     env = args.env
@@ -62,11 +54,9 @@ if __name__ == "__main__":
 
     credentials_json = dbutils.secrets.get("quintoandar", APIEnum.CLASSIFIEDS_BIGQUERY)
 
-
     credentials_dict = json.loads(credentials_json)
     credentials_b64 = base64.b64encode(credentials_json.encode("utf-8")).decode("utf-8")
     credentials = service_account.Credentials.from_service_account_info(credentials_dict)
-
 
     query = f"""
     SELECT * 
@@ -90,6 +80,13 @@ if __name__ == "__main__":
         .load()
     )
 
+    df = (
+        SparkDataFrameService()
+        .input(df)
+        .create_year_month_day_columns_from_dataframe_column("event_date")
+        .output()
+    )
+
     spark_client = SparkClient()
     s3_loader = S3Loader()
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -98,13 +95,6 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-
-    if args.table_privileges:
-        table_privileges_dict = json.loads(args.table_privileges)
-        full_table_name = f"{database_name}.{table_name}"
-        table_privileges = TablePrivileges.from_input_dict(table_privileges_dict, full_table_name)
-    else:
-        table_privileges = None
 
     spark_metastore_service.create_database(database_name)
 
@@ -130,6 +120,3 @@ if __name__ == "__main__":
         table_name=table_name,
         partition_cols=raw_partition_cols
     )
-
-    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
-        table_privileges.apply()
