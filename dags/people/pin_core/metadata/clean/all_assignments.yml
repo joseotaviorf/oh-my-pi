@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: all_assignments
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores comprehensive information about employee assignments and work terms.
 columns:
   id_action_occurrence:
@@ -155,6 +155,10 @@ columns:
     description: Seniority.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.seniority_basis
+  career_track:
+    description: Worker's career path.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.ass_attribute14  
   frequency:
     description: Frequency of normal working hours. Sourced from 'Frequency' lookup type.
     lineage:
@@ -179,104 +183,112 @@ columns:
     description: Normal working hours.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.normal_hours
+  target_plr:
+    description: Target Profit Sharing.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.ass_attribute_number1  
+  target_rvv:
+    description: Target Variable Pay.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.ass_attribute_number2  
   is_assignment_override_allowed:
     description: 'Override Work Term related data. User-enterable for Work Terms, defaults to N for Assignments.'
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.allow_asg_override_flag
     categories:
-      true: Override allowed.
-      false: Override not allowed.
+      "true": Override allowed.
+      "false": Override not allowed.
   is_auto_ended:
     description: Determines whether to automatically end temporary assignments.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.auto_end_flag
     categories:
-      true: Automatically end.
-      false: Do not automatically end.
+      "true": Automatically end.
+      "false": Do not automatically end.
   is_included_in_grade_step_progression:
     description: Identifies if person is included in grade step progression.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.gsp_eligibility_flag
     categories:
-      true: Included in grade step progression.
-      false: Not included in grade step progression.
+      "true": Included in grade step progression.
+      "false": Not included in grade step progression.
   is_position_override:
     description: Override Position related data.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.position_override_flag
     categories:
-      true: Override allowed.
-      false: Override not allowed.
+      "true": Override allowed.
+      "false": Override not allowed.
   is_primary_assignment:
     description: Indicates if this is the primary deployment.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.primary_assignment_flag
     categories:
-      true: Primary deployment.
-      false: Not primary deployment.
+      "true": Primary deployment.
+      "false": Not primary deployment.
   is_primary:
     description: 'Primary flag for the primary assignment associated with the primary Work Relationship and Work Terms.'
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.primary_flag
     categories:
-      true: Primary.
-      false: Not primary.
+      "true": Primary.
+      "false": Not primary.
   is_primary_work_relation:
     description: Indicates if attached to the primary Work Relationship.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.primary_work_relation_flag
     categories:
-      true: Primary Work Relationship.
-      false: Not Primary Work Relationship.
+      "true": Primary Work Relationship.
+      "false": Not Primary Work Relationship.
   is_primary_work_terms:
     description: Indicates if attached to the primary set of Employment/Placement Terms.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.primary_work_terms_flag
     categories:
-      true: Primary Work Terms.
-      false: Not Primary Work Terms.
+      "true": Primary Work Terms.
+      "false": Not Primary Work Terms.
   is_labour_union_member:
     description: Labour union member flag.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.labour_union_member_flag
     categories:
-      true: Labour union member.
-      false: Not a labour union member.
+      "true": Labour union member.
+      "false": Not a labour union member.
   is_manager:
     description: Indicates if the employee in this assignment is a manager.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.manager_flag
     categories:
-      true: Manager.
-      false: Not a manager.
+      "true": Manager.
+      "false": Not a manager.
   is_permanent_position:
     description: Indicates if the position is permanent or temporary.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.permanent_temporary_flag
     categories:
-      true: Permanent.
-      false: Temporary.
+      "true": Permanent.
+      "false": Temporary.
   is_effective_latest_change:
     description: 'Indicates if this row is the latest change in the day.'
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.effective_latest_change
     categories:
-      true: Latest change in the day.
-      false: Not the latest change in the day.
+      "true": Latest change in the day.
+      "false": Not the latest change in the day.
   is_recommended_for_rehiring:
     description: Indicates if person is recommended for re-hiring (Yes/No).
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.rehire_recommendation
     categories:
-      yes: Recommended for re-hiring.
-      false: Not recommended for re-hiring.
+      "true": Recommended for re-hiring.
+      "false": Not recommended for re-hiring.
   is_working_at_home:
     description: Work at home flag.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.work_at_home
     categories:
-      true: Working at home.
-      false: Not working at home.
+      "true": Working at home.
+      "false": Not working at home.
   dt_effective_started:
     description: Start date of the period for which this row is effective.
     lineage:
