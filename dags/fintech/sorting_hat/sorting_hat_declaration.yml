@@ -11,7 +11,7 @@ workflow:
   database_type: postgres
   custom_schema: sorting_hat
   source_database: sortinghat
-  dbutils_secret_key: SORTING_HAT_DB
+  dbutils_secret_key: SORTINGHAT_DB
   tables_customization:
     AnalysisMachine:
       clean_table_name: analysis_machine
