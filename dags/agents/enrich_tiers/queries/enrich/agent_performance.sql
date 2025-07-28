@@ -92,6 +92,8 @@ member_profile AS (
         fb.bimester_name,
         u.id_main_user,
         u.id_agent,
+        u_parent.id_main_user AS id_main_user_parent,
+        u_parent.id_agent AS id_agent_parent,
         mp.id_business_unit,
         bu.hub_name,
         bu.business_context,
@@ -113,6 +115,9 @@ member_profile AS (
     JOIN
         datalake_hub_services.users AS u
             ON u.id_user = mp.id_user
+    JOIN
+        datalake_hub_services.users AS u_parent
+            ON u_parent.id_user = mp.id_parent_user
     JOIN
         datalake_hub_services_clean.business_unit AS bu
             ON bu.id = mp.id_business_unit
@@ -136,8 +141,8 @@ user_with_multiple_roles AS (
 ),
 agent_prospects AS (
     SELECT
-        ap.id_user,
-        ap.id_user_parent,
+        mp.id_main_user AS id_user,
+        mp.id_main_user_parent AS id_user_parent,
         ap.id_prospect,
         ap.year,
         ap.bimester
@@ -145,7 +150,7 @@ agent_prospects AS (
         datalake_tiers.agent_prospects AS ap
     JOIN
         member_profile AS mp
-            ON mp.id_main_user = ap.id_user
+            ON mp.id_agent = ap.id_agent
             AND mp.year = ap.year
             AND mp.bimester = ap.bimester
     WHERE
@@ -155,6 +160,7 @@ agent_prospects AS (
 union_agent_prospects AS (
     SELECT
         ap.id_user,
+        "Broker" AS profile,
         COUNT(DISTINCT ap.id_prospect) AS total_prospect,
         ap.year,
         ap.bimester
@@ -164,6 +170,7 @@ union_agent_prospects AS (
     UNION ALL
     SELECT
         ap.id_user_parent AS id_user,
+        "Negotiation Executive" AS profile,
         COUNT(DISTINCT ap.id_prospect) AS total_prospect,
         ap.year,
         ap.bimester
@@ -237,6 +244,7 @@ LEFT JOIN
 LEFT JOIN
     union_agent_prospects AS uap
         ON uap.id_user = mp.id_main_user 
+        AND uap.profile = mp.profile
         AND uap.bimester = mp.bimester
         AND uap.year = mp.year
 WHERE
