@@ -22,49 +22,51 @@ def clean_cf(df):
     """
     # Make sure we handle escaped quotes
     df = df.withColumn("data", from_json(col("message"), get_opa_schema()))
-    ts = to_timestamp(col("data.timestamp"))
+    ts = to_timestamp(col("timestamp"))
+    ts_event = to_timestamp(col("data.timestamp"))
     traceparent = col("data.input.attributes.request.http.headers.traceparent")
 
     trace_id = when(
-        traceparent.isNotNull() & 
+        traceparent.isNotNull() &
         traceparent.contains("-"),
         element_at(split(traceparent, "-"), 2)
     ).otherwise(lit(None))
 
     df = df.select(
-        ts.alias("ts_event"), 
+        ts_event.alias("ts_event"),
         trace_id.alias("id_trace"),
-        traceparent.alias("request_traceparent"), 
-        col("data.bundles").alias("bundles"), 
-        col("data.decision_id").alias("id_decision"), 
-        "data.erased", 
-        col("data.input.attributes.source.principal").alias("request_source_principal"), 
-        col("data.input.attributes.destination.principal").alias("request_destination_principal"), 
-        col("data.input.attributes.request.http.headers.x-request-id").alias("id_request"), 
-        col("data.input.attributes.request.http.headers.x-amz-cf-id").alias("id_amz_cf"), 
-        col("data.input.attributes.request.http.headers.x-real-ip").alias("request_real_ip"), 
+        traceparent.alias("request_traceparent"),
+        col("data.bundles").alias("bundles"),
+        col("data.decision_id").alias("id_decision"),
+        "data.erased",
+        col("data.input.attributes.source.principal").alias("request_source_principal"),
+        col("data.input.attributes.destination.principal").alias("request_destination_principal"),
+        col("data.input.attributes.request.http.headers.x-request-id").alias("id_request"),
+        col("data.input.attributes.request.http.headers.x-amz-cf-id").alias("id_amz_cf"),
+        col("data.input.attributes.request.http.headers.x-real-ip").alias("request_real_ip"),
         col("data.result.dynamic_metadata.parameterized_path").alias("request_parameterized_path"),
         col("data.input.attributes.request.http.method").alias("request_method"),
-        col("data.input.attributes.request.http.path").alias("request_path"), 
-        col("data.result.principalinfo.authorized_by").alias("request_authorized_by"), 
-        col("data.result.principalinfo.required_roles").alias("request_required_roles"), 
-        col("data.result.allowed").alias("result_http_allowed"), 
-        col("data.result.http_status").alias("result_http_status"), 
-        col("data.result.principalinfo.user.payload.email").alias("principal_user_email"), 
-        col("data.result.principalinfo.user.payload.main_user_id").alias("id_main_principal_user"), 
+        col("data.input.attributes.request.http.path").alias("request_path"),
+        col("data.result.principalinfo.authorized_by").alias("request_authorized_by"),
+        col("data.result.principalinfo.required_roles").alias("request_required_roles"),
+        col("data.result.allowed").alias("result_http_allowed"),
+        col("data.result.http_status").alias("result_http_status"),
+        col("data.result.principalinfo.user.payload.email").alias("principal_user_email"),
+        col("data.result.principalinfo.user.payload.main_user_id").alias("id_main_principal_user"),
         col("data.result.principalinfo.user.payload.personUUID").alias("uuid_person_principal_user"),
-        col("data.result.principalinfo.user.provided_roles").alias("principal_user_provided_roles"), 
-        col("data.result.principalinfo.user.payload.providerId").alias("principal_user_idp"), 
-        col("data.result.principalinfo.user.payload.iss").alias("principal_user_issuer"), 
-        col("data.result.principalinfo.user.payload.sudoed_by_id").alias("id_principal_user_impersonated_by"), 
-        col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"), 
+        col("data.result.principalinfo.user.provided_roles").alias("principal_user_provided_roles"),
+        col("data.result.principalinfo.user.payload.providerId").alias("principal_user_idp"),
+        col("data.result.principalinfo.user.payload.iss").alias("principal_user_issuer"),
+        col("data.result.principalinfo.user.payload.sudoed_by_id").alias("id_principal_user_impersonated_by"),
+        col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"),
         col("data.result.principalinfo.service.id").alias("principal_service"),
-        col("data.labels.app_name").alias("app"),
+        col("data.app").alias("app"),
         year(ts).alias("year"),
         month(ts).alias("month"),
         dayofmonth(ts).alias("day"),
         hour(ts).alias("hour")
-            ).where(col("data.timestamp").isNotNull())
+    ).where(col("data.timestamp").isNotNull())
+
     return df
 
 
