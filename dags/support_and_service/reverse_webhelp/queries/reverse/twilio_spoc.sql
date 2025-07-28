@@ -125,6 +125,10 @@ sk_session,
 sk_interaction,
 chat_started_time,
 chat_ended_time,
-avg_reply_time
+avg_reply_time,
+YEAR(CURRENT_DATE - 1) AS year,
+MONTH(CURRENT_DATE - 1) AS month,
+DAY(CURRENT_DATE - 1) AS day,
+NOW() AS ts_load
 FROM final
 where workday_chat = TRUE
