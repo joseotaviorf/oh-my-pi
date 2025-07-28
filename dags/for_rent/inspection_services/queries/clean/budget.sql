@@ -13,6 +13,7 @@ SELECT
     total_cost,
     owner_amount_payment,
     tenant_amount_payment,
+    early_both_agree AS is_early_both_agree,
     owner_approved_date AS dt_owner_approved,
     tenant_approved_date AS dt_tenant_approved,
     owner_deadline_date AS dt_owner_dead_line,
