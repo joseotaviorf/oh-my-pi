@@ -2,7 +2,7 @@
 database_name: dw_rede
 table_name: fact_lead_3p_flows
 description: A Lead 3P is a property from a real estate agency in Rede QuintoAndar, sent through Supply Processor. Each row of this table is a flow of a Lead 3P in a given context (SALE or RENT), with the dates for the milestones in the funnel (lead, prospect, qualified, opportunity and first listing). There are also foreign keys pointing to the context, company, file, lead, status, and house (if it has been published).
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_flow:
@@ -80,6 +80,12 @@ columns:
     description: Date key for when the lead was first unpublished.
   total_house_updates:
     description: Total number of times the house was updated in Main.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead flow is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead flows in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   dt_first_version_sent:
     lineage:
     - datalake_rede_lead_crawler.lead_3p_freshness.dt_supply_processor

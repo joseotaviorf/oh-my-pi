@@ -32,6 +32,7 @@ SELECT
   GET_JSON_OBJECT(ae.event_properties, '$.properties.pricing.payloadToPricingReport.blueprint.bedrooms') AS pricing_bedrooms,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.enrichment.enrichmentResponse.features') AS enrichment_features,
   GET_JSON_OBJECT(ae.event_properties, '$.properties.completeness.completenessScore') AS completeness_score,
+  ae.has_3p_access_control,
   ae.ts_event,
   ae.ts_created,
   ae.ts_updated,

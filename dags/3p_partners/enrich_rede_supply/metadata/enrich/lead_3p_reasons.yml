@@ -2,8 +2,8 @@
 database_name: datalake_rede_supply
 table_name: lead_3p_reasons
 description: Table with all combinations of non-conversion reasons. Base for the junk dimension dw_rede.dim_lead_3p_reason.
-owner: gustavo.miller@quintoandar.com.br
-domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
 columns:
   sk_lead_3p_reason:
     description: 'Surrogate key for the lead 3p reason, generated incrementally.'
@@ -14,11 +14,17 @@ columns:
   reason_type:
     lineage:
       - datalake_rede_supply.lead_3p_reason_changes.reason_type
-    description: Type of reason.
+    description: Type of the reason.
     categories:
       INELIGIBLE_REASON: 'Reason for the lead not being converted due to ineligibility.'
       DISCARD_REASON: 'Reason for the lead not being converted due to discard.'
       ENRICHMENT_REASON: 'Reason for the lead not being converted due to enrichment.'
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead reason is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead reason records in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   is_ineligible_reason:
     lineage:
       - datalake_rede_supply.lead_3p_reason_changes.is_ineligible_reason

@@ -57,6 +57,7 @@ SELECT
     acquisition_team,
     integrator_trade_name,
     freshness,
+    TRUE AS has_3p_access_control,
     business_context = 'SALE' AS is_for_sale,
     business_context = 'RENT' AS is_for_rent,
     recurrency_type = 'FIRST_BATCH' AS is_first_batch,

@@ -15,25 +15,28 @@ lead_publications AS (
         id_lead_3p,
         id_company_hubspot,
         business_context,
+        has_3p_access_control,
         MIN(ts_status_started) AS ts_first_listing
     FROM
         datalake_rede_supply.lead_3p_status_changes
     WHERE
         growth_status = 'FIRST_LISTING'
-    GROUP BY 1, 2, 3
+    GROUP BY 1, 2, 3, 4
 ),
 first_leads AS (
     SELECT
         lsc.id_company_hubspot,
         lsc.business_context,
+        lsc.has_3p_access_control,
         MIN(lsc.ts_status_started) AS ts_first_lead
     FROM
         datalake_rede_supply.lead_3p_status_changes AS lsc
-    GROUP BY 1, 2
+    GROUP BY 1, 2, 3
 )
 SELECT
     lp.id_lead_3p,
     lp.business_context,
+    lp.has_3p_access_control,
     -- Farming is when the lead was published in the first 30 days after the last membership start
     -- If the membership has not started yet, we consider the date of the first lead sent
     -- Otherwise, it is hunting

@@ -1,7 +1,7 @@
 database_name: dw_rede
 table_name: dim_lead_3p_reason
 description: Dimension containing all possible reasons why a lead is not converted, such as enrichment, ineligibility or discard. Each row is a reason.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_reason:
@@ -16,6 +16,12 @@ columns:
     lineage:
     - datalake_rede_supply.lead_3p_reasons.reason_type
     description: 'Type of reason: INELIGIBLE_REASON, DISCARD_REASON or ENRICHMENT_REASON.'
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead reason is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead reasons in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   is_ineligible_reason:
     lineage:
     - datalake_rede_supply.lead_3p_reasons.is_ineligible_reason

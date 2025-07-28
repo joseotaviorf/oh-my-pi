@@ -112,6 +112,7 @@ SELECT
     status_when_reason_ended,
     growth_status_when_reason_ended,
     days_in_reason,
+    TRUE AS has_3p_access_control,
     is_ineligible_reason,
     is_discard_reason,
     is_enrichment_reason,

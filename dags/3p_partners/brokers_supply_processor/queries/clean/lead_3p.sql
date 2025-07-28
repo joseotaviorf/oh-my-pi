@@ -16,6 +16,7 @@ SELECT
     photos,
     lead_hash,
     cnpj,
+    TRUE AS has_3p_access_control,
     sent_to_main AS is_sent_to_main,
     created_at AS ts_created,
     updated_at AS ts_updated,

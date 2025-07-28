@@ -5,6 +5,7 @@ SELECT
     file_name,
     type,
     url,
+    has_3p_access_control,
     ts_created,
     ts_updated,
     NOW() AS ts_load

@@ -1,8 +1,8 @@
 ---
 database_name: datalake_rede_supply
 table_name: lead_3p_reason_changes
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 description: 'Every non-conversion reason associated with a lead and its business context becomes a row in this table, with their validity dates (ts_reason_started and ended)'
 columns:
   id_lead_3p:
@@ -59,6 +59,12 @@ columns:
   days_in_reason:
     description: How many days between reason started and reason ended, rounded down.
       Null if the reason has not ended.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead reason is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead reason records in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   is_ineligible_reason:
     description: 'True if the reason is an ineligible reason.'
   is_discard_reason:

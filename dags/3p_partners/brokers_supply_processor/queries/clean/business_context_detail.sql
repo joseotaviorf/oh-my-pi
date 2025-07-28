@@ -8,6 +8,7 @@ SELECT
     status,
     status_reason,
     version,
+    TRUE AS has_3p_access_control,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

@@ -9,7 +9,8 @@ SELECT
         sk_file, -- Keep the sk_file if it is already defined, so it is durable
         sv.max_sk_file + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
     ) AS sk_file,
-    f.id AS id_file -- Natural key
+    f.id AS id_file, -- Natural key
+    f.has_3p_access_control
 FROM
     datalake_brokers_supply_processor.file AS f,
     starting_value AS sv

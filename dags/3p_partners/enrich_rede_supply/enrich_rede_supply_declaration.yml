@@ -1,7 +1,7 @@
 dag:
   name: enrich_rede_supply
   schedule_start_date: 2021, 8, 24
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: |
       Creates tables for the context `enrich_rede_supply`, enriching supply information from Rede QuintoAndar.

@@ -14,6 +14,7 @@ SELECT
         WHEN is_discarded THEN 'DISCARDED'
         ELSE 'NOT DISCARDED'
     END AS discarded_indicator,
+    has_3p_access_control,
     is_waiting_for_enrichment,
     is_ineligible,
     is_discarded,

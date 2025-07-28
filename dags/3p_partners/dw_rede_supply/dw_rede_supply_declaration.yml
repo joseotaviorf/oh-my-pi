@@ -1,6 +1,6 @@
 dag:
   name: dw_rede_supply
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: This DAG creates the models for the supply side of Rede QuintoAndar, which is a marketplace.
 workflow:
@@ -35,4 +35,3 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
-  

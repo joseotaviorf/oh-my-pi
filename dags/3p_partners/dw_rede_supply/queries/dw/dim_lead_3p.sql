@@ -99,6 +99,7 @@ SELECT
     l.has_balcony,
     l.has_agency_key,
     l.has_concierge,
+    l.has_3p_access_control,
     lf_sale.is_fresh AS is_fresh_in_sale,
     lf_sale.is_early_fresh AS is_early_fresh_in_sale,
     lf_rent.is_fresh AS is_fresh_in_rent,

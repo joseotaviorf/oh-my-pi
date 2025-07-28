@@ -1,7 +1,7 @@
 dag:
   name: enrich_brokers_supply_processor
   schedule_start_date: 2020, 7, 1
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: |
       Creates enriched tables for the `Supply Processor` Product, responsible for managing Rede Supply leads. Most of the fields, especially in `lead_3p`, are JSON strings, so it is convenient to extract the fields into proper columns.

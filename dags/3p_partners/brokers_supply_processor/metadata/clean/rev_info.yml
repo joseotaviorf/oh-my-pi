@@ -2,20 +2,81 @@
 database_name: datalake_brokers_supply_processor_clean
 table_name: rev_info
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
+domain: 3P Partners
+description: >
+  Central revision information table managed by Hibernate Envers that coordinates all audit operations across
+  the brokers-supply-processor system. This table provides the master timeline for all changes made to audited
+  entities, serving as the authoritative source for revision timestamps and transaction boundaries.
+
+  AUDIT COORDINATION: Acts as the central hub linking all audit tables (lead_3p_aud, business_context_detail_aud, 
+  file_aud) through shared revision numbers. Each revision represents a single transaction boundary,
+  enabling correlation of related changes across multiple entities within the same business operation.
+
+  BUSINESS CONTEXT: Essential for 3P Partners operations requiring precise audit timing and transaction correlation:
+  - Complete transaction timeline reconstruction for compliance auditing
+  - Cross-entity change correlation for business process analysis
+  - Precise timing analysis for performance monitoring and SLA tracking
+  - Audit trail integrity verification and forensic analysis
+  - Regulatory compliance reporting with exact timestamps
+
+  REVISION SYSTEM: Hibernate Envers generates unique, sequential revision numbers for each transaction that
+  modifies audited entities. The revision number serves as a global sequence across all audit tables,
+  while the timestamp provides human-readable timing information for analysis and reporting.
+
+  TRANSACTION BOUNDARIES: Each revision represents a complete business transaction, which may include
+  multiple entity changes. For example, processing a file might create revisions across file_aud,
+  lead_3p_aud, and business_context_detail_aud tables, all sharing the same revision number.
+
+  TEMPORAL ANALYSIS: Critical for point-in-time analysis, enabling reconstruction of complete system
+  state at any revision point. Essential for understanding system evolution, change impact analysis,
+  and historical data state queries.
+
+  RELATED TABLES: Referenced by all audit tables (lead_3p_aud.rev, business_context_detail_aud.rev, file_aud.rev).
+  Forms the backbone of the complete 3P Partners audit ecosystem.
+
+  KEY ANALYSIS PATTERNS: Transaction timeline analysis, Change frequency monitoring, Performance tracking,
+  Audit trail integrity verification, Cross-entity correlation analysis, Business process timing.
+
+  USE CASES: Audit trail reconstruction, Compliance reporting, Performance analysis, System troubleshooting,
+  Change impact assessment, Forensic analysis, Business process optimization.
+
+  QUERY CONSIDERATIONS: Central table for all audit queries - typically joined with specific audit tables
+  for timestamp information. Use for filtering by time ranges and correlating changes across entities.
 columns:
   rev:
+    description: >
+      Unique, auto-incrementing revision number (BIGINT, Primary Key, Not Nullable).
+      Global sequence identifier for all audit operations across the entire system.
+      Shared across all audit tables to enable transaction boundary correlation.
+      Sequential numbering enables efficient range queries and change ordering.
+      Links to rev field in all audit tables for complete transaction context.
     lineage:
       - datalake_brokers_supply_processor_raw.revinfo.rev
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All events in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_raw.revinfo.revtstmp
+    description: >
+      Precise timestamp when the revision was created (TIMESTAMP, Not Nullable).
+      Represents the exact moment when the audited transaction was committed.
+      Provides human-readable timing for all audit operations and timeline analysis.
+      Critical for SLA monitoring, performance analysis, and temporal queries.
+      Use for filtering audit data by time ranges and correlating business events.
+      Enables reconstruction of system timeline and change velocity analysis.
   year:
     lineage:
       - datalake_brokers_supply_processor_raw.revinfo.year
+    description: 'Partition column: Year extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
   month:
     lineage:
       - datalake_brokers_supply_processor_raw.revinfo.month
+    description: 'Partition column: Month extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
   day:
     lineage:
       - datalake_brokers_supply_processor_raw.revinfo.day
+    description: 'Partition column: Day extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'

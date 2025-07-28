@@ -207,6 +207,7 @@ SELECT
     GET_JSON_OBJECT(l.brokers, '$.balcony')::BOOLEAN AS has_balcony,
     GET_JSON_OBJECT(l.brokers, '$.agencyKey')::BOOLEAN AS has_agency_key,
     GET_JSON_OBJECT(l.brokers, '$.concierge')::BOOLEAN AS has_concierge,
+    l.has_3p_access_control,
     l.is_sent_to_main,
     ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY l.ts_created) = 1 AS is_first_version_global,
     ROW_NUMBER() OVER(PARTITION BY l.lead_hash ORDER BY sale_recurrency.ts_batch_sent NULLS LAST, l.ts_created) = 1 AS is_first_sale_version_global,

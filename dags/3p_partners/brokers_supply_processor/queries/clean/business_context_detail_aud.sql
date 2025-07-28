@@ -16,6 +16,7 @@ SELECT
     business_context_mod AS mod_business_context,
     status_mod AS mod_status,
     status_reason_mod AS mod_status_reason,
+    TRUE AS has_3p_access_control,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

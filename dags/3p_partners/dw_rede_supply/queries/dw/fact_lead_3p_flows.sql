@@ -78,6 +78,7 @@ SELECT
     DATEDIFF(f.ts_qualified, f.ts_lead) AS days_lead_to_qualified,
     DATEDIFF(f.ts_opportunity, f.ts_lead) AS days_lead_to_opportunity,
     DATEDIFF(f.ts_first_listing, f.ts_lead) AS days_lead_to_first_listing,
+    lsk.has_3p_access_control,
     lf.dt_supply_processor AS dt_first_version_sent,
     lf.dt_crawler,
     f.ts_lead,

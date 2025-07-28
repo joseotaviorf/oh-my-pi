@@ -11,6 +11,7 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(lsc.ts_status_started, 'yyyyMMdd')), -1) AS sk_status_started_date,
     COALESCE(BIGINT(DATE_FORMAT(lsc.ts_status_ended, 'yyyyMMdd')), -1) AS sk_status_ended_date,
     days_in_status,
+    lsc.has_3p_access_control,
     ts_status_started,
     ts_status_ended,
     NOW() AS ts_load

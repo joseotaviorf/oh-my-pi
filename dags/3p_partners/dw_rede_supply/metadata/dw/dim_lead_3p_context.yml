@@ -2,7 +2,7 @@
 database_name: dw_rede
 table_name: dim_lead_3p_context
 description: Dimension containing all possible contexts of a lead flow, including business context and recurrency type.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_context:
@@ -45,6 +45,12 @@ columns:
       '15 - 90': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 14 days, but up to 90 days.'
       '91 - 180': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 90 days, but up to 180 days.'
       '180+': 'The lead was sent to Supply Processor AFTER Zap Imóveis by more than 180 days.'
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead context is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead contexts in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   is_fresh:
     description: 'True if the lead is fresh, i.e., was sent to Supply Processor within two weeks of the creation in Zap Imóveis, either before or after.'
     lineage:

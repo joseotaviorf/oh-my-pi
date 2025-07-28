@@ -9,6 +9,7 @@ WITH files_with_company AS (
         f.url,
         f.file_byte,
         f.version,
+        f.has_3p_access_control,
         f.ts_created,
         f.ts_updated
     FROM
@@ -34,6 +35,7 @@ SELECT
     fwc.url,
     fwc.file_byte,
     fwc.version,
+    fwc.has_3p_access_control,
     LAG(fwc.ts_created) OVER (
         PARTITION BY
             COALESCE(fwc.uuid_company, SPLIT(fwc.file_name, '_dedup_')[0])

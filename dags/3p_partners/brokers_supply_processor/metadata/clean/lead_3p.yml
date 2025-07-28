@@ -2,74 +2,185 @@
 database_name: datalake_brokers_supply_processor_clean
 table_name: lead_3p
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
+domain: 3P Partners
+description: >
+  Contains third-party (3P) real estate leads from external partner companies in the Rede QuintoAndar ecosystem.
+  Each row represents a property lead submitted by real estate agencies and partners for potential inclusion 
+  in QuintoAndar's platform. These leads go through eligibility filtering and quality assessment before being 
+  published. The table stores comprehensive property information including location, pricing, owner details, 
+  and broker information in JSON format for flexible schema management.
+
+  BUSINESS CONTEXT: This is the core table for 3P Partners operations, supporting QuintoAndar's expansion from a direct real estate 
+  company to a real estate partnership ecosystem. Leads can be for both SALE and RENT business contexts, 
+  with each lead potentially having multiple business context details tracked separately.
+
+  RELATED TABLES: business_context_detail (one-to-many relationship tracking business context and status for each lead), 
+  file (many-to-one relationship linking leads to their import batch file), analytic_event (one-to-many relationship for tracking lead lifecycle events).
+
+  KEY METRICS: Lead conversion rate (is_sent_to_main = true), Lead processing time (ts_updated - ts_created), 
+  Partner performance by cnpj, Geographic distribution via location data.
+
+  USE CASES: Partner performance analysis and lead quality assessment, Property market analysis and pricing trends, 
+  Lead conversion funnel analysis and optimization, Geographic expansion planning and market research, 
+  Partner onboarding and relationship management.
 columns:
   id:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.id
+    description: >
+      Unique auto-incrementing identifier for the 3P lead record in the system (BIGINT, Primary Key, Not Nullable).
+      Used for cross-system lead tracking and deduplication.
   uuid_lead:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.lead_uuid
+    description: >
+      Unique UUID identifier for the lead, used for external references and API responses (STRING, Nullable).
+      Used for cross-system lead tracking and deduplication.
   id_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.real_estate_id
+    description: >
+      Legacy field - always NULL. Originally intended for real estate company identification (BIGINT, Nullable, DEPRECATED).
   id_by_real_estate:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.id_by_real_estate
+    description: >
+      External identifier used by the partner/real estate agency for this property in their own system (STRING, Nullable).
+      Critical for partner integration and lead synchronization.
   uuid_company:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.company_uuid
+    description: >
+      UUID of the QuintoAndar company/partner account that owns or manages this lead (STRING, Nullable).
+      Links lead to the partner organization in QuintoAndar system.
   brokers:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.brokers
+    description: >
+      JSON object containing broker information associated with the property lead (JSON, Nullable).
+      Typically includes broker contact details, licensing info, and availability.
+      Structure varies by partner but commonly includes: name, phone, email, creci_number.
+      Example: {"name": "João Silva", "phone": "+5511999999999", "email": "joao@partner.com", "furnished": false}
   location:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.location
+    description: >
+      JSON object with complete property location information including address, coordinates,
+      neighborhood, city, state, country, and building details (JSON, Nullable). May include floor information
+      for apartment buildings.
+      Example: {"address": "Rua das Flores, 123", "neighborhood": "Vila Madalena", "city": "São Paulo", 
+      "zipCode": "05014-000", "stateName": "São Paulo", "stateAcronym": "SP", 
+      "lat": -23.5505, "lng": -46.6333, "countryName": "Brasil", "countryCode": "BR"}
   pricing:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.pricing
+    description: >
+      JSON object containing all pricing information for the property including rent price,
+      sale price, condominium fees, IPTU (property tax), total costs, and other charges (JSON, Nullable).
+      Values typically in BRL (Brazilian Real).
+      Example: {"rentPrice": 2500.00, "salePrice": 450000.00, "condominiumPrice": 350.00, 
+      "iptuPrice": 150.00, "totalCost": 3000.00}
   owner:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.owner
+    description: >
+      JSON object with property owner information including contact details, preferences,
+      and ownership status (JSON, Nullable). Used for communication and negotiation processes.
+      Example: {"name": "Maria Santos", "phone": "+5511888888888", "email": "maria@email.com", 
+      "acceptsPets": true, "preferredContactTime": "evening"}
   blueprint:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.blueprint
+    description: >
+      JSON object containing property layout and structural information including number of
+      bedrooms, bathrooms, suites, garages, total area, and architectural details (JSON, Nullable).
+      Example: {"bedrooms": 3, "bathrooms": 2, "suites": 1, "garages": 2, "totalArea": 85, 
+      "privateArea": 70, "furnished": false}
   details:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.details
+    description: >
+      JSON object with detailed property characteristics including amenities, features,
+      building type, age, and specific property attributes (JSON, Nullable). Structure varies by property type.
+      Example: {"propertyType": "apartment", "buildingAge": 10, "elevator": true, "pool": true, 
+      "gym": false, "security": "24h", "petPolicy": "allowed"}
   access:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.access
+    description: >
+      JSON object containing property access information for viewings and visits including
+      availability schedules, visit preferences, and access instructions (JSON, Nullable).
+      Example: {"visitsAllowed": true, "schedule": "weekdays 9-18", "keyLocation": "portaria", 
+      "specialInstructions": "ligar antes da visita"}
   administrators:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.administrators
+    description: >
+      Legacy field - always NULL. Originally intended for property administrator information (STRING, Nullable, DEPRECATED).
   owner_agent:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.owner_agent
+    description: >
+      JSON object containing information about the agent representing the property owner (JSON, Nullable).
+      Includes agent contact details, commission structure, and authorization level.
+      Example: {"name": "Carlos Broker", "phone": "+5511777777777", "email": "carlos@agency.com", 
+      "commission": 5.0, "authorized": true}
   photos:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.photos
+    description: >
+      JSON array containing property photos with URLs and metadata (JSON, Nullable). Each photo object includes
+      image URL, description, and potentially quality/categorization information.
+      Example: [{"url": "https://cdn.partner.com/photo1.jpg", "description": "sala de estar"}, 
+      {"url": "https://cdn.partner.com/photo2.jpg", "description": "cozinha"}]
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.lead_hash
+    description: >
+      MD5 hash generated from key property attributes used for deduplication and identifying
+      similar properties across different partners (STRING, Nullable). Limited to 32 characters.
+      Critical for preventing duplicate listings and maintaining data quality.
   cnpj:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.cnpj
+    description: >
+      Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica) tax identifier of the partner
+      company that submitted this lead (STRING, Nullable). Used for legal and financial tracking.
+      Format: XX.XXX.XXX/XXXX-XX
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All events in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   is_sent_to_main:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.sent_to_main
+    description: >
+      Boolean flag indicating whether this lead has been successfully sent to QuintoAndar's
+      main property management system after passing eligibility and quality filters (BOOLEAN, Nullable).
+      Key metric for measuring lead processing success rate and funnel conversion.
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.created_at
+    description: >
+      Timestamp when the lead record was first created in the brokers-supply-processor system (TIMESTAMP, Not Nullable).
+      Used for SLA tracking and performance monitoring.
   ts_updated:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.updated_at
+    description: >
+      Timestamp when the lead record was last modified, automatically updated on any field change (TIMESTAMP, Not Nullable).
+      Important for change tracking and audit purposes.
   year:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.year
+    description: 'Partition column: Year extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
   month:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.month
+    description: 'Partition column: Month extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
   day:
     lineage:
       - datalake_brokers_supply_processor_raw.lead3p.day
+    description: 'Partition column: Day extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'

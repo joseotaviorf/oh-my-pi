@@ -99,6 +99,7 @@ SELECT
     sea.status,
     sea.growth_status,
     DATEDIFF(sea.ts_status_ended, sea.ts_status_started) AS days_in_status,
+    TRUE AS has_3p_access_control,
     sea.is_waiting_for_enrichment,
     sea.is_ineligible,
     sea.is_discarded,

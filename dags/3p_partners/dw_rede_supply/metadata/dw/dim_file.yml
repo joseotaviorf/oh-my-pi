@@ -1,7 +1,7 @@
 database_name: dw_rede
 table_name: dim_file
 description: Files are sent from real estate agencies to Supply Processor containing data that will be processed into one or more leads. This table has information about the file, such as the name, status, or when it was sent.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_file:
@@ -29,6 +29,12 @@ columns:
     lineage:
     - datalake_brokers_supply_processor.file.url
     description: URL of the file.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this file is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All files in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   ts_created:
     lineage:
     - datalake_brokers_supply_processor.file.ts_created
@@ -38,4 +44,4 @@ columns:
     - datalake_brokers_supply_processor.file.ts_updated
     description: Time when the file was updated.
   ts_load:
-    description: Time when the table was last processed.
+    description: Time when the table was last processed.  

@@ -21,6 +21,7 @@ SELECT
     ) AS sk_lead_3p_reason,
     pr.reason,
     pr.reason_type,
+    TRUE AS has_3p_access_control,
     pr.is_ineligible_reason,
     pr.is_discard_reason,
     pr.is_enrichment_reason

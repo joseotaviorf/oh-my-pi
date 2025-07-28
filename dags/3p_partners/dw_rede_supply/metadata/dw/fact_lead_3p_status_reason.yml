@@ -2,7 +2,7 @@
 database_name: dw_rede
 table_name: fact_lead_3p_status_reason
 description: Each row in this table represents a reason why a certain lead is not converted, associated with the lead in the given business context (SALE or RENT).
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_reason_event:
@@ -65,6 +65,12 @@ columns:
       - datalake_rede_supply.lead_3p_reason_changes.days_in_reason
     description: How many days between reason started and reason ended, rounded down.
       Null if the reason has not ended.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead status reason is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead status reasons in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   ts_reason_started:
     lineage:
       - datalake_rede_supply.lead_3p_reason_changes.ts_reason_started

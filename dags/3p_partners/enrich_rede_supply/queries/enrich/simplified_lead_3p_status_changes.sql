@@ -152,6 +152,7 @@ SELECT
     sea.business_context,
     sea.status,
     sea.listing_status,
+    TRUE AS has_3p_access_control,
     sea.is_waiting_for_enrichment,
     sea.is_ineligible,
     sea.is_discarded,

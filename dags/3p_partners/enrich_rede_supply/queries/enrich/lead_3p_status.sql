@@ -21,6 +21,7 @@ SELECT
     ) AS sk_lead_3p_status,
     ps.status,
     ps.growth_status,
+    TRUE AS has_3p_access_control,
     ps.is_waiting_for_enrichment,
     ps.is_ineligible,
     ps.is_discarded

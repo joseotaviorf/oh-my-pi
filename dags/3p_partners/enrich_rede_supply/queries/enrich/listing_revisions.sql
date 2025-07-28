@@ -39,6 +39,7 @@ SELECT
     ure.reason AS revision_reason,
     NULL::STRING AS status_reason,
     h_aud.rev,
+    TRUE AS has_3p_access_control,
     ure.id_user IS NOT NULL AS is_manual,
     COUNT(*) OVER (PARTITION BY rev) > 1 AS is_mass_update,
     FROM_UNIXTIME(ts_revision/1000) AS ts_revision

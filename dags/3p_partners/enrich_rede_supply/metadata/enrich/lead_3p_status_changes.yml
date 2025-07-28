@@ -1,8 +1,8 @@
 ---
 database_name: datalake_rede_supply
 table_name: lead_3p_status_changes
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 description: 'Unifies all events of lead 3p status changes associated with the business context.'
 columns:
   id_status_change:
@@ -60,6 +60,12 @@ columns:
       FIRST_LISTING: Fifth and final stage. The opportunity was approved, and registered in Main for publication.
   days_in_status:
     description: 'Number of days the lead stayed in the status. Null if the status is still ongoing.'
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this lead status is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All lead status records in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   is_waiting_for_enrichment:
     lineage:
       - datalake_rede_supply.simplified_lead_3p_status_changes.is_waiting_for_enrichment

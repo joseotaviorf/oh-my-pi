@@ -2,9 +2,23 @@ dag:
   name: brokers_supply_processor
   schedule_start_date: 2021, 8, 10
   schedule_interval: 0 0 * * *
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: This DAG imports the tables from Supply Processor, a platform responsible for bringing and processing properties from other real estate agencies in 3P Partners.
+    dag_purpose: >
+      Imports tables from brokers-supply-processor service, QuintoAndar's platform for processing 
+      third-party (3P) real estate leads from external partner agencies. Supports QuintoAndar's 
+      expansion into a partnership ecosystem by processing, filtering, and qualifying partner-submitted 
+      property leads for both SALE and RENT contexts.
+      
+      KEY TABLES: lead_3p (core property lead data), business_context_detail (lead status tracking), 
+      file (bulk import management), analytic_event (system events), and audit tables (*_aud) for 
+      complete change history and compliance.
+      
+      PIPELINE: Daily CDC from PostgreSQL with 24-hour latency. Handles medium to high volume data 
+      depending on partner activity. Includes comprehensive audit trail for compliance and troubleshooting.
+      
+      USE CASES: Partner performance analysis, lead conversion funnel optimization, market intelligence, 
+      operational monitoring, and data quality management across the 3P Partners ecosystem.
 workflow:
   type: cdc
   layer: raw

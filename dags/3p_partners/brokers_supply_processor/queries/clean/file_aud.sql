@@ -16,6 +16,7 @@ SELECT
     type_mod AS mod_type,
     url_mod AS mod_url,
     file_byte_mod AS mod_file_byte,
+    TRUE AS has_3p_access_control,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
