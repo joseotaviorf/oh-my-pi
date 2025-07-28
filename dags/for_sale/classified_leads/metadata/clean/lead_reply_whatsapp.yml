@@ -1,7 +1,7 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_reply_whatsapp
 domain: For Sale
-description: This table contains lead reply from whatsapp information
+description: This table contains lead reply from whatsapp information.
 columns:
   id_pk:
     lineage:
