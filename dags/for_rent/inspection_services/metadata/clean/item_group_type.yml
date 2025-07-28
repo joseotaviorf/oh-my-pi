@@ -25,6 +25,10 @@ columns:
     lineage:
       - datalake_inspection_services_raw.item_group_type.deleted
     description: Identifies whether the record is deleted
+  is_p3ml:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type.p3ml
+    description: Boolean information indicating whether the item is part of the P3ML (floor, door, wall, furniture and cleaning)
   ts_created:
     lineage:
       - datalake_inspection_services_raw.item_group_type.created_at

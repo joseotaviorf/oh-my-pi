@@ -4,6 +4,7 @@ SELECT
     review_instruction,
     deletable AS is_deletable,
     deleted AS is_deleted,
+    COALESCE(p3ml, FALSE) AS is_p3ml,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
