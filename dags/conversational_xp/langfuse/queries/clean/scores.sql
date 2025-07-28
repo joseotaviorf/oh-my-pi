@@ -25,5 +25,7 @@ FROM
     datalake_langfuse_raw.scores
 WHERE
     MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 12 HOUR
+    -- removes sessions with multiple tags (BUG from late July/2025)
+    AND sessionId NOT IN (SELECT DISTINCT sessionId FROM datalake_langfuse_raw.traces WHERE cardinality(tags) > 1)
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_score ORDER BY ts_updated DESC) = 1
