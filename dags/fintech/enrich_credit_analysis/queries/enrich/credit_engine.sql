@@ -22,6 +22,7 @@ SELECT
     am.type AS machine_type,
     asg.group_type,
     asg.group_name,
+    ar.result AS analysis_request_result,
     asg.result AS state_group_result,
     ans.result AS analysis_state_result,
     ans.input,
@@ -48,7 +49,7 @@ SELECT
       get_json_object(ans.input, '$.total_informed_income'),
       NULL
     ) AS total_informed_income,
-    IF(asg.group_name = 'CREDIT_POLICY', get_json_object(ans.input, '$.risk_category_canon'), NULL) AS risk_category_canon,
+    IF(asg.group_name IN ('CREDIT_POLICY', 'INCOME_VALUE_VERIFIED'), get_json_object(ans.input, '$.risk_category_canon'), NULL) AS risk_category_canon,
     IF(asg.group_name = 'CREDIT_POLICY', get_json_object(ans.input, '$.dti'), NULL) AS dti,
     IF(
       asg.group_name = 'CREDIT_POLICY', get_json_object(ans.input, '$.policy_dti'), NULL
@@ -58,6 +59,8 @@ SELECT
     IF(asg.group_name = 'POLITICALLY_EXPOSED_PERSON', get_json_object(ans.input, '$.is_currently_pep'), NULL) AS is_currently_pep,
     IF(asg.group_name IN ('INCOME_DOCUMENT', 'VERIFIED_PAYMENT_CAPABILITY'), get_json_object(ans.input, '$.is_income_sufficient_for_renting'), NULL) AS is_income_sufficient_for_renting,
     IF(asg.group_name = 'INCOME_VALUE_VERIFIED', get_json_object(ans.input, '$.is_there_any_fraud_suspicion'), NULL) AS is_there_any_fraud_suspicion,
+    IF(asg.group_name = 'INCOME_VALUE_VERIFIED', get_json_object(ans.input, '$.is_low_risk'), NULL) AS is_low_risk,
+    IF(asg.group_name = 'VERIFIED_PAYMENT_CAPABILITY', get_json_object(ans.input, '$.is_verification_skipped'), NULL) AS is_verification_skipped,
     ans.ts_updated,
     ans.ts_created
   FROM
@@ -92,6 +95,7 @@ SELECT
     group_name,
     state_group_result,
     analysis_state_result,
+    analysis_request_result,
     input,
     documentation_analysis_type,
     CAST(package_value AS DECIMAL(10,2)) AS package_value,
@@ -113,6 +117,8 @@ SELECT
     CAST(is_currently_pep AS BOOLEAN) AS is_currently_pep,
     CAST(is_income_sufficient_for_renting AS BOOLEAN) AS is_income_sufficient_for_renting,
     CAST(is_there_any_fraud_suspicion AS BOOLEAN) AS is_there_any_fraud_suspicion,
+    CAST(is_low_risk AS BOOLEAN) AS is_low_risk,
+    CAST(is_verification_skipped AS BOOLEAN) AS is_verification_skipped,
     ts_updated,
     ts_created
 FROM get_analysis_state_data

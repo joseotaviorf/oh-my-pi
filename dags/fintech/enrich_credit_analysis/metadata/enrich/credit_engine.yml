@@ -68,6 +68,14 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.result
     description: "This column represents the result of the group. Ex: if some state from the policy is not compliant the result of the group would reflect it"
+  analysis_state_result:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.result
+    description: "This column represents the result of the analysis state."
+  analysis_request_result:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.result
+    description: "This column represents the result of the analysis request."
   input:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
@@ -76,7 +84,7 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
     description: "The documentation policy applied to the proposal."
-    categorues:
+    categories:
       LIGHT_APPROVAL: When the income document is optional
       FLEX: When an income document may be requested
       FULL: When the full documentation is necessary
@@ -168,6 +176,14 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
     description: "Identifies if there is any proponent with a possible fraud suspicious."
+  is_low_risk:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Identifies if the tenant is considered low risk based on income value verification analysis."
+  is_verification_skipped:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Identifies if the income verification process was skipped for the verified payment capability analysis."
   ts_updated:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.ts_updated
