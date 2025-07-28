@@ -81,6 +81,10 @@ columns:
       - datalake_inspection_services_clean.reviewer.is_approved
       - datalake_inspection_services_clean.budget.owner_approved
     description: Boolean information indicating whether the tenant approved.
+  is_early_both_agree:
+    lineage:
+      - datalake_inspection_services_clean.budget.is_early_both_agree
+    description: Boolean information indicating whether the owner and tenant agreed to approve the repair report at the first review.
   ts_owner_approved:
     lineage:
       - datalake_inspection_services_clean.reviewer.ts_approved

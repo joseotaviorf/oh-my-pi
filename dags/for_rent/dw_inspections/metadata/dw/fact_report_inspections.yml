@@ -69,6 +69,10 @@ columns:
     lineage:
       - datalake_inspections.report_approvals.tenant_approved
     description: Boolean information indicating whether there was an iteration of the tenant in the budget approval review.
+  is_early_both_agree:
+    lineage:
+      - datalake_inspections.report_approvals.is_early_both_agree
+    description: Boolean information indicating whether the owner and tenant agreed to approve the repair report at the first review.
   ts_scheduled:
     lineage:
       - datalake_inspections.inspection_status_change.ts_scheduled

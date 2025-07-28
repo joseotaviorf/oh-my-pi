@@ -18,6 +18,7 @@ SELECT
     isa.has_tenant_access_budget_approval,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.owner_approved END AS has_owner_approved_budget_approval,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.tenant_approved END AS has_tenant_approved_budget_approval,
+    ra.is_early_both_agree,
     isc.ts_scheduled,
     isc.ts_received,
     isc.ts_processing,
