@@ -69,9 +69,9 @@ columns:
     lineage:
     - datalake_credit_analysis.credit_engine
   total_informed_income:
-    description: Total informed income submitted by the user when the person filled up the credit passport.
+    description: Total informed income submitted by the user when the person filled up the credit evaluation.
     lineage:
-    - datalake_credit_analysis.total_informed_income
+    - datalake_docx_clean.credit_evaluation_proponent.monthly_income
   credit_evaluation_source:
     description: The credit evaluation source. This column indicates the origin of the credit evaluation.
     categories:

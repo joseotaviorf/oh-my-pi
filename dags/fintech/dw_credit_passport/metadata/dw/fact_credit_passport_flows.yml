@@ -26,6 +26,10 @@ columns:
     description: ID city whithin the credit passport was submitted.
     lineage:
       - datalake_docx.credit_evaluation_events.id_city
+  sk_offer:
+    description: ID offer related to the proposal.
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_offer
   sk_proposal:
     description: ID proposal submitted by the user. This ID can be null (-1) if the credit evaluation was done before offer approval (such as credit passport pre offer flow).
     lineage:

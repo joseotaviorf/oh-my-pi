@@ -28,7 +28,8 @@ credit_evaluation AS (
     cep.id_credit_evaluation,
     ce.id_user,
     ce.id_proposal,
-    cep.proponent_type
+    cep.proponent_type,
+    cep.monthly_income
   FROM
     datalake_docx_clean.credit_evaluation_proponent AS cep
       LEFT JOIN datalake_docx_clean.credit_evaluation AS ce
@@ -55,6 +56,15 @@ proposal_proponent_type AS (
     credit_evaluation
   GROUP BY
     id_proposal
+),
+credit_evaluation_income AS (
+  SELECT
+    id_credit_evaluation,
+    SUM(monthly_income) AS total_informed_income
+  FROM
+    credit_evaluation
+  GROUP BY
+    id_credit_evaluation
 ),
 proposal_proponents AS (
   SELECT
@@ -100,7 +110,7 @@ SELECT DISTINCT
   ce.type AS documentation_policy_type,
   ce.pre_approved_limit AS user_pre_approved_limit,
   CAST(ce.limit_value AS DECIMAL(10,2)) AS user_requested_value,
-  cen.total_informed_income,
+  cei.total_informed_income,
   cen.debit_limit AS maximum_debit_limit,
   CASE
     WHEN
@@ -176,3 +186,5 @@ FROM
     LEFT JOIN datalake_sorting_hat.policy_report AS p
       ON p.id_external = ce.id
       AND p.external_source = 'CREDIT_EVALUATION'
+    LEFT JOIN credit_evaluation_income AS cei
+      ON ce.id = cei.id_credit_evaluation
