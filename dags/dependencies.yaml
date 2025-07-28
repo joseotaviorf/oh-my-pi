@@ -2961,6 +2961,7 @@ bietlejuice.enrich_reverses_monitoring:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomy:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
+  - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry:first-run-of-day
@@ -4141,6 +4142,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-chat-messages:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
@@ -4197,6 +4199,7 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomy:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
+  - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
 bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:
