@@ -45,5 +45,9 @@ FROM
     datalake_nexxera_raw.cnab_charges_recupera_velo_2
 WHERE
     record_type = '1'
-AND
-    DATE(CONCAT(year, '-', month, '-', day)) = DATE(CURRENT_DATE)
+    AND
+        year = {year}
+    AND 
+        month = {month}
+    AND 
+        day = {day}
