@@ -54,6 +54,7 @@ dags_out_of_pattern:
         "survicate_survey_attributes",
         "reverse_neighborhood_price_range_load",
         "reverse_neighborhood_price_range_access",
+        "reverse_rene_reprocessing",
         "reverse_integration_cloudzero",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
