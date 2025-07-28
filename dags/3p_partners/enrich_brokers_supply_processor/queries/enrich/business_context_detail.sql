@@ -3,6 +3,7 @@ SELECT
     id_listing,
     id_file,
     id_partner,
+    id_lead,
     business_context,
     status,
     FROM_JSON(NULLIF(status_reason, '{{}}'), 'map<string, string>') AS status_reason,
