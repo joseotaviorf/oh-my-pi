@@ -173,6 +173,33 @@ columns:
     lineage:
       - datalake_visit.visits.has_more_one_agent
     description: True when the visit has more than one associated agent.
+  has_offer_submitted:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+    description: True when the visit has a offer submitted.
+  has_offer_accepted:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+    description: True when the visit has a offer accepted.
+  has_contract_signed:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+    description: True when the visit has a contract signed.
+  has_offer_submitted_after_visit_creation:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+      - datalake_visit.visits.ts_created
+    description: True when the visit has a offer submitted after creation of visit.
+  has_offer_accepted_after_visit_creation:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+      - datalake_visit.visits.ts_created
+    description: True when the visit has a offer accepted after creation of visit.
+  has_contract_signed_after_visit_creation:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+      - datalake_visit.visits.ts_created
+    description: True when the visit has a contract signed after creation of visit.
   dt_created:
     lineage:
       - datalake_visit.visits.ts_created
@@ -229,5 +256,17 @@ columns:
     lineage:
       - datalake_visit.visits.ts_first_visit
     description: Timestamp when the visit was first scheduled.
+  ts_first_offer_submitted:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+    description: Timestamp when the first offer of visit was submitted.
+  ts_first_offer_accepted:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+    description: Timestamp when the first offer of visit was accepted.
+  ts_first_contract_signed:
+    lineage:
+      - dw_rent.fact_rent_demand_events.ts_event
+    description: Timestamp when the first contract of visit was signed.
   ts_load:
     description: Timestamp of the ingestion data.

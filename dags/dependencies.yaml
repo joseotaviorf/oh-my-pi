@@ -1091,6 +1091,8 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics:first-run-of-day
   - bietlejuice.velo_zendesk:load-clean-users:first-run-of-day
 bietlejuice.dw_visit:
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-dim-rent-event-type:first-run-of-day
+  - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified:first-run-of-day
