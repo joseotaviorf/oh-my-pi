@@ -28,7 +28,7 @@ SELECT
   dd.team,
   dd.journey_step,
   dd.area,
-  bmt.sla_target,
+  tf.sla_target,
   bmt.days_worked,
   bmt.days_worked_with_days_offs,
   bmt.days_off,
