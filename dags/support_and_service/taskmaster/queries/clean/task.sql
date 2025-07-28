@@ -19,4 +19,4 @@ SELECT
     month,
     day
 FROM
-    datalake_taskmaster_test_raw.task
+    datalake_taskmaster_raw.task
