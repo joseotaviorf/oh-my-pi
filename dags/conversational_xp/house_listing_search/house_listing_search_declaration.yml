@@ -19,8 +19,12 @@ workflow:
     recommendation_use_case: {}
 
 cluster:
-  type: databricks_12_2_med_memory_cluster
-  databricks_conn_id: databricks_new
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    spark_version: 12.2.x-scala2.12
+    num_workers: 3
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
