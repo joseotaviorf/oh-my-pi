@@ -276,10 +276,22 @@ ticket_twilio_data AS (
   WITH twilio_attr AS (
     SELECT DISTINCT
       id_ticket,
-      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created) AS first_queue,
-      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC) AS last_queue,
-      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created) AS first_analyst_email,
-      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC) AS last_analyst_email,
+      CASE WHEN channel NOT IN ('call', 'chat')
+        THEN FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created)
+        ELSE FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created)
+      END AS first_queue,
+      CASE WHEN channel NOT IN ('call', 'chat')
+        THEN FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created DESC)
+        ELSE FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC)
+      END AS last_queue,
+      CASE WHEN channel NOT IN ('call', 'chat')
+        THEN FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created)
+        ELSE FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created)
+      END AS first_analyst_email,
+      CASE WHEN channel NOT IN ('call', 'chat')
+        THEN FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created DESC)
+        ELSE FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC)
+      END AS last_analyst_email,
       MAX(ts_created_twilio) OVER(PARTITION BY id_ticket) AS ts_created_twilio
     FROM
       tickets_per_task
