@@ -1,0 +1,9 @@
+---
+table_name: datalake_jaiminho_clean.user_notifications
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: ts_updated
+  incremental_date_mask: yyyy-MM-dd
+table_level_validations:
+  has_size:
+    greater_than: 500
