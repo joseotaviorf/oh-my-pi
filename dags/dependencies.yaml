@@ -218,6 +218,7 @@ bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-invoice:first-run-of-day
 bietlejuice.dw_contract:
   - bietlejuice.condominium_payments:load-clean-non-payment-report:first-run-of-day
+  - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   - bietlejuice.enrich_b2b:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_condo_monitoring:load-enrich-communication:first-run-of-day
   - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events:first-run-of-day

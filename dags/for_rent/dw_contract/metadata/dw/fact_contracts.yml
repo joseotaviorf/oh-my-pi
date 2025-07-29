@@ -20,6 +20,10 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.id_house
     description: Key of the house related to the contract.
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: Key of the region related to the contract.
   country_code:
     lineage:
       - datalake_ebdb_contract.contract.country_code

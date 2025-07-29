@@ -36,9 +36,10 @@ non_payment_reports AS (
 )
 SELECT
   c.id AS sk_contract,
-  c.id_proposal AS sk_proposal,
-  hl.id_house_listing AS sk_house_listing,
-  c.id_house AS sk_house,
+  COALESCE(c.id_proposal, -1) AS sk_proposal,
+  COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
+  COALESCE(c.id_house, -1) AS sk_house,
+  COALESCE(h.id_region, -1) AS sk_region,
   c.country_code,
   COUNT_IF(comm.communication_type = 'INVITE' AND comm.was_delivered) AS total_condo_monitoring_invite_sent,
   COALESCE(DATE_DIFF(DAY, cme.ts_first_invitation, cme.ts_first_activation), 0) AS days_to_activate_condo_monitoring,
@@ -58,6 +59,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_condo_monitoring.communication AS comm
     ON c.id = comm.id_contract
+LEFT JOIN
+  datalake_ebdb_clean.house AS h
+    ON c.id_house = h.id
 LEFT JOIN
   first_condo_monitoring_events AS cme
     ON c.id = cme.id_contract
