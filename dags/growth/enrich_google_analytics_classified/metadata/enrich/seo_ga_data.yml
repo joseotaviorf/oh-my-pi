@@ -4,30 +4,54 @@ owner: henrique.miamoto@quintoandar.com.br
 domain: Growth
 description: This table contains information about GA (Google analytics). It compiles the GA (Google analytics) data with our bussiness information.
 columns:
-  event_timestamp_utc:
-    description: Exact time the event occurred, in UTC.
+  id_property:
+    description: Unique GA property ID.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_timestamp_utc
-  event_date:
-    description: Date the event was recorded (YYYYMMDD).
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_property
+  id_stream:
+    description: Unique data stream ID within the GA4 property.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_date
-  site:
-    description: Name or ID of the website/app.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_stream
+  id_user_custom:
+    description: Custom user ID.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.site
-  property_id:
-    description: Unique GA property ID (e.g., G-XXXXXXXXXX).
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_user_custom
+  id_user_pseudo:
+    description: GA's anonymous user ID.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.property_id
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_user_pseudo
+  id_session:
+    description: Unique ID for the session.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_session
+  id_session_campaign:
+    description: Campaign ID for the session.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_session_campaign
+  id_session_gads_ad_group:
+    description: Google Ads Ad Group ID for the session.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_session_gads_ad_group
+  id_event_campaign:
+    description: Campaign ID for the event.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_event_campaign
+  id_lead:
+    description: Unique ID for the lead.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.id_lead
   platform:
-    description: Platform where the event originated (e.g., "web", "android").
+    description: Platform where the event occurred.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.platform
-  stream_id:
-    description: Unique data stream ID within a GA4 property.
+  ga_number:
+    description: GA session number.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.stream_id
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ga_number
+  site_section:
+    description: Section or category of the site.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.site_section
   city:
     description: User's city.
     lineage:
@@ -37,7 +61,7 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.country
   region:
-    description: User's region/state.
+    description: User's region or state.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.region
   hostname:
@@ -45,146 +69,134 @@ columns:
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.hostname
   device:
-    description: User's device type (e.g., "mobile", "desktop").
+    description: Type of user device.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.device
-  user_id_custom:
-    description: Your custom user ID.
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.user_id_custom
-  user_pseudo_id:
-    description: GA's anonymous, consistent user ID.
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.user_pseudo_id
-  unique_session_id:
-    description: Unique ID for a specific user session.
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.unique_session_id
-  ga_session_number:
-    description: The user's session count (1st, 2nd, etc.).
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.ga_session_number
-  event_name:
-    description: Name of the recorded event (e.g., "page_view", "purchase").
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_name
   lead_type:
-    description: Custom field for lead type.
+    description: Type of lead.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.lead_type
-  lead_id:
-    description: Unique ID for a specific lead.
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.lead_id
   page_location:
-    description: Full URL of the page.
+    description: URL of the page visited.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.page_location
-  site_section:
-    description: Category/section of the site.
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.site_section
   operation_type:
-    description: Custom field for operation type on the page.
+    description: Type of operation on the page.
     lineage:
       - datalake_google_analytics_classified_clean.google_analytics_classified.operation_type
-  session_source:
-    description: Session's origin (e.g., "google", "direct").
+  ses_src:
+    description: Session source.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_source
-  session_medium:
-    description: Session's type (e.g., "organic", "cpc").
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_src
+  ses_medium:
+    description: Session medium.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_medium
-  session_campaign_id:
-    description: Campaign ID for the session.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_medium
+  ses_cmp_name:
+    description: Session campaign name.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_campaign_id
-  session_campaign_name:
-    description: Campaign name for the session.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_cmp_name
+  ses_ad_content:
+    description: Ad content for the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_campaign_name
-  session_ad_content:
-    description: Ad content that led to the session.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_ad_content
+  ses_ad_term:
+    description: Paid search term for the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_ad_content
-  session_ad_term:
-    description: Search term for paid campaigns.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_ad_term
+  ses_src_platform:
+    description: Platform source of the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_ad_term
-  session_source_platform:
-    description: Originating platform (e.g., "Google Ads").
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_src_platform
+  ses_creative_format:
+    description: Creative format of the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_source_platform
-  session_creative_format:
-    description: Ad creative format (e.g., "display").
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_creative_format
+  ses_mkt_tactic:
+    description: Marketing tactic used in the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_creative_format
-  session_marketing_tactic:
-    description: Marketing tactic used (e.g., "retargeting").
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_marketing_tactic
-  session_gads_ad_group_id:
-    description: Google Ads Ad Group ID for the session.
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_gads_ad_group_id
-  session_gads_ad_group_name:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_mkt_tactic
+  ses_gads_ad_grp_name:
     description: Google Ads Ad Group name for the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_gads_ad_group_name
-  event_campaign_id:
-    description: Campaign ID for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_gads_ad_grp_name
+  ev_name:
+    description: Event name.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_campaign_id
-  event_campaign_name:
-    description: Campaign name for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_name
+  ev_cmp_name:
+    description: Campaign name for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_campaign_name
-  event_source:
-    description: Event's origin.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_cmp_name
+  ev_src:
+    description: Source of the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_source
-  event_medium:
-    description: Event's type.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_src
+  ev_medium:
+    description: Medium of the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_medium
-  event_term:
-    description: Search term for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_medium
+  ev_term:
+    description: Term for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_term
-  event_content:
-    description: Ad content for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_term
+  ev_content:
+    description: Ad content for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_content
-  event_source_platform:
-    description: Originating platform for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_content
+  ev_src_platform:
+    description: Source platform for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_source_platform
-  event_creative_format:
-    description: Ad creative format for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_src_platform
+  ev_creative_format:
+    description: Creative format for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_creative_format
-  event_marketing_tactic:
-    description: Marketing tactic for this event.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_creative_format
+  ev_mkt_tactics:
+    description: Marketing tactic for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_marketing_tactic
-  event_gclid:
-    description: Google Click ID (links to Google Ads).
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_mkt_tactics
+  ev_gclid:
+    description: Google Click ID (GCLID) for the event.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.event_gclid
-  session_ga4_default_channel_group:
-    description: GA4's default channel group (e.g., "Paid Search").
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_gclid
+  ses_ga4_def_channel_grp:
+    description: Default GA4 channel group for the session.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.session_ga4_default_channel_group
-  last_update:
-    description: Timestamp of the last update to the event record.
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ses_ga4_def_channel_grp
+  ev_total:
+    description: Total number of events.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.last_update
-  total_events:
-    description: Total count of events (context-dependent, e.g., in a session).
-    lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.total_events
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ev_total
   is_branded:
-    description: If the search query is branded or non-branded
+    description: Flag indicating if the search is branded.
     lineage:
-      - datalake_google_analytics_classified_clean.google_analytics_classified.query
+      - datalake_google_analytics_classified_clean.google_analytics_classified.is_branded
+  structPage:
+    description: Categorized page structure (e.g., Home, Transactional, Content).
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.structPage
+  ts_event_timestamp_utc:
+    description: Timestamp when the event occurred.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ts_event_timestamp_utc
+  ts_event:
+    description: Timestamp for the event record.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ts_event
+  ts_last_update:
+    description: Timestamp of the last update.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.ts_last_update
+  year:
+    description: Year extracted from the event date.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.year
+  month:
+    description: Month extracted from the event date.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.month
+  day:
+    description: Day extracted from the event date.
+    lineage:
+      - datalake_google_analytics_classified_clean.google_analytics_classified.day

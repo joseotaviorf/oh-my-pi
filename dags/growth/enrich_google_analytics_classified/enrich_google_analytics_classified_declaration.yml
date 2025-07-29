@@ -14,13 +14,22 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
-  default_partitions:
-    - event_date
+  default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}"
+  tables_customization:
+   seo_ga_data:
+    default_table_privileges:
+      software-engineers:
+        - ALL PRIVILEGES
+      analytics-engineers:
+        - ALL PRIVILEGES
 cluster:
-  type: databricks_12_2_min_general_photon_cluster
+  type: databricks_13_3_high_mem_driver_high_mem_nodes
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
