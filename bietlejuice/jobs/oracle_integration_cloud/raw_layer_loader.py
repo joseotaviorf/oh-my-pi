@@ -7,7 +7,6 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from quintoandar_logger import QuintoAndarLogger
 
 LOGGER = QuintoAndarLogger(__name__)
@@ -60,10 +59,6 @@ class RawLayerLoader:
         self.database_name = self.db_info["db_raw_databricks"]
         self.database_location = self.db_info["db_raw_path"]
 
-        self.table_privileges = TablePrivileges.from_environment_default(
-            f"{self.database_name}.{self.table_name}"
-        )
-
     def load_to_raw(self, df: DataFrame) -> None:
         """
         Orchestrates the process of loading the provided DataFrame into the raw data
@@ -84,7 +79,6 @@ class RawLayerLoader:
             self._load_df_to_s3(df)
             self._update_metastore(df)
             self._refresh_table()
-            self._grant_table_permissions()
         except Exception as e:
             self.logger.error(
                 f"Failed to load data to raw layer for table '{self.table_name}'. Error: {e}",
@@ -167,24 +161,3 @@ class RawLayerLoader:
                 f"Error refreshing table '{self.table_name}': {e}", exc_info=True
             )
             raise
-
-    def _grant_table_permissions(self) -> None:
-        """
-        Applies the defined table privileges using the provided TablePrivileges object.
-        """
-        if self.table_privileges:
-            self.logger.info(
-                f"Applying table privileges for {self.table_privileges.table_name}"
-            )
-            try:
-                self.table_privileges.apply()
-                self.logger.info("Successfully applied table privileges.")
-            except Exception as e:
-                self.logger.warning(
-                    f"Could not apply table privileges for {self.table_privileges.table_name}. "
-                    f"This might be a non-critical error. Details: {e}"
-                )
-        else:
-            self.logger.info(
-                "No TablePrivileges object provided, skipping permission grants."
-            )
