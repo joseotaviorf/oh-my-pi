@@ -1,6 +1,8 @@
 ---
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.demand_balancer_service:
+  - quintoml.search.maestro.inference:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
@@ -4199,6 +4201,8 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
+bietlejuice.search_metrics_service:
+  - quintoml.search.search_monitoring.inference:first-run-of-day
 bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:

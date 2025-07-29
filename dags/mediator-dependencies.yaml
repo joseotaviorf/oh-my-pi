@@ -1,4 +1,0 @@
-bietlejuice.demand_balancer_service:
-  - quintoml.search.maestro.inference:batch-predict
-bietlejuice.search_metrics_service:
-  - quintoml.search.search_monitoring.inference:batch-predict

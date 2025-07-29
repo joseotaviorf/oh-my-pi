@@ -959,3 +959,9 @@ bietlejuice.dw_pipeline:
     - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information
     - bietlejuice.enrich_pipeline:load-enrich-dag
     - bietlejuice.enrich_pipeline:load-enrich-line
+bietlejuice.demand_balancer_service:
+  add:
+    - quintoml.search.maestro.inference:first-run-of-day
+bietlejuice.search_metrics_service:
+  add:
+    - quintoml.search.search_monitoring.inference:first-run-of-day
