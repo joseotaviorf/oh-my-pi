@@ -522,7 +522,6 @@ def schema_define():
                 'schema':
 					StructType(
       					[
-      						StructField("attributes",StringType()),
       						StructField("Id",StringType()),
       						StructField("OwnerId",StringType()),
       						StructField("IsDeleted",StringType()),
@@ -628,7 +627,7 @@ def schema_define():
       						StructField("HouseRegistryMustBeUpdatedForm__c",StringType()),
       						StructField("HaveDemandNoteReason__c",StringType()),
       						StructField("CCVCompletionDate__c",StringType()),
-      						]
+      					]
     			)
             },
        'relisting_context':
