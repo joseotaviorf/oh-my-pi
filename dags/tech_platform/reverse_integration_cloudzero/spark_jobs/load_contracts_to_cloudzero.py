@@ -57,7 +57,7 @@ def send_to_cloudzero(contracts_count: int, execution_date: str, cloudzero_token
     payload = {
         "records": [
             {
-                "granularity": "DAILY",
+                "granularity": "MONTHLY",
                 "timestamp": execution_date,
                 "value": contracts_count
             }
@@ -65,7 +65,7 @@ def send_to_cloudzero(contracts_count: int, execution_date: str, cloudzero_token
     }
 
     # API endpoint
-    url = "https://api.cloudzero.com/unit-cost/v1/telemetry/metric/quintoandar_contracts_ongoing_rentals"
+    url = "https://api.cloudzero.com/unit-cost/v1/telemetry/metric/quintoandar_contracts_ongoing_rentals/replace"
 
     # Headers
     headers = {
