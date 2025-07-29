@@ -60,7 +60,7 @@ def clean_cf(df):
         col("data.result.principalinfo.user.payload.sudoed_by_id").alias("id_principal_user_impersonated_by"),
         col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"),
         col("data.result.principalinfo.service.id").alias("principal_service"),
-        col("data.app").alias("app"),
+        col("app"),
         year(ts).alias("year"),
         month(ts).alias("month"),
         dayofmonth(ts).alias("day"),
