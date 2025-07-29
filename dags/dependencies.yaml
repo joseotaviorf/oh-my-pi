@@ -17,7 +17,6 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
   - bietlejuice.enrich_visit_agent_performance:load-enrich-agent-performance-daily-summary:first-run-of-day
 bietlejuice.dw_agent_contract:
-  - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-coincident-business-contexts:first-run-of-day
@@ -905,7 +904,6 @@ bietlejuice.dw_sale_closing_flows:
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow:first-run-of-day
 bietlejuice.dw_sale_events:
   - bietlejuice.dw_agent_contract:load-dw-agent-fact-agent-contract:first-run-of-day
-  - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
@@ -4006,8 +4004,8 @@ bietlejuice.reverse_minority_report_ss:
   - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step:first-run-of-day
 bietlejuice.reverse_nazare:
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
-  - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day

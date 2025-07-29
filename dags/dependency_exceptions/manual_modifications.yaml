@@ -1,7 +1,4 @@
 ---
-bietlejuice.dw_agent_contract:
-  add:
-    - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   remove:
     - bietlejuice.dw_losses:load-dw-losses-fact-delay:first-run-of-day
@@ -174,9 +171,6 @@ bietlejuice.dw_revenue_lines:
     - bietlejuice.enrich_revenue_lines:load-enrich-management-fee:first-run-of-day
     - bietlejuice.enrich_revenue_lines:load-enrich-service-fee:first-run-of-day
     - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
-bietlejuice.dw_sale_events:
-  add:
-    - bietlejuice.dw_rede_company:load-dw-rede-dim-company:first-run-of-day
 bietlejuice.dw_sale_flows:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day

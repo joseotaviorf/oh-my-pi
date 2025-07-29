@@ -84,13 +84,13 @@ columns:
     - dw_sale.fact_visits.sk_company_supply
     - dw_sale.fact_offers.sk_company_supply
     description: Key of the listing's origin company in Rede Supply, if that is the
-      case. It can be joined with dw_rede.dim_company.
+      case. It can be joined with dw_public.dim_company or dw_public.dim_company_3p_partners.
   sk_company_demand:
     lineage:
     - dw_sale.fact_visits.sk_company_demand
     - dw_sale.fact_offers.sk_company_demand
     description: Key of the agents's company in Rede Demand at the start of the funnel,
-      if that is the case. It can be joined with dw_rede.dim_company.
+      if that is the case. It can be joined with dw_public.dim_company or dw_public.dim_company_3p_partners.
   sk_secretariat_booking_creator:
     lineage:
     - dw_sale.fact_visits.sk_secretariat_booking_creator

@@ -14,7 +14,7 @@ SELECT
 FROM
     datalake_gsheets_clean.forbrokers_3p_partner_conditions AS pc
 LEFT JOIN
-    dw_rede.dim_company AS dc
-        ON pc.partner_short_name = dc.extracted_3p_tag
-        AND NOT dc.is_archived
-        AND dc.uuid_company is not null
+    dw_public.dim_company_3p_partners AS dc
+        ON pc.partner_short_name = dc.hubspot_company_tag
+        AND dc.hubspot_status != 'Archived'
+        AND dc.uuid_company IS NOT NULL

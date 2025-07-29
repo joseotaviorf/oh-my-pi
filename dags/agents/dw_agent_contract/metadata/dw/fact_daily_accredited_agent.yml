@@ -24,7 +24,7 @@ columns:
   sk_company:
     lineage:
       - dw_agent.fact_agent_contract.sk_company
-    description: Foreign key of the company. Can be joined with dw_rede.dim_company.
+    description: Foreign key of the company. Can be joined with dw_public.dim_company or dw_public.dim_company_3p_partners.
   allocated_slots:
     description: Number of available slots on that day for the given contract.
   days_since_last_contract_changed:
