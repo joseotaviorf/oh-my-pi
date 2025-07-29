@@ -52,8 +52,8 @@ class JobArgumentParser:
 
         Raises:
             json.JSONDecodeError: If the 'extra_details' argument is not a valid JSON string.
-            ValueError: If any of the date arguments ('load_start_date', 'load_end_date', 'execution_date')
-                        are not in the 'YYYY-MM-DD' format.
+            ValueError: If any of the date arguments are not in the 'YYYY-MM-DD' format,
+                        or if the 'partitions' argument is a valid JSON but not a list of strings.
         """
         parser = cls.create_parser()
         args = parser.parse_args()
@@ -64,7 +64,8 @@ class JobArgumentParser:
             extra_details = json.loads(extra_details_str)
         except json.JSONDecodeError as e:
             LOGGER.error(
-                f"Invalid JSON for extra_details: {extra_details_str}. Error: {e}"
+                f"Invalid JSON for extra_details: {extra_details_str}. Error: {e}",
+                exc_info=True,
             )
             raise
 
@@ -78,31 +79,36 @@ class JobArgumentParser:
                     ).date()
                 except ValueError as e:
                     LOGGER.error(
-                        f"Invalid date format for {date_field}: {args_dict[date_field]}. Error: {e}"
+                        f"Invalid date format for {date_field}: {args_dict[date_field]}. Error: {e}",
+                        exc_info=True,
                     )
                     raise
 
-        raw_partitions = args_dict.get("partitions")
+        raw_partitions = args_dict.get("partitions", "").strip()
         partition_cols = []
-        if raw_partitions:
-            raw_partitions = raw_partitions.strip()
-            if raw_partitions and raw_partitions != "[]":
-                try:
-                    parsed = json.loads(raw_partitions)
-                    if isinstance(parsed, list) and all(
-                        isinstance(p, str) for p in parsed
-                    ):
-                        partition_cols = [col.strip() for col in parsed if col.strip()]
-                    else:
-                        partition_cols = [
-                            col.strip()
-                            for col in raw_partitions.split(",")
-                            if col.strip()
-                        ]
-                except json.JSONDecodeError:
-                    partition_cols = [
-                        col.strip() for col in raw_partitions.split(",") if col.strip()
-                    ]
+
+        if (
+            raw_partitions
+            and raw_partitions.startswith("[")
+            and raw_partitions.endswith("]")
+        ):
+            try:
+                parsed = json.loads(raw_partitions)
+                if isinstance(parsed, list) and all(isinstance(p, str) for p in parsed):
+                    partition_cols = [p.strip() for p in parsed if p.strip()]
+                else:
+                    raise ValueError(
+                        f"Partitions argument is not a valid JSON list of strings: {raw_partitions}"
+                    )
+            except json.JSONDecodeError:
+                LOGGER.warning(
+                    f"Could not parse partitions as JSON, falling back to comma-separated: {raw_partitions}"
+                )
+                partition_cols = [
+                    p.strip() for p in raw_partitions.split(",") if p.strip()
+                ]
+        elif raw_partitions:
+            partition_cols = [p.strip() for p in raw_partitions.split(",") if p.strip()]
 
         args_dict["partition_cols"] = partition_cols
 

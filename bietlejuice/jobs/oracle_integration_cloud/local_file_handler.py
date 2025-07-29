@@ -19,17 +19,18 @@ class LocalFileHandler:
             file_path (str): The full path to the file to be deleted.
 
         Raises:
-            FileNotFoundError: If the specified file does not exist.
-            Exception: For any other errors encountered during the file deletion process
-                    (e.g., permission issues).
+            Exception: For any errors encountered during the file deletion process
+                    (e.g., permission issues), other than the file not being found.
         """
         try:
             os.remove(file_path)
+            LOGGER.info(f"Successfully deleted local file: {file_path}")
         except FileNotFoundError:
-            LOGGER.DEBUG(f"Could not delete temporary file {file_path}: {file_path}")
-            raise
+            LOGGER.warning(
+                f"Could not delete local file because it was not found: {file_path}"
+            )
         except Exception as e:
-            LOGGER.DEBUG(f"Error deleting temporary file {file_path}: {e}")
+            LOGGER.error(f"Error deleting local file {file_path}: {e}", exc_info=True)
             raise
 
     @staticmethod
@@ -53,8 +54,8 @@ class LocalFileHandler:
                 file_content = f.read()
             return file_content
         except FileNotFoundError:
-            LOGGER.error(f"File not found: {file_path}")
+            LOGGER.error(f"File not found: {file_path}", exc_info=True)
             raise
         except Exception as e:
-            LOGGER.error(f"Error reading file {file_path}: {e}")
+            LOGGER.error(f"Error reading file {file_path}: {e}", exc_info=True)
             raise

@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import paramiko
 
@@ -38,7 +38,8 @@ class SFTPHandler:
         self.secret_key = sftp_secret_key
         self.logger = logger
         self.job_name = job_name
-        self.sftp = None
+        self.sftp: Optional[paramiko.SFTPClient] = None
+        self.transport: Optional[paramiko.Transport] = None
         self._connect()
 
     def _get_credentials(self) -> Tuple[str, int, str, str]:
@@ -83,9 +84,9 @@ class SFTPHandler:
         host, port, username, password = self._get_credentials()
 
         try:
-            transport = paramiko.Transport((host, port))
-            transport.connect(username=username, password=password)
-            self.sftp = paramiko.SFTPClient.from_transport(transport)
+            self.transport = paramiko.Transport((host, port))
+            self.transport.connect(username=username, password=password)
+            self.sftp = paramiko.SFTPClient.from_transport(self.transport)
         except paramiko.AuthenticationException as e:
             self.logger.error(f"SFTP Authentication failed: {e}")
             raise
@@ -96,11 +97,19 @@ class SFTPHandler:
             self.logger.error(f"SFTP connection error: {e}")
             raise
 
+    def _ensure_connected(self) -> None:
+        """
+        Ensures the SFTP connection is active, reconnecting if necessary.
+        """
+        if not self.transport or not self.transport.is_active():
+            self.logger.warning("SFTP connection is inactive. Reconnecting...")
+            self._connect()
+
     def list_files(
         self,
         hcm_tablename: str,
-        start_date: datetime.date,
-        end_date: datetime.date,
+        start_date: Optional[datetime.date] = None,
+        end_date: Optional[datetime.date] = None,
         default_remote_dir: str = "/home/users/integracao.datalake",
     ) -> List[str]:
         """
@@ -122,6 +131,7 @@ class SFTPHandler:
             List[str]: A list of the full remote paths to the XML files that match the
                     specified filtering criteria.
         """
+        self._ensure_connected()
         remote_dir = self.sftp.getcwd() or default_remote_dir
         remote_files = self.sftp.listdir()
         reports_to_process = [
@@ -160,6 +170,7 @@ class SFTPHandler:
         Returns:
             str: The full local path to the downloaded file.
         """
+        self._ensure_connected()
         os.makedirs(local_dir, exist_ok=True)
         filename = os.path.basename(remote_path)
         local_path = f"{local_dir}/{filename}"
@@ -177,13 +188,24 @@ class SFTPHandler:
             FileNotFoundError: If the specified file does not exist on the SFTP server.
             Exception: For any other errors encountered during the file deletion process.
         """
+        self._ensure_connected()
         try:
             self.sftp.remove(file_path)
         except FileNotFoundError:
-            self.logger.DEBUG(f"File not found on SFTP: {file_path}")
+            self.logger.warning(
+                f"File not found on SFTP, it may have been already deleted: {file_path}"
+            )
             raise
         except Exception as e:
-            self.logger.DEBUG(
+            self.logger.error(
                 f"Failed to delete file from SFTP: {file_path} - Error: {e}"
             )
             raise
+
+    def close(self) -> None:
+        """
+        Closes the SFTP connection if it is active.
+        """
+        if self.transport and self.transport.is_active():
+            self.logger.info("Closing SFTP connection.")
+            self.transport.close()

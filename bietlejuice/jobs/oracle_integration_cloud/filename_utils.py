@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
 import os
-from typing import Optional
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -14,29 +13,28 @@ class FileNameUtils:
     """
 
     @staticmethod
-    def extract_report_name(filename: str) -> Optional[str]:
+    def extract_report_name(filename: str) -> str:
         """
         Extracts the report name from a filename based on a specific pattern.
-        The expected pattern is: RM_<report_name>_YYYY-MM-DDTHHMMSS.xml (case-insensitive for 'RM' and '.xml').
+        The expected pattern is: RM_<report_name>_YYYY-MM-DDTHHMMSS.xml (case-insensitive).
 
         Args:
             filename (str): The name of the file.
 
         Returns:
-            Optional[str]: The extracted report name if the filename matches the expected pattern,
-                        otherwise None.
+            str: The extracted report name if the filename matches the expected pattern.
 
         Raises:
-            Exception: If the filename does not match the expected pattern and the report name cannot be extracted.
+            ValueError: If the filename does not match the expected pattern.
         """
-        match = re.match(r"RM_(.+?)_\d{4}-\d{2}-\d{2}T", filename)
+        pattern = re.compile(r"RM_(.+?)_\d{4}-\d{2}-\d{2}T", re.IGNORECASE)
+        match = pattern.search(filename)
         if not match:
-            LOGGER.error(f"Could not extract report name from filename: {filename}")
-            raise
+            raise ValueError(f"Could not extract report name from filename: {filename}")
         return match.group(1)
 
     @staticmethod
-    def extract_date_from_filename(filename: str) -> Optional[str]:
+    def extract_date_from_filename(filename: str) -> str:
         """
         Extracts the date string (YYYY-MM-DD) from a filename based on a specific pattern.
         The expected pattern is: *_YYYY-MM-DDTHHMMSS*.
@@ -45,17 +43,15 @@ class FileNameUtils:
             filename (str): The name of the file.
 
         Returns:
-            Optional[str]: The extracted date string (YYYY-MM-DD) if the filename matches
-                        the expected pattern, otherwise None.
+            str: The extracted date string (YYYY-MM-DD) if the filename matches the pattern.
 
         Raises:
-            Exception: If the filename does not contain a date in the expected format.
+            ValueError: If the filename does not contain a date in the expected format.
         """
         pattern = re.compile(r"_(\d{4}-\d{2}-\d{2})T")
         match = pattern.search(filename)
         if not match:
-            LOGGER.error(f"Could not extract date from filename: {filename}")
-            raise
+            raise ValueError(f"Could not extract date from filename: {filename}")
         return match.group(1)
 
     @staticmethod
@@ -72,20 +68,15 @@ class FileNameUtils:
 
         Returns:
             bool: True if the file's date is within the range, False otherwise.
-
-        Raises:
-            Exception: If the date cannot be extracted from the filename or if the
-                    extracted date string is not in the expected 'YYYY-MM-DD' format.
+                  Returns False if the date cannot be extracted or is in an invalid format.
         """
-        date_string = FileNameUtils.extract_date_from_filename(filename)
-        if not date_string:
-            return False
         try:
+            date_string = FileNameUtils.extract_date_from_filename(filename)
             file_date = datetime.strptime(date_string, "%Y-%m-%d").date()
             return start_date <= file_date <= end_date
-        except ValueError as e:
-            LOGGER.error(f"Invalid date format in filename: {filename}. Error: {e}")
-            raise
+        except (ValueError, TypeError) as e:
+            LOGGER.warning(f"Could not validate date for filename '{filename}': {e}")
+            return False
 
     @staticmethod
     def build_s3_incoming_path(filename: str, bucket: str) -> str:
@@ -95,31 +86,34 @@ class FileNameUtils:
 
         Args:
             filename (str): The name of the file.
-            bucket (str): The target S3 bucket name (although the bucket itself is not
-                        part of the returned path).
+            bucket (str): The target S3 bucket name (not used in the returned path).
 
         Returns:
             str: The S3 path for the incoming file in the format:
                 'incoming/<report_name>/YYYY/MM/DD/<filename>'.
-                The report name is converted to lowercase.
 
         Raises:
-            Exception: If the report name or date cannot be extracted from the filename,
-                    indicating an invalid filename format.
+            ValueError: If the report name or date cannot be extracted from the filename.
         """
-        filename = os.path.basename(filename)
-        report_name = FileNameUtils.extract_report_name(filename)
-        date_str = FileNameUtils.extract_date_from_filename(filename)
+        try:
+            base_filename = os.path.basename(filename)
+            report_name = FileNameUtils.extract_report_name(base_filename)
+            date_str = FileNameUtils.extract_date_from_filename(base_filename)
 
-        if not report_name or not date_str:
-            error_message = f"Invalid filename format: {filename}"
-            LOGGER.error(error_message)
-            raise
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+            year = date_obj.strftime("%Y")
+            month = date_obj.strftime("%m")
+            day = date_obj.strftime("%d")
 
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
-        year = date_obj.strftime("%Y")
-        month = date_obj.strftime("%m")
-        day = date_obj.strftime("%d")
-
-        path = f"incoming/{report_name.lower()}/{year}/{month:02}/{day:02}/{filename}"
-        return path
+            path = (
+                f"incoming/{report_name.lower()}/{year}/{month}/{day}/{base_filename}"
+            )
+            return path
+        except ValueError as e:
+            LOGGER.error(
+                f"Could not build S3 path due to invalid filename format: {filename}",
+                exc_info=True,
+            )
+            raise ValueError(
+                f"Invalid filename format for S3 path generation: {filename}"
+            ) from e

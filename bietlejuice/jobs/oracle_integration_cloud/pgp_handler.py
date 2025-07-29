@@ -1,8 +1,7 @@
 import os
 import subprocess
-import traceback
-from typing import Tuple
 import json
+from typing import Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark import BaseDBUtils
@@ -49,16 +48,23 @@ class PGPHandler:
                             and the PGP private key (second element).
 
         Raises:
-            Exception: If the secret cannot be retrieved or parsed, or if the
-                    required keys ('passphrase', 'private_key') are missing
-                    in the parsed JSON.
+            ValueError: If the required keys ('passphrase', 'private_key') are missing
+                        in the parsed JSON.
+            Exception: For any other errors during secret retrieval or parsing.
         """
         base_dbutils = BaseDBUtils()
         dbutils = base_dbutils.get_dbutils()
-        pgp_keys = dbutils.secrets.get(scope=self.scope, key=self.secret_key)
-        pgp_keys = json.loads(pgp_keys)
-        passphrase = pgp_keys["passphrase"]
-        private_key = pgp_keys["private_key"].replace("\\n", "\n")
+        pgp_keys_raw = dbutils.secrets.get(scope=self.scope, key=self.secret_key)
+        pgp_keys = json.loads(pgp_keys_raw)
+
+        passphrase = pgp_keys.get("passphrase")
+        private_key_raw = pgp_keys.get("private_key")
+
+        if not passphrase or not private_key_raw:
+            self.logger.error("'passphrase' or 'private_key' not found in PGP secret.")
+            raise ValueError("'passphrase' or 'private_key' not found in PGP secret.")
+
+        private_key = private_key_raw.replace("\\n", "\n")
         return passphrase, private_key
 
     def _setup_gpg_environment(self) -> str:
@@ -93,16 +99,27 @@ class PGPHandler:
                 is the original filename with ".XML" replaced by ".decrypted.xml".
 
         Raises:
-            subprocess.CalledProcessError: If the GPG decryption process fails
+            subprocess.CalledProcessError: If any GPG process fails
                                         (non-zero exit code). The error output
                                         from GPG is logged.
             Exception: For any unexpected errors during the decryption process.
         """
-        subprocess.run(
-            ["gpg", "--batch", "--import", self.private_key_path], check=True
-        )
+        try:
+            self.logger.info(f"Importing GPG key from {self.private_key_path}")
+            subprocess.run(
+                ["gpg", "--batch", "--import", self.private_key_path],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            error_message = f"GPG key import failed: {e.stderr or e.stdout}"
+            self.logger.error(error_message, exc_info=True)
+            raise
+
         decrypted_path = encrypted_path.replace(".XML", ".decrypted.xml")
         try:
+            self.logger.info(f"Decrypting file {encrypted_path} to {decrypted_path}")
             subprocess.run(
                 [
                     "gpg",
@@ -123,10 +140,11 @@ class PGPHandler:
             )
         except subprocess.CalledProcessError as e:
             error_message = f"Decryption failed: {e.stderr or e.stdout}"
-            self.logger.error(error_message + traceback.format_exc())
+            self.logger.error(error_message, exc_info=True)
             raise
         except Exception as e:
-            error_message = f"Unexpected decryption error: {e}"
-            self.logger.error(error_message + traceback.format_exc())
+            self.logger.error(f"Unexpected decryption error: {e}", exc_info=True)
             raise
+
+        self.logger.info(f"File successfully decrypted: {decrypted_path}")
         return decrypted_path

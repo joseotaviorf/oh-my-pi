@@ -1,3 +1,4 @@
+from typing import List
 from pyspark.sql import DataFrame
 
 from bietlejuice.base.spark import SparkTableStorageFormat
@@ -6,6 +7,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from quintoandar_logger import QuintoAndarLogger
 
 LOGGER = QuintoAndarLogger(__name__)
@@ -23,7 +25,7 @@ class RawLayerLoader:
         source: str,
         datalake_bucket: str,
         table_name: str,
-        partition_cols: str,
+        partition_cols: List[str],
         extraction_type: str = "full",
         logger: QuintoAndarLogger = LOGGER,
     ):
@@ -36,7 +38,7 @@ class RawLayerLoader:
             source (str): The data source identifier.
             datalake_bucket (str): The target S3 bucket name.
             table_name (str): The name of the table to load.
-            partition_cols (str): Comma-separated string of partition columns.
+            partition_cols (List[str]): A list of partition column names.
             extraction_type (str, optional): The type of extraction ("full" or "incremental"). Defaults to "full".
             logger (QuintoAndarLogger, optional): The logger instance. Defaults to LOGGER.
         """
@@ -51,68 +53,69 @@ class RawLayerLoader:
         self.metastore_service = SparkMetastoreService(spark_client)
         self.s3_loader = S3Loader()
         self.metastore_loader = SparkMetastoreLoader(self.metastore_service)
+
         self.db_info = DatalakeMetastoreService.get_db_info(
             self.environment, self.source, self.datalake_bucket
         )
         self.database_name = self.db_info["db_raw_databricks"]
         self.database_location = self.db_info["db_raw_path"]
 
+        self.table_privileges = TablePrivileges.from_environment_default(
+            f"{self.database_name}.{self.table_name}"
+        )
+
     def load_to_raw(self, df: DataFrame) -> None:
         """
         Orchestrates the process of loading the provided DataFrame into the raw data
-        layer. This includes creating the database if it doesn't exist, writing the
-        DataFrame to S3, updating the Hive metastore with the new data, and refreshing
-        the corresponding table for query availability.
+        layer. This includes creating the database, writing the DataFrame to S3,
+        updating the metastore, refreshing the table, and granting access permissions.
 
         Args:
             df (DataFrame): The Spark DataFrame to be loaded into the raw layer.
-
-        Raises:
-            Exception: If any error occurs during the database creation, data loading
-                    to S3, metastore update, or table refresh steps. Specific
-                    details of the error will be logged.
         """
+        if df.isEmpty():
+            self.logger.warning(
+                f"Input DataFrame for table '{self.table_name}' is empty. Skipping load process."
+            )
+            return
+
         try:
             self._create_database_if_not_exists()
             self._load_df_to_s3(df)
             self._update_metastore(df)
             self._refresh_table()
+            self._grant_table_permissions()
         except Exception as e:
-            self.logger.error(f"Error loading to raw layer: {e}")
+            self.logger.error(
+                f"Failed to load data to raw layer for table '{self.table_name}'. Error: {e}",
+                exc_info=True,
+            )
             raise
 
     def _create_database_if_not_exists(self) -> None:
         """
-        Checks if the specified database exists in the metastore and creates it
-        if it does not. Logs the attempt and any potential errors.
-
-        Raises:
-            Exception: If an error occurs during the database creation process
-                    in the metastore service.
+        Creates the database in the metastore if it does not already exist.
         """
         try:
+            self.logger.info(f"Ensuring database '{self.database_name}' exists.")
             self.metastore_service.create_database(self.database_name)
         except Exception as e:
-            self.logger.error(f"Error creating database: {e}")
+            self.logger.error(
+                f"Error creating database '{self.database_name}': {e}", exc_info=True
+            )
             raise
 
     def _load_df_to_s3(self, df: DataFrame) -> None:
         """
-        Loads the provided Spark DataFrame to the specified S3 location.
-        The storage format and write mode (overwrite for full loads, append for
-        incremental loads) are determined based on the configuration. The data
-        is partitioned according to the configured partition columns.
-
-        Args:
-            df (DataFrame): The Spark DataFrame to be loaded to S3.
-
-        Raises:
-            Exception: If any error occurs during the process of loading the
-                    DataFrame to S3, including issues with the S3 loader service.
+        Loads the DataFrame to the specified S3 location.
         """
         s3_path = f"{self.database_location}{self.table_name}"
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         mode = "overwrite" if self.extraction_type == "full" else "append"
+
+        self.logger.info(
+            f"Loading DataFrame to S3 path '{s3_path}' with mode '{mode}' and partitions {self.partition_cols}."
+        )
         try:
             self.s3_loader.load_df(
                 df=df,
@@ -122,26 +125,19 @@ class RawLayerLoader:
                 mode=mode,
             )
         except Exception as e:
-            self.logger.error(f"Error loading DataFrame to S3: {e}")
+            self.logger.error(
+                f"Error loading DataFrame to S3 path '{s3_path}': {e}", exc_info=True
+            )
             raise
 
     def _update_metastore(self, df: DataFrame) -> None:
         """
-        Updates the Hive metastore with the schema and location of the data loaded
-        into S3. This ensures that the table is properly defined and queryable by
-        Spark SQL or other data access tools. It forces a recreation of the table
-        metadata to ensure consistency.
-
-        Args:
-            df (DataFrame): A sample Spark DataFrame representing the schema of the
-                        data that was loaded to S3. This DataFrame is used to infer
-                        the column names and data types for the metastore table.
-
-        Raises:
-            Exception: If any error occurs during the metastore update process,
-                    including issues communicating with the metastore service.
+        Updates the Hive metastore with the schema and location of the data.
         """
         format_options = SparkTableStorageFormat.DEFAULT_RAW
+        self.logger.info(
+            f"Updating metastore for table '{self.database_name}.{self.table_name}'."
+        )
         try:
             self.metastore_loader.update_metastore(
                 df=df,
@@ -153,22 +149,42 @@ class RawLayerLoader:
                 partitions=self.partition_cols,
             )
         except Exception as e:
-            self.logger.error(f"Error updating metastore: {e}")
+            self.logger.error(
+                f"Error updating metastore for table '{self.table_name}': {e}",
+                exc_info=True,
+            )
             raise
 
     def _refresh_table(self) -> None:
         """
         Refreshes the metadata of the specified table in the Hive metastore.
-        This operation ensures that the metastore has the most up-to-date information
-        about the table's schema and data location, especially after new data has
-        been loaded or partitions have been added.
-
-        Raises:
-            Exception: If an error occurs while attempting to refresh the table
-                    metadata in the metastore service.
         """
+        self.logger.info(f"Refreshing table '{self.database_name}.{self.table_name}'.")
         try:
             self.metastore_service.refresh_table(self.database_name, self.table_name)
         except Exception as e:
-            self.logger.error(f"Error refreshing metastore table: {e}")
+            self.logger.error(
+                f"Error refreshing table '{self.table_name}': {e}", exc_info=True
+            )
             raise
+
+    def _grant_table_permissions(self) -> None:
+        """
+        Applies the defined table privileges using the provided TablePrivileges object.
+        """
+        if self.table_privileges:
+            self.logger.info(
+                f"Applying table privileges for {self.table_privileges.table_name}"
+            )
+            try:
+                self.table_privileges.apply()
+                self.logger.info("Successfully applied table privileges.")
+            except Exception as e:
+                self.logger.warning(
+                    f"Could not apply table privileges for {self.table_privileges.table_name}. "
+                    f"This might be a non-critical error. Details: {e}"
+                )
+        else:
+            self.logger.info(
+                "No TablePrivileges object provided, skipping permission grants."
+            )

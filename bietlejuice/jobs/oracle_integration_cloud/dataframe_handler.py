@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import re
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, dayofmonth, month, now, to_timestamp, year
@@ -24,9 +25,8 @@ class DataFrameHandler:
     def read_xml(self, spark: SparkSession, file_path: str) -> DataFrame:
         """
         Reads an XML file and transforms its content into a Spark DataFrame.
-        It assumes the XML structure has a root element containing multiple child elements,
-        where each child element represents a record and its sub-elements represent
-        columns.
+        It pre-processes the file to remove control characters and escape invalid
+        XML characters (e.g., '&') in text content before parsing to prevent errors.
 
         Args:
             spark (SparkSession): The active SparkSession.
@@ -34,30 +34,51 @@ class DataFrameHandler:
 
         Returns:
             DataFrame: A Spark DataFrame where each row corresponds to a record in the
-                    XML file, and the columns are derived from the tags of the
-                    sub-elements within each record.
+                    XML file.
 
         Raises:
-            xml.etree.ElementTree.ParseError: If there is an error parsing the XML file
-                                            (e.g., malformed XML).
-            Exception: For any other unexpected errors encountered during the XML
-                    reading or DataFrame creation process.
+            ValueError: If the XML file is empty or contains no records after parsing.
+            xml.etree.ElementTree.ParseError: If there is an error parsing the XML file.
+            Exception: For any other unexpected errors.
         """
         try:
-            tree = ET.parse(file_path)
-            root = tree.getroot()
+            self.logger.info(f"Reading and pre-processing XML file: {file_path}")
+            with open(file_path, "r", encoding="utf-8") as f:
+                xml_content = f.read()
+
+            # 1. Remove control characters, mirroring REGEXP_REPLACE(..., '[[:cntrl:]]', '')
+            # This regex removes characters in the C0 and C1 control blocks, which are invalid in XML 1.0.
+            xml_content = re.sub(
+                r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]", "", xml_content
+            )
+
+            # 2. Escape unescaped ampersands that are not part of a valid entity reference.
+            # This prevents "not-well formed" parsing errors.
+            corrected_content = re.sub(
+                r"&(?![a-zA-Z]{2,5};|#\d{2,5};)", "&amp;", xml_content
+            )
+
+            root = ET.fromstring(corrected_content)
+
             rows = []
             for record in root:
                 row = {elem.tag: elem.text for elem in record}
                 rows.append(row)
 
+            if not rows:
+                raise ValueError(
+                    f"XML file is empty or contains no records: {file_path}"
+                )
+
             df = spark.createDataFrame(rows)
             return df
         except ET.ParseError as e:
-            self.logger.error(f"Error parsing XML file {file_path}: {e}")
+            self.logger.error(f"Error parsing XML file {file_path}: {e}", exc_info=True)
             raise
         except Exception as e:
-            self.logger.error(f"Unexpected error reading XML file {file_path}: {e}")
+            self.logger.error(
+                f"Unexpected error reading XML file {file_path}: {e}", exc_info=True
+            )
             raise
 
     def rename_columns_to_lower(self, df: DataFrame) -> DataFrame:
@@ -69,15 +90,14 @@ class DataFrameHandler:
 
         Returns:
             DataFrame: A new Spark DataFrame with all column names converted to lowercase.
-
-        Raises:
-            Exception: If any error occurs during the column renaming process.
         """
         try:
-            new_cols = [col.lower() for col in df.columns]
+            new_cols = [c.lower() for c in df.columns]
             return df.toDF(*new_cols)
         except Exception as e:
-            self.logger.error(f"Error renaming columns to lowercase: {e}")
+            self.logger.error(
+                f"Error renaming columns to lowercase: {e}", exc_info=True
+            )
             raise
 
     def insert_partitions(
@@ -85,26 +105,21 @@ class DataFrameHandler:
     ) -> DataFrame:
         """
         Adds 'year', 'month', and 'day' columns to the DataFrame by converting the
-        specified string column to a timestamp. If a datetime format is provided,
-        it will be used for the conversion; otherwise, Spark's default timestamp
-        conversion will be applied. A 'ts_load' column with the current timestamp
-        is also added.
+        specified string column to a timestamp. A 'ts_load' column with the current
+        timestamp is also added.
 
         Args:
             df (DataFrame): The input Spark DataFrame.
             date_column_to_partition (str): The name of the string column containing
-                                            the date information to be used for
-                                            partitioning.
+                                            the date information for partitioning.
             datetime_format (str, optional): The format string to use when converting
-                                            the date column to a timestamp. If None,
-                                            Spark's default conversion is used.
-                                            Defaults to None.
+                                            the date column. Defaults to None.
 
         Returns:
-            DataFrame: A new Spark DataFrame with the added 'ts_load', 'year', 'month',
-                    and 'day' columns. If the specified partition column does not
-                    exist, a warning is logged, and the original DataFrame is returned
-                    with only the 'ts_load' column added.
+            DataFrame: A new DataFrame with 'ts_load', 'year', 'month', and 'day' columns.
+
+        Raises:
+            ValueError: If all values in the partition column fail to be converted to a valid date.
         """
         df = df.withColumn("ts_load", now())
 
@@ -123,5 +138,18 @@ class DataFrameHandler:
         df = df.withColumn("year", year(timestamp_col))
         df = df.withColumn("month", month(timestamp_col))
         df = df.withColumn("day", dayofmonth(timestamp_col))
+
+        null_partition_count = df.where(col("year").isNull()).count()
+        if null_partition_count > 0:
+            total_count = df.count()
+            self.logger.warning(
+                f"{null_partition_count} out of {total_count} rows have null partition values "
+                f"due to failed date conversion on column '{date_column_to_partition}'."
+            )
+            if null_partition_count == total_count:
+                raise ValueError(
+                    f"All date conversions failed for partition column '{date_column_to_partition}'. "
+                    "Halting job to prevent writing to a null partition."
+                )
 
         return df
