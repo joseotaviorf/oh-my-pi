@@ -1,7 +1,7 @@
 database_name: datalake_docpilot
 table_name: docpilot_auditing_process
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This table stores the results returned by Quinturk (Label Studio) regarding the auditing of a percentage of the documents analysed by the credit desk and processed by Docpilot. Each line represents a task assigned to an analyst and the annotations done in an income documentation (payslip or bank statement). These annotations include the reported incomes (net, gross and committed), the document type and if there is any fraud."
 columns:
   id_task:
@@ -79,6 +79,10 @@ columns:
     lineage:
       - datalake_quinturk_clean.task_completion.result
     description: "The end date of the period when the document is a Bank Statement, and part of the period was skipped/ignored."
+  bank_statement_reference_period:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The reference period when the document is a Bank Statement as we have in Payslip"
   is_fraud:
     lineage:
       - datalake_quinturk_clean.task_completion.result
