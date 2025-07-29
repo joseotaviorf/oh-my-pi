@@ -1,0 +1,2 @@
+api_url: "https://api.quires.com.br/v1/quinto-andar"
+raw_partition_cols: [year, month, day]

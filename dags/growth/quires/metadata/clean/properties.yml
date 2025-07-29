@@ -1,0 +1,65 @@
+database_name: datalake_quires_clean
+table_name: properties
+owner: henrique.pauloa@quintoandar.com.br
+domain: Growth
+description: Table containing properties data from quires
+columns:
+  id:
+    description: Unique identifier for the property record
+    lineage:
+      - datalake_quires_raw.properties.id
+  code:
+    description: Property code identifier
+    lineage:
+      - datalake_quires_raw.properties.code
+  city:
+    description: City where the property is located
+    lineage:
+      - datalake_quires_raw.properties.city
+  city_group:
+    description: City group classification
+    lineage:
+      - datalake_quires_raw.properties.cityGroup
+  geolocation:
+    description: Geographic location coordinates of the property
+    lineage:
+      - datalake_quires_raw.properties.geolocation
+  property_type:
+    description: Type of property
+    lineage:
+      - datalake_quires_raw.properties.propertyType
+  status:
+    description: Current status of the property
+    lineage:
+      - datalake_quires_raw.properties.status
+  transaction_type:
+    description: Type of transaction for the property
+    lineage:
+      - datalake_quires_raw.properties.transactionType
+  url:
+    description: URL associated with the property listing
+    lineage:
+      - datalake_quires_raw.properties.url
+  rent_price:
+    description: Rental price of the property
+      - datalake_quires_raw.properties.rentPrice
+  sale_price:
+    description: Sale price of the property
+    lineage:
+      - datalake_quires_raw.properties.salePrice
+  dt_load:
+    description: Date when the property data was loaded
+    lineage:
+      - datalake_quires_raw.properties.load_date
+  year:
+    description: Year extracted from the load date for partitioning
+    lineage:
+      - datalake_quires_raw.properties.year
+  month:
+    description: Month extracted from the load date for partitioning
+    lineage:
+      - datalake_quires_raw.properties.month
+  day:
+    description: Day extracted from the load date for partitioning
+    lineage:
+      - datalake_quires_raw.properties.day

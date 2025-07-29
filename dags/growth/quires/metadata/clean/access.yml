@@ -1,0 +1,30 @@
+database_name: datalake_quires_clean
+table_name: access
+owner: henrique.pauloa@quintoandar.com.br
+domain: Growth
+description: Table containing access data from quires
+columns:
+  id:
+    description: Unique identifier for the access record
+    lineage:
+      - datalake_quires_raw.access.id
+  plate:
+    description: Plate information associated with the access record
+    lineage:
+      - datalake_quires_raw.access.plate
+  ts_created:
+    description: Timestamp when the access record was created
+    lineage:
+      - datalake_quires_raw.access.createdAt
+  year:
+    description: Year extracted from the access date for partitioning
+    lineage:
+      - datalake_quires_raw.access.year
+  month:
+    description: Month extracted from the access date for partitioning
+    lineage:
+      - datalake_quires_raw.access.month
+  day:
+    description: Day extracted from the access date for partitioning
+    lineage:
+      - datalake_quires_raw.access.day

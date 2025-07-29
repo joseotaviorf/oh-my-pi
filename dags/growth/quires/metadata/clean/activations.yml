@@ -1,0 +1,62 @@
+database_name: datalake_quires_clean
+table_name: activations
+owner: henrique.pauloa@quintoandar.com.br
+domain: Growth
+description: Table containing activations data from quires
+columns:
+  id:
+    description: Unique identifier for the activation record
+    lineage:
+      - datalake_quires_raw.activations.id
+  installer:
+    description: Installer identifier
+    lineage:
+      - datalake_quires_raw.activations.installer
+  installer_name:
+    description: Name of the installer
+    lineage:
+      - datalake_quires_raw.activations.installerName
+  plate:
+    description: Plate information associated with the activation record
+    lineage:
+      - datalake_quires_raw.activations.plate
+  property:
+    description: Property information associated with the activation
+    lineage:
+      - datalake_quires_raw.activations.property
+  transaction_type:
+    description: Type of transaction for the activation
+    lineage:
+      - datalake_quires_raw.activations.transactionType
+  url:
+    description: URL associated with the activation
+    lineage:
+      - datalake_quires_raw.activations.url
+  utm_campaign:
+    description: UTM campaign parameter
+    lineage:
+      - datalake_quires_raw.activations.utmCampaign
+  utm_medium:
+    description: UTM medium parameter
+    lineage:
+      - datalake_quires_raw.activations.utmMedium
+  utm_source:
+    description: UTM source parameter
+    lineage:
+      - datalake_quires_raw.activations.utmSource
+  ts_created:
+    description: Timestamp when the activation record was created
+    lineage:
+      - datalake_quires_raw.activations.createdAt
+  year:
+    description: Year extracted from the activation date for partitioning
+    lineage:
+      - datalake_quires_raw.activations.year
+  month:
+    description: Month extracted from the activation date for partitioning
+    lineage:
+      - datalake_quires_raw.activations.month
+  day:
+    description: Day extracted from the activation date for partitioning
+    lineage:
+      - datalake_quires_raw.activations.day

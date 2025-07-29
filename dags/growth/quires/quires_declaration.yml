@@ -1,0 +1,41 @@
+dag:
+  name: quires
+  owner: Data Growth
+  schedule_start_date: 2025, 07, 24
+  schedule_interval: "0 3 * * *"
+  documentation:
+    dag_purpose: |
+      Quires is a platform that provides data about the real estate market in Brazil. We are using the Quires API to get the data and load it into our datalake.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_quires_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+  - "{environment}" # env
+  - "{bucket}"  # datalake_bucket
+  - "{dag_name}"  # source
+  - "{load_start_date}" # load_start_date
+  - "{load_end_date}" # load_end_date
+  tables_customization:
+    access:
+      extra_spark_job_arguments:
+      - access  # table_name
+    activations:
+      extra_spark_job_arguments:
+      - activations # table_name
+    properties:
+      extra_spark_job_arguments:
+      - properties  # table_name
+cluster:
+  type: databricks_13_3_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
