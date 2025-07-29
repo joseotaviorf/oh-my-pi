@@ -1,0 +1,89 @@
+---
+database_name: datalake_pin_core_clean
+table_name: rate_values
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Stores specific values for compensation rates, such as salary bands or pay grades. It includes minimum, midpoint, and maximum values for different types of rates (e.g., grade rates, salary rates) and their effective dates.
+columns:
+  id_rate_value:
+    description: 'System-generated unique identifier for the rate value. Primary key.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.rate_value_id
+  id_business_group:
+    description: 'Identifier for the business group, used for data partitioning.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.business_group_id
+  id_action_occurrence:
+    description: 'Foreign key referencing the specific HR action (e.g., hire, promotion) that triggered the creation or update of this rate value.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.action_occurrence_id
+  id_rate:
+    description: 'Foreign key referencing the rate definition (e.g., "Annual Salary", "Hourly Wage") to which this value belongs.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.rate_id
+  id_rate_object:
+    description: 'Identifier of the object to which the rate is attached, such as a grade, job, or position.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.rate_object_id
+  legislation_code:
+    description: 'Code indicating the legislative context for the rate, such as "US" for the United States or "BR" for Brazil.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.legislation_code
+  created_by:
+    description: 'User who created the record in the source system.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.created_by
+  updated_by:
+    description: 'User who last updated the record in the source system.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.last_updated_by
+  rate_object_type:
+    description: 'Type of the object to which the rate value applies. Examples: "GRADE", "JOB", "POSITION".'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.rate_object_type
+  minimum_value:
+    description: 'The minimum value for this rate, often used as the floor of a salary band.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.minimum
+  mid_value:
+    description: 'The midpoint value for this rate, often used as the target reference in a salary band.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.mid_value
+  maximum_value:
+    description: 'The maximum value for this rate, often used as the ceiling of a salary band.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.maximum
+  object_version_number:
+    description: 'Version number of the record, used for optimistic locking to prevent concurrent update conflicts.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.object_version_number
+  ts_created:
+    description: 'Timestamp of when the record was created in the source system.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.creation_date
+  ts_updated:
+    description: 'Timestamp of when the record was last updated in the source system.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.last_update_date
+  dt_effective_started:
+    description: 'The date from which this rate value record is effective and valid.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.effective_start_date
+  dt_effective_ended:
+    description: 'The date until which this rate value record is effective. A future date (e.g., 4712-12-31) indicates it is currently active.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.effective_end_date
+  ts_load:
+    description: 'Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.'
+  year:
+    description: 'Year from the ts_updated column, useful for data partitioning and filtering.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.year
+  month:
+    description: 'Month from the ts_updated column, useful for data partitioning and filtering.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.month
+  day:
+    description: 'Day from the ts_updated column, useful for data partitioning and filtering.'
+    lineage:
+      - datalake_pin_core_raw.per_rate_values_f.day

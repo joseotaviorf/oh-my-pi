@@ -1,8 +1,8 @@
----
+--- 
 database_name: datalake_pin_core_clean
 table_name: job
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Defines roles that employees can hold within the enterprise, independent of specific organizational units.
 columns:
   id_action_occurrence:
@@ -69,23 +69,54 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_jobs_f.approval_authority
   has_medical_checkup_requirement:
-    description: Indicates if a medical checkup is required for this job (Yes/No).
+    description: Indicates if a medical checkup is required for this job.
     lineage:
       - datalake_pin_core_raw.per_jobs_f.med_checkup_req
     categories:
-      true: Medical checkup is required.
-      false: Medical checkup is not required.
+      "true": Medical checkup is required.
+      "false": Medical checkup is not required.
   is_benchmark_job:
-    description: Indicates if this job serves as a benchmark for comparison (Yes/No).
+    description: Indicates if this job serves as a benchmark for comparison.
     lineage:
       - datalake_pin_core_raw.per_jobs_f.benchmark_job_flag
     categories:
-      Y: Benchmark job.
-      N: Not a benchmark job.
+      "true": Benchmark job.
+      "false": Not a benchmark job.
+  is_time_clocking_required:
+    description: Indicates if the job requires time clocking (punch-in/out).
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute2
+    categories:
+      "true": Time clocking is required.
+      "false": Time clocking is not required.
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:
       - datalake_pin_core_raw.per_jobs_f.object_version_number
+  target_plr:
+    description: Target value for Profit and Results Sharing (PLR) bonus.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute_number1
+  target_rvv:
+    description: Target value for Variable Sales Compensation (Remuneração Variável de Vendas).
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute_number2
+  target_sop:
+    description: Target value or units for the Stock Option Plan.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute_number3
+  target_hiring_sop:
+    description: Target value or units for the Stock Option Plan granted upon hiring.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute_number4
+  target_bonus_tech_usd:
+    description: Target bonus amount in USD for technical roles.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute_number5
+  target_plr_salary_multiplier:
+    description: Target for Profit and Results Sharing (PLR) expressed as a multiple of the employee's salary.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute8
   dt_effective_ended:
     description: End date of the period for which this job definition is valid.
     lineage:
@@ -104,8 +135,6 @@ columns:
       - datalake_pin_core_raw.per_jobs_f.last_update_date
   ts_load:
     description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_core_raw.per_jobs_f.ts_load
   year:
     description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
     lineage:

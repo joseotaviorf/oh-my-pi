@@ -215,6 +215,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_rate_values_f:
+      clean_table_name: rate_values
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_users:
       clean_table_name: user
       extra_spark_job_arguments:
