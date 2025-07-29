@@ -3,28 +3,31 @@ terminations AS (
   SELECT
     aa.id_period_of_service,
     aa.action_code,
-    al.description
+    al.description AS dismissal_type,
+    art.action_reason AS dismissal_reason
   FROM
     datalake_pin_core_clean.all_assignments AS aa
   LEFT JOIN
     datalake_hr_system_clean.actions_lov AS al
       ON al.action_code = aa.action_code
+  LEFT JOIN
+    datalake_pin_core_clean.action_reason_base AS arb
+      ON arb.action_reason_code = aa.reason_code
+  LEFT JOIN
+    datalake_pin_core_clean.action_reason_translation AS art
+      ON art.id_action_reason = arb.id_action_reason
+      AND art.language = 'PTB'  
   WHERE
     aa.is_primary
-    AND aa.assignment_type = 'E'
-    AND aa.dt_effective_ended >= DATE('{load_end_date}')
-    AND aa.updated_by <> 'FUSION_APPS_HCM_ESS_LOADER_APPID'
-    AND (
-      (
-        aa.action_code IN ('TERMINATION', 'RESIGNATION', 'DEATH')
-        AND aa.assignment_status_type = 'INACTIVE'
-      )
-      OR (
-        aa.action_code = 'GLB_TRANSFER'
-        AND aa.reason_code = 'EXPATRIADO'
-        AND aa.assignment_status_type = 'ACTIVE'
-      )
-    ) 
+    AND aa.assignment_type IN ('E', 'C')
+    AND aa.action_code IN (
+      'TERMINATION', 
+      'RESIGNATION', 
+      'DEATH',
+      'GLB_TRANSFER',
+      'EXPATRIADO'
+    )
+    AND aa.assignment_status_type = 'INACTIVE' 
     QUALIFY 
       ROW_NUMBER() OVER(
         PARTITION BY id_period_of_service, assignment_status_type 
@@ -66,7 +69,8 @@ SELECT
   ca.legislation_code,
   ids.assignment_type,
   ca.assignment_status_type,
-  t.description AS dismissal_type,
+  t.dismissal_type,
+  t.dismissal_reason,
   IF(ca.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
   ca.dt_projected_started,
   pp.dt_started,

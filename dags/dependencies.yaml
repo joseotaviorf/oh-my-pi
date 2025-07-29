@@ -2030,6 +2030,8 @@ bietlejuice.enrich_employee_registration:
 bietlejuice.enrich_employment:
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.hr_system:load-clean-actions-lov:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
