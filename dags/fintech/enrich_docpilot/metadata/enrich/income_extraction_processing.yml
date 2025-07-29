@@ -1,7 +1,7 @@
 database_name: datalake_docpilot
 table_name: income_extraction_processing
 owner: isabella.santos@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "This table stores the results returned by DocPilot regarding the processing of an income extraction. Each line represents the income extracted (net or gross) from a document in a reference month."
 columns:
   id_document:
@@ -39,10 +39,10 @@ columns:
     categories:
       PAYSLIP: ""
       BANK_STATEMENT: ""
-  number_of_documents_with_errors:
+  number_of_errors:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The number of documents with errors."
+    description: "The number of errors in extraction."
   file_path:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
@@ -55,6 +55,10 @@ columns:
     lineage:
       - datalake_docpilot_clean.income_extraction.errors
     description: "The type of error found."
+  processing_errors:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.errors
+    description: "The processing type of error found."
   error_file_path:
     lineage:
       - datalake_docpilot_clean.income_extraction.errors
@@ -63,10 +67,26 @@ columns:
     lineage:
       - datalake_docpilot_clean.income_extraction.errors
     description: "The layout detected when Docpilot does not support the file layout."
-  bank_statement_type:
+  statement_type:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "Bank statement type."
+  llm_normalized_bank_name:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.errors
+    description: "Normalized Bank name detected by LLM."
+  llm_bank_name:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.errors
+    description: "Bank name detected by LLM."
+  llm_document_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.errors
+    description: "Document type detected by LLM."
+    categories:
+      PAYSLIP: ""
+      BANK_STATEMENT: ""
+      OTHERS: ""
   net_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
@@ -91,6 +111,18 @@ columns:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "The average of the committed income extracted from a document in a period."
+  median_net_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The median of the net income extracted from a document in a period."
+  median_gross_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The median of the gross income extracted from a document in a period."
+  median_committed_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The median of the committed income extracted from a document in a period."
   reference_period:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
@@ -101,11 +133,11 @@ columns:
     description: "The reference date of the extracted income, which corresponds to the date when the document was processed."
   document_number:
     description: "Ranking based on the document ID and reference period to indicate the order of the processed documents."
-  any_suspicious_document:
+  is_suspicious:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "Based on the metadata analysis, indicates if there is any suspicious document."
-  any_divergent_date:
+  is_dates_divergent:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "Based on the metadata analysis, indicates if there is any divergent date."
