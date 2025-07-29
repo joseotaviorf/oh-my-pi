@@ -1,48 +1,77 @@
 database_name: datalake_betopera_clean
 table_name: certificate
+domain: Fintech
+description: Certificate management data for Betopera insurance products, tracking certificate lifecycle from creation to cancellation
 columns:
   id:
+    description: Unique identifier for the certificate record
     lineage:
       - datalake_betopera_raw.certificate.id
   id_insurance:
+    description: Foreign key reference to the associated insurance product
     lineage:
       - datalake_betopera_raw.certificate.insurance_id
   id_certificate_request:
+    description: Foreign key reference to the originating certificate request
     lineage:
       - datalake_betopera_raw.certificate.certificate_request_id
   version:
+    description: Version number of the certificate for tracking revisions
     lineage:
       - datalake_betopera_raw.certificate.version
   status:
+    description: Current status of the certificate (e.g., active, cancelled, expired)
     lineage:
       - datalake_betopera_raw.certificate.status
   response_payload:
+    description: JSON payload containing the response data from certificate generation
     lineage:
       - datalake_betopera_raw.certificate.response_payload
   file_url:
+    description: URL location where the certificate document is stored
     lineage:
       - datalake_betopera_raw.certificate.file_url
+  source_input_type:
+    description: Type of input source used to create the certificate
+    lineage:
+      - datalake_betopera_raw.certificate.source_input_type
+  cancellation_reason:
+    description: Reason provided when the certificate was cancelled
+    lineage:
+      - datalake_betopera_raw.certificate.cancellation_reason
+  certificate_properties:
+    description: Additional properties and metadata specific to the certificate
+    lineage:
+      - datalake_betopera_raw.certificate.certificate_properties
   dt_start:
+    description: Start date when the certificate becomes effective
     lineage:
       - datalake_betopera_raw.certificate.start_date
   dt_end:
+    description: End date when the certificate expires
     lineage:
       - datalake_betopera_raw.certificate.end_date
   dt_cancel:
+    description: Date when the certificate was cancelled
     lineage:
       - datalake_betopera_raw.certificate.cancel_date
   ts_created:
+    description: Timestamp when the certificate record was created
     lineage:
       - datalake_betopera_raw.certificate.created_at
   ts_updated:
+    description: Timestamp when the certificate record was last updated
     lineage:
       - datalake_betopera_raw.certificate.updated_at
   year:
+    description: Year extracted from the certificate date for partitioning
     lineage:
       - datalake_betopera_raw.certificate.year
   month:
+    description: Month extracted from the certificate date for partitioning
     lineage:
       - datalake_betopera_raw.certificate.month
   day:
+    description: Day extracted from the certificate date for partitioning
     lineage:
       - datalake_betopera_raw.certificate.day
