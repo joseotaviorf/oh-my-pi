@@ -1,13 +1,13 @@
 SELECT
     fsk.sk_file,
     f.id AS id_file,
-    hash,
-    file_name,
-    type,
-    url,
-    has_3p_access_control,
-    ts_created,
-    ts_updated,
+    f.hash,
+    f.file_name,
+    f.type,
+    f.url,
+    f.has_3p_access_control,
+    f.ts_created,
+    f.ts_updated,
     NOW() AS ts_load
 FROM
     datalake_brokers_supply_processor.file AS f
