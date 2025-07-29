@@ -140,6 +140,11 @@ if __name__ == "__main__":
     filtered_files = list_files(table_name, source_root_path, format, datetime_to_ingest)
 
     if len(filtered_files) > 0:
+        
+        logger.info(
+            f"m=__main__, msg= The following files were found for {datetime_to_ingest.date()} and will be loaded: {filtered_files}"
+        )    
+
         if format == 'csv':
             schema = generate_schema(col_names)
             dfs = []
