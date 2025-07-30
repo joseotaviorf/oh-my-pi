@@ -2,36 +2,113 @@
 database_name: datalake_person_clean
 table_name: preference_settings
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description:
+domain: 3P Partners
+description: |
+  User preferences and personalization settings that customize the QuintoAndar experience for each person.
+  Enables localization, personalization, and user experience optimization across the platform.
+  
+  **Business Context:**
+  - Enables personalized user experience and interface customization
+  - Supports multi-language and multi-timezone operations
+  - Critical for user engagement and satisfaction
+  - Enables A/B testing and feature personalization
+  - Supports accessibility and user experience preferences
+  
+  **Personalization Features:**
+  - Language preferences for multi-language support
+  - Timezone settings for accurate time display and scheduling
+  - Communication preferences and notification settings
+  - Interface customization and accessibility options
+  - Feature enablement and experience personalization
+  
+  **Localization Support:**
+  - Multi-language interface support (Portuguese, Spanish, English, etc.)
+  - Timezone-aware scheduling and time display
+  - Cultural and regional preference adaptation
+  - Currency and format localization
+  - Local market feature enablement
+  
+  **Data Architecture:**
+  - One-to-one relationship with person (person_id foreign key)
+  - Optional preferences (not all users customize their experience)
+  - Extensible design for future preference types
+  - Default values applied when preferences not set
+  - Audit trail for preference change tracking
 columns:
   id:
     lineage:
-      - datalake_person_raw.preference_settings.id
+    - datalake_person_raw.preference_settings.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the preference settings record.
+      Used for internal database relationships and efficient preference management.
   id_person:
     lineage:
-      - datalake_person_raw.preference_settings.person_id
+    - datalake_person_raw.preference_settings.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** One-to-One with person table (each person has one preference set)
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links the preferences to the owning person record
+      **Constraint:** Unique per person for preference settings.
   timezone:
     lineage:
-      - datalake_person_raw.preference_settings.timezone
+    - datalake_person_raw.preference_settings.timezone
+    description: |
+      User's preferred timezone for time display and scheduling.
+      **Format:** Standard timezone identifiers (IANA Time Zone Database format)
+      **Examples:** "America/Sao_Paulo", "America/Mexico_City", "UTC", "America/New_York"
+      **Usage:** Used for accurate time display in user interfaces
+      **Scheduling:** Critical for appointment scheduling and notification timing
+      **Default:** System defaults to user's country/region timezone if not specified
+      **Validation:** Must be a valid IANA timezone identifier.
   language:
     lineage:
-      - datalake_person_raw.preference_settings.language
+    - datalake_person_raw.preference_settings.language
+    description: |
+      User's preferred language for the interface and communications.
+      **Format:** Language codes (ISO 639-1 or locale identifiers)
+      **Examples:** "pt-BR" (Brazilian Portuguese), "es-MX" (Mexican Spanish), "en-US" (US English)
+      **Usage:** Determines interface language and communication language
+      **Content:** Affects all user-facing text, emails, and notifications
+      **Default:** System defaults based on user's country or browser settings
+      **Localization:** Drives content localization and cultural adaptation
+      **Support:** Must be supported by the platform's localization system.
   version:
     lineage:
-      - datalake_person_raw.preference_settings.version
+    - datalake_person_raw.preference_settings.version
+    description: |
+      Optimistic locking version number for concurrent update protection.
+      Incremented automatically on each update to prevent data conflicts.
   ts_created:
     lineage:
-      - datalake_person_raw.preference_settings.created_at
+    - datalake_person_raw.preference_settings.created_at
+    description: |
+      Timestamp when the preference settings were first created.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Preference creation tracking, user onboarding analysis, feature adoption measurement.
   ts_updated:
     lineage:
-      - datalake_person_raw.preference_settings.updated_at
+    - datalake_person_raw.preference_settings.updated_at
+    description: |
+      Timestamp when the preference settings were last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Change tracking, preference update monitoring, user engagement analysis
+      **Analytics:** Used to understand preference change patterns and user behavior.
   year:
     lineage:
-      - datalake_person_raw.preference_settings.year
+    - datalake_person_raw.preference_settings.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
-      - datalake_person_raw.preference_settings.month
+    - datalake_person_raw.preference_settings.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
-      - datalake_person_raw.preference_settings.day
+    - datalake_person_raw.preference_settings.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.

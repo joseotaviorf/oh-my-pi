@@ -2,9 +2,48 @@ dag:
   name: person
   schedule_start_date: 2023, 1, 1
   schedule_interval: 0 21,8,12 * * *
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: This DAG imports the tables from Person, a service that centralizes natural person data.
+    dag_purpose: |
+      This DAG imports the tables from Person, a core identity management microservice that centralizes natural person data across QuintoAndar's ecosystem.
+      
+      **Service Overview:**
+      The Person service acts as the single source of truth for person/user identity and data, handling:
+      - Person registration and profile management
+      - Identity resolution across multiple systems (email, phone, documents, social logins)
+      - Multi-country compliance (Brazil, Mexico) with local document types (CPF, RFC, RNE, Passport)
+      - GDPR compliance through "Right to be Forgotten" implementation
+      - Integration with authentication systems (Cognito, Keycloak, Gandalf)
+      - Audit trail for all person data changes using Hibernate Envers
+      
+      **Data Architecture:**
+      - Uses PostgreSQL with full audit capabilities
+      - Implements optimistic locking for concurrent updates
+      - Supports JSONB for flexible metadata storage
+      - UUID-based business identifiers for external system integration
+      - CDC (Change Data Capture) for real-time data synchronization
+      
+      **Key Relationships:**
+      - Person → Address (1:1): Physical address information
+      - Person → ContactInfo (1:N): Emails, phones, push notification tokens
+      - Person → IdentityDocument (1:N): Government-issued documents
+      - Person → Credential (1:N): External system authentication references
+      - Person → PersonIdentity (1:N): Cross-system identity resolution
+      - Person → Preferences (1:1): User preferences and settings
+      - Person → RightToBeForgotten (1:N): GDPR compliance tracking
+      
+      **Integration Points:**
+      - Processes events from AWS Cognito for user signup/login
+      - Consumes SQS messages for asynchronous operations
+      - Integrates with multiple authentication providers
+      - Provides service-to-service APIs with OAuth2 scopes
+      - Supports duplicate person detection and merging
+      
+      **Compliance & Security:**
+      - Full audit trail with user attribution and change reasons
+      - Data sanitization for PII handling
+      - Country-specific validation rules
+      - Anonymization capabilities for LGPD/GDPR compliance
 workflow:
   type: cdc
   layer: raw

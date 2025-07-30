@@ -1,9 +1,45 @@
 dag:
   name: enrich_person
   schedule_start_date: 2020, 1, 1
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: This DAG creates the enriched table for the Person Database. This DAG is triggered by Mediator and loads the table via full load.
+    dag_purpose: |
+      This DAG creates enriched person tables that bridge raw person data with dimensional modeling and cross-entity relationships.
+      Acts as the enrichment layer that consolidates person data with related business entities across QuintoAndar's ecosystem.
+      
+      **Business Context:**
+      The enrichment layer serves as a critical transformation step that:
+      - Generates surrogate keys for dimensional modeling and analytics
+      - Consolidates foreign key relationships across person-related entities
+      - Enriches person data with cross-system business relationships
+      - Enables unified person analytics across multiple product domains
+      - Provides optimized data structures for downstream data warehouse consumption
+      
+      **Data Architecture:**
+      - **Source Layer**: Consumes cleaned person data from datalake_person_clean
+      - **Enrichment Process**: Applies business logic to create analytical-ready datasets
+      - **Surrogate Key Generation**: Creates stable dimensional keys for analytics
+      - **Cross-Entity Integration**: Links persons with company, member profiles, and business relationships
+      - **Output Layer**: Produces enriched tables for data warehouse consumption
+      
+      **Key Transformations:**
+      - **Surrogate Key Assignment**: Generates sk_person for dimensional modeling stability
+      - **Contact Segregation**: Separates email and phone contacts for analytics
+      - **Business Relationship Mapping**: Links persons to company member profiles and business roles
+      - **User ID Consolidation**: Maps person IDs to main system user identifiers
+      - **Profile Type Classification**: Categorizes person types (affiliated, buyer prospect, CIQ member, etc.)
+      
+      **Integration Points:**
+      - **Person System**: Primary source for person identity and core attributes
+      - **Company System**: Source for member profiles and business relationships
+      - **Main System**: Source for user ID mapping and authentication references
+      - **Downstream DW**: Feeds dimensional models for analytics and reporting
+
+      **Data Quality & Governance:**
+      - **Referential Integrity**: Maintains foreign key relationships across systems
+      - **Business Rule Application**: Applies enrichment logic for person categorization
+      - **Data Lineage**: Tracks transformation from source systems to enriched layer
+      - **Change Detection**: Identifies and processes changes in person relationships
 workflow:
   type: query_delta
   layer: enrich

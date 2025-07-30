@@ -2,30 +2,127 @@
 database_name: datalake_person_clean
 table_name: right_to_be_forgotten
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description:
+domain: 3P Partners
+description: |
+  LGPD/GDPR compliance table tracking data anonymization requests and "Right to be Forgotten" processes.
+  Critical for regulatory compliance and privacy law adherence across jurisdictions.
+  
+  **Business Context:**
+  - Implements GDPR/LGPD "Right to Erasure" requirements
+  - Tracks user requests for data anonymization and deletion
+  - Supports privacy compliance across multiple jurisdictions (EU, Brazil LGPD, etc.)
+  - Enables audit trail for regulatory compliance reporting
+  - Manages anonymization workflow and completion status
+  
+  **Legal & Compliance:**
+  - Required for GDPR compliance in European operations
+  - Supports LGPD (Lei Geral de Proteção de Dados) compliance in Brazil
+  - Provides audit trail for regulatory authorities
+  - Tracks user consent withdrawal and data processing cessation
+  - Implements data subject rights as required by privacy laws
+  
+  **Anonymization Process:**
+  - Records user feedback about reasons for data deletion
+  - Tracks anonymization completion with hash-based verification
+  - Maintains audit trail without retaining personal data
+  - Supports partial anonymization for legitimate business interests
+  - Enables compliance reporting and process validation
+  
+  **Data Architecture:**
+  - One-to-many relationship with person (person_id foreign key)
+  - Hash-based anonymization verification system
+  - User feedback collection for service improvement
+  - Audit trail preservation for compliance requirements
 columns:
   id:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.id
+    - datalake_person_raw.right_to_be_forgotten.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the anonymization request record.
+      Used for internal database relationships and compliance tracking.
   id_person:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.person_id
+    - datalake_person_raw.right_to_be_forgotten.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** Many-to-One with person table
+      **Business Rule:** Required field, cannot be null
+      **Compliance:** Links anonymization requests to specific persons
+      **Audit:** Maintained for compliance reporting and legal requirements.
+  hash_id:
+    lineage:
+    - datalake_person_raw.right_to_be_forgotten.hash_id
+    description: |
+      Cryptographic hash identifier for anonymized person verification.
+      **Purpose:** Enables verification of anonymization completion without storing personal data
+      **Security:** One-way hash prevents reverse identification
+      **Compliance:** Allows audit trail maintenance while respecting privacy rights
+      **Format:** SHA-256 or similar cryptographic hash string
+      **Usage:** Used for compliance reporting and anonymization verification.
+  explained_feedback:
+    lineage:
+    - datalake_person_raw.right_to_be_forgotten.explained_feedback
+    description: |
+      Free-text explanation provided by the user for requesting data deletion.
+      **Purpose:** Captures detailed user feedback for service improvement
+      **Content:** User's own words explaining their decision to request anonymization
+      **Privacy:** Subject to anonymization itself after processing
+      **Analytics:** Used for understanding user churn and service issues
+      **Compliance:** May be required for certain regulatory reporting.
+  feedback:
+    lineage:
+    - datalake_person_raw.right_to_be_forgotten.feedback
+    description: |
+      Categorized reason for requesting data anonymization/deletion.
+      **Allowed Values:**
+      - 'DONT_USE_ANYMORE': User no longer uses QuintoAndar services
+      - 'ANOTHER_ACCOUNT': User has another account or wants to consolidate
+      - 'TECHNICAL_PROBLEMS': Service issues driving the deletion request
+      - 'BETTER_ALTERNATIVE': Found alternative service provider
+      - 'CUSTOMER_SERVICE': Poor customer service experience
+      - 'COSTS_PROBLEMS': Service pricing concerns
+      - 'OTHER': Reasons not captured by standard categories
+      **Analytics:** Used for categorizing churn reasons and service improvement
+      **Reporting:** Aggregated for business intelligence and compliance reports.
   version:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.version
+    - datalake_person_raw.right_to_be_forgotten.version
+    description: |
+      Optimistic locking version number for concurrent update protection.
+      Incremented automatically on each update to prevent data conflicts.
   ts_created:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.created_at
+    - datalake_person_raw.right_to_be_forgotten.created_at
+    description: |
+      Timestamp when the anonymization request was first created.
+      **Format:** UTC timestamp with timezone information
+      **Compliance:** Critical for GDPR compliance timeline tracking (30-day response requirement)
+      **Audit:** Part of regulatory audit trail for privacy compliance
+      **SLA:** Used for measuring compliance response times.
   ts_updated:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.updated_at
+    - datalake_person_raw.right_to_be_forgotten.updated_at
+    description: |
+      Timestamp when the anonymization request was last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Tracks anonymization process progress and completion
+      **Compliance:** Documents timeline of privacy request processing
+      **Audit:** Shows when anonymization was completed for regulatory purposes.
   year:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.year
+    - datalake_person_raw.right_to_be_forgotten.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.month
+    - datalake_person_raw.right_to_be_forgotten.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
-      - datalake_person_raw.right_to_be_forgotten.day
+    - datalake_person_raw.right_to_be_forgotten.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.

@@ -3,7 +3,35 @@ dag:
   schedule_start_date: 2020, 1, 1
   owner: Data Rede
   documentation:
-    dag_purpose: "This DAG creates the model for QuintoAndar's natural persons."
+    dag_purpose: |
+      This DAG creates the dimensional person model that serves as the central person dimension for QuintoAndar's data warehouse.
+      Provides a single source of truth for person analytics, reporting, and business intelligence across all product domains.
+      
+      **Business Context:**
+      The person dimension is fundamental to QuintoAndar's analytics ecosystem, enabling:
+      - **Customer Analytics**: Comprehensive view of natural persons across all touchpoints
+      - **Cross-Product Analysis**: Unified person view spanning rental, sales, company, and financial products
+      - **Behavioral Analytics**: Person-centric analysis of interactions, preferences, and lifecycle
+      - **Market Segmentation**: Geographic, demographic, and behavioral person segmentation
+      - **Compliance Reporting**: LGPD/GDPR compliant analytics with proper data governance
+
+      **Data Integration:**
+      - **Source Systems**: Consolidates data from Person, Company, and Main systems
+      - **Enrichment Layer**: Consumes enriched person data with business relationships
+      - **Cross-References**: Links to other dimensions (geography, time, product entities)
+      - **Fact Table Integration**: Supports all person-related fact tables and metrics
+      
+      **Operational Excellence:**
+      - **Performance Optimization**: Optimized for analytical query patterns and BI tools
+      - **Data Quality**: Comprehensive validation and business rule enforcement
+      - **Change Management**: Tracks person attribute changes over time
+      - **Scalability**: Supports QuintoAndar's growing customer base across multiple countries
+      
+      **Governance & Compliance:**
+      - **Data Privacy**: LGPD/GDPR compliant with proper masking and access controls
+      - **Data Lineage**: Full traceability from source systems to analytical outputs
+      - **Business Metadata**: Rich business context for self-service analytics
+      - **Quality Monitoring**: Automated data quality checks and alerting
 workflow:
   type: query_delta
   layer: dw

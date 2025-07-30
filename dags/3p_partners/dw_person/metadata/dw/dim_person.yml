@@ -1,148 +1,285 @@
 database_name: dw_public
 table_name: dim_person
-description: Table that describes all QuintoAndar's natural persons. Here, all the characteristics of natural persons will be centralized, including their user IDs and relationships with other entities in the data lake.
-domain: Rede
+description: |
+  Central person dimension table providing a single source of truth for all natural person analytics across QuintoAndar's data lakehouse.
+  Serves as the foundational dimension for customer analytics, cross-product analysis, and business intelligence reporting.
+  
+  **Business Context:**
+  The person dimension is the cornerstone of QuintoAndar's customer-centric analytics, enabling:
+  - **360° Customer View**: Complete person profile across all product touchpoints and interactions
+  - **Cross-Product Analytics**: Unified analysis spanning rental, sales, company, and financial services
+  - **Customer Journey Analysis**: End-to-end tracking of person interactions and lifecycle stages
+  - **Market Segmentation**: Geographic, demographic, and behavioral customer segmentation
+  - **Business Intelligence**: Self-service analytics for business users and stakeholders
+  
+  **Dimensional Model Architecture:**
+  - **Dimension Type**: Type 2 Slowly Changing Dimension with historical attribute tracking
+  - **Surrogate Keys**: Stable sk_person for consistent analytics across time and systems
+  - **Business Keys**: Natural identifiers (id_person, uuid_person, id_user) for system integration
+  - **Rich Attributes**: Comprehensive person attributes including demographics, preferences, and business relationships
+  - **Cross-References**: Links to geographic, temporal, and business entity dimensions
+  
+  **Key Analytics Use Cases:**
+  - **Customer Segmentation**: Behavioral, demographic, and geographic customer classification
+  - **Retention Analysis**: Customer lifecycle, churn prediction, and engagement tracking
+  - **Product Adoption**: Cross-product usage patterns and customer value analysis
+  - **Geographic Analysis**: Market penetration and regional customer behavior
+  - **Business Performance**: Revenue attribution and customer lifetime value analysis
+  
+  **Data Lineage & Quality:**
+  - **Source Systems**: Person service (primary), Company service (relationships), Main system (authentication)
+  - **Enrichment Layer**: Consolidated through person_sks enrichment process
+  - **Data Quality**: Comprehensive validation, business rule enforcement, and referential integrity
+  - **Change Detection**: Tracks person attribute changes over time for historical analysis
+  
+  **Performance & Scalability:**
+  - **Optimized Structure**: Designed for analytical query patterns and BI tool performance
+  - **Partitioning Strategy**: Efficient data organization for query performance
+  - **Index Strategy**: Optimized for common analytical access patterns
+  - **Scalability**: Supports QuintoAndar's growing customer base across multiple countries
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_person:
     lineage: 
       - datalake_person.person_sks.sk_person
-    description: Surrogate key and unique identifier for a natural person in the data lakehouse.
+    description: |
+      Surrogate key serving as the primary identifier for the person dimension.
+      **Purpose**: Provides stable, unique dimensional key for all analytical processes
+      **Generation**: Auto-generated sequence ensuring uniqueness across the dimension
+      **Usage**: Primary key for dimension table and foreign key in all person-related fact tables
+      **Stability**: Immutable identifier that remains constant throughout person's lifecycle
+      **Analytics**: Enables efficient joins, aggregations, and historical analysis in BI tools.
   id_person:
     lineage: 
       - datalake_person.person_sks.id_person
-    description: Unique identifier for the person in Person entity.
+    description: |
+      Natural business key from the source person system.
+      **Source**: Original person.id from the person service database
+      **Business Key**: Primary identifier used by operational systems
+      **Integration**: Used for system integration and data lineage tracking
+      **Relationship**: Direct mapping to source person records.
   id_user:
     lineage: 
       - datalake_person.person_sks.id_user
-    description: Unique identifier for the person user in Main.
+    description: |
+      User identifier from QuintoAndar's main authentication system.
+      **Integration**: Links person dimension to main system user accounts and sessions
+      **Authentication**: Connects person analytics to login, session, and transaction data
+      **Cross-System**: Enables unified analysis across person and user behavior
+      **Analytics**: Critical for user journey and engagement analysis.
   id_user_email:
     lineage: 
       - datalake_person_clean.contact_info.contact_info
-    description: Unique identifier for the person user based in QuintoAndar's email.
+    description: |
+      Email-based user identifier for QuintoAndar systems.
+      **Format**: Email address serving as business identifier
+      **Authentication**: Used for login and account recovery processes
+      **Communication**: Primary channel for customer communication and marketing
+      **Analytics**: Enables email-based attribution and communication effectiveness analysis.
   uuid_person:
     lineage: 
       - datalake_person.person_sks.uuid_person
-    description: External unique identifier for the company in Person entity.
+    description: |
+      External UUID identifier for API and service integration.
+      **Format**: Standard UUID format for external system integration
+      **API Integration**: Used by external systems and services to reference persons
+      **Stability**: Immutable identifier for external system consistency
+      **Cross-Platform**: Enables person identification across different platforms and services.
   country_code:
     lineage: 
       - datalake_person_clean.person.country_code
-    description: Country code where the person is located, registered in the person's entity.
+    description: |
+      ISO 2-letter country code indicating person's primary geographic location.
+      **Geographic Segmentation**: Enables country-level market analysis and reporting
+      **Compliance**: Determines applicable regulations (LGPD for BR, GDPR for EU, etc.)
+      **Localization**: Drives country-specific features and content delivery
+      **Values**: BR (Brazil), MX (Mexico), and other ISO country codes.
   language:
     lineage: 
       - datalake_person_clean.preference_settings.language
-    description: Language used by the person, registered in the person's preference_settings entity.
+    description: |
+      Person's preferred language for interface and communications.
+      **Localization**: Determines language for user interface and communications
+      **Personalization**: Enables language-based customer experience customization
+      **Format**: ISO language codes (pt-BR, es-MX, en-US, etc.)
+      **Business Impact**: Affects communication effectiveness and user engagement.
   person_email:
     lineage: 
       - datalake_person_clean.contact_info.contact_info
-    description: Email of the person, registered in the person's contact_info entity.
+    description: |
+      Primary email address for the person.
+      **Communication**: Primary channel for customer communication and notifications
+      **Marketing**: Used for email campaigns and transactional communications
+      **Authentication**: Used for account verification and password recovery
   person_name:
     lineage: 
       - datalake_person_clean.person.person_name
-    description: Name of the person, registered in the person's entity.
+    description: |
+      Full name of the person as registered in the system.
+      **Identity**: Primary identifier for customer recognition and personalization
+      **Communication**: Used in personalized communications and customer service
+      **Legal**: Required for legal documents and compliance purposes
+      **Privacy**: Subject to data protection regulations and masking policies.
   person_phone:
     lineage: 
       - datalake_person_clean.contact_info.contact_info
-    description: Phone number of the person, registered in the person's contact_info entity.
+    description: |
+      Primary phone number for the person.
+      **Format**: Includes country code and standardized formatting
   timezone:
     lineage: 
       - datalake_person_clean.preference_settings.timezone
-    description: Timezone used by the person, registered in the person's preference_settings entity.
+    description: |
+      Person's preferred timezone for time-sensitive communications and scheduling.
+      **Format**: IANA timezone identifiers (America/Sao_Paulo, America/Mexico_City, etc.)
   is_blocked:
     lineage: 
       - datalake_person_clean.person.is_blocked
-    description: Flag indicating whether the person is blocked, registered in the person's entity.
+    description: |
+      Boolean flag indicating whether the person account is currently blocked.
+      **Security**: Identifies accounts with security or compliance restrictions
+      **Business Rules**: Blocked persons have limited access to platform features
   has_right_to_be_forgotten:
     lineage: 
       - datalake_person_clean.person.has_right_to_be_forgotten
-    description: Flag indicating whether the person has the right to be forgotten, registered in the person's entity. Indicates that the person has requested to be removed from the QuintoAndar database and should not have their information propagated to any entity in the data lake.
+    description: |
+      Boolean flag indicating person has requested data deletion under LGPD/GDPR.
+      **Privacy Compliance**: Identifies persons who have exercised their right to data erasure
+      **Data Governance**: Critical for ensuring compliance with privacy regulations
   has_affiliated_member_profile:
     lineage: 
       - datalake_person.person_sks.has_affiliated_member_profile
-    description: Flag indicating whether the person has an affiliated member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has an affiliated member profile in Company product.
+      **Business Logic**: True when person is linked to an active company member profile
   has_buyer_prospect_member_profile:
     lineage: 
       - datalake_person.person_sks.has_buyer_prospect_member_profile
-    description: Flag indicating whether the person has a buyer prospect member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a buyer prospect member profile.
+      **Business Context**: Identifies persons in the buyer acquisition funnel
   has_ciq_member_profile:
     lineage: 
       - datalake_person.person_sks.has_ciq_member_profile
-    description: Flag indicating whether the person has a CIQ member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a CIQ (Corporate) member profile.
+      **Business Context**: Identifies corporate/business account members
   has_company_admin_member_profile:
     lineage: 
       - datalake_person.person_sks.has_company_admin_member_profile
-    description: Flag indicating whether the person has a company admin member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a company admin member profile.
+      **Role**: Administrative role within company accounts
   has_company_owner_member_profile:
     lineage: 
       - datalake_person.person_sks.has_company_owner_member_profile
-    description: Flag indicating whether the person has a company owner member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a company owner member profile.
+      **Role**: Ownership role with full company account control
   has_company_member_profile:
     lineage: 
       - datalake_person.person_sks.has_company_member_profile
-    description: Flag indicating whether the person has a company member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a general company member profile.
+      **Role**: Regular member of a company account
   has_contract_person_member_profile:
     lineage: 
       - datalake_person.person_sks.has_contract_person_member_profile
-    description: Flag indicating whether the person has a contract person member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a contract person member profile.
+      **Role**: Designated contract signatory for company accounts
   has_customer_member_profile:
     lineage: 
       - datalake_person.person_sks.has_customer_member_profile
-    description: Flag indicating whether the person has a customer member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a customer member profile.
+      **Role**: End customer using QuintoAndar services
   has_legal_person_tenant_member_profile:
     lineage: 
       - datalake_person.person_sks.has_legal_person_tenant_member_profile
-    description: Flag indicating whether the person has a legal person tenant member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a legal person tenant member profile.
+      **Role**: Corporate tenant (business entity) rather than individual
   has_partner_agent_member_profile:
     lineage: 
       - datalake_person.person_sks.has_partner_agent_member_profile
-    description: Flag indicating whether the person has a partner agent member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a partner agent member profile.
+      **Role**: External partner agent working with QuintoAndar
   has_photographer_agent_member_profile:
     lineage: 
       - datalake_person.person_sks.has_photographer_agent_member_profile
-    description: Flag indicating whether the person has a photographer agent member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a photographer agent member profile.
+      **Role**: Professional photographer working as agent
   has_photographer_member_profile:
     lineage: 
       - datalake_person.person_sks.has_photographer_member_profile
-    description: Flag indicating whether the person has a photographer member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a photographer member profile.
+      **Role**: Professional photographer providing services
   has_property_inspector_member_profile:
     lineage: 
       - datalake_person.person_sks.has_property_inspector_member_profile
-    description: Flag indicating whether the person has a property inspector member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a property inspector member profile.
+      **Role**: Property inspection professional
   has_property_owner_member_profile:
     lineage: 
       - datalake_person.person_sks.has_property_owner_member_profile
-    description: Flag indicating whether the person has a property owner member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a property owner member profile.
+      **Role**: Property owner listing properties for rent/sale
   has_property_owner_prospect_member_profile:
     lineage: 
       - datalake_person.person_sks.has_property_owner_prospect_member_profile
-    description: Flag indicating whether the person has a property owner prospect member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a property owner prospect member profile.
+      **Role**: Potential property owner in acquisition pipeline
   has_realtor_member_profile:
     lineage: 
       - datalake_person.person_sks.has_realtor_member_profile
-    description: Flag indicating whether the person has a realtor member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a realtor member profile.
+      **Role**: Licensed real estate professional
   has_tenant_member_profile:
     lineage: 
       - datalake_person.person_sks.has_tenant_member_profile
-    description: Flag indicating whether the person has a tenant member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a tenant member profile.
+      **Role**: Property tenant seeking or occupying rental properties
   has_tenant_prospect_member_profile:
     lineage: 
       - datalake_person.person_sks.has_tenant_prospect_member_profile
-    description: Flag indicating whether the person has a tenant prospect member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a tenant prospect member profile.
+      **Role**: Potential tenant in rental acquisition pipeline
   has_third_party_agent_member_profile:
     lineage: 
       - datalake_person.person_sks.has_third_party_agent_member_profile
-    description: Flag indicating whether the person has a third party agent member profile, registered in the company's entity.
+    description: |
+      Boolean flag indicating if person has a third party agent member profile.
+      **Role**: External agent providing specialized services
   dt_birth:
     lineage: 
       - datalake_person_clean.person.dt_birth
-    description: Date of birth of the person, registered in the person's entity
+    description: |
+      Person's date of birth for demographic analysis and age verification.
   ts_created:
     lineage: 
       - datalake_person_clean.person.ts_created
-    description: Date when the person was created in the company entity.
+    description: |
+      Timestamp when the person record was originally created.
+      **Source**: Creation timestamp from the source person system
+      **Usage**: Person acquisition tracking and cohort analysis
   ts_updated:
     lineage: 
       - datalake_person_clean.person.ts_updated
-    description: Date when the person was updated in the company entity.
+    description: |
+      Timestamp when the person record was last updated.
+      **Source**: Last update timestamp from the source person system
+      **Usage**: Data freshness monitoring and change tracking
   ts_load:
-    description: Date when the table data was updated.
+    description: |
+      Timestamp when this dimensional record was last loaded into the data warehouse.

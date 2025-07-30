@@ -2,48 +2,137 @@
 database_name: datalake_person_clean
 table_name: contact_info
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Contact info of the person, such as phone number, email, etc.
+domain: 3P Partners
+description: |
+  Contact information for persons including emails, phone numbers, and push notification tokens.
+  Supports multiple contact methods per person with priority ranking and validation status.
+  
+  **Business Context:**
+  - Enables multi-channel communication with users
+  - Supports contact preference management
+  - Implements contact validation and verification workflows
+  - Critical for user authentication and password recovery
+  - Used for marketing communications and transactional notifications
+  
+  **Data Architecture:**
+  - One-to-many relationship with person (person_id foreign key)
+  - JSONB extra_info field for flexible metadata storage
+  - Contact information is sanitized before storage for security
+  - Supports contact activation/deactivation for lifecycle management
+  
+  **Contact Types & Validation:**
+  - EMAIL: Email addresses with validation rules and verification status
+  - PHONE: Phone numbers with country-specific formatting and SMS verification
+  - PUSH_NOTIFICATION: Device tokens for mobile push notifications
+  
+  **Priority System:**
+  - PRIMARY: Main contact method for critical communications
+  - SECONDARY: Backup contact method
+  - BUSINESS: Business-related communications only
 columns:
   id:
     lineage:
     - datalake_person_raw.contact_info.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the contact info record.
+      Used for internal database relationships and efficient indexing.
   uuid_contact:
     lineage:
     - datalake_person_raw.contact_info.contactuuid
+    description: |
+      Business identifier - Unique UUID for this contact information, automatically generated.
+      Used for external API references and cross-service communication when referring to specific contact methods.
   id_person:
     lineage:
     - datalake_person_raw.contact_info.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** Many-to-One with person table
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links contact information to the owning person record.
   contact_info:
     lineage:
     - datalake_person_raw.contact_info.contact_info
+    description: |
+      The actual contact information value (email address, phone number, or push token).
+      **Data Processing:** Subject to sanitization based on contact type
+      **Validation:** Format validation applied based on category (email format, phone format, etc.)
+      **Security:** Considered PII, handled according to data protection policies
+      **Indexing:** Indexed for fast lookup during authentication and contact resolution.
   category:
     lineage:
     - datalake_person_raw.contact_info.category
+    description: |
+      Type of contact information stored in this record.
+      **Allowed Values:**
+      - 'EMAIL': Email addresses for digital communication
+      - 'PHONE': Phone numbers for SMS and voice communication  
+      - 'PUSH_NOTIFICATION': Device tokens for mobile app notifications
+      **Business Rules:** Determines validation rules and communication preferences
+      **Integration:** Used by notification services to route messages appropriately.
   extra_info:
     lineage:
     - datalake_person_raw.contact_info.extra_info
+    description: |
+      JSONB field containing additional metadata about the contact information.
+      **Structure:** Flexible JSON document supporting various contact-specific attributes
+      **Common Fields:** verification_status, country_code, device_info, preferences
+      **Usage:** Stores verification tokens, device information, and communication preferences
+      **Querying:** Supports JSON queries for filtering and analytics.
   priority:
     lineage:
     - datalake_person_raw.contact_info.priority
+    description: |
+      Priority ranking for this contact method relative to other contacts for the same person.
+      **Allowed Values:**
+      - 'PRIMARY': Main contact method, used for critical communications
+      - 'SECONDARY': Backup contact method, used when primary is unavailable
+      - 'BUSINESS': Dedicated to business communications and marketing
+      **Business Logic:** Notification systems use priority to determine contact order
+      **Rules:** Each person should have one primary contact per category when possible.
   version:
     lineage:
     - datalake_person_raw.contact_info.version
+    description: |
+      Optimistic locking version number for concurrent update protection.
+      Incremented automatically on each update to prevent data conflicts.
   is_active:
     lineage:
     - datalake_person_raw.contact_info.is_active
+    description: |
+      Boolean flag indicating whether this contact method is currently active and should be used for communications.
+      **Values:** true (active, can receive communications), false (inactive, should not be contacted)
+      **Business Rules:** Inactive contacts are excluded from notification campaigns
+      **Lifecycle:** Contacts may be deactivated due to bounces, unsubscribes, or verification failures.
   ts_created:
     lineage:
     - datalake_person_raw.contact_info.created_at
+    description: |
+      Timestamp when the contact information was first added to the system.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Contact acquisition tracking, verification workflow timing, audit trail.
   ts_updated:
     lineage:
     - datalake_person_raw.contact_info.updated_at
+    description: |
+      Timestamp when the contact information was last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Change tracking, verification status updates, preference modifications.
   year:
     lineage:
     - datalake_person_raw.contact_info.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
     - datalake_person_raw.contact_info.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
     - datalake_person_raw.contact_info.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.

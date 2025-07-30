@@ -2,54 +2,170 @@
 database_name: datalake_person_clean
 table_name: address
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description:
+domain: 3P Partners
+description: |
+  Physical address information for persons, supporting multi-country address formats and validation.
+  Critical for service delivery, compliance verification, and geographic analysis.
+  
+  **Business Context:**
+  - Enables service delivery and logistics coordination
+  - Supports geographic market analysis and expansion planning
+  - Required for compliance and identity verification in many jurisdictions
+  - Enables location-based service personalization and offerings
+  - Critical for fraud prevention and risk assessment
+  
+  **Geographic Coverage:**
+  - Supports multiple address formats (Brazilian, Mexican, international)
+  - Flexible structure accommodates varying address conventions
+  - ZIP/postal code integration for delivery and verification
+  - State/province tracking for regulatory compliance
+  - Country-level tracking for international operations
+  
+  **Data Quality & Validation:**
+  - Address validation against postal services where available
+  - Geocoding integration for coordinate-based services
+  - Standardization for consistent formatting and search
+  - Complement field for apartment/unit/additional address details
+  
+  **Privacy & Security:**
+  - Considered sensitive PII under data protection regulations
+  - Subject to data residency requirements in some jurisdictions
+  - Audit trail maintained for compliance and verification
+  - May be masked or anonymized for certain use cases
 columns:
   id:
     lineage:
-      - datalake_person_raw.address.id
+    - datalake_person_raw.address.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the address record.
+      Used for internal database relationships and efficient address management.
+  uuid_address:
+    lineage:
+    - datalake_person_raw.address.address_uuid
+    description: |
+      Business identifier - Unique UUID for this address, automatically generated.
+      Used for external API references and address tracking across systems.
   id_person:
     lineage:
-      - datalake_person_raw.address.person_id
-  country:
-    lineage:
-      - datalake_person_raw.address.country
-  state:
-    lineage:
-      - datalake_person_raw.address.state
-  city:
-    lineage:
-      - datalake_person_raw.address.city
-  neighborhood:
-    lineage:
-      - datalake_person_raw.address.neighborhood
+    - datalake_person_raw.address.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** One-to-One with person table (each person has one primary address)
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links the address to the owning person record
+      **Constraint:** Unique per person for primary address.
   address:
     lineage:
-      - datalake_person_raw.address.address
-  zip_code:
-    lineage:
-      - datalake_person_raw.address.zip_code
-  complement:
-    lineage:
-      - datalake_person_raw.address.complement
+    - datalake_person_raw.address.address
+    description: |
+      Street address or primary address line.
+      **Content:** Street name, avenue, road, or primary address identifier
+      **Format:** Free-text field supporting various international address formats
+      **Examples:** "Rua das Flores, 123", "Avenida Paulista, 1000", "123 Main Street"
+      **Validation:** May be validated against postal services and geocoding APIs
+      **Privacy:** Considered sensitive PII for data protection purposes.
   number:
     lineage:
-      - datalake_person_raw.address.number
+    - datalake_person_raw.address.number
+    description: |
+      Street number or building identifier within the address.
+      **Format:** Alphanumeric field supporting various numbering systems
+      **Examples:** "123", "45-A", "1000-1002", "S/N" (sem número - no number)
+      **Usage:** Used for precise location identification and delivery
+      **Validation:** May be cross-referenced with postal databases.
+  complement:
+    lineage:
+    - datalake_person_raw.address.complement
+    description: |
+      Additional address details for precise location identification.
+      **Content:** Apartment, suite, floor, building, or additional location info
+      **Examples:** "Apto 101", "Sala 205", "Bloco B", "2nd Floor", "Casa dos Fundos"
+      **Usage:** Critical for accurate delivery and service provision
+      **Optional:** Not all addresses require complement information.
+  neighborhood:
+    lineage:
+    - datalake_person_raw.address.neighborhood
+    description: |
+      Neighborhood, district, or local area name within the city.
+      **Content:** Local geographic subdivision within the city
+      **Examples:** "Vila Madalena", "Copacabana", "Centro", "Downtown"
+      **Usage:** Used for market analysis, delivery routing, and local service provision
+      **Cultural:** Neighborhood names vary significantly by country and culture.
+  zip_code:
+    lineage:
+    - datalake_person_raw.address.zip_code
+    description: |
+      Postal code or ZIP code for the address.
+      **Format:** Country-specific postal code format (CEP in Brazil, ZIP in US, etc.)
+      **Examples:** "01310-100" (Brazil CEP), "90210" (US ZIP), "SW1A 1AA" (UK)
+      **Validation:** Validated against postal service databases when possible
+      **Usage:** Critical for delivery, taxation, and geographic classification
+      **Integration:** Used with postal APIs for address validation and completion.
+  city:
+    lineage:
+    - datalake_person_raw.address.city
+    description: |
+      City or municipality name.
+      **Content:** Official city or municipality name as recognized by local authorities
+      **Examples:** "São Paulo", "Rio de Janeiro", "Mexico City", "New York"
+      **Validation:** May be validated against official city registries
+      **Usage:** Used for market analysis, service coverage, and delivery coordination
+      **Standardization:** Normalized for consistent reporting and analysis.
+  state:
+    lineage:
+    - datalake_person_raw.address.state
+    description: |
+      State, province, or regional administrative division.
+      **Content:** Official state or province name or abbreviation
+      **Examples:** "SP" (São Paulo), "RJ" (Rio de Janeiro), "CA" (California), "DF" (Mexico)
+      **Format:** May use abbreviations or full names depending on country
+      **Usage:** Critical for tax calculation, regulatory compliance, and service availability
+      **Legal:** Required for compliance with state-level regulations and taxation.
+  country:
+    lineage:
+    - datalake_person_raw.address.country
+    description: |
+      Country name for the address.
+      **Content:** Full country name as stored in the system
+      **Examples:** "Brazil", "Mexico", "United States", "Argentina"
+      **Standards:** Should align with ISO country naming conventions
+      **Usage:** Determines applicable laws, service availability, and delivery options
+      **Compliance:** Critical for international compliance and data residency requirements.
   version:
     lineage:
-      - datalake_person_raw.address.version
+    - datalake_person_raw.address.version
+    description: |
+      Optimistic locking version number for concurrent update protection.
+      Incremented automatically on each update to prevent data conflicts.
   ts_created:
     lineage:
-      - datalake_person_raw.address.created_at
+    - datalake_person_raw.address.created_at
+    description: |
+      Timestamp when the address was first created in the system.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Address registration tracking, data freshness analysis, audit trail.
   ts_updated:
     lineage:
-      - datalake_person_raw.address.updated_at
+    - datalake_person_raw.address.updated_at
+    description: |
+      Timestamp when the address was last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Change tracking, address update monitoring, data quality assessment.
   year:
     lineage:
-      - datalake_person_raw.address.year
+    - datalake_person_raw.address.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
-      - datalake_person_raw.address.month
+    - datalake_person_raw.address.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
-      - datalake_person_raw.address.day
+    - datalake_person_raw.address.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.

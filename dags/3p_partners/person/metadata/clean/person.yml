@@ -2,48 +2,119 @@
 database_name: datalake_person_clean
 table_name: person
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Entity of a natural person.
+domain: 3P Partners
+description: |
+  Core entity representing a natural person in QuintoAndar's ecosystem. This table serves as the central registry for all person data,
+  supporting multi-country operations (Brazil, Mexico) and acting as the single source of truth for person identity across all systems.
+  
+  **Business Context:**
+  - Central hub for person/user data management
+  - Supports user registration, authentication, and profile management
+  - Enables identity resolution across multiple systems
+  - Implements blocking/unblocking for security and compliance
+  - Provides UUID-based external system integration
+  
+  **Data Quality & Constraints:**
+  - Gender: Limited to 'male' or 'female' values
+  - Country Code: ISO 2-letter country codes (BR, MX, etc.)
+  - Block Reason: Enum values for different blocking scenarios
+  - UUID Generation: Automatic UUID assignment for external system reference
+  - Optimistic Locking: Version field prevents concurrent update conflicts
+  
+  **Audit & Compliance:**
+  - Full audit trail via Hibernate Envers (person_aud table)
+  - GDPR compliance through Right to be Forgotten integration
+  - Change tracking with user attribution and timestamps
 columns:
   id:
     lineage:
     - datalake_person_raw.person.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the person record.
+      Used for internal database relationships and performance optimization.
   uuid_person:
     lineage:
     - datalake_person_raw.person.personuuid
+    description: |
+      Business identifier - Unique UUID for this person, automatically generated.
+      This UUID is used for external system integration, API responses, and cross-service communication.
+      Immutable after creation and serves as the stable external reference for this person.
   person_name:
     lineage:
     - datalake_person_raw.person.name
+    description: |
+      Full name of the person as provided during registration or profile updates.
+      Subject to data sanitization for security. May be updated by the person or system administrators.
   gender:
     lineage:
     - datalake_person_raw.person.gender
+    description: |
+      Person's gender identity. Constrained to specific values for data consistency.
+      **Allowed Values:** 'male', 'female'
+      **Business Rules:** Required for demographic analysis and personalization features.
   country_code:
     lineage:
     - datalake_person_raw.person.country_code
+    description: |
+      ISO 2-letter country code indicating the person's primary country of residence/operation.
+      **Common Values:** 'BR' (Brazil), 'MX' (Mexico)
+      **Business Impact:** Determines applicable regulations, document validation rules, and feature availability.
+      **Data Governance:** Required field for compliance and localization.
   photo:
     lineage:
     - datalake_person_raw.person.photo
+    description: |
+      URL or path to the person's profile photo. Optional field that may be populated from
+      social login providers or direct uploads. Subject to content moderation policies.
   version:
     lineage:
     - datalake_person_raw.person.version
+    description: |
+      Optimistic locking version number. Incremented on every update to prevent
+      concurrent modification conflicts. Critical for data integrity in high-concurrency scenarios.
   is_blocked:
     lineage:
     - datalake_person_raw.person.blocked
+    description: |
+      Boolean flag indicating if the person is currently blocked. Derived from block_reason field.
+      **Values:** true (person is blocked), false (person is active)
+      **Business Rules:** Blocked users cannot perform certain actions and may have restricted access.
   dt_birth:
     lineage:
     - datalake_person_raw.person.birth_date
+    description: |
+      Person's date of birth. Used for age verification, legal compliance, and demographic analysis.
+      **Validation:** Must be a reasonable date (not future, not impossibly old)
+      **Privacy:** Considered sensitive PII, subject to data protection regulations.
   ts_created:
     lineage:
     - datalake_person_raw.person.created_at
+    description: |
+      Timestamp when the person record was first created in the system.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Audit trail, account age analysis, onboarding funnel tracking.
   ts_updated:
     lineage:
     - datalake_person_raw.person.updated_at
+    description: |
+      Timestamp when the person record was last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Change tracking, data freshness monitoring, audit purposes.
   year:
     lineage:
     - datalake_person_raw.person.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
     - datalake_person_raw.person.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
     - datalake_person_raw.person.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.

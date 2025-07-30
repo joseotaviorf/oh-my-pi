@@ -2,57 +2,169 @@
 database_name: datalake_person_clean
 table_name: identity_document
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Identity documents associated with the person, such as RG or CPF.
+domain: 3P Partners
+description: |
+  Government-issued identity documents for persons, supporting multi-country compliance and identity verification.
+  Critical for KYC (Know Your Customer) processes, age verification, and regulatory compliance.
+  
+  **Business Context:**
+  - Enables identity verification and fraud prevention
+  - Supports multi-country operations with local document types
+  - Implements document validation workflows and status tracking
+  - Critical for onboarding, account verification, and compliance reporting
+  - Stores document attachments and validation metadata
+  
+  **Document Types by Country:**
+  - **Brazil (BR):** CPF (Tax ID), RG (Identity Card), RNE (Foreigner Registry)
+  - **Mexico (MX):** RFC (Tax Registry), CURP (Population Registry)
+  - **International:** PASSPORT (Universal travel document)
+  
+  **Validation & Compliance:**
+  - Document number format validation per country and type
+  - Issuing country verification against document type
+  - Document status lifecycle (ACTIVE/INACTIVE)
+  - Attachment storage for document scans and photos
+  - Validation status tracking for verification workflows
+  
+  **Data Architecture:**
+  - One-to-many relationship with person (person_id foreign key)
+  - JSONB extra_info field for document-specific metadata
+  - Document numbers are sanitized and validated before storage
+  - Supports unique constraints to prevent duplicate documents
 columns:
   id:
     lineage:
     - datalake_person_raw.identity_document.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the identity document record.
+      Used for internal database relationships and efficient document management.
   uuid_document:
     lineage:
     - datalake_person_raw.identity_document.documentuuid
+    description: |
+      Business identifier - Unique UUID for this identity document, automatically generated.
+      Used for external API references and document tracking across systems.
   id_person:
     lineage:
     - datalake_person_raw.identity_document.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** Many-to-One with person table
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links identity documents to the owning person record.
   identification_number:
     lineage:
     - datalake_person_raw.identity_document.identification_number
-  document_validation_status:
-    lineage:
-    - datalake_person_raw.identity_document.document_validation_status
+    description: |
+      The actual document number as issued by the government authority.
+      **Data Processing:** Sanitized based on document type (removes special characters, formatting)
+      **Validation:** Format validation applied per document type and issuing country
+      **Security:** Considered highly sensitive PII, encrypted at rest
+      **Uniqueness:** Originally enforced unique constraint (may have multiple documents per person now)
+      **Examples:** CPF (11 digits), RFC (13 characters), Passport (alphanumeric).
   document_type:
     lineage:
     - datalake_person_raw.identity_document.document_type
+    description: |
+      Type of government-issued document.
+      **Allowed Values:**
+      - 'CPF': Brazilian individual taxpayer registry (Cadastro de Pessoas Físicas)
+      - 'RG': Brazilian identity card (Registro Geral)
+      - 'RNE': Brazilian foreigner registry (Registro Nacional de Estrangeiro)
+      - 'RFC': Mexican tax registry (Registro Federal de Contribuyentes)
+      - 'CURP': Mexican population registry (Clave Única de Registro de Población)
+      - 'PASSPORT': International travel document
+      **Business Rules:** Must be compatible with issuing country
+      **Validation:** Different validation rules apply per document type.
   issuing_country:
     lineage:
     - datalake_person_raw.identity_document.issuing_country
+    description: |
+      Country code of the authority that issued the document.
+      **Format:** ISO 2-letter country codes (BR, MX, US, etc.)
+      **Validation:** Must be compatible with document_type
+      **Business Rules:** CPF/RG/RNE must be issued by BR, RFC/CURP by MX
+      **Compliance:** Used for determining applicable regulations and validation rules.
   extra_info:
     lineage:
     - datalake_person_raw.identity_document.extra_info
+    description: |
+      JSONB field containing additional document-specific metadata.
+      **Structure:** Flexible JSON document supporting various document attributes
+      **Common Fields:** verification_details, expiration_date, issue_date, document_status
+      **Usage:** Stores verification results, expiration tracking, and document-specific data
+      **Querying:** Supports JSON queries for compliance reporting and analytics.
   attachment_path:
     lineage:
     - datalake_person_raw.identity_document.attachment_path
+    description: |
+      File system path or URL to the scanned/photographed document image.
+      **Security:** Points to secure storage with access controls
+      **Formats:** Typically PDF, JPG, PNG files
+      **Compliance:** Required for certain verification levels and audit trails
+      **Retention:** Subject to data retention policies and GDPR requirements.
+  document_validation_status:
+    lineage:
+    - datalake_person_raw.identity_document.document_validation_status
+    description: |
+      Current validation status of the document in the verification workflow.
+      **Common Values:** 'not_validated', 'pending', 'validated', 'rejected', 'expired'
+      **Workflow:** Tracks document through verification process
+      **Business Impact:** Affects user permissions and account status
+      **Integration:** Used by verification services and compliance systems.
   document_name:
     lineage:
     - datalake_person_raw.identity_document.document_name
+    description: |
+      Human-readable name or title for the document.
+      **Usage:** Display purposes, user interface labels
+      **Examples:** "Primary CPF", "Backup Passport", "Work Visa"
+      **Optional:** May be system-generated or user-provided.
   status:
     lineage:
     - datalake_person_raw.identity_document.status
+    description: |
+      Lifecycle status of the document record.
+      **Allowed Values:**
+      - 'ACTIVE': Document is current and valid for use
+      - 'INACTIVE': Document is disabled or superseded
+      **Business Rules:** Only ACTIVE documents are used for verification
+      **Lifecycle:** Documents may be deactivated when replaced or expired.
   version:
     lineage:
     - datalake_person_raw.identity_document.version
+    description: |
+      Optimistic locking version number for concurrent update protection.
+      Incremented automatically on each update to prevent data conflicts.
   ts_created:
     lineage:
     - datalake_person_raw.identity_document.created_at
+    description: |
+      Timestamp when the identity document was first added to the system.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Document submission tracking, verification workflow timing, audit trail.
   ts_updated:
     lineage:
     - datalake_person_raw.identity_document.updated_at
+    description: |
+      Timestamp when the identity document was last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Change tracking, validation status updates, document lifecycle management.
   year:
     lineage:
     - datalake_person_raw.identity_document.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
     - datalake_person_raw.identity_document.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
     - datalake_person_raw.identity_document.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.

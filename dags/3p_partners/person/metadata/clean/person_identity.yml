@@ -2,45 +2,151 @@
 database_name: datalake_person_clean
 table_name: person_identity
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Identifiers of each person, such as email, CPF and phone number.
+domain: 3P Partners
+description: |
+  Identity resolution table that enables person matching and deduplication across multiple systems and platforms.
+  Critical for preventing duplicate accounts and enabling seamless user experience across QuintoAndar's ecosystem.
+  
+  **Business Context:**
+  - Enables cross-system person identification and deduplication
+  - Supports identity resolution from multiple sources (social logins, documents, contacts)
+  - Implements validation workflows for identity verification
+  - Critical for fraud prevention and account security
+  - Enables single sign-on and unified user experience
+  
+  **Identity Types & Sources:**
+  - **Contact Identities:** EMAIL, PHONE for communication-based identification
+  - **Document Identities:** CPF, RFC, PASSPORT for government document matching
+  - **Social Identities:** COGNITO, GOOGLE, APPLE for social login integration
+  
+  **Scope & Geographic Coverage:**
+  - **BR:** Brazil-specific identities (CPF, Brazilian phones/emails)
+  - **MX:** Mexico-specific identities (RFC, Mexican phones/emails) 
+  - **WW:** Worldwide identities (passports, international emails)
+  - **COGNITO_USER_POOL_BR/MX:** Country-specific Cognito user pools
+  
+  **Validation & Trust Levels:**
+  - **SELF:** User-provided, self-attested information
+  - **INTERNAL:** Validated by internal QuintoAndar systems
+  - **EXPIRED:** Previously validated but now expired or superseded
+  
+  **Data Architecture:**
+  - One-to-many relationship with person (person_id foreign key)
+  - Value sanitization based on identity type before storage
+  - Supports validation timestamp tracking for verification workflows
+  - Enables partial and fuzzy matching for identity resolution
 columns:
   id:
     lineage:
     - datalake_person_raw.person_identity.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the person identity record.
+      Used for internal database relationships and efficient identity management.
   id_person:
     lineage:
     - datalake_person_raw.person_identity.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** Many-to-One with person table
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links identity values to the person they identify
+      **Indexing:** Heavily indexed for fast person lookup by identity.
   value:
     lineage:
     - datalake_person_raw.person_identity.value
+    description: |
+      The actual identity value used for person matching and resolution.
+      **Data Processing:** Sanitized based on identity type (email normalization, phone formatting, etc.)
+      **Examples:** "user@example.com", "+5511999999999", "12345678901", "google:user123"
+      **Security:** May contain PII, handled according to data protection policies
+      **Uniqueness:** Combined with scope and type for uniqueness constraints
+      **Matching:** Used in identity resolution algorithms and duplicate detection.
   scope:
     lineage:
     - datalake_person_raw.person_identity.scope
+    description: |
+      Geographic or system scope that defines the context and validity of the identity.
+      **Allowed Values:**
+      - 'BR': Brazil-specific identities (CPF, Brazilian contacts)
+      - 'MX': Mexico-specific identities (RFC, Mexican contacts)
+      - 'WW': Worldwide identities (passports, international contacts)
+      - 'COGNITO_USER_POOL_BR': Brazil Cognito user pool identities
+      - 'COGNITO_USER_POOL_MX': Mexico Cognito user pool identities
+      **Business Rules:** Determines validation rules and matching algorithms
+      **Compliance:** Used for regulatory compliance and data residency requirements.
   type:
     lineage:
     - datalake_person_raw.person_identity.type
+    description: |
+      Category of identity information stored in this record.
+      **Contact Identities:**
+      - 'EMAIL': Email addresses for digital identification
+      - 'PHONE': Phone numbers for SMS/voice identification
+      **Document Identities:**
+      - 'CPF': Brazilian tax ID for government verification
+      - 'RFC': Mexican tax registry for government verification
+      - 'PASSPORT': International travel document identification
+      **Social Identities:**
+      - 'COGNITO': AWS Cognito user pool identities
+      - 'GOOGLE': Google social login identities
+      - 'APPLE': Apple social login identities
+      **Business Logic:** Different validation and matching rules apply per type.
   validation_type:
     lineage:
     - datalake_person_raw.person_identity.validation_type
+    description: |
+      Method or level of validation applied to this identity.
+      **Allowed Values:**
+      - 'SELF': User-provided information, not independently verified
+      - 'INTERNAL': Verified by QuintoAndar's internal validation systems
+      - 'EXPIRED': Previously validated but validation has expired
+      **Trust Levels:** INTERNAL > SELF > EXPIRED for identity matching confidence
+      **Workflow:** Identities may progress through validation states
+      **Business Impact:** Affects matching algorithms and trust scores.
   version:
     lineage:
     - datalake_person_raw.person_identity.version
+    description: |
+      Optimistic locking version number for concurrent update protection.
+      Incremented automatically on each update to prevent data conflicts.
   ts_last_validated:
     lineage:
     - datalake_person_raw.person_identity.last_validated_at
+    description: |
+      Timestamp when this identity was last successfully validated or verified.
+      **Format:** UTC timestamp, null if never validated
+      **Usage:** Trust scoring, validation workflow tracking, verification age calculation
+      **Business Rules:** Recent validation increases trust score for identity matching
+      **Compliance:** Required for certain regulatory verification requirements.
   ts_created:
     lineage:
     - datalake_person_raw.person_identity.created_at
+    description: |
+      Timestamp when the person identity was first created in the system.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Identity acquisition tracking, validation workflow timing, audit trail.
   ts_updated:
     lineage:
     - datalake_person_raw.person_identity.updated_at
+    description: |
+      Timestamp when the person identity was last modified.
+      **Format:** UTC timestamp with timezone information
+      **Usage:** Change tracking, validation status updates, identity lifecycle management.
   year:
     lineage:
     - datalake_person_raw.person_identity.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   month:
     lineage:
     - datalake_person_raw.person_identity.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
   day:
     lineage:
     - datalake_person_raw.person_identity.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
