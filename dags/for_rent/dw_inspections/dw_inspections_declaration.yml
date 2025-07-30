@@ -61,6 +61,7 @@ workflow:
       z_order_by: [sk_appointment]
       merge_on: [sk_appointment]
     fact_contestation:
+      extraction_type: full
       z_order_by: [sk_contestation]
       merge_on: [sk_contestation]
     fact_item:
