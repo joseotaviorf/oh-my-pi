@@ -2,30 +2,64 @@
 database_name: datalake_company_clean
 table_name: company_document
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Result of a relationship between a company and a document. This design provides the flexibility for a company to have N documents. The relationship of this table to Company is many-to-one.'
+domain: 3P Partners
+description: |
+  Junction table implementing many-to-many relationships between companies and legal documents. Enables flexible document management where companies can have multiple compliance documents and documents can be shared across corporate entities for efficiency and compliance.
+
+  RELATIONSHIP PATTERNS:
+  - Many-to-many: Single company can have multiple documents for different compliance needs
+  - Shared documents: Corporate groups sharing CNPJ certificates, legal documents
+  - Document reuse: Efficiency through shared documentation across subsidiaries
+  - Compliance tracking: Complete audit trail of company-document associations
+  
+  BUSINESS SCENARIOS:
+  - Corporate groups: Parent company CNPJ shared with subsidiaries for legal efficiency
+  - Document versioning: Companies referencing different versions of same document type
+  - Compliance inheritance: Subsidiaries inheriting parent company documentation
+  - Regulatory requirements: Multiple companies under same legal umbrella
+  - Document lifecycle: Tracking document associations throughout business evolution
+  
+  COMPLIANCE FRAMEWORK:
+  - Legal documentation: Official business registration and licensing documents
+  - Tax compliance: CNPJ, CPF, and RFC associations for tax obligations
+  - Professional licensing: CRECI licenses for real estate operations
+  - Audit trails: Complete history of document-company relationships for compliance
+  - Regulatory reporting: Document associations for government and regulatory filings
 columns:
   id_document:
     lineage:
       - datalake_company_raw.company_document.document_id
+    description: |
+      Foreign key to document.id (BIGINT). References specific legal document record in the document table.
   id_company:
     lineage:
       - datalake_company_raw.company_document.company_id
+    description: |
+      Foreign key to company.id (BIGINT). References specific company entity in the company table.
   version:
     lineage:
       - datalake_company_raw.company_document.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures document-company relationship integrity during simultaneous modifications.
   ts_created:
     lineage:
       - datalake_company_raw.company_document.created_at
+    description: |
+      Association creation timestamp (UTC). When the company-document relationship was first established.
   ts_updated:
     lineage:
       - datalake_company_raw.company_document.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks changes to company-document relationships for compliance monitoring and audit purposes.
   year:
     lineage:
       - datalake_company_raw.company_document.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient compliance reporting and annual document association analysis.'
   month:
     lineage:
       - datalake_company_raw.company_document.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly compliance tracking and document lifecycle monitoring.'
   day:
     lineage:
       - datalake_company_raw.company_document.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily compliance monitoring and document association tracking.'

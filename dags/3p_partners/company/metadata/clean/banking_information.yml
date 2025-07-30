@@ -2,45 +2,103 @@
 database_name: datalake_company_clean
 table_name: banking_information
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains the record of companys banking information. The relationship between this table and Company is many-to-many.'
+domain: 3P Partners
+description: |
+  Financial institution account details for company payment operations. Critical for revenue distribution, commission payments, and financial settlements with partner companies. Supports multiple bank accounts per company for different transaction types (operational, commission, settlement).
+  
+  FINANCIAL OPERATIONS:
+  - Partner payments: Commission and revenue share distributions
+  - Operational expenses: Company expense account management
+  - Settlement accounts: Transaction clearing and reconciliation
+  - Multi-currency: Prepared for international expansion (Mexico, Colombia)
 columns:
   id:
     lineage:
       - datalake_company_raw.banking_information.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and payment system references.
+      Used by: Payment processing workflows, financial reconciliation, and audit trails.
   id_company:
     lineage:
       - datalake_company_raw.banking_information.company_id
+    description: |
+      Foreign key to company.id (BIGINT). Links banking details to specific company entity with one-to-many relationship.
   uuid_banking_information:
     lineage:
       - datalake_company_raw.banking_information.banking_information_uuid
+    description: |
+      Unique business identifier (UUID) for external payment system integrations. Generated automatically via gen_random_uuid().
   bank:
     lineage:
       - datalake_company_raw.banking_information.bank
+    description: |
+      Brazilian bank code (up to 5 chars). Standard BACEN (Central Bank of Brazil) bank identification code for payment routing.
+      
+      MAJOR BRAZILIAN BANKS:
+      - '001': Banco do Brasil
+      - '104': Caixa Econômica Federal
+      - '237': Bradesco
+      - '341': Itaú Unibanco
+      - '033': Santander Brasil
+      - '260': Nu Pagamentos
+      - '336': Banco C6
+      - '077': Banco Inter
   agency_number:
     lineage:
       - datalake_company_raw.banking_information.agency_number
+    description: |
+      Bank branch/agency number (up to 15 chars). Identifies specific bank branch where account is held.
+      
+      FORMAT VARIATIONS BY BANK:
+      - Standard format: "1234" (4 digits) or "12345" (5 digits)
+      - With check digit: "1234-5" (4 digits + check)
+      - Regional coding: "1234-SP" (branch + state identifier)
   account_number:
     lineage:
       - datalake_company_raw.banking_information.account_number
+    description: |
+      Bank account number (up to 15 chars). Complete account identifier including check digits.
+      
+      FORMAT STANDARDS:
+      - Account number: "12345678" (8-10 digits typical)
+      - With check digit: "12345678-9" (account + check)
+      - Savings accounts: Different numbering scheme from checking accounts
   type:
     lineage:
       - datalake_company_raw.banking_information.type
+    description: |
+      Account type classification enum determining payment routing logic and business purpose. Added 2022-10-26.
+      
+      ENUM VALUES:
+      - 'OPERATIONAL': Daily business operations, expense payments, general transactions
+      - 'COMMISSION': Partner commission payments, revenue sharing distributions
+      - 'SETTLEMENT': Transaction clearing, marketplace settlement, refund processing
+      - 'RESERVE': Emergency funds, compliance reserves, risk management
+      - 'INTERNATIONAL': Cross-border payments, currency exchange, global operations
   version:
     lineage:
       - datalake_company_raw.banking_information.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Critical for financial data integrity.
   ts_created:
     lineage:
       - datalake_company_raw.banking_information.created_at
+    description: |
+      Account registration timestamp (UTC). When banking information was first added to system.
   ts_updated:
     lineage:
       - datalake_company_raw.banking_information.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks changes to banking details for financial data lineage.
   year:
     lineage:
       - datalake_company_raw.banking_information.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient financial data archival and annual reporting compliance. Enables yearly banking relationship analysis.'
   month:
     lineage:
       - datalake_company_raw.banking_information.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly payment reconciliation and financial audit procedures. Supports monthly banking operation reporting.'
   day:
     lineage:
       - datalake_company_raw.banking_information.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily banking update tracking and payment system monitoring. Enables daily financial operations dashboards.'

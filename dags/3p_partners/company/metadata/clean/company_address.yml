@@ -2,30 +2,64 @@
 database_name: datalake_company_clean
 table_name: company_address
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Result of a relationship between a company and a address. This design provides the flexibility for a company to have N addresses. The relationship of this table to Company is many-to-one.'
+domain: 3P Partners
+description: |
+  Junction table implementing many-to-many relationships between companies and addresses. Enables flexible address management where companies can have multiple operational locations and addresses can be shared across corporate entities.
+
+  RELATIONSHIP PATTERNS:
+  - Many-to-many: Single company can have multiple addresses for different purposes
+  - Shared addresses: Corporate headquarters used by parent and subsidiary companies
+  - Operational flexibility: Easy addition/removal of company-address associations
+  - Audit trails: Complete history of company-location relationships
+  
+  BUSINESS SCENARIOS:
+  - Corporate headquarters: Parent company and subsidiaries sharing main office
+  - Regional operations: Company presence across multiple cities and states
+  - Service centers: Shared facilities serving multiple business units
+  - Franchise networks: Independent franchisees with multiple location types
+  - Legal compliance: Different addresses for legal, operational, and billing purposes
+  
+  ADDRESS USAGE TYPES:
+  - Legal registration: Official business registration addresses for compliance
+  - Operational offices: Physical locations for daily business operations
+  - Service territories: Geographic coverage areas for business activities
+  - Administrative centers: Financial, legal, and administrative operations
+  - Customer-facing locations: Storefronts, sales offices, and service centers
 columns:
   id_address:
     lineage:
       - datalake_company_raw.company_address.address_id
+    description: |
+      Foreign key to address.id (BIGINT). References specific geographic location record in the address table.
   id_company:
     lineage:
       - datalake_company_raw.company_address.company_id
+    description: |
+      Foreign key to company.id (BIGINT). References specific company entity in the company table.
   version:
     lineage:
       - datalake_company_raw.company_address.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures relationship integrity during simultaneous modifications.
   ts_created:
     lineage:
       - datalake_company_raw.company_address.created_at
+    description: |
+      Association creation timestamp (UTC). When the company-address relationship was first established.
   ts_updated:
     lineage:
       - datalake_company_raw.company_address.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks changes to company-address relationships for operational coordination.
   year:
     lineage:
       - datalake_company_raw.company_address.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient geographic expansion analysis and annual location strategy reporting.'
   month:
     lineage:
       - datalake_company_raw.company_address.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly location tracking and geographic development analysis.'
   day:
     lineage:
       - datalake_company_raw.company_address.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily company-address relationship monitoring and operational tracking.'

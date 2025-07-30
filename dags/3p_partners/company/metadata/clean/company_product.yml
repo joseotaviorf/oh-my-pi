@@ -2,15 +2,18 @@
 database_name: datalake_company_clean
 table_name: company_product
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Result of a relationship between a company and a products. This design provides the flexibility for a company to have N products. The relationship of this table to Company is many-to-one.'
+domain: 3P Partners
+description: 'Many-to-many relationship table linking companies to products/services they offer. Enables flexible business models where companies can provide multiple products and products can be offered by multiple partner companies. Includes product-specific configuration settings in JSONB format for customization. Created 2022-10-31 during major architecture refactoring to replace direct company-product foreign keys. Enhanced 2024-07 with status field for product lifecycle management.'
 columns:
   id_company:
     lineage:
       - datalake_company_raw.company_product.company_id
+    description: 'Foreign key to company.id (BIGINT). Identifies the company entity providing the product/service. Combined with id_product forms the composite primary key for this relationship table.'
   id_product:
     lineage:
       - datalake_company_raw.company_product.product_id
+    description: 'Foreign key to product.id (BIGINT). Identifies the specific product/service being offered by the company. Combined with id_company forms the composite primary key for this relationship table.'
   product_settings:
     lineage:
       - datalake_company_raw.company_product.product_settings
+    description: 'Flexible configuration settings (JSONB, nullable). Company-specific customizations for how the product is offered, including pricing rules, feature toggles, regional settings, or business-specific parameters. Enables product personalization without schema changes.'

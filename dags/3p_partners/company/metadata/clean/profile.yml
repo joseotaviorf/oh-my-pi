@@ -2,30 +2,75 @@
 database_name: datalake_company_clean
 table_name: profile
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains information about the possible positions a user can take The relationship of this table to Member Profile is many-to-one. The relationship of this table to Profile Hierarchy is many-to-one.'
+domain: 3P Partners
+description: |
+  Organizational role definitions and permission templates for access control across QuintoAndar's partner ecosystem. Profiles define standardized roles that can be assigned to users within specific company-product contexts through member_profile relationships.
+  
+  ACCESS CONTROL MODEL:
+  - Role-based permissions: Profiles define capabilities and access levels
+  - Context-sensitive: Same profile may have different permissions across products
+  - Hierarchical relationships: Profile_hierarchy table manages role hierarchies
+  - Extensible framework: New profiles can be added for emerging business needs
+  
+  PERMISSION FRAMEWORK:
+  - Functional permissions: Create, read, update, delete operations
+  - Data scope: Access to specific data sets and information levels
+  - Feature access: UI components and functionality availability
+  - Administrative capabilities: User management and configuration access
 columns:
   id:
     lineage:
       - datalake_company_raw.profile.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and profile management.
+      Used by: member_profile assignments and profile_hierarchy relationships.
   profile_name:
     lineage:
       - datalake_company_raw.profile.profile_name
+    description: |
+      Profile identifier and role name (up to 255 chars). Standardized organizational role definitions for consistent access control.
+      
+      CORE PROFILES:
+      - 'admin': System administrator with full platform access and user management
+      - 'company_admin': Partner company administrator with company-wide management rights
+      - 'broker': Real estate broker with property listing and transaction capabilities
+      - 'manager': Regional or team manager with oversight and reporting access
+      - 'property_owner_prospect': Property owner with listing and portfolio management
+      - 'legal_person_tenant': Corporate tenant with lease management and legal access
+      - 'contract_person': Contract specialist with document and legal process access
+      
+      PERMISSION LEVELS BY PROFILE:
+      - admin: Full system access, user management, company configuration, all products
+      - company_admin: Company-wide management, user administration within company scope
+      - broker: Property management, client interaction, transaction processing, commission tracking
+      - manager: Team oversight, performance reporting, regional operations management
+      - property_owner_prospect: Property submission, portfolio tracking, landlord services
+      - legal_person_tenant: Corporate lease management, legal document access, compliance
+      - contract_person: Contract preparation, legal process management, document handling
   version:
     lineage:
       - datalake_company_raw.profile.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures profile definition integrity during simultaneous modifications.
   ts_created:
     lineage:
       - datalake_company_raw.profile.created_at
+    description: |
+      Profile creation timestamp (UTC). When the organizational role was first defined in the system.
   ts_updated:
     lineage:
       - datalake_company_raw.profile.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks role definition changes for access control monitoring and audit compliance.
   year:
     lineage:
       - datalake_company_raw.profile.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient organizational analysis and annual access control reporting.'
   month:
     lineage:
       - datalake_company_raw.profile.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly role management and organizational development tracking.'
   day:
     lineage:
       - datalake_company_raw.profile.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily access control monitoring and role management operations.'

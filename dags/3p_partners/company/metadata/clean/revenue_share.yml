@@ -2,45 +2,94 @@
 database_name: datalake_company_clean
 table_name: revenue_share
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains the record of companys revenue share. The relationship between this table and Company is many-to-many.'
+domain: 3P Partners
+description: |
+  Commission and fee structure configurations for partner companies in revenue-sharing agreements. Defines how transaction revenue is distributed between QuintoAndar and partner companies based on business model (demand-side, supply-side, platform services). Critical for financial calculations, partner payments, and P&L reporting.
+  
+  MONETIZATION MODELS:
+  - Demand-side: Customer acquisition, lead generation, tenant services
+  - Supply-side: Property listings, landlord services, property management
+  - Platform services: Technology, operations, shared infrastructure
+  - Value-added services: Insurance, financing, legal, maintenance
+  
+  FINANCIAL FRAMEWORK:
+  - Commission-based: Partner receives percentage of transaction value
+  - Fee-based: Fixed fees for specific services or platform usage
+  - Hybrid models: Combination of commission and fees for comprehensive partnerships
+  - Performance tiers: Revenue sharing based on volume, quality, or exclusivity metrics
 columns:
   id:
     lineage:
       - datalake_company_raw.revenue_share.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and financial calculation references.
+      Used by: Commission calculation engines, financial reporting systems, and partner payment processing.
   id_company:
     lineage:
       - datalake_company_raw.revenue_share.company_id
+    description: |
+      Foreign key to company.id (BIGINT). Links revenue sharing rules to specific partner company.
+      
+      BUSINESS RELATIONSHIPS:
+      - One-to-many: Single company can have multiple revenue share configurations
+      - Time-based: Different terms for different time periods or contract phases
+      - Product-specific: Separate revenue sharing for different service lines
+      - Performance-based: Tier-based revenue sharing based on partnership performance
   uuid_revenue_share:
     lineage:
       - datalake_company_raw.revenue_share.revenue_share_uuid
+    description: |
+      Unique business identifier (UUID) for external financial system integrations. Generated automatically via gen_random_uuid().
+      
+      SYSTEM INTEGRATION:
+      - Payment calculators: External commission calculation services
+      - Financial reporting: Cross-system revenue tracking and attribution
+      - Partner portals: External partner access to revenue share configurations
+      - Audit systems: Compliance and regulatory reporting integration
   commission:
     lineage:
       - datalake_company_raw.revenue_share.commission
+    description: |
+      Partner commission percentage or fixed amount (NUMERIC). The portion of transaction value paid to partner company for successful deals.
   demand_fee:
     lineage:
       - datalake_company_raw.revenue_share.demand_fee
+    description: |
+      Demand-side service fee (NUMERIC, nullable). Fee charged for customer acquisition, lead generation, or tenant-focused services.
   supply_fee:
     lineage:
       - datalake_company_raw.revenue_share.supply_fee
+    description: |
+      Supply-side service fee (NUMERIC, nullable). Fee charged for property listings, landlord services, or property owner-focused operations.
   platform_fee:
     lineage:
       - datalake_company_raw.revenue_share.platform_fee
+    description: |
+      Platform service fee (NUMERIC, required). QuintoAndar platform usage fee covering technology, operations, and shared services.
   version:
     lineage:
       - datalake_company_raw.revenue_share.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Critical for financial data integrity.
   ts_created:
     lineage:
       - datalake_company_raw.revenue_share.created_at
+    description: |
+      Revenue share agreement creation timestamp (UTC). When the financial terms were first established.
   ts_updated:
     lineage:
       - datalake_company_raw.revenue_share.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks changes to commission structure for financial audit trails.
   year:
     lineage:
       - datalake_company_raw.revenue_share.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient financial reporting and annual commission analysis. Enables yearly revenue sharing performance evaluation.'
   month:
     lineage:
       - datalake_company_raw.revenue_share.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly revenue share calculations and partner payment processing. Supports monthly financial performance reporting.'
   day:
     lineage:
       - datalake_company_raw.revenue_share.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily financial configuration tracking and audit compliance. Enables daily revenue sharing monitoring and analysis.'

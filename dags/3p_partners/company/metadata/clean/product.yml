@@ -2,39 +2,108 @@
 database_name: datalake_company_clean
 table_name: product
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains the record of products that a company works with. In the current design of the Company domain, partners must be associated with products. So the relationship of this table with Member Profile is one-to-many. The businessSegment field is an enum that defines which business segment the product belongs to. The concept of logical exclusion was implemented in this table using the status field. The relationship of this table to Company is many-to-one.'
+domain: 3P Partners
+description: |
+  Product catalog defining business lines and services offered within QuintoAndar's ecosystem. Partners must be associated with specific products to access corresponding features and revenue sharing opportunities. Supports flexible many-to-many relationships with companies through company_product junction table.
+  
+  PRODUCT STRATEGY:
+  - Platform services: Core technology and infrastructure offerings
+  - Vertical solutions: Industry-specific products for real estate market
+  - Value-added services: Complementary services enhancing core offerings
+  - Partner enablement: Tools and services empowering partner success
+  
+  BUSINESS MODEL INTEGRATION:
+  - Revenue sharing: Products linked to specific commission and fee structures
+  - Access control: Product association determines feature and data access
+  - Market segmentation: Products enable targeted market strategies
+  - Partnership types: Different products support different partnership models
 columns:
   id:
     lineage:
       - datalake_company_raw.product.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and product management.
+      Used by: company_product junction table, member_profile assignments, and revenue_share configurations.
   uuid_product:
     lineage:
       - datalake_company_raw.product.product_uuid
+    description: |
+      Unique business identifier (UUID) for external API integrations and cross-service product identification. Generated automatically via gen_random_uuid().
+      
+      INTEGRATION POINTS:
+      - Mobile applications: Product-specific feature flags and UI components
+      - Analytics platform: Product performance tracking and business intelligence
+      - Partner APIs: External partner system product configuration
+      - Revenue systems: Commission and fee calculation by product line
   name:
     lineage:
       - datalake_company_raw.product.name
+    description: |
+      Product name (up to 255 chars). Human-readable identifier for business lines and service offerings.
+      
+      PRODUCT EXAMPLES:
+      - "Rental Platform": Core rental property marketplace and management
+      - "Sales Platform": Property sales and brokerage services
+      - "Property Management": Building and tenant administration services
+      - "Financial Services": Insurance, financing, and payment solutions
+      - "Marketing Tools": Lead generation and digital marketing platform
+      - "Analytics Dashboard": Business intelligence and performance insights
   status:
     lineage:
       - datalake_company_raw.product.status
+    description: |
+      Product lifecycle status enum controlling availability and partner access. Added 2024-07-22 for product lifecycle management.
+      
+      ENUM VALUES:
+      - 'ACTIVE': Product is available for partner assignment and operations
+      - 'INACTIVE': Product is disabled, existing assignments maintained but no new activations
+      - 'DEPRECATED': Product being phased out, migration to replacement product encouraged
+      - 'BETA': Product in testing phase, limited partner access for validation
+      - 'COMING_SOON': Product announced but not yet available for partner assignment
+      
+      BUSINESS WORKFLOWS:
+      - Product launch: COMING_SOON → BETA → ACTIVE (staged rollout)
+      - Product retirement: ACTIVE → DEPRECATED → INACTIVE (graceful sunset)
+      - Quality control: BETA status for controlled partner testing and feedback
+      - Emergency disable: ACTIVE → INACTIVE for critical issues or compliance
   business_segment:
     lineage:
       - datalake_company_raw.product.business_segment
+    description: |
+      Business segment classification enum defining market focus and operational domain.
+      
+      ENUM VALUES:
+      - 'RENTAL_PLATFORM': Residential and commercial property rental marketplace
+      - 'SALES_PLATFORM': Property sales, brokerage, and transaction services
+      - 'PROPERTY_MANAGEMENT': Building administration, tenant services, maintenance
+      - 'FINANCIAL_SERVICES': Insurance, financing, payment processing, escrow
+      - 'MARKETING_SOLUTIONS': Lead generation, digital marketing, CRM tools
+      - 'ANALYTICS_SERVICES': Business intelligence, market insights, reporting
+      - 'PLATFORM_SERVICES': Core infrastructure, APIs, shared technology
   version:
     lineage:
       - datalake_company_raw.product.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures product configuration integrity during simultaneous modifications.
   ts_created:
     lineage:
       - datalake_company_raw.product.created_at
+    description: |
+      Product creation timestamp (UTC). When the product was first introduced to the platform.
   ts_updated:
     lineage:
       - datalake_company_raw.product.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks product configuration changes for operational monitoring and change management.
   year:
     lineage:
       - datalake_company_raw.product.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient product portfolio analysis and annual product strategy reporting.'
   month:
     lineage:
       - datalake_company_raw.product.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly product launch tracking and portfolio development analysis.'
   day:
     lineage:
       - datalake_company_raw.product.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily product management and configuration change monitoring.'

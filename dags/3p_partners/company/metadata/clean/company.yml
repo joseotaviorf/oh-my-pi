@@ -2,45 +2,95 @@
 database_name: datalake_company_clean
 table_name: company
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Abstraction to deal with the paradigm shift that For Brokers will bring to QuintoAndar. In this design, all companies will be persisted in this table, QuintoAndar itself being one of them. Thus, it is possible to list documents, addresses, products and, through that partners. The companyUUID column represents a unique company identifier across the entire QuintoAndar services ecosystem, so was implemented a logical exclusion using the status field.'
+domain: 3P Partners
+description: |
+  Core entity representing legal companies in QuintoAndar's partner ecosystem, supporting the For Brokers paradigm shift. This table stores all legal entities including QuintoAndar itself, partner companies, real estate brokers, and property managers. Features hierarchical relationships (headquarters → branches), logical deletion via status field, and comprehensive audit trails.
+
+  BUSINESS RULES:
+  - QuintoAndar itself is stored as a HEADQUARTERS company
+  - Partner companies can be HEADQUARTERS (independent) or BRANCH (subsidiary)
+  - Logical deletion via INACTIVE status preserves audit trails
+  - company_uuid enables cross-service integration and API communications
+  - Trigram indexing supports fuzzy company name search for user interfaces
 columns:
   id:
     lineage:
       - datalake_company_raw.company.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and foreign key references.
+      Used by: banking_information, revenue_share, company_address, company_document, company_product relationships.
   id_parent:
     lineage:
       - datalake_company_raw.company.parent_id
+    description: |
+      Self-referencing foreign key to company.id. Enables hierarchical company structures where branches reference their headquarters. 
+      NULL for headquarters companies. Added 2022-02-07 to support corporate structures.
   uuid_company:
     lineage:
       - datalake_company_raw.company.company_uuid
+    description: |
+      Unique business identifier (UUID) for external API integrations and cross-service communication. Generated automatically via gen_random_uuid(). 
+      This UUID represents companies across the entire QuintoAndar services ecosystem.
   company_name:
     lineage:
       - datalake_company_raw.company.company_name
+    description: |
+      Official legal name of the company as registered with government authorities (up to 255 chars). Used for legal documents, contracts, and official communications. 
+      Indexed with trigram search (pg_trgm) for fuzzy matching in user interfaces.
   trade_name:
     lineage:
       - datalake_company_raw.company.trade_name
+    description: |
+      Commercial trading name or DBA (Doing Business As) name used in day-to-day operations (up to 255 chars). 
+      May differ from legal company_name. Used for marketing, customer-facing communications, and brand recognition.
   company_type:
     lineage:
       - datalake_company_raw.company.company_type
+    description: |
+      Hierarchical classification enum determining corporate structure and business relationships. Added 2022-02-07.
+      
+      ENUM VALUES:
+      - 'HEADQUARTERS': Independent parent company with potential subsidiaries
+      - 'BRANCH': Subsidiary or branch office linked to a headquarters company
   status:
     lineage:
       - datalake_company_raw.company.status
+    description: |
+      Logical deletion status enum controlling company visibility and operational state. Added 2022-02-09.
+      
+      ENUM VALUES:
+      - 'ACTIVE': Company is operational and visible in business processes
+      - 'INACTIVE': Company is soft-deleted, hidden from operations but preserved for audit
+      
+      BUSINESS RULES:
+      - ACTIVE companies appear in broker listings, property searches, partner directories
+      - INACTIVE companies are excluded from business operations but maintain historical data
+      - Status changes trigger cascading updates to related entities (members, products)
+      - Financial data preserved for compliance regardless of status
   version:
     lineage:
       - datalake_company_raw.company.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Incremented on each update to prevent lost update problems in distributed systems.
   ts_created:
     lineage:
       - datalake_company_raw.company.created_at
+    description: |
+      Record creation timestamp (UTC). Automatically set to now() on insert. Used for data lineage, audit trails, and temporal analysis.
   ts_updated:
     lineage:
       - datalake_company_raw.company.updated_at
+    description: |
+      Last modification timestamp (UTC). Automatically updated on each record change. Critical for CDC change detection and incremental processing.
   year:
     lineage:
       - datalake_company_raw.company.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient data lake partitioning and query performance optimization. Enables year-over-year partner growth analysis.'
   month:
     lineage:
       - datalake_company_raw.company.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly data organization and time-based analytics. Supports monthly partner acquisition reporting.'
   day:
     lineage:
       - datalake_company_raw.company.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily data segmentation and incremental processing strategies. Enables daily operational dashboards.'

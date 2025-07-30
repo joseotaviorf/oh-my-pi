@@ -1,7 +1,7 @@
 dag:
   name: dw_company
   schedule_start_date: 2020, 1, 1
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: "This DAG creates the model for QuintoAndar's companies partners."
 workflow:

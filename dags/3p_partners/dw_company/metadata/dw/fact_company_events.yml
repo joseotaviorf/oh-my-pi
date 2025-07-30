@@ -1,7 +1,7 @@
 database_name: dw_public
 table_name: fact_company_events
-description: 
-domain: Rede
+description: 'This table contains all the events that have been triggered in a company. It is used to track the changes in the company description over time.'
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_company_event:

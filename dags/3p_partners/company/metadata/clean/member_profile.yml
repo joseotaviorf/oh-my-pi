@@ -2,42 +2,107 @@
 database_name: datalake_company_clean
 table_name: member_profile
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Result of a relationship between a person, a company, a product and a profile. This design provides the flexibility for a person to be part of N companies, in N products and with N profiles. Rules that must be applied in the hierarchy of profiles will not be treated in this domain. The concept of logical exclusion was implemented in this table using the status field. The relationship of this table to Product is many-to-one. The relationship of this table to Profile is many-to-one.'
+domain: 3P Partners
+description: |
+  User membership and role assignment matrix linking people to companies, products, and organizational roles. Enables flexible multi-company, multi-product, multi-role relationships where individuals can have different permissions across various business contexts. Critical for access control, organizational reporting, and partner management.
+  
+  ACCESS CONTROL MODEL:
+  - Matrix-based permissions: Person × Company × Product × Profile = Specific Access Rights
+  - Multi-tenancy: Single user can have different roles across multiple companies
+  - Product-scoped access: Granular permissions for specific business lines
+  - Hierarchical inheritance: Branch companies inherit base permissions from headquarters
+  - Workflow states: Support for approval processes and onboarding workflows
 columns:
   id:
     lineage:
       - datalake_company_raw.member_profile.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and membership tracking.
+      Used for: Access control queries, audit logs, and membership lifecycle management.
   id_profile:
     lineage:
       - datalake_company_raw.member_profile.profile_id
+    description: |
+      Foreign key to profile.id (BIGINT). References organizational role/profile determining user permissions and capabilities.
+      
+      COMMON PROFILE TYPES:
+      - admin: Full system access, company management, user administration
+      - broker: Property listing, client management, transaction processing
+      - manager: Team oversight, regional operations, performance reporting  
+      - property_owner_prospect: Property submission, portfolio management
+      - legal_person_tenant: Corporate tenant access, lease management
+      - contract_person: Contract management, document handling
   uuid_person:
     lineage:
       - datalake_company_raw.member_profile.person_uuid
+    description: |
+      External person identifier (UUID). References user entity from person microservice for cross-service user identification.
+      
+      INTEGRATION POINTS:
+      - Authentication service: Login session management and SSO
+      - Person service: User profile data, contact information, preferences
+      - Notification service: Email/SMS targeting based on company memberships
+      - Analytics platform: User behavior analysis across company contexts
   id_product:
     lineage:
       - datalake_company_raw.member_profile.company_product_product_id
+    description: |
+      Foreign key to product.id via company_product relationship (BIGINT). Identifies specific product/service line within the company context.
   id_company:
     lineage:
       - datalake_company_raw.member_profile.company_product_company_id
+    description: |
+      Foreign key to company.id via company_product relationship (BIGINT). Identifies company context for the membership.
+      
+      MULTI-COMPANY SCENARIOS:
+      - Broker networks: Individual broker working for multiple companies
+      - Corporate acquisitions: User access during company mergers
+      - Service providers: QuintoAndar employees supporting multiple partners
+      - Consultants: External users with temporary access to multiple companies
   status:
     lineage:
       - datalake_company_raw.member_profile.status
+    description: |
+      Membership lifecycle status enum controlling user access and onboarding workflow progression.
+      
+      ENUM VALUES (Workflow Order):
+      - 'PENDING': Membership created, awaiting approval or activation
+      - 'APPROVED': Approved by admin but not yet activated by user
+      - 'ACTIVE': Full operational access, user can login and perform assigned functions
+      - 'INACTIVE': Access revoked, user cannot login or perform operations
+      - 'SUSPENDED': Temporary access restriction, can be reactivated
+      - 'EXPIRED': Time-limited access has expired (e.g., contractor, temp access)
+      
+      BUSINESS WORKFLOWS:
+      - Partner onboarding: PENDING → APPROVED → ACTIVE (admin approval + user activation)
+      - Direct assignment: PENDING → ACTIVE (immediate activation for trusted users)
+      - Access revocation: ACTIVE → INACTIVE (termination, policy violation)
+      - Temporary suspension: ACTIVE → SUSPENDED → ACTIVE (investigation, compliance hold)
+      - Contract expiration: ACTIVE → EXPIRED (automatic based on end date)
   version:
     lineage:
       - datalake_company_raw.member_profile.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Critical for access control integrity when multiple systems modify user permissions simultaneously.
   ts_created:
     lineage:
       - datalake_company_raw.member_profile.created_at
+    description: |
+      Membership creation timestamp (UTC). When user was first assigned to company-product-role combination.
   ts_updated:
     lineage:
       - datalake_company_raw.member_profile.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks status changes, role updates, or permission modifications.
   year:
     lineage:
       - datalake_company_raw.member_profile.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient access control reporting and annual security audits. Enables year-over-year membership growth analysis.'
   month:
     lineage:
       - datalake_company_raw.member_profile.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly user onboarding analytics and membership lifecycle tracking. Supports monthly partner acquisition reporting.'
   day:
     lineage:
       - datalake_company_raw.member_profile.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily access control monitoring and security compliance reporting. Enables daily onboarding and activation dashboards.'

@@ -2,8 +2,8 @@ database_name: dw_rede
 table_name: dim_company
 description: This table shows details about companies that are or have been a member of Rede QuintoAndar at some point. It uses both HubSpot
   and Company Database as sources.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_company:
     lineage:

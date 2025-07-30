@@ -1,9 +1,28 @@
 dag:
   name: company
-  owner: Data Rede
+  owner: Data 3P Partners
   schedule_interval: 0 21,8,12 * * *
   documentation:
-    dag_purpose: This DAG imports the tables from Company, a service that centralizes legal entity data.
+    dag_purpose: |
+      This DAG imports critical tables from the Company microservice, which centralizes legal entity data for QuintoAndar's partner ecosystem.
+      
+      BUSINESS CONTEXT:
+      The Company service manages QuintoAndar's paradigm shift to support broker partners (For Brokers initiative), where QuintoAndar
+      itself becomes one entity among many companies in the platform. This CDC pipeline captures real-time changes from the production
+      PostgreSQL database (company.db.core-prd.habitat.zone) to support analytics, reporting, and downstream data products.
+      
+      INGESTED ENTITIES:
+      - Company hierarchies (headquarters → branches)
+      - Legal documents (CNPJ, CRECI, CPF, RFC) with validation status
+      - Address information and company locations
+      - Banking details for financial operations
+      - Revenue sharing configurations and commission structures
+      - User membership and role assignments across companies/products
+      - Product catalogs and tier-based service levels
+      
+      SCHEDULE: Runs 3x daily (8:00, 12:00, 21:00 UTC) to capture business-hour changes and end-of-day settlements.
+      
+      DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer → Analytics Layer
 workflow:
   type: cdc
   layer: raw

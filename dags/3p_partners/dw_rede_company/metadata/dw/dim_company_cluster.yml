@@ -1,8 +1,8 @@
 database_name: dw_rede
 table_name: dim_company_cluster
 description: Dimension that shows the period during which a Rede partner company belonged to a certain cluster (Decola, Tier, etc.), according to the classification criteria defined by the Operations team on HubSpot
-domain: Rede
-owner: ae-rede@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_company_cluster:
     lineage: 

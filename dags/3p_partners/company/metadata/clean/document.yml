@@ -2,51 +2,152 @@
 database_name: datalake_company_clean
 table_name: document
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains the record of all company documents. These can be distinguished by the combination of documentType and documentNumber columns. The documentValidationStatus column is an enum referring to the document authenticity validation process. Also there is a need to archive the document file. So the documentName, attachmentPath and status fields were added to provide a versioning and a logical exclusion strategy. The relationship between this table and Company is many-to-many.'
+domain: 3P Partners
+description: |
+  Legal document repository for company compliance and verification. Stores critical business documents including tax IDs (CNPJ), real estate licenses (CRECI), personal IDs (CPF), and international IDs (RFC). Features document validation pipeline, file attachment management, and versioning capabilities. Supports many-to-many relationships with companies via company_document junction table.
+  
+  COMPLIANCE FRAMEWORK:
+  - Brazilian regulations: CNPJ (corporate tax ID), CPF (personal tax ID)
+  - Real estate licensing: CRECI (broker license verification)
+  - International: RFC (Mexican tax ID for LATAM expansion)
+  - Document validation: Multi-step verification pipeline
+  - Audit trails: Complete document lifecycle tracking
 columns:
   id:
     lineage:
       - datalake_company_raw.document.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and document tracking.
+      Used by: company_document junction table for many-to-many relationships.
   uuid_company:
     lineage:
       - datalake_company_raw.document.company_uuid
+    description: |
+      Legacy company reference (UUID). NULLABLE since 2023-04-06 migration to many-to-many relationship model.
+      
+      MIGRATION CONTEXT:
+      - Legacy: Direct company_uuid → document relationship
+      - Current: company_document junction table for many-to-many
+      - NULL values: Documents shared across multiple companies
+      - Non-NULL values: Legacy documents not yet migrated to junction table
   identification_number:
     lineage:
       - datalake_company_raw.document.identification_number
+    description: |
+      The actual document number/ID (up to 255 chars). Combined with document_type forms unique business key for document identification.
+      
+      FORMAT EXAMPLES BY TYPE:
+      - CNPJ: "12.345.678/0001-90" (14 digits with formatting) or "12345678000190" (raw)
+      - CRECI: "CRECI-SP 123456" (state-specific broker license)
+      - CPF: "123.456.789-01" (11 digits with formatting) or "12345678901" (raw)
+      - RFC: "ABCD123456EFG" (13 characters for Mexican tax ID)
   document_validation_status:
     lineage:
       - datalake_company_raw.document.document_validation_status
+    description: |
+      Document authenticity verification status enum indicating progress through validation pipeline.
+      
+      ENUM VALUES (Business Process Order):
+      - 'PENDING': Document uploaded, awaiting validation queue processing
+      - 'UNDER_REVIEW': Manual review in progress by compliance team
+      - 'VALIDATED': Successfully verified against government databases
+      - 'REJECTED': Failed validation (invalid number, fake document, etc.)
+      - 'EXPIRED': Previously valid document has expired (license renewal needed)
+      - 'REVALIDATION_REQUIRED': Periodic re-verification needed for compliance
   document_type:
     lineage:
       - datalake_company_raw.document.document_type
+    description: |
+      Document classification enum determining validation rules, business logic, and compliance requirements.
+      
+      ENUM VALUES:
+      - 'cnpj': Brazilian corporate tax identification (Cadastro Nacional da Pessoa Jurídica)
+      - 'creci': Brazilian real estate broker license (Conselho Regional de Corretores de Imóveis)
+      - 'cpf': Brazilian personal tax identification (Cadastro de Pessoas Físicas)  
+      - 'rfc': Mexican tax identification (Registro Federal de Contribuyentes)
+      
+      BUSINESS PURPOSE BY TYPE:
+      - CNPJ: Corporate entity verification, tax compliance, payment processing
+      - CRECI: Broker licensing verification, property listing authorization
+      - CPF: Individual identity verification, personal tax compliance
+      - RFC: Mexican market expansion, international partner compliance
   attachment_path:
     lineage:
       - datalake_company_raw.document.attachment_path
+    description: |
+      File storage path (up to 255 chars) pointing to document scan/upload in object storage (S3). NULL if no physical file attached.
   extra_info:
     lineage:
       - datalake_company_raw.document.extra_info
+    description: |
+      Flexible JSONB field for document-specific metadata and validation details. Enables extensibility without schema changes.
+      
+      COMMON JSON STRUCTURE EXAMPLES:
+      ```json
+      {
+        "validation_details": {
+          "government_api_response": {...},
+          "validation_timestamp": "2023-10-15T14:30:00Z",
+          "validator_service": "receita_federal_api"
+        },
+        "expiration_date": "2024-12-31",
+        "issuing_authority": "Receita Federal do Brasil",
+        "document_metadata": {
+          "file_size_bytes": 2048576,
+          "ocr_confidence": 0.98,
+          "detected_text": "CNPJ: 12.345.678/0001-90"
+        },
+        "business_context": {
+          "renewal_required": true,
+          "renewal_reminder_sent": "2023-10-01"
+        }
+      }
+      ```
   document_name:
     lineage:
       - datalake_company_raw.document.document_name
+    description: |
+      Human-readable document title or filename (up to 255 chars). Added 2022-02-22 for document versioning and user-friendly identification.
+      
+      NAMING CONVENTIONS:
+      - Format: "{document_type}_{company_name}_{date}_{version}"
+      - Examples: "CNPJ_QuintoAndar_2023-10-15_v1.pdf"
+      - Examples: "CRECI_Santos_Imobiliaria_2023-11-01_renewal.pdf"
+      - Examples: "CPF_Joao_Silva_2023-09-20_updated.jpg"
   status:
     lineage:
       - datalake_company_raw.document.status
+    description: |
+      Document lifecycle status for archival and data retention management.
+      
+      ENUM VALUES:
+      - 'ACTIVE': Current, valid document available for business operations
+      - 'ARCHIVED': Superseded by newer version but kept for historical records
+      - 'DELETED': Marked for deletion but preserved for audit compliance
   version:
     lineage:
       - datalake_company_raw.document.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Critical for document integrity when multiple systems update validation status simultaneously.
   ts_created:
     lineage:
       - datalake_company_raw.document.created_at
+    description: |
+      Document registration timestamp (UTC). When the document record was first created in the system.
   ts_updated:
     lineage:
       - datalake_company_raw.document.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks validation status changes, file updates, or metadata modifications.
   year:
     lineage:
       - datalake_company_raw.document.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient data lake partitioning and compliance reporting by time periods. Enables annual document lifecycle analysis.'
   month:
     lineage:
       - datalake_company_raw.document.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly compliance audits and document lifecycle analysis. Supports monthly validation pipeline performance reporting.'
   day:
     lineage:
       - datalake_company_raw.document.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily document processing and validation pipeline monitoring. Enables daily operational dashboards and SLA tracking.'

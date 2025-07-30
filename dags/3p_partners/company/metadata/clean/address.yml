@@ -2,54 +2,148 @@
 database_name: datalake_company_clean
 table_name: address
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains the record of companys addresses. The relationship between this table and Company is many-to-many.'
+domain: 3P Partners
+description: |
+  Company address repository for operational locations, legal addresses, and business presence tracking. Supports many-to-many relationships with companies via company_address junction table, enabling companies to have multiple locations and addresses to be shared across corporate entities.
+  
+  ADDRESS TYPES & USAGE:
+  - Legal addresses: Official registered business addresses for compliance
+  - Operational addresses: Physical office locations and service centers
+  - Branch locations: Regional offices and franchise locations
+  - Service areas: Geographic territories for business operations
+  - Billing addresses: Financial and administrative correspondence
 columns:
   id:
     lineage:
       - datalake_company_raw.address.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and address management.
+      Used by: company_address junction table for many-to-many relationships with companies.
   uuid_company:
     lineage:
       - datalake_company_raw.address.company_uuid
+    description: |
+      Legacy company reference (UUID). NULLABLE since migration to many-to-many relationship model via company_address junction table.
+      
+      MIGRATION CONTEXT:
+      - Legacy: Direct company_uuid → address relationship
+      - Current: company_address junction table for many-to-many relationships
+      - NULL values: Addresses shared across multiple companies or corporate groups
+      - Non-NULL values: Legacy addresses not yet migrated to junction table model
+      
+      BUSINESS SCENARIOS:
+      - Shared addresses: Corporate headquarters used by parent and subsidiary companies
+      - Service centers: Regional offices serving multiple company entities
+      - Administrative efficiency: Single address record for corporate group locations
   public_area:
     lineage:
       - datalake_company_raw.address.public_area
+    description: |
+      Street name and type (up to 50 chars). Brazilian standard public area designation following postal service conventions.
+      
+      FORMAT EXAMPLES:
+      - "Rua das Flores" (street)
+      - "Avenida Paulista" (avenue)  
+      - "Praça da Sé" (square/plaza)
+      - "Alameda Santos" (alameda/tree-lined street)
   country:
     lineage:
       - datalake_company_raw.address.country
+    description: |
+      Country code or name for international expansion support. Enables multi-country operations and regulatory compliance.
+      
+      SUPPORTED COUNTRIES:
+      - 'BR' / 'Brazil': Primary market for domestic operations
+      - 'MX' / 'Mexico': International expansion market
   state:
     lineage:
       - datalake_company_raw.address.state
+    description: |
+      State/province identifier following country-specific standards. Critical for regional operations and regulatory compliance.
+      
+      BRAZIL STATE EXAMPLES:
+      - 'SP': São Paulo (largest market)
+      - 'RJ': Rio de Janeiro (major metropolitan area)
+      - 'MG': Minas Gerais (regional expansion)
+      - 'PR': Paraná (southern region)
+      - 'RS': Rio Grande do Sul (extreme south)
   city:
     lineage:
       - datalake_company_raw.address.city
+    description: |
+      Municipality/city name (up to 50 chars). Critical for local market operations and service delivery planning.
+      
+      MAJOR MARKETS:
+      - São Paulo
+      - Rio de Janeiro
+      - Belo Horizonte
+      - Porto Alegre
+      - Brasília
   neighborhood:
     lineage:
       - datalake_company_raw.address.neighborhood
+    description: |
+      Local neighborhood or district (up to 50 chars). Provides granular location context for micro-market analysis and operations.
+
+      EXAMPLES:
+      - São Paulo: "Vila Olímpia", "Itaim Bibi", "Pinheiros"
+      - Rio de Janeiro: "Copacabana", "Ipanema", "Barra da Tijuca"
+      - Neighborhood-specific strategies: Premium vs. value market positioning
   zip_code:
     lineage:
       - datalake_company_raw.address.zip_code
+    description: |
+      Postal code (up to 10 chars). Brazilian CEP (Código de Endereçamento Postal) format: 12345-678 or 12345678.
+      
+      CEP STRUCTURE:
+      - Format: "01234-567" (formatted) or "01234567" (raw)
+      - Geographic hierarchy: State → Region → Sector → Subsector
+      - Delivery optimization: Postal service routing and logistics
   number:
     lineage:
       - datalake_company_raw.address.number
+    description: |
+      Building/property number (BIGINT, nullable). Street address number for specific location identification.
+      
+      SPECIAL CASES:
+      - NULL: Rural areas or locations without formal numbering
+      - 0: Properties with "S/N" (sem número / without number) designation
+      - Large numbers: Commercial complexes, shopping centers, industrial areas
   complement:
     lineage:
       - datalake_company_raw.address.complement
+    description: |
+      Address complement/apartment details (up to 100 chars, nullable). Additional location information for complex properties.
+      
+      COMMON FORMATS:
+      - "Apartamento 123" (apartment)
+      - "Sala 456" (office/room)
+      - "Bloco A, Andar 10" (building block and floor)
+      - "Torre Norte, Conjunto 789" (tower and suite)
   version:
     lineage:
       - datalake_company_raw.address.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures address data integrity during simultaneous modifications.
   ts_created:
     lineage:
       - datalake_company_raw.address.created_at
+    description: |
+      Address registration timestamp (UTC). When the address was first added to the system.
   ts_updated:
     lineage:
       - datalake_company_raw.address.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks address changes for data accuracy and operational coordination.
   year:
     lineage:
       - datalake_company_raw.address.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient geographic analysis and historical address tracking.'
   month:
     lineage:
       - datalake_company_raw.address.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly location analysis and geographic expansion reporting.'
   day:
     lineage:
       - datalake_company_raw.address.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily address management and operational location tracking.'

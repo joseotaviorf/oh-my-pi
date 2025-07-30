@@ -1,7 +1,7 @@
 database_name: dw_public
 table_name: dim_company_3p_partners
 description: Table that describes all QuintoAndar's Rede Companies enriched HubSpot information.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_company:

@@ -2,36 +2,108 @@
 database_name: datalake_company_clean
 table_name: profile_hierarchy
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: 'Contains the record of the hierarchy of profiles in a given product and a given company. Rules that must be applied in the hierarchy of profiles will not be treated in this domain. The relationship of this table to Product is many-to-one. The relationship of this table to Profile is many-to-one.'
+domain: 3P Partners
+description: |
+  Organizational hierarchy definition table establishing role structures and reporting relationships within specific product contexts. Defines how profiles (roles) relate to each other hierarchically within different business products, enabling complex organizational structures and approval workflows.
+
+  HIERARCHICAL FRAMEWORK:
+  - Product-scoped hierarchies: Different role structures for different business products
+  - Position-based ordering: Numerical position defines hierarchy level and authority
+  - Flexible role relationships: Same profile can have different hierarchy positions across products
+  - Approval chain definition: Hierarchy determines workflow routing and approval sequences
+  
+  BUSINESS APPLICATIONS:
+  - Reporting structures: Define who reports to whom within product teams
+  - Approval workflows: Route requests through appropriate hierarchy levels
+  - Access inheritance: Lower positions inherit permissions from higher levels
+  - Organizational charts: Visual representation of team structures and reporting lines
+  - Performance management: Hierarchy-based performance review and evaluation processes
+  
+  PRODUCT-SPECIFIC HIERARCHIES:
+  - Rental Platform: Broker → Manager → Regional Director → VP hierarchy
+  - Sales Platform: Sales Rep → Team Lead → Regional Manager → Sales Director
+  - Property Management: Coordinator → Supervisor → Manager → Director
+  - Financial Services: Analyst → Senior Analyst → Manager → Director
 columns:
   id:
     lineage:
       - datalake_company_raw.profile_hierarchy.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and hierarchy management.
+      Used for: Hierarchy relationship tracking, organizational chart generation, and approval workflow configuration.
   id_profile:
     lineage:
       - datalake_company_raw.profile_hierarchy.profile_id
+    description: |
+      Foreign key to profile.id (BIGINT). References specific organizational role within the hierarchy structure.
+      
+      PROFILE HIERARCHY EXAMPLES:
+      - admin: Typically highest position (position_number 1) with override capabilities
+      - manager: Mid-level position (position_number 2-3) with team oversight
+      - broker: Operational level (position_number 4-5) with direct client interaction
+      - property_owner_prospect: Customer-level (position_number 6+) with limited access
+      
+      HIERARCHICAL RELATIONSHIPS:
+      - Authority levels: Lower position numbers indicate higher authority and broader access
+      - Approval chains: Requests flow upward through position hierarchy for approval
+      - Access inheritance: Higher positions inherit all capabilities of lower positions
+      - Decision authority: Position level determines what decisions can be made independently
   id_product:
     lineage:
       - datalake_company_raw.profile_hierarchy.product_id
+    description: |
+      Foreign key to product.id (BIGINT). References specific business product that defines the organizational context for the hierarchy.
+      
+      PRODUCT-SPECIFIC HIERARCHIES:
+      - Rental Platform: Traditional real estate brokerage hierarchy with brokers, managers, directors
+      - Sales Platform: Sales-focused structure with representatives, team leads, regional managers
+      - Property Management: Operational hierarchy with coordinators, supervisors, managers
+      - Financial Services: Analytical hierarchy with analysts, senior analysts, managers
+      - Marketing Solutions: Creative and analytical roles with specialists, managers, directors
+      - Platform Services: Technical hierarchy with developers, leads, architects, directors
   position_number:
     lineage:
       - datalake_company_raw.profile_hierarchy.position_number
+    description: |
+      Numerical hierarchy position indicator (INTEGER). Lower numbers indicate higher authority levels and broader organizational scope.
+      
+      HIERARCHY LEVELS:
+      - Position 1: Executive level (CEO, VP, C-Suite) with strategic authority
+      - Position 2: Director level with cross-functional and strategic responsibilities  
+      - Position 3: Manager level with team oversight and operational authority
+      - Position 4: Supervisor level with direct team management responsibilities
+      - Position 5: Senior contributor level with mentoring and specialized expertise
+      - Position 6+: Individual contributor level with operational execution focus
+      
+      AUTHORITY IMPLICATIONS:
+      - Decision authority: Lower position numbers enable higher-value decision making
+      - Approval workflows: Requests route upward through position hierarchy
+      - Access control: Higher positions inherit all lower position capabilities
+      - Information access: Higher positions access broader organizational information
   version:
     lineage:
       - datalake_company_raw.profile_hierarchy.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures hierarchy integrity during simultaneous organizational changes.
   ts_created:
     lineage:
       - datalake_company_raw.profile_hierarchy.created_at
+    description: |
+      Hierarchy definition creation timestamp (UTC). When the organizational structure was first established for the specific profile-product combination.
   ts_updated:
     lineage:
       - datalake_company_raw.profile_hierarchy.updated_at
+    description: |
+      Last modification timestamp (UTC). Tracks organizational structure changes for governance and operational coordination.
   year:
     lineage:
       - datalake_company_raw.profile_hierarchy.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient organizational analysis and annual hierarchy structure reporting.'
   month:
     lineage:
       - datalake_company_raw.profile_hierarchy.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly organizational development tracking and hierarchy evolution analysis.'
   day:
     lineage:
       - datalake_company_raw.profile_hierarchy.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily organizational monitoring and hierarchy management operations.'
