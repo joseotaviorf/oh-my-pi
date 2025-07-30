@@ -1,7 +1,7 @@
 dag:
   name: enrich_rede_house_history
   schedule_start_date: 2020, 8, 29
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: |
       This DAG creates the enriched table that tells us the history of how a house was or was not in Rede.

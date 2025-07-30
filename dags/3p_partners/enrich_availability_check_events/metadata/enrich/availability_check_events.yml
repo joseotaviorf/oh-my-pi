@@ -1,8 +1,8 @@
 ---
 database_name: datalake_availability_check
 table_name: availability_check_events
-owner: ae-rede@quintoandar.com.br
-domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
 description: 'Table containing events related to availability checks'
 columns:
   id_house:

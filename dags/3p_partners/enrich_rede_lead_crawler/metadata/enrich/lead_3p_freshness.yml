@@ -3,8 +3,8 @@ database_name: datalake_rede_lead_crawler
 table_name: lead_3p_freshness
 description: Matches leads from Supply Processor to offers in Zap Imóveis, in order to analyze its freshness.
   A lead is considered fresh when it was sent to Supply Processor for the first time within two weeks of the creation in Zap Imóveis.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_lead_3p:
     description: Id of the lead 3P.

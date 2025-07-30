@@ -1,7 +1,7 @@
 dag:
   name: enrich_rede_lead_crawler
   schedule_start_date: 2020, 8, 29
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: |
       Creates enriched tables focused on the context of Rede and its interaction with crawlers.

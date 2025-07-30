@@ -2,7 +2,7 @@ dag:
   name: growth_lab
   schedule_start_date: 2020, 12, 21
   schedule_interval: "0 2 * * *"
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: "Growth Lab is an initiative that has been trying to understand our supply, using crawler data from Spinver, which is in GCP. This DAG is responsible for ingesting the data from GCP to our datalake."
 workflow:

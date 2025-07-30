@@ -1,8 +1,8 @@
 ---
 database_name: datalake_rede_house_history
 table_name: rede_house_history
-owner: gustavo.miller@quintoandar.com.br
-domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
 description: Every row in this table asserts whether or not a listing belonged to Rede in a given business context (SALE or RENT), in a given validity period
   (between ts_status_started and ts_status_ended).
 columns:

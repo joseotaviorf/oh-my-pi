@@ -1,7 +1,7 @@
 dag:
   name: enrich_availability_check_events
   schedule_start_date: 2024, 1, 1
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: Creates enriched tables for the `Availability Check` process, using Amplitude events.
 workflow:
