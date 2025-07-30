@@ -268,7 +268,7 @@ SELECT
     g.bank_statement_date_start_partial,
     g.bank_statement_date_end_partial,
     pr.payslip_reference_period,
-    DATE_ADD(MONTH,CAST( n.position AS INT), g.bank_statement_start_date) AS bank_statement_reference_period,
+    ADD_MONTHS(g.bank_statement_start_date, CAST(n.position AS INT)) AS bank_statement_reference_period,
     g.is_fraud,
     g.is_partial,
     g.ts_updated
@@ -316,7 +316,7 @@ SELECT
     g.bank_statement_date_start_partial,
     g.bank_statement_date_end_partial,
     pr.payslip_reference_period,
-    DATE_ADD(MONTH,CAST( n.position AS INT), g.bank_statement_start_date) AS bank_statement_reference_period,
+    ADD_MONTHS(g.bank_statement_start_date, CAST(n.position AS INT)) AS bank_statement_reference_period,
     g.is_fraud,
     g.is_partial,
     g.ts_updated
