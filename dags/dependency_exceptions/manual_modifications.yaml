@@ -433,6 +433,7 @@ bietlejuice.enrich_offer:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
     - bietlejuice.enrich_firestore:load-enrich-rent-offer:first-run-of-day
+    - bietlejuice.godfather:load-clean-offer:first-run-of-day
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing:first-run-of-day

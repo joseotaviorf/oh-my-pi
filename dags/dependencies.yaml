@@ -2589,7 +2589,6 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_rental_transact:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
-  - bietlejuice.godfather:load-clean-offer:first-run-of-day
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   - bietlejuice.rental_transact:load-clean-event-log:first-run-of-day
