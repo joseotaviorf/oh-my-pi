@@ -1,0 +1,25 @@
+database_name: datalake_gsheets_clean
+table_name: seo_budget_target_leads_2025
+description: "Cleaned SEO budget and target leads data for 2025"
+domain: Growth
+columns:
+  pais:
+    description: "Country of the record"
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_leads_2025.pais
+  fuente:
+    description: "Data source or provider"
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_leads_2025.fuente
+  periodo:
+    description: "Time period of the record (e.g., YYYYMM)"
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_leads_2025.periodo
+  variable:
+    description: "Variable measured (e.g., budget, leads)"
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_leads_2025.variable
+  valor:
+    description: "Value corresponding to the variable in the given period"
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_leads_2025.valor

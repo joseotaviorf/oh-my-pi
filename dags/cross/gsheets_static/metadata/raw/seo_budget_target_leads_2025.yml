@@ -1,0 +1,4 @@
+database_name: datalake_gsheets_raw
+table_name: seo_budget_target_leads_2025
+description: "Raw SEO budget and target leads data for 2025"
+domain: Growth
