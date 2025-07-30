@@ -146,14 +146,16 @@ sap_ledger AS (
     created_by,
     account_number,
     debit_credit,
+    cost_center_code,
     DATE(dt_created) AS dt_sap_created,
     DATE(dt_reference) AS dt_sap_reference
   FROM
     datalake_pas.ledger
   WHERE
     dt_reference >= DATE('2025-01-01')
-    AND account_number IN ('700005', '700008', '700009', '700010', '700011') -- 700006', '700007'
+    AND account_number IN ('700005', '700008', '700009', '700010', '700011', '700006', '700007')
     AND source_client NOT IN ('rental-guarantee-pla')
+    AND UPPER(cost_center_code) LIKE ('%R%')
 )
 
 SELECT
