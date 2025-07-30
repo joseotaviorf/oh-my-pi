@@ -6,65 +6,65 @@ domain: For Sale
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_app:
-    description: Id of the app.
+    description: Id of the application
   id_visit:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.event_properties
-    description: Id of the visit.
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.event_properties
+    description: Identifier of the visit.
   country_code:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: Code of the country where the visit is taking place.
   user_country:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.country
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.country
     description: Country of the user.
   app_type:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
-    description: App type.
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
+    description: Type of Application.
   media_source:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: Media source from where this user came.
   adjust_network:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: Media source from where this user came (info gathered from the app Adjust and replicated inside Amplitude).
   utm_source:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: User property that identifies the utm source.
   utm_campaign:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: User property that identifies the utm campaign.
   utm_medium:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: User property that identifies the utm medium.
   utm_content:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: User property that identifies the utm content.
   utm_term:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: User property that identifies the utm term.
   entrance_uri:
     lineage:
       - datalake_amplitude_clean.170698_visit_schedule_confirmed_events
-      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events 
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events
     description: The URL of the first page a user visits in a session
   is_branded:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: Boolean indicating if the campaign had the QuintoAndar brand on it.
   branded:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.user_properties
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.user_properties
     description: Brand used in the campaign.
   ts_event:
     lineage:
-      - datalake_amplitude_clean_staging.170698_debug_visit_schedule_confirmed_events.ts_event
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.ts_event
     description: Timestamp of the event.

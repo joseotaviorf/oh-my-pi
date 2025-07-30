@@ -1,111 +1,132 @@
 database_name: datalake_amplitude_page_viewed_events
 table_name: schedule_search_listing_events
+description: This table consolidates and enriches data from multiple Amplitude page view events (schedule, search, and listing pages) to provide a comprehensive view of user journey across key property discovery and scheduling touchpoints.
+domain: Growth
+owner: growth@quintoandar.com.br
 columns:
   ep_house_id:
+    description: Unique identifier of the property being viewed, searched, or scheduled across different page types.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.ep_house_id
-    - datalake_amplitude_clean.170698_search_page_viewed_events.id_house
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.ep_id_house
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.ep_house_id
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_house
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ep_id_house
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
   id_amplitude:
+    description: Unique identifier for the user in Amplitude analytics across all tracked page events.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_amplitude
-    - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
   id_user:
+    description: User identifier linking events across different pages in the user journey.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_user
-    - datalake_amplitude_clean.170698_search_page_viewed_events.id_user
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
   id_device:
+    description: Device identifier used to track user behavior across different pages and sessions.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_device
-    - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_device
   business_context:
+    description: Business context or product area where the page view event occurred (e.g., rental, sale).
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.business_context
-    - datalake_amplitude_clean.170698_search_page_viewed_events.business_context
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.business_context
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.business_context
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.business_context
+      - datalake_amplitude_clean.170698_search_page_viewed_events.business_context
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.business_context
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.business_context
   entrance_uri:
+    description: URI path where the user first entered the site or application session.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.entrance_uri
-    - datalake_amplitude_clean.170698_search_page_viewed_events.entrance_uri
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.entrance_uri
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.entrance_uri
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.entrance_uri
+      - datalake_amplitude_clean.170698_search_page_viewed_events.entrance_uri
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.entrance_uri
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.entrance_uri
   referrer:
+    description: Referring URL or source that brought the user to the page before the tracked event.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.referrer
-    - datalake_amplitude_clean.170698_search_page_viewed_events.referrer
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.referrer
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.referrer
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.referrer
+      - datalake_amplitude_clean.170698_search_page_viewed_events.referrer
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.referrer
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.referrer
   utm_source:
+    description: UTM source parameter indicating the traffic source across all tracked page events.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_source
-    - datalake_amplitude_clean.170698_search_page_viewed_events.utm_source
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_source
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_source
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_source
+      - datalake_amplitude_clean.170698_search_page_viewed_events.utm_source
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_source
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_source
   utm_medium:
+    description: UTM medium parameter indicating the marketing medium used across all tracked page events.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_medium
-    - datalake_amplitude_clean.170698_search_page_viewed_events.utm_medium
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_medium
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_medium
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_medium
+      - datalake_amplitude_clean.170698_search_page_viewed_events.utm_medium
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_medium
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_medium
   utm_campaign:
+    description: UTM campaign parameter identifying the specific marketing campaign across all tracked page events.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_campaign
-    - datalake_amplitude_clean.170698_search_page_viewed_events.utm_campaign
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_campaign
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_campaign
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_campaign
+      - datalake_amplitude_clean.170698_search_page_viewed_events.utm_campaign
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_campaign
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_campaign
   utm_term:
+    description: UTM term parameter for tracking paid search keywords across all tracked page events.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_term
-    - datalake_amplitude_clean.170698_search_page_viewed_events.utm_term
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_term
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_term
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_term
+      - datalake_amplitude_clean.170698_search_page_viewed_events.utm_term
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_term
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_term
   utm_content:
+    description: UTM content parameter for tracking different versions of ads or content across all tracked page events.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_content
-    - datalake_amplitude_clean.170698_search_page_viewed_events.utm_content
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_content
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_content
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_content
+      - datalake_amplitude_clean.170698_search_page_viewed_events.utm_content
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_content
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_content
   up_platform:
+    description: Platform or application where the event occurred (e.g., web, mobile app, iOS, Android).
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.up_platform
-    - datalake_amplitude_clean.170698_search_page_viewed_events.up_platform
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.up_platform
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.up_platform
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.up_platform
+      - datalake_amplitude_clean.170698_search_page_viewed_events.up_platform
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.up_platform
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.up_platform
   top5_house_id:
+    description: Identifiers of the top 5 houses displayed or interacted with during the page view event.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.top5_house_id
-    - datalake_amplitude_clean.170698_search_page_viewed_events.top5_house_id
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.top5_house_id
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.top5_house_id
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.top5_house_id
+      - datalake_amplitude_clean.170698_search_page_viewed_events.top5_house_id
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.top5_house_id
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.top5_house_id
   ts_event:
+    description: Timestamp when the page view event occurred across any of the tracked page types.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.ts_event
-    - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
   year:
+    description: Year extracted from the event timestamp for partitioning and time-based analysis.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.year
-    - datalake_amplitude_clean.170698_search_page_viewed_events.year
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.year
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.year
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.year
+      - datalake_amplitude_clean.170698_search_page_viewed_events.year
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.year
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.year
   month:
+    description: Month extracted from the event timestamp for partitioning and time-based analysis.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.month
-    - datalake_amplitude_clean.170698_search_page_viewed_events.month
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.month
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.month
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.month
+      - datalake_amplitude_clean.170698_search_page_viewed_events.month
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.month
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.month
   day:
+    description: Day extracted from the event timestamp for partitioning and time-based analysis.
     lineage:
-    - datalake_amplitude_clean.170698_schedule_page_viewed_events.day
-    - datalake_amplitude_clean.170698_search_page_viewed_events.day
-    - datalake_amplitude_clean.170698_search_results_page_viewed_events.day
-    - datalake_amplitude_clean.170698_listing_page_viewed_events.day
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.day
+      - datalake_amplitude_clean.170698_search_page_viewed_events.day
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.day
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.day

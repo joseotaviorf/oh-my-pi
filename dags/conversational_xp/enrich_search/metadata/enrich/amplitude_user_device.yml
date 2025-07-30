@@ -6,7 +6,7 @@ description: |
   Mapping of id_users to id_device, id_amplitude and id_amplitude_main.
   The latter is a coalesce between id_amplitude_merged and id_amplitude.
   This occurs due to amplitude way of handling user's multiple devices.
-  For more information read the documentation: 
+  For more information read the documentation:
   https://help.amplitude.com/hc/en-us/articles/115003135607-Track-unique-users
   Disclaimer: since there are 4 types of ids in the table, their relation is:
   (id_user 1:N id_device)
@@ -18,21 +18,20 @@ columns:
     description: The coalesce between id_amplitude_merged and id_amplitude
     lineage:
       - datalake_amplitude_clean.170698_user_merge.id_amplitude_merged
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_amplitude
-      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
   id_user:
     description: The QuintoAndar user identification number
     lineage:
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_user
-      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
   id_device:
     description: The device id
     lineage:
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_device
-      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
   id_amplitude:
     description: Amplitude id
     lineage:
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_amplitude
-      - datalake_amplitude_clean_staging.170698_search_results_page_viewed_events.id_amplitude
-  
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
