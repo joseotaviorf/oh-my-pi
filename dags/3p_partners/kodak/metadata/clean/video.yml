@@ -1,21 +1,69 @@
+---
 database_name: datalake_kodak_clean
 table_name: video
+description: |
+  Contains metadata for all videos stored and managed through Kodak's media system. Each row represents a unique video with its source information, external domain association, processing status, and flexible JSON metadata containing video-specific attributes. Videos can be sourced from multiple platforms (YouTube, Vimeo, S3) and are linked to property listings, leads, or other business entities across QuintoAndar's ecosystem.
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kodak_raw.video.id
-  external_domain:
-    lineage:
-      - datalake_kodak_raw.video.externaldomain
+    description: 'Unique identifier for each video record in the Kodak system. Primary key used for referencing in video processing workflows and audit trails.'
   id_external_domain:
     lineage:
       - datalake_kodak_raw.video.externaldomainid
-  metadata:
+    description: 'External identifier linking the video to records in other systems (property ID, lead ID, building ID, etc.). The interpretation depends on the external_domain value.'
+  external_domain:
     lineage:
-      - datalake_kodak_raw.video.metadata
-  id_source:
+      - datalake_kodak_raw.video.externaldomain
+    description: 'Domain classification indicating which external system this video belongs to.'
+    categories:
+      HOUSE: 'Video belongs to a QuintoAndar house listing'
+      BUILDING_VENTURE: 'Video belongs to a building or real estate venture'
+      LEAD3P: 'Video belongs to a third-party partner lead'
+      ATLAS: 'Video belongs to Atlas system (internal tooling)'
+  source_id:
     lineage:
       - datalake_kodak_raw.video.sourceid
+    description: 'Identifier of the video in the source platform (YouTube video ID, Vimeo video ID, S3 object key, etc.). Used for accessing the original video content.'
   video_source:
     lineage:
       - datalake_kodak_raw.video.videosource
+    description: 'Platform or service where the video is hosted or originated.'
+    categories:
+      YOUTUBE: 'Video hosted on YouTube platform'
+      VIMEO: 'Video hosted on Vimeo platform'
+      S3: 'Video stored directly in QuintoAndar S3 storage'
+  status:
+    lineage:
+      - datalake_kodak_raw.video.status
+    description: 'Current processing status of the video in Kodak workflows. Tracks video lifecycle from creation through processing completion.'
+  metadata:
+    lineage:
+      - datalake_kodak_raw.video.metadata
+    description: 'JSON object containing flexible video metadata including titles, descriptions, duration, quality settings, processing timestamps, and other video-specific attributes that vary by source platform.'
+  backup:
+    lineage:
+      - datalake_kodak_raw.video.backup
+    description: 'JSON object containing backup information for the video, including alternative storage locations, backup timestamps, and recovery metadata for disaster recovery purposes.'
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.video.created_at
+    description: 'Timestamp when the video record was initially created in the Kodak system.'
+  ts_updated:
+    lineage:
+      - datalake_kodak_raw.video.updated_at
+    description: 'Timestamp when the video record was last modified or updated with new metadata or status changes.'
+  year:
+    lineage:
+      - datalake_kodak_raw.video.year
+    description: 'Year partition key extracted from the creation timestamp for optimized data organization and querying.'
+  month:
+    lineage:
+      - datalake_kodak_raw.video.month
+    description: 'Month partition key extracted from the creation timestamp for optimized data organization and querying.'
+  day:
+    lineage:
+      - datalake_kodak_raw.video.day
+    description: 'Day partition key extracted from the creation timestamp for optimized data organization and querying.'

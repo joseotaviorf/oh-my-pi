@@ -1,8 +1,8 @@
 ---
 database_name: datalake_search_session_event
 table_name: search_session_event
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 description: Each row of this table corresponds to a house associated with a search. For example if an event in 170698_search_page_viewed_events returned 30 houses, there
   will be 30 rows in this table. Currently, it has only search and listing page viewed events.
 columns:

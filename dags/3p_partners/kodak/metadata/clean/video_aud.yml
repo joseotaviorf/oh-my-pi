@@ -1,39 +1,68 @@
 database_name: datalake_kodak_clean
 table_name: video_aud
+description: |
+  Hibernate Envers audit table that captures the complete change history of video records in Kodak's system. Each row represents a historical version of a video entity, tracking all modifications including metadata changes, source updates, and status transitions. This table enables temporal queries to reconstruct the state of any video at any point in time, supports compliance requirements, and provides detailed change tracking for debugging and analysis purposes.
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kodak_raw.video_aud.id
+    description: 'Video identifier from the original video table. Combined with rev to form the composite primary key for this audit record.'
   rev:
     lineage:
       - datalake_kodak_raw.video_aud.rev
+    description: 'Revision identifier linking to user_revision_entity table. Combined with id to form the composite primary key. References the specific transaction that created this audit record.'
   rev_type:
     lineage:
       - datalake_kodak_raw.video_aud.revtype
+    description: 'Type of database operation that created this audit record.'
+    categories:
+      '0': 'INSERT - Record was created'
+      '1': 'UPDATE - Record was modified'  
+      '2': 'DELETE - Record was deleted'
   rev_end:
     lineage:
       - datalake_kodak_raw.video_aud.revend
+    description: 'Revision identifier when this version of the record was superseded by a new change. Null for the current/latest version of the record.'
   external_domain:
     lineage:
       - datalake_kodak_raw.video_aud.externaldomain
+    description: 'Historical value of the external domain classification at the time of this revision.'
+    categories:
+      HOUSE: 'Video belonged to a QuintoAndar house listing'
+      BUILDING_VENTURE: 'Video belonged to a building or real estate venture'
+      LEAD3P: 'Video belonged to a third-party partner lead'
+      ATLAS: 'Video belonged to Atlas system (internal tooling)'
   id_external_domain:
     lineage:
       - datalake_kodak_raw.video_aud.externaldomainid
+    description: 'Historical value of the external domain identifier at the time of this revision. Links to records in other systems (property ID, lead ID, etc.).'
   metadata:
     lineage:
       - datalake_kodak_raw.video_aud.metadata
+    description: 'Historical snapshot of the video metadata JSON object at the time of this revision. Captures all video-specific attributes as they existed during this version.'
   mod_metadata:
     lineage:
       - datalake_kodak_raw.video_aud.metadata_mod
+    description: 'Boolean flag indicating whether the metadata field was modified in this revision. True means this field changed compared to the previous version.'
   id_source:
     lineage:
       - datalake_kodak_raw.video_aud.sourceid
+    description: 'Historical value of the source platform identifier (YouTube video ID, Vimeo ID, S3 key, etc.) at the time of this revision.'
   mod_id_source:
     lineage:
       - datalake_kodak_raw.video_aud.sourceid_mod
+    description: 'Boolean flag indicating whether the source ID field was modified in this revision. True means this field changed compared to the previous version.'
   video_source:
     lineage:
       - datalake_kodak_raw.video_aud.videosource
+    description: 'Historical value of the video platform/source at the time of this revision.'
+    categories:
+      YOUTUBE: 'Video was hosted on YouTube platform'
+      VIMEO: 'Video was hosted on Vimeo platform'
+      S3: 'Video was stored directly in QuintoAndar S3 storage'
   mod_video_source:
     lineage:
       - datalake_kodak_raw.video_aud.videosource_mod
+    description: 'Boolean flag indicating whether the video source field was modified in this revision. True means this field changed compared to the previous version.'

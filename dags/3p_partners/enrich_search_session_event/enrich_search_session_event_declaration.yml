@@ -1,7 +1,9 @@
 dag:
   name: enrich_search_session_event
   schedule_start_date: 2020, 8, 29
-  owner: Data Rede
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: 'This DAG is used to enrich the search session event data.'
 workflow:
   type: query_delta
   layer: enrich

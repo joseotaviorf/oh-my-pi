@@ -2,7 +2,7 @@
 database_name: dw_public
 table_name: fact_kodak_image_inspection
 description: This table stores detailed information about photo inspections related to Kodak. 
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_image_inspection:

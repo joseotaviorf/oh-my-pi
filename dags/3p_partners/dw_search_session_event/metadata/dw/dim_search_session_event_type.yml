@@ -3,8 +3,8 @@ database_name: dw_public
 table_name: dim_search_session_event_type
 description: Every row in this table is a possible combination of characteristics of an event in fact_search_session_event.
   This includes event type (search or LPV), business context, referrer, search location type, platform, and others.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_event_type:
     description: Primary key of the dimension table, representing the combination of characteristics of a search session event.

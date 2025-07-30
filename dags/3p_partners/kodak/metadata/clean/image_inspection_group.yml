@@ -1,88 +1,131 @@
 ---
 database_name: datalake_kodak_clean
 table_name: image_inspection_group
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Contains property-level aggregated analysis results from Kodak's image inspection system. Each row represents a complete photo analysis for a property or listing, combining individual image inspection results into overall quality scores, approval decisions, and compliance assessments. This table drives automated listing approval workflows and property photo quality optimization across QuintoAndar's platform and partner integrations.
 columns:
   id:
     lineage:
       - datalake_kodak_raw.image_inspection_group.id
+    description: 'Unique identifier for each property-level image inspection group. Primary key used for linking with individual image inspections and business context results.'
   id_external_domain:
     lineage:
       - datalake_kodak_raw.image_inspection_group.externaldomainid
+    description: 'External identifier linking the image group to records in other systems (property ID, lead ID, building ID, etc.). The interpretation depends on the external_domain value.'
   external_domain:
     lineage:
       - datalake_kodak_raw.image_inspection_group.externaldomain
+    description: 'Domain classification indicating which external system this image group belongs to.'
+    categories:
+      HOUSE: 'Image group for a QuintoAndar house listing'
+      BUILDING_VENTURE: 'Image group for a building or real estate venture'
+      LEAD3P: 'Image group for a third-party partner lead'
+      ATLAS: 'Image group for Atlas system (internal tooling)'
   status:
     lineage:
       - datalake_kodak_raw.image_inspection_group.status
+    description: 'Current processing status of the property-level image analysis workflow.'
+    categories:
+      PENDING: 'Analysis not yet started'
+      GROUP_ANALYSIS: 'Property-level analysis in progress'
+      UPLOAD: 'Images being uploaded or processed'
+      WATERMARK_REMOVAL: 'Watermark detection/removal in progress'
+      COMPLETED: 'All analysis completed'
   bathrooms:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bathrooms
+    description: 'Number of bathrooms detected in the property based on AI analysis of room classifications from uploaded images.'
   bedrooms:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bedrooms
+    description: 'Number of bedrooms detected in the property based on AI analysis of room classifications from uploaded images.'
   score:
     lineage:
       - datalake_kodak_raw.image_inspection_group.score
+    description: 'Overall quality score (0-100 scale) calculated from aggregated individual image inspection results. Higher scores indicate better photo quality and completeness.'
   approval_score_threshold:
     lineage:
       - datalake_kodak_raw.image_inspection_group.approval_score_threshold
+    description: 'Minimum score threshold required for automatic approval of the property listing. Typically set to 25 points but can vary by business context or property type.'
   property_condition:
     lineage:
       - datalake_kodak_raw.image_inspection_group.property_condition
+    description: 'Aggregated property condition score (0-10 scale) based on AI analysis of all property images. Reflects overall maintenance, cleanliness, and physical state.'
   framing_score:
     lineage:
       - datalake_kodak_raw.image_inspection_group.framing_score
+    description: 'Average framing quality score across all property images. Measures overall photo composition and visual presentation quality.'
   num_internal_photos:
     lineage:
       - datalake_kodak_raw.image_inspection_group.num_internal_photos
+    description: 'Count of interior photos detected in the property image set. Used for evaluating property photo coverage completeness.'
   images_per_room:
     lineage:
       - datalake_kodak_raw.image_inspection_group.images_per_room
+    description: 'Average number of images per room detected in the property. Indicates depth of photo coverage and listing completeness.'
   total_faults:
     lineage:
       - datalake_kodak_raw.image_inspection_group.total_faults
+    description: 'Total count of quality faults detected across all property images. Includes brightness, sharpness, and aspect ratio issues that may impact listing quality.'
   is_approved:
     lineage:
       - datalake_kodak_raw.image_inspection_group.approved
+    description: 'Boolean flag indicating whether the entire property image set passed quality and compliance checks for publication. True means the listing is approved for display.'
   has_bonus_good_sharpness:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_good_sharpness
+    description: 'Quality bonus: True if the property has a high percentage of exceptionally sharp images, indicating superior photo quality.'
   has_bonus_aspect_ratio:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_aspect_ratio
+    description: 'Quality bonus: True if property images consistently meet optimal aspect ratio standards for platform display.'
   has_bonus_images_per_room:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_images_per_room
+    description: 'Coverage bonus: True if property has comprehensive photo coverage with adequate images per room, enhancing listing attractiveness.'
   has_bonus_view:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_view
+    description: 'Content bonus: True if property includes high-quality view photos showing surroundings, adding value to the listing presentation.'
   has_bonus_external:
     lineage:
       - datalake_kodak_raw.image_inspection_group.bonus_external
+    description: 'Content bonus: True if property includes good exterior photos showing building facade and external features.'
   has_red_flags:
     lineage:
       - datalake_kodak_raw.image_inspection_group.red_flags
+    description: 'Critical aggregated flag: True if any critical compliance or quality issues were detected across the property images. Typically blocks approval.'
   has_red_flag_images_per_room:
     lineage:
       - datalake_kodak_raw.image_inspection_group.red_flag_images_per_room
+    description: 'Coverage red flag: True if property has insufficient photo coverage (too few images per room), potentially misleading users about property details.'
   has_red_flag_property_condition:
     lineage:
       - datalake_kodak_raw.image_inspection_group.red_flag_property_condition
+    description: 'Condition red flag: True if aggregated property condition score indicates poor maintenance or unsuitable property state for listing.'
   has_red_flag_primary_risk:
     lineage:
       - datalake_kodak_raw.image_inspection_group.red_flag_primary_risk
+    description: 'High-priority red flag: True if critical compliance, fraud, or quality issues were detected that pose primary risks to platform integrity.'
   ts_created:
     lineage:
       - datalake_kodak_raw.image_inspection_group.created_at
+    description: 'Timestamp when the image inspection group was initially created and analysis began.'
   ts_updated:
     lineage:
       - datalake_kodak_raw.image_inspection_group.updated_at
+    description: 'Timestamp when the image inspection group was last updated with new analysis results or status changes.'
   year:
     lineage:
       - datalake_kodak_raw.image_inspection_group.year
+    description: 'Year partition key extracted from the creation timestamp for optimized data organization and querying.'
   month:
     lineage:
       - datalake_kodak_raw.image_inspection_group.month
+    description: 'Month partition key extracted from the creation timestamp for optimized data organization and querying.'
   day:
     lineage:
       - datalake_kodak_raw.image_inspection_group.day
+    description: 'Day partition key extracted from the creation timestamp for optimized data organization and querying.'

@@ -1,9 +1,52 @@
 dag:
   name: dw_kodak
   schedule_start_date: 2020, 1, 1
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: "This DAG creates the model for QuintoAndar's Kodak photos inspections service."
+    dag_purpose: |
+      This DAG creates the analytical data warehouse layer for Kodak's image inspection and analysis service, building dimensional and fact tables optimized for business intelligence, reporting, and advanced analytics on property photo quality and AI-powered image analysis.
+      
+      **Data Warehouse Purpose:**
+      This pipeline transforms enriched Kodak data into a star schema model designed for high-performance analytical queries, executive reporting, and machine learning workflows focused on property image quality assessment and real estate listing optimization.
+      
+      **Data Models Created:**
+      
+      **1. dim_kodak_photos (Dimension Table):**
+      - Master dimension of all photos in the Kodak system
+      - Contains photo metadata, S3 paths, and external domain references
+      - Provides lookup capabilities for photo-related analytics
+      - Supports slowly changing dimension tracking for photo updates
+      
+      **2. fact_kodak_image_inspection (Fact Table):**
+      - Central fact table containing detailed image inspection metrics and analysis results
+      - Combines individual image analysis with property and business context
+      - Includes comprehensive AI-generated quality scores and compliance indicators
+      - Links images to properties (houses) and 3P partner leads for cross-domain analysis
+      
+      **Key Metrics and Dimensions:**
+      - **Quality Metrics**: Brightness, sharpness, framing scores, condition ratings
+      - **Compliance Flags**: Watermark detection, size compliance, aspect ratio validation
+      - **Business Context**: Property type, room classification, external domain mapping
+      - **AI Analysis**: Automated approval status, red flags, bonus indicators
+      - **Operational Data**: Processing status, duplicate detection, noise analysis
+      
+      **Data Sources:**
+      - `datalake_kodak_clean.*`: Raw Kodak tables (photos, inspections, groups)
+      - `datalake_brokers_supply_processor.lead_3p`: 3P partner property data
+      - `datalake_ebdb_clean.house`: QuintoAndar property master data
+      
+      **Business Use Cases:**
+      - **Executive Reporting**: Photo quality KPIs and compliance dashboards
+      - **Operational Analytics**: Image processing performance and bottleneck analysis
+      - **Quality Assurance**: Automated photo approval rates and rejection reasons
+      - **Partner Management**: 3P partner photo quality benchmarking
+      - **ML/AI Analytics**: Training data for image quality prediction models
+      - **Property Insights**: Room coverage analysis and listing completeness metrics
+      
+      **Performance Optimizations:**
+      - Custom cluster configuration for large-scale analytical workloads
+      - Optimized for complex joins across property and image data
+      - Designed for both batch reporting and interactive query performance
 workflow:
   type: query_delta
   layer: dw

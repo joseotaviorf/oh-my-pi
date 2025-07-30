@@ -2,8 +2,8 @@
 database_name: datalake_kodak
 table_name: image_inspection_amenities
 description: Infers which amenities each analyzed house has, based on the image inspection.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:
     description: Id of the house.

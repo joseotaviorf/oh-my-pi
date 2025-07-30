@@ -2,9 +2,40 @@ dag:
   name: kodak
   schedule_start_date: 2020, 3, 19
   schedule_interval: 0 0 * * *
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: This flow is intended to retrieve data related to images and videos used on our platforms.
+    dag_purpose: |
+      This DAG imports raw data from Kodak, QuintoAndar's centralized media management microservice responsible for storing and analyzing all media formats (photos, videos, 360° images/photospheres).
+      
+      **Kodak Service Overview:**
+      Kodak is QuintoAndar's core media storage and AI-powered analysis platform that handles:
+      - Photo, video, and photosphere (360° images) storage in S3
+      - AI-powered image quality analysis and compliance checking
+      - Watermark detection and removal workflows
+      - Property image inspection and scoring for real estate listings
+      - Integration with external domains (HOUSE, BUILDING_VENTURE, LEAD3P, ATLAS)
+      
+      **Data Pipeline Purpose:**
+      This pipeline performs Change Data Capture (CDC) from Kodak's PostgreSQL production database, extracting:
+      - Media metadata and storage paths
+      - AI analysis results including quality scores, compliance flags, and red flags
+      - Image inspection group results for property-level analysis
+      - Watermark removal processing results
+      - Audit trails for all media operations
+      
+      **Key Tables Ingested:**
+      - **photo**: Core photo metadata with S3 paths and external domain references
+      - **video**: Video metadata with source tracking (YouTube, Vimeo, S3)
+      - **photosphere**: 360° image data with preview paths and positioning
+      - **image_inspection**: Individual image AI analysis with quality metrics, room classification, and compliance flags
+      - **image_inspection_group**: Property-level aggregated analysis results and approval status
+      - **image_inspection_group_result**: Business context-specific group analysis results
+      - **watermark_removal**: Watermark detection and removal processing results
+      - **photo_invalid_source**: Tracking of failed photo processing attempts
+      - **Audit tables**: Complete change history via Hibernate Envers for compliance
+      
+      **Business Impact:**
+      This data enables analytics for property photo quality, compliance monitoring, automated photo approval workflows, and performance analysis of AI-powered image processing systems.
 workflow:
   type: cdc
   layer: raw
