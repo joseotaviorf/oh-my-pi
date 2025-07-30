@@ -1,5 +1,5 @@
 -- RELATION BOOKING OFFER
- WITH 
+ WITH
     first_booking_author AS (
         SELECT DISTINCT
             bsc.id_booking,
@@ -78,7 +78,7 @@
         datalake_ebdb_clean.booking AS b
       LEFT JOIN
           first_booking_author AS fba
-              ON fba.id_booking = b.id 
+              ON fba.id_booking = b.id
       LEFT JOIN
           datalake_hub_services.secretariat_hierarchy AS su
               ON su.id_user_5a = fba.id_user_creation
@@ -90,7 +90,7 @@
             ON b.id_house = hl.id
       LEFT JOIN
           datalake_ebdb_clean.country AS ct
-              ON ct.code = hl.country_code                                
+              ON ct.code = hl.country_code
       WHERE
           b.business_context = 'SALE'
           AND b.type = 'Visita'
@@ -190,7 +190,7 @@ relation_booking_offer AS (
         COALESCE(vo.id_offer, bo.id_offer) AS id_offer,
         COALESCE(vo.id_booking, bo.id_booking) AS id_booking,
         COALESCE(vo.id_agent, bo.id_agent) AS id_agent,
-        CASE 
+        CASE
             WHEN vo.id_booking IS NOT NULL THEN vo.id_user_secretariat_booking_creator
             ELSE bo.id_user_secretariat_booking_creator
         END AS id_user_secretariat_booking_creator,
@@ -1042,9 +1042,9 @@ last_secretariat as (
     JOIN
         datalake_hub_services.buyer_secretariat_changes AS bsc
             ON b.id_buyer = bsc.id_external_lead
-            AND bsc.is_last_responsible 
+            AND bsc.is_last_responsible
 )
-SELECT
+SELECT DISTINCT
     br.id_offer,
     id_sale_flow,
     id_buyer,
@@ -1071,9 +1071,9 @@ SELECT
     id_business_unit,
     id_company_supply,
     uuid_company_supply,
-    cs_supply.sk_company AS sk_company_supply,
+    COALESCE(supply_company.sk_company, supply_hubspot.sk_company, supply_tag.sk_company) AS sk_company_supply,
     id_company_demand,
-    cs_demand.sk_company AS sk_company_demand,
+    COALESCE(demand_hubspot.sk_company, demand_tag.sk_company) AS sk_company_demand,
     pendency,
     CASE
         WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (
@@ -1229,22 +1229,17 @@ LEFT JOIN
     last_secretariat AS ls
         ON ls.id_offer = br.id_offer
 LEFT JOIN
-    datalake_company.company_sks AS cs_demand
-        ON (br.id_company_demand IS NOT NULL
-        AND br.id_company_demand = cs_demand.id_hubspot)
-        OR (br.id_company_demand IS NULL
-        AND br.partner_3p_demand = cs_demand.extracted_3p_tag)
+    datalake_company.company_sks AS demand_hubspot
+        ON br.id_company_demand = demand_hubspot.id_hubspot
 LEFT JOIN
-    datalake_company.company_sks AS cs_supply
-        ON (
-        br.uuid_company_supply IS NOT NULL
-        AND br.uuid_company_supply = cs_supply.uuid_company
-        ) OR (
-        br.uuid_company_supply IS NULL
-        AND br.id_company_supply IS NOT NULL
-        AND br.id_company_supply = cs_supply.id_hubspot
-        ) OR (
-         br.uuid_company_supply IS NULL
-         AND br.id_company_supply IS NULL
-         AND br.partner_3p_supply = cs_supply.extracted_3p_tag
-     )
+    datalake_company.company_sks AS demand_tag
+        ON br.partner_3p_demand = demand_tag.extracted_3p_tag
+LEFT JOIN
+    datalake_company.company_sks AS supply_company
+        ON br.uuid_company_supply = supply_company.uuid_company
+LEFT JOIN
+    datalake_company.company_sks AS supply_hubspot
+        ON br.id_company_supply = supply_hubspot.id_hubspot
+LEFT JOIN
+    datalake_company.company_sks AS supply_tag
+        ON br.partner_3p_supply = supply_tag.extracted_3p_tag
