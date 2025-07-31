@@ -3,7 +3,7 @@ WITH ciq_daily_history AS (
       cu.id_partner,
       cu.id_user,
       COALESCE(u.id_agent, -1) AS id_agent,
-      cu_status_date.status,
+      cu.status,
       cu.email,
       dd.date AS dt_reference,
       dd.year AS year,
@@ -74,7 +74,7 @@ agent_status_history AS (
   QUALIFY
       ROW_NUMBER() OVER (PARTITION BY id_agent, dt_action ORDER BY ts_revision DESC) = 1
 )
-SELECT 
+SELECT
     cdh.id_partner,
     cdh.id_user,
     cdh.id_agent,
@@ -90,7 +90,7 @@ SELECT
     cdh.year,
     cdh.month,
     cdh.day
-FROM 
+FROM
     ciq_daily_history AS cdh
 LEFT JOIN
     logins_pm_per_day AS lpd
