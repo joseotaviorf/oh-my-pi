@@ -333,6 +333,17 @@ databricks_13_3_med_memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_13_3_med_memory_on_demand_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        availability: ON_DEMAND
+
 databricks_12_2_med_compute_cluster:
     <<: *cluster_anchor
     driver_node_type_id: c5a.large
