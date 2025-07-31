@@ -72,7 +72,6 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     def load_partition(hour):
-        execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
         df = s3_consumer.get_data_from_file(
             proxy_path.format(
                 execution_date.year,
@@ -122,10 +121,11 @@ if __name__ == "__main__":
             partition_cols=partition_cols,
         )
 
-    for execution_date in date_list:
+    for date in date_list:
+        execution_date = datetime.strptime(date, "%Y-%m-%d")
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_cores) as executor:
             future_to_hour = {
-                executor.submit(load_partition, hour_list): hour for hour in hour_list
+                executor.submit(load_partition, hour): hour for hour in hour_list
             }
             for future in concurrent.futures.as_completed(future_to_hour):
                 hour = future_to_hour[future]
