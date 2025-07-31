@@ -12,6 +12,8 @@ SELECT
     internal_status,
     source,
     requested_by,
+    responsible_off_manager_email,
+    responsible_off_manager_email_mod AS mod_responsible_off_manager_email,
     date AS dt_termination,
     vacancy_date AS dt_vacancy,
     canceled_at AS ts_canceled,

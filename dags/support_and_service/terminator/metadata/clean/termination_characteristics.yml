@@ -68,6 +68,14 @@ columns:
     lineage:
       - datalake_terminator_raw.termination_characteristics.admin_termination
     description: termination with the administration, that is, cases in which the landlord no longer wants its property to be managed by QuintoAndar.
+  has_automatic_repair_analysis:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.automatic_repair_analysis
+    description: This field indicates whether the termination will go through the automated flow.
+  is_automatic_repair_analysis_opted_out:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.automatic_repair_analysis_opted_out
+    description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
   ts_created:
     lineage:
       - datalake_terminator_raw.termination_characteristics.created_at

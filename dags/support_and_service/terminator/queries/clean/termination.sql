@@ -18,6 +18,7 @@ SELECT
     team,
     tenant_pending_tasks,
     category,
+    responsible_off_manager_email,
     inspection_date_offset_in_days,
     wave AS spoc_wave,
     is_spoc,

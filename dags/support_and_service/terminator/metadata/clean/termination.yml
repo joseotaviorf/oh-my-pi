@@ -80,6 +80,10 @@ columns:
     lineage:
       - datalake_terminator_raw.termination.category
     description: Category or type of termination (e.g., STANDARD, BEFORE_RENTAL, JOB_TRANSFER...).
+  responsible_off_manager_email:
+    lineage:
+      - datalake_terminator_raw.termination.responsible_off_manager_email
+    description: Email of SPOC responsible analyst.
   inspection_date_offset_in_days:
     lineage:
       - datalake_terminator_raw.termination.inspection_date_offset_in_days

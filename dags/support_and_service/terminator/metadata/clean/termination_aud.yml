@@ -1,66 +1,98 @@
 database_name: datalake_terminator_clean
 table_name: termination_aud
+description: The audit table from termination contracts.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_terminator_raw.termination_aud.id
+    description: Termination identification key.
   id_contract:
     lineage:
       - datalake_terminator_raw.termination_aud.contract_id
+    description: Contract identification key.
   id_exit_inspection:
     lineage:
       - datalake_terminator_raw.termination_aud.exit_inspection_id
+    description: Exit inspection identification key.
   rev:
     lineage:
       - datalake_terminator_raw.termination_aud.rev
+    description: Revision number.
   rev_type:
     lineage:
       - datalake_terminator_raw.termination_aud.revtype
+    description: Revision type.
   rev_end:
     lineage:
       - datalake_terminator_raw.termination_aud.revend
+    description: Number of next revision.
   feedback:
     lineage:
       - datalake_terminator_raw.termination_aud.feedback
+    description: Customer or tenant feedback related to the termination process.
   tenant_keys_location:
     lineage:
       - datalake_terminator_raw.termination_aud.tenant_keys_location
+    description: Location where the tenant's keys are stored or returned.
   owner_keys_location:
     lineage:
       - datalake_terminator_raw.termination_aud.owner_keys_location
+    description: Location where the owner's keys are stored or returned.
   status:
     lineage:
       - datalake_terminator_raw.termination_aud.status
+    description: Current status of the termination process.
   internal_status:
     lineage:
       - datalake_terminator_raw.termination_aud.internal_status
+    description: Internal status used for tracking the process on back.
   source:
     lineage:
       - datalake_terminator_raw.termination_aud.source
+    description: Source or origin of the termination request.
   requested_by:
     lineage:
       - datalake_terminator_raw.termination_aud.requested_by
+    description: Identifier of the individual or entity that initiated the termination request.
+  responsible_off_manager_email:
+    lineage:
+      - datalake_terminator_raw.termination_aud.responsible_off_manager_email
+    description: Email of SPOC responsible analyst.
+  mod_responsible_off_manager_email:
+    lineage:
+      - datalake_terminator_raw.termination_aud.responsible_off_manager_email_mod
+    description: Boolean to indicate updates on email of SPOC responsible analyst.
   dt_termination:
     lineage:
       - datalake_terminator_raw.termination_aud.date
+    description: Date when the property became or will become vacant.
   dt_vacancy:
     lineage:
       - datalake_terminator_raw.termination_aud.vacancy_date
+    description: Date when the property became or will become vacant.
   ts_canceled:
     lineage:
       - datalake_terminator_raw.termination_aud.canceled_at
+    description: Timestamp for when the termination was canceled, if applicable.
   ts_created:
     lineage:
       - datalake_terminator_raw.termination_aud.created_at
+    description: Timestamp for when the termination record was initially created.
   ts_updated:
     lineage:
       - datalake_terminator_raw.termination_aud.updated_at
+    description: Timestamp for the most recent update to the termination record.
   year:
     lineage:
       - datalake_terminator_raw.termination_aud.year
+    description: Updated year.
   month:
     lineage:
       - datalake_terminator_raw.termination_aud.month
+    description: Updated month.
   day:
     lineage:
       - datalake_terminator_raw.termination_aud.day
+    description: Updated day.

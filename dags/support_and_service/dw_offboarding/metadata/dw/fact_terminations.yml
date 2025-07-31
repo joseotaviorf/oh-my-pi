@@ -163,6 +163,14 @@ columns:
     description: Boolean information that indicates whether the termination fee is prior notice.
     lineage:
       - datalake_terminator.termination.is_fee_prior_notice
+  has_automatic_repair_analysis:
+    lineage:
+      - datalake_terminator.termination.has_automatic_repair_analysis
+    description: This field indicates whether the termination will go through the automated flow.
+  is_automatic_repair_analysis_opted_out:
+    lineage:
+      - datalake_terminator.termination.is_automatic_repair_analysis_opted_out
+    description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
   ts_termination_request:
     description: Date in timestamp format that indicates when the termination request occurred.
     lineage:

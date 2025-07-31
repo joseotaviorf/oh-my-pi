@@ -3415,6 +3415,7 @@ bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination-task:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-workflow:first-run-of-day
   - bietlejuice.terminator:load-clean-termination:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:

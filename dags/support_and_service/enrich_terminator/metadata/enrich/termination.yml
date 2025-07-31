@@ -104,6 +104,10 @@ columns:
     description: Descriptive information that indicates the type of task related to the termination.
     lineage:
       - datalake_terminator_clean.termination_task.type
+  responsible_off_manager_email:
+    lineage:
+      - datalake_terminator_clean.termination.responsible_off_manager_email
+    description: Email of SPOC responsible analyst.
   is_spoc:
     description: Boolean information indicating whether the termination is part of the spoc control group.
     lineage:
@@ -158,6 +162,14 @@ columns:
     description: Boolean information that indicates whether the termination fee is prior notice.
     lineage:
       - datalake_terminator_clean.termination_fee.is_fee_prior_notice
+  has_automatic_repair_analysis:
+    lineage:
+      - datalake_terminator_clean.termination_characteristics.has_automatic_repair_analysis
+    description: This field indicates whether the termination will go through the automated flow.
+  is_automatic_repair_analysis_opted_out:
+    lineage:
+      - datalake_terminator_clean.termination_characteristics.is_automatic_repair_analysis_opted_out
+    description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:

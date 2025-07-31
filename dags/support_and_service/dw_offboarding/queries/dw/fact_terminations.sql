@@ -49,6 +49,8 @@ SELECT
     t.is_exit_inspection_opt_out,
     t.has_early_termination_fee,
     t.is_fee_prior_notice,
+    t.has_automatic_repair_analysis,
+    t.is_automatic_repair_analysis_opted_out,
     t.ts_termination_request,
     t.ts_termination_updated,
     t.ts_termination_canceled,

@@ -159,6 +159,7 @@ SELECT
     checklist.checklist_item,
     cdr.decline_person,
     tt.type AS task_type,
+    t.responsible_off_manager_email,
     t.is_spoc,
     t.is_spoc_control_group,
     t.is_relisting,
@@ -174,6 +175,8 @@ SELECT
     ln.has_early_termination_fee,
     ln.is_fee_prior_notice,
     neg.needs_repair_by_tenant AS has_repair_by_tenant_needed,
+    tc.has_automatic_repair_analysis,
+    tc.is_automatic_repair_analysis_opted_out,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
     ln.fee_discount_value,
@@ -241,6 +244,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_terminator_clean.inspection_opted_out AS ioo
       ON t.id = ioo.id_termination
+LEFT JOIN
+    datalake_terminator_clean.termination_characteristics AS tc
+        ON tc.id_termination = t.id
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY

@@ -15,6 +15,8 @@ SELECT
     intermediation_required AS is_intermediation_required,
     high_value_contract AS is_high_value_contract,
     admin_termination AS is_admin_termination,
+    automatic_repair_analysis AS has_automatic_repair_analysis,
+    automatic_repair_analysis_opted_out AS is_automatic_repair_analysis_opted_out,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
