@@ -1,48 +1,70 @@
 database_name: datalake_sales_flow_clean
 table_name: ccv_party
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "This table contains detailed information about each party (such as buyers, sellers, and witnesses) involved in a Purchase and Sale Agreement (CCV). It stores demographic and contact data, as well as the signature status for each individual or entity that is part of the contract."
 columns:
   id:
+    description: 'Unique identifier for the CCV party record.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.id
   id_ccv:
+    description: 'Identifier of the CCV (Contrato de Compra e Venda) to which this party is associated.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.ccv_id
   id_address_data:
+    description: 'Identifier for the address data associated with this party.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.address_data_id
   type:
+    description: 'Type of the party involved in the CCV (e.g., Buyer, Seller).'
     lineage:
       - datalake_sales_flow_raw.ccv_party.type
   name:
+    description: 'Full name of the party.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.name
   email:
+    description: 'Email address of the party.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.email
   document:
+    description: 'Official document number of the party (e.g., CPF, CNPJ).'
     lineage:
       - datalake_sales_flow_raw.ccv_party.document
   nationality:
+    description: 'Nationality of the party.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.nationality
   profession:
+    description: 'Profession of the party.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.profession
   marital_status:
+    description: 'Marital status of the party (e.g., Single, Married).'
     lineage:
       - datalake_sales_flow_raw.ccv_party.marital_status
+  is_signed:
+    description: 'Flag indicating whether the party has signed the CCV.'
+    lineage:
+      - datalake_sales_flow_raw.ccv_party.signed
   ts_created:
+    description: 'Timestamp indicating when the party record was created.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.created_at
   ts_updated:
+    description: 'Timestamp indicating the last time the party record was updated.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.updated_at
   year:
+    description: 'Partitioning column: Year of the record''s creation/update.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.year
   month:
+    description: 'Partitioning column: Month of the record''s creation/update.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.month
   day:
+    description: 'Partitioning column: Day of the record''s creation/update.'
     lineage:
       - datalake_sales_flow_raw.ccv_party.day
