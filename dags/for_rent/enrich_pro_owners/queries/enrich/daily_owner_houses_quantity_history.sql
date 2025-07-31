@@ -142,11 +142,11 @@ owner_qtd_houses AS (
 
 pp_multi_history AS (
   SELECT /*+ RANGE_JOIN(aud, 50000) */
-    COALESCE(um.id_user, aud.id_user) AS id_owner,
+    COALESCE(aud.id_user, um.id_user) AS id_owner,
     aud.id_account_manager,
     aud.is_active,
     DATE(FROM_UNIXTIME(ure.ts_revision/1000)) AS dt_event,
-    LEAD(DATE(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY COALESCE(um.id_user, aud.id_user) ORDER BY aud.rev) AS dt_next_event
+    LEAD(DATE(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY COALESCE(aud.id_user, um.id_user) ORDER BY aud.rev) AS dt_next_event
   FROM
     datalake_ebdb_clean.user_pro_owner_aud AS aud
   LEFT JOIN
