@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: company_members
-description: Each row is a company registered in Hubspot that is a member or has been a member according to sale_lead_status, discarding merged or archived companies.
-domain: Rede
+description: |
+  Enriched company membership tracking table with comprehensive member status analysis and business qualification metrics. 
+  Each row represents a company that has achieved member status or has membership history, filtered to exclude merged 
+  or archived entities. This table provides a clean, analytics-ready view of the company membership base with enriched 
+  business intelligence for member lifecycle analysis and retention optimization.
+  
+  **Key Features:**
+  - Active and historical member company tracking with status qualification logic
+  - Lead status progression analysis specific to member conversion paths
+  - Data quality controls excluding merged, archived, or invalid company records
+  - Member lifecycle tracking from lead generation through membership achievement
+  - Ownership and territory attribution for member acquisition performance analysis
+  - Business context enrichment for member segmentation and retention strategies
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_company:

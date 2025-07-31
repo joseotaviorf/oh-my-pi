@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: owner
-description: Table showing the user and team information of the owners of tickets created in Hubspot. Each row is an owner.
-domain: Rede
+description: |
+  Enriched HubSpot owner entities representing sales and support team members with comprehensive user management and attribution data. 
+  Each row represents a unique HubSpot owner in their current state, enriched with team affiliations, cross-platform user mapping, 
+  and contact information. This table provides the foundation for user attribution across all CRM activities including deals, 
+  tickets, calls, meetings, and communications.
+
+  **Key Enrichments:**
+  - Current team assignment with hierarchical team structure and management relationships
+  - Cross-platform user identification linking HubSpot users to QuintoAndar person service
+  - Contact information standardization for communication and notification systems
+  - Owner status tracking for active/inactive user management and performance analytics
+  - Team performance attribution enabling sales and support effectiveness measurement
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_owner:

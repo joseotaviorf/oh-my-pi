@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: call_history
-description: This table has one row per day that has a modification or creation of a call in HubSpot. If you want one row per call, use datalake_hubspot.call. 
-domain: Rede
+description: |
+  Historical tracking table for HubSpot call activity changes with daily granularity and comprehensive engagement evolution analysis. 
+  Each row represents a specific day when a call record was created or modified in HubSpot, capturing the complete evolution 
+  of call details, outcomes, and associated relationships. This table enables trend analysis of communication patterns, 
+  call effectiveness over time, and customer engagement evolution.
+
+  **Historical Tracking Features:**
+  - Daily snapshots of call activity changes including outcome updates and relationship modifications
+  - Call engagement evolution tracking from initial contact through follow-up activities
+  - Customer interaction pattern analysis for relationship development and engagement optimization
+  - Team performance trend tracking with historical call metrics and effectiveness measurement
+  - Communication strategy effectiveness analysis through outcome and duration evolution
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_call:

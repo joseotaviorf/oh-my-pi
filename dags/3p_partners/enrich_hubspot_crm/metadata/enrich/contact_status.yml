@@ -1,9 +1,21 @@
 ---
 database_name: datalake_hubspot
 table_name: contact_status
-description: This table shows the status changes of contacts registered in HubSpot. Each row is a status of a contact.
+description: |
+  Enriched contact lead status tracking table with comprehensive change attribution and lifecycle progression analysis. 
+  Each row represents a specific status change event for a contact, capturing the complete context of customer lifecycle 
+  progression including source attribution, user actions, and engagement patterns. This table enables detailed analysis 
+  of customer journey optimization and lead nurturing effectiveness.
+  
+  **Key Features:**
+  - Complete contact status change event tracking with timestamp precision
+  - Source attribution including API calls, UI actions, automation, and marketing campaigns
+  - User attribution for understanding who triggered lifecycle stage changes
+  - Lifecycle stage progression tracking for conversion funnel analysis
+  - Lead scoring evolution and engagement pattern identification
+  - Customer journey mapping with touchpoint effectiveness measurement
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede 
+domain: 3P Partners
 columns:
   id_contact:
     lineage:

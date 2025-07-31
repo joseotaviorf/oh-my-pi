@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: company
-description: Each row is a company lead registered in HubSpot.
-domain: Rede
+description: |
+  Enriched company entities from HubSpot CRM with comprehensive business intelligence and relationship data. 
+  Each row represents a unique company in its current state, enriched with calculated fields, business logic, 
+  and relationship hierarchies. This table combines raw HubSpot data with business rules to provide an 
+  analytics-ready view of company entities including lead scoring, relationship mapping, and business context.
+  
+  **Key Enrichments:**
+  - Deciding contact identification with business hierarchy logic (CEO > Partner/Director > Manager)
+  - Company relationship mapping including parent companies and merged entities
+  - Lead status tracking with change attribution and source information
+  - Geographic and industry standardization for analytics consistency
+  - Cross-platform matching with internal systems (EBDB) for unified customer view
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_company:

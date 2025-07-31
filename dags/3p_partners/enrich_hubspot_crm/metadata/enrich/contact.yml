@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: contact
-description: This table shows the contacts registered in HubSpot. Each row is one contact.
-domain: Rede
+description: |
+  Enriched contact entities from HubSpot CRM with comprehensive customer intelligence and engagement analytics. 
+  Each row represents a unique contact in its current state, enriched with calculated metrics, lifecycle tracking, 
+  and attribution data. This table provides an analytics-ready view of customer profiles with business logic 
+  for lead scoring, engagement analysis, and customer journey tracking.
+  
+  **Key Enrichments:**
+  - Contact lifecycle stage progression with attribution tracking
+  - Lead source and campaign attribution for marketing effectiveness analysis
+  - Company relationship mapping with deciding contact identification
+  - Cross-platform matching with internal systems (EBDB) for unified customer profiles
+  - Engagement scoring and interaction frequency calculations
+  - Geographic and demographic standardization for segmentation analysis
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_contact:

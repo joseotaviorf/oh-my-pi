@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: ticket_history
-description: This table shows the history about tickets registered in HubSpot. Each row is one change in a ticket, limited to the most recent per day. If you want the current row, use datalake_hubspot.ticket.
-domain: Rede
+description: |
+  Historical tracking table for support ticket changes in HubSpot CRM with comprehensive customer service analytics and resolution tracking. 
+  Each row represents a daily snapshot of ticket state changes, enabling time-series analysis and support performance measurement. 
+  This table captures the complete evolution of customer support cases over time with enriched metadata for SLA optimization, 
+  resolution analysis, and customer satisfaction improvement.
+  
+  **Key Features:**
+  - Daily granularity change tracking with complete ticket progression history
+  - Pipeline and stage movement tracking for resolution time analysis
+  - Priority and category evolution for workload management optimization
+  - Support team attribution changes for performance measurement
+  - Customer context tracking with company and contact relationship evolution
+  - Resolution tracking and SLA compliance measurement over time
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_ticket:

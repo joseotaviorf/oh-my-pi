@@ -1,7 +1,7 @@
 dag:
   name: enrich_hubspot_events
   schedule_start_date: 2020, 1, 1
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: DAG created to load the tables consolidates all HubSpot events that will support the `fact_company_events` and `dim_company_events` in DW Company, consolidating all the events observed in Hubspot.
 workflow:

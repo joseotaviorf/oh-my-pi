@@ -1,7 +1,7 @@
 database_name: datalake_hubspot
 table_name: cluster_updates
 description: Table that shows the period during which a Rede partner company belonged to a certain cluster (Decola, Tier, etc.), according to the classification criteria defined by the Operations team on HubSpot.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_cluster_update:

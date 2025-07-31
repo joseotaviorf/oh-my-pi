@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: contact_history
-description: This table shows the history about contacts registered in HubSpot. Each row is one change in a contact, limited to the most recent per day. If you want the current row, use datalake_hubspot.contact.
-domain: Rede
+description: |
+  Historical tracking table for contact changes in HubSpot CRM with comprehensive change attribution and temporal analytics. 
+  Each row represents a daily snapshot of contact state changes, enabling time-series analysis and change attribution. 
+  This table captures the evolution of contact data over time with enriched metadata for tracking business process 
+  effectiveness and customer journey progression.
+  
+  **Key Features:**
+  - Daily granularity change tracking with complete property history
+  - Source attribution for understanding what triggered changes (API, UI, automation, etc.)
+  - Lifecycle stage progression tracking for conversion funnel analysis
+  - Marketing attribution with first-touch and last-touch campaign tracking
+  - Cross-platform relationship tracking with internal systems (EBDB)
+  - Lead scoring evolution and engagement pattern analysis over time
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_contact:

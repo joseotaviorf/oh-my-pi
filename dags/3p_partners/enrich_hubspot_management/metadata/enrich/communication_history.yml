@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: communication_history
-description: This table has one row per day that has a modification or creation of a communication in HubSpot. If you want one row per communication, use datalake_hubspot.communication. 
-domain: Rede
+description: |
+  Historical tracking table for HubSpot communication activity changes with daily granularity and comprehensive multichannel engagement evolution analysis. 
+  Each row represents a specific day when a communication record was created or modified in HubSpot, capturing the complete evolution 
+  of communication details, outcomes, and cross-channel engagement patterns. This table enables trend analysis of communication 
+  effectiveness over time, channel preference evolution, and customer engagement maturity.
+
+  **Historical Tracking Features:**
+  - Daily snapshots of communication activity changes including outcome updates and channel effectiveness modifications
+  - Cross-channel engagement evolution tracking from initial contact through multichannel relationship development
+  - Customer communication preference analysis for channel optimization and personalization strategies
+  - Team performance trend tracking with historical communication metrics across all channels
+  - Communication strategy effectiveness analysis through channel performance and engagement evolution
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_communication:

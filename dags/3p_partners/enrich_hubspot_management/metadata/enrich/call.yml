@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: call
-description: This table has one row per call in HubSpot.
-domain: Rede
+description: |
+  Enriched HubSpot call activity records with comprehensive engagement analytics and customer interaction intelligence. 
+  Each row represents a unique phone call interaction between team members and prospects/customers, enriched with 
+  business context, relationship mapping, and performance metrics. This table provides detailed insights into 
+  sales and support call effectiveness, customer engagement patterns, and team communication performance.
+
+  **Key Enrichments:**
+  - Call outcome classification and business result analysis with success/failure attribution
+  - Customer relationship context including associated deals, tickets, companies, and contacts
+  - Team member attribution with performance tracking and activity measurement
+  - Call timing and duration analysis for efficiency optimization and customer experience
+  - Communication effectiveness measurement with engagement scoring and follow-up tracking
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_call:

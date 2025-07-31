@@ -1,43 +1,62 @@
 ---
 database_name: datalake_hubspot_clean
 table_name: owner
+description: |
+  HubSpot Owner objects represent users within the HubSpot platform who can own and manage CRM records. 
+  Owners are assigned to contacts, companies, deals, and tickets for accountability and workflow management. 
+  This table contains user information and team assignments essential for CRM ownership tracking and performance analysis.
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_hubspot_raw.owner.id
+    description: 'Unique identifier for the owner record in HubSpot. Primary key used for assigning ownership of contacts, companies, deals, and tickets to specific users.'
   id_user:
     lineage:
       - datalake_hubspot_raw.owner.user_id
+    description: 'Internal user identifier in HubSpot system. Links the owner record to the underlying user account and permissions within the platform.'
   email:
     lineage:
       - datalake_hubspot_raw.owner.email
+    description: 'Email address of the owner/user. Used for communication, notifications, and as a unique identifier for the HubSpot user account.'
   first_name:
     lineage:
       - datalake_hubspot_raw.owner.firstname
+    description: 'First name of the owner/user. Used for display purposes in the HubSpot interface and for personalization in communications.'
   last_name:
     lineage:
       - datalake_hubspot_raw.owner.lastname
+    description: 'Last name of the owner/user. Combined with first name for full user identification and display in reports and UI.'
   teams:
     lineage:
       - datalake_hubspot_raw.owner.teams
+    description: 'JSON array of team memberships for the owner. Defines team-based permissions, reporting hierarchies, and collaboration groups within the organization.'
   is_archived:
     lineage:
       - datalake_hubspot_raw.owner.archived
+    description: 'Boolean flag indicating whether the owner/user account has been deactivated. Archived owners retain historical ownership but cannot access the system.'
   ts_archived:
     lineage:
       - datalake_hubspot_raw.owner.archived_at
+    description: 'Timestamp when the owner account was archived/deactivated. NULL for active owners. Used for tracking user lifecycle and access management.'
   ts_created:
     lineage:
       - datalake_hubspot_raw.owner.created_at
+    description: 'Timestamp when the owner record was created in HubSpot. Indicates when the user was first added to the system and began ownership activities.'
   ts_updated:
     lineage:
       - datalake_hubspot_raw.owner.updated_at
+    description: 'Timestamp of the most recent update to any owner property. Used for incremental data loading and tracking changes to user profiles and team assignments.'
   year:
     lineage:
       - datalake_hubspot_raw.owner.year
+    description: 'Partition column: Year extracted from the data processing date. Enables time-based analysis of owner activity and user management over annual periods.'
   month:
     lineage:
       - datalake_hubspot_raw.owner.month
+    description: 'Partition column: Month extracted from the data processing date. Supports monthly owner performance analysis and team composition tracking.'
   day:
     lineage:
       - datalake_hubspot_raw.owner.day
+    description: 'Partition column: Day extracted from the data processing date. Provides daily granularity for owner activity analysis and user access patterns.'

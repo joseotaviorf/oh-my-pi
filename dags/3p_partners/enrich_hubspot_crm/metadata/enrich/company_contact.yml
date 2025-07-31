@@ -2,8 +2,19 @@
 database_name: datalake_hubspot
 table_name: company_contact
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Every row is an association between a company and a contact in HubSpot.
+domain: 3P Partners
+description: |
+  Enriched relationship mapping table between companies and contacts with comprehensive business context and hierarchy analysis. 
+  Each row represents a specific relationship between a company and contact, enriched with business logic for decision-making 
+  hierarchies and relationship classification. This table enables sophisticated account-based analytics and relationship intelligence.
+  
+  **Key Features:**
+  - Complete company-contact relationship mapping with business hierarchy context
+  - Deciding contact identification using business logic (CEO > Partner/Director > Manager priority)
+  - Relationship type classification for understanding business decision-making structures
+  - Occupation and role tracking for organizational analysis
+  - Association type enrichment for primary vs secondary company relationships
+  - Contact influence scoring for account-based marketing and sales strategies
 columns:
   id_company:
     lineage:

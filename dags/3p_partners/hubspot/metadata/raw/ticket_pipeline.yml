@@ -1,3 +1,0 @@
----
-database_name: datalake_hubspot_raw
-table_name: ticket_pipeline

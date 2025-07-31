@@ -1,9 +1,29 @@
 dag:
   name: enrich_hubspot_management
   schedule_start_date: 2021, 8, 24
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: Creates enriched tables for `hubspot`. Due to limitation of Job Cluster, the enrich_hubspot was separated in two DAGs (enrich_hubspot_management and enrich_hubspot_crm).
+    dag_purpose: |
+      Creates enriched, analytics-ready tables from raw HubSpot management and activity data with comprehensive business intelligence and relationship mapping.
+
+      **Focus Areas:**
+      - **User Management**: HubSpot owners, teams, and user attribution for sales and support activities
+      - **Activity Tracking**: Calls, meetings, and communications with engagement analytics and performance measurement
+      - **Relationship Intelligence**: Contact and company interaction history for customer journey analysis
+      - **Team Performance**: Owner attribution and team effectiveness measurement across activities
+
+      **Enrichment Strategy:**
+      - **Current State Tables**: Denormalized, analytics-ready views of owners, calls, meetings, and communications
+      - **Historical Tracking**: Complete change history with daily snapshots for trend analysis and performance measurement
+      - **Business Context**: Enriched with calculated fields, relationship hierarchies, and activity classifications
+      - **Cross-Platform Integration**: Linked with QuintoAndar person service for unified user identification
+
+      **Key Table Categories:**
+      - **Management**: owner - User and team management with current state and relationship mapping
+      - **Activities**: call, meeting, communication - Customer interaction tracking with engagement analytics
+      - **History Tables**: *_history - Complete change tracking for trend analysis and performance measurement
+
+      **Technical Notes**: Separated from enrich_hubspot_crm due to Job Cluster limitations for optimal resource utilization.
 workflow:
   type: query_delta
   layer: enrich
@@ -13,16 +33,10 @@ workflow:
     - call_history
     communication:
     - communication_history
-    email:
-    - email_history
     meeting:
     - meeting_history
-    note:
-    - note_history
     owner:
     - owner_history
-    task:
-    - task_history
   tables_customization:
     call_history:
       extraction_type: incremental
@@ -36,31 +50,13 @@ workflow:
       - year
       - month
       - day
-    email_history:
-      extraction_type: incremental
-      partitions:
-      - year
-      - month
-      - day
     meeting_history:
       extraction_type: incremental
       partitions:
       - year
       - month
       - day
-    note_history:
-      extraction_type: incremental
-      partitions:
-      - year
-      - month
-      - day
     owner_history:
-      extraction_type: incremental
-      partitions:
-      - year
-      - month
-      - day
-    task_history:
       extraction_type: incremental
       partitions:
       - year

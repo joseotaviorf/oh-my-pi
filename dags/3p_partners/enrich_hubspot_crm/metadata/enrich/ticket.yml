@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: ticket
-description: Each row is one ticket registered in HubSpot.
-domain: Rede
+description: |
+  Enriched support ticket entities from HubSpot CRM with comprehensive customer service analytics and resolution tracking. 
+  Each row represents a unique support case in its current state, enriched with calculated metrics, resolution 
+  analysis, and customer context. This table provides an analytics-ready view of customer support operations 
+  with business logic for SLA tracking, resolution optimization, and customer satisfaction measurement.
+  
+  **Key Enrichments:**
+  - Ticket pipeline and stage progression with resolution time calculations
+  - Customer context integration including company and contact relationships
+  - Priority and category classification with business rules
+  - Support team attribution and workload distribution analytics
+  - Resolution tracking with SLA compliance measurement
+  - Customer satisfaction correlation with support interaction quality
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_ticket:

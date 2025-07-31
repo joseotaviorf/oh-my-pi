@@ -1,51 +1,54 @@
 ---
 database_name: datalake_hubspot_clean
 table_name: call
-description: Every time a call in HubSpot is created or updated, a new row is created in this table (limited to the most recent per day).
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+description: |
+  HubSpot Call objects represent phone call activities and interactions tracked in the CRM. Calls include 
+  details like duration, outcome, notes, and recordings when available. This table captures all call 
+  activities essential for sales performance analysis, customer interaction tracking, and communication auditing.
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_call:
     lineage:
       - datalake_hubspot_raw.call.id
-    description: Id of the call in HubSpot
+    description: 'Unique identifier for the call activity record in HubSpot. Primary key used for tracking specific call interactions and associating calls with contacts, companies, and deals.'
   properties:
     lineage:
       - datalake_hubspot_raw.call.properties
-    description: String containing a JSON, in which the properties are located.
+    description: 'JSON object containing all call properties including duration, outcome, direction (inbound/outbound), notes, recording URL, and custom fields. Contains current call details and interaction data.'
   properties_with_history:
     lineage:
       - datalake_hubspot_raw.call.properties_with_history
-    description: String containing a JSON, in which the properties (including all of their history of modifications) are located.
+    description: 'JSON object containing historical values of call properties with timestamps. Tracks modifications to call notes, outcomes, and custom fields for comprehensive activity auditing.'
   associations:
     lineage:
       - datalake_hubspot_raw.call.associations
-    description: String containing a JSON, in which the associations are located.
+    description: 'JSON object containing associations to contacts, companies, deals, and tickets. Links calls to CRM records for complete customer interaction context and relationship tracking.'
   is_archived:
     lineage:
       - datalake_hubspot_raw.call.archived
-    description: True if the object has been archived in HubSpot.
+    description: 'Boolean flag indicating whether the call record has been archived/deleted. Archived calls are preserved for historical analysis but excluded from active reporting.'
   ts_archived:
     lineage:
       - datalake_hubspot_raw.call.archived_at
-    description: Timestamp of when the object was archived in HubSpot.
+    description: 'Timestamp when the call record was archived. NULL for active calls. Used for data retention policies and understanding call activity lifecycle management.'
   ts_created:
     lineage:
       - datalake_hubspot_raw.call.created_at
-    description: Timestamp of when the object was created in HubSpot.
+    description: 'Timestamp when the call activity was logged in HubSpot. Critical for sales activity analysis, contact frequency tracking, and understanding customer engagement patterns.'
   ts_updated:
     lineage:
       - datalake_hubspot_raw.call.updated_at
-    description: Timestamp of when the object was updated in HubSpot.
+    description: 'Timestamp of the most recent update to any call property. Used for incremental data loading and tracking call record modifications for audit purposes.'
   year:
     lineage:
       - datalake_hubspot_raw.call.year
-    description: Year of when the object was updated in HubSpot.
+    description: 'Partition column: Year extracted from the data processing date. Enables annual analysis of call activity trends and year-over-year communication performance comparison.'
   month:
     lineage:
       - datalake_hubspot_raw.call.month
-    description: Month of when the object was updated in HubSpot.
+    description: 'Partition column: Month extracted from the data processing date. Supports monthly call volume analysis, seasonal communication patterns, and team activity tracking.'
   day:
     lineage:
       - datalake_hubspot_raw.call.day
-    description: Day of when the object was updated in HubSpot.
+    description: 'Partition column: Day extracted from the data processing date. Provides daily granularity for call activity analysis and real-time sales performance monitoring.'

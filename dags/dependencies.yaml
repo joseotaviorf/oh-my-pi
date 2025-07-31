@@ -2230,12 +2230,8 @@ bietlejuice.enrich_hubspot_events:
 bietlejuice.enrich_hubspot_management:
   - bietlejuice.hubspot:load-clean-call:first-run-of-day
   - bietlejuice.hubspot:load-clean-communication:first-run-of-day
-  - bietlejuice.hubspot:load-clean-email:first-run-of-day
   - bietlejuice.hubspot:load-clean-meeting:first-run-of-day
-  - bietlejuice.hubspot:load-clean-note:first-run-of-day
   - bietlejuice.hubspot:load-clean-owner:first-run-of-day
-  - bietlejuice.hubspot:load-clean-task:first-run-of-day
-  - bietlejuice.hubspot:load-clean-team:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-person:first-run-of-day
 bietlejuice.enrich_inspections:

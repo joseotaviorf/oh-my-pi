@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: deal
-description: Each row is one deal registered in HubSpot.
-domain: Rede
+description: |
+  Enriched deal opportunities from HubSpot CRM with comprehensive sales pipeline analytics and business context. 
+  Each row represents a unique sales opportunity in its current state, enriched with calculated metrics, 
+  pipeline positioning, and relationship data. This table provides an analytics-ready view of the sales 
+  funnel with business logic for deal classification, stage progression analysis, and revenue forecasting.
+  
+  **Key Enrichments:**
+  - Pipeline and stage progression tracking with historical context
+  - Deal classification and business context enrichment
+  - Revenue calculations and forecasting metrics with business rules
+  - Sales owner and team attribution for performance analytics
+  - Company and contact relationship mapping for account context
+  - Conversion tracking and sales cycle analysis
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_deal:

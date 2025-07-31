@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: meeting
-description: This table has one row per meeting in HubSpot.
-domain: Rede
+description: |
+  Enriched HubSpot meeting activity records with comprehensive engagement analytics and customer relationship intelligence. 
+  Each row represents a unique meeting interaction between team members and prospects/customers, enriched with business 
+  context, relationship mapping, and performance metrics. This table provides detailed insights into sales and support 
+  meeting effectiveness, customer engagement patterns, and team relationship-building performance.
+
+  **Key Enrichments:**
+  - Meeting outcome classification and business result analysis with success/failure attribution
+  - Customer relationship context including associated deals, tickets, companies, and contacts
+  - Team member attribution with performance tracking and meeting effectiveness measurement
+  - Meeting timing, duration, and attendance analysis for efficiency optimization
+  - Relationship development tracking through meeting frequency and engagement progression
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_meeting:

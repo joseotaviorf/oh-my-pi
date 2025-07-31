@@ -1,9 +1,25 @@
 dag:
   name: enrich_hubspot_crm
   schedule_start_date: 2021, 8, 24
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: Creates enriched tables for `hubspot`. Due to limitation of Job Cluster, the enrich_hubspot was separated in two DAGs (enrich_hubspot_management and enrich_hubspot_crm).
+    dag_purpose: |
+      Creates enriched, analytics-ready tables from raw HubSpot CRM data with comprehensive business logic and data quality enhancements.
+      
+      **Enrichment Strategy:**
+      - **Current State Tables**: Denormalized, flattened views of core CRM entities (companies, contacts, deals, tickets)
+      - **Historical Tracking**: Complete change history with daily snapshots for trend analysis and attribution
+      - **Business Logic**: Enriched with calculated fields, status classifications, and relationship hierarchies
+      - **Data Quality**: Cleaned, validated, and standardized data with consistent naming and formatting
+      
+      **Key Table Categories:**
+      - **Core Entities**: company, contact, deal, ticket - Enriched current state with business calculations
+      - **History Tables**: *_history - Complete change tracking with daily granularity for time-series analysis
+      - **Status Tables**: *_status - Business status transitions and change attribution with source tracking
+      - **Relationships**: company_contact, company_members - Normalized association tables with business context
+      - **Configuration**: pipeline, stage, *_stage - Workflow definitions and process metadata
+      
+      **Technical Notes**: Separated from enrich_hubspot_management due to Job Cluster limitations for optimal resource utilization.
 workflow:
   type: query_delta
   layer: enrich

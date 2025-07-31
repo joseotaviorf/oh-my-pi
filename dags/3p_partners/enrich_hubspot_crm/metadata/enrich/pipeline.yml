@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: pipeline
-description: Table showing the types of pipelines that exist within the Rede business model. Each row is a different business pipeline.
-domain: Rede
+description: |
+  Enriched pipeline configuration table with comprehensive business process definitions and workflow analytics metadata. 
+  Each row represents a distinct business pipeline within the organization, enriched with business context and process 
+  classification logic. This table provides the foundational structure for understanding workflow definitions and 
+  process optimization across sales and support operations.
+  
+  **Key Features:**
+  - Complete pipeline taxonomy and business process classification
+  - Deal vs ticket pipeline distinction for sales and support workflow differentiation
+  - Display order and hierarchy management for user interface optimization
+  - Business context labeling for process identification and analytics segmentation
+  - Pipeline lifecycle tracking with creation and modification history
+  - Process effectiveness measurement foundation for workflow optimization
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_pipeline:

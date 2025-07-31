@@ -1,8 +1,20 @@
 ---
 database_name: datalake_hubspot
 table_name: company_history
-description: This table shows the history about company leads registered in HubSpot. Each row is one change in a company, limited to the most recent per day. If you want the current row, use datalake_hubspot.company.
-domain: Rede
+description: |
+  Historical tracking table for company changes in HubSpot CRM with comprehensive business intelligence and temporal analytics. 
+  Each row represents a daily snapshot of company state changes, enabling time-series analysis and business process tracking. 
+  This table captures the complete evolution of company data over time with enriched metadata for lead progression analysis, 
+  relationship mapping, and business development effectiveness measurement.
+  
+  **Key Features:**
+  - Daily granularity change tracking with complete property and relationship history
+  - Lead status progression tracking with change attribution and source analysis
+  - Parent company and merger tracking for organizational hierarchy analysis
+  - Geographic and industry evolution tracking for market analysis
+  - Cross-platform matching evolution with internal systems (EBDB) for data lineage
+  - Sales territory and ownership changes for performance attribution
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_company:

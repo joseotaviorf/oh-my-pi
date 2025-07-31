@@ -1,8 +1,19 @@
 ---
 database_name: datalake_hubspot
 table_name: communication
-description: This table has one row per communication in HubSpot.
-domain: Rede
+description: |
+  Enriched HubSpot communication activity records with comprehensive omnichannel interaction analytics and customer engagement intelligence. 
+  Each row represents a unique communication touchpoint between team members and prospects/customers across multiple channels 
+  (email, SMS, social media, chat), enriched with business context, relationship mapping, and engagement effectiveness metrics. 
+  This table provides detailed insights into multichannel communication strategy effectiveness and customer interaction patterns.
+
+  **Key Enrichments:**
+  - Communication channel classification and engagement effectiveness analysis across multiple touchpoints
+  - Customer relationship context including associated deals, tickets, companies, and contacts
+  - Team member attribution with multichannel performance tracking and communication effectiveness
+  - Communication timing, frequency, and response analysis for channel optimization
+  - Cross-channel engagement pattern identification for unified customer experience strategy
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_communication:

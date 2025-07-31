@@ -278,12 +278,6 @@ ticket_pipeline:
   schema: pipeline
   date_filter_column: updated_at
   params: {}
-team:
-  is_incremental: false
-  bring_archived: false
-  encode_inner_dictionaries: false
-  schema: team
-  params: {}
 owner:
   is_incremental: true
   bring_archived: true
@@ -291,92 +285,6 @@ owner:
   schema: owner
   date_filter_column: updated_at
   params: {}
-email:
-  is_incremental: true
-  bring_archived: false
-  encode_inner_dictionaries: true
-  schema: object
-  date_filter_column: updated_at
-  params:
-    properties:
-      - hs_body_preview_is_truncated
-      - hs_createdate
-      - hs_email_attached_video_opened
-      - hs_email_attached_video_watched
-      - hs_email_direction
-      - hs_engagement_source
-      - hs_lastmodifieddate
-      - hs_object_id
-      - hs_timestamp
-      - hs_user_ids_of_all_owners
-      - hubspot_owner_assigneddate
-      - hubspot_owner_id
-      - hs_all_owner_ids
-      - hs_email_text
-      - hubspot_team_id
-      - hs_all_team_ids
-      - hs_all_accessible_team_ids
-      - hs_email_html
-      - hs_body_preview
-      - hs_body_preview_html
-      - hs_email_headers
-      - hs_direction_and_unique_id
-      - hs_email_from_email
-      - hs_email_logged_from
-      - hs_email_media_processing_status
-      - hs_email_message_id
-      - hs_email_sender_email
-      - hs_email_thread_id
-      - hs_unique_id
-      - hs_email_subject
-      - hs_email_to_email
-      - hs_email_to_raw
-      - hs_email_from_firstname
-      - hs_email_from_lastname
-      - hs_email_to_firstname
-      - hs_email_tracker_key
-      - hs_email_to_lastname
-      - hs_created_by
-      - hs_created_by_user_id
-      - hs_modified_by
-      - hs_updated_by_user_id
-      - hs_email_post_send_status
-      - hs_email_status
-      - hs_attachment_ids
-      - hs_email_facsimile_send_id
-      - hs_email_sent_via
-      - hs_email_from_raw
-      - hs_gdpr_deleted
-      - hs_email_cc_email
-      - hs_email_cc_raw
-      - hs_email_cc_firstname
-      - hs_email_cc_lastname
-      - hs_email_error_message
-    associations:
-      - company
-      - contact
-      - deal
-      - ticket
-marketing_email:
-  is_incremental: true
-  bring_archived: false
-  encode_inner_dictionaries: true
-  date_filter_column: updated_at
-  params: {}
-marketing_email_event:
-  is_incremental: true
-  bring_archived: false
-  encode_inner_dictionaries: true
-  date_filter_column: created_at
-  params: {}
-marketing_campaign:
-  is_incremental: false
-  bring_archived: false
-  encode_inner_dictionaries: true
-  params: {}
-  ids_list:
-    endpoint: marketing_email_campaign_id
-    key: id
 call:
   is_incremental: true
   bring_archived: false
@@ -442,43 +350,6 @@ meeting:
       - hs_meeting_outcome
       - hs_activity_type
       - hs_attachment_ids
-    associations:
-      - company
-      - contact
-      - deal
-      - ticket
-note:
-  is_incremental: true
-  bring_archived: false
-  encode_inner_dictionaries: true
-  schema: object
-  date_filter_column: updated_at
-  params:
-    properties:
-      - hs_timestamp
-      - hs_note_body
-      - hubspot_owner_id
-      - hs_attachment_ids
-    associations:
-      - company
-      - contact
-      - deal
-      - ticket
-task:
-  is_incremental: true
-  bring_archived: false
-  encode_inner_dictionaries: true
-  schema: object
-  date_filter_column: updated_at
-  params:
-    properties:
-      - hs_timestamp
-      - hs_task_body
-      - hubspot_owner_id
-      - hs_task_subject
-      - hs_task_status
-      - hs_task_priority
-      - hs_task_type
     associations:
       - company
       - contact

@@ -2,27 +2,46 @@
 database_name: datalake_hubspot
 table_name: deal_stage
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Every row is an association between a deal and a stage in HubSpot.
+domain: 3P Partners
+description: |
+  Enriched deal stage progression tracking table with comprehensive sales pipeline analytics and stage transition measurement. 
+  Each row represents a specific stage progression event for a deal, capturing the complete context of sales pipeline 
+  movement including timing, attribution, and progression velocity. This table enables detailed analysis of sales 
+  funnel effectiveness and stage-level conversion optimization.
+  
+  **Key Features:**
+  - Complete deal stage progression tracking with precise timing measurement
+  - Stage transition velocity analysis for sales cycle optimization
+  - User and source attribution for understanding stage change triggers
+  - Pipeline context integration for multi-pipeline performance comparison
+  - Stage duration calculation for bottleneck identification and process optimization
+  - Progression path analysis for conversion funnel effectiveness measurement
 columns:
   id_deal:
     lineage:
       - datalake_hubspot.deal.id_deal
+    description: 'Unique identifier for the deal that progressed through this stage. Primary key for tracking deal-specific stage progression and sales pipeline movement.'
   id_stage:
     lineage:
       - datalake_hubspot.deal.id_stage_history
+    description: 'Unique identifier for the stage the deal moved to. References the stage configuration and enables stage-level performance analysis.'
   id_pipeline:
     lineage:
       - datalake_hubspot.stage.id_pipeline
+    description: 'Reference to the pipeline containing this stage. Provides context for multi-pipeline deal workflow analysis and process comparison.'
   id_user_updated_by:
     lineage:
       - datalake_hubspot.deal.id_stage_history
+    description: 'User ID of the person who moved the deal to this stage. Critical for sales team performance analysis and stage change attribution.'
   source_type:
     lineage:
       - datalake_hubspot.deal.id_stage_history
+    description: 'Source of the stage change (e.g., API, CRM_UI, AUTOMATION_PLATFORM, IMPORT). Enables analysis of stage progression triggers and process automation effectiveness.'
   ts_stage_started:
     lineage:
       - datalake_hubspot.deal.id_stage_history
+    description: 'Timestamp when the deal entered this stage. Critical for calculating stage duration, sales velocity, and pipeline progression analysis.'
   ts_stage_ended:
     lineage:
       - datalake_hubspot.deal.id_stage_history
+    description: 'Timestamp when the deal exited this stage (NULL if currently in this stage). Used for stage duration calculations and conversion timing analysis.'

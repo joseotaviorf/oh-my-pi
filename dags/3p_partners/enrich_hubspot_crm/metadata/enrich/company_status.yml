@@ -2,8 +2,20 @@
 database_name: datalake_hubspot
 table_name: company_status
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
-description: Every time the company lead status in HubSpot changes (either in Rent or Sale), the new status is recorded in this table.
+domain: 3P Partners
+description: |
+  Enriched company lead status tracking table with comprehensive change attribution and business context analysis. 
+  Each row represents a specific status change event for a company, capturing the complete context of lead progression 
+  including source attribution, user actions, and business logic classification. This table enables detailed analysis 
+  of lead conversion processes and status change effectiveness.
+  
+  **Key Features:**
+  - Complete status change event tracking with timestamp precision
+  - Source attribution including API calls, UI actions, automation, and imports
+  - User attribution for understanding who triggered status changes
+  - Business context classification (Rent vs Sale) for segment-specific analysis
+  - Change reasoning and trigger identification for process optimization
+  - Lead progression funnel analysis with conversion path tracking
 columns:
   id_company:
     lineage:

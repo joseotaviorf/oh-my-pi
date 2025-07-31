@@ -1,8 +1,0 @@
----
-database_name: datalake_hubspot_raw
-table_name: marketing_email_event
-columns:
-  recipient:
-    tags:
-      - PII
-      - Confidential
