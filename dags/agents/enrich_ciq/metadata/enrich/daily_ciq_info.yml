@@ -1,0 +1,88 @@
+---
+database_name: datalake_ciq
+table_name: daily_ciq_info
+description: |
+  The table described provides daily information about the CIQ status and its information related to the demand context (Visit Broker), 
+  with 1 record per day for each CIQ.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_partner:
+    description: Id partner of CIQ.
+    lineage:
+      - datalake_ebdb_agents.ciq_users.id_partner
+  id_user:
+    description: Id user of CIQ.
+    lineage:
+      - datalake_ebdb_agents.ciq_users.id_user
+  id_agent:
+    description: Id agent of CIQ.
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+  id_work_contract:
+    description: Unique Work Contract Identifier.
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_work_contract
+  ciq_status:
+    description: Status to identify wheter the CIQ is active or inactive.
+    lineage:
+      - datalake_ebdb_agents.ciq_users.status
+  qty_logins:
+    description: Number of login performed by CIQ in Portfolio Manager.
+  agent_profile:
+    description: "Agent's performance profile"
+    lineage:
+      - datalake_agent_accreditation.agent_profile.profile
+    categories:
+      "Visita": "Agents who are responsible for conducting property visits"
+      "Inspection": "Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract"
+      "Photo Session": "Photographer agents responsible for taking photos of the properties that will be published"
+      "Quarterly Inspection": "Outsourced agents who are responsible for conducting property visits"
+      "CheckUpLar": "Agents responsible for performing/analyzing reported repairs to the properties"
+      "N/A" : "The user in question is a CIQ only and has no Agent information."
+  business_context:
+    description: Represents the specific business context assigned to the agent during the given period. Which can be Sale or Rent.
+    categories:
+      "SALE": "The agent is responsible for conducting visits with potential buyers for properties on sale."
+      "RENT": "The agent is responsible for conducting visits with potential tenants for rental properties."
+      "N/A": "The agent is not assigned to a specific business context during this period."
+    lineage:
+      - datalake_agent_accreditation.business_context_activity.business_context
+  is_agent_active:
+    description: Indicates whether the Agent has an active registration.
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.is_active
+  accreditation_status:
+    description: Describes what action was performed on the Agent registration.
+    categories:
+      "Accreditation": "The agent has been officially accredited and registered in the system for the first time."
+      "First activation after accreditation": "The agent has been activated for the first time after the initial accreditation process."
+      "De-accreditation": "The agent's accreditation has been revoked, making them ineligible to operate."
+      "Re-accreditation": "The agent has been re-accredited after a previous de-accreditation, restoring their ability to operate."
+      "N/A" : "The user in question is a CIQ only and has no Agent accreditation information."
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.action
+  visit_agent_type:
+    description: "Describe the type of Visiting Agent: Whether it is a 5A agent or associated with a partner real estate agency"
+    categories:
+      "CORRETOR_5A": "Visiting Agents who have a contract directly with 5A."
+      "CORRETOR_REDE": "Visiting Agents who are associated with a real estate agency that is a partner of 5A."
+      "N/A": "The user in question is a CIQ only and has no Agent information."
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.visit_agent_type
+  dt_reference:
+    description: Reference date for CIQ information.
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  year:
+    description: When the record was created or updated. It's a partition.
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  month:
+    description: When the record was created or updated. It's a partition.
+    lineage:
+      - datalake_quintoandar.aux_date.month
+  day:
+    description: When the record was created or updated. It's a partition.
+    lineage:
+      - datalake_quintoandar.aux_date.day

@@ -1,0 +1,7 @@
+---
+table_name: datalake_ciq.daily_ciq_info
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_partner:
+    is_complete:
+      severity_level: Warning

@@ -1,0 +1,117 @@
+WITH ciq_daily_history AS (
+  SELECT
+      cu.id_partner,
+      cu.id_user,
+      COALESCE(u.id_agent, -1) AS id_agent,
+      cu_status_date.status,
+      cu.email,
+      dd.date AS dt_reference,
+      dd.year AS year,
+      dd.month AS month,
+      dd.day AS day
+  FROM
+      datalake_ebdb_agents.ciq_users AS cu
+  LEFT JOIN
+      datalake_quintoandar.aux_date AS dd
+        ON dd.date BETWEEN DATE(cu.ts_agent_status_start)
+        AND COALESCE(DATE(cu.ts_agent_status_end), (DATE('{load_end_date}')))
+  LEFT JOIN
+      datalake_ebdb_user.user AS u
+        ON cu.id_user = u.id
+  QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY cu.id_partner, dd.date ORDER BY cu.ts_agent_status_start DESC) = 1
+),
+logins_pm_per_day AS (
+  SELECT
+      email,
+      DATE(ts_event) AS dt_event,
+      COUNT(email) AS qtd_logins
+  FROM
+      datalake_amplitude_clean.440441_home_page_viewed_events
+  WHERE
+      login_status IS TRUE
+      AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GROUP BY 1,2
+),
+agent_profile_history AS (
+  SELECT
+      id_agent,
+      profile,
+      ts_revision_started,
+      ts_revision_ended
+  FROM
+      datalake_agent_accreditation.agent_profile AS ap
+  WHERE
+      ap.profile = 'Visita'
+),
+accreditation_history AS (
+  SELECT
+      id_agent,
+      action,
+      DATE(ts_revision) AS dt_started,
+      DATE(COALESCE(LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY ts_revision ASC) - INTERVAL '1' DAY, DATE('{load_end_date}'))) AS dt_ended
+  FROM
+      datalake_agent_accreditation.agent_registration_actions_log
+  WHERE
+      action IN ("Re-accreditation", "De-accreditation", "Accreditation")
+      AND DATE(ts_revision) <= DATE('{load_end_date}')
+  QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_agent, dt_action ORDER BY ts_revision DESC) = 1
+),
+agent_status_history AS (
+  SELECT
+      id_agent,
+      id_user,
+      id_work_contract,
+      visit_agent_type,
+      is_active,
+      DATE(ts_revision) AS dt_started,
+      DATE(COALESCE(LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY ts_revision ASC) - INTERVAL '1' DAY, DATE('{load_end_date}'))) AS dt_ended
+  FROM
+      datalake_agent_accreditation.agent_registration_actions_log
+  WHERE
+      DATE(ts_revision) <= DATE('{load_end_date}')
+  QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_agent, dt_action ORDER BY ts_revision DESC) = 1
+)
+SELECT 
+    cdh.id_partner,
+    cdh.id_user,
+    cdh.id_agent,
+    COALESCE(ash.id_work_contract, -1) AS id_work_contract,
+    cdh.status AS ciq_status,
+    COALESCE(lpd.qtd_logins, 0) AS qty_logins,
+    COALESCE(aph.profile, 'N/A') AS agent_profile,
+    COALESCE(bca.business_context, 'N/A') AS business_context,
+    COALESCE(ash.is_active, FALSE) AS is_agent_active,
+    COALESCE(aha.action, 'N/A') AS accreditation_status,
+    COALESCE(ash.visit_agent_type, 'N/A') AS visit_agent_type,
+    cdh.dt_reference,
+    cdh.year,
+    cdh.month,
+    cdh.day
+FROM 
+    ciq_daily_history AS cdh
+LEFT JOIN
+    logins_pm_per_day AS lpd
+      ON cdh.email = lpd.email
+      AND cdh.dt_reference = lpd.dt_event
+LEFT JOIN
+    agent_profile_history AS aph
+      ON cdh.id_agent = aph.id_agent
+      AND cdh.dt_reference BETWEEN aph.ts_revision_started AND COALESCE(aph.ts_revision_ended, DATE('{load_end_date}'))
+LEFT JOIN
+    datalake_agent_accreditation.business_context_activity AS bca
+      ON cdh.id_agent = bca.id_agent
+      AND cdh.dt_reference BETWEEN bca.dt_started AND bca.dt_ended
+LEFT JOIN
+    agent_status_history AS ash
+      ON cdh.id_agent = ash.id_agent
+      AND cdh.dt_reference BETWEEN ash.dt_started AND ash.dt_ended
+LEFT JOIN
+    accreditation_history AS aha
+      ON cdh.id_agent = aha.id_agent
+      AND cdh.dt_reference BETWEEN aha.dt_started AND aha.dt_ended
+WHERE
+    cdh.id_partner NOT IN (691, 674) -- Inconsistent CIQs
+    AND MAKE_DATE(cdh.year, cdh.month, cdh.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

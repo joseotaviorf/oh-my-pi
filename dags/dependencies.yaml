@@ -1471,7 +1471,13 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
 bietlejuice.enrich_ciq:
+  - bietlejuice.amplitude_subpartitioned:load-clean-440441-home-page-viewed-events:first-run-of-day
+  - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile:first-run-of-day
+  - bietlejuice.enrich_agent_accreditation:load-enrich-agent-registration-actions-log:first-run-of-day
+  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context-activity:first-run-of-day
+  - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-ciq-portfolio:first-run-of-day
 bietlejuice.enrich_ciq_comissioning:
