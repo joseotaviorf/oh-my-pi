@@ -55,6 +55,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    fnd_setid_sets:
+      clean_table_name: set_identifiers
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     hcm_extended_lookup_codes_tl:
       clean_table_name: hcm_extended_lookup_code_translation
       extra_spark_job_arguments:
@@ -185,6 +190,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_job_leg_f:
+      clean_table_name: job_legislative
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date   
     per_jobs_f:
       clean_table_name: job
       extra_spark_job_arguments:
@@ -220,8 +230,18 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_rates_f:
+      clean_table_name: rates
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date    
     per_users:
       clean_table_name: user
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_valid_grades_f:
+      clean_table_name: valid_grades
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date

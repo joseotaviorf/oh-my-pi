@@ -1,0 +1,105 @@
+---
+database_name: datalake_pin_core_clean
+table_name: rates
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: "Stores pay rates for various objects such as grades, jobs, or positions. This data is sourced from Oracle HCM's PER_RATES_F table and is fundamental for compensation and payroll calculations."
+columns:
+  id_rate:
+    description: "Unique identifier for the pay rate record."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.rate_id
+  id_business_group:
+    description: "Identifier for the business group to which this rate belongs."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.business_group_id
+  id_legislative_data_group:
+    description: "Identifier for the legislative data group, used to partition data by country-specific legislation."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.legislative_data_group_id
+  id_action_occurrence:
+    description: "Identifier for the specific action or event that triggered this record's creation or update."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.action_occurrence_id
+  id_grade_ladder:
+    description: "Identifier for the associated grade ladder, if applicable."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.grade_ladder_id
+  legislation_code:
+    description: "Legislation code for the country to which this rate applies (e.g., 'US', 'BR')."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.legislation_code
+  currency_code:
+    description: "Currency code for the rate amount (e.g., 'USD', 'BRL')."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.currency_code
+  created_by:
+    description: "User who originally created the record."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.created_by
+  updated_by:
+    description: "User who last modified the record."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.last_updated_by
+  rate_type:
+    description: "The type of rate, such as 'Grade' or 'Salary'."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.rate_type
+  rate_object_type:
+    description: "The type of object to which the rate applies, such as a grade, position, or job."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.rate_object_type
+  rate_unity_of_measure:
+    description: "The unit of measure for the rate, such as 'HOURLY' or 'ANNUAL'."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.rate_uom
+  rate_frequency:
+    description: "The frequency at which the rate is applied, such as 'HOURLY' or 'MONTHLY'."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.rate_frequency
+  annualization_factor:
+    description: "The factor used to convert the rate to an annual amount."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.annualization_factor
+  object_version_number:
+    description: "Version number of the record, used for concurrency control."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.object_version_number
+  is_progression_rate:
+    description: "Boolean flag indicating if this is a progression rate (TRUE or FALSE)."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.progression_rate_flag
+  is_active:
+    description: "Indicates whether the rate is currently active (TRUE) or inactive (FALSE)."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.active_status
+  dt_effective_started:
+    description: "The date from which this rate becomes effective."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.effective_start_date
+  dt_effective_ended:
+    description: "The date until which this rate is effective."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.effective_end_date
+  ts_created:
+    description: "Timestamp indicating when the record was created."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.creation_date
+  ts_updated:
+    description: "Timestamp indicating when the record was last updated."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.last_update_date
+  ts_load:
+    description: "Timestamp indicating when the record was loaded into the data lake. This value is generated during the load process."
+  year:
+    description: "Year partition column, representing the year the data was loaded."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.year
+  month:
+    description: "Month partition column, representing the month the data was loaded."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.month
+  day:
+    description: "Day partition column, representing the day the data was loaded."
+    lineage:
+      - datalake_pin_core_raw.per_rates_f.day

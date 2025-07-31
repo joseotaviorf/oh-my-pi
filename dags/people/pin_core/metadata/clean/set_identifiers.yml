@@ -1,0 +1,61 @@
+---
+database_name: datalake_pin_core_clean
+table_name: set_identifiers
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: "Stores reference data sets used to partition and share data across different business units while maintaining data security. Sourced from Oracle HCM's FND_SETID_SETS table."
+columns:
+  id_enterprise:
+    description: "Unique identifier for the enterprise."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.enterprise_id
+  id_set:
+    description: "Unique identifier for the reference data set."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.set_id
+  set_code:
+    description: "A short, unique code for the reference data set."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.set_code
+  set_name:
+    description: "The name of the reference data set."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.set_name
+  language:
+    description: "The language code for the set's name and description."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.language
+  source_language:
+    description: "The base language from which the set's name and description are translated."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.source_lang
+  created_by:
+    description: "User who originally created the record."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.created_by
+  updated_by:
+    description: "User who last modified the record."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.last_updated_by
+  ts_created:
+    description: "Timestamp indicating when the record was created."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.creation_date
+  ts_updated:
+    description: "Timestamp indicating when the record was last updated."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.last_update_date
+  ts_load:
+    description: "Timestamp indicating when the record was loaded into the data lake. This value is generated during the load process."
+  year:
+    description: "Year partition column, representing the year the data was loaded."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.year
+  month:
+    description: "Month partition column, representing the month the data was loaded."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.month
+  day:
+    description: "Day partition column, representing the day the data was loaded."
+    lineage:
+      - datalake_pin_core_raw.fnd_setid_sets.day
