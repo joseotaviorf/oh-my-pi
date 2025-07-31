@@ -4,7 +4,7 @@ import multiprocessing
 import concurrent.futures
 
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -29,16 +29,21 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("table_name")
     parser.add_argument("partition_cols")
-    parser.add_argument("execution_date")
+    parser.add_argument("load_start_date")
+    parser.add_argument("load_end_date")
 
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     partition_cols = json.loads(args.partition_cols)
-    execution_date = args.execution_date
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
 
-    execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
+    load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
+    load_end_date = datetime.strptime(load_end_date, "%Y-%m-%d")
+
+    date_list = [(load_start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range((load_end_date - load_start_date).days + 1)]
 
     proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/proxy/*.gz"
 
@@ -48,7 +53,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
-        execution_date={execution_date}, partition_cols={partition_cols}"""
+        load_start_date={load_start_date}, load_end_date={load_end_date}, partition_cols={partition_cols}"""
         "msg=Starting spark job..."
     )
 
@@ -66,60 +71,61 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    def load_partition(hour):
+    def load_partition(hour_list, execution_date):
+        for hour in hour_list:
+            execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
+            df = s3_consumer.get_data_from_file(
+                proxy_path.format(
+                    execution_date.year,
+                    str(execution_date.month).zfill(2),
+                    str(execution_date.day).zfill(2),
+                    str(hour).zfill(2),
+                ),
+                format="json",
+            )
 
-        df = s3_consumer.get_data_from_file(
-            proxy_path.format(
-                execution_date.year,
-                str(execution_date.month).zfill(2),
-                str(execution_date.day).zfill(2),
-                str(hour).zfill(2),
-            ),
-            format="json",
-        )
+            df = df.where("NOT RLIKE(message, 'error')")
+            
+            # Check if kubernetes column exists and convert it to string if present
+            if "kubernetes" in df.columns:
+                logger.info("Converting 'kubernetes' column to JSON string")
+                df = df.withColumn("kubernetes", to_json(col("kubernetes")))
 
-        df = df.where("NOT RLIKE(message, 'error')")
-        
-        # Check if kubernetes column exists and convert it to string if present
-        if "kubernetes" in df.columns:
-            logger.info("Converting 'kubernetes' column to JSON string")
-            df = df.withColumn("kubernetes", to_json(col("kubernetes")))
+            df = (
+                df.withColumn("year", lit(execution_date.year))
+                .withColumn("month", lit(execution_date.month))
+                .withColumn("day", lit(execution_date.day))
+                .withColumn("hour", lit(hour))
+            )
 
-        df = (
-            df.withColumn("year", lit(execution_date.year))
-            .withColumn("month", lit(execution_date.month))
-            .withColumn("day", lit(execution_date.day))
-            .withColumn("hour", lit(hour))
-        )
+            s3_loader.load_df(
+                df=df,
+                s3_path=f"{database_location}{table_name}",
+                format_options=format_options,
+                partitions=partition_cols,
+                compression="gzip",
+            )
 
-        s3_loader.load_df(
-            df=df,
-            s3_path=f"{database_location}{table_name}",
-            format_options=format_options,
-            partitions=partition_cols,
-            compression="gzip",
-        )
+            spark_metastore_loader.update_metastore(
+                df=df,
+                database_name=database_name,
+                table_name=table_name,
+                format_options=format_options,
+                database_location=database_location,
+                partitions=partition_cols,
+                force_recreate=False,
+            )
 
-        spark_metastore_loader.update_metastore(
-            df=df,
-            database_name=database_name,
-            table_name=table_name,
-            format_options=format_options,
-            database_location=database_location,
-            partitions=partition_cols,
-            force_recreate=False,
-        )
-
-        spark_metastore_service.create_new_partitions_from_df(
-            df=df,
-            database_name=database_name,
-            table_name=table_name,
-            partition_cols=partition_cols,
-        )
+            spark_metastore_service.create_new_partitions_from_df(
+                df=df,
+                database_name=database_name,
+                table_name=table_name,
+                partition_cols=partition_cols,
+            )
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_cores) as executor:
         future_to_hour = {
-            executor.submit(load_partition, hour): hour for hour in hour_list
+            executor.submit(load_partition, hour_list, execution_date): execution_date for execution_date in date_list
         }
         for future in concurrent.futures.as_completed(future_to_hour):
             hour = future_to_hour[future]

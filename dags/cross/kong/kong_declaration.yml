@@ -15,7 +15,8 @@ workflow:
   - "{bucket}"
   - "{table_name}"
   - "{partitions}"
-  - "{{ data_interval_start | ds }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day, hour]
