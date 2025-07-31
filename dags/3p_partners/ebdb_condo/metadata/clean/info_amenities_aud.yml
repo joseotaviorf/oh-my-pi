@@ -1,24 +1,34 @@
 database_name: datalake_ebdb_clean
 table_name: info_amenities_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Audit trail table for property-amenity relationship changes. This table maintains a complete historical record of all modifications to property amenity assignments, including additions, removals, and characteristic updates. Essential for compliance, data lineage tracking, understanding property feature evolution, and debugging data quality issues. Each record represents a change event with full change context and metadata.'
 columns:
   id_info_amenity:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.id
+    description: 'Identifier of the property-amenity relationship record that was modified. Links to the primary info_amenities table to identify which specific property-amenity association this audit event refers to.'
   rev:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.rev
+    description: 'Revision number for this audit event. Sequential identifier that establishes the chronological order of changes across all audited tables. Higher numbers indicate more recent changes in the audit timeline.'
   rev_type:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.revtype
+    description: 'Type of change operation that occurred (e.g., 0=INSERT, 1=UPDATE, 2=DELETE). Indicates whether this audit record represents a new amenity assignment, modification of existing assignment, or removal of amenity from property.'
   has_feature:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.temcaracteristica
+    description: 'Historical value of the amenity presence flag at the time of this change. Captures whether the property had this amenity (True) or not (False) when this audit event was recorded.'
   mod_has_feature:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.temcaracteristica_mod
+    description: 'Modification flag indicating whether the has_feature field was changed in this revision. True means the amenity presence status was modified, False means it remained unchanged in this audit event.'
   id_house:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.imovel_id
+    description: 'Historical foreign key to the property that this amenity relationship audit event refers to. Identifies which specific property the amenity assignment change affected at the time of modification.'
   id_amenity:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo_aud.amenidades_id
+    description: 'Historical foreign key to the amenity that this relationship audit event refers to. Identifies which specific amenity (air conditioning, pool, etc.) was being assigned or modified for the property.'

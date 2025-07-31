@@ -1,78 +1,106 @@
 database_name: datalake_ebdb_clean
 table_name: access_type_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Comprehensive audit trail table for property access management changes. This table maintains a complete historical record of all modifications to property access arrangements, security details, key management procedures, and authorization changes. Critical for security compliance, access control auditing, troubleshooting access issues, and maintaining detailed logs of property entry procedure changes over time.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.id
+    description: 'Identifier of the property access record that was modified. Links to the primary access_type table to identify which specific property access arrangement this audit event refers to.'
   id_authorization:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.authorization_id
+    description: 'Historical foreign key to the access authorization type at the time of this change. Captures which authorization method (doorman, electronic, etc.) was associated with the property when this audit event occurred.'
   id_house:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.imovel_id
+    description: 'Historical foreign key to the property that this access audit event refers to. Identifies which specific property the access arrangement change affected at the time of modification.'
   id_occupant:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.occupant_id
+    description: 'Historical foreign key to the occupant/tenant associated with this access arrangement at the time of change. Captures which user had access rights when this audit event was recorded.'
   id_restriction:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.restriction_id
+    description: 'Historical foreign key to access restrictions that applied to this property at the time of change. Captures which access limitations were in effect when this audit event occurred.'
   id_type:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.type_id
+    description: 'Historical foreign key to the general access type category at the time of change. Captures which access method classification was assigned when this audit event was recorded.'
   rev:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.rev
+    description: 'Revision number for this audit event. Sequential identifier that establishes the chronological order of changes across all audited tables. Higher numbers indicate more recent changes in the global audit timeline.'
   rev_type:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.revtype
+    description: 'Type of change operation that occurred (e.g., 0=INSERT, 1=UPDATE, 2=DELETE). Indicates whether this audit record represents new access setup, modification of existing access, or removal of access arrangements.'
   additional_info:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.additionalinfo
+    description: 'Historical value of additional access instructions at the time of this change. Captures what supplementary access information was recorded when this audit event occurred.'
   description:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.description
+    description: 'Historical value of the access arrangement description at the time of this change. Captures how the access procedure was described when this audit event was recorded.'
   locker_address:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.lockeraddress
+    description: 'Historical value of the key storage location at the time of this change. Captures where keys were stored (lockbox address, concierge location, etc.) when this audit event occurred.'
   password:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.password
+    description: 'Historical value of the access password/code at the time of this change. Captures what security code was required for property entry when this audit event was recorded. Security-sensitive historical data.'
   has_opted_keys_with_agent:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.optedkeyswithagent
+    description: 'Historical value of the agent key custody flag at the time of this change. Captures whether keys were left with QuintoAndar agents when this audit event was recorded.'
   mod_id_house:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.imovel_mod
+    description: 'Modification flag indicating whether the property association was changed in this revision. True means the property link was modified, False means it remained unchanged in this audit event.'
   mod_additional_info:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.additionalinfo_mod
+    description: 'Modification flag indicating whether the additional access information was changed in this revision. True means supplementary instructions were modified, False means they remained unchanged.'
   mod_authorization:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.authorization_mod
+    description: 'Modification flag indicating whether the authorization type was changed in this revision. True means the access authorization method was modified, False means it remained unchanged in this audit event.'
   mod_description:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.description_mod
+    description: 'Modification flag indicating whether the access description was changed in this revision. True means the access arrangement description was modified, False means it remained unchanged.'
   mod_locker_address:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.lockeraddress_mod
+    description: 'Modification flag indicating whether the key storage location was changed in this revision. True means the lockbox or key location was modified, False means it remained unchanged.'
   mod_occupant:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.occupant_mod
+    description: 'Modification flag indicating whether the occupant association was changed in this revision. True means the tenant/user link was modified, False means it remained unchanged in this audit event.'
   mod_password:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.password_mod
+    description: 'Modification flag indicating whether the access password was changed in this revision. True means the security code was updated, False means it remained unchanged. Critical for security auditing.'
   mod_restriction:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.restriction_mod
+    description: 'Modification flag indicating whether access restrictions were changed in this revision. True means access limitations were modified, False means restrictions remained unchanged in this audit event.'
   mod_type:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.type_mod
+    description: 'Modification flag indicating whether the general access type was changed in this revision. True means the access method category was modified, False means it remained unchanged.'
   mod_has_opted_keys_with_agent:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.optedkeyswithagent_mod
+    description: 'Modification flag indicating whether the agent key custody option was changed in this revision. True means the agent key arrangement was modified, False means it remained unchanged.'
   mod_dt_vacated:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.vacanton_mod
+    description: 'Modification flag indicating whether the vacation date was changed in this revision. True means the property vacation date was modified, False means it remained unchanged in this audit event.'
   dt_vacated:
     lineage:
       - datalake_ebdb_raw.accesstype_aud.vacanton
+    description: 'Historical value of the property vacation date at the time of this change. Captures when the property was vacated according to records when this audit event was recorded.'

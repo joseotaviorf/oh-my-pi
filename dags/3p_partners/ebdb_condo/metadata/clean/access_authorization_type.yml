@@ -1,15 +1,22 @@
 database_name: datalake_ebdb_clean
 table_name: access_authorization_type
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Reference table defining the standardized types of access authorization methods available for property entry. This master table catalogs different authorization approaches such as doorman approval, electronic access, key collection, or direct access. Used to classify and standardize property access procedures across the platform for operational consistency and security management.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.accessauthorizationtype.id
+    description: 'Unique identifier for the access authorization type. Primary key referenced by access_type table to specify the authorization method required for specific properties.'
   name:
     lineage:
       - datalake_ebdb_raw.accessauthorizationtype.name
+    description: 'Descriptive name of the access authorization method. Examples include "DOORMAN" for concierge approval, "ELECTRONIC" for keycard/code access, "KEY_PICKUP" for physical key collection, "UNINFORMED" for unspecified methods.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.accessauthorizationtype.criadoem
+    description: 'Timestamp when this authorization type was first created in the system. Used for audit trails and understanding the evolution of access authorization methods in the platform.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.accessauthorizationtype.atualizadoem
+    description: 'Timestamp of the most recent update to this authorization type definition. Important for maintaining current access method classifications and ensuring operational consistency.'

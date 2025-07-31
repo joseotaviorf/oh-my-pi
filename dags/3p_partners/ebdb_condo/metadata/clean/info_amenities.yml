@@ -1,36 +1,50 @@
 database_name: datalake_ebdb_clean
 table_name: info_amenities
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Property-amenity relationship table that associates specific amenities with individual properties (houses/apartments). This junction table enables many-to-many relationships between properties and amenities, supporting complex property feature descriptions. Each record represents one amenity being present or absent in a specific property, with additional boolean fields for nuanced amenity characteristics. Critical for property search filtering, recommendation systems, and feature-based analytics.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.id
+    description: 'Unique identifier for the property-amenity relationship record. Primary key for this association table, ensuring each property-amenity combination is uniquely trackable.'
   is_first_field:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.campo1
+    description: 'First boolean characteristic field for the amenity in this property. Used to capture additional nuanced information about how the amenity is implemented or its specific characteristics. The meaning varies by amenity type and is defined in the parent amenity record.'
   is_second_field:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.campo2
+    description: 'Second boolean characteristic field for the amenity in this property. Provides additional detail about amenity attributes such as quality, accessibility, or specific implementation features. Interpretation depends on the associated amenity type.'
   is_third_field:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.campo3
+    description: 'Third boolean characteristic field for the amenity in this property. Allows for detailed categorization of amenity features beyond simple presence/absence. Used for capturing specific amenity variations or conditions.'
   is_fourth_field:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.campo4
+    description: 'Fourth boolean characteristic field for the amenity in this property. Enables granular description of amenity implementation details, such as size, condition, or accessibility features specific to this property.'
   is_fifth_field:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.campo5
+    description: 'Fifth boolean characteristic field for the amenity in this property. Provides the finest level of detail for amenity characteristics, allowing complex feature descriptions that go beyond basic amenity presence.'
   has_characteristic:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.temcaracteristica
+    description: 'Primary boolean flag indicating whether the property actually has this amenity. True means the amenity is present and available in the property, False means it is explicitly absent. This is the main field used for amenity-based property filtering and search.'
   id_house:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.imovel_id
+    description: 'Foreign key reference to the property (imovel) that has this amenity. Links to the main property table, establishing which specific apartment, house, or unit possesses the amenity described in this record.'
   id_amenities:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.amenidades_id
+    description: 'Foreign key reference to the amenity definition in the amenities table. Identifies which specific amenity (e.g., air conditioning, pool, parking) this record describes for the associated property.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.atualizadoem
+    description: 'Timestamp of the most recent update to this property-amenity relationship. Used for tracking changes in property features, cache invalidation, and ensuring search indexes reflect current amenity information.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.amenidadesinfo.criadoem
+    description: 'Timestamp when this property-amenity relationship was first established in the system. Important for audit trails and understanding when amenity information was added to property listings.'

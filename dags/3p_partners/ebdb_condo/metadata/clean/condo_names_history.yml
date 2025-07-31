@@ -1,21 +1,30 @@
 database_name: datalake_ebdb_clean
 table_name: condo_names_history
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Historical tracking table for condominium name changes and registrations. This table maintains a complete audit trail of all name variations, corrections, and updates for condominium buildings over time. Essential for data lineage, maintaining historical accuracy, understanding property branding evolution, and ensuring consistent identification across different time periods and data sources.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.condonameshistory.id
+    description: 'Unique identifier for the condominium name history record. Primary key used for tracking individual name change events and maintaining chronological sequence of building identification updates.'
   id_condo:
     lineage:
       - datalake_ebdb_raw.condonameshistory.condo_id
+    description: 'Foreign key reference to the condominium in the condo table. Establishes which building this name history record belongs to, enabling tracking of all name variations for a single property over time.'
   input_condo_name:
     lineage:
       - datalake_ebdb_raw.condonameshistory.inputCondoName
+    description: 'The condominium name as it was entered or registered at this point in time. Captures the exact name variation, including any spelling changes, branding updates, or official re-naming of the building.'
   type_registrant:
     lineage:
       - datalake_ebdb_raw.condonameshistory.registrantType
+    description: 'Type of entity or person who registered this name variation (e.g., OWNER, AGENT, ADMIN, SYSTEM). Indicates the source of the name change to understand data provenance and change authority.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.condonameshistory.criadoEm
+    description: 'Timestamp when this name variation was first recorded in the system. Critical for establishing chronological order of name changes and understanding the timeline of building identification evolution.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.condonameshistory.atualizadoEm
+    description: 'Timestamp of the most recent update to this name history record. Used for maintaining data integrity and tracking any corrections or modifications to historical name information.'

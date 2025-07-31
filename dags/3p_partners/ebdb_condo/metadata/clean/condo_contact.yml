@@ -1,24 +1,34 @@
 database_name: datalake_ebdb_clean
 table_name: condo_contact
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Condominium contact information table storing phone numbers and contact details for building management, emergency services, and administrative personnel. This table enables efficient communication coordination for maintenance requests, emergency situations, tenant support, and operational coordination. Each condominium can have multiple contact points for different purposes and times of day.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contatocondominio.id
+    description: 'Unique identifier for the condominium contact record. Primary key used for managing and referencing specific contact information entries for building communication purposes.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contatocondominio.atualizadoem
+    description: 'Timestamp of the most recent update to the contact information. Critical for maintaining current communication channels and ensuring contact details remain accurate for emergency and operational use.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.contatocondominio.criadoem
+    description: 'Timestamp when the contact record was first created in the system. Used for audit trails and tracking the establishment of communication channels for building management.'
   name:
     lineage:
       - datalake_ebdb_raw.contatocondominio.nome
+    description: 'Name or title of the contact person or department. May include names like "Portaria", "Síndico", "Administradora", or specific personnel names. Used for identifying the appropriate contact for different types of inquiries.'
   phone_number:
     lineage:
       - datalake_ebdb_raw.contatocondominio.telefone
+    description: 'Phone number for contacting the building management or service. Includes both landline and mobile numbers for various building personnel, emergency contacts, and administrative services. Essential for operational coordination.'
   type:
     lineage:
       - datalake_ebdb_raw.contatocondominio.tipo
+    description: 'Type or category of the contact (e.g., PORTARIA for concierge, EMERGENCIA for emergency, ADMINISTRACAO for administration). Used to classify contacts by purpose and route communications appropriately.'
   id_condo:
     lineage:
       - datalake_ebdb_raw.contatocondominio.condominio_id
+    description: 'Foreign key reference to the condominium that this contact information belongs to. Links to the condo table, establishing which building or complex this contact serves for communication purposes.'

@@ -2,8 +2,8 @@
 database_name: dw_house
 table_name: fact_house_information_filling
 description: Every time a particular information changes, such as a house or condo amenity, a new row is inserted in this table.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_house_information_change:
     description: Primary key of the table. Unique for every change in any particular house information.

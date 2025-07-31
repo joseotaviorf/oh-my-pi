@@ -1,37 +1,51 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: condo_manager
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Condominium management companies and administrators responsible for building operations, maintenance, and resident services. This table contains contact information and system access details for property management entities that oversee condominiums in the QuintoAndar network. Essential for operational coordination, maintenance requests, and building administration workflows.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.condomanager.id
+    description: 'Unique identifier for the condominium manager record. Primary key referenced by condominiums to establish management relationships and enable operational coordination.'
   id_state:
     lineage:
       - datalake_ebdb_raw.condomanager.state_id
+    description: 'Foreign key reference to the Brazilian state where this condo manager operates. Used for geographic organization of management services and regional operational reporting.'
   condo_manager_name:
     lineage:
       - datalake_ebdb_raw.condomanager.name
+    description: 'Official name of the condominium management company or administrator. Used for contract documentation, communication, and administrative identification in building management processes.'
   email:
     lineage:
       - datalake_ebdb_raw.condomanager.email
+    description: 'Primary email address for communication with the condo manager. Used for operational notifications, maintenance coordination, tenant-related communications, and administrative correspondence.'
   city:
     lineage:
       - datalake_ebdb_raw.condomanager.city
+    description: 'City where the condo manager is based or primarily operates. Important for proximity-based manager assignment and regional service coordination.'
   observation:
     lineage:
       - datalake_ebdb_raw.condomanager.observation
+    description: 'Free-form text field containing additional notes, special instructions, or important information about the condo manager. May include service quality notes, special procedures, or contact preferences.'
   system_login:
     lineage:
       - datalake_ebdb_raw.condomanager.loginSystem
+    description: 'Username or login identifier for the condo manager in integrated property management systems. Enables automated system access and coordination between QuintoAndar platform and external management tools.'
   system_password:
     lineage:
       - datalake_ebdb_raw.condomanager.passwordSystem
+    description: 'Encrypted password for condo manager system access. Stored securely for integration with external property management platforms and automated workflow systems. Security-sensitive field requiring appropriate access controls.'
   system_url:
     lineage:
       - datalake_ebdb_raw.condomanager.systemUrl
+    description: 'URL of the property management system or platform used by this condo manager. Enables direct integration and automated communication with external management tools and workflows.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.condomanager.criadoEm
+    description: 'Timestamp when the condo manager record was first created in the system. Used for audit trails and tracking the onboarding of new management companies into the QuintoAndar network.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.condomanager.atualizadoEm
+    description: 'Timestamp of the most recent update to the condo manager record. Important for tracking changes in contact information, system access details, and management company information.'

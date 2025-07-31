@@ -4,8 +4,8 @@ table_name: dim_house_amenities_version
 description: Slowly changing dimension of house and condo amenities. Every time an amenity associated with
   a house is updated, a new row is created in this table. It contains all the amenities of a given house,
   as well as the version number, and timestamps of start and end of the version.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_house_amenities_version:
     description: Primary key of the table, generated incrementally.

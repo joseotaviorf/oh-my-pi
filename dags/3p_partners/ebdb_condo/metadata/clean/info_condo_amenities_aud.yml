@@ -1,24 +1,34 @@
 database_name: datalake_ebdb_clean
 table_name: info_condo_amenities_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Audit trail table for property-installation relationship changes. This table maintains a complete historical record of all modifications to property access to building-level amenities and installations. Tracks changes in access rights to shared facilities like pools, gyms, elevators, and party halls. Critical for compliance, access control auditing, and understanding the evolution of building amenity availability for specific units.'
 columns:
   id_info_condo_amenity:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.id
+    description: 'Identifier of the property-installation relationship record that was modified. Links to the primary info_condo_amenities table to identify which specific property-installation access association this audit event refers to.'
   rev:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.rev
+    description: 'Revision number for this audit event. Sequential identifier that establishes the chronological order of changes across all audited tables. Higher numbers indicate more recent changes in the global audit timeline.'
   rev_type:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.revtype
+    description: 'Type of change operation that occurred (e.g., 0=INSERT, 1=UPDATE, 2=DELETE). Indicates whether this audit record represents granting new installation access, modifying existing access rights, or removing installation access.'
   has_feature:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.temcaracteristica
+    description: 'Historical value of the installation access flag at the time of this change. Captures whether the property had access to this building amenity (True) or not (False) when this audit event was recorded.'
   mod_has_feature:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.temcaracteristica_mod
+    description: 'Modification flag indicating whether the has_feature field was changed in this revision. True means the installation access status was modified, False means access rights remained unchanged in this audit event.'
   id_house:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.imovel_id
+    description: 'Historical foreign key to the property that this installation access audit event refers to. Identifies which specific property unit the building amenity access change affected at the time of modification.'
   id_amenity:
     lineage:
       - datalake_ebdb_raw.instalacaoinfo_aud.instalacao_id
+    description: 'Historical foreign key to the building installation that this access audit event refers to. Identifies which specific shared amenity (pool, gym, elevator, etc.) access was being granted or modified for the property.'

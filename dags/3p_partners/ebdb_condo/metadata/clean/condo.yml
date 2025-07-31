@@ -1,78 +1,106 @@
 database_name: datalake_ebdb_clean
 table_name: condo
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Core condominium master data table containing location, management, and operational information for apartment buildings and housing complexes in QuintoAndar platform. This table serves as the foundation for property grouping, location-based analytics, and condominium management operations. Each record represents a unique condominium building or complex that may contain multiple individual properties (units).'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.condominio.id
+    description: 'Unique identifier for the condominium record. Primary key used for referencing condominiums across all related tables and systems.'
   id_condo_manager:
     lineage:
       - datalake_ebdb_raw.condominio.condomanager_id
+    description: 'Foreign key reference to the condo manager responsible for this building. Links to condo_manager table. Null values indicate buildings without assigned management.'
   name:
     lineage:
       - datalake_ebdb_raw.condominio.nome
+    description: 'Official name of the condominium building or complex. Used for display purposes and administrative identification. May include building names like "Edifício Copacabana" or complex names like "Residencial Parque das Flores".'
   address:
     lineage:
       - datalake_ebdb_raw.condominio.endereco
+    description: 'Street address of the condominium including street name and type (Rua, Avenida, etc.). Does not include street number, which is stored separately in the number field.'
   number:
     lineage:
       - datalake_ebdb_raw.condominio.numero
+    description: 'Street number portion of the condominium address. Combined with address field to form complete street address. May include additional identifiers like building letters (e.g., "123A").'
   neighborhood:
     lineage:
       - datalake_ebdb_raw.condominio.bairro
+    description: 'Neighborhood (bairro) where the condominium is located. Used for location-based analytics, pricing models, and property search filtering. Key field for market analysis by geographic region.'
   city:
     lineage:
       - datalake_ebdb_raw.condominio.cidade
+    description: 'City where the condominium is located. Primary geographic grouping for market analysis and operational reporting. Primarily includes major Brazilian cities where QuintoAndar operates.'
   zipcode:
     lineage:
       - datalake_ebdb_raw.condominio.cep
+    description: 'Brazilian postal code (CEP) for the condominium. Used for precise location identification, logistics planning, and integration with external services like delivery and mapping systems.'
   code:
     lineage:
       - datalake_ebdb_raw.condominio.code
+    description: 'Internal administrative code for the condominium. May be used for integration with external property management systems or internal operational processes.'
   lat:
     lineage:
       - datalake_ebdb_raw.condominio.lat
+    description: 'Latitude coordinate of the condominium location in decimal degrees. Used for mapping, distance calculations, proximity searches, and location-based analytics. Precision to 6 decimal places provides meter-level accuracy.'
   lng:
     lineage:
       - datalake_ebdb_raw.condominio.lng
+    description: 'Longitude coordinate of the condominium location in decimal degrees. Combined with latitude for complete geographic positioning. Essential for map display and spatial analysis operations.'
   latlng:
     lineage:
       - datalake_ebdb_raw.condominio.latlng
+    description: 'Geometric point representation combining latitude and longitude coordinates. Used for efficient spatial queries, geographic indexing, and proximity calculations in database operations.'
   rules:
     lineage:
       - datalake_ebdb_raw.condominio.rules
+    description: 'Condominium rules and regulations text. Contains building-specific policies, restrictions, and guidelines that residents must follow. Important for property management and tenant onboarding processes.'
   external_reference:
     lineage:
       - datalake_ebdb_raw.condominio.referenciaexterna
+    description: 'External system reference identifier for the condominium. Used for integration with third-party property management systems, government databases, or partner platforms.'
   entry_authorization:
     lineage:
       - datalake_ebdb_raw.condominio.entryauthorization
+    description: 'Type of entry authorization system for the building (e.g., UNINFORMED, DOORMAN, ELECTRONIC_ACCESS). Indicates how visitors and residents gain access to the property.'
   entry_authorization_info:
     lineage:
       - datalake_ebdb_raw.condominio.entryauthorizationinfo
+    description: 'Additional details about the entry authorization system. May include specific instructions, access codes, or operational procedures for building entry.'
   has_condo_page:
     lineage:
       - datalake_ebdb_raw.condominio.hascondominiumpage
+    description: 'Boolean flag indicating whether this condominium has a dedicated information page on QuintoAndar platform. Used for content management and SEO optimization.'
   construction_year:
     lineage:
       - datalake_ebdb_raw.condominio.anoConstrucao
+    description: 'Year when the condominium was constructed. Important for property valuation models, maintenance planning, and age-based analytics. Used in pricing algorithms and property condition assessments.'
   dt_expiration:
     lineage:
       - datalake_ebdb_raw.condominio.expirationday
+    description: 'Day of the month when certain condominium-related processes or agreements expire. Used for operational scheduling and administrative management.'
   ts_weekend_moving_schedule_ended:
     lineage:
       - datalake_ebdb_raw.condominio.weekendendmovingschedule
+    description: 'End time for weekend moving schedule at this condominium. Defines when moving activities must conclude on weekends to comply with building rules and noise regulations.'
   ts_weekend_moving_schedule_started:
     lineage:
       - datalake_ebdb_raw.condominio.weekendstartmovingschedule
+    description: 'Start time for weekend moving schedule at this condominium. Indicates earliest time when moving activities are permitted on weekends according to building policies.'
   ts_workdays_moving_schedule_ended:
     lineage:
       - datalake_ebdb_raw.condominio.workdaysendmovingschedule
+    description: 'End time for weekday moving schedule at this condominium. Defines when moving activities must conclude on business days to maintain resident comfort and building policies.'
   ts_workdays_moving_schedule_started:
     lineage:
       - datalake_ebdb_raw.condominio.workdaysstartmovingschedule
+    description: 'Start time for weekday moving schedule at this condominium. Indicates earliest time when moving activities are permitted on business days according to building regulations.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.condominio.criadoem
+    description: 'Timestamp when the condominium record was first created in the system. Used for data lineage tracking, audit purposes, and understanding data ingestion patterns.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.condominio.atualizadoem
+    description: 'Timestamp of the most recent update to the condominium record. Essential for change tracking, data freshness monitoring, and identifying recently modified records for downstream processing.'

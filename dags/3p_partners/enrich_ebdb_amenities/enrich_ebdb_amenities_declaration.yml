@@ -1,7 +1,7 @@
 dag:
   name: enrich_ebdb_amenities
   schedule_start_date: 2021, 8, 24
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: |
       Creates enriched tables for EBDB amenities.

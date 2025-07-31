@@ -2,8 +2,8 @@
 database_name: datalake_ebdb_amenities
 table_name: amenity
 description: This table has one row per amenity, be it from house or condo.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_amenity:
     lineage:

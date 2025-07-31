@@ -1,45 +1,62 @@
 database_name: datalake_ebdb_clean
 table_name: condo_amenities
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Master catalog of building-level installations and amenities available in condominium complexes. Unlike property-specific amenities, these represent shared facilities and features available to all residents of a building (e.g., swimming pools, gyms, elevators, party halls). This reference table powers condominium feature searches, building comparisons, and lifestyle-based property recommendations. Each installation can be associated with multiple condominiums through relationship tables.'
 columns:
   id_condo_amenity:
     lineage:
       - datalake_ebdb_raw.instalacao.id
+    description: 'Unique identifier for the condominium installation/amenity record. Primary key used for referencing specific building-level features across the platform and in property-installation relationships.'
   name:
     lineage:
       - datalake_ebdb_raw.instalacao.nome
+    description: 'Human-readable display name of the condominium installation in Portuguese. Used in user interfaces, building descriptions, and marketing materials. Examples include "Piscina", "Academia", "Salão de Festas", "Elevador".'
   is_active:
     lineage:
       - datalake_ebdb_raw.instalacao.ativo
+    description: 'Boolean flag indicating whether this installation type is currently active and available for assignment to condominiums. Inactive installations are retained for historical data but cannot be assigned to new buildings.'
   first_description_field:
     lineage:
       - datalake_ebdb_raw.instalacao.descricaocampo1
+    description: 'First descriptive field providing additional context about the installation type. May contain details about size, capacity, specifications, or operational characteristics specific to this amenity category.'
   second_description_field:
     lineage:
       - datalake_ebdb_raw.instalacao.descricaocampo2
+    description: 'Second descriptive field for extended installation details. Provides supplementary information about features, accessibility, hours of operation, or usage restrictions for the amenity type.'
   third_description_field:
     lineage:
       - datalake_ebdb_raw.instalacao.descricaocampo3
+    description: 'Third descriptive field for comprehensive installation documentation. Contains additional specifications, maintenance requirements, or special characteristics relevant to this building amenity category.'
   fourth_description_field:
     lineage:
       - datalake_ebdb_raw.instalacao.descricaocampo4
+    description: 'Fourth descriptive field for detailed installation attributes. Captures specific technical details, quality standards, or operational parameters that define this type of building amenity.'
   fifth_description_field:
     lineage:
       - datalake_ebdb_raw.instalacao.descricaocampo5
+    description: 'Fifth descriptive field providing the most granular level of installation documentation. Contains specialized information about amenity variations, premium features, or unique characteristics.'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.instalacao.atualizadoem
+    description: 'Timestamp of the most recent update to the installation record. Used for tracking changes to amenity definitions, maintaining data consistency, and coordinating updates across dependent systems.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.instalacao.criadoem
+    description: 'Timestamp when the installation record was first created in the system. Important for audit trails and understanding the evolution of the building amenity catalog over time.'
   is_editable:
     lineage:
       - datalake_ebdb_raw.instalacao.editavel
+    description: 'Boolean flag indicating whether this installation definition can be modified by system administrators. False for core building amenities that should remain standardized across the platform.'
   code:
     lineage:
       - datalake_ebdb_raw.instalacao.codigo
+    description: 'Standardized installation code following the CodigoInstalacao enum system. Examples include ELEVADOR (elevator), PISCINA (pool), ACADEMIA (gym), SALAO_FESTAS (party hall). Used for programmatic identification and API integrations.'
   slug:
     lineage:
       - datalake_ebdb_raw.instalacao.slug
+    description: 'URL-friendly identifier for the installation, used in web interfaces and SEO-optimized URLs. Typically a lowercase, hyphenated version of the installation name (e.g., "piscina", "academia", "salao-festas").'
   salesforce_code:
     lineage:
       - datalake_ebdb_raw.instalacao.salesforcecode
+    description: 'External identifier used for integration with Salesforce CRM system. Enables synchronization of building amenity data between QuintoAndar platform and Salesforce for sales and marketing operations.'

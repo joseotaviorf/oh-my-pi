@@ -1,7 +1,7 @@
 dag:
   name: dw_house_amenities
   schedule_start_date: 2020,8,29
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
     dag_purpose: |
       This DAG loads data about amenities, such as pool or grill area, into the DW.

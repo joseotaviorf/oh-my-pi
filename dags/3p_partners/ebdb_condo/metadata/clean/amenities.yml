@@ -1,27 +1,38 @@
 database_name: datalake_ebdb_clean
 table_name: amenities
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'Master catalog of property amenities available in the QuintoAndar platform. Contains standardized amenity definitions used to describe property features across comfort and practicality categories. This reference table powers property search filters, recommendation algorithms, and feature-based pricing models. Each amenity can be associated with individual properties through the info_amenities relationship table.'
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.amenidades.id
+    description: 'Unique identifier for the amenity record. Primary key used as foreign key reference in property-amenity relationships and throughout the platform for amenity identification.'
   code:
     lineage:
       - datalake_ebdb_raw.amenidades.codigo
+    description: 'Standardized amenity code following the CodigoAmenidade enum system. Examples include AR_CONDICIONADO (air conditioning), PISCINA_PRIVATIVA (private pool), ARMARIOS_EMBUTIDOS_NO_QUARTO (built-in bedroom wardrobes). Used for programmatic amenity identification and API integrations.'
   name:
     lineage:
       - datalake_ebdb_raw.amenidades.nome
+    description: 'Human-readable display name for the amenity in Portuguese. Used in user interfaces, property listings, search filters, and customer communications. Examples include "Ar condicionado", "Piscina privativa", "Armários no quarto".'
   is_editable:
     lineage:
       - datalake_ebdb_raw.amenidades.editavel
+    description: 'Boolean flag indicating whether this amenity definition can be modified by system administrators. False for core system amenities that should remain standardized across the platform to ensure data consistency.'
   slug:
     lineage:
       - datalake_ebdb_raw.amenidades.slug
+    description: 'URL-friendly identifier for the amenity, used in web interfaces and SEO-optimized URLs. Typically a lowercase, hyphenated version of the amenity name (e.g., "ar-condicionado", "piscina-privativa").'
   ts_updated:
     lineage:
       - datalake_ebdb_raw.amenidades.atualizadoem
+    description: 'Timestamp of the most recent update to the amenity record. Used for tracking changes to amenity definitions, cache invalidation, and ensuring data consistency across dependent systems.'
   is_active:
     lineage:
       - datalake_ebdb_raw.amenidades.ativo
+    description: 'Boolean flag indicating whether this amenity is currently active and available for use in property listings. Inactive amenities are retained for historical data integrity but cannot be assigned to new properties.'
   ts_created:
     lineage:
       - datalake_ebdb_raw.amenidades.criadoem
+    description: 'Timestamp when the amenity record was first created in the system. Used for audit trail purposes and understanding the evolution of the amenity catalog over time.'

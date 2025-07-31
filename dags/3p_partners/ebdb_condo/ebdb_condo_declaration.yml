@@ -2,9 +2,43 @@ dag:
   name: ebdb_condo
   schedule_start_date: 2021, 2, 20
   schedule_interval: 45 21,8,12 * * *
-  owner: Data Rede
+  owner: Data 3P Partners
   documentation:
-    dag_purpose: Extraction of EBDB tables related to Condo into data lake. EBDB is the main database for QuintoAndar.
+    dag_purpose: |
+      **Business Context:**
+      Extracts and processes condominium and amenities data from EBDB (QuintoAndar's main production database) into the data lake house for analytics and reporting purposes. This pipeline enables data teams to analyze property features, condominium characteristics, and amenity distributions across QuintoAndar's real estate portfolio.
+
+      **Data Domain Coverage:**
+      - Condominium master data (location, contact info, construction details)
+      - Property amenities catalog (comfort and practicality features)
+      - Condominium installations and features (pools, gyms, elevators, etc.)
+      - Amenity-property relationships and audit trails
+      - Access control and entry authorization data
+      - Condo management information and contact details
+
+      **Key Business Use Cases:**
+      - Property recommendation algorithms based on amenities
+      - Market analysis of amenity preferences by region
+      - Condominium management operational reporting
+      - Property valuation models incorporating amenity data
+      - Customer search and filtering capabilities
+      - Compliance and audit trail maintenance
+
+      **Technical Details:**
+      - CDC (Change Data Capture) pipeline for real-time data synchronization
+      - Processes 14 core tables from the EBDB MySQL database
+      - Raw layer preserves original data structure for audit purposes
+      - Clean layer provides standardized, analytics-ready transformed data
+      - Supports both current state and historical change tracking (AUD tables)
+
+      **Data Lineage:**
+      EBDB (MySQL) → Databricks Raw Layer → Databricks Clean Layer → Analytics Layer
+
+      **Schedule & SLA:**
+      - Runs 3x daily at 08:45, 12:45, and 21:45 UTC
+      - Expected completion: < 30 minutes per run
+      - Data freshness: Maximum 8-hour delay from source system
+      - Critical for downstream property analytics and recommendation systems
 workflow:
   type: cdc
   layer: raw
