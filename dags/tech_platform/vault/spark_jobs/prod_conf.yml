@@ -1,0 +1,2 @@
+input_path: "s3://auditlogs.s3.sre.quintoandar.com.br/vault"
+output_path: "s3://auditlogs-s3-data-quintoandar-com-br/vault"

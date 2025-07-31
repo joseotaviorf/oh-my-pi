@@ -1,0 +1,114 @@
+database_name: datalake_vault_audit_logs
+table_name: events
+description: Table with Vault audit events.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket.time
+    description: Event timestamp
+  id_request:
+    lineage:
+      - s3_auditlogs_bucket.request.id
+    description: Request ID
+  type:
+    lineage:
+      - s3_auditlogs_bucket.type
+    description: Event type
+  time:
+    lineage:
+      - s3_auditlogs_bucket.time
+    description: Event timestamp
+  display_name:
+    lineage:
+      - s3_auditlogs_bucket.auth.display_name
+    description: Display name
+  policies:
+    lineage:
+      - s3_auditlogs_bucket.auth.policies
+    description: Authentication policies list
+  token_policies:
+    lineage:
+      - s3_auditlogs_bucket.auth.token_policies
+    description: Token policies
+  allowed:
+    lineage:
+      - s3_auditlogs_bucket.auth.policy_results.allowed
+    description: Policy evaluation result
+  granting_policies:
+    lineage:
+      - s3_auditlogs_bucket.auth.policy_results.granting_policies
+    description: Granting policies
+  role:
+    lineage:
+      - s3_auditlogs_bucket.auth.metadata.role
+    description: Authentication role
+  entity_id:
+    lineage:
+      - s3_auditlogs_bucket.auth.entity_id
+    description: Authentication entity identifier
+  token_type:
+    lineage:
+      - s3_auditlogs_bucket.auth.token_type
+    description: Token type
+  token_ttl:
+    lineage:
+      - s3_auditlogs_bucket.auth.token_ttl
+    description: Token time to live
+  token_issue_time:
+    lineage:
+      - s3_auditlogs_bucket.auth.token_issue_time
+    description: Token issue time
+  request_id:
+    lineage:
+      - s3_auditlogs_bucket.request.id
+    description: Request ID
+  client_id:
+    lineage:
+      - s3_auditlogs_bucket.request.client_id
+    description: Request client identifier
+  operation:
+    lineage:
+      - s3_auditlogs_bucket.request.operation
+    description: Vault operation type
+  mount_point:
+    lineage:
+      - s3_auditlogs_bucket.request.mount_point
+    description: Mount point
+  mount_type:
+    lineage:
+      - s3_auditlogs_bucket.request.mount_type
+    description: Mount type
+  namespace:
+    lineage:
+      - s3_auditlogs_bucket.request.namespace.id
+    description: Vault namespace identifier
+  path:
+    lineage:
+      - s3_auditlogs_bucket.request.path
+    description: Request path in Vault
+  remote_address:
+    lineage:
+      - s3_auditlogs_bucket.request.remote_address
+    description: Remote address
+  remote_port:
+    lineage:
+      - s3_auditlogs_bucket.request.remote_port
+    description: Remote port
+  year:
+    lineage:
+      - s3_auditlogs_bucket.time
+    description: Event year partition
+  month:
+    lineage:
+      - s3_auditlogs_bucket.time
+    description: Event month partition
+  day:
+    lineage:
+      - s3_auditlogs_bucket.time
+    description: Event day partition
+  hour:
+    lineage:
+      - s3_auditlogs_bucket.time
+    description: Event hour partition
