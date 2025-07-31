@@ -24,10 +24,10 @@ fraudulent_invoices AS (
     ON i.id_external = ii.id_invoice
   LEFT JOIN datalake_ebdb_contract.contract AS c
     ON c.id = i.id_contract_external
-  WHERE
-    i.status = "not-payable"
+  WHERE 1=1
+    AND i.status IN ("not-payable", 'open')
     AND b.bill_item LIKE "%LOSS%"
-    AND LOWER(b.bill_item_description) LIKE "%ação boletos%"
+    AND ((LOWER(b.bill_item_description) LIKE "%ação boletos%") OR (LOWER(b.bill_item_description) LIKE "%liminar judicial%")) 
     AND b.value_sign_bill_item <0
 ),
 fraudulent_contracts AS (
