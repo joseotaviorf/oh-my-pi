@@ -20,7 +20,7 @@ WITH agent_region AS (
             ON r.id = aud.id_region
     WHERE
         TRIM(r.region_code) <> ''
-        AND DATE(u.ts_revision) <= DATE('{load_end_date}')
+        -- AND DATE(u.ts_revision) <= DATE('{load_end_date}')
 ),
 total_micro_regions AS (
     SELECT
@@ -79,5 +79,5 @@ SELECT
     re.ts_ended
 FROM
     revision_ended AS re
-WHERE
-    DATE(re.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+-- WHERE
+--     DATE(re.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

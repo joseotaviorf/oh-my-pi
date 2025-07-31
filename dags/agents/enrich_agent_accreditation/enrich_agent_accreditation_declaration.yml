@@ -28,7 +28,7 @@ workflow:
       - agent_registration_actions_log
   tables_customization:
     agent_major_region_code:
-      merge_on: [id_major_region_code]
+      extraction_type: full
       z_order_by: [id_agent, ts_started]
     agent_profile_activity:
       merge_on: [id_agent_profile_activity]
