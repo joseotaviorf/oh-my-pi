@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     date_list = [(load_start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range((load_end_date - load_start_date).days + 1)]
 
-    proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/proxy/*.gz"
+    proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/proxy/*/*.gz"
 
     max_cores = int(multiprocessing.cpu_count() * 0.6)
 
