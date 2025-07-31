@@ -22,6 +22,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.business_contexts') AS ep_business_context,
     GET_JSON_OBJECT(event_properties, '$.content_business_context') AS ep_content_business_context,
     GET_JSON_OBJECT(event_properties, '$.main_message') AS ep_main_message,
+    GET_JSON_OBJECT(event_properties, '$.score_number') AS ep_score_number,
     GET_JSON_OBJECT(event_properties, '$.price_top_button_shown') AS ep_price_top_button_shown,
     GET_JSON_OBJECT(event_properties, '$.available_hours_top_button_shown') AS ep_available_hours_top_button_shown,
     GET_JSON_OBJECT(event_properties, '$.ad_pageviews') AS ep_ad_pageviews,

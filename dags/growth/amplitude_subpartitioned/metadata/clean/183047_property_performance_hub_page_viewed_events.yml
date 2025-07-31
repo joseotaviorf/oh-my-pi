@@ -97,6 +97,10 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Column ep_main_message from Amplitude events
+  ep_score_number:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Column ep_main_message from Amplitude events
   ep_price_top_button_shown:
     lineage:
     - datalake_amplitude_clean.events.event_properties
