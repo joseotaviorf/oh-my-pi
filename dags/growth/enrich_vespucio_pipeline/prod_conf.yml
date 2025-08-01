@@ -10,6 +10,7 @@ kodak_photo_sns_arn: "arn:aws:sns:us-east-1:632540934959:ProdKodakPhoto"
 custom_cluster:
   driver_node_type_id: r5d.4xlarge
   node_type_id: r5d.4xlarge
+  runtime_engine: PHOTON
   num_workers: 5
   spark_version: 14.3.x-scala2.12
   aws_attributes:
@@ -19,7 +20,5 @@ custom_cluster:
     spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.heartbeatInterval: "100s"
-    spark.executor.memory: "48g"
-    spark.executor.memoryOverhead: "3g"
     spark.network.timeout: "600s"
     spark.metrics.appStatusSource.enabled: "true"

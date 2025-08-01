@@ -19,6 +19,5 @@ custom_cluster:
     spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.heartbeatInterval: "100s"
-    spark.executor.memory: "2g"
     spark.network.timeout: "600s"
     spark.metrics.appStatusSource.enabled: "true"
