@@ -1,0 +1,45 @@
+database_name: datalake_betopera_clean
+table_name: renewal
+domain: Fintech
+description: Insurance certificate renewal records for Betopera, tracking renewal periods and types for existing certificates
+columns:
+  id:
+    description: Unique identifier for the renewal record
+    lineage:
+      - datalake_betopera_raw.renewal.id
+  id_certificate:
+    description: Foreign key reference to the certificate being renewed
+    lineage:
+      - datalake_betopera_raw.renewal.certificate_id
+  type:
+    description: Type of renewal (e.g., automatic, manual, grace period)
+    lineage:
+      - datalake_betopera_raw.renewal.type
+  dt_start:
+    description: Start date of the renewal period
+    lineage:
+      - datalake_betopera_raw.renewal.start_date
+  dt_end:
+    description: End date of the renewal period
+    lineage:
+      - datalake_betopera_raw.renewal.end_date
+  ts_created:
+    description: Timestamp when the renewal record was created
+    lineage:
+      - datalake_betopera_raw.renewal.created_at
+  ts_updated:
+    description: Timestamp when the renewal record was last updated
+    lineage:
+      - datalake_betopera_raw.renewal.updated_at
+  year:
+    description: Year extracted from the renewal date for partitioning
+    lineage:
+      - datalake_betopera_raw.renewal.year
+  month:
+    description: Month extracted from the renewal date for partitioning
+    lineage:
+      - datalake_betopera_raw.renewal.month
+  day:
+    description: Day extracted from the renewal date for partitioning
+    lineage:
+      - datalake_betopera_raw.renewal.day

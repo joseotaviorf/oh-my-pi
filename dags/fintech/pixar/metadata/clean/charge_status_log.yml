@@ -1,0 +1,29 @@
+database_name: datalake_pixar_clean
+table_name: charge_status_log
+domain: Fintech
+description: Log table tracking status changes and bank responses for PIX payment charges in the Pixar system
+columns:
+  id:
+    description: Unique identifier for the charge status log entry
+    lineage:
+      - datalake_pixar_raw.charge_status_log.id
+  id_charge:
+    description: Foreign key reference to the associated charge record
+    lineage:
+      - datalake_pixar_raw.charge_status_log.charge_id
+  status:
+    description: The status of the charge at the time of this log entry
+    lineage:
+      - datalake_pixar_raw.charge_status_log.status
+  bank_response:
+    description: Response received from the bank for this charge status update
+    lineage:
+      - datalake_pixar_raw.charge_status_log.bank_response
+  ts_created:
+    description: Timestamp when this status log entry was created
+    lineage:
+      - datalake_pixar_raw.charge_status_log.created_at
+  ts_processed:
+    description: Timestamp when this status change was processed
+    lineage:
+      - datalake_pixar_raw.charge_status_log.processed_at

@@ -25,6 +25,7 @@ workflow:
     payment: {}
     reminder: {}
     reminder_aud: {}
+    renewal: {}
     revinfo:
       clean_table_name: rev_info
 cluster:

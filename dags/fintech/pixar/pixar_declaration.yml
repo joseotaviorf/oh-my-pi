@@ -21,6 +21,7 @@ workflow:
   tables_customization:
     account: {}
     charge: {}
+    charge_status_log: {}
     refund: {}
 cluster:
   type: databricks_12_2_med_general_cluster
