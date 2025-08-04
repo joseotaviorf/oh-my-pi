@@ -22,7 +22,6 @@ WITH old_entry_model AS (
     WHERE
         at.id_house IS NOT NULL
 ),
-
 new_entry_model AS (
     SELECT
         entry.id_house,
@@ -44,12 +43,20 @@ new_entry_model AS (
         entry.id_house IS NOT NULL
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY entry.id_house ORDER BY holder.id DESC) = 1
+),
+last_contract_by_house AS (
+    SELECT
+        id_house,
+        status
+    FROM
+        datalake_ebdb_clean.contract
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_created DESC) = 1
 )
-
 SELECT
     new.id_house,
     old.key_type,
-    old.occupant_type,
+    IF(old.occupant_type = 'Empty' AND lc.status = 'Ativo', 'Tenant', old.occupant_type) AS occupant_type,
     old.restriction_type,
     old.authorization_type,
     new.key_location,
@@ -66,3 +73,6 @@ FROM
 LEFT JOIN
     old_entry_model AS old
         ON new.id_house = old.id_house
+LEFT JOIN
+    last_contract_by_house AS lc
+        ON new.id_house = lc.id_house
