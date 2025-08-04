@@ -202,7 +202,7 @@ if __name__ == "__main__":
                     df.value.substr(9,240).alias('metadata'),
                     )
                 if any(account in path for account in ['97477', '52081']):
-                    date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
+                    date_str = re.search(r'_(\d{6})\d+\.ret$', path).group(1)
                     date_obj = datetime.strptime(date_str, '%d%m%y')
                 elif any(account in path for account in ['5514', '130067134']):
                     date_str = re.search(r'_(\d{8})_', path).group(1)
