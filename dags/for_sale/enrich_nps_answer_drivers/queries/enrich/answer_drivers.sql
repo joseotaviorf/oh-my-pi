@@ -77,7 +77,9 @@ ebdb_listing AS (
 		ld.id_answer,
 		ld.id_house_listing
 	FROM listing_drivers ld
-	INNER JOIN datalake_ebdb_listing.house_listing hl
+	INNER JOIN (SELECT id_house_listing FROM datalake_ebdb_listing.house_listing
+		    UNION ALL
+		    SELECT id_sale_listing AS id_house_listing FROM datalake_sale_listings.sale_listing) hl
 		ON hl.id_house_listing = ld.id_house_listing
 ),
 listing AS (
