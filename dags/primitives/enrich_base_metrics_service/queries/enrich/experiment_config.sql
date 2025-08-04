@@ -85,7 +85,7 @@ FROM VALUES
     (
         "ab_beakman_search_services_location_embedding_on_cg_experiment",
         named_struct(
-            'begin_date', DATE('2025-07-19'),
+            'begin_date', DATE('2025-08-06'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
