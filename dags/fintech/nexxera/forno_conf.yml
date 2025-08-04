@@ -1,7 +1,7 @@
 ---
 custom_cluster:
-  driver_node_type_id: m5a.xlarge
-  node_type_id: m5a.large
+  driver_node_type_id: r5a.2xlarge
+  node_type_id: r5a.xlarge
   num_workers: 3
   spark_version: 12.2.x-scala2.12
 consumer_extra_args:
@@ -61,7 +61,7 @@ tables:
       - col_44
       - col_45
   - table_name: cnab_payments
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/return/pag"
+    source_root_path: "s3://5a-datalake-forno/temp/nexxera/pag"
     format: "ret_pag"
     has_raw: True
     col_names:
@@ -72,14 +72,14 @@ tables:
       - col_5
       - col_6
   - table_name: cnab_charges
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/return/cob"
+    source_root_path: "s3://5a-datalake-forno/temp/nexxera/cob"
     format: "ret_cob"
     has_raw: True
     col_names:
       - col_1
       - col_2
   - table_name: financial
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
+    source_root_path: "s3://cnab-files-data-prod/prod/reports/nexxera/operation="
     format: "csv"
     has_raw: True
     col_names:
@@ -138,7 +138,7 @@ tables:
       - col_53
       - col_54
   - table_name: inadvance
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
+    source_root_path: "s3://cnab-files-data-prod/prod/reports/nexxera/operation="
     format: "csv"
     has_raw: True
     col_names:
@@ -166,7 +166,7 @@ tables:
       - col_22
       - col_23
   - table_name: sales
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
+    source_root_path: "s3://cnab-files-data-prod/prod/reports/nexxera/operation="
     format: "csv"
     has_raw: True
     col_names:
@@ -225,7 +225,7 @@ tables:
       - col_53
       - col_54
   - table_name: transaction
-    source_root_path: "s3://5a-datalake-forno/temp/nexxera/operation="
+    source_root_path: "s3://cnab-files-data-prod/prod/reports/nexxera/operation="
     format: "csv"
     has_raw: True
     col_names:

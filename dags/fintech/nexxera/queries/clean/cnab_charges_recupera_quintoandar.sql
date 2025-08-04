@@ -45,9 +45,5 @@ FROM
     datalake_nexxera_raw.cnab_charges_recupera_quintoandar
 WHERE
     record_type = '1'
-    AND
-        year = {year}
-    AND 
-        month = {month}
-    AND 
-        day = {day}
+AND
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

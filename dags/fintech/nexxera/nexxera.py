@@ -114,6 +114,7 @@ for table in tables:
             raw_spark_job_extra_args=[
                 SOURCE,
                 SOURCE_ROOT_PATH,
+                "{{ macros.ds_add(data_interval_start | ds, -7) }}",
                 "{{ data_interval_start | ds }}",
                 table_name,
                 json.dumps(CONSUMER_EXTRA_ARGS),
@@ -130,6 +131,10 @@ for table in tables:
         table_name=table_name,
         is_incremental=True,
         partitions=partition_columns,
+        extra_query_template_params={
+            "load_start_date": "{{ macros.ds_add(data_interval_start | ds, -7) }}",
+            "load_end_date": "{{ data_interval_start | ds }}",
+        },
     )
 
 

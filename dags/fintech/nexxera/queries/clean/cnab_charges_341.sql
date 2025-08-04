@@ -42,13 +42,9 @@ SELECT
     day
 FROM 
     datalake_nexxera_raw.cnab_charges
-WHERE 
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+AND
     record_type = '1'
 AND 
     SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(file_name, '/', -1), '_', 2), '_', -1) = 341
-AND 
-    year = {year}
-AND 
-    month = {month}
-AND 
-    day = {day}

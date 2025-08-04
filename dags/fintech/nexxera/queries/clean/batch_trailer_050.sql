@@ -30,9 +30,7 @@ SELECT
 FROM
     datalake_nexxera_raw.financial_extracts
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     AND id_bank IN (341, 237)
     AND record_type = 5
     AND SUBSTRING(file_name, 48, 14) <> 'ext_237_93738_'

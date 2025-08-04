@@ -4,6 +4,7 @@ from functools import reduce
 import json
 import logging
 import re
+import pandas as pd
 
 from bietlejuice.base.spark import (
     SparkTableStorageFormat,
@@ -36,44 +37,59 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def list_files(table_name, source_root_path, format, datetime_to_ingest):
     if format == 'csv':
+        filtered_files = []
         s3_files_path = f"{source_root_path}{table_name}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        pattern = re.compile(f".*{datetime_to_ingest.strftime('%Y%m%d')}.*")
-        filtered_files = list(filter(pattern.match, files))
+        for date in datetime_to_ingest:
+            pattern = re.compile(f".*{date.strftime('%Y%m%d')}.*")
+            filtered_files_list = list(filter(pattern.match, files))
+            for file in filtered_files_list:
+                filtered_files.append(file)
 
     elif format == 'txt':
         filtered_files = []
         s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
         for f in files:
-            if any(account in f for account in ['97477', '52081']):
-                if datetime_to_ingest.strftime('_%d%m%y') in f:
-                    filtered_files.append(f)
-            elif any(account in f for account in ['5514', '130067134']):
-                if datetime_to_ingest.strftime('_%d%m%Y_') in f:
-                    filtered_files.append(f)
-            else:
-                if datetime_to_ingest.strftime('_%y%m%d_') in f:
-                    filtered_files.append(f)
+            for date in datetime_to_ingest:
+                if any(account in f for account in ['97477', '52081']):
+                    if date.strftime('_%d%m%y') in f:
+                        filtered_files.append(f)
+                elif any(account in f for account in ['5514', '130067134']):
+                    if date.strftime('_%d%m%Y_') in f:
+                        filtered_files.append(f)
+                else:
+                    if date.strftime('_%y%m%d_') in f:
+                        filtered_files.append(f)
 
     elif format == 'ret_pag':
         filtered_files = []
         s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
         for f in files:
-            if any(account in f for account in ['452586', '426879', '433065']):
-                if datetime_to_ingest.strftime('_%d%m%y_') in f:
-                    filtered_files.append(f)
-            else:
-                if datetime_to_ingest.strftime('_%y%m%d_') in f:
-                    filtered_files.append(f)
+            for date in datetime_to_ingest:
+                if any(account in f for account in ['426879']):
+                    if date.strftime('_%d%m%y_') in f:
+                        filtered_files.append(f)
+                else:
+                    if date.strftime('_%y%m%d_') in f:
+                        filtered_files.append(f)
 
     elif format == 'ret_cob':
+        filtered_files = []
         s3_files_path = f"{source_root_path}"
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
-        dt_pattern = '_%d%m%y_' if 'velo' not in s3_files_path else '_%d%m%y'
-        pattern = re.compile(f".*{datetime_to_ingest.strftime(dt_pattern)}.*")
-        filtered_files = list(filter(pattern.match, files))
+        for f in files:
+            for date in datetime_to_ingest:
+                if any(account in f for account in ['velo']):
+                    if date.strftime('_%d%m%y') in f:
+                        filtered_files.append(f)
+                elif any(account in f for account in ['063180', '148643', '099036', '469916']):
+                    if date.strftime('_%d%m%Y_') in f:
+                        filtered_files.append(f)
+                else:
+                    if date.strftime('_%d%m%y_') in f:
+                        filtered_files.append(f)
 
     return filtered_files
 
@@ -93,7 +109,11 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the source")
     parser.add_argument("source_root_path", help="name of the source", default=None)
     parser.add_argument(
-        "date_to_ingest",
+        "load_start_date",
+        help="Date to be used in filtering the files. Format: '%Y-%m-%d'",
+    )
+    parser.add_argument(
+        "load_end_date",
         help="Date to be used in filtering the files. Format: '%Y-%m-%d'",
     )
     parser.add_argument("table_name", help="name of the output table")
@@ -109,12 +129,16 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     source_root_path = args.source_root_path if args.source_root_path != "None" else None
-    date_to_ingest = args.date_to_ingest
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
     table_name = args.table_name
     consumer_extra_args = json.loads(args.consumer_extra_args)
     partition_cols = ["year", "month", "day"]
-    datetime_to_ingest = datetime.strptime(date_to_ingest, "%Y-%m-%d")
-    datetime_to_ingest = datetime_to_ingest if 'recupera' not in source_root_path else datetime_to_ingest + timedelta(days=1)
+    load_start_datetime = datetime.strptime(load_start_date, "%Y-%m-%d")
+    load_start_datetime = load_start_datetime if 'recupera' not in source_root_path else load_start_datetime + timedelta(days=1)
+    load_end_datetime = datetime.strptime(load_end_date, "%Y-%m-%d")
+    load_end_datetime = load_end_datetime if 'recupera' not in source_root_path else load_end_datetime + timedelta(days=1)
+    datetime_to_ingest = pd.date_range(start=load_start_datetime, end=load_end_datetime).tolist()
     format = args.format if args.format != "None" else None
     col_names = json.loads(args.col_names) if args.col_names != "None" else None
 
@@ -122,8 +146,8 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-                source_root_path={source_root_path}, date_to_ingest={date_to_ingest}, datetime_to_ingest={datetime_to_ingest},
+                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, source_root_path={source_root_path},
+                load_start_date={load_start_date}, load_start_datetime={load_start_datetime}, load_end_date={load_end_date}, load_end_datetime={load_end_datetime}, datetime_to_ingest={datetime_to_ingest},
                 table_name={table_name}, format={format},col_names={col_names}, consumer_extra_args={consumer_extra_args}, msg=Starting spark job...
         """
     )
@@ -142,7 +166,7 @@ if __name__ == "__main__":
     if len(filtered_files) > 0:
         
         logger.info(
-            f"m=__main__, msg= The following files were found for {datetime_to_ingest.date()} and will be loaded: {filtered_files}"
+            f"m=__main__, msg= The following files were found for {datetime_to_ingest} and will be loaded: {filtered_files}"
         )    
 
         if format == 'csv':
@@ -156,15 +180,16 @@ if __name__ == "__main__":
                     .option("encoding", "ISO-8859-1")
                     .load(file_path)
                 )
+                date_str = re.search(r'_(\d{8})\d{6}\.csv$', file_path).group(1)
+                date_obj = datetime.strptime(date_str, '%Y%m%d')
+                df = df.withColumn('file_name', lit(file_path)) \
+                .withColumn("year", lit(date_obj.year)) \
+                .withColumn("month", lit(date_obj.month)) \
+                .withColumn("day", lit(date_obj.day))
                 dfs.append(df)
 
             df = reduce(DataFrame.unionAll, dfs)
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_date(datetime_to_ingest)
-                .output()
-            )
+
         elif format == 'txt':
             dfs = []
 
@@ -175,18 +200,23 @@ if __name__ == "__main__":
                     df.value.substr(4,4).alias('id_service_batch'),
                     df.value.substr(8,1).alias('record_type'),
                     df.value.substr(9,240).alias('metadata'),
-
                     )
-                df = df.withColumn('file_name', lit(path))
+                if any(account in path for account in ['97477', '52081']):
+                    date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%d%m%y')
+                elif any(account in path for account in ['5514', '130067134']):
+                    date_str = re.search(r'_(\d{8})_', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%d%m%Y')
+                else:
+                    date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%y%m%d')
+                df = df.withColumn('file_name', lit(path)) \
+                    .withColumn("year", lit(date_obj.year)) \
+                    .withColumn("month", lit(date_obj.month)) \
+                    .withColumn("day", lit(date_obj.day))
                 dfs.append(df)
 
             df = reduce(DataFrame.unionAll, dfs)
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_date(datetime_to_ingest)
-                .output()
-            )
 
         elif format == 'ret_pag':
             dfs = []
@@ -200,18 +230,20 @@ if __name__ == "__main__":
                     df.value.substr(9, 5).alias('record_sequence_number'),
                     df.value.substr(14, 1).alias('segment_type'),
                     df.value.substr(15,225).alias('metadata'),
-
-                    )
-                df = df.withColumn('file_name', lit(path))
+                    )    
+                if any(account in path for account in ['426879']):
+                    date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%d%m%y')
+                else:
+                    date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%y%m%d')
+                df = df.withColumn('file_name', lit(path)) \
+                    .withColumn("year", lit(date_obj.year)) \
+                    .withColumn("month", lit(date_obj.month)) \
+                    .withColumn("day", lit(date_obj.day))
                 dfs.append(df)
 
             df = reduce(DataFrame.unionAll, dfs)
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_date(datetime_to_ingest)
-                .output()
-            )
 
         elif format == 'ret_cob':
             dfs = []
@@ -221,18 +253,20 @@ if __name__ == "__main__":
                 df = df.select(
                     df.value.substr(1,1).alias('record_type'),
                     df.value.substr(2,399).alias('metadata'),
-
-                    )
-                df = df.withColumn('file_name', lit(path))
+                )
+                if any(account in path for account in ['063180', '148643', '099036', '469916']):
+                    date_str = re.search(r'_(\d{8})_', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%d%m%Y')
+                else:
+                    date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
+                    date_obj = datetime.strptime(date_str, '%d%m%y')
+                df = df.withColumn('file_name', lit(path)) \
+                    .withColumn("year", lit(date_obj.year)) \
+                    .withColumn("month", lit(date_obj.month)) \
+                    .withColumn("day", lit(date_obj.day))
                 dfs.append(df)
 
             df = reduce(DataFrame.unionAll, dfs)
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_date(datetime_to_ingest)
-                .output()
-            )
 
         db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
         spark_metastore_service = SparkMetastoreService(spark_client)

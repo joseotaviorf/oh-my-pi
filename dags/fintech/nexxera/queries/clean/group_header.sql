@@ -16,9 +16,7 @@ SELECT
 FROM
     datalake_nexxera_raw.adjustments -- headers from adjustments files
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     AND col_1 = 00
 
 UNION ALL
@@ -41,9 +39,7 @@ SELECT
 FROM
     datalake_nexxera_raw.financial -- headers from financial files
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     AND col_1 = 00
 
 UNION ALL
@@ -66,9 +62,7 @@ SELECT
 FROM
     datalake_nexxera_raw.inadvance -- headers from inadvance files
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     AND col_1 = 00
 
 UNION ALL
@@ -91,9 +85,7 @@ SELECT
 FROM
     datalake_nexxera_raw.sales -- headers from sales files
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     AND col_1 = 00
 
 UNION ALL
@@ -116,7 +108,5 @@ SELECT
 FROM
     datalake_nexxera_raw.transaction -- headers from transaction files
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     AND col_1 = 00

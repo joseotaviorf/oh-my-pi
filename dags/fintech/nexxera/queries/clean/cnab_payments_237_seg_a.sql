@@ -41,9 +41,5 @@ WHERE
   id_bank = '237'
 AND 
   segment_type = 'A'
-AND 
-    year = {year}
-AND 
-    month = {month}
-AND 
-    day = {day}
+AND
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
