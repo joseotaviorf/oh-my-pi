@@ -202,64 +202,133 @@ lag_model AS (
         ts_created AS ts_entrance_started
     FROM
         enriched_model
+),
+filtered_model AS (
+    SELECT
+        MD5(id_house || CAST(ts_entrance_started AS STRING)) AS id,
+        id_house,
+        id_occupant,
+        occupant_type,
+        restriction_type,
+        key_type,
+        entry_model_details,
+        COALESCE(migration_old_key_location, key_location) AS key_location,
+        CASE
+            COALESCE(migration_old_key_location, key_location)
+            WHEN 'OWNER' THEN 'ASSISTED_ENTRANCE'
+            WHEN 'TENANT' THEN 'ASSISTED_ENTRANCE'
+            WHEN 'INSPECTOR' THEN 'ASSISTED_ENTRANCE'
+            WHEN 'EXTERNAL_RESPONSIBLE' THEN 'ASSISTED_ENTRANCE'
+            WHEN 'EXTERNAL_TENANT' THEN 'ASSISTED_ENTRANCE'
+            WHEN 'FRONT_DOOR' THEN 'EASY_ENTRANCE'
+            WHEN 'AGENT' THEN 'EASY_ENTRANCE'
+            WHEN 'PASSWORD' THEN 'EASY_ENTRANCE'
+            WHEN 'LOCK_BOX' THEN 'EASY_ENTRANCE'
+            WHEN 'LOCKER' THEN 'EASY_ENTRANCE'
+            ELSE 'NOT_CLASSIFIED'
+        END AS entry_model_type,
+        authorization_type,
+        doorman_type,
+        entry_model_channel,
+        actor_role,
+        event_type,
+        entry_access_model,
+        key_holder_type,
+        key_holder_identifier,
+        key_holder_business_context,
+        actor_user_type,
+        entry_model_source,
+        country_code,
+        has_opted_keys_with_agent,
+        COALESCE(authorization_type, -1) <> COALESCE(lag_authorization_type, -1) AS mod_authorization,
+        COALESCE(occupant_type, -1) <> COALESCE(lag_occupant_type, -1) AS mod_occupant,
+        COALESCE(key_type, -1) <> COALESCE(lag_key_type, -1) AS mod_type,
+        COALESCE(has_opted_keys_with_agent::INTEGER, -1) <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1) AS mod_has_opted_keys_with_agent,
+        COALESCE(MAX(lag_model.ts_entrance_started) OVER(PARTITION BY lag_model.id_house, DATE(lag_model.ts_entrance_started)) = lag_model.ts_entrance_started, FALSE) AS is_last_status_of_day,
+        ts_entrance_started,
+        LEAD(lag_model.ts_entrance_started) OVER(PARTITION BY lag_model.id_house ORDER BY lag_model.ts_entrance_started) AS ts_entrance_ended
+    FROM
+        lag_model
+    WHERE
+        (id_occupant <> COALESCE(lag_id_occupant, -1))
+        OR (occupant_type <> COALESCE(lag_occupant_type, -1))
+        OR (restriction_type <> COALESCE(lag_restriction_type, -1))
+        OR (key_type <> COALESCE(lag_key_type, -1))
+        OR (entry_model_details <> COALESCE(lag_entry_model_details, -1))
+        OR (key_location <> COALESCE(lag_key_location, -1))
+        OR (doorman_type <> COALESCE(lag_doorman_type, -1))
+        OR (entry_model_channel <> COALESCE(lag_entry_model_channel, -1))
+        OR (actor_role <> COALESCE(lag_actor_role, -1))
+        OR (event_type <> COALESCE(lag_event_type, -1))
+        OR (key_holder_identifier <> COALESCE(lag_key_holder_identifier, -1))
+        OR (actor_user_type <> COALESCE(lag_actor_user_type, -1))
+        OR (has_opted_keys_with_agent::INTEGER <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1))
+        OR (authorization_type <> COALESCE(lag_authorization_type, -1))
+),
+terminations AS (
+    SELECT
+        id_contract,
+        status,
+        dt_vacancy,
+        IF(status = 'DONE', DATE(ts_updated), NULL) AS dt_termination_finished
+    FROM
+        datalake_terminator_clean.termination
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
+),
+contracts AS (
+    SELECT
+        c.id_house,
+        c.status,
+        c.dt_started,
+        IF(t.status = 'DONE' AND c.dt_termination > DATE('2020-01-07'), t.dt_vacancy, c.dt_termination) AS dt_termination,
+        c.ts_created
+    FROM
+        datalake_ebdb_clean.contract AS c
+    LEFT JOIN
+        terminations AS t
+            ON t.id_contract = c.id
 )
 SELECT
-    MD5(id_house || CAST(ts_entrance_started AS STRING)) AS id,
-    id_house,
-    id_occupant,
-    occupant_type,
-    restriction_type,
-    key_type,
-    entry_model_details,
-    COALESCE(migration_old_key_location, key_location) AS key_location,
+    fm.id,
+    fm.id_house,
+    fm.id_occupant,
     CASE
-        COALESCE(migration_old_key_location, key_location)
-        WHEN 'OWNER' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'TENANT' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'INSPECTOR' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'EXTERNAL_RESPONSIBLE' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'EXTERNAL_TENANT' THEN 'ASSISTED_ENTRANCE'
-        WHEN 'FRONT_DOOR' THEN 'EASY_ENTRANCE'
-        WHEN 'AGENT' THEN 'EASY_ENTRANCE'
-        WHEN 'PASSWORD' THEN 'EASY_ENTRANCE'
-        WHEN 'LOCK_BOX' THEN 'EASY_ENTRANCE'
-        WHEN 'LOCKER' THEN 'EASY_ENTRANCE'
-        ELSE 'NOT_CLASSIFIED'
-    END AS entry_model_type,
-    authorization_type,
-    doorman_type,
-    entry_model_channel,
-    actor_role,
-    event_type,
-    entry_access_model,
-    key_holder_type,
-    key_holder_identifier,
-    key_holder_business_context,
-    actor_user_type,
-    entry_model_source,
-    country_code,
-    has_opted_keys_with_agent,
-    COALESCE(authorization_type, -1) <> COALESCE(lag_authorization_type, -1) AS mod_authorization,
-    COALESCE(occupant_type, -1) <> COALESCE(lag_occupant_type, -1) AS mod_occupant,
-    COALESCE(key_type, -1) <> COALESCE(lag_key_type, -1) AS mod_type,
-    COALESCE(has_opted_keys_with_agent::INTEGER, -1) <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1) AS mod_has_opted_keys_with_agent,
-    COALESCE(MAX(lag_model.ts_entrance_started) OVER(PARTITION BY lag_model.id_house, DATE(lag_model.ts_entrance_started)) = lag_model.ts_entrance_started, FALSE) AS is_last_status_of_day,
-    ts_entrance_started,
-    LEAD(lag_model.ts_entrance_started) OVER(PARTITION BY lag_model.id_house ORDER BY lag_model.ts_entrance_started) AS ts_entrance_ended
+        WHEN fm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND fm.ts_entrance_ended IS NOT NULL THEN 'Tenant'
+        WHEN fm.occupant_type = 'Empty' AND c.status = 'Ativo' AND fm.ts_entrance_ended IS NULL THEN 'Tenant'
+        ELSE fm.occupant_type
+    END AS occupant_type,
+    fm.restriction_type,
+    fm.key_type,
+    fm.entry_model_details,
+    fm.key_location,
+    fm.entry_model_type,
+    fm.authorization_type,
+    fm.doorman_type,
+    fm.entry_model_channel,
+    fm.actor_role,
+    fm.event_type,
+    fm.entry_access_model,
+    fm.key_holder_type,
+    fm.key_holder_identifier,
+    fm.key_holder_business_context,
+    fm.actor_user_type,
+    fm.entry_model_source,
+    fm.country_code,
+    fm.has_opted_keys_with_agent,
+    fm.mod_authorization,
+    fm.mod_occupant,
+    fm.mod_type,
+    fm.mod_has_opted_keys_with_agent,
+    fm.is_last_status_of_day,
+    fm.ts_entrance_started,
+    fm.ts_entrance_ended
 FROM
-    lag_model
-WHERE
-    (id_occupant <> COALESCE(lag_id_occupant, -1))
-    OR (occupant_type <> COALESCE(lag_occupant_type, -1))
-    OR (restriction_type <> COALESCE(lag_restriction_type, -1))
-    OR (key_type <> COALESCE(lag_key_type, -1))
-    OR (entry_model_details <> COALESCE(lag_entry_model_details, -1))
-    OR (key_location <> COALESCE(lag_key_location, -1))
-    OR (doorman_type <> COALESCE(lag_doorman_type, -1))
-    OR (entry_model_channel <> COALESCE(lag_entry_model_channel, -1))
-    OR (actor_role <> COALESCE(lag_actor_role, -1))
-    OR (event_type <> COALESCE(lag_event_type, -1))
-    OR (key_holder_identifier <> COALESCE(lag_key_holder_identifier, -1))
-    OR (actor_user_type <> COALESCE(lag_actor_user_type, -1))
-    OR (has_opted_keys_with_agent::INTEGER <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1))
-    OR (authorization_type <> COALESCE(lag_authorization_type, -1))
+    filtered_model AS fm
+LEFT JOIN
+    contracts AS c
+        ON fm.id_house = c.id_house
+        AND fm.ts_entrance_started >= c.dt_started
+        AND fm.ts_entrance_started < COALESCE(c.dt_termination, NOW())
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY fm.id ORDER BY c.ts_created DESC) = 1
