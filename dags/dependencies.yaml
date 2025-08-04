@@ -769,14 +769,6 @@ bietlejuice.dw_recon_quintocred_snapshot:
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry:first-run-of-day
   - bietlejuice.robin_hood:load-clean-payment-request:first-run-of-day
-bietlejuice.dw_rede_company:
-  - bietlejuice.company:load-clean-address:first-run-of-day
-  - bietlejuice.company:load-clean-company:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
-  - bietlejuice.enrich_hubspot_management:load-enrich-owner:first-run-of-day
 bietlejuice.dw_rede_supply:
   - bietlejuice.company:load-clean-company:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
@@ -3412,12 +3404,12 @@ bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-inspection-opted-out:first-run-of-day
   - bietlejuice.terminator:load-clean-negotiation:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-aud:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-fee-negotiation:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-fee:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-task:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-workflow:first-run-of-day
   - bietlejuice.terminator:load-clean-termination:first-run-of-day
-  - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:
