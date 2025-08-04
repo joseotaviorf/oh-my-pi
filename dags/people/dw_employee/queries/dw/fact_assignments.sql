@@ -1,45 +1,194 @@
+WITH
+subordinates AS (
+  SELECT
+    mh.id_manager_period_of_service,
+    SUM(IF(mh.is_direct_manager AND a.assignment_status_type = 'ACTIVE', 1, 0)) AS qnt_directly_led,
+    SUM(IF(NOT mh.is_direct_manager AND a.assignment_status_type = 'ACTIVE', 1, 0)) AS qnt_undirectly_led
+  FROM
+    datalake_hr_system.management_hierarchy AS mh
+  LEFT JOIN
+    datalake_hr_system.assignment_effective_status AS a
+      ON a.id_assignment = mh.id_assignment
+  GROUP BY
+    mh.id_manager_period_of_service
+),
+salaries AS (
+  SELECT 
+    s.id_assignment,
+    s.currency_code,
+    s.salary_amount,
+    s.adjustment_amount,
+    s.adjustment_percent,
+    s.dt_started,
+    s.dt_ended
+  FROM 
+    datalake_pin_compensation_clean.salary AS s
+  WHERE 
+    s.dt_started <= CURRENT_DATE
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) = 1
+),
+disability AS (
+  SELECT DISTINCT
+    sk_disability,
+    id_person,
+    has_self_declared_disability
+  FROM 
+    datalake_hr_system.disability
+  QUALIFY
+    ts_last_updated = MAX(ts_last_updated) OVER (PARTITION BY id_person)
+),
+current_assignments AS (
+  SELECT 
+    id_period_of_service, 
+    id_job,
+    id_organization,
+    id_business_unit,
+    legislation_code, 
+    assignment_status_type,
+    dt_projected_started,
+    target_plr,
+    career_track
+  FROM 
+    datalake_pin_core_clean.all_assignments
+  WHERE
+    (
+      (
+        dt_effective_started <= CURRENT_DATE
+        AND assignment_type IN ('E', 'C')
+      )
+      OR (
+        dt_projected_started > CURRENT_DATE
+        AND assignment_type = 'P'
+      )
+    )
+    AND dt_effective_ended >= CURRENT_DATE
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY id_period_of_service 
+      ORDER BY dt_effective_ended ASC
+    ) = 1
+),
+managers AS (
+  SELECT
+    id_period_of_service,
+    id_manager_period_of_service,
+    id_assignment,
+    id_manager
+  FROM
+    datalake_pin.managers_history
+  WHERE
+    dt_effective_started <= CURRENT_DATE
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY dt_effective_started DESC) = 1
+),
+latest_rates AS (
+  SELECT
+    id_grade_ladder,
+    id_rate
+  FROM 
+    datalake_pin_core_clean.rates
+  WHERE 
+    dt_effective_ended = DATE('4712-12-31')
+  QUALIFY 
+    ROW_NUMBER() OVER (PARTITION BY id_grade_ladder ORDER BY ts_updated DESC) = 1
+),
+latest_rate_values AS (
+  SELECT
+    id_rate,
+    mid_value
+  FROM 
+    datalake_pin_core_clean.rate_values
+  WHERE 
+    dt_effective_ended = DATE('4712-12-31')
+  QUALIFY 
+    ROW_NUMBER() OVER (PARTITION BY id_rate ORDER BY ts_updated DESC) = 1
+),
+job_salary_reference AS (
+  SELECT
+    j.id_job,
+    MAX(prvf.mid_value) as mid_value
+  FROM 
+    datalake_pin_core_clean.job AS j
+  INNER JOIN 
+    latest_rates AS prf ON j.id_grade_ladder = prf.id_grade_ladder
+  INNER JOIN 
+    latest_rate_values AS prvf ON prf.id_rate = prvf.id_rate
+  WHERE 
+    j.dt_effective_ended = DATE('4712-12-31') 
+    AND j.active_status = 'A'
+  GROUP BY 
+    j.id_job
+)
+
 SELECT
-  am.sk_assignment,
-  am.sk_employee,
-  am.sk_demographic_information,
-  am.sk_disability,
-  am.sk_cost_center,
-  am.sk_business_unit,
-  am.sk_job,
-  am.sk_manager,
-  am.sk_manager_assignment,
-  REPLACE(am.dt_work_relationship_started, '-', '') AS sk_work_relationship_started_date,
-  REPLACE(am.dt_work_relationship_terminated, '-', '') AS sk_work_relationship_ended_date,
-  h.sk_hierarchy,
-  am.assignment_number,
-  am.salary_currency AS salary_currency_code,
-  am.sk_last_increase_date AS sk_last_salary_increase_date,
-  am.sk_first_promotion_date,
-  am.is_last_work_relationship,
-  am.is_active,
-  am.is_pending_worker,
-  am.is_manager,
-  am.has_self_declared_disability,
-  am.assignment_age_months,
-  am.qnt_directly_led,
-  am.qnt_undirectly_led,
-  am.salary,
-  am.target_plr,
-  am.salary_reference,
-  am.qnt_movimentations,
-  am.average_time_between_movimentations,
-  am.last_increase AS last_salary_increase,
-  am.pct_last_increase AS pct_last_salary_increase,
-  am.first_salary,
-  am.last_salary,
-  am.range_salary_movement,
-  am.first_promotion_salary,
-  am.nominal_increase_first_promotion AS nominal_salary_increase_first_promotion,
-  am.pct_increase_first_promotion AS pct_salary_increase_first_promotion,
-  am.months_to_first_promotion,
+  im.id_period_of_service AS sk_assignment,
+  im.id_person AS sk_employee,
+  COALESCE(da.sk_demographic_information, '-1') AS sk_demographic_information,
+  COALESCE(d.sk_disability, '-1') AS sk_disability,
+  COALESCE(a.id_organization, '-1') AS sk_cost_center,
+  COALESCE(a.id_business_unit, '-1') AS sk_business_unit,
+  COALESCE(a.id_job, '-1') AS sk_job,
+  COALESCE(am.id_manager, '-1') AS sk_manager,
+  COALESCE(am.id_manager_period_of_service, '-1') AS sk_manager_assignment,
+  DATE_FORMAT(ps.dt_started, 'yyyyMMdd') AS sk_work_relationship_started_date,
+  DATE_FORMAT(ps.dt_actual_termination, 'yyyyMMdd') AS sk_work_relationship_ended_date,
+  DATE_FORMAT(s.dt_started, 'yyyyMMdd') AS sk_last_salary_increase_date,
+  COALESCE(h.sk_hierarchy, '-1') AS sk_hierarchy,
+  im.assignment_number,
+  s.currency_code AS salary_currency_code,
+  ROW_NUMBER() OVER (PARTITION BY im.id_period_of_service, ed.assignment_status_type ORDER BY ps.dt_started DESC) = 1 AS is_last_work_relationship,
+  IF(ed.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
+  IF(ed.assignment_type = 'P', TRUE, FALSE) AS is_pending_worker,
+  CASE
+    WHEN a.career_track = 'L'
+      OR sub.qnt_directly_led > 0
+    THEN TRUE
+    ELSE FALSE
+  END AS is_manager,
+  COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
+  CASE 
+    WHEN ed.assignment_type = 'P' THEN 0
+    ELSE FLOOR(MONTHS_BETWEEN(COALESCE(ps.dt_actual_termination, CURRENT_DATE), ps.dt_started)) 
+  END AS assignment_age_months,
+  COALESCE(sub.qnt_directly_led, 0) AS qnt_directly_led,
+  COALESCE(sub.qnt_undirectly_led, 0) AS qnt_undirectly_led,
+  s.salary_amount AS salary,
+  a.target_plr,
+  COALESCE(jsr.mid_value, 0) AS salary_reference,
+  s.adjustment_amount AS last_salary_increase,
+  s.adjustment_percent AS pct_last_salary_increase,
   NOW() AS ts_load
-FROM
-  datalake_hr_system.assignment_metrics AS am
+FROM 
+  datalake_employee_registration.identifier_mapping AS im
+INNER JOIN 
+  datalake_employment.employee_details AS ed
+    ON ed.id_period_of_service = im.id_period_of_service
+INNER JOIN 
+  current_assignments AS a
+    ON a.id_period_of_service = im.id_period_of_service
+LEFT JOIN 
+  datalake_pin_core_clean.periods_of_service AS ps
+    ON ps.id_period_of_service = im.id_period_of_service
+LEFT JOIN
+  subordinates AS sub 
+    ON sub.id_manager_period_of_service = im.id_period_of_service
+LEFT JOIN
+  salaries AS s
+    ON s.id_assignment = im.id_assignment
+LEFT JOIN
+  disability AS d
+    ON d.id_person = im.id_person
+LEFT JOIN
+  datalake_hr_system.demographic_attributes AS da
+    ON da.id_person = im.id_person
+    AND a.legislation_code = da.legislation_code
 LEFT JOIN
   datalake_hr_system.hierarchy_ids AS h
-    ON h.sk_assignment = am.sk_assignment
+    ON h.sk_assignment = im.id_period_of_service
+LEFT JOIN 
+  managers AS am 
+    ON am.id_assignment = im.id_assignment
+LEFT JOIN 
+  job_salary_reference AS jsr 
+    ON jsr.id_job = a.id_job

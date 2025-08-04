@@ -490,10 +490,13 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids:first-run-of-day
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
+  - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-disability:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-employee-info:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships:first-run-of-day
+  - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
+  - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.hr_system:load-clean-areas-of-responsibility:first-run-of-day
   - bietlejuice.hr_system:load-clean-jobs:first-run-of-day
@@ -503,6 +506,12 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_absence:load-clean-person-entry:first-run-of-day
   - bietlejuice.pin_absence:load-clean-type-translation:first-run-of-day
   - bietlejuice.pin_absence:load-clean-type:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job:first-run-of-day
+  - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
+  - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
+  - bietlejuice.pin_core:load-clean-rates:first-run-of-day
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
