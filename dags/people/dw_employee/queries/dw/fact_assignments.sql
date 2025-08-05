@@ -192,3 +192,5 @@ LEFT JOIN
 LEFT JOIN 
   job_salary_reference AS jsr 
     ON jsr.id_job = a.id_job
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY im.id_person ORDER BY ps.dt_started DESC) = 1
