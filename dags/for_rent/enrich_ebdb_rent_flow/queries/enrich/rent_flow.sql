@@ -1,4 +1,14 @@
-WITH rent_flow_offer_and_pre_proposal AS (
+WITH
+lbc_first_publication AS (
+    SELECT
+        id_house,
+        ts_first_publication
+    FROM
+        datalake_ebdb_clean.listing_business_context
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_first_publication) = 1
+),
+rent_flow_offer_and_pre_proposal AS (
     WITH pre_proposal_with_visits AS (
         SELECT
             pp.id AS id_pp,
@@ -140,7 +150,7 @@ WITH rent_flow_offer_and_pre_proposal AS (
     rent_flow_offer_full AS (
         SELECT
             house.id AS id_house,
-            house.dt_first_publication AS dt_house_first_listing,
+            lbc.ts_first_publication AS dt_house_first_listing,
             booking.id AS id_booking,
             booking.ts_created AS dt_booking_created,
             booking.dt_booking AS dt_visit,
@@ -188,6 +198,8 @@ WITH rent_flow_offer_and_pre_proposal AS (
         FROM datalake_ebdb_clean.house
         JOIN datalake_ebdb_clean.rent_flow rf
             ON house.id = rf.id_house
+        LEFT JOIN lbc_first_publication AS lbc
+            ON lbc.id_house = house.id
         LEFT JOIN datalake_ebdb_clean.booking
             ON rf.id = booking.id_rent_flow
             AND booking.type = 'Visita'
@@ -302,7 +314,7 @@ contract_with_rent_flow_portability AS (
         NULL AS is_visit_completed,
         NULL AS is_visit_performed,
         proposal.ts_approved AS dt_proposal_approved,
-        house.dt_first_publication AS dt_house_first_listing,
+        lbc.ts_first_publication AS dt_house_first_listing,
         NULL AS dt_booking_created,
         NULL AS dt_visit,
         NULL AS dt_client_sign_up,
@@ -319,6 +331,8 @@ contract_with_rent_flow_portability AS (
         ON house.id = rf.id_house
     JOIN datalake_ebdb_clean.portability
         ON portability.id_flow = rf.id
+    LEFT JOIN lbc_first_publication AS lbc
+        ON lbc.id_house = house.id
     LEFT JOIN datalake_ebdb_clean.proposal
         ON contract.id_proposal = proposal.id
     LEFT JOIN datalake_ebdb_clean.offer
@@ -343,7 +357,7 @@ contract_with_rent_flow AS (
         NULL AS is_visit_completed,
         NULL AS is_visit_performed,
         proposal.ts_approved AS dt_proposal_approved,
-        house.dt_first_publication AS dt_house_first_listing,
+        lbc.ts_first_publication AS dt_house_first_listing,
         NULL AS dt_booking_created,
         NULL AS dt_visit,
         NULL AS dt_client_sign_up,
@@ -359,6 +373,8 @@ contract_with_rent_flow AS (
         AND contract.id_user = rf.id_client
     JOIN datalake_ebdb_clean.house
         ON house.id = rf.id_house
+    LEFT JOIN lbc_first_publication AS lbc
+        ON lbc.id_house = house.id
     LEFT JOIN datalake_ebdb_clean.proposal
         ON contract.id_proposal = proposal.id
     WHERE (proposal.id  IS NULL) OR

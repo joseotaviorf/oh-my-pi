@@ -1975,6 +1975,7 @@ bietlejuice.enrich_ebdb_rent_flow:
   - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-portability:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-proposal:first-run-of-day

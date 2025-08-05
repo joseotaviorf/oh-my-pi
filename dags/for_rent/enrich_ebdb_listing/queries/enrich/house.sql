@@ -313,7 +313,7 @@ SELECT
   COALESCE(has_rent_smart_price_activated, FALSE) AS has_rent_smart_price_activated,
   h.dt_built,
   h.dt_expiration,
-  h.dt_first_publication,
+  lbc.ts_first_publication AS dt_first_publication,
   h.dt_availability_end,
   h.dt_creation,
   h.ts_first_verified,
@@ -328,6 +328,9 @@ SELECT
   h.ts_updated
 FROM
   datalake_ebdb_clean.house AS h
+LEFT JOIN
+  datalake_ebdb_clean.listing_business_context AS lbc
+    ON lbc.id_house = h.id
 LEFT JOIN
   datalake_ebdb_clean.state
     ON state.id = h.id_state
@@ -376,3 +379,5 @@ LEFT JOIN
 LEFT JOIN
   smart_price AS sp
     ON sp.id_house = h.id
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY lbc.ts_first_publication) = 1
