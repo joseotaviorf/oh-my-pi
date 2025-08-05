@@ -9,6 +9,9 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    credit_passport_ab_test_user_classification:
+      - person_document_information
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new

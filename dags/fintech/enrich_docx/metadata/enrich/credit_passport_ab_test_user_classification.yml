@@ -1,0 +1,55 @@
+---
+database_name: datalake_docx
+table_name: credit_passport_ab_test_user_classification
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: A/B test classification table for credit passport functionality, categorizing users into test groups based on eligibility criteria and feature flags.
+columns:
+  id_user:
+    description: The unique identifier for the user. This column can be used in any join with the id_user from main.
+    lineage:
+      - datalake_docx.person_document_information.id_user
+  group_details:
+    description: Detailed classification of user groups based on test group participation and eligibility criteria
+    categories:
+      a. eligible: Users eligible for credit passport experience based on app version and early credit criteria
+      b. passport only: Users who only experienced the credit passport flow
+      c. both experiences (credit passport and early credit): Users who experienced both passport and early credit page view
+      d. not eligible - app version and early credit criteria: Users not meeting both app version and early credit requirements
+      e. not eligible - app version criteria: Users not meeting app version requirements
+      f. not eligible - early credit criteria: Users not meeting early credit criteria
+      z. to be classified: Users that don't fit into other categories
+    lineage:
+      - datalake_docx.person_document_information.is_in_test_group
+      - datalake_docx.person_document_information.is_app_version_updated
+      - datalake_docx.person_document_information.is_early_credit_criteria_satisfied
+  ab_test_group:
+    description: Simplified A/B test group classification for analysis purposes
+    categories:
+      a. control: Control group (eligible users)
+      b. test: Test group (passport only users)
+      c. noise: Users not included in the main A/B test comparison
+    lineage:
+      - datalake_docx.person_document_information.is_in_test_group
+      - datalake_docx.person_document_information.is_app_version_updated
+      - datalake_docx.person_document_information.is_early_credit_criteria_satisfied
+  days_engaged:
+    description: Number of days since the user's first landing page view (LPV) until yesterday
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_1w:
+    description: Boolean flag indicating if the user has been engaged for at least 1 week (7 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_2w:
+    description: Boolean flag indicating if the user has been engaged for at least 2 weeks (14 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_4w:
+    description: Boolean flag indicating if the user has been engaged for at least 4 weeks (28 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  dt_first_lpv:
+    description: Date of the user's first landing page view, marking the start of their engagement tracking
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
