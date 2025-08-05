@@ -24,7 +24,6 @@ SELECT
     salary,
     target_plr,
     salary_reference,
-    qnt_movimentations,
     last_salary_increase,
     pct_last_salary_increase,
     NOW() AS ts_load
