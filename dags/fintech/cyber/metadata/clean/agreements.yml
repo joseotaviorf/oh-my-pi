@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: agreements
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Negotiation information. Table granularity - id_agreement.
 columns:
   id_agreement:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHTYPE
   contract_group:
-    description: ""
+    description: "Contract Group"
     lineage:
       - datalake_cyber_raw.agrhdr.AHACCTG
   authorized_by_manager:
@@ -32,11 +32,11 @@ columns:
   frequency:
     description: "Frequency/Periodicity"
     categories:
-      weekly: ""
-      daily: ""
-      monthly: ""
-      bimonthly: ""
-      quarterly: ""
+      weekly: "weekly"
+      daily: "daily"
+      monthly: "monthly"
+      bimonthly: "bimonthly"
+      quarterly: "quarterly"
     lineage:
       - datalake_cyber_raw.agrhdr.AHFREQ
   number_of_installments:
@@ -49,7 +49,7 @@ columns:
       Autorizado: "Same as Offset in Trato Feito"
       Cancelado: "Same as Canceled in Trato Feito"
       Finalizado: "Same as Finished in Trato Feito"
-      Pendente: ""
+      Pendente: "Pendente"
     lineage:
       - datalake_cyber_raw.agrhdr.AHSTATUS
   type_interest_quota:
@@ -57,27 +57,38 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHPYTYPE
   contact_type:
-    description: "Contact type"
+    description: "Type of contact made by the advisory/agency to create the negotiation"
+    categories:
+      BackOfc: Negociação Backoffice
+      AVirtual: Negociação Agente Virtuall, utiliza tecnologia mais limitada com interações pré-programadas e sem IA avançada.
+      Chatbot: Negociação Chatbot
+      Discador: Negociação Discador
+      E-mail: Negociação E-mail
+      IAPortal: Negociação Portal IA, conduzida por uma inteligência artificial que proporciona uma experiência mais fluida e personalizada.
+      IAWpp: Negociação WhatsApp IA
+      Portal: Negociação Portal
+      Manual: Negociação Discador Manual
+      WhatsApp: Negociação WhatsApp
     lineage:
       - datalake_cyber_raw.agrhdr.AHCTTYPE
   notify_central_system:
-    description: ""
+    description: "Notify Central System"
     lineage:
       - datalake_cyber_raw.agrhdr.AHCSPERNT
   payments_to_notify:
-    description: ""
+    description: "Payments to notify"
     lineage:
       - datalake_cyber_raw.agrhdr.AHCSINITNT
   number_payments_to_exempt:
-    description: ""
+    description: "Number Payments to exempt"
     lineage:
       - datalake_cyber_raw.agrhdr.AHCNDPAYN
   required_number_payments_to_exempt:
-    description: ""
+    description: "Required Number Payments to exempt"
     lineage:
       - datalake_cyber_raw.agrhdr.AHCNDPAYM
   broken_payments:
-    description: ""
+    description: "broken Payments"
     lineage:
       - datalake_cyber_raw.agrhdr.AHBREAK
   total_negotiated_amount_with_fees:
@@ -101,7 +112,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHRATE2
   payment_type_after_free_term:
-    description: ""
+    description: "payment_type_after_free_term"
     lineage:
       - datalake_cyber_raw.agrhdr.AHGRPERTY
   level_agreement_authorization:
@@ -117,23 +128,23 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHFORMAPAG
   times_accordion_updated:
-    description: ""
+    description: "times_accordion_updated"
     lineage:
       - datalake_cyber_raw.agrhdr.AHNUMUP
   percentage_paid_agreement:
-    description: ""
+    description: "percentage_paid_agreement"
     lineage:
       - datalake_cyber_raw.agrhdr.AHFLFLVL
   ts_agreement:
-    description: ""
+    description: "ts_agreement"
     lineage:
       - datalake_cyber_raw.agrhdr.AHREGDT
   ts_agreement_creation:
-    description: ""
+    description: "ts_agreement_creation"
     lineage:
       - datalake_cyber_raw.agrhdr.AHDT
   ts_authorized:
-    description: ""
+    description: "ts_authorized"
     lineage:
       - datalake_cyber_raw.agrhdr.AHAUTDT
   ts_status_update:

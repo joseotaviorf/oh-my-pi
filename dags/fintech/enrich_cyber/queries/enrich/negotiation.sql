@@ -220,6 +220,7 @@ SELECT
     a.exception,
     at.min_down_payment_percentage,
     CASE
+      WHEN UPPER(a.contact_type) IN ('IAPORTAL', 'IAWPP') THEN 'Matthew'
       WHEN a.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE 'CAM%' THEN "Boletagem"
       WHEN UPPER(at.agreement_type_description) LIKE '%SELFSERVICE%' THEN "Portal Auto Negociação"
       WHEN UPPER(ag.agency_type) = "PORTAL" THEN "Portal Auto Negociação"

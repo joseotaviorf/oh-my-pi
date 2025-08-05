@@ -2,7 +2,7 @@
 database_name: datalake_debt_recovery
 table_name: negotiation
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Enrich table focused on Negotiation context for Debt Recovery"
 columns:
   id_negotiation:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_trato_feito_clean.negotiation.id_debtor_external
   debtor:
-    description: "Debtor"
+    description: "Debtor - 5A or 5C"
     categories:
       "rental_contract_landlord": "PP QuintoAndar"
       "rental_contract_tenant": "IQ QuintoAndar"
@@ -91,6 +91,21 @@ columns:
     description: "Consultancy/advisory name that created the negotiation"
     lineage:
       - datalake_trato_feito_clean.negotiation.consultancy
+  contact_type:
+    description: "Type of contact made by the advisory/agency to create the negotiation"
+    categories:
+      BackOfc: Negociação Backoffice
+      AVirtual: Negociação Agente Virtuall, utiliza tecnologia mais limitada com interações pré-programadas e sem IA avançada.
+      Chatbot: Negociação Chatbot
+      Discador: Negociação Discador
+      E-mail: Negociação E-mail
+      IAPortal: Negociação Portal IA, conduzida por uma inteligência artificial que proporciona uma experiência mais fluida e personalizada.
+      IAWpp: Negociação WhatsApp IA
+      Portal: Negociação Portal
+      Manual: Negociação Discador Manual
+      WhatsApp: Negociação WhatsApp
+    lineage:
+      - datalake_trato_feito_clean.negotiation.contact_type
   dt_expected_end:
     description: "Installment due date"
     lineage:

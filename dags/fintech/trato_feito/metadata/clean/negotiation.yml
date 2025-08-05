@@ -2,39 +2,54 @@
 database_name: datalake_trato_feito_clean
 table_name: negotiation
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: "Data about negotiations of debts"
+domain: Fintech
+description: Data about debt negotiations originated in the Trato Feito platform, including debtor, collector, status, and operational metadata.
 columns:
   id:
+    description: Unique identifier for the negotiation.
     lineage:
       - datalake_trato_feito_raw.negotiation.id
   id_collector:
+    description: Internal identifier of the collector responsible for the negotiation.
     lineage:
       - datalake_trato_feito_raw.negotiation.collector_id
   id_collector_external:
+    description: External identifier of the collector, as registered in the partner system.
     lineage:
       - datalake_trato_feito_raw.negotiation.collector_external_id
   id_debtor:
+    description: Internal identifier of the debtor involved in the negotiation.
     lineage:
       - datalake_trato_feito_raw.negotiation.debtor_id
   id_debtor_external:
+    description: External identifier of the debtor, used by the source system.
     lineage:
       - datalake_trato_feito_raw.negotiation.debtor_external_id
   status:
+    description: Current status of the negotiation (e.g., pending, accepted, cancelled).
     lineage:
       - datalake_trato_feito_raw.negotiation.status
   currency:
+    description: Currency used in the negotiation amounts (e.g., BRL, USD).
     lineage:
       - datalake_trato_feito_raw.negotiation.currency
   status_reason:
+    description: Additional information or reason explaining the current negotiation status.
     lineage:
       - datalake_trato_feito_raw.negotiation.status_reason
   consultancy:
+    description: Consultancy agency responsible for conducting or mediating the negotiation.
     lineage:
       - datalake_trato_feito_raw.negotiation.consultancy
+  contact_type:
+    description: Type of contact used to initiate or conduct the negotiation (e.g., phone, email, chatbot).
+    lineage:
+      - datalake_trato_feito_raw.negotiation.contact_type
   ts_created:
+    description: Timestamp when the negotiation was created in the system.
     lineage:
       - datalake_trato_feito_raw.negotiation.created_at
   ts_updated:
+    description: Timestamp of the most recent update to the negotiation record.
     lineage:
       - datalake_trato_feito_raw.negotiation.updated_at

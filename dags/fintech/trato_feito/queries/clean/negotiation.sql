@@ -10,6 +10,7 @@ SELECT
     payload,
     manage_type,
     consultancy,
+    contact_type,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

@@ -97,6 +97,7 @@ SELECT
         WHEN UPPER(n.consultancy) IN ('013','G013', 'QA_PLC') THEN 'PLC'
         ELSE UPPER(n.consultancy)
     END AS consultancy_name,
+    n.contact_type,
     n.status,
     i.promisse_payment_method,
     COALESCE(cc.total_installments, i.qt_installments) AS qt_installments,

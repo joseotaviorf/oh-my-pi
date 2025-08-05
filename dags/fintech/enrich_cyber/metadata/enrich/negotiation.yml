@@ -1,172 +1,186 @@
----
 database_name: datalake_cyber
 table_name: negotiation
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: Table granularity - agreement/negotiation
+domain: Fintech
+description: Table at agreement/negotiation level, containing financial and operational information about debt renegotiation events.
 columns:
   id_negotiation:
-    description: ""
+    description: Unique identifier for the negotiation event.
     lineage:
       - datalake_cyber_clean.agreements.id_agreement
   id_contract:
-    description: ""
+    description: Internal contract identifier.
     lineage:
       - datalake_cyber_clean.contracts_agreements.id_contract
   id_contract_external:
-    description: ""
+    description: External contract identifier, used by source systems.
     lineage:
       - datalake_cyber_clean.contracts.id_contract_external
   id_customer:
-    description: ""
+    description: Customer identifier associated with the contract.
     lineage:
       - datalake_cyber_clean.contracts.id_client
   id_operator:
-    description: ""
+    description: Operator responsible for creating the agreement.
     lineage:
       - datalake_cyber_clean.agreements.id_user
   id_user_authorized:
-    description: "It indicates that there was an authorization, either for cancellation or approval. When the status is 'C' (Cancelled), it is filled with the user who requested the cancellation."
+    description: Indicates authorization by a manager, usually for cancellations or approvals.
     lineage:
       - datalake_cyber_clean.agreements.authorized_by_manager
   advisory:
-    description: ""
+    description: Name of the agency or advisor responsible for the agreement.
     lineage:
       - datalake_cyber_clean.agency.agency_name
   id_campaign:
-    description: ""
+    description: Campaign identifier associated with the agreement.
     lineage:
       - datalake_cyber_clean.agreements.offer_number
   creditor:
-    description: ""
+    description: Name or code of the creditor related to the contract group.
     lineage:
       - datalake_cyber_clean.agreements.contract_group
   agreement_type:
-    description: ""
+    description: Type of agreement created (e.g., settlement, restructuring).
     lineage:
       - datalake_cyber_clean.agreements.agreement_type
   agreement_type_description:
-    description: ""
+    description: Description of the agreement type.
     lineage:
       - datalake_cyber_clean.agreements.agreement_type_description
   payment_method:
-    description: "Payment method selected during agreement creation"
+    description: Payment method selected for the agreement (e.g., boleto, credit card).
     lineage:
       - datalake_cyber_clean.agreements.payment_method
   promisse_payment_method:
-    description: ""
+    description: Payment method promised by the customer during negotiation.
     lineage:
       - datalake_cyber_clean.agreements.promisse_payment_method
+  contact_type:
+    description: "Type of contact made by the advisory/agency to create the negotiation"
+    categories:
+      BackOfc: Negociação Backoffice
+      AVirtual: Negociação Agente Virtuall, utiliza tecnologia mais limitada com interações pré-programadas e sem IA avançada.
+      Chatbot: Negociação Chatbot
+      Discador: Negociação Discador
+      E-mail: Negociação E-mail
+      IAPortal: Negociação Portal IA, conduzida por uma inteligência artificial que proporciona uma experiência mais fluida e personalizada.
+      IAWpp: Negociação WhatsApp IA
+      Portal: Negociação Portal
+      Manual: Negociação Discador Manual
+      WhatsApp: Negociação WhatsApp
+    lineage:
+      - datalake_cyber_clean.agreements.contact_type
   min_down_payment_percentage:
-    description: ""
+    description: Minimum down payment percentage required for the agreement.
     lineage:
       - datalake_cyber_clean.agreements.min_down_payment_percentage
   origin_agreement:
-    description: ""
+    description: Indicates the origin of the agreement (e.g., agency type).
     lineage:
       - datalake_cyber_clean.agreements.agency_type
   original_negotiation_status:
-    description: ""
+    description: Original status of the negotiation at the time of creation.
     lineage:
       - datalake_cyber_clean.agreements.status
   negotiation_status:
-    description: ""
+    description: Current status of the agreement (e.g., active, finished, broken).
     lineage:
       - datalake_cyber_clean.agreements.status
   is_down_payment_paid:
-    description: ""
+    description: Indicates whether the down payment was paid.
     lineage:
       - datalake_cyber_clean.agreements.dt_down_payment
   number_of_installments:
-    description: ""
+    description: Total number of installments in the agreement.
     lineage:
       - datalake_cyber_clean.agreements.number_of_installments
   paid_installments:
-    description: ""
+    description: Number of installments that have been paid.
     lineage:
       - datalake_cyber_clean.agreements.paid_installments
   breached_installments:
-    description: ""
+    description: Number of installments that were breached.
     lineage:
       - datalake_cyber_clean.agreements.status
   original_amount:
-    description: ""
+    description: Total debt amount before any negotiation.
     lineage:
       - datalake_cyber_clean.agreements.original_amount
   fine_amount:
-    description: ""
+    description: Amount referring to fines applied to the debt.
     lineage:
       - datalake_cyber_clean.agreements.fine_amount
   contract_interest_fees_amount:
-    description: ""
+    description: Interest fees charged on the contract before negotiation.
     lineage:
       - datalake_cyber_clean.agreements.contract_interest_fees_amount
   installment_interest_fees_amount:
-    description: ""
+    description: Interest charged during installment generation.
     lineage:
       - datalake_cyber_clean.agreements.installment_interest_fees_amount
   total_interest_fees_amount:
-    description: ""
+    description: Sum of contract and installment interest fees.
     lineage:
       - datalake_cyber_clean.agreements.contract_interest_fees_amount
       - datalake_cyber_clean.agreements.installment_interest_fees_amount
   eviction_costs_amount:
-    description: ""
+    description: Legal and operational costs related to eviction proceedings.
     lineage:
       - datalake_cyber_clean.agreements.eviction_costs_amount
   eviction_honorarium_amount:
-    description: ""
+    description: Honorarium associated with eviction actions.
     lineage:
       - datalake_cyber_clean.historical_agreements.eviction_honorarium_amount
   credit_card_fee_amount:
-    description: ""
+    description: Fee charged when payment is made via credit card.
     lineage:
       - datalake_cyber_clean.agreements.credit_card_fee_amount
   debt_amount:
-    description: ""
+    description: Negotiated debt amount including eviction honorarium.
     lineage:
       - datalake_cyber_clean.agreements.debt_amount + eviction_honorarium_amount
   negotiated_amount:
-    description: ""
+    description: Final amount negotiated, including possible credit card fees.
     lineage:
       - datalake_cyber_clean.agreements.negotiated_amount + i.credit_card_fee_amount
   discount_amount:
-    description: ""
+    description: Total discount granted during negotiation.
     lineage:
       - datalake_cyber_clean.agreements.discount_amount
   discount_to_original_amount:
-    description: ""
+    description: Discount granted over the original debt amount.
     lineage:
       - datalake_cyber_clean.agreements.discount_to_original_amount
   discount_to_fine_amount:
-    description: ""
+    description: Discount applied to the fine component.
     lineage:
       - datalake_cyber_clean.agreements.discount_to_fine_amount
   discount_to_fees_amount:
-    description: ""
+    description: Discount applied to fees (interest charges).
     lineage:
       - datalake_cyber_clean.agreements.discount_to_fees_amount
   discount_to_eviction_costs:
-    description: ""
+    description: Discount applied to eviction-related costs.
     lineage:
       - datalake_cyber_clean.agreements.discount_to_eviction_costs
   percentage_paid_agreement:
-    description: ""
+    description: Percentage of the total agreement amount that has been paid.
     lineage:
       - datalake_cyber_clean.agreements.percentage_paid_agreement
   down_payment_amount:
-    description: ""
+    description: Value paid as down payment to activate the agreement.
     lineage:
       - datalake_cyber_clean.agreements.down_payment_amount
   dt_promisse:
-    description: ""
+    description: Timestamp when the agreement was created.
     lineage:
       - datalake_cyber_clean.agreements.ts_agreement_creation
   dt_due_promisse:
-    description: ""
+    description: Due date of the promised payment.
     lineage:
       - datalake_cyber_clean.agreements.dt_due_promisse
   dt_down_payment:
-    description: ""
+    description: Date when the down payment was made.
     lineage:
       - datalake_cyber_clean.agreements.dt_down_payment

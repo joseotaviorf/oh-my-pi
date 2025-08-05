@@ -1,7 +1,7 @@
 database_name: datalake_collections_quintoandar
 table_name: negotiation
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description:
   Table that consolidates negotiation data from Trato Feito, Cyber, and
   Recupera systems. It includes enriched fields such as total amounts, status, and
@@ -84,6 +84,22 @@ columns:
     description: Reason why the agreement was broken (Cyber only).
     lineage:
       - datalake_cyber.negotiation.description_broken_agreement
+  contact_type:
+    description: "Type of contact made by the advisory/agency to create the negotiation"
+    categories:
+      BackOfc: Negociação Backoffice
+      AVirtual: Negociação Agente Virtuall, utiliza tecnologia mais limitada com interações pré-programadas e sem IA avançada.
+      Chatbot: Negociação Chatbot
+      Discador: Negociação Discador
+      E-mail: Negociação E-mail
+      IAPortal: Negociação Portal IA, conduzida por uma inteligência artificial que proporciona uma experiência mais fluida e personalizada.
+      IAWpp: Negociação WhatsApp IA
+      Portal: Negociação Portal
+      Manual: Negociação Discador Manual
+      WhatsApp: Negociação WhatsApp
+    lineage:
+      - datalake_cyber.negotiation.contact_type
+      - datalake_debt_recovery.negotiation.contact_type
   negotiation_status:
     description: Current status of the negotiation.
     lineage:

@@ -17,7 +17,9 @@ trato_feito_negotiation AS (
       WHEN n.debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
     END AS creditor,
     n.consultancy_name AS advisory,
+    n.contact_type,
     CASE
+      WHEN UPPER(n.contact_type) IN ('IAPORTAL', 'IAWPP') THEN 'Matthew'
       WHEN n.consultancy_name = "PORTAL_QUINTOANDAR" THEN "Portal Auto Negociação"
       WHEN n.consultancy_name IN ("PASCHOALOTTO", "MEETCALL", "TRC", "GRB", "MONEST", "PELLON", "PLC") THEN "Assessoria"
       WHEN n.consultancy_name = "SERASA" THEN "Serasa Digital"
@@ -185,7 +187,7 @@ SELECT DISTINCT
     COALESCE(rn.origin_agreement, cn.origin_agreement, tfn.origin_agreement) AS origin_agreement,
     cn.campaign_status,
     cn.broken_reason,
-    cn.contact_type AS channel,
+    COALESCE(cn.contact_type, tfn.contact_type) AS contact_type,
     COALESCE(tfn.status, cn.negotiation_status, rn.negotiation_status) AS negotiation_status,
     UPPER(COALESCE(tfn.promisse_payment_method, cn.promisse_payment_method, rn.promisse_payment_method)) AS promisse_payment_method,
     cn.payment_method,
