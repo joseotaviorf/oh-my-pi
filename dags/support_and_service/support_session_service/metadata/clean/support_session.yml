@@ -1,0 +1,119 @@
+---
+database_name: datalake_support_session_service_clean
+table_name: support_session
+description: This table stores detailed information about support sessions.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_support_session_service_raw.support_session.id
+    description: |
+      Session identifier.
+  status:
+    lineage:
+      - datalake_support_session_service_raw.support_session.status
+    description: |
+      Session status.
+    categories:
+      active: 'Active'
+      expired: 'Expired'
+  agent:
+    lineage:
+      - datalake_support_session_service_raw.support_session.agent
+    description: |
+      Indicates which agent the session is with. Greenseer | QuintoAndar | QuintoAndarAI 
+    categories:
+      Greenseer: 'Greenseer'
+      QuintoAndar: 'QuintoAndar'
+      QuintoAndarAI: 'QuintoAndarAI'
+  user_data:
+    lineage:
+      - datalake_support_session_service_raw.support_session.user_data
+    description: |
+      User data in JSON format.
+  user_phone:
+    lineage:
+      - datalake_support_session_service_raw.support_session.user_phone
+    description: |
+      User phone
+  context:
+    description: |
+      Campo n usado por call
+  created_by:
+    lineage:
+      - datalake_support_session_service_raw.support_session.created_by
+    description: |
+      Describes who created the session.
+    categories:
+      user: 'User'
+      hsm_sent: 'HSM sent'
+      human_support: 'Human support'
+  source:
+    description: |
+      Indicates the source of the session.
+    categories:
+      call: 'Call'
+      call_in_app: 'Call in app'
+  source_env:
+    lineage:
+      - datalake_support_session_service_raw.support_session.source_env
+    description: |
+      Subdivision of a source. More used for whatsapp, to identify different possible flows.
+  source_identity:
+    lineage:
+      - datalake_support_session_service_raw.support_session.source_identity
+    description: |
+      Session identifier depending on the source.
+    categories:
+      userId: 'User ID'
+      userPhone: 'User Phone'
+      task: 'Task'
+      connection: 'Connection'
+  department:
+    lineage:
+      - datalake_support_session_service_raw.support_session.department
+    description: |
+      Department the session was transferred to.
+  tags:
+    lineage:
+      - datalake_support_session_service_raw.support_session.tags
+    description: |
+      List of tags made by the bot.
+  ticket_comments:
+    lineage:
+      - datalake_support_session_service_raw.support_session.ticket_comments
+    description: |
+      JSON field with comments related to the session.
+  metadata:
+    lineage:
+      - datalake_support_session_service_raw.support_session.metadata
+    description: |
+      JSON field with extra session attributes, such as worker transferred by escalation.
+  ts_created:
+    lineage:
+      - datalake_support_session_service_raw.support_session.created_at
+    description: |
+      Session creation time.
+  ts_updated:
+    lineage:
+      - datalake_support_session_service_raw.support_session.updated_at
+    description: |
+      Last session update time.
+  ts_last_message:
+    lineage:
+      - datalake_support_session_service_raw.support_session.last_message_at
+    description: |
+      Last interaction time (it has the name message because the session started with chat, but also identifies the call interaction)
+  year:
+    lineage:
+    - datalake_support_session_service_raw.support_session.year
+    description: year when the record was created or updated. It's a partition.
+  month:
+    lineage:
+    - datalake_support_session_service_raw.support_session.month
+    description: month when the record was created or udpated. It's a partition.
+  day:
+    lineage:
+    - datalake_support_session_service_raw.support_session.day
+    description: day when the record was created or updated. It's a partition.
