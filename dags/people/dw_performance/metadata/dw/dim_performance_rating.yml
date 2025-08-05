@@ -5,21 +5,25 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: >
   Dimension that stores all unique combinations of performance ratings for Behavior, Impact, and Leadership. 
-  This table is generated from the performance calibration data and is used to analyze combined performance profiles.
+  This table is generated from both manager and calibrated ratings in the performance evaluation data to analyze combined performance profiles.
 columns:
   sk_performance_rating:
-    description: "Surrogate key for the performance rating dimension. It is an MD5 hash generated from the concatenation of the behavior, impact, and leadership rating descriptions."
+    description: "Surrogate key for the performance rating dimension. It is an MD5 hash generated from the concatenation of the rating descriptions for behavior, impact, and leadership."
     lineage: 
-        - datalake_pin.performance_calibration.rating_description_from_calibration
+      - datalake_pin.performance_evaluation.id_performance_rating_from_manager
+      - datalake_pin.performance_evaluation.id_performance_rating_from_calibration
   behavior:
-    description: "The performance rating description for the 'Behavior' section of a performance review."
+    description: "The performance rating description for the 'Behavior' section."
     lineage: 
-        - datalake_pin.performance_calibration.rating_description_from_calibration
+      - datalake_pin.performance_evaluation.description_behavior_from_manager
+      - datalake_pin.performance_evaluation.description_behavior_from_calibration
   impact:
-    description: "The performance rating description for the 'Impact' section of a performance review."
+    description: "The performance rating description for the 'Impact' section."
     lineage: 
-        - datalake_pin.performance_calibration.rating_description_from_calibration
+      - datalake_pin.performance_evaluation.description_impact_from_manager
+      - datalake_pin.performance_evaluation.description_impact_from_calibration
   leadership:
-    description: "The performance rating description for the 'Leadership' section of a performance review."
+    description: "The performance rating description for the 'Leadership' section."
     lineage: 
-        - datalake_pin.performance_calibration.rating_description_from_calibration
+      - datalake_pin.performance_evaluation.description_leadership_from_manager
+      - datalake_pin.performance_evaluation.description_leadership_from_calibration

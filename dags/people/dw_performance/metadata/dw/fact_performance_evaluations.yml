@@ -5,74 +5,80 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: >
   Fact table that consolidates performance evaluations. 
-  It includes composite keys for initial (manager) and calibrated ratings, 
+  It includes surrogate keys for initial (manager) and calibrated ratings, 
   as well as composite keys for tracking changes during calibration and between evaluation periods. 
-  It is populated from the datalake_pin.performance_calibration table.
+  It is populated from the datalake_pin.performance_evaluation table.
 columns:
   sk_evaluation:
-    description: "Unique identifier for the evaluation."
+    description: "Surrogate key uniquely identifying a single performance evaluation. Serves as the table's grain."
     lineage:
-      - datalake_pin.performance_calibration.id_evaluation
+      - datalake_pin.performance_evaluation.id_evaluation
   sk_assignment:
-    description: "Unique identifier for the period of service (assignment)."
+    description: "Surrogate key for the employee's period of service (assignment)."
     lineage:
-      - datalake_pin.performance_calibration.id_period_of_service
+      - datalake_pin.performance_evaluation.id_period_of_service
   sk_employee:
-    description: "Unique identifier for the employee (person)."
+    description: "Surrogate key for the employee."
     lineage:
-      - datalake_pin.performance_calibration.id_person
+      - datalake_pin.performance_evaluation.id_person
   sk_evaluation_date:
-    description: "Date when the evaluation occurred, in 'yyyyMMdd' format."
+    description: "Surrogate key for the date when the evaluation occurred, in 'yyyyMMdd' format. Links to a date dimension."
     lineage:
-      - datalake_pin.performance_calibration.dt_evaluation_occurred
+      - datalake_pin.performance_evaluation.dt_evaluation_occurred
   sk_performance_rating_from_manager:
-    description: "Composite surrogate key representing the combination of initial performance ratings (Behavior, Impact, Leadership) from the manager before calibration. Links to dim_performance_rating."
+    description: "Surrogate key representing the combination of initial ratings (Behavior, Impact, Leadership) from the manager. Links to dim_performance_rating."
     lineage:
-      - datalake_pin.performance_calibration.id_rating_level_from_manager
+      - datalake_pin.performance_evaluation.id_performance_rating_from_manager
   sk_performance_rating_from_calibration:
-    description: "Composite surrogate key representing the combination of calibrated performance ratings (Behavior, Impact, Leadership) after committee review. Links to dim_performance_rating."
+    description: "Surrogate key representing the combination of final, calibrated ratings (Behavior, Impact, Leadership). Links to dim_performance_rating."
     lineage:
-      - datalake_pin.performance_calibration.id_rating_level_from_calibration
+      - datalake_pin.performance_evaluation.id_performance_rating_from_calibration
   sk_performance_variation_period:
-    description: "Composite surrogate key indicating the trend (Increased, Decreased, Maintained) for each performance dimension compared to the previous review period. Links to dim_performance_variation."
+    description: "Surrogate key indicating the trend (Increased, Decreased, Maintained) of calibrated ratings compared to the previous evaluation period. Links to dim_performance_variation."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_evaluation.numeric_behavior_from_calibration
+      - datalake_pin.performance_evaluation.numeric_impact_from_calibration
+      - datalake_pin.performance_evaluation.numeric_leadership_from_calibration
   sk_performance_variation_calibration:
-    description: "Composite surrogate key indicating the trend (Increased, Decreased, Maintained) for each performance dimension from the initial (manager) to the calibrated assessment. Links to dim_performance_variation."
+    description: "Surrogate key indicating the trend (Increased, Decreased, Maintained) of ratings from the manager's initial assessment to the final calibrated assessment within the same cycle. Links to dim_performance_variation."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_manager
-      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_evaluation.numeric_behavior_from_manager
+      - datalake_pin.performance_evaluation.numeric_behavior_from_calibration
+      - datalake_pin.performance_evaluation.numeric_impact_from_manager
+      - datalake_pin.performance_evaluation.numeric_impact_from_calibration
+      - datalake_pin.performance_evaluation.numeric_leadership_from_manager
+      - datalake_pin.performance_evaluation.numeric_leadership_from_calibration
   assignment_number:
-    description: "Registration number of the employee."
+    description: "The business identifier for the employee's assignment."
     lineage:
-      - datalake_pin.performance_calibration.assignment_number
+      - datalake_pin.performance_evaluation.assignment_number
   numeric_behavior_from_manager:
-    description: "Numeric value of the Behavior assessment from the manager (before calibration)."
+    description: "Numeric value of the Behavior assessment from the manager, before calibration."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_evaluation.numeric_behavior_from_manager
   numeric_behavior_from_calibration:
-    description: "Numeric value of the Behavior assessment after calibration."
+    description: "Final numeric value of the Behavior assessment after calibration."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_evaluation.numeric_behavior_from_calibration
   numeric_impact_from_manager:
-    description: "Numeric value of the Impact assessment from the manager (before calibration)."
+    description: "Numeric value of the Impact assessment from the manager, before calibration."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_evaluation.numeric_impact_from_manager
   numeric_impact_from_calibration:
-    description: "Numeric value of the Impact assessment after calibration."
+    description: "Final numeric value of the Impact assessment after calibration."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_evaluation.numeric_impact_from_calibration
   numeric_leadership_from_manager:
-    description: "Numeric value of the Leadership assessment from the manager (before calibration)."
+    description: "Numeric value of the Leadership assessment from the manager, before calibration."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_evaluation.numeric_leadership_from_manager
   numeric_leadership_from_calibration:
-    description: "Numeric value of the Leadership assessment after calibration."
+    description: "Final numeric value of the Leadership assessment after calibration."
     lineage:
-      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_evaluation.numeric_leadership_from_calibration
   is_last_cycle:
-    description: "Boolean (TRUE/FALSE) indicating if this is the last recorded evaluation cycle for the respective period of service (assignment)."
+    description: "Boolean flag (TRUE/FALSE) indicating if this is the most recent evaluation cycle for the employee's period of service."
     lineage:
-      - datalake_pin.performance_calibration.dt_performance_document_started
+      - datalake_pin.performance_evaluation.dt_performance_document_started
   ts_load:
-    description: "Timestamp of when the record was loaded into the fact table."
+    description: "Timestamp of when the record was loaded into this fact table."

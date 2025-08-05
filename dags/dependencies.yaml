@@ -685,7 +685,7 @@ bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline:first-run-of-day
   - bietlejuice.enrich_payments_platform:load-enrich-payment:first-run-of-day
 bietlejuice.dw_performance:
-  - bietlejuice.enrich_performance:load-enrich-performance-calibration:first-run-of-day
+  - bietlejuice.enrich_performance:load-enrich-performance-evaluation:first-run-of-day
   - bietlejuice.enrich_performance:load-enrich-talent-review:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
@@ -2673,13 +2673,12 @@ bietlejuice.enrich_performance:
   - bietlejuice.pin_performance:load-clean-section-definition-translation:first-run-of-day
   - bietlejuice.pin_performance:load-clean-template-section:first-run-of-day
   - bietlejuice.pin_talent:load-clean-profile-base:first-run-of-day
-  - bietlejuice.pin_talent:load-clean-profile-item:first-run-of-day
-  - bietlejuice.pin_talent:load-clean-profile-type-sections-translation:first-run-of-day
   - bietlejuice.pin_talent:load-clean-rating-level-base:first-run-of-day
   - bietlejuice.pin_talent:load-clean-rating-level-translation:first-run-of-day
   - bietlejuice.pin_talent:load-clean-rating-model-base:first-run-of-day
   - bietlejuice.pin_talent:load-clean-rating-model-translation:first-run-of-day
   - bietlejuice.pin_talent:load-clean-review-period-base:first-run-of-day
+  - bietlejuice.pin_talent:load-clean-review-period-translation:first-run-of-day
 bietlejuice.enrich_person:
   - bietlejuice.company:load-clean-member-profile:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
