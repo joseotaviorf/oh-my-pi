@@ -1,6 +1,7 @@
 WITH francesinha AS (
     SELECT
         UPPER(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', '')) AS company_use,
+        bank_account,
         dt_credit AS dt_paid,
         SUM(net_amount) AS amount
     FROM
@@ -11,7 +12,7 @@ WITH francesinha AS (
         AND document_number IS NOT NULL
         AND TRIM(document_number) != ''
     GROUP BY
-        1,2
+        1,2,3
 ),
 
 seu_barriga AS (
@@ -75,8 +76,10 @@ sap AS (
     SELECT DISTINCT
         id_business_entity,
         COALESCE(UPPER(REPLACE(id_external_payment, 'C!', '')), sb.company_use) AS company_use,
+        account_number,
         dt_tax AS dt_paid,
-        SUM(debit_credit) AS amount
+        SUM(debit_credit) AS amount,
+        CONCAT_WS(', ', COLLECT_LIST(hash)) AS hash
     FROM
         datalake_pas.ledger AS l
     LEFT JOIN 
@@ -99,7 +102,7 @@ sap AS (
         AND NOT(id_external_payment IS NULL AND sb.company_use IS NULL)
         AND NOT(TRIM(id_external_payment) = '' AND sb.company_use IS NULL)
     GROUP BY
-        1,2,3
+        1,2,3,4
     HAVING
         SUM(debit_credit) != 0
 ),
@@ -191,6 +194,9 @@ df_all AS (
 df AS (
     SELECT DISTINCT
         cs.company_use AS id_company_use,
+        s.hash,
+        f.bank_account AS bank_account_number,
+        s.account_number AS sap_account_number,
         f.amount AS bank_amount,
         sb.amount AS retsuko_amount,
         vc.amount AS vans_checkout_amount,
@@ -251,6 +257,9 @@ df AS (
 
 SELECT
     id_company_use,
+    hash,
+    bank_account_number,
+    sap_account_number,
     bank_amount,
     retsuko_amount,
     vans_checkout_amount,

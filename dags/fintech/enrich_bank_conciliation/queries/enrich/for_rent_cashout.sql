@@ -57,7 +57,8 @@ sap AS (
         l.account_number,
         l.dt_reference AS dt_paid,
         l.dt_tax,
-        ROUND(SUM(l.debit_credit), 2) AS paid_amount
+        ROUND(SUM(l.debit_credit), 2) AS paid_amount,
+        CONCAT_WS(', ', COLLECT_LIST(l.hash)) AS hash
     FROM
         datalake_accounting_funnel.ledger AS l
     LEFT JOIN 
@@ -100,6 +101,7 @@ cap_sap AS (
 
 SELECT DISTINCT
     cs.company_use AS id_company_use,
+    sap.hash,
     f.bank_account AS bank_account_number,
     sap.account_number AS sap_account_number,
     f.last_occurrence_code,

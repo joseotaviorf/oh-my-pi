@@ -3,7 +3,7 @@ database_name: datalake_bank_conciliation
 table_name: for_rent_cashin_collections
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: Table containing bank reconciliation data for For Rent cash-in collections, comparing bank statements, checkout records, and SAP entries.
+description: Table containing bank reconciliation data for For Rent cash-in collections, comparing bank statements, checkout records, billing systems, and SAP entries.
 columns:
   id_our_number:
     description: 'Unique identifier for the payment, derived from our_number in various source systems'
@@ -16,6 +16,18 @@ columns:
     - datalake_trato_feito_clean.bill.our_number
     - datalake_retsuko.invoice.payment_company_use_number
     - datalake_pas.ledger.id_external_payment
+  hash:
+    description: 'Hash values from SAP ledger entries for tracking purposes'
+    lineage:
+    - datalake_pas.ledger.hash
+  bank_account_number:
+    description: 'Bank account number from Nexxera CNAB charges'
+    lineage:
+    - datalake_nexxera.cnab_charges_recupera.bank_account
+  sap_account_number:
+    description: 'SAP account number from ledger entries'
+    lineage:
+    - datalake_pas.ledger.account_number
   bank_amount:
     description: 'Amount received in bank statements from Nexxera and Itau'
     lineage:

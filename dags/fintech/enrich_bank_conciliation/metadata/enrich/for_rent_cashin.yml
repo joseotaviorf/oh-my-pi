@@ -3,62 +3,87 @@ database_name: datalake_bank_conciliation
 table_name: for_rent_cashin
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: null
+description: Table containing bank reconciliation data for For Rent cash-in payments, comparing bank statements, Retsuko billing, Vans checkout, and SAP entries.
 columns:
   id_company_use:
-    description: ''
+    description: 'Unique identifier for the payment, derived from company_use in various source systems'
     lineage:
-    - .df.id_company_use
+    - datalake_nexxera.cnab_charges.document_number
+    - datalake_retsuko.invoice.payment_company_use_number
+    - datalake_checkout_clean.boleto.your_number
+    - datalake_vans_clean.boleto.company_use
+    - datalake_vans_clean.boleto.document_number
+    - datalake_pas.ledger.id_external_payment
+  hash:
+    description: 'Hash values from SAP ledger entries for tracking purposes'
+    lineage:
+    - datalake_pas.ledger.hash
+  bank_account_number:
+    description: 'Bank account number from Nexxera CNAB charges'
+    lineage:
+    - datalake_nexxera.cnab_charges.bank_account
+  sap_account_number:
+    description: 'SAP account number from ledger entries'
+    lineage:
+    - datalake_pas.ledger.account_number
   bank_amount:
-    description: ''
+    description: 'Amount received in bank statements from Nexxera'
     lineage:
-    - .df.bank_amount
+    - datalake_nexxera.cnab_charges.net_amount
   retsuko_amount:
-    description: ''
+    description: 'Amount recorded in Retsuko billing system'
     lineage:
-    - .df.retsuko_amount
+    - datalake_retsuko.invoice.paid_amount
   vans_checkout_amount:
-    description: ''
+    description: 'Amount recorded in Vans checkout system from boleto payments'
     lineage:
-    - .df.vans_checkout_amount
+    - datalake_checkout_clean.boleto.paid_amount
+    - datalake_vans_clean.boleto.paid_amount
   sap_amount:
-    description: ''
+    description: 'Amount recorded in SAP system for financial entries'
     lineage:
-    - .df.sap_amount
+    - datalake_pas.ledger.debit_credit
   status_bank:
-    description: ''
+    description: 'Status indicating if the payment was recorded in bank statements (ok/not recorded)'
     lineage:
-    - .df.status_bank
+    - datalake_nexxera.cnab_charges
   status_retsuko:
-    description: ''
+    description: 'Status comparing bank and Retsuko amounts and dates (ok/not recorded/recorded with divergent date or value)'
     lineage:
-    - .df.status_retsuko
+    - datalake_retsuko.invoice
   status_vans_checkout:
-    description: ''
+    description: 'Status comparing bank and Vans checkout amounts and dates (ok/not recorded/recorded with divergent date or value)'
     lineage:
-    - .df.status_vans_checkout
+    - datalake_checkout_clean.boleto
+    - datalake_vans_clean.boleto
   status_sap:
-    description: ''
+    description: 'Status comparing bank and SAP amounts and dates (ok/not recorded/recorded with divergent date or value)'
     lineage:
-    - .df.status_sap
+    - datalake_pas.ledger
   is_reconciled:
-    description: ''
+    description: 'Boolean flag indicating if the payment is fully reconciled across all systems'
     lineage:
-    - .df.CASE WHEN status_bank = 'ok' AND status_vans_checkout = 'ok' AND status_retsuko
-      = 'ok' AND status_sap = 'ok' THEN TRUE ELSE FALSE END
+    - datalake_nexxera.cnab_charges
+    - datalake_pas.ledger
+    - datalake_checkout_clean.boleto
+    - datalake_vans_clean.boleto
+    - datalake_retsuko.invoice
   dt_bank_paid:
-    description: ''
+    description: 'Date when the payment was received in bank statements'
     lineage:
-    - .df.dt_bank_paid
+    - datalake_nexxera.cnab_charges.dt_credit
   dt_retsuko_paid:
-    description: ''
+    description: 'Date when the payment was recorded in Retsuko billing system'
     lineage:
-    - .df.dt_retsuko_paid
+    - datalake_retsuko.invoice.ts_paid
+    - dw_public.dim_date.next_brz_fintech_business_day
   dt_vans_checkout_paid:
-    description: ''
+    description: 'Date when the payment was recorded in Vans checkout system'
     lineage:
-    - .df.dt_vans_checkout_paid
+    - datalake_checkout_clean.boleto.ts_paid
+    - datalake_vans_clean.boleto.dt_paid
+    - dw_public.dim_date.next_brz_fintech_business_day
   dt_sap_paid:
-    description: ''
+    description: 'Date when the payment was recorded in SAP system'
     lineage:
-    - .df.dt_sap_paid
+    - datalake_pas.ledger.dt_tax

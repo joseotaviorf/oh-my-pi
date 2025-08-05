@@ -1,6 +1,7 @@
 WITH francesinha AS (
     SELECT
         CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS our_number,
+        bank_account,
         dt_credit AS dt_paid,
         SUM(net_amount) AS amount
     FROM
@@ -12,16 +13,19 @@ WITH francesinha AS (
         AND TRIM(our_number) != ''
         AND dt_credit >= current_date - 180
     GROUP BY
-        1,2
+        1,2,3
 
     UNION
 
     SELECT 
-      CASE WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
-        substring(ext.origin_complement, 20, 20), 
-        '^0+', 
-        ''
-      ) ELSE regexp_replace(ext.origin_complement, '^0+', '') END AS our_number,
+        CASE 
+            WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
+            substring(ext.origin_complement, 20, 20), 
+            '^0+', 
+            '') 
+            ELSE regexp_replace(ext.origin_complement, '^0+', '') 
+        END AS our_number,
+        '04526' AS bank_account,
         DATE(ext.date_accounting) AS dt_paid,
         ext.amount_value AS amount
     FROM 
@@ -37,7 +41,9 @@ sap AS (
         id_finance_entity,
         COALESCE(CAST(SPLIT_PART(id_external_payment, '|', 2) AS INTEGER), id_external_payment) AS our_number,
         dt_tax AS dt_paid,
-        SUM(debit_credit) AS amount
+        account_number,
+        SUM(debit_credit) AS amount,
+        CONCAT_WS(', ', COLLECT_LIST(hash)) AS hash
     FROM
         datalake_pas.ledger
     WHERE
@@ -56,7 +62,7 @@ sap AS (
         AND id_finance_entity IS NOT NULL
         AND dt_tax >= current_date - 180
     GROUP BY
-        1,2,3,4
+        1,2,3,4,5
     HAVING
         SUM(debit_credit) != 0
 ),
@@ -181,6 +187,9 @@ df_all AS (
 df AS (
     SELECT DISTINCT
         cs.our_number AS id_our_number,
+        s.hash,
+        f.bank_account AS bank_account_number,
+        s.account_number AS sap_account_number,
         f.amount AS bank_amount,
         COALESCE(sbs.amount, tf.amount) AS billing_amount,
         vc.amount AS checkout_amount,
@@ -245,6 +254,9 @@ df AS (
 
 SELECT
     id_our_number,
+    hash,
+    bank_account_number,
+    sap_account_number,
     bank_amount,
     billing_amount,
     checkout_amount,

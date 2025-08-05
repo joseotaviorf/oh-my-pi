@@ -95,8 +95,8 @@ WITH df AS (
             WHEN OCCURRENCE_CODE = '92' THEN 'TARIFA MENSAL DE CANCELAMENTO DE NEGATIVAÇÃO EXPRESSA'
             WHEN OCCURRENCE_CODE = '93' THEN 'TARIFA MENSAL DE EXCLUSÃO DE NEGATIVAÇÃO EXPRESSA POR LIQUIDAÇÃO' 
         END AS occurrence_code_description,
-        file_name,
-        regexp_extract(file_name, r'_([0-9]+)\.', 1) AS file_name_sulfix,
+        LOWER(file_name) AS file_name,
+        LOWER(regexp_extract(file_name, r'_([0-9]+)\.', 1)) AS file_name_sulfix,
         due_amount,
         interest_amount,
         net_amount,
