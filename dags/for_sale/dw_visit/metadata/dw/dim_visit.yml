@@ -176,30 +176,36 @@ columns:
   has_offer_submitted:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
     description: True when the visit has a offer submitted.
   has_offer_accepted:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
     description: True when the visit has a offer accepted.
   has_contract_signed:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
-    description: True when the visit has a contract signed.
+      - dw_sale.fact_sale_demand_event.ts_event
+    description: True when the visit has a contract signed (cs from rent and ccv from sale).
   has_offer_submitted_after_visit_creation:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
       - datalake_visit.visits.ts_created
     description: True when the visit has a offer submitted after creation of visit.
   has_offer_accepted_after_visit_creation:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
       - datalake_visit.visits.ts_created
     description: True when the visit has a offer accepted after creation of visit.
   has_contract_signed_after_visit_creation:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
       - datalake_visit.visits.ts_created
-    description: True when the visit has a contract signed after creation of visit.
+    description: True when the visit has a contract signed after creation of visit (cs from rent and ccv from sale).
   dt_created:
     lineage:
       - datalake_visit.visits.ts_created
@@ -259,14 +265,17 @@ columns:
   ts_first_offer_submitted:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
     description: Timestamp when the first offer of visit was submitted.
   ts_first_offer_accepted:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
+      - dw_sale.fact_sale_demand_event.ts_event
     description: Timestamp when the first offer of visit was accepted.
   ts_first_contract_signed:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_event
-    description: Timestamp when the first contract of visit was signed.
+      - dw_sale.fact_sale_demand_event.ts_event
+    description: Timestamp when the first contract of visit was signed (cs from rent and ccv from sale).
   ts_load:
     description: Timestamp of the ingestion data.
