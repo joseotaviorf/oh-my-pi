@@ -256,7 +256,7 @@ add_maximum_funnel_step AS (
     is_group_active,
     is_group_last_credit_evaluation,
     CASE
-      WHEN ROW_NUMBER() OVER (PARTITION BY sk_user ORDER BY funnel_step DESC, ts_credit_evaluation_created DESC) = 1 THEN TRUE
+      WHEN ROW_NUMBER() OVER (PARTITION BY sk_user, dt_credit_passport ORDER BY funnel_step DESC, ts_credit_evaluation_created DESC) = 1 THEN TRUE
       ELSE FALSE
     END AS is_user_version,
     dt_credit_passport,
