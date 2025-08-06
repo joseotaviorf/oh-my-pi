@@ -17,16 +17,13 @@ SELECT
     line_name IN (
         'Data 3P Partners',
         'Data Agents',
-        'Data Bedrock',
         'Data Engineering',
         'Data Fintech',
         'Data ForRent',
         'Data ForSale',
         'Data Growth',
-        'Data International',
         'Data People',
         'Data Primitives',
-        'Data Rede',
         'Data SS'
     ) AS is_data_line,
     TIMESTAMP(ts_line_first_event) AS ts_line_first_event

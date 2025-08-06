@@ -4,7 +4,7 @@ table_name: fact_general_costs
 description: |
   Transactional fact table that aims to store general processing cost information in Databricks.
   Each row in the table must have a unique cost business key.
-domain: Data Platform
+domain: Data Life Cycle
 owner: data-platform-team@quintoandar.com.br
 columns:
   sk_snapshot:

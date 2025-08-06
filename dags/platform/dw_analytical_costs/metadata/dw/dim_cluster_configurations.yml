@@ -3,7 +3,7 @@ database_name: dw_analytical_costs
 table_name: dim_cluster_configurations
 description: Dimensional table of combinations that aims to gather descriptive information about the configuration of the clusters. 
   Each row in this table generates a unique combination of settings.
-domain: Data Platform 
+domain: Data Life Cycle 
 owner: data-platform-team@quintoandar.com.br
 columns:
   sk_cluster_config:

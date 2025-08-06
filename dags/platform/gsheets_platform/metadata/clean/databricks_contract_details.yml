@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: databricks_contract_details
 description: Table based on a gsheet that aims to store databricks contract information.
-domain: Data Platform
+domain: Data Life Cycle
 owner: data-platform-team@quintoandar.com.br
 columns:
   cluster_compute_type:

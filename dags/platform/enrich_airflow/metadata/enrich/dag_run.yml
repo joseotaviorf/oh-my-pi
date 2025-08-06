@@ -3,7 +3,7 @@ database_name: datalake_airflow
 table_name: dag_run
 description: Stores information on all past and current DAG runs including whether they were successful, whether they were scheduled
   or manually triggered, and detailed timing information. It combines information from Composer (our old Airflow instance) and Astro.
-domain: Data Platform 
+domain: Data Life Cycle 
 owner: data-platform-team@quintoandar.com.br
 columns:
   id:

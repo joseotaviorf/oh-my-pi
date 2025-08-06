@@ -1,7 +1,7 @@
 dag:
   name: metric_rede__performance
   schedule_start_date: 2020, 1, 1
-  owner: Data Rede
+  owner: Data 3P Partners
 workflow:
   type: query_delta
   layer: metric

@@ -3,7 +3,7 @@ database_name: dw_analytical_costs
 table_name: fact_execution_costs
 description: Transactional fact table with the objective of gathering the main cost information generated in Databricks by executions. 
   This table can be used to analyze the test clusters that generate the most cost in Databricks.
-domain: Data Platform 
+domain: Data Life Cycle 
 owner: data-platform-team@quintoandar.com.br
 columns:
   sk_snapshot:

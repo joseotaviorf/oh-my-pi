@@ -4,7 +4,7 @@ table_name: fact_bietlejuice_costs
 description:
   Daily snapshot fact table with the aim of gathering the main cost information generated in Databricks by bietlejuice dags.
   Each row in this table represents a unique combination of date and dag key.
-domain: Data Platform
+domain: Data Life Cycle
 owner: data-platform-team@quintoandar.com.br
 columns:
   sk_snapshot:

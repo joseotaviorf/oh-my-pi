@@ -61,7 +61,7 @@ jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_AVAILABILITY,
+        "owner": DAGOwnerEnum.DATA_LIFE_CYCLE,
         "wait_for_downstream": False,
         "depends_on_past": False,
         "on_failure_callback": jiraops_callback.task_failure_alert,

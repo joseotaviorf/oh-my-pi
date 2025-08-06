@@ -1,6 +1,6 @@
 dag:
   name: enrich_databricks_job_runs
-  owner: Data Platform
+  owner: Data Life Cycle
   documentation: 
     dag_purpose: |
       Generate metrics about job runs on Databricks.

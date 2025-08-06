@@ -2,7 +2,7 @@
 database_name: datalake_airflow
 table_name: task_instance
 description: Stores information on all Airflow task instances. It combines information from Composer (our old Airflow instance) and Astro.
-domain: Data Platform 
+domain: Data Life Cycle 
 owner: data-platform-team@quintoandar.com.br
 columns:
   id_task:

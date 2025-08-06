@@ -1,7 +1,7 @@
 database_name: datalake_databricks_usage_clean
 table_name: billable_usage
 description: Table with the objective of storing cluster information and execution cost.
-domain: Data Platform 
+domain: Data Life Cycle 
 owner: data-platform-team@quintoandar.com.br
 columns:
   id_cluster:
