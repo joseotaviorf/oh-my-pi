@@ -23,6 +23,12 @@ sheets_info:
     clean_table_name: associate_executive_correction
     sheet_context: fintech
 
+  audit_decisions:
+    sheet_id: 1FB5aycyIb6XQ0xVh_XTiaHmo6ksepRrHWg_g8mxsdLU
+    sheet_name: AuditDecisions
+    clean_table_name: audit_decisions
+    sheet_context: fintech
+
   aux_commission:
     sheet_id: 1IbmJlF7YNGA6xaApwFVGMyupJzwsAcD7uJDD0qvrCGg
     sheet_name: aux_commission

@@ -1,0 +1,350 @@
+---
+database_name: datalake_gsheets_clean
+table_name: audit_decisions
+domain: Fintech
+description: Audit decisions table for credit analysis processes, tracking detailed evaluation criteria, checklist validations, and analyst decisions for proposal assessments
+columns:
+  id_proposal:
+    description: Unique identifier for the proposal being audited
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Id_proposal
+  analyst_name:
+    description: Name of the analyst who performed the audit
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Analyst_Name
+  decision_type:
+    description: Type of decision made during the audit process
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.decision_type
+  proposal_type:
+    description: Type or category of the proposal being evaluated
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.proposal_type
+  checklist_pillar_intention_to_use_rental:
+    description: Checklist validation for intention to use rental property
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Intention_to_Use_Rental
+  checklist_pillar_resends:
+    description: Checklist validation for document resend requirements
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Resends
+  checklist_pillar_cpf_regularity:
+    description: Checklist validation for CPF document regularity
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_CPF_Regularity
+  checklist_pillar_personal_documentation:
+    description: Checklist validation for personal documentation completeness
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Personal_Documentation
+  checklist_pillar_selfie_for_identification:
+    description: Checklist validation for selfie identification verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Selfie_for_Identification
+  checklist_pillar_processes:
+    description: Checklist validation for legal processes and procedures
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Processes
+  checklist_pillar_income_documentation:
+    description: Checklist validation for income documentation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Income_Documentation
+  checklist_pillar_income_assessment:
+    description: Checklist validation for income assessment evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Income_Assessment
+  checklist_pillar_blocklist:
+    description: Checklist validation for blocklist verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Blocklist
+  checklist_pillar_pep:
+    description: Checklist validation for Politically Exposed Person (PEP) verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_PEP
+  checklist_pillar_sanctions:
+    description: Checklist validation for sanctions list verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Sanctions
+  checklist_pillar_email:
+    description: Checklist validation for email verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Email
+  checklist_pillar_interview:
+    description: Checklist validation for interview completion
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Interview
+  checklist_pillar_payment_pendencies:
+    description: Checklist validation for payment pendencies verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Payment_Pendencies
+  checklist_pillar_active_contract:
+    description: Checklist validation for active contract verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Active_Contract
+  checklist_pillar_age_confirmation:
+    description: Checklist validation for age confirmation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Age_Confirmation
+  checklist_pillar_bypass:
+    description: Checklist validation for bypass procedures
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Bypass
+  checklist_pillar_bureau:
+    description: Checklist validation for credit bureau verification
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Checklist_Pillar_Bureau
+  records_and_updates_updated_assessed_income_crm:
+    description: Record of assessed income updates in CRM system
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Updated_Assessed_Income_CRM
+  records_and_updates_updated_committed_income_crm:
+    description: Record of committed income updates in CRM system
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Updated_Committed_Income_CRM
+  records_and_updates_exception_notes_checklist:
+    description: Exception notes recorded in the checklist
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Exception_Notes_Checklist
+  records_and_updates_fraud_notes_checklist:
+    description: Fraud-related notes recorded in the checklist
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Fraud_Notes_Checklist
+  records_and_updates_other_reasons_notes_checklist:
+    description: Other reasons notes recorded in the checklist
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Other_Reasons_Notes_Checklist
+  records_and_updates_jobtype_update_crm:
+    description: Job type updates recorded in CRM system
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Jobtype_Update_CRM
+  records_and_updates_termination_need_comment_crm:
+    description: Termination need comments recorded in CRM system
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_Termination_Need_Comment_CRM
+  records_and_updates_pep_risk_special_approvals_notes:
+    description: PEP risk special approval notes recorded
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Records_and_Updates_PEP_Risk_Special_Approvals_Notes
+  procedure_pillar_income_and_commitments_assessment:
+    description: Procedure pillar for income and commitments assessment
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Procedure_Pillar_Income_and_Commitments_Assessment
+  procedure_pillar_termination_reminder_zendesk:
+    description: Procedure pillar for termination reminder in Zendesk
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Procedure_Pillar_Termination_Reminder_Zendesk
+  procedure_pillar_user_block_magiclink:
+    description: Procedure pillar for user block via magic link
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Procedure_Pillar_User_Block_Magiclink
+  procedure_pillar_transfer_to_antifraud_cell:
+    description: Procedure pillar for transfer to anti-fraud cell
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Procedure_Pillar_Transfer_to_AntiFraud_Cell
+  procedure_pillar_docpilot:
+    description: Procedure pillar for DocPilot document processing
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Procedure_Pillar_DocPilot
+  decision_pillar_bypass:
+    description: Decision pillar for bypass authorization
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Decision_Pillar_Bypass
+  outstrike_classification_error_flagged:
+    description: Flag indicating if outstrike classification error was detected
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Outstrike_Classification_Error_Flagged
+  general_feedback_leader_analyst:
+    description: General feedback from leader analyst
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.General_Feedback_Leader_Analyst
+  internal_comment_audit:
+    description: Internal comments for the audit process
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Internal_Comment_Audit
+  intention_to_use_rental:
+    description: Evaluation of intention to use rental property
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Intention_to_Use_Rental
+  resends:
+    description: Document resend evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Resends
+  cpf_regularity:
+    description: CPF regularity evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.CPF_Regularity
+  personal_documentation:
+    description: Personal documentation evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Personal_Documentation
+  selfie_for_identification:
+    description: Selfie identification evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Selfie_for_Identification
+  lawsuits:
+    description: Lawsuits evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Lawsuits
+  income_documentation:
+    description: Income documentation evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Income_Documentation
+  income_assessment:
+    description: Income assessment evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Income_Assessment
+  blocklist:
+    description: Blocklist verification evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Blocklist
+  pep:
+    description: Politically Exposed Person (PEP) evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.PEP
+  sanctions:
+    description: Sanctions list evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Sanctions
+  email:
+    description: Email verification evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Email
+  interview:
+    description: Interview completion evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Interview
+  payment_pendencies:
+    description: Payment pendencies evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Payment_Pendencies
+  active_contract:
+    description: Active contract verification evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Active_Contract
+  age:
+    description: Age verification evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Age
+  bypass:
+    description: Bypass procedure evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Bypass
+  bureau:
+    description: Credit bureau verification evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Bureau
+  updated_assessed_income_crm:
+    description: Assessment of updated assessed income in CRM
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Updated_Assessed_Income_CRM
+  updated_committed_income_crm:
+    description: Assessment of updated committed income in CRM
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Updated_Committed_Income_CRM
+  exception_notes:
+    description: Exception notes evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Exception_Notes
+  fraud_notes:
+    description: Fraud notes evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Fraud_Notes
+  other_reasons_notes:
+    description: Other reasons notes evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Other_Reasons_Notes
+  jobtype_update_crm:
+    description: Job type update evaluation in CRM
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Jobtype_Update_CRM
+  termination_need_comment_crm:
+    description: Termination need comment evaluation in CRM
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Termination_Need_Comment_CRM
+  pep_risk_special_approvals_notes:
+    description: PEP risk special approval notes evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.PEP_Risk_Special_Approvals_Notes
+  income_and_commitments_assessment:
+    description: Income and commitments assessment evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Income_and_Commitments_Assessment
+  termination_reminder_zendesk:
+    description: Termination reminder Zendesk evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Termination_Reminder_Zendesk
+  user_block_magiclink:
+    description: User block magic link evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.User_Block_Magiclink
+  transfer_to_antifraud_cell:
+    description: Transfer to anti-fraud cell evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Transfer_to_AntiFraud_Cell
+  docpilot:
+    description: DocPilot document processing evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.DocPilot
+  final_manual_decision:
+    description: Final manual decision made by the analyst
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Final_Manual_Decision
+  total_discounts:
+    description: Total discounts applied during evaluation
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Total_Discounts
+  outstrike:
+    description: Outstrike classification result
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.outstrike
+  initial_score:
+    description: Initial credit score before manual review
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Initial_Score
+  final_score:
+    description: Final credit score after manual review
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Final_Score
+  traffic_light:
+    description: Traffic light risk classification (red, yellow, green)
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Traffic_Light
+  team_leader:
+    description: Name of the team leader overseeing the audit
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.TeamLeader
+  dispute_comment:
+    description: Comments related to audit disputes
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Dispute_Comment
+  dispute_status:
+    description: Status of the audit dispute
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Dispute_Status
+  dispute_review:
+    description: Review details of the audit dispute
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Dispute_Review
+  quantity:
+    description: Quantity metric for the audit record
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Quantity
+  week:
+    description: Week identifier for the audit period
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Week
+  dispute_quantity:
+    description: Number of disputes for this audit
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Dispute_Quantity
+  dt_dispute:
+    description: Date when the dispute was raised
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Dispute_Date
+  dt_proposal:
+    description: Date when the proposal was submitted
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.proposal_date
+  dt_audit:
+    description: Date when the audit was performed
+    lineage:
+      - datalake_gsheets_raw.audit_decisions.Audit_Date
