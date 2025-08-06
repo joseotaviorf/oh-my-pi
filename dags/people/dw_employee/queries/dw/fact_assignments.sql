@@ -137,7 +137,7 @@ SELECT
   COALESCE(h.sk_hierarchy, '-1') AS sk_hierarchy,
   im.assignment_number,
   s.currency_code AS salary_currency_code,
-  ROW_NUMBER() OVER (PARTITION BY im.id_period_of_service, ed.assignment_status_type ORDER BY ps.dt_started DESC) = 1 AS is_last_work_relationship,
+  ROW_NUMBER() OVER (PARTITION BY im.id_person ORDER BY ps.dt_started DESC) = 1 AS is_last_work_relationship,
   IF(ed.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
   IF(ed.assignment_type = 'P', TRUE, FALSE) AS is_pending_worker,
   CASE
@@ -192,5 +192,3 @@ LEFT JOIN
 LEFT JOIN 
   job_salary_reference AS jsr 
     ON jsr.id_job = a.id_job
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY im.id_person ORDER BY ps.dt_started DESC) = 1

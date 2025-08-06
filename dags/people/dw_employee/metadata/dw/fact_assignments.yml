@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_pin_compensation_clean.salary.currency_code
   is_last_work_relationship:
-    description: "Flag (TRUE/FALSE) indicating if this is the most recent work relationship for the employee, partitioned by assignment status."
+    description: "Flag (TRUE/FALSE) indicating if this is the most recent work relationship for the employee, partitioned by person id."
     lineage:
       - datalake_employee_registration.identifier_mapping.id_period_of_service
       - datalake_employment.employee_details.assignment_status_type
