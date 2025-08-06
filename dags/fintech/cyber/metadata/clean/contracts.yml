@@ -2,8 +2,8 @@
 database_name: datalake_cyber_clean
 table_name: contracts
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: null
+domain: Fintech
+description: Table with user-defined load interface fields.
 columns:
   id_contract:
     description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
@@ -38,13 +38,9 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1CPFCNPJ
   rg:
-    description: "RG"
+    description: "RG - personal document"
     lineage:
       - datalake_cyber_raw.uda1.U1RG
-  subset:
-    description: "Subset"
-    lineage:
-      - datalake_cyber_raw.uda1.U1SUBSET
   collection_phase:
     description: "Collection phase"
     lineage:
@@ -217,8 +213,8 @@ columns:
     description: "identifies that the contract is without Negative action for any Bureau (SERASA/CYB)."
     lineage:
       - datalake_cyber_raw.uda1.U1FLATISEMAC
-  U1FLACAVAL:
-    description: ""
+  has_guarantor_denial:
+    description: "has_guarantor_denial"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACAVAL
   ts_rg_issuance:
@@ -250,7 +246,7 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1NACIONALID
   gender:
-    description: "Gender"
+    description: "Gender - famale, male"
     lineage:
       - datalake_cyber_raw.uda1.U1SEXO
   mother_name:
@@ -401,6 +397,10 @@ columns:
     description: "Code representing the customer’s collection flow, based on collection_classification + probability_group, activation delay + BPO postponement."
     lineage:
       - datalake_cyber_raw.uda1.U1INDCOR25
+  contract_segment_strategy:
+    description: "This field segments contracts for internal collections strategies. It's designed to be flexible for future segmentation profiles."
+    lineage:
+      - datalake_cyber_raw.uda1.U1INDCOR27
   reason_pause:
     description: "Pause reason.Possible reasons: fraud, legal proceedings, operational errors, friction"
     lineage:
@@ -453,12 +453,8 @@ columns:
     description: "Cost amount"
     lineage:
       - datalake_cyber_raw.uda1.U1VLCUSTASAG
-  U2DIASEVIC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.uda1.U2DIASEVIC
   week_day:
-    description: "week day"
+    description: "week day - monday, tuesday.."
     lineage:
       - datalake_cyber_raw.uda1.U1DIASEMANA
   open_invoices:
@@ -470,7 +466,7 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1TPCOB
   delay_contamined_days:
-    description: "Days"
+    description: "delay contamined days"
     lineage:
       - datalake_cyber_raw.uda1.U1DAYS
   collection_classification:

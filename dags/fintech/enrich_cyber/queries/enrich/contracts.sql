@@ -32,6 +32,7 @@ SELECT
     c.bpo_segmentation,
     c.probability_group,
     c.collection_strategy,
+    c.contract_segment_strategy,
     dm.agreement_type,
     dm.agreement_status,
     dm.last_payment_promisse_status,

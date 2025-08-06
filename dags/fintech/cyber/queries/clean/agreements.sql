@@ -28,12 +28,21 @@ SELECT
         WHEN AHPYTYPE = "DECR" THEN "Cota Decrescente"
         ELSE AHPYTYPE
     END AS type_interest_quota,
-    AHCTTYPE AS contact_type,
+    CASE
+        WHEN UPPER(AHCTTYPE) = 'A' THEN 'Domiciliário'
+        WHEN UPPER(AHCTTYPE) = 'B' THEN 'Discador'
+        WHEN UPPER(AHCTTYPE) = 'C' THEN 'Carta'
+        WHEN UPPER(AHCTTYPE) = 'D' THEN 'Telegrama'
+        WHEN UPPER(AHCTTYPE) = 'E' THEN 'Mensagem Virtual'
+    ELSE AHCTTYPE
+    END AS contact_type,
     AHCSPERNT AS notify_central_system,
     CASE
         WHEN AHEXCP = "DSC" THEN "Acordos negociados com desconto maior do que o permitido na alçada do usuário e com pagamento inicial dentro da política"
         WHEN AHEXCP = "IPY" THEN "Acordos negociados com desconto dentro da alçada do usuário e com pagamento inicial fora da política"
         WHEN AHEXCP = "MUL" THEN "Acordos negociados com desconto maior do que o permitido na alçada do usuário e com pagamento fora da política"
+        WHEN AHEXCP = "CNL" THEN "Cancelamento com Pagamento"
+        WHEN AHEXCP = "CNN" THEN "Cancelamento"
         ELSE AHEXCP
     END AS exception,
     AHFORMAPAG AS payment_method,
