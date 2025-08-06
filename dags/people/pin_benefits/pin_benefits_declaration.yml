@@ -1,6 +1,7 @@
 dag:
   name: pin_benefits
   owner: Data People
+  schedule_interval: 0 3 * * *
   dag_documentation:
     dag_purpose: |
       This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
