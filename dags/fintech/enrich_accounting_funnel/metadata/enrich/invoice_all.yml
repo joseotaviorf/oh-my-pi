@@ -37,19 +37,19 @@ columns:
     description: "If the contract annulment happened before the start"
     lineage:
       - dw_rent.dim_contract.dt_start
-      - dw_rent.dim_contract.dt_annulment
+      - datalake_ebdb_clean.contract.dt_termination
   is_contract_b2b:
     lineage:
-      - dw_rent.dim_contract.version
+      - dw_rent.dim_contract.is_contract_b2b
     description: "Flag indicating if the contract is shared with partners"
   locale:
     lineage:
       - dw_public.dim_region.city_name
-    description: "City name"
+    description: "Name from the City"
   localidade:
     lineage:
       - datalake_gsheets_clean.cod_locale.id_locale
-    description: "City ID"
+    description: "ID from the City"
   guarantee:
     lineage:
       - dw_rent.dim_contract.guarantee
@@ -68,8 +68,12 @@ columns:
     description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
   is_reversed:
     description: "Flag that indicates if a entry was create to reverse (cancel) another entry or if that entry was reversed by another entry"
+    lineage:
+      - datalake_retsuko.entry
   is_not_invoiceable_inconsiderable:
     description: "Flag that indicates, if true, that a entry is a not-invoiceable/reversed insconsiderable"
+    lineage:
+      - datalake_retsuko.entry
   is_write_off:
     lineage:
       - dw_payment.dim_invoice_entry.is_write_off
@@ -77,18 +81,18 @@ columns:
   bill_item:
     lineage:
       - dw_payment.dim_invoice_entry.entry_type
-    description: "Bill item"
+    description: "Bill item indication"
   description:
     lineage:
       - dw_payment.dim_invoice_entry.description
     description: "Invoice entry title as shown in invoice"
   has_negotiation:
     lineage:
-      - dw_payment.dim_invoice_entry.has_negotiation
+      - dw_payment.dim_invoice_entry.description
     description: "Indicates whether the invoice has an agreement (value 1) or not (value 0)"
   has_installments:
     lineage:
-      - dw_payment.dim_invoice_entry.has_installments
+      - dw_payment.dim_invoice_entry.description
     description: "Indicates whether the invoice has more then 1 installment (value 1) or not (value 0)"
   purpose:
     lineage:
@@ -112,14 +116,22 @@ columns:
     description: "Rotine that produces the entry"
   account_type:
     lineage:
-      - dw_payment.dim_invoice_entry.account_type
+      - dw_payment.dim_invoice_entry.from_account_type
+      - dw_payment.dim_invoice_entry.to_account_type
     description: "The account type: landlord, tenant or other."
   account_classification:
     lineage:
-      - dw_payment.dim_invoice_entry.account_classification
+      - dw_payment.dim_invoice_entry.entry_type
+      - dw_payment.dim_invoice_entry.from_account_type
+      - dw_payment.dim_invoice_entry.to_account_type
+      - dw_payment.dim_invoice.payment_status
+      - dw_payment.dim_invoice.due_amount
     description: "Indicates the account classification based on bill item:  receivable or payable."
   status:
     description: "Description of payment status"
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice
+      - dw_payment.dim_invoice.payment_status
   closing_mode:
     lineage:
       - dw_payment.dim_invoice.closing_mode
@@ -143,6 +155,9 @@ columns:
   accrual_year_month:
     lineage:
       - dw_payment.dim_invoice.accrual_year_month
+      - dw_payment.dim_invoice_entry.from_account_type
+      - dw_payment.dim_invoice_entry.to_account_type
+      - dw_payment.fact_invoice_entries.ts_created
     description: "Expense reference month"
   invoice_accrual_year_month:
     lineage:
@@ -190,12 +205,18 @@ columns:
     description: "Date when the invoice was canceled"
   invoice_reversal_date:
     lineage:
-      - dw_payment.fact_invoice_entries.ts_created
+      - datalake_retsuko.entry.ts_created
     description: "Date when a entry was reversed (canceled) by another one"
   invoice_paid_date_next_business_day:
     lineage:
       - dw_public.dim_date.date
     description: "First business day after the invoice payment"
+  real_invoice_paid_date:
+    description: "Real invoice paid date considering payment method (immediate for some methods, next business day for others)"
+    lineage:
+      - dw_payment.dim_invoice.paid_via
+      - dw_payment.dim_invoice.dt_paid
+      - dw_public.dim_date.date
   contract_start:
     lineage:
       - dw_rent.dim_contract.dt_start

@@ -155,6 +155,8 @@ SELECT DISTINCT
     ELSE 'other'
   END AS account_type,
   CASE
+    WHEN (i.payment_status IN ('preview') OR fie.sk_invoice = -1) AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord') THEN 'payable'
+    WHEN (i.payment_status IN ('preview') OR fie.sk_invoice = -1) AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
     WHEN entry_type IN ('brokerage installment fee', 'brokerage loan fidc', 'brokerage fidc', 'property damage fine') THEN 'receivable'
     WHEN entry_type IN ('rental anticipation fee') THEN 'payable'
     WHEN entry_type IN ('payment adjustment') AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
@@ -162,7 +164,7 @@ SELECT DISTINCT
     WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2) = 0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
     ELSE 'payable'
   END AS account_classification,
-  IF(ni.id_entry IS NOT NULL, 'not-invoiceable', i.payment_status) AS status,
+  IF(fie.sk_invoice = -1, 'not-invoiceable', i.payment_status) AS status,
   i.closing_mode,
   i.paid_via,
   ROUND(fie.brl_entry_due_amount,2) AS due_amount,
@@ -172,25 +174,53 @@ SELECT DISTINCT
     WHEN
         i.payment_status IS NULL
         AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord')
-        AND (dd_entry_created.date >= date_trunc('month',DATEADD(MONTH,-1,current_date)))
-    THEN CAST(DATE_FORMAT(DATEADD(MONTH, 1, dd_entry_created.date), 'yyyyMM') AS INT)
+        AND (DATE(fie.ts_created) >= date_trunc('month',DATEADD(MONTH,-1,current_date)))
+    THEN CAST(DATE_FORMAT(DATEADD(MONTH, 1, DATE(fie.ts_created)), 'yyyyMM') AS INT)
     ELSE i.accrual_year_month
   END AS accrual_year_month,
   i.accrual_year_month AS invoice_accrual_year_month,
   ie.accrual_year_month AS entry_accrual_year_month,
   ie.due_year_month AS entry_due_year_month,
-  CAST(DATE_FORMAT(DATEADD(month, 1, dd_entry_created.date), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
-  DATE_FORMAT(dd_entry_created.date, 'yyyy-MM-dd') AS entry_created_date,
-  DATE_FORMAT(DATE(i.ts_created), 'yyyy-MM-dd') AS invoice_created_date,
-  DATE_FORMAT(i.dt_due, 'yyyy-MM-dd') AS invoice_due_date,
-  DATE_FORMAT(i.dt_sent, 'yyyy-MM-dd') AS invoice_sent_date,
-  DATE_FORMAT(i.dt_paid, 'yyyy-MM-dd') AS invoice_paid_date,
-  DATE_FORMAT(i.dt_write_off, 'yyyy-MM-dd') AS invoice_write_off_date,
-  DATE_FORMAT(i.ts_canceled, 'yyyy-MM-dd') AS invoice_canceled_date,
-  DATE_FORMAT(rr.ts_entry_reversed, 'yyyy-MM-dd') AS invoice_reversal_date,
-  DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,
-  c.dt_start AS contract_start,
-  c1.dt_termination AS contract_annulment,
+  CAST(DATE_FORMAT(DATEADD(month, 1, DATE(fie.ts_created)), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
+  DATE(fie.ts_created) AS entry_created_date,
+  DATE(i.ts_created) AS invoice_created_date,
+  DATE(i.dt_due) AS invoice_due_date,
+  DATE(i.dt_sent) AS invoice_sent_date,
+  DATE(i.dt_paid) AS invoice_paid_date,
+  DATE(i.dt_write_off) AS invoice_write_off_date,
+  DATE(i.ts_canceled) AS invoice_canceled_date,
+  DATE(rr.ts_entry_reversed) AS invoice_reversal_date,
+  DATE(nbd.date_next_bd) AS invoice_paid_date_next_business_day,
+  DATE(CASE 
+    WHEN lower(paid_via) IN (
+      'bank-transfer'
+      ,'checkout-credit-card'
+      ,'credit-card'
+      ,'cyber-credit-card'
+      ,'recupera-credit-card'
+      ,'recurrent-credit-card'
+      ,'seumadruga-credit-card'
+      ,'collector-5a-pix'
+      ,'cyber-pix'
+      ,'recupera-pix'
+      ,'icatu-paid'
+      ,'paypal'
+      ,'unknown'
+      ,'internet-banking'
+      ,'non-specified')
+      THEN invoice_paid_date
+    WHEN lower(paid_via) IN (
+      'cnab'
+      ,'checkout-boleto'
+      ,'cyber-boleto'
+      ,'recupera'
+      ,'collector-5a')
+      THEN invoice_paid_date_next_business_day
+    ELSE
+      invoice_paid_date
+  END) AS real_invoice_paid_date,
+  DATE(c.dt_start) AS contract_start,
+  DATE(c1.dt_termination) AS contract_annulment,
   NOW() AS ts_load
 FROM
     dw_payment.fact_invoice_entries AS fie
@@ -212,12 +242,6 @@ LEFT JOIN
 LEFT JOIN
     dw_payment.dim_invoice AS i
     ON fie.sk_invoice = i.sk_invoice
-LEFT JOIN
-    dw_public.dim_date AS dd_entry_created
-    ON dd_entry_created.sk_date = fie.sk_created_date
-LEFT JOIN
-    dw_public.dim_date AS dd_invoice_paid
-    ON dd_invoice_paid.date = i.dt_paid
 LEFT JOIN
     next_business_day AS nbd
     ON nbd.date = i.dt_paid

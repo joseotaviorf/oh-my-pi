@@ -994,7 +994,9 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-accounting:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-share:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-write-off:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420003-420019-420020-420025-611012:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-513020:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-700005-700008-700009-700010-700011:first-run-of-day
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
