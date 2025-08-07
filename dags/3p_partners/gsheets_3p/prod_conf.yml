@@ -4,6 +4,12 @@ sheets_info:
     sheet_name: target_3p
     clean_table_name: 3p_partners_performance_targets
     sheet_context: 3p
+
+  agents_3p_tqc:
+    sheet_id: 1WiofyypXlV0nsnQyGFR29mGUXb0N0Ero5-pDq5DnvGw
+    sheet_name: agents_3p_tqc
+    clean_table_name: agents_3p_tqc
+    sheet_context: 3p
     
   hubspot_acquisition_funnel_hunting:
     sheet_id: 1wSw3qcXri9rxD_ESqXn4Vp_PCgydvvw5XiyFaV0ZOxI

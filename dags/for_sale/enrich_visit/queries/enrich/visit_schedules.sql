@@ -379,15 +379,15 @@ buyer_review AS (
 filtered_visit AS (
   SELECT
     v.id,
-    id_visitor,
+    v.id_visitor,
     v.id_house,
-    id_agent,
+    v.id_agent,
     v.code,
-    business_context,
-    behavior,
-    business_model,
-    dt_visit,
-    id_real_estate_agent_rating,
+    v.business_context,
+    v.behavior,
+    vbm.business_model,
+    v.dt_visit,
+    v.id_real_estate_agent_rating,
     vo_create.name AS first_update_source,
     v.ts_visit,
     v.ts_created
@@ -404,6 +404,9 @@ filtered_visit AS (
   LEFT JOIN
     datalake_ebdb_clean.visit_origin AS vo_create
       ON vo_create.id = v.id_creation_origin
+  LEFT JOIN
+    datalake_visit.visit_business_model AS vbm
+      ON v.id = vbm.id_visit
 )
 SELECT DISTINCT
   s.id_schedule,

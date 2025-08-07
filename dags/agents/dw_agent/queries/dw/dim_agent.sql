@@ -30,6 +30,7 @@ SELECT
     BOOLEAN(du.inquilino) AS is_tenant,
     du.is_sale_agent,
     du.is_rent_agent,
+    tqc.id_agent IS NOT NULL AND tqc.is_currently_active AS is_tqc_3p_agent,
     wd.is_3p_contract AS is_rede_agent,
     du.data_nascimento AS dt_birth,
     du.criado_em AS ts_created,
@@ -46,6 +47,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.agent_data_types AS at 
         ON at.id_agent_data = du.dados_agente_id
+LEFT JOIN
+    datalake_gsheets_clean.agents_3p_tqc AS tqc
+        ON tqc.id_agent = du.dados_agente_id
 WHERE
     dados_agente_id IS NOT NULL
 QUALIFY -- There are extremely few duplicate rows on agent_data_types (12/16595 at the moment of writing). This is to get rid of them.

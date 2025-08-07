@@ -93,7 +93,7 @@ SELECT
     visit.computed_status,
     visit.behavior,
     visit.booking_type,
-    visit.business_model,
+    vbm.business_model,
     visit_log.first_event,
     entry_model.key_location AS method,
     entry_model.entry_model_type,
@@ -227,5 +227,8 @@ LEFT JOIN
 LEFT JOIN
     visit_by_history AS vbh
         ON visit.id = vbh.id_visit
+LEFT JOIN
+    datalake_visit.visit_business_model AS vbm
+        ON visit.id = vbm.id_visit
 WHERE
     DATE(visit.ts_created) >= '2024-11-01'

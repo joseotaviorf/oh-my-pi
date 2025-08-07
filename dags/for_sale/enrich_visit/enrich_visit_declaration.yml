@@ -10,6 +10,9 @@ workflow:
     inner_dependencies:
       visits:
       - visit_cancellation_unified
+      - visit_business_model
+      visit_schedules:
+        - visit_business_model
     execution_timeout_hours: 3
     tables_customization:
         visit_fitting:

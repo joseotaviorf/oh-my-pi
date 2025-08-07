@@ -1,0 +1,30 @@
+database_name: datalake_visit
+table_name: visit_business_model
+description: This table contains the business model of the visit.
+domain: For Sale
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+    description: The id of the visit.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.visit.id_agent
+    description: The id of the agent.
+  id_visitor:
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+    description: The id of the visitor.
+  business_model:
+    lineage:
+      - datalake_ebdb_clean.visit.business_model
+    description: The business model of the visit.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+    description: The timestamp of the visit creation.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_updated
+    description: The timestamp of the visit update.

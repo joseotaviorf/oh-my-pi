@@ -18,6 +18,7 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_agenda_allocation:load-enrich-agent-region-group:first-run-of-day
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
   - bietlejuice.enrich_visit_agent_performance:load-enrich-agent-performance-daily-summary:first-run-of-day
+  - bietlejuice.gsheets_3p:done-clean-agents-3p-tqc:first-run-of-day
 bietlejuice.dw_agent_contract:
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
@@ -3621,6 +3622,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs:first-run-of-day
+  - bietlejuice.gsheets_3p:done-clean-agents-3p-tqc:first-run-of-day
   - bietlejuice.insider:load-clean-review:first-run-of-day
 bietlejuice.enrich_visit_agent_performance:
   - bietlejuice.enrich_agenda_allocation:load-enrich-agenda-hourly-allocations:first-run-of-day

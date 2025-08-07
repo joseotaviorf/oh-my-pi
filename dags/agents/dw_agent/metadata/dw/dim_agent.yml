@@ -203,6 +203,10 @@ columns:
     lineage:
     - dw_public.dim_user.is_rent_agent
     description: If user is an Agent with QuintoAndar working with Rentals.
+  is_tqc_3p_agent:
+    lineage:
+    - datalake_gsheets_clean.agents_3p_tqc.id_agent
+    description: If user is an Agent with in TQC 3P PoC.
   is_rede_agent:
     lineage:
     - datalake_ebdb_work_contract.work_contract.is_3p_contract
