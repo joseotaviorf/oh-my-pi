@@ -708,6 +708,45 @@ workflow:
     170698_listing_favorite_remove_events:
       run_optimize: false
       run_vacuum: false
+    170698_overdue_invoices_payment_option_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_overdue_invoices_payment_options_closed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_overdue_invoices_total_payment_option_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_overdue_invoices_payment_option_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pi_negotiation_started_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pi_negotiation_payment_option_closed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_exception_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_exception_cta_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_checkout_order_credit_card_payment_button_tapped_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_checkout_order_credit_card_payment_success_view_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_checkout_order_credit_card_payment_failure_view_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_checkout_order_credit_card_payment_pending_view_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_checkout_order_credit_card_try_again_tapped_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new
