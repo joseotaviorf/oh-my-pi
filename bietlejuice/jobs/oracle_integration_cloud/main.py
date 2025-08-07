@@ -14,7 +14,7 @@ from bietlejuice.jobs.oracle_integration_cloud.job_argument_parser import (
 from bietlejuice.jobs.oracle_integration_cloud.sftp_handler import SFTPHandler
 from bietlejuice.jobs.oracle_integration_cloud.pgp_handler import PGPHandler
 from bietlejuice.jobs.oracle_integration_cloud.dataframe_handler import DataFrameHandler
-from bietlejuice.jobs.oracle_integration_cloud.raw_layer_loader import RawLayerLoader
+from bietlejuice.jobs.loaders.raw_layer_loader import RawLayerLoader
 from bietlejuice.jobs.oracle_integration_cloud.local_file_handler import (
     LocalFileHandler,
 )
