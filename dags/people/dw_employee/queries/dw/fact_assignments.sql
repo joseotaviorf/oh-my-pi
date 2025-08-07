@@ -82,20 +82,39 @@ managers AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY dt_effective_started DESC) = 1
 ),
-latest_rates AS (
+active_jobs AS (
   SELECT
-    id_grade_ladder,
-    id_rate
-  FROM 
-    datalake_pin_core_clean.rates
-  WHERE 
+    id_job,
+    id_grade_ladder
+  FROM
+    datalake_pin_core_clean.job
+  WHERE
     dt_effective_ended = DATE('4712-12-31')
-  QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY id_grade_ladder ORDER BY ts_updated DESC) = 1
+    AND active_status = 'A'
+),
+active_valid_grades AS (
+  SELECT
+    id_job,
+    id_grade
+  FROM
+    datalake_pin_core_clean.valid_grades 
+  WHERE
+    dt_effective_ended = DATE('4712-12-31')
+),
+salary_rates AS (
+  SELECT
+    id_rate,
+    id_grade_ladder
+  FROM
+    datalake_pin_core_clean.rates
+  WHERE
+    dt_effective_ended = DATE('4712-12-31')
+    AND rate_type = 'SALARY'
 ),
 latest_rate_values AS (
   SELECT
     id_rate,
+    id_rate_object,
     mid_value
   FROM 
     datalake_pin_core_clean.rate_values
@@ -105,20 +124,21 @@ latest_rate_values AS (
     ROW_NUMBER() OVER (PARTITION BY id_rate ORDER BY ts_updated DESC) = 1
 ),
 job_salary_reference AS (
-  SELECT
+  SELECT DISTINCT
     j.id_job,
-    MAX(prvf.mid_value) as mid_value
-  FROM 
-    datalake_pin_core_clean.job AS j
-  INNER JOIN 
-    latest_rates AS prf ON j.id_grade_ladder = prf.id_grade_ladder
-  INNER JOIN 
-    latest_rate_values AS prvf ON prf.id_rate = prvf.id_rate
-  WHERE 
-    j.dt_effective_ended = DATE('4712-12-31') 
-    AND j.active_status = 'A'
-  GROUP BY 
-    j.id_job
+    rv.mid_value
+  FROM
+    active_jobs AS j
+  INNER JOIN
+    active_valid_grades AS vg
+      ON j.id_job = vg.id_job
+  INNER JOIN
+    salary_rates AS sr
+      ON j.id_grade_ladder = sr.id_grade_ladder
+  INNER JOIN
+    latest_rate_values AS rv
+      ON sr.id_rate = rv.id_rate
+      AND vg.id_grade = rv.id_rate_object
 )
 
 SELECT
