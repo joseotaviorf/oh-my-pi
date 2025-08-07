@@ -85,8 +85,8 @@ def get_langfuse_data(langfuse, execution_date, table_name):
 
     first_page_result = fetch_page_with_retry(langfuse, table_name, execution_date, 1, limit)
     if not first_page_result['success']:
-        logger.error(f"Failed to fetch first page, returning empty list")
-        return []
+        logger.error(f"Failed to fetch first page after {MAX_RETRIES} retries")
+        raise Exception(f"Critical error: Unable to fetch first page for table {table_name} from Langfuse API after {MAX_RETRIES} retry attempts")
     
     all_json_data = first_page_result['data']
     
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     table_name = args.table_name
     execution_date_str = args.execution_date
     # fetch last 6 hours of data
-    execution_date = datetime.fromisoformat(execution_date_str) - timedelta(hours=6)
+    execution_date = datetime.fromisoformat(execution_date_str) - timedelta(hours=2)
     partition_cols = ["year", "month", "day", "hour"]
 
     config_service = ConfigurationService(dag_name)
