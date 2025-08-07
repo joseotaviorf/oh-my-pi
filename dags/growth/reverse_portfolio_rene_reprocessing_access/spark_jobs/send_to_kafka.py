@@ -17,7 +17,7 @@ spark = SparkSession.builder.appName(JOB_NAME).getOrCreate()
 def get_kafka_credentials(dbutils):
     """Get and decode Kafka credentials from Databricks secrets."""
     try:
-        spark_token = dbutils.secrets.get(scope="quintoandar", key="RENE_DESCARTES_DB")
+        spark_token = dbutils.secrets.get(scope="quintoandar", key="RENEDESCARTES_SA_CONFLUENT")
         raw_credentials = json.loads(spark_token)
         str_credentials = raw_credentials.get("pwd")
         
