@@ -1,0 +1,42 @@
+dag:
+  name: ebdb_visit_fast_lane
+  schedule_start_date: 2024,01,01
+  schedule_interval: 0,30 * * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      DAG containing tables from Visits context that are running every 30 minutes.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  dbutils_secret_key: EBDB_DB
+  source_database: ebdb
+  source_schema: ebdb
+  custom_schema: ebdb_test
+  #extra_query_template_params:
+  #  load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
+  #  load_end_date: "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
+  tables_customization:
+    Visita:
+      clean_table_name: visit
+      clean_primary_keys: [id]
+      #z_order_by: [id]
+    VisitStatusLog:
+      clean_table_name: visit_status_log
+      clean_primary_keys: [id_visit_status_log]
+      #z_order_by: [id_visit]
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r5.large
+    node_type_id: r5.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

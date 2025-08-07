@@ -1,0 +1,113 @@
+database_name: datalake_ebdb_test_clean
+table_name: visit
+domain: For Sale
+description: Table with visit data.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.visita.id
+    description: "Unique identifier for the visit."
+  id_real_estate_agent_rating:
+    lineage:
+      - datalake_ebdb_test_raw.visita.realEstateAgentRating_id
+    description: "Identifier for the rating of the real estate agent associated with the visit."
+  id_visitor:
+    lineage:
+      - datalake_ebdb_test_raw.visita.visitante_id
+    description: "Identifier for the visitor who made the visit."
+  id_agent:
+    lineage:
+      - datalake_ebdb_test_raw.visita.agente_id
+    description: "Identifier for the agent responsible for the visit."
+  id_creation_origin:
+    lineage:
+      - datalake_ebdb_test_raw.visita.origemCriacao_id
+    description: "Identifier for the origin of the visit's creation (e.g., app, website, etc.)."
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_test_raw.visita.origemUltimaAtualizacao_id
+    description: "Identifier for the origin of the last update to the visit."
+  id_house_rating:
+    lineage:
+      - datalake_ebdb_test_raw.visita.houseRating_id
+    description: "Identifier for the rating of the house associated with the visit."
+  id_house:
+    lineage:
+      - datalake_ebdb_test_raw.visita.house_id
+    description: "Identifier for the house being visited."
+  code:
+    lineage:
+      - datalake_ebdb_test_raw.visita.codigo
+    description: "Code or reference number for the visit."
+  slot:
+    lineage:
+      - datalake_ebdb_test_raw.visita.slot
+    description: "Indicates the scheduled time or time slot for the visit (e.g., 2 PM - 3 PM)."
+  slot_count:
+    lineage:
+      - datalake_ebdb_test_raw.visita.numeroSlots
+    description: "Number of available or scheduled time slots."
+  slot_request:
+    lineage:
+      - datalake_ebdb_test_raw.visita.request_slot
+    description: "The time slot requested by the user."
+  type:
+    lineage:
+      - datalake_ebdb_test_raw.visita.tipo
+    description: "The type of visit (e.g., in-person, virtual, etc.)."
+  status:
+    lineage:
+      - datalake_ebdb_test_raw.visita.status
+    description: "The current status of the visit (e.g., scheduled, confirmed, canceled, etc.)."
+  computed_status:
+    lineage:
+      - datalake_ebdb_test_raw.visita.computed_status
+    description: "The calculated status of the visit, which may be derived from other fields."
+  booking_type:
+    lineage:
+      - datalake_ebdb_test_raw.visita.bookingType
+    description: "The type of booking for the visit."
+  behavior:
+    lineage:
+      - datalake_ebdb_test_raw.visita.behavior
+    description: "The behavior associated with the visit (e.g., the process, whether it's a lead generation or a sales visit)."
+  business_model:
+    lineage:
+      - datalake_ebdb_test_raw.visita.business_model
+    description: "The business model to which the visit is related."
+  business_context:
+    lineage:
+      - datalake_ebdb_test_raw.visita.business_context
+    description: "The business context of the visit."
+  is_fixed_agent:
+    lineage:
+      - datalake_ebdb_test_raw.visita.agenteFixo
+    description: "Indicates whether a fixed agent has been assigned to the visit (true/false)."
+  structured:
+    lineage:
+      - datalake_ebdb_test_raw.visita.structured
+    description: "Indicates if the visit was structured (true/false)."
+  dt_visit:
+    lineage:
+      - datalake_ebdb_test_raw.visita.dia
+    description: "The date of the visit."
+  dt_request:
+    lineage:
+      - datalake_ebdb_test_raw.visita.request_date
+    description: "The date on which the visit was requested."
+  dt_confirmation_expiration:
+    lineage:
+      - datalake_ebdb_test_raw.visita.confirmation_expiration_date
+    description: "The expiration date for the visit's confirmation."
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.visita.criadoEm
+    description: "Timestamp (date and time) when the visit was created."
+  ts_visit:
+    lineage:
+      - datalake_ebdb_test_raw.visita.visit_datetime
+    description: "Timestamp (date and time) of the visit."
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.visita.atualizadoEm
+    description: "Timestamp (date and time) when the visit was last updated."

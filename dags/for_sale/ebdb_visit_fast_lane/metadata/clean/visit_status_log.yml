@@ -1,0 +1,53 @@
+database_name: datalake_ebdb_test_clean
+table_name: visit_status_log
+domain: For Sale
+description: Table with visit events.
+columns:
+  id_visit_status_log:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.id
+    description: "Unique identifier for the visit status log record."
+  id_visit:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.visit_id
+    description: "The identifier of the visit that this status log refers to."
+  id_schedule:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.schedule_id
+    description: "The identifier of the schedule associated with the log."
+  id_author_user:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.author_user_identifier
+    description: "The identifier of the user who performed the action that triggered the status change."
+  author_user_type:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.author_user_type
+    description: "The type of user who performed the action (e.g., agent, visitor)."
+  author_user_role:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.author_user_role
+    description: "The role or function of the user who performed the action (e.g., administrator, realtor)."
+  on_behalf_of:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.on_behalf_of
+    description: "Indicates if the action was performed on behalf of another user or entity."
+  reason:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.reason
+    description: "The reason or justification for the visit status change."
+  channel:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.channel
+    description: "The channel through which the status change was made (e.g., app, API, internal system)."
+  event_type:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.event_type
+    description: "The type of status change event."
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.created_at
+    description: "Timestamp (date and time) when the log record was created."
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.visitstatuslog.updated_at
+    description: "Timestamp (date and time) when the log record was last updated."
