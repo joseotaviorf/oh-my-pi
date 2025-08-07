@@ -48,8 +48,6 @@ columns:
       - datalake_ebdb_test_raw.visita.numeroSlots
     description: "Number of available or scheduled time slots."
   slot_request:
-    lineage:
-      - datalake_ebdb_test_raw.visita.request_slot
     description: "The time slot requested by the user."
   type:
     lineage:
@@ -92,8 +90,6 @@ columns:
       - datalake_ebdb_test_raw.visita.dia
     description: "The date of the visit."
   dt_request:
-    lineage:
-      - datalake_ebdb_test_raw.visita.request_date
     description: "The date on which the visit was requested."
   dt_confirmation_expiration:
     lineage:
