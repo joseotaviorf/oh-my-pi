@@ -61,7 +61,7 @@ WITH
             COUNT(DISTINCT id_agent) AS nbr_agent,
             MIN_BY(id_agent, rev) AS id_first_associated_agent,
             MAX_BY(id_agent, rev) AS id_last_associated_agent,
-            MIN_by(ts_visit, rev) AS ts_first_visit
+            MIN_BY(ts_visit, rev) AS ts_first_visit
         FROM
             datalake_ebdb_clean.visit_aud
         GROUP BY 1
@@ -105,7 +105,7 @@ SELECT
     END AS last_event,
     visit.slot,
     visit.slot_count,
-    business_context,
+    visit.business_context,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
@@ -145,7 +145,7 @@ SELECT
     IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
     IF(visit_demand.id_visit IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
     FALSE AS is_3p_supply,
-    visit.is_fixed_agent,
+    IF(pfa.id_pfa_history IS NOT NULL, TRUE, FALSE) AS is_fixed_agent,
     IF(computed_status IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
     CASE
         WHEN visit_log.ts_visit_tenant_answer IS NOT NULL
@@ -230,5 +230,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_visit.visit_business_model AS vbm
         ON visit.id = vbm.id_visit
+LEFT JOIN
+    datalake_visit.preferred_fixed_agent_history AS pfa
+        ON visit.id_agent = pfa.id_user_agent
+        AND visit.id_visitor = pfa.id_visitor
+        AND visit.ts_created >= pfa.ts_started
+        AND visit.ts_created < COALESCE(pfa.ts_ended, NOW())
+        AND pfa.is_enabled
 WHERE
     DATE(visit.ts_created) >= '2024-11-01'

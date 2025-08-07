@@ -210,8 +210,8 @@ columns:
     description: If this visit is by 3p supply.
   is_fixed_agent:
     lineage:
-      - datalake_ebdb_clean.visit.is_fixed_agent
-    description: If this visit has a fixed agent by the visitor.
+      - datalake_visit.preferred_fixed_agent_history.id_pfa_history
+    description: True when the visit was requested with the visitor's preferred fixed agent.
   has_finisher_status:
     description: True when the visit has a finisher status.
   has_fup_collected:
