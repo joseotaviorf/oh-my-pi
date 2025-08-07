@@ -338,13 +338,15 @@ extract_step_task = create_task(
     parameters=[
         f"--input_staged_condos={Tables.stage_step_condos}",
         f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
+        f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         f"--overwrite_schema",
         f"--output_extracted_condos={Tables.extract_step_condos}",
         f"--output_extracted_houses={Tables.extract_step_houses}",
     ],
 )
 
-core_tasks = [
+address_tasks = [
     create_task(
         entry_point="core_geocode_step",
         parameters=[
@@ -392,46 +394,50 @@ core_tasks = [
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         ],
-    ),
-    create_task(
-        entry_point="core_cluster_step",
-        parameters=[
-            f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
-            f"--input_indirect_matches_clustering_image={Tables.address_adjusted_step_houses}",
-            f"--overwrite_schema",
-            f"--output_clustered_condos={Tables.cluster_step_condos}",
-            f"--output_clustered_houses={Tables.cluster_step_houses}",
-        ],
-    ),
-    create_task(
-        entry_point="core_source_predict_step",
-        parameters=[
-            f"--input_staged_houses={Tables.stage_step_houses}",
-            f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--input_source_itbi_houses={Tables.source_itbi_houses}",
-            f"--overwrite_schema",
-            f"--output_source_predicted_houses={Tables.source_predict_step_houses}",
-        ],
-    ),
-    create_task(
-        entry_point="core_merge_step",
-        parameters=[
-            f"--input_staged_condos={Tables.stage_step_condos}",
-            f"--input_staged_houses={Tables.stage_step_houses}",
-            f"--input_clustered_condos={Tables.cluster_step_condos}",
-            f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--overwrite_schema",
-            f"--output_merged_condos={Tables.merge_step_condos}",
-            f"--output_merged_houses={Tables.merge_step_houses}",
-        ],
-    ),
+    )
 ]
+
+cluster_task = create_task(
+    entry_point="core_cluster_step",
+    parameters=[
+        f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
+        f"--input_indirect_matches_clustering_image={Tables.address_adjusted_step_houses}",
+        f"--overwrite_schema",
+        f"--output_clustered_condos={Tables.cluster_step_condos}",
+        f"--output_clustered_houses={Tables.cluster_step_houses}",
+    ],
+)
+
+source_predict_task = create_task(
+    entry_point="core_source_predict_step",
+    parameters=[
+        f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--input_clustered_houses={Tables.cluster_step_houses}",
+        f"--input_source_itbi_houses={Tables.source_itbi_houses}",
+        f"--overwrite_schema",
+        f"--output_source_predicted_houses={Tables.source_predict_step_houses}",
+    ],
+)
+
+merge_task = create_task(
+    entry_point="core_merge_step",
+    parameters=[
+        f"--input_staged_condos={Tables.stage_step_condos}",
+        f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--input_clustered_condos={Tables.cluster_step_condos}",
+        f"--input_clustered_houses={Tables.cluster_step_houses}",
+        f"--overwrite_schema",
+        f"--output_merged_condos={Tables.merge_step_condos}",
+        f"--output_merged_houses={Tables.merge_step_houses}",
+    ],
+)
 
 images_and_relations_tasks = [
     create_task(
         entry_point="core_images_step",
         parameters=[
-            f"--input_merged_houses={Tables.merge_step_houses}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_extracted_houses={Tables.extract_step_houses}",
             f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
             f"--input_kodak_photo={Tables.kodak_photo}",
             "--overwrite_schema",
@@ -689,12 +695,20 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 execute_job_cluster_task >> source_tasks
 
 source_tasks >> stage_step_task
-stage_step_task >> extract_step_task
-stage_step_task >> core_tasks[0]
+stage_step_task >> address_tasks[0]
 
-chain(*core_tasks)
+chain(*address_tasks)
 
-core_tasks[-1] >> images_and_relations_tasks
+address_tasks[-1] >> extract_step_task
+address_tasks[-1] >> cluster_task
+
+cluster_task >> source_predict_task
+source_predict_task >> merge_task
+
+extract_step_task >> images_and_relations_tasks[0]
+cluster_task >> images_and_relations_tasks[0]
+merge_task >> images_and_relations_tasks[1]
+
 images_and_relations_tasks >> predict_and_join_task[0]
 chain(*predict_and_join_task)
 
