@@ -28,8 +28,8 @@ DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_languse_raw"
 SOURCE = "langfuse"
 MAX_WORKERS = 10  # number of parallel workers for API calls
-PAGE_SIZE = 100
-MAX_RETRIES = 3  # number of retries for failed API calls
+PAGE_SIZE = 50
+MAX_RETRIES = 1  # number of retries for failed API calls
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
