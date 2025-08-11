@@ -75,7 +75,7 @@ seu_barriga_sap AS (
 sap AS (
     SELECT DISTINCT
         id_business_entity,
-        COALESCE(UPPER(REPLACE(id_external_payment, 'C!', '')), sb.company_use) AS company_use,
+        COALESCE(UPPER(REPLACE(id_external_payment, 'C!', '')), UPPER(REPLACE(sb.company_use, 'C!', ''))) AS company_use,
         account_number,
         dt_tax AS dt_paid,
         SUM(debit_credit) AS amount,
