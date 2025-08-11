@@ -2,17 +2,15 @@ WITH inspection AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.inspection_aud
+        datalake_inspection_services_clean.inspection
     WHERE
         MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 ),
 appointment AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.appointment_aud
+        datalake_inspection_services_clean.appointment
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 ),
@@ -20,9 +18,9 @@ assessment AS (
     SELECT
         *
     FROM
-        datalake_inspection_services_clean.assessment_aud
+        datalake_inspection_services_clean.assessment
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_assessment ORDER BY ts_updated DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 ),
 room AS (
     SELECT

@@ -10,19 +10,19 @@ columns:
   id_inspection:
     description: Inspection identification key (or in this case, report).
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.id_inspection
+      - datalake_inspection_services_clean.inspection.id_inspection
   id_inspector:
     description: Inspector identification key in IS.
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.id_inspector
+      - datalake_inspection_services_clean.inspection.id_inspector
   id_contract:
     description: Identification key of the contract related to the report.
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.id_contract
+      - datalake_inspection_services_clean.inspection.id_contract
   id_appointment:
     description: Identification key of the appointment related to the report.
     lineage:
-      - datalake_inspection_services_clean.appointment_aud.id_appointment
+      - datalake_inspection_services_clean.appointment.id_appointment
   id_room:
     description: Identification key of the room related to the report.
     lineage:
@@ -46,7 +46,7 @@ columns:
   inspection_type:
     description: Type of inspection (onboarding or offboarding).
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.type
+      - datalake_inspection_services_clean.inspection.type
   room_type:
     description: Type of room related to the report (for example - kitchen, laundry room...)
     lineage:
@@ -98,16 +98,16 @@ columns:
   ts_synced:
     description: Date in timestamp format indicating when the inspection actually took place.
     lineage:
-      - datalake_inspection_services_clean.assessment_aud.ts_created
+      - datalake_inspection_services_clean.assessment.ts_created
   year:
     description: Year in which the inspection took place.
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.year
+      - datalake_inspection_services_clean.inspection.year
   month:
     description: Month in which the inspection took place.
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.month
+      - datalake_inspection_services_clean.inspection.month
   day:
     description: Day in which the inspection took place.
     lineage:
-      - datalake_inspection_services_clean.inspection_aud.day
+      - datalake_inspection_services_clean.inspection.day
