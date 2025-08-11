@@ -3,6 +3,7 @@ SELECT
     label_id AS id_label,
     parent_id AS id_parent,
     key,
+    active as is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
@@ -10,4 +11,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.closing_type
-

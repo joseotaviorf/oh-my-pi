@@ -5,6 +5,7 @@ SELECT
     house_id AS id_house,
     monday_id AS id_monday,
     closing_type_id AS id_closing_type,
+    visit_external_id AS id_visit_external,
     flow_step,
     flow_type,
     status_closing,
@@ -21,4 +22,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.sales_flow
-

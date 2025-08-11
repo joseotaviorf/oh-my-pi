@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: sales_flow_invite
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: Table with the invites statuses.
 columns:
@@ -25,6 +25,10 @@ columns:
     description: Buyer Docx Folder ID on Docx tables.
     lineage:
       - datalake_sales_flow_raw.sales_flow_invite.folder_id
+  id_house:
+    description: House ID on SalesFlow tables (house).
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_invite.house_id
   type:
     description: User type. BUYER or SELLER
     lineage:

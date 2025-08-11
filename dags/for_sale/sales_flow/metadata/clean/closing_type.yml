@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: closing_type
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: The main idea of this table is to identify status and types of closing process in For Sale.
 columns:
@@ -21,6 +21,10 @@ columns:
     description: Which offer model (CCV Assistance, Pampas etc), type of financing (External or Internal) and payment method (Financed or Cash).
     lineage:
       - datalake_sales_flow_raw.closing_type.key
+  is_active:
+    description: Indicates if this closing type is active.
+    lineage:
+      - datalake_sales_flow_raw.closing_type.active
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:

@@ -4,6 +4,7 @@ SELECT
     inviter_id AS id_inviter,
     invitee_id AS id_invitee,
     folder_id AS id_folder,
+    house_id AS id_house,
     type,
     name,
     email,

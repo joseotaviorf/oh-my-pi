@@ -7,6 +7,10 @@ SELECT
     accepted_by,
     is_tacit_acceptance,
     had_risk_reclassification,
+    report_document_token,
+    reset_reason,
+    help_requested_by_buyer_at AS ts_help_requested_by_buyer,
+    help_requested_by_seller_at AS ts_help_requested_by_seller,
     partner_started_at AS ts_partner_started,
     partner_ended_at AS ts_partner_ended,
     legal_risk_started_at AS ts_legal_risk_started,
@@ -22,4 +26,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.diligence
-

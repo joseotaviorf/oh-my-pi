@@ -12,6 +12,12 @@ SELECT
     deed_price,
     discard_reason,
     status,
+    furniture_will_be_left,
+    preemptive_right,
+    seller_counter_proposal,    
+    updated_offer_price,
+    seller_has_done_onboarding AS has_seller_done_onboarding,
+    buyer_has_done_onboarding AS has_buyer_done_onboarding,
     used_offer_suggestion AS has_used_offer_suggestion,
     proposal_date AS dt_proposed,
     accepted_at AS ts_accepted,
@@ -24,4 +30,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.offer
-

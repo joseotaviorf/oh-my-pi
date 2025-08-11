@@ -1,24 +1,38 @@
 database_name: datalake_sales_flow_clean
 table_name: rev_info
+domain: For Sale
+owner: thiago.bueno@quintoandar.com.br
+description: Table that contains revision information for audited tables.
 columns:
   id:
+    description: Revision ID.
     lineage:
       - datalake_sales_flow_raw.revinfo.id
   id_user:
+    description: User ID associated with the revision.
     lineage:
       - datalake_sales_flow_raw.revinfo.user_id
   id_keycloak:
+    description: Keycloak ID associated with the user who made the change.
     lineage:
       - datalake_sales_flow_raw.revinfo.keycloak_id
+  id_trace:
+    description: Trace ID for request tracking and debugging.
+    lineage:
+      - datalake_sales_flow_raw.revinfo.trace_id
   ts_created:
+    description: Timestamp of when the revision was created.
     lineage:
       - datalake_sales_flow_raw.revinfo.timestamp
   year:
+    description: Year partition value.
     lineage:
       - datalake_sales_flow_raw.revinfo.year
   month:
+    description: Month partition value.
     lineage:
       - datalake_sales_flow_raw.revinfo.month
   day:
+    description: Day partition value.
     lineage:
       - datalake_sales_flow_raw.revinfo.day

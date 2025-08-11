@@ -28,6 +28,7 @@ SELECT
     crn_finished_at AS ts_crn_finished,
     key_delivery_finished_at AS ts_key_delivery_finished,
     cri_finished_at AS ts_cri_finished,
+    seller_paid_at AS ts_seller_paid,
     year,
     month,
     day

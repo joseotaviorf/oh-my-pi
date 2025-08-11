@@ -1,6 +1,6 @@
 database_name: datalake_sales_flow_clean
 table_name: sales_flow
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: SalesFlow main table that contains general info about the offers.
 columns:
@@ -28,6 +28,10 @@ columns:
     description: Closing type ID that indicates which process this offer is being done. This ID join with the ID on datalake_sales_flow_clean.closing_type.
     lineage:
       - datalake_sales_flow_raw.sales_flow.closing_type_id
+  id_visit_external:
+    description: External visit ID.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.visit_external_id
   flow_step:
     description: Which step this offer is on the sale process.
     lineage:

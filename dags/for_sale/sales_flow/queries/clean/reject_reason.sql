@@ -3,6 +3,7 @@ SELECT
     source,
     category,
     reason,
+    sub_reason,
     active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,

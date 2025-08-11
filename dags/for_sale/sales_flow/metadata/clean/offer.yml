@@ -1,6 +1,6 @@
 database_name: datalake_sales_flow_clean
 table_name: offer
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: Table that contains information about the offer made by the buyer.
 columns:
@@ -56,6 +56,30 @@ columns:
     description: Offer status.
     lineage:
       - datalake_sales_flow_raw.offer.status
+  furniture_will_be_left:
+    description: Indicates if the furniture will be left in the house.
+    lineage:
+      - datalake_sales_flow_raw.offer.furniture_will_be_left
+  preemptive_right:
+    description: Indicates if the preemptive right was used.
+    lineage:
+      - datalake_sales_flow_raw.offer.preemptive_right
+  seller_counter_proposal:
+    description: Indicates if the seller made a counter proposal.
+    lineage:
+      - datalake_sales_flow_raw.offer.seller_counter_proposal
+  updated_offer_price:
+    description: Indicates if the offer price was updated.
+    lineage:
+      - datalake_sales_flow_raw.offer.updated_offer_price
+  has_seller_done_onboarding:
+    description: Indicates if the seller has done the onboarding.
+    lineage:
+      - datalake_sales_flow_raw.offer.seller_has_done_onboarding
+  has_buyer_done_onboarding:
+    description: Indicates if the buyer has done the onboarding.
+    lineage:
+      - datalake_sales_flow_raw.offer.buyer_has_done_onboarding
   has_used_offer_suggestion:
     description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
     lineage:

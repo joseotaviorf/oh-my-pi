@@ -8,6 +8,7 @@ SELECT
     order_clause,
     variables,
     is_negotiation_clause,
+    clause_identifier,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
     year,

@@ -6,6 +6,7 @@ SELECT
     seller_onboarding_taskmaster_id AS id_seller_onboarding_taskmaster,
     buyer_hefesto_portfolio_unit_id AS id_buyer_hefesto_portfolio_unit,
     seller_hefesto_portfolio_unit_id AS id_seller_hefesto_portfolio_unit,
+    incubator_eop_taskmaster_id AS id_incubator_eop_taskmaster,
     opportunities_of_the_week,
     isolve_link,
     google_drive_link,

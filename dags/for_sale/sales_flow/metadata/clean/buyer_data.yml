@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: buyer_data
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: Table with the buyer information that will be used on the CCV. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
 columns:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_sales_flow_raw.buyer_data.docx_folder_id
   name:
-    description: User name
+    description: Buyer full name
     lineage:
       - datalake_sales_flow_raw.buyer_data.name
   email:
@@ -37,6 +37,14 @@ columns:
     description: Indicate if this user is a CCV signer.
     lineage:
       - datalake_sales_flow_raw.buyer_data.signer_status
+  investor:
+    description: Indicates if this user is an investor.
+    lineage:
+      - datalake_sales_flow_raw.buyer_data.investor
+  triage_status:
+    description: Triage status for this buyer.
+    lineage:
+      - datalake_sales_flow_raw.buyer_data.triage_status
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:

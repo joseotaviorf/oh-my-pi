@@ -1,6 +1,6 @@
 database_name: datalake_sales_flow_clean
 table_name: payment
-domain: ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 description: Table that contains information about the payment payment.
 columns:
@@ -36,6 +36,34 @@ columns:
     description: Status used to track the buyer's payment.
     lineage:
       - datalake_sales_flow_raw.payment.status
+  fgts_doc_submission_finished_by:
+    description: Who finished the FGTS doc submission.
+    lineage:
+      - datalake_sales_flow_raw.payment.fgts_doc_submission_finished_by
+  fgts_payment_finished_by:
+    description: Who finished the FGTS payment.
+    lineage:
+      - datalake_sales_flow_raw.payment.fgts_payment_finished_by
+  is_down_payment_paid:
+    description: Boolean indicating if the down payment was paid.
+    lineage:
+      - datalake_sales_flow_raw.payment.is_down_payment_paid
+  payment_type:
+    description: Type of the payment.
+    lineage:
+      - datalake_sales_flow_raw.payment.payment_type
+  ts_down_payment_paid:
+    description: Timestamp that indicates when the down payment was paid.
+    lineage:
+      - datalake_sales_flow_raw.payment.down_payment_paid_at
+  ts_fgts_doc_submission_finished:
+    description: Timestamp that indicates when the FGTS doc submission was finished.
+    lineage:
+      - datalake_sales_flow_raw.payment.fgts_doc_submission_finished_at
+  ts_fgts_payment_finished:
+    description: Timestamp that indicates when the FGTS payment was finished.
+    lineage:
+      - datalake_sales_flow_raw.payment.fgts_payment_finished_at
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:

@@ -1,52 +1,83 @@
 ---
 database_name: datalake_sales_flow_clean
 table_name: cash_payment
+domain: For Sale
+owner: thiago.bueno@quintoandar.com.br
+description: Contains information about cash payments within the sales flow.
 columns:
   id_cash_payment:
+    description: Unique ID for the cash payment record.
     lineage:
       - datalake_sales_flow_raw.cash_payment.id
   id_payment:
+    description: Foreign key to the main payment table.
     lineage:
       - datalake_sales_flow_raw.cash_payment.payment_id
   partner_notary:
+    description: Name or identifier of the partner notary.
     lineage:
       - datalake_sales_flow_raw.cash_payment.partner_notary
   status_notary_notes:
+    description: Status of the notary notes.
     lineage:
       - datalake_sales_flow_raw.cash_payment.status_notary_notes
   crn_details:
+    description: Details related to the CRN (Central de Registro Nacional).
     lineage:
       - datalake_sales_flow_raw.cash_payment.crn_details
   status_fgts:
+    description: Status of the FGTS (Fundo de Garantia do Tempo de Serviço) process.
     lineage:
       - datalake_sales_flow_raw.cash_payment.status_fgts
+  cash_value:
+    description: The amount of the cash payment.
+    lineage:
+      - datalake_sales_flow_raw.cash_payment.cash_value
+  is_notary_costs_paid:
+    description: Flag indicating if the notary costs have been paid.
+    lineage:
+      - datalake_sales_flow_raw.cash_payment.is_notary_costs_paid
+  is_total_price_paid:
+    description: Flag indicating if the total price has been paid.
+    lineage:
+      - datalake_sales_flow_raw.cash_payment.is_total_price_paid
   ts_crn_started:
+    description: Timestamp of when the CRN process started.
     lineage:
       - datalake_sales_flow_raw.cash_payment.crn_started_at
   ts_crn_returned:
+    description: Timestamp of when the CRN was returned.
     lineage:
       - datalake_sales_flow_raw.cash_payment.crn_returned_at
   ts_crn_ended:
+    description: Timestamp of when the CRN process ended.
     lineage:
       - datalake_sales_flow_raw.cash_payment.crn_ended_at
   ts_draft_fgts_started:
+    description: Timestamp of when the FGTS draft started.
     lineage:
       - datalake_sales_flow_raw.cash_payment.draft_fgts_started_at
   ts_draft_fgts_ended:
+    description: Timestamp of when the FGTS draft ended.
     lineage:
       - datalake_sales_flow_raw.cash_payment.draft_fgts_ended_at
   ts_created:
+    description: Timestamp of when the record was created.
     lineage:
       - datalake_sales_flow_raw.cash_payment.created_at
   ts_updated:
+    description: Timestamp of the last update to the record.
     lineage:
       - datalake_sales_flow_raw.cash_payment.updated_at
   year:
+    description: Year partition value.
     lineage:
       - datalake_sales_flow_raw.cash_payment.year
   month:
+    description: Month partition value.
     lineage:
       - datalake_sales_flow_raw.cash_payment.month
   day:
+    description: Day partition value.
     lineage:
       - datalake_sales_flow_raw.cash_payment.day
