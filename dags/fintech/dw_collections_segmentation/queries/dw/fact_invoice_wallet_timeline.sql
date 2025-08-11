@@ -288,7 +288,7 @@ SELECT
     i.invoice_delay_t2,
     c.contract_delay_t3 as invoice_delay_t3,
     IF(i.invoice_delay_t1 > 0, i.recovered_amount, 0) AS overdue_recovered_amount_t1,
-    IF(i.invoice_delay_t1 < =0, i.recovered_amount, 0) AS on_time_paid_amount_t1,
+    IF(i.invoice_delay_t1 <= 0, i.recovered_amount, 0) AS on_time_paid_amount_t1,
     IF(i.invoice_delay_t2 > 0, i.recovered_amount, 0) AS overdue_recovered_amount_t2,
     IF(i.invoice_delay_t2 <= 0, i.recovered_amount, 0) AS on_time_paid_amount_t2,
     IF(c.contract_delay_t3 > 0, i.recovered_amount, 0) AS overdue_recovered_amount_t3,
