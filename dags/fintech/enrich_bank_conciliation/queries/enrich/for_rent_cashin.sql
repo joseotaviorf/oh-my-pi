@@ -139,6 +139,7 @@ vans_checkout_union AS (
         AND (b.id_bank_boleto = 1 OR b.id_bank_boleto IS NULL)
         AND (NULLIF(b.company_use, '') IS NOT NULL OR NULLIF(b.document_number, '') IS NOT NULL)
         AND LOWER(b.document_number) NOT LIKE 'f%'
+        AND SUBSTRING(b.original_response, 24, 4) = 3922
 ),
 
 pre_vans_checkout AS (
