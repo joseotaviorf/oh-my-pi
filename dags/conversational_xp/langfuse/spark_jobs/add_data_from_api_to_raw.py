@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
+import os
 
 from langfuse import Langfuse
 from pyspark.sql.functions import lit, to_json, col
@@ -25,68 +25,57 @@ from quintoandar_logger import QuintoAndarLogger
 
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_languse_raw"
+JOB_NAME = "load_langfuse_raw"
 SOURCE = "langfuse"
-MAX_WORKERS = 10  # number of parallel workers for API calls
 PAGE_SIZE = 50
-MAX_RETRIES = 1  # number of retries for failed API calls
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def fetch_page_with_retry(langfuse, table_name, execution_date, page, limit=PAGE_SIZE, max_retries=MAX_RETRIES):
-    """Fetch a single page of data with retry logic and exponential backoff."""
-    for attempt in range(max_retries):
-        try:
-            if table_name == "scores":
-                resp = langfuse.api.score_v_2.get(
-                    from_timestamp=execution_date,
-                    page=page,
-                    limit=limit
-                )
-            elif table_name == "traces":
-                resp = langfuse.api.trace.list(
-                    from_timestamp=execution_date,
-                    page=page,
-                    limit=limit
-                )
-            elif table_name == "observations":
-                resp = langfuse.api.observations.get_many(
-                    from_start_time=execution_date,
-                    page=page,
-                    limit=limit
-                )
-            else:
-                raise Exception(f"Table {table_name} not found")
-            
-            return {
-                'page': page,
-                'data': [json.dumps(x.dict(), default=str) for x in resp.data],
-                'meta': resp.meta.dict() if hasattr(resp, 'meta') else {},
-                'success': True
-            }
-        except Exception as e:
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff: 1, 2, 4 seconds
-                logger.warning(f"Retry {attempt + 1}/{max_retries} for page {page} after {wait_time}s: {e}")
-                time.sleep(wait_time)
-            else:
-                logger.error(f"Failed to fetch page {page} after {max_retries} attempts: {e}")
-                return {'page': page, 'data': [], 'meta': {}, 'success': False}
+def fetch_page(langfuse, table_name, start_timestamp, end_timestamp, page, limit=PAGE_SIZE):
+    """Fetch a single page of data from start_timestamp to end_timestamp. Raise on failure."""
+    if table_name == "scores":
+        resp = langfuse.api.score_v_2.get(
+            from_timestamp=start_timestamp,
+            to_timestamp=end_timestamp,
+            page=page,
+            limit=limit,
+        )
+    elif table_name == "traces":
+        resp = langfuse.api.trace.list(
+            from_timestamp=start_timestamp,
+            to_timestamp=end_timestamp,
+            page=page,
+            limit=limit,
+        )
+    elif table_name == "observations":
+        resp = langfuse.api.observations.get_many(
+            from_start_time=start_timestamp,
+            to_start_time=end_timestamp,
+            page=page,
+            limit=limit,
+        )
+    else:
+        raise Exception(f"Table {table_name} not found")
+
+    return {
+        'page': page,
+        'data': [json.dumps(x.dict(), default=str) for x in resp.data],
+        'meta': resp.meta.dict() if hasattr(resp, 'meta') else {},
+    }
 
 
-def get_langfuse_data(langfuse, execution_date, table_name):
+def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name):
     """Retrieves data from Langfuse API using parallel requests for better performance."""
     limit = PAGE_SIZE
+    # use 80% of available CPU cores for the worker pool, minimum of 1
+    max_workers = max(1, int((os.cpu_count() or 1) * 0.8))
     
-    logger.info(f"Fetching data starting from execution_date {execution_date}")
-    logger.info(f"Using {MAX_WORKERS} workers with page size {limit}")
+    logger.info(f"Fetching data from start_timestamp {start_timestamp} to end_timestamp {end_timestamp}")
+    logger.info(f"Using {max_workers} workers with page size {limit}")
 
-    first_page_result = fetch_page_with_retry(langfuse, table_name, execution_date, 1, limit)
-    if not first_page_result['success']:
-        logger.error(f"Failed to fetch first page after {MAX_RETRIES} retries")
-        raise Exception(f"Critical error: Unable to fetch first page for table {table_name} from Langfuse API after {MAX_RETRIES} retry attempts")
+    first_page_result = fetch_page(langfuse, table_name, start_timestamp, end_timestamp, 1, limit)
     
     all_json_data = first_page_result['data']
     
@@ -101,29 +90,31 @@ def get_langfuse_data(langfuse, execution_date, table_name):
     pages_to_fetch = list(range(2, total_pages + 1))
     
     # use only as many workers as we have pages to fetch
-    num_workers = min(MAX_WORKERS, len(pages_to_fetch))
+    num_workers = min(max_workers, len(pages_to_fetch))
 
     
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         future_to_page = {
-            executor.submit(fetch_page_with_retry, langfuse, table_name, 
-                          execution_date, page, limit): page 
+            executor.submit(fetch_page, langfuse, table_name, start_timestamp, end_timestamp, page, limit): page
             for page in pages_to_fetch
         }
         
-        # collect results as they complete
+        # collect results as they complete; aggregate errors and raise after fetch phase
+        errors = []
         for future in as_completed(future_to_page):
             page = future_to_page[future]
             try:
                 result = future.result()
-                if result['success'] and result['data']:
+                if result.get('data'):
                     all_json_data.extend(result['data'])
-                else:
-                    logger.warning(f"Page {page} returned no data or failed")
             except Exception as e:
-                logger.error(f"Error processing page {page}: {e}")
+                errors.append((page, e))
+
+        if errors:
+            sample = ", ".join([f"page={p}: {str(e)}" for p, e in errors[:5]])
+            raise RuntimeError(f"{len(errors)} page request(s) failed: {sample}")
     
-    logger.info(f"Total records fetched for table {table_name}: {len(all_json_data)}")
+    logger.info(f"Total records for table {table_name}: {len(all_json_data)}")
     return all_json_data
 
 if __name__ == "__main__":
@@ -132,7 +123,8 @@ if __name__ == "__main__":
     parser.add_argument("dag_name")
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
-    parser.add_argument("execution_date")
+    parser.add_argument("start_timestamp")
+    parser.add_argument("end_timestamp")
     parser.add_argument("table_name")
 
     args = parser.parse_args()
@@ -140,16 +132,18 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
-    execution_date_str = args.execution_date
-    # fetch last 6 hours of data
-    execution_date = datetime.fromisoformat(execution_date_str) - timedelta(hours=2)
+    start_timestamp_str = args.start_timestamp
+    end_timestamp_str = args.end_timestamp
+
+    start_timestamp = datetime.fromisoformat(start_timestamp_str)  - timedelta(hours=2)
+    end_timestamp = datetime.fromisoformat(end_timestamp_str)
     partition_cols = ["year", "month", "day", "hour"]
 
     config_service = ConfigurationService(dag_name)
     langfuse_host = config_service.get_config("langfuse_host")
 
     logger.info(f"m=dag_name={dag_name}, environment={environment}, datalake_bucket={datalake_bucket}")
-    logger.info(f"m=table_name={table_name}, execution_date={execution_date}, execution_date_str={execution_date_str}")
+    logger.info(f"m=table_name={table_name}, start_timestamp={start_timestamp}, end_timestamp={end_timestamp}")
  
 
     base_dbutils = BaseDBUtils()
@@ -178,7 +172,7 @@ if __name__ == "__main__":
         host=langfuse_host
     )
 
-    json_data = get_langfuse_data(langfuse, execution_date, table_name)
+    json_data = get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name)
 
     if not json_data:
         logger.warning(f"No data found, skipping processing.")
@@ -191,10 +185,10 @@ if __name__ == "__main__":
             df = df.withColumn("metadata", to_json(col("metadata")))
         
         df = (
-            df.withColumn("year", lit(execution_date.year))
-            .withColumn("month", lit(execution_date.month))
-            .withColumn("day", lit(execution_date.day))
-            .withColumn("hour", lit(execution_date.hour))
+            df.withColumn("year", lit(start_timestamp.year))
+            .withColumn("month", lit(start_timestamp.month))
+            .withColumn("day", lit(start_timestamp.day))
+            .withColumn("hour", lit(start_timestamp.hour))
         )
 
         s3_loader.load_df(

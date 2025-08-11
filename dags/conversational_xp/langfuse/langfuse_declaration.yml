@@ -17,11 +17,13 @@ workflow:
   - "{environment}"
   - "{bucket}"
   - "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
   - "{table_name}"
 
   default_partitions: [year, month, day, hour]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
   tables_customization:
     scores:
       merge_on: [id_score]
