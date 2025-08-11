@@ -19,7 +19,7 @@ seu_barriga AS (
     SELECT
         id_external AS id_invoice,
         id_original_invoice_external,
-        UPPER(payment_company_use_number) AS company_use,
+        UPPER(REPLACE(payment_company_use_number, 'C!', '')) AS company_use,
         payment_status,
         status,
         paid_via,
