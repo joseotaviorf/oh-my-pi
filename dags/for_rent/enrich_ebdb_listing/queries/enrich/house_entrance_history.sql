@@ -292,7 +292,11 @@ contracts AS (
 SELECT
     fm.id,
     fm.id_house,
-    fm.id_occupant,
+    CASE
+        WHEN fm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND fm.ts_entrance_ended IS NOT NULL THEN 2
+        WHEN fm.occupant_type = 'Empty' AND c.status = 'Ativo' AND fm.ts_entrance_ended IS NULL THEN 2
+        ELSE fm.id_occupant
+    END AS id_occupant,
     CASE
         WHEN fm.occupant_type = 'Empty' AND c.status IN ('Ativo', 'Finalizado') AND fm.ts_entrance_ended IS NOT NULL THEN 'Tenant'
         WHEN fm.occupant_type = 'Empty' AND c.status = 'Ativo' AND fm.ts_entrance_ended IS NULL THEN 'Tenant'

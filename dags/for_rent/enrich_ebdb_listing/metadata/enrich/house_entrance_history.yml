@@ -16,7 +16,7 @@ columns:
   id_occupant:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_occupant
-    description: ID to represent who is occupying the house. This field come from the old model.
+    description: ID to represent who is occupying the house. This field come from the old model. If the occupant_type = Empty but the house was related with an active contract when the event occurred then id_occupant = 2.
     categories:
       '1': None
       '2': Tenant
