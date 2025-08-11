@@ -2,13 +2,13 @@ WITH
 subordinates AS (
   SELECT
     mh.id_manager_period_of_service,
-    SUM(IF(mh.is_direct_manager AND a.assignment_status_type = 'ACTIVE', 1, 0)) AS qnt_directly_led,
-    SUM(IF(NOT mh.is_direct_manager AND a.assignment_status_type = 'ACTIVE', 1, 0)) AS qnt_undirectly_led
+    SUM(IF(mh.is_direct_manager AND ed.assignment_status_type = 'ACTIVE', 1, 0)) AS qnt_directly_led,
+    SUM(IF(NOT mh.is_direct_manager AND ed.assignment_status_type = 'ACTIVE', 1, 0)) AS qnt_undirectly_led
   FROM
     datalake_hr_system.management_hierarchy AS mh
   LEFT JOIN
-    datalake_hr_system.assignment_effective_status AS a
-      ON a.id_assignment = mh.id_assignment
+    datalake_employment.employee_details AS ed
+      ON ed.id_assignment = mh.id_assignment
   GROUP BY
     mh.id_manager_period_of_service
 ),

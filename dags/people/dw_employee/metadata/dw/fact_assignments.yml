@@ -87,7 +87,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.career_track
       - datalake_hr_system.management_hierarchy.is_direct_manager
-      - datalake_hr_system.assignment_effective_status.assignment_status_type
+      - datalake_employment.employee_details.assignment_status_type
   has_self_declared_disability:
     description: "Flag (TRUE/FALSE) indicating if the employee has a self-declared disability."
     lineage:
@@ -101,12 +101,12 @@ columns:
     description: "Number of direct reports."
     lineage:
       - datalake_hr_system.management_hierarchy.is_direct_manager
-      - datalake_hr_system.assignment_effective_status.assignment_status_type
+      - datalake_employment.employee_details.assignment_status_type
   qnt_undirectly_led:
     description: "Number of indirect reports."
     lineage:
       - datalake_hr_system.management_hierarchy.is_direct_manager
-      - datalake_hr_system.assignment_effective_status.assignment_status_type
+      - datalake_employment.employee_details.assignment_status_type
   salary:
     description: "Employee's current salary amount."
     lineage:
