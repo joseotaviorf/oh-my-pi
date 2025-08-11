@@ -49,6 +49,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.booking_type,
   v.business_context,
   v.business_model,
+  v.business_model_supply,
+  v.business_model_demand,
   v.cancellation_reason,
   v.cancellation_on_behalf_of,
   v.cancellation_channel,

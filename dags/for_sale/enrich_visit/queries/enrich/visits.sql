@@ -94,6 +94,16 @@ SELECT
     visit.behavior,
     visit.booking_type,
     vbm.business_model,
+    CASE
+        WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 2) = '1P' THEN '1P'
+        WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 5) = 'SUPPLY' THEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 4)
+        WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 3) = 'SUPPLY' THEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 2)
+    END AS business_model_supply,
+    CASE
+        WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 2) = '1P' THEN '1P'
+        WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 3) = 'DEMAND' OR SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 3) = 'LEADGEN' THEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 2)
+        WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 5) = 'DEMAND' THEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 4)
+    END AS business_model_demand,
     visit_log.first_event,
     entry_model.key_location AS method,
     entry_model.entry_model_type,
@@ -143,8 +153,14 @@ SELECT
     IF(visit_log.author_role_visit_registered = 'AGENT', TRUE, FALSE) AS is_registered_by_agent,
     IF(visit_log.ts_visit_fup_collected IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
     IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
-    IF(visit_demand.id_visit IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
-    FALSE AS is_3p_supply,
+    CASE
+        WHEN business_model_demand = '3P' THEN TRUE
+        WHEN business_model_demand = '1P' THEN FALSE
+    END AS is_3p_demand,
+    CASE
+        WHEN business_model_supply = '3P' THEN TRUE
+        WHEN business_model_supply = '1P' THEN FALSE
+    END AS is_3p_supply,
     IF(pfa.id_pfa_history IS NOT NULL, TRUE, FALSE) AS is_fixed_agent,
     IF(computed_status IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
     CASE

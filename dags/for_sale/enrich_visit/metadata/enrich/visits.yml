@@ -135,8 +135,16 @@ columns:
     description: Type of the booking
   business_model:
     lineage:
-      - datalake_ebdb_clean.visit.business_model
+      - datalake_visit.visit_business_model.business_model
     description: Identify the business model of the visit.
+  business_model_supply:
+    lineage:
+      - datalake_visit.visit_business_model.business_model
+    description: Identify if the business model of supply is 1P or 3P.
+  business_model_demand:
+    lineage:
+      - datalake_visit.visit_business_model.business_model
+    description: Identify if the business model of demand (agent) is 1P or 3P.
   default_timezone:
     lineage:
       - datalake_ebdb_clean.country.default_timezone
@@ -205,8 +213,12 @@ columns:
   is_registered_by_agent:
     description: If the visit was registered by agent.
   is_3p_demand:
+    lineage:
+      - datalake_visit.visit_business_model.business_model
     description: If this visit is by 3p demand.
   is_3p_supply:
+    lineage:
+      - datalake_visit.visit_business_model.business_model
     description: If this visit is by 3p supply.
   is_fixed_agent:
     lineage:

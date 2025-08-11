@@ -77,6 +77,14 @@ columns:
     lineage:
       - datalake_visit.visits.business_model
     description: Identify the business model of the visit
+  business_model_supply:
+    lineage:
+      - datalake_visit.visits.business_model_supply
+    description: Identify if the business model of supply is 1P or 3P.
+  business_model_demand:
+    lineage:
+      - datalake_visit.visits.business_model_supply_demand
+    description: Identify if the business model of demand is 1P or 3P.
   cancellation_reason:
     lineage:
       - datalake_visit.visits.cancellation_reason
