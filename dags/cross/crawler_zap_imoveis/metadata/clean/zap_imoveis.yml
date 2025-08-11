@@ -1,0 +1,118 @@
+---
+database_name: datalake_crawler_zap_imoveis_clean
+table_name: zap_imoveis
+description: |
+  This table contains the data from the Zap Imóveis crawler.
+  Only the listings that have the city available are included in the table,
+  following the same logic of the raw table.
+  It is updated weekly, every Friday at 00:00, to update the data from the current week,
+  which is provided every wednesday by the crawler provider.
+domain: Cross
+owner: andre.melo@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.id
+    description: |
+      The ID of the listing.
+  origin:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.origin
+    description: |
+      The origin of the listing, in this case, it is always "zapimoveis".
+  address:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.address
+    description: |
+      The address of the listing.
+      It has all the fields of the address, such as: city, country, neighborhood,
+      number, state, street, and zip_code.
+  region:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.region
+    description: |
+      The region of the listing.
+  geolocation:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.geolocation
+    description: |
+      The geolocation of the listing.
+      It has the fields approximate_latitude, approximate_longitude, latitude,
+      longitude, and radius.
+  listing_name:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.name
+    description: |
+      The name of the listing.
+  crawl_metadata:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.crawl_metadata
+    description: |
+      The metadata of the crawl, with the listing url.
+  house_info:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.house_info
+    description: |
+      The house info of the listing.
+      It has all the main information about the house, such as, amenities, area,
+      bathrooms, bedrooms, description, floor, parking_spaces, suites, total_area,
+      unity_type, and usage_type.
+  type:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.type
+    description: |
+      The type of the listing, describe if it is buyable or rentable.
+    categories:
+      buyable: "For Sale"
+      rentable: "For Rent"
+  image_urls:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.image_urls
+    description: |
+      The list of image urls of the listing.
+  contact_information:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.contact_information
+    description: |
+      The contact information of the listing.
+      It has the fields advertiser_name and advertiser_phones.
+  price:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.price
+    description: |
+      The price of the listing.
+      It has the fields rent and sale.
+      Each one provides information about the price of the listing,
+      the yearly iptu value, and the condominium fee.
+  date_info:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.date_info
+    description: |
+      It has important information about the crawler date, also, when the listing
+      was created and when it was updated.
+  city:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.city
+    description: |
+      The city of the listing.
+      It is obtained from the address field, which contains the city.
+      All the listings where the city is not available are removed from the table.
+      It is a partition column.
+  year:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.year
+    description: |
+      The year of the crawler date.
+      It is a partition column.
+  month:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.month
+    description: |
+      The month of the crawler date.
+      It is a partition column.
+  day:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.day
+    description: |
+      The day of the crawler date.
+      It is a partition column.
