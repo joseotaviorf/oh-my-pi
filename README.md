@@ -1,17 +1,11 @@
 <table align="center">
   <tr>
     <th>Build Status</th>
-    <th>Coverage</th>
   </tr>
   <tr>
     <td>
         <a href="https://woodpecker.shared.quintoandar.com.br/quintoandar/bi-etl-ejuice">
             <img src="https://woodpecker.shared.quintoandar.com.br/api/badges/quintoandar/bi-etl-ejuice/status.svg" />
-        </a>
-    </td>
-    <td>
-        <a href="https://woodpecker.shared.quintoandar.com.br/quintoandar/bi-etl-ejuice">
-            <img src="https://s3.amazonaws.com/5a-coverage/bi-etl-ejuice/coverage_badge.svg" />
         </a>
     </td>
   </tr>

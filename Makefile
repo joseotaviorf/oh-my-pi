@@ -218,11 +218,11 @@ check-style:
 ###############################################################################
 ###################### Tests commands #########################################
 ###############################################################################
+
 .PHONY: tests
-## run all unit and integration tests with coverage report
+## run all unit and integration tests
 tests:
-	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov=bietlejuice/ --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
-	@python -m coverage xml -i
+	@python -m pytest -W ignore::DeprecationWarning tests
 
 .PHONY: unit-tests
 unit-tests:
@@ -230,16 +230,16 @@ unit-tests:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/ --cov-fail-under=35 tests/unit/
+	@python -m pytest -W ignore::DeprecationWarning tests/unit/
 
 .PHONY: integration-tests
-## run integration tests with coverage report
+## run integration tests
 integration-tests:
 	@echo ""
 	@echo "Integration Tests"
 	@echo "================="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report xml:integration-tests-cov.xml --cov=bietlejuice/ --cov-fail-under=0 tests/integration
+	@python -m pytest -W ignore::DeprecationWarning tests/integration
 
 .PHONY: files-validation
 files-validation:
@@ -320,14 +320,7 @@ create-dag-files:
 	@echo ""
 	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name)
 
-.PHONY: cov-badge
-## build coverage badge
-cov-badge:
-	@echo ""
-	@echo "Building Coverage Badge"
-	@echo "=========="
-	@echo ""
-	@coverage-badge -o coverage_badge.svg
+
 
 .PHONY: clean
 ## delete all compiled python files
@@ -338,10 +331,6 @@ clean:
 	@find ./ -type d -name 'python_logger.egg-info' -exec rm -rf {} +;
 	@find ./ -type d -name 'metastore_db' -exec rm -rf {} +;
 	@find ./ -type d -name 'htmlcov' -exec rm -rf {} +;
-	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
-	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
-	@find ./ -type f -name '.coverage' -exec rm -f {} \;
-	@find ./ -type f -name '*-cov.*' -exec rm -f {} \;
 	@find ./ -type f -name '*derby.log' -exec rm -f {} \;
 	@find ./ -type f -name '.version' -exec rm -f {} \;
 	@find ./ -type f -name '.package_name' -exec rm -f {} \;

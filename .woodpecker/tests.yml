@@ -8,7 +8,6 @@ steps:
       - make requirements-test
       - make requirements
       - make unit-tests
-      - make cov-badge
     when:
       event: push
     depends_on: [] # This is for the steps to run in parallel
@@ -24,15 +23,3 @@ steps:
       - make integration-tests
     when:
       event: push
-
-#  export-coverage:
-#    image: plugins/s3
-#    settings:
-#      bucket: 5a-coverage
-#      source: coverage_badge.svg
-#      target: ${CI_REPO_NAME}/
-#      acl: public-read
-#      cache_control: no-cache
-#    when:
-#      event: push
-#      branch: master
