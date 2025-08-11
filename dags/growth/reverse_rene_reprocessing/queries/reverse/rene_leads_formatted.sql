@@ -1,5 +1,5 @@
 
-SELECT 
+SELECT distinct
     hl.new_id AS leadId,
     hl.created_at AS createdAt,
     'lead' AS eventType,
@@ -17,10 +17,7 @@ SELECT
         'regionSlug', a.region_slug
     )) AS address,
     to_json(named_struct(
-        'ownerId', per.id,
-        'personUUId', per.uuid_person,
-        'name', per.person_name,
-        'phoneNumber', ci.contact_info
+        'phoneNumber', p.phone_nr
     )) AS owner,
     to_json(named_struct(
         'area', get_json_object(ac.house_info, '$.area'),
@@ -45,12 +42,6 @@ LEFT JOIN
 LEFT JOIN 
     datalake_rene_descartes_raw.phone p 
     ON hl.house_owner_id = p.owner_id
-LEFT JOIN 
-    datalake_person_clean.contact_info ci 
-    ON p.phone_nr = ci.contact_info
-LEFT JOIN 
-    datalake_person_clean.person per 
-    ON ci.id_person = per.id
 WHERE  hl.new_id  IS NOT NULL
-AND a.street_name != NULL 
+AND a.street_name IS NOT NULL 
 OR (a.lat IS NOT NULL AND a.lng IS NOT NULL)
