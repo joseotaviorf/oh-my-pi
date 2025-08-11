@@ -1495,18 +1495,35 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.gsheets_agents:done-clean-rent-comission-for-strategic-region:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region:first-run-of-day
 bietlejuice.enrich_collections_quintoandar:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-button-tapped-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-failure-view-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-pending-view-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-success-view-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-try-again-tapped-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-menu-page-onload-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-menu-page-payment-cta-onclick-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-menu-page-payment-option-select-onclick-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-review-check-negotiation-cta-onclick-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-review-check-negotiation-page-onload-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-contract-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-my-rent-pending-invoices-card-view-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-invoice-pay-button-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-invoice-pay-total-button-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-page-viewed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-payment-option-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-payment-option-viewed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-payment-options-closed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-total-payment-option-viewed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-cta-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-invoice-pay-button-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-negotiation-cta-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-pay-total-cta-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-payment-option-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-payment-option-clicked-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-invoice-payment-option-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-payment-option-closed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-started-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-pending-invoices-page-viewed-events:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution:first-run-of-day

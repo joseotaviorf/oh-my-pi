@@ -747,6 +747,21 @@ workflow:
     170698_checkout_order_credit_card_try_again_tapped_events:
       run_optimize: false
       run_vacuum: false
+    170698_coll_review_check_negotiation_page_onload_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_coll_review_check_negotiation_cta_onclick_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_coll_negotiation_menu_page_onload_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_coll_negotiation_menu_page_payment_option_select_onclick_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_coll_negotiation_menu_page_payment_cta_onclick_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new
