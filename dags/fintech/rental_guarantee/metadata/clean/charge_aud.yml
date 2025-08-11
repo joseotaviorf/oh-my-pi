@@ -1,87 +1,137 @@
 database_name: datalake_rental_guarantee_clean
 table_name: charge_aud
+domain: Fintech
+description: "Audit log of charge records from Rental Guarantee, including revision metadata and field-level change tracking (mod_* columns)."
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.id
+    description: "Unique identifier of the charge."
   id_guarantee:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.guarantee_id
+    description: "Identifier of the related guarantee."
+  id_checkout_order:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.checkout_order_id
+    description: "Identifier of the Checkout order associated with this charge."
   rev:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.rev
+    description: "Audit revision identifier."
   rev_end:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.revend
+    description: "Audit revision end identifier."
   rev_type:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.revtype
+    description: "Audit change type for the revision (e.g., insert, update, delete)."
   cancellation_reason:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.cancellation_reason
+    description: "Reason the charge was canceled, when applicable."
   card_token:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.card_token
+    description: "Masked token representing the card used for the payment, when applicable."
   emv:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.emv
+    description: "EMV-related payload or data for card transactions, when available."
   installments:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.installments
+    description: "Number of installments configured for the charge."
   pix_link:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.pix_link
+    description: "PIX payment link generated for the charge, when applicable."
   qr_code:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.qr_code
+    description: "QR code payload for PIX payment, when applicable."
   charge_status:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.status
+    description: "Current processing status of the charge."
   charge_type:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.type
+    description: "Type/category of the charge (e.g., initial, renewal)."
   refund_amount:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.refund_amount
+    description: "Amount refunded for this charge, if any."
+  checkout_order_hash:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.checkout_order_hash
+    description: "Hash reference for the associated Checkout order."
+  external_source:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.external_source
+    description: "External system that originated the charge, when present."
   mod_id_guarantee:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.guarantee_id_mod
+    description: "Flag indicating modification of guarantee_id on this revision."
   mod_cancellation_reason:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.cancellation_reason_mod
+    description: "Flag indicating modification of cancellation_reason on this revision."
   mod_card_token:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.card_token_mod
+    description: "Flag indicating modification of card_token on this revision."
   mod_emv:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.emv_mod
+    description: "Flag indicating modification of emv on this revision."
   mod_installments:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.installments_mod
+    description: "Flag indicating modification of installments on this revision."
   mod_pix_link:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.pix_link_mod
+    description: "Flag indicating modification of pix_link on this revision."
   mod_qr_code:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.qr_code_mod
+    description: "Flag indicating modification of qr_code on this revision."
   mod_charge_status:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.status_mod
+    description: "Flag indicating modification of status on this revision."
   mod_charge_type:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.type_mod
+    description: "Flag indicating modification of type on this revision."
   mod_refund_amount:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.refund_amount_mod
+    description: "Flag indicating modification of refund_amount on this revision."
+  mod_checkout_order_hash:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.checkout_order_hash_mod
+    description: "Flag indicating modification of checkout_order_hash on this revision."
+  mod_id_checkout_order:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.checkout_order_id_mod
+    description: "Flag indicating modification of checkout_order_id on this revision."
   mod_ts_created:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.created_at_mod
+    description: "Flag indicating modification of created_at on this revision."
   mod_ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.updated_at_mod
+    description: "Flag indicating modification of updated_at on this revision."
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.created_at
+    description: "Creation timestamp recorded on the audit row."
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.updated_at
+    description: "Update timestamp recorded on the audit row."
