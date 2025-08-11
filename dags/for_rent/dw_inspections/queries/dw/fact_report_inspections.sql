@@ -1,3 +1,29 @@
+WITH
+last_reviewer as (
+    SELECT
+        id_inspection,
+        reviewer_type,
+        is_approved,
+        ts_approved
+    FROM
+        datalake_inspections.reviewer
+    WHERE
+        approval_type = 'REVIEW'
+    QUALIFY
+         ROW_NUMBER() OVER (PARTITION BY id_assessment, reviewer_type ORDER BY ts_approved DESC) = 1
+),
+reviewer AS (
+    SELECT
+        id_inspection,
+        MAX(reviewer_type = 'OWNER' AND lr.is_approved) AS has_owner_approved_review,
+        MAX(reviewer_type = 'TENANT' AND lr.is_approved) AS has_tenant_approved_review,
+        MAX(IF(reviewer_type = 'OWNER' AND lr.is_approved, ts_approved, NULL)) AS ts_owner_approved_review,
+        MAX(IF(reviewer_type = 'TENANT' AND lr.is_approved, ts_approved, NULL)) AS ts_tenant_approved_review
+    FROM
+        last_reviewer AS lr
+    GROUP BY
+        ALL
+)
 SELECT
     isa.id_inspection AS sk_inspection,
     ra.id_assessment AS sk_assessment,
@@ -16,8 +42,8 @@ SELECT
     isa.has_tenant_access_review,
     isa.has_owner_access_budget_approval,
     isa.has_tenant_access_budget_approval,
-    CASE WHEN ra.approval_type = 'REVIEW' THEN ra.owner_approved END AS has_owner_approved_review,
-    CASE WHEN ra.approval_type = 'REVIEW' THEN ra.tenant_approved END AS has_tenant_approved_review, 
+    r.has_owner_approved_review,
+    r.has_tenant_approved_review,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.owner_approved END AS has_owner_approved_budget_approval,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.tenant_approved END AS has_tenant_approved_budget_approval,
     ra.is_early_both_agree,
@@ -50,8 +76,8 @@ SELECT
     isa.ts_last_tenant_access_budget_approval,
     isc.ts_budget_approval_started_by_tenant,
     isc.ts_reviewed,
-    CASE WHEN ra.approval_type = 'REVIEW' THEN ra.ts_owner_approved END AS ts_owner_approved_review, 
-    CASE WHEN ra.approval_type = 'REVIEW' THEN ra.ts_tenant_approved END AS ts_tenant_approved_review, 
+    r.ts_owner_approved_review,
+    r.ts_tenant_approved_review,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.ts_owner_approved END AS ts_owner_approved_budget_approval,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.ts_tenant_approved END AS ts_tenant_approved_budget_approval,
     CASE WHEN ra.approval_type = 'REVIEW' THEN ra.dt_owner_limit_revision END AS ts_owner_limit_revision,
@@ -66,12 +92,15 @@ FROM
     datalake_amplitude_inspections.inspection_stages_access AS isa
 LEFT JOIN
     datalake_inspections.repair_request AS rr
-      ON isa.id_inspection = rr.id_inspection
+        ON isa.id_inspection = rr.id_inspection
 LEFT JOIN
     datalake_inspections.report_approvals AS ra
         ON isa.id_inspection = ra.id_inspection
 LEFT JOIN
     datalake_inspections.inspection_status_change AS isc
         ON isa.id_inspection = isc.id_inspection
+LEFT JOIN
+    reviewer AS r
+        ON isa.id_inspection = r.id_inspection
 GROUP BY
     ALL
