@@ -191,6 +191,31 @@ cpf_agg_contracts AS (
     FROM
         datalake_ebdb_clean.contract_person
     GROUP BY 1
+),
+rent_flow_emails AS (
+    SELECT DISTINCT
+        rf.id_contract,
+        rf.id_client,
+        h.id_user AS id_owner,
+        u_owner.email AS owner_email,
+        u_client.email AS client_email
+    FROM
+        datalake_ebdb_rent_flow.rent_flow AS rf
+    LEFT JOIN
+        datalake_ebdb_clean.contract AS c
+            ON c.id_house = rf.id_house
+            AND c.id = rf.id_contract
+    LEFT JOIN
+        datalake_ebdb_clean.house AS h
+            ON h.id = rf.id_house
+    LEFT JOIN
+        datalake_ebdb_clean.user AS u_owner
+            ON h.id_user = u_owner.id
+    LEFT JOIN
+        datalake_ebdb_clean.user AS u_client
+            ON rf.id_client = u_client.id
+    WHERE
+        c.ts_signed IS NOT NULL
 )
 SELECT
     cp.id AS id_contract_person,
@@ -229,6 +254,12 @@ SELECT
         (cp.type = 'Inquilino' AND cp.id_user = cusr.id_user_tenant)
         OR (cp.type = 'Proprietario' AND cp.id_user = cusr.id_user_owner),
     FALSE) AS is_contract_user,
+    CASE
+      WHEN (cp.type = 'Proprietario' AND rfe_owner.id_owner IS NOT NULL)
+        OR (cp.type = 'Inquilino' AND rfe_client.id_client IS NOT NULL)
+      THEN TRUE
+      ELSE FALSE
+    END AS is_rent_flow_user,
     (cp.id_contract = COALESCE(uag.id_first_contract, cag.id_first_contract)) AS is_first_contract,
     (cp.id_contract = COALESCE(uag.id_last_contract, cag.id_last_contract)) AS is_last_contract,
     cp.dt_birth,
@@ -258,3 +289,11 @@ LEFT JOIN
 LEFT JOIN
     cpf_validator AS cv
         ON cp.id = cv.id
+LEFT JOIN
+    rent_flow_emails AS rfe_owner
+        ON rfe_owner.id_contract = cp.id_contract
+        AND rfe_owner.owner_email = cp.email
+LEFT JOIN
+    rent_flow_emails AS rfe_client
+        ON rfe_client.id_contract = cp.id_contract
+        AND rfe_client.client_email = cp.email

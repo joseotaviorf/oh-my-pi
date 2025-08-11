@@ -12,6 +12,7 @@ SELECT
     is_valid_cpf,
     is_valid_cnpj,
     is_contract_user,
+    is_rent_flow_user,
     is_living,
     is_first_contract,
     is_last_contract,

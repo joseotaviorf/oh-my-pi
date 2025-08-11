@@ -1888,6 +1888,7 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead:first-run-of-day
   - bietlejuice.rental_management:load-clean-condo-monitoring-actions:first-run-of-day

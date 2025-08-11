@@ -85,6 +85,8 @@ columns:
     description: Boolean indicating whether the person related to the contract is an user.
   is_contract_user:
     description: Boolean indicating whether the person's user matches the user related to the contract and property.
+  is_rent_flow_user:
+    description: Boolean indicating whether the person related to the contract is also present in the Rent Flow in the same contract role.
   is_first_contract:
     description: Boolean indicating whether the contract is the first one related to the person.
   is_last_contract:
