@@ -1,3 +1,14 @@
+WITH
+history_check AS (
+    SELECT
+        *,
+        LAG(indicator_content, 1) OVER (
+            PARTITION BY id_creditor, id_customer, id_product, id_contract, id_indicator
+            ORDER BY ts_load
+        ) AS previous_value
+    FROM
+        datalake_recupera_raw.indicator_contracts
+)
 SELECT
     id_creditor,
     id_customer,
@@ -12,5 +23,7 @@ SELECT
     month,
     day
 FROM
-    datalake_recupera_raw.indicator_contracts
-QUALIFY row_number() OVER(PARTITION BY id_creditor, id_customer, id_product, id_contract, id_indicator, indicator_content, content_description ORDER BY ts_load) = 1
+    history_check
+WHERE
+    previous_value IS NULL
+    OR indicator_content <> previous_value
