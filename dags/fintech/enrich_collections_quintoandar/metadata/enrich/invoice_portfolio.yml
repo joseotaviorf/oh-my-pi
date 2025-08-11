@@ -1,7 +1,7 @@
 database_name: datalake_collections_quintoandar
 table_name: invoice_portfolio
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   Centralized table containing all tenant invoices, excluding canceled ones, used as the single source of truth for Collections & Evictions analysis.
   It includes all invoices, with relevant tags for first payments, write-offs, and payment delays, providing a comprehensive view of the tenant's financial history.
@@ -18,6 +18,10 @@ columns:
     description: External identifier for the original invoice before any adjustments.
     lineage:
       - datalake_retsuko.invoice.id_original_invoice_external
+  id_invoice_anchor:
+    description: Identifier for the anchor invoice in negotiation relationships, representing the parent invoice that serves as reference.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.id_invoice
   id_account:
     description: Unique identifier for the account associated with the invoice.
     lineage:
@@ -30,6 +34,34 @@ columns:
     description: Business key for the contract, representing a globally unique identifier used for integration with external systems.
     lineage:
       - datalake_retsuko.invoice.id_contract_external
+  id_negotiation_parent:
+    description: Identifier for the parent negotiation associated with the invoice.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.id_negotiation
+  id_negotiation_child:
+    description: Identifier for the child negotiation associated with the invoice.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.id_negotiation
+  negotiation_installment_number:
+    description: Installment number in the negotiation agreement.
+    lineage:
+      - datalake_collections_quintoandar.installment.installment_number
+  is_child_negotiation:
+    description: Flag indicating if this invoice is part of a child negotiation.
+    lineage:
+      - datalake_collections_quintoandar.debt_negotiated.id_negotiation
+  has_child:
+    description: Flag indicating if this invoice has child negotiation records.
+    lineage:
+      - datalake_collections_quintoandar.debt_negotiated.id_negotiation
+  child_negotiation_agency:
+    description: Agency responsible for the child negotiation.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.advisory
+  has_app_action_event:
+    description: Flag indicating if there are app action events associated with this invoice.
+    lineage:
+      - datalake_collections_quintoandar.delinquency_app_events.ts_event
   id_audit:
     description: Identifier for the audit trail associated with the invoice.
     lineage:
@@ -74,30 +106,54 @@ columns:
     description: Detailed substatus of the invoice, providing additional context to the main status (e.g., debt, ongoing negotiation).
     lineage:
       - datalake_retsuko.invoice.substatus
-  negotiation_status:
-    description: Status indicating if the invoice is part of a negotiation process.
-    lineage:
-      - datalake_retsuko.invoice.negotiation_status
-  paid_via:
-    description: Method used to pay the invoice (e.g., bank transfer, credit card).
-    lineage:
-      - datalake_retsuko.invoice.paid_via
   purpose:
     description: Purpose or reason for the invoice generation (e.g., monthly rent, early termination, security deposit).
     lineage:
       - datalake_retsuko.invoice.purpose
-  closing_mode:
-    description: Method used to close the invoice (e.g., manual, automatic).
-    lineage:
-      - datalake_retsuko.invoice.closing_mode
   reason:
     description: Reason for the invoice status or adjustments (e.g., negotiation, agreement, early termination).
     lineage:
       - datalake_retsuko.invoice.reason
+  recovery_channel:
+    description: Classification of the recovery method used for the invoice based on payment status, negotiation details, and origin agreement.
+    lineage:
+      - datalake_retsuko.invoice.status
+      - datalake_retsuko.invoice.reason
+      - datalake_collections_quintoandar.negotiation.id_negotiation
+      - datalake_collections_quintoandar.negotiation.origin_agreement
+      - datalake_collections_quintoandar.negotiation.advisory
+  digital_recovery:
+    description: Classification of the recovery channel as digital or non-digital based on the recovery method used (BPO, DIGITAL, DIGITAL EXTERNAL PARTNERS, or NON DIGITAL OTHERS).
+    lineage:
+      - datalake_retsuko.invoice.status
+      - datalake_retsuko.invoice.reason
+      - datalake_collections_quintoandar.negotiation.origin_agreement
+      - datalake_collections_quintoandar.negotiation.advisory
+  paid_via:
+    description: Method used to pay the invoice (e.g., bank transfer, credit card).
+    lineage:
+      - datalake_retsuko.invoice.paid_via
+  closing_mode:
+    description: Method used to close the invoice (e.g., manual, automatic).
+    lineage:
+      - datalake_retsuko.invoice.closing_mode
   country_code:
     description: Country code associated with the contract.
     lineage:
       - datalake_retsuko.invoice.country_code
+  is_negative_eligible:
+    description: Flag indicating if the invoice is eligible for negative billing processes.
+    lineage:
+      - datalake_trato_feito_clean.bill.negativate
+  negotiation_promisse_payment_method:
+    description: Payment method promised during the negotiation process.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.promisse_payment_method
+  net_rate_recovery:
+    description: Calculated recovery rate representing the ratio of down payment amount to original debt amount in negotiation agreements.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.down_payment_amount
+      - datalake_collections_quintoandar.negotiation.original_debt_amount
   due_amount:
     description: Total amount due for the invoice.
     lineage:
@@ -126,22 +182,34 @@ columns:
     description: Indicates if the contract associated with the invoice has been written off as a loss.
     lineage:
       - datalake_retsuko.invoice.is_contract_write_off
-  is_first_payment_default:
-    description: Indicates if this is the first defaulted payment for the contract, used for FPD (First Payment Default) analysis.
+  is_first_payment:
+    description: Flag indicating if this is the first payment for the contract.
     lineage:
-      - datalake_retsuko.invoice.is_first_payment_default
-  delay_first_payment_default:
-    description: Number of days between the due date of the first defaulted payment and its actual payment date.
-    lineage:
-      - datalake_retsuko.invoice.delay_first_payment_default
+      - datalake_retsuko.invoice.is_first_payment
   dt_due_adjusted:
     description: Adjusted due date for the invoice, considering any manual adjustments.
+    lineage:
+      - datalake_retsuko.invoice.dt_due_adjusted
+  dt_invoice_anchor:
+    description: Due date of the anchor invoice in negotiation relationships.
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+  dt_adjusted_invoice_anchor:
+    description: Adjusted due date of the anchor invoice in negotiation relationships.
     lineage:
       - datalake_retsuko.invoice.dt_due_adjusted
   dt_contract_annulled:
     description: Date when the contract associated with the invoice was annulled.
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
+  dt_created_negotiation_parent:
+    description: Creation date of the parent negotiation.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.dt_promisse
+  dt_created_negotiation_child:
+    description: Creation date of the child negotiation.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.dt_promisse
   ts_write_off:
     description: Timestamp when the invoice was written off as a loss.
     lineage:
@@ -210,3 +278,5 @@ columns:
     description: Timestamp when the last app action event occurred.
     lineage:
       - datalake_collections_quintoandar.negotiation.ts_event
+  ts_load:
+    description: Timestamp when the record was loaded into the table.
