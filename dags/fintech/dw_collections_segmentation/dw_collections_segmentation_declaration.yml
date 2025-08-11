@@ -1,0 +1,14 @@
+dag:
+  name: dw_collections_segmentation
+  schedule_start_date: 2025, 8, 08
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates tables for collections segmentation analysis in QuintoAndar context.
+      Contains tables for timeline analysis and wallet segmentation for collections operations.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: collections_segmentation
+cluster:
+  type: databricks_13_3_med_general_cluster

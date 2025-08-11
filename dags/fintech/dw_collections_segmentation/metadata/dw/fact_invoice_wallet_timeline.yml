@@ -1,0 +1,180 @@
+---
+database_name: dw_collections_segmentation
+table_name: invoice_wallet_timeline
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Daily timeline of invoices in QuintoAndar collections context with wallet segmentation metrics.
+  Contains detailed timeline information for each invoice including delay contamination analysis,
+  recovery channel information, and bill item composition for collections analysis.
+columns:
+  id_contract:
+    description: Contract identifier
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.id_contract
+  id_invoice:
+    description: Invoice identifier
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.id_invoice
+  id_negotiation_parent:
+    description: Parent negotiation identifier
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_parent
+  id_negotiation_child:
+    description: Child negotiation identifier
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_child
+  is_child_negotiation:
+    description: Flag indicating if this is a child negotiation
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  is_negative_eligible:
+    description: Flag indicating if eligible for negative operations
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.is_negative_eligible
+  has_child:
+    description: Flag indicating if has child negotiations
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.has_child
+  negotiation_promisse_payment_method:
+    description: Payment method promised in negotiation
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.negotiation_promisse_payment_method
+  invoice_status:
+    description: Current status of the invoice
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+  payment_status:
+    description: Payment status at reference date
+  contract_status:
+    description: Contract status (Active/Finished) at reference date
+  invoice_type:
+    description: Type of invoice (purpose)
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.purpose
+  recovery_channel:
+    description: Recovery channel assigned to the invoice
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
+  anchor_delay_from_deal:
+    description: Days between deal creation and invoice anchor date
+  recovery_channel_timeline:
+    description: Recovery channel considering timeline (null if paid before reference)
+  has_negotiation_in_contract:
+    description: Flag indicating if contract has any negotiation
+  deal_status_on_delay:
+    description: Deal status classification based on delay (DEAL IN DELAY, DEAL ON TIME. DELAY AT ANCHOR, NOT-DEAL)
+  is_invoice_overdue_t1:
+    description: Flag indicating if invoice is overdue according to T1 methodology
+  is_invoice_overdue_t2:
+    description: Flag indicating if invoice is overdue according to T2 methodology
+  is_invoice_overdue_t3:
+    description: Flag indicating if invoice is overdue according to T3 methodology
+  delay_invoice_at_reference:
+    description: Days of delay for the invoice at reference date
+  net_rate_recovery:
+    description: Net recovery rate for written-down invoices
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+  negotiation_installment_number:
+    description: Installment number in negotiation
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.negotiation_installment_number
+  due_amount:
+    description: Amount due for the invoice
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.due_amount
+  recovered_amount:
+    description: Amount recovered at reference date
+  has_bill_item_condominio:
+    description: Flag indicating presence of condominium bill items
+  has_bill_item_multa_recisoria:
+    description: Flag indicating presence of termination fine bill items
+  has_bill_item_acordo:
+    description: Flag indicating presence of agreement bill items
+  has_bill_item_rental_core:
+    description: Flag indicating presence of rental core bill items
+  has_bill_item_reparos:
+    description: Flag indicating presence of repair bill items
+  has_bill_item_multas_ongoing:
+    description: Flag indicating presence of ongoing fine bill items
+  has_bill_item_utilidades:
+    description: Flag indicating presence of utilities bill items
+  has_bill_item_outros:
+    description: Flag indicating presence of other bill items
+  balance_bill_item_condominio:
+    description: Balance amount for condominium bill items
+  balance_bill_item_multa_recisoria:
+    description: Balance amount for termination fine bill items
+  balance_bill_item_acordo:
+    description: Balance amount for agreement bill items
+  balance_bill_item_rental_core:
+    description: Balance amount for rental core bill items
+  balance_bill_item_reparos:
+    description: Balance amount for repair bill items
+  balance_bill_item_multas_ongoing:
+    description: Balance amount for ongoing fine bill items
+  balance_bill_item_utilidades:
+    description: Balance amount for utilities bill items
+  balance_bill_item_outros:
+    description: Balance amount for other bill items
+  anchor_delay_contract:
+    description: Maximum anchor delay from deal at contract level
+  invoice_delay_t1:
+    description: Invoice delay using T1 methodology (basic delay)
+  invoice_delay_t2:
+    description: Invoice delay using T2 methodology (with deal contamination)
+  invoice_delay_t3:
+    description: Invoice delay using T3 methodology (contract level contamination)
+  overdue_recovered_amount_t1:
+    description: Amount recovered from overdue invoices (T1 methodology)
+  on_time_paid_amount_t1:
+    description: Amount paid on time (T1 methodology)
+  overdue_recovered_amount_t2:
+    description: Amount recovered from overdue invoices (T2 methodology)
+  on_time_paid_amount_t2:
+    description: Amount paid on time (T2 methodology)
+  overdue_recovered_amount_t3:
+    description: Amount recovered from overdue invoices (T3 methodology)
+  on_time_paid_amount_t3:
+    description: Amount paid on time (T3 methodology)
+  contract_delay_t1:
+    description: Contract delay using T1 methodology
+  contract_delay_t3:
+    description: Contract delay using T3 methodology
+  contract_delay_t3_losses:
+    description: Contract delay for loss calculations (T3 methodology)
+  order_invoice_wallet_risk:
+    description: Ranking order for invoice in wallet based on risk (T2 delay)
+  order_invoice_wallet:
+    description: Ranking order for invoice in wallet based on T1 delay
+  dt_reference:
+    description: Reference date for the timeline
+  dt_due:
+    description: Invoice due date
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  dt_invoice_anchor:
+    description: Invoice anchor date
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+  dt_created_negotiation_parent:
+    description: Parent negotiation creation date
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+  dt_paid:
+    description: Invoice payment date
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  dt_paid_timeline:
+    description: Payment date considering timeline (null if paid after reference)
+  dt_created:
+    description: Invoice creation date
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.ts_created
+  dt_begin:
+    description: Timeline begin date (earliest between creation and payment)
+  dt_contract_annulled:
+    description: Contract annulment date
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.dt_contract_annulled
