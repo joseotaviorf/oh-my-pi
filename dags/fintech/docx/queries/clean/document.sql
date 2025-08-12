@@ -6,6 +6,7 @@ SELECT
     document_type_id AS id_document_type,
     country_code,
     attributes,
+    get_json_object(attributes, '$.cpf') AS cpf,
     attachments,
     created_at AS ts_created,
     updated_at AS ts_updated
