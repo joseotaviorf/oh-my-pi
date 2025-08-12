@@ -79,6 +79,23 @@ columns:
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
     lineage: 
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  gclid:
+    description: The google click identifier of the the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  fbclid:
+    description: The facebook click identifier of the the lead.
+    lineage:
+      - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  id_task: 
+    description: The ID for the lead creation task.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  quinto_andar_phone_number:
+    description: The QuintoAndar phone number the client used to get in touch and have their lead created.
+    lineage:
+      - datalake_customer_support.chats
+      - datalake_customer_support.calls
   original_lead:
     description: The identifier of the original lead if the current lead is a result of reprocessing process.
     lineage: 

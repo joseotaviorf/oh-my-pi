@@ -2,11 +2,12 @@ database_name: datalake_supply_flows
 table_name: acquisition_tracking
 domain: Growth
 owner: henrique.paulo@quintoandar.com.br
-description: This table is a union between 1P, 3P and CIQ leads and prospects. Also, contains information about the backfill of leads which doesn't have records in Rene Descartes. |
+description:
+  This table is a union between 1P, 3P and CIQ leads and prospects. Also, contains information about the backfill of leads which doesn't have records in Rene Descartes. |
   For understading backfill, please check this [notebook](https://dbc-931ee6e0-6803.cloud.databricks.com/?o=4531937035440038#notebook/2308696875379500/command/3611167693023950).
 columns:
   sk_supply_lead:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.sk_supply_lead
       - datalake_supply_flows.leads_1p.sk_supply_lead
       - datalake_supply_flows.prospects_1p.sk_supply_lead
@@ -16,7 +17,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.sk_supply_lead
     description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
   business_context:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.business_context
       - datalake_supply_flows.leads_1p.business_context
       - datalake_supply_flows.prospects_1p.business_context
@@ -26,7 +27,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.business_context
     description: The business context of the lead, referring to the business context where the lead originated.
   id_lead:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_lead
       - datalake_supply_flows.leads_1p.id_lead
       - datalake_supply_flows.prospects_1p.id_lead
@@ -36,7 +37,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.id_lead
     description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
   id_lead_ebdb:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_lead_ebdb
       - datalake_supply_flows.leads_1p.id_lead_ebdb
       - datalake_supply_flows.prospects_1p.id_lead_ebdb
@@ -46,7 +47,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.id_lead_ebdb
     description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
   id_region:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_region
       - datalake_supply_flows.leads_1p.id_region
       - datalake_supply_flows.prospects_1p.id_region
@@ -56,23 +57,23 @@ columns:
       - datalake_supply_flows.prospects_ciq.id_region
     description: The identifier for region in the 1P/3P/CIQ tables.
   id_user_registrant:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_user_registrant
       - datalake_supply_flows.leads_1p.id_user_registrant
       - datalake_supply_flows.prospects_1p.id_user_registrant
     description: The id_user of the registrant of the lead. It's not implemented in source databases yet.
   id_wololo:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_wololo
       - datalake_supply_flows.prospects_1p.id_wololo
     description: The id_prospect used in Wololo for the lead.
   id_house:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_house
       - datalake_supply_flows.prospects_1p.id_house
     description: The identifier for each house related in the 1P/3P/CIQ tables.
   id_referred_by:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.id_referred_by
       - datalake_supply_flows.leads_1p.id_referred_by
       - datalake_supply_flows.prospects_1p.id_referred_by
@@ -82,7 +83,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.id_referred_by
     description: The identifier of the user that referred the current lead.
   business_event:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.business_event
       - datalake_supply_flows.leads_1p.business_event
       - datalake_supply_flows.prospects_1p.business_event
@@ -92,7 +93,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.business_event
     description: The description of the business event of the lead.
   funnel_step:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.funnel_step
       - datalake_supply_flows.leads_1p.funnel_step
       - datalake_supply_flows.prospects_1p.funnel_step
@@ -102,7 +103,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.funnel_step
     description: The funnel step of the lead, referring to the funnel step in supply funnel.
   supply_source:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.supply_source
       - datalake_supply_flows.leads_1p.supply_source
       - datalake_supply_flows.prospects_1p.supply_source
@@ -111,19 +112,19 @@ columns:
       - datalake_supply_flows.leads_ciq.supply_source
       - datalake_supply_flows.prospects_ciq.supply_source
     description: The source of the lead, referring to the source where the lead originated.
-    category:
-      - 1P: The lead is from 1P.
-      - 3P: The lead is from 3P.
-      - CIQ: The lead is from CIQ.
+    categories:
+      1P: "The lead is from 1P."
+      3P: "The lead is from 3P."
+      CIQ: "The lead is from CIQ."
   drop_step_reason:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.drop_step_reason
       - datalake_supply_flows.prospects_1p.drop_step_reason
       - datalake_supply_flows.prospects_3p.drop_step_reason
       - datalake_supply_flows.prospects_ciq.drop_step_reason
     description: The reason for the drop of the lead, referring to the funnel step in supply funnel.
   funnel_level:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.funnel_level
       - datalake_supply_flows.leads_1p.funnel_level
       - datalake_supply_flows.prospects_1p.funnel_level
@@ -133,7 +134,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.funnel_level
     description: The funnel level of the lead, is useful for debug leads and prospects levels.
   aux_product_status:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.aux_product_status
       - datalake_supply_flows.leads_1p.aux_product_status
       - datalake_supply_flows.prospects_1p.aux_product_status
@@ -143,7 +144,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.aux_product_status
     description: Status of lead or prospect in the product databases.
   ts_event:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ts_event
       - datalake_supply_flows.leads_1p.ts_event
       - datalake_supply_flows.prospects_1p.ts_event
@@ -153,7 +154,7 @@ columns:
       - datalake_supply_flows.prospects_ciq.ts_event
     description: Timestamp indicating the time of the event.
   ts_load:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ts_load
       - datalake_supply_flows.leads_1p.ts_load
       - datalake_supply_flows.prospects_1p.ts_load
@@ -163,102 +164,112 @@ columns:
       - datalake_supply_flows.prospects_ciq.ts_load
     description: Timestamp indicating last update time of register.
   affiliate_type:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.affiliate_type
       - datalake_supply_flows.lead_origin.affiliate_type
     description: The type of the affiliate.
   campaign:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.campaign
       - datalake_supply_flows.lead_origin.campaign
     description: The utm_campaign that brings the lead.
   medium:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.medium
       - datalake_supply_flows.lead_origin.medium
     description: The utm_medium that brings the lead.
   source:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.source
       - datalake_supply_flows.lead_origin.source
     description: The utm_source that brings the lead.
   ops_agent:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ops_agent
       - datalake_supply_flows.lead_origin.ops_agent
     description: The operations agent that is responsible for registering the lead.
   ops_objective:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ops_objective
       - datalake_supply_flows.lead_origin.ops_objective
     description: Objective of the operations, could be acquisition or conversion.
   ops_partner:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ops_partner
       - datalake_supply_flows.lead_origin.ops_partner
     description: The name of the company that register the lead.
   ops_assigned:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ops_assigned
       - datalake_supply_flows.lead_origin.ops_assigned
     description: The name of the company that will be receive the lead for Wololo or Olos Dialer.
   application:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.application
       - datalake_supply_flows.lead_origin.application
     description: Origin of lead in the PWAs.
   landing_page:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.landing_page
       - datalake_supply_flows.lead_origin.landing_page
     description: The landing page the lead went to to register.
   reprocessed:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.reprocessed
       - datalake_supply_flows.lead_origin.reprocessed
     description: Tag of reprocessed by Rene Descartes.
   ops_approach:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ops_approach
       - datalake_supply_flows.lead_origin.ops_approach
     description: The approach of the operations, could be receptive or active.
   ops_contact_medium:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.ops_contact_medium
       - datalake_supply_flows.lead_origin.ops_contact_medium
     description: The medium of the contact, could be phone, email or chat.
   platform:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.platform
       - datalake_supply_flows.lead_origin.platform
     description: The name of platform that register the lead, as IoS, Android or Web.
   lead_type:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.lead_type
       - datalake_supply_flows.lead_origin.lead_type
     description: The type of the lead, that could be related with application.
   detailed_route:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.detailed_route
       - datalake_supply_flows.lead_origin.detailed_route
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
+  id_task:
+    lineage:
+      - datalake_supply_flows.acquisition_backfill.id_task
+      - datalake_supply_flows.lead_origin.id_task
+    description: The ID for the lead creation task.
+  quinto_andar_phone_number:
+    lineage:
+      - datalake_supply_flows.acquisition_backfill.quinto_andar_phone_number
+      - datalake_supply_flows.lead_origin.quinto_andar_phone_number
+    description: The QuintoAndar phone number the client used to get in touch and have their lead created.
   original_lead:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.original_lead
       - datalake_supply_flows.lead_origin.original_lead
     description: In cases of reprocessed leads, the id of original lead.
   database_tracking_campaign:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.database_tracking_campaign
       - datalake_supply_flows.lead_origin.database_tracking_campaign
     description: The source of utm_campaign, can be Amplitude or Rene Descartes.
   database_tracking_medium:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.database_tracking_medium
       - datalake_supply_flows.lead_origin.database_tracking_medium
     description: The source of utm_medium, can be Amplitude or Rene Descartes.
   database_tracking_source:
-    lineage: 
+    lineage:
       - datalake_supply_flows.acquisition_backfill.database_tracking_source
       - datalake_supply_flows.lead_origin.database_tracking_source
     description: The source of utm_source, can be Amplitude or Rene Descartes.

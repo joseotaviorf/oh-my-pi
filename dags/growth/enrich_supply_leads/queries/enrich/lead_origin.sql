@@ -20,25 +20,32 @@ WITH lead_origin_rene_descartes AS (
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.type') AS STRING) AS lead_type,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.detailedRoute') AS STRING) AS detailed_route,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.originalLead') AS BIGINT) AS original_lead,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.taskId') AS BIGINT) AS id_task,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.gclid') AS BIGINT) AS gclid,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.fbclid') AS BIGINT) AS fbclid,
     amd.ts_created AS ts_event
-  FROM datalake_rene_descartes_clean.house_lead AS hl
-  LEFT JOIN datalake_rene_descartes_clean.acquisition_misc_data AS amd
-    ON hl.id_acquisition = amd.id
-  WHERE DATE(amd.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-
+  FROM
+    datalake_rene_descartes_clean.house_lead AS hl
+  LEFT JOIN
+    datalake_rene_descartes_clean.acquisition_misc_data AS amd
+      ON hl.id_acquisition = amd.id
+  WHERE
+    DATE(amd.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 -- Rule to fix affiliate type, we get the original affiliate type
 affiliate_type_fix AS (
   SELECT
     lo_base.id_lead,
     lo_fix.affiliate_type AS first_affiliate_type
-  FROM lead_origin_rene_descartes AS lo_base
-  JOIN lead_origin_rene_descartes AS lo_fix
-    ON (lo_base.original_lead = lo_fix.id_lead_ebdb)
-  WHERE lo_base.affiliate_type IS NULL
+  FROM
+    lead_origin_rene_descartes AS lo_base
+  JOIN
+    lead_origin_rene_descartes AS lo_fix
+      ON (lo_base.original_lead = lo_fix.id_lead_ebdb)
+  WHERE
+    lo_base.affiliate_type IS NULL
     AND lo_fix.affiliate_type IS NOT NULL
 ),
-
 lead_origin_amplitude AS (
   -- Here, I collect data from Amplitude
   SELECT
@@ -52,11 +59,29 @@ lead_origin_amplitude AS (
     IF(city == '', '-1', city) AS city,
     IF(platform == '', '-1', platform) AS platform,
     ts_event
-  FROM datalake_amplitude_lead.lead_origin
-  WHERE DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  FROM
+    datalake_amplitude_lead.lead_origin AS lo
+  WHERE
+    DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(formfield_lead_uuid, id_firestore, id_lead) ORDER BY ts_event) = 1 -- Works if formfield_lead_uuid is a NULL
 ),
 
+phone_number AS (
+  SELECT DISTINCT
+    id_task,
+    twilio_phone_number as quinto_andar_phone_number
+  FROM
+    datalake_customer_support.chats
+  UNION ALL
+  SELECT DISTINCT
+    id_task,
+    CASE
+      WHEN direction = 'inbound' THEN to_phone_number
+      WHEN direction = 'outbound' THEN from_phone_number
+    END AS quinto_andar_phone_number
+  FROM
+    datalake_customer_support.calls
+),
 mid_table AS (
   SELECT
     r.id_lead AS id_lead,
@@ -78,6 +103,10 @@ mid_table AS (
     r.lead_type,
     r.detailed_route,
     r.original_lead,
+    r.id_task,
+    r.gclid,
+    r.fbclid,
+    pn.quinto_andar_phone_number,
     -- We're tracking how database is the source of our UTMs
     NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', 'lost_tracking'))) AS database_tracking_campaign,
     NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(a2.medium, 'amplitude', 'lost_tracking'))) AS database_tracking_medium,
@@ -85,15 +114,21 @@ mid_table AS (
     NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(a2.content, 'amplitude', 'lost_tracking'))) AS database_tracking_content,
     NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(a2.term, 'amplitude', 'lost_tracking'))) AS database_tracking_term,
     COALESCE(r.ts_event, a.ts_event) AS ts_event
-  FROM lead_origin_rene_descartes AS r
-  LEFT JOIN lead_origin_amplitude AS a
-    ON (a.id_lead = r.id_lead)
-  LEFT JOIN lead_origin_amplitude AS a2
-    ON (r.id_lead_ebdb = a2.id_lead_ebdb)
-  LEFT JOIN affiliate_type_fix AS atf
-    ON (r.id_lead = atf.id_lead)
+  FROM
+    lead_origin_rene_descartes AS r
+  LEFT JOIN
+    lead_origin_amplitude AS a
+      ON (a.id_lead = r.id_lead)
+  LEFT JOIN
+    lead_origin_amplitude AS a2
+      ON (r.id_lead_ebdb = a2.id_lead_ebdb)
+  LEFT JOIN
+    affiliate_type_fix AS atf
+      ON (r.id_lead = atf.id_lead)
+  LEFT JOIN
+    phone_number AS pn
+      ON (pn.id_task = r.id_task)
 )
-
 -- Hard rules
 SELECT DISTINCT
   id_lead,
@@ -121,6 +156,10 @@ SELECT DISTINCT
   SF_NORMALIZE_STRING(platform) AS platform,
   SF_NORMALIZE_STRING(lead_type) AS lead_type,
   SF_NORMALIZE_STRING(detailed_route) AS detailed_route,
+  gclid,
+  fbclid,
+  id_task,
+  REGEXP_EXTRACT(quinto_andar_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
   original_lead,
   database_tracking_campaign,
   database_tracking_medium,

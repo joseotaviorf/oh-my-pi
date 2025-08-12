@@ -117,6 +117,14 @@ columns:
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
     lineage:
       - datalake_supply_flows.acquisition_tracking.detailed_route
+  id_task:
+    description: The ID for the lead creation task.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.id_task
+  quinto_andar_phone_number:
+    description: The QuintoAndar phone number the client used to get in touch and have their lead created.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.quinto_andar_phone_number
   lead_application:
     description: Origin of acquisition in the PWAs.
     lineage:

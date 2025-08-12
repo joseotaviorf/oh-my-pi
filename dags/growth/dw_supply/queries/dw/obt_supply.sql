@@ -72,6 +72,8 @@ base AS (
         fse.utm_content AS nm_content,
         fse.utm_term AS nm_term,
         fse.nm_detailed_route,
+        fse.sk_task,
+        fse.quinto_andar_phone_number,
         dal.tp_lead,
         dfs.cd_funnel_step,
         dfs.tp_business_event,
