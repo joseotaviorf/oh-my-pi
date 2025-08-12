@@ -2201,7 +2201,6 @@ bietlejuice.enrich_hr_system:
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-codex-cost-centers:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-codex-cost-informations:first-run-of-day
-  - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
   - bietlejuice.hr_system:load-clean-workers:first-run-of-day
 bietlejuice.enrich_hr_system_custom:
