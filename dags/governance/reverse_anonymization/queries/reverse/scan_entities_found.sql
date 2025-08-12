@@ -100,13 +100,7 @@ SELECT
     END AS sample,
     TO_JSON(sample_summary) AS sample_summary,
     TO_JSON(col_summary) as col_summary,
-    CASE
-        WHEN highest_occur_sample = highest_occur_col THEN highest_occur_col
-        WHEN highest_occur_sample != highest_occur_col AND highest_occur_col = "NOT_FOUND" THEN highest_occur_sample
-        WHEN highest_occur_sample != highest_occur_col AND highest_occur_sample = "NOT_FOUND" THEN highest_occur_col
-        WHEN highest_occur_sample != highest_occur_col AND highest_occur_sample != "NOT_FOUND" AND highest_occur_col != "NOT_FOUND" THEN highest_occur_sample
-        ELSE "NOT_FOUND"
-    END AS initial_eval,
+    highest_occur_sample AS initial_eval,
     jd.year,
     jd.month,
     jd.day
