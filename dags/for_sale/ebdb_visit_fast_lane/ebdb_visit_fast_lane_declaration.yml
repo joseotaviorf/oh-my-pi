@@ -21,11 +21,13 @@ workflow:
     Visita:
       clean_table_name: visit
       clean_primary_keys: [id]
-      #z_order_by: [id]
+      raw_z_order_by: [id]
+      clean_z_order_by: [id]
     VisitStatusLog:
       clean_table_name: visit_status_log
       clean_primary_keys: [id_visit_status_log]
-      #z_order_by: [id_visit]
+      raw_z_order_by: [visit_id]
+      clean_z_order_by: [id_visit]
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new

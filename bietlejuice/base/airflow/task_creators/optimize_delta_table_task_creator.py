@@ -1,5 +1,6 @@
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.formatters.string_formatter import StringFormatter
+from bietlejuice.base.pipeline import LayerEnum
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
 
@@ -58,24 +59,37 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         default_vacuum_lite = self.dag_execution_context.workflow_args.get(
             "vacuum_lite", False
         )
-        return json.dumps(
-            {
-                table.table_name: {
-                    "schema": table.schema,
-                    "vacuum_retention_hours": table.table_customization.get(
-                        "vacuum_retention_hours", default_vacuum_retention_hours
-                    ),
-                    "run_optimize": table.table_customization.get(
-                        "run_optimize", default_run_optimize
-                    ),
-                    "run_vacuum": table.table_customization.get(
-                        "run_vacuum", default_run_vacuum
-                    ),
-                    "vacuum_lite": table.table_customization.get(
-                        "vacuum_lite", default_vacuum_lite
-                    ),
-                    "z_order_by": table.table_customization.get("z_order_by", []),
-                }
-                for table in tables_attributes
+
+        tables_config = {}
+        for table in tables_attributes:
+            default_z_order_by = table.table_customization.get("z_order_by", [])
+
+            if table.layer in (LayerEnum.TRANSACTIONAL, LayerEnum.RAW):
+                z_order_by = table.table_customization.get(
+                    "raw_z_order_by", default_z_order_by
+                )
+            elif table.layer == LayerEnum.CLEAN:
+                z_order_by = table.table_customization.get(
+                    "clean_z_order_by", default_z_order_by
+                )
+            else:
+                z_order_by = default_z_order_by
+
+            tables_config[table.table_name] = {
+                "schema": table.schema,
+                "vacuum_retention_hours": table.table_customization.get(
+                    "vacuum_retention_hours", default_vacuum_retention_hours
+                ),
+                "run_optimize": table.table_customization.get(
+                    "run_optimize", default_run_optimize
+                ),
+                "run_vacuum": table.table_customization.get(
+                    "run_vacuum", default_run_vacuum
+                ),
+                "vacuum_lite": table.table_customization.get(
+                    "vacuum_lite", default_vacuum_lite
+                ),
+                "z_order_by": z_order_by,
             }
-        )
+
+        return json.dumps(tables_config)
