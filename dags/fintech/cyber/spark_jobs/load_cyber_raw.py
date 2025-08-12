@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 
 from pyspark.sql.functions import col, current_timestamp, greatest, lit
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum
@@ -105,35 +106,40 @@ if __name__ == "__main__":
     oracle_consumer = OracleConsumer(conn_config, spark_client)
 
     oracle_table_name = table_name.upper()
+
     if extraction_type == "incremental" and date_filter_columns:
         df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date, excluded_fields)
     else:
         df = oracle_consumer.get_data_from_table(oracle_table_name, excluded_fields)
 
-        if purge_table:
-            df = df.withColumn("source", lit("Original Table"))
-            df_purge= oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP', excluded_fields)
-            df_purge = df_purge.withColumn("source", lit("Purge Table"))
+    df = df.withColumn("source", lit("Original Table"))
+    if purge_table:
 
-            # Get the columns from both DataFrames
-            existing_columns = set(df.columns)
-            new_columns = set(df_purge.columns)
+        if extraction_type == "incremental" and date_filter_columns:
+            df_purge = oracle_consumer.get_incremental_data_from_table(f'{oracle_table_name}_ESP', date_filter_columns, load_start_date, load_end_date, excluded_fields)
+        else:
+            df_purge = oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP', excluded_fields)
+        df_purge = df_purge.withColumn("source", lit("Purge Table"))
 
-            # Find missing columns in each DataFrame
-            missing_in_existing = new_columns - existing_columns
-            missing_in_new = existing_columns - new_columns
+        # Get the columns from both DataFrames
+        existing_columns = set(df.columns)
+        new_columns = set(df_purge.columns)
 
-            # Add missing columns to the DataFrames with null values
-            for columns_missing_existing in missing_in_existing:
-                df = df.withColumn(columns_missing_existing, lit(None))
+        # Find missing columns in each DataFrame
+        missing_in_existing = new_columns - existing_columns
+        missing_in_new = existing_columns - new_columns
 
-            for column_missing_new in missing_in_new:
-                df_purge = df_purge.withColumn(column_missing_new, lit(None))
+        # Add missing columns to the DataFrames with null values
+        for columns_missing_existing in missing_in_existing:
+            df = df.withColumn(columns_missing_existing, lit(None))
 
-            df = df.unionByName(df_purge)
+        for column_missing_new in missing_in_new:
+            df_purge = df_purge.withColumn(column_missing_new, lit(None))
+
+        df = df.unionByName(df_purge)
 
 
-    if df.rdd.isEmpty():
+    if df.count() == 0:
         _send_warning(dbutils, environment, table_name)
     else:
         df = df.withColumn("ts_ingestion", current_timestamp())
@@ -155,6 +161,9 @@ if __name__ == "__main__":
                 .output()
             )
 
+        if purge_table:
+            df.groupBy("source").count().orderBy("source", ascending=False).show()
+
         db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
         spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -165,6 +174,10 @@ if __name__ == "__main__":
         database_location = db_info["db_raw_path"]
         spark_metastore_service.create_database(database_name)
 
+        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
+
+
+
         if extraction_type == "incremental":
             IncrementalTableLoaderPipeline(
                 database_name=database_name,
@@ -173,6 +186,7 @@ if __name__ == "__main__":
                 layer=LayerEnum.RAW,
                 query=None,
                 partitions=partitions,
+                table_privileges=table_privileges,
             ).load_and_register(df, format_options)
         else:
             FullTableLoaderPipeline(
@@ -180,5 +194,6 @@ if __name__ == "__main__":
                 table_name=table_name,
                 database_location=database_location,
                 layer=LayerEnum.RAW,
-                query=None
+                query=None,
+                table_privileges=table_privileges,
             ).load_and_register(df, format_options)
