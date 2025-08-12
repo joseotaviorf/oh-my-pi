@@ -80,6 +80,10 @@ columns:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.paid_via
     description: "Method by which the invoice was paid (e.g., Pix, Boleto, Credit Card)."
+  has_matthew_interaction:
+    description: Flag indicating if there are Matthew interaction events associated with this invoice.
+    lineage:
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.has_matthew_interaction
   is_ssn:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.has_app_action_event

@@ -157,8 +157,6 @@ create_recovery_channel AS (
         b.purpose,
         b.reason,
         CASE
-            WHEN b.status = 'canceled' THEN 'Canceled'
-            WHEN b.status = 'open' THEN NULL
             WHEN b.status = 'paid'
                 AND ssn.id_invoice IS NOT NULL
                 AND bn.id_negotiation_parent IS NOT NULL
@@ -194,6 +192,15 @@ create_recovery_channel AS (
                 AND bn.id_negotiation_child IS NOT NULL
                 AND bn.origin_agreement = 'Portal Auto Negociação'
                 THEN 'Negotiation - SSN'
+            WHEN b.status = 'written-down'
+                AND bn.id_negotiation_child IS NOT NULL
+                AND bn.id_negotiation_parent IS NOT NULL
+                AND bn.origin_agreement = 'Matthew'
+                THEN 'Negotiation of Installment - Matthew'
+            WHEN b.status = 'written-down'
+                AND bn.id_negotiation_child IS NOT NULL
+                AND bn.origin_agreement = 'Matthew'
+                THEN 'Negotiation - Matthew'
             WHEN b.status = 'written-down'
                 AND bn.id_negotiation_child IS NOT NULL
                 AND bn.origin_agreement = 'Boletagem'
@@ -234,6 +241,7 @@ create_recovery_channel AS (
         IFNULL(b.is_write_off, FALSE) AS is_write_off,
         IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
         IFNULL(fp.is_first_payment, FALSE) AS is_first_payment,
+        IF(matthew.id_contract IS NOT NULL, TRUE, FALSE) AS has_matthew_interaction,
         b.dt_due_adjusted,
         bn.dt_due_parent AS dt_invoice_anchor,
         bn.dt_due_adjusted_parent AS dt_adjusted_invoice_anchor,
@@ -271,6 +279,10 @@ create_recovery_channel AS (
             AND ssn.id_contract = b.id_contract_external
             AND DATE(ssn.ts_event) <= DATE(b.ts_paid)
             AND DATE(ssn.ts_event) >= DATE(b.ts_paid) - INTERVAL 5 DAY
+    LEFT JOIN datalake_collections_quintoandar.matthew_interaction AS matthew
+        ON matthew.id_contract = b.id_contract_external
+            AND DATE(matthew.ts_created) <= DATE(b.ts_paid)
+            AND DATE(matthew.ts_created) >= DATE(b.ts_paid) - INTERVAL 2 DAY
     LEFT JOIN
         datalake_trato_feito_clean.bill AS btf
             ON btf.id_external = b.id_external
@@ -324,6 +336,7 @@ SELECT
     is_write_off,
     is_contract_write_off,
     is_first_payment,
+    has_matthew_interaction,
     dt_due_adjusted,
     dt_invoice_anchor,
     dt_adjusted_invoice_anchor,

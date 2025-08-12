@@ -1529,17 +1529,21 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-payment-option-closed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-started-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-pending-invoices-page-viewed-events:first-run-of-day
+  - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+  - bietlejuice.enrich_chatbot:load-enrich-support-sessions:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-installment:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-negotiation:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-users:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-installment:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation:first-run-of-day
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_proposal:load-enrich-proposal:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
+  - bietlejuice.langfuse:load-clean-scores:first-run-of-day
   - bietlejuice.trato_feito:load-clean-bill:first-run-of-day
   - bietlejuice.trato_feito:load-clean-client:first-run-of-day
   - bietlejuice.trato_feito:load-clean-contract:first-run-of-day

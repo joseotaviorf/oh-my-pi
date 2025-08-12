@@ -1,0 +1,28 @@
+---
+database_name: datalake_collections_quintoandar
+table_name: matthew_interaction
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Table that contains interactions with Matthew agent sessions, tracking user sessions that contain Matthew agent evaluations and their associated contract information for active users.
+columns:
+  score_session:
+    description: Unique identifier for the Matthew agent evaluation session from Langfuse scores.
+    lineage:
+      - datalake_langfuse_clean.scores.id_session
+  id_session:
+    description: Unique session identifier from the chatbot support sessions.
+    lineage:
+      - datalake_chatbot.support_sessions.id_session
+  id_user:
+    description: Unique user identifier from the support sessions.
+    lineage:
+      - datalake_chatbot.support_sessions.id_user
+  id_contract:
+    description: Identifier of the active contract associated with the user.
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_contract
+      - datalake_ebdb_clean.contract.id
+  ts_created:
+    description: Timestamp when the support session was created.
+    lineage:
+      - datalake_chatbot.support_sessions.ts_created

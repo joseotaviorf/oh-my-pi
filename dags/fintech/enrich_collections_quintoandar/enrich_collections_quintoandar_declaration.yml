@@ -19,6 +19,7 @@ workflow:
       - debt_negotiated
       - installment
       - negotiation
+      - matthew_interaction
     overdue_portfolio_timeline:
       - invoice_portfolio
   tables_customization:

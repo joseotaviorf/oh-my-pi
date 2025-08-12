@@ -62,6 +62,10 @@ columns:
     description: Flag indicating if there are app action events associated with this invoice.
     lineage:
       - datalake_collections_quintoandar.delinquency_app_events.ts_event
+  has_matthew_interaction:
+    description: Flag indicating if there are Matthew interaction events associated with this invoice.
+    lineage:
+      - datalake_collections_quintoandar.matthew_interaction.ts_created
   id_audit:
     description: Identifier for the audit trail associated with the invoice.
     lineage:
