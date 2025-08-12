@@ -1,6 +1,8 @@
 ---
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.cyber_complement:
+  - bietlejuice.cyber:load-raw-delqmst:first-run-of-day
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:first-run-of-day
 bietlejuice.dw_accounts_receivable:
