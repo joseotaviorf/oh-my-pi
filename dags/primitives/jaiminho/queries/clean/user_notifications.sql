@@ -12,7 +12,7 @@ SELECT
 	tags,
 	destination,
 	payload,
-	payload:bodyTemplate AS template,
+	COALESCE(templateName, payload:bodyTemplate) AS template,
 	payload:country AS country_code,
 	payload:metadata AS metadata,
 	ccost AS cost_center,

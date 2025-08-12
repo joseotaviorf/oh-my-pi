@@ -64,6 +64,7 @@ columns:
     description: Template identifier used for formatting the notification body.
     lineage:
       - datalake_jaiminho_raw.user_notifications.payload:bodyTemplate
+      - datalake_jaiminho_raw.user_notifications.templateName
   country_code:
     description: Country code where the notification was sent or targeted.
     lineage:
