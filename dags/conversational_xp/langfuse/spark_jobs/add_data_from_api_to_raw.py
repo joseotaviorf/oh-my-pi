@@ -27,7 +27,7 @@ from quintoandar_logger import QuintoAndarLogger
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_langfuse_raw"
 SOURCE = "langfuse"
-PAGE_SIZE = 50
+PAGE_SIZE = 100
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -66,40 +66,43 @@ def fetch_page(langfuse, table_name, start_timestamp, end_timestamp, page, limit
     }
 
 
-def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name):
-    """Retrieves data from Langfuse API using parallel requests for better performance."""
-    limit = PAGE_SIZE
-    # use 80% of available CPU cores for the worker pool, minimum of 1
-    max_workers = max(1, int((os.cpu_count() or 1) * 0.8))
+def generate_4hr_intervals(start_timestamp, end_timestamp):
+    """Generate two-hour intervals between start and end timestamps."""
+    intervals = []
+    current_start = start_timestamp
     
-    logger.info(f"Fetching data from start_timestamp {start_timestamp} to end_timestamp {end_timestamp}")
-    logger.info(f"Using {max_workers} workers with page size {limit}")
+    while current_start < end_timestamp:
+        current_end = min(current_start + timedelta(hours=4), end_timestamp)
+        intervals.append((current_start, current_end))
+        current_start = current_end
+    
+    return intervals
 
-    first_page_result = fetch_page(langfuse, table_name, start_timestamp, end_timestamp, 1, limit)
-    
+
+def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name, max_workers):
+    """Retrieves data from Langfuse API using parallel requests for better performance."""
+
+    logger.info(f"Fetching data from {start_timestamp} to {end_timestamp}")
+
+    first_page_result = fetch_page(langfuse, table_name, start_timestamp, end_timestamp, 1, PAGE_SIZE)
     all_json_data = first_page_result['data']
     
     # according to Langfuse API docs, meta.totalPages should always be present
     total_pages = first_page_result['meta']['totalPages']
-    logger.info(f"Total pages to fetch: {total_pages}")
+    logger.info(f"Pages to fetch: {total_pages}")
 
     if total_pages == 1:
-        logger.info(f"Only one page of data for table {table_name}")
         return all_json_data
 
     pages_to_fetch = list(range(2, total_pages + 1))
-    
-    # use only as many workers as we have pages to fetch
-    num_workers = min(max_workers, len(pages_to_fetch))
 
-    
-    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_page = {
-            executor.submit(fetch_page, langfuse, table_name, start_timestamp, end_timestamp, page, limit): page
+            executor.submit(fetch_page, langfuse, table_name, start_timestamp, end_timestamp, page, PAGE_SIZE): page
             for page in pages_to_fetch
         }
         
-        # collect results as they complete; aggregate errors and raise after fetch phase
+        # collect results as they complete; aggregate errors and raise after fetch
         errors = []
         for future in as_completed(future_to_page):
             page = future_to_page[future]
@@ -114,7 +117,7 @@ def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name):
             sample = ", ".join([f"page={p}: {str(e)}" for p, e in errors[:5]])
             raise RuntimeError(f"{len(errors)} page request(s) failed: {sample}")
     
-    logger.info(f"Total records for table {table_name}: {len(all_json_data)}")
+    logger.info(f"Total records from {start_timestamp} to {end_timestamp}: {len(all_json_data)}")
     return all_json_data
 
 if __name__ == "__main__":
@@ -135,15 +138,17 @@ if __name__ == "__main__":
     start_timestamp_str = args.start_timestamp
     end_timestamp_str = args.end_timestamp
 
-    start_timestamp = datetime.fromisoformat(start_timestamp_str)  - timedelta(hours=2)
-    end_timestamp = datetime.fromisoformat(end_timestamp_str)
+    # fetch the last 2 hours of data, 1 + 1 from airflow
+    # remove timezone info
+    end_timestamp = datetime.fromisoformat(end_timestamp_str).replace(tzinfo=None)
+    start_timestamp = datetime.fromisoformat(start_timestamp_str).replace(tzinfo=None) - timedelta(hours=1)
     partition_cols = ["year", "month", "day", "hour"]
 
     config_service = ConfigurationService(dag_name)
     langfuse_host = config_service.get_config("langfuse_host")
 
     logger.info(f"m=dag_name={dag_name}, environment={environment}, datalake_bucket={datalake_bucket}")
-    logger.info(f"m=table_name={table_name}, start_timestamp={start_timestamp}, end_timestamp={end_timestamp}")
+    logger.info(f"m=table_name={table_name}")
  
 
     base_dbutils = BaseDBUtils()
@@ -172,10 +177,34 @@ if __name__ == "__main__":
         host=langfuse_host
     )
 
-    json_data = get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name)
+    # use 80% of available CPU cores for the worker pool, minimum of 1
+    max_workers = max(1, int((os.cpu_count() or 1) * 0.8))
+    logger.info(f"Using {max_workers} workers")
+    logger.info(f"Using {PAGE_SIZE} page size")
+
+    intervals = generate_4hr_intervals(start_timestamp, end_timestamp)
+    logger.info(f"start_timestamp={start_timestamp} end_timestamp={end_timestamp}")
+    logger.info(f"{len(intervals)} 4hr intervals")
+
+    all_json_data = []
+    for i, (interval_start, interval_end) in enumerate(intervals, 1):
+        logger.info(f"Processing interval {i}/{len(intervals)}: {interval_start} to {interval_end}")
+        try:
+            interval_data = get_langfuse_data(langfuse, interval_start, interval_end, table_name, max_workers)
+            if interval_data:
+                all_json_data.extend(interval_data)
+                logger.info(f"{len(interval_data)} records from interval {i}")
+            else:
+                logger.info(f"No data found for interval {i}")
+        except Exception as e:
+            logger.error(f"Failed to fetch data for interval {i} ({interval_start} to {interval_end}): {str(e)}")
+            raise
+    
+    logger.info(f"Total records: {len(all_json_data)}")
+    json_data = all_json_data
 
     if not json_data:
-        logger.warning(f"No data found, skipping processing.")
+        logger.warning(f"No data found, skipping processing...")
     else:
 
         rdd = spark.sparkContext.parallelize(json_data)
