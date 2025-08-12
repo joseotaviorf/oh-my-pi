@@ -2,6 +2,7 @@ SELECT
   id,
   origin,
   address,
+  city,
   region,
   geolocation,
   name AS listing_name,
@@ -12,7 +13,6 @@ SELECT
   contact_information,
   price,
   date_info,
-  city,
   year,
   month,
   day

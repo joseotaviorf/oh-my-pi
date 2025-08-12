@@ -11,12 +11,13 @@ from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
 from pyspark.sql.utils import AnalysisException
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
@@ -116,33 +117,17 @@ def save_to_datalake(
 
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(database_name)
+    table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
 
-    s3_loader = S3Loader()
-    s3_loader.load_df(
-        df=dataframe,
-        s3_path=f"{database_location}{table_name}",
-        format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        partitions=partitions,
-        compression="gzip",
-        )
-
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    spark_metastore_loader.update_metastore(
-        df=dataframe,
+    IncrementalTableLoaderPipeline(
         database_name=database_name,
         table_name=table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_RAW,
         database_location=database_location,
+        layer=LayerEnum.RAW,
+        query=None,
         partitions=partitions,
-        force_recreate=True,
-        )
-
-    spark_metastore_service.create_new_partitions_from_df(
-        df=dataframe,
-        database_name=database_name,
-        table_name=table_name,
-        partition_cols=partitions,
-        )
+        table_privileges=table_privileges,
+    ).load_and_register(df=dataframe, format_options=SparkTableStorageFormat.DEFAULT_RAW)
 
 
 def main(

@@ -27,6 +27,13 @@ columns:
       The address of the listing.
       It has all the fields of the address, such as: city, country, neighborhood,
       number, state, street, and zip_code.
+  city:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.city
+    description: |
+      The city of the listing.
+      It is obtained from the address field, which contains the city.
+      All the listings where the city is not available are removed from the table.
   region:
     lineage:
       - datalake_crawler_zap_imoveis_raw.zap_imoveis.region
@@ -90,14 +97,6 @@ columns:
     description: |
       It has important information about the crawler date, also, when the listing
       was created and when it was updated.
-  city:
-    lineage:
-      - datalake_crawler_zap_imoveis_raw.zap_imoveis.city
-    description: |
-      The city of the listing.
-      It is obtained from the address field, which contains the city.
-      All the listings where the city is not available are removed from the table.
-      It is a partition column.
   year:
     lineage:
       - datalake_crawler_zap_imoveis_raw.zap_imoveis.year
