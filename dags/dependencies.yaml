@@ -1499,6 +1499,47 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-rent-comission-for-strategic-region:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region:first-run-of-day
+bietlejuice.enrich_credit_journey_experience:
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-address-submit-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-address-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-basicinfo-submit-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-basicinfo-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-document-photo-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-income-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-income-submit-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-list-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-personal-submit-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-personal-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-selfie-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-selfieok-submit-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-doc-tenants-submit-complete-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-anchor-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-anchor-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-drop-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-error-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-errordialog-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-onboarding-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-onboarding-dismissed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-onboarding-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-action-bar-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-close-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-cta-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-guarantee-clicked:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-newevaluation-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-redoevaluation-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-reservation-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-search-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-secondary-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-senddocs-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-result-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-runevaluation-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-selecttenants-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-setvalue-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-summary-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-tenantform-viewed-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-tenantslist-submitted-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-timeout-result-clicked-events:first-run-of-day
+ - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-timeout-viewed-events:first-run-of-day
 bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-button-tapped-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-failure-view-events:first-run-of-day

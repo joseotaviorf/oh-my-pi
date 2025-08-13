@@ -1,0 +1,221 @@
+database_name: datalake_credit_journey_experience
+table_name: credit_evaluation_tenant_form_page
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: Aggregated Amplitude events for tenant form steps in the credit evaluation journey across all related events.
+columns:
+  id_session:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.id_session
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.id_session
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.id_session
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.id_session
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.id_session
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.id_session
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.id_session
+    description: Amplitude session identifier.
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.id_amplitude
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.id_amplitude
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.id_amplitude
+    description: Amplitude event unique identifier.
+  id_user:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.id_user
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.id_user
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.id_user
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.id_user
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.id_user
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.id_user
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.id_user
+    description: User identifier from Amplitude.
+  version_name:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.version_name
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.version_name
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.version_name
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.version_name
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.version_name
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.version_name
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.version_name
+    description: App version name.
+  device_family:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.device_family
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.device_family
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.device_family
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.device_family
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.device_family
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.device_family
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.device_family
+    description: Device used by the user to access the app.
+  city:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.city
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.city
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.city
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.city
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.city
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.city
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.city
+    description: City in which the user is located.
+  region:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.region
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.region
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.region
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.region
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.region
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.region
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.region
+    description: Region in which the user is located.
+  country:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.country
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.country
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.country
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.country
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.country
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.country
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.country
+    description: Country in which the user is located.
+  event_name:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_type
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.event_type
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_type
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_type
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_type
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.event_type
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_type
+    description: Event type name from Amplitude.
+  event_source:
+    description: High-level source label for the page.
+  drop_clicked_page:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.current_page
+    description: Page where the user clicked the drop action.
+  credit_passport_city_name:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.city_name
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.event_properties.city_name
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.city_name
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_properties.city_name
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.city_name
+    description: City name selected by the user to to the Credit Passport.
+  tenant_type:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.tenant_type
+    description: Tenant type extracted from event properties (other or main).
+  number_of_proponents:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_properties.tenant_count
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.tenant_count
+    description: Number of proponents extracted from event properties.
+  group_type:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.tenants_group
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_properties.tenants_group
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.tenants_group
+    description: Group type extracted from properties (multi, single, others).
+  entry_point:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.onboarding_variant
+    description: Entry point variant extracted from properties.
+  sourcee:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.source
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.event_properties.source
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.source
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.source
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.source
+    description: Source type extracted from event properties.
+  source_value:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.default_value
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.default_value
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.default_value
+    description: Source value extracted from event properties. It can be the listing value or the offer value.
+  user_requested_value:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.required_value
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.required_value
+    description: User requested value extracted from event properties.
+  current_page:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.current_page
+    description: Current page identifier extracted from event properties.
+  is_early_credit:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.earlyCredit
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.event_properties.earlyCredit
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.earlyCredit
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_properties.earlyCredit
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.earlyCredit
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.event_properties.earlyCredit
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.earlyCredit
+    description: Flag indicating Early Credit context.
+  is_credit_passport:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.event_properties.credit_evaluation
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.event_properties.credit_evaluation
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.event_properties.credit_evaluation
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.event_properties.credit_evaluation
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.event_properties.credit_evaluation
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.event_properties.credit_evaluation
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.credit_passport
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.event_properties.credit_evaluation
+    description: Flag indicating Credit Passport context (from credit_passport or credit_evaluation).
+  is_pos_offer:
+    description: Flag indicating post-offer context (proposal credit evaluation).
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.ts_event
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.ts_event
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.ts_event
+    description: Event timestamp.
+  year:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.year
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.year
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.year
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.year
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.year
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.year
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.year
+    description: Partition column year.
+  month:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.month
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.month
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.month
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.month
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.month
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.month
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.month
+    description: Partition column month.
+  day:
+    lineage:
+    - datalake_amplitude_clean.170698_evaluation_setvalue_viewed_events.day
+    - datalake_amplitude_clean.170698_evaluation_selecttenants_viewed_events.day
+    - datalake_amplitude_clean.170698_evaluation_tenantform_viewed_events.day
+    - datalake_amplitude_clean.170698_evaluation_tenantslist_submitted_events.day
+    - datalake_amplitude_clean.170698_evaluation_summary_viewed_events.day
+    - datalake_amplitude_clean.170698_evaluation_runevaluation_clicked_events.day
+    - datalake_amplitude_clean.170698_evaluation_drop_clicked_events.day
+    description: Partition column day.

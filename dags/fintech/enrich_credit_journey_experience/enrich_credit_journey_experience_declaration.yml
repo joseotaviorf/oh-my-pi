@@ -1,0 +1,30 @@
+---
+dag:
+  name: enrich_credit_journey_experience
+  schedule_start_date: 2025, 8, 11
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates the enriched tables for selected Amplitude events regarding the credit journey experience.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
+    autotermination_minutes: 20

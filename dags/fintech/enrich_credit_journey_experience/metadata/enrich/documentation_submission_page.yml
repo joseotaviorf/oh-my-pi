@@ -1,0 +1,312 @@
+database_name: datalake_credit_journey_experience
+table_name: documentation_submission_page
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: Aggregated Amplitude events for documentation submission journey steps across multiple documentation screens.
+columns:
+  id_session:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.id_session
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.id_session
+    description: Amplitude session identifier.
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.id_amplitude
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.id_amplitude
+    description: Amplitude event unique identifier.
+  id_user:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.id_user
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.id_user
+    description: User identifier from Amplitude.
+  id_proposal:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_properties.proposalId
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_properties.proposalId
+    description: Proposal identifier extracted from event properties.
+  city:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.city
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.city
+    description: City in which the user is located.
+  region:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.region
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.region
+    description: Region in which the user is located.
+  country:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.country
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.country
+    description: Country in which the user is located.
+  device_family:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.device_family
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.device_family
+    description: Device used by the user to access the app.
+  version_name:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.version_name
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.version_name
+    description: App version name.
+  event_name:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_type
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_type
+    description: Event type name from Amplitude.
+  event_source:
+    description: High-level source label for the page.
+  number_of_proponents:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_properties.iqQuantity
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_properties.iqQuantity
+    description: Number of proponents extracted from event properties.
+  is_documentation_complete:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_properties.isDocumentationComplete
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_properties.isDocumentationComplete
+    description: Flag indicating whether the documentation is complete.
+  is_retenant:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_properties.isRetenant
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_properties.isRetenant
+    description: Flag indicating a retenant flow.
+  is_resend:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_properties.hasResendInfo
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_properties.hasResendInfo
+    description: Flag indicating if a resend action was performed.
+  is_fast_pass:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.event_properties.isFastPass
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.event_properties.isFastPass
+    description: Flag indicating FastPass journey.
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.ts_event
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.ts_event
+    description: Event timestamp.
+  year:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.year
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.year
+    description: Partition column year.
+  month:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.month
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.month
+    description: Partition column month.
+  day:
+    lineage:
+    - datalake_amplitude_clean.170698_doc_tenants_list_viewed_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_personal_viewed_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_selfie_clicked_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_selfieok_submit_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_document_photo_clicked_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_personal_submit_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_viewed_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_basicinfo_submit_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_income_clicked_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_income_submit_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_address_viewed_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_address_submit_events.day
+    - datalake_amplitude_clean.170698_doc_tenants_submit_complete_events.day
+    description: Partition column day.
