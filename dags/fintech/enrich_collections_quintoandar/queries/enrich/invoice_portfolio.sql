@@ -127,6 +127,13 @@ paid_by_ssn AS (
       AND id_invoice IS NOT NULL
     GROUP BY 1,2
 ),
+matthew_interaction AS (
+    SELECT
+        id_contract,
+        MAX(ts_created) AS ts_created
+    FROM datalake_collections_quintoandar.matthew_interaction
+    GROUP BY 1
+),
 create_recovery_channel AS (
     SELECT
         b.id_external AS id_invoice,
@@ -279,10 +286,11 @@ create_recovery_channel AS (
             AND ssn.id_contract = b.id_contract_external
             AND DATE(ssn.ts_event) <= DATE(b.ts_paid)
             AND DATE(ssn.ts_event) >= DATE(b.ts_paid) - INTERVAL 5 DAY
-    LEFT JOIN datalake_collections_quintoandar.matthew_interaction AS matthew
+    LEFT JOIN matthew_interaction AS matthew
         ON matthew.id_contract = b.id_contract_external
             AND DATE(matthew.ts_created) <= DATE(b.ts_paid)
             AND DATE(matthew.ts_created) >= DATE(b.ts_paid) - INTERVAL 2 DAY
+            AND DATE(matthew.ts_created) >= DATE(b.ts_created)
     LEFT JOIN
         datalake_trato_feito_clean.bill AS btf
             ON btf.id_external = b.id_external
