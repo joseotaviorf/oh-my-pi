@@ -22,6 +22,10 @@ columns:
     description:
       Id of the house that belongs to the contract, which may not be unique
       (a house can be related to different contracts).
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.contract.id_user
+    description: Id of the tenant that belongs to the contract.
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code

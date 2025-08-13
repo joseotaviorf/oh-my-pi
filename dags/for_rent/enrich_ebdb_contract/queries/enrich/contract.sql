@@ -189,6 +189,7 @@ SELECT
   ch.id_country,
   c.id_proposal,
   c.id_house,
+  c.id_user,
   ch.country_code,
   c.rent,
   CASE

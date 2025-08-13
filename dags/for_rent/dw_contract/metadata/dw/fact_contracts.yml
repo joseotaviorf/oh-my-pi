@@ -24,6 +24,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id_region
     description: Key of the region related to the contract.
+  sk_tenant:
+    lineage:
+      - datalake_ebdb_contract.contract.id_user
+    description: Key of the tenant related to the contract.
+  sk_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+    description: Key of the owner related to the contract.
   country_code:
     lineage:
       - datalake_ebdb_contract.contract.country_code

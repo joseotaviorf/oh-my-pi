@@ -40,6 +40,8 @@ SELECT
   COALESCE(hl.id_house_listing, -1) AS sk_house_listing,
   COALESCE(c.id_house, -1) AS sk_house,
   COALESCE(h.id_region, -1) AS sk_region,
+  COALESCE(c.id_user, -1) AS sk_tenant,
+  COALESCE(c.id_user, -1) AS sk_owner,
   c.country_code,
   COUNT_IF(comm.communication_type = 'INVITE' AND comm.was_delivered) AS total_condo_monitoring_invite_sent,
   COALESCE(DATE_DIFF(DAY, cme.ts_first_invitation, cme.ts_first_activation), 0) AS days_to_activate_condo_monitoring,
