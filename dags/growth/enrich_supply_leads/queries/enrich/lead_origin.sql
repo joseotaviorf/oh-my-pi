@@ -20,9 +20,9 @@ WITH lead_origin_rene_descartes AS (
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.type') AS STRING) AS lead_type,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.detailedRoute') AS STRING) AS detailed_route,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.originalLead') AS BIGINT) AS original_lead,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.taskId') AS BIGINT) AS id_task,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.gclid') AS BIGINT) AS gclid,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.fbclid') AS BIGINT) AS fbclid,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.taskId') AS STRING) AS id_task,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.gclid') AS STRING) AS gclid,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.fbclid') AS STRING) AS fbclid,
     amd.ts_created AS ts_event
   FROM
     datalake_rene_descartes_clean.house_lead AS hl
