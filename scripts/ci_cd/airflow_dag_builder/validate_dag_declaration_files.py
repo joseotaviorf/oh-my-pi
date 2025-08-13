@@ -3,8 +3,6 @@ import logging
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from functools import partial
-from tqdm import tqdm
 from glob import glob
 
 from quintoandar_logger import QuintoAndarLogger
@@ -41,28 +39,24 @@ def dag_python_file_exists(dag_declaration_file_path):
             )
 
 
-def validate_one_dag(
-    validator: DAGDeclarationValidator, dag_declaration_file_path: str
-):
+def validate_one_dag(dag_declaration_file_path: str):
     """
     Validates a single DAG, by validating its DAG declaration YAML file structure
     and the absence of the Python DAG file. Used for multiple concurrent validations
     which share the same DAGDeclarationValidator object.
 
-    :param validator: DAG Declaration validator object
-    :type validator: DAGDeclarationValidator
     :param dag_declaration_file_path: Local dir where the DAG Delcaration file is placed
     :type dag_declaration_file_path: str
     """
     logger.debug(f"Validating file '{dag_declaration_file_path}'")
     dag_declaration = FileService.get_dict_from_yaml_file(dag_declaration_file_path)
-    validator.validate(dag_declaration=dag_declaration)
+    # instantiate a fresh validator per file to ensure thread-safety
+    DAGDeclarationValidator().validate(dag_declaration=dag_declaration)
     dag_python_file_exists(dag_declaration_file_path)
     logger.debug(f"Successfully validated file '{dag_declaration_file_path}'")
 
 
-validator = DAGDeclarationValidator()
-func = partial(validate_one_dag, validator)
+func = validate_one_dag
 
 dag_declaration_glob_path = DAGPackagesPathService.generate_artifact_file_path(
     artifact_type="dag_declaration", dag_name="**"
@@ -72,22 +66,27 @@ dag_declaration_files = glob(pathname=dag_declaration_glob_path, recursive=True)
 dag_declaration_fails_msg = ""
 
 if dag_declaration_files:
-    with tqdm(
-        desc=f"Validating DAG declaration files", total=len(dag_declaration_files)
-    ) as progress_bar:
-        with ThreadPoolExecutor(max_workers=64) as executor:
-            futures = {
-                executor.submit(func, dag_declaration_file): dag_declaration_file
-                for dag_declaration_file in dag_declaration_files
-            }
-            for future in as_completed(futures):
-                if future.exception():
-                    exc = future.exception()
-                    error_msg = exc.args[1] if len(exc.args) > 1 else str(exc)
-                    dag_declaration_fails_msg += "\n- Path: {}\n- Validation errors:\n{}".format(
-                        futures[future], error_msg
-                    )
-                progress_bar.update(1)
+    logger.info(
+        f"Validating DAG declaration files (count={len(dag_declaration_files)})"
+    )
+    with ThreadPoolExecutor(max_workers=64) as executor:
+        futures = {
+            executor.submit(func, dag_declaration_file): dag_declaration_file
+            for dag_declaration_file in dag_declaration_files
+        }
+        processed = 0
+        for future in as_completed(futures):
+            if future.exception():
+                exc = future.exception()
+                error_msg = exc.args[1] if len(exc.args) > 1 else str(exc)
+                dag_declaration_fails_msg += "\n- Path: {}\n- Validation errors:\n{}".format(
+                    futures[future], error_msg
+                )
+            processed += 1
+            if processed % 50 == 0 or processed == len(dag_declaration_files):
+                logger.info(
+                    f"Validated {processed}/{len(dag_declaration_files)} files"
+                )
     if dag_declaration_fails_msg:
         sys.tracebacklimit = 0
         raise AssertionError(
