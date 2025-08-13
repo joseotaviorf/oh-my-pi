@@ -11,7 +11,7 @@ columns:
     description: The unique identifier for the user registration history.
   uuid_person_requester:
     lineage:
-      - datalake_signup_raw.user_registration_history.requester_person_id
+      - datalake_signup_raw.user_registration_history.requester_person_uuid
     description: The unique identifier for the requester person.
   uuid_person_target:
     lineage:

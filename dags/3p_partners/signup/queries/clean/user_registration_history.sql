@@ -1,6 +1,6 @@
 SELECT
     id,
-    requester_person_id AS uuid_person_requester,
+    requester_person_uuid AS uuid_person_requester,
     target_person_uuid AS uuid_person_target,
     operation,
     reason,
