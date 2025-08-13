@@ -8,6 +8,7 @@ from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.db import DatalakeMetastoreService
 from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 
 LOGGER = QuintoAndarLogger(__name__)
 
@@ -78,6 +79,7 @@ class RawLayerLoader:
             self._create_database_if_not_exists()
             self._load_df_to_s3(df)
             self._update_metastore(df)
+            self._apply_privileges_to_people_team()
             self._refresh_table()
         except Exception as e:
             self.logger.error(
@@ -161,3 +163,23 @@ class RawLayerLoader:
                 f"Error refreshing table '{self.table_name}': {e}", exc_info=True
             )
             raise
+
+    def _apply_privileges_to_people_team(self) -> None:
+        """Applies specific table privileges for the 'people-analytics' role.
+
+        This method grants `SELECT`, `APPLY TAG`, and `MODIFY` permissions
+        on the current table to the 'people-analytics' role."""
+
+        table_privileges_dict = {"people-analytics": ["ALL PRIVILEGES"]}
+
+        try:
+            full_table_name = f"{self.database_name}.{self.table_name}"
+            table_privileges = TablePrivileges.from_input_dict(
+                table_privileges_dict, full_table_name
+            )
+            table_privileges.apply()
+            self.logger.info(
+                f"Successfully applied privileges on {full_table_name} for 'people-analytics'."
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to apply privileges on {full_table_name}: {e}")
