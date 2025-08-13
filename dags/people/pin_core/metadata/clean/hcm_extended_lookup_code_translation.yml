@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: hcm_extended_lookup_code_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: This table holds the translated information for extended lookup code records.
 columns:
   id_enterprise:
@@ -17,7 +17,7 @@ columns:
     description: Code of the language for the translated content.
     lineage:
       - datalake_pin_core_raw.hcm_extended_lookup_codes_tl.language
-  source_language_code:
+  source_language:
     description: Code of the original language of the content.
     lineage:
       - datalake_pin_core_raw.hcm_extended_lookup_codes_tl.source_lang

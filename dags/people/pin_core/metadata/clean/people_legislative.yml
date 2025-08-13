@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: people_legislative
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores core personal data specific to different legal contexts, including information from Person Descriptive Flexfield (DDF) segments. Allows multiple records per legal code for a single person.
 columns:
   id_person:

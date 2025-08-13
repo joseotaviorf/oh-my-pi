@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: template_role
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Defines the roles assigned to participants within performance document templates, including role type and participant limits.
 columns:
   id_template_role:

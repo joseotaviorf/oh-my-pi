@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: person_name
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores core and legislation-specific name components for individuals, including names in different character sets. Tracks changes over time with date effectivity.
 columns:
   id_business_group:

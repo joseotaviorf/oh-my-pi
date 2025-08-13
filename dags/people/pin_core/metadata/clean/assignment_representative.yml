@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: assignment_representative
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Denormalized table containing the active and current mapping between workers and their representatives.
 columns:
   id_representative_assignment:

@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: disability
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores disability information for individuals.
 columns:
   id_business_group:

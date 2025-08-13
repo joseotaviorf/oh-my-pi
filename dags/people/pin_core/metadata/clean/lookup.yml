@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: lookup
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: This table stores predefined values used to populate drop-down lists or control application behavior.
 columns:
   lookup_code:
@@ -42,8 +42,8 @@ columns:
     lineage:
       - datalake_pin_core_raw.hr_lookups.enabled_flag
     categories:
-      true: Lookup value is active.
-      false: Lookup value is inactive.
+      "true": Lookup value is active.
+      "false": Lookup value is inactive.
   dt_active_started:
     description: Date and time when the lookup value becomes active.
     lineage:

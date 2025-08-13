@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: job_family
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Defines job families, which group related jobs that may not share all the same attributes. These groupings are useful for reporting purposes.
 columns:
   id_business_group:
@@ -29,17 +29,17 @@ columns:
     description: User who last updated the record.
     lineage:
       - datalake_pin_core_raw.per_job_family_f.last_updated_by
-  active_status:
-    description: Indicates whether the job family is currently active.
-    lineage:
-      - datalake_pin_core_raw.per_job_family_f.active_status
-    categories:
-      A: Job family is active.
-      I: Job family is inactive.
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:
       - datalake_pin_core_raw.per_job_family_f.object_version_number
+  is_active:
+    description: Indicates whether the job family is currently active.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.active_status
+    categories:
+      "true": Job family is active.
+      "false": Job family is inactive.
   dt_effective_ended:
     description: End date of the period for which this job family definition is valid.
     lineage:

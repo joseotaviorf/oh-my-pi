@@ -2,18 +2,18 @@
 database_name: datalake_pin_performance_clean
 table_name: task_role_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores translations for the names of tasks within the performance process flow, specific to different roles.
 columns:
   id_process_task_role:
     description: Foreign key referencing the unique identifier of the process task role. Part of the primary key.
     lineage:
       - datalake_pin_performance_raw.hra_pf_task_roles_tl.process_task_role_id
-  language_code:
+  language:
     description: Code of the language used for the translated content in this record. Part of the primary key.
     lineage:
       - datalake_pin_performance_raw.hra_pf_task_roles_tl.language
-  source_language_code:
+  source_language:
     description: Code of the original language in which the task names were created.
     lineage:
       - datalake_pin_performance_raw.hra_pf_task_roles_tl.source_lang

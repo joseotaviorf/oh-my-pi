@@ -11,7 +11,7 @@ SELECT
     review_period_id AS id_review_period,
     action_performed_by AS id_person_action_performed_by,
     template_type_code,
-    language_code,
+    language,
     status_code,
     prev_status_code AS previous_status_code,
     created_by,

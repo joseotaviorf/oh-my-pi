@@ -90,7 +90,7 @@ active_jobs AS (
     datalake_pin_core_clean.job
   WHERE
     dt_effective_ended = DATE('4712-12-31')
-    AND active_status = 'A'
+    AND is_active
 ),
 active_valid_grades AS (
   SELECT

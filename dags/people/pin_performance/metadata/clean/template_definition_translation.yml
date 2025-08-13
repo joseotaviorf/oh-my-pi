@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: template_definition_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores translations for performance template definitions, including translated names and language information.
 columns:
   id_template_definition:
@@ -13,11 +13,11 @@ columns:
     description: Foreign key referencing the business group where the template was defined.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_tl.business_group_id
-  language_code:
+  language:
     description: Code of the language for the translated template name in this record. Part of the primary key.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_tl.language
-  source_language_code:
+  source_language:
     description: Code of the original language used for the template name.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_tl.source_lang

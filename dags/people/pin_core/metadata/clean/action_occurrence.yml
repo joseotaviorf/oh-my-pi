@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: action_occurrence
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores records of actions that have occurred, detailing the specific action, reason, associated entities, and relevant dates. This table effectively serves as a document of record for each action instance.
 columns:
   id_action_occurrence:

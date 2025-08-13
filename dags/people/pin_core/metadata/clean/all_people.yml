@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: all_people
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores core personal data that is consistent across different legal contexts or requires a global value independent of legal codes. Data includes date effectivity, but core attributes may remain constant over time. Static values are duplicated across new date-effective instances for the same person.
 columns:
   id_business_group:

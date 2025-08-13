@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: ethnicity
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores ethnicity data for individuals, specific to different legal contexts. A person may have multiple ethnicity records under the same legal code.
 columns:
   id_person:

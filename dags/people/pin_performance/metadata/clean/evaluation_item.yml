@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: evaluation_item
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores details of individual items within a performance evaluation.
 columns:
   id_eval_item:
@@ -50,22 +50,22 @@ columns:
     lineage:
       - datalake_pin_performance_raw.hra_eval_items.mandatory_flag
     categories:
-      true: Item is mandatory.
-      false: Item is not mandatory.
+      "true": Item is mandatory.
+      "false": Item is not mandatory.
   is_critical:
     description: Indicates if this item is marked as critical by the user.
     lineage:
       - datalake_pin_performance_raw.hra_eval_items.critical_flag
     categories:
-      true: Item is critical.
-      false: Item is not critical.
+      "true": Item is critical.
+      "false": Item is not critical.
   is_not_rated:
     description: Indicates if this item is excluded from rating.
     lineage:
       - datalake_pin_performance_raw.hra_eval_items.not_rated_flag
     categories:
-      true: Item is not rated.
-      false: Item is rated.
+      "true": Item is not rated.
+      "false": Item is rated.
   is_added_in_task:
     description: Identifier of the specific task during which this item was added to the evaluation.
     lineage:

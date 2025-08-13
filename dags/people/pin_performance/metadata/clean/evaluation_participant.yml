@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: evaluation_participant
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores information about individuals participating in the performance review process.
 columns:
   id_eval_participant:
@@ -78,22 +78,22 @@ columns:
     lineage:
       - datalake_pin_performance_raw.hra_eval_participants.notified_flag
     categories:
-      true: Participant has been notified.
-      false: Participant has not been notified.
+      "true": Participant has been notified.
+      "false": Participant has not been notified.
   is_feedback_started:
     description: Indicates whether the participant has begun providing feedback.
     lineage:
       - datalake_pin_performance_raw.hra_eval_participants.fdback_started_flag
     categories:
-      true: Participant has started feedback.
-      false: Participant has not started feedback.
+      "true": Participant has started feedback.
+      "false": Participant has not started feedback.
   is_locked_out:
     description: Indicates whether the participant is currently locked out from providing feedback.
     lineage:
       - datalake_pin_performance_raw.hra_eval_participants.locked_out_flag
     categories:
-      true: Participant is locked out.
-      false: Participant is not locked out.
+      "true": Participant is locked out.
+      "false": Participant is not locked out.
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:

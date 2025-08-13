@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: evaluation_role
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the different roles involved in the performance evaluation process.
 columns:
   id_evaluation_role:

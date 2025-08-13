@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: action_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: This table holds the translated names and descriptions of defined actions for different languages.
 columns:
   id_action:

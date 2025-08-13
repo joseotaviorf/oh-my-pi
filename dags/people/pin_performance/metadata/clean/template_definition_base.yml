@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: template_definition_base
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the configuration and structure of performance evaluation templates, defining rules and flows for evaluations.
 columns:
   id_template_definition:
@@ -58,43 +58,43 @@ columns:
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_b.use_calc_ratings_flag
     categories:
-      true: Calculated ratings are used.
-      false: Calculated ratings are not used.
+      "true": Calculated ratings are used.
+      "false": Calculated ratings are not used.
   is_ratings_calculation_enabled:
     description: Indicates whether the system should automatically calculate performance ratings.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_b.calculate_ratings_flag
     categories:
-      true: Ratings calculation is enabled.
-      false: Ratings calculation is disabled.
+      "true": Ratings calculation is enabled.
+      "false": Ratings calculation is disabled.
   is_manager_selection_allowed:
     description: Indicates if workers can select their evaluating manager when starting a review.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_b.select_mgr_allowed_flag
     categories:
-      true: Workers can select their manager.
-      false: Workers cannot select their manager.
+      "true": Workers can select their manager.
+      "false": Workers cannot select their manager.
   is_worker_allowed_to_see_manager_participants:
     description: Indicates if workers can view the participants added by their manager.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_b.wrk_see_mgr_pcpn_flag
     categories:
-      true: Workers can see manager's participants.
-      false: Workers cannot see manager's participants.
+      "true": Workers can see manager's participants.
+      "false": Workers cannot see manager's participants.
   is_participant_allowed_to_see_calculated_rating:
     description: Indicates if calculated ratings are visible to feedback participants.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_b.show_pcpn_calc_rating_flag
     categories:
-      true: Participants can see calculated ratings.
-      false: Participants cannot see calculated ratings.
+      "true": Participants can see calculated ratings.
+      "false": Participants cannot see calculated ratings.
   is_matrix_manager_allowed_to_see_calculated_rating:
     description: Indicates if matrix managers can view the calculated ratings.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_defns_b.show_mm_calc_rating_flag
     categories:
-      true: Matrix managers can see calculated ratings.
-      false: Matrix managers cannot see calculated ratings.
+      "true": Matrix managers can see calculated ratings.
+      "false": Matrix managers cannot see calculated ratings.
   dt_started:
     description: Date when this performance template became effective.
     lineage:

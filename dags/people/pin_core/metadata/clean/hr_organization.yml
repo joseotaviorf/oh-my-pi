@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: hr_organization
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores information about organizational units, their classifications, hierarchy, status, and effective periods.
 columns:
   id_organization:

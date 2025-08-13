@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: grade_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Contains translated attributes from the base table for grades.
 columns:
   id_business_group:

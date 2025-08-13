@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: per_assignment_extra_info
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Stores additional information related to employee assignments, 
   which can include details about vacation balances, leaves, and 

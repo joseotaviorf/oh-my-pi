@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: user
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores one record per Fusion system user, generally mapping to a single LDAP user unless the user is deleted in LDAP.
 columns:
   id_user:
@@ -50,22 +50,22 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_users.active_flag
     categories:
-      true: User record is active.
-      false: User record is inactive (deleted in LDAP).
+      "true": User record is active.
+      "false": User record is inactive (deleted in LDAP).
   is_suspended:
     description: Indicates if the user is suspended, typically due to termination. Suspended users can be reactivated.
     lineage:
       - datalake_pin_core_raw.per_users.suspended
     categories:
-      true: User is suspended.
-      false: User is not suspended.
+      "true": User is suspended.
+      "false": User is not suspended.
   has_credentials_email_sent:
     description: Flag indicating if the user's login credentials (username/password) have been sent.
     lineage:
       - datalake_pin_core_raw.per_users.credentials_email_sent
     categories:
-      true: Credentials email sent.
-      false: Credentials email not sent.
+      "true": Credentials email sent.
+      "false": Credentials email not sent.
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_raw
 table_name: fnd_lookup_values
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Stores information about lookup types used in Oracle applications. We receive the data filtered by LOOKUP_TYPE = HRA_EVAL_STEP_STATUS and HRA_PARTICIPATION_STATUS.
   For more information, access the [Oracle HCM Documentation](https://docs.oracle.com/en/cloud/saas/applications-common/25a/oedma/fndlookupvalues-5634.html).

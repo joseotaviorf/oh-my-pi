@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: template_period_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores translations for performance template periods, including translated customary and short names, along with language information.
 columns:
   id_template_period:
@@ -13,11 +13,11 @@ columns:
     description: Foreign key referencing the business group or enterprise context.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_periods_tl.business_group_id
-  language_code:
+  language:
     description: Code representing the language of the translated content. Part of the primary key.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_periods_tl.language
-  source_language_code:
+  source_language:
     description: Code representing the original language of the content.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_periods_tl.source_lang

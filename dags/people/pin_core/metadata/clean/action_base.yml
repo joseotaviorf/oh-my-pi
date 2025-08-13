@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: action_base
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores information about actions that can be performed within the system, including their types, codes, and validity periods.
 columns:
   id_action:

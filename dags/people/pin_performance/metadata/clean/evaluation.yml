@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: evaluation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the primary data for Performance Documents.
 columns:
   id_evaluation:
@@ -53,10 +53,10 @@ columns:
     description: Code defining the type of performance document template used.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.template_type_code
-  language_code:
+  language:
     description: Code defining the language of the performance document.
     lineage:
-      - datalake_pin_performance_raw.hra_evaluations.language_code
+      - datalake_pin_performance_raw.hra_evaluations.language
   status_code:
     description: Current status of the performance document.
     lineage:
@@ -98,64 +98,64 @@ columns:
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.use_calc_ratings_flag
     categories:
-      true: Calculated ratings are used.
-      false: Calculated ratings are not used.
+      "true": Calculated ratings are used.
+      "false": Calculated ratings are not used.
   is_rating_calculation_enabled:
     description: Indicates whether ratings should be automatically calculated.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.calculation_ratings_flag
     categories:
-      true: Ratings calculation is enabled.
-      false: Ratings calculation is disabled.
+      "true": Ratings calculation is enabled.
+      "false": Ratings calculation is disabled.
   is_worker_allowed_to_see_manager_participants:
     description: Indicates whether the worker can view participants added by the manager.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.wrk_see_mgr_pcpn_flag
     categories:
-      true: Worker can see manager's participants.
-      false: Worker cannot see manager's participants.
+      "true": Worker can see manager's participants.
+      "false": Worker cannot see manager's participants.
   is_participant_allowed_to_see_calculated_rating:
     description: Indicates whether calculated ratings are visible to participants.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.show_pcpn_calc_rating_flag
     categories:
-      true: Calculated ratings are visible to participants.
-      false: Calculated ratings are not visible to participants.
+      "true": Calculated ratings are visible to participants.
+      "false": Calculated ratings are not visible to participants.
   is_manager_calculated_rating_shown:
     description: Indicates whether calculated ratings are visible to the manager.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.show_mgr_calc_rating_flag
     categories:
-      true: Calculated ratings are visible to the manager.
-      false: Calculated ratings are not visible to the manager.
+      "true": Calculated ratings are visible to the manager.
+      "false": Calculated ratings are not visible to the manager.
   is_worker_calculated_rating_shown:
     description: Indicates whether calculated ratings are visible to the worker.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.show_wkr_calc_rating_flag
     categories:
-      true: Calculated ratings are visible to the worker.
-      false: Calculated ratings are not visible to the worker.
+      "true": Calculated ratings are visible to the worker.
+      "false": Calculated ratings are not visible to the worker.
   is_matrix_manager_allowed_to_see_calculated_rating:
     description: Indicates whether calculated ratings are visible to matrix managers.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.show_mm_calc_rating_flag
     categories:
-      true: Calculated ratings are visible to matrix managers.
-      false: Calculated ratings are not visible to matrix managers.
+      "true": Calculated ratings are visible to matrix managers.
+      "false": Calculated ratings are not visible to matrix managers.
   is_feedback_required_for_participants:
     description: Indicates whether feedback from participants is mandatory.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.pcpn_feedback_req_flag
     categories:
-      true: Participant feedback is required.
-      false: Participant feedback is not required.
+      "true": Participant feedback is required.
+      "false": Participant feedback is not required.
   is_worker_connections_used:
     description: Indicates whether worker connections are used for participant selection.
     lineage:
       - datalake_pin_performance_raw.hra_evaluations.use_wrk_connections_flag
     categories:
-      true: Worker connections are used.
-      false: Worker connections are not used.
+      "true": Worker connections are used.
+      "false": Worker connections are not used.
   dt_performance_document_started:
     description: Start date of this performance document.
     lineage:

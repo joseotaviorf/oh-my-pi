@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: task_role_base
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the roles associated with tasks in the performance evaluation process flow definitions.
 columns:
   id_process_task_role:

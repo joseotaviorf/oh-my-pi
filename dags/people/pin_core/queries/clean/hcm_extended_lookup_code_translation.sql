@@ -2,7 +2,7 @@ SELECT
   enterprise_id AS id_enterprise,
   extended_lookup_code_id AS id_enterprise_extended_lookup_code,
   language,
-  source_lang AS source_language_code,
+  source_lang AS source_language,
   extended_lookup_code_name,
   created_by,
   last_updated_by AS updated_by,

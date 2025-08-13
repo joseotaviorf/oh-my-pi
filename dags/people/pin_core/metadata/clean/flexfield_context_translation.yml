@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: flexfield_context_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores translated information for flexfield contexts.
 columns:
   id_application:

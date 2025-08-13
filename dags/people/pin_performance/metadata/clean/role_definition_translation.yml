@@ -1,7 +1,7 @@
 database_name: datalake_pin_performance_clean
 table_name: role_definition_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Stores translated names for performance evaluation roles.
   This table supports multilingual views for role definitions used in evaluation templates.

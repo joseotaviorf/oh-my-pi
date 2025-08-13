@@ -2,7 +2,7 @@
 database_name: datalake_pin_performance_clean
 table_name: evaluation_section
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores details about sections within a performance evaluation document, including type, rating models, calculation rules, and display settings.
 columns:
   id_eval_section:

@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: foundation_lookup_value
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: >
   Stores standardized lookup values derived from PIN, such as employment statuses,
   job categories, and participation indicators. These values translate coded fields
@@ -30,11 +30,11 @@ columns:
     description: "Specifies the classification or grouping of the lookup value, indicating its context of use."
     lineage:
       - datalake_pin_core_raw.fnd_lookup_values.lookup_type
-  source_language_code:
+  source_language:
     description: "Code representing the original language in which the translatable content was defined."
     lineage:
       - datalake_pin_core_raw.fnd_lookup_values.source_lang
-  language_code:
+  language:
     description: "Code of the language in which the lookup value's meaning is presented."
     lineage:
       - datalake_pin_core_raw.fnd_lookup_values.language

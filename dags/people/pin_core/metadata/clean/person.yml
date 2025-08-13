@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: person
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Core table serving as a non-date-tracked parent for all tables within the Person Model.
 columns:
   id_person:

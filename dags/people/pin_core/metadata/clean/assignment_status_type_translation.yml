@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: assignment_status_type_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Holds translated definitions of user statuses for a specific assignment or set of employment/placement terms. This table is maintained as is.
 columns:
   id_assignment_status_type:

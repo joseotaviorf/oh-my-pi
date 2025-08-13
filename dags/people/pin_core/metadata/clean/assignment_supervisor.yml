@@ -2,7 +2,7 @@
 database_name: datalake_pin_core_clean
 table_name: assignment_supervisor
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the supervisors associated with a specific assignment, supporting different supervisory relationships. For example, a person might have a functional manager (direct line manager) and a project manager (leader for a specific project).
 columns:
   id_action_occurrence:
