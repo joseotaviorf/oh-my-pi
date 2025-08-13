@@ -1,0 +1,58 @@
+database_name: datalake_core_visit
+table_name: visit
+domain: For Sale
+owner: isadora.gallerani@quintoandar.com.br
+description: Visit Core Model test.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_clean.visit.id
+    description: Identifier of the visit
+  id_house:
+    lineage:
+      - datalake_ebdb_test_clean.visit.id_house
+    description: House id related to the visit
+  id_visitor:
+    lineage:
+      - datalake_ebdb_test_clean.visit.id_visitor
+    description: Visitor user id
+  id_agent:
+    lineage:
+      - datalake_ebdb_test_clean.visit.id_agent
+    description: Agent user id
+  code:
+    lineage:
+      - datalake_ebdb_test_clean.visit.code
+    description: Visit code
+  status:
+    lineage:
+      - datalake_ebdb_test_clean.visit.status
+    description: Status of the visit
+  computed_status:
+    lineage:
+      - datalake_ebdb_test_clean.visit.computed_status
+    description: Computed status of the visit
+  business_context:
+    lineage:
+      - datalake_ebdb_test_clean.visit.business_context
+    description: Business context of the visit
+  last_event_type:
+    lineage:
+      - datalake_ebdb_test_clean.visit_status_log.event_type
+    description: Last event type of the visit
+  dt_visit:
+    lineage:
+      - datalake_ebdb_test_clean.visit.dt_visit
+    description: Date of the visit.
+  dt_request:
+    lineage:
+      - datalake_ebdb_test_clean.visit.dt_request
+    description: Date of when the visit was requested.
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_clean.visit.ts_created
+    description: Timestamp of when the visit was created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_clean.visit.ts_updated
+    description: Last timestampd of when the visit was updated
