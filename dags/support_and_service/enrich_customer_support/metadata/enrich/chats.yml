@@ -95,6 +95,10 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.task.is_spoc_task
     description: Indicates if the task is part of a SPOC
+  is_isaias_session:
+    lineage:
+      - datalake_sauron_clean.session.source_environment
+    description: Indicates if the session is part of an ISAIAS AI Agent interaction
   ts_created:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created

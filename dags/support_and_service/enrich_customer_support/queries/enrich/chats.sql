@@ -34,7 +34,8 @@ sauron_sessions AS (
     user_data:["user_id"] AS id_user,
     user_data:["user_phone"] AS user_phone,
     user_data:["user_email"] AS user_email,
-    created_by
+    created_by,
+    source_environment
   FROM
     datalake_sauron_clean.session
   WHERE
@@ -107,6 +108,10 @@ SELECT
   t.is_forwarded,
   t.is_per_team_task,
   t.is_spoc_task,
+  CASE 
+    WHEN ss.source_environment = 'isaias_inbound' THEN TRUE
+    ELSE FALSE
+  END AS is_isaias_session,
   t.ts_created,
   t.ts_updated AS ts_ended,
   t.task_attributes,

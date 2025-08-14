@@ -71,6 +71,7 @@ twilio_demand AS (
     is_call_answered AS is_contact_answered,
     is_reservation_answered AS is_interaction_answered,
     NULL AS is_spoc_task,
+    NULL AS is_isaias_session,
     ts_task_created,
     ts_reservation_created,
     ts_reservation_ended,
@@ -115,6 +116,7 @@ twilio_demand AS (
       ELSE TRUE
     END AS is_interaction_answered,
     is_spoc_task,
+    is_isaias_session,
     ts_created AS ts_task_created,
     NULL AS ts_reservation_created,
     NULL AS ts_reservation_ended,
@@ -167,6 +169,7 @@ twilio_contacts AS (
     d.is_contact_answered,
     d.is_interaction_answered,
     d.is_spoc_task,
+    d.is_isaias_session,
     d.ts_task_created,
     COALESCE(d.ts_reservation_created, crt.ts_reservation_created) AS ts_reservation_created,
     d.ts_reservation_ended,
@@ -248,6 +251,7 @@ front_contacts AS (
     is_contact_answered,
     is_interaction_answered,
     is_spoc_task,
+    is_isaias_session,
     ts_task_created,
     ts_reservation_created,
     ts_reservation_ended
@@ -290,6 +294,7 @@ front_contacts AS (
     TRUE AS is_contact_answered,
     TRUE AS is_interaction_answered,
     NULL AS is_spoc_task,
+    NULL AS is_isaias_session,
     t.ts_created AS ts_task_created,
     NULL AS ts_reservation_created,
     NULL AS ts_reservation_ended
@@ -346,6 +351,7 @@ SELECT DISTINCT
   is_contact_answered,
   is_interaction_answered,
   is_spoc_task,
+  is_isaias_session,
   ts_task_created,
   ts_reservation_created,
   ts_reservation_ended,

@@ -153,6 +153,10 @@ columns:
     description: Indicates if the interaction was answered.
   is_spoc_task:
     description: True if the task was originated by SPOC
+  is_isaias_session:
+    lineage:
+      - datalake_customer_support.chats.is_isaias_session
+    description: Indicates if the session is part of an ISAIAS AI Agent interaction
   is_first_interaction:
     description: Indicates if this is the first interaction in the contact.
   is_last_interaction:
