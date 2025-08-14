@@ -109,7 +109,7 @@ SELECT
   t.is_per_team_task,
   t.is_spoc_task,
   CASE 
-    WHEN ss.source_environment = 'isaias_inbound' THEN TRUE
+    WHEN ss.source_environment IN ('isaias_inbound', 'isaias_inbound_main') THEN TRUE
     ELSE FALSE
   END AS is_isaias_session,
   t.ts_created,
