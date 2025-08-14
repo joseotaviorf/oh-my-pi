@@ -88,6 +88,7 @@ columns:
   dt_house_first_listing:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_clean.house.dt_first_publication
     description: First listing date of the property related to the rent flow.
   dt_booking_created:
     lineage:

@@ -1,12 +1,14 @@
-WITH
-lbc_first_publication AS (
+WITH lbc_first_publication AS (
     SELECT
-        id_house,
-        ts_first_publication
+        h.id AS id_house,
+        COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS ts_first_publication
     FROM
-        datalake_ebdb_clean.listing_business_context
+        datalake_ebdb_clean.house AS h
+    LEFT JOIN
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON lbc.id_house = h.id
     QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_first_publication) = 1
+        ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) = 1
 ),
 rent_flow_offer_and_pre_proposal AS (
     WITH pre_proposal_with_visits AS (

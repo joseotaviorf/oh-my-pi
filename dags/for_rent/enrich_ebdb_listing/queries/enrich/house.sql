@@ -313,7 +313,7 @@ SELECT
   COALESCE(has_rent_smart_price_activated, FALSE) AS has_rent_smart_price_activated,
   h.dt_built,
   h.dt_expiration,
-  lbc.ts_first_publication AS dt_first_publication,
+  COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS dt_first_publication,
   h.dt_availability_end,
   h.dt_creation,
   h.ts_first_verified,
@@ -380,4 +380,4 @@ LEFT JOIN
   smart_price AS sp
     ON sp.id_house = h.id
 QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY lbc.ts_first_publication) = 1
+  ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) = 1

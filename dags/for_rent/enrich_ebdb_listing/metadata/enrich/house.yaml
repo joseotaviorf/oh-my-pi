@@ -617,7 +617,8 @@ columns:
   dt_first_publication:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
-    description: 'The timestamp the house was first published'
+      - datalake_ebdb_clean.house.dt_first_publication
+    description: 'The timestamp the house was first published. In the case of hybrid houses, it contains information regarding rental context.'
   dt_availability_end:
     lineage:
       - datalake_ebdb_clean.house.dt_availability_end
