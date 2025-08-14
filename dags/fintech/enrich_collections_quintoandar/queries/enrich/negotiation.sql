@@ -47,7 +47,8 @@ trato_feito_negotiation AS (
     DATE(n.ts_first_payment) AS dt_down_payment,
     DATE(n.ts_paid_all) AS dt_paid_all,
     DATE(n.ts_breach) AS dt_cancellation,
-    DATE(COALESCE(n.ts_breach, n.ts_paid_all)) AS dt_ending
+    DATE(COALESCE(n.ts_breach, n.ts_paid_all)) AS dt_ending,
+    n.ts_created_at AS ts_promisse
   FROM datalake_debt_recovery.negotiation AS n
   LEFT JOIN datalake_trato_feito_clean.contract AS ct
     ON n.id_contract = ct.id_external
@@ -106,6 +107,7 @@ cyber_negotiation AS (
     dt_down_payment,
     dt_paid_all,
     COALESCE(dt_cancellation, dt_paid_all) AS dt_ending,
+    ts_promisse,
     "Cyber" AS source,
     1 AS priority
   FROM datalake_cyber.negotiation
@@ -224,6 +226,7 @@ SELECT DISTINCT
     COALESCE(tfn.dt_down_payment, cn.dt_down_payment, rn.dt_down_payment) AS dt_down_payment,
     COALESCE(tfn.dt_paid_all, cn.dt_paid_all, rn.dt_paid_all) AS dt_paid_all_installments,
     COALESCE(tfn.dt_expected_end, cn.dt_expected_end, rn.dt_expected_end) AS dt_expected_ending,
+    COALESCE(tfn.ts_promisse, cn.ts_promisse) AS ts_promisse,
     NOW() AS ts_load
 FROM
     trato_feito_negotiation AS tfn

@@ -133,7 +133,8 @@ calculations AS (
     DATE(IF(u.negotiation_status != "finished", u.dt_cancellation, NULL)) AS dt_cancellation,
     COALESCE(i.dt_down_payment,u.dt_down_payment) AS dt_down_payment,
     u.dt_paid_all_installments,
-    u.dt_expected_ending
+    u.dt_expected_ending,
+    u.ts_promisse
   FROM datalake_collections_quintoandar.negotiation AS u
   LEFT JOIN paschoalotto_operator AS po
     ON
@@ -220,7 +221,8 @@ calculate_discounts AS (
     dt_down_payment,
     dt_paid_all_installments,
     dt_expected_ending,
-    COALESCE(dt_paid_all_installments, dt_cancellation) AS dt_ending
+    COALESCE(dt_paid_all_installments, dt_cancellation) AS dt_ending,
+    ts_promisse
   FROM calculations
 )
 SELECT
@@ -298,5 +300,6 @@ SELECT
   dt_paid_all_installments,
   dt_expected_ending,
   dt_ending,
+  ts_promisse,
   NOW() AS ts_load
 FROM calculate_discounts

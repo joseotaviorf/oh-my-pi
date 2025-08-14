@@ -163,7 +163,7 @@ union_promisses_agreements AS (
     d.discount_to_fine_amount,
     d.discount_to_fees_amount,
     d.discount_to_eviction_costs,
-    COALESCE(a.ts_agreement_creation, DATE(c.ts_boletagem_sent)) AS dt_promisse,
+    COALESCE(DATE(a.ts_agreement_creation), DATE(c.ts_boletagem_sent)) AS dt_promisse,
     COALESCE(i.dt_due_promisse, DATE(c.ts_due_down_payment)) AS dt_due_promisse,
     i.dt_down_payment,
     i.dt_paid_all,
@@ -171,7 +171,8 @@ union_promisses_agreements AS (
     CASE
       WHEN a.status = "Cancelado" THEN DATE(COALESCE(a.ts_agreement_breach, a.ts_canceled, a.ts_status_update))
       WHEN c.campaign_status = "Vencida" THEN DATE(c.ts_due_boletagem)
-    END AS dt_cancellation
+    END AS dt_cancellation,
+    COALESCE(a.ts_agreement_creation, c.ts_boletagem_sent) AS ts_promisse
   FROM datalake_cyber_clean.agreements AS a
   LEFT JOIN datalake_cyber_clean.contracts_agreements AS ca
     ON a.id_agreement = ca.id_agreement
@@ -277,6 +278,7 @@ SELECT
     a.dt_paid_all,
     a.dt_expected_end,
     a.dt_cancellation,
+    a.ts_promisse,
     NOW() AS ts_load
 FROM union_promisses_agreements AS a
 LEFT JOIN datalake_cyber_clean.contracts AS c
