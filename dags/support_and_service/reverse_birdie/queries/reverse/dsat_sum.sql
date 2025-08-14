@@ -40,6 +40,7 @@ WHERE rn = 1
       SELECT 
       sk_analyst AS author_id,  
       sk_answer AS feedback_id, 
+      CAST(sk_answer AS VARCHAR(50)) || '_' || CAST(sk_analyst AS VARCHAR(50)) account_id,
       ROUND((facility_satisfaction + COALESCE(time_satisfaction,1) + COALESCE(support_satisfaction,1))/3,2) AS rating,
       ts_survey_answer AS posted_at, 
       team,
