@@ -59,6 +59,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_aud.id_agent
     description: Last id_agent associated with visit.
+  id_user_visit_request:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_author_user
+    description: ID of user who requested the visit.
   code:
     lineage:
       - datalake_ebdb_clean.visit.code
@@ -182,8 +186,46 @@ columns:
       EARLY: When the visit was earlier (last < first)
   visit_request_channel:
     lineage:
-      - datalake_visit.visits.visit_request_channel
+      - datalake_ebdb_clean.visit_status_log.channel
     description: Channel when the visit was requested.
+  visit_request_on_behalf_of:
+    lineage:
+      - datalake_ebbd_clean.visit_status_log.on_behalf_of
+    description: On whose behalf the request was made.
+  visit_request_user_role:
+    lineage:
+      - datalake_ebbd_clean.visit_status_log.author_user_role
+    description: Role of user who requested the visit.
+  first_supply_answer_channel:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Channel when owner answer the confirmation for the first time.
+  first_supply_answer:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.event_type
+    description: First confirmation response from owner.
+    categories:
+      ANSWER_CONFIRMED: Owner confirmed the visit.
+      ANSWER_REJECTED: Owner rejected the visit.
+  first_tenant_living_answer_channel:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Channel when tenant living answer the confirmation for the first time.
+  visit_first_confirmed_channel:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Channel when the visit was confirmed for the first time.
+  visit_first_confirmed_user_role:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Role of user who is related to the first visit confirmation.
+  first_tenant_livign_answer:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.event_type
+    description: First confirmation response from tenant living.
+    categories:
+      ANSWER_CONFIRMED: Tenant living confirmed the visit.
+      ANSWER_REJECTED: Tenant living rejected the visit.
   nbr_reschedule:
     description: Number of rescheduling.
   nbr_agent:

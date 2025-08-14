@@ -6,6 +6,9 @@ WITH
             SUM(1) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_visit_requested,
             MIN(channel) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_channel,
+            MIN(on_behalf_of) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_on_behalf_of,
+            MIN(author_user_role) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_user_role,
+            MIN(id_author_user) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS id_user_visit_request,
             MAX(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_rescheduled,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_first_rescheduled,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_DONE') AS ts_visit_done,
@@ -17,6 +20,8 @@ WITH
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_STALLED') AS ts_visit_stalled,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
             MAX(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
+            MIN_BY(channel, ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_channel,
+            MIN_BY(author_user_role, ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_user_role,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_answer,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'DEMAND') AS ts_visit_demand_answer,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'AGENT') AS ts_visit_agent_answer,
@@ -30,7 +35,11 @@ WITH
             MIN(ts_created) AS ts_first_event,
             MAX(ts_created) AS ts_last_event,
             MIN_BY(event_type, ts_created) AS first_event,
-            MAX_BY(event_type, ts_created) AS last_event
+            MAX_BY(event_type, ts_created) AS last_event,
+            MIN_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS first_supply_answer,
+            MIN_BY(channel, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS first_supply_answer_channel,
+            MIN_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer,
+            MIN_BY(channel, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel
         FROM
             datalake_ebdb_clean.visit_status_log
         GROUP BY
@@ -82,6 +91,7 @@ SELECT
     -1 AS id_entrance_type,
     vbh.id_first_associated_agent,
     vbh.id_last_associated_agent,
+    visit_log.id_user_visit_request,
     visit.code,
     v_origin.name AS visit_origin,
     v_origin.description AS visit_origin_description,
@@ -132,6 +142,14 @@ SELECT
         ELSE 'EARLY'
     END AS visit_schedule_type,
     visit_log.visit_request_channel,
+    visit_log.visit_request_on_behalf_of,
+    visit_log.visit_request_user_role,
+    visit_log.first_supply_answer_channel,
+    visit_log.first_supply_answer,
+    visit_log.first_tenant_living_answer,
+    visit_log.first_tenant_living_answer_channel,
+    visit_log.visit_first_confirmed_channel,
+    visit_log.visit_first_confirmed_user_role,
     CASE
       WHEN visit_log.nbr_reschedule IS NULL THEN 0
       ELSE visit_log.nbr_reschedule

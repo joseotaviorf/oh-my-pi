@@ -20,11 +20,11 @@ columns:
     description: Code of visit
   visit_origin:
     lineage:
-      - datalake_ebdb_clean.visit_origin.name
+      - datalake_visit.visits.visit_origin
     description: Shows the origin of visit
   visit_origin_description:
     lineage:
-      - datalake_ebdb_clean.visit_origin.description
+      - datalake_visit.visits.visit_origin_description
     description: Origin description of visit
   business_unit:
     lineage:
@@ -133,6 +133,44 @@ columns:
     lineage:
       - datalake_visit.visits.visit_request_channel
     description: Channel when the visit was requested.
+  visit_request_on_behalf_of:
+    lineage:
+      - datalake_visit.visits.visit_request_on_behalf_of
+    description: On whose behalf the request was made.
+  visit_request_user_role:
+    lineage:
+      - datalake_visit.visits.visit_request_user_role
+    description: Role of user who requested the visit.
+  first_supply_answer:
+    lineage:
+      - datalake_visit.visits.first_supply_answer
+    description: First confirmation response from owner.
+    categories:
+      ANSWER_CONFIRMED: Owner confirmed the visit.
+      ANSWER_REJECTED: Owner rejected the visit.
+  first_supply_answer_channel:
+    lineage:
+      - datalake_visit.visits.first_supply_answer_channel
+    description: Channel when owner answer the confirmation for the first time.
+  first_tenant_living_answer:
+    lineage:
+      - datalake_visit.visits.first_tenant_living_answer
+    description: First confirmation response from tenant living.
+    categories:
+      ANSWER_CONFIRMED: Tenant living confirmed the visit.
+      ANSWER_REJECTED: Tenant living rejected the visit.
+  first_tenant_living_answer_channel:
+    lineage:
+      - datalake_visit.visits.first_tenant_living_answer_channel
+    description: Channel when tenant living answer the confirmation for the first time.
+  visit_first_confirmed_channel:
+    lineage:
+      - datalake_visit.visits.visit_first_confirmed_channel
+    description: Channel when the visit was confirmed for the first time.
+  visit_first_confirmed_user_role:
+    lineage:
+      - datalake_visit.visits.visit_first_confirmed_user_role
+    description: Role of user who is related to the first visit confirmation.
   is_visit_with_fixed_agent:
     lineage:
       - datalake_visit.visits.is_fixed_agent
@@ -169,6 +207,10 @@ columns:
     lineage:
       - datalake_visit.visits.is_stalled
     description: If the visit is stalled.
+  has_visit_tenant_living:
+    lineage:
+      - datalake_visit.visits.has_tenant_living
+    description: If the visit has tenant living.
   has_visit_finisher_status:
     lineage:
       - datalake_visit.visits.has_finisher_status
@@ -234,6 +276,22 @@ columns:
     lineage:
       - datalake_visit.visits.ts_visit_first_confirmed
     description: Timestamp with the first confirmation of this visit.
+  ts_visit_supply_answer:
+    lineage:
+      - datalake_visit.visits.ts_visit_supply_answer
+    description: Timestamp of the first supply confirmation answer.
+  ts_visit_demand_answer:
+    lineage:
+      - datalake_visit.visits.ts_visit_demand_answer
+    description: Timestamp of the first demand confirmation answer.
+  ts_visit_agent_answer:
+    lineage:
+      - datalake_visit.visits.ts_visit_agent_answer
+    description: Timestamp of the first agent confirmation answer.
+  ts_visit_tenant_answer:
+    lineage:
+      - datalake_visit.visits.ts_visit_tenant_answer
+    description: Timestamp of the first tenant living confirmation answer.
   ts_visit_last_confirmed:
     lineage:
       - datalake_visit.visits.ts_visit_last_confirmed
