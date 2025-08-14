@@ -56,7 +56,7 @@ columns:
   language:
     description: Code defining the language of the performance document.
     lineage:
-      - datalake_pin_performance_raw.hra_evaluations.language
+      - datalake_pin_performance_raw.hra_evaluations.language_code
   status_code:
     description: Current status of the performance document.
     lineage:
