@@ -1,6 +1,6 @@
 from typing import Optional
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, to_timestamp, to_date, when
+from pyspark.sql.functions import abs as pyspark_abs, col, to_timestamp, to_date, when
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment import (
     CdcSchemaTreatment,
 )
@@ -188,9 +188,9 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
             transactional_dataframe = transactional_dataframe.withColumn(
                 column,
                 to_timestamp(
-                    when(col(column) < 100000000000000, col(column) / 1000).otherwise(
-                        col(column) / 1000000
-                    )
+                    when(
+                        pyspark_abs(col(column)) < 100000000000000, col(column) / 1000
+                    ).otherwise(col(column) / 1000000)
                 ),
             )
 
