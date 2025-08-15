@@ -18,7 +18,7 @@ workflow:
     rene_leads_formatted: {}
 cluster:
   type: databricks_13_3_min_general_2_workers_cluster
-  databricks_conn_id: databricks_new_backup
+  databricks_conn_id: databricks_new_env
   access_control_list:
     group_name: software-engineers
     permission_level: CAN_MANAGE
