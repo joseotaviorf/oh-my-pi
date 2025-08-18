@@ -1029,6 +1029,7 @@ bietlejuice.dw_smart_price:
 bietlejuice.dw_supply:
   - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day

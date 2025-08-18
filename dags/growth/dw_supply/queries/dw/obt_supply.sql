@@ -44,6 +44,12 @@ WHERE
    is_pp_multi_active = TRUE
    AND ppm.dt_houses_owned >= DATE '2024-01-01'
 ),
+ciq_id_users AS (
+SELECT
+    DISTINCT id_user
+FROM
+    datalake_ebdb_agents.ciq_users 
+),
 base AS (
     SELECT
         dd.date,
@@ -153,6 +159,14 @@ base AS (
             WHEN dfs.cd_funnel_step = 'opportunity' THEN 5
             WHEN dfs.cd_funnel_step = 'first_listing' THEN 6
         END AS funnel_order,
+        CASE 
+          WHEN fse.sk_house = -1 THEN false
+          ELSE (
+              DENSE_RANK() OVER (PARTITION BY fse.sk_house, dfs.cd_funnel_step ORDER BY fse.nm_business_context ASC) + 
+              DENSE_RANK() OVER (PARTITION BY fse.sk_house, dfs.cd_funnel_step ORDER BY fse.nm_business_context DESC) - 1 
+          ) > 1
+        END AS is_hybrid_listing, -- Essa regra será usada somente para CIQ
+        cu.id_user IS NOT NULL AS is_converted_by_ciq,
         fse.sk_supply,
         ac.affiliate_campaign,
         ac.affiliate_objective,
@@ -207,6 +221,9 @@ base AS (
             ON pp_m.id_owner = fse.sk_owner
             AND dd.date = dt_houses_owned
             AND fse.nm_business_context = 'RENT'
+    LEFT JOIN
+        ciq_id_users as cu
+            on fse.sk_user_conversion = cu.id_user
     WHERE fse.sk_funnel_step IN (5,9,2,10,7,12)
 ),
 report_origin AS (
@@ -272,6 +289,7 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'is_inbound' THEN 'Inbound'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' THEN 'Backend'
             -- Adjusting cases without leads
+            WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND obt.is_hybrid_listing AND obt.is_converted_by_ciq THEN 'CIQ'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND obt.acquisition_origin = 'notmapped-notmapped' THEN 'Owner PWA - Not Mapped'
             -- Adjusting cases with leads equal other
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'ownerpwa' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
@@ -346,6 +364,7 @@ SELECT
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'Inbound'
+        WHEN full_conversion_origin = 'ownerpwa' AND is_hybrid_listing AND is_converted_by_ciq THEN 'CIQ'
         WHEN acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration', 'ownerpwa')
                 AND (LOWER(medium) = 'seo non-branded' OR LOWER(behavior_type) = 'organic') AND is_pp_multi_active = TRUE THEN 'PP Multi'
         WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
@@ -385,6 +404,7 @@ SELECT
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'IS'
+        WHEN full_conversion_origin = 'ownerpwa' AND is_hybrid_listing AND is_converted_by_ciq THEN 'CIQ'
         WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
         WHEN full_conversion_origin = 'rede' THEN 'Rede'
         WHEN full_conversion_origin = 'ciq' THEN 'CIQ'
