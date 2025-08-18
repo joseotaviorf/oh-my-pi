@@ -1,7 +1,7 @@
 dag:
   name: pin_compensation
   owner: Data People
-  schedule_interval: 0 3 * * *
+  schedule_interval: 30 0 * * *
   dag_documentation:
     dag_purpose: |
       This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).

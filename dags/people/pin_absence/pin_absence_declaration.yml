@@ -1,6 +1,6 @@
 dag:
   name: pin_absence
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 1 * * *
   owner: Data People
   dag_documentation:
     dag_purpose: |
