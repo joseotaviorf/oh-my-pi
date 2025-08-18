@@ -1,6 +1,5 @@
 SELECT
-   cc_legacy AS id_cost_center_legacy,
-   cc_code AS id_cost_center_current,
+   cc_code AS id_cost_center,
    CAST(team_code AS INT) AS team_code,
    cc_full_name AS cost_center_full_name,
    cc_name AS cost_center_name,

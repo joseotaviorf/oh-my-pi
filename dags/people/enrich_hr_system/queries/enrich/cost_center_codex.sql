@@ -1,17 +1,7 @@
 WITH
 cost_center_headcount_type AS (
   SELECT DISTINCT
-    id_cost_center_current AS id_cost_center,
-    cost_center_detail AS headcount_type
-  FROM
-    datalake_gsheets_people_clean.codex_cost_informations
-  WHERE
-    cost_center_detail IN ('Capacity', 'Overhead')
-  
-  UNION ALL
-
-  SELECT DISTINCT
-    id_cost_center_legacy AS id_cost_center,
+    id_cost_center,
     cost_center_detail AS headcount_type
   FROM
     datalake_gsheets_people_clean.codex_cost_informations
@@ -62,7 +52,7 @@ employee_ids_enrich AS (
 ),
 codex_unified AS (
   SELECT
-    codex_cc.id_cost_center_current AS id_cost_center,
+    codex_cc.id_cost_center AS id_cost_center,
     codex_cc.cost_center_name,
     codex_cc.cost_center_full_name,
     codex_cc.business,
@@ -87,66 +77,30 @@ codex_unified AS (
     CASE
       WHEN codex_cc.cost_center_status = 'Active' THEN TRUE
       WHEN codex_cc.cost_center_status = 'End' THEN FALSE
-    END AS is_active,
-    FALSE AS is_legacy_code
+    END AS is_active
   FROM
     datalake_gsheets_people_clean.codex_cost_centers AS codex_cc
   LEFT JOIN
     cost_center_headcount_type AS codex_hctp
-      ON codex_cc.id_cost_center_current = codex_hctp.id_cost_center
-
-  UNION ALL
-
-  SELECT
-    codex_cc.id_cost_center_legacy AS id_cost_center,
-    codex_cc.cost_center_name,
-    codex_cc.cost_center_full_name,
-    codex_cc.business,
-    codex_cc.product,
-    codex_cc.brand,
-    CASE
-      WHEN codex_cc.structure IN ('Sales','Operations','Marketing','Guarantees') THEN 'Ops'
-      WHEN codex_cc.structure IN ('Finance','People','Legal','Administrative') THEN 'Corp'
-      WHEN codex_cc.structure = 'Product' THEN 'Tech'
-    END AS vertical,
-    codex_cc.structure,
-    codex_cc.team,
-    codex_cc.chapter,
-    codex_cc.line,
-    codex_cc.owner_l1_email,
-    codex_cc.owner_l2_email,
-    codex_cc.owner_l3_email,
-    codex_cc.owner_finance_email,
-    codex_hctp.headcount_type,
-    codex_cc.team_code,
-    codex_cc.sort_number,
-    CASE
-      WHEN codex_cc.cost_center_status = 'Active' THEN TRUE
-      WHEN codex_cc.cost_center_status = 'End' THEN FALSE
-    END AS is_active,
-    TRUE AS is_legacy_code
-  FROM
-    datalake_gsheets_people_clean.codex_cost_centers AS codex_cc
-  LEFT JOIN
-    cost_center_headcount_type AS codex_hctp
-      ON codex_cc.id_cost_center_current = codex_hctp.id_cost_center
+      ON codex_cc.id_cost_center = codex_hctp.id_cost_center
   QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY
-        codex_cc.id_cost_center_legacy
+        codex_cc.id_cost_center
       ORDER BY
         (
-          CAST((codex_cc.cost_center_status = 'Active') AS INT) * 100
+          CAST((codex_cc.cost_center_status = 'Active') AS INT) * 10
           + CAST((codex_cc.chapter IS NOT NULL) AS INT)
           + CAST((codex_cc.line IS NOT NULL) AS INT)
           + CAST((codex_cc.owner_l1_email IS NOT NULL) AS INT)
           + CAST((codex_cc.owner_l2_email IS NOT NULL) AS INT)
-          + CAST((codex_cc.owner_l2_email IS NOT NULL) AS INT)
+          + CAST((codex_cc.owner_l3_email IS NOT NULL) AS INT)
           + CAST((codex_hctp.headcount_type IS NOT NULL) AS INT)
         ) DESC,
         codex_cc.sort_number
       ) = 1
     )
+
 SELECT
   codex.id_cost_center,
   codex.cost_center_name,
@@ -173,7 +127,6 @@ SELECT
   codex.team_code,
   codex.sort_number,
   codex.is_active,
-  codex.is_legacy_code,
   CASE
     WHEN org.codigo_dff IS NULL THEN NULL
     ELSE (
@@ -190,7 +143,8 @@ SELECT
       OR (emp_id3.full_name IS DISTINCT FROM org.owner_leadership_layer_3_name)
       OR (codex.headcount_type IS DISTINCT FROM org.headcount_type)
     )
-  END AS is_outdated_in_system
+  END AS is_outdated_in_system,
+  NOW() AS ts_load
 FROM
   codex_unified AS codex
 LEFT JOIN

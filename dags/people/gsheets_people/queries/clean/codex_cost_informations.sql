@@ -1,6 +1,5 @@
 SELECT
-   cc_old AS id_cost_center_legacy,
-   cc_code AS id_cost_center_current,
+   cc_code AS id_cost_center,
    pl_line_type AS cost_center_detail,
    ts_load
 FROM

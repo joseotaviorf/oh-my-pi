@@ -112,8 +112,6 @@ columns:
     description: "Boolean flag indicating the status of the cost center. TRUE if cost_center_status is 'Active', FALSE if 'End'."
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.status
-  is_legacy_code:
-    description: 'Boolean flag indicating if the id_cost_center for this row is a legacy identifier (TRUE) or a current identifier (FALSE).'
   is_outdated_in_system:
     description: "Flag indicating if a cost center's attributes are synchronized between the source of truth (cost_center_codex) and the PIN system (organizations). Derived from comparing multiple attributes between the cost_center_codex and organizations tables."
     categories:
