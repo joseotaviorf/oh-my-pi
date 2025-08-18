@@ -151,8 +151,9 @@ steps:
     pull: true
     when:
       event: push
-      branch: [ forno ]
-    depends_on: [ upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno ]
+      branch: [forno]
+    depends_on:
+      [upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno]
 
   astronomer-deploy-dags-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:prod-latest
@@ -160,7 +161,8 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-    depends_on: [ upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod ]
+    depends_on:
+      [upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod]
 
   upload-dag-packages-spark-jobs-s3-forno:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -231,7 +233,7 @@ steps:
     commands:
       - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
       - make requirements-scripts
-      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.data.quintoandar.com.br/"
+      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-prd.habitat.zone/"
     when:
       event: push
       branch: [master, hotfix/*]
