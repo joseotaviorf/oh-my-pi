@@ -12,6 +12,7 @@ class TestLayerEnum:
             LayerEnum.RAW.value,
             LayerEnum.CLEAN.value,
             LayerEnum.CLEAN_STAGING.value,
+            LayerEnum.CORE.value,
             LayerEnum.ENRICH.value,
             LayerEnum.DW_STAGING.value,
             LayerEnum.DW.value,

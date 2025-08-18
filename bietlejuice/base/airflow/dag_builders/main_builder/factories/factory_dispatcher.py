@@ -19,6 +19,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.reverse_factor
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.clean_factory import (
     CleanFactory,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.factories.core_factory import (
+    CoreFactory,
+)
 from bietlejuice.base.pipeline import LayerEnum
 from airflow.datasets import BaseDataset
 
@@ -32,6 +35,7 @@ class FactoryDispatcher:
     FACTORY_CLASSES_MAPPING_BY_LAYER = {
         LayerEnum.RAW: RawFactory,
         LayerEnum.CLEAN: CleanFactory,
+        LayerEnum.CORE: CoreFactory,
         LayerEnum.ENRICH: EnrichFactory,
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,

@@ -13,6 +13,7 @@ class TableStorageDescriptorEnum(Enum):
     RAW_FORMAT = TableFormatInfo().json
     CLEAN_FORMAT = TableFormatInfo().parquet
     CLEAN_STAGING_FORMAT = TableFormatInfo().parquet
+    CORE_FORMAT = TableFormatInfo().parquet
     ENRICH_FORMAT = TableFormatInfo().parquet
     DW = TableFormatInfo().parquet
     METRIC_FORMAT = TableFormatInfo().parquet
@@ -31,6 +32,7 @@ class TableStorageDescriptorEnum(Enum):
             LayerEnum.RAW: TableStorageDescriptorEnum.RAW_FORMAT.value,
             LayerEnum.CLEAN: TableStorageDescriptorEnum.CLEAN_FORMAT.value,
             LayerEnum.CLEAN_STAGING: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value,
+            LayerEnum.CORE: TableStorageDescriptorEnum.CORE_FORMAT.value,
             LayerEnum.ENRICH: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
             LayerEnum.DW: TableStorageDescriptorEnum.DW.value,
             LayerEnum.METRIC: TableStorageDescriptorEnum.METRIC_FORMAT.value,

@@ -10,6 +10,7 @@ class TestTableStorageDescriptorEnum:
             ("raw", TableStorageDescriptorEnum.RAW_FORMAT.value),
             ("clean", TableStorageDescriptorEnum.CLEAN_FORMAT.value),
             ("clean_staging", TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value),
+            ("core", TableStorageDescriptorEnum.CORE_FORMAT.value),
             ("enrich", TableStorageDescriptorEnum.ENRICH_FORMAT.value),
             ("dw", TableStorageDescriptorEnum.DW.value),
             ("metric", TableStorageDescriptorEnum.METRIC_FORMAT.value),

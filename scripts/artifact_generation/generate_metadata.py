@@ -102,6 +102,8 @@ if __name__ == "__main__":
             layer = "dw"
         elif "/metric/" in file_path:
             layer = "metric"
+        elif "/core/" in file_path:
+            layer = "core"
         else:
             raise Exception(f"ERROR finding the layer.")
         regex = f"{path}(.*)\/(.*)\/queries\/(.*)\/(.*).sql"
@@ -113,6 +115,8 @@ if __name__ == "__main__":
         elif layer == "enrich":
             database_name = database_name.replace("enrich_", "")
             db_template = f"datalake_{database_name}"
+        elif layer == "core":
+            db_template = f"{database_name}"
         elif layer == "dw":
             db_template = f"{database_name}"
         elif layer == "metric":

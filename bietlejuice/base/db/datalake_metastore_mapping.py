@@ -7,7 +7,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
 
     DATABASE_PATTERN = re.compile(
-        r"(?<=^datalake_)(?P<schema>[\w|_]*?)(?:_transactional|_raw|_clean|_clean_staging)?$"
+        r"^(?:datalake_|core_)(?P<schema>[\w|_]+?)(?:_transactional|_raw|_clean|_clean_staging)?$"
     )
 
     def get_full_database_name(self, layer: LayerEnum = None) -> str:
@@ -16,6 +16,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "transactional": f"datalake_{self.source}_transactional",
             "raw": f"datalake_{self.source}_raw",
             "clean": f"datalake_{self.source}_clean",
+            "core": f"{self.source}",
             "clean_staging": f"datalake_{self.source}_clean_staging",
             "enrich": f"datalake_{self.source}",
         }[layer.value]
@@ -26,6 +27,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "transactional": f"s3a://{self.bucket}/transactional/{self.source}/",
             "raw": f"s3a://{self.bucket}/raw/{self.source}/",
             "clean": f"s3a://{self.bucket}/clean/{self.source}/",
+            "core": f"s3a://{self.bucket}/core/{self.source}/",
             "clean_staging": f"s3a://{self.bucket}/clean_staging/{self.source}/",
             "enrich": f"s3a://{self.bucket}/enrich/{self.source}/",
         }[layer.value]
@@ -43,6 +45,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 LayerEnum.RAW,
                 LayerEnum.CLEAN,
                 LayerEnum.CLEAN_STAGING,
+                LayerEnum.CORE,
                 LayerEnum.ENRICH,
             )
         }
@@ -53,6 +56,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 LayerEnum.RAW,
                 LayerEnum.CLEAN,
                 LayerEnum.CLEAN_STAGING,
+                LayerEnum.CORE,
                 LayerEnum.ENRICH,
             )
         }

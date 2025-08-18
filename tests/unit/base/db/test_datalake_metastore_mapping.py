@@ -18,6 +18,8 @@ class TestDatalakeMetastoreMapping:
             "db_clean_path": "s3a://bucket-forno/clean/_my_src_/",
             "db_clean_staging_name": "datalake__my_src__clean_staging",
             "db_clean_staging_path": "s3a://bucket-forno/clean_staging/_my_src_/",
+            "db_core_name": "_my_src_",
+            "db_core_path": "s3a://bucket-forno/core/_my_src_/",
             "db_raw_name": "datalake__my_src__raw",
             "db_raw_path": "s3a://bucket-forno/raw/_my_src_/",
             "db_enrich_name": "datalake__my_src_",
@@ -42,6 +44,8 @@ class TestDatalakeMetastoreMapping:
             "db_clean_path": "s3a://5a-datalake-prod/clean/_my_src_/",
             "db_clean_staging_name": "datalake__my_src__clean_staging",
             "db_clean_staging_path": "s3a://5a-datalake-prod/clean_staging/_my_src_/",
+            "db_core_name": "_my_src_",
+            "db_core_path": "s3a://5a-datalake-prod/core/_my_src_/",
             "db_raw_name": "datalake__my_src__raw",
             "db_raw_path": "s3a://5a-datalake-prod/raw/_my_src_/",
             "db_enrich_name": "datalake__my_src_",
@@ -89,6 +93,16 @@ class TestDatalakeMetastoreMapping:
     def test_get_schema_from_database_for_clean(self):
         # arrange
         database = "datalake_my_schema_clean"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "my_schema"
+
+    def test_get_schema_from_database_for_core(self):
+        # arrange
+        database = "core_my_schema"
 
         # act
         schema = DatalakeMetastoreMapping.get_schema_from_database(database)

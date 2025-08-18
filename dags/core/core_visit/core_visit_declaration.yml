@@ -1,5 +1,5 @@
 dag:
-  name: enrich_core_visit
+  name: core_visit
   schedule_start_date: 2025, 8, 13
   owner: Data ForSale
   documentation:
@@ -7,7 +7,7 @@ dag:
       This is a test DAG related to Core Models proposal
 workflow:
   type: query_delta
-  layer: enrich
+  layer: core
   default_extraction_type: full
   tables_customization:
     visit:

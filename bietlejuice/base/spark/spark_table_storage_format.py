@@ -3,6 +3,7 @@ class SparkTableStorageFormat:
     PARQUET = "PARQUET"
     DEFAULT_RAW = JSON
     DEFAULT_CLEAN = PARQUET
+    DEFAULT_CORE = PARQUET
     DEFAULT_ENRICH = PARQUET
     DEFAULT_CLEAN_STAGING = PARQUET
     DEFAULT_DW = PARQUET
@@ -19,6 +20,7 @@ class SparkTableStorageFormat:
         return [
             "raw",
             "clean",
+            "core",
             "enrich",
             "clean_staging",
             "dw_staging",
@@ -37,6 +39,7 @@ class SparkTableStorageFormat:
         return {
             "raw": cls.DEFAULT_RAW,
             "clean": cls.DEFAULT_CLEAN,
+            "core": cls.DEFAULT_CORE,
             "enrich": cls.DEFAULT_ENRICH,
             "clean_staging": cls.DEFAULT_CLEAN_STAGING,
             "dw_staging": cls.DEFAULT_DW_STAGING,

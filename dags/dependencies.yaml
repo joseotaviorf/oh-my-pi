@@ -1,6 +1,9 @@
 ---
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.core_visit:
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
 bietlejuice.cyber_complement:
   - bietlejuice.cyber:load-raw-delqmst:first-run-of-day
 bietlejuice.demand_balancer_service:
@@ -1618,9 +1621,6 @@ bietlejuice.enrich_copilot_service:
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.copilot_service:load-clean-state:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
-bietlejuice.enrich_core_visit:
-  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit
-  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
 bietlejuice.enrich_cozy_metrics:
   - bietlejuice.cozy_metrics:load-clean-library-versions:first-run-of-day
 bietlejuice.enrich_credit_analysis:

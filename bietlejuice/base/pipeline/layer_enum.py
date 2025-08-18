@@ -6,6 +6,7 @@ class LayerEnum(Enum):
     RAW = "raw"
     CLEAN = "clean"
     CLEAN_STAGING = "clean_staging"
+    CORE = "core"
     ENRICH = "enrich"
     DW_STAGING = "dw_staging"
     DW = "dw"

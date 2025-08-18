@@ -54,6 +54,7 @@ class MetadataFileService:
         self.schemas = {
             "raw": yamale.make_schema(f"{base_path}/raw_schema.yml"),
             "clean": yamale.make_schema(f"{base_path}/clean_schema.yml"),
+            "core": yamale.make_schema(f"{base_path}/core_schema.yml"),
             "enrich_dw": yamale.make_schema(f"{base_path}/enrich_dw_schema.yml"),
             "metric": yamale.make_schema(f"{base_path}/metric_schema.yml"),
         }
@@ -220,6 +221,8 @@ class MetadataFileService:
             return "raw"
         elif re.match(r".*_clean$", schema):
             return "clean"
+        elif re.match(r"^core_.*", schema):
+            return "core"
         elif re.match(r"^dw_datamarts_.*", schema):
             return "dw_datamarts"
         elif re.match(r"^dw_.*", schema):
@@ -278,6 +281,8 @@ class MetadataFileService:
             return yamale.validate(self.schemas["raw"], yaml_data)
         elif layer == "clean":
             return yamale.validate(self.schemas["clean"], yaml_data)
+        elif layer == "core":
+            return yamale.validate(self.schemas["core"], yaml_data)
         elif layer in ["enrich", "dw"]:
             return yamale.validate(self.schemas["enrich_dw"], yaml_data)
         elif layer == "metric":
@@ -300,7 +305,7 @@ class MetadataFileService:
         table_info = MetadataFileService._get_info_from_path(file_path)
         layer = table_info.get("layer")
 
-        if layer in {"raw", "clean", "enrich", "dw", "metric"}:
+        if layer in {"raw", "clean", "core", "enrich", "dw", "metric"}:
             return os.path.isfile(
                 file_path.replace("/queries/", "/metadata/").replace(".sql", ".yml")
             ) or os.path.isfile(

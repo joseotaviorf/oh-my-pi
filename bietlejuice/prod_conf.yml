@@ -6,6 +6,8 @@ dags_out_of_pattern:
         "amplitude",
         "amplitude_demand",
         "amplitude_supply",
+        "cyber",
+        "cyber_complement",
         "dw_contract_test",
         "dw_datamarts_cross",
         "dw_datamarts_for_rent",
@@ -56,8 +58,6 @@ dags_out_of_pattern:
         "reverse_neighborhood_price_range_access",
         "reverse_rene_reprocessing",
         "reverse_integration_cloudzero",
-        "cyber_complement",
-        "cyber",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks
