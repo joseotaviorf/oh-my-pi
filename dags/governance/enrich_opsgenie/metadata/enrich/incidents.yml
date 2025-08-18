@@ -1,0 +1,148 @@
+---
+database_name: datalake_opsgenie
+table_name: incidents
+domain: Cross
+owner: vitor.musachio@quintoandar.com.br
+description: This table consolidates Jira card incidents with JiraOps alert signals, DAG ownership and auxiliary date attributes for monitoring and governance.
+columns:
+  id_issue_jira:
+    description: The Jira issue identifier for the incident
+    lineage:
+      - datalake_jira.issues.id_issue
+  id_alert:
+    description: The unique alert identifier, use it as the primary key for alert data
+    lineage:
+      - datalake_opsgenie.alerts.id_alert
+  dag_name:
+    description: The name of the DAG related to the incident
+    lineage:
+      - datalake_jira.issues.summary
+  dag_owner:
+    description: The pipeline line owner associated with the DAG
+    lineage:
+      - datalake_pipeline.dag.line_name
+  incident_owner:
+    description: The owner of the incident in Jira
+    lineage:
+      - datalake_jira.issues.incident_owner
+  layer:
+    description: Data layer of the DAG
+    lineage:
+      - datalake_pipeline.dag.layer
+  current_status:
+    description: Current status of the incident in Jira
+    lineage:
+      - datalake_jira.issues.current_status
+  incident_category:
+    description: Incident category informed in Jira
+    lineage:
+      - datalake_jira.issues.incident_category
+  incident_root_cause_resolution:
+    description: Root cause resolution description of the incident
+    lineage:
+      - datalake_jira.issues.root_cause_resolution
+  oncall_incident_status:
+    description: On-call incident status from Jira 
+    lineage:
+      - datalake_jira.issues.incident_status
+  issue_description:
+    description: Description of the incident from Jira
+    lineage:
+      - datalake_jira.issues.issue_description
+  user_assigned:
+    description: User assigned to the incident
+    lineage:
+      - datalake_jira.issues.assignee
+  user_acknowledged:
+    description: User who acknowledged the alert related to the incident
+    lineage:
+      - datalake_opsgenie.alerts.acknowledged_by
+  is_assigned:
+    description: True if the incident has an assigned user; otherwise, false
+    lineage:
+      - datalake_jira.issues.assignee
+  is_acknowledged:
+    description: True if the incident has an acknowledged alert; otherwise, false
+    lineage:
+      - datalake_opsgenie.alerts.is_acknowledged
+  is_not_an_incident:
+    description: True if the record was marked as not an incident; otherwise, false
+    lineage:
+      - datalake_jira.issues.root_cause_resolution
+  is_open:
+    description: True if the incident is currently open; otherwise, false
+    lineage:
+      - datalake_jira.issues.ts_resolved
+  is_resolved:
+    description: True if the incident is resolved; otherwise, false
+    lineage:
+      - datalake_jira.issues.ts_resolved
+  is_card_filled:
+    description: True if the incident card has all required fields filled; otherwise, false
+  has_notification_sent:
+    description: True if any notification (email or call) was sent; otherwise, false
+    lineage:
+      - datalake_opsgenie.alerts.has_notification_sent
+  has_call_notification_sent:
+    description: True if a call notification was sent; otherwise, false
+    lineage:
+      - datalake_opsgenie.alerts.has_call_notification_made
+  has_email_notification_sent:
+    description: True if an email notification was sent; otherwise, false
+    lineage:
+      - datalake_opsgenie.alerts.has_email_notification_sent
+  has_root_cause_filled:
+    description: True if root cause resolution is filled; otherwise, false
+    lineage:
+      - datalake_jira.issues.root_cause_resolution
+  has_incident_category_filled:
+    description: True if incident category is filled; otherwise, false
+    lineage:
+      - datalake_jira.issues.incident_category
+  is_deleted:
+    description: True if the incident was deleted; otherwise, false
+    lineage:
+      - datalake_jira.issues.is_deleted
+  is_deleted_duplicate:
+    description: True if the deleted incident is considered a duplicate (after 2025-06-01); otherwise, false
+    lineage:
+      - datalake_jira.issues.is_deleted
+      - datalake_jira.issues.ts_created
+  dt_deleted:
+    description: Date when the incident was deleted
+    lineage:
+      - datalake_jira.issues.dt_deleted
+  dt_started:
+    description: Start date of the incident
+    lineage:
+      - datalake_jira.issues.dt_started
+  ts_created:
+    description: Timestamp when the incident was created
+    lineage:
+      - datalake_jira.issues.ts_created
+  ts_resolved:
+    description: Timestamp when the incident was resolved
+    lineage:
+      - datalake_jira.issues.ts_resolved
+  ts_updated:
+    description: Timestamp when the incident was last updated
+    lineage:
+      - datalake_jira.issues.ts_updated
+  quarter:
+    description: Calendar quarter of incident creation
+    lineage:
+      - datalake_quintoandar.aux_date.quarter
+  year:
+    description: Calendar year of incident creation
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  month:
+    description: Calendar month of incident creation
+    lineage:
+      - datalake_quintoandar.aux_date.month
+  day:
+    description: Calendar day of incident creation
+    lineage:
+      - datalake_quintoandar.aux_date.day
+  ts_load:
+    description: Timestamp of when the data was inserted into the table
