@@ -101,6 +101,10 @@ columns:
     lineage:
       - datalake_visit.visits.cancellation_author_role
     description: Role of user who cancelled the visit
+  unsuccessful_reason:
+    lineage:
+      - datalake_visit.visits.unsuccessful_reason
+    description: Reason of visit unsuccessful.
   entry_method:
     lineage:
       - datalake_visit.visit_schedule.method
@@ -256,6 +260,18 @@ columns:
       - dw_sale.fact_sale_demand_event.ts_event
       - datalake_visit.visits.ts_created
     description: True when the visit has a contract signed after creation of visit (cs from rent and ccv from sale).
+  has_unsuccessful_demand_attended:
+    lineage:
+      - datalake_visit.visits.has_demand_attended
+    description: True if demand (visitor) attended the visit.
+  has_unsuccessful_agent_attended:
+    lineage:
+      - datalake_visit.visits.has_agent_attended
+    description: True if agent attended the visit.
+  has_unsuccessful_supply_attended:
+    lineage:
+      - datalake_visit.visits.has_supply_attended
+    description: True if supply (owner) attended the visit.
   dt_created:
     lineage:
       - datalake_visit.visits.ts_created

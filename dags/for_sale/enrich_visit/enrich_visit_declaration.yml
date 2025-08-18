@@ -9,9 +9,10 @@ workflow:
     layer: enrich
     inner_dependencies:
       visits:
-      - visit_cancellation_unified
-      - preferred_fixed_agent_history
-      - visit_business_model
+        - visit_cancellation_unified
+        - preferred_fixed_agent_history
+        - visit_business_model
+        - visit_unsuccessful_unified
       visit_schedules:
         - visit_business_model
     execution_timeout_hours: 3

@@ -1,0 +1,44 @@
+database_name: datalake_visit
+table_name: visit_unsuccessful_unified
+description: The visit unsuccessful details is collected through an agent's follow up. This model
+  This model contains information on visits unsuccessful from the old model. We will soon have this information in the new modeling and this model will unify them.
+  Each row is an unique visit.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.booking.id_visit
+    description: Primary key of this table. The unsuccessful information is at visit granularity.
+  id_schedule:
+    lineage:
+      - datalake_ebdb_clean.booking.id
+    description: ID of schedule (booking).
+  reason:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup
+    description: Reason of visit unsuccessful.
+  comment:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup_comment
+    description: Comment about reason of visit unsuccessful.
+  has_demand_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+    description: True if demand (visitor) attended the visit.
+  has_agent_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+    description: True if agent attended the visit.
+  has_tenant_living_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+    description: True if tenant living attended the visit.
+  has_supply_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+    description: True if supply (owner) attended the visit.
+  ts_visit_unsuccessful:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_visit_fup
+    description: Timestamp when the follow up was collected.

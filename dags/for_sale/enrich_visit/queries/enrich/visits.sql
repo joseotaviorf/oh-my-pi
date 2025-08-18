@@ -131,6 +131,7 @@ SELECT
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
     visit_cancellation.channel AS cancellation_channel,
     visit_cancellation.author_user_role AS cancellation_author_role,
+    visit_unsuccessful.reason AS unsuccessful_reason,
     CASE
         WHEN visit_log.ts_visit_registered IS NOT NULL THEN 'REGISTERED'
         WHEN visit_log.ts_visit_fitted IS NOT NULL THEN 'FITTED'
@@ -193,6 +194,9 @@ SELECT
     visit_log.ts_visit_tenant_answer IS NOT NULL AS has_tenant_answered,
     visit_log.ts_visit_tenant_confirmed IS NOT NULL AS has_tenant_confirmed,
     visit_cancellation.is_cancelled_by_expiration,
+    visit_unsuccessful.has_demand_attended AS has_unsuccessful_demand_attended,
+    visit_unsuccessful.has_agent_attended AS has_unsuccessful_agent_attended,
+    visit_unsuccessful.has_supply_attended AS has_unsuccessful_supply_attended,
     visit.dt_visit,
     TO_UTC_TIMESTAMP(
         (
@@ -250,6 +254,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_visit.visit_cancellation_unified AS visit_cancellation
         ON visit.id = visit_cancellation.id_visit
+LEFT JOIN
+    datalake_visit.visit_unsuccessful_unified AS visit_unsuccessful
+        ON visit.id = visit_unsuccessful.id_visit
 LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.code = hl.country_code

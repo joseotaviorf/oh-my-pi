@@ -169,6 +169,10 @@ columns:
     lineage:
       - datalake_visit.visit_cancellation_unified.author_user_role
     description: Role of user who cancelled the visit.
+  unsuccessful_reason:
+    lineage:
+      - datalake_visit.visit_unsuccessful_unified.reason
+    description: Reason of visit unsuccessful.
   visit_model:
     description: Visit model of the visit.
     categories:
@@ -288,6 +292,18 @@ columns:
     lineage:
       - datalake_visit.visit_cancellation_unified.is_cancelled_by_expiration
     description: True if the visit was cancelled due to expired time.
+  has_unsuccessful_demand_attended:
+    lineage:
+      - datalake_visit.visit_unsuccessful_unified.has_demand_attended
+    description: True if demand (visitor) attended the visit.
+  has_unsuccessful_agent_attended:
+    lineage:
+      - datalake_visit.visit_unsuccessful_unified.has_agent_attended
+    description: True if agent attended the visit.
+  has_unsuccessful_supply_attended:
+    lineage:
+      - datalake_visit.visit_unsuccessful_unified.has_supply_attended
+    description: True if supply (owner) attended the visit.
   dt_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit

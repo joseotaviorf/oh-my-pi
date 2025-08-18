@@ -3674,6 +3674,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit:first-run-of-day
+  - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
