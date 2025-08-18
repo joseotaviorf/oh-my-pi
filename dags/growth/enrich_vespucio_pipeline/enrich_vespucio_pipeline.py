@@ -436,7 +436,8 @@ images_and_relations_tasks = [
     create_task(
         entry_point="core_images_step",
         parameters=[
-            f"--input_merged_houses={Tables.merge_step_houses}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_extracted_houses={Tables.extract_step_houses}",
             f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
             f"--input_kodak_photo={Tables.kodak_photo}",
             "--overwrite_schema",
@@ -704,8 +705,9 @@ address_tasks[-1] >> cluster_task
 cluster_task >> source_predict_task
 source_predict_task >> merge_task
 
-extract_step_task >> predict_and_join_task[0]
-merge_task >> images_and_relations_tasks
+extract_step_task >> images_and_relations_tasks[0]
+cluster_task >> images_and_relations_tasks[0]
+merge_task >> images_and_relations_tasks[1]
 
 images_and_relations_tasks >> predict_and_join_task[0]
 chain(*predict_and_join_task)
