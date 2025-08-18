@@ -2,7 +2,7 @@
 database_name: datalake_opsgenie
 table_name: alerts
 domain: Cross
-owner: vitor.musachio@quintoandar.com.br
+owner: "vitor.musachio@quintoandar.com.br"
 description: This table contains detailed information from OpsGenie alerts to monitor Data Engineering Incidents.
 columns:
   id_alert:
@@ -16,8 +16,7 @@ columns:
   id_issue_jira:
     description: The ticket identifier generated in Jira for the incident
     lineage:
-      - datalake_opsgenie.jira_alert_actions.id_issue_jira
-      - datalake_jira.issues.id_issue
+      - datalake_jira_ops_clean.alert_log.log
   dag_name:
     description: The name of the DAG that generated the alert
     lineage:
@@ -58,14 +57,6 @@ columns:
     description: True if the alert is closed; otherwise, false
     lineage:
       - datalake_jira_ops_clean.alerts.status
-  is_out_of_rotation:
-    description: True if the alert was identified as out-of-rotation; otherwise, false
-    lineage:
-      - datalake_opsgenie.jira_alert_actions.is_out_of_rotation
-  is_card_creation_failed:
-    description: True if the Jira card creation failed; otherwise, false
-    lineage:
-      - datalake_opsgenie.jira_alert_actions.is_card_creation_failed
   has_email_notification_sent:
     description: True if an email was sent for this alert; otherwise, false
     lineage:
@@ -74,41 +65,20 @@ columns:
     description: True if a call notification was sent for this alert; otherwise, false
     lineage:
       - datalake_opsgenie.jira_alert_actions.is_call_notification_sent
-  has_notification_sent:
-    description: True if any call or email notification was sent for this alert; otherwise, false
-    lineage:
-      - datalake_opsgenie.jira_alert_actions.is_call_notification_sent
-      - datalake_opsgenie.jira_alert_actions.is_email_notification_sent
   ts_created:
     description: Timestamp when the alert was created
-    lineage:
-      - datalake_jira_ops_clean.alerts.ts_created
-  ts_created_local_tz:
-    description: Alert creation timestamp converted to America/Sao_Paulo timezone
     lineage:
       - datalake_jira_ops_clean.alerts.ts_created
   ts_updated:
     description: Timestamp when the alert was updated
     lineage:
       - datalake_jira_ops_clean.alerts.ts_updated
-  ts_updated_local_tz:
-    description: Alert update timestamp converted to America/Sao_Paulo timezone
-    lineage:
-      - datalake_jira_ops_clean.alerts.ts_updated
   ts_acknowledged:
     description: Timestamp when the alert was acknowledged
     lineage:
       - datalake_opsgenie.jira_alert_actions.ts_acknowledged
-  ts_acknowledged_local_tz:
-    description: Alert acknowledged timestamp converted to America/Sao_Paulo timezone
-    lineage:
-      - datalake_opsgenie.jira_alert_actions.ts_acknowledged
   ts_closed:
     description: Timestamp when the alert was closed
-    lineage:
-      - datalake_opsgenie.jira_alert_actions.ts_closed
-  ts_closed_local_tz:
-    description: Alert closed timestamp converted to America/Sao_Paulo timezone
     lineage:
       - datalake_opsgenie.jira_alert_actions.ts_closed
   year:
