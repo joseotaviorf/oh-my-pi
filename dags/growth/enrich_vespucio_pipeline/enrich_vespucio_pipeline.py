@@ -56,7 +56,9 @@ CLUSTER_DESCRIPTION["spark_conf"].update(
 CLUSTER_DESCRIPTION["spark_env_vars"]["OUTPUT_LOCATION"] = output_location
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -107,6 +109,7 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
 
 # Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
 DatasetAdder.attach_reprocessing_guard(execute_job_cluster_task)
+
 
 def create_task(entry_point: str, parameters: List[str], task_id: str = None):
     return QuintoAndarDatabricksCheckJobTaskOperator(
@@ -578,7 +581,7 @@ plugin_tasks = [
             f"--output_nearest_neighborhoods=nearest_neighborhoods",
             f"--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
             f"--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
-            f"--output_avg_price_by_neighborhood_slug=avg_price_by_neighborhood_slug",
+            f"--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
             f"--redis_host=redis.pwa-tenants-link-service.quintoandar.com.br",
             f"--redis_port=6379",
         ],
@@ -647,7 +650,7 @@ zordominium_tasks = [
             f"--operation=both",
             f"--env={ENV}",
             f"--stage_db=zordominium_vespucio_plugin",
-            f"--remove_old_condos=False"
+            f"--remove_old_condos=False",
         ],
     ),
     create_task(
@@ -658,7 +661,7 @@ zordominium_tasks = [
             f"--output_database=condos_by_region_plugin",
             "--operation=all",
             "--redis_host=redis.zordominium.quintoandar.com.br",
-            "--redis_port=6379"
+            "--redis_port=6379",
         ],
     ),
 ]
