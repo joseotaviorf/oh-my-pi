@@ -37,6 +37,7 @@ workflow:
     offer_agent: {}
     offer_partner: {}
     partner: {}
+    revenue_share_by_offer: {}
     revenue_share_by_participant: {}
     revenue_share_file: {}
     tier_bonus: {}
