@@ -85,7 +85,7 @@ get_alert_dei_automation AS (
 get_alert_dei_automation_exception_1 AS (
   SELECT
     l.id_alert,
-    REGEXP_EXTRACT(l.log, '\\{issueKey-[^=]+=([^}]+)\\}', 1) AS id_issue_jira
+    REGEXP_EXTRACT(l.log, '\\{{issueKey[^}=]*=([^}}]+)\\}}', 1) AS id_issue_jira
   FROM
     datalake_jira_ops_clean.alert_log AS l
   WHERE
@@ -94,7 +94,7 @@ get_alert_dei_automation_exception_1 AS (
 get_alert_dei_automation_exception_2 AS (
   SELECT
     l.id_alert,
-    SUBSTRING_INDEX(SUBSTRING_INDEX(l.log, 'key: [', -1), ']', 1) AS id_issue_jira
+    NULLIF(SUBSTRING_INDEX(SUBSTRING_INDEX(l.log, 'key: [', -1), ']', 1), '') AS id_issue_jira
   FROM
     datalake_jira_ops_clean.alert_log AS l
   WHERE
