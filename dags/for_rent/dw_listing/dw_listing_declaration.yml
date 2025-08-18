@@ -17,13 +17,17 @@ workflow:
     dim_condo:
       partitions: []
       custom_schema: public
-    fact_house_listing_daily_infos:
-      partitions: ["country_code", "year", "month", "day"]
-      extraction_type: incremental
+    dim_house_listing:
+      merge_on: [sk_house_listing]
     fact_house_listing_daily_available_hours:
       partitions: ["year", "month", "day"]
       extraction_type: incremental
       custom_schema: listing
+    fact_house_listing_daily_infos:
+      partitions: ["country_code", "year", "month", "day"]
+      extraction_type: incremental
+    fact_house_listings:
+      merge_on: [sk_house_listing]
 cluster:
   type: custom_cluster
   access_control_list:
