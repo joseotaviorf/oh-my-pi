@@ -41,9 +41,16 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("raw_table_name")
     parser.add_argument("partition_cols")
-    parser.add_argument("workspace_id")
-    parser.add_argument("object_id")
-    parser.add_argument("column_create_date")
+    parser.add_argument("table_details")
+
+    # TODO this is a temp fix
+    all_table_details = {
+        "conversation_time_metrics": {
+            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
+            "object_id": "801119",
+            "column_create_date": "date"
+        }
+    }
 
     args = parser.parse_args()
 
@@ -51,15 +58,13 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     raw_table_name = args.raw_table_name
     partition_cols = ["year", "month", "day"]
-    workspace_id = args.workspace_id
-    object_id = args.object_id
-    column_create_date = args.column_create_date
+    table_details = all_table_details[raw_table_name]
 
     logger.info(
         f"""
             m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={SOURCE}, partition_cols={partition_cols}, raw_table_name={raw_table_name},
-            workspace_id={workspace_id}, msg= All spark jobs args"
+            table_details={table_details}, msg=print spark jobs args"
         """
     )
 
@@ -93,6 +98,10 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
+    workspace_id = table_details["workspace_id"]
+    object_id = table_details["object_id"]
+    column_create_date = table_details["column_create_date"]
+
     twilio_flex_insights_consumer.client.refresh_token()
     report_link = twilio_flex_insights_consumer.get_report_link(workspace_id, object_id)
 
@@ -114,7 +123,9 @@ if __name__ == "__main__":
         df = spark_client.create_dataframe(response_rdd)
 
         # Redefining dataframe column names
-        header = [StringFormatter.set_snake_case(column_name) for column_name in header]
+        header = list(
+            map(lambda column_name: StringFormatter.set_snake_case(column_name), header)
+        )
         df = df.toDF(*header)
 
         df = df.withColumn(
@@ -152,7 +163,7 @@ if __name__ == "__main__":
             partition_cols=partition_cols,
         )
     else:
-        raise ValueError(
+        raise Exception(
             f"""m=__main__, table_name={raw_table_name},
             msg=No data returned from API."""
         )
