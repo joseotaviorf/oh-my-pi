@@ -1,0 +1,39 @@
+---
+dag:
+  name: enrich_semrush
+  schedule_start_date: 2025, 08, 15
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG generates tables to track demand user queries in the SEMRush SEO clusterization.
+      It is relevant for the SEO tribe to monitor and analyze the results so they can more efficiently
+      identify problems, impacts, and opportunities. In addition, this funnel helps to prioritize
+      the most relevant pages for the business.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+  inner_dependencies:
+    keyword_region_attributes:
+      - keywords_from_players
+    keyword_attributes:
+      - keyword_region_attributes
+    keyword_clusters:
+      - keyword_attributes
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -15), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -15), 'load_end_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

@@ -3317,6 +3317,29 @@ bietlejuice.enrich_secretariat:
   - bietlejuice.hub_services:load-clean-responsible:first-run-of-day
   - bietlejuice.hub_services:load-clean-users:first-run-of-day
   - bietlejuice.hub_services:load-clean-visitor:first-run-of-day
+bietlejuice.enrich_semrush:
+  - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+  - bietlejuice.semrush:load-clean-123i-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-ape11-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-arboimoveis-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-auxiliadorapredial-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-casamineira-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-chavesnamao-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-direcional-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-emcasa-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-imoveisestadao-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-imoveismercadolivre-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-imovelguide-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-imovelweb-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-loft-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-lopes-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-olximoveis-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-quintoandar-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-secovi-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-trisul-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-vivareal-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-wimoveis-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush:load-clean-zapimoveis-organic-search-kw:first-run-of-day
 bietlejuice.enrich_seo_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand:first-run-of-day
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand:first-run-of-day
