@@ -1,0 +1,284 @@
+---
+database_name: datalake_crawler_zap_imoveis
+table_name: zap_imoveis
+description: |
+  This table contains enriched fields regarding the Zap Imóveis crawler data.
+  It transforms and flattens the original struct fields from the clean table into
+  individual columns for easier analysis and consumption.
+  Data Sources & Timeline:
+  - Historical data (2021-2024): Provided by Zyte crawler service
+  - Current data (2025 onwards): Provided by Growth Intel team
+  Update Schedule:
+  The table is updated weekly, every Friday, after the datalake_crawler_zap_imoveis_clean
+  table is refreshed. This ensures data consistency and maintains the dependency chain.
+domain: Cross
+owner: andre.melo@quintoandar.com.br
+columns:
+  id_house_platform:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.id
+    description: |
+      The id of the house in the zap imoveis platform.
+  id_house:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.id
+    description: |
+      It concatenates the id of the house in the zap imoveis platform with the
+      string "ZapImoveis".
+  platform:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.origin
+    description: |
+      The origin of the house.
+      If the original value is null, then it assumes the value "ZapImoveis".
+  country:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The country of the house.
+      It is provided by the original struct field "address".
+  state:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The state of the house.
+      It is provided by the original struct field "address".
+  address_city:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The city of the house.
+      It is provided by the original struct field "address".
+      If the original value is null, then it assumes the clean table partition,
+      which is the "city" field.
+      It doens't assume null values, and it is used as a z_order field for the
+      delta table.
+  neighborhood:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The neighborhood of the house.
+      It is provided by the original struct field "address".
+  street:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The street of the house.
+      It is provided by the original struct field "address".
+  street_number:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The number of the house.
+      It is provided by the original struct field "address".
+  zip_code:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+    description: |
+      The zip code of the house.
+      It is provided by the original struct field "address".
+  latitude:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.geolocation
+    description: |
+      The latitude of the house.
+      It is provided by the original struct field "geolocation".
+  longitude:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.geolocation
+    description: |
+      The longitude of the house.
+      It is provided by the original struct field "geolocation".
+  listing_name:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.listing_name
+    description: |
+      The name of the listing.
+      It is the listing description provided in the origin platform.
+  total_area:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The total area of the house in square meters.
+      It is extracted from the house_info struct field and cast as integer.
+  amenities:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The amenities available in the house, such as pool, balcony, elevator, gym,
+      among others.
+      It is provided by the original struct field "house_info".
+  bathrooms:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The number of bathrooms in the house.
+      It is extracted from the house_info struct field and cast as integer.
+  bedrooms:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The number of bedrooms in the house.
+      It is extracted from the house_info struct field and cast as integer.
+  floors:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The floor number where the house is located.
+      It is extracted from the house_info struct field and cast as integer.
+  parking_spaces:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The number of parking spaces available for the house.
+      It is extracted from the house_info struct field and cast as integer.
+  suites:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The number of suites in the house.
+      It is extracted from the house_info struct field and cast as integer.
+  unit_type:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The type of the housing unit (e.g., apartment, house, etc.).
+      It is provided by the original struct field "house_info, and it can
+      assume null values.
+    categories:
+      ALLOTMENT_LAND: "Undivided land that can be subdivided for development purposes"
+      APARTMENT: "Individual residential unit within a multi-story building or complex"
+      BUILDING: "Complete multi-unit structure, typically sold as a whole property"
+      BUSINESS: "Commercial property designed for business operations and activities"
+      CLINIC: "Healthcare facility or medical office space for clinical services"
+      COMMERCIAL_ALLOTMENT_LAND: "Land designated specifically for commercial development"
+      COMMERCIAL_BUILDING: "Structure designed and zoned for commercial business use"
+      COMMERCIAL_PROPERTY: "Any property used for business purposes and income generation"
+      CONDOMINIUM: "Private residential unit with shared common areas and facilities"
+      COUNTRY_HOUSE: "Rural or countryside residential property, typically with larger grounds"
+      FARM: "Agricultural property with land suitable for farming and livestock"
+      FLAT: "Small residential unit, typically single-story with minimal rooms"
+      HOME: "General residential property, usually a single-family dwelling"
+      HOTEL: "Commercial accommodation property for temporary lodging services"
+      KITNET: "Compact studio apartment with integrated kitchen and living space"
+      LOFT: "Open-plan living space, often converted from industrial or commercial use"
+      OFFICE: "Commercial space designed for professional and administrative work"
+      PARKING_SPACE: "Designated area or structure for vehicle parking"
+      PENTHOUSE: "Luxury apartment located on the top floor of a high-rise building"
+      RESIDENTIAL_ALLOTMENT_LAND: "Land designated and zoned for residential development"
+      RESIDENTIAL_BUILDING: "Multi-unit structure designed for residential occupancy"
+      SHED_DEPOSIT_WAREHOUSE: "Industrial storage facility or warehouse space"
+      TWO_STORY_HOUSE: "Residential property with two floors or levels"
+      VILLAGE_HOUSE: "Residential property located in a small community or village setting"
+  usage_type:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The intended usage type of the property (e.g., residential, commercial).
+      It is provided by the original struct field "house_info", and it can
+      assume null values.
+    categories:
+      COMMERCIAL: "Property designated for business or commercial use"
+      RESIDENTIAL: "Property designated for residential use"
+  advertiser_name:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information
+    description: |
+      The name of the advertiser/agent responsible for the listing.
+      It is provided by the original struct field "contact_information".
+  advertiser_phone:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information
+    description: |
+      The phone number of the advertiser/agent responsible for the listing.
+      It is provided by the original struct field "contact_information".
+  condo_fee:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+    description: |
+      The condominium fee for the property.
+      It is extracted from the price struct field, considering both rent and sale scenarios,
+      and cast as double.
+  iptu:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+    description: |
+      The yearly IPTU (property tax) for the house.
+      It is extracted from the price struct field, considering both rent and sale scenarios,
+      and cast as double.
+  price_rental:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+    description: |
+      The rental price of the property.
+      It is extracted from the price.rent.price field and cast as double.
+  price_sale:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+    description: |
+      The sale price of the property.
+      It is extracted from the price.sale.price field and cast as double.
+  price_m2_rental:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The rental price per square meter.
+      It is calculated by dividing the rental price by the total area,
+      rounded to 2 decimal places.
+  price_m2_sale:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+    description: |
+      The sale price per square meter.
+      It is calculated by dividing the sale price by the total area,
+      rounded to 2 decimal places.
+  is_for_rent:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.type
+    description: |
+      Boolean flag indicating if the property is available for rent.
+      It is extracted from the type.rentable field and cast as boolean.
+  is_for_sale:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.type
+    description: |
+      Boolean flag indicating if the property is available for sale.
+      It is extracted from the type.buyable field and cast as boolean.
+  is_hybrid:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.type
+    description: |
+      Boolean flag indicating if the property is available for both rent and sale.
+      It is true when both type.rentable and type.buyable are true, false otherwise.
+  ts_created:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.date_info
+    description: |
+      The timestamp when the listing was created.
+      It is provided by the original struct field "date_info".
+  ts_updated:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.date_info
+    description: |
+      The timestamp when the listing was last updated.
+      It is provided by the original struct field "date_info".
+  year:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.year
+    description: |
+      The year of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  month:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.month
+    description: |
+      The month of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  day:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.day
+    description: |
+      The day of the crawler date.
+      It is used for data partitioning and filtering purposes.

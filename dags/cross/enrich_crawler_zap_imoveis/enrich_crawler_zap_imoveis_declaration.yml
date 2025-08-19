@@ -1,0 +1,35 @@
+dag:
+  name: enrich_crawler_zap_imoveis
+  owner: Data Growth
+  schedule_start_date: 2025, 8, 17
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for enriching the crawler_zap_imoveis data.
+      It split the original struct fields into multiple columns, and creates
+      generic enriched fields for the house domain.
+      It is weekly updated, every Friday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis table
+      is updated.
+workflow:
+  layer: enrich
+  type: query_delta
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  tables_customization:
+    zap_imoveis:
+      z_order_by: [address_city]
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 4
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    spark_version: 14.3.x-scala2.12
