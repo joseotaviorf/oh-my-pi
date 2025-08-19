@@ -1,0 +1,47 @@
+---
+table_name: core_visit.visit
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 30000
+    severity_level: Error
+column_level_validations:
+  sk_core_visit:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_visit:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_visitor:
+    is_complete:
+      severity_level: Error
+  id_owner:
+      greater_than: 0.98
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  code:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  computed_status:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  ts_visit:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error

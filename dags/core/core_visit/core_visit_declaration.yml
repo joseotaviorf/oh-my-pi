@@ -11,7 +11,7 @@ workflow:
   default_extraction_type: full
   tables_customization:
     visit:
-      z_order_by: [id]
+      z_order_by: [id_house, business_context]
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
