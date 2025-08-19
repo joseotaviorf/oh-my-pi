@@ -20,6 +20,7 @@ column_level_validations:
     is_complete:
       severity_level: Error
   id_owner:
+    has_completeness:
       greater_than: 0.98
       severity_level: Error
   id_house:
