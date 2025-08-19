@@ -56,6 +56,7 @@ def create_feedbacks_results_payload(df, table_name):
                         'dsat_new_surveys':'csat',
                         'dsat_financing': 'csat',
                         'dsat_diligence': 'csat',
+                        'dsat_sum': 'csat',
                         'onboarding': 'nps',
                         'ongoing':'nps',
                         'offboarding':'nps',

@@ -49,6 +49,11 @@ workflow:
       - "feedbacks"
       - "audience/accounts"
       - "https://api.br.birdie.ai/ingestion"
+    dsat_sum:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.br.birdie.ai/ingestion"
     lost:
       extra_spark_job_arguments:
       - "feedbacks"
