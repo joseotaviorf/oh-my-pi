@@ -86,6 +86,10 @@ columns:
     description:
       Field that indicates whether a previous inspection will be used as
       a basis for comparison
+  has_early_mediation:
+    lineage:
+      - datalake_inspection_services_raw.inspection.has_early_mediation
+    description: Boolean column indicating if the inspection process had an early mediation.
   ts_schedule:
     lineage:
       - datalake_inspection_services_raw.inspection.schedule_date
