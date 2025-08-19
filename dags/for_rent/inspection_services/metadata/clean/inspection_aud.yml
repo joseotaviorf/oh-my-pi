@@ -69,6 +69,7 @@ columns:
   status:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.status
+    description: Identifies the stage of the inspection from scheduling to review.
     categories:
       scheduled: Inspection scheduled and awaiting execution
       received: Inspection sent by the inspector, waiting for synchronization with the Main
@@ -94,6 +95,10 @@ columns:
     description:
       Field that indicates whether a previous inspection will be used as
       a basis for comparison
+  has_early_mediation:
+    lineage:
+      - datalake_inspection_services_raw.inspection_aud.has_early_mediation
+    description: Boolean column indicating if the inspection process had an early mediation.
   mod_id_previous_inspection:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.previous_inspection_id_mod
@@ -158,6 +163,10 @@ columns:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.comparative_mod
     description: Indicates if the comparative field has been changed
+  mod_has_early_mediation:
+    lineage:
+      - datalake_inspection_services_raw.inspection_aud.has_early_mediation_mod
+    description: Indicates if the has_early_mediation field has been changed
   ts_schedule:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.schedule_date
