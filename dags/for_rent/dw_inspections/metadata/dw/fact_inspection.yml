@@ -109,6 +109,10 @@ columns:
         description: Indicates whether the inspection took place in the first scheduled time.
         lineage:
             - datalake_inspections.inspection_booking.is_executed_in_first_schedule
+    has_early_mediation:
+        description: Indicates if the inspection process had an early mediation.
+        lineage:
+            - datalake_inspections.inspection_booking.has_early_mediation
     dt_contract_entrance:
         description: Date defined in the contract of when the tenant will enter in the property.
         lineage:

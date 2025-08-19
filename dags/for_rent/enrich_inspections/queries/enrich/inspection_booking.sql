@@ -27,6 +27,7 @@ WITH union_inspection_history AS (
             WHEN GET_JSON_OBJECT(i.schedule, '$.observation') = "Local das chaves: Proprietário acompanha" THEN True
             ELSE FALSE
         END AS has_owner_accompanying,
+        i.has_early_mediation,
         NULL AS ts_inspected,
         i.ts_created,
         i.ts_updated,
@@ -54,6 +55,7 @@ WITH union_inspection_history AS (
         "PWA" AS source,
         i.status,
         NULL AS has_owner_accompanying,
+        NULL AS has_early_mediation,
         i.ts_inspected,
         i.ts_created,
         i.ts_updated,
@@ -147,6 +149,7 @@ SELECT DISTINCT
         WHEN ad.cancellation_reason IS NULL THEN NULL
         ELSE FALSE
     END AS is_not_canceled_by_inspector,
+    COALESCE(i.has_early_mediation, FALSE) AS has_early_mediation,
     ic.dt_contract_entrance,
     ic.dt_contract_termination,
     ic.dt_execution_limit,

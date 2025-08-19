@@ -151,6 +151,10 @@ columns:
     description: Indicates that the inspection was canceled by the inspector the day before the scheduled.
   is_not_canceled_by_inspector:
     description: Indicates that the inspection was not canceled because of the inspector.
+  has_early_mediation:
+    lineage:
+      - datalake_inspection_services_clean.inspection_aud.has_early_mediation
+    description: Boolean column indicating if the inspection process had an early mediation.
   dt_contract_entrance:
     description: Date defined in the contract of when the tenant will enter in the property.
     lineage:

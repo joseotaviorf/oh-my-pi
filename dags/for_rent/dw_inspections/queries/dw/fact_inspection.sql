@@ -21,6 +21,7 @@ SELECT
     i.is_not_canceled_by_inspector,
     i.is_first_schedule,
     i.is_executed_in_first_schedule,
+    i.has_early_mediation,
     i.dt_contract_entrance,
     i.dt_contract_termination,
     i.dt_execution_limit,
