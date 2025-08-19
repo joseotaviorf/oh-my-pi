@@ -136,7 +136,7 @@ SELECT
     ('RE-RTSK-I-' || sl.id_transaction || '-' || COALESCE(sl.account_number, '')) AS id_accounting_process,
     sl.id_business_entity,
     sl.id_finance_entity,
-    NULL AS id_finance_entity_entry,
+    CAST(NULL AS INT) AS id_finance_entity_entry,
     MAX(r.accounting_version) AS version,
     'for rent' AS business_unit,
     's4' AS source_name,
