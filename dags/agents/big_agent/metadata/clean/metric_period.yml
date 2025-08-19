@@ -1,0 +1,52 @@
+---
+database_name: datalake_big_agent_clean
+table_name: metric_period
+description: Stores the validity periods of Tier Agent metrics and their lifecycle metadata.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.metric_period.id
+    description: Metric period unique identifier.
+  metric:
+    lineage:
+      - datalake_big_agent_raw.metric_period.metric
+    description: Metric name or identifier to which the period applies.
+  invalidated_by:
+    lineage:
+      - datalake_big_agent_raw.metric_period.invalidated_by
+    description: Identifier of the entity or action that invalidated this metric period, when applicable.
+  status:
+    lineage:
+      - datalake_big_agent_raw.metric_period.status
+    description: Current status of the period record.
+  dt_init:
+    lineage:
+      - datalake_big_agent_raw.metric_period.init_date
+    description: Start date of the metric validity period.
+  dt_end:
+    lineage:
+      - datalake_big_agent_raw.metric_period.end_date
+    description: End date of the metric validity period.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.metric_period.created_at
+    description: Creation timestamp of the record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.metric_period.updated_at
+    description: Last update timestamp of the record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.metric_period.year
+    description: Ingestion year (partition).
+  month:
+    lineage:
+      - datalake_big_agent_raw.metric_period.month
+    description: Ingestion month (partition).
+  day:
+    lineage:
+      - datalake_big_agent_raw.metric_period.day
+    description: Ingestion day (partition).
+
