@@ -31,9 +31,6 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  computed_status:
-    is_complete:
-      severity_level: Error
   business_context:
     is_complete:
       severity_level: Error
