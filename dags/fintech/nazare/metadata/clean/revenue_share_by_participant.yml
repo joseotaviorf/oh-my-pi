@@ -1,25 +1,38 @@
 ---
 database_name: datalake_nazare_clean
 table_name: revenue_share_by_participant
+domain: Fintech
+description: data from the revenue share by participant table
 columns:
   id_revenue_share:
+    description: "id of the revenue share"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.id
   id_offer_agent:
+    description: "id of the offer agent"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.offer_agent_id
   id_offer_partner:
+    description: "id of the offer partner"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.offer_partner_id
   json_output:
+    description: "output of the transaction in JSON format"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  json_output_pd:
+    description: "output of the transaction in JSON format"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   json_errors:
+    description: "errors of the transaction in JSON format"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.errors
   ts_invalidated:
+    description: "timestamp of the invalidation of the transaction"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.invalidated_at
   ts_created:
+    description: "timestamp of the creation of the transaction"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.created_at
