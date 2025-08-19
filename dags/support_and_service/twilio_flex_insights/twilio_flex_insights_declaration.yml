@@ -23,10 +23,14 @@ workflow:
   tables_customization:
     conversation_time_metrics:
       extra_spark_job_arguments:
-      - table_details:
-          workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
-          object_id: "801119"
-          column_create_date: "date"
+        - workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+        - object_id: "801119"
+        - column_create_date: "date"
+    analyst_activity_time:
+      extra_spark_job_arguments:
+        - workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+        - object_id: "5552"
+        - column_create_date: "date"
 
 cluster:
   type: custom_cluster
