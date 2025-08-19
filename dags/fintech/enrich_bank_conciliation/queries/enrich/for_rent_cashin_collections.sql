@@ -125,7 +125,7 @@ trato_feito AS (
         COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) AS our_number,
         b.id_external AS id_invoice,
         i.total_amount AS amount,
-        DATE(p.dt_paid) AS dt_paid
+        COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) AS dt_paid
     FROM 
         datalake_trato_feito_clean.installment i
     LEFT JOIN 
