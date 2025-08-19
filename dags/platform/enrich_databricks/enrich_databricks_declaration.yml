@@ -40,7 +40,12 @@ cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
+    init_scripts:
+      - s3:
+            destination: "s3://artifacts.s3.data.quintoandar.com.br/openlineage/openlineage_bej_init_script.sh"
+            region: ""
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.extraListeners: "ch.cern.sparkmeasure.FlightRecorderStageMetrics,com.databricks.backend.daemon.driver.DBCEventLoggingListener,io.openlineage.spark.agent.OpenLineageSparkListener"
