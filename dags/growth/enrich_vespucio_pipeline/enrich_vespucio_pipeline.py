@@ -397,7 +397,7 @@ address_tasks = [
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         ],
-    )
+    ),
 ]
 
 cluster_task = create_task(
@@ -584,6 +584,7 @@ plugin_tasks = [
             f"--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
             f"--redis_host=redis.pwa-tenants-link-service.quintoandar.com.br",
             f"--redis_port=6379",
+            f"--overwrite_schema",
         ],
     ),
     create_task(
