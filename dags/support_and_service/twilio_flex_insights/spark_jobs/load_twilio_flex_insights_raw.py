@@ -41,16 +41,9 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("raw_table_name")
     parser.add_argument("partition_cols")
-    parser.add_argument("table_details")
-
-    # TODO this is a temp fix
-    all_table_details = {
-        "conversation_time_metrics": {
-            "workspace_id": "vz8klwkjsszukriuuqllc3dz4d8sl6yx",
-            "object_id": "801119",
-            "column_create_date": "date"
-        }
-    }
+    parser.add_argument("workspace_id")
+    parser.add_argument("object_id")
+    parser.add_argument("column_create_date")
 
     args = parser.parse_args()
 
@@ -58,13 +51,15 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     raw_table_name = args.raw_table_name
     partition_cols = ["year", "month", "day"]
-    table_details = all_table_details[raw_table_name]
+    workspace_id = args.workspace_id
+    object_id = args.object_id
+    column_create_date = args.column_create_date
 
     logger.info(
         f"""
             m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={SOURCE}, partition_cols={partition_cols}, raw_table_name={raw_table_name},
-            table_details={table_details}, msg=print spark jobs args"
+            workspace_id={workspace_id}, msg= All spark jobs args"
         """
     )
 
@@ -98,35 +93,32 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    workspace_id = table_details["workspace_id"]
-    object_id = table_details["object_id"]
-    column_create_date = table_details["column_create_date"]
-
     twilio_flex_insights_consumer.client.refresh_token()
     report_link = twilio_flex_insights_consumer.get_report_link(workspace_id, object_id)
 
     response = twilio_flex_insights_consumer.sync(report_link).splitlines()
 
-    response_rdd = spark_client.conn.sparkContext.parallelize(response)
+    # Remove empty lines and format as list of lists
+    rows = [
+        line.replace('"', "").split(",")
+        for line in response
+        if line.strip()
+    ]
 
-    # removing empty lines
-    response_rdd = response_rdd.filter(lambda x: x)
+    # Get header and data rows
+    if rows:
+        header = rows[0]
+        data_rows = rows[1:]
 
-    # formatting the text in columns
-    response_rdd = response_rdd.map(lambda x: x.replace('"', "").split(","))
+        # Convert header to snake_case and rename if startswith 'total_activity_'
+        header = [
+            "total_activity_time" if StringFormatter.set_snake_case(column_name).startswith("total_activity_")
+            else StringFormatter.set_snake_case(column_name)
+            for column_name in header
+        ]
 
-    # Getting the first row as a header and stripping it from the response
-    header = response_rdd.first()
-    response_rdd = response_rdd.filter(lambda line: line != header)
-
-    if not response_rdd.isEmpty():
-        df = spark_client.create_dataframe(response_rdd)
-
-        # Redefining dataframe column names
-        header = list(
-            map(lambda column_name: StringFormatter.set_snake_case(column_name), header)
-        )
-        df = df.toDF(*header)
+        # Create DataFrame directly from list of lists
+        df = spark_client.create_dataframe(data_rows, schema=header)
 
         df = df.withColumn(
             column_create_date,
@@ -163,7 +155,7 @@ if __name__ == "__main__":
             partition_cols=partition_cols,
         )
     else:
-        raise Exception(
+        raise ValueError(
             f"""m=__main__, table_name={raw_table_name},
             msg=No data returned from API."""
         )
