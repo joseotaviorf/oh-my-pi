@@ -43,6 +43,9 @@ workflow:
     twilio_spoc:
       extra_spark_job_arguments:
       - cx
+    tarefas_salesforce:
+      extra_spark_job_arguments:
+      - cx
     offboarding_perspective_metrics:
       extra_spark_job_arguments:
       - services

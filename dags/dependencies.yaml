@@ -4306,6 +4306,7 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-repair-tickets:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-speech-call:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-speech-chat:first-run-of-day
+  - bietlejuice.reverse_webhelp:load-reverse-tarefas-salesforce:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-taxonomy:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
