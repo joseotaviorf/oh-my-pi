@@ -31,4 +31,4 @@ FROM
     dw_employee.fact_assignments
 WHERE 
     NOT is_pending_worker
-    AND is_last_work_relationship
+    AND is_last_valid_work_relationship

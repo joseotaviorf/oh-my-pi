@@ -68,11 +68,12 @@ columns:
     description: "Currency code of the salary."
     lineage:
       - datalake_pin_compensation_clean.salary.currency_code
-  is_last_work_relationship:
-    description: "Flag (TRUE/FALSE) indicating if this is the most recent work relationship for the employee, partitioned by person id."
+  is_last_valid_work_relationship:
+    description: "Flag (TRUE/FALSE) indicating if this is the most recent valid work relationship for the employee, prioritizing non-pending records, partitioned by person id."
     lineage:
       - datalake_employee_registration.identifier_mapping.id_period_of_service
       - datalake_employment.employee_details.assignment_status_type
+      - datalake_employment.employee_details.assignment_type
       - datalake_pin_core_clean.periods_of_service.dt_started
   is_active:
     description: "Flag (TRUE/FALSE) indicating if the assignment is active."

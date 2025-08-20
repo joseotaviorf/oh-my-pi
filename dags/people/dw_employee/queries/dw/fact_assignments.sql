@@ -157,7 +157,10 @@ SELECT
   COALESCE(h.sk_hierarchy, '-1') AS sk_hierarchy,
   im.assignment_number,
   s.currency_code AS salary_currency_code,
-  ROW_NUMBER() OVER (PARTITION BY im.id_person ORDER BY ps.dt_started DESC) = 1 AS is_last_work_relationship,
+  ROW_NUMBER() OVER (
+    PARTITION BY im.id_person
+    ORDER BY CASE WHEN ed.assignment_type <> 'P' THEN ps.dt_started ELSE NULL END DESC NULLS LAST
+  ) = 1 AS is_last_valid_work_relationship,
   IF(ed.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
   IF(ed.assignment_type = 'P', TRUE, FALSE) AS is_pending_worker,
   CASE
