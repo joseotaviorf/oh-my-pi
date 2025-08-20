@@ -388,7 +388,6 @@ filtered_visit AS (
     vbm.business_model,
     v.dt_visit,
     v.id_real_estate_agent_rating,
-    vo_create.name AS first_update_source,
     v.ts_visit,
     v.ts_created
   FROM
@@ -401,9 +400,6 @@ filtered_visit AS (
   LEFT JOIN
     datalake_ebdb_clean.country AS ct
       ON ct.code = hll.country_code
-  LEFT JOIN
-    datalake_ebdb_clean.visit_origin AS vo_create
-      ON vo_create.id = v.id_creation_origin
   LEFT JOIN
     datalake_visit.visit_business_model AS vbm
       ON v.id = vbm.id_visit
@@ -442,7 +438,6 @@ SELECT DISTINCT
   END AS visit_model,
   bb.visit_fup,
   v.behavior,
-  v.first_update_source,
   s.schedule_origin,
   s.channel_creation,
   bha.contract_name AS hub_agent_region,

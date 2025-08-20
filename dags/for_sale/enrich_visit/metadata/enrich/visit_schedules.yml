@@ -136,11 +136,6 @@ columns:
       - datalake_ebdb_clean.visit.behavior
     description:
       What is the behavior of the visit.
-  first_update_source:
-    lineage:
-      - datalake_ebdb_clean.visit_origin.name
-    description:
-      Shows the origin from the booking, self service web, booked by agent
   schedule_origin:
     description:
       If the start of this schedule is from a Request or a Reschedule.
@@ -243,32 +238,32 @@ columns:
       Timestamp  of the creation of the schedule.
   ts_schedule_requested:
     lineage:
-      - datalake_visit.visit_status_events.ts_event_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description:
       Timestamp of the request event.
   ts_schedule_rescheduled:
     lineage:
-      - datalake_visit.visit_status_events.ts_event_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description:
       Timestamp of the reschedule event.
   ts_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_status_events.ts_event_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description:
       Timestamp of the confirmation event.
   ts_schedule_completed:
     lineage:
-      - datalake_visit.visit_status_events.ts_event_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description:
       Timestamp of the completed event.
   ts_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_status_events.ts_event_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description:
       Timestamp with the  event.
   ts_schedule_canceled:
     lineage:
-      - datalake_visit.visit_status_events.ts_event_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description:
       Timestamp of the canceled event.
   ts_schedule_visit:

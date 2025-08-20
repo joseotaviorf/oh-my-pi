@@ -18,14 +18,6 @@ columns:
     lineage:
       - datalake_visit.visits.code
     description: Code of visit
-  visit_origin:
-    lineage:
-      - datalake_visit.visits.visit_origin
-    description: Shows the origin of visit
-  visit_origin_description:
-    lineage:
-      - datalake_visit.visits.visit_origin_description
-    description: Origin description of visit
   business_unit:
     lineage:
       - datalake_sale_visit_hubs.sale_visit_hubs.business_unit

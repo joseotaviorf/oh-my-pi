@@ -36,8 +36,6 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.id_visit AS sk_visit,
   v.id_visit AS id_visit,
   v.code AS cd_visit,
-  v.visit_origin,
-  v.visit_origin_description,
   sv.business_unit,
   v.dt_visit AS day_visit,
   v.slot,

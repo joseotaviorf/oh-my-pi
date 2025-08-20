@@ -1,0 +1,22 @@
+database_name: datalake_visit
+table_name: visit_origin_unified
+description: This data model unifies visit origin data. Until 2024-11 coming from visit_origin and after 2024-11 coming from visit_status_log.
+  Each row is an unique visit.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+      - datalake_ebdb_clean.visit_status_log.id_visit
+    description: Primary key of table.
+  visit_request_channel:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Channel of the visit origin (request event).
+  ts_visit_requested:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+      - datalake_ebdb_clean.visit_status_log.ts_created
+    description: Timestamp when the visit was requested (created).

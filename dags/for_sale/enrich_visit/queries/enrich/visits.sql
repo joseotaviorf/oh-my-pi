@@ -4,8 +4,6 @@ WITH
             id_visit,
             MAX_BY(id_schedule, ts_created) AS last_id_schedule,
             SUM(1) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_visit_requested,
-            MIN(channel) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_channel,
             MIN(on_behalf_of) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_on_behalf_of,
             MIN(author_user_role) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_user_role,
             MIN(id_author_user) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS id_user_visit_request,
@@ -93,8 +91,6 @@ SELECT
     vbh.id_last_associated_agent,
     visit_log.id_user_visit_request,
     visit.code,
-    v_origin.name AS visit_origin,
-    v_origin.description AS visit_origin_description,
     visit.type,
     hl.country_code,
     lh.partner_3p_supply,
@@ -142,7 +138,7 @@ SELECT
         WHEN visit.ts_visit > vbh.ts_first_visit THEN 'POSTPONED'
         ELSE 'EARLY'
     END AS visit_schedule_type,
-    visit_log.visit_request_channel,
+    v_origin.visit_request_channel,
     visit_log.visit_request_on_behalf_of,
     visit_log.visit_request_user_role,
     visit_log.first_supply_answer_channel,
@@ -211,7 +207,7 @@ SELECT
     visit.ts_visit,
     visit_log.ts_first_event,
     visit_log.ts_last_event,
-    visit_log.ts_visit_requested,
+    v_origin.ts_visit_requested,
     visit_log.ts_visit_registered,
     visit_log.ts_visit_rescheduled,
     visit_log.ts_visit_first_rescheduled,
@@ -235,8 +231,8 @@ SELECT
 FROM
     datalake_ebdb_clean.visit AS visit
 LEFT JOIN
-    datalake_ebdb_clean.visit_origin AS v_origin
-        ON visit.id_creation_origin = v_origin.id
+    datalake_visit.visit_origin_unified AS v_origin
+        ON visit.id = v_origin.id_visit
 LEFT JOIN
     visit_log
         ON visit.id = visit_log.id_visit
