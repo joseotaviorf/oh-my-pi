@@ -9,6 +9,8 @@ WITH alerts_updated AS (
     datalake_jira_ops_clean.alert_log AS al
   WHERE
     MAKE_DATE(al.year, al.month, al.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
+  QUALIFY 
+    1 = ROW_NUMBER() OVER (PARTITION BY al.id_alert ORDER BY al.dt_load DESC)
 ),
 alert_log AS (
   SELECT

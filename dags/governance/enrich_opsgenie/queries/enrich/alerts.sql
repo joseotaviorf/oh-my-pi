@@ -43,6 +43,8 @@ alerts AS (
   WHERE
     MAKE_DATE(a.year, a.month, a.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
     OR ja.id_alert IS NOT NULL
+  QUALIFY 
+    1 = ROW_NUMBER() OVER (PARTITION BY a.id_alert ORDER BY GREATEST(a.ts_updated, TIMESTAMP(ja.dt_updated)) DESC)
 )
 SELECT
   a.id_alert,

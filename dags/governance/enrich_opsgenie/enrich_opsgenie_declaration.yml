@@ -25,7 +25,7 @@ workflow:
       extraction_type: incremental
       partitions: [year, month, day]
     incidents:
-      merge_on: [id_issue_jira]
+      merge_on: [id_issue_jira, id_alert]
       z_order_by: [id_issue_jira, ts_created]
       extraction_type: incremental
       partitions: [year, month, day]
