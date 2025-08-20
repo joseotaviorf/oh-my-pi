@@ -3561,7 +3561,6 @@ bietlejuice.enrich_tqc_referral:
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
-  - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-unified-contract-changes:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day

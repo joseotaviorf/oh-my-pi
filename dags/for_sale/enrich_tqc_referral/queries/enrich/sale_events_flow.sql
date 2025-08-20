@@ -1,4 +1,4 @@
-WITH 
+WITH
 first_booking_author AS (
     SELECT DISTINCT
         bsc.id_booking,
@@ -8,17 +8,6 @@ first_booking_author AS (
         ) AS id_user_creation
     FROM
         datalake_ebdb_clean.booking_status_change AS bsc
-),
-visit_origin AS (
-    SELECT
-        v.id AS id_visit,
-        v.code,
-        vo_update.name AS last_update_source
-    FROM
-        datalake_ebdb_clean.visit AS v
-    LEFT JOIN
-        datalake_ebdb_clean.visit_origin AS vo_update
-            ON vo_update.id = v.id_last_update_origin
 ),
 base_booking AS (
 SELECT
@@ -44,8 +33,7 @@ SELECT
         NULL
       ) AS user_sale_booking_creator,
     FROM_UTC_TIMESTAMP(b.ts_created, COALESCE(ct.default_timezone, 'UTC')) AS ts_created_local_tz,
-    vo.last_update_source,
-    vo.code AS visit_code,
+    visit.code AS visit_code,
     CASE
       WHEN b.status = 'Realizado' AND b.visit_fup IN ('EntradaNaoAutorizada','NaoCompareceu')
         THEN 'Cancelado'
@@ -61,10 +49,10 @@ SELECT
     datalake_ebdb_clean.booking AS b
   LEFT JOIN
     first_booking_author AS fba
-      ON fba.id_booking = b.id 
+      ON fba.id_booking = b.id
   LEFT JOIN
-    visit_origin AS vo
-        ON b.id_visit = vo.id_visit        
+    datalake_ebdb_clean.visit
+      ON b.id_visit = visit.id
   LEFT JOIN
     datalake_ebdb_clean.user AS ua
       ON ua.id_agent = b.id_agent
@@ -76,16 +64,16 @@ SELECT
       ON u.id = fba.id_user_creation
   LEFT JOIN
     datalake_ebdb_listing.house AS hl
-      ON b.id_house = hl.id    
+      ON b.id_house = hl.id
   LEFT JOIN
     datalake_ebdb_clean.country AS ct
-      ON ct.code = hl.country_code     
+      ON ct.code = hl.country_code
   WHERE
     b.type = 'Visita'
     AND b.business_context = 'SALE'
 ),
 sale_visit_flows AS (
-SELECT 
+SELECT
   id_visit,
   id_house,
   id_buyer,
@@ -94,14 +82,13 @@ SELECT
   id_sale_flow,
   FIRST_VALUE(user_sale_booking_creator) OVER(PARTITION BY id_visit ORDER BY ts_created_local_tz) AS first_visit_creation_origin,
   user_sale_booking_creator AS visit_creation_origin,
-  last_update_source AS visit_update_origin,
   ts_created_local_tz AS ts_visit_created,
   visit_code,
   visit_status,
   TO_UTC_TIMESTAMP(ts_booking_local_tz, default_timezone) AS ts_visit_scheduled_for,
   FIRST_VALUE(ts_created_local_tz) OVER(PARTITION BY id_visit ORDER BY ts_created_local_tz) AS ts_first_visit_created,
   ts_updated AS ts_visit_updated
-FROM 
+FROM
   base_booking
 QUALIFY
   ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_updated DESC) = 1
@@ -116,7 +103,6 @@ SELECT
     so.id_offer,
     svf.first_visit_creation_origin,
     svf.visit_creation_origin,
-    svf.visit_update_origin,
     svf.visit_code,
     svf.visit_status,
     tqc.tqc_flow,

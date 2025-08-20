@@ -41,7 +41,7 @@ columns:
       - datalake_hub_services.secretariat_hierarchy.id_user_5a
       - datalake_ebdb_clean.booking.id_visit
       - datalake_ebdb_clean.booking.ts_created
-    description: teste
+    description: Identifies the type of user who created the sale visit.
   visit_creation_origin:
     lineage:
       - datalake_ebdb_clean.booking_status_change.id_user
@@ -49,10 +49,6 @@ columns:
       - datalake_hub_services.secretariat_hierarchy.id_user_5a
       - datalake_ebdb_clean.booking.id_visit
     description: Identifies the type of user who created the sale booking.
-  visit_update_origin:
-    lineage:
-      - datalake_ebdb_clean.visit_origin.name
-    description: Show origin of last source to alter the booking.
   visit_code:
     lineage:
       - datalake_ebdb_clean.visit.code
