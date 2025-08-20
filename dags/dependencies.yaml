@@ -2704,6 +2704,8 @@ bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-offer-submitted-new-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-183049-offer-submitted-events:first-run-of-day
 bietlejuice.enrich_opsgenie:
+  - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
+  - bietlejuice.enrich_pipeline:load-enrich-dag:first-run-of-day
   - bietlejuice.jira_ops:load-clean-alert-log:first-run-of-day
   - bietlejuice.jira_ops:load-clean-alerts:first-run-of-day
 bietlejuice.enrich_owner_fees:

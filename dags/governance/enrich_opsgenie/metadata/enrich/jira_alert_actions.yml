@@ -2,13 +2,17 @@
 database_name: datalake_opsgenie
 table_name: jira_alert_actions
 domain: Cross
-owner: "vitor.musachio@quintoandar.com.br"
-description: This table contains enriched information about the actions of an alert opened in Jira.
+description: This table contains enriched information about actions and notifications of Jira alerts.
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_alert:
     description: The unique alert identifier, use it as the primary key for alert data
     lineage:
     - datalake_jira_ops_clean.alert_log.id_alert
+  id_issue_jira:
+    description: The ticket identifier generated in Jira for the incident
+    lineage:
+    - datalake_jira_ops_clean.alert_log.log
   closed_by:
     description: The user of the person who closed the alert
     lineage:
@@ -17,12 +21,24 @@ columns:
     description: The user of the person who acknowledged the alert
     lineage:
     - datalake_jira_ops_clean.alert_log.owner
+  card_creation_status:
+    description: The status of the DEI Automation card creation for this alert
+    lineage:
+    - datalake_jira_ops_clean.alert_log.log
   is_call_notification_sent:
     description: True if a call notification was sent for this alert; otherwise, false
     lineage:
     - datalake_jira_ops_clean.alert_log.log
   is_email_notification_sent:
     description: True if an email was sent for this alert; otherwise, false
+    lineage:
+    - datalake_jira_ops_clean.alert_log.log
+  is_out_of_rotation:
+    description: True if the alert was identified as out-of-rotation; otherwise, false
+    lineage:
+    - datalake_jira_ops_clean.alert_log.log
+  is_card_creation_failed:
+    description: True if the Jira card creation failed; otherwise, false
     lineage:
     - datalake_jira_ops_clean.alert_log.log
   ts_acknowledged:
@@ -32,6 +48,16 @@ columns:
     - datalake_jira_ops_clean.alert_log.log
   ts_closed:
     description: Timestamp when the alert was closed
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_out_of_rotation_identified:
+    description: Timestamp when the out-of-rotation state was identified for the alert
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_out_of_rotation_closed:
+    description: Timestamp when the alert was closed due to out-of-rotation
     lineage:
     - datalake_jira_ops_clean.alert_log.ts_log
     - datalake_jira_ops_clean.alert_log.log

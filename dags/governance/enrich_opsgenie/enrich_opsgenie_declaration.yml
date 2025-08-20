@@ -4,26 +4,38 @@ dag:
   schedule_start_date: 2020, 1, 1
   owner: Data Governance
   documentation:
-    dag_purpose: 'Get data from OpsGenie alerts and "acordamentos" to monitor Data Engineering Incidents.'
+    dag_purpose: Get data from JiraOps alerts and Jira incidents to monitor Data Engineering Incidents.
 workflow:
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
     alerts:
-    - jira_alert_actions
+      - jira_alert_actions
     acordamentos:
-    - jira_alert_actions
+      - alerts
+    incidents:
+      - alerts
   tables_customization:
     alerts:
+      merge_on: [id_alert]
+      z_order_by: [id_alert, ts_created]
       extraction_type: incremental
-      partitions:
-        - year
-        - month
-        - day
-    acordamentos:
-      extraction_type: full
+      partitions: [year, month, day]
+    incidents:
+      merge_on: [id_issue_jira]
+      z_order_by: [id_issue_jira, ts_created]
+      extraction_type: incremental
+      partitions: [year, month, day]
+    jira_alert_actions:
+      merge_on: [id_alert]
+      z_order_by: [id_alert, dt_updated]
+      extraction_type: incremental
+      partitions: [year, month, day]
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_min_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
