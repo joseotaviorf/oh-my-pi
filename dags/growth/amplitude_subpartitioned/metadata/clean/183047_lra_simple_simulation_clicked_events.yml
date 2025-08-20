@@ -1,6 +1,6 @@
 
 database_name: datalake_amplitude_clean
-table_name: 183047_lra_simple_simulation_clicked
+table_name: 183047_lra_simple_simulation_clicked_events
 owner: marina.samuel@quintoandar.com.br
 domain: Fintech
 description:
