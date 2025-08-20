@@ -681,5 +681,5 @@ SELECT
     dt_contract_start,
     dt_month_start,
     dt_month_end,
-    NOW() AS ts_laod
+    NOW() AS ts_load
 FROM contract_enhanced

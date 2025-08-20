@@ -11,12 +11,16 @@ workflow:
   layer: dw
   custom_schema: collections_segmentation
   inner_dependencies:
+    fact_contract_features_timeline:
+      - fact_contract_wallet_timeline
     fact_contract_wallet_timeline:
       - fact_invoice_wallet_timeline
   tables_customization:
     fact_invoice_wallet_timeline:
       z_order_by: [dt_reference, id_contract, id_invoice]
     fact_contract_wallet_timeline:
+      z_order_by: [dt_reference, id_contract]
+    fact_contract_features_timeline:
       z_order_by: [dt_reference, id_contract]
 cluster:
   type: custom_cluster

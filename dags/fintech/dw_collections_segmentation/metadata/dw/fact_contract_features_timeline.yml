@@ -1,0 +1,73 @@
+---
+database_name: dw_collections_segmentation
+table_name: fact_contract_features_timeline
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Essential contract features timeline for machine learning and advanced analytics in QuintoAndar collections context.
+  Contains key accumulated features, calculated metrics, and forward-fill variables optimized for risk modeling
+  and collection strategy analysis. This table focuses on the most critical features for predictive analytics.
+columns:
+  id_contract:
+    description: Contract identifier
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.id_contract
+  dt_reference:
+    description: Reference date for the timeline
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+  reference_contract_status:
+    description: Contract status at the reference date (Ativo/Finalizado)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+  max_delay_contaminated_contract_t1:
+    description: Maximum Contract Delay within T1 Contamination methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+  sum_monthly_overdue_days_paid_t1:
+    description: Sum of DELAY VALUE (number of days in delay) from invoices recovered in that day, considering T1 contamination
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
+  count_monthly_overdue_invoices_paid_t1:
+    description: COUNT of DELAY Invoices recovered in that day, considering T1 contamination
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+  days_since_ending:
+    description: Number of days since contract finalization
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_ending
+  acc_max_n_repairs:
+    description: Max number of repair invoices within contract wallet considering contract lifetime and dataset time range (accumulated)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
+  acc_cpc_l90:
+    description: Sum of CPC (contact completions) over the last 90 days (accumulated rolling window)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.cpc
+  acc_broken_multiple_deals_lifetime:
+    description: Number of broken multiple installments deals in lifetime accumulated
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.qt_acordo_quebrado
+  n_evictions_processes_lifetime:
+    description: Number of distinct eviction processes accumulated over contract lifetime
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.id_process_evictions
+  has_overdue_balance_over0_t1_at_ending_ffill:
+    description: Forward fill from has_overdue_balance_over0_t1_at_ending - indicates if contract ever had overdue balance over 0 days using T1 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over0_t1_at_ending
+  has_overdue_balance_over5_t1_at_ending_ffill:
+    description: Forward fill from has_overdue_balance_over5_t1_at_ending - indicates if contract ever had overdue balance over 5 days using T1 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over5_t1_at_ending
+  avg_days_overdue_invoices_paid_t1:
+    description: Average days overdue for invoices paid - calculated as ACC_SUM_MONTHLY_OVERDUE_DAYS_PAID_T1 divided by ACC_COUNT_MONTHLY_OVERDUE_INVOICES_PAID_T1
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+  monthly_income:
+    description: Sum of monthly income from proponentes (contract holders) - placeholder for future implementation requiring JOIN with contract/proponente tables
+    lineage:
+      - "TODO: JOIN with dim_contract or proponente table"
+  ts_load:
+    description: Timestamp when the record was loaded into the table
