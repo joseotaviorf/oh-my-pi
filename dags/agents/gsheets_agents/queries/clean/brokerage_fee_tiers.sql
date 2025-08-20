@@ -8,6 +8,7 @@ SELECT
     CAST(REPLACE(comission_percentage, ',', '.') AS FLOAT) AS comission_percentage,
     CAST(REPLACE(additional_comission_percentage, ',', '.') AS FLOAT) AS additional_comission_percentage,
     TO_DATE(dt_tier_start, 'dd/MM/yyyy') AS dt_tier_started,
-    TO_DATE(dt_tier_end, 'dd/MM/yyyy') AS dt_tier_ended
+    TO_DATE(dt_tier_end, 'dd/MM/yyyy') AS dt_tier_ended,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.brokerage_fee_tiers

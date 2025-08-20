@@ -9,7 +9,8 @@ SELECT
     quartil AS quartile,
     CAST(REPLACE(score_gp, ',', '.') AS FLOAT) AS score_gp,
     CAST(mes AS INT) AS month,
-    CAST(ano AS INT) AS year
+    CAST(ano AS INT) AS year,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.broker_score_by_quartiles
 

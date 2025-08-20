@@ -4,6 +4,7 @@ SELECT
   time AS account_manager_team,
   funcao AS account_manager_function,
   status AS account_manager_status,
-  obs AS additional_information 
+  obs AS additional_information,
+  NOW() AS ts_load 
 FROM
   datalake_gsheets_raw.account_managers_info

@@ -1,49 +1,72 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tqc_pro_pilot_program_cognito_form
+description: |
+  Captures entries from the TQC Pro Pilot Program (Cognito form), including associate and buyer
+  information, awareness flags, and entry lifecycle timestamps (created, submitted, updated).
+  Each row represents a single form submission.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.programapilototrazquemcomprapro_id
+    description: Unique identifier of the form entry.
   associate_infos:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_infos
+    description: Raw information provided about the associate.
   associate_infos_label:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_infos_label
+    description: Labels associated with the associate information fields.
   associate_cpf:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_qualoseucpf
+    description: Associate CPF.
   associate_name_and_phone:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_nometelefone
+    description: Associate full name and phone number.
   buyer_name:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_nomedocomprador
+    description: Buyer name.
   buyer_phone:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_telefonedocomprador
+    description: Buyer phone number.
   buyer_email:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_emaildocomprador
+    description: Buyer email address.
   house_or_region_of_interest:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_qualoimoveleouregiaodeinteressedocompradorinformeaquiocodigodoimovellinkdoanuncioenderecooubairroessainformacaoeessencialparaocadastrodocompradoreparavalidarasuaparticipacaonoprograma
+    description: House code/link/address or region of interest provided by the associate.
   entry_status:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_status
+    description: Current status of the form entry.
   is_buyer_aware_of_register:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_ocompradorestacientedocadastro
+    description: Indicates whether the buyer is aware of the registration (boolean).
   is_associate_invited_by_quintoandar:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_vocefoiconvidadoaparticipardestepilotopeloquintoandar
+    description: Indicates whether the associate was invited by QuintoAndar (boolean).
   dt_entry_created:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_datecreated
+    description: Date and time when the entry was created.
   dt_entry_submitted:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_datesubmitted
+    description: Date and time when the entry was submitted.
   dt_entry_updated:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_dateupdated
+    description: Date and time when the entry was last updated.
+  ts_load:
+    description: Date when the table data was updated.

@@ -14,6 +14,4 @@ columns:
       - datalake_gsheets_raw.pp_multi_cluster.cluster
     description: Cluster of the PP Multi. (Short Stay, Corporate Or Investors)
   ts_load:
-    lineage:
-      - datalake_gsheets_raw.pp_multi_cluster.ts_load
-    description: Timestamp at which the data was loaded.
+    description: Date when the table data was updated.

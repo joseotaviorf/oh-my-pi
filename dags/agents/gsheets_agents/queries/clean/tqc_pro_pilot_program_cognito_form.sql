@@ -15,6 +15,7 @@ SELECT
     dadosdoassociado_vocefoiconvidadoaparticipardestepilotopeloquintoandar::BOOLEAN AS is_associate_invited_by_quintoandar,
     entry_datecreated::TIMESTAMP AS dt_entry_created,
     entry_datesubmitted::TIMESTAMP AS dt_entry_submitted,
-    entry_dateupdated::TIMESTAMP AS dt_entry_updated
+    entry_dateupdated::TIMESTAMP AS dt_entry_updated,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form

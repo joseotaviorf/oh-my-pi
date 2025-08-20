@@ -4,6 +4,7 @@ SELECT
     CAST(praca AS STRING) AS city_group,
     CAST(bairro AS STRING) AS region,
     CAST(hub AS STRING) AS hub_name,
-    CAST(subhub AS STRING) AS subhub_name
+    CAST(subhub AS STRING) AS subhub_name,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.subhub_regions

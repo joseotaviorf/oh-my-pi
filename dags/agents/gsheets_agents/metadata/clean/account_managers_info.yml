@@ -29,3 +29,5 @@ columns:
     description: Additional informations of the Account Manager.
     lineage:
       - datalake_gsheets_raw.account_managers_info.obs
+  ts_load:
+    description: Date when the table data was updated.

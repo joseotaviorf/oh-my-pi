@@ -113,3 +113,5 @@ columns:
     lineage:
       - datalake_gsheets_raw.agents_targets_tracking.mes
     description: Target reference month for that region.
+  ts_load:
+    description: Date when the table data was updated.

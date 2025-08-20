@@ -1,9 +1,18 @@
 database_name: datalake_gsheets_clean
 table_name: sale_ongoing_listings_date
+description:
+  Provides ongoing allocation dates for sale listings recorded via GSheets.
+  Each row represents a listing currently in progress and its allocation date.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_listing:
     lineage:
       - datalake_gsheets_raw.sale_ongoing_listings_date.listing_id
+    description: Listing ID.
   dt_alloc:
     lineage:
       - datalake_gsheets_raw.sale_ongoing_listings_date.dt_alloc
+    description: Allocation date.
+  ts_load:
+    description: Date when the table data was updated.

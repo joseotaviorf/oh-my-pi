@@ -1,7 +1,8 @@
 database_name: datalake_gsheets_clean
 table_name: ciq_portfolio
-description: 
-  Each record brings information about a given CIQ about which cluster it belongs to and which portfolio it belongs to.
+description:
+  Contains CIQ partner allocations to clusters and portfolios.
+  Each row maps a CIQ partner to the cluster and the user's portfolio where it belongs.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -21,3 +22,5 @@ columns:
     description: Date the record was created in the spreadsheet. The first occurrence of the record is considered as the allocation date in the portfolio.
     lineage:
       - datalake_gsheets_raw.ciq_portfolio.ts_load
+  ts_load:
+    description: Date when the table data was updated.

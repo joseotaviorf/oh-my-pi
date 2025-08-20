@@ -4,7 +4,8 @@ SELECT
     city_group,
     region_code,
     agent_type,
-    quartil AS quartile,
-    DATE(month) AS dt_month_reference
+    quartile,
+    DATE(month) AS dt_month_reference,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.agents_historical_quartile

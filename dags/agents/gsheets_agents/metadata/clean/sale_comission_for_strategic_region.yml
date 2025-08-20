@@ -1,21 +1,29 @@
 database_name: datalake_gsheets_clean
 table_name: sale_comission_for_strategic_region
+description:
+  Strategic region mapping for Sale. Identifies whether a region (city/neighborhood) is considered strategic.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_region:
     lineage:
       - datalake_gsheets_raw.sale_comission_for_strategic_region.id
+    description: Region ID.
   city_name:
     lineage:
       - datalake_gsheets_raw.sale_comission_for_strategic_region.city_name
+    description: City name.
   neighborhood_name:
     lineage:
       - datalake_gsheets_raw.sale_comission_for_strategic_region.neighborhood_name
+    description: Neighborhood name.
   concat_city_neighborhood:
     lineage:
       - datalake_gsheets_raw.sale_comission_for_strategic_region.concat_city_neighborhood
+    description: Concatenated city and neighborhood names.
   is_strategic_region:
     lineage:
       - datalake_gsheets_raw.sale_comission_for_strategic_region.strategic_region
+    description: Whether the region is strategic.
   ts_load:
-    lineage:
-      - datalake_gsheets_raw.sale_comission_for_strategic_region.ts_load
+    description: Date when the table data was updated.

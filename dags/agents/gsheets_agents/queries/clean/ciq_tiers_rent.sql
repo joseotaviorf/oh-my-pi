@@ -11,6 +11,7 @@ SELECT
     DATE(dt_end_audit) AS dt_end_audit,
     DATE(dt_start_validity) AS dt_start_validity,
     DATE(dt_end_validity) AS dt_end_validity,
-    TIMESTAMP(ts_updated) AS ts_updated
+    TIMESTAMP(ts_updated) AS ts_updated,
+    NOW() AS ts_load
 FROM 
     datalake_gsheets_raw.ciq_tiers_rent

@@ -5,6 +5,7 @@ SELECT
     ts_load AS ts_created,
     YEAR(ts_load) AS year,
     MONTH(ts_load) AS month,
-    DAY(ts_load) AS day
+    DAY(ts_load) AS day,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.ciq_portfolio

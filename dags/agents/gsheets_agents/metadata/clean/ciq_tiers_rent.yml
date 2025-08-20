@@ -7,54 +7,56 @@ domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_user:
-    description: User ID.
+    description: Unique identifier of the user (CIQ member) in the Rent context.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.id_user
   id_partner:
-    description: Partner ID in the Partner structure.
+    description: Unique identifier of the partner in the partner structure.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.id_partner
   status_ciq:
-    description: CIQ status, it should stop at the partnership where it was de-registered.
+    description: CIQ status for the partnership; de-registrations stop at the last valid partnership.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.status_ciq
   ciq_type:
-    description: Type of CIQ partnership.
+    description: Type/category of the CIQ partnership.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.ciq_type
   city_group_partner:
-    description: Operating city (Agent) or main city for acquisitions (Only).
+    description: Operating city for agents or main acquisition city for the Only segment.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.city_group_partner
   dt_start_audit:
-    description: Start date of the audit.
+    description: Start date for the audit period considered in the calculation.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.dt_start_audit
   dt_end_audit:
-    description: End date of the audit.
+    description: End date for the audit period considered in the calculation.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.dt_end_audit
   n_fl:
-    description: Total number of First Listings.
+    description: Total number of First Listings captured in the period.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.n_fl
   n_fl_valid:
-    description: Number of valid First Listings (>= 15 days published).
+    description: Number of First Listings considered valid (published for at least 15 days).
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.n_fl_valid
   dt_start_validity:
-    description: Start date of the payment value.
+    description: Start date for the payment value validity period.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.dt_start_validity
   dt_end_validity:
-    description: End date of the payment value.
+    description: End date for the payment value validity period.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.dt_end_validity
   rev_share:
-    description: Default Revenue Share value paid.
+    description: Default Revenue Share value paid for valid outcomes.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.rev_share
   ts_updated:
-    description: Timestamp of last update.
+    description: Timestamp of the last update to this record.
     lineage:
       - datalake_gsheets_raw.ciq_tiers_rent.ts_updated
+  ts_load:
+    description: Date when the table data was updated.

@@ -25,6 +25,7 @@ SELECT
     tgt_share_vbba_tf,	
     tgt_canc_noshow_tf,	
     tgt_share_canc_noshow_tf,
-    DATE(mes) AS dt_month_reference
+    DATE(mes) AS dt_month_reference,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.agents_targets_tracking

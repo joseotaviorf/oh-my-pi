@@ -8,25 +8,27 @@ columns:
   id_region:
     lineage:
       - datalake_gsheets_raw.subhub_regions.id_bairro
-    description: Subhub region ID.
+    description: Unique identifier of the subhub region.
   city:
     lineage:
       - datalake_gsheets_raw.subhub_regions.cidade
-    description: Subhub city.
+    description: City where this subhub is located.
   city_group:
     lineage:
       - datalake_gsheets_raw.subhub_regions.praca
-    description: Subhub city group.
+    description: City group (market area) that aggregates multiple cities and neighborhoods.
   region:
     lineage:
       - datalake_gsheets_raw.subhub_regions.bairro
-    description: Subhub region.
+    description: Neighborhood/region that composes the subhub area.
   hub_name:
     lineage:
       - datalake_gsheets_raw.subhub_regions.hub
-    description: Hub name.
+    description: Name of the hub to which the subhub belongs.
   subhub_name:
     lineage:
       - datalake_gsheets_raw.subhub_regions.subhub
-    description: Subhub name.
+    description: Name of the subhub within the business unit (hub).
+  ts_load:
+    description: Date when the table data was updated.
 
