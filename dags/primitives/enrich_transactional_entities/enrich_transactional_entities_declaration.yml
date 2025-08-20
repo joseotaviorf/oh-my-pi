@@ -1,0 +1,30 @@
+dag:
+  name: enrich_transactional_entities
+  schedule_start_date: 2025, 8, 20
+  owner: Data CDP
+  documentation:
+    dag_purpose: |
+      This DAG creates enriched tables containing the CDP Transactional entities vision.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  extra_query_template_params:
+    house_address: "CONCAT(h.address, ', ', h.number, ' - ', h.complement, '. ', h.neighborhood, ', ', h.city)"
+  tables_customization:
+    entities:
+      z_order_by: [id_user, id_house, persona]
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r-fleet.xlarge
+    node_type_id: r-fleet.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

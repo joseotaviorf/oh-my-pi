@@ -1,0 +1,69 @@
+database_name: datalake_transactional_entities
+table_name: entities
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+description: A table containing all transactional entities, providing a comprehensive view of our customers'
+  activities on the platform. Its format is specifically designed for use by AI initiatives like our chatbots.
+columns:
+  sk_entity:
+    lineage:
+      - core_visit.visit.sk_core_visit
+    description: Surrogate key of all transactional entities.
+      It's made by concatenating "<entity>||<id_entity>" and then applying the SHA256 hash.
+      This key must always be unique. 
+  id_entity:
+    lineage:
+      - core_visit.visit.id_visit
+    description: The primary identifier for an entity, directly from our production systems.
+      This key might not always be unique across all entities, as different entities may share the same id.
+  id_house:
+    lineage:
+      - core_visit.visit.id_house
+    description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
+  id_contract:
+    description: Contract id related to the entity, if it has any.
+      It's the id of the Contrato/Contract table, from Main's database (EBDB).
+  id_user:
+    lineage:
+      - core_visit.visit.id_agent
+      - core_visit.visit.id_owner
+      - core_visit.visit.id_visitor
+    description: The unique identifier for a user associated with the entity.
+      This id corresponds to the id from the User table in our Main database (EBDB).
+      Each entity may be linked to multiple users.
+  entity:
+    description: String that specifies the type of entity.
+    categories:
+      VISIT: The entity is a visit, with its id_entity mapping directly to the id_visit from the Visit table in EBDB database.
+  persona:
+    description: A persona describes the primary role of a user (id_user) in relation to a specific
+      entity within our platform's business context.
+    categories:
+      AGENT_BROKER: A broker who acts as an agent, managing client demands and mediating communication.
+      BUYER_PROSPECT: A potential customer interested in purchasing a property.
+      TENANT_PROSPECT: A potential customer interested in renting a property.
+      OWNER: The owner of one or more properties registered on the platform.
+  house_address:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
+      - datalake_ebdb_clean.house.neighborhood
+      - datalake_ebdb_clean.house.city
+    description: The full address of the property related to the entity.
+      It combines address, number, complement, neighborhood and city (in this exactly order)
+      from EBDB's House/Imovel table.
+  is_active:
+    description: Boolean flag indicating if the entity is currently active.
+      An entity is considered active as long as it is still receiving interactions.
+      A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsucessfull. 
+  ts_created:
+    lineage:
+      - core_visit.visit.ts_created
+    description: Timestamp of when the entity was created in our product.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_clean.visit.ts_updated
+    description: Last timestamp of when the entity was updated in our product.
+  ts_load:
+    description: Timestamp of when the entity was updated and loaded for the last time in this table.
