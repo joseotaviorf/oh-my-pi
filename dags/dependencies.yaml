@@ -213,13 +213,13 @@ bietlejuice.dw_collection_recovery_quintocred:
   - bietlejuice.trato_feito:load-clean-debt:first-run-of-day
   - bietlejuice.trato_feito:load-clean-payment:first-run-of-day
 bietlejuice.dw_collections_segmentation:
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-collection:first-run-of-day
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-delinquency-app-events:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-bill-items:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.trato_feito:load-clean-blocklist:first-run-of-day
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-collection:first-run-of-day
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
-  - bietlejuice.enrich_collections_quintoandar:load-enrich-delinquency-app-events:first-run-of-day
 bietlejuice.dw_company:
   - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day
@@ -4265,6 +4265,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks:first-run-of-day
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination:first-run-of-day
@@ -4281,6 +4282,10 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
+  - bietlejuice.salesforce:load-clean-cases:first-run-of-day
+  - bietlejuice.salesforce:load-clean-relisting-context:first-run-of-day
+  - bietlejuice.salesforce:load-clean-task:first-run-of-day
+  - bietlejuice.salesforce:load-clean-terminations:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-task:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-workflow:first-run-of-day
