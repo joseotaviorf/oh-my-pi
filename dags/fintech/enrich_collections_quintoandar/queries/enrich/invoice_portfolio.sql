@@ -6,7 +6,8 @@ base AS (
         c.id_house,
         c.id_proposal,
         c.status AS contract_status,
-        c.dt_termination AS dt_contract_annulled
+        c.dt_termination AS dt_contract_annulled,
+        c.dt_started AS dt_contract_start
     FROM
         datalake_retsuko.invoice AS i
     LEFT JOIN
@@ -252,6 +253,7 @@ create_recovery_channel AS (
         b.dt_due_adjusted,
         bn.dt_due_parent AS dt_invoice_anchor,
         bn.dt_due_adjusted_parent AS dt_adjusted_invoice_anchor,
+        b.dt_contract_start,
         b.dt_contract_annulled,
         bn.dt_created_negotiation_parent,
         bn.dt_created_negotiation_child,
@@ -348,6 +350,7 @@ SELECT
     dt_due_adjusted,
     dt_invoice_anchor,
     dt_adjusted_invoice_anchor,
+    dt_contract_start,
     dt_contract_annulled,
     dt_created_negotiation_parent,
     dt_created_negotiation_child,

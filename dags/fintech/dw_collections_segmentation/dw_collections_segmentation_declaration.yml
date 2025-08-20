@@ -10,5 +10,8 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: collections_segmentation
+  inner_dependencies:
+    fact_contract_wallet_timeline:
+      - fact_invoice_wallet_timeline
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_13_3_med_3_fixed_workers_general_photon_cluster

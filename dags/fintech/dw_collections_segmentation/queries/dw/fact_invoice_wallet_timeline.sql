@@ -8,28 +8,29 @@ get_invoices_with_balance AS (
   WHERE
     due_amount <= 0
     AND payment_status IN ('open', 'paid', 'canceled', 'written-down')
+    AND DATE(dt_created) >= DATE('2023-01-01')
   GROUP BY 1,2
   HAVING bill_item_balance > 0
 ),
 add_bill_items_flags AS (
     SELECT
         id_invoice,
-        MAX(CASE WHEN bill_item_cluster_name = 'CONDOMINIO'       THEN 1 ELSE 0 END) AS has_bill_item_condominio,
-        MAX(CASE WHEN bill_item_cluster_name = 'MULTA-RECISORIA'  THEN 1 ELSE 0 END) AS has_bill_item_multa_recisoria,
-        MAX(CASE WHEN bill_item_cluster_name = 'ACORDO'           THEN 1 ELSE 0 END) AS has_bill_item_acordo,
-        MAX(CASE WHEN bill_item_cluster_name = 'RENTAL-CORE'      THEN 1 ELSE 0 END) AS has_bill_item_rental_core,
-        MAX(CASE WHEN bill_item_cluster_name = 'REPAROS'          THEN 1 ELSE 0 END) AS has_bill_item_reparos,
-        MAX(CASE WHEN bill_item_cluster_name = 'MULTAS ONGOING'   THEN 1 ELSE 0 END) AS has_bill_item_multas_ongoing,
-        MAX(CASE WHEN bill_item_cluster_name = 'UTILIDADES'       THEN 1 ELSE 0 END) AS has_bill_item_utilidades,
-        MAX(CASE WHEN bill_item_cluster_name = 'OUTROS'           THEN 1 ELSE 0 END) AS has_bill_item_outros,
-        SUM(CASE WHEN bill_item_cluster_name = 'CONDOMINIO'       THEN bill_item_balance ELSE 0 END) AS balance_bill_item_condominio,
-        SUM(CASE WHEN bill_item_cluster_name = 'MULTA-RECISORIA'  THEN bill_item_balance ELSE 0 END) AS balance_bill_item_multa_recisoria,
-        SUM(CASE WHEN bill_item_cluster_name = 'ACORDO'           THEN bill_item_balance ELSE 0 END) AS balance_bill_item_acordo,
-        SUM(CASE WHEN bill_item_cluster_name = 'RENTAL-CORE'      THEN bill_item_balance ELSE 0 END) AS balance_bill_item_rental_core,
-        SUM(CASE WHEN bill_item_cluster_name = 'REPAROS'          THEN bill_item_balance ELSE 0 END) AS balance_bill_item_reparos,
-        SUM(CASE WHEN bill_item_cluster_name = 'MULTAS ONGOING'   THEN bill_item_balance ELSE 0 END) AS balance_bill_item_multas_ongoing,
-        SUM(CASE WHEN bill_item_cluster_name = 'UTILIDADES'       THEN bill_item_balance ELSE 0 END) AS balance_bill_item_utilidades,
-        SUM(CASE WHEN bill_item_cluster_name = 'OUTROS'           THEN bill_item_balance ELSE 0 END) AS balance_bill_item_outros
+        MAX(IF(bill_item_cluster_name = 'CONDOMINIO', TRUE, FALSE)) AS has_bill_item_condominio,
+        MAX(IF(bill_item_cluster_name = 'MULTA-RECISORIA', TRUE, FALSE)) AS has_bill_item_multa_recisoria,
+        MAX(IF(bill_item_cluster_name = 'ACORDO', TRUE, FALSE)) AS has_bill_item_acordo,
+        MAX(IF(bill_item_cluster_name = 'RENTAL-CORE', TRUE, FALSE)) AS has_bill_item_rental_core,
+        MAX(IF(bill_item_cluster_name = 'REPAROS', TRUE, FALSE)) AS has_bill_item_reparos,
+        MAX(IF(bill_item_cluster_name = 'MULTAS ONGOING', TRUE, FALSE)) AS has_bill_item_multas_ongoing,
+        MAX(IF(bill_item_cluster_name = 'UTILIDADES', TRUE, FALSE)) AS has_bill_item_utilidades,
+        MAX(IF(bill_item_cluster_name = 'OUTROS', TRUE, FALSE)) AS has_bill_item_outros,
+        SUM(IF(bill_item_cluster_name = 'CONDOMINIO', bill_item_balance, 0)) AS balance_bill_item_condominio,
+        SUM(IF(bill_item_cluster_name = 'MULTA-RECISORIA', bill_item_balance, 0)) AS balance_bill_item_multa_recisoria,
+        SUM(IF(bill_item_cluster_name = 'ACORDO', bill_item_balance, 0)) AS balance_bill_item_acordo,
+        SUM(IF(bill_item_cluster_name = 'RENTAL-CORE', bill_item_balance, 0)) AS balance_bill_item_rental_core,
+        SUM(IF(bill_item_cluster_name = 'REPAROS', bill_item_balance, 0)) AS balance_bill_item_reparos,
+        SUM(IF(bill_item_cluster_name = 'MULTAS ONGOING', bill_item_balance, 0)) AS balance_bill_item_multas_ongoing,
+        SUM(IF(bill_item_cluster_name = 'UTILIDADES', bill_item_balance, 0)) AS balance_bill_item_utilidades,
+        SUM(IF(bill_item_cluster_name = 'OUTROS', bill_item_balance, 0)) AS balance_bill_item_outros
     FROM get_invoices_with_balance
     GROUP BY 1
 ),
@@ -37,6 +38,7 @@ base AS (
     SELECT
         i.id_invoice,
         i.id_contract,
+        i.dt_contract_start,
         i.dt_contract_annulled,
         i.id_negotiation_parent,
         i.id_negotiation_child,
@@ -50,14 +52,14 @@ base AS (
         i.purpose,
         i.recovery_channel,
         i.due_amount,
-        COALESCE(d.has_bill_item_condominio, 0) as has_bill_item_condominio,
-        COALESCE(d.has_bill_item_multa_recisoria, 0) as has_bill_item_multa_recisoria,
-        COALESCE(d.has_bill_item_acordo, 0) as has_bill_item_acordo,
-        COALESCE(d.has_bill_item_rental_core, 0) as has_bill_item_rental_core,
-        COALESCE(d.has_bill_item_reparos, 0) as has_bill_item_reparos,
-        COALESCE(d.has_bill_item_multas_ongoing, 0) as has_bill_item_multas_ongoing,
-        COALESCE(d.has_bill_item_utilidades, 0) as has_bill_item_utilidades,
-        COALESCE(d.has_bill_item_outros, 0) as has_bill_item_outros,
+        COALESCE(d.has_bill_item_condominio, FALSE) as has_bill_item_condominio,
+        COALESCE(d.has_bill_item_multa_recisoria, FALSE) as has_bill_item_multa_recisoria,
+        COALESCE(d.has_bill_item_acordo, FALSE) as has_bill_item_acordo,
+        COALESCE(d.has_bill_item_rental_core, FALSE) as has_bill_item_rental_core,
+        COALESCE(d.has_bill_item_reparos, FALSE) as has_bill_item_reparos,
+        COALESCE(d.has_bill_item_multas_ongoing, FALSE) as has_bill_item_multas_ongoing,
+        COALESCE(d.has_bill_item_utilidades, FALSE) as has_bill_item_utilidades,
+        COALESCE(d.has_bill_item_outros, FALSE) as has_bill_item_outros,
         COALESCE(d.balance_bill_item_condominio, 0) as balance_bill_item_condominio,
         COALESCE(d.balance_bill_item_multa_recisoria, 0) as balance_bill_item_multa_recisoria,
         COALESCE(d.balance_bill_item_acordo, 0) as balance_bill_item_acordo,
@@ -82,6 +84,7 @@ base AS (
     WHERE i.invoice_status <> 'canceled'
       AND i.user = 'tenant'
       AND i.country_code = 'BR'
+      AND DATE(i.ts_created) >= DATE('2023-01-01')
       AND (i.negotiation_installment_number IS NULL
         OR (i.negotiation_installment_number > 1
             AND COALESCE(i.negotiation_promisse_payment_method, 'UNFOUND') <> 'CREDIT-CARD'))
@@ -180,11 +183,11 @@ invoice_timeline AS (
         END AS dt_paid_timeline,
         rdb.dt_created,
         rdb.dt_begin,
+        rdb.dt_contract_start,
         rdb.dt_contract_annulled
     FROM date_range AS asdt
     LEFT JOIN base rdb
       ON rdb.id_invoice = asdt.id_invoice AND rdb.id_contract = asdt.id_contract
-    WHERE asdt.dt_reference >= DATE('2023-01-01')
 ),
 contract_flags AS (
     SELECT
@@ -292,7 +295,7 @@ SELECT
     IF(i.invoice_delay_t2 > 0, i.recovered_amount, 0) AS overdue_recovered_amount_t2,
     IF(i.invoice_delay_t2 <= 0, i.recovered_amount, 0) AS on_time_paid_amount_t2,
     IF(c.contract_delay_t3 > 0, i.recovered_amount, 0) AS overdue_recovered_amount_t3,
-    IF(c.contract_delay_t3 <=0, i.recovered_amount, 0) AS on_time_paid_amount_t3,
+    IF(c.contract_delay_t3 <= 0, i.recovered_amount, 0) AS on_time_paid_amount_t3,
     c.contract_delay_t1,
     c.contract_delay_t3,
     c.contract_delay_t3_losses,
@@ -306,6 +309,7 @@ SELECT
     i.dt_paid_timeline,
     i.dt_created,
     i.dt_begin,
+    i.dt_contract_start,
     i.dt_contract_annulled,
     NOW() AS ts_load
 FROM
