@@ -182,14 +182,14 @@ SELECT DISTINCT
   ie.accrual_year_month AS entry_accrual_year_month,
   ie.due_year_month AS entry_due_year_month,
   CAST(DATE_FORMAT(DATEADD(month, 1, DATE(fie.ts_created)), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
-  DATE(fie.ts_created) AS entry_created_date,
-  DATE(i.ts_created) AS invoice_created_date,
+  TIMESTAMP(fie.ts_created) AS entry_created_date,
+  TIMESTAMP(i.ts_created) AS invoice_created_date,
   DATE(i.dt_due) AS invoice_due_date,
   DATE(i.dt_sent) AS invoice_sent_date,
   DATE(i.dt_paid) AS invoice_paid_date,
   DATE(i.dt_write_off) AS invoice_write_off_date,
-  DATE(i.ts_canceled) AS invoice_canceled_date,
-  DATE(rr.ts_entry_reversed) AS invoice_reversal_date,
+  TIMESTAMP(i.ts_canceled) AS invoice_canceled_date,
+  TIMESTAMP(rr.ts_entry_reversed) AS invoice_reversal_date,
   DATE(nbd.date_next_bd) AS invoice_paid_date_next_business_day,
   DATE(CASE 
     WHEN lower(paid_via) IN (
