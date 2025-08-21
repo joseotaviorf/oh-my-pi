@@ -8,7 +8,6 @@ get_invoices_with_balance AS (
   WHERE
     due_amount <= 0
     AND payment_status IN ('open', 'paid', 'canceled', 'written-down')
-    AND DATE(dt_created) >= DATE('2023-01-01')
   GROUP BY 1,2
   HAVING bill_item_balance > 0
 ),
@@ -188,6 +187,7 @@ invoice_timeline AS (
     FROM date_range AS asdt
     LEFT JOIN base rdb
       ON rdb.id_invoice = asdt.id_invoice AND rdb.id_contract = asdt.id_contract
+    WHERE asdt.dt_reference >= date('2023-01-01')
 ),
 contract_flags AS (
     SELECT
@@ -246,6 +246,7 @@ delay_contamination_contract AS (
 )
 SELECT
     i.id_contract,
+    i.dt_reference,
     i.id_invoice,
     i.id_negotiation_parent,
     i.id_negotiation_child,
@@ -301,7 +302,6 @@ SELECT
     c.contract_delay_t3_losses,
     ROW_NUMBER() OVER (PARTITION BY i.id_contract, i.dt_reference ORDER BY i.invoice_delay_t2 DESC, i.dt_created ASC, i.id_invoice ASC) AS order_invoice_wallet_risk,
     ROW_NUMBER() OVER (PARTITION BY i.id_contract, i.dt_reference ORDER BY i.invoice_delay_t1 DESC, i.dt_created ASC, i.id_invoice ASC) AS order_invoice_wallet,
-    i.dt_reference,
     i.dt_due,
     i.dt_invoice_anchor,
     i.dt_created_negotiation_parent,

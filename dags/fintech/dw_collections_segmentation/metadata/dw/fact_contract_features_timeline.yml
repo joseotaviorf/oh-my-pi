@@ -36,6 +36,78 @@ columns:
     description: Number of days since contract finalization
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_ending
+  max_delay_contaminated_contract_t2:
+    description: Maximum Contract Delay within T2 Contamination methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+  days_since_contract_start:
+    description: Number of days since contract start
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_contract_start
+  n_reparos_invoices:
+    description: Number of repair invoices
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
+  cpc:
+    description: Contact completion count
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.cpc
+  qt_acordo_quebrado:
+    description: Quantity of broken agreements
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.qt_acordo_quebrado
+  id_process_evictions:
+    description: Eviction process identifier
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.id_process_evictions
+  has_overdue_balance_over0_t1_at_ending:
+    description: Flag indicating if contract had overdue balance over 0 days using T1 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over0_t1_at_ending
+  has_overdue_balance_over5_t1_at_ending:
+    description: Flag indicating if contract had overdue balance over 5 days using T1 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over5_t1_at_ending
+  has_overdue_balance_over0_t2_at_ending:
+    description: Flag indicating if contract had overdue balance over 0 days using T2 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over0_t2_at_ending
+  has_overdue_balance_over5_t2_at_ending:
+    description: Flag indicating if contract had overdue balance over 5 days using T2 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over5_t2_at_ending
+  has_overdue_balance_over0_t3_at_ending:
+    description: Flag indicating if contract had overdue balance over 0 days using T3 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over0_t3_at_ending
+  has_overdue_balance_over5_t3_at_ending:
+    description: Flag indicating if contract had overdue balance over 5 days using T3 methodology at ending
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_overdue_balance_over5_t3_at_ending
+  is_evictions:
+    description: Flag indicating if contract has eviction process
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
+  is_blocklisted:
+    description: Flag indicating if contract is blocklisted
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_blocklisted
+  n_anchor_invoices_not_negativable:
+    description: Number of anchor invoices that are not negativable
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_anchor_invoices_not_negativable
+  array_open_invoices:
+    description: Array of open invoice IDs
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.array_open_invoices
+  array_paid_invoices:
+    description: Array of paid invoice IDs
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.array_paid_invoices
+  array_negotiated_invoices:
+    description: Array of negotiated (written-down) invoice IDs
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.array_negotiated_invoices
   acc_max_n_repairs:
     description: Max number of repair invoices within contract wallet considering contract lifetime and dataset time range (accumulated)
     lineage:
@@ -66,8 +138,45 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
   monthly_income:
-    description: Sum of monthly income from proponentes (contract holders) - placeholder for future implementation requiring JOIN with contract/proponente tables
+    description: Sum of monthly income from proponentes (contract holders) who will reside in the property
     lineage:
-      - "TODO: JOIN with dim_contract or proponente table"
+      - datalake_sorting_hat_clean.proponent.monthly_income
+      - dw_rent.fact_listing_rent_flows.sk_proposal
+      - dw_rent.fact_listing_rent_flows.sk_contract
+      - dw_rent.dim_contract.sk_contract
+  segments_risk:
+    description: Risk segmentation based on contract status and payment behavior - categorizes contracts into ALTA, MEDIA, BAIXA, BAIXISSIMA probability segments
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_ending
+      - datalake_sorting_hat_clean.proponent.monthly_income
+  segments_risk_ffill:
+    description: Forward-filled version of segments_risk to maintain consistency across timeline
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.segments_risk
+  t1_delay_bucket:
+    description: Bucketed categorization of T1 delay into ranges (Current, 1-30, 31-60, 61-90, 91-180, >180 days)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+  t2_delay_bucket:
+    description: Bucketed categorization of T2 delay into ranges (Current, 1-30, 31-60, 61-90, 91-180, >180 days)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+  segment_comms:
+    description: Communication segmentation for collections strategy - includes categories like FPD, NEW DEFAULTER, EVEX, BLOCKLIST, etc.
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_blocklisted
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_contract_start
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_anchor_invoices_not_negativable
+  segment_comms_ffill:
+    description: Forward-filled version of segment_comms to maintain consistency across timeline
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.segment_comms
   ts_load:
     description: Timestamp when the record was loaded into the table

@@ -71,36 +71,44 @@ contract_features AS (
         SUM(overdue_recovered_amount_t3) AS overdue_recovered_amount_t3,
         SUM(on_time_paid_amount_t3)   AS on_time_paid_amount_t3,
         SUM(CASE WHEN is_invoice_overdue_t1 AND overdue_recovered_amount_t1 > 0 AND invoice_type IN ('monthly') THEN invoice_delay_t1 ELSE 0 END) AS sum_monthly_overdue_days_paid_t1,
-        COUNT(DISTINCT CASE WHEN is_invoice_overdue_t1 AND overdue_recovered_amount_t1 > 0 AND invoice_type IN ('monthly') THEN id_invoice END) AS count_monthly_overdue_invoices_paid_t1
+        COUNT(DISTINCT CASE WHEN is_invoice_overdue_t1 AND overdue_recovered_amount_t1 > 0 AND invoice_type IN ('monthly') THEN id_invoice END) AS count_monthly_overdue_invoices_paid_t1,
+        COLLECT_SET(CASE
+            WHEN payment_status = 'open' THEN id_invoice
+            ELSE NULL
+        END)  AS array_open_invoices,
+        COLLECT_SET(CASE
+            WHEN payment_status = 'paid' THEN id_invoice
+            ELSE NULL
+        END)  AS array_paid_invoices,
+        COLLECT_SET(CASE
+            WHEN payment_status = 'written-down' THEN id_invoice
+            ELSE NULL
+        END)  AS array_negotiated_invoices
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
-    GROUP BY dt_reference, id_contract
+    GROUP BY 1, 2
 ),
 get_invoice_date_range AS (
     SELECT
         id_contract,
-        contract_status,
         dt_contract_annulled AS dt_contract_end,
         dt_contract_start,
         MIN(dt_reference) AS dt_first_invoice,
         MAX(dt_reference) AS dt_last_invoice
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
-    GROUP BY 1,2,3,4
+    GROUP BY 1, 2, 3
 ),
 get_date_array AS (
     SELECT
         id_contract,
-        contract_status,
         dt_contract_end,
         dt_contract_start,
-        SEQUENCE(dt_first_invoice, IF(contract_status = 'Finalizado', GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
+        SEQUENCE(dt_first_invoice, IF(dt_contract_end IS NOT NULL, GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
                 CURRENT_DATE())) AS dt_reference_array
-    FROM
-        get_invoice_date_range
+    FROM get_invoice_date_range
 ),
 contract_date_references AS (
     SELECT
         id_contract,
-        contract_status,
         dt_contract_end,
         dt_contract_start,
         dt_reference
@@ -254,7 +262,10 @@ contract_timeline AS (
         COALESCE(f.overdue_recovered_amount_t3, 0) AS overdue_recovered_amount_t3,
         COALESCE(f.on_time_paid_amount_t3, 0) AS on_time_paid_amount_t3,
         COALESCE(f.sum_monthly_overdue_days_paid_t1, 0) AS sum_monthly_overdue_days_paid_t1,
-        COALESCE(f.count_monthly_overdue_invoices_paid_t1, 0) AS count_monthly_overdue_invoices_paid_t1
+        COALESCE(f.count_monthly_overdue_invoices_paid_t1, 0) AS count_monthly_overdue_invoices_paid_t1,
+        COALESCE(f.array_open_invoices, NULL) AS array_open_invoices,
+        COALESCE(f.array_paid_invoices, NULL) AS array_paid_invoices,
+        COALESCE(f.array_negotiated_invoices, NULL) AS array_negotiated_invoices
     FROM
         contract_date_references m
     LEFT JOIN
@@ -527,7 +538,7 @@ contract_enhanced AS (
             ON d.sk_contract = m.id_contract
             AND d.dt_reference = m.dt_reference
 )
-SELECT
+SELECT DISTINCT
     id_contract,
     dt_reference,
     id_process_evictions,
@@ -610,6 +621,9 @@ SELECT
     on_time_paid_amount_t3,
     sum_monthly_overdue_days_paid_t1,
     count_monthly_overdue_invoices_paid_t1,
+    array_open_invoices,
+    array_paid_invoices,
+    array_negotiated_invoices,
     is_evictions,
     has_app_events,
     has_app_events_overdue,
