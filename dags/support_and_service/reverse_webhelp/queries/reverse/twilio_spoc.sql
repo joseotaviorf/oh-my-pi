@@ -19,7 +19,8 @@ WITH segments_perspective AS (
       dd_next.department AS transferred_to,
       fcc.ts_task_created - interval '3' hour AS ts_created,
       fcc.is_spoc_task,
-      fcc.direction as spoc_direction
+      fcc.direction as spoc_direction,
+      dtax.customer_type_tag AS customer_type
     FROM
       dw_customer_support.fact_customer_contacts AS fcc
     LEFT JOIN 
@@ -37,9 +38,15 @@ WITH segments_perspective AS (
     LEFT JOIN 
       dw_customer_support.dim_department AS dd_next
         ON dd_next.sk_department = fcc.sk_next_department
+    LEFT JOIN
+      dw_customer_support.dim_ticket AS dt
+        ON dt.sk_ticket = fcc.sk_ticket
     LEFT JOIN 
       dw_customer_support.dim_analyst AS da 
         ON da.sk_analyst = fcc.sk_analyst
+    LEFT JOIN
+      dw_customer_support.dim_taxonomy AS dtax
+        ON dtax.sk_taxonomy = dt.sk_taxonomy
     WHERE 
       fcc.channel IN ('chat', 'call')
       AND fcc.origin NOT IN ('outbound')
@@ -80,6 +87,10 @@ LEFT JOIN dw_customer_support.fact_customer_contacts fcc
   sec_inicio.chat_started_time,
   sec_inicio.chat_ended_time,
   ROUND(AVG(fcm.reply_time), 0) avg_reply_time,
+  CASE WHEN mq.customer_type LIKE '%owner%' THEN 'owner'
+    WHEN mq.customer_type LIKE '%tenant%' THEN 'tenant'
+    ELSE mq.customer_type
+  END customer_type,
   IF(sec_inicio.chat_started_time BETWEEN DATE_FORMAT('09:00:00', 'HH:mm:ss') AND DATE_FORMAT('17:00:00', 'HH:mm:ss') AND DAYOFWEEK(DATE(mq.ts_created)) BETWEEN 2 AND 6, TRUE, FALSE) workday_chat
 
 FROM segments_perspective mq
@@ -106,6 +117,7 @@ GROUP BY
   mq.sk_interaction,
   sec_inicio.chat_started_time,
   sec_inicio.chat_ended_time,
+  mq.customer_type,
   workday_chat
 )
 SELECT
@@ -126,6 +138,8 @@ sk_interaction,
 chat_started_time,
 chat_ended_time,
 avg_reply_time,
+customer_type,
+workday_chat,
 YEAR(CURRENT_DATE - 1) AS year,
 MONTH(CURRENT_DATE - 1) AS month,
 DAY(CURRENT_DATE - 1) AS day,
