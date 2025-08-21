@@ -14,20 +14,17 @@ workflow:
   source_database: ebdb
   source_schema: ebdb
   custom_schema: ebdb_test
-  #extra_query_template_params:
-  #  load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
-  #  load_end_date: "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
   tables_customization:
     Visita:
       clean_table_name: visit
       clean_primary_keys: [id]
-      raw_z_order_by: [id, ts_database_transaction]
-      clean_z_order_by: [id]
+      raw_z_order_by: [house_id, ts_database_transaction]
+      clean_z_order_by: [id_house, business_context]
     VisitStatusLog:
       clean_table_name: visit_status_log
       clean_primary_keys: [id_visit_status_log]
       raw_z_order_by: [visit_id, ts_database_transaction]
-      clean_z_order_by: [id_visit]
+      clean_z_order_by: [id_visit, event_type]
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
