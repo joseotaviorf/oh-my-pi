@@ -29,6 +29,10 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.task_event.id_queue
     description: Twilio queue ID
+  id_source_ctwa:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ctwa_source_id
+    description: The Id for the campaign related to the click to whatsapp identifier.
   queue_name:
     lineage:
       - datalake_quinto_messenger_clean.task_event.queue_name
@@ -95,6 +99,14 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.task.is_spoc_task
     description: Indicates if the task is part of a SPOC
+  url_source_ctwa:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ctwa_source_url
+    description: The url for the campaign related to the click to whatsapp identifier.
+  type_source_ctwa:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ctwa_source_type
+    description: The type of the campaign related to the click to whatsapp identifier.
   is_isaias_session:
     lineage:
       - datalake_sauron_clean.session.source_environment
