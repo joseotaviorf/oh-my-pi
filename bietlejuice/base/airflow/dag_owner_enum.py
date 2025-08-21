@@ -8,6 +8,7 @@ class DAGOwnerEnum:
     DATA_AGENTS = "Data Agents"
     DATA_CDP = "Data CDP"
     DATA_CONVERSATIONAL_XP = "Data Conversational XP"
+    DATA_DS_PRICING = "Data DS Pricing"
     DATA_FINTECH = "Data Fintech"
     DATA_FOR_RENT = "Data ForRent"
     DATA_FOR_SALE = "Data ForSale"

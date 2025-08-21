@@ -1632,6 +1632,8 @@ bietlejuice.enrich_cozy_metrics:
   - bietlejuice.cozy_metrics:load-clean-library-versions:first-run-of-day
 bietlejuice.enrich_crawler_zap_imoveis:
   - bietlejuice.crawler_zap_imoveis:load-clean-zap-imoveis:first-run-of-day
+bietlejuice.enrich_crawlers_listings_deduplicated:
+  - bietlejuice.enrich_crawler_zap_imoveis:load-enrich-zap-imoveis:first-run-of-day
 bietlejuice.enrich_credit_analysis:
   - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day

@@ -300,7 +300,6 @@ bietlejuice.enrich_crawlers_listings_deduplicated:
     - bietlejuice.enrich_sale_crawlers_listings:load-enrich-em-casa:first-run-of-day
     - bietlejuice.enrich_sale_crawlers_listings:load-enrich-loft:first-run-of-day
     - bietlejuice.enrich_viva_real_crawler_listings:load-enrich-viva-real:first-run-of-day
-    - bietlejuice.enrich_zap_imoveis_crawler_listings:load-enrich-zap-imoveis:first-run-of-day
 bietlejuice.enrich_credit_analysis:
   remove:
     - bietlejuice.sorting_hat:load-clean-credit-analysis-version:first-run-of-day

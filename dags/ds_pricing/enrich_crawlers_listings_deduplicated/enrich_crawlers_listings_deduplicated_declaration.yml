@@ -1,0 +1,27 @@
+dag:
+  name: enrich_crawlers_listings_deduplicated
+  owner: Data DS Pricing
+  schedule_start_date: 2024, 1, 1
+  documentation:
+    dag_purpose: |
+      Computes the listings of Loft, Zapimoveis, VivaReal and EmCasa crawlers without deduplication.
+      It uses the latitude, longitude, and the price_m2 to deduplicate the listings,
+      retrieving the listing with the oldest ts_created timestamp.
+      It will run every Friday, after the enrich_crawler_zap_imoveis dag has finished.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  has_hive_sync: false
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 4
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    spark_version: 14.3.x-scala2.12

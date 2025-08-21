@@ -1,0 +1,141 @@
+database_name: datalake_crawlers_listings_deduplicated
+table_name: crawlers_listings_deduplicated
+description: |
+  This table contains the listings of Loft, Zapimoveis, VivaReal and EmCasa
+  crawlers without deduplication.
+  It is updated every Friday, after the datalake_crawler_zap_imoveis.zap_imoveis table
+  has been updated.
+  It checks all the historical listings of each platform and deduplicates them.
+  It uses the latitude, longitude, and the price_m2 to deduplicate the listings,
+  retrieving the listing with the oldest ts_created timestamp.
+  Some rules must be followed for each one of the platforms:
+  - Loft:
+    - The business type must be "FOR_SALE"
+    - The listing sale price m2 must be between 1.000 and 100.000
+  - Zap Imoveis:
+    - The usage type must be "RESIDENTIAL"
+    - The listing sale price m2 must be between 1.000 and 100.000
+    - The latitude must not be null
+    - The street number must not be null
+    - The street must not be null
+    - The neighborhood must not be null
+  - Viva Real:
+    - The listing sale price m2 must be between 1.000 and 100.000
+    - The latitude must not be null
+    - The street number must not be null
+  - Em Casa:
+    - The listing sale price m2 must be between 1.000 and 100.000
+    - The latitude must not be null
+domain: DS Pricing
+owner: augusto.marcolin@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_crawlers_listings.loft.id_house
+      - datalake_crawler_zap_imoveis.zap_imoveis.id_house
+      - datalake_crawlers_listings.viva_real.id_house
+      - datalake_crawlers_listings.em_casa.id_house
+    description: |
+      Key of the house.
+      It is the concatenation of the platform id and the origin name.
+  platform:
+    lineage:
+      - datalake_crawlers_listings.loft.platform
+      - datalake_crawler_zap_imoveis.zap_imoveis.platform
+      - datalake_crawlers_listings.viva_real.platform
+      - datalake_crawlers_listings.em_casa.platform
+    description: |
+      The platform from which this listing was sourced.
+    categories:
+      loft: "Listings provided by Loft"
+      zapimoveis: "Listings provided by Zap Imoveis"
+      vivareal: "Listings provided by Viva Real"
+      emcasa: "Listings provided by Em Casa"
+  state:
+    lineage:
+      - datalake_crawlers_listings.loft.state
+      - datalake_crawler_zap_imoveis.zap_imoveis.state
+      - datalake_crawlers_listings.viva_real.state
+      - datalake_crawlers_listings.em_casa.state
+    description: |
+      It is the abbreviation of the state name.
+  city:
+    lineage:
+      - datalake_crawlers_listings.loft.city
+      - datalake_crawler_zap_imoveis.zap_imoveis.address_city
+      - datalake_crawlers_listings.viva_real.address_city
+      - datalake_crawlers_listings.em_casa.city
+    description: |
+      It is the name of the city.
+  street:
+    lineage:
+      - datalake_crawlers_listings.loft.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.street
+      - datalake_crawlers_listings.viva_real.street
+      - datalake_crawlers_listings.em_casa.address
+    description: |
+      It is the name of the street.
+  street_number:
+    lineage:
+      - datalake_crawlers_listings.loft.st_number
+      - datalake_crawler_zap_imoveis.zap_imoveis.street_number
+      - datalake_crawlers_listings.viva_real.street_number
+      - datalake_crawlers_listings.em_casa.st_number
+    description: |
+      It is the number of the house.
+  latitude:
+    lineage:
+      - datalake_crawlers_listings.loft.lat
+      - datalake_crawler_zap_imoveis.zap_imoveis.latitude
+      - datalake_crawlers_listings.viva_real.latitude
+      - datalake_crawlers_listings.em_casa.lat
+    description: |
+      It is the latitude of the house.
+  longitude:
+    lineage:
+      - datalake_crawlers_listings.loft.lng
+      - datalake_crawler_zap_imoveis.zap_imoveis.longitude
+      - datalake_crawlers_listings.viva_real.longitude
+      - datalake_crawlers_listings.em_casa.lng
+    description: |
+      It is the longitude of the house.
+  total_area:
+    lineage:
+      - datalake_crawlers_listings.loft.total_area
+      - datalake_crawler_zap_imoveis.zap_imoveis.total_area
+      - datalake_crawlers_listings.viva_real.total_area
+      - datalake_crawlers_listings.em_casa.total_area
+    description: |
+      It is the total area of the house.
+  price:
+    lineage:
+      - datalake_crawlers_listings.loft.price
+      - datalake_crawler_zap_imoveis.zap_imoveis.price_sale
+      - datalake_crawlers_listings.viva_real.price_sale
+      - datalake_crawlers_listings.em_casa.price
+    description: |
+      It is the sale price of the house.
+  price_m2:
+    lineage:
+      - datalake_crawlers_listings.loft.price_m2
+      - datalake_crawler_zap_imoveis.zap_imoveis.price_m2_sale
+      - datalake_crawlers_listings.viva_real.price_m2_sale
+      - datalake_crawlers_listings.em_casa.price_m2
+    description: |
+      The sale price per squared meter of the listing.
+  ts_created:
+    lineage:
+      - datalake_crawlers_listings.loft.ts_created
+      - datalake_crawler_zap_imoveis.zap_imoveis.ts_created
+      - datalake_crawlers_listings.viva_real.ts_created
+      - datalake_crawlers_listings.em_casa.ts_created
+    description: |
+      It is the timestamp of when the listing was created.
+  ts_updated:
+    lineage:
+      - datalake_crawlers_listings.loft.ts_updated
+      - datalake_crawler_zap_imoveis.zap_imoveis.ts_updated
+      - datalake_crawlers_listings.viva_real.ts_updated
+      - datalake_crawlers_listings.em_casa.ts_updated
+    description: |
+      It is the timestamp of when the listing was updated.
