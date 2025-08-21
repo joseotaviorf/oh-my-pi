@@ -1,102 +1,150 @@
 database_name: datalake_quinto_messenger_clean
 table_name: task
+description: Clean version of the tasks table related to the Quinto Messenger service
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
+    description: Identifier of the task in quinto messenger.
     lineage:
       - datalake_quinto_messenger_raw.task.id
   id_task:
+    description: Identifier of the task in twilio.
     lineage:
       - datalake_quinto_messenger_raw.task.task_id
   id_channel:
+    description: Identifier of the channel in twilio.
     lineage:
       - datalake_quinto_messenger_raw.task.channel_id
   id_chat:
+    description: Identifier of the chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   id_worker:
+    description: Identifier of the worker responsible for the chat.
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  id_source_ctwa:
+    description: The Id for the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   task_status:
+    description: Status of the task.
     lineage:
       - datalake_quinto_messenger_raw.task.task_status
   task_outcome:
+    description: Outcome of the task.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_metadata:
+    description: Metadata related to the customer in chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_contact_info:
+    description: Contact information of the customer in chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_phone_number:
+    description: Customer phone number.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   customer_email:
+    description: Customer email.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   twilio_phone_number:
+    description: Twilio phone number responsible for the chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   worker_email:
+    description: Email of the worker in charge for the chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   channel_type:
+    description: Channel where the chat was provided.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   completion_reason:
+    description: Completion reason of the chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   channel_status:
+    description: Status of the channel.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   department:
+    description: Department responsible for the service.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   bpo_name:
+    description: BPO responsible for the service.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   tags:
+    description: Tags related to the chat.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   conversation_attributes:
+    description: Metrics and attributes realted to the chat.
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  url_source_ctwa:
+    description: The url for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  type_source_ctwa:
+    description: The type of the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   task_attributes:
+    description: Attributes of the task.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   task_resource:
+    description: Resources of the task.
     lineage:
       - datalake_quinto_messenger_raw.task.task_resource
   assigned_to:
+    description: Information about who is assigned to the chat.
     lineage:
       - datalake_quinto_messenger_raw.task.assigned_to
   seconds_to_first_response:
+    description: Lead time in seconds to the first response.
     lineage:
       - datalake_quinto_messenger_raw.task.seconds_to_first_response
   is_forwarded:
+    description: Flag indicating whether the chat was forwarded.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   is_per_team_task:
+    description: Flag indicating whether the chat is in per_team category.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   is_spoc_task:
+    description: Flag indicating whether the chat is a spoc service.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   ts_created:
+    description: timestamp indicating when the chat was created.
     lineage:
       - datalake_quinto_messenger_raw.task.created_at
   ts_updated:
+    description: timestamp indicating when the chat was last updated.
     lineage:
       - datalake_quinto_messenger_raw.task.updated_at
   year:
+    description: Year component of the task creation date.
     lineage:
       - datalake_quinto_messenger_raw.task.year
   month:
+    description: Month component of the task creation date.
     lineage:
       - datalake_quinto_messenger_raw.task.month
   day:
+    description: Day and month component of the task creation date.
     lineage:
       - datalake_quinto_messenger_raw.task.day
   year_month:
+    description: Year and month component of the task creation date.
     lineage:
       - datalake_quinto_messenger_raw.task.year_month
