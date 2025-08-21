@@ -65,7 +65,7 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.user_properties
     description: Column up_ab_beakman_owner_house_setup from Amplitude events
-    ab_beakman_native_owner_home_toggle:
+  ab_beakman_native_owner_home_toggle:
     lineage:
     - datalake_amplitude_clean.events.user_properties
     description: Column ab_beakman_native_owner_home_toggle from Amplitude events
@@ -79,6 +79,10 @@ columns:
     - datalake_amplitude_clean.events.user_properties
     description: Column up_rc_beakman_owners_listing_performance_sale_toggle from
       Amplitude events
+  up_platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column platform from Amplitude events user properties
   ep_business_context:
     lineage:
     - datalake_amplitude_clean.events.event_properties

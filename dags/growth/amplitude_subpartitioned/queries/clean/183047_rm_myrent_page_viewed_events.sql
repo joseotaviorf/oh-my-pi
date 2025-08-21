@@ -18,6 +18,7 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.ab_beakman_native_owner_home_toggle') AS ab_beakman_native_owner_home_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_rent_toggle') AS up_rc_beakman_owners_listing_performance_rent_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_sale_toggle') AS up_rc_beakman_owners_listing_performance_sale_toggle,
+    GET_JSON_OBJECT(user_properties, '$.platform') AS up_platform,
     GET_JSON_OBJECT(event_properties, '$.house_business_contexts') AS ep_business_context,
     GET_JSON_OBJECT(event_properties, '$.ad_improvements_button_available') AS ep_ad_improvements_button_available,
     GET_JSON_OBJECT(event_properties, '$.ad_performance_button_available') AS ep_ad_performance_button_available,

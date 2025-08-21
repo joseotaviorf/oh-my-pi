@@ -81,6 +81,10 @@ columns:
     description:
       Column up_rc_beakman_owners_listing_performance_sale_toggle from
       Amplitude events
+  up_platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column platform from Amplitude events user properties
   ep_business_context:
     lineage:
       - datalake_amplitude_clean.events.event_properties
