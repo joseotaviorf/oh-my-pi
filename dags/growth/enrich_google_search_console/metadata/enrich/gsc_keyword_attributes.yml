@@ -1,0 +1,306 @@
+database_name: datalake_google_search_console
+table_name: gsc_keyword_attributes
+owner: erica.bertan@quintoandar.com.br
+domain: Growth
+description: |
+  Keyword attributes enriched from `gsc_keyword_region_attributes`, adding refined
+  city/neighborhood matches, numerous semantic mention flags, and rent subcategories
+  while preserving keyword performance metrics and partitions.
+columns:
+    id_region_match_operation_city:
+        description: Identifier for the matched operation city (internal region id).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.id_region_match_operation_city
+    id_region_match_operation_neighborhood:
+        description: Identifier for the matched operation neighborhood (internal region id).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.id_region_match_operation_neighborhood
+    dt_created:
+        description: Month reference date (first day of month) for the aggregated metrics.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.dt_created
+    keyword:
+        description: Original search query from GSC.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword
+    keyword_clean:
+        description: Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    match_igbe_city:
+        description: IBGE city match refined using contextual rules over the cleaned keyword.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.match_igbe_city
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    match_operation_city:
+        description: Operation city match refined using contextual rules over the cleaned keyword.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.match_operation_city
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    match_operation_neighborhood:
+        description: Operation neighborhood match refined using contextual rules over the cleaned keyword.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.match_operation_neighborhood
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    page:
+        description: Full page URL.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.page
+    google_property:
+        description: GSC property type associated with the measurement (e.g., web, image, news, video).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.google_property
+    branded:
+        description: Branded classification from the source dataset.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.branded
+    page_cluster:
+        description: Page cluster according to business rules.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.page_cluster
+    structure:
+        description: Page structure according to business rules.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.structure
+    page_path:
+        description: Page path within the domain.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.page_path
+    state:
+        description: State inferred for the page context, when applicable.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.state
+    city:
+        description: City inferred for the page context, when applicable.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.city
+    location_level:
+        description: Granularity of the location context (e.g., neighborhood, city).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.location_level
+    search_region:
+        description: Region searched or referenced in the page URL.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.search_region
+    poi_type:
+        description: Type of point of interest present in the search context.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.poi_type
+    filter_count:
+        description: Number of filters combined on the search page.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.filter_count
+    filter_combination:
+        description: Filter combination used on the search page.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.filter_combination
+    position:
+        description: Aggregated average position computed as SUM(posimp) / SUM(impressions) at keyword-group level.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.posimp
+            - datalake_google_search_console.gsc_keyword_region_attributes.impressions
+    impressions:
+        description: Total impressions in the month for the group (SUM of impressions).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.impressions
+    clicks:
+        description: Total clicks in the month for the group (SUM of clicks).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.clicks
+    ctr:
+        description: Aggregated click-through rate computed as SUM(clicks) / SUM(impressions).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.clicks
+            - datalake_google_search_console.gsc_keyword_region_attributes.impressions
+    site_url:
+        description: Main property URL measured by GSC.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.site_url
+    posimp:
+        description: Total position-impressions product in the month for the group (SUM of posimp).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.posimp
+    device:
+        description: Device type where the search was made (desktop, mobile, tablet).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.device
+    domain:
+        description: Generic referring domain grouping (Supply, Content, Help, QuintoAndar).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.domain
+    slug:
+        description: First path segment of the URL content.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.slug
+    subtitle_content:
+        description: Second path segment of the URL content (after the first slug).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.subtitle_content
+    is_branded:
+        description: Flag indicating whether the search query is branded.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.is_branded
+    has_mention_to_location:
+        description: Flag indicating whether the keyword mentions or implies a location.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.has_mention_to_location
+    has_mention_to_city:
+        description: Flag indicating whether the keyword mentions or implies a city.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+            - datalake_google_search_console.gsc_keyword_region_attributes.match_igbe_city
+            - datalake_google_search_console.gsc_keyword_region_attributes.match_operation_city
+    has_mention_to_neighborhood:
+        description: Flag indicating whether the keyword mentions or implies a neighborhood.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+            - datalake_google_search_console.gsc_keyword_region_attributes.match_operation_neighborhood
+    has_mention_to_cep:
+        description: Flag indicating whether the keyword contains a Brazilian postal code (CEP).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_city_zone:
+        description: Flag indicating whether the keyword mentions zones or regions within a city.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_agent:
+        description: Flag indicating whether the keyword refers to an agent or owner-direct terms.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_apartment:
+        description: Flag indicating whether the keyword refers to apartments or related synonyms.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_brokerage:
+        description: Flag indicating whether the keyword refers to brokerages or portals in a brokerage context.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_company:
+        description: Flag indicating whether the keyword refers to companies, developers or administrators.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_condo:
+        description: Flag indicating whether the keyword refers to condominiums or buildings.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_condo_facilities:
+        description: Flag indicating whether the keyword mentions condo facilities or amenities.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_construction:
+        description: Flag indicating whether the keyword refers to construction or developers.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_country:
+        description: Flag indicating whether the keyword mentions countries.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_decor:
+        description: Flag indicating whether the keyword is about decor, furniture or interior topics rather than listings.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_e_classified:
+        description: Flag indicating whether the keyword mentions e-classified portals.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_guide_tips:
+        description: Flag indicating whether the keyword indicates guides, tips or informational content.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_helps_doubts:
+        description: Flag indicating whether the keyword indicates questions, how-tos or help intents.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_house_type:
+        description: Flag indicating whether the keyword refers to houses or house-related property types.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_house_facilities:
+        description: Flag indicating whether the keyword mentions in-unit features or facilities.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_kitnet:
+        description: Flag indicating whether the keyword refers to kitnet/kitinete.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_law_taxes_market:
+        description: Flag indicating whether the keyword mentions laws, taxes or market/economic terms.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_life_hack:
+        description: Flag indicating whether the keyword indicates repairs, fixes or day-to-day hacks.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_non_related:
+        description: Flag indicating whether the keyword appears non-real-estate related.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_number:
+        description: Flag indicating whether the keyword contains numbers.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_other_house_types:
+        description: Flag indicating whether the keyword refers to other property types (e.g., commercial, land).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_other_info:
+        description: Flag indicating whether the keyword mentions other miscellaneous attributes or qualifiers.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_platform:
+        description: Flag indicating whether the keyword mentions platforms, brands or portals (including QuintoAndar variants).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_poi:
+        description: Flag indicating whether the keyword mentions points of interest or proximity terms.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_rent:
+        description: Flag indicating whether the keyword refers to renting intents or terms.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_sale:
+        description: Flag indicating whether the keyword refers to selling/buying intents or terms.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_short_term_homestays:
+        description: Flag indicating whether the keyword mentions short-term homestay platforms (e.g., Airbnb).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_short_term_rental:
+        description: Flag indicating whether the keyword mentions short-term rental terms (e.g., weekend, monthly).
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_state:
+        description: Flag indicating whether the keyword mentions states or state abbreviations.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_street:
+        description: Flag indicating whether the keyword mentions street names or address types.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_transaction_info_doubts:
+        description: Flag indicating whether the keyword mentions transaction process, documents, or doubts.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    has_mention_to_vacation:
+        description: Flag indicating whether the keyword mentions vacation/holiday/seasonal contexts.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    rent_subcategories:
+        description: Derived rent-related subcategory extracted from the keyword phrase.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    year:
+        description: Partition year.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.year
+    month:
+        description: Partition month.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.month
+    day:
+        description: Partition day.
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.day
+

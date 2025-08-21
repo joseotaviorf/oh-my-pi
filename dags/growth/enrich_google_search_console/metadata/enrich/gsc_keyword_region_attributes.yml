@@ -1,0 +1,172 @@
+database_name: datalake_google_search_console
+table_name: gsc_keyword_region_attributes
+owner: erica.bertan@quintoandar.com.br
+domain: Growth
+description: |
+  Keyword-level regional enrichment for Google Search Console (GSC) data.
+  Adds inferred matches for IBGE city, operation city, and operation neighborhood,
+  plus location intent flags, while preserving keyword performance metrics.
+columns:
+    id_region_match_operation_city:
+      description: Identifier for the matched operation city (internal region id).
+      lineage:
+        - datalake_region.region.id
+    id_region_match_operation_neighborhood:
+      description: Identifier for the matched operation neighborhood (internal region id).
+      lineage:
+        - datalake_region.region.id
+    dt_created:
+      description: Month reference date (first day of month) for the aggregated metrics.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.dt_created
+    keyword:
+      description: Original search query from GSC.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.keyword
+    keyword_clean:
+      description: Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+    match_igbe_city:
+      description: IBGE city name inferred from the cleaned keyword using Brazilian cities reference.
+      lineage:
+        - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+    match_operation_city:
+      description: Operation city matched using internal regions dataset and the cleaned keyword.
+      lineage:
+        - datalake_region.region.name
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+    match_operation_neighborhood:
+      description: Operation neighborhood matched using internal regions dataset and the cleaned keyword.
+      lineage:
+        - datalake_region.region.name
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+    page:
+      description: Full page URL.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.page
+    google_property:
+      description: GSC property type associated with the measurement (e.g., web, image, news, video).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.google_property
+    branded:
+      description: Branded classification from the source dataset.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.branded
+    page_cluster:
+      description: Page cluster according to business rules.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.page_cluster
+    structure:
+      description: Page structure according to business rules.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.structure
+    page_path:
+      description: Page path within the domain.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.page_path
+    state:
+      description: State inferred for the page context, when applicable.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.state
+    city:
+      description: City inferred for the page context, when applicable.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.city
+    location_level:
+      description: Granularity of the location context (e.g., neighborhood, city).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.location_level
+    search_region:
+      description: Region searched or referenced in the page URL.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.search_region
+    poi_type:
+      description: Type of point of interest present in the search context.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.poi_type
+    filter_count:
+      description: Number of filters combined on the search page.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.filter_count
+    filter_combination:
+      description: Filter combination used on the search page.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.filter_combination
+    position:
+      description: Aggregated average position computed as SUM(posimp) / SUM(impressions) at keyword-group level.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.posimp
+        - datalake_google_search_console.gsc_keywords.impressions
+    impressions:
+      description: Total impressions in the month for the group (SUM of impressions).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.impressions
+    clicks:
+      description: Total clicks in the month for the group (SUM of clicks).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.clicks
+    ctr:
+      description: Aggregated click-through rate computed as SUM(clicks) / SUM(impressions).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.clicks
+        - datalake_google_search_console.gsc_keywords.impressions
+    site_url:
+      description: Main property URL measured by GSC.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.site_url
+    posimp:
+      description: Total position-impressions product in the month for the group (SUM of posimp).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.posimp
+    device:
+      description: Device type where the search was made (desktop, mobile, tablet).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.device
+    domain:
+      description: Generic referring domain grouping (Supply, Content, Help, QuintoAndar).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.domain
+    slug:
+      description: First path segment of the URL content.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.slug
+    subtitle_content:
+      description: Second path segment of the URL content (after the first slug).
+      lineage:
+        - datalake_google_search_console.gsc_keywords.subtitle_content
+    is_branded:
+      description: Flag indicating whether the search query is branded.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.is_branded
+    has_mention_to_location:
+      description: Flag indicating whether the keyword mentions or implies a location.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+        - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
+        - datalake_region.region.name
+    has_mention_to_city:
+      description: Flag indicating whether the keyword mentions or implies a city.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+        - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
+        - datalake_region.region.name
+    has_mention_to_neighborhood:
+      description: Flag indicating whether the keyword mentions or implies a neighborhood.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.keyword_clean
+        - datalake_region.region.name
+    year:
+      description: Partition year.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.year
+    month:
+      description: Partition month.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.month
+    day:
+      description: Partition day.
+      lineage:
+        - datalake_google_search_console.gsc_keywords.day
+

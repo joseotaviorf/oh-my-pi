@@ -1,0 +1,133 @@
+database_name: datalake_google_search_console
+table_name: gsc_keywords
+owner: erica.bertan@quintoandar.com.br
+domain: Growth
+description: |
+  Monthly aggregated Google Search Console (GSC) keyword performance by page and
+  related attributes. Includes a normalized version of the keyword (keyword_clean)
+  and aggregated metrics (position, impressions, clicks, ctr, posimp) for each
+  group of attributes.
+columns:
+  dt_created:
+    description: "Month reference date (first day of month) derived from the original search date."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.dt_created
+  keyword:
+    description: "Original search query from GSC."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.query
+  keyword_clean:
+    description: "Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.query
+  page:
+    description: "Full page URL."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.page
+  google_property:
+    description: "GSC property type associated with the measurement (e.g., web, image, news, video)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.google_property
+  branded:
+    description: "Branded classification from the source dataset."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.branded
+  page_cluster:
+    description: "Page cluster according to business rules."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.page_cluster
+  structure:
+    description: "Page structure according to business rules."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.structure
+  page_path:
+    description: "Page path within the domain."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.page_path
+  state:
+    description: "State inferred for the page context, when applicable."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.state
+  city:
+    description: "City inferred for the page context, when applicable."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.city
+  location_level:
+    description: "Granularity of the location context (e.g., neighborhood, city)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.location_level
+  search_region:
+    description: "Region searched or referenced in the page URL."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.search_region
+  poi_type:
+    description: "Type of point of interest present in the search context."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.poi_type
+  filter_count:
+    description: "Number of filters combined on the search page."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.filter_count
+  filter_combination:
+    description: "Filter combination used on the search page."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.filter_combination
+  site_url:
+    description: "Main property URL measured by GSC."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.site_url
+  device:
+    description: "Device type where the search was made (desktop, mobile, tablet)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.device
+  domain:
+    description: "Generic referring domain grouping (Supply, Content, Help, QuintoAndar)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.domain
+  slug:
+    description: "First path segment of the URL content."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.slug
+  subtitle_content:
+    description: "Second path segment of the URL content (after the first slug)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.subtitle_content
+  is_branded:
+    description: "Flag indicating whether the search query is branded."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.is_branded
+  year:
+    description: "Partition year."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.year
+  month:
+    description: "Partition month."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.month
+  day:
+    description: "Partition day (set to 01 for monthly aggregation)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.day
+  position:
+    description: "Aggregated average position computed as SUM(posimp) / SUM(impressions)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.posimp
+      - datalake_google_search_console.seo_gsc_data.impressions
+  impressions:
+    description: "Total impressions in the month for the group (SUM of impressions)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.impressions
+  clicks:
+    description: "Total clicks in the month for the group (SUM of clicks)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.clicks
+  ctr:
+    description: "Aggregated click-through rate computed as SUM(clicks) / SUM(impressions)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.clicks
+      - datalake_google_search_console.seo_gsc_data.impressions
+  posimp:
+    description: "Total position-impressions product in the month for the group (SUM of posimp)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.posimp
+

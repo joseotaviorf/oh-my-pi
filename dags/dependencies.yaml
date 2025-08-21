@@ -2139,6 +2139,7 @@ bietlejuice.enrich_golden_set:
 bietlejuice.enrich_google_analytics_classified:
   - bietlejuice.google_analytics_classified:load-clean-google-analytics-classified:first-run-of-day
 bietlejuice.enrich_google_search_console:
+  - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.google_search_console:load-clean-report-by-page-and-query:first-run-of-day
 bietlejuice.enrich_google_search_console_classified:
   - bietlejuice.google_search_console_classified:load-clean-report-by-page-and-query:first-run-of-day
