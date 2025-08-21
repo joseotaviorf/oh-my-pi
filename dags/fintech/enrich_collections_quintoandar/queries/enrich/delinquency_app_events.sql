@@ -154,7 +154,7 @@ overdue_invoices_events AS (
     id_amplitude,
     id_session,
     id_user,
-    ARRAY(ep_id_contract) AS id_contract,
+    FROM_JSON(ep_id_contracts, 'array<bigint>') AS id_contract,
     FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_family,
     "overdue_invoices_total_payment_option_clicked" AS event_name,
