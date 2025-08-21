@@ -157,6 +157,31 @@ overdue_invoices_events AS (
     ARRAY(ep_id_contract) AS id_contract,
     FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_family,
+    "overdue_invoices_total_payment_option_clicked" AS event_name,
+    event_properties,
+    "Overdue Self Service Action" AS funnel_step,
+    8 AS level,
+    "Triggers when user clicks one of the invoice payment options on the 'Pagar fatura' page" AS event_description,
+    "pwa" AS feature,
+    TRUE AS is_active,
+    year,
+    month,
+    day,
+    ts_event
+  FROM
+    datalake_amplitude_clean.170698_overdue_invoices_total_payment_option_clicked_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+  UNION ALL
+
+  SELECT
+    id_amplitude,
+    id_session,
+    id_user,
+    ARRAY(ep_id_contract) AS id_contract,
+    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
+    device_family,
     "coll_review_check_negotiation_cta_onclick" AS event_name,
     event_properties,
     "Overdue Self Service Action" AS funnel_step,

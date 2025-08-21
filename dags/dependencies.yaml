@@ -1528,6 +1528,7 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-payment-option-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-payment-option-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-payment-options-closed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-total-payment-option-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-total-payment-option-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-cta-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-page-viewed-events:first-run-of-day
