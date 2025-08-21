@@ -529,6 +529,7 @@ contract_enhanced AS (
 )
 SELECT
     id_contract,
+    dt_reference,
     id_process_evictions,
     contract_status_beginning_of_month,
     reference_contract_status,
@@ -675,7 +676,6 @@ SELECT
     END AS has_overdue_balance_over0_t3_at_ending,
     DATEDIFF(DAY, dt_contract_end, DATE(dt_reference)) AS days_since_ending,
     DATEDIFF(DAY, dt_contract_start, DATE(dt_reference)) AS days_since_contract_start,
-    dt_reference,
     dt_pipe,
     dt_contract_end,
     dt_contract_start,
