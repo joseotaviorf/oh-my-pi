@@ -4,7 +4,7 @@ SELECT
     target_person_uuid AS uuid_person_target,
     operation,
     reason,
-    addition_comment,
+    additional_comment,
     channel,
     executed_at AS ts_executed,
     year,

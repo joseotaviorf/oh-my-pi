@@ -25,9 +25,9 @@ columns:
     lineage:
       - datalake_signup_raw.user_registration_history.reason
     description: The reason for the operation.
-  addition_comment:
+  additional_comment:
     lineage:
-      - datalake_signup_raw.user_registration_history.addition_comment
+      - datalake_signup_raw.user_registration_history.additional_comment
     description: The addition comment for the operation.
   channel:
     lineage:
