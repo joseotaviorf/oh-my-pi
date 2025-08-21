@@ -18,6 +18,7 @@ SELECT
     GET_JSON_OBJECT(task_attributes,'$.status') AS channel_status,
     GET_JSON_OBJECT(task_attributes,'$.target') AS department,
     GET_JSON_OBJECT(task_attributes,'$.BPO') AS bpo_name,
+    GET_JSON_OBJECT(task_attributes,'$.bpo_selection_reason') AS bpo_selection_reason,
     GET_JSON_OBJECT(task_attributes,'$.tagsByType') AS tags,
     GET_JSON_OBJECT(task_attributes,'$.conversations') AS conversation_attributes,
     GET_JSON_OBJECT(task_attributes,'$.extra_params.referral_source_url') AS url_source_ctwa,

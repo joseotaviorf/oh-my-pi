@@ -80,6 +80,10 @@ columns:
     description: BPO responsible for the service.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
+  bpo_selection_reason:
+    description: Reason for the BPO selection, by the Balancer.
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   tags:
     description: Tags related to the chat.
     lineage:
