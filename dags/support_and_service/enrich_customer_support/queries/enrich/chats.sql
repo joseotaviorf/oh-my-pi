@@ -70,10 +70,7 @@ tasks AS (
     is_spoc_task,
     ts_created,
     ts_updated,
-    task_attributes,
-    id_source_ctwa,
-    url_source_ctwa,
-    type_source_ctwa
+    task_attributes
   FROM
     datalake_quinto_messenger_clean.task
   WHERE
@@ -88,7 +85,6 @@ SELECT
   ss.id_user,
   t.id_worker,
   tq.id_queue,
-  t.id_source_ctwa,
   tq.queue_name,
   COALESCE(ss.user_email, t.customer_email) AS customer_email,
   COALESCE(ss.user_phone, t.from_phone_number) AS customer_phone_number,
@@ -116,8 +112,6 @@ SELECT
     WHEN ss.source_environment IN ('isaias_inbound', 'isaias_inbound_main') THEN TRUE
     ELSE FALSE
   END AS is_isaias_session,
-  t.url_source_ctwa,
-  t.type_source_ctwa,
   t.ts_created,
   t.ts_updated AS ts_ended,
   t.task_attributes,
