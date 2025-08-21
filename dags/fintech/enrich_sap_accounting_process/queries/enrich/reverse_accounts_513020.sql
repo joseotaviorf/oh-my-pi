@@ -117,6 +117,7 @@ df AS (
             OR s.id_finance_entity = CAST(r.id_finance_entity AS STRING)
     WHERE 
         r.id_finance_entity IS NULL
+        AND sap_amount != 0
     GROUP BY 
         ALL
 )

@@ -12,7 +12,7 @@ WITH sap_entity AS (
   WHERE
     id_finance_entity IS NOT NULL
     AND event IN ('new-accounting-entries', 'payment-accounting-entries')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY id_sap_gateway_feature DESC, ts_updated DESC) = 1
 ),
 
 retsuko_entry AS (
@@ -51,7 +51,7 @@ retsuko_entry AS (
     TRUE
     AND e.bill_item IN ('entry.bill-item/rental-anticipation-fee', 'entry.bill-item/property-damage-fine')
     AND ct.country_code = 'BR'
-    AND DATE(e.ts_created) >= '2024-01-01'
+    AND DATE(e.ts_created) >= '2025-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
     AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
@@ -100,7 +100,7 @@ retsuko_invoice AS (
       OR (e.bill_item IN('entry.bill-item/credit-card-revenue') AND (se.version = 'v2' OR se.version IS NULL))
     )
     AND ct.country_code = 'BR'
-    AND DATE(i.ts_paid) >= '2024-01-01'
+    AND DATE(i.ts_paid) >= '2025-01-01'
     AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
     HAVING
@@ -134,7 +134,6 @@ sap_gateway AS (
     s.erp_solution IN ('S4')
     AND s.type = 'LCM'
     AND s.status NOT IN ('ignore', 'ignored')
-    AND DATE(f.ts_created) >= DATE('2024-01-01')
   QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) = 1
 ),
 
@@ -144,15 +143,13 @@ sap_ledger AS (
     id_finance_entity_entry,
     hash,
     account_number,
-    SUM(debit_credit) AS debit_credit,
-    DATE(dt_created) AS dt_sap_created,
-    DATE(dt_reference) AS dt_sap_reference
+    SUM(debit_credit) OVER (PARTITION BY COALESCE(id_finance_entity_entry, id_finance_entity), account_number) AS debit_credit,
+    MAX(DATE(dt_created)) OVER (PARTITION BY COALESCE(id_finance_entity_entry, id_finance_entity), account_number) AS dt_sap_created,
+    MAX(DATE(dt_reference)) OVER (PARTITION BY COALESCE(id_finance_entity_entry, id_finance_entity), account_number) AS dt_sap_reference
   FROM
     datalake_pas.ledger
   WHERE
-    dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('420003', '420019', '420020', '420025', '611012')
-  GROUP BY 1, 2, 3, 4, 6, 7
+    account_number IN ('420003', '420019', '420020', '420025', '611012')
 ),
 
 errors_base AS (
