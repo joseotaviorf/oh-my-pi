@@ -238,6 +238,7 @@ sheets_info:
     sheet_name: entries_import
     clean_table_name: split_ciq_bh
     sheet_context: for_sale
+    preload_time_in_seconds: 30
 
   target_sale_cohort_demand:
     sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
