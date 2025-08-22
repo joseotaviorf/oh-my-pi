@@ -314,4 +314,4 @@ LEFT JOIN
     ON cs.source_identity = c.id_call
     OR cs.source_identity = c.id_task
 WHERE
-  c.id_task NOT IN ('WT455822dbec3756a5c183172a15def95')
+  c.id_task NOT IN ('WT455822dbec3756a5c183172a15def951')
