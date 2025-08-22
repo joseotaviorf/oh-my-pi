@@ -65,15 +65,15 @@ general_city_level_enrichment AS (
     day
   FROM
     datalake_google_search_console.gsc_keywords AS kfp
-  WHERE
-    kfp.dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN
     cities AS c 
       ON CHARINDEX(LOWER(c.city_name), LOWER(kfp.keyword_clean)) > 0 
-      QUALIFY ROW_NUMBER() OVER(
-        PARTITION BY dt_created, keyword, page, device
-        ORDER BY LENGTH(match_igbe_city) DESC, CHARINDEX(match_igbe_city, keyword) DESC
-        ) = 1
+  WHERE
+    kfp.dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  QUALIFY ROW_NUMBER() OVER(
+    PARTITION BY dt_created, keyword, page, device
+    ORDER BY LENGTH(match_igbe_city) DESC, CHARINDEX(match_igbe_city, keyword) DESC
+    ) = 1
 ),
 
 operation_cities AS (
