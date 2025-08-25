@@ -25,7 +25,6 @@ class TableAttributes:
             or "load_spark_job" in self.table_customization
         )
         self.table_privileges = self._get_table_privileges()
-        self.table_properties = self._get_table_properties()
         self.has_soft_delete = self.get_has_soft_delete()
 
     @staticmethod
@@ -129,15 +128,6 @@ class TableAttributes:
             )
 
         return table_partitions
-
-    def _get_table_properties(self):
-        """
-        Get's proeprties from table customization if don't
-        returns an empty dict.
-        """
-        table_properties = self.table_customization.get("table_properties", {})
-
-        return table_properties
 
     def _get_table_privileges(self):
         """
