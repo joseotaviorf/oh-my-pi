@@ -2134,6 +2134,8 @@ bietlejuice.enrich_expected_contribution_margin:
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all:first-run-of-day
+bietlejuice.enrich_firestore:
+  - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set:first-run-of-day
 bietlejuice.enrich_google_analytics_classified:

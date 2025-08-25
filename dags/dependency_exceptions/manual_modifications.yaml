@@ -332,9 +332,6 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_expected_contribution_margin:
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision:first-run-of-day
-bietlejuice.enrich_firestore:
-  remove:
-    - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_golden_set:
   remove:
     - bietlejuice.enrich_vespucio:load-enrich-dejavu:first-run-of-day
