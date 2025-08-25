@@ -210,6 +210,7 @@ bietlejuice.enrich_accounting_funnel:
   remove:
     - bietlejuice.sap:load-clean-users:first-run-of-day
     - bietlejuice.sap:load-clean-chart-of-accounts:first-run-of-day
+    - bietlejuice.payable_accounts_transactions:load-clean-accounts-payable:first-run-of-day
 bietlejuice.enrich_airflow:
   override: []
 bietlejuice.enrich_app_installed:
