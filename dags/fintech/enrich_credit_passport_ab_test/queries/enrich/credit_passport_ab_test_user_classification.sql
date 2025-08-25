@@ -86,6 +86,38 @@ WITH base1 AS (
   WHERE
     DATE(ts_updated) >= DATE '2025-06-03'
 ),
+exclude_tps AS (
+  SELECT
+    dt_event AS dt_start,
+    sk_client
+  FROM
+    dw_datamarts.performance_marketing_metrics_demand mmd
+    LEFT JOIN (
+      SELECT
+        country_code,
+        city_group
+      FROM
+        dw_public.dim_region
+      WHERE
+        city_group IS NOT NULL
+      GROUP BY
+        1,
+        2
+    ) dr ON dr.city_group = mmd.city_group
+  WHERE
+    dt_event >= date('2025-05-06')
+    AND (coalesce(dr.country_code, 'BR') = 'BR')
+    AND (
+      tenant_prospect_order = 1
+      OR (
+        status_detail LIKE 'Recover%'
+        AND ts_event = ts_status_start
+      )
+    )
+  GROUP BY
+    1,
+    2
+),
 base4 AS (
   SELECT
     id_user,
@@ -103,7 +135,7 @@ base4 AS (
     base3 AS b3
   WHERE
     rn = 1
-)
+), group_categories AS (
 SELECT
   id_user,
   group_details,
@@ -122,9 +154,76 @@ SELECT
     ELSE FALSE
   END AS lpv_time_completed_2w,
   CASE
+    WHEN DATE_DIFF(DAY, dt_first_lpv, CURRENT_DATE() - INTERVAL '1' DAY) >= 21 THEN TRUE
+    ELSE FALSE
+  END AS lpv_time_completed_3w,
+  CASE
     WHEN DATE_DIFF(DAY, dt_first_lpv, CURRENT_DATE() - INTERVAL '1' DAY) >= 28 THEN TRUE
     ELSE FALSE
   END AS lpv_time_completed_4w,
+  CASE
+    WHEN DATE_DIFF(DAY, dt_first_lpv, CURRENT_DATE() - INTERVAL '1' DAY) >= 35 THEN TRUE
+    ELSE FALSE
+  END AS lpv_time_completed_5w,
+  CASE
+    WHEN DATE_DIFF(DAY, dt_first_lpv, CURRENT_DATE() - INTERVAL '1' DAY) >= 42 THEN TRUE
+    ELSE FALSE
+  END AS lpv_time_completed_6w,
+  CASE
+    WHEN DATE_DIFF(DAY, dt_first_lpv, CURRENT_DATE() - INTERVAL '1' DAY) >= 49 THEN TRUE
+    ELSE FALSE
+  END AS lpv_time_completed_7w,
+  CASE
+    WHEN DATE_DIFF(DAY, dt_first_lpv, CURRENT_DATE() - INTERVAL '1' DAY) >= 56 THEN TRUE
+    ELSE FALSE
+  END AS lpv_time_completed_8w,
   dt_first_lpv
 FROM
   base4
+),
+remove_recent_tps AS (
+  SELECT
+    id_user,
+  CASE
+    WHEN b5.sk_client IS NULL THEN group_details
+    WHEN b5.sk_client IS NOT NULL THEN 'g. not eligible - recent TP criteria'
+    ELSE group_details
+  END AS group_details,
+  CASE
+    WHEN b5.sk_client IS NULL THEN ab_test_group
+    WHEN b5.sk_client IS NOT NULL THEN 'c. noise'
+    ELSE ab_test_group
+  END AS ab_test_group,
+  days_engaged,
+  lpv_time_completed_1w,
+  lpv_time_completed_2w,
+  lpv_time_completed_3w,
+  lpv_time_completed_4w,
+  lpv_time_completed_5w,
+  lpv_time_completed_6w,
+  lpv_time_completed_7w,
+  lpv_time_completed_8w,
+  dt_first_lpv
+  FROM
+    group_categories AS gc
+  LEFT JOIN exclude_tps AS b5
+        on gc.id_user = b5.sk_client AND date_diff(day,dt_first_lpv,dt_start) < 0 AND date_diff(day,dt_first_lpv,dt_start) >= -28
+  QUALIFY
+    row_number() over (partition by id_user order by dt_start desc) = 1
+)
+SELECT
+  id_user,
+  group_details,
+  ab_test_group,
+  days_engaged,
+  lpv_time_completed_1w,
+  lpv_time_completed_2w,
+  lpv_time_completed_3w,
+  lpv_time_completed_4w,
+  lpv_time_completed_5w,
+  lpv_time_completed_6w,
+  lpv_time_completed_7w,
+  lpv_time_completed_8w,
+  dt_first_lpv
+FROM
+  remove_recent_tps

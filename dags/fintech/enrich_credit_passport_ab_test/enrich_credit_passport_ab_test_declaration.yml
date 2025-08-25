@@ -1,23 +1,20 @@
 ---
 dag:
-  name: enrich_docx
-  schedule_start_date: 2020, 7, 1
+  name: enrich_credit_passport_ab_test
+  schedule_start_date: 2025, 8, 22
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      Creates the enriched tables for the source `Docx`. This DAG enriches the credit evaluation data to track the result of the user's credit for a proposal.
+      Creates the enriched tables to segment the users into test, control or noise groups to follow-up the credit passport ab test. This DAG will be deprecated aftter the credit passport is released to 100% of the users.
 workflow:
   type: query_delta
   layer: enrich
+  custom_schema: datalake_docx
 cluster:
-  type: custom_cluster
+  type: databricks_12_2_min_io-memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-    driver_node_type_id: m5d.xlarge
-    node_type_id: r5.xlarge
-    num_workers: 3
-    spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

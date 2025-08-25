@@ -1702,6 +1702,10 @@ bietlejuice.enrich_credit_journey_experience:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-tenantslist-submitted-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-timeout-result-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-evaluation-timeout-viewed-events:first-run-of-day
+bietlejuice.enrich_credit_passport_ab_test:
+  - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand:first-run-of-day
+  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.enrich_docx:load-enrich-person-document-information:first-run-of-day
 bietlejuice.enrich_criteo:
   - bietlejuice.criteo_temp:load-clean-criteo-costs:first-run-of-day
 bietlejuice.enrich_crm:

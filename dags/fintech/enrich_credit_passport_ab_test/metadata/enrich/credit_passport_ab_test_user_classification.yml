@@ -18,6 +18,7 @@ columns:
       d. not eligible - app version and early credit criteria: Users not meeting both app version and early credit requirements
       e. not eligible - app version criteria: Users not meeting app version requirements
       f. not eligible - early credit criteria: Users not meeting early credit criteria
+      g. not eligible - recent TP criteria: Users excluded due to recent Tenant Prospect activity
       z. to be classified: Users that don't fit into other categories
     lineage:
       - datalake_docx.person_document_information.is_in_test_group
@@ -45,8 +46,28 @@ columns:
     description: Boolean flag indicating if the user has been engaged for at least 2 weeks (14 days)
     lineage:
       - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_3w:
+    description: Boolean flag indicating if the user has been engaged for at least 3 weeks (21 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
   lpv_time_completed_4w:
     description: Boolean flag indicating if the user has been engaged for at least 4 weeks (28 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_5w:
+    description: Boolean flag indicating if the user has been engaged for at least 5 weeks (35 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_6w:
+    description: Boolean flag indicating if the user has been engaged for at least 6 weeks (42 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_7w:
+    description: Boolean flag indicating if the user has been engaged for at least 7 weeks (49 days)
+    lineage:
+      - datalake_docx.person_document_information.ts_updated
+  lpv_time_completed_8w:
+    description: Boolean flag indicating if the user has been engaged for at least 8 weeks (56 days)
     lineage:
       - datalake_docx.person_document_information.ts_updated
   dt_first_lpv:
