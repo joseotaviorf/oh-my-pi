@@ -57,6 +57,10 @@ columns:
     description: Standard weekly working hours for the job.
     lineage:
       - datalake_pin_core_raw.per_jobs_f.attribute4
+  target_sop_currency:
+    description: Currency of the target value for the Stock Option Plan.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute7
   approval_authority:
     description: Numerical level indicating approval authority across different jobs.
     lineage:

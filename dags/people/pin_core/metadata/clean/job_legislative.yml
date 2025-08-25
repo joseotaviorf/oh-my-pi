@@ -25,6 +25,10 @@ columns:
     description: "Legislation code for the country to which this information applies (e.g., 'US', 'BR')."
     lineage:
       - datalake_pin_core_raw.per_job_leg_f.legislation_code
+  brazilian_occupation_code:
+    description: "Job occupation code according to the Brazilian Occupation Code (CBO)."
+    lineage:
+      - datalake_pin_core_raw.per_job_leg_f.information1
   created_by:
     description: "User who originally created the record."
     lineage:

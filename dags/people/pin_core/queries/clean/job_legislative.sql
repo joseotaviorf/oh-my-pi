@@ -4,6 +4,7 @@ SELECT
     job_id AS id_job,
     action_occurrence_id AS id_action_occurrence,
     legislation_code,
+    information1 AS brazilian_occupation_code,
     created_by,
     last_updated_by AS updated_by,
     INT(sequence_number) AS sequence_number,

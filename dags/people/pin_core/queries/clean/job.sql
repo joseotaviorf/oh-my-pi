@@ -12,6 +12,7 @@ SELECT
   attribute1 AS contribution_level,
   attribute3 AS work_arrangement,
   attribute4 AS weekly_hours,
+  attribute7 AS target_sop_currency,
   approval_authority,
   IF(med_checkup_req = 'Y', TRUE, FALSE) AS has_medical_checkup_requirement,
   IF(benchmark_job_flag = 'Y', TRUE, FALSE) AS is_benchmark_job,
