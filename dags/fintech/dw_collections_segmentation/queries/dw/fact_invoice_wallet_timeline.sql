@@ -83,7 +83,6 @@ base AS (
     WHERE i.invoice_status <> 'canceled'
       AND i.user = 'tenant'
       AND i.country_code = 'BR'
-      AND DATE(i.ts_created) >= DATE('2023-01-01')
       AND (i.negotiation_installment_number IS NULL
         OR (i.negotiation_installment_number > 1
             AND COALESCE(i.negotiation_promisse_payment_method, 'UNFOUND') <> 'CREDIT-CARD'))
