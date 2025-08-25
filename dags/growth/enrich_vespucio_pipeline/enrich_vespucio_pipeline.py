@@ -156,6 +156,8 @@ class Tables:
     stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
     extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
     extract_step_houses = "vespucio_pipeline_delta.extract_step_houses"
+    prioritize_step_condos = "vespucio_pipeline_delta.prioritize_step_condos"
+    prioritize_step_houses = "vespucio_pipeline_delta.prioritize_step_houses"
     geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
     geocode_step_condos = "vespucio_pipeline_delta.geocode_step_condos"
     geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
@@ -346,6 +348,19 @@ extract_step_task = create_task(
         f"--overwrite_schema",
         f"--output_extracted_condos={Tables.extract_step_condos}",
         f"--output_extracted_houses={Tables.extract_step_houses}",
+    ],
+)
+
+prioritize_step_task = create_task(
+    entry_point="core_prioritize_step",
+    parameters=[
+        f"--input_clustered_condos={Tables.cluster_step_condos}",
+        f"--input_clustered_houses={Tables.cluster_step_houses}",
+        f"--input_extracted_condos={Tables.extract_step_condos}",
+        f"--input_extracted_houses={Tables.extract_step_houses}",
+        "--overwrite_schema",
+        f"--output_prioritized_condos={Tables.prioritize_step_condos}",
+        f"--output_prioritized_houses={Tables.prioritize_step_houses}",
     ],
 )
 
@@ -707,9 +722,11 @@ address_tasks[-1] >> extract_step_task
 address_tasks[-1] >> cluster_task
 
 cluster_task >> source_predict_task
+cluster_task >> prioritize_step_task
 source_predict_task >> merge_task
 
 extract_step_task >> images_and_relations_tasks[0]
+extract_step_task >> prioritize_step_task
 cluster_task >> images_and_relations_tasks[0]
 merge_task >> images_and_relations_tasks[1]
 
