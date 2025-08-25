@@ -24,7 +24,7 @@ WITH terminations AS (
     datalake_ebdb_contract.contract AS ec
       ON ec.id = ct.id_contract
   WHERE
-    ct.ts_updated >= '{load_start_date}'
+    ct.ts_updated >= DATE('{load_start_date}') - INTERVAL 90 DAY
     AND ct.status <> 'CANCELED'
     AND ec.country_code = 'BR'
   QUALIFY
@@ -51,7 +51,7 @@ mediations_via_ticket AS (
   FROM
     datalake_zendesk.tickets_current AS tc
   WHERE
-    tc.ts_updated >= '{load_start_date}'
+    tc.ts_updated >= DATE('{load_start_date}') - INTERVAL 90 DAY
     AND tc.group_name = 'Offboarding Reparos [OFF] [POS] [BACK]'
     AND tc.tags NOT LIKE '%ezsend_one%'
     AND tc.tags NOT LIKE '%closed_by_merge%'
@@ -85,7 +85,7 @@ mediations_via_terminator AS (
     datalake_zendesk.tickets_current AS tc
       ON ts.id_external = tc.id_ticket
   WHERE
-    ts.ts_updated >= '{load_start_date}'
+    ts.ts_updated >= DATE('{load_start_date}') - INTERVAL 90 DAY
     AND ts.type = 'TERMINATION_LANDLORD'
     AND tc.tags NOT LIKE '%closed_by_merge%'
     AND tc.group_name = 'Offboarding Reparos [OFF] [POS] [BACK]'
@@ -125,6 +125,12 @@ SELECT
   has_mediation_ticket,
   has_ac_repairs,
   is_ticket_opened_via_terminator,
+  IF((
+    (has_ac_repairs = TRUE)
+    AND (
+      (has_mediation_ticket = TRUE AND squad <> 'both_agreed')
+      OR (has_mediation_ticket = FALSE AND squad IS NULL)
+    )), TRUE, FALSE) AS has_mediation,
   dt_inspection,
   ts_termination_request,
   ts_termination_finished,

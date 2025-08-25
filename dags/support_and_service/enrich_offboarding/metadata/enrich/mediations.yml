@@ -35,6 +35,8 @@ columns:
     lineage:
       - datalake_terminator_clean.termination_task.id_external
     description: Indicates if the mediation ticket was opened via the Terminator system.
+  has_mediation:
+    description: Flag indicating if a mediation occurred.
   dt_inspection:
     lineage:
       - datalake_inspections.inspection_booking.ts_synced
@@ -49,6 +51,6 @@ columns:
       - datalake_offboarding.contract_termination.ts_termination_finished
     description: Timestamp when the termination process was completed.
   ts_termination_updated:
-    ineage:
+    lineage:
       - datalake_offboarding.contract_termination.ts_termination_updated
     description: Timestamp when the termination process was updated.
