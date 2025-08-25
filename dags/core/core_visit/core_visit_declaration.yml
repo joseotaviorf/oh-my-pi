@@ -12,6 +12,8 @@ workflow:
   tables_customization:
     visit:
       z_order_by: [id_house, business_context]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
