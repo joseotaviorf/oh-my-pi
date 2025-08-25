@@ -18,6 +18,10 @@ columns:
     description: The lead's identifier in the Firestore database.
     lineage: 
       - datalake_rene_descartes_clean.house_lead.id_external_reference
+  id_source_ctwa:
+    description: The Id for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_customer_support.chats.id_source_ctwa
   affiliate_type:
     description: The type of affiliate associated with the lead's acquisition campaign.
     lineage: 
@@ -27,16 +31,31 @@ columns:
     lineage: 
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
   medium:
     description: The medium of the lead, referring to utm_medium where the lead originated.
     lineage: 
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_medium
+      - datalake_growth_media_platform.facebook_metrics.utm_medium
   source:
     description: The source of the lead, referring to utm_source where the lead originated.
     lineage: 
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_source
+      - datalake_growth_media_platform.facebook_metrics.utm_source
+  term:
+    description: The medium of the lead, referring to utm_medium where the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_term
+      - datalake_growth_media_platform.facebook_metrics.utm_term
+  content:
+    description: The medium of the lead, referring to utm_medium where the lead originated.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_content
+      - datalake_growth_media_platform.facebook_metrics.utm_content
   ops_agent:
     description: The operational agent responsible for handling the lead.
     lineage: 
@@ -87,6 +106,10 @@ columns:
     description: The facebook click identifier of the the lead.
     lineage:
       - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ctwa_clid:
+    description: The whatsapp click identifier of the the lead.
+    lineage:
+      - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   id_task: 
     description: The ID for the lead creation task.
     lineage:
@@ -96,6 +119,14 @@ columns:
     lineage:
       - datalake_customer_support.chats
       - datalake_customer_support.calls
+  url_source_ctwa:
+    description: The url for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_customer_support.chats.url_source_ctwa
+  type_source_ctwa:
+    description: The type of the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_customer_support.chats.type_source_ctwa
   original_lead:
     description: The identifier of the original lead if the current lead is a result of reprocessing process.
     lineage: 
