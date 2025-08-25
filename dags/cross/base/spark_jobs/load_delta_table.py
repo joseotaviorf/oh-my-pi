@@ -10,7 +10,6 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
 
-
 JOB_NAME = "load_delta_table"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -76,6 +75,7 @@ def main():
         when_matched_operation=json.loads(args.when_matched_operation),
         when_not_matched_operation=json.loads(args.when_not_matched_operation),
         table_privileges=table_privileges,
+        table_properties=json.loads(args.table_properties) if args.table_properties else None,
         spark=spark
     )
     table_loader_pipeline.run()
@@ -150,6 +150,14 @@ def parse_arguments() -> Namespace:
         "--table-privileges",
         type=lambda arg: None if not arg else arg,
         help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-tr",
+        "--table-properties",
+        type=lambda arg: None if not arg else arg,
+        help="json string with dict of custom table properties",
         required=False,
         default=None,
     )

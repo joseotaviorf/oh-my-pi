@@ -7,6 +7,7 @@ from bietlejuice.pipeline.table_loader_pipeline import TableLoaderPipeline
 from bietlejuice.services.metastore_services.spark_metastore_service import (
     SparkMetastoreService,
 )
+from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("DeltaTableLoaderPipeline")
@@ -33,6 +34,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         when_matched_operation: dict = None,
         when_not_matched_operation: dict = None,
         table_privileges: TablePrivileges = None,
+        table_properties: dict = None,
         spark=BaseSparkContext.spark,
     ):
         """
@@ -86,6 +88,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         self.when_matched_delete_condition = when_matched_delete_condition
         self.when_matched_operation = when_matched_operation
         self.when_not_matched_operation = when_not_matched_operation
+        self.table_properties = table_properties
         self.spark = spark
 
     def load_and_register(self, df, format_options):
@@ -117,6 +120,12 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
         )
+
+        if self.table_properties:
+            for param, value in self.table_properties.items():
+                SparkTablePropertyHelper.set_property(
+                    f"{self.target_database_name}.{self.table_name}", param, value
+                )
 
         if (
             self.table_privileges
