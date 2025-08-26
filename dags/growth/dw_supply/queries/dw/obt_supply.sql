@@ -50,6 +50,20 @@ SELECT
 FROM
     datalake_ebdb_agents.ciq_users 
 ),
+hybrid_houses AS (
+  SELECT 
+    fse.sk_house,
+    dfs.cd_funnel_step,
+    COUNT(DISTINCT fse.nm_business_context) as business_context_count
+  FROM
+      dw_growth.fact_supply_events AS fse
+  LEFT JOIN
+      dw_growth.dim_funnel_step AS dfs 
+      ON fse.sk_funnel_step = dfs.sk_funnel_step
+  WHERE 
+      fse.sk_house != -1
+  GROUP BY ALL
+),
 base AS (
     SELECT
         dd.date,
@@ -161,10 +175,7 @@ base AS (
         END AS funnel_order,
         CASE 
           WHEN fse.sk_house = -1 THEN false
-          ELSE (
-              DENSE_RANK() OVER (PARTITION BY fse.sk_house, dfs.cd_funnel_step ORDER BY fse.nm_business_context ASC) + 
-              DENSE_RANK() OVER (PARTITION BY fse.sk_house, dfs.cd_funnel_step ORDER BY fse.nm_business_context DESC) - 1 
-          ) > 1
+          ELSE COALESCE(hh.business_context_count > 1, FALSE)
         END AS is_hybrid_listing, -- Essa regra será usada somente para CIQ
         cu.id_user IS NOT NULL AS is_converted_by_ciq,
         fse.sk_supply,
@@ -224,7 +235,12 @@ base AS (
     LEFT JOIN
         ciq_id_users as cu
             on fse.sk_user_conversion = cu.id_user
-    WHERE fse.sk_funnel_step IN (5,9,2,10,7,12)
+    LEFT JOIN 
+        hybrid_houses AS hh 
+        ON fse.sk_house = hh.sk_house 
+        AND dfs.cd_funnel_step = hh.cd_funnel_step
+    WHERE
+        fse.sk_funnel_step IN (5,9,2,10,7,12)
 ),
 report_origin AS (
     SELECT

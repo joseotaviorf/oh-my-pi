@@ -40,7 +40,7 @@ workflow:
       z_order_by: ['sk_user_path', 'id_level', 'bk_user_path']
       vacuum_retention_hours: 168
     fact_supply_events:
-      z_order_by: ['sk_supply', 'nm_business_context']
+      z_order_by: ['sk_supply','sk_funnel_step', 'nm_business_context']
       extraction_type: full
       vacuum_retention_hours: 168
     obt_supply:
@@ -58,7 +58,7 @@ workflow:
     obt_supply:
       - fact_supply_events
 cluster:
-  type: databricks_12_2_min_memory_photon_cluster
+  type: databricks_12_2_med_io-memory_photon_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
