@@ -14,7 +14,7 @@ SELECT
     idfa,
     event_type,
     amplitude_event_type,
-    GET_JSON_OBJECT(event_properties, '$.rent_pricing_comms_routines_enabled') AS ep_ab_beakman_pricing_comms,
+    GET_JSON_OBJECT(event_properties, '$.ab_beakman_pricing_comms') AS ep_ab_beakman_pricing_comms,
     GET_JSON_OBJECT(event_properties, '$.business_contexts') AS ep_business_context,
     city,
     country,
