@@ -1,0 +1,361 @@
+database_name: datalake_ebdb_test_clean
+table_name: contract
+domain: For Rent
+description: Table that contains data related to rent contracts.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.id
+    description: Contract id. This key must be always unique.
+  id_house:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.imovel_id
+    description: Property id related to the contract.
+  id_proposal:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.proposta_id
+    description: Proposal id. A contract might be linked to a proposal.
+  id_user:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.usuario_id
+    description: User id related to tenant that might rent the property with us.
+  id_state:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.estado_id
+    description: State id of where the property is located.
+  id_bank_data:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_banco_id
+    description: Bank id related to the user that wants to rent the property.
+  id_google_drive:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.googledriveid
+    description: Google drive id where the contract document is located.
+  id_administration_fee_type:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.administrationfeetype_id
+    description: Administration id fee type.
+  id_contract_version:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contractversion_id
+    description: Contract version id.
+  id_mailing_state:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_estado_id
+    description: Maligin state id.
+  id_bank_account_validation_bank_data:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosBanco_bankAccountValidation_id
+    description: Bank account validation id.
+  invoice_email:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.emailfatura
+    description: Email for invoices of the person that is renting the property.
+  observation:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.observacao
+    description: Observation about the contract.
+  rent:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.valoraluguel
+    description: Rent value of the contract.
+  status:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.status
+    description: Currently status of the contract.
+  contract_rent_model:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contractRentModel
+    description: The contract rent model.
+  house_number:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.numimovel
+    description: Number of the property that is being rented.
+  billing_day_of_month:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.diamescobranca
+    description: Day in which the rent billing will happen.
+  guarantee_type:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.garantia
+    description: Type of guarantee related to the contract.
+  type:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.tipo
+    description: Type of contract.
+  bank_agency:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.agenciabanco
+    description: Bank agency.
+  owners_comment:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.comentarioproprietario
+    description: Comments of the owner related to the contract.
+  bank_account:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contabanco
+    description: Bank account.
+  neighborhood_for_mailing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_bairro
+    description: Neighborhood of the property for mailing.
+  zip_code_for_mailing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_cep
+    description: Zip code of the property for mailing.
+  city_for_mailing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_cidade
+    description: City of the property for mailing.
+  complement_for_mailing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_complemento
+    description: Complement of the address for mailing.
+  street_for_mailing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_logradouro
+    description: Street of the property for mailing.
+  house_number_for_mailing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.correspondencia_numero
+    description: Number of the property for mailing.
+  iptu_installment:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.iptu_parcelas
+    description: Number of installments of IPTU.
+  iptu:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.iptu_valor
+    description: IPTU value.
+  bank_name:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.nomebanco
+    description: Bank name.
+  paying_condo:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.pagantecondominio
+    description: Indicates if the tenant is paying the condo fee.
+  paying_iptu:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.paganteiptu
+    description: Indicates if the tenant is paying the IPTU.
+  responsible_for_condo:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.responsavelcondominio
+    description: The person responsible for paying the condo fee.
+  responsible_for_iptu:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.responsaveliptu
+    description: The person responsible for paying the IPTU.
+  rental_guarantee_installment:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.segurofianca_parcelas
+    description: Number of installments of the rental guarantee insurance.
+  rental_guarantee_value:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.segurofianca_valor
+    description: Value of the rental guarantee insurance.
+  home_insurance_installment:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.seguroresidencial_parcelas
+    description: Number of installments of the home insurance.
+  home_insurance_value:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.seguroresidencial_valor
+    description: Value of the home insurance.
+  fist_rent_comission_fee:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.taxacomissaoprimeiroaluguel
+    description: First rent commission fee.
+  account_type:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.tipocontabanco
+    description: Type of bank account.
+  condo_price:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.valorcondominio
+    description: Condo price.
+  value_iptu:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.valoriptu
+    description: IPTU value.
+  neighborhood:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.bairro
+    description: Neighborhood of the property.
+  zip_code:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.cep
+    description: Zip code of the property.
+  city:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.cidade
+    description: City of the property.
+  address_details:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.complemento
+    description: Address details of the property.
+  address:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.endereco
+    description: Address of the property.
+  number:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.numero
+    description: Number of the property.
+  bank_data_agency:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_agencia
+    description: Bank agency.
+  bank_data_account:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_contacorrente
+    description: Bank account number.
+  bank_data_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_cpfoucnpj
+    description: CPF or CNPJ of the bank account holder.
+  bank_data_name:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_nome
+    description: Name of the bank account holder.
+  bank_data_other_holder:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_outrotitular
+    description: Indicates if there is another bank account holder.
+  bank_data_account_type:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dadosbanco_tipoconta
+    description: Type of bank account.
+  is_tenant_in_transit:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.emtransitoinquilino
+    description: Indicates if the tenant is in transit.
+  is_owner_in_transit:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.emtransitoproprietario
+    description: Indicates if the owner is in transit.
+  has_home_insurance:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.comseguroresidencial
+    description: Indicates if the contract has home insurance.
+  has_received_after_signature:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.recebidoaposassinatura
+    description: Indicates if the contract was received after signature.
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.relistingenabled
+    description: Indicates if relisting is enabled for the property.
+  has_contract_amendment:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.termoaditivoadicionado
+    description: Indicates if a contract amendment was added.
+  has_everybody_signed_electronic_contract:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.todosassinaramcontratoeletronico
+    description: Indicates if everyone has signed the electronic contract.
+  signature_type:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.tipoassinatura
+    description: Type of signature on the contract.
+  status_closing:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.statusclosing
+    description: The closing status of the contract.
+  contract_signed:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contratoassinado
+    description: Indicates if the contract is signed.
+  token_esignature_rent:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.tokenesignaturelocacao
+    description: E-signature token for the rent contract.
+  token_esignature_adm:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.tokenesignatureadm
+    description: E-signature token for the administration contract.
+  management_contract_signed:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contratoadministracaoassinado
+    description: Indicates if the management contract is signed.
+  authorization_contract_entry_signed:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contratoautorizacaoentradaassinado
+    description: Indicates if the authorization contract entry is signed.
+  rent_contract_signed:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.contratolocacaoassinado
+    description: Indicates if the rent contract is signed.
+  policy:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.policy
+    description: Contract policy.
+  agent_brokerage_share:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.estateagentbrokerageshare
+    description: The share of the brokerage fee for the agent.
+  tenant_service_fee:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.tenantservicefee
+    description: The service fee for the tenant.
+  is_exit_inspection_opted_out:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.exitInspectionOptOut
+    description: Indicates if the exit inspection was opted out.
+  dt_started:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datainicio
+    description: Date of when the contract started.
+  dt_entered:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dataentrada
+    description: Date of when the tenant will enter in the property.
+  dt_termination:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datarescisao
+    description: Date of contract termination.
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.criadoem
+    description: Timestamp when the contract was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.atualizadoem
+    description: Timestamp when the contract was last updated.
+  ts_signed:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dataassinado
+    description: Timestamp when the contract was signed.
+  ts_ownership_swapped:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datatrocatitularidade
+    description: Timestamp when ownership was swapped.
+  ts_electronic_contract_sent:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datacontratoeletronicoenviado
+    description: Timestamp when the electronic contract was sent.
+  ts_expected_termination:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datarescisaoprevista
+    description: Expected termination date of the contract.
+  ts_contract_expected_end:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datafimcontratoprevisto
+    description: Expected end date of the contract.
+  ts_affiliate_comission_calculated:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datacalculocomissaoafiliado
+    description: Timestamp when the affiliate commission was calculated.
+  ts_agent_comission_calculated:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.datacalculocomissaocorretor
+    description: Timestamp when the agent commission was calculated.
+  ts_minuta_approved:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.dataminutaaprovada
+    description: Timestamp when the minuta was approved.
+  ts_fair_fax_started:
+    lineage:
+      - datalake_ebdb_test_raw.contrato.fairfaxstartdate
+    description: Timestamp when the Fairfax process started.

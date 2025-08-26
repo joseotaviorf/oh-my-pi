@@ -1,0 +1,13 @@
+---
+table_name: datalake_ebdb_test_raw.contrato
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+  usuario_id:
+    is_complete:
+      severity_level: Error
+  imovel_id:
+    is_complete:
+      severity_level: Error
