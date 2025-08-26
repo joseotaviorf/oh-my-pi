@@ -18,7 +18,6 @@ workflow:
     Contrato:
       clean_table_name: contract
       clean_primary_keys: [id]
-      raw_z_order_by: [ts_database_transaction]
       clean_z_order_by: [id_user, id_house]
 cluster:
   type: custom_cluster
