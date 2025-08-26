@@ -19,8 +19,8 @@ WITH base_gsc AS (
     impressions,
     clicks,
     ctr,
-    site_url,
     posimp,
+    site_url,
     device,
     domain,
     slug,
@@ -70,14 +70,13 @@ SELECT
   slug,
   subtitle_content,
   is_branded,
+  ctr,
+  clicks,
+  position,
+  impressions,
+  posimp,
   year,
   month,
-  day,
-  SUM(posimp) / SUM(impressions) AS position,
-  SUM(impressions) AS impressions,
-  SUM(clicks) AS clicks,
-  SUM(clicks) / SUM(impressions) AS ctr,
-  SUM(posimp) AS posimp
+  day
 FROM
   base_gsc
-GROUP BY ALL
