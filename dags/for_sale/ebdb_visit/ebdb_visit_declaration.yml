@@ -38,10 +38,6 @@ workflow:
       clean_primary_keys: [id]
     FollowUpDetails:
       clean_table_name: follow_up_details
-    FollowUpDetails_FeedbackTag:
-      raw_primary_keys: [FollowUpDetails_id, tags_id]
-      clean_table_name: follow_up_details_feedback_tag
-      clean_primary_keys: [id_follow_up_details, id_tags]
     Imovel_informacoesVisita:
       raw_primary_keys: [Imovel_id, informacoesVisita]
       clean_table_name: house_visit_information
