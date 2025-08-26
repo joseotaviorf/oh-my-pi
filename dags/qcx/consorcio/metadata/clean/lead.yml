@@ -7,65 +7,65 @@ description: This table contains lead information from consorcio prospects.
 columns:
   id:
     lineage:
-    - datalake_consorcio_raw.lead.id
+      - datalake_consorcio_raw.lead.id
     description: Primary key of table.
   uuid:
     lineage:
-    - datalake_consorcio_raw.lead.uuid
+      - datalake_consorcio_raw.lead.uuid
     description: Unique identifier of lead.
   name:
     lineage:
-    - datalake_consorcio_raw.lead.name
+      - datalake_consorcio_raw.lead.name
     description: Name of lead prospect.
   phone:
     lineage:
-    - datalake_consorcio_raw.lead.phone
+      - datalake_consorcio_raw.lead.phone
     description: Phone number of lead.
   email:
     lineage:
-    - datalake_consorcio_raw.lead.email
+      - datalake_consorcio_raw.lead.email
     description: Email address of lead.
   metadata:
     lineage:
-    - datalake_consorcio_raw.lead.metadata
+      - datalake_consorcio_raw.lead.metadata
     description: Additional metadata information for lead.
   source:
     lineage:
-    - datalake_consorcio_raw.lead.source
+      - datalake_consorcio_raw.lead.source
     description: Source origin of lead.
   uuid_person:
     lineage:
-    - datalake_consorcio_raw.lead.person_uuid
+      - datalake_consorcio_raw.lead.person_uuid
     description: UUID of person associated with lead.
   utm_source:
     lineage:
-    - datalake_consorcio_raw.lead.utm_source
+      - datalake_consorcio_raw.lead.utm_source
     description: UTM source parameter for tracking.
   utm_medium:
     lineage:
-    - datalake_consorcio_raw.lead.utm_medium
+      - datalake_consorcio_raw.lead.utm_medium
     description: UTM medium parameter for tracking.
   utm_campaign:
     lineage:
-    - datalake_consorcio_raw.lead.utm_campaign
+      - datalake_consorcio_raw.lead.utm_campaign
     description: UTM campaign parameter for tracking.
   utm_term:
     lineage:
-    - datalake_consorcio_raw.lead.utm_term
+      - datalake_consorcio_raw.lead.utm_term
     description: UTM term parameter for tracking.
-  utm_consent:
+  utm_content:
     lineage:
-    - datalake_consorcio_raw.lead.utm_consent
-    description: UTM consent parameter for tracking.
+      - datalake_consorcio_raw.lead.utm_content
+    description: UTM content parameter for tracking.
   id_session:
     lineage:
-    - datalake_consorcio_raw.lead.session_id
+      - datalake_consorcio_raw.lead.session_id
     description: Session ID associated with lead.
   ts_created:
     lineage:
-    - datalake_consorcio_raw.lead.created_at
+      - datalake_consorcio_raw.lead.created_at
     description: Timestamp when record was created.
   ts_updated:
     lineage:
-    - datalake_consorcio_raw.lead.updated_at
-    description: Timestamp when record was last updated. 
+      - datalake_consorcio_raw.lead.updated_at
+    description: Timestamp when record was last updated.

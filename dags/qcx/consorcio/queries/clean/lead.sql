@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     session_id AS id_session,
     uuid,
@@ -12,8 +12,8 @@ SELECT
     utm_medium,
     utm_campaign,
     utm_term,
-    utm_consent,
+    utm_content,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM 
-    datalake_consorcio_raw.lead 
+FROM
+    datalake_consorcio_raw.lead
