@@ -1,0 +1,71 @@
+---
+database_name: datalake_consorcio_clean
+table_name: order_item
+owner: cadu.procha@quintoandar.com.br
+domain: QCX
+description: This table contains individual items within consortium orders.
+columns:
+  id:
+    lineage:
+    - datalake_consorcio_raw.order_item.id
+    description: Primary key of table.
+  uuid:
+    lineage:
+    - datalake_consorcio_raw.order_item.uuid
+    description: Unique identifier of order item.
+  id_order:
+    lineage:
+    - datalake_consorcio_raw.order_item.order_id
+    description: FK from order table.
+  id_external_segment:
+    lineage:
+    - datalake_consorcio_raw.order_item.external_segment_id
+    description: External identifier of product segment.
+  name:
+    lineage:
+    - datalake_consorcio_raw.order_item.name
+    description: Name of order item.
+  id_external_product:
+    lineage:
+    - datalake_consorcio_raw.order_item.external_product_id
+    description: External identifier of product.
+  id_external_sale_plan:
+    lineage:
+    - datalake_consorcio_raw.order_item.external_sale_plan_id
+    description: External identifier of sale plan.
+  id_external_group:
+    lineage:
+    - datalake_consorcio_raw.order_item.external_group_id
+    description: External identifier of consortium group.
+  administrative_fee:
+    lineage:
+    - datalake_consorcio_raw.order_item.administrative_fee
+    description: Administrative fee percentage of order item.
+  reserve_fund_fee:
+    lineage:
+    - datalake_consorcio_raw.order_item.reserve_fund_fee
+    description: Reserve fund fee percentage of order item.
+  installment_value:
+    lineage:
+    - datalake_consorcio_raw.order_item.installment_value
+    description: Monthly installment value of order item.
+  sale_plan_contemplation:
+    lineage:
+    - datalake_consorcio_raw.order_item.sale_plan_contemplation
+    description: Sale plan contemplation percentage.
+  good_value:
+    lineage:
+    - datalake_consorcio_raw.order_item.good_value
+    description: Total value of good in order item.
+  deadline_term:
+    lineage:
+    - datalake_consorcio_raw.order_item.deadline_term
+    description: Deadline term in months for order item.
+  ts_created:
+    lineage:
+    - datalake_consorcio_raw.order_item.created_at
+    description: Timestamp when record was created.
+  ts_updated:
+    lineage:
+    - datalake_consorcio_raw.order_item.updated_at
+    description: Timestamp when record was last updated. 

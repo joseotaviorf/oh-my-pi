@@ -1,0 +1,29 @@
+dag:
+  name: consorcio
+  schedule_start_date: 2025, 7, 25
+  schedule_interval: 0 1 * * *
+  owner: QCX
+  documentation:
+    dag_purpose: |
+      Ingest the S3 data from consorcio and clean them for the datalake
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: CONSORCIO_DB
+  tables_customization:
+    # consorciado:
+    #   clean_table_name: consorciado
+    # consorciado_quota:
+    #   clean_table_name: consorciado_quota
+    lead:
+      clean_table_name: lead
+    # order:
+    #   clean_table_name: order
+    # order_item:
+    #   clean_table_name: order_item
+    product:
+      clean_table_name: product
+cluster:
+  type: databricks_13_3_med_general_cluster

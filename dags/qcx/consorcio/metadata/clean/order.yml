@@ -1,0 +1,39 @@
+---
+database_name: datalake_consorcio_clean
+table_name: order
+owner: cadu.procha@quintoandar.com.br
+domain: QCX
+description: This table contains consorcio order information.
+columns:
+  id:
+    lineage:
+    - datalake_consorcio_raw.order.id
+    description: Primary key of table.
+  uuid:
+    lineage:
+    - datalake_consorcio_raw.order.uuid
+    description: Unique identifier of order.
+  id_lead:
+    lineage:
+    - datalake_consorcio_raw.order.lead_id
+    description: FK from lead table.
+  id_consorciado:
+    lineage:
+    - datalake_consorcio_raw.order.consorciado_id
+    description: FK from consorciado table.
+  checkout_url:
+    lineage:
+    - datalake_consorcio_raw.order.checkout_url
+    description: URL for order checkout process.
+  status:
+    lineage:
+    - datalake_consorcio_raw.order.status
+    description: Current status of order.
+  ts_created:
+    lineage:
+    - datalake_consorcio_raw.order.created_at
+    description: Timestamp when record was created.
+  ts_updated:
+    lineage:
+    - datalake_consorcio_raw.order.updated_at
+    description: Timestamp when record was last updated. 

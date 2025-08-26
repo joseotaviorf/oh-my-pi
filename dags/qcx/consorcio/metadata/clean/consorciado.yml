@@ -1,0 +1,31 @@
+---
+database_name: datalake_consorcio_clean
+table_name: consorciado
+owner: cadu.procha@quintoandar.com.br
+domain: QCX
+description: This table contains consorcio member information.
+columns:
+  id:
+    lineage:
+    - datalake_consorcio_raw.consorciado.id
+    description: Primary key of table.
+  uuid:
+    lineage:
+    - datalake_consorcio_raw.consorciado.uuid
+    description: Unique identifier of consorcio member.
+  id_external:
+    lineage:
+    - datalake_consorcio_raw.consorciado.external_id
+    description: External identifier of consorcio member.
+  uuid_person:
+    lineage:
+    - datalake_consorcio_raw.consorciado.person_uuid
+    description: UUID of person associated with consorcio member.
+  ts_created:
+    lineage:
+    - datalake_consorcio_raw.consorciado.created_at
+    description: Timestamp when record was created.
+  ts_updated:
+    lineage:
+    - datalake_consorcio_raw.consorciado.updated_at
+    description: Timestamp when record was last updated. 
