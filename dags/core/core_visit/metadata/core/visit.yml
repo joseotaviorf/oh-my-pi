@@ -30,6 +30,7 @@ columns:
   id_owner:
     lineage:
       - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
     description: User id of the owner related to the property that is being visited.
       It's the id of the User table, from Main's database (EBDB).
   id_agent:

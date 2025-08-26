@@ -292,6 +292,8 @@ bietlejuice.core_visit:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
   remove:
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_listing:load-clean-house-listing-relation:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
 bietlejuice.enrich_crawlers_listings:

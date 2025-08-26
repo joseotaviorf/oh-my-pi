@@ -25,7 +25,7 @@ SELECT
     v.id AS id_visit,
     v.id_house,
     v.id_visitor,
-    h.id_user AS id_owner,
+    COALESCE(u.id, h.id_user) AS id_owner,
     v.id_agent,
     v.code,
     v.status,
@@ -56,3 +56,11 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.house AS h
         ON h.id = v.id_house
+LEFT JOIN
+    datalake_ebdb_clean.house_listing_relation AS hl
+        ON hl.id = v.id_house
+        AND hl.related_as = 'PROPERTY_OWNER'
+LEFT JOIN
+    datalake_ebdb_clean.user AS u
+        ON (u.id = hl.id_related
+        OR u.uuid_person = hl.id_related)
