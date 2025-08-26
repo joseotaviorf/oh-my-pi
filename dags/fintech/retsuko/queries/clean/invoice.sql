@@ -7,6 +7,7 @@ SELECT
     checkout_order_id AS id_checkout_order,
     checkout_charge_id AS id_checkout_charge,
     idempotency_id AS id_idempotency,
+    external_negotiation_id AS id_external_negotiation,
     payment_unique_payment_identifier,
     status,
     sub_status AS substatus,

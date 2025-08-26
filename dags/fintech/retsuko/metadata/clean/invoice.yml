@@ -2,21 +2,27 @@
 database_name: datalake_retsuko_clean
 table_name: invoice
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
+description: "Clean layer table containing invoice information from SeuBarriga for renting contracts"
 columns:
   id:
+    description: "Unique invoice identifier"
     lineage:
       - datalake_retsuko_raw.invoice.id
   id_external:
+    description: "External invoice identifier"
     lineage:
       - datalake_retsuko_raw.invoice.external_id
   id_original_invoice_external:
+    description: "Indicates the first invoice created to an entry. It's very important in cancel causes, to not lose track"
     lineage:
       - datalake_retsuko_raw.invoice.original_invoice_external_id
   id_account:
+    description: "Account identifier associated with the invoice"
     lineage:
       - datalake_retsuko_raw.invoice.account_id
   id_contract:
+    description: "The Seu Barriga's internal contract ID reference of an invoice"
     lineage:
       - datalake_retsuko_raw.invoice.contract_id
   id_checkout_order:
@@ -28,30 +34,43 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.checkout_charge_id
   id_idempotency:
-    description: ""
-    lineage: 
+    description: "Idempotency identifier to ensure unique operations"
+    lineage:
       - datalake_retsuko_raw.invoice.idempotency_id
+  id_external_negotiation:
+    description: "External negotiation identifier"
+    lineage:
+      - datalake_retsuko_raw.invoice.external_negotiation_id
   payment_unique_payment_identifier:
     description: "Unique payment identifier in vans"
     lineage:
       - datalake_retsuko_raw.invoice.payment_unique_payment_identifier
   status:
+    description: "Invoice status indicating current state"
     lineage:
       - datalake_retsuko_raw.invoice.status
   substatus:
+    description: "Invoice sub-status for additional state information"
     lineage:
       - datalake_retsuko_raw.invoice.sub_status
   payment_status:
     description: "Status from invoice payment. It's different from STATUS column. In a chargeback case, payment_status will be as chargeback and status column, will be field with canceled"
     lineage:
       - datalake_retsuko_raw.invoice.payment_status
+  negotiation_status:
+    description: "Negotiation status information"
+    lineage:
+      - datalake_retsuko_raw.invoice.negotiation_status
   paid_via:
+    description: "Payment method used for the invoice"
     lineage:
       - datalake_retsuko_raw.invoice.paid_via
   purpose:
+    description: "Invoice purpose indicating the type of charge"
     lineage:
       - datalake_retsuko_raw.invoice.purpose
   closing_mode:
+    description: "Indicates if invoice closing is automatic or manual"
     lineage:
       - datalake_retsuko_raw.invoice.closing_mode
   reason:
@@ -67,18 +86,23 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.reason
   due_amount:
+    description: "Amount due for the invoice"
     lineage:
       - datalake_retsuko_raw.invoice.due_amount
   paid_amount:
+    description: "Amount actually paid for the invoice"
     lineage:
       - datalake_retsuko_raw.invoice.paid_amount
   payment_paid_interest_amount:
+    description: "Interest amount paid with the invoice payment"
     lineage:
       - datalake_retusko_raw.invoice.payment_paid_interest_amount
   payment_paid_fine_amount:
+    description: "Fine amount paid with the invoice payment"
     lineage:
       - datalake_retusko_raw.invoice.payment_paid_fine_amount
   accrual_year_month:
+    description: "Year and month reference for the invoice accrual"
     lineage:
       - datalake_retsuko_raw.invoice.accrual_year_month
   should_request_boleto:
@@ -106,6 +130,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.write_off_at
   ts_paid:
+    description: "Timestamp when the invoice was paid"
     lineage:
       - datalake_retsuko_raw.invoice.paid_date
   ts_payment_confirmation:
@@ -129,23 +154,27 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.payment_credit_date
   ts_payment_chargeback:
-    description: ""
-    lineage: 
+    description: "Timestamp when payment chargeback occurred"
+    lineage:
       - datalake_retsuko_raw.invoice.payment_chargeback_at
   ts_payment_refunded:
-    description: ""
-    lineage: 
+    description: "Timestamp when payment was refunded"
+    lineage:
       - datalake_retsuko_raw.invoice.payment_refunded_at
   ts_canceled:
+    description: "Timestamp when the invoice was canceled"
     lineage:
       - datalake_retsuko_raw.invoice.canceled_at
   ts_sent:
+    description: "Timestamp when the invoice was sent"
     lineage:
       - datalake_retsuko_raw.invoice.sent_at
   ts_due:
+    description: "Timestamp when the invoice is due for payment"
     lineage:
       - datalake_retsuko_raw.invoice.due_date
   ts_created:
+    description: "Timestamp when the invoice was created"
     lineage:
       - datalake_retsuko_raw.invoice.created_at
   ts_synced:
@@ -157,9 +186,11 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.nf_requested_at
   ts_retsuko_created:
+    description: "Timestamp when the invoice was created in Retsuko system"
     lineage:
       - datalake_retsuko_raw.invoice.retsuko_created_at
   ts_retsuko_updated:
+    description: "Timestamp when the invoice was last updated in Retsuko system"
     lineage:
       - datalake_retsuko_raw.invoice.retsuko_updated_at
   year:

@@ -2,7 +2,7 @@
 database_name: datalake_retsuko
 table_name: invoice
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Information about invoices issued by SeuBarriga for renting contracts."
 columns:
   id:
@@ -42,9 +42,13 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.id_checkout_charge
   id_idempotency:
-    description: ""
+    description: "Idempotency identifier to ensure unique operations"
     lineage:
       - datalake_retsuko_clean.invoice.id_idempotency
+  id_external_negotiation:
+    description: "External negotiation identifier"
+    lineage:
+      - datalake_retsuko_clean.invoice.id_external_negotiation
   payment_unique_payment_identifier:
     description: "Unique payment identifier in Vans"
     lineage:
@@ -215,11 +219,11 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.ts_payment_credit
   ts_payment_chargeback:
-    description: ""
+    description: "Timestamp when payment chargeback occurred"
     lineage:
       - datalake_retsuko_clean.invoice.ts_payment_chargeback
   ts_payment_refunded:
-    description: ""
+    description: "Timestamp when payment was refunded"
     lineage:
       - datalake_retsuko_clean.invoice.ts_payment_refunded
   ts_canceled:
@@ -231,13 +235,17 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.ts_sent
   ts_due:
-    description: Invoice due to timestamp"
+    description: "Invoice due to timestamp"
     lineage:
       - datalake_retsuko_clean.invoice.ts_due
   ts_nf_requested:
     description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
     lineage:
       - datalake_retsuko_clean.invoice.ts_nf_requested
+  ts_synced:
+    description: "Data that indicates when data was synced from SB to Retsuko"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_synced
   ts_created:
     description: "Invoice creation timestamp"
     lineage:
