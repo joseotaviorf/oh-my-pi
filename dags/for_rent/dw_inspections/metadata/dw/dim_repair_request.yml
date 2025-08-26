@@ -26,7 +26,7 @@ columns:
   repair_type:
     lineage:
       - datalake_inspections.repair_request.type
-    description:
+    description: Type of repair requested.
   comment:
     lineage:
       - datalake_inspections.repair_request.comment
@@ -39,6 +39,14 @@ columns:
     lineage:
       - datalake_inspections.repair_request.repair_service
     description: Repair service requested
+  item_name:
+    lineage:
+      - datalake_inspections.repair_request.item_name
+    description: Name of the item to be repaired
+  room_name:
+    lineage:
+      - datalake_inspections.repair_request.room_name
+    description: Room name where the item is located
   ts_created:
     lineage:
       - datalake_inspections.repair_request.ts_created

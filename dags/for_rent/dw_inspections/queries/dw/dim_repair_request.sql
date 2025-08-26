@@ -6,6 +6,8 @@ SELECT DISTINCT
     rr.comment,
     rr.responsibility,
     rr.repair_service,
+    rr.item_name,
+    rr.room_name,
     rr.ts_created,
     rr.ts_updated,
     NOW() AS ts_load,

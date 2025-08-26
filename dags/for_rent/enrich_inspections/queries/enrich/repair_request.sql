@@ -37,6 +37,8 @@ SELECT
     rr.responsibility,
     rr.type AS repair_type,
     rr.type,
+    ig.name AS item_name,
+    ro.room_name,
     rr.cost,
     rr.repair_service,
     rr.comment,

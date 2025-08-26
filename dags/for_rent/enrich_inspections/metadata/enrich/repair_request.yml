@@ -57,6 +57,14 @@ columns:
       TAKE AWAY: Remove item left in the property.
       GIVE BACK: Replace item that was in the property.
       OTHER: Other types not listed.
+  item_name:
+    lineage:
+      - datalake_inspection_services_clean.repair_request.name
+    description: Name of the item to be repaired
+  room_name:
+    lineage:
+      - datalake_inspection_services_clean.repair_request.room_name
+    description: Room name where the item is located
   cost:
     lineage:
       - datalake_inspection_services_clean.repair_request.cost
@@ -64,7 +72,7 @@ columns:
   repair_type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
-    description:
+    description: Type of repair requested
   comment:
     lineage:
       - datalake_inspection_services_clean.repair_request.comment
