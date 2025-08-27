@@ -15,8 +15,14 @@ last_reviewer as (
 reviewer AS (
     SELECT
         id_inspection,
-        MAX(reviewer_type = 'OWNER' AND lr.is_approved) AS has_owner_approved_review,
-        MAX(reviewer_type = 'TENANT' AND lr.is_approved) AS has_tenant_approved_review,
+        MAX(CASE
+          WHEN reviewer_type = 'OWNER' AND lr.is_approved IS NOT NULL THEN is_approved
+          ELSE NULL
+        END) AS has_owner_approved_review,
+        MAX(CASE
+          WHEN reviewer_type = 'TENANT' AND lr.is_approved IS NOT NULL THEN is_approved
+          ELSE NULL
+        END) AS has_tenant_approved_review,
         MAX(IF(reviewer_type = 'OWNER' AND lr.is_approved, ts_approved, NULL)) AS ts_owner_approved_review,
         MAX(IF(reviewer_type = 'TENANT' AND lr.is_approved, ts_approved, NULL)) AS ts_tenant_approved_review
     FROM
