@@ -94,6 +94,7 @@ default_access_control_list:
 
 pool_m5a_xlarge_on_demand: &pool_m5a_xlarge_on_demand 0909-205705-pelts9-pool-0fnxc9hu
 pool_m5a_xlarge_spot: &pool_m5a_xlarge_spot 0909-210021-must9-pool-419cr6z6
+pool_rfleet_xlarge_on_demand: &pool_rfleet_xlarge_on_demand 0827-144052-skis45-pool-igeg036a
 
 ##### Clusters Configs #####
 cluster_template:
@@ -1033,6 +1034,13 @@ databricks_13_3_high_mem_driver_high_mem_nodes_3_workers:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+databricks_13_3_rfleet_instance_cluster:
+  <<: *cluster_anchor_base
+  driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+  instance_pool_id: *pool_rfleet_xlarge_on_demand
+  num_workers: 2
+  spark_version: 13.3.x-scala2.12
 
 ### Notification Configs ###
 notification_webhooks_keys:
