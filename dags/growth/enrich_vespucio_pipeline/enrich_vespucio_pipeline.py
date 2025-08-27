@@ -547,18 +547,6 @@ plugin_tasks = [
         ],
     ),
     create_task(
-        entry_point="plugins_listing_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_listings={Tables.listings}",
-            f"--output_index_prefix=vespucio_prod",
-            "--number_of_shards=3",
-            "--number_of_replicas=2",
-        ],
-    ),
-    create_task(
         entry_point="plugins_address_details_indexer",
         parameters=[
             f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
