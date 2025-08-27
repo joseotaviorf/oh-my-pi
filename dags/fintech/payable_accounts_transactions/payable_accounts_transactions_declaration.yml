@@ -1,6 +1,6 @@
 dag:
   name: payable_accounts_transactions
-  schedule_interval: 0 1 * * *
+  schedule_interval: 0 9 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: This DAG brings CAP (Contas a Pagar) data, a agregation of Accounts Payable XLSX Sheets for current and last year.
