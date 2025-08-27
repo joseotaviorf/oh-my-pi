@@ -7,7 +7,7 @@ dag:
   schedule_interval: 0 3 * * *
   
 cluster:
-  type: databricks_13_3_min_memory_people_cluster
+  type: custom_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
@@ -17,7 +17,13 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.sql.execution.arrow.pyspark.enabled: True
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
 workflow:
   layer: raw
@@ -41,8 +47,99 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  
   tables_customization:
     close_reasons:
       extraction_type: full
+      z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "close_reasons"
+
+    custom_fields:
+      extraction_type: full
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "custom_fields"
+
+    demographics_answer_options:
+      extraction_type: full
+      z_order_by: ["is_active"]
+      extra_spark_job_arguments:
+        - endpoint: "demographics/answer_options"   
+
+    demographics_questions:
+      extraction_type: full
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "demographics/questions"
+
+    departments:
+      extraction_type: full
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "departments"
+
+    email_templates:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "email_templates"
+          date_column_to_partition: "updated_at"
+
+    jobs:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "jobs"
+          date_column_to_partition: "updated_at"
+
+    offers:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["ts_updated", "id_application", "id_job"]
+      extra_spark_job_arguments:
+        - endpoint: "offers"
+          date_column_to_partition: "updated_at"
+
+    offices:
+      extraction_type: full
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "offices"
+
+    rejection_reasons:
+      extraction_type: full
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "rejection_reasons"
+
+    scheduled_interviews:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["ts_updated", "id_application"]
+      extra_spark_job_arguments:
+        - endpoint: "scheduled_interviews"
+          date_column_to_partition: "updated_at"
+
+    scorecards:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["ts_updated", "id_application", "id_candidate"]
+      extra_spark_job_arguments:
+        - endpoint: "scorecards"
+          date_column_to_partition: "updated_at"
+
+    tags_candidate:
+      extraction_type: full
+      z_order_by: ["id_candidate", "id_tag"]
+      extra_spark_job_arguments:
+        - endpoint: "tags/candidate"
+
+    users:
+      extraction_type: incremental
+      merge_on: ["id"]
+      extra_spark_job_arguments:
+        - endpoint: "users"
+          date_column_to_partition: "updated_at"

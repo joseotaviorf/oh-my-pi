@@ -1,0 +1,53 @@
+---
+database_name: datalake_greenhouse_clean
+table_name: offices
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table containing office data, sourced from the Greenhouse Harvest API's 'offices' endpoint.
+columns:
+  id:
+    description: The office's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.offices.id
+  id_parent:
+    description: The parent office's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.offices.parent_id
+  id_external:
+    description: The office's external unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.offices.external_id
+  id_parent_office_external:
+    description: The parent office's external unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.offices.parent_office_external_id
+  name:
+    description: The name of the office.
+    lineage:
+      - datalake_greenhouse_raw.offices.name
+  location_name:
+    description: The name of the location for the office.
+    lineage:
+      - datalake_greenhouse_raw.offices.location.name
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  child_ids:
+    description: An array of child office IDs.
+    lineage:
+      - datalake_greenhouse_raw.offices.child_ids
+  child_office_external_ids:
+    description: An array of child office external IDs.
+    lineage:
+      - datalake_greenhouse_raw.offices.child_office_external_ids
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+      - datalake_greenhouse_raw.offices.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+      - datalake_greenhouse_raw.offices.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+      - datalake_greenhouse_raw.offices.day

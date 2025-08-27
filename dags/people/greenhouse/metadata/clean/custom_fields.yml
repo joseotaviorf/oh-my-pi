@@ -1,0 +1,93 @@
+---
+database_name: datalake_greenhouse_clean
+table_name: custom_fields
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table containing custom field definitions, sourced from the Greenhouse Harvest API's 'custom_fields' endpoint.
+columns:
+  id:
+    description: The custom field's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.id
+  name:
+    description: The name of the custom field.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.name
+  field_type:
+    description: The type of the custom field (e.g., candidate, job, offer).
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.field_type
+  value_type:
+    description: The data type of the custom field's value (e.g., short_text, boolean, currency).
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.value_type
+  name_key:
+    description: A unique, machine-readable key for the custom field.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.name_key
+  description:
+    description: A description of the custom field.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.description
+  template_token_string:
+    description: The template token for the custom field.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.template_token_string
+  priority:
+    description: The display priority of the custom field.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.priority
+  is_active:
+    description: A boolean flag indicating if the custom field is active.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.active
+  is_private:
+    description: A boolean flag indicating if the custom field is private.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.private
+  is_required:
+    description: A boolean flag indicating if the custom field is required.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.required
+  is_approval_required:
+    description: A boolean flag indicating if approval is required for the custom field.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.require_approval
+  is_new_version_trigger:
+    description: A boolean flag indicating if a new version is triggered when the field is updated.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.trigger_new_version
+  is_exposed_in_job_board_api:
+    description: A boolean flag indicating if the custom field is exposed in the job board API.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.expose_in_job_board_api
+  is_api_only:
+    description: A boolean flag indicating if the custom field is API-only.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.api_only
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  offices:
+    description: An array of offices where the custom field is used.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.offices
+  departments:
+    description: An array of departments where the custom field is used.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.departments
+  custom_field_options:
+    description: An array of options for the custom field, if applicable.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.custom_field_options
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+      - datalake_greenhouse_raw.custom_fields.day
