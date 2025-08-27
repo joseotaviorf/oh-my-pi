@@ -6,7 +6,7 @@ from bietlejuice.base.spark import BaseDBUtils
 
 from bietlejuice.jobs.degreed.argument_parser import JobArgumentParser
 from bietlejuice.jobs.degreed.degreed_api import DegreedAPI
-from bietlejuice.jobs.loaders.raw_layer_loader import RawLayerLoader
+from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 from bietlejuice.jobs.degreed.helpers import json_to_dataframe
 
 LOGGER = QuintoAndarLogger(__name__)

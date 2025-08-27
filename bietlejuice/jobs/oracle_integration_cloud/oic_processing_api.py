@@ -1,13 +1,14 @@
-import requests
 import base64
 import json
 from bietlejuice.base.spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.jobs.common.api_client import BaseAPIClient
+from bietlejuice.jobs.common.api_exceptions import APIException
 
 LOGGER = QuintoAndarLogger(__name__)
 
 
-class OICprocessingAPI:
+class OICprocessingAPI(BaseAPIClient):
     """
     A class to interact with the OIC Data Lake processing API.
     It handles authentication and sending processing requests.
@@ -21,15 +22,18 @@ class OICprocessingAPI:
     def __init__(self, environment: str = "PROD"):
         """
         Initializes the API client.
-
-        Args:
-            environment (str): The target environment ('PROD' or 'FORNO').
-                               Defaults to 'PROD'.
         """
         self.environment = environment.upper()
-        self.api_url = self._API_URLS[self.environment]
+        api_url = self._API_URLS.get(self.environment)
+        if not api_url:
+            raise ValueError(
+                f"Invalid environment provided: '{environment}'. Use 'PROD' or 'FORNO'."
+            )
+
+        super().__init__(base_url=api_url)
+
         self._username, self._password = self._get_secrets()
-        self.headers = self._prepare_auth_header()
+        self._prepare_auth_header()
 
     def _get_secrets(self) -> tuple[str, str]:
         """
@@ -57,12 +61,9 @@ class OICprocessingAPI:
             LOGGER.error(f"Failed to retrieve secrets: {e}", exc_info=True)
             raise
 
-    def _prepare_auth_header(self) -> dict:
+    def _prepare_auth_header(self) -> None:
         """
-        Prepares the Basic authentication header with Base64 encoding.
-
-        Returns:
-            dict: The headers dictionary ready for the request.
+        Prepares the Basic authentication header and applies it to the session.
         """
         auth_string = f"{self._username}:{self._password}"
         base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode(
@@ -72,11 +73,12 @@ class OICprocessingAPI:
             "Content-Type": "application/json",
             "Authorization": f"Basic {base64_auth_string}",
         }
-        return headers
+        self.session.headers.update(headers)
 
     def send_process_request(self, report_name: str) -> dict:
         """
-        Triggers the processing flow for a specific report.
+        Triggers the processing flow for a specific report using the resilient
+        post method from the base class.
 
         Args:
             report_name (str): The name of the report to be reprocessed (without the 'RM_' prefix).
@@ -92,23 +94,17 @@ class OICprocessingAPI:
             "displayName": f"RM_{report_name}",
             "absolutePath": f"/QuintoAndar/REPORTS_DATALAKE/RM_{report_name}.xdo",
         }
-        try:
-            response = requests.post(
-                self.api_url,
-                headers=self.headers,
-                data=json.dumps(payload),
-                timeout=600,
+
+        response = self.post(endpoint="", data=json.dumps(payload), timeout=600)
+
+        response_json = response.json() if response.text else {}
+
+        if response_json.get("returnStatus") == "E":
+            error_message = response_json.get(
+                "returnMessage", "Unknown API business error"
             )
-            response.raise_for_status()
-            response_json = response.json() if response.text else {}
-            if response_json.get("returnStatus") == "E":
-                error_message = response_json.get("returnMessage", "Unknown API error")
-                LOGGER.error(f"OIC API returned a failure status: {error_message}")
-                raise Exception(error_message)
-            LOGGER.info(f"OIC API response received: {response_json}")
-            return response_json
-        except requests.exceptions.RequestException as e:
-            LOGGER.error(
-                f"HTTP request error for report '{report_name}': {e}", exc_info=True
-            )
-            raise
+            LOGGER.error(f"OIC API returned a failure status: {error_message}")
+            raise APIException(error_message, response_text=json.dumps(response_json))
+
+        LOGGER.info(f"OIC API response received: {response_json}")
+        return response_json
