@@ -301,6 +301,9 @@ bietlejuice.dw_credit_passport:
   - bietlejuice.enrich_sorting_hat:load-enrich-policy-report:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-analysis-request:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-credit-analysis:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-early-credit-analysis:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-variant:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-policy-report:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-proponent:first-run-of-day
 bietlejuice.dw_crm:

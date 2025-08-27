@@ -84,6 +84,81 @@ group_proponents AS (
     datalake_docx_clean.group_member
   GROUP BY
     id_group
+),
+get_credit_policy AS (
+  SELECT
+    ce.id,
+    ce.id_proposal,
+    ce.id_group,
+    ce.id_user,
+    get_json_object(pr.raw_data, '$.variant') AS variant,
+    get_json_object(pr.result, '$.policy_dti') AS policy_dti,
+    get_json_object(pr.result, '$.analysis_category') AS category,
+    get_json_object(pr.result, '$.risk_category_canon') AS risk_category_canon,
+    'credit_policy' AS policy_type,
+    ce.ts_created
+  FROM
+    datalake_docx_clean.credit_evaluation AS ce
+    INNER JOIN datalake_sorting_hat_clean.policy_report AS pr ON ce.id = pr.id_external
+  WHERE
+    pr.type = 'CREDIT_POLICY'
+),
+get_docs_policy AS (
+  SELECT
+    ce.id,
+    ce.id_proposal,
+    ce.id_group,
+    ce.id_user,
+    get_json_object(pr.raw_data, '$.variant') AS variant,
+    get_json_object(pr.result, '$.policy_dti') AS policy_dti,
+    get_json_object(pr.raw_data, '$.analysis_category') AS category,
+    get_json_object(pr.raw_data, '$.risk_category_canon') AS risk_category_canon,
+    'documentation_policy' AS policy_type,
+    ce.ts_created
+  FROM
+    datalake_docx_clean.credit_evaluation AS ce
+    LEFT JOIN datalake_sorting_hat_clean.policy_report AS pr ON ce.id_proposal = pr.id_external
+  WHERE
+    pr.type = 'DOCUMENTATION_POLICY'
+),
+get_credit_model_data AS (
+  SELECT
+    cp.id,
+    cp.id_proposal,
+    cp.id_group,
+    cp.id_user,
+    IF(dp.id IS NOT NULL, dp.variant, cp.variant) AS variant,
+    IF(dp.id IS NOT NULL, dp.policy_dti, cp.policy_dti) AS policy_dti,
+    IF(dp.id IS NOT NULL, dp.category, cp.category) AS category,
+    IF(dp.id IS NOT NULL, dp.risk_category_canon, cp.risk_category_canon) AS risk_category_canon,
+    cp.ts_created
+  FROM
+    get_credit_policy AS cp
+      LEFT JOIN get_docs_policy AS dp
+        ON cp.id = dp.id
+),
+credit_analysis_variant as (
+  SELECT
+    ca.id_proposal,
+    ca.category,
+    v.name AS variant_name
+  FROM
+    datalake_sorting_hat_clean.credit_analysis AS ca
+      INNER JOIN datalake_sorting_hat_clean.variant AS v
+        ON v.id = ca.id_variant
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY ca.id_proposal ORDER BY ca.ts_created DESC) = 1
+),
+get_early_credit as (
+  SELECT
+    eca.id_credit_evaluation,
+    v.name AS variant,
+    get_json_object(eca.result, '$.category') AS category,
+    eca.risk_category_canon
+  FROM
+    datalake_sorting_hat_clean.early_credit_analysis AS eca
+      INNER JOIN datalake_sorting_hat_clean.variant AS v
+        ON v.id = eca.id_variant
 )
 SELECT DISTINCT
   ce.id AS sk_credit_evaluation,
@@ -143,10 +218,10 @@ SELECT DISTINCT
     THEN
       'MULTI_TENANT'
   END group_type,
-  GET_JSON_OBJECT(pr.raw_data, '$.variant') AS variant,
-  GET_JSON_OBJECT(pr.result, '$.policy_dti') AS policy_dti,
-  GET_JSON_OBJECT(pr.result, '$.analysis_category') AS category,
-  GET_JSON_OBJECT(pr.result, '$.risk_category_canon') AS risk_category_canon,
+  IF(eca.id_credit_evaluation IS NULL, COALESCE(cm.variant, ca.variant_name), eca.variant) AS variant,
+  cm.policy_dti,
+  IF(eca.id_credit_evaluation IS NULL, COALESCE(cm.category, ca.category), eca.variant) AS category,
+  IF(eca.id_credit_evaluation IS NULL, cm.risk_category_canon, eca.risk_category_canon) AS risk_category_canon,
   COALESCE(pp.total_proposal_proponents, gp.total_group_proponents) AS number_of_proponents,
   ce.is_automatic,
   IF(
@@ -173,9 +248,8 @@ FROM
       ON ce.id_group = gp.id_group
     LEFT JOIN evaluations AS eval
       ON ce.id = eval.id_credit_evaluation
-    LEFT JOIN datalake_sorting_hat_clean.policy_report AS pr
-      ON pr.id_external = ce.id
-      AND pr.type = 'CREDIT_POLICY'
+    LEFT JOIN get_credit_model_data AS cm
+      ON cm.id = ce.id
     LEFT JOIN get_credit_evaluation_source AS ces
       ON ces.id = ce.id
     LEFT JOIN datalake_credit_analysis.credit_engine AS cen
@@ -188,3 +262,7 @@ FROM
       AND p.external_source = 'CREDIT_EVALUATION'
     LEFT JOIN credit_evaluation_income AS cei
       ON ce.id = cei.id_credit_evaluation
+    LEFT JOIN credit_analysis_variant AS ca
+      ON ca.id_proposal = ce.id_proposal
+    LEFT JOIN get_early_credit AS eca
+      ON eca.id_credit_evaluation = ce.id
