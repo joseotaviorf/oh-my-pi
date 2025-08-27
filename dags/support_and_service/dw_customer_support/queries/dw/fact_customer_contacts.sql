@@ -131,8 +131,8 @@ twilio_demand AS (
 twilio_contacts AS (
   SELECT DISTINCT
     CASE
-      WHEN d.channel = 'call' THEN MD5(COALESCE(d.id_call, d.id_task))
-      WHEN d.channel = 'chat' THEN MD5(d.id_session)
+      WHEN d.channel = 'call' THEN MD5(CONCAT(COALESCE(d.id_call, d.id_task), 'call'))
+      WHEN d.channel = 'chat' THEN MD5(CONCAT(d.id_session, 'chat'))
     END AS sk_contact,
     CASE
       WHEN d.channel = 'call' THEN MD5(COALESCE(d.id_reservation, CONCAT(COALESCE(d.id_call, d.id_task), 'n/a')))
@@ -259,7 +259,7 @@ front_contacts AS (
     twilio_contacts
   UNION ALL
   SELECT DISTINCT
-    MD5(t.id_ticket) AS sk_contact,
+    MD5(CONCAT(t.id_ticket, 'email')) AS sk_contact,
     MD5(CONCAT(t.id_ticket, 'email')) AS sk_interaction,
     NULL AS sk_session,
     NULL AS sk_task,
