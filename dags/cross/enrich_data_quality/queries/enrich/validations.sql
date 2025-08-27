@@ -1,6 +1,6 @@
 WITH get_validations AS (
     SELECT DISTINCT
-        t.dag,
+        COALESCE(t.dag, -1) AS dag,
         IF(startswith(dv.database, 'dw_') AND endswith(dv.database, '_staging'), REPLACE(dv.database, "_staging", ""), dv.database) AS database,
         dv.table,
         dv.suite_result,
@@ -13,7 +13,7 @@ WITH get_validations AS (
         dv.day
     FROM
         datalake_inmetro_clean.data_validations AS dv
-    INNER JOIN
+    LEFT JOIN
         datalake_dag_inventory_clean.table AS t
             ON t.table = CONCAT(IF(startswith(dv.database, 'dw_') AND endswith(dv.database, '_staging'), REPLACE(dv.database, "_staging", ""), dv.database), ".", dv.table)
     WHERE
