@@ -1,0 +1,104 @@
+database_name: datalake_sap_accounting_process
+table_name: monopoly_invoices
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track Monopoly (for sale) invoices, following the route from source (Monopoly)
+  to SAP through the SAP Gateway payload system.
+  It applies business rules to assess completeness, correctness (up to R$0.05 deviation),
+  and temporality (within 3 days).
+  The final output includes a status classification and failure reason to support
+  monitoring and root-cause analysis.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table
+    lineage:
+      - datalake_monopoly_clean
+  id_business_entity:
+    description: Business key for the feature/sync identifier used in SAP Gateway.
+    lineage:
+      - datalake_monopoly_clean.sale_transaction.id_external_sync
+      - datalake_sap_gateway_clean.feature.id_feature
+  id_finance_entity:
+    description: Business key for the invoice/sale transaction, used for external integration.
+    lineage:
+      - datalake_monopoly_clean.sale_transaction.id
+  id_finance_entity_entry:
+    description: Business key for the accounting entry, if applicable.
+    lineage:
+      - datalake_monopoly_clean.accounting_entry.id
+  version:
+    description: Version identifier from source system (if applicable); kept for schema compatibility.
+    lineage:
+      - datalake_monopoly_clean
+  business_unit:
+    description: Identifier created in this table to segment the business unit (e.g. for sale).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.business_unit
+  source_name:
+    description: Origin system/source label derived from Monopoly (e.g. Casa Mineira, Plataforma QuintoAndar).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.source_name
+  accounting_type:
+    description: Type indicator used to segregate accounts (e.g. invoice, provision, revenue share).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP.
+    lineage:
+      - datalake_pas.ledger.account_number
+  accounting_name:
+    description: Human readable name for SAP accounts based on business rules.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.accounting_name
+  source_amount:
+    description: Value from the source system (Monopoly) considering business rules for the account as trigger.
+    lineage:
+      - datalake_monopoly_clean.accounting_entry.credit
+  sap_amount:
+    description: Value recorded in SAP.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether there is a corresponding entry/invoice in SAP.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.is_completeness
+  is_correctness:
+    description: TRUE if the difference between source and SAP amount is less than R$0.05.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.is_correctness
+  is_temporality:
+    description: TRUE if the SAP date is within 3 days after the source date.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness, and temporality checks are all TRUE.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.is_compliance
+  accounting_process_status:
+    description: Classification of accounting status (e.g. success, source_failure, gateway_failure).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoices.accounting_process_status
+  error_description:
+    description: Textual reason for accounting process failure (may include JSON from gateway/source).
+    lineage:
+      - datalake_monopoly_clean.nota_fiscal_emission_error.error_type
+      - datalake_sap_gateway_clean.webhook_log.errors
+  accrual_year_month:
+    description: Account reference in the format YYYYMM.
+    lineage:
+      - datalake_monopoly_clean.sale_revision.dt_notary_start
+  dt_source_trigger:
+    description: Trigger date based on accounting workflow rules in Monopoly.
+    lineage:
+      - datalake_monopoly_clean.sale_revision.dt_notary_start
+  dt_sap_reference:
+    description: Reference date in SAP associated with accrual.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of transaction in SAP.
+    lineage:
+      - datalake_pas.ledger.dt_created
+
+
