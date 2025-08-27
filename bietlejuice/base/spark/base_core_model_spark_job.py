@@ -1,4 +1,3 @@
-# Databricks notebook source
 import logging
 import json
 from abc import ABC, abstractmethod
@@ -204,10 +203,54 @@ class BaseCoreModelSparkJob(ABC):
             args: Parsed command line arguments
             spark: SparkSession instance
         """
+
+        """ Make the default behaviour never update not null columns in target table with null values from source dataframe
+            It is a requirement for core models, since we represent one entity per row and event based data not always have all columns filled
+        """
+        source_cols = dataframe.columns
+
+        # Get target table columns if table exists, otherwise assume all columns are new
+        target_table_name = f"{args.schema}.{args.table_name}"
+        try:
+            target_table = spark.table(target_table_name)
+            target_cols = set(target_table.columns)
+        except Exception:
+            # Table doesn't exist yet, so all columns are new
+            target_cols = set()
+
+        # Create smart when_matched_operation:
+        # - For existing columns (in both source and target): use CASE WHEN to preserve non-null target values
+        # - For new columns (only in source): use source value directly
+        default_when_matched_operation = {}
+        for col in source_cols:
+            if col in target_cols:
+                # Existing column: preserve non-null target values
+                default_when_matched_operation[
+                    col
+                ] = f"CASE WHEN source.{col} IS NOT NULL THEN source.{col} ELSE target.{col} END"
+            else:
+                # New column: use source value directly (target column doesn't exist yet)
+                default_when_matched_operation[col] = f"source.{col}"
+
         # Get pipeline configuration
         merge_on = self.get_config("merge_on", required=False, default=None)
+
         when_matched_update_condition = self.get_config(
             "when_matched_update_condition", required=False, default=None
+        )
+        when_not_matched_insert_condition = self.get_config(
+            "when_not_matched_insert_condition", required=False, default=None
+        )
+        when_matched_delete_condition = self.get_config(
+            "when_matched_delete_condition", required=False, default=None
+        )
+        when_matched_operation = self.get_config(
+            "when_matched_operation",
+            required=False,
+            default=default_when_matched_operation,
+        )
+        when_not_matched_operation = self.get_config(
+            "when_not_matched_operation", required=False, default=None
         )
         partitions = self.get_config("partitions", required=False, default=None)
 
@@ -231,6 +274,10 @@ class BaseCoreModelSparkJob(ABC):
             target_database_location=database_location,
             merge_on=merge_on,
             when_matched_update_condition=when_matched_update_condition,
+            when_not_matched_insert_condition=when_not_matched_insert_condition,
+            when_matched_delete_condition=when_matched_delete_condition,
+            when_matched_operation=when_matched_operation,
+            when_not_matched_operation=when_not_matched_operation,
             table_privileges=table_privileges,
             spark=spark,
         )
