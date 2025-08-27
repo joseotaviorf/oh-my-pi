@@ -130,6 +130,8 @@ business_unit_region_relations AS (
         COALESCE(DATE(bur.ts_end_coverage), CURRENT_DATE) AS dt_end
     FROM
         datalake_hub_services.business_unit_region AS bur
+    WHERE 
+        bur.hub_name NOT LIKE "%[For rent]%"
 ),
 
 visit_relation AS (
@@ -154,7 +156,7 @@ visit_relation AS (
           ON whp.id_user_agent = b.id_user_sale_agent
           AND b.ts_created BETWEEN whp.ts_started AND whp.ts_ended
           AND whp.id_hub IS NOT NULL
-     LEFT JOIN
+    LEFT JOIN
          business_unit_region_relations AS bur
            ON bur.id_region = h.id_region
            AND b.ts_created BETWEEN bur.dt_start AND bur.dt_end
