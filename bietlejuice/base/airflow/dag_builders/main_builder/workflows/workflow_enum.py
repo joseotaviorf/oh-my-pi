@@ -8,6 +8,7 @@ class WorkflowEnum(Enum):
 
     ACCESS_WORKFLOW = "access"
     CDC_WORKFLOW = "cdc"
+    CORE_MODEL_WORKFLOW = "core_model"
     CUSTOM_INGESTION_WORKFLOW = "custom_ingestion"
     DATABASE_PULL_DELTA_WORKFLOW = "database_pull_delta"
     DATABASE_PULL_WORKFLOW = "database_pull"

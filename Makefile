@@ -53,7 +53,7 @@ setup-local-variables:
 		read -r DATABRICKS_USERNAME;\
 		echo export DATABRICKS_USERNAME=$$DATABRICKS_USERNAME >> $$SHELL_RC;\
 	fi
-	
+
 	@echo "All variables set!"
 	@echo "~> Restart your shell to apply changes!"
 
@@ -82,14 +82,14 @@ restart-local-environment:
 	@echo "Restart local Airflow environment"
 	@make setup-bietlejuice
 	@cd ./local/astro; \
-	astro dev restart --build-secrets id=GITHUB_TOKEN 
+	astro dev restart --build-secrets id=GITHUB_TOKEN
 
 .PHONY: stop-local-environment
 stop-local-environment:
 	@echo "Restart local Airflow environment"
 	@cd ./local/astro; \
 	astro dev stop
-	
+
 .PHONY: stop-local-environment
 kill-local-environment:
 	@echo "Delete local Airflow environment"
@@ -203,7 +203,7 @@ lint:
 	@echo "Running lint in all files from <bietlejuice/>"
 	@echo "=========="
 	@echo ""
-	@python -m black bietlejuice/ tests/unit/ --exclude=".*\/__dags_template__.py"
+	@python -m black bietlejuice/ tests/unit/ tests/core_model_dags/ --exclude=".*\/__dags_template__.py"
 
 .PHONY: check-style
 ## check style with flake8 and black
@@ -212,8 +212,8 @@ check-style:
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/ tests/unit/ --exclude=".*\/__dags_template__.py" && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
-	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/
+	@python -m black --check bietlejuice/ tests/unit/ tests/core_model_dags/ --exclude=".*\/__dags_template__.py" && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
+	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/ tests/core_model_dags/
 
 ###############################################################################
 ###################### Tests commands #########################################
@@ -248,6 +248,15 @@ files-validation:
 	@echo "=========="
 	@echo ""
 	@python -m pytest tests/files_validation/
+
+.PHONY: core-model-tests
+## run core model DAG tests
+core-model-tests:
+	@echo ""
+	@echo "Core Model DAG Tests"
+	@echo "=========="
+	@echo ""
+	@python -m pytest -W ignore::DeprecationWarning tests/core_model_dags/
 
 ###############################################################################
 ###################### Validations commands ###################################

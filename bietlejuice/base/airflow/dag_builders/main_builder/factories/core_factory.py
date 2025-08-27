@@ -4,6 +4,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.base_factory i
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.core_model_workflow import (
+    CoreModelWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.core_query_delta_workflow import (
     CoreQueryDeltaWorkflow,
 )
@@ -19,7 +22,8 @@ class CoreFactory(BaseFactory):
     """
 
     _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
-        WorkflowEnum.QUERY_DELTA_WORKFLOW: CoreQueryDeltaWorkflow
+        WorkflowEnum.CORE_MODEL_WORKFLOW: CoreModelWorkflow,
+        WorkflowEnum.QUERY_DELTA_WORKFLOW: CoreQueryDeltaWorkflow,
     }
 
     def get_workflow(self) -> BaseWorkflow:

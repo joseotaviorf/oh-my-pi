@@ -22,3 +22,4 @@ class TaskEnum(Enum):
     REPROCESSING_GUARD = "reprocessing_guard"
     SKIP_RUN = "skip_run"
     SYNC_METADATA = "sync_metadata"
+    LOAD_CORE_MODEL = "load_core_model"

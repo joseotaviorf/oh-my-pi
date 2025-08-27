@@ -43,6 +43,7 @@ from bietlejuice.base.airflow.task_creators.load_delta_table_task_creator import
 from bietlejuice.base.airflow.task_creators.load_custom_task_creator import (
     LoadCustomTaskCreator,
 )
+
 from bietlejuice.base.airflow.task_creators.optimize_delta_table_task_creator import (
     OptimizeDeltaTableTaskCreator,
 )
@@ -83,6 +84,7 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_POSTGRES_RAW: LoadPostgresRawTaskCreator,
         TaskEnum.LOAD_QUERY: LoadQueryTaskCreator,
         TaskEnum.LOAD_DELTA: LoadDeltaTableTaskCreator,
+        TaskEnum.LOAD_CORE_MODEL: LoadCustomTaskCreator,
         TaskEnum.OPTIMIZE_DELTA_TABLE: OptimizeDeltaTableTaskCreator,
         TaskEnum.REGISTER_DELTA_TABLE: RegisterDeltaTableTaskCreator,
         TaskEnum.REPROCESSING_GUARD: ReprocessingGuardTaskCreator,

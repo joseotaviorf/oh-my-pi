@@ -215,14 +215,14 @@ bietlejuice.dw_collection_recovery_quintocred:
 bietlejuice.dw_collections_segmentation:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-collection:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-delinquency-app-events:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-bill-items:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
-  - bietlejuice.trato_feito:load-clean-blocklist:first-run-of-day
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-proponent:first-run-of-day
+  - bietlejuice.trato_feito:load-clean-blocklist:first-run-of-day
 bietlejuice.dw_company:
   - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day
