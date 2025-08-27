@@ -1,0 +1,11 @@
+---
+table_name: datalake_pin_core_clean.grade_ladder_translation
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_grade:
+    is_complete:
+      severity_level: Warning
