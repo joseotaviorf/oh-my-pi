@@ -102,14 +102,14 @@ errors_base AS (
     m.id_feature AS id_business_entity,
     COALESCE(m.id_finance_entity, sl.id_finance_entity) AS id_finance_entity,
     CAST(NULL AS INT) AS id_finance_entity_entry,
-    NULL AS version,
+    CAST(NULL AS STRING) AS version,
     m.source_name,
     sl.account_number,
     CASE
       WHEN sl.account_number = '420008' THEN 'Brokerage (Casa Mineira)'
       WHEN sl.account_number = '420007' THEN 'Brokerage (Platform)'
       WHEN sl.account_number = '420032' THEN 'Provision - Brokerage (Platform)'
-      ELSE NULL
+      ELSE CAST(NULL AS STRING)
     END AS accounting_name,
     DATE_FORMAT(m.dt_source_trigger, 'yyyyMM') AS accrual_year_month,
     MIN(CASE
@@ -124,7 +124,7 @@ errors_base AS (
       WHEN sl.id_finance_entity IS NULL AND sg.id_feature IS NULL THEN 'gateway not found'
       WHEN sl.id_finance_entity IS NULL AND sg.sync_sap_job_status = 'error' THEN COALESCE(sg.type, '') || ' - ' || COALESCE(sg.webhook_error, '')
       WHEN sl.id_finance_entity IS NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
-      ELSE NULL
+      ELSE CAST(NULL AS STRING)
     END) AS error_description,
     MIN(IF(sl.id_finance_entity IS NULL, FALSE, TRUE)) AS is_completeness,
     CAST(SUM(m.source_amount) AS DECIMAL(12,2)) AS source_amount,
