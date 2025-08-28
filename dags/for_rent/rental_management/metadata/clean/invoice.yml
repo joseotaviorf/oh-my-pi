@@ -1,34 +1,64 @@
 ---
 database_name: datalake_rental_management_clean
 table_name: invoice
+description: |
+  This table contains the invoices.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
 columns:
   id:
+    description: ID of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.id
   id_external:
+    description: External ID of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.external_id
   id_invoice_user:
+    description: ID of the invoice user.
     lineage:
       - datalake_rental_management_raw.boleto.boleto_user_id
   id_contract:
+    description: ID of the contract.
     lineage:
       - datalake_rental_management_raw.boleto.contract_id
+  id_invoice_issuer:
+    description: ID of the invoice issuer.
+    lineage:
+      - datalake_rental_management_raw.boleto.boleto_issuer_id
   value:
+    description: Value of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.value
   status:
+    description: Status of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.status
+  digitable_line:
+    description: Digitable line of the invoice.
+    lineage:
+      - datalake_rental_management_raw.boleto.digitable_line
+  our_number:
+    description: Our number of the invoice.
+    lineage:
+      - datalake_rental_management_raw.boleto.our_number
+  version:
+    description: Version of the invoice.
+    lineage:
+      - datalake_rental_management_raw.boleto.version
   raw_data:
+    description: Raw data of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.raw_data
   dt_due:
+    description: Due date of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.due_date
   ts_created:
+    description: Timestamp of the creation of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.created_at
   ts_updated:
+    description: Timestamp of the update of the invoice.
     lineage:
       - datalake_rental_management_raw.boleto.updated_at

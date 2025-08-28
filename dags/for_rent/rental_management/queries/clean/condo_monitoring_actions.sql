@@ -9,6 +9,7 @@ SELECT
     boleto_user_document AS invoice_user_document,
     boleto_issuer_name AS invoice_issuer_name,
     boleto_issuer_document AS invoice_issuer_document,
+    version,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

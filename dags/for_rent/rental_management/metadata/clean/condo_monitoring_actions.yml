@@ -1,40 +1,60 @@
 ---
 database_name: datalake_rental_management_clean
 table_name: condo_monitoring_actions
+description: |
+  This table contains the actions performed by the condo monitoring system.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
 columns:
   id:
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.id
+    description: ID of the condo monitoring action.
   id_contract:
+    description: ID of the contract.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.contract_id
   id_action_main_user:
+    description: ID of the user that performed the action.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.action_main_user_id
   action_type:
+    description: Type of action performed.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.action_type
   action_main_user_email:
+    description: Email of the user that performed the action.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.action_main_user_email
   action_system:
+    description: System that performed the action.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.action_system
   invoice_user_name:
+    description: Name of the user that is associated with the invoice.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.boleto_user_name
   invoice_user_document:
+    description: Document of the user that is associated with the invoice.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.boleto_user_document
   invoice_issuer_name:
+    description: Name of the issuer that is associated with the invoice.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.boleto_issuer_name
   invoice_issuer_document:
+    description: Document of the issuer that is associated with the invoice.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.boleto_issuer_document
+  version:
+    description: Version of the condo monitoring action.
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.version
   ts_created:
+    description: Timestamp of the creation of the condo monitoring action.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.created_at
   ts_updated:
+    description: Timestamp of the update of the condo monitoring action.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.updated_at

@@ -2,6 +2,7 @@ SELECT
     id,
     contract_id AS id_contract,
     eligibility,
+    version,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

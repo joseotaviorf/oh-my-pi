@@ -1,25 +1,48 @@
 ---
 database_name: datalake_rental_management_clean
 table_name: invoice_user_issuer
+description: |
+  This table contains the users issuers associated with the invoices.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
 columns:
   id:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.id
+    description: ID of the invoice user issuer.
   id_invoice_user:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.boleto_user_id
+    description: ID of the invoice user.
   id_invoice_issuer:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.boleto_issuer_id
+    description: ID of the invoice issuer.
   id_contract:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.contract_id
+    description: ID of the contract.
+  request_status:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.request_status
+    description: Request status.
+  version:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.version
+    description: Version of the invoice user issuer.
+  dt_monitoring_started:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.monitoring_start_date
+    description: Monitoring start date.
   dt_due:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.due_date
+    description: Due date of the invoice.
   ts_created:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.created_at
+    description: Timestamp of the creation of the invoice user issuer.
   ts_updated:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.updated_at
+    description: Timestamp of the update of the invoice user issuer.
