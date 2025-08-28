@@ -39,7 +39,7 @@ if __name__ == "__main__":
     execution_date_str = args.execution_date
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
 
-    proxy_path = f"s3://5a-datalake-prod/airbyte/zendesk_{table_name}/{table_name}/{execution_date_str.replace('-', '_')}_*"
+    proxy_path = f"s3://5a-datalake-incoming-prod/airbyte/zendesk_{table_name}/{table_name}/{execution_date_str.replace('-', '_')}_*"
 
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    objs = s3_service.list_objects(f"s3://5a-datalake-prod/airbyte/zendesk_{table_name}/{table_name}")
+    objs = s3_service.list_objects(f"s3://5a-datalake-incoming-prod/airbyte/zendesk_{table_name}/{table_name}")
     valid_files = [filename for filename in objs if f"{execution_date_str.replace('-', '_')}" in filename]
     if valid_files:
 
