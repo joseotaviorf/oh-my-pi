@@ -44,8 +44,12 @@ class BaseCoreModelSparkJob(ABC):
         )
         parser.add_argument("schema", type=str, help="Database base name")
         parser.add_argument("table_name", type=str, help="Table name")
-        parser.add_argument("load_start_date", type=str, help="Load start date")
-        parser.add_argument("load_end_date", type=str, help="Load end date")
+        parser.add_argument(
+            "load_start_date", type=str, help="Load start date", nargs="?", default=None
+        )
+        parser.add_argument(
+            "load_end_date", type=str, help="Load end date", nargs="?", default=None
+        )
         parser.add_argument(
             "--extra_spark_job_arguments",
             type=str,

@@ -26,6 +26,14 @@ workflow:
         - "{dag_name}"
         - "{schema}"
         - "{table_name}"
+    visit_incremental:
+      load_spark_job: load_core_visit
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
         - "{load_start_date}"
         - "{load_end_date}"
 

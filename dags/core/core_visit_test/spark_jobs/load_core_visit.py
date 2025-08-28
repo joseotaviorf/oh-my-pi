@@ -39,14 +39,21 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         # Get visit-specific configuration
         config = self.get_visit_config()
 
+        # Log execution mode based on date parameters
+        if (args.load_start_date is not None and args.load_start_date != "" and
+            args.load_end_date is not None and args.load_end_date != ""):
+            self.logger.info(f"m=create_core_model, mode=INCREMENTAL, load_start_date={args.load_start_date}, load_end_date={args.load_end_date}")
+        else:
+            self.logger.info("m=create_core_model, mode=FULL, msg=Running full load without date filtering")
+
         # Read required tables
         vsl_df = spark.table(config['VISIT_STATUS_LOG_TABLE'])
         visit_df = spark.table(config['VISIT_TABLE'])
         house_df = spark.table(config['HOUSE_TABLE'])
 
-        vsl_last_event_df = self._get_visit_last_event(vsl_df)
-        all_events_df = self._get_visit_all_events(vsl_df)
-        last_update_df = self._calculate_visit_last_update(visit_df, vsl_last_event_df, all_events_df)
+        vsl_last_event_df = self._get_visit_last_event(vsl_df, args.load_start_date, args.load_end_date)
+        all_events_df = self._get_visit_all_events(vsl_df, args.load_start_date, args.load_end_date)
+        last_update_df = self._calculate_visit_last_update(visit_df, vsl_last_event_df, all_events_df, args.load_start_date, args.load_end_date)
 
         assembled_df = (
             visit_df.alias("v")
@@ -81,14 +88,30 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         return result_df
 
     @staticmethod
-    def _get_visit_last_event(vsl_df: DataFrame) -> DataFrame:
-        """(Unit Testable) Returns the last event for each visit."""
+    def _get_visit_last_event(vsl_df: DataFrame, load_start_date: str = None, load_end_date: str = None) -> DataFrame:
+        """(Unit Testable) Returns the last event for each visit, filtered by date range."""
+        # Apply date filter only if both parameters are provided and not null/empty
+        if (load_start_date is not None and load_start_date != "" and
+            load_end_date is not None and load_end_date != ""):
+            vsl_df = vsl_df.filter(
+                (col("ts_created") >= lit(load_start_date)) &
+                (col("ts_created") <= lit(load_end_date))
+            )
+
         vsl_window = Window.partitionBy("id_visit").orderBy(col("ts_created").desc())
         return vsl_df.withColumn("rn", row_number().over(vsl_window)).filter(col("rn") == 1)
 
     @staticmethod
-    def _get_visit_all_events(vsl_df: DataFrame) -> DataFrame:
-        """(Unit Testable) Aggregates all key event timestamps for each visit."""
+    def _get_visit_all_events(vsl_df: DataFrame, load_start_date: str = None, load_end_date: str = None) -> DataFrame:
+        """(Unit Testable) Aggregates all key event timestamps for each visit, filtered by date range."""
+        # Apply date filter only if both parameters are provided and not null/empty
+        if (load_start_date is not None and load_start_date != "" and
+            load_end_date is not None and load_end_date != ""):
+            vsl_df = vsl_df.filter(
+                (col("ts_created") >= lit(load_start_date)) &
+                (col("ts_created") <= lit(load_end_date))
+            )
+
         return vsl_df.groupBy("id_visit").agg(
             max(when(col("event_type").isin("VISIT_REQUEST_CANCELED", "VISIT_CANCELED"), col("reason"))).alias("cancellation_reason"),
             max(when(col("event_type") == "VISIT_CONFIRMED", col("ts_created"))).alias("ts_visit_confirmed"),
@@ -98,8 +121,17 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         )
 
     @staticmethod
-    def _calculate_visit_last_update(visit_df: DataFrame, vsl_last_event_df: DataFrame, all_events_df: DataFrame) -> DataFrame:
-        """(Unit Testable) Calculates the true last update timestamp for a visit entity."""
+    def _calculate_visit_last_update(visit_df: DataFrame, vsl_last_event_df: DataFrame, all_events_df: DataFrame,
+                                   load_start_date: str = None, load_end_date: str = None) -> DataFrame:
+        """(Unit Testable) Calculates the true last update timestamp for a visit entity, filtered by date range."""
+        # Apply date filter to visit_df only if both parameters are provided and not null/empty
+        if (load_start_date is not None and load_start_date != "" and
+            load_end_date is not None and load_end_date != ""):
+            visit_df = visit_df.filter(
+                (col("ts_created") >= lit(load_start_date)) &
+                (col("ts_created") <= lit(load_end_date))
+            )
+
         return (
             visit_df.alias("v")
             .join(vsl_last_event_df.alias("vsl"), col("v.id") == col("vsl.id_visit"), "left")
