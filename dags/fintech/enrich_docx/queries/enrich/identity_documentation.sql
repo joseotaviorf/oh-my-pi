@@ -1,32 +1,47 @@
+WITH get_personal_data AS (
+  SELECT
+    d.id_folder,
+    d.id_context_external,
+    ft.name AS folder_type,
+    GET_JSON_OBJECT(d.attributes, '$.cpf') AS cpf
+  FROM
+    datalake_docx_clean.document AS d
+  INNER JOIN datalake_docx_clean.folder AS f ON d.id_folder = f.id
+  INNER JOIN datalake_docx_clean.folder_type AS ft ON ft.id = f.id_folder_type
+  WHERE d.id_document_type = 7
+)
+
 SELECT
-    id,
-    id_folder,
-    id_document_type,
-    id_document_context,
-    id_context_external,
-    GET_JSON_OBJECT(attributes, '$.documentNumber') AS document_number,
-    CASE
-        WHEN id_document_type = 1 THEN 'RG'
-        WHEN id_document_type = 2 THEN 'CPF'
-        WHEN id_document_type = 3 THEN 'CNH'
-        WHEN id_document_type = 4 THEN 'RNE'
-    END AS document_type,
-    CASE
-        WHEN id_document_context = 1 THEN 'Owner'
-        WHEN id_document_context = 2 THEN 'Tenant'
-        WHEN id_document_context = 3 THEN 'Affiliate'
-        WHEN id_document_context = 4 THEN 'Buyer'
-        WHEN id_document_context = 5 THEN 'Seller'
-    END AS document_context,
-    GET_JSON_OBJECT(attributes, '$.motherName') AS mother_name,
-    GET_JSON_OBJECT(attributes, '$.nationality') AS nationality,
-    GET_JSON_OBJECT(attributes, '$.countryOfOrigin') AS country_of_origin,
-    NULLIF(attachments, '[]') AS attributes,
-    NULLIF(attachments, '[]') AS attachments,
-    DATE(GET_JSON_OBJECT(attributes, '$.birthDate')) AS dt_birth,
-    ts_created,
-    ts_updated
+    d.id AS id_document,
+    d.id_folder,
+    d.id_document_type,
+    CAST(d.id_context_external AS bigint) AS id_proposal,
+    GET_JSON_OBJECT(d.attributes, '$.documentNumber') AS document_number,
+    pd.cpf,
+    dt.name AS document_type,
+    dc.name AS document_context,
+    pd.folder_type,
+    GET_JSON_OBJECT(d.attributes, '$.motherName') AS mother_name,
+    GET_JSON_OBJECT(d.attributes, '$.nationality') AS nationality,
+    GET_JSON_OBJECT(d.attributes, '$.countryOfOrigin') AS country_of_origin,
+    d.attributes,
+    d.attachments,
+    DATE(GET_JSON_OBJECT(d.attributes, '$.birthDate')) AS dt_birth,
+    CAST(GET_JSON_OBJECT(d.attributes, '$.isNewRg') AS boolean) AS is_new_rg,
+    CAST(GET_JSON_OBJECT(d.attributes, '$.isDigital') AS boolean) AS is_digital,
+    d.ts_created,
+    d.ts_updated
 FROM
-    datalake_docx_clean.document
+    datalake_docx_clean.document AS d
+INNER JOIN
+    datalake_docx_clean.document_type AS dt
+        ON d.id_document_type = dt.id
+INNER JOIN
+    datalake_docx_clean.document_context AS dc
+        ON d.id_document_context = dc.id
+LEFT JOIN
+    get_personal_data AS pd
+        ON pd.id_folder = d.id_folder
+        AND pd.id_context_external = d.id_context_external
 WHERE
-    id_document_type IN (1, 3, 4)
+    d.id_document_type IN (1, 2, 3, 4)

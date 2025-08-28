@@ -1,67 +1,68 @@
 database_name: datalake_docx
 table_name: identity_documentation
-owner: felipe.chies@quintoandar.com.br
-domain: fintech
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
 description: "Table with the identity documentation of the tenant"
 columns:
-  id:
+  id_document:
     lineage:
       - datalake_docx_clean.document.id
-    description: "Id of the identity documentation"  
+    description: "Id of the identity documentation"
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
-    description: "Id of the folder"  
+    description: "Id of the folder"
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Id of the document type"  
-  id_document_context:
-    lineage:
-      - datalake_docx_clean.document.id_document_context
-    description: "Id of the document context"  
-  id_context_external:
+    description: "Id of the document type"
+  id_proposal:
     lineage:
       - datalake_docx_clean.document.id_context_external
-    description: "Id external of the document context"
+    description: "Id of the proposal"
   document_number:
     lineage:
       - datalake_docx_clean.document.attributes
     description: "Tenant document number"
+  cpf:
+    lineage:
+      - datalake_docx_clean.document.attributes
+    description: "CPF from personal data (document_type = 7)"
   document_type:
     lineage:
-      - datalake_docx_clean.document.id_document_type
+      - datalake_docx_clean.document_type.name
     description: "Document type"
     categories:
       RG: ""
       CPF: ""
       CNH: ""
       RNE: ""
-      PERSONAL_DATA: ""
-      INCOME_DATA: ""
-      ADDRESS: ""
   document_context:
     lineage:
-      - datalake_docx_clean.document.id_document_context
+      - datalake_docx_clean.document_context.name
     description: "Document context"
     categories:
       Owner: ""
       Tenant: ""
       Affiliate: ""
       Buyer: ""
-      Seller: ""  
+      Seller: ""
   mother_name:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant mother name" 
+    description: "Tenant mother name"
   nationality:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant nationality" 
+    description: "Tenant nationality"
   country_of_origin:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant country of origin" 
+    description: "Tenant country of origin"
+  folder_type:
+    lineage:
+      - datalake_docx_clean.folder_type.name
+    description: "Type of folder from personal data"
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -74,6 +75,14 @@ columns:
     lineage:
       - datalake_docx_clean.document.attributes
     description: "Tenant birth date"
+  is_new_rg:
+    lineage:
+      - datalake_docx_clean.document.attributes
+    description: "Boolean flag indicating if this is a new RG"
+  is_digital:
+    lineage:
+      - datalake_docx_clean.document.attributes
+    description: "Boolean flag indicating if this is a digital document"
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created

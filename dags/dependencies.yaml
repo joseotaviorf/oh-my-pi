@@ -1891,6 +1891,10 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-person-document:first-run-of-day
   - bietlejuice.docx:load-clean-person:first-run-of-day
   - bietlejuice.docx:load-clean-rev-info:first-run-of-day
+  - bietlejuice.docx:load-clean-document-context:first-run-of-day
+  - bietlejuice.docx:load-clean-document-type:first-run-of-day
+  - bietlejuice.docx:load-clean-folder-type:first-run-of-day
+  - bietlejuice.docx:load-clean-folder:first-run-of-day
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_finance:load-clean-account-transaction:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
