@@ -10,6 +10,7 @@ workflow:
   type: cdc
   layer: raw
   database_type: postgres
+  source_database: rental_transact
   source_schema: public
   dbutils_secret_key: RENTAL_TRANSACT_DB
   has_soft_delete: true
