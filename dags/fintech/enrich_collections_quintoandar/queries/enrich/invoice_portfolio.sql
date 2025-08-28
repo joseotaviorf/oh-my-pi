@@ -110,7 +110,13 @@ first_payment AS (
             WHEN ROW_NUMBER() OVER (PARTITION BY id_contract_external ORDER BY dt_due_adjusted, ts_created, id_external) = 1
                 THEN TRUE
             ELSE FALSE
-        END AS is_first_payment
+        END AS is_first_payment,
+        CASE
+            WHEN purpose IN ('monthly', 'onboarding')
+                AND ROW_NUMBER() OVER (PARTITION BY id_contract_external ORDER BY dt_due_adjusted, ts_created, id_external) = 1
+                THEN TRUE
+            ELSE FALSE
+        END AS is_first_invoice_contract
     FROM base
     WHERE
         LOWER(status) != 'canceled'
@@ -249,6 +255,7 @@ create_recovery_channel AS (
         IFNULL(b.is_write_off, FALSE) AS is_write_off,
         IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
         IFNULL(fp.is_first_payment, FALSE) AS is_first_payment,
+        IFNULL(fp.is_first_invoice_contract, FALSE) AS is_first_invoice_contract,
         IF(matthew.id_contract IS NOT NULL, TRUE, FALSE) AS has_matthew_interaction,
         b.dt_due_adjusted,
         bn.dt_due_parent AS dt_invoice_anchor,
@@ -346,6 +353,7 @@ SELECT
     is_write_off,
     is_contract_write_off,
     is_first_payment,
+    is_first_invoice_contract,
     has_matthew_interaction,
     dt_due_adjusted,
     dt_invoice_anchor,

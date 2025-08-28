@@ -3,7 +3,7 @@ contract_features AS (
     SELECT
         dt_reference,
         id_contract,
-        MAX(CAST(has_negotiation_in_contract AS INT))  AS num_has_negotiation_in_contract,
+        CAST(MAX(has_negotiation_in_contract) AS BOOLEAN) AS has_negotiation_in_contract,
         COUNT(CASE WHEN NOT(is_negative_eligible) AND order_invoice_wallet_risk = 1 THEN id_invoice END)  AS n_anchor_invoices_not_negativable,
         COUNT(IF(is_negative_eligible, id_invoice, NULL)) AS n_invoices_negativable,
         COUNT(IF(has_bill_item_condominio, id_invoice, NULL)) AS n_condominio_invoices,
@@ -30,6 +30,7 @@ contract_features AS (
         COUNT(IF(has_bill_item_outros, id_invoice, NULL)) AS n_outros_invoices,
         COUNT(IF(payment_status = 'open' AND has_bill_item_outros, id_invoice, NULL)) AS n_outros_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_outros, ABS(balance_bill_item_outros), 0)) AS open_outros_balance,
+        COUNT(CASE WHEN is_first_invoice_contract AND payment_status = 'open' THEN id_invoice ELSE NULL END) AS n_first_invoices_open,
         COUNT(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t1 > 0 THEN id_invoice END)  AS n_overdue_monthlys_t1,
         COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t1 > 0 THEN id_invoice END)  AS n_overdue_deals_t1,
         COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t1 > 0 THEN id_invoice END)  AS n_overdue_others_t1,
@@ -83,7 +84,18 @@ contract_features AS (
         COLLECT_SET(CASE
             WHEN payment_status = 'written-down' THEN id_invoice
             ELSE NULL
-        END)  AS array_negotiated_invoices
+        END)  AS array_negotiated_invoices,
+        COUNT(CASE WHEN invoice_type IN ('monthly') THEN id_invoice ELSE NULL END) AS n_monthly_invoices,
+        COUNT(CASE WHEN payment_status = 'paid' THEN id_invoice ELSE NULL END) AS n_invoices_paid,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t2 <= 0 THEN id_invoice ELSE NULL END) AS n_invoices_paid_ontime_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t2 > 0 THEN id_invoice ELSE NULL END) AS n_overdue_invoices_paid_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t1 <= 0 THEN id_invoice ELSE NULL END) AS n_invoices_paid_ontime_t1,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t1 > 0 THEN id_invoice ELSE NULL END) AS n_overdue_invoices_paid_t1,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t2 <= 0 THEN id_invoice ELSE NULL END) AS n_monthly_invoices_paid_ontime_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t1 <= 0 THEN id_invoice ELSE NULL END) AS n_monthly_invoices_paid_ontime_t1,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t2 > 0 THEN id_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t1 > 0 THEN id_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t1,
+        COUNT(CASE WHEN invoice_type IN ('monthly') AND dt_reference = dt_begin THEN id_invoice ELSE NULL END) AS n_monthly_invoices_created
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
     GROUP BY 1, 2
 ),
@@ -102,8 +114,15 @@ get_date_array AS (
         id_contract,
         dt_contract_end,
         dt_contract_start,
-        SEQUENCE(dt_first_invoice, IF(dt_contract_end IS NOT NULL, GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
-                CURRENT_DATE())) AS dt_reference_array
+        SEQUENCE(dt_first_invoice,
+            IF(dt_contract_end IS NOT NULL,
+                LEAST(
+                    GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
+                    CURRENT_DATE()
+                ),
+                CURRENT_DATE()
+            )
+        ) AS dt_reference_array
     FROM get_invoice_date_range
 ),
 contract_date_references AS (
@@ -153,7 +172,7 @@ deduplicate_billing_dates AS (
   QUALIFY ROW_NUMBER() OVER (PARTITION BY dt_month ORDER BY invoices DESC) = 1
 ),
 get_dates_billing as (
-    SELECT
+    SELECT /*+ RANGE_JOIN(d, 1) */
         COALESCE(p.dt_month, b.dt_month) AS dt_month,
         d.month_start AS dt_month_start,
         d.month_end AS dt_month_end,
@@ -169,7 +188,7 @@ get_dates_billing as (
             ON d.date = COALESCE(p.dt_month, b.dt_month)
 ),
 contract_timeline AS (
-    SELECT
+    SELECT /*+ RANGE_JOIN(f, 1), RANGE_JOIN(d, 1) */
         m.*,
         CASE
             WHEN m.dt_contract_end IS NULL
@@ -194,7 +213,7 @@ contract_timeline AS (
         COALESCE(f.overdue_recovered_amount_t3, 0) > 0 AND COALESCE(f.open_wallet_overdue_t3, 0) = 0 AS is_quitacao_t3,
         COALESCE(f.open_wallet_overdue_t1, 0) = 0 AS is_regular_t1,
         COALESCE(f.open_wallet_overdue_t2, 0) = 0 AND COALESCE(f.overdue_recovered_amount_t2, 0) = 0 AND DATE_TRUNC('MONTH', m.dt_reference) = m.dt_reference AS is_current_at_month_start_t1,
-        COALESCE(f.num_has_negotiation_in_contract, 0) AS num_has_negotiation_in_contract,
+        COALESCE(f.has_negotiation_in_contract, FALSE) AS has_negotiation_in_contract,
         COALESCE(f.n_anchor_invoices_not_negativable, 0) AS n_anchor_invoices_not_negativable,
         COALESCE(f.n_invoices_negativable, 0) AS n_invoices_negativable,
         COALESCE(f.n_condominio_invoices, 0) AS n_condominio_invoices,
@@ -221,6 +240,7 @@ contract_timeline AS (
         COALESCE(f.n_outros_invoices,0) AS n_outros_invoices,
         COALESCE(f.n_outros_open_invoices,0) AS n_outros_open_invoices,
         COALESCE(f.open_outros_balance,0) AS open_outros_balance,
+        COALESCE(f.n_first_invoices_open, 0) AS n_first_invoices_open,
         COALESCE(f.n_overdue_monthlys_t1,0) AS n_overdue_monthlys_t1,
         COALESCE(f.n_overdue_deals_t1,0) AS n_overdue_deals_t1,
         COALESCE(f.n_overdue_others_t1, 0) AS n_overdue_others_t1,
@@ -265,7 +285,18 @@ contract_timeline AS (
         COALESCE(f.count_monthly_overdue_invoices_paid_t1, 0) AS count_monthly_overdue_invoices_paid_t1,
         COALESCE(f.array_open_invoices, NULL) AS array_open_invoices,
         COALESCE(f.array_paid_invoices, NULL) AS array_paid_invoices,
-        COALESCE(f.array_negotiated_invoices, NULL) AS array_negotiated_invoices
+        COALESCE(f.array_negotiated_invoices, NULL) AS array_negotiated_invoices,
+        COALESCE(f.n_monthly_invoices, 0) AS n_monthly_invoices,
+        COALESCE(f.n_invoices_paid, 0) AS n_invoices_paid,
+        COALESCE(f.n_invoices_paid_ontime_t2, 0) AS n_invoices_paid_ontime_t2,
+        COALESCE(f.n_overdue_invoices_paid_t2, 0) AS n_overdue_invoices_paid_t2,
+        COALESCE(f.n_invoices_paid_ontime_t1, 0) AS n_invoices_paid_ontime_t1,
+        COALESCE(f.n_overdue_invoices_paid_t1, 0) AS n_overdue_invoices_paid_t1,
+        COALESCE(f.n_monthly_invoices_paid_ontime_t2, 0) AS n_monthly_invoices_paid_ontime_t2,
+        COALESCE(f.n_monthly_invoices_paid_ontime_t1, 0) AS n_monthly_invoices_paid_ontime_t1,
+        COALESCE(f.n_monthly_overdue_invoices_paid_t2, 0) AS n_monthly_overdue_invoices_paid_t2,
+        COALESCE(f.n_monthly_overdue_invoices_paid_t1, 0) AS n_monthly_overdue_invoices_paid_t1,
+        COALESCE(f.n_monthly_invoices_created, 0) AS n_monthly_invoices_created
     FROM
         contract_date_references m
     LEFT JOIN
@@ -294,9 +325,9 @@ collections_efforts AS (
         esforco,
         alo,
         cpc,
-        IF(esforco > 0, TRUE, FALSE) AS has_esforco,
-        IF(alo > 0, TRUE, FALSE) AS has_alo,
-        IF(cpc > 0, TRUE, FALSE) AS has_cpc,
+        CAST(esforco > 0 AS BOOLEAN) AS has_esforco,
+        CAST(alo > 0 AS BOOLEAN) AS has_alo,
+        CAST(cpc > 0 AS BOOLEAN) AS has_cpc,
         dt_reference
     FROM fact_collection_base
 ),
@@ -310,12 +341,12 @@ app_events_features AS (
                 AND id_invoice IS NOT NULL
             THEN id_amplitude
         END) AS qnt_app_events_overdue,
-        COUNT(DISTINCT id_amplitude) > 0 AS has_app_events,
-        COUNT(DISTINCT CASE
+        CAST(COUNT(DISTINCT id_amplitude) > 0 AS BOOLEAN) AS has_app_events,
+        CAST(COUNT(DISTINCT CASE
             WHEN funnel_step IN ('Overdue Self Service Viewed', 'Overdue Self Service Action')
                 AND id_invoice IS NOT NULL
             THEN id_amplitude
-        END) > 0 AS has_app_events_overdue
+        END) > 0 AS BOOLEAN) AS has_app_events_overdue
     FROM datalake_collections_quintoandar.delinquency_app_events
     WHERE id_contract IS NOT NULL
         AND DATE(ts_event) >= DATE('2023-01-01')
@@ -361,18 +392,27 @@ base_evictions AS (
             OR DATE(dt_elaw_closure) IS NULL
         )
 ),
+evictions_with_date_array AS (
+    SELECT
+        *,
+        SEQUENCE(
+            GREATEST(dt_begin, DATE('2023-01-01')),
+            LEAST(COALESCE(DATE(dt_elaw_closure), CURRENT_DATE()), CURRENT_DATE())
+        ) AS dt_reference_array
+    FROM base_evictions
+),
 date_expansion AS (
     SELECT
-        d.date AS dt_reference,
-        m.*
-    FROM
-        base_evictions AS m
-    CROSS JOIN
-        dw_public.dim_date AS d
-        ON d.date >= m.dt_begin
-        AND d.date <= COALESCE(DATE(m.dt_elaw_closure), CURRENT_DATE())
-        AND d.date >= DATE('2023-01-01')
-        AND d.date <= CURRENT_DATE()
+        dt_reference,
+        id_process,
+        process,
+        id_contract,
+        dt_registered,
+        dt_arbitral_distribution,
+        dt_elaw_closure,
+        dt_begin
+    FROM evictions_with_date_array
+    LATERAL VIEW EXPLODE(dt_reference_array) AS dt_reference
 ),
 timeline_addition AS (
     SELECT
@@ -406,7 +446,7 @@ evictions_timeline AS (
     SELECT
         id_contract,
         id_process,
-        true AS is_evictions,
+        TRUE AS is_evictions,
         dt_reference
     FROM
         status_timeline_evic
@@ -483,19 +523,19 @@ base_negotiations AS (
 ),
 negotiations AS (
     SELECT *,
-        IF(promessas > 0, TRUE, FALSE) AS has_promessas,
-        IF(acordos > 0, TRUE, FALSE) AS has_acordos,
-        IF(promessas_neg_parcelada_boleto > 0, TRUE, FALSE) AS has_promessas_neg_parcelada_boleto,
-        IF(acordos_neg_parcelada_boleto > 0, TRUE, FALSE) AS has_acordos_neg_parcelada_boleto,
-        IF(promessas_desconto_principal > 0, TRUE, FALSE) AS has_promessas_desconto_principal,
-        IF(acordo_desconto_principal > 0, TRUE, FALSE) AS has_acordo_desconto_principal,
-        IF(promessas_desconto_multas > 0, TRUE, FALSE) AS has_promessas_desconto_multas,
-        IF(acordo_desconto_multas > 0, TRUE, FALSE) AS has_acordo_desconto_multas
+        CAST(promessas > 0 AS BOOLEAN) AS has_promessas,
+        CAST(acordos > 0 AS BOOLEAN) AS has_acordos,
+        CAST(promessas_neg_parcelada_boleto > 0 AS BOOLEAN) AS has_promessas_neg_parcelada_boleto,
+        CAST(acordos_neg_parcelada_boleto > 0 AS BOOLEAN) AS has_acordos_neg_parcelada_boleto,
+        CAST(promessas_desconto_principal > 0 AS BOOLEAN) AS has_promessas_desconto_principal,
+        CAST(acordo_desconto_principal > 0 AS BOOLEAN) AS has_acordo_desconto_principal,
+        CAST(promessas_desconto_multas > 0 AS BOOLEAN) AS has_promessas_desconto_multas,
+        CAST(acordo_desconto_multas > 0 AS BOOLEAN) AS has_acordo_desconto_multas
     FROM
         base_negotiations
 ),
 contract_enhanced AS (
-    SELECT
+    SELECT /*+ RANGE_JOIN(e, 1), RANGE_JOIN(be, 1), RANGE_JOIN(app, 1), RANGE_JOIN(bl, 1), RANGE_JOIN(d, 1) */
         m.*,
         COALESCE(e.is_evictions, FALSE) AS is_evictions,
         COALESCE(e.id_process, NULL) AS id_process_evictions,
@@ -539,161 +579,96 @@ contract_enhanced AS (
             AND d.dt_reference = m.dt_reference
 )
 SELECT DISTINCT
-    id_contract,
+    CAST(id_contract AS BIGINT) AS id_contract,
     dt_reference,
-    id_process_evictions,
-    contract_status_beginning_of_month,
     reference_contract_status,
-    is_pipeturn_day,
-    is_first_day,
-    is_last_day,
-    is_quitacao_t1,
-    is_quitacao_t2,
-    is_quitacao_t3,
-    is_regular_t1,
-    is_current_at_month_start_t1,
-    num_has_negotiation_in_contract,
-    n_anchor_invoices_not_negativable,
-    n_invoices_negativable,
-    n_condominio_invoices,
-    n_condominio_open_invoices,
-    open_condominio_balance,
-    n_multa_recisoria_invoices,
-    n_multa_recisoria_open_invoices,
-    open_multa_recisoria_balance,
-    n_acordo_invoices,
-    n_acordo_open_invoices,
-    open_acordo_balance,
-    n_rental_core_invoices,
-    n_rental_core_open_invoices,
-    open_rental_core_balance,
-    n_reparos_invoices,
-    n_reparos_open_invoices,
-    open_reparos_balance,
-    n_multas_ongoing_invoices,
-    n_multas_ongoing_open_invoices,
-    open_multas_ongoing_balance,
-    n_utilidades_invoices,
-    n_utilidades_open_invoices,
-    open_utilidades_balance,
-    n_outros_invoices,
-    n_outros_open_invoices,
-    open_outros_balance,
-    n_overdue_monthlys_t1,
-    n_overdue_deals_t1,
-    n_overdue_others_t1,
-    n_overdue_monthlys_t2,
-    n_overdue_deals_t2,
-    n_overdue_others_t2,
-    sum_overdue_monthlys_t2,
-    sum_overdue_deals_t2,
-    sum_overdue_others_t2,
-    max_delay_original_invoices_t1,
-    max_delay_deal_invoices_t1,
-    max_delay_original_invoices_t2,
-    max_delay_deal_invoices_t2,
-    max_delay_contaminated_contract_t2,
-    max_delay_contaminated_contract_t3_losses,
-    max_delay_contaminated_contract_t1,
-    max_open_delay_contaminated_contract_t2,
-    max_open_delay_contaminated_contract_t3_losses,
-    max_open_delay_contaminated_contract_t1,
-    open_wallet,
-    wallet,
-    recovered_amount,
-    wallet_on_time_t1,
-    wallet_overdue_t1,
-    open_wallet_on_time_t1,
-    open_wallet_overdue_t1,
-    overdue_recovered_amount_t1,
-    on_time_paid_amount_t1,
-    wallet_on_time_t2,
-    wallet_overdue_t2,
-    open_wallet_on_time_t2,
-    open_wallet_overdue_t2,
-    overdue_recovered_amount_t2,
-    on_time_paid_amount_t2,
-    wallet_on_time_t3,
-    wallet_overdue_t3,
-    open_wallet_on_time_t3,
-    open_wallet_overdue_t3,
-    overdue_recovered_amount_t3,
-    on_time_paid_amount_t3,
-    sum_monthly_overdue_days_paid_t1,
-    count_monthly_overdue_invoices_paid_t1,
-    array_open_invoices,
-    array_paid_invoices,
-    array_negotiated_invoices,
-    is_evictions,
-    has_app_events,
-    has_app_events_overdue,
-    is_blocklisted,
-    has_esforco,
-    has_alo,
-    has_cpc,
-    esforco,
-    alo,
+    CAST(max_delay_contaminated_contract_t1 AS BIGINT) AS max_delay_contaminated_contract_t1,
+    CAST(max_delay_contaminated_contract_t2 AS BIGINT) AS max_delay_contaminated_contract_t2,
+    CAST(max_delay_original_invoices_t1 AS BIGINT) AS max_delay_original_invoices_t1,
+    CAST(max_delay_deal_invoices_t1 AS BIGINT) AS max_delay_deal_invoices_t1,
+    CAST(n_overdue_monthlys_t1 AS BIGINT) AS n_overdue_monthlys_t1,
+    CAST(n_overdue_others_t1 AS BIGINT) AS n_overdue_others_t1,
+    CAST(has_negotiation_in_contract AS BOOLEAN) AS has_negotiation_in_contract,
+    CAST(sum_monthly_overdue_days_paid_t1 AS BIGINT) AS sum_monthly_overdue_days_paid_t1,
+    CAST(count_monthly_overdue_invoices_paid_t1 AS BIGINT) AS count_monthly_overdue_invoices_paid_t1,
+    CAST(DATEDIFF(DAY, dt_contract_end, DATE(dt_reference)) AS BIGINT) AS days_since_ending,
+    CAST(DATEDIFF(DAY, dt_contract_start, DATE(dt_reference)) AS BIGINT) AS days_since_contract_start,
+    CAST(n_reparos_invoices AS BIGINT) AS n_reparos_invoices,
+    CAST(n_rental_core_invoices AS BIGINT) AS n_rental_core_invoices,
+    CAST(n_acordo_invoices AS BIGINT) AS n_acordo_invoices,
     cpc,
-    promessas,
-    qt_app_events,
-    qt_app_events_overdue,
-    qt_acordo_quebrado,
-    qt_promessa_quebrada_fp,
-    qt_acordo_parcelado,
-    qt_aco_deconto,
-    CASE
-        WHEN reference_contract_status = 'Finalizado'
-            THEN 12*(YEAR(dt_contract_end) - YEAR(dt_contract_start)) + (MONTH(dt_contract_end) - MONTH(dt_contract_start))
-        ELSE NULL
-    END AS mob_finalizacao,
-    CASE
-        WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
-            AND open_wallet_overdue_t1 > 0
-            AND max_open_delay_contaminated_contract_t1 > 5
-        THEN TRUE
-        ELSE FALSE
-    END AS has_overdue_balance_over5_t1_at_ending,
-    CASE
-        WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
-            AND open_wallet_overdue_t2 > 0
-            AND max_open_delay_contaminated_contract_t2 > 5
-        THEN TRUE
-        ELSE FALSE
-    END AS has_overdue_balance_over5_t2_at_ending,
-    CASE
-        WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
-            AND open_wallet_overdue_t3 > 0
-            AND max_open_delay_contaminated_contract_t2 > 5
-        THEN TRUE
-        ELSE FALSE
-    END AS has_overdue_balance_over5_t3_at_ending,
-    CASE
+    CAST(qt_acordo_quebrado AS BIGINT) AS qt_acordo_quebrado,
+    CAST(qt_aco_deconto AS BIGINT) AS qt_aco_desconto,
+    CAST(id_process_evictions AS BIGINT) AS id_process_evictions,
+    CAST(CASE
         WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
             AND open_wallet_overdue_t1 > 0
             AND max_open_delay_contaminated_contract_t1 > 0
         THEN TRUE
         ELSE FALSE
-    END AS has_overdue_balance_over0_t1_at_ending,
-    CASE
+    END AS BOOLEAN) AS has_overdue_balance_over0_t1_at_ending,
+    CAST(CASE
+        WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
+            AND open_wallet_overdue_t1 > 0
+            AND max_open_delay_contaminated_contract_t1 > 5
+        THEN TRUE
+        ELSE FALSE
+    END AS BOOLEAN) AS has_overdue_balance_over5_t1_at_ending,
+    CAST(CASE
         WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
             AND open_wallet_overdue_t2 > 0
             AND max_open_delay_contaminated_contract_t2 > 0
         THEN TRUE
         ELSE FALSE
-    END AS has_overdue_balance_over0_t2_at_ending,
-    CASE
+    END AS BOOLEAN) AS has_overdue_balance_over0_t2_at_ending,
+    CAST(CASE
+        WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
+            AND open_wallet_overdue_t2 > 0
+            AND max_open_delay_contaminated_contract_t2 > 5
+        THEN TRUE
+        ELSE FALSE
+    END AS BOOLEAN) AS has_overdue_balance_over5_t2_at_ending,
+    CAST(CASE
         WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
             AND open_wallet_overdue_t3 > 0
             AND max_open_delay_contaminated_contract_t2 > 0
         THEN TRUE
         ELSE FALSE
-    END AS has_overdue_balance_over0_t3_at_ending,
-    DATEDIFF(DAY, dt_contract_end, DATE(dt_reference)) AS days_since_ending,
-    DATEDIFF(DAY, dt_contract_start, DATE(dt_reference)) AS days_since_contract_start,
-    dt_pipe,
+    END AS BOOLEAN) AS has_overdue_balance_over0_t3_at_ending,
+    CAST(CASE
+        WHEN DATE_TRUNC('MONTH', dt_contract_end) = DATE_TRUNC('MONTH', dt_reference)
+            AND open_wallet_overdue_t3 > 0
+            AND max_open_delay_contaminated_contract_t2 > 5
+        THEN TRUE
+        ELSE FALSE
+    END AS BOOLEAN) AS has_overdue_balance_over5_t3_at_ending,
+    CAST(is_evictions AS BOOLEAN) AS is_evictions,
+    CAST(is_blocklisted AS BOOLEAN) AS is_blocklisted,
+    CAST(n_anchor_invoices_not_negativable AS BIGINT) AS n_anchor_invoices_not_negativable,
+    CAST(n_first_invoices_open AS BIGINT) AS n_first_invoices_open,
+    IF(n_first_invoices_open > 0, TRUE, FALSE) AS has_fpd_in_wallet,
+    array_open_invoices,
+    array_paid_invoices,
+    array_negotiated_invoices,
+    CAST(n_monthly_invoices AS BIGINT) AS n_monthly_invoices,
+    CAST(n_invoices_paid AS BIGINT) AS n_invoices_paid,
+    CAST(n_invoices_paid_ontime_t2 AS BIGINT) AS n_invoices_paid_ontime_t2,
+    CAST(n_overdue_invoices_paid_t2 AS BIGINT) AS n_overdue_invoices_paid_t2,
+    CAST(n_invoices_paid_ontime_t1 AS BIGINT) AS n_invoices_paid_ontime_t1,
+    CAST(n_overdue_invoices_paid_t1 AS BIGINT) AS n_overdue_invoices_paid_t1,
+    CAST(n_monthly_invoices_paid_ontime_t2 AS BIGINT) AS n_monthly_invoices_paid_ontime_t2,
+    CAST(n_monthly_invoices_paid_ontime_t1 AS BIGINT) AS n_monthly_invoices_paid_ontime_t1,
+    CAST(n_monthly_overdue_invoices_paid_t2 AS BIGINT) AS n_monthly_overdue_invoices_paid_t2,
+    CAST(n_monthly_overdue_invoices_paid_t1 AS BIGINT) AS n_monthly_overdue_invoices_paid_t1,
+    CAST(n_monthly_invoices_created AS BIGINT) AS n_monthly_invoices_created,
+    CAST(n_condominio_invoices + n_multa_recisoria_invoices + n_acordo_invoices +
+         n_rental_core_invoices + n_reparos_invoices + n_multas_ongoing_invoices +
+         n_utilidades_invoices + n_outros_invoices AS BIGINT) AS n_invoices_in_wallet,
+    open_wallet_overdue_t1,
+    open_wallet_overdue_t2,
+    open_wallet_overdue_t3,
+    CAST(max_open_delay_contaminated_contract_t1 AS BIGINT) AS max_open_delay_contaminated_contract_t1,
+    CAST(max_open_delay_contaminated_contract_t2 AS BIGINT) AS max_open_delay_contaminated_contract_t2,
     dt_contract_end,
-    dt_contract_start,
-    dt_month_start,
-    dt_month_end,
-    NOW() AS ts_load
+    dt_contract_start
 FROM contract_enhanced
