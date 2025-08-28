@@ -94,8 +94,8 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         if (load_start_date is not None and load_start_date != "" and
             load_end_date is not None and load_end_date != ""):
             vsl_df = vsl_df.filter(
-                (col("ts_created") >= lit(load_start_date)) &
-                (col("ts_created") <= lit(load_end_date))
+                (col("ts_created").cast("date") >= lit(load_start_date).cast("date")) &
+                (col("ts_created").cast("date") <= lit(load_end_date).cast("date"))
             )
 
         vsl_window = Window.partitionBy("id_visit").orderBy(col("ts_created").desc())
@@ -108,8 +108,8 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         if (load_start_date is not None and load_start_date != "" and
             load_end_date is not None and load_end_date != ""):
             vsl_df = vsl_df.filter(
-                (col("ts_created") >= lit(load_start_date)) &
-                (col("ts_created") <= lit(load_end_date))
+                (col("ts_created").cast("date") >= lit(load_start_date).cast("date")) &
+                (col("ts_created").cast("date") <= lit(load_end_date).cast("date"))
             )
 
         return vsl_df.groupBy("id_visit").agg(
@@ -128,8 +128,8 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         if (load_start_date is not None and load_start_date != "" and
             load_end_date is not None and load_end_date != ""):
             visit_df = visit_df.filter(
-                (col("ts_created") >= lit(load_start_date)) &
-                (col("ts_created") <= lit(load_end_date))
+                (col("ts_created").cast("date") >= lit(load_start_date).cast("date")) &
+                (col("ts_created").cast("date") <= lit(load_end_date).cast("date"))
             )
 
         return (
