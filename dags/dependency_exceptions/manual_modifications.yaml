@@ -1,4 +1,10 @@
 ---
+bietlejuice.core_visit_test:
+  add:
+    - bietlejuice.ebdb_visit:load-clean-visit:first-run-of-day
+    - bietlejuice.ebdb_visit:load-clean-visit-status-log:first-run-of-day
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
 bietlejuice.cyber_complement:
   add:
     - bietlejuice.cyber:load-raw-delqmst:first-run-of-day
