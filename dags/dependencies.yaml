@@ -303,9 +303,9 @@ bietlejuice.dw_credit_passport:
   - bietlejuice.sorting_hat:load-clean-analysis-request:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-credit-analysis:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-variant:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-policy-report:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-proponent:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-variant:first-run-of-day
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal:first-run-of-day
@@ -1009,6 +1009,7 @@ bietlejuice.dw_sale_visits:
 bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-kill-queue-reservation-issuance:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-invoices:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision-reverse:first-run-of-day
@@ -1885,16 +1886,16 @@ bietlejuice.enrich_documentation_metrics:
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation-aud:first-run-of-day
   - bietlejuice.docx:load-clean-credit-evaluation:first-run-of-day
+  - bietlejuice.docx:load-clean-document-context:first-run-of-day
+  - bietlejuice.docx:load-clean-document-type:first-run-of-day
   - bietlejuice.docx:load-clean-document:first-run-of-day
+  - bietlejuice.docx:load-clean-folder-type:first-run-of-day
+  - bietlejuice.docx:load-clean-folder:first-run-of-day
   - bietlejuice.docx:load-clean-machine-state:first-run-of-day
   - bietlejuice.docx:load-clean-person-document-info-aud:first-run-of-day
   - bietlejuice.docx:load-clean-person-document:first-run-of-day
   - bietlejuice.docx:load-clean-person:first-run-of-day
   - bietlejuice.docx:load-clean-rev-info:first-run-of-day
-  - bietlejuice.docx:load-clean-document-context:first-run-of-day
-  - bietlejuice.docx:load-clean-document-type:first-run-of-day
-  - bietlejuice.docx:load-clean-folder-type:first-run-of-day
-  - bietlejuice.docx:load-clean-folder:first-run-of-day
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_finance:load-clean-account-transaction:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
