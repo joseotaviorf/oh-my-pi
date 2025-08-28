@@ -5,6 +5,10 @@ monopoly AS (
         ae.id,
         ae.id_sale_transaction,
         CASE
+            WHEN sr.id_state_external = '11' THEN '420008'
+            ELSE '420007'
+        END AS account_number,
+        CASE
             WHEN sr.id_state_external = '11' THEN 'Casa Mineira'
             ELSE 'Plataforma QuintoAndar'
         END AS source_name,
@@ -28,7 +32,7 @@ monopoly AS (
     WHERE
       sr.dt_notary_start >= '2025-01-01'
       AND st.id_external_sync IS NOT NULL
-     GROUP BY 1, 2, 3, 4, 5, 6, 7
+     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 ),
 sap_gateway AS (
   SELECT
@@ -94,7 +98,7 @@ SELECT
     sap_gateway_base sg ON l.hash = sg.hash
   WHERE 1=1
     AND dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('420007','420008','420032')
+    AND account_number IN ('420007','420008')
   GROUP BY 1, 2, 3
 ),
 errors_base AS (
@@ -104,7 +108,7 @@ errors_base AS (
     CAST(NULL AS INT) AS id_finance_entity_entry,
     CAST(NULL AS STRING) AS version,
     m.source_name,
-    sl.account_number,
+    m.account_number,
     CASE
       WHEN sl.account_number = '420008' THEN 'Brokerage (Casa Mineira)'
       WHEN sl.account_number = '420007' THEN 'Brokerage (Platform)'
