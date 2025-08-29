@@ -1,5 +1,5 @@
 import logging
-import json
+import ast
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser
 from typing import Any
@@ -45,23 +45,15 @@ class BaseCoreModelSparkJob(ABC):
         parser.add_argument("schema", type=str, help="Database base name")
         parser.add_argument("table_name", type=str, help="Table name")
         parser.add_argument(
+            "partitions", help="Table partitions", nargs="?", default=None
+        )
+        parser.add_argument(
             "load_start_date", type=str, help="Load start date", nargs="?", default=None
         )
         parser.add_argument(
             "load_end_date", type=str, help="Load end date", nargs="?", default=None
         )
-        parser.add_argument(
-            "--extra_spark_job_arguments",
-            type=str,
-            default="{}",
-            help="Extra spark job arguments (optional, defaults to empty JSON object)",
-        )
-        parser.add_argument(
-            "--table_privileges",
-            type=str,
-            help="Table privileges as JSON string",
-            default=None,
-        )
+
         return parser.parse_args()
 
     def initialize_configuration(self, source: str) -> None:
@@ -171,15 +163,9 @@ class BaseCoreModelSparkJob(ABC):
         Returns:
             TablePrivileges instance
         """
-        if args.table_privileges is not None:
-            table_privileges_dict = json.loads(args.table_privileges)
-            return TablePrivileges.from_input_dict(
-                table_privileges_dict, f"{args.schema}.{args.table_name}"
-            )
-        else:
-            return TablePrivileges.from_environment_default(
-                f"{args.schema}.{args.table_name}"
-            )
+        return TablePrivileges.from_environment_default(
+            f"{args.schema}.{args.table_name}"
+        )
 
     @abstractmethod
     def create_core_model(self, spark: SparkSession, args: Any) -> DataFrame:
@@ -212,7 +198,10 @@ class BaseCoreModelSparkJob(ABC):
             It is a requirement for core models, since we represent one entity per row and event based data not always have all columns filled
         """
         source_cols = dataframe.columns
-
+        if args.partitions is not None:
+            partitions = ast.literal_eval(args.partitions)
+        else:
+            partitions = []
         # Get target table columns if table exists, otherwise assume all columns are new
         target_table_name = f"{args.schema}.{args.table_name}"
         try:
@@ -256,7 +245,6 @@ class BaseCoreModelSparkJob(ABC):
         when_not_matched_operation = self.get_config(
             "when_not_matched_operation", required=False, default=None
         )
-        partitions = self.get_config("partitions", required=False, default=None)
 
         # Setup table privileges
         table_privileges = self.setup_table_privileges(args)
@@ -265,7 +253,7 @@ class BaseCoreModelSparkJob(ABC):
         database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         self.logger.info(
-            f"m=run_pipeline, msg=Loading data using DataFrameDeltaTableLoaderPipeline"
+            f"m=run_pipeline, msg=Loading data using DataFrameDeltaTableLoaderPipeline with partitions: {partitions}"
         )
         pipeline = DataFrameDeltaTableLoaderPipeline(
             database_name=args.schema,

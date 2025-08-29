@@ -25,6 +25,8 @@ workflow:
         - "{dag_name}"
         - "{schema}"
         - "{table_name}"
+        - "{partitions}"
+      partitions: [year, month, day]
     visit_incremental:
       load_spark_job: load_core_visit
       spark_job_arguments:
@@ -33,8 +35,10 @@ workflow:
         - "{dag_name}"
         - "{schema}"
         - "{table_name}"
+        - "{partitions}"
         - "{load_start_date}"
         - "{load_end_date}"
+      partitions: [year, month, day]
 
 cluster:
   type: custom_cluster

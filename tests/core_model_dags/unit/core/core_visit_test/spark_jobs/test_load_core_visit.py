@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from datetime import datetime
 from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, lit
 
 # Import the actual functions from the DAG
 import sys
@@ -772,6 +772,13 @@ class TestCreateVisitCoreModel:
             mock_read_table.side_effect = [visit_status_log_df, visit_df, house_df]
             mock_result_df = Mock(spec=DataFrame)
             mock_result_df.count.return_value = 3
+            # The method now adds year, month, day columns after surrogate key generation
+            mock_result_with_date_cols = Mock(spec=DataFrame)
+            mock_result_with_date_cols.count.return_value = 3
+            mock_result_df.withColumn.return_value = mock_result_with_date_cols
+            mock_result_with_date_cols.withColumn.return_value = (
+                mock_result_with_date_cols
+            )
             mock_surrogate_helper.generate_surrogate_key.return_value = mock_result_df
 
             # Mock the configuration
@@ -790,7 +797,9 @@ class TestCreateVisitCoreModel:
             # Assert
             assert mock_read_table.call_count == 3
             mock_surrogate_helper.generate_surrogate_key.assert_called_once()
-            assert result == mock_result_df
+            assert (
+                result == mock_result_with_date_cols
+            )  # Now expecting the DataFrame with date columns
 
     def test_create_core_model_logs_incremental_mode(
         self, spark_session, visit_df, visit_status_log_df, house_df
@@ -974,6 +983,13 @@ class TestCreateVisitCoreModel:
             mock_read_table.side_effect = [visit_status_log_df, visit_df, house_df]
             mock_result_df = Mock(spec=DataFrame)
             mock_result_df.count.return_value = 3
+            # The method now adds year, month, day columns after surrogate key generation
+            mock_result_with_date_cols = Mock(spec=DataFrame)
+            mock_result_with_date_cols.count.return_value = 3
+            mock_result_df.withColumn.return_value = mock_result_with_date_cols
+            mock_result_with_date_cols.withColumn.return_value = (
+                mock_result_with_date_cols
+            )
             mock_surrogate_helper.generate_surrogate_key.return_value = mock_result_df
 
             # Mock the configuration
@@ -990,8 +1006,307 @@ class TestCreateVisitCoreModel:
                 result = job.create_core_model(spark_session, mock_args)
 
                 # Assert - Check that the result is valid and the method completed successfully
-                assert result == mock_result_df
+                assert (
+                    result == mock_result_with_date_cols
+                )  # Now expecting the DataFrame with date columns
                 mock_surrogate_helper.generate_surrogate_key.assert_called_once()
+
+    def test_create_core_model_adds_year_month_day_columns(
+        self, spark_session, visit_df, visit_status_log_df, house_df
+    ):
+        """Test that create_core_model correctly adds year, month, day columns based on ts_created."""
+        # Arrange
+        job = CoreVisitSparkJob()
+        mock_args = Mock()
+        mock_args.load_start_date = None
+        mock_args.load_end_date = None
+
+        # Mock table reads to return our test DataFrames
+        with patch.object(spark_session, "table") as mock_read_table, patch.object(
+            load_core_visit, "SurrogateKeysHelper"
+        ) as mock_surrogate_helper:
+
+            mock_read_table.side_effect = [visit_status_log_df, visit_df, house_df]
+
+            # Mock SurrogateKeysHelper to return a DataFrame that preserves the input structure
+            def mock_generate_surrogate_key(df, entity_type):
+                # Add sk_entity column to the input DataFrame and return it
+                return df.withColumn("sk_entity", lit(f"sk_{entity_type}_123"))
+
+            mock_surrogate_helper.generate_surrogate_key.side_effect = (
+                mock_generate_surrogate_key
+            )
+
+            # Mock the configuration
+            with patch.object(job, "get_visit_config") as mock_config:
+                mock_config.return_value = {
+                    "ENTITY_TYPE": "VISIT",
+                    "VISIT_TABLE": "test_visit_table",
+                    "VISIT_STATUS_LOG_TABLE": "test_vsl_table",
+                    "HOUSE_TABLE": "test_house_table",
+                    "CONTRACT_TABLE": "test_contract_table",
+                }
+
+                # Act - Call the actual method with mocked SurrogateKeysHelper
+                result_df = job.create_core_model(spark_session, mock_args)
+
+                # Assert - Check that year, month, day columns are present
+                result_columns = result_df.columns
+                assert "year" in result_columns, "year column should be present"
+                assert "month" in result_columns, "month column should be present"
+                assert "day" in result_columns, "day column should be present"
+
+                # Collect data to validate the values
+                result_data = result_df.select(
+                    "ts_created", "year", "month", "day"
+                ).collect()
+
+                # Validate that year, month, day values are correctly derived from ts_created
+                for row in result_data:
+                    ts_created = row["ts_created"]
+                    expected_year = ts_created.year
+                    expected_month = ts_created.month
+                    expected_day = ts_created.day
+
+                    assert (
+                        row["year"] == expected_year
+                    ), f"Year should be {expected_year}, got {row['year']}"
+                    assert (
+                        row["month"] == expected_month
+                    ), f"Month should be {expected_month}, got {row['month']}"
+                    assert (
+                        row["day"] == expected_day
+                    ), f"Day should be {expected_day}, got {row['day']}"
+
+    def test_create_core_model_year_month_day_with_different_dates(self, spark_session):
+        """Test year, month, day columns with various dates to ensure correct extraction."""
+        # Arrange
+        from pyspark.sql.types import (
+            StructType,
+            StructField,
+            StringType,
+            TimestampType,
+            BooleanType,
+            DateType,
+        )
+        from datetime import datetime, date
+
+        job = CoreVisitSparkJob()
+        mock_args = Mock()
+        mock_args.load_start_date = None
+        mock_args.load_end_date = None
+
+        # Create test data with specific dates
+        visit_schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("id_visitor", StringType(), True),
+                StructField("id_agent", StringType(), True),
+                StructField("id_house", StringType(), True),
+                StructField("business_context", StringType(), True),
+                StructField("status", StringType(), True),
+                StructField("computed_status", StringType(), True),
+                StructField("ts_created", TimestampType(), True),
+                StructField("ts_updated", TimestampType(), True),
+                StructField("code", StringType(), True),
+                StructField("slot", StringType(), True),
+                StructField("behavior", StringType(), True),
+                StructField("booking_type", StringType(), True),
+                StructField("structured", BooleanType(), True),
+                StructField("business_model", StringType(), True),
+                StructField("is_fixed_agent", BooleanType(), True),
+                StructField("ts_visit", TimestampType(), True),
+                StructField("dt_request", DateType(), True),
+                StructField("dt_confirmation_expiration", DateType(), True),
+            ]
+        )
+
+        visit_data = [
+            (
+                "visit_1",
+                "visitor_1",
+                "agent_1",
+                "house_1",
+                "FOR_RENT",
+                "Confirmed",
+                "CONFIRMED",
+                datetime(2023, 12, 25, 15, 30),
+                datetime(2023, 12, 25, 16, 0),
+                "V001",
+                "morning",
+                "standard",
+                "instant",
+                True,
+                "b2c",
+                False,
+                datetime(2023, 12, 26, 10, 0),
+                date(2023, 12, 25),
+                date(2023, 12, 27),
+            ),
+            (
+                "visit_2",
+                "visitor_2",
+                "agent_2",
+                "house_2",
+                "FOR_SALE",
+                "Done",
+                "DONE",
+                datetime(2024, 2, 29, 9, 15),
+                datetime(2024, 2, 29, 10, 0),
+                "V002",
+                "afternoon",
+                "premium",
+                "scheduled",
+                False,
+                "b2b",
+                True,
+                datetime(2024, 3, 1, 14, 0),
+                date(2024, 2, 29),
+                date(2024, 3, 2),
+            ),
+        ]
+        test_visit_df = spark_session.createDataFrame(visit_data, visit_schema)
+
+        # Create minimal test data for other required tables
+        vsl_schema = StructType(
+            [
+                StructField("id_visit", StringType(), True),
+                StructField("id_schedule", StringType(), True),
+                StructField("event_type", StringType(), True),
+                StructField("author_user_role", StringType(), True),
+                StructField("on_behalf_of", StringType(), True),
+                StructField("reason", StringType(), True),
+                StructField("ts_created", TimestampType(), True),
+            ]
+        )
+        vsl_data = [
+            (
+                "visit_1",
+                "schedule_1",
+                "VISIT_CONFIRMED",
+                "AGENT",
+                None,
+                None,
+                datetime(2023, 12, 25, 16, 0),
+            ),
+            (
+                "visit_2",
+                "schedule_2",
+                "VISIT_DONE",
+                "AGENT",
+                None,
+                None,
+                datetime(2024, 2, 29, 10, 0),
+            ),
+        ]
+        test_vsl_df = spark_session.createDataFrame(vsl_data, vsl_schema)
+
+        house_schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("id_user", StringType(), True),
+                StructField("id_region", StringType(), True),
+                StructField("address", StringType(), True),
+                StructField("neighborhood", StringType(), True),
+                StructField("number", StringType(), True),
+                StructField("complement", StringType(), True),
+                StructField("city", StringType(), True),
+                StructField("zipcode", StringType(), True),
+                StructField("is_for_rent", BooleanType(), True),
+                StructField("is_for_sale", BooleanType(), True),
+            ]
+        )
+        house_data = [
+            (
+                "house_1",
+                "owner_1",
+                "region_1",
+                "Rua A",
+                "Centro",
+                "123",
+                "Apt 1",
+                "São Paulo",
+                "01000-000",
+                True,
+                False,
+            ),
+            (
+                "house_2",
+                "owner_2",
+                "region_2",
+                "Rua B",
+                "Vila Nova",
+                "456",
+                None,
+                "Rio de Janeiro",
+                "20000-000",
+                False,
+                True,
+            ),
+        ]
+        test_house_df = spark_session.createDataFrame(house_data, house_schema)
+
+        # Mock table reads
+        with patch.object(spark_session, "table") as mock_read_table, patch.object(
+            load_core_visit, "SurrogateKeysHelper"
+        ) as mock_surrogate_helper:
+
+            mock_read_table.side_effect = [test_vsl_df, test_visit_df, test_house_df]
+
+            # Mock SurrogateKeysHelper to return a DataFrame that preserves the input structure
+            def mock_generate_surrogate_key(df, entity_type):
+                # Add sk_entity column to the input DataFrame and return it
+                return df.withColumn("sk_entity", lit(f"sk_{entity_type}_123"))
+
+            mock_surrogate_helper.generate_surrogate_key.side_effect = (
+                mock_generate_surrogate_key
+            )
+
+            # Mock the configuration
+            with patch.object(job, "get_visit_config") as mock_config:
+                mock_config.return_value = {
+                    "ENTITY_TYPE": "VISIT",
+                    "VISIT_TABLE": "test_visit_table",
+                    "VISIT_STATUS_LOG_TABLE": "test_vsl_table",
+                    "HOUSE_TABLE": "test_house_table",
+                    "CONTRACT_TABLE": "test_contract_table",
+                }
+
+                # Act
+                result_df = job.create_core_model(spark_session, mock_args)
+
+                # Assert - Validate specific date extractions
+                result_data = result_df.select(
+                    "id_entity", "ts_created", "year", "month", "day"
+                ).collect()
+
+                # Check Christmas 2023 (December 25, 2023)
+                visit_1_data = [
+                    row for row in result_data if row["id_entity"] == "visit_1"
+                ][0]
+                assert (
+                    visit_1_data["year"] == 2023
+                ), f"Expected year 2023, got {visit_1_data['year']}"
+                assert (
+                    visit_1_data["month"] == 12
+                ), f"Expected month 12, got {visit_1_data['month']}"
+                assert (
+                    visit_1_data["day"] == 25
+                ), f"Expected day 25, got {visit_1_data['day']}"
+
+                # Check Leap Year Day 2024 (February 29, 2024)
+                visit_2_data = [
+                    row for row in result_data if row["id_entity"] == "visit_2"
+                ][0]
+                assert (
+                    visit_2_data["year"] == 2024
+                ), f"Expected year 2024, got {visit_2_data['year']}"
+                assert (
+                    visit_2_data["month"] == 2
+                ), f"Expected month 2, got {visit_2_data['month']}"
+                assert (
+                    visit_2_data["day"] == 29
+                ), f"Expected day 29, got {visit_2_data['day']}"
 
 
 class TestJobConstants:

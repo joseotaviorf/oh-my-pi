@@ -9,6 +9,9 @@ from pyspark.sql.functions import (
     greatest,
     sha2,
     concat_ws,
+    year,
+    month,
+    dayofmonth,
 )
 from pyspark.sql.window import Window
 
@@ -79,6 +82,9 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
 
         # Generate surrogate key using workflow utility
         result_df = SurrogateKeysHelper.generate_surrogate_key(assembled_df, config['ENTITY_TYPE'])
+        result_df = result_df.withColumn("year", year(col("ts_created")))
+        result_df = result_df.withColumn("month", month(col("ts_created")))
+        result_df = result_df.withColumn("day", dayofmonth(col("ts_created")))
 
         # Apply schema validation - for now just return the dataframe
         # TODO: Implement schema validation if needed

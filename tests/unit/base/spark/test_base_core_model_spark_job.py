@@ -79,6 +79,7 @@ class TestBaseCoreModelSparkJob:
             load_end_date="2024-01-31",
             extra_spark_job_arguments="{}",
             table_privileges=None,
+            partitions=None,  # Added to support partitions parameter handling
         )
 
     def test_default_when_matched_operation_generation(
@@ -507,3 +508,314 @@ class TestBaseCoreModelSparkJob:
                 # All columns should use source value directly (no target table exists)
                 for col in source_df.columns:
                     assert when_matched_operation[col] == f"source.{col}"
+
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.ConfigurationService")
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.TablePrivileges")
+    def test_partitions_parameter_none(
+        self, mock_table_privileges, mock_config_service, job_instance
+    ):
+        """Test partitions parameter when None (should default to empty list)."""
+        # Arrange
+        mock_config_instance = Mock()
+        mock_config_service.return_value = mock_config_instance
+        job_instance.config_service = mock_config_instance
+
+        # Mock table privileges
+        mock_privileges_instance = Mock()
+        mock_table_privileges.from_environment_default.return_value = (
+            mock_privileges_instance
+        )
+
+        # Mock configuration
+        mock_config_instance.get_config.return_value = None
+
+        # Create mock args with partitions=None
+        mock_args = Mock()
+        mock_args.environment = "test"
+        mock_args.bucket = "test-bucket"
+        mock_args.schema = "test_schema"
+        mock_args.table_name = "test_table"
+        mock_args.partitions = None  # This should default to []
+
+        # Create source DataFrame
+        source_data = [{"col1": "val1", "col2": "val2"}]
+        source_df = spark.createDataFrame(source_data)
+
+        # Mock spark.table() to return target DataFrame
+        target_df = spark.createDataFrame([{"col1": "old_val1", "col2": "old_val2"}])
+
+        with patch.object(spark, "table", return_value=target_df):
+            with patch(
+                "bietlejuice.base.spark.base_core_model_spark_job.DataFrameDeltaTableLoaderPipeline"
+            ) as mock_pipeline_class:
+                mock_pipeline_instance = Mock()
+                mock_pipeline_class.return_value = mock_pipeline_instance
+
+                # Act
+                job_instance.run_pipeline(source_df, mock_args, spark)
+
+                # Assert
+                call_args = mock_pipeline_class.call_args
+                partitions_passed = call_args.kwargs["partitions"]
+
+                assert partitions_passed == []  # Should be empty list when None
+
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.ConfigurationService")
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.TablePrivileges")
+    def test_partitions_parameter_single_partition(
+        self, mock_table_privileges, mock_config_service, job_instance
+    ):
+        """Test partitions parameter with single partition as string."""
+        # Arrange
+        mock_config_instance = Mock()
+        mock_config_service.return_value = mock_config_instance
+        job_instance.config_service = mock_config_instance
+
+        # Mock table privileges
+        mock_privileges_instance = Mock()
+        mock_table_privileges.from_environment_default.return_value = (
+            mock_privileges_instance
+        )
+
+        # Mock configuration
+        mock_config_instance.get_config.return_value = None
+
+        # Create mock args with single partition
+        mock_args = Mock()
+        mock_args.environment = "test"
+        mock_args.bucket = "test-bucket"
+        mock_args.schema = "test_schema"
+        mock_args.table_name = "test_table"
+        mock_args.partitions = "['year']"  # Single partition as string
+
+        # Create source DataFrame
+        source_data = [{"col1": "val1", "year": "2023"}]
+        source_df = spark.createDataFrame(source_data)
+
+        # Mock spark.table() to return target DataFrame
+        target_df = spark.createDataFrame([{"col1": "old_val1", "year": "2022"}])
+
+        with patch.object(spark, "table", return_value=target_df):
+            with patch(
+                "bietlejuice.base.spark.base_core_model_spark_job.DataFrameDeltaTableLoaderPipeline"
+            ) as mock_pipeline_class:
+                mock_pipeline_instance = Mock()
+                mock_pipeline_class.return_value = mock_pipeline_instance
+
+                # Act
+                job_instance.run_pipeline(source_df, mock_args, spark)
+
+                # Assert
+                call_args = mock_pipeline_class.call_args
+                partitions_passed = call_args.kwargs["partitions"]
+
+                assert partitions_passed == ["year"]  # Should parse to list
+
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.ConfigurationService")
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.TablePrivileges")
+    def test_partitions_parameter_multiple_partitions(
+        self, mock_table_privileges, mock_config_service, job_instance
+    ):
+        """Test partitions parameter with multiple partitions as string."""
+        # Arrange
+        mock_config_instance = Mock()
+        mock_config_service.return_value = mock_config_instance
+        job_instance.config_service = mock_config_instance
+
+        # Mock table privileges
+        mock_privileges_instance = Mock()
+        mock_table_privileges.from_environment_default.return_value = (
+            mock_privileges_instance
+        )
+
+        # Mock configuration
+        mock_config_instance.get_config.return_value = None
+
+        # Create mock args with multiple partitions
+        mock_args = Mock()
+        mock_args.environment = "test"
+        mock_args.bucket = "test-bucket"
+        mock_args.schema = "test_schema"
+        mock_args.table_name = "test_table"
+        mock_args.partitions = (
+            "['year', 'month', 'day']"
+        )  # Multiple partitions as string
+
+        # Create source DataFrame
+        source_data = [{"col1": "val1", "year": "2023", "month": "01", "day": "15"}]
+        source_df = spark.createDataFrame(source_data)
+
+        # Mock spark.table() to return target DataFrame
+        target_df = spark.createDataFrame(
+            [{"col1": "old_val1", "year": "2022", "month": "12", "day": "31"}]
+        )
+
+        with patch.object(spark, "table", return_value=target_df):
+            with patch(
+                "bietlejuice.base.spark.base_core_model_spark_job.DataFrameDeltaTableLoaderPipeline"
+            ) as mock_pipeline_class:
+                mock_pipeline_instance = Mock()
+                mock_pipeline_class.return_value = mock_pipeline_instance
+
+                # Act
+                job_instance.run_pipeline(source_df, mock_args, spark)
+
+                # Assert
+                call_args = mock_pipeline_class.call_args
+                partitions_passed = call_args.kwargs["partitions"]
+
+                assert partitions_passed == [
+                    "year",
+                    "month",
+                    "day",
+                ]  # Should parse to list
+
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.ConfigurationService")
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.TablePrivileges")
+    def test_partitions_parameter_empty_list_string(
+        self, mock_table_privileges, mock_config_service, job_instance
+    ):
+        """Test partitions parameter with empty list as string."""
+        # Arrange
+        mock_config_instance = Mock()
+        mock_config_service.return_value = mock_config_instance
+        job_instance.config_service = mock_config_instance
+
+        # Mock table privileges
+        mock_privileges_instance = Mock()
+        mock_table_privileges.from_environment_default.return_value = (
+            mock_privileges_instance
+        )
+
+        # Mock configuration
+        mock_config_instance.get_config.return_value = None
+
+        # Create mock args with empty list as string
+        mock_args = Mock()
+        mock_args.environment = "test"
+        mock_args.bucket = "test-bucket"
+        mock_args.schema = "test_schema"
+        mock_args.table_name = "test_table"
+        mock_args.partitions = "[]"  # Empty list as string
+
+        # Create source DataFrame
+        source_data = [{"col1": "val1", "col2": "val2"}]
+        source_df = spark.createDataFrame(source_data)
+
+        # Mock spark.table() to return target DataFrame
+        target_df = spark.createDataFrame([{"col1": "old_val1", "col2": "old_val2"}])
+
+        with patch.object(spark, "table", return_value=target_df):
+            with patch(
+                "bietlejuice.base.spark.base_core_model_spark_job.DataFrameDeltaTableLoaderPipeline"
+            ) as mock_pipeline_class:
+                mock_pipeline_instance = Mock()
+                mock_pipeline_class.return_value = mock_pipeline_instance
+
+                # Act
+                job_instance.run_pipeline(source_df, mock_args, spark)
+
+                # Assert
+                call_args = mock_pipeline_class.call_args
+                partitions_passed = call_args.kwargs["partitions"]
+
+                assert partitions_passed == []  # Should parse to empty list
+
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.ConfigurationService")
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.TablePrivileges")
+    def test_partitions_parameter_logging(
+        self, mock_table_privileges, mock_config_service, job_instance
+    ):
+        """Test that partitions are properly logged."""
+        # Arrange
+        mock_config_instance = Mock()
+        mock_config_service.return_value = mock_config_instance
+        job_instance.config_service = mock_config_instance
+
+        # Mock table privileges
+        mock_privileges_instance = Mock()
+        mock_table_privileges.from_environment_default.return_value = (
+            mock_privileges_instance
+        )
+
+        # Mock configuration
+        mock_config_instance.get_config.return_value = None
+
+        # Create mock args with partitions
+        mock_args = Mock()
+        mock_args.environment = "test"
+        mock_args.bucket = "test-bucket"
+        mock_args.schema = "test_schema"
+        mock_args.table_name = "test_table"
+        mock_args.partitions = "['year', 'month']"
+
+        # Create source DataFrame
+        source_data = [{"col1": "val1", "year": "2023", "month": "01"}]
+        source_df = spark.createDataFrame(source_data)
+
+        # Mock spark.table() to return target DataFrame
+        target_df = spark.createDataFrame(
+            [{"col1": "old_val1", "year": "2022", "month": "12"}]
+        )
+
+        with patch.object(spark, "table", return_value=target_df):
+            with patch(
+                "bietlejuice.base.spark.base_core_model_spark_job.DataFrameDeltaTableLoaderPipeline"
+            ) as mock_pipeline_class:
+                mock_pipeline_instance = Mock()
+                mock_pipeline_class.return_value = mock_pipeline_instance
+
+                with patch.object(job_instance, "logger") as mock_logger:
+                    # Act
+                    job_instance.run_pipeline(source_df, mock_args, spark)
+
+                    # Assert - Check that partitions are logged
+                    mock_logger.info.assert_any_call(
+                        "m=run_pipeline, msg=Loading data using DataFrameDeltaTableLoaderPipeline with partitions: ['year', 'month']"
+                    )
+
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.ConfigurationService")
+    @patch("bietlejuice.base.spark.base_core_model_spark_job.TablePrivileges")
+    def test_partitions_parameter_invalid_string_format(
+        self, mock_table_privileges, mock_config_service, job_instance
+    ):
+        """Test partitions parameter with invalid string format (should raise exception)."""
+        # Arrange
+        mock_config_instance = Mock()
+        mock_config_service.return_value = mock_config_instance
+        job_instance.config_service = mock_config_instance
+
+        # Mock table privileges
+        mock_privileges_instance = Mock()
+        mock_table_privileges.from_environment_default.return_value = (
+            mock_privileges_instance
+        )
+
+        # Mock configuration
+        mock_config_instance.get_config.return_value = None
+
+        # Create mock args with invalid partition string
+        mock_args = Mock()
+        mock_args.environment = "test"
+        mock_args.bucket = "test-bucket"
+        mock_args.schema = "test_schema"
+        mock_args.table_name = "test_table"
+        mock_args.partitions = "invalid_format"  # Invalid format
+
+        # Create source DataFrame
+        source_data = [{"col1": "val1", "col2": "val2"}]
+        source_df = spark.createDataFrame(source_data)
+
+        # Mock spark.table() to return target DataFrame
+        target_df = spark.createDataFrame([{"col1": "old_val1", "col2": "old_val2"}])
+
+        with patch.object(spark, "table", return_value=target_df):
+            with patch(
+                "bietlejuice.base.spark.base_core_model_spark_job.DataFrameDeltaTableLoaderPipeline"
+            ) as mock_pipeline_class:
+                mock_pipeline_instance = Mock()
+                mock_pipeline_class.return_value = mock_pipeline_instance
+
+                # Act & Assert - Should raise an exception due to invalid format
+                with pytest.raises((ValueError, SyntaxError)):
+                    job_instance.run_pipeline(source_df, mock_args, spark)
