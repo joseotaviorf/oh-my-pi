@@ -134,6 +134,7 @@ if __name__ == "__main__":
             )
 
     else:
+        feedback_parameters = None
         response = jira_consumer.sync(endpoint_enum=endpoint_enum, params=params)
 
     if response:
