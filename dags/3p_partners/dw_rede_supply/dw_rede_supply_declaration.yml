@@ -31,6 +31,10 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    init_scripts:
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_spark_3_5.sh"
+              region: ""
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
