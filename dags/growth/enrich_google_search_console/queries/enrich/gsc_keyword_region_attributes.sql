@@ -71,7 +71,7 @@ general_city_level_enrichment AS (
   WHERE
     kfp.dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY ROW_NUMBER() OVER(
-    PARTITION BY dt_created, keyword, page, device
+    PARTITION BY dt_created, keyword, page, device, site_url, year, month, day
     ORDER BY LENGTH(match_igbe_city) DESC, CHARINDEX(match_igbe_city, keyword) DESC
     ) = 1
 ),
@@ -171,7 +171,7 @@ operation_city_level_enrichment AS (
     operation_cities AS r 
       ON CHARINDEX(r.name, gcle.keyword_clean) > 0
       QUALIFY ROW_NUMBER() OVER(
-        PARTITION BY dt_created, keyword, page, device
+        PARTITION BY dt_created, keyword, page, device, site_url, year, month, day
         ORDER BY LENGTH(match_operation_city) DESC, CHARINDEX(match_operation_city, keyword) DESC
       ) = 1
 ),
@@ -261,7 +261,7 @@ operation_neighborhood_level_enrichment AS (
     operation_neighborhoodies AS r
       ON CHARINDEX(r.name, gcle.keyword_clean) > 0
       QUALIFY ROW_NUMBER() OVER(
-        PARTITION BY dt_created, keyword, page, device
+        PARTITION BY dt_created, keyword, page, device, site_url, year, month, day
         ORDER BY LENGTH(match_operation_neighborhood) DESC, CHARINDEX(match_operation_neighborhood, keyword) DESC
       ) = 1
 )
