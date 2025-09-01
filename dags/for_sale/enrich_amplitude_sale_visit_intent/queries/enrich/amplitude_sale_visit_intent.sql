@@ -1,6 +1,6 @@
 SELECT
     CAST(id_user AS BIGINT) AS id_user,
-    id_house,
+    CAST(id_house AS BIGINT) AS id_house,
     ts_event AS ts_visit_intent,
     year,
     month,
@@ -14,7 +14,7 @@ WHERE
 UNION ALL
 SELECT
     CAST(id_user AS BIGINT) AS id_user,
-    id_house,
+    CAST(id_house AS BIGINT) AS id_house,
     ts_event AS ts_visit_intent,
     year,
     month,
@@ -28,7 +28,7 @@ WHERE
 UNION ALL
 SELECT
     CAST(id_user AS BIGINT) AS id_user,
-    ep_house_id AS id_house,
+    CAST(ep_house_id AS BIGINT) AS id_house,
     ts_event AS ts_visit_intent,
     year,
     month,
@@ -42,7 +42,7 @@ WHERE
 UNION ALL
 SELECT
     CAST(id_user AS BIGINT) AS id_user,
-    ep_house_id AS id_house,
+    CAST(ep_house_id AS BIGINT) AS id_house,
     ts_event AS ts_visit_intent,
     year,
     month,
