@@ -309,11 +309,57 @@ overdue_invoices_events AS (
       FROM overdue_invoices_events
     ) AS filled_arrays
   LATERAL VIEW EXPLODE(
-    ARRAYS_ZIP(
-      filled_id_contract,
-      filled_id_invoice
-    )
+    ARRAYS_ZIP(filled_id_contract, filled_id_invoice)
   ) AS contract_invoice
+
+
+  UNION ALL
+
+  SELECT
+    CAST(contract_val AS BIGINT) AS id_contract,
+    CAST(NULL AS BIGINT) AS id_invoice,
+    id_amplitude,
+    id_session,
+    id_user,
+    device_family,
+    event_name,
+    event_properties,
+    funnel_step,
+    level,
+    event_description,
+    feature,
+    is_active,
+    year,
+    month,
+    day,
+    ts_event
+  FROM overdue_invoices_events
+  LATERAL VIEW EXPLODE(id_contract) AS contract_val
+  WHERE COALESCE(ARRAY_JOIN(id_invoice, ','), '') = '' OR COALESCE(ARRAY_JOIN(id_invoice, ','), '') = 'null'
+
+  UNION ALL
+
+  SELECT
+    CAST(NULL AS BIGINT) AS id_contract,
+    CAST(invoice_val AS BIGINT) AS id_invoice,
+    id_amplitude,
+    id_session,
+    id_user,
+    device_family,
+    event_name,
+    event_properties,
+    funnel_step,
+    level,
+    event_description,
+    feature,
+    is_active,
+    year,
+    month,
+    day,
+    ts_event
+  FROM overdue_invoices_events
+  LATERAL VIEW EXPLODE(id_invoice) AS invoice_val
+  WHERE COALESCE(ARRAY_JOIN(id_contract, ','), '') = '' OR COALESCE(ARRAY_JOIN(id_contract, ','), '') = 'null'
   )
 
 SELECT
