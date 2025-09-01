@@ -134,7 +134,6 @@ if __name__ == "__main__":
             )
 
     else:
-        feedback_parameters = None
         response = jira_consumer.sync(endpoint_enum=endpoint_enum, params=params)
 
     if response:
@@ -171,7 +170,7 @@ if __name__ == "__main__":
         logger.warn(
             f"""
             m={JOB_NAME}, endpoint_enum={endpoint_enum}, params={params}, 
-            feedback_parameters={feedback_parameters}, table_name={table_name}, 
+            feedback_config={feedback_config}, table_name={table_name}, 
             msg=api response is empty"
         """
         )
