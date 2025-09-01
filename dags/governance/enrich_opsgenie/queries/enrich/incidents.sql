@@ -38,7 +38,7 @@ SELECT
   ji.dt_started,
   ji.ts_created,
   ji.ts_resolved,
-  TIMESTAMP(ji.ts_updated) AS ts_updated,
+  GREATEST(TIMESTAMP(ji.ts_updated), TIMESTAMP(ji.dt_deleted), oa.ts_updated) AS ts_updated,
   NOW() AS ts_load,
   aux.quarter,
   aux.year,
@@ -57,4 +57,3 @@ LEFT JOIN
     ON DATE(ji.ts_created) = aux.date
 WHERE
   ji.id_project = '11446'
-  AND GREATEST(DATE(ji.ts_updated), ji.dt_deleted, oa.ts_updated_local_tz) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
