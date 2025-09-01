@@ -523,7 +523,6 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.hr_system:load-clean-areas-of-responsibility:first-run-of-day
-  - bietlejuice.hr_system:load-clean-jobs:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
   - bietlejuice.hr_system:load-clean-salaries:first-run-of-day
   - bietlejuice.hr_system:load-clean-workers:first-run-of-day
@@ -532,10 +531,16 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_absence:load-clean-type:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-job:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
   - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
   - bietlejuice.pin_core:load-clean-rates:first-run-of-day
+  - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day

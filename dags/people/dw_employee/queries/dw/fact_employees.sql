@@ -22,8 +22,6 @@ SELECT
     qnt_directly_led,
     qnt_undirectly_led,
     salary,
-    target_plr,
-    salary_reference,
     last_salary_increase,
     pct_last_salary_increase,
     NOW() AS ts_load

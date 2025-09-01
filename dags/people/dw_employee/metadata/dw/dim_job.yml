@@ -1,63 +1,111 @@
 ---
 database_name: dw_employee
 table_name: dim_jobs
-owner: isabella.araujo@quintoandar.com.br
+owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: "Dimension table that stores information about job roles, including their structure, career path, and operational attributes within the QuintoAndar Group."
 columns:
   sk_job:
     description: "Surrogate key for the job, serving as the unique identifier for this dimension."
     lineage:
-      - datalake_hr_system_clean.jobs.id_job
+      - datalake_pin_core_clean.job.id_job
   job_code:
-    description: "The unique code assigned to the job role."
+    description: "The external code assigned to the job role."
     lineage:
-      - datalake_hr_system_clean.jobs.job_code
+      - datalake_pin_core_clean.job.job_code
+  brazilian_occupation_code:
+    description: "The Brazilian Classification of Occupations (CBO) code for the job."
+    lineage:
+      - datalake_pin_core_clean.job_legislative.brazilian_occupation_code
   job_name:
-    description: "The official name or title of the job role."
+    description: "The official name or title of the job role in Portuguese."
     lineage:
-      - datalake_hr_system_clean.jobs.job_name
-  band:
-    description: "The salary or seniority band associated with the job. The most recent value is considered the current one."
-    lineage:
-      - datalake_pin.movement_details.band
-  comp_ladder_directorate:
-    description: "The name of the compensation ladder, which defines the career progression structure for a specific directorate."
-    lineage:
-      - datalake_hr_system_clean.jobs.comp_ladder_directorate
-  comp_ladder_business_unit:
-    description: "A grouping of jobs that belong to the same business unit or organizational structure."
-    lineage:
-      - datalake_hr_system_clean.jobs.id_set
+      - datalake_pin_core_clean.job_translation.name
   job_category:
-    description: "The job family name, which groups jobs with similar functions or characteristics (e.g., 'Engineering', 'Marketing')."
+    description: "The job family name, which groups jobs with similar characteristics (e.g., 'Analistas', 'Gerentes')."
     lineage:
-      - datalake_hr_system_clean.jobs.id_job_family
+      - datalake_pin_core_clean.job_family_translation.job_family_name
+  band:
+    description: "The salary/seniority band associated with the job's grade."
+    lineage:
+      - datalake_pin_core_clean.grade_translation.name
   career_track:
-    description: "The career track for the job. Possible values: 'Líder' (Leader), 'Contribuidor Individual' (Individual Contributor), 'UNKNOWN'."
+    description: "The contribution level or career track for the job (e.g., 'Contribuidor Individual', 'Líder')."
     lineage:
-      - datalake_hr_system_clean.jobs.career_track
+      - datalake_pin_core_clean.job.contribution_level
+  comp_ladder_directorate:
+    description: "The name of the compensation ladder, or salary table, which defines the compensation details for a set of jobs."
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+  comp_ladder_business_unit:
+    description: "Business unit linked to the compensation ladder and job, based on the set identifier."
+    lineage:
+      - datalake_pin_core_clean.set_identifiers.set_name
   working_hours_regime:
-    description: "The legal working hours regime for the job. Possible values: '1 - Submetido a Jornada de Trabalho' (Standard Hours), '3 - Função de Confiança' (Position of Trust), '4 - Teletrabalho (Inciso III Art 62 CLT)' (Remote Work), 'UNKNOWN'."
+    description: "The work arrangement or legal working hours regime for the job."
     lineage:
-      - datalake_hr_system_clean.jobs.working_hours_regime
+      - datalake_pin_core_clean.job.work_arrangement
+  target_sop_currency:
+    description: "The currency for the Target SOP (Stock Options Program)."
+    lineage:
+      - datalake_pin_core_clean.job.target_sop_currency
   workload:
-    description: "The expected weekly workload in hours and other details related to the job's schedule."
+    description: "The expected weekly workload in hours for the job."
     lineage:
-      - datalake_hr_system_clean.jobs.workload
+      - datalake_pin_core_clean.job.weekly_hours
+  target_plr:
+    description: "Target PLR (Profit Sharing) amount."
+    lineage:
+      - datalake_pin_core_clean.job.target_plr
+  target_plr_salary_multiplier:
+    description: "The multiplier applied to the salary to calculate the target PLR."
+    lineage:
+      - datalake_pin_core_clean.job.target_plr_salary_multiplier
+  target_rvv:
+    description: "Target RVV (Remuneração Variável de Vendas / Variable Sales Compensation) amount."
+    lineage:
+      - datalake_pin_core_clean.job.target_rvv
+  target_sop:
+    description: "Target SOP (Stock Options Program) amount."
+    lineage:
+      - datalake_pin_core_clean.job.target_sop
+  target_hiring_sop:
+    description: "Target Hiring SOP (Stock Options Program for new hires) amount."
+    lineage:
+      - datalake_pin_core_clean.job.target_hiring_sop
+  target_bonus_tech_usd:
+    description: "Target bonus amount in USD for technology roles."
+    lineage:
+      - datalake_pin_core_clean.job.target_bonus_tech_usd
+  salary_range_midpoint:
+    description: "The midpoint value of the salary range for the job's grade."
+    lineage:
+      - datalake_pin_core_clean.rate_values.mid_value
+  salary_range_min:
+    description: "The minimum value of the salary range for the job's grade."
+    lineage:
+      - datalake_pin_core_clean.rate_values.minimum_value
+  salary_range_max:
+    description: "The maximum value of the salary range for the job's grade."
+    lineage:
+      - datalake_pin_core_clean.rate_values.maximum_value
   is_active:
-    description: "Flag indicating if the job role is currently active. Possible values: TRUE, FALSE, NULL."
+    description: "Flag indicating if the job role is currently active. Possible values: TRUE, FALSE."
     lineage:
-      - datalake_hr_system_clean.jobs.active_status
+      - datalake_pin_core_clean.job.is_active
   has_clock_in:
-    description: "Flag indicating if the job requires employees to clock in and out. Possible values are: TRUE, FALSE, NULL."
+    description: "Flag indicating if the job requires employees to clock in and out. Possible values are: TRUE, FALSE."
     lineage:
-      - datalake_hr_system_clean.jobs.has_clock_in
+      - datalake_pin_core_clean.job.is_time_clocking_required
   dt_effective_start:
     description: "The start date for when the job information became effective, used for tracking historical changes."
     lineage:
-      - datalake_hr_system_clean.jobs.dt_effective_start
+      - datalake_pin_core_clean.job.dt_effective_started
   dt_effective_end:
     description: "The end date for the validity of the job record, used for tracking historical changes."
     lineage:
-      - datalake_hr_system_clean.jobs.dt_effective_end
+      - datalake_pin_core_clean.job.dt_effective_ended
+  ts_last_update:
+    description: "Timestamp of the last update to the record in the source system."
+    lineage:
+      - datalake_pin_core_clean.job.ts_updated

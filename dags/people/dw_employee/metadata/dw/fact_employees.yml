@@ -99,14 +99,6 @@ columns:
     description: "Employee's current salary amount."
     lineage:
       - dw_employee.fact_assignments.salary
-  target_plr:
-    description: "Target PLR (Profit Sharing) amount."
-    lineage:
-      - dw_employee.fact_assignments.target_plr
-  salary_reference:
-    description: "Reference salary (mid-point) for the job."
-    lineage:
-      - dw_employee.fact_assignments.salary_reference
   last_salary_increase:
     description: "Amount of the last salary adjustment."
     lineage:

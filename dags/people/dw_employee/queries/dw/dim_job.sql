@@ -1,103 +1,249 @@
-WITH jobs AS (
+WITH
+job_latest AS (
     SELECT
         id_job,
-        id_set,
-        id_job_family,
-        id_grade_ladder,
-        active_status,
         job_code,
-        job_name,
-        job_customer_flex,
-        valid_grades,
-        dt_effective_start,
-        dt_effective_end
+        id_job_family,
+        contribution_level,
+        id_grade_ladder,
+        id_set,
+        work_arrangement,
+        target_sop_currency,
+        weekly_hours,
+        target_plr,
+        target_plr_salary_multiplier,
+        target_rvv,
+        target_sop,
+        target_hiring_sop,
+        target_bonus_tech_usd,
+        is_active,
+        is_time_clocking_required,
+        dt_effective_started,
+        dt_effective_ended,
+        ts_updated,
+        object_version_number
     FROM
-        datalake_hr_system_clean.jobs
-), job_customer_flex_step1 AS (
-    SELECT
-        id_job,
-        EXPLODE (job_customer_flex) AS job_customer_flex
-    FROM
-        jobs
-), job_customer_flex AS (
-    SELECT
-        id_job,
-        DATE(job_customer_flex['EffectiveStartDate'])   AS dt_effective_start_jcf,
-        DATE(job_customer_flex['EffectiveEndDate'])     AS dt_effective_end_jcf,
-        job_customer_flex['trilha']                     AS career_track,
-        job_customer_flex['marcaPonto']                 AS has_clock_in,
-        job_customer_flex['regimeDeJornadaDoEmpregado'] AS working_hours_regime,
-        job_customer_flex['cargaHoraria']               AS workload,
-        job_customer_flex['target']                     AS target,
-        job_customer_flex['targetMensal']               AS monthly_target,
-        job_customer_flex['targetSop']                  AS sop_target
-    FROM
-        job_customer_flex_step1
-), band_ladder AS (
-    SELECT
-        id_band_ladder,
-        comp_ladder_directorate
-    FROM
-        datalake_pin.movement_details
+        datalake_pin_core_clean.job
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_band_ladder ORDER BY dt_effective_started DESC) = 1
-), band AS (
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+job_tl_latest AS (
     SELECT
         id_job,
-        band
+        name,
+        dt_effective_started,
+        object_version_number,
+        language
     FROM
-        datalake_pin.movement_details
+        datalake_pin_core_clean.job_translation
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+        AND language = 'PTB'
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_job ORDER BY dt_effective_started DESC) = 1
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+rate_val_latest AS (
+    SELECT
+        id_rate,
+        id_rate_object,
+        minimum_value,
+        maximum_value,
+        mid_value,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.rate_values
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_rate, id_rate_object
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+job_family_tl_latest AS (
+    SELECT
+        id_job_family,
+        job_family_name,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.job_family_translation
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job_family
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+job_leg_latest AS (
+    SELECT
+        id_job,
+        brazilian_occupation_code,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.job_legislative
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+valid_grades_latest AS (
+    SELECT
+        id_job,
+        id_grade,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.valid_grades
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+grade_tl_latest AS (
+    SELECT
+        id_grade,
+        name,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.grade_translation
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_grade
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+grade_ladder_tl_latest AS (
+    SELECT
+        id_grade_ladder,
+        name,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.grade_ladder_translation
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_grade_ladder
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+rates_latest AS (
+    SELECT
+        id_grade_ladder,
+        id_rate,
+        dt_effective_started,
+        object_version_number
+    FROM
+        datalake_pin_core_clean.rates
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_grade_ladder, id_rate
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) = 1
+),
+
+set_id_latest AS (
+    SELECT
+        id_set,
+        set_name,
+        language,
+        ts_updated
+    FROM
+        datalake_pin_core_clean.set_identifiers
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_set
+            ORDER BY CASE WHEN language = 'PTB' THEN 1 ELSE 2 END, ts_updated DESC
+        ) = 1
 )
-SELECT DISTINCT
-    -- ids
-    j.id_job AS sk_job,
-    -- non-metrics
-    j.job_code,
-    j.job_name,
-    b.band,
-    COALESCE(bl.comp_ladder_directorate, 'UNKNOWN') AS comp_ladder_directorate,
-    CASE
-        WHEN j.id_set = 300000004799082 THEN 'Benvi MX'
-        WHEN j.id_set = 300000004799081 THEN 'Benvi PT'
-        WHEN j.id_set = 300000004799083 THEN 'Classifieds Latam'
-        WHEN j.id_set = 0 THEN 'Conjunto Comum'
-        WHEN j.id_set = 300000000000174 THEN 'Conjunto do Enterprise'
-        WHEN j.id_set = 300000004799080 THEN 'Deel - QuintoAndar'
-        WHEN j.id_set = 300000004799078 THEN 'QuintoAndar MG'
-        WHEN j.id_set = 300000004799079 THEN 'QuintoAndar SC'
-        WHEN j.id_set = 300000004799077 THEN 'QuintoAndar SP'
-        ELSE 'UNKNOWN'
-    END AS comp_ladder_business_unit,
-    jf.name_job_family AS job_category,
-    COALESCE(jcf.career_track, 'UNKNOWN') AS career_track,
-    COALESCE(jcf.working_hours_regime, 'UNKNOWN') AS working_hours_regime,
-    jcf.workload,
-    -- metrics
-    CASE
-        WHEN j.active_status = 'A' THEN TRUE
-        WHEN j.active_status = 'I' THEN FALSE
-    END AS is_active,
-    CASE
-        WHEN jcf.has_clock_in = 'Sim' THEN TRUE
-        WHEN jcf.has_clock_in = 'Não' THEN FALSE
-    END has_clock_in,
-    -- dates
-    j.dt_effective_start,
-    j.dt_effective_end,
-    NOW() AS ts_load
+
+SELECT
+    job_latest.id_job AS sk_job,
+    job_latest.job_code,
+    job_tl.name AS job_name,
+    job_family_tl.job_family_name AS job_category,
+    grade_tl.name AS band,
+    job_latest.contribution_level AS career_track,
+    grade_ladder_tl.name AS comp_ladder_directorate,
+    set_id.set_name AS comp_ladder_business_unit,
+    job_latest.work_arrangement AS working_hours_regime,
+    job_latest.target_sop_currency,
+    job_leg.brazilian_occupation_code,
+    job_latest.weekly_hours AS workload,
+    COALESCE(job_latest.target_plr, 0) AS target_plr,
+    COALESCE(job_latest.target_plr_salary_multiplier, 0) AS target_plr_salary_multiplier,
+    COALESCE(job_latest.target_rvv, 0) AS target_rvv,
+    COALESCE(job_latest.target_sop, 0) AS target_sop,
+    COALESCE(job_latest.target_hiring_sop, 0) AS target_hiring_sop,
+    COALESCE(job_latest.target_bonus_tech_usd, 0) AS target_bonus_tech_usd,
+    rate_val.mid_value AS salary_range_midpoint,
+    rate_val.minimum_value AS salary_range_min,
+    rate_val.maximum_value AS salary_range_max,
+    job_latest.is_active,
+    job_latest.is_time_clocking_required AS has_clock_in,
+    job_latest.dt_effective_started AS dt_effective_started,
+    job_latest.dt_effective_ended AS dt_effective_ended,
+    job_latest.ts_updated AS ts_updated
+
 FROM
-    jobs AS j
+    job_latest
 LEFT JOIN
-    job_customer_flex AS jcf
-        ON j.id_job = jcf.id_job
+    job_tl_latest AS job_tl
+        ON job_tl.id_job = job_latest.id_job
 LEFT JOIN
-    band_ladder AS bl
-        ON j.id_grade_ladder = bl.id_band_ladder
+    job_family_tl_latest AS job_family_tl
+        ON job_family_tl.id_job_family = job_latest.id_job_family
 LEFT JOIN
-    band AS b
-        ON j.id_job = b.id_job
+    job_leg_latest AS job_leg
+        ON job_leg.id_job = job_latest.id_job
 LEFT JOIN
-    datalake_hr_system_clean.job_families AS jf
-        ON jf.id_job_family = j.id_job_family
+    valid_grades_latest AS valid_grades
+        ON valid_grades.id_job = job_latest.id_job
+LEFT JOIN
+    grade_tl_latest AS grade_tl
+        ON grade_tl.id_grade = valid_grades.id_grade
+LEFT JOIN
+    grade_ladder_tl_latest AS grade_ladder_tl
+        ON grade_ladder_tl.id_grade_ladder = job_latest.id_grade_ladder
+LEFT JOIN
+    set_id_latest AS set_id
+        ON job_latest.id_set = set_id.id_set
+LEFT JOIN
+    rates_latest AS rate
+        ON rate.id_grade_ladder = job_latest.id_grade_ladder
+LEFT JOIN
+    rate_val_latest AS rate_val
+        ON rate_val.id_rate = rate.id_rate
+        AND rate_val.id_rate_object = valid_grades.id_grade

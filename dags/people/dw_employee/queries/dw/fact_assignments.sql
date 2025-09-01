@@ -122,23 +122,6 @@ latest_rate_values AS (
     dt_effective_ended = DATE('4712-12-31')
   QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY id_rate ORDER BY ts_updated DESC) = 1
-),
-job_salary_reference AS (
-  SELECT DISTINCT
-    j.id_job,
-    rv.mid_value
-  FROM
-    active_jobs AS j
-  INNER JOIN
-    active_valid_grades AS vg
-      ON j.id_job = vg.id_job
-  INNER JOIN
-    salary_rates AS sr
-      ON j.id_grade_ladder = sr.id_grade_ladder
-  INNER JOIN
-    latest_rate_values AS rv
-      ON sr.id_rate = rv.id_rate
-      AND vg.id_grade = rv.id_rate_object
 )
 
 SELECT
@@ -177,8 +160,6 @@ SELECT
   COALESCE(sub.qnt_directly_led, 0) AS qnt_directly_led,
   COALESCE(sub.qnt_undirectly_led, 0) AS qnt_undirectly_led,
   s.salary_amount AS salary,
-  a.target_plr,
-  COALESCE(jsr.mid_value, 0) AS salary_reference,
   s.adjustment_amount AS last_salary_increase,
   s.adjustment_percent AS pct_last_salary_increase,
   NOW() AS ts_load
@@ -212,6 +193,3 @@ LEFT JOIN
 LEFT JOIN 
   managers AS am 
     ON am.id_assignment = im.id_assignment
-LEFT JOIN 
-  job_salary_reference AS jsr 
-    ON jsr.id_job = a.id_job

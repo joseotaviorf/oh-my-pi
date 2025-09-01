@@ -112,16 +112,6 @@ columns:
     description: "Employee's current salary amount."
     lineage:
       - datalake_pin_compensation_clean.salary.salary_amount
-  target_plr:
-    description: "Target PLR (Profit Sharing) amount."
-    lineage:
-      - datalake_pin_core_clean.all_assignments.target_plr
-  salary_reference:
-    description: "Reference salary (mid-point) for the job."
-    lineage:
-      - datalake_pin_core_clean.job.id_grade_ladder
-      - datalake_pin_core_clean.rates.id_rate
-      - datalake_pin_core_clean.rate_values.mid_value
   last_salary_increase:
     description: "Amount of the last salary adjustment."
     lineage:
