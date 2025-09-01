@@ -22,6 +22,7 @@ WITH app_205027_referral_form_events AS (
         datalake_amplitude_clean.205027_referral_form_accepted_events
     WHERE
         id_lead::INTEGER IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
     UNION
     SELECT
         id_lead::INTEGER AS id_lead,
@@ -46,6 +47,7 @@ WITH app_205027_referral_form_events AS (
         datalake_amplitude_clean.205027_referral_form_discarded_events
     WHERE
         id_lead::INTEGER IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_183047_form_submitted_events AS (
     SELECT
@@ -69,6 +71,7 @@ app_183047_form_submitted_events AS (
         datalake_amplitude_clean.183047_lead_form_submitted_events
     WHERE
         formfield_lead_uuid IS NOT NULL OR id_lead_ebdb IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
     UNION
     SELECT
         id_lead_ebdb,
@@ -91,6 +94,7 @@ app_183047_form_submitted_events AS (
         datalake_amplitude_clean.183047_price_suggestion_form_submitted_events
     WHERE
         formfield_lead_uuid IS NOT NULL OR id_lead_ebdb IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
     UNION
     SELECT
         id_lead_ebdb,
@@ -113,6 +117,7 @@ app_183047_form_submitted_events AS (
         datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events
     WHERE
         formfield_lead_uuid IS NOT NULL OR id_lead_ebdb IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_ALL_lead_referred_events AS (
     SELECT
@@ -138,6 +143,7 @@ app_ALL_lead_referred_events AS (
         datalake_amplitude_clean.160023_affiliate_lead_referred_events
     WHERE
         ep_id_lead::INTEGER IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 
     UNION
 
@@ -164,6 +170,7 @@ app_ALL_lead_referred_events AS (
         datalake_amplitude_clean.155696_refer_lead_referred_events
     WHERE
         ep_id_lead::INTEGER IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 
     UNION
 
@@ -190,6 +197,7 @@ app_ALL_lead_referred_events AS (
         datalake_amplitude_clean.155697_refer_lead_referred_events
     WHERE
         ep_id_lead::INTEGER IS NOT NULL
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 user_attribution_exploded AS (
     SELECT
@@ -212,6 +220,7 @@ user_attribution_exploded AS (
         datalake_amplitude_clean.events
     WHERE
         id_app = 183047
+        AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_183047_all_events_firestore AS (
     SELECT
@@ -297,6 +306,7 @@ app_183047_intro_page_viewed_events AS(
     datalake_amplitude_clean.183047_intro_page_viewed_events
   WHERE
     GET_JSON_OBJECT(event_properties, '$.lead_id') IS NOT NULL
+    AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_183047_property_details_page_viewed_events AS (
   SELECT
@@ -322,6 +332,7 @@ app_183047_property_details_page_viewed_events AS (
     datalake_amplitude_clean.183047_property_details_page_viewed_events
   WHERE
     event_properties:lead_id IS NOT NULL
+    AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_183047_rent_pricing_new_listing_form_submitted_events AS (
   SELECT
@@ -347,6 +358,7 @@ app_183047_rent_pricing_new_listing_form_submitted_events AS (
     datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events
   WHERE
     event_properties:lead_id IS NOT NULL
+    AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_183047_rent_pricing_new_listing_page_viewed_events AS (
   SELECT
@@ -372,6 +384,7 @@ app_183047_rent_pricing_new_listing_page_viewed_events AS (
     datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events
   WHERE
     event_properties:lead_id IS NOT NULL
+    AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 lead_events_union AS (
     SELECT
