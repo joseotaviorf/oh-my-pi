@@ -29,7 +29,7 @@ workflow:
     alerts:
       extra_spark_job_arguments:
         - endpoint_enum: LIST_ALERTS
-          jql_query_filter: 'responders: "Analytics Engineering"'
+          jql_query_filter: 'responders: "Data Engineering"'
     alert_log:
       extra_spark_job_arguments:
         - endpoint_enum: LIST_ALERT_LOG
