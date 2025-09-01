@@ -589,5 +589,6 @@ SELECT
     f.array_open_invoices,
     f.array_paid_invoices,
     f.array_negotiated_invoices,
+    f.dt_contract_start,
     NOW() AS ts_load
 FROM segmentation_features AS f
