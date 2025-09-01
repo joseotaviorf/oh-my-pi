@@ -220,6 +220,7 @@ user_attribution_exploded AS (
         datalake_amplitude_clean.events
     WHERE
         id_app = 183047
+        AND event_type NOT IN ('[Experiment] Exposure')
         AND year >= YEAR(CURRENT_DATE() - INTERVAL 2 YEAR)
 ),
 app_183047_all_events_firestore AS (
