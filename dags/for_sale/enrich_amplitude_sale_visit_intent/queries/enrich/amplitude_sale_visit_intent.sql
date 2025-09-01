@@ -1,5 +1,5 @@
 SELECT
-    id_user,
+    CAST(id_user AS BIGINT) AS id_user,
     id_house,
     ts_event AS ts_visit_intent,
     year,
@@ -13,7 +13,7 @@ WHERE
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 UNION ALL
 SELECT
-    id_user,
+    CAST(id_user AS BIGINT) AS id_user,
     id_house,
     ts_event AS ts_visit_intent,
     year,
@@ -27,7 +27,7 @@ WHERE
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 UNION ALL
 SELECT
-    id_user,
+    CAST(id_user AS BIGINT) AS id_user,
     ep_house_id AS id_house,
     ts_event AS ts_visit_intent,
     year,
@@ -41,7 +41,7 @@ WHERE
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 UNION ALL
 SELECT
-    id_user,
+    CAST(id_user AS BIGINT) AS id_user,
     ep_house_id AS id_house,
     ts_event AS ts_visit_intent,
     year,
