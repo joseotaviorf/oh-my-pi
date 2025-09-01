@@ -1,0 +1,22 @@
+SELECT
+    id,
+    person_id AS id_person,
+    rev,
+    revtype AS rev_type,
+    value,
+    scope,
+    type,
+    validation_type,
+    version,
+    value_mod AS mod_value,
+    scope_mod AS mod_scope,
+    type_mod AS mod_type,
+    validation_type_mod AS mod_validation_type,
+    last_validated_at AS ts_last_validated,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_person_raw.person_identity_aud

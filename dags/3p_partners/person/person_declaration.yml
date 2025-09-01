@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: |
       This DAG imports the tables from Person, a core identity management microservice that centralizes natural person data across QuintoAndar's ecosystem.
-      
+
       **Service Overview:**
       The Person service acts as the single source of truth for person/user identity and data, handling:
       - Person registration and profile management
@@ -15,14 +15,14 @@ dag:
       - GDPR compliance through "Right to be Forgotten" implementation
       - Integration with authentication systems (Cognito, Keycloak, Gandalf)
       - Audit trail for all person data changes using Hibernate Envers
-      
+
       **Data Architecture:**
       - Uses PostgreSQL with full audit capabilities
       - Implements optimistic locking for concurrent updates
       - Supports JSONB for flexible metadata storage
       - UUID-based business identifiers for external system integration
       - CDC (Change Data Capture) for real-time data synchronization
-      
+
       **Key Relationships:**
       - Person → Address (1:1): Physical address information
       - Person → ContactInfo (1:N): Emails, phones, push notification tokens
@@ -31,14 +31,14 @@ dag:
       - Person → PersonIdentity (1:N): Cross-system identity resolution
       - Person → Preferences (1:1): User preferences and settings
       - Person → RightToBeForgotten (1:N): GDPR compliance tracking
-      
+
       **Integration Points:**
       - Processes events from AWS Cognito for user signup/login
       - Consumes SQS messages for asynchronous operations
       - Integrates with multiple authentication providers
       - Provides service-to-service APIs with OAuth2 scopes
       - Supports duplicate person detection and merging
-      
+
       **Compliance & Security:**
       - Full audit trail with user attribution and change reasons
       - Data sanitization for PII handling
@@ -57,6 +57,7 @@ workflow:
     contact_info: {}
     credential_reference: {}
     identity_document: {}
+    person_identity_aud: {}
     person_identity: {}
     person: {}
     preference_settings: {}

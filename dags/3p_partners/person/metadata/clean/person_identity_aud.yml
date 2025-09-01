@@ -1,0 +1,198 @@
+---
+database_name: datalake_person_clean
+table_name: person_identity_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Audit table that captures the complete change history of person identity records. Each row represents
+  a historical version of an identity entity, tracking all modifications including value changes, scope updates,
+  validation status transitions, and identity type modifications.
+
+  **Audit Functionality:**
+  - Complete audit trail for all changes made to the person_identity table
+  - Every create, update, and delete operation creates a new audit entry
+  - Full data snapshots at each revision point for point-in-time reconstruction
+  - Modification flags indicate which specific fields changed in each revision
+
+  **Business Context:**
+  - Enables cross-system person identification and deduplication
+  - Supports identity resolution from multiple sources (social logins, documents, contacts)
+  - Implements validation workflows for identity verification
+  - Critical for fraud prevention and account security
+  - Enables single sign-on and unified user experience
+
+  **Identity Types & Sources:**
+  - **Contact Identities:** EMAIL, PHONE for communication-based identification
+  - **Document Identities:** CPF, RFC, PASSPORT for government document matching
+  - **Social Identities:** COGNITO, GOOGLE, APPLE for social login integration
+
+  **Scope & Geographic Coverage:**
+  - **BR:** Brazil-specific identities (CPF, Brazilian phones/emails)
+  - **MX:** Mexico-specific identities (RFC, Mexican phones/emails)
+  - **WW:** Worldwide identities (passports, international emails)
+  - **COGNITO_USER_POOL_BR/MX:** Country-specific Cognito user pools
+
+  **Validation & Trust Levels:**
+  - **SELF:** User-provided, self-attested information
+  - **INTERNAL:** Validated by internal QuintoAndar systems
+  - **EXPIRED:** Previously validated but now expired or superseded
+
+  **Data Architecture:**
+  - PK: id, rev
+  - One-to-many relationship with person_identity (id foreign key)
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.person_identity_aud.id
+    description: |
+      Original person identity ID from the main table (BIGINT, Not Nullable, Primary Key).
+      Combined with rev to form the composite primary key for this audit record.
+  rev:
+    lineage:
+      - datalake_person_raw.person_identity_aud.rev
+    description: |
+      Hibernate Envers revision number (BIGINT, Not Nullable, Primary Key).
+      Global sequence number identifying the transaction that created this audit record.
+  rev_type:
+    lineage:
+      - datalake_person_raw.person_identity_aud.revtype
+    description: |
+      Type of database operation that created this audit record.
+  rev_end:
+    lineage:
+      - datalake_person_raw.person_identity_aud.revend
+    description: |
+      Revision number when this record was superseded (BIGINT, Nullable).
+      **Active Records:** NULL for current/active revisions
+      **Historical Cutoff:** Points to the next revision that replaced this state
+      **Query Optimization:** Enables efficient querying of record states within specific time ranges
+      **Point-in-time Analysis:** Critical for reconstructing system state at any historical point.
+  id_person:
+    lineage:
+      - datalake_person_raw.person_identity_aud.person_id
+    description: |
+      Foreign key reference to the person table (person.id).
+      **Relationship:** Many-to-One with person table
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links identity values to the person they identify
+      **Indexing:** Heavily indexed for fast person lookup by identity.
+  value:
+    lineage:
+      - datalake_person_raw.person_identity_aud.value
+    description: |
+      The actual identity value used for person matching and resolution.
+      **Data Processing:** Sanitized based on identity type (email normalization, phone formatting, etc.)
+      **Examples:** "user@example.com", "+5511999999999", "12345678901", "google:user123"
+      **Security:** May contain PII, handled according to data protection policies
+      **Uniqueness:** Combined with scope and type for uniqueness constraints
+      **Matching:** Used in identity resolution algorithms and duplicate detection.
+  scope:
+    lineage:
+      - datalake_person_raw.person_identity_aud.scope
+    description: |
+      Geographic or system scope that defines the context and validity of the identity.
+      **Allowed Values:**
+      - 'BR': Brazil-specific identities (CPF, Brazilian contacts)
+      - 'MX': Mexico-specific identities (RFC, Mexican contacts)
+      - 'WW': Worldwide identities (passports, international contacts)
+      - 'COGNITO_USER_POOL_BR': Brazil Cognito user pool identities
+      - 'COGNITO_USER_POOL_MX': Mexico Cognito user pool identities
+      **Business Rules:** Determines validation rules and matching algorithms
+      **Compliance:** Used for regulatory compliance and data residency requirements.
+  type:
+    lineage:
+      - datalake_person_raw.person_identity_aud.type
+    description: |
+      Category of identity information stored in this record.
+      **Contact Identities:**
+      - 'EMAIL': Email addresses for digital identification
+      - 'PHONE': Phone numbers for SMS/voice identification
+      **Document Identities:**
+      - 'CPF': Brazilian tax ID for government verification
+      - 'RFC': Mexican tax registry for government verification
+      - 'PASSPORT': International travel document identification
+      **Social Identities:**
+      - 'COGNITO': AWS Cognito user pool identities
+      - 'GOOGLE': Google social login identities
+      - 'APPLE': Apple social login identities
+      **Business Logic:** Different validation and matching rules apply per type.
+  validation_type:
+    lineage:
+      - datalake_person_raw.person_identity_aud.validation_type
+    description: |
+      Method or level of validation applied to this identity.
+      **Allowed Values:**
+      - 'SELF': User-provided information, not independently verified
+      - 'INTERNAL': Verified by QuintoAndar's internal validation systems
+      - 'EXPIRED': Previously validated but validation has expired
+      **Trust Levels:** INTERNAL > SELF > EXPIRED for identity matching confidence
+      **Workflow:** Identities may progress through validation states
+      **Business Impact:** Affects matching algorithms and trust scores.
+  version:
+    lineage:
+      - datalake_person_raw.person_identity_aud.version
+    description: |
+      Optimistic locking version at time of revision.
+  mod_id_person:
+    lineage:
+      - datalake_person_raw.person_identity_aud.person_id_mod
+    description: |
+      Modification flag for person ID field.
+  mod_value:
+    lineage:
+      - datalake_person_raw.person_identity_aud.value_mod
+    description: |
+      Modification flag for identity value field.
+  mod_scope:
+    lineage:
+      - datalake_person_raw.person_identity_aud.scope_mod
+    description: |
+      Modification flag for scope field.
+  mod_type:
+    lineage:
+      - datalake_person_raw.person_identity_aud.type_mod
+    description: |
+      Modification flag for identity type field.
+  mod_validation_type:
+    lineage:
+      - datalake_person_raw.person_identity_aud.validation_type_mod
+    description: |
+      Modification flag for validation type field.
+  mod_ts_last_validated:
+    lineage:
+      - datalake_person_raw.person_identity_aud.last_validated_at_mod
+    description: |
+      Modification flag for last validation timestamp field.
+  ts_last_validated:
+    lineage:
+      - datalake_person_raw.person_identity_aud.last_validated_at
+    description: |
+      Last validation timestamp at time of revision.
+  ts_created:
+    lineage:
+      - datalake_person_raw.person_identity_aud.created_at
+    description: |
+      Identity creation timestamp at time of revision.
+  ts_updated:
+    lineage:
+      - datalake_person_raw.person_identity_aud.updated_at
+    description: |
+      Last update timestamp at time of revision.
+  year:
+    lineage:
+    - datalake_person_raw.person_identity_aud.year
+    description: |
+      Partition column - Year extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
+  month:
+    lineage:
+    - datalake_person_raw.person_identity_aud.month
+    description: |
+      Partition column - Month extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
+  day:
+    lineage:
+    - datalake_person_raw.person_identity_aud.day
+    description: |
+      Partition column - Day extracted from the record's processing timestamp.
+      Used for efficient data partitioning and query performance optimization.
