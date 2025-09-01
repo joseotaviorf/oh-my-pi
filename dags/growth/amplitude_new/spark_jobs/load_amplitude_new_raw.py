@@ -21,6 +21,8 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 
+from pyspark.sql.functions import col
+
 JOB_NAME = "load_amplitude_new_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
@@ -36,7 +38,7 @@ def process_key(key, environment, source, datalake_bucket, execution_date, parti
         transient_path = f'{transient_location}{key["app_id"]}/{key["app_id"]}_{execution_date}_*/'
         logger.info(f'Starting events processing for app_id={key["app_id"]}, path={transient_path}')
 
-        df = spark_client.conn.read.json(transient_path, schema=transient_data_schema)
+        df = spark_client.conn.read.json(transient_path, schema=transient_data_schema).filter(~col('event_type').contains('Exposure'))
 
         if not df.isEmpty():
             df = (
