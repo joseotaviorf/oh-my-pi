@@ -8,7 +8,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.greenhouse.argument_parser import JobArgumentParser
 from bietlejuice.jobs.greenhouse.greenhouse_api import GreenhouseAPI
 from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
-from bietlejuice.jobs.greenhouse.helpers import json_to_dataframe, insert_partitions
+from bietlejuice.jobs.common.helpers import json_to_dataframe, insert_partitions
 
 LOGGER = QuintoAndarLogger(__name__)
 

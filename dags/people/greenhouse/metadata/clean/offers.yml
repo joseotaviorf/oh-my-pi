@@ -37,14 +37,6 @@ columns:
     description: The workplace address for the offer.
     lineage:
       - datalake_greenhouse_raw.offers.keyed_custom_fields['workplace_address']['value']
-  salary_unit:
-    description: The currency unit for the monthly salary.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['salary']['value']
-  annual_salary_unit:
-    description: The currency unit for the annual salary.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['brasil_annual_salary_amount']['value']
   employment_type:
     description: The employment type for the offer.
     lineage:
@@ -56,7 +48,7 @@ columns:
   reporting_to_manager_name:
     description: The name of the hiring manager.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['reporting_to_manager']['value']
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['reporting_to_manager']['value']['name']
   car_allowance:
     description: Details about the car allowance.
     lineage:
@@ -65,14 +57,6 @@ columns:
     description: Details about the medical plan.
     lineage:
       - datalake_greenhouse_raw.offers.keyed_custom_fields['plan_m_dico']['value']
-  hiring_bonus_unit:
-    description: The currency unit for the hiring bonus.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['sign_on_bonus']['value']
-  stock_options_cash_unit:
-    description: The currency unit for the stock options cash amount.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['stock_options_cash_amount_offered']['value']
   opening_status:
     description: The status of the opening.
     lineage:
@@ -81,22 +65,38 @@ columns:
     description: The version number of the offer.
     lineage:
       - datalake_greenhouse_raw.offers.version
+  salary_unit:
+    description: The currency unit for the monthly salary.
+    lineage:
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['salary']['value']['unit']
+  annual_salary_unit:
+    description: The currency unit for the annual salary.
+    lineage:
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['brasil_annual_salary_amount']['value']['unit']
+  hiring_bonus_unit:
+    description: The currency unit for the hiring bonus.
+    lineage:
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['sign_on_bonus']['value']['unit']
+  stock_options_cash_unit:
+    description: The currency unit for the stock options cash amount.
+    lineage:
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['stock_options_cash_amount_offered']['value']['unit']
   salary_value:
     description: The monthly salary amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['salary']['value']
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['salary']['value']['value']
   annual_salary_value:
     description: The annual salary amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['brasil_annual_salary_amount']['value']
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['brasil_annual_salary_amount']['value']['value']
   hiring_bonus_value:
     description: The hiring bonus amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['sign_on_bonus']['value']
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['sign_on_bonus']['value']['value']
   stock_options_cash_value:
     description: The stock options cash amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['stock_options_cash_amount_offered']['value']
+      - datalake_greenhouse_raw.offers.keyed_custom_fields['stock_options_cash_amount_offered']['value']['value']
   has_hiring_bonus:
     description: A boolean flag indicating if a hiring bonus is included.
     lineage:
