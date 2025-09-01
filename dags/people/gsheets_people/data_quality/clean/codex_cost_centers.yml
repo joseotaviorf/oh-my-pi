@@ -1,0 +1,13 @@
+---
+table_name: datalake_gsheets_people_clean.codex_cost_centers
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_cost_center:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
