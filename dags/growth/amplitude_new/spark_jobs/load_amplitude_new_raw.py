@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, col
 
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -51,8 +51,8 @@ def process_key(key, environment, source, datalake_bucket, execution_date, parti
             )
 
             missing_cols = [col for col in transient_expected_cols if col not in df.columns]
-            for col in missing_cols:
-                df = df.withColumn(col, lit(None))
+            for table_col in missing_cols:
+                df = df.withColumn(table_col, lit(None))
 
             df = df.select(transient_expected_cols).na.drop(subset=partition_cols)
 
