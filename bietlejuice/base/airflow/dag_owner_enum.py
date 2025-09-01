@@ -6,7 +6,6 @@ class DAGOwnerEnum:
     DEFAULT_OWNER = "Data Engineering"
     DATA_3P_PARTNERS = "Data 3P Partners"
     DATA_AGENTS = "Data Agents"
-    DATA_CDP = "Data CDP"
     DATA_CONVERSATIONAL_XP = "Data Conversational XP"
     DATA_DS_PRICING = "Data DS Pricing"
     DATA_FINTECH = "Data Fintech"

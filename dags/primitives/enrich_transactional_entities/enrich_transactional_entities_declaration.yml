@@ -1,7 +1,7 @@
 dag:
   name: enrich_transactional_entities
   schedule_start_date: 2025, 8, 20
-  owner: Data CDP
+  owner: Data Primitives
   documentation:
     dag_purpose: |
       This DAG creates enriched tables containing the CDP Transactional entities vision.
