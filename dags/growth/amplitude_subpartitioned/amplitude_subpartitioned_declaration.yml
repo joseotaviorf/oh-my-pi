@@ -225,6 +225,9 @@ workflow:
     170698_visit_list_request_schedule_button_clicked_events:
       run_optimize: false
       run_vacuum: false
+    170698_visit_schedule_clicked_events:
+      run_optimize: false
+      run_vacuum: false
     170698_visit_schedule_confirmed_events:
       run_optimize: false
       run_vacuum: false

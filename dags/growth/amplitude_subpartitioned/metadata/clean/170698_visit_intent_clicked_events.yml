@@ -1,5 +1,9 @@
 database_name: datalake_amplitude_clean
 table_name: 170698_visit_intent_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: This table contains visit_intent_clicked events from app 170698.
+  It tracks user interactions and includes relevant metadata and user properties.
 columns:
   id_amplitude:
     lineage:
@@ -21,6 +25,14 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.id_app
     description: Column id_app from Amplitude events
+  id_house:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: ID of house extract from event_properties field
+  business_context:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Business context extract from event_properties field
   city:
     lineage:
     - datalake_amplitude_clean.events.city

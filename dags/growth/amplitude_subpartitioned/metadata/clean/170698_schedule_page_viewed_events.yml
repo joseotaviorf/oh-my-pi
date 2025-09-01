@@ -1,5 +1,9 @@
 database_name: datalake_amplitude_clean
 table_name: 170698_schedule_page_viewed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: This table contains schedule_page_viewed events from app 170698. It tracks
+  user interactions and includes relevant metadata and user properties.
 columns:
   ep_house_id:
     lineage:
@@ -265,7 +269,3 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Column top5_house_id from Amplitude events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
-description: This table contains schedule_page_viewed events from app 170698. It tracks
-  user interactions and includes relevant metadata and user properties.

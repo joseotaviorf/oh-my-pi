@@ -1,0 +1,35 @@
+database_name: datalake_amplitude_clean
+table_name: 170698_visit_schedule_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: This table contains visit_schedule_clicked events from app 170698.
+  It tracks user interactions and includes relevant metadata and user properties.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: Unique identifier for the user who triggered the visit schedule click event.
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: House identifier extracted from event_properties JSON field using get_json_object function.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context information extracted from event_properties JSON field using get_json_object function.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the visit schedule click event occurred
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year partition column for efficient data partitioning and query performance.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month partition column for efficient data partitioning and query performance.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day partition column for efficient data partitioning and query performance.

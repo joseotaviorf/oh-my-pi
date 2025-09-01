@@ -2,34 +2,48 @@
 database_name: datalake_amplitude_sale_visit_intent
 table_name: amplitude_sale_visit_intent
 description: Enriched table identify sale visit intent events from Amplitude.
-domain: Data ForSale
-owner: herivelto.junior@quintoandar.com.br
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_user:
-    description: User ID
+    description: Unique identifier for the user who triggered the visit intent event.
     lineage:
-      - datalake_amplitude_clean.events.id_user
-  id_app:
-    description: App ID
-    lineage:
-      - datalake_amplitude_clean.events.id_app
+      - datalake_amplitude_clean.170698_visit_intent_clicked_events.id_user
+      - datalake_amplitude_clean.170698_visit_schedule_clicked_events.id_user
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.id_user
   id_house:
-    description: House ID
+    description: ID of the house that the user want to visit.
     lineage:
-      - datalake_amplitude_clean.events.event_properties
+      - datalake_amplitude_clean.170698_visit_intent_clicked_events.id_house
+      - datalake_amplitude_clean.170698_visit_schedule_clicked_events.id_house
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.ep_house_id
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.ep_house_id
   ts_visit_intent:
     description: Timestamp when this sale visit intent event happened
     lineage:
-      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.170698_visit_intent_clicked_events.ts_event
+      - datalake_amplitude_clean.170698_visit_schedule_clicked_events.ts_event
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.ts_event
   year:
-    description: Event year
+    description: Year partition column for efficient data partitioning and query performance.
     lineage:
-      - datalake_amplitude_clean.events.year
+      - datalake_amplitude_clean.170698_visit_intent_clicked_events.year
+      - datalake_amplitude_clean.170698_visit_schedule_clicked_events.year
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.year
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.year
   month:
-    description: Event month
+    description: Month partition column for efficient data partitioning and query performance.
     lineage:
-      - datalake_amplitude_clean.events.month
+      - datalake_amplitude_clean.170698_visit_intent_clicked_events.month
+      - datalake_amplitude_clean.170698_visit_schedule_clicked_events.month
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.month
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.month
   day:
-    description: Event day
+    description: Day partition column for efficient data partitioning and query performance.
     lineage:
-      - datalake_amplitude_clean.events.day
+      - datalake_amplitude_clean.170698_visit_intent_clicked_events.day
+      - datalake_amplitude_clean.170698_visit_schedule_clicked_events.day
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.day
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.day

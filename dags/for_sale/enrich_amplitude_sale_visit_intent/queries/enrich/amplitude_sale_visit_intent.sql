@@ -1,29 +1,55 @@
-WITH aux_events AS (
-    SELECT
-        CAST(e.id_user AS BIGINT) AS id_user,
-        JSON_TUPLE(e.event_properties, 'house_id', 'business_context'),
-        e.ts_event AS ts_visit_intent,
-        year,
-        month,
-        day
-    FROM 
-        datalake_amplitude_clean.events AS e
-    WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
-        AND e.id_app = 170698
-        AND e.event_type IN ('visit_intent_clicked','visit_schedule_clicked', 'schedule_page_viewed', 'visit_schedule_confirmed')
-        AND e.id_user IS NOT NULL 
-)
 SELECT
     id_user,
-    CAST(TRIM(c0) AS BIGINT) AS id_house,
-    ts_visit_intent,
+    id_house,
+    ts_event AS ts_visit_intent,
     year,
     month,
     day
 FROM
-    aux_events
+    datalake_amplitude_clean.170698_visit_intent_clicked_events
 WHERE
-    TRIM(c1) IN ('sale','SALE')
+    id_user IS NOT NULL
+    AND UPPER(business_context) = 'SALE'
+    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+UNION ALL
+SELECT
+    id_user,
+    id_house,
+    ts_event AS ts_visit_intent,
+    year,
+    month,
+    day
+FROM
+    datalake_amplitude_clean.170698_visit_schedule_clicked_events
+WHERE
+    id_user IS NOT NULL
+    AND UPPER(business_context) = 'SALE'
+    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+UNION ALL
+SELECT
+    id_user,
+    ep_house_id AS id_house,
+    ts_event AS ts_visit_intent,
+    year,
+    month,
+    day
+FROM
+    datalake_amplitude_clean.170698_schedule_page_viewed_events
+WHERE
+    id_user IS NOT NULL
+    AND UPPER(business_context) = 'SALE'
+    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+UNION ALL
+SELECT
+    id_user,
+    ep_house_id AS id_house,
+    ts_event AS ts_visit_intent,
+    year,
+    month,
+    day
+FROM
+    datalake_amplitude_clean.170698_visit_schedule_confirmed_events
+WHERE
+    id_user IS NOT NULL
+    AND UPPER(ep_business_context) = 'SALE'
+    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

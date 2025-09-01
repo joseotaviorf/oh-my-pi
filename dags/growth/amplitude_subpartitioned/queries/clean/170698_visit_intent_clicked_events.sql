@@ -4,6 +4,8 @@ SELECT
   adid,
   amplitude_event_type,
   id_app,
+  get_json_object(event_properties, '$.house_id') AS id_house,
+  get_json_object(event_properties, '$.business_context') AS business_context,
   city,
   ts_client_event,
   ts_client_uploaded,
@@ -52,6 +54,6 @@ SELECT
 FROM
     datalake_amplitude_clean.events
 WHERE
-    id_app = '170698' AND
-    event_type = 'visit_intent_clicked'
+    id_app = '170698'
+    AND event_type = 'visit_intent_clicked'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

@@ -1267,7 +1267,10 @@ bietlejuice.enrich_amplitude_page_viewed_events:
 bietlejuice.enrich_amplitude_partner_taxonomy:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.enrich_amplitude_sale_visit_intent:
-  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-schedule-page-viewed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-intent-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events:first-run-of-day
 bietlejuice.enrich_amplitude_user:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.enrich_amplitude_visit:
