@@ -1014,7 +1014,7 @@ class TestCreateVisitCoreModel:
     def test_create_core_model_adds_year_month_day_columns(
         self, spark_session, visit_df, visit_status_log_df, house_df
     ):
-        """Test that create_core_model correctly adds year, month, day columns based on ts_created."""
+        """Test that create_core_model correctly adds year, month, day columns based on ts_updated."""
         # Arrange
         job = CoreVisitSparkJob()
         mock_args = Mock()
@@ -1058,15 +1058,15 @@ class TestCreateVisitCoreModel:
 
                 # Collect data to validate the values
                 result_data = result_df.select(
-                    "ts_created", "year", "month", "day"
+                    "ts_updated", "year", "month", "day"
                 ).collect()
 
-                # Validate that year, month, day values are correctly derived from ts_created
+                # Validate that year, month, day values are correctly derived from ts_updated
                 for row in result_data:
-                    ts_created = row["ts_created"]
-                    expected_year = ts_created.year
-                    expected_month = ts_created.month
-                    expected_day = ts_created.day
+                    ts_updated = row["ts_updated"]
+                    expected_year = ts_updated.year
+                    expected_month = ts_updated.month
+                    expected_day = ts_updated.day
 
                     assert (
                         row["year"] == expected_year
@@ -1079,7 +1079,7 @@ class TestCreateVisitCoreModel:
                     ), f"Day should be {expected_day}, got {row['day']}"
 
     def test_create_core_model_year_month_day_with_different_dates(self, spark_session):
-        """Test year, month, day columns with various dates to ensure correct extraction."""
+        """Test year, month, day columns with various dates to ensure correct extraction from ts_updated."""
         # Arrange
         from pyspark.sql.types import (
             StructType,
@@ -1277,7 +1277,7 @@ class TestCreateVisitCoreModel:
 
                 # Assert - Validate specific date extractions
                 result_data = result_df.select(
-                    "id_entity", "ts_created", "year", "month", "day"
+                    "id_entity", "ts_updated", "year", "month", "day"
                 ).collect()
 
                 # Check Christmas 2023 (December 25, 2023)
