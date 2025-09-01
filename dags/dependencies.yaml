@@ -3561,8 +3561,6 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:
-  - bietlejuice.big_agent:load-clean-points-rule:first-run-of-day
-  - bietlejuice.big_agent:load-clean-share-rule:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant:first-run-of-day
@@ -3576,10 +3574,6 @@ bietlejuice.enrich_tiers:
   - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
-bietlejuice.enrich_tiers_classification:
-  - bietlejuice.enrich_tiers:load-enrich-agent-performance:first-run-of-day
-  - bietlejuice.enrich_tiers:load-enrich-hub-points-rule:first-run-of-day
-  - bietlejuice.enrich_tiers:load-enrich-hub-share-rule:first-run-of-day
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-intro-page-viewed-events:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates:first-run-of-day
@@ -4238,11 +4232,6 @@ bietlejuice.reverse_supply:
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts:first-run-of-day
 bietlejuice.reverse_supply_access:
   - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry:first-run-of-day
-bietlejuice.reverse_tiers:
-  - bietlejuice.enrich_tiers:load-enrich-agent-performance:first-run-of-day
-  - bietlejuice.enrich_tiers_classification:load-enrich-tiers:first-run-of-day
-bietlejuice.reverse_tiers_access:
-  - bietlejuice.reverse_tiers:load-reverse-tiers:first-run-of-day
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
