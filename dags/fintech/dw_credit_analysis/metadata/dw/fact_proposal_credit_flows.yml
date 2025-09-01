@@ -86,7 +86,7 @@ columns:
     description: "Key for the last credit analysis ID to a given proposal. This ID can be used in any join with the credit analysis ID from Sorting Hat."
   sk_last_credit_evaluation_init:
     lineage:
-      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
+      - datalake_docx_clean.credit_evaluation.ts_created
     description: "Key of date of the last credit evaluation."
   sk_last_credit_evaluation_negative:
     lineage:
@@ -263,8 +263,8 @@ columns:
     description: "The number of proponents in a proposal."
   dt_last_credit_evaluation_init:
     lineage:
-      - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
-    description: "Key of date when credit evaluation last was initiated."
+      - datalake_docx_clean.credit_evaluation.ts_created
+    description: "Date when credit evaluation last was initiated."
   dt_tenant_first_doc_sent_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_tenant_first_doc_sent_date

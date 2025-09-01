@@ -172,7 +172,8 @@ rent_flows AS (
     CAST(
       COALESCE(cap.id_last_credit_analysis, -1) AS INTEGER
     ) AS sk_last_credit_analysis,
-    flrf.sk_last_credit_evaluation_init,
+    -- considera a data de ES da credit evaluation do docx
+    COALESCE(CAST(DATE_FORMAT(cev.ts_created, "yyyyMMdd") AS BIGINT), -1) AS sk_last_credit_evaluation_init,
     flrf.sk_last_credit_evaluation_negative,
     flrf.sk_last_credit_evaluation_positive,
     flrf.sk_offer,
@@ -243,6 +244,9 @@ rent_flows AS (
   LEFT JOIN
     proposal_proponent_type AS pt
       ON pt.id_proposal = flrf.sk_proposal
+  LEFT JOIN
+    datalake_docx_clean.credit_evaluation AS cev
+      ON cev.id_proposal = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
