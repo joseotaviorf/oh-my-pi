@@ -1,0 +1,47 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: automatic_invoice
+description: This table contains information about the automatic invoices from the inspection services.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_automatic_invoice:
+    description: ID of the table.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.id
+  uuid_inspection:
+    description: UUID of the inspection.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.inspection_uuid
+  id_contract:
+    description: ID of the contract.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.contract_id
+  payment_method:
+    description: Payment method.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.payment_method
+  tag:
+    description: Automatic invoice tag.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.tag
+  tenant_cost:
+    description: Tenant cost.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.tenant_cost
+  owner_cost:
+    description: Owner cost.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.owner_cost
+  installments:
+    description: Number of installments.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.installments
+  ts_created:
+    description: Timestamp when the register was created.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.created_at
+  ts_updated:
+    description: Timestamp when the register was last updated.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice.updated_at

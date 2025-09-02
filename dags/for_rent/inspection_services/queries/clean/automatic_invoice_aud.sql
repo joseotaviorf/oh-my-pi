@@ -1,0 +1,25 @@
+SELECT
+	id AS id_automatic_invoice,
+	inspection_uuid AS uuid_inspection,
+	contract_id AS id_contract,
+	rev,
+	revend AS rev_end,
+	revtype AS rev_type,
+	payment_method,
+	tag,
+	tenant_cost,
+	owner_cost,
+	installments,
+	inspection_uuid_mod AS mod_uuid_inspection,
+	contract_id_mod AS mod_id_contract,
+	payment_method_mod AS mod_payment_method,
+	tag_mod AS mod_tag,
+	tenant_cost_mod AS mod_tenant_cost,
+	owner_cost_mod AS mod_owner_cost,
+	installments_mod AS mod_installments,
+	created_at_mod AS mod_ts_created,
+	updated_at_mod AS mod_ts_updated,
+	created_at AS ts_created,
+	updated_at AS ts_updated
+FROM
+	datalake_inspection_services_raw.automatic_invoice_aud

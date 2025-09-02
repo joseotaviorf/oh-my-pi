@@ -39,6 +39,8 @@ workflow:
       clean_table_name: assessment
       clean_primary_keys: [id_assessment]
       raw_primary_keys: [id]
+    automatic_invoice: {}
+    automatic_invoice_aud: {}
     budget_approval_payment_preference_aud:
       clean_table_name: budget_approval_payment_preference_aud
       clean_primary_keys: [id_budget_approval_payment_preference, rev]

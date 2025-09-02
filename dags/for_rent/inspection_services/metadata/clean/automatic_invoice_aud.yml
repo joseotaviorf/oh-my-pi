@@ -1,0 +1,99 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: automatic_invoice_aud
+description: This table contains information about the automatic invoices from the inspection services.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_automatic_invoice:
+    description: ID of the table.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.id
+  uuid_inspection:
+    description: UUID of the inspection.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.inspection_uuid
+  id_contract:
+    description: ID of the contract.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.contract_id
+  rev:
+    description: Foreign key of the RevInfo table, which indicates when the record was changed.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.rev
+  rev_end:
+    description: Foreign key of the RevInfo table, which indicates the next revision of the record.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.rev_end
+  rev_type:
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.revtype
+  payment_method:
+    description: Payment method.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.payment_method
+  tag:
+    description: Automatic invoice tag.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.tag
+  tenant_cost:
+    description: Tenant cost.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.tenant_cost
+  owner_cost:
+    description: Owner cost.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.owner_cost
+  installments:
+    description: Number of installments.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.installments
+  mod_uuid_inspection:
+    description: Boolean column indicating if the uuid_inspection column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.inspection_uuid_mod
+  mod_id_contract:
+    description: Boolean column indicating if the id_contract column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.contract_id_mod
+  mod_payment_method:
+    description: Boolean column indicating if the payment_method column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.payment_method_mod
+  mod_tag:
+    description: Boolean column indicating if the tag column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.tag_mod
+  mod_tenant_cost:
+    description: Boolean column indicating if the tenant_cost column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.tenant_cost_mod
+  mod_owner_cost:
+    description: Boolean column indicating if the owner_cost column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.owner_cost_mod
+  mod_installments:
+    description: Boolean column indicating if the installments column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.installments_mod
+  mod_ts_created:
+    description: Boolean column indicating if the ts_created column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.created_at_mod
+  mod_ts_updated:
+    description: Boolean column indicating if the ts_updated column has been modified.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.updated_at_mod
+  ts_created:
+    description: Timestamp when the register was created.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.created_at
+  ts_updated:
+    description: Timestamp when the register was last updated.
+    lineage:
+      - datalake_inspection_services_raw.automatic_invoice_aud.updated_at
