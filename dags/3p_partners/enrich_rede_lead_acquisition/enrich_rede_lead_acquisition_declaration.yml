@@ -18,3 +18,5 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    spark_env_vars:
+      SPARK_VERSION: "3.5"

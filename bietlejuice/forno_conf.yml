@@ -267,9 +267,6 @@ databricks_16_4_med_general_cluster:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_spark_3_5.sh"
               region: ""
-    spark_env_vars:
-        SPARK_VERSION: "3.5"
-        INMETRO_VERSION: "4.9.0"
 
 databricks_12_2_med_2xlarge_general_cluster:
     <<: *cluster_anchor
@@ -422,9 +419,6 @@ databricks_16_4_min_memory_cluster:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_spark_3_5.sh"
               region: ""
-    spark_env_vars:
-        SPARK_VERSION: "3.5"
-        INMETRO_VERSION: "4.9.0"
 
 databricks_12_2_xmin_memory_cluster:
     <<: *cluster_anchor
