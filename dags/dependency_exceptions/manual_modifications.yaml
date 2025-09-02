@@ -292,6 +292,12 @@ bietlejuice.enrich_content_funnel:
     - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
     - bietlejuice.ebdb_visit:load-clean-visit:first-run-of-day
+bietlejuice.core_offer:
+  add:
+    - bietlejuice.rental_transact_fast_lane:load-clean-offer
+  remove:
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.rental_transact_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.core_visit:
   add:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit

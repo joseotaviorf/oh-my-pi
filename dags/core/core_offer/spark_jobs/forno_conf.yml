@@ -1,0 +1,5 @@
+RENTAL_TRANSACT_OFFER_TABLE: "datalake_rental_transact_test_clean.offer"
+EBDB_USER_TABLE: "datalake_ebdb_clean.user"
+ENTITY_TYPE: "OFFER"
+merge_on: ["sk_core_offer"]
+when_matched_update_condition: "source.ts_updated > target.ts_updated"

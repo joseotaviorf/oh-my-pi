@@ -1,0 +1,53 @@
+dag:
+  name: core_offer
+  schedule_start_date: 2025, 1, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Creates the Offer Core Model by processing offer data, calculating
+      aggregated timestamps and generating surrogate key for the offer entity.
+      Transforms clean offer data into a unified Core Model, in the core layer, for analytical usage.
+
+      This is a derived Core Model that depends on foundational models like core_user and core_property.
+workflow:
+  type: core_model
+  layer: core
+  default_extraction_type: full
+  load_spark_job: load_core_offer
+  tables_customization:
+    offer:
+      load_spark_job: load_core_offer
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+    offer_incremental:
+      load_spark_job: load_core_offer
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      extraction_type: incremental
+      partitions: [year, month, day]
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r-fleet.xlarge
+    node_type_id: r-fleet.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

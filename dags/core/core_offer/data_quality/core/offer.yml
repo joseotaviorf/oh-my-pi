@@ -1,0 +1,48 @@
+---
+table_name: core_offer.offer
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 30000
+    severity_level: Error
+column_level_validations:
+  sk_core_offer:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_offer:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_tenant_external:
+    is_complete:
+      severity_level: Error
+  id_owner_external:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  status:
+    is_complete:
+      severity_level: Error
+  type:
+    is_complete:
+      severity_level: Error
+  turn:
+    is_complete:
+      severity_level: Error
+  iteration:
+    is_complete:
+      severity_level: Error
+  original_rent_value:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
