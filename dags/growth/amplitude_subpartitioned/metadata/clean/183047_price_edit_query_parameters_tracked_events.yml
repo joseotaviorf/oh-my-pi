@@ -69,6 +69,18 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Column ep_source_platform from Amplitude events
+  ep_recurrent_iteration_days:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Column ep_recurrent_iteration_days from Amplitude events
+  ep_utm_campaign:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Column ep_utm_campaign from Amplitude events
+  utm_source:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Column utm_source from Amplitude events
   city:
     lineage:
     - datalake_amplitude_clean.events.city
