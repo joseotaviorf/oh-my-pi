@@ -110,7 +110,16 @@ first_payment AS (
             WHEN ROW_NUMBER() OVER (PARTITION BY id_contract_external ORDER BY dt_due_adjusted, ts_created, id_external) = 1
                 THEN TRUE
             ELSE FALSE
-        END AS is_first_payment,
+        END AS is_first_payment
+    FROM base
+    WHERE
+        LOWER(status) != 'canceled'
+        AND LOWER(contract_status) != 'cancelado'
+),
+first_invoice_contract AS (
+     SELECT
+        id_contract_external,
+        id_external,
         CASE
             WHEN purpose IN ('monthly', 'onboarding')
                 AND ROW_NUMBER() OVER (PARTITION BY id_contract_external ORDER BY dt_due_adjusted, ts_created, id_external) = 1
@@ -120,7 +129,6 @@ first_payment AS (
     FROM base
     WHERE
         LOWER(status) != 'canceled'
-        AND LOWER(contract_status) != 'cancelado'
 ),
 paid_by_ssn AS (
     SELECT
@@ -255,7 +263,7 @@ create_recovery_channel AS (
         IFNULL(b.is_write_off, FALSE) AS is_write_off,
         IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
         IFNULL(fp.is_first_payment, FALSE) AS is_first_payment,
-        IFNULL(fp.is_first_invoice_contract, FALSE) AS is_first_invoice_contract,
+        IFNULL(fic.is_first_invoice_contract, FALSE) AS is_first_invoice_contract,
         IF(matthew.id_contract IS NOT NULL, TRUE, FALSE) AS has_matthew_interaction,
         b.dt_due_adjusted,
         bn.dt_due_parent AS dt_invoice_anchor,
@@ -287,6 +295,9 @@ create_recovery_channel AS (
     LEFT JOIN first_payment AS fp
         ON fp.id_external = b.id_external
             AND fp.id_contract_external = b.id_contract_external
+    LEFT JOIN first_invoice_contract AS fic
+        ON fic.id_external = b.id_external
+            AND fic.id_contract_external = b.id_contract_external
     LEFT JOIN base_negotiation AS bn
         ON bn.id_invoice = b.id_external
             AND bn.id_contract = b.id_contract_external

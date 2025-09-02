@@ -64,8 +64,11 @@ essential_features AS (
         n_first_invoices_open,
         has_fpd_in_wallet,
         qt_acordo_quebrado,
+        qt_promessa_quebrada_fp,
         qt_aco_desconto,
         n_invoices_in_wallet,
+        wallet_overdue_t2,
+        overdue_recovered_amount_t2,
         dt_contract_start
     FROM dw_collections_segmentation.fact_contract_wallet_timeline
 ),
@@ -87,6 +90,11 @@ contract_features_with_acc AS (
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS acc_broken_multiple_deals_lifetime,
+        COALESCE(SUM(qt_promessa_quebrada_fp) OVER (
+            PARTITION BY id_contract
+            ORDER BY dt_reference
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ), 0) AS acc_broken_promessas_lifetime,
         COALESCE(SUM(qt_aco_desconto) OVER (
             PARTITION BY id_contract
             ORDER BY dt_reference
@@ -298,11 +306,11 @@ prob_payment_calculation AS (
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_multiple_deals_lifetime <= 1.5 THEN 'ALTA'
+                AND f.acc_broken_promessas_lifetime <= 1.5 THEN 'ALTA'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_multiple_deals_lifetime > 1.5 THEN 'BAIXA'
+                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'BAIXA'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 > 20 THEN 'BAIXA'
@@ -554,6 +562,7 @@ SELECT
     CAST(f.acc_max_n_repairs AS BIGINT) AS acc_max_n_repairs,
     CAST(f.acc_cpc_l90 AS BIGINT) AS acc_cpc_l90,
     CAST(f.acc_broken_multiple_deals_lifetime AS BIGINT) AS acc_broken_multiple_deals_lifetime,
+    CAST(f.acc_broken_promessas_lifetime AS BIGINT) AS acc_broken_promessas_lifetime,
     CAST(f.acc_deals_principal_discount_lifetime AS BIGINT) AS acc_deals_principal_discount_lifetime,
     CAST(f.acc_count_monthly_overdue_invoices_paid_t1 AS BIGINT) AS acc_count_monthly_overdue_invoices_paid_t1,
     CAST(f.acc_sum_monthly_overdue_days_paid_t1 AS BIGINT) AS acc_sum_monthly_overdue_days_paid_t1,
@@ -579,6 +588,8 @@ SELECT
     CAST(f.cpc AS BIGINT) AS cpc,
     CAST(f.id_process_evictions AS BIGINT) AS id_process_evictions,
     CAST(f.mob_months AS BIGINT) AS mob_months,
+    f.wallet_overdue_t2,
+    f.overdue_recovered_amount_t2,
     f.avg_days_overdue_invoices_paid_t1,
     f.monthly_income,
     f.pct_monthly_paid_ontime_t2_l12m,

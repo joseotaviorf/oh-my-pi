@@ -632,6 +632,7 @@ SELECT
     open_outros_balance,
     cpc,
     CAST(qt_acordo_quebrado AS BIGINT) AS qt_acordo_quebrado,
+    CAST(qt_promessa_quebrada_fp AS BIGINT) AS qt_promessa_quebrada_fp,
     CAST(qt_aco_deconto AS BIGINT) AS qt_aco_desconto,
     CAST(id_process_evictions AS BIGINT) AS id_process_evictions,
     CAST(CASE
