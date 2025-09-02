@@ -59,8 +59,6 @@ workflow:
       clean_table_name: info_amenities
     AmenidadesInfo_AUD:
       clean_table_name: info_amenities_aud
-    CondicoesEntrada:
-      clean_table_name: entrance_conditions
     CondoManager:
       clean_table_name: condo_manager
     CondoNamesHistory:
