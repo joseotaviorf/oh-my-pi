@@ -139,7 +139,7 @@ workflow:
 
     tags_candidate:
       extraction_type: full
-      z_order_by: ["id_candidate", "id_tag"]
+      z_order_by: ["id_tag"]
       extra_spark_job_arguments:
         - endpoint: "tags/candidate"
 

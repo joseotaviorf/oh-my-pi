@@ -31,7 +31,7 @@ def main():
 
         if api_data_list:
             
-            df = json_to_dataframe(spark, dbutils, api_data_list)
+            df = json_to_dataframe(spark, api_data_list)
             
             raw_loader = RawLayerLoader(
                 spark_client=spark_client,
