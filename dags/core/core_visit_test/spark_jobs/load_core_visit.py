@@ -54,12 +54,15 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         visit_df = spark.table(config['VISIT_TABLE'])
         house_df = spark.table(config['HOUSE_TABLE'])
 
+        # Derive business flags from business_context
+        visit_with_flags_df = self._derive_business_flags(visit_df)
+
         vsl_last_event_df = self._get_visit_last_event(vsl_df, args.load_start_date, args.load_end_date)
         all_events_df = self._get_visit_all_events(vsl_df, args.load_start_date, args.load_end_date)
-        last_update_df = self._calculate_visit_last_update(visit_df, vsl_last_event_df, all_events_df, args.load_start_date, args.load_end_date)
+        last_update_df = self._calculate_visit_last_update(visit_with_flags_df, vsl_last_event_df, all_events_df, args.load_start_date, args.load_end_date)
 
         assembled_df = (
-            visit_df.alias("v")
+            visit_with_flags_df.alias("v")
             .join(vsl_last_event_df.alias("vsl"), col("v.id") == col("vsl.id_visit"), "left")
             .join(all_events_df.alias("ae"), col("v.id") == col("ae.id_visit"), "left")
             .join(last_update_df.alias("le"), col("v.id") == col("le.id"))
@@ -76,7 +79,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
                 col("ae.ts_visit_confirmed"), col("v.dt_confirmation_expiration"), col("ae.ts_visit_done"),
                 col("ae.ts_visit_canceled"), col("ae.ts_visit_unsuccessful"), col("h.id_region"), col("h.address"),
                 col("h.neighborhood"), col("h.number"), col("h.complement"), col("h.city"), col("h.zipcode"),
-                col("h.is_for_rent"), col("h.is_for_sale")
+                col("v.is_for_rent"), col("v.is_for_sale")  # Now using derived flags from business_context
             )
         )
 
@@ -92,6 +95,29 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         self.logger.info(f"m=create_core_model, msg=Core visit model created with {result_df.count()} records")
 
         return result_df
+
+    @staticmethod
+    def _derive_business_flags(visit_df: DataFrame) -> DataFrame:
+        """(Unit Testable) Derives is_for_rent and is_for_sale flags from business_context column.
+
+        Args:
+            visit_df: DataFrame with business_context column
+
+        Returns:
+            DataFrame with additional is_for_rent and is_for_sale boolean columns
+
+        Logic:
+            - If business_context == "FOR_RENT", then is_for_rent=True, is_for_sale=False
+            - If business_context == "FOR_SALE", then is_for_rent=False, is_for_sale=True
+            - Otherwise, both flags are False
+        """
+        return visit_df.withColumn(
+            "is_for_rent",
+            when(col("business_context") == "FOR_RENT", lit(True)).otherwise(lit(False))
+        ).withColumn(
+            "is_for_sale",
+            when(col("business_context") == "FOR_SALE", lit(True)).otherwise(lit(False))
+        )
 
     @staticmethod
     def _get_visit_last_event(vsl_df: DataFrame, load_start_date: str = None, load_end_date: str = None) -> DataFrame:

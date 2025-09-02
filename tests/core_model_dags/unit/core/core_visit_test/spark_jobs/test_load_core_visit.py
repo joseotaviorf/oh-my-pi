@@ -1309,6 +1309,220 @@ class TestCreateVisitCoreModel:
                 ), f"Expected day 29, got {visit_2_data['day']}"
 
 
+class TestDeriveBusinessFlags:
+    """Test cases for _derive_business_flags method."""
+
+    def test_derive_business_flags_for_rent(self, spark_session):
+        """Test that FOR_RENT business_context sets is_for_rent=True, is_for_sale=False."""
+        # Arrange
+        from pyspark.sql.types import StructType, StructField, StringType
+
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("business_context", StringType(), True),
+            ]
+        )
+
+        data = [("visit_1", "FOR_RENT"), ("visit_2", "FOR_RENT")]
+
+        test_df = spark_session.createDataFrame(data, schema)
+
+        # Act
+        result_df = CoreVisitSparkJob._derive_business_flags(test_df)
+
+        # Assert
+        result_data = result_df.collect()
+
+        for row in result_data:
+            assert (
+                row["is_for_rent"] is True
+            ), f"Expected is_for_rent=True for FOR_RENT, got {row['is_for_rent']}"
+            assert (
+                row["is_for_sale"] is False
+            ), f"Expected is_for_sale=False for FOR_RENT, got {row['is_for_sale']}"
+
+    def test_derive_business_flags_for_sale(self, spark_session):
+        """Test that FOR_SALE business_context sets is_for_rent=False, is_for_sale=True."""
+        # Arrange
+        from pyspark.sql.types import StructType, StructField, StringType
+
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("business_context", StringType(), True),
+            ]
+        )
+
+        data = [("visit_1", "FOR_SALE"), ("visit_2", "FOR_SALE")]
+
+        test_df = spark_session.createDataFrame(data, schema)
+
+        # Act
+        result_df = CoreVisitSparkJob._derive_business_flags(test_df)
+
+        # Assert
+        result_data = result_df.collect()
+
+        for row in result_data:
+            assert (
+                row["is_for_rent"] is False
+            ), f"Expected is_for_rent=False for FOR_SALE, got {row['is_for_rent']}"
+            assert (
+                row["is_for_sale"] is True
+            ), f"Expected is_for_sale=True for FOR_SALE, got {row['is_for_sale']}"
+
+    def test_derive_business_flags_other_values(self, spark_session):
+        """Test that other business_context values set both flags to False."""
+        # Arrange
+        from pyspark.sql.types import StructType, StructField, StringType
+
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("business_context", StringType(), True),
+            ]
+        )
+
+        data = [
+            ("visit_1", "OTHER"),
+            ("visit_2", "UNKNOWN"),
+            ("visit_3", ""),
+            ("visit_4", None),
+            ("visit_5", "for_rent"),  # Case sensitive test
+            ("visit_6", "for_sale"),  # Case sensitive test
+        ]
+
+        test_df = spark_session.createDataFrame(data, schema)
+
+        # Act
+        result_df = CoreVisitSparkJob._derive_business_flags(test_df)
+
+        # Assert
+        result_data = result_df.collect()
+
+        for row in result_data:
+            assert (
+                row["is_for_rent"] is False
+            ), f"Expected is_for_rent=False for {row['business_context']}, got {row['is_for_rent']}"
+            assert (
+                row["is_for_sale"] is False
+            ), f"Expected is_for_sale=False for {row['business_context']}, got {row['is_for_sale']}"
+
+    def test_derive_business_flags_mixed_values(self, spark_session):
+        """Test mixed business_context values in a single DataFrame."""
+        # Arrange
+        from pyspark.sql.types import StructType, StructField, StringType
+
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("business_context", StringType(), True),
+            ]
+        )
+
+        data = [
+            ("visit_1", "FOR_RENT"),
+            ("visit_2", "FOR_SALE"),
+            ("visit_3", "OTHER"),
+            ("visit_4", None),
+        ]
+
+        test_df = spark_session.createDataFrame(data, schema)
+
+        # Act
+        result_df = CoreVisitSparkJob._derive_business_flags(test_df)
+
+        # Assert
+        result_data = result_df.collect()
+        result_dict = {row["id"]: row for row in result_data}
+
+        # Check FOR_RENT case
+        assert result_dict["visit_1"]["is_for_rent"] is True
+        assert result_dict["visit_1"]["is_for_sale"] is False
+
+        # Check FOR_SALE case
+        assert result_dict["visit_2"]["is_for_rent"] is False
+        assert result_dict["visit_2"]["is_for_sale"] is True
+
+        # Check OTHER case
+        assert result_dict["visit_3"]["is_for_rent"] is False
+        assert result_dict["visit_3"]["is_for_sale"] is False
+
+        # Check NULL case
+        assert result_dict["visit_4"]["is_for_rent"] is False
+        assert result_dict["visit_4"]["is_for_sale"] is False
+
+    def test_derive_business_flags_preserves_original_columns(self, spark_session):
+        """Test that the method preserves all original columns."""
+        # Arrange
+        from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("name", StringType(), True),
+                StructField("value", IntegerType(), True),
+                StructField("business_context", StringType(), True),
+            ]
+        )
+
+        data = [
+            ("visit_1", "Test Visit 1", 100, "FOR_RENT"),
+            ("visit_2", "Test Visit 2", 200, "FOR_SALE"),
+        ]
+
+        test_df = spark_session.createDataFrame(data, schema)
+        original_columns = set(test_df.columns)
+
+        # Act
+        result_df = CoreVisitSparkJob._derive_business_flags(test_df)
+
+        # Assert
+        result_columns = set(result_df.columns)
+        expected_columns = original_columns | {"is_for_rent", "is_for_sale"}
+
+        assert (
+            result_columns == expected_columns
+        ), f"Expected columns {expected_columns}, got {result_columns}"
+
+        # Verify original data is preserved
+        result_data = result_df.select(
+            "id", "name", "value", "business_context"
+        ).collect()
+        original_data = test_df.collect()
+
+        for orig_row, result_row in zip(original_data, result_data):
+            assert orig_row["id"] == result_row["id"]
+            assert orig_row["name"] == result_row["name"]
+            assert orig_row["value"] == result_row["value"]
+            assert orig_row["business_context"] == result_row["business_context"]
+
+    def test_derive_business_flags_empty_dataframe(self, spark_session):
+        """Test that the method handles empty DataFrames correctly."""
+        # Arrange
+        from pyspark.sql.types import StructType, StructField, StringType
+
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("business_context", StringType(), True),
+            ]
+        )
+
+        test_df = spark_session.createDataFrame([], schema)
+
+        # Act
+        result_df = CoreVisitSparkJob._derive_business_flags(test_df)
+
+        # Assert
+        assert result_df.count() == 0, "Empty DataFrame should remain empty"
+        expected_columns = {"id", "business_context", "is_for_rent", "is_for_sale"}
+        assert (
+            set(result_df.columns) == expected_columns
+        ), f"Expected columns {expected_columns}, got {set(result_df.columns)}"
+
+
 class TestJobConstants:
     """Test cases for job constants - isolated to this DAG context."""
 
