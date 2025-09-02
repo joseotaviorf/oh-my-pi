@@ -30,6 +30,7 @@ cluster:
           region: ""
     spark_env_vars:
       SPARK_VERSION: "3.5"
+      INMETRO_VERSION: "4.9.0"
 
 workflow:
   layer: raw
