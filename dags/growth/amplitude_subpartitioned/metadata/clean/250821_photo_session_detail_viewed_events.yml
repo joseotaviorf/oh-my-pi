@@ -1,0 +1,44 @@
+database_name: datalake_amplitude_clean
+table_name: 250821_photo_session_detail_viewed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  This table contains photo_session_detail_viewed events from app 250821.
+  It tracks user interactions and includes relevant metadata and user properties.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: Unique identifier for the user who viewed the photo session details, cast to BIGINT.
+  id_photographer:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Photographer identifier extracted from event_properties JSON field using get_json_object function and cast to BIGINT.
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: House identifier extracted from event_properties JSON field using get_json_object function and cast to BIGINT.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context information extracted from the first element of event_properties businessContext array, converted to uppercase using UPPER function.
+  is_entry_methods_step_enabled:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Boolean flag indicating if entry methods step is enabled, extracted from event_properties JSON field and cast to BOOLEAN.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the photo session detail viewed event occurred.
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year partition column for efficient data partitioning and query performance.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month partition column for efficient data partitioning and query performance.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day partition column for efficient data partitioning and query performance.

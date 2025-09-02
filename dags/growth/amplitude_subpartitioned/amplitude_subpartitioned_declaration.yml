@@ -453,6 +453,9 @@ workflow:
     233592_tts_helps_button_clicked_events:
       run_optimize: false
       run_vacuum: false
+    250821_photo_session_detail_viewed_events:
+      run_optimize: false
+      run_vacuum: false
     440441_home_page_viewed_events:
       run_optimize: false
       run_vacuum: false
