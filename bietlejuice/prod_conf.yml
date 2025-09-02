@@ -73,7 +73,7 @@ union_bucket: ingestao-dados-union/union
 analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
 inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-prod
-datahub_host: https://datahub.data.quintoandar.com.br
+datahub_host: https://datahub.apps.data-prd.habitat.zone
 spectrum_iam_role: arn:aws:iam::206390561754:role/SpectrumCrossAccount
 spark_jobs_logs_path: s3://5a-databricks/logs/jobs/
 default_libraries:
