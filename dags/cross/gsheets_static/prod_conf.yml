@@ -424,3 +424,9 @@ sheets_info:
     sheet_name: Quarter
     clean_table_name: collections_quarter_targets
     sheet_context: static
+
+  seo_goldenset:
+    sheet_id: 11i0VX84FLSxW70O0_u0yTCMGr47kMNILbpyw2dxB6nM
+    sheet_name: seo_goldenset
+    clean_table_name: seo_goldenset
+    sheet_context: static

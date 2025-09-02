@@ -1,0 +1,17 @@
+database_name: datalake_gsheets_clean
+table_name: seo_goldenset
+description: "Cleaned SEO golden set data"
+domain: Growth
+columns:
+  keyword:
+    description: "Strategic SEO keyword from the golden set used for high-priority search engine optimization campaigns and content targeting"
+    lineage:
+      - datalake_gsheets_raw.seo_goldenset.keyword
+  dt_effective_start:
+    description: "Date when the keyword becomes active in the golden set or when it was added to the strategic SEO keyword portfolio"
+    lineage:
+      - datalake_gsheets_raw.seo_goldenset.dt_effective_start
+  dt_effective_end:
+    description: "Date when the keyword becomes inactive in the golden set or when it was removed from the strategic SEO keyword portfolio"
+    lineage:
+      - datalake_gsheets_raw.seo_goldenset.dt_effective_end

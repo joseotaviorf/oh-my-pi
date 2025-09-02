@@ -424,3 +424,9 @@ sheets_info:
     sheet_name: broker_wave_allocation
     clean_table_name: broker_wave_allocation
     sheet_context: static
+
+  seo_goldenset:
+    sheet_id: 11i0VX84FLSxW70O0_u0yTCMGr47kMNILbpyw2dxB6nM
+    sheet_name: seo_goldenset
+    clean_table_name: seo_goldenset
+    sheet_context: static
