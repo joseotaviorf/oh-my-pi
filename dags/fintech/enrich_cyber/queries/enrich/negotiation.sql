@@ -204,6 +204,7 @@ SELECT
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%MONES%" THEN "MONEST"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%PELLON%" THEN "PELLON"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%PLC%" THEN "PLC"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%GONDIM%" THEN "GONDIM"
       WHEN UPPER(a.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
       WHEN UPPER(a.id_user) LIKE "%SERASA%" THEN "SERASA"
       WHEN COALESCE(u.id_agency, a.id_agency) = "QUINTO" THEN "COBRANÇA_INTERNA_QA"

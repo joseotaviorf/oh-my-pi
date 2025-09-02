@@ -95,6 +95,7 @@ SELECT
         WHEN UPPER(n.consultancy) IN ('021','G021', 'QA_MONES') THEN 'MONEST'
         WHEN UPPER(n.consultancy) IN ('020','G020', 'QA_PELL') THEN 'PELLON'
         WHEN UPPER(n.consultancy) IN ('013','G013', 'QA_PLC') THEN 'PLC'
+        WHEN UPPER(n.consultancy) IN ('022','G022', 'QA_GONDIM') THEN 'GONDIM'
         ELSE UPPER(n.consultancy)
     END AS consultancy_name,
     n.contact_type,
