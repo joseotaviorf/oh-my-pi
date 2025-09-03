@@ -1,0 +1,20 @@
+dag:
+  name: reverse_house_portfolio_reprocessing
+  schedule_start_date: 2025,05,10
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG has the purpose of processing and storing the portfolio reprocessing declaration data for houses in the datalake.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: house_portfolio_reprocessing
+  default_extraction_type: full
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
