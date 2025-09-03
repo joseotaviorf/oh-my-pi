@@ -23,6 +23,8 @@ SELECT
   v.id_agent,
   v.id_visitor,
   CASE
+    WHEN (pfa.id_visitor <> v.id_visitor OR pfa.id_visitor IS NULL) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
+    WHEN (pfa.id_visitor <> v.id_visitor OR pfa.id_visitor IS NULL) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
     WHEN pfa.id IS NOT NULL AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
     WHEN pfa.id IS NOT NULL AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
     ELSE v.business_model
