@@ -144,7 +144,7 @@ vans_checkout_union AS (
 
 pre_vans_checkout AS (
     SELECT
-        REPLACE(UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')), 'C!', '') AS company_use,
+        REPLACE(REPLACE(UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')), 'C!', ''), 'C]', '') AS company_use,
         vc.id_invoice,
         DATE(dd.next_brz_fintech_business_day) AS dt_paid,
         vc.paid_amount
