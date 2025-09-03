@@ -37,4 +37,4 @@ cluster:
       availability: ON_DEMAND
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.driver.maxResultSize: "16g"
+      spark.driver.maxResultSize: "0"
