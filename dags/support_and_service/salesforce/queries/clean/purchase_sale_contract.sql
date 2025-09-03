@@ -30,6 +30,7 @@ SELECT
   BypassRescissionValidation__c AS bypass_rescission_validation,  
   CRI_HaveDemandNote__c AS cri_have_demand_note,
   CRNPartner__c AS crn_partner,
+  CRN_Complexity__c AS crn_complexity,
   Escrivao__c AS escrivao,
   HaveUnpaidAlienation__c AS have_unpaid_alienation,
   HouseOccupant__c AS house_occupant,

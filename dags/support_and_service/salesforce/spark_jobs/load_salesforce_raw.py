@@ -627,6 +627,7 @@ def schema_define():
       						StructField("HouseRegistryMustBeUpdatedForm__c",StringType()),
       						StructField("HaveDemandNoteReason__c",StringType()),
       						StructField("CCVCompletionDate__c",StringType()),
+                            StructField("CRN_Complexity__c",StringType()),
       					]
     			)
             },

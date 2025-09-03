@@ -129,6 +129,10 @@ columns:
     description: 'Notary office (CRN) partner'
     lineage:
     - datalake_salesforce_raw.purchase_sale_contract.CRNPartner__c
+  crn_complexity:
+    description: 'Complexity of the notary office (CRN)'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.CRN_Complexity__c
   escrivao:
     description: 'Name of the clerk (escrivao)'
     lineage:
