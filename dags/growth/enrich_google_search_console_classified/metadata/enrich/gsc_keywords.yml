@@ -1,0 +1,83 @@
+database_name: datalake_google_search_console_classified
+table_name: gsc_keywords
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
+description: |
+  Monthly aggregated Google Search Console (GSC) keyword performance by page and
+  related attributes. Includes a normalized version of the keyword (keyword_clean)
+  and aggregated metrics (position, impressions, clicks, ctr, posimp) for each
+  group of attributes.
+columns:
+  keyword:
+    description: "Original search query from GSC."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.query
+  keyword_clean:
+    description: "Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.query
+  page:
+    description: "Full page URL."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.page
+  structure:
+    description: "Page structure according to business rules."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.struct
+  site_url:
+    description: "Main property URL measured by GSC."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.site_url
+  device:
+    description: "Device type where the search was made (desktop, mobile, tablet)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.device
+  domain:
+    description: "Generic referring domain grouping (Supply, Content, Help, QuintoAndar)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.domain
+  country:
+    description: "Country from GSC"
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.country
+  position:
+    description: "Aggregated average position computed as SUM(posimp) / SUM(impressions)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.position
+  impressions:
+    description: "Total impressions in the month for the group (SUM of impressions)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.impressions
+  clicks:
+    description: "Total clicks in the month for the group (SUM of clicks)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.clicks
+  ctr:
+    description: "Aggregated click-through rate computed as SUM(clicks) / SUM(impressions)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.ctr
+  posimp:
+    description: "Total position-impressions product in the month for the group (SUM of posimp)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.posimp
+  is_branded:
+    description: "Flag indicating whether the search query is branded."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.is_branded
+  dt_created:
+    description: "Month reference date (first day of month) derived from the original search date."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.dt_created
+  year:
+    description: "Partition year."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.year
+  month:
+    description: "Partition month."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.month
+  day:
+    description: "Partition day (set to 01 for monthly aggregation)."
+    lineage:
+      - datalake_google_search_console_classified.seo_gsc_data.day
+

@@ -13,6 +13,11 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    gsc_keywords:
+      - seo_gsc_data
+    gsc_keyword_region_attributes:
+      - gsc_keywords
   default_extraction_type: incremental
   default_partitions:
     - year
