@@ -1,0 +1,16 @@
+database_name: datalake_pp_multi
+table_name: pp_multi_classification
+description:
+  This table is used to store the PP Multi classification of Owner Persona. It contains just the users that are classified as ACTIVE or POTENTIAL PP Multi.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  sk_owner:
+    description: The key of the owner persona.
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner
+  pp_multi_classification:
+    description: The PP Multi classification of the owner persona. Can be ACTIVE or POTENTIAL.
+    categories:
+      "ACTIVE": The owner have more than 5 ongoing houses and at least 1 rented house.
+      "POTENTIAL": The owner at some time had more than 5 ongoing houses and at least 1 rented house.
