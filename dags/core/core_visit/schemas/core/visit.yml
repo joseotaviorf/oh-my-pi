@@ -50,7 +50,7 @@ columns:
 
   # Visit type
   type:
-    type: string
+    type: int
     required: false
 
   # Business context - RENT or SALE
