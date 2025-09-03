@@ -1,0 +1,164 @@
+# Schema validation file for core visit table
+# This file defines the expected schema for the core.visit table
+# Path: dags/core/core_visit/schemas/core/visit.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_visit:
+    type: string
+    nullable: false
+    required: true
+
+  # Visit identifier
+  id_visit:
+    type: bigint
+    nullable: false
+    required: true
+
+  # House information - required for all visits
+  id_house:
+    type: bigint
+    nullable: false
+    required: true
+
+  # User information
+  id_visitor:
+    type: bigint
+    nullable: true
+    required: true
+
+  # Owner information (from house/house_listing_relation)
+  id_owner:
+    type: bigint
+    nullable: true
+    required: false
+
+  # Agent information
+  id_agent:
+    type: bigint
+    nullable: true
+    required: false
+
+  # Visit code
+  code:
+    type: string
+    nullable: true
+    required: false
+
+  # Visit status (original)
+  status:
+    type: string
+    nullable: true
+    required: false
+
+  # Computed status based on business rules
+  computed_status:
+    type: string
+    nullable: true
+    required: false
+
+  # Visit type
+  type:
+    type: string
+    nullable: true
+    required: false
+
+  # Business context - RENT or SALE
+  business_context:
+    type: string
+    nullable: true
+    required: false
+
+  # Last event type from visit status log
+  last_event_type:
+    type: string
+    nullable: true
+    required: false
+
+  # Cancellation reason from events
+  cancellation_reason:
+    type: string
+    nullable: true
+    required: false
+
+  # Fixed agent flag
+  is_fixed_agent:
+    type: boolean
+    nullable: true
+    required: false
+
+  # Visit date
+  dt_visit:
+    type: date
+    nullable: true
+    required: false
+
+  # Visit timestamp
+  ts_visit:
+    type: timestamp
+    nullable: true
+    required: false
+
+  # Event timestamps from visit status log
+  ts_visit_requested:
+    type: timestamp
+    nullable: true
+    required: false
+
+  ts_visit_confirmed:
+    type: timestamp
+    nullable: true
+    required: false
+
+  ts_visit_done:
+    type: timestamp
+    nullable: true
+    required: false
+
+  ts_visit_canceled:
+    type: timestamp
+    nullable: true
+    required: false
+
+  ts_visit_unsuccessful:
+    type: timestamp
+    nullable: true
+    required: false
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    nullable: false
+    required: true
+
+  ts_updated:
+    type: timestamp
+    nullable: false
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    nullable: false
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    nullable: false
+    required: true
+
+  month:
+    type: int
+    nullable: false
+    required: true
+
+  day:
+    type: int
+    nullable: false
+    required: true
+
+# Schema constraints
+min_columns: 27
+max_columns: 27
+strict: true # Allow additional columns for flexibility

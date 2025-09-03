@@ -280,7 +280,7 @@ def mock_surrogate_keys_helper():
         "dags.core.core_visit.spark_jobs.load_core_visit.SurrogateKeysHelper"
     ) as mock_helper:
 
-        def generate_surrogate_key(df, entity_type):
+        def generate_surrogate_key(df, entity_type, id_column="id_entity"):
             # Add a mock surrogate key column for testing
             return df.withColumn("sk_entity", df["id_visit"].cast(StringType()))
 
