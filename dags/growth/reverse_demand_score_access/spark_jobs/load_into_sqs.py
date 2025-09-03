@@ -38,11 +38,12 @@ def transform_payload(database_name, table_name):
 
     df = spark.table(f"{database_name}.{table_name}")
 
-    df = df.select(['id_house', 'demand_score', 'dt_snapshot'])
+    df = df.select(['id_house', 'demand_score','occupation_status', 'dt_snapshot'])
 
     df = df.withColumnRenamed('id_house', 'houseId') \
             .withColumnRenamed('demand_score', 'listingAgeDemandScore') \
-            .withColumnRenamed('dt_snapshot', 'eventDate')
+            .withColumnRenamed('dt_snapshot', 'eventDate') \
+            .withColumnRenamed('occupation_status', 'occupationStatus')
 
     df = df.withColumn('eventDate', (df['eventDate'].cast('timestamp').cast('long') * 1000))
 
@@ -50,7 +51,7 @@ def transform_payload(database_name, table_name):
 
     message_contents = df.collect()
 
-    payload = [{"eventDate": row["eventDate"], "payload": {"houseId": row["houseId"], "listingAgeDemandScore": row["listingAgeDemandScore"]}} for row in message_contents]
+    payload = [{"eventDate": row["eventDate"], "payload": {"houseId": row["houseId"], "listingAgeDemandScore": row["listingAgeDemandScore"], "occupationStatus": row["occupationStatus"]}} for row in message_contents]
 
     return payload
 
