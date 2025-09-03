@@ -1,0 +1,181 @@
+---
+database_name: datalake_greenhouse_clean
+table_name: applications
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table containing candidate application data, sourced from the Greenhouse Harvest API's 'applications' endpoint.
+columns:
+  id:
+    description: The application's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.id
+  id_candidate:
+    description: The candidate's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.candidate_id
+  id_job_post:
+    description: The job post's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.job_post_id
+  id_source:
+    description: The source's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.source.id
+  id_credited_to:
+    description: The user credited for the application's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.credited_to.id
+  id_recruiter:
+    description: The recruiter's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.recruiter.id
+  id_coordinator:
+    description: The coordinator's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.coordinator.id
+  id_rejection_reason:
+    description: The rejection reason's unique identifier.
+    lineage:
+      - datalake_greenhouse_raw.applications.rejection_reason.id
+  status:
+    description: The current status of the application (e.g., active, rejected, hired).
+    lineage:
+      - datalake_greenhouse_raw.applications.status
+  location:
+    description: The location associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.location
+  source_name:
+    description: The public name of the source from which the application originated.
+    lineage:
+      - datalake_greenhouse_raw.applications.source.public_name
+  current_stage_name:
+    description: The name of the current stage in the hiring process for the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.current_stage.name
+  rejection_reason_name:
+    description: The name of the rejection reason, if applicable.
+    lineage:
+      - datalake_greenhouse_raw.applications.rejection_reason.name
+  credited_to_name:
+    description: The full name of the user credited for the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.credited_to.name
+  credited_to_first_name:
+    description: The first name of the user credited for the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.credited_to.first_name
+  credited_to_last_name:
+    description: The last name of the user credited for the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.credited_to.last_name
+  recruiter_name:
+    description: The full name of the recruiter associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.recruiter.name
+  recruiter_first_name:
+    description: The first name of the recruiter associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.recruiter.first_name
+  recruiter_last_name:
+    description: The last name of the recruiter associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.recruiter.last_name
+  coordinator_name:
+    description: The full name of the coordinator associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.coordinator.name
+  coordinator_first_name:
+    description: The first name of the coordinator associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.coordinator.first_name
+  coordinator_last_name:
+    description: The last name of the coordinator associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.coordinator.last_name
+  prospective_department:
+    description: The department for which the candidate is being prospected.
+    lineage:
+      - datalake_greenhouse_raw.applications.prospective_department
+  prospective_office:
+    description: The office for which the candidate is being prospected.
+    lineage:
+      - datalake_greenhouse_raw.applications.prospective_office
+  prospect_pool_name:
+    description: The name of the prospect pool the candidate belongs to.
+    lineage:
+      - datalake_greenhouse_raw.applications.prospect_detail.prospect_pool.name
+  prospect_stage_name:
+    description: The name of the prospect stage the candidate is in.
+    lineage:
+      - datalake_greenhouse_raw.applications.prospect_detail.prospect_stage.name
+  prospect_owner_name:
+    description: The name of the user who owns the prospect.
+    lineage:
+      - datalake_greenhouse_raw.applications.prospect_detail.prospect_owner.name
+  social_name:
+    description: The candidate's social name, coalesced from different custom fields.
+    lineage:
+      - datalake_greenhouse_raw.applications.keyed_custom_fields
+  work_authorization_status:
+    description: The candidate's work authorization status, coalesced from different custom fields.
+    lineage:
+      - datalake_greenhouse_raw.applications.keyed_custom_fields
+  disability_type_details:
+    description: Details about the candidate's disability type, coalesced from different custom fields.
+    lineage:
+      - datalake_greenhouse_raw.applications.keyed_custom_fields
+  accessibility_needs:
+    description: The candidate's accessibility needs, coalesced from different custom fields.
+    lineage:
+      - datalake_greenhouse_raw.applications.keyed_custom_fields
+  rejection_details_counter_offer_company:
+    description: The name of the company that made a counter-offer, if applicable.
+    lineage:
+      - datalake_greenhouse_raw.applications.rejection_details.keyed_custom_fields
+  rejection_details_counter_offer_value:
+    description: The value of the counter-offer made to the candidate, if applicable.
+    lineage:
+      - datalake_greenhouse_raw.applications.rejection_details.keyed_custom_fields
+  is_prospect:
+    description: A boolean flag indicating if the application is from a prospected candidate.
+    lineage:
+      - datalake_greenhouse_raw.applications.prospect
+  ts_applied:
+    description: The timestamp when the application was submitted.
+    lineage:
+      - datalake_greenhouse_raw.applications.applied_at
+  ts_rejected:
+    description: The timestamp when the application was rejected.
+    lineage:
+      - datalake_greenhouse_raw.applications.rejected_at
+  ts_last_activity:
+    description: The timestamp of the last activity on the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.last_activity_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  attachments:
+    description: An array of attachments associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.attachments
+  jobs:
+    description: An array of jobs associated with the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.jobs
+  answers:
+    description: An array of answers to custom questions on the application.
+    lineage:
+      - datalake_greenhouse_raw.applications.answers
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning.
+    lineage:
+      - datalake_greenhouse_raw.applications.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning.
+    lineage:
+      - datalake_greenhouse_raw.applications.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning.
+    lineage:
+      - datalake_greenhouse_raw.applications.day

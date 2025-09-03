@@ -37,6 +37,7 @@ workflow:
   type: custom_ingestion
   bucket_config_name: people_bucket
   load_spark_job: load_greenhouse_raw
+  default_partitions: ["year", "month", "day"]
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
@@ -55,6 +56,22 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   
   tables_customization:
+    applications:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["status"]
+      extra_spark_job_arguments:
+        - endpoint: "applications"
+          date_column_to_partition: "last_activity_at"
+
+    candidates:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["job_title"]
+      extra_spark_job_arguments:
+        - endpoint: "candidates"
+          date_column_to_partition: "last_activity"
+
     close_reasons:
       extraction_type: full
       z_order_by: ["name"]
@@ -66,6 +83,13 @@ workflow:
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "custom_fields"
+
+    demographics_answers:
+      extraction_type: incremental
+      z_order_by: ["name"]
+      merge_on: ["id"]
+      extra_spark_job_arguments:
+        - endpoint: "demographics/answers"
 
     demographics_answer_options:
       extraction_type: full
@@ -99,6 +123,14 @@ workflow:
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "jobs"
+          date_column_to_partition: "updated_at"
+
+    job_posts:
+      extraction_type: incremental
+      merge_on: ["id"]
+      z_order_by: ["title"]
+      extra_spark_job_arguments:
+        - endpoint: "job_posts"
           date_column_to_partition: "updated_at"
 
     offers:
@@ -139,7 +171,6 @@ workflow:
 
     tags_candidate:
       extraction_type: full
-      z_order_by: ["id_tag"]
       extra_spark_job_arguments:
         - endpoint: "tags/candidate"
 
