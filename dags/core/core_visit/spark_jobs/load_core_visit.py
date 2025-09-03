@@ -52,13 +52,13 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
 
         # Process visit status log - last event
         vsl_last_event_df = self._process_last_event(visit_status_log_df)
-        
+
         # Process visit status log - all events
         all_events_df = self._process_all_events(visit_status_log_df)
 
         # Join all data
         result_df = self._join_all_data(
-            visit_df, vsl_last_event_df, all_events_df, 
+            visit_df, vsl_last_event_df, all_events_df,
             house_df, house_listing_relation_df, user_df
         )
 
@@ -76,7 +76,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
     def _load_visit_data(self, spark, config, args):
         """Load and filter visit data."""
         visit_df = spark.read.table(config['VISIT_TABLE'])
-        
+
         # Apply date filter if provided (for incremental loads)
         if (args.load_start_date is not None and args.load_start_date != "" and
             args.load_end_date is not None and args.load_end_date != ""):
@@ -84,7 +84,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
                 (col("ts_updated").cast("date") >= lit(args.load_start_date).cast("date")) &
                 (col("ts_updated").cast("date") <= lit(args.load_end_date).cast("date"))
             )
-        
+
         return visit_df
 
     def _load_visit_status_log_data(self, spark, config, args):
@@ -106,7 +106,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
     def _process_last_event(self, visit_status_log_df):
         """Process visit status log to get the last event per visit."""
         window_spec = Window.partitionBy("id_visit").orderBy(col("ts_created").desc())
-        
+
         return visit_status_log_df.withColumn(
             "row_num", row_number().over(window_spec)
         ).filter(
@@ -122,64 +122,64 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
             spark_max(
                 when(col("event_type").isin("VISIT_REQUEST_CANCELED", "VISIT_CANCELED"), col("reason"))
             ).alias("cancellation_reason"),
-            
+
             spark_max(
                 when(col("event_type") == "VISIT_REQUESTED", col("ts_created"))
             ).alias("ts_visit_requested"),
-            
+
             spark_max(
                 when(col("event_type") == "VISIT_CONFIRMED", col("ts_created"))
             ).alias("ts_visit_confirmed"),
-            
+
             spark_max(
                 when(col("event_type") == "VISIT_DONE", col("ts_created"))
             ).alias("ts_visit_done"),
-            
+
             spark_max(
                 when(col("event_type").isin("VISIT_REQUEST_CANCELED", "VISIT_CANCELED"), col("ts_created"))
             ).alias("ts_visit_canceled"),
-            
+
             spark_max(
                 when(col("event_type") == "VISIT_UNSUCCESSFUL", col("ts_created"))
             ).alias("ts_visit_unsuccessful")
         )
 
-    def _join_all_data(self, visit_df, vsl_last_event_df, all_events_df, 
+    def _join_all_data(self, visit_df, vsl_last_event_df, all_events_df,
                        house_df, house_listing_relation_df, user_df):
         """Join all data sources to create the final result."""
-        
+
         # Start with visit data
         result_df = visit_df
-        
+
         # Join with last event
         result_df = result_df.alias("v").join(
             vsl_last_event_df.alias("vsl"),
             col("v.id") == col("vsl.id_visit"),
             "left"
         )
-        
+
         # Join with all events
         result_df = result_df.join(
             all_events_df.alias("ae"),
             col("v.id") == col("ae.id_visit"),
             "left"
         )
-        
+
         # Join with house
         result_df = result_df.join(
             house_df.alias("h"),
             col("v.id_house") == col("h.id"),
             "left"
         )
-        
+
         # Join with house listing relation
         result_df = result_df.join(
             house_listing_relation_df.alias("hl"),
-            (col("v.id_house") == col("hl.id")) & 
+            (col("v.id_house") == col("hl.id")) &
             (col("hl.related_as") == "PROPERTY_OWNER"),
             "left"
         )
-        
+
         # Join with user (with complex OR condition)
         # id_related can be either a numeric ID (as string) or a UUID string
         result_df = result_df.join(
@@ -188,7 +188,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
             (col("u.uuid_person") == col("hl.id_related")),
             "left"
         )
-        
+
         # Select final columns
         return result_df.select(
             col("v.id").alias("id_visit"),
@@ -217,3 +217,6 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         )
 
 
+if __name__ == "__main__":
+    job = CoreVisitSparkJob()
+    job.run()
