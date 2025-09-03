@@ -27,8 +27,7 @@ SELECT
 FROM
     datalake_amplitude_clean.events
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    AND id_app = 170698
+    id_app = 170698
     AND event_type IN (
         'offboarding_bills_task_summary_page_viewed',
         'offboarding_bills_task_condo_form_submitted',
@@ -37,3 +36,4 @@ WHERE
         'offboarding_bills_task_installation_code_form_submitted',
         'offboarding_bills_task_success_page_viewed'
     )
+    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
