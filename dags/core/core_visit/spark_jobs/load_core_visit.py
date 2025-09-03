@@ -64,7 +64,7 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
 
         # Generate surrogate key
         result_df = SurrogateKeysHelper.generate_surrogate_key(result_df, config['ENTITY_TYPE'], id_column="id_visit")
-        result_df = result_df.withColumnRenamed("sk_entity", "sk_core_visit")
+        result_df = result_df.withColumnRenamed("surrogate_key", "sk_core_visit")
 
         # Add partitioning columns
         result_df = result_df.withColumn("year", year(col("ts_updated"))) \
