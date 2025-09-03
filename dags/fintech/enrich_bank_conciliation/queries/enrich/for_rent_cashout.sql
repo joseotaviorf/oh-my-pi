@@ -9,7 +9,7 @@ WITH de_para_company_use AS (
 francesinha AS (
     SELECT
         IF(
-              LENGTH(company_use) IN (8,9,10,11,12,13,14,15,16) 
+              LENGTH(company_use) IN (8,9,10,11,12,13,14,15,16,17) 
                   AND company_use NOT LIKE '%|%' 
                   AND dt_paid > '2025-06-23', 
               LEFT(REPLACE(company_use, '|', '!'), LENGTH(company_use) -2), 
@@ -17,6 +17,14 @@ francesinha AS (
           ) AS company_use,
         our_number,
         bank_account,
+        CASE
+            WHEN bank_account = 426887 THEN '11010X'
+            WHEN bank_account = 79952 THEN '11118X'
+            WHEN bank_account = 433065 THEN '11016X'
+            WHEN bank_account = 502307 THEN '11035X'
+            WHEN bank_account = 502331 THEN '11057X'
+            ELSE 'unknown'
+        END AS sap_account,
         dt_paid,
         occurrence_code AS last_occurrence_code,
         IF(occurrence_code = '00', paid_amount, 0.00) AS paid_amount
@@ -114,6 +122,7 @@ SELECT DISTINCT
     ELSE FALSE
     END AS is_vans_compliance,
     CASE
+        WHEN f.sap_account != sap.account_number THEN FALSE
         WHEN (ABS(f.paid_amount) = ABS(sap.paid_amount)) THEN TRUE
         WHEN last_occurrence_code = 'DV' AND (sap.paid_amount = 0 OR sap.paid_amount IS NULL) THEN TRUE
     ELSE FALSE
