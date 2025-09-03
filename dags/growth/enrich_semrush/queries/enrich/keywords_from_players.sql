@@ -673,14 +673,14 @@ SELECT DISTINCT -- There are duplicates in the source table
 )
 
 SELECT
-  player,
-  keyword,
+  pds.player,
+  pds.keyword,
 
   -- Replaces the UDF SF_SET_ALPHANUMERIC_LOWER
   LOWER(
     REGEXP_REPLACE(
       TRANSLATE(
-        keyword,
+        pds.keyword,
         'áàãâäéèêëíìîïóòõôöúùûüçÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÔÖÚÙÛÜÇ',
         'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC'
       ),
@@ -689,11 +689,11 @@ SELECT
     )
   ) AS keyword_clean,
 
-  url,
-  REPLACE(REPLACE(trends, "["), "]") AS trends,
-  position,
-  previous_position,
-  position_difference,
+  pds.url,
+  REPLACE(REPLACE(pds.trends, "["), "]") AS trends,
+  pds.position,
+  pds.previous_position,
+  pds.position_difference,
 
   -- Replaces the UDF FORMAT_KEYWORD_INTENT
   LOWER(
@@ -712,13 +712,13 @@ SELECT
     )
   ) AS keyword_intents,
 
-  position_type,
+  pds.position_type,
 
   -- Replaces the UDF FORMAT_SERP_VALUES to the serp_features_by_position
   LOWER(
     ARRAY_JOIN(
       TRANSFORM(
-        SPLIT(serp_features_by_position, ','),
+        SPLIT(pds.serp_features_by_position, ','),
         x -> CASE
           WHEN x = '0' THEN 'Instant answer'
           WHEN x = '1' THEN 'Knowledge panel'
@@ -781,7 +781,7 @@ SELECT
   LOWER(
     ARRAY_JOIN(
       TRANSFORM(
-        SPLIT(serp_features_by_keyword, ','),
+        SPLIT(pds.serp_features_by_keyword, ','),
         x -> CASE
           WHEN x = '0' THEN 'Instant answer'
           WHEN x = '1' THEN 'Knowledge panel'
@@ -840,18 +840,25 @@ SELECT
     )
   ) AS serp_features_by_keyword,
 
-  search_volume,
-  cpc,
-  traffic,
-  share_of_traffic,
-  traffic_cost_percentage,
-  competition,
-  number_of_results,
-  keyword_difficulty,
-  dt_display,
-  dt_report,
-  ts_report,
-  year,
-  month,
-  day
-FROM players_data_from_semrush
+  pds.search_volume,
+  pds.cpc,
+  pds.traffic,
+  pds.share_of_traffic,
+  pds.traffic_cost_percentage,
+  pds.competition,
+  pds.number_of_results,
+  pds.keyword_difficulty,
+  CASE WHEN sg.keyword IS NOT NULL 
+    THEN TRUE
+    ELSE FALSE
+  END AS is_goldenset,
+  pds.dt_display,
+  pds.dt_report,
+  pds.ts_report,
+  pds.year,
+  pds.month,
+  pds.day
+FROM players_data_from_semrush AS pds
+LEFT JOIN datalake_gsheets_clean.seo_goldenset AS sg 
+  ON pds.keyword = sg.keyword
+    AND pds.dt_display BETWEEN sg.dt_effective_start AND COALESCE(sg.dt_effective_end, CURRENT_DATE())

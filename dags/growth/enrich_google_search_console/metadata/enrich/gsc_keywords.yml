@@ -96,18 +96,10 @@ columns:
     description: "Flag indicating whether the search query is branded."
     lineage:
       - datalake_google_search_console.seo_gsc_data.is_branded
-  year:
-    description: "Partition year."
+  is_goldenset:
+    description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
     lineage:
-      - datalake_google_search_console.seo_gsc_data.year
-  month:
-    description: "Partition month."
-    lineage:
-      - datalake_google_search_console.seo_gsc_data.month
-  day:
-    description: "Partition day (set to 01 for monthly aggregation)."
-    lineage:
-      - datalake_google_search_console.seo_gsc_data.day
+      - datalake_gsheets_clean.seo_goldenset.keyword
   position:
     description: "Aggregated average position computed as SUM(posimp) / SUM(impressions)."
     lineage:
@@ -130,4 +122,15 @@ columns:
     description: "Total position-impressions product in the month for the group (SUM of posimp)."
     lineage:
       - datalake_google_search_console.seo_gsc_data.posimp
-
+  year:
+    description: "Partition year."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.year
+  month:
+    description: "Partition month."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.month
+  day:
+    description: "Partition day (set to 01 for monthly aggregation)."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.day

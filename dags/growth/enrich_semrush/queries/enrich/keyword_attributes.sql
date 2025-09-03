@@ -52,6 +52,7 @@ SELECT
   competition,
   number_of_results,
   keyword_difficulty,
+  is_goldenset,
   has_mention_to_location,
   
   CASE

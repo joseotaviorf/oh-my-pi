@@ -140,6 +140,10 @@ columns:
         description: Flag indicating whether the search query is branded.
         lineage:
             - datalake_google_search_console.gsc_keyword_region_attributes.is_branded
+    is_goldenset:
+        description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
+        lineage:
+            - datalake_gsheets_clean.seo_goldenset.keyword
     has_mention_to_location:
         description: Flag indicating whether the keyword mentions or implies a location.
         lineage:

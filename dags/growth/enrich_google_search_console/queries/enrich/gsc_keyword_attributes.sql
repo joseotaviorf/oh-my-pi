@@ -59,6 +59,7 @@ SELECT
   slug,
   subtitle_content,
   is_branded,
+  is_goldenset,
   has_mention_to_location,
 
   CASE

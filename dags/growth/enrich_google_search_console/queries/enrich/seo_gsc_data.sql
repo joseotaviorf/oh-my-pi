@@ -304,6 +304,7 @@ layer1 AS (
             WHEN REGEXP_LIKE(page, '(complexo-esportivo-)|(esporte)|(futebol)|(esportivo)|(coreo-danca-)|(academia)|(smart-fit)|(olimpico)|(yoga)|(fit-)|(ballet)|(velocity)|(sports)') THEN 'Complexos Esportivos'
             ELSE 'Other'
         END AS tipo_poi
+
     FROM
         datalake_google_search_console_clean.report_by_page_and_query
     WHERE
@@ -339,6 +340,7 @@ layer2 AS (
         position,
         impressions,
         posimp,
+
         CASE
             WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' OR page LIKE '%/guias/%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'

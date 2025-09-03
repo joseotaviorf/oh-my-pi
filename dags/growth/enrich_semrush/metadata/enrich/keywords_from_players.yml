@@ -465,6 +465,10 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.keyword_difficulty
       - datalake_semrush_clean.loft_organic_search_kw.keyword_difficulty
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword_difficulty
+  is_goldenset:
+    description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
+    lineage:
+      - datalake_gsheets_clean.seo_goldenset.keyword
   dt_display:
     description: "Display date string as provided by SEMrush."
     lineage:

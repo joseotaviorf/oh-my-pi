@@ -60,6 +60,7 @@ general_city_level_enrichment AS (
     slug,
     subtitle_content,
     is_branded,
+    is_goldenset,
     year,
     month,
     day
@@ -154,6 +155,7 @@ operation_city_level_enrichment AS (
     slug,
     subtitle_content,
     is_branded,
+    is_goldenset,
     CASE
       WHEN match_igbe_city != '' THEN 1
       ELSE 0
@@ -252,6 +254,7 @@ operation_neighborhood_level_enrichment AS (
         ELSE 0
       END
     ) AS has_mention_to_city,
+    is_goldenset,
     year,
     month,
     day
@@ -310,6 +313,7 @@ SELECT
     WHEN match_operation_neighborhood != '' THEN 1
     ELSE 0
   END AS has_mention_to_neighborhood,
+  is_goldenset,
   year,
   month,
   day

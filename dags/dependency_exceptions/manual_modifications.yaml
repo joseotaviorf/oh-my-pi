@@ -682,6 +682,7 @@ bietlejuice.enrich_semrush:
     - bietlejuice.semrush:load-clean-zapimoveis-organic-search-kw:first-run-of-day
     - bietlejuice.semrush:load-clean-olximoveis-organic-search-kw:first-run-of-day
     - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+    - bietlejuice.gsheets_static:load-clean-seo-goldenset:first-run-of-day
 bietlejuice.enrich_ss_logic_model:
   remove:
     - bietlejuice.ebdb:load-clean-contract:first-run-of-day

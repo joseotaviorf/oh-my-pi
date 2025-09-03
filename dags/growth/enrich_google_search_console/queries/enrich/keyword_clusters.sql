@@ -32,6 +32,7 @@ WITH categories_and_subcategories AS (
     slug,
     subtitle_content,
     is_branded,
+    is_goldenset,
     has_mention_to_location,
     has_mention_to_neighborhood,
     has_mention_to_city,
@@ -244,6 +245,7 @@ SELECT
   slug,
   subtitle_content,
   is_branded,
+  is_goldenset,
   has_mention_to_location,
   has_mention_to_neighborhood,
   has_mention_to_city,
@@ -361,6 +363,6 @@ SELECT
   
   year,
   month,
-  day 
+  day
 FROM
   categories_and_subcategories

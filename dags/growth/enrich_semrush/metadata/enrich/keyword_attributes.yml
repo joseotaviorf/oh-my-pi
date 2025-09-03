@@ -107,6 +107,10 @@ columns:
     description: "SEMrush keyword difficulty score (0–100)."
     lineage:
       - datalake_semrush.keyword_region_attributes.keyword_difficulty
+  is_goldenset:
+    description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
+    lineage:
+      - datalake_gsheets_clean.seo_goldenset.keyword
   has_mention_to_location:
     description: "Flag indicating whether the keyword mentions any location (city or neighborhood) directly or inferred via matches."
     lineage:
