@@ -170,13 +170,10 @@ class Tables:
     cluster_step_condos = "vespucio_pipeline_delta.cluster_step_condos"
     cluster_step_houses = "vespucio_pipeline_delta.cluster_step_houses"
     source_predict_step_houses = "vespucio_pipeline_delta.source_predict_step_houses"
-    merge_step_condos = "vespucio_pipeline_delta.merge_step_condos"
-    merge_step_houses = "vespucio_pipeline_delta.merge_step_houses"
+    join_step_condos = "vespucio_pipeline_delta.join_step_condos"
+    join_step_houses = "vespucio_pipeline_delta.join_step_houses"
     images_step_houses = "vespucio_pipeline_delta.images_step_houses"
     link_step = "vespucio_pipeline_delta.link_step"
-    compound_predict_step_houses = (
-        "vespucio_pipeline_delta.compound_predict_step_houses"
-    )
     condo_compounds = "vespucio_prod_delta.condo_compounds"
     house_compounds = "vespucio_prod_delta.house_compounds"
     listings = "vespucio_prod_delta.listings"
@@ -437,36 +434,7 @@ source_predict_task = create_task(
     ],
 )
 
-merge_task = create_task(
-    entry_point="core_merge_step",
-    parameters=[
-        f"--input_staged_condos={Tables.stage_step_condos}",
-        f"--input_staged_houses={Tables.stage_step_houses}",
-        f"--input_clustered_condos={Tables.cluster_step_condos}",
-        f"--input_clustered_houses={Tables.cluster_step_houses}",
-        f"--overwrite_schema",
-        f"--output_merged_condos={Tables.merge_step_condos}",
-        f"--output_merged_houses={Tables.merge_step_houses}",
-    ],
-)
-
-images_and_relations_tasks = [
-    create_task(
-        entry_point="core_images_step",
-        parameters=[
-            f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--input_extracted_houses={Tables.extract_step_houses}",
-            f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
-            f"--input_kodak_photo={Tables.kodak_photo}",
-            "--overwrite_schema",
-            f"--output_images_houses={Tables.images_step_houses}",
-            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
-            f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
-            "--kodak_photo_sns_region=us-east-1",
-            "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
-        ],
-    ),
-    create_task(
+link_task = create_task(
         entry_point="core_link_step",
         parameters=[
             f"--input_staged_condos={Tables.stage_step_condos}",
@@ -477,28 +445,46 @@ images_and_relations_tasks = [
             f"--output_linked={Tables.link_step}",
         ],
     ),
-]
 
-predict_and_join_task = [
+images_task = create_task(
+    entry_point="core_images_step",
+    parameters=[
+        f"--input_clustered_houses={Tables.cluster_step_houses}",
+        f"--input_extracted_houses={Tables.extract_step_houses}",
+        f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
+        f"--input_kodak_photo={Tables.kodak_photo}",
+        "--overwrite_schema",
+        f"--output_images_houses={Tables.images_step_houses}",
+        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+        f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
+        "--kodak_photo_sns_region=us-east-1",
+        "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+    ],
+)
+
+join_and_predict_task = [
+    create_task(
+            entry_point="core_join_compound_step",
+            parameters=[
+                "--overwrite_schema",
+                f"--input_staged_houses={Tables.stage_step_houses}",
+                f"--input_staged_condos={Tables.stage_step_condos}",
+                f"--input_images_houses={Tables.images_step_houses}",
+                f"--input_prioritized_houses={Tables.prioritize_step_houses}",
+                f"--input_prioritized_condos={Tables.prioritize_step_condos}",
+                f"--input_linked={Tables.link_step}",
+                f"--input_joined_condos={Tables.join_step_condos}",
+                f"--output_joined_houses={Tables.join_step_houses}",
+                f"--output_joined_condos={Tables.join_step_condos}",
+            ],
+        ),
     create_task(
         entry_point="core_compound_predict_step",
         parameters=[
+            "--overwrite_schema",
             f"--input_linked={Tables.link_step}",
-            f"--input_merged_houses={Tables.merge_step_houses}",
-            f"--overwrite_schema",
-            f"--output_compound_predicted_houses={Tables.compound_predict_step_houses}",
-        ],
-    ),
-    create_task(
-        entry_point="core_join_compound_step",
-        parameters=[
-            f"--input_images_houses={Tables.images_step_houses}",
-            f"--input_linked={Tables.link_step}",
-            f"--input_merged_houses={Tables.merge_step_houses}",
-            f"--input_merged_condos={Tables.merge_step_condos}",
+            f"--input_joined_houses={Tables.join_step_houses}",
             f"--input_source_predicted_houses={Tables.source_predict_step_houses}",
-            f"--input_compound_predicted_houses={Tables.compound_predict_step_houses}",
-            f"--overwrite_schema",
             f"--output_house_compounds={Tables.house_compounds}",
         ],
     ),
@@ -508,20 +494,18 @@ after_join_tasks = [
     create_task(
         entry_point="core_listing_step",
         parameters=[
+            "--overwrite_schema",
             f"--input_house_compounds={Tables.house_compounds}",
-            f"--input_linked={Tables.link_step}",
-            f"--input_merged_condos={Tables.merge_step_condos}",
-            f"--overwrite_schema",
+            f"--input_joined_condos={Tables.join_step_condos}",
             f"--output_listings_houses={Tables.listings}",
         ],
     ),
     create_task(
         entry_point="core_condo_plans_step",
         parameters=[
-            f"--input_linked={Tables.link_step}",
-            f"--input_merged_condos={Tables.merge_step_condos}",
-            f"--input_house_compounds={Tables.house_compounds}",
             "--overwrite_schema",
+            f"--input_joined_condos={Tables.join_step_condos}",
+            f"--input_house_compounds={Tables.house_compounds}",
             f"--output_condo_compounds={Tables.condo_compounds}",
         ],
     ),
@@ -709,19 +693,22 @@ chain(*address_tasks)
 address_tasks[-1] >> extract_step_task
 address_tasks[-1] >> cluster_task
 
+cluster_task >> images_task
+cluster_task >> link_task
 cluster_task >> source_predict_task
 cluster_task >> prioritize_step_task
-source_predict_task >> merge_task
-
-extract_step_task >> images_and_relations_tasks[0]
 extract_step_task >> prioritize_step_task
-cluster_task >> images_and_relations_tasks[0]
-merge_task >> images_and_relations_tasks[1]
+extract_step_task >> images_task
 
-images_and_relations_tasks >> predict_and_join_task[0]
-chain(*predict_and_join_task)
 
-predict_and_join_task[-1] >> after_join_tasks
+prioritize_step_task >> join_and_predict_task[0]
+link_task >> join_and_predict_task[0]
+images_task >> join_and_predict_task[0]
+chain(*join_and_predict_task)
+
+source_predict_task >> join_and_predict_task[1]
+
+join_and_predict_task[-1] >> after_join_tasks
 after_join_tasks >> join_plugins
 
 join_plugins >> plugin_tasks
