@@ -1,0 +1,6 @@
+ENTITY_TYPE: "VISIT"
+VISIT_TABLE: "datalake_ebdb_test_clean.visit"
+VISIT_STATUS_LOG_TABLE: "datalake_ebdb_test_clean.visit_status_log"
+HOUSE_TABLE: "datalake_ebdb_clean.house"
+HOUSE_LISTING_RELATION_TABLE: "datalake_ebdb_clean.house_listing_relation"
+EBDB_USER_TABLE: "datalake_ebdb_clean.user"

@@ -6,11 +6,19 @@ dag:
     dag_purpose: |
       This is a test DAG related to Core Models proposal
 workflow:
-  type: query_delta
+  type: core_model
   layer: core
   default_extraction_type: full
+  load_spark_job: load_core_visit
   tables_customization:
     visit:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
       z_order_by: [id_house, business_context]
       table_properties:
         "delta.enableChangeDataFeed": "true"
