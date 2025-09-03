@@ -315,6 +315,44 @@ validate-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v
 
+.PHONY: validate-core-model-schemas
+## validates that all core model tables have corresponding schema files (CI/CD only)
+validate-core-model-schemas:
+	@echo ""
+	@echo "Validating if new/modified core model tables have corresponding schema files"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schemas.py -b "$(CI_COMMIT_BRANCH)" -v
+
+.PHONY: validate-core-model-schema-content
+## validates that core model schema files have correct content structure (CI/CD only)
+validate-core-model-schema-content:
+	@echo ""
+	@echo "Validating if new/modified core model schema files have correct content structure"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schema_content.py -b "$(CI_COMMIT_BRANCH)" -v
+
+.PHONY: validate-core-model-schemas-all
+## validates that all core model tables have corresponding schema files (local development)
+validate-core-model-schemas-all:
+	@echo ""
+	@echo "Validating all core model schema files"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schemas.py -a
+
+.PHONY: validate-core-model-schema-content-all
+## validates that all core model schema files have correct content structure (local development)
+validate-core-model-schema-content-all:
+	@echo ""
+	@echo "Validating all core model schema file content"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schema_content.py -a
+
 ###############################################################################
 ###################### Common commands ########################################
 ###############################################################################

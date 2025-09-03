@@ -1,0 +1,224 @@
+# Schema validation file for core visit table
+# This file defines the expected schema for the core.visit table
+# Path: dags/core/core_visit_test/schemas/core/visit.yml
+
+columns:
+  surrogate_key:
+    type: string
+    required: true
+  # Core entity identifier - must be present and non-null
+  id_entity:
+    type: bigint
+    required: true
+
+  # Entity type (from config)
+  entity:
+    type: string
+    required: true
+
+  # Visitor information
+  id_visitor:
+    type: bigint
+    required: true
+
+  # Owner information (from house)
+  id_owner:
+    type: bigint
+    required: true
+
+  # Agent information
+  id_agent:
+    type: bigint
+    required: true
+
+  # House information - required for all visits
+  id_house:
+    type: bigint
+    required: true
+
+  # Business context - FOR_RENT or FOR_SALE
+  business_context:
+    type: string
+    required: true
+
+  # Visit status (computed or original)
+  status:
+    type: string
+    required: true
+
+  # Active status flag
+  is_active:
+    type: boolean
+    required: true
+
+  # Computed status based on business rules
+  computed_status:
+    type: string
+    required: true
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: true
+
+  ts_updated:
+    type: timestamp
+    required: true
+
+  # Visit scheduling information
+  ts_visit:
+    type: timestamp
+    required: true
+
+  # Request date
+  dt_request:
+    type: date
+    required: true
+
+  # Visit scheduling information
+  id_schedule:
+    type: bigint
+    required: true
+
+  # Visit code
+  code:
+    type: string
+    required: true
+
+  # Visit slot
+  slot:
+    type: int
+    required: true
+
+  # Event type
+  event_type:
+    type: string
+    required: true
+
+  # Author user role
+  author_user_role:
+    type: string
+    required: true
+
+  # On behalf of
+  on_behalf_of:
+    type: string
+    required: true
+
+  # Behavior
+  behavior:
+    type: string
+    required: true
+
+  # Booking type
+  booking_type:
+    type: string
+    required: true
+
+  # Structured flag
+  structured:
+    type: boolean
+    required: true
+
+  # Business model
+  business_model:
+    type: string
+    required: true
+
+  # Cancellation reason
+  cancellation_reason:
+    type: string
+    required: true
+
+  # Fixed agent flag
+  is_fixed_agent:
+    type: boolean
+    required: true
+
+  # Visit confirmation timestamp
+  ts_visit_confirmed:
+    type: timestamp
+    required: true
+
+  # Confirmation expiration date
+  dt_confirmation_expiration:
+    type: timestamp
+    required: true
+
+  # Visit completion timestamp
+  ts_visit_done:
+    type: timestamp
+    required: true
+
+  # Visit cancellation timestamp
+  ts_visit_canceled:
+    type: timestamp
+    required: true
+
+  # Visit unsuccessful timestamp
+  ts_visit_unsuccessful:
+    type: timestamp
+    required: true
+
+  # House region
+  id_region:
+    type: bigint
+    required: true
+
+  # House address
+  address:
+    type: string
+    required: true
+
+  # House neighborhood
+  neighborhood:
+    type: string
+    required: true
+
+  # House number
+  number:
+    type: string
+    required: true
+
+  # House complement
+  complement:
+    type: string
+    required: true
+
+  # House city
+  city:
+    type: string
+    required: true
+
+  # House zipcode
+  zipcode:
+    type: string
+    required: true
+
+  # For rent flag
+  is_for_rent:
+    type: boolean
+    required: true
+
+  # For sale flag
+  is_for_sale:
+    type: boolean
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 44
+max_columns: 44
+strict: true # Only these exact columns are allowed

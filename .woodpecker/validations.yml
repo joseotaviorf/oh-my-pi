@@ -76,3 +76,19 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
+
+  validate-core-model-schemas:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - make requirements-scripts
+      - make validate-core-model-schemas
+    when:
+      event: push
+
+  validate-core-model-schema-content:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - make requirements-scripts
+      - make validate-core-model-schema-content
+    when:
+      event: push

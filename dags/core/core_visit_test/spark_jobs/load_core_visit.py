@@ -89,8 +89,6 @@ class CoreVisitSparkJob(BaseCoreModelSparkJob):
         result_df = result_df.withColumn("month", month(col("ts_updated")))
         result_df = result_df.withColumn("day", dayofmonth(col("ts_updated")))
 
-        # Apply schema validation - for now just return the dataframe
-        # TODO: Implement schema validation if needed
 
         self.logger.info(f"m=create_core_model, msg=Core visit model created with {result_df.count()} records")
 

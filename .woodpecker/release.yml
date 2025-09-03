@@ -218,6 +218,24 @@ steps:
       event: push
       branch: [master, hotfix/*]
 
+  upload-dag-packages-schemas-s3-forno:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br schemas
+    when:
+      event: push
+      branch: forno
+
+  upload-dag-packages-schemas-s3-prod:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - pip install boto3==1.24.0 tqdm==4.64.1
+      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks schemas
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
   load-metadata-files-to-s3-forno:
     image: public.ecr.aws/docker/library/python:3.7.16
     commands:

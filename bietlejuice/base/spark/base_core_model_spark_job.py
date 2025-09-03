@@ -9,10 +9,19 @@ from pyspark.sql import SparkSession, DataFrame
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.core_models.helpers.schema_validator import (
+    SchemaValidator,
+    SchemaValidationError,
+)
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
 from bietlejuice.services.configuration_service import ConfigurationService
+
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 
 
 class BaseCoreModelSparkJob(ABC):
@@ -167,6 +176,316 @@ class BaseCoreModelSparkJob(ABC):
             f"{args.schema}.{args.table_name}"
         )
 
+    def get_expected_schema(self, args: Any) -> dict:
+        """
+        Get expected schema definition for DataFrame validation.
+
+        First tries to load schema from S3 YAML file, then falls back to configuration.
+        Schema file should be stored in S3 following the pattern:
+        schemas/{table_name}.yml
+
+        Expected schema format:
+        {
+            "columns": {
+                "column_name": {
+                    "type": "string|int|double|boolean|timestamp|date|...",
+                    "nullable": True/False,
+                    "required": True/False
+                },
+                ...
+            },
+            "strict": True/False,
+            "min_columns": int,
+            "max_columns": int
+        }
+
+        Args:
+            args: Parsed command line arguments containing dag_name and table_name
+
+        Returns:
+            Schema definition dictionary
+        """
+        try:
+            # First, try to load schema from S3 file
+            schema_from_file = self._load_schema_from_s3_file(
+                args.dag_name, args.table_name, args
+            )
+            if schema_from_file:
+                self.logger.info(
+                    f"m=get_expected_schema, msg=Using schema file from S3 for table {args.table_name}"
+                )
+                return schema_from_file
+        except Exception as e:
+            self.logger.warning(
+                f"m=get_expected_schema, msg=Error loading schema file from S3: {e}, trying configuration"
+            )
+
+        try:
+            # Fall back to configuration-based schema
+            expected_schema = self.get_config(
+                "expected_schema", required=False, default={}
+            )
+            if expected_schema:
+                self.logger.info(
+                    "m=get_expected_schema, msg=Using configured schema validation"
+                )
+                return expected_schema
+            else:
+                self.logger.info(
+                    "m=get_expected_schema, msg=No schema validation configured"
+                )
+                return {}
+        except Exception as e:
+            self.logger.warning(
+                f"m=get_expected_schema, msg=Error loading schema configuration: {e}, skipping validation"
+            )
+            return {}
+
+    def _load_schema_from_s3_file(
+        self, dag_name: str, table_name: str, args: Any
+    ) -> dict:
+        """
+        Load schema definition from S3 YAML file.
+
+        Schema file should be stored as: schemas/{dag_name}/{layer}/{table_name}.yml
+        where layer is inferred from the schema argument (e.g., 'core' for core_visit_test)
+
+        Args:
+            dag_name: DAG name without bietlejuice prefix
+            table_name: Table name
+            args: Parsed command line arguments containing schema information
+
+        Returns:
+            Schema definition dictionary or empty dict if not found
+        """
+        try:
+            from bietlejuice.base.service.dag_packages_path_service import (
+                DAGPackagesPathService,
+            )
+            import yaml
+
+            # Get the layer from the schema argument (e.g., 'core' from 'core_visit_test')
+            # The schema argument typically follows the pattern: {layer}_{context}
+            layer = args.schema.split("_")[0] if args.schema else "core"
+
+            # Build the schema file path following the S3 structure: schemas/{dag_name}/{layer}/{table_name}.yml
+            schema_file_relative_path = f"schemas/{dag_name}/{layer}/{table_name}.yml"
+
+            self.logger.info(
+                f"m=_load_schema_from_s3_file, msg=Attempting to load schema file: {schema_file_relative_path}"
+            )
+
+            # Use the same mechanism as query files to load from S3
+            schema_content = DAGPackagesPathService._read_dag_package_file_from_s3(
+                sql_file_relative_path=schema_file_relative_path
+            )
+
+            if schema_content:
+                schema_dict = yaml.safe_load(schema_content)
+                self.logger.info(
+                    f"m=_load_schema_from_s3_file, msg=Successfully loaded schema file: {schema_file_relative_path}"
+                )
+                return schema_dict or {}
+            else:
+                self.logger.info(
+                    f"m=_load_schema_from_s3_file, msg=Schema file is empty: {schema_file_relative_path}"
+                )
+                return {}
+
+        except FileNotFoundError:
+            self.logger.info(
+                f"m=_load_schema_from_s3_file, msg=Schema file not found: {schema_file_relative_path}"
+            )
+            return {}
+        except yaml.YAMLError as e:
+            self.logger.error(
+                f"m=_load_schema_from_s3_file, msg=Invalid YAML in schema file {schema_file_relative_path}: {e}"
+            )
+            raise ValueError(f"Invalid YAML in schema file: {e}")
+        except Exception as e:
+            self.logger.error(
+                f"m=_load_schema_from_s3_file, msg=Unexpected error loading schema file: {e}"
+            )
+            raise
+
+    def validate_dataframe_schema(self, dataframe: DataFrame, args: Any) -> None:
+        """
+        Validate DataFrame schema against expected schema definition.
+
+        Args:
+            dataframe: DataFrame to validate
+            args: Parsed command line arguments
+
+        Raises:
+            SchemaValidationError: If validation fails and fail_on_schema_validation_error is True
+        """
+        expected_schema = self.get_expected_schema(args)
+
+        if not expected_schema:
+            self.logger.info(
+                "m=validate_dataframe_schema, msg=No expected schema defined, skipping validation"
+            )
+            return
+
+        try:
+            validator = SchemaValidator()
+
+            self.logger.info(
+                f"m=validate_dataframe_schema, msg=Validating DataFrame schema for table {args.schema}.{args.table_name}"
+            )
+
+            # Log current DataFrame schema for debugging
+            schema_summary = validator.get_schema_summary(dataframe)
+            self.logger.info(
+                f"m=validate_dataframe_schema, msg=Current DataFrame schema summary: {schema_summary}"
+            )
+
+            # Perform validation
+            validator.validate_schema(dataframe, expected_schema)
+
+            self.logger.info(
+                f"m=validate_dataframe_schema, msg=Schema validation passed for table {args.schema}.{args.table_name}"
+            )
+
+        except SchemaValidationError as e:
+            # Create detailed validation message
+            detailed_error_msg = self._create_schema_validation_message(
+                table_name=f"{args.schema}.{args.table_name}",
+                schema_errors=str(e).split("\n"),
+                expected_schema=expected_schema,
+                actual_schema_summary=schema_summary,
+            )
+
+            self.logger.error(f"m=validate_dataframe_schema, msg={detailed_error_msg}")
+
+            # Send webhook notification
+            self._send_schema_validation_webhook(
+                table_name=f"{args.schema}.{args.table_name}",
+                validation_message=detailed_error_msg,
+            )
+
+            # Check if validation failures should stop execution
+            fail_on_validation_error = self.get_config(
+                "fail_on_schema_validation_error", required=False, default=True
+            )
+
+            if fail_on_validation_error:
+                raise SchemaValidationError(detailed_error_msg)
+            else:
+                self.logger.warning(
+                    "m=validate_dataframe_schema, msg=Schema validation failed but continuing execution due to configuration"
+                )
+
+        except Exception as e:
+            self.logger.error(
+                f"m=validate_dataframe_schema, msg=Unexpected error during schema validation: {str(e)}"
+            )
+            # For unexpected errors, we should probably fail unless explicitly configured not to
+            fail_on_validation_error = self.get_config(
+                "fail_on_schema_validation_error", required=False, default=True
+            )
+
+            if fail_on_validation_error:
+                raise
+            else:
+                self.logger.warning(
+                    "m=validate_dataframe_schema, msg=Schema validation error but continuing execution due to configuration"
+                )
+
+    def _create_schema_validation_message(
+        self,
+        table_name: str,
+        schema_errors: list,
+        expected_schema: dict,
+        actual_schema_summary: dict,
+    ) -> str:
+        """
+        Create a detailed schema validation message similar to CDC schema changes notifier.
+
+        Args:
+            table_name: Name of the table being validated
+            schema_errors: List of validation errors from SchemaValidator
+            expected_schema: Expected schema definition
+            actual_schema_summary: Actual DataFrame schema summary
+
+        Returns:
+            Formatted validation message
+        """
+        message = f"Schema validation failed for table {table_name}.\n\n"
+
+        if schema_errors:
+            message += "Validation Errors:\n"
+            for error in schema_errors:
+                message += f"• {error}\n"
+            message += "\n"
+
+        if expected_schema and "columns" in expected_schema:
+            message += "Expected Schema:\n"
+            for col_name, col_def in expected_schema["columns"].items():
+                nullable = (
+                    "nullable" if col_def.get("nullable", True) else "non-nullable"
+                )
+                required = "required" if col_def.get("required", True) else "optional"
+                message += f"• {col_name}: {col_def.get('type', 'unknown')} ({nullable}, {required})\n"
+            message += "\n"
+
+        if actual_schema_summary and "columns" in actual_schema_summary:
+            message += "Actual Schema:\n"
+            for col_name, col_info in actual_schema_summary["columns"].items():
+                nullable = (
+                    "nullable" if col_info.get("nullable", True) else "non-nullable"
+                )
+                message += (
+                    f"• {col_name}: {col_info.get('type', 'unknown')} ({nullable})\n"
+                )
+
+        return message.rstrip()
+
+    def _send_schema_validation_webhook(
+        self, table_name: str, validation_message: str
+    ) -> None:
+        """
+        Send schema validation failure notification via webhook.
+
+        Args:
+            table_name: Name of the table that failed validation
+            validation_message: Detailed validation message
+        """
+        try:
+            # Get webhook URL from dbutils secrets
+            try:
+                base_dbutils = BaseDBUtils()
+                dbutils = base_dbutils.get_dbutils()
+                webhook_url = dbutils.secrets.get(
+                    scope="quintoandar",
+                    key=GchatWebhooksEnum.GCHAT_CORE_MODEL_SCHEMA_VALIDATION,
+                )
+            except Exception as e:
+                self.logger.warning(
+                    f"m=_send_schema_validation_webhook, msg=Failed to get webhook from dbutils: {str(e)}"
+                )
+                webhook_url = None
+
+            if webhook_url:
+                # Create message object
+                message = Message(validation_message, webhook_url)
+
+                # Send notification
+                GChatService.send_message(message)
+
+                self.logger.info(
+                    f"m=_send_schema_validation_webhook, msg=Schema validation webhook sent for table {table_name}"
+                )
+            else:
+                self.logger.info(
+                    f"m=_send_schema_validation_webhook, msg=No CORE_MODEL_WEBHOOK secret found in dbutils for schema validation notifications"
+                )
+
+        except Exception as e:
+            self.logger.warning(
+                f"m=_send_schema_validation_webhook, msg=Failed to send schema validation webhook: {str(e)}"
+            )
+
     @abstractmethod
     def create_core_model(self, spark: SparkSession, args: Any) -> DataFrame:
         """
@@ -296,6 +615,10 @@ class BaseCoreModelSparkJob(ABC):
             # Create core model (implemented by subclass)
             self.logger.info(f"m=run, msg=Creating {self.job_name} core model")
             core_model_df = self.create_core_model(spark_session, args)
+
+            # Validate DataFrame schema before writing
+            self.logger.info(f"m=run, msg=Validating {self.job_name} core model schema")
+            self.validate_dataframe_schema(core_model_df, args)
 
             # Run the pipeline
             self.run_pipeline(core_model_df, args, spark_session)

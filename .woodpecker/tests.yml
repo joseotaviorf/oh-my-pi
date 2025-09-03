@@ -41,3 +41,4 @@ steps:
           "tests/core_model_dags/**",
           "bietlejuice/base/core_models/**",
         ]
+      event: push
