@@ -1,4 +1,4 @@
-table_name: datalake_ebdb_test_raw.visitstatuslog
+table_name: datalake_ebdb_raw.visitstatuslog
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:

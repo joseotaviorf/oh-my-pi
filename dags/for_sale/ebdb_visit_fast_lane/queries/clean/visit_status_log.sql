@@ -12,4 +12,4 @@ SELECT
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
-    datalake_ebdb_test_raw.visitstatuslog
+    datalake_ebdb_raw.visitstatuslog

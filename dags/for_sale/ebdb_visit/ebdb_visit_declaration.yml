@@ -51,8 +51,6 @@ workflow:
       clean_table_name: user_visit_preferences
     UserVisitPreferences_AUD:
       clean_table_name: user_visit_preferences_aud
-    Visita:
-      clean_table_name: visit
     Visita_AUD:
       clean_table_name: visit_aud
     VisitCheckin:
@@ -63,8 +61,6 @@ workflow:
       clean_table_name: visit_fitting
     VisitaOrigem:
       clean_table_name: visit_origin
-    VisitStatusLog:
-      clean_table_name: visit_status_log
     Visitor:
       clean_table_name: visitor
     Visitor_AUD:
