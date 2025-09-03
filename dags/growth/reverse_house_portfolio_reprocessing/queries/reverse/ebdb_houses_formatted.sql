@@ -1,7 +1,7 @@
 -- Query to extract formatted house data from EBDB for portfolio reprocessing
 SELECT DISTINCT
-    i.id AS property_id,
-    i.dataCriacao AS created_at,
+    imovel.id AS property_id,
+    imovel.dataCriacao AS created_at,
     'house' AS event_type,
     TO_JSON(NAMED_STRUCT(
         'zipcode', imovel.cep,
