@@ -173,6 +173,10 @@ columns:
     description: 'FS CRI name for CCV'
     lineage:
     - datalake_salesforce_raw.purchase_sale_contract.FS_CRINameCCV__c
+  fs_cri_status:    
+    description: 'FS CRI status for CCV'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.FS_CRIStatus__c
   fs_endorsement_status_ccv:
     description: 'FS endorsement status for CCV'
     lineage:
@@ -189,6 +193,10 @@ columns:
     description: 'Address associated with the contract'
     lineage:
     - datalake_salesforce_raw.purchase_sale_contract.Address__c
+  addendum_status:
+    description: 'Status of the addendum'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.AddendumStatus__c
   fs_responsible_assistant_ccv:
     description: 'FS responsible assistant for CCV'
     lineage:
@@ -341,6 +349,10 @@ columns:
     description: 'Date of the FS CRI request for the CCV'
     lineage:
     - datalake_salesforce_raw.purchase_sale_contract.FS_CRI_RequestDateCCV__c
+  dt_completion_ccv:
+    description: 'Date of the CCV completion'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.CCVCompletionDate__c
   ts_created:
     description: 'Timestamp of when the purchase sale contract was created'
     lineage:
