@@ -90,6 +90,10 @@ default_access_control_list:
     - group_name: analytics-engineers
       permission_level: CAN_MANAGE
 
+##### Cluster Pools #####
+
+pool_rfleet_xlarge_on_demand: &pool_rfleet_xlarge_on_demand 0826-142710-shies22-pool-rhh4mccw
+
 ##### Clusters Configs #####
 cluster_template:
     cluster: &cluster_anchor
@@ -164,6 +168,73 @@ cluster_template:
         ssh_public_keys: []
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
+        spark_version: 10.4.x-scala2.12
+        data_security_mode: SINGLE_USER
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
+
+    cluster_base: &cluster_anchor_base
+        autotermination_minutes: 20
+        aws_attributes:
+            instance_profile_arn: "{{ var.value.instance_profile_arn }}"
+        cluster_log_conf:
+            s3:
+                destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
+                region: us-east-1
+        cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
+        custom_tags:
+            - key: app
+              value: airflow
+            - key: resource-name
+              value: databricks
+            - key: environment
+              value: "{{ var.value.environment }}"
+            - key: owner
+              value: "{{ task.owner.lower().replace(' ', '-') }}"
+            - key: ecosystem
+              value: data-engineering
+            - key: data-classification
+              value: private
+            - key: sensitive-data
+              value: true
+            - key: cost-center
+              value: c052
+            - key: provisioner
+              value: databricks
+        init_scripts:
+            - s3:
+                  destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+                  region: ""
+        spark_conf:
+            spark.rpc.message.maxSize: "2000"
+            spark.sql.sources.partitionOverwriteMode: dynamic
+            spark.sql.parquet.filterPushdown: "true"
+            spark.sql.sources.default: parquet
+            spark.sql.legacy.createHiveTableByDefault: "true"
+            spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
+            spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
+            spark.sql.legacy.timeParserPolicy: LEGACY
+            spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
+            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.forno.quintoandar.com.br"
+            spark.metrics.conf.*.sink.graphite.period: "15"
+            spark.metrics.conf.*.sink.graphite.port: "9109"
+            spark.metrics.conf.*.sink.graphite.unit: "seconds"
+            spark.metrics.conf.*.source.jvm.class: "org.apache.spark.metrics.source.JvmSource"
+            spark.metrics.namespace: "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
+            spark.plugins: "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+            spark.jars.packages: "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21"
+            spark.cernSparkPlugin.cloudFsName: "s3a"
+            spark.extraListeners: "ch.cern.sparkmeasure.FlightRecorderStageMetrics"
+            spark.sparkmeasure.outputFilename: "/tmp/stageMetrics_flightRecorder.json"
+            spark.sparkmeasure.outputFormat: "json"
+            spark.sparkmeasure.printToStdout: "false"
+            spark.databricks.delta.retentionDurationCheck.enabled: "false"
+            spark.databricks.behaviorChange.SC102534CommandRedactProperties.enabled: "false"
+            spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+        spark_env_vars:
+            PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+            ENVIRONMENT: "{{ var.value.environment }}"
+            ARTIFACTS_BUCKET: *artifacts_bucket
+        ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
         data_security_mode: SINGLE_USER
         single_user_name: "{{ var.value.databricks_single_user_name }}"
@@ -1084,6 +1155,13 @@ databricks_13_3_high_mem_driver_high_mem_nodes:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+databricks_13_3_rfleet_instance_cluster:
+  <<: *cluster_anchor_base
+  driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+  instance_pool_id: *pool_rfleet_xlarge_on_demand
+  num_workers: 2
+  spark_version: 13.3.x-scala2.12
 
 ### Notification Configs ###
 notification_webhooks_keys:
