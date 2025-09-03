@@ -4,6 +4,7 @@ SELECT
     folder_reference_type_id  AS id_folder_reference_type,
     source_folder_id AS id_source_folder,
     target_folder_id AS id_target_folder,
+    reference_properties,
     revtype AS rev_type,
     revend AS rev_end,
     documentation_send_date_mod AS mod_ts_documentation_sent,
