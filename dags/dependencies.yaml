@@ -3642,6 +3642,7 @@ bietlejuice.enrich_tracksale_dispatches:
   - bietlejuice.gsheets_for_rent:done-clean-nps-offboarding-contracts-dispatched:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
 bietlejuice.enrich_transactional_entities:
+  - bietlejuice.core_offer:load-core-offer
   - bietlejuice.core_visit:load-core-visit
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries:first-run-of-day

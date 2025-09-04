@@ -8,17 +8,20 @@ columns:
   sk_entity:
     lineage:
       - core_visit.visit.sk_core_visit
+      - core_offer.offer.sk_core_offer
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>" and then applying the SHA256 hash.
       This key must always be unique. 
   id_entity:
     lineage:
       - core_visit.visit.id_visit
+      - core_offer.offer.id_offer
     description: The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
   id_house:
     lineage:
       - core_visit.visit.id_house
+      - core_offer.offer.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     description: Contract id related to the entity, if it has any.
@@ -28,13 +31,22 @@ columns:
       - core_visit.visit.id_agent
       - core_visit.visit.id_owner
       - core_visit.visit.id_visitor
+      - core_offer.offer.id_tenant
+      - core_offer.offer.id_owner
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
+      Each entity may be linked to multiple users.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: The unique identifier for a user associated with the entity.
+      This is the Person's uuid.
       Each entity may be linked to multiple users.
   entity:
     description: String that specifies the type of entity.
     categories:
       VISIT: The entity is a visit, with its id_entity mapping directly to the id_visit from the Visit table in EBDB database.
+      OFFER: The entity is an offer, with its id_entity mapping directly to the id_offer from the Rental Transact system.
   persona:
     description: A persona describes the primary role of a user (id_user) in relation to a specific
       entity within our platform's business context.
@@ -56,14 +68,17 @@ columns:
   is_active:
     description: Boolean flag indicating if the entity is currently active.
       An entity is considered active as long as it is still receiving interactions.
-      A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsucessfull. 
+      A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsucessfull.
+      An offer entity will be considered as active for status proposed, and inactive for statuses accepted, dismissed or rejected. 
   ts_created:
     lineage:
       - core_visit.visit.ts_created
+      - core_offer.offer.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
-      - datalake_ebdb_test_clean.visit.ts_updated
+      - core_visit.visit.ts_updated
+      - core_offer.offer.ts_updated
     description: Last timestamp of when the entity was updated in our product.
   ts_load:
     description: Timestamp of when the entity was updated and loaded for the last time in this table.

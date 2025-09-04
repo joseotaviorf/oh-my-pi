@@ -63,6 +63,51 @@ WITH visit AS (
     FROM
         visit_base
 ),
+offer AS (
+    WITH offer_base AS (
+        SELECT
+            sk_core_offer AS sk_entity,
+            id_offer AS id_entity,
+            id_house,
+            id_tenant,
+            id_owner,
+            'OFFER' AS entity,
+            CASE
+                WHEN status = 'PROPOSED' THEN TRUE
+                WHEN status IN ('ACCEPTED', 'DISMISSED', 'REJECTED') THEN FALSE
+                ELSE NULL
+            END AS is_active,
+            ts_created,
+            ts_updated
+        FROM
+            core_offer.offer
+    )
+    SELECT
+        sk_entity,
+        id_entity,
+        id_house,
+        id_tenant AS id_user,
+        entity,
+        'TENANT_PROSPECT' AS persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        offer_base
+    UNION ALL
+    SELECT
+        sk_entity,
+        id_entity,
+        id_house,
+        id_owner AS id_user,
+        entity,
+        'OWNER' AS persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        offer_base
+),
 base AS (
     SELECT
         sk_entity,
@@ -77,6 +122,20 @@ base AS (
         ts_updated
     FROM
         visit
+    UNION ALL
+    SELECT
+        sk_entity,
+        id_entity,
+        id_house,
+        CAST(NULL AS BIGINT) AS id_contract,
+        id_user,
+        entity,
+        persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        offer
 )
 SELECT
     b.sk_entity,
@@ -84,6 +143,7 @@ SELECT
     b.id_house,
     b.id_contract,
     b.id_user,
+    u.uuid_person,
     b.entity,
     b.persona,
     {house_address} AS house_address,
@@ -95,3 +155,9 @@ FROM
 LEFT JOIN
     datalake_ebdb_clean.house AS h
         ON h.id = b.id_house
+LEFT JOIN
+    datalake_ebdb_clean.user AS u
+        ON u.id = b.id_user
+WHERE
+    b.id_user IS NOT NULL
+    AND b.persona IS NOT NULL
