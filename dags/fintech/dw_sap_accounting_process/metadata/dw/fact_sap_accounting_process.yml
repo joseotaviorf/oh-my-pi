@@ -17,6 +17,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.id_accounting_process
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.id_accounting_process
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.id_accounting_process
+      - datalake_sap_accounting_process.retsuko_transactional.id_accounting_process
     description: "Surrogate key for accounting funnel, combining source identifier with finance entity ID"
   id_business_entity:
     lineage:
@@ -30,6 +31,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.id_business_entity
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.id_business_entity
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.id_business_entity
+      - datalake_sap_accounting_process.retsuko_transactional.id_business_entity
     description: "ID to identify Business Entity from the source"
   id_finance_entity:
     lineage:
@@ -43,6 +45,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.id_finance_entity
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.id_finance_entity
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.id_finance_entity
+      - datalake_sap_accounting_process.retsuko_transactional.id_finance_entity
     description: "ID to identify Finance Entity from the source"
   id_finance_entity_entry:
     lineage:
@@ -56,6 +59,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.id_finance_entity_entry
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.id_finance_entity_entry
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.id_finance_entity_entry
+      - datalake_sap_accounting_process.retsuko_transactional.id_finance_entity_entry
     description: "ID to identify Finance Entity Entry from the source"
   version:
     lineage:
@@ -68,6 +72,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.version
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.version
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.version
+      - datalake_sap_accounting_process.retsuko_transactional.version
     description: "Accounting Version"
   business_unit:
     lineage:
@@ -80,6 +85,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.business_unit
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.business_unit
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.business_unit
+      - datalake_sap_accounting_process.retsuko_transactional.business_unit
     description: "Business unit identifier"
   source_name:
     lineage:
@@ -93,6 +99,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.source_name
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.source_name
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.source_name
+      - datalake_sap_accounting_process.retsuko_transactional.source_name
     description: "Product's name that is responsible to send accounting information"
   accounting_type:
     lineage:
@@ -105,6 +112,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.accounting_type
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.accounting_type
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.accounting_type
+      - datalake_sap_accounting_process.retsuko_transactional.accounting_type
     description: "What type of accounting it refers to"
   account_number:
     lineage:
@@ -118,6 +126,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.account_number
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.account_number
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.account_number
+      - datalake_sap_accounting_process.retsuko_transactional.account_number
     description: "Account Number from SAP"
   accounting_name:
     lineage:
@@ -130,6 +139,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.accounting_name
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.accounting_name
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.accounting_name
+      - datalake_sap_accounting_process.retsuko_transactional.accounting_name
     description: "What kind of accounting it refers to"
   source_amount:
     lineage:
@@ -143,6 +153,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.source_amount
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.source_amount
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.source_amount
+      - datalake_sap_accounting_process.retsuko_transactional.source_amount
     description: "Amount that suppose to be create analyzing source's entry"
   sap_amount:
     lineage:
@@ -156,6 +167,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.sap_amount
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.sap_amount
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.sap_amount
+      - datalake_sap_accounting_process.retsuko_transactional.sap_amount
     description: "Amount that was accounted in SAP"
   is_completeness:
     lineage:
@@ -169,6 +181,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.is_completeness
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.is_completeness
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.is_completeness
+      - datalake_sap_accounting_process.retsuko_transactional.is_completeness
     description: "Indicates if the funnel is complete: same ID throught all products until arrive in SAP"
   is_correctness:
     lineage:
@@ -182,6 +195,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.is_correctness
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.is_correctness
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.is_correctness
+      - datalake_sap_accounting_process.retsuko_transactional.is_correctness
     description: "Indicates if a accounting entry create in source, arrive in SAP Gateway and SAP in the correct amount and in the right account"
   is_temporality:
     lineage:
@@ -195,6 +209,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.is_temporality
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.is_temporality
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.is_temporality
+      - datalake_sap_accounting_process.retsuko_transactional.is_temporality
     description: "Indicates if the creation in SAP was in the right time"
   is_compliance:
     lineage:
@@ -208,6 +223,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.is_compliance
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.is_compliance
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.is_compliance
+      - datalake_sap_accounting_process.retsuko_transactional.is_compliance
     description: "Indicates if all the metrics are TRUE (completeness, correctness, temporality)"
   type:
     description: "Type of accounting process entry (straw, reverse straw)"
@@ -222,6 +238,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.accounting_process_status
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.accounting_process_status
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.accounting_process_status
+      - datalake_sap_accounting_process.retsuko_transactional.accounting_process_status
     description: "Status of the accounting process"
   error_description:
     lineage:
@@ -233,6 +250,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.error_description
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.error_description
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.error_description
+      - datalake_sap_accounting_process.retsuko_transactional.error_description
     description: "Description of any errors in the accounting process"
   accrual_year_month:
     lineage:
@@ -246,6 +264,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.accrual_year_month
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.accrual_year_month
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.accrual_year_month
+      - datalake_sap_accounting_process.retsuko_transactional.accrual_year_month
     description: "Accrual year month from from accounting entry"
   dt_source_trigger:
     lineage:
@@ -259,6 +278,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.dt_source_trigger
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.dt_source_trigger
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.dt_source_trigger
+      - datalake_sap_accounting_process.retsuko_transactional.dt_source_trigger
     description: "Indicates the date that starts the accounting funnel"
   dt_sap_reference:
     lineage:
@@ -272,6 +292,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.dt_sap_reference
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.dt_sap_reference
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.dt_sap_reference
+      - datalake_sap_accounting_process.retsuko_transactional.dt_sap_reference
     description: "Indicates date that was referenced in SAP"
   dt_sap_created:
     lineage:
@@ -285,6 +306,7 @@ columns:
       - datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012.dt_sap_created
       - datalake_sap_accounting_process.reverse_accounts_700005_700008_700009_700010_700011.dt_sap_created
       - datalake_sap_accounting_process.reverse_accounts_420001_420002_420004.dt_sap_created
+      - datalake_sap_accounting_process.retsuko_transactional.dt_sap_created
     description: "Indicates date that was created in SAP"
   dt_filter:
     description: "Filter date computed as COALESCE(dt_sap_reference, dt_source_trigger)"

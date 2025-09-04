@@ -1029,6 +1029,7 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-accounting:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-share:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-write-off:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420001-420002-420004:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420003-420019-420020-420025-611012:first-run-of-day
@@ -3744,9 +3745,9 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_visit:load-clean-visit-checkin:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-fitting:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day
+  - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
-  - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
@@ -4113,8 +4114,8 @@ bietlejuice.reverse_idactum_load:
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.dw_visit:load-dw-public-dim-visit:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
-  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified:first-run-of-day
   - bietlejuice.monopoly:load-clean-income-reference:first-run-of-day
