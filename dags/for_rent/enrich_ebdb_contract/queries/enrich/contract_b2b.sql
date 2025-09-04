@@ -1,5 +1,5 @@
 WITH b2b_house_contracts AS (
-  /** This CTE checks reflects the currently house status (B2B or not), but not necessarily the contract status. 
+  /** This CTE checks reflects the currently house status (B2B or not), but not necessarily the contract status.
   As a reminder, a house can belong to different existing contracts, and during this flows, the house may has changed it status from B2B or not. **/
     SELECT
         c.id AS id_contract,
@@ -26,11 +26,11 @@ contracts_partner_quantity AS (
         id_contract,
         count(distinct id_partner) AS partner_quantity,
         MAX(IF(partner_type='EXECUTIVE_FOR_RENT', TRUE, FALSE)) AS is_executive_partner
-    FROM 
+    FROM
         datalake_ebdb_clean.contract_partnership_data
     GROUP BY
         id_contract
-), 
+),
 contracts_partner_selection AS (
     SELECT
         cpd.id_contract,
@@ -42,9 +42,9 @@ contracts_partner_selection AS (
         pq.partner_quantity,
         pq.is_executive_partner,
         IF(cpd.partner_type='EXECUTIVE_FOR_RENT', 2, 1) AS partner_weight
-    FROM 
+    FROM
         datalake_ebdb_clean.contract_partnership_data AS cpd
-    JOIN 
+    JOIN
         contracts_partner_quantity AS pq
             ON pq.id_contract = cpd.id_contract
     LEFT JOIN
@@ -65,10 +65,22 @@ b2b_contracts AS (
         partner_quantity,
         is_executive_partner,
         ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY partner_weight ASC) AS row_num
-    FROM 
+    FROM
         contracts_partner_selection
     QUALIFY
         row_num = 1
+),
+lbc_first_publication AS (
+    SELECT
+        h.id AS id_house,
+        COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS ts_first_publication
+    FROM
+        datalake_ebdb_clean.house AS h
+    LEFT JOIN
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON lbc.id_house = h.id
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) = 1
 ),
 b2b_info AS (
     SELECT DISTINCT
@@ -93,7 +105,7 @@ b2b_info AS (
                 AND NOT b2b_h_c.is_from_b2b_partner
             THEN
                 CASE
-                    WHEN pj.id IS NULL AND h.dt_first_publication IS NOT NULL
+                    WHEN pj.id IS NULL AND lbc.ts_first_publication IS NOT NULL
                       THEN 'advanced_negotiation'
                     WHEN h.id_external IS NULL OR h.id_external RLIKE '^([a-zA-Z0-9]+-){{4}}[a-zA-Z0-9]+$'
                       THEN 'standard'
@@ -113,6 +125,9 @@ b2b_info AS (
     JOIN
         datalake_ebdb_country.house AS ch
             ON ch.id_house = c.id_house
+    LEFT JOIN
+        lbc_first_publication AS lbc
+            ON lbc.id_house = h.id
     LEFT JOIN
         b2b_house_contracts AS b2b_h_c
             ON b2b_h_c.id_contract = c.id

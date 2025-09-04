@@ -18,7 +18,6 @@ house_aud AS (
         h.rev,
         h.mod_status,
         h.mod_rent,
-        h.dt_first_publication,
         rev.reason AS revision_reason
     FROM
       datalake_ebdb_clean.house_aud AS h

@@ -3,16 +3,27 @@ WITH house_portability AS (
         hl.id_house,
         hl.id_house_listing,
         hl.id_contract
-    FROM 
+    FROM
         datalake_ebdb_listing.house_listing hl
-    JOIN 
+    JOIN
         datalake_ebdb_clean.portability por
-            ON por.id_house = hl.id_house 
+            ON por.id_house = hl.id_house
             AND por.owner_type = 'B2B'
     WHERE
         por.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, NOW())
+),
+lbc_first_publication AS (
+    SELECT
+        h.id AS id_house,
+        COALESCE(IF(lbc.business_context = 'RENT', lbc.ts_first_publication, NULL), h.dt_first_publication) AS ts_first_publication
+    FROM
+        datalake_ebdb_clean.house AS h
+    LEFT JOIN
+        datalake_ebdb_clean.listing_business_context AS lbc
+            ON lbc.id_house = h.id
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY h.id ORDER BY IF(lbc.business_context = 'RENT', 1, 2)) = 1
 )
-
 SELECT DISTINCT
     h.id AS id_house,
     hl.id_house_listing,
@@ -31,7 +42,7 @@ SELECT DISTINCT
             AND COALESCE(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
         THEN
             CASE
-            WHEN pj.id IS NULL AND h.dt_first_publication IS NOT NULL THEN 'advanced_negotiation'
+            WHEN pj.id IS NULL AND lbc.ts_first_publication IS NOT NULL THEN 'advanced_negotiation'
             WHEN h.id_external IS NULL OR h.id_external RLIKE '^([a-zA-Z0-9]+-){{4}}[a-zA-Z0-9]+$' THEN 'standard'
             WHEN h.id_external IS NOT NULL THEN 'batch'
             END
@@ -40,12 +51,15 @@ SELECT DISTINCT
         (COALESCE(lo.affiliate_type, l.affiliate_type) = 'B2BPartner')
             OR (partner_agent.id_partner IS NOT NULL AND partner.type = 'PRIME'))
             AND partner_agent.status = 'ACTIVE'), TRUE, FALSE)
-        OR por.id_house IS NOT NULL 
+        OR por.id_house IS NOT NULL
     AS is_b2b,
     IF(por.id_house_listing IS NOT NULL, TRUE, FAlSE) AS is_portability
-FROM 
+FROM
     datalake_ebdb_clean.house AS h
-LEFT JOIN 
+LEFT JOIN
+    lbc_first_publication AS lbc
+        ON lbc.id_house = h.id
+LEFT JOIN
     datalake_ebdb_clean.conversion_lead AS cl
         ON cl.id_house = h.id
 LEFT JOIN

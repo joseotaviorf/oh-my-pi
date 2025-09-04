@@ -1324,6 +1324,7 @@ bietlejuice.enrich_b2b:
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_lead:load-clean-conversion-lead:first-run-of-day
   - bietlejuice.ebdb_lead:load-clean-lead:first-run-of-day
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
@@ -2157,6 +2158,7 @@ bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
 bietlejuice.enrich_fintech_snapshot:
