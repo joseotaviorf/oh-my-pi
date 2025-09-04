@@ -103,6 +103,14 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.task.ctwa_source_url
     description: The url for the campaign related to the click to whatsapp identifier.
+  total_inactivity_time:
+    lineage:
+      - datalake_quinto_messenger_clean.task.total_inactivity_time
+    description: The total inactivity time of the task.
+  last_inactivity_time:
+    lineage:
+      - datalake_quinto_messenger_clean.task.last_inactivity_time
+    description: The last inactivity time of the task.
   type_source_ctwa:
     lineage:
       - datalake_quinto_messenger_clean.task.ctwa_source_type

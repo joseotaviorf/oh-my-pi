@@ -74,7 +74,9 @@ tasks AS (
     task_attributes,
     id_source_ctwa,
     url_source_ctwa,
-    type_source_ctwa
+    type_source_ctwa,
+    total_inactivity_time,
+    last_inactivity_time
   FROM
     datalake_quinto_messenger_clean.task
   WHERE
@@ -120,6 +122,8 @@ SELECT
   END AS is_isaias_session,
   t.url_source_ctwa,
   t.type_source_ctwa,
+  t.total_inactivity_time, 
+  t.last_inactivity_time,
   t.ts_created,
   t.ts_updated AS ts_ended,
   t.task_attributes,
