@@ -23,10 +23,10 @@ SELECT
   v.id_agent,
   v.id_visitor,
   CASE
-    WHEN (pfa.id_visitor <> v.id_visitor OR pfa.id_visitor IS NULL) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
-    WHEN (pfa.id_visitor <> v.id_visitor OR pfa.id_visitor IS NULL) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
     WHEN pfa.id IS NOT NULL AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
     WHEN pfa.id IS NOT NULL AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
+    WHEN (at.id_agent IS NOT NULL AND pfah.id_visitor IS NOT NULL) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
+    WHEN (at.id_agent IS NOT NULL AND pfah.id_visitor IS NOT NULL) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
     ELSE v.business_model
   END AS business_model,
   v.ts_created,
@@ -38,3 +38,13 @@ LEFT JOIN
     ON v.id_agent = pfa.id_user_agent
     AND v.id_visitor = pfa.id_visitor
     AND DATE(v.ts_created) BETWEEN pfa.dt_start AND COALESCE(pfa.dt_end, CURRENT_DATE)
+LEFT JOIN
+  datalake_gsheets_clean.agents_3p_tqc AS at
+    ON v.id_agent = at.id_user
+    AND DATE(v.ts_created) BETWEEN at.dt_start AND COALESCE(at.dt_end, CURRENT_DATE)
+LEFT JOIN
+  datalake_visit.preferred_fixed_agent_history AS pfah
+    ON v.id_visitor = pfah.id_visitor
+    AND v.ts_created BETWEEN pfah.ts_started AND COALESCE(pfah.ts_ended, CURRENT_DATE)
+    AND pfah.is_enabled
+    AND pfah.business_context = 'SALE'
