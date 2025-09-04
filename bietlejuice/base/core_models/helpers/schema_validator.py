@@ -311,6 +311,7 @@ class SchemaValidator:
             "timestamptype": "timestamp",
             "datetype": "date",
             "binarytype": "binary",
+            "decimaltype": "decimal",
         }
 
         for spark_t, simple_t in reverse_mapping.items():

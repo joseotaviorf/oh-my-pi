@@ -169,7 +169,7 @@ def validate_schema_structure(content: Dict, schema_file: Path) -> List[str]:
 
                 # Validate field types and values
                 if 'type' in col_def:
-                    valid_types = ['string', 'bigint', 'int', 'double', 'boolean', 'date', 'timestamp']
+                    valid_types = ['string', 'bigint', 'int', 'double', 'boolean', 'date', 'timestamp', 'decimal']
                     if col_def['type'] not in valid_types:
                         errors.append(f"Column '{col_name}' has invalid type '{col_def['type']}'. Valid types: {', '.join(valid_types)}")
 
@@ -396,7 +396,7 @@ def validate_core_model_schema_content(mode="all_files", input=None, verbose=Fal
         print(f"\n💡 Schema file structure should follow this format:")
         print(f"   columns:")
         print(f"     column_name:")
-        print(f"       type: string|bigint|int|double|boolean|date|timestamp")
+        print(f"       type: string|bigint|int|double|boolean|date|timestamp|decimal")
         print(f"       required: true|false")
         print(f"       nullable: true|false  # Optional: not validated (Spark auto-infers)")
         print(f"   min_columns: <number>  # Required: minimum column count")

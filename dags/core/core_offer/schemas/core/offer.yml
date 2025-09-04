@@ -1,0 +1,104 @@
+# Schema validation file for core offer table
+# This file defines the expected schema for the core.offer table
+# Path: dags/core/core_offer/schemas/core/offer.yml
+
+columns:
+  # Offer identifier
+  id_offer:
+    type: bigint
+    required: true
+
+  # Tenant information
+  id_tenant:
+    type: bigint
+    required: true
+
+  id_tenant_external:
+    type: string
+    required: true
+
+  # Owner information
+  id_owner:
+    type: bigint
+    required: true
+
+  id_owner_external:
+    type: string
+    required: true
+
+  # Resident information
+  id_resident_info:
+    type: bigint
+    required: true
+
+  # House information
+  id_house:
+    type: bigint
+    required: true
+
+  # Offer details
+  status:
+    type: string
+    required: true
+
+  type:
+    type: string
+    required: true
+
+  turn:
+    type: string
+    required: true
+
+  iteration:
+    type: int
+    required: true
+
+  rejection_reason:
+    type: string
+    required: true
+
+  # Financial information
+  original_rent_value:
+    type: decimal
+    required: true
+
+  # Timestamps
+  ts_created:
+    type: timestamp
+    required: true
+
+  ts_updated:
+    type: timestamp
+    required: true
+
+  ts_expiration:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Surrogate key - primary identifier
+  sk_core_offer:
+    type: string
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 21
+max_columns: 21
+strict: true
