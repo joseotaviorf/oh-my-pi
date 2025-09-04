@@ -6,7 +6,7 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_jira_api_client.clients import JiraClient
-from quintoandar_jira_api_client.consumers import CONSUMERS
+from quintoandar_jira_api_client.consumers.jira_jql_consumer import JiraJQLConsumer
 
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -27,23 +27,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def sync_data(username, token, server, endpoint_name, updated_date):
-    """
-    Method for calling the JiraClient and the specific consumer
-    :param username: username for authorization
-    :param token: api token for authorization
-    :param server: name of the Jira account
-    :param endpoint_name: name of the Jira endpoint
-    :param updated_date: updated date for querying incremental data
-    :return: Json list of returned records
-    """
-
-    jira_client = JiraClient(username=username, token=token, server=server)
-
-    consumer_instance = CONSUMERS[endpoint_name](jira_client)
-    return consumer_instance.sync(**{"updated_date": updated_date})
-
-
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -51,10 +34,22 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the API")
-    parser.add_argument("execution_date", help="execution date in str format")
+    parser.add_argument("load_start_date", help="start execution date in str format")
+    parser.add_argument("load_end_date", help="end execution date in str format")
     parser.add_argument("endpoint_name", help="endpoint to call the API")
+    parser.add_argument("endpoint_params", help="")
 
     args = parser.parse_args()
+
+    endpoint_params = json.loads(args.endpoint_params)
+    endpoint_enum = endpoint_params.get("endpoint_enum")
+    jql_query_filter = endpoint_params.get("jql_query_filter")
+
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
+
+    dt_start_execution = datetime.strptime(load_start_date, "%Y-%m-%d").date()
+    dt_end_execution = datetime.strptime(load_end_date, "%Y-%m-%d").date()
 
     logger.info(
         f"""
@@ -70,15 +65,32 @@ if __name__ == "__main__":
     json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.JIRA)
     credentials = json.loads(json_credentials)
 
-    dt_execution = datetime.strptime(args.execution_date, "%Y-%m-%d").date()
-
-    api_response = sync_data(
-        username=credentials["username"],
-        token=credentials["token"],
-        server=credentials["server"],
-        endpoint_name="issues",
-        updated_date=dt_execution,
+    startTime = int(
+        datetime.combine(dt_start_execution, datetime.min.time()).timestamp()
     )
+    endTime = int(
+        datetime.combine(dt_end_execution, datetime.max.time()).timestamp()
+    )
+
+    jql_query_filter = (
+        jql_query_filter + f" AND created >= {startTime} AND created <= {endTime}"
+    )
+
+
+    params = {
+        'jql': jql_query_filter,
+        'fields': '*all',
+        'expand': 'changelog',
+    }
+
+    jira_client = JiraClient(
+        username=credentials["username"], 
+        token=credentials["token"], 
+        server=credentials["server"]
+    )
+
+    consumer_instance = JiraJQLConsumer(jira_client)
+    api_response = consumer_instance.sync(endpoint_enum=endpoint_enum, params=params)
 
     if not api_response:
         logger.warn(
