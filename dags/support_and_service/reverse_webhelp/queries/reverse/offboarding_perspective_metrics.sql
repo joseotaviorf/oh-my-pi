@@ -563,13 +563,15 @@ main_query AS (
         to.id_house,
         to.sync_date,
         to.spoc_wave,
-        CASE
-            WHEN to.termination_request < DATE('2025-05-22') AND to.is_spoc_contract = TRUE THEN 'before_wave_6'
-            WHEN to.termination_request >= DATE('2025-05-22') AND to.is_spoc_contract = TRUE AND (to.is_spoc_control_group = FALSE OR to.is_spoc_control_group IS NULL) AND (to.spoc_team = 'ROLLOUT' OR to.spoc_team IS NULL) THEN 'rollout'
-            WHEN to.termination_request >= DATE('2025-05-22') AND to.is_spoc_contract = TRUE AND (to.is_spoc_control_group = FALSE OR to.is_spoc_control_group IS NULL) AND to.spoc_team = 'LAB' THEN 'lab_test'
-            WHEN to.termination_request >= DATE('2025-05-22') AND to.is_spoc_contract = TRUE AND to.is_spoc_control_group = TRUE THEN 'lab_control'
-            ELSE NULL
-        END AS spoc_class,
+        CASE WHEN to.termination_request < DATE('2025-06-02') AND to.is_spoc_contract = TRUE AND (to.is_spoc_control_group = FALSE OR to.is_spoc_control_group IS NULL) THEN 'before_wave_6_lab_test'
+             WHEN to.termination_request < DATE('2025-06-02') AND to.is_spoc_contract = TRUE AND to.is_spoc_control_group = TRUE THEN 'before_wave_6_lab_control'
+             WHEN to.termination_request >= DATE('2025-05-22') AND to.is_spoc_contract = TRUE AND (to.is_spoc_control_group = FALSE OR to.is_spoc_control_group IS NULL) AND (to.spoc_team = 'ROLLOUT' OR to.spoc_team IS NULL) THEN 'rollout'
+             WHEN to.termination_request BETWEEN DATE('2025-06-02') AND DATE('2025-07-29') AND to.is_spoc_contract = TRUE AND (to.is_spoc_control_group = FALSE OR to.is_spoc_control_group IS NULL) AND to.spoc_team = 'LAB' THEN 'wave_6_lab_test'
+             WHEN to.termination_request BETWEEN DATE('2025-07-30') AND DATE('{load_start_date}') AND to.is_spoc_contract = TRUE AND (to.is_spoc_control_group = FALSE OR to.is_spoc_control_group IS NULL) AND to.spoc_team = 'LAB' THEN 'wave_6b_lab_test'
+             WHEN to.termination_request BETWEEN DATE('2025-06-02') AND DATE('2025-07-29') AND to.is_spoc_contract = TRUE AND to.is_spoc_control_group = TRUE THEN 'wave_6_lab_control'
+             WHEN to.termination_request BETWEEN DATE('2025-07-30') AND DATE('{load_start_date}') AND to.is_spoc_contract = TRUE AND to.is_spoc_control_group = TRUE THEN 'wave_6b_lab_control'
+             ELSE NULL
+       END spoc_class,
         IF(to.spoc_agent_email LIKE '%webhelp%', to.spoc_agent_email, NULL) AS spoc_agent_email,
         to.has_repairs,
         rep.total_repair_request,

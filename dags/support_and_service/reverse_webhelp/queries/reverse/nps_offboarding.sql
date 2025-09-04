@@ -162,12 +162,15 @@ SELECT DISTINCT
   IF(ofb.rent >= 2500, 'High Value', 'Non High Value') high_value,
   disp.sk_user,
   spc.spoc_wave,
-  CASE WHEN ofb.termination_request < DATE('2025-05-22') AND spc.is_spoc_contract = TRUE THEN 'before_wave_6'
-    WHEN ofb.termination_request >= DATE('2025-05-22') AND spc.is_spoc_contract = TRUE AND (spc.is_spoc_control_group = FALSE OR spc.is_spoc_control_group IS NULL) AND (spc.team = 'ROLLOUT' OR spc.team IS NULL) THEN 'rollout'
-    WHEN ofb.termination_request >= DATE('2025-05-22') AND spc.is_spoc_contract = TRUE AND (spc.is_spoc_control_group = FALSE OR spc.is_spoc_control_group IS NULL) AND spc.team = 'LAB' THEN 'lab_test'
-    WHEN ofb.termination_request >= DATE('2025-05-22') AND spc.is_spoc_contract = TRUE AND spc.is_spoc_control_group = TRUE THEN 'lab_control'
-    ELSE NULL
-  END spoc_class,
+ CASE WHEN ofb.termination_request < DATE('2025-06-02') AND spc.is_spoc_contract = TRUE AND (spc.is_spoc_control_group = FALSE OR spc.is_spoc_control_group IS NULL) THEN 'before_wave_6_lab_test'
+     WHEN ofb.termination_request < DATE('2025-06-02') AND spc.is_spoc_contract = TRUE AND spc.is_spoc_control_group = TRUE THEN 'before_wave_6_lab_control'
+     WHEN ofb.termination_request >= DATE('2025-05-22') AND spc.is_spoc_contract = TRUE AND (spc.is_spoc_control_group = FALSE OR spc.is_spoc_control_group IS NULL) AND (spc.team = 'ROLLOUT' OR spc.team IS NULL) THEN 'rollout'
+     WHEN ofb.termination_request BETWEEN DATE('2025-06-02') AND DATE('2025-07-29') AND spc.is_spoc_contract = TRUE AND (spc.is_spoc_control_group = FALSE OR spc.is_spoc_control_group IS NULL) AND spc.team = 'LAB' THEN 'wave_6_lab_test'
+     WHEN ofb.termination_request BETWEEN DATE('2025-07-30') AND DATE('{load_start_date}') AND spc.is_spoc_contract = TRUE AND (spc.is_spoc_control_group = FALSE OR spc.is_spoc_control_group IS NULL) AND spc.team = 'LAB' THEN 'wave_6b_lab_test'
+     WHEN ofb.termination_request BETWEEN DATE('2025-06-02') AND DATE('2025-07-29') AND spc.is_spoc_contract = TRUE AND spc.is_spoc_control_group = TRUE THEN 'wave_6_lab_control'
+     WHEN ofb.termination_request BETWEEN DATE('2025-07-30') AND DATE('{load_start_date}') AND spc.is_spoc_contract = TRUE AND spc.is_spoc_control_group = TRUE THEN 'wave_6b_lab_control'
+   ELSE NULL
+ END spoc_class,
   med.created_date med_created_dt,
   med.sk_ticket AS med_sk_ticket,
   IF(spc.agent_email LIKE '%webhelp%', spc.agent_email, NULL) spoc_agent_email,

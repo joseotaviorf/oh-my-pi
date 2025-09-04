@@ -47,12 +47,14 @@ SELECT DISTINCT
   t.id_contract,
   tm.id_external id_termination,
   --sc.id_case,
-  CASE WHEN ft.ts_termination_request < DATE('2025-05-22') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) THEN 'before_wave_6_lab_test'
-    WHEN ft.ts_termination_request < DATE('2025-05-22') AND ft.is_spoc_contract = TRUE AND ft.is_spoc_control_group = TRUE THEN 'before_wave_6_lab_control'
-    WHEN ft.ts_termination_request >= DATE('2025-05-22') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) AND (dt.team = 'ROLLOUT' OR dt.team IS NULL) THEN 'rollout'
-    WHEN ft.ts_termination_request >= DATE('2025-05-22') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) AND dt.team = 'LAB' THEN 'lab_test'
-    WHEN ft.ts_termination_request >= DATE('2025-05-22') AND ft.is_spoc_contract = TRUE AND ft.is_spoc_control_group = TRUE THEN 'lab_control'
-  ELSE NULL
+CASE WHEN ft.ts_termination_request < DATE('2025-06-02') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) THEN 'before_wave_6_lab_test'
+     WHEN ft.ts_termination_request < DATE('2025-06-02') AND ft.is_spoc_contract = TRUE AND ft.is_spoc_control_group = TRUE THEN 'before_wave_6_lab_control'
+     WHEN ft.ts_termination_request >= DATE('2025-05-22') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) AND (dt.team = 'ROLLOUT' OR dt.team IS NULL) THEN 'rollout'
+     WHEN ft.ts_termination_request BETWEEN DATE('2025-06-02') AND DATE('2025-07-29') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) AND dt.team = 'LAB' THEN 'wave_6_lab_test'
+     WHEN ft.ts_termination_request BETWEEN DATE('2025-07-30') AND DATE('{load_start_date}') AND ft.is_spoc_contract = TRUE AND (ft.is_spoc_control_group = FALSE OR ft.is_spoc_control_group IS NULL) AND dt.team = 'LAB' THEN 'wave_6b_lab_test'
+     WHEN ft.ts_termination_request BETWEEN DATE('2025-06-02') AND DATE('2025-07-29') AND ft.is_spoc_contract = TRUE AND ft.is_spoc_control_group = TRUE THEN 'wave_6_lab_control'
+     WHEN ft.ts_termination_request BETWEEN DATE('2025-07-30') AND DATE('{load_start_date}') AND ft.is_spoc_contract = TRUE AND ft.is_spoc_control_group = TRUE THEN 'wave_6b_lab_control'
+     ELSE NULL
   END spoc_class,
   tm.responsible_off_manager,
   h.worker_email responsible_off_manager_email,
