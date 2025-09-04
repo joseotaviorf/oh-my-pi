@@ -100,6 +100,17 @@ columns:
     description: The type of the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
+  total_inactivity_time:
+    description: The cumulative duration an agent has been in a "paused" state for a 
+      specific task or conversation. This value is used to enforce a time limit for 
+      paused tasks, automatically rerouting them to the queue if the agent doesn't 
+      resume work within the set period.
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  last_inactivity_time:
+    description: Last inactivity time in milliseconds.
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   task_attributes:
     description: Attributes of the task.
     lineage:

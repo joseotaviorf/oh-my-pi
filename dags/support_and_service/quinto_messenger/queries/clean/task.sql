@@ -23,6 +23,8 @@ SELECT
     GET_JSON_OBJECT(task_attributes,'$.conversations') AS conversation_attributes,
     GET_JSON_OBJECT(task_attributes,'$.extra_params.referral_source_url') AS url_source_ctwa,
     GET_JSON_OBJECT(task_attributes,'$.extra_params.referral_source_type') AS type_source_ctwa,
+    GET_JSON_OBJECT(task_attributes,'$.inactivityTimer.totalPausedMillis') AS total_inactivity_time,
+    GET_JSON_OBJECT(task_attributes,'$.inactivityTimer.totalPausedLastTimeMillis') AS last_inactivity_time,
     task_attributes,
     task_resource,
     assigned_to,
