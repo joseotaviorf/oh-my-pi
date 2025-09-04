@@ -1,5 +1,3 @@
-create or replace temporary view canudo2 as 
-
 WITH retsuko AS (
     SELECT DISTINCT
         ct.id_external AS id_business_entity,
