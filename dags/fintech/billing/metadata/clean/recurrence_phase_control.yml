@@ -1,0 +1,39 @@
+database_name: datalake_billing_clean
+table_name: recurrence_phase_control
+domain: Fintech
+description: data from the recurrence  control table 
+columns:
+  id:
+    description: Unique identifier of the record
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.id
+  id_recurrence_phase:
+    description: Identifier of the related recurrence phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.recurrence_phase_id
+  status:
+    description: Current status of the recurrence phase control
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.status
+  dt_accrual:
+    description: Accrual date of the phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.accrual
+  dt_open:
+    description: Opening date of the phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.open_date
+  dt_close:
+    description: Closing date of the phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.close_date
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase_control.updated_at
+
+

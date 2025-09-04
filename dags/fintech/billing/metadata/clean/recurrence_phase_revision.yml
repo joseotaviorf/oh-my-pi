@@ -1,0 +1,59 @@
+database_name: datalake_billing_clean
+table_name: recurrence_phase_revision
+domain: Fintech
+description: data from the recurrence phase revision table from billing
+columns:
+  id:
+    description: Unique identifier of the phase revision record
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.id
+  id_recurrence_phase:
+    description: Identifier of the recurrence phase of the revision
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.recurrence_phase_id
+  revision:
+    description: Revision number of the phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.revision
+  period:
+    description: Revision period such as monthly quarterly or interval
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.period
+  index:
+    description: Order index of the revision within the phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.index
+  status:
+    description: Current status of the revision
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.status
+  status_reason:
+    description: Reason associated with the revision status
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.status_reason
+  metadata:
+    description: Free form metadata
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.metadata
+  dt_start_charge:
+    description: Start date of revision charge
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.start_charge
+  dt_end_charge:
+    description: End date of revision charge
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.end_charge
+  dt_open:
+    description: Opening date of the revision
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.open_date
+  dt_close:
+    description: Closing date of the revision
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.close_date
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase_revision.created_at
+
+

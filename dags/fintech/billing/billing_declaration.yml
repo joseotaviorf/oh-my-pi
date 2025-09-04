@@ -1,0 +1,22 @@
+dag:
+  name: billing
+  schedule_start_date: 2025, 9, 1
+  schedule_interval: 0 12 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG load tables from Billing, the service that calculates the revenue with external partners and executives.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: BILLING_DB
+  lineage_product_database_name: billing
+  tables_customization:
+    recurrence_phase_control:
+      clean_table_name: recurrence_phase_control
+    recurrence_phase_revision:
+      clean_table_name: recurrence_phase_revision
+cluster:
+  type: databricks_13_3_med_general_cluster
