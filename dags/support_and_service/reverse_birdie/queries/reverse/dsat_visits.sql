@@ -54,7 +54,6 @@ schedules as (
     schedules.sk_fixed_agent,
     schedules.sk_author_creator,
     schedules.visit_code,
-    et.entrance_type,
     schedules.sk_succeed_schedule,
     schedules.has_tenant_living,
     schedules.is_reschedule,
@@ -73,7 +72,6 @@ schedules as (
       left join
         dw_visit.dim_business_model as bm
         on schedules.sk_business_model = bm.sk_business_model
-      left join dw_visit.dim_entrance_type as et on schedules.sk_entrance_type = et.sk_entrance_type
   where
     schedules.sk_succeed_schedule is null
 )
@@ -89,7 +87,6 @@ select
   cancelation_details.reason as cancelation_reason,
   cancelation_details.on_behalf_of as cancelation_on_behalf_of,
   schedules.has_tenant_living,
-  schedules.entrance_type,
   schedules.sk_author_creator,
   schedules.behavior_type,
   schedules.business_model,

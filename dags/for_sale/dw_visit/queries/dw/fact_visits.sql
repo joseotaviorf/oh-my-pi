@@ -27,7 +27,7 @@ SELECT
   v.id_company_demand AS sk_company_demand,
   v.id_company_supply AS sk_company_supply,
   bc.sk_business_context,
-  et.sk_entrance_type,
+  dim_heh.sk_house_entrance,
   bm.sk_business_model,
   db.sk_behavior_type,
   dvs.sk_visit_status,
@@ -73,7 +73,7 @@ INNER JOIN
   visit_status_events AS vse
     ON v.id_visit = vse.id_visit
 INNER JOIN
-    dw_visit.dim_behavior AS db
+  dw_visit.dim_behavior AS db
     ON v.behavior = db.behavior_type
 LEFT JOIN
   dw_visit.dim_visit_status AS dvs
@@ -82,8 +82,10 @@ LEFT JOIN
   dw_visit.dim_business_context AS bc
     ON v.business_context = bc.business_context
 LEFT JOIN
-    dw_visit.dim_entrance_type AS et
-        ON v.method = et.entrance_type
+  dw_visit.dim_business_model AS bm
+    ON v.business_model = bm.business_model
 LEFT JOIN
-    dw_visit.dim_business_model AS bm
-        ON v.business_model = bm.business_model
+  dw_house.dim_house_entrance_history AS dim_heh
+    ON v.id_house = dim_heh.sk_house
+    AND v.ts_visit >= dim_heh.ts_entrance_started
+    AND v.ts_visit < COALESCE(dim_heh.ts_entrance_ended, NOW())

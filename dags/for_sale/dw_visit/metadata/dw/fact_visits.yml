@@ -40,10 +40,10 @@ columns:
     description: Id of company supply.
     lineage:
         - datalake_visit.visits.id_company_supply
-  sk_entrance_type:
-    description: Entrance type Id.
+  sk_house_entrance:
     lineage:
-        - datalake_visit.visits.id_entrance_type
+      - dw_house.dim_house_entrance_history.sk_house_entrance
+    description: Foreign key from dw_house.dim_house_entrance_history. Last event before the visit.
   sk_business_context:
     description: Context type Id.
     lineage:
@@ -177,7 +177,7 @@ columns:
   hours_waiting_for_answers:
     description: Hours waiting for the answers.
     lineage:
-        -datalake_visit.visits.hours_waiting_for_answers
+        - datalake_visit.visits.hours_waiting_for_answers
   ts_load:
     description:
       Timestamp of the load of the table.

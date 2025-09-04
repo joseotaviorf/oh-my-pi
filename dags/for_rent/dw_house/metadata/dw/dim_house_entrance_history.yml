@@ -1,0 +1,119 @@
+---
+database_name: dw_house
+table_name: dim_house_entrance_history
+description: Information related to house entrance history.
+  Each line is an event of house entrance.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  sk_house_entrance:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.id
+    description: Primary key of table. Concatenation of id_house and ts_entrance_started.
+  sk_house:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.id_house
+    description: ID of house related to the event.
+  occupant_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.occupant_type
+    description: Who is occupying the house.
+    categories:
+      None: Unknown.
+      Empty: The house is empty.
+      Tenant: The house is occupied by a tenant.
+      Owner: The house is occupied by the owner.
+  key_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.key_type
+    description: Type of the house's key during the period.
+    categories:
+      Biometry: Access by biometry.
+      None: Unknown.
+      Common: Access by a regular key.
+      Password: Access by a password.
+  entry_model_details:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.entry_model_details
+    description: Additional info about the unified entry model.
+  key_location:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.key_location
+    description: Location of the house's key.
+    categories:
+      PASSWORD: Access through a password.
+      EXTERNAL_TENANT: Access through an external tenant.
+      FRONT_DOOR: Access through the front door.
+      LOCKER: Access through a locker.
+      LOCK_BOX: Access through a lock box.
+      EXTERNAL_RESPONSIBLE: Access through an external responsible.
+      TENANT: Access through a tenant.
+      AGENT: Access through an agent.
+      BUILDINGMANAGER: Access through a building manager.
+      INSPECTOR: Access through an inspector.
+      OTHER: Access through other.
+      OWNER: Access through the owner.
+      NONE: Unknown.
+  entry_model_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.entry_model_type
+    description: Type of entry model.
+    categories:
+      ASSISTED_ENTRANCE: When a third person is needed to enter.
+      EASY_ENTRANCE: When no third person is needed to enter.
+      NOT_CLASSIFIED: Unmapped case.
+  doorman_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.doorman_type
+    description: Last type of doorman of the house before the current event of entry model.
+    categories:
+      NaoHaPorteiro: No doorman.
+      horas24: Doorman present 24 hours a day.
+      Diurno: Doorman present only during the day.
+      Noturno: Doorman present only at night.
+  entry_model_channel:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.entry_model_channel
+    description: Entry channel from event.
+  actor_role:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.actor_role
+    description: Entry actor role from event.
+    categories:
+      PHOTOGRAPHER: Information recorded by the photographer.
+      TENANT: Information recorded by the tenant.
+      AGENT: Information recorded by the agent.
+      INSPECTOR: Information recorded by the inspector.
+      OWNER: Information recorded by the owner.
+      SYSTEM: Information recorded by the system.
+      OPS: Information recorded by the operations team.
+  event_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.event_type
+    description: Type of event.
+  mod_authorization:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.mod_authorization
+    description: Boolean indicating whether the authorization_type field was modified in relation to the previous event for this house.
+  mod_occupant:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.mod_occupant
+    description: Boolean indicating whether the occupant_type field was modified in relation to the previous event for this house.
+  mod_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.mod_type
+    description: Boolean indicating whether the key_type field was modified in relation to the previous event for this house.
+  is_last_status_of_day:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.is_last_status_of_day
+    description: Boolean indicating whether the current event is the last of the day.
+  ts_entrance_started:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
+    description: Timestamp of when the entry condition started.
+  ts_entrance_ended:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_ended
+    description: Timestamp of when the entry condition ended.
+  ts_load:
+    description: Timestamp of when the row was updated.

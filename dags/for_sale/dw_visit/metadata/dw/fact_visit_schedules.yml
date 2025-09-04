@@ -106,11 +106,11 @@ columns:
       - datalake_visit.visit_schedules.id_offer
     description:
       If the house have a offer, we fill this field.
-  sk_entrance_type:
+  sk_house_entrance:
     lineage:
-      - datalake_visit.visit_schedules.id_entrance_type
+      - dw_house.dim_house_entrance_history.sk_house_entrance
     description:
-      How occurred the entry method.
+      Foreign key from dw_house.dim_house_entrance_history. Last event before the schedule creation.
   sk_succeed_schedule:
     description:
       The next schedule case when this schedule have a reschedule.

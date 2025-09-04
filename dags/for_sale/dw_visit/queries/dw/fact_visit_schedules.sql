@@ -21,7 +21,7 @@ SELECT
   es.id_user_cancelation AS sk_author_cancelation,
   es.visit_code,
   es.id_offer AS sk_offer,
-  et.sk_entrance_type,
+  dim_heh.sk_house_entrance,
   es.id_succeed_schedule AS sk_succeed_schedule,
   sk_origin_type,
   es.days_visit_cancelled_to_visit,
@@ -53,24 +53,26 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_visit.visit_schedules AS es
-INNER JOIN
+LEFT JOIN
    dw_visit.dim_origin_type AS dot
     ON es.schedule_origin = dot.origin_name
-INNER JOIN
+LEFT JOIN
    dw_visit.dim_business_context AS bc
     ON es.business_context = bc.business_context
-INNER JOIN
+LEFT JOIN
     dw_visit.dim_visit_model AS vm
      ON  es.visit_model = vm.visit_model
-INNER JOIN
+LEFT JOIN
     dw_visit.dim_behavior AS db
         ON es.behavior = db.behavior_type
-LEFT JOIN
-    dw_visit.dim_entrance_type AS et
-        ON es.method = et.entrance_type
 LEFT JOIN
     dw_visit.dim_business_model AS bm
         ON es.business_model = bm.business_model
 LEFT JOIN
     dw_visit.dim_visit_fup AS fup
         ON es.visit_fup = fup.visit_fup
+LEFT JOIN
+    dw_house.dim_house_entrance_history AS dim_heh
+        ON es.id_house = dim_heh.sk_house
+        AND es.ts_schedule_created >= dim_heh.ts_entrance_started
+        AND es.ts_schedule_created < COALESCE(dim_heh.ts_entrance_ended, NOW())

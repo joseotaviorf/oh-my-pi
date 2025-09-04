@@ -567,6 +567,7 @@ bietlejuice.dw_house:
   - bietlejuice.ebdb_condo:load-clean-info-amenities:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-info-condo-amenities:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-maintenance-condition:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
 bietlejuice.dw_house_amenities:
@@ -1131,6 +1132,7 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics:first-run-of-day
   - bietlejuice.velo_zendesk:load-clean-users:first-run-of-day
 bietlejuice.dw_visit:
+  - bietlejuice.dw_house:load-dw-house-dim-house-entrance-history:first-run-of-day
   - bietlejuice.dw_rent_demand_events:load-dw-rent-dim-rent-event-type:first-run-of-day
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
@@ -3745,7 +3747,6 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
@@ -4012,7 +4013,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-dim-business-context:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-dim-business-model:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day

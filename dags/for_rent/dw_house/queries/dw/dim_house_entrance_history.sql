@@ -1,0 +1,21 @@
+SELECT
+    id AS sk_house_entrance,
+    id_house AS sk_house,
+    occupant_type,
+    key_type,
+    entry_model_details,
+    key_location,
+    entry_model_type,
+    doorman_type,
+    entry_model_channel,
+    actor_role,
+    event_type,
+    mod_authorization,
+    mod_occupant,
+    mod_type,
+    is_last_status_of_day,
+    ts_entrance_started,
+    ts_entrance_ended,
+    NOW() AS ts_load
+FROM
+    datalake_ebdb_listing.house_entrance_history

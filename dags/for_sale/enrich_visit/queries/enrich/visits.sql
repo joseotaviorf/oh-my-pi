@@ -111,8 +111,6 @@ SELECT
         WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 5) = 'DEMAND' THEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 4)
     END AS business_model_demand,
     visit_log.first_event,
-    entry_model.key_location AS method,
-    entry_model.entry_model_type,
     CASE
         WHEN visit_log.ts_visit_fup_collected IS NOT NULL THEN 'FOLLOW_UP_COLLECTED'
         WHEN visit_log.ts_visit_fup_collected IS NULL
@@ -256,11 +254,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.code = hl.country_code
-LEFT JOIN
-    datalake_ebdb_listing.house_entrance_history AS entry_model
-        ON visit.id_house = entry_model.id_house
-        AND visit.ts_visit >= entry_model.ts_entrance_started
-        AND visit.ts_visit < COALESCE(entry_model.ts_entrance_ended, NOW())
 LEFT JOIN
     visit_by_history AS vbh
         ON visit.id = vbh.id_visit

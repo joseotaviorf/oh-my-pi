@@ -430,8 +430,6 @@ SELECT DISTINCT
   v.code AS visit_code,
   v.business_context,
   v.business_model,
-  entry_model.key_location AS method,
-  entry_model.entry_model_type,
   CASE
     WHEN vm.visit_model IS NULL THEN 'STANDARD'
     ELSE vm.visit_model
@@ -523,11 +521,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_hub_services.secretariat_hierarchy AS su
     ON su.id_user_5a = s.id_user_creator
-LEFT JOIN
-  datalake_ebdb_listing.house_entrance_history AS entry_model
-    ON v.id_house = entry_model.id_house
-    AND s.ts_schedule_created >= entry_model.ts_entrance_started
-    AND s.ts_schedule_created < COALESCE(entry_model.ts_entrance_ended, NOW())
 LEFT JOIN
   booking_3p_demand_agent AS dm
     ON s.id_schedule = dm.id_schedule
