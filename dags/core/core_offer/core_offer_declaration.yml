@@ -12,20 +12,10 @@ dag:
 workflow:
   type: core_model
   layer: core
-  default_extraction_type: full
+  default_extraction_type: incremental
   load_spark_job: load_core_offer
   tables_customization:
     offer:
-      load_spark_job: load_core_offer
-      spark_job_arguments:
-        - "{environment}"
-        - "{bucket}"
-        - "{dag_name}"
-        - "{schema}"
-        - "{table_name}"
-        - "{partitions}"
-    offer_incremental:
-      load_spark_job: load_core_offer
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"
