@@ -8,7 +8,7 @@ dag:
 workflow:
   type: core_model
   layer: core
-  default_extraction_type: full
+  default_extraction_type: incremental
   load_spark_job: load_core_visit
   tables_customization:
     visit:
@@ -19,6 +19,9 @@ workflow:
         - "{schema}"
         - "{table_name}"
         - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [year, month, day]
       z_order_by: [id_house, business_context]
       table_properties:
         "delta.enableChangeDataFeed": "true"
