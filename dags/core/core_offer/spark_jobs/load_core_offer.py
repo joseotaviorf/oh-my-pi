@@ -47,8 +47,8 @@ class CoreOfferSparkJob(BaseCoreModelSparkJob):
         if (args.load_start_date is not None and args.load_start_date != "" and
             args.load_end_date is not None and args.load_end_date != ""):
             rental_transact_offer_df = rental_transact_offer_df.filter(
-                (col("ts_updated").cast("date") >= lit(args.load_start_date).cast("date")) &
-                (col("ts_updated").cast("date") <= lit(args.load_end_date).cast("date"))
+                (col("ts_database_transaction").cast("date") >= lit(args.load_start_date).cast("date")) &
+                (col("ts_database_transaction").cast("date") <= lit(args.load_end_date).cast("date"))
             )
 
         # Filter out deleted records (op_cdc <> 'd')

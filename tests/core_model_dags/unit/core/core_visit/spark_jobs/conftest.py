@@ -50,6 +50,7 @@ def visit_df(spark_session):
             StructField("ts_visit", TimestampType(), True),
             StructField("ts_created", TimestampType(), True),
             StructField("ts_updated", TimestampType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
         ]
     )
 
@@ -69,6 +70,7 @@ def visit_df(spark_session):
             datetime(2025, 1, 15, 14, 0),  # ts_visit
             datetime(2025, 1, 1, 10, 0),  # ts_created
             datetime(2025, 1, 1, 11, 0),  # ts_updated
+            datetime(2025, 1, 1, 12, 0),  # ts_database_transaction
         ),
         (
             2,  # id
@@ -85,6 +87,7 @@ def visit_df(spark_session):
             datetime(2025, 1, 16, 15, 0),  # ts_visit
             datetime(2025, 1, 2, 10, 0),  # ts_created
             datetime(2025, 1, 2, 11, 0),  # ts_updated
+            datetime(2025, 1, 2, 12, 0),  # ts_database_transaction
         ),
         (
             3,  # id
@@ -101,6 +104,7 @@ def visit_df(spark_session):
             datetime(2025, 1, 17, 16, 0),  # ts_visit
             datetime(2025, 1, 3, 10, 0),  # ts_created
             datetime(2025, 1, 3, 11, 0),  # ts_updated
+            datetime(2025, 1, 3, 12, 0),  # ts_database_transaction
         ),
         (
             4,  # id
@@ -117,6 +121,9 @@ def visit_df(spark_session):
             datetime(2022, 12, 25, 10, 0),  # ts_visit
             datetime(2022, 12, 25, 9, 0),  # ts_created
             datetime(2022, 12, 25, 10, 0),  # ts_updated (old date for filtering test)
+            datetime(
+                2022, 12, 25, 11, 0
+            ),  # ts_database_transaction (old date for filtering test)
         ),
     ]
     return spark_session.createDataFrame(data, schema)

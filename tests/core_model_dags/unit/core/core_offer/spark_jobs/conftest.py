@@ -49,6 +49,7 @@ def rental_transact_offer_df(spark_session):
             StructField("ts_created", TimestampType(), True),
             StructField("ts_updated", TimestampType(), True),
             StructField("ts_expiration", TimestampType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
             StructField("op_cdc", StringType(), True),
         ]
     )
@@ -70,6 +71,7 @@ def rental_transact_offer_df(spark_session):
             datetime(2025, 1, 1, 10, 0),
             datetime(2025, 1, 1, 11, 0),
             datetime(2025, 1, 15, 23, 59),
+            datetime(2025, 1, 1, 12, 0),  # ts_database_transaction
             "i",  # insert
         ),
         (
@@ -88,6 +90,7 @@ def rental_transact_offer_df(spark_session):
             datetime(2025, 1, 2, 10, 0),
             datetime(2025, 1, 2, 11, 0),
             datetime(2025, 1, 16, 23, 59),
+            datetime(2025, 1, 2, 12, 0),  # ts_database_transaction
             "u",  # update
         ),
         (
@@ -106,6 +109,7 @@ def rental_transact_offer_df(spark_session):
             datetime(2025, 1, 3, 10, 0),
             datetime(2025, 1, 3, 11, 0),
             datetime(2025, 1, 17, 23, 59),
+            datetime(2025, 1, 3, 12, 0),  # ts_database_transaction
             "u",  # update
         ),
         (
@@ -124,6 +128,9 @@ def rental_transact_offer_df(spark_session):
             datetime(2022, 12, 25, 10, 0),  # Before date range for testing
             datetime(2022, 12, 25, 11, 0),
             datetime(2025, 1, 10, 23, 59),
+            datetime(
+                2022, 12, 25, 12, 0
+            ),  # ts_database_transaction - before date range
             "d",  # deleted - should be filtered out
         ),
     ]
