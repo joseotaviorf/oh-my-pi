@@ -31,6 +31,9 @@ SELECT
   bm.sk_business_model,
   db.sk_behavior_type,
   dvs.sk_visit_status,
+  funnel_os.sk_visit_funnel AS sk_funnel_offer_submitted,
+  funnel_oa.sk_visit_funnel AS sk_funnel_offer_accepted,
+  funnel_cs.sk_visit_funnel AS sk_funnel_contract_signed,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_visit_requested,1, 10),'-','') AS BIGINT), -1) AS sk_visit_request_date,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_created,1, 10),'-','') AS BIGINT), -1) AS sk_visit_created_date,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_visit_local_tz,1, 10),'-','') AS BIGINT), -1) AS sk_visit_date_local_tz,
@@ -89,3 +92,18 @@ LEFT JOIN
     ON v.id_house = dim_heh.sk_house
     AND v.ts_visit >= dim_heh.ts_entrance_started
     AND v.ts_visit < COALESCE(dim_heh.ts_entrance_ended, NOW())
+LEFT JOIN
+  dw_visit.dim_visit_funnel AS funnel_os
+    ON v.id_visit = funnel_os.sk_visit
+    AND v.business_context = funnel_os.business_context
+    AND funnel_os.event_code = 'os'
+LEFT JOIN
+  dw_visit.dim_visit_funnel AS funnel_oa
+    ON v.id_visit = funnel_oa.sk_visit
+    AND v.business_context = funnel_oa.business_context
+    AND funnel_oa.event_code = 'oa'
+LEFT JOIN
+  dw_visit.dim_visit_funnel AS funnel_cs
+    ON v.id_visit = funnel_cs.sk_visit
+    AND v.business_context = funnel_cs.business_context
+    AND funnel_cs.event_code = 'cs'

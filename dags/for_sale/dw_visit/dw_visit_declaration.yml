@@ -61,6 +61,7 @@ workflow:
         - dim_business_context
         - dim_entrance_type
         - dim_business_model
+        - dim_visit_funnel
 cluster:
     type: custom_cluster
     access_control_list:

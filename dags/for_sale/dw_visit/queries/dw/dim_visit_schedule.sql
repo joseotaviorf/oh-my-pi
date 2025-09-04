@@ -2,8 +2,6 @@ SELECT
   id_schedule AS sk_schedule,
   schedule_origin,
   channel_creation,
-  method AS entry_method,
-  entry_model_type AS entry_method_type,
   last_confirm_answer_supply,
   last_confirm_answer_demand,
   last_confirm_answer_agent,

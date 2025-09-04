@@ -48,6 +48,18 @@ columns:
     description: Context type Id.
     lineage:
       - dw_visit.dim_business_context.sk_business_context
+  sk_funnel_offer_submitted:
+    description: Foreign key from dim_visit_funnel about visits with offer submitted.
+    lineage:
+      - dw_visit.dim_visit_funnel.sk_visit_funnel
+  sk_funnel_offer_accepted:
+    description: Foreign key from dim_visit_funnel about visits with offer accepted.
+    lineage:
+      - dw_visit.dim_visit_funnel.sk_visit_funnel
+  sk_funnel_contract_signed:
+    description: Foreign key from dim_visit_funnel about visits with contract signed.
+    lineage:
+      - dw_visit.dim_visit_funnel.sk_visit_funnel
   sk_visit_request_date:
     description: Requested date of the visit.
     lineage:
