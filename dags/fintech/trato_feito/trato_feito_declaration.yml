@@ -81,6 +81,7 @@ workflow:
     segment_distribution_history: {}
     segment_filter: {}
     segmentation_features: {}
+    pause_collection: {}
 cluster:
   type: custom_cluster
   custom_configurations:

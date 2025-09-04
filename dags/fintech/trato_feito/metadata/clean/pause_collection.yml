@@ -1,0 +1,51 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: pause_collection
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: "Table for storing pause collection information"
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.id
+    description: "Unique identifier"
+  id_entity:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.entity_id
+    description: "Entity identifier"
+  entity_type:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.entity_type
+    description: "Entity type description"
+  version:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.version
+    description: "Version number"
+  reason:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.reason
+    description: "Reason for the pause collection"
+  request_by:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.request_by
+    description: "Description of the requester"
+  is_active:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.active
+    description: "Flag indicating if the register is active"
+  dt_started:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.start_at
+    description: "Date when started"
+  dt_ended:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.end_at
+    description: "Date when ended"
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.created_at
+    description: "Timestamp when the register was created"
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.pause_collection.updated_at
+    description: "Timestamp when the register was updated"
