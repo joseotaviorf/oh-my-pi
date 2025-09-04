@@ -4,7 +4,7 @@ SELECT
     entity_type,
     version,
     reason,
-    request_by,
+    requested_by,
     active AS is_active,
     start_at AS dt_started,
     end_at AS dt_ended,

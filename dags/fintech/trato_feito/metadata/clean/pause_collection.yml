@@ -25,9 +25,9 @@ columns:
     lineage:
       - datalake_trato_feito_raw.pause_collection.reason
     description: "Reason for the pause collection"
-  request_by:
+  requested_by:
     lineage:
-      - datalake_trato_feito_raw.pause_collection.request_by
+      - datalake_trato_feito_raw.pause_collection.requested_by
     description: "Description of the requester"
   is_active:
     lineage:
