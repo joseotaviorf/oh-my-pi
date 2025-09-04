@@ -74,12 +74,14 @@ workflow:
 
     close_reasons:
       extraction_type: full
+      partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "close_reasons"
 
     custom_fields:
       extraction_type: full
+      partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "custom_fields"
@@ -93,18 +95,21 @@ workflow:
 
     demographics_answer_options:
       extraction_type: full
+      partitions: []
       z_order_by: ["is_active"]
       extra_spark_job_arguments:
         - endpoint: "demographics/answer_options"   
 
     demographics_questions:
       extraction_type: full
+      partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "demographics/questions"
 
     departments:
       extraction_type: full
+      partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "departments"
@@ -143,12 +148,14 @@ workflow:
 
     offices:
       extraction_type: full
+      partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "offices"
 
     rejection_reasons:
       extraction_type: full
+      partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "rejection_reasons"
@@ -171,6 +178,7 @@ workflow:
 
     tags_candidate:
       extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - endpoint: "tags/candidate"
 
