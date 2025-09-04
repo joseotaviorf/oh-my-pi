@@ -97,14 +97,6 @@ columns:
     lineage:
       - datalake_visit.visits.unsuccessful_reason
     description: Reason of visit unsuccessful.
-  entry_method:
-    lineage:
-      - datalake_visit.visit_schedule.method
-    description: How occurred the entry method. Last method before the visit.
-  entry_method_type:
-    lineage:
-      - datalake_visit.visit_schedule.entry_model_type
-    description: Type of entry method.
     categories:
       ASSISTED_ENTRANCE: When a third person is needed to enter.
       EASY_ENTRANCE: When no third person is needed to enter.

@@ -38,7 +38,7 @@ SELECT
     event_code,
     business_context,
     ts_first_event,
-    ts_last_event,
+    ts_last_event
 FROM
     visit_rent_flow
 UNION ALL
@@ -48,6 +48,6 @@ SELECT
     event_code,
     business_context,
     ts_first_event,
-    ts_last_event,
+    ts_last_event
 FROM
     visit_sale_flow

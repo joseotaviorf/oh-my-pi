@@ -24,9 +24,6 @@ workflow:
       dim_business_model:
         extraction_type: incremental
         merge_on: [ "business_model" ]
-      dim_entrance_type:
-        extraction_type: incremental
-        merge_on: [ "entrance_type" ]
       dim_event_type:
         extraction_type: incremental
         merge_on: [ "event_name" ]
@@ -52,14 +49,12 @@ workflow:
         - dim_business_context
         - dim_visit_model
         - dim_behavior
-        - dim_entrance_type
         - dim_business_model
         - dim_visit_fup
       fact_visits:
         - dim_behavior
         - dim_visit_status
         - dim_business_context
-        - dim_entrance_type
         - dim_business_model
         - dim_visit_funnel
 cluster:

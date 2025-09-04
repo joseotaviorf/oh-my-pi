@@ -18,14 +18,6 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.channel_creation
     description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED)
-  entry_method:
-    lineage:
-      - datalake_visit.visit_schedules.method
-    description: How occurred the entry method. Last method before the schedule.
-  entry_method_type:
-    lineage:
-      - datalake_visit.visit_schedules.entry_model_type
-    description: Type of entry method.
   last_confirm_answer_supply:
     lineage:
       - datalake_visit.visit_schedules.last_answer_supply
