@@ -1,3 +1,5 @@
+create or replace temporary view canudo2 as 
+
 WITH retsuko AS (
     SELECT DISTINCT
         ct.id_external AS id_business_entity,
@@ -492,25 +494,25 @@ errors_base AS (
         r.accounting_name,
         r.accrual_year_month,
         MIN(CASE
-        WHEN sl.hash IS NOT NULL THEN 'success'
-        WHEN sl.hash IS NULL AND (se.id_finance_entity IS NULL OR se.status = 'failed' OR se.failed_reason IS NOT NULL) THEN 'source failure'
-        WHEN sl.hash IS NULL AND (sg.id_feature IS NULL OR sg.sync_sap_job_status = 'error' OR sg.webhook_error IS NOT NULL) THEN 'gateway failure'
+        WHEN (sl_hash.hash IS NOT NULL OR sl_entry.hash IS NOT NULL) THEN 'success'
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND (se.id_finance_entity IS NULL OR se.status = 'failed' OR se.failed_reason IS NOT NULL) THEN 'source failure'
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND (sg.id_feature IS NULL OR sg.sync_sap_job_status = 'error' OR sg.webhook_error IS NOT NULL) THEN 'gateway failure'
         ELSE 'unknown failure'
         END) AS accounting_process_status,
         MIN(CASE
-        WHEN sl.hash IS NULL AND se.id_finance_entity IS NULL THEN 'source not found'
-        WHEN sl.hash IS NULL AND se.status = 'failed' THEN se.failed_reason
-        WHEN sl.hash IS NULL AND sg.id_feature IS NULL THEN 'gateway not found'
-        WHEN sl.hash IS NULL AND sg.sync_sap_job_status = 'error' THEN sg.webhook_error
-        WHEN sl.hash IS NULL AND se.id_finance_entity IS NOT NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND se.id_finance_entity IS NULL THEN 'source not found'
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND se.status = 'failed' THEN se.failed_reason
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND sg.id_feature IS NULL THEN 'gateway not found'
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND sg.sync_sap_job_status = 'error' THEN sg.webhook_error
+        WHEN (sl_hash.hash IS NULL AND sl_entry.hash IS NULL) AND se.id_finance_entity IS NOT NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
         ELSE NULL
         END) AS error_description,
-        MIN(IF(sl.hash IS NULL, FALSE, TRUE)) AS is_completeness,
+        MIN(IF(sl_hash.hash IS NULL AND sl_entry.hash IS NULL, FALSE, TRUE)) AS is_completeness,
         CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
-        CAST(SUM(sl.debit_credit) AS DECIMAL(12,2)) AS sap_amount,
+        CAST(SUM(COALESCE(sl_hash.debit_credit, sl_entry.debit_credit, 0)) AS DECIMAL(12,2)) AS sap_amount,
         MAX(r.dt_source_trigger) AS dt_source_trigger,
-        MAX(sl.dt_sap_created) AS dt_sap_created,
-        MAX(sl.dt_sap_reference) AS dt_sap_reference
+        MAX(COALESCE(sl_hash.dt_sap_created, sl_entry.dt_sap_created)) AS dt_sap_created,
+        MAX(COALESCE(sl_hash.dt_sap_reference, sl_entry.dt_sap_reference)) AS dt_sap_reference
     FROM
         retsuko AS r
     LEFT JOIN
@@ -520,18 +522,17 @@ errors_base AS (
         sap_gateway AS sg
             ON se.id_sap_gateway_feature = sg.id_feature
     LEFT JOIN
-        sap AS sl
-            ON (sl.hash = sg.hash AND r.account_number = sl.account_number)
+        sap AS sl_hash
+            ON sl_hash.hash = sg.hash AND r.account_number = sl_hash.account_number
     LEFT JOIN
-        sap AS sl
-            ON (sl.hash = sg.hash AND r.account_number = sl.account_number) OR
-            (r.id_finance_entity_entry = sl.id_finance_entity_entry AND r.account_number = sl.account_number)
+        sap AS sl_entry
+            ON sl_entry.id_finance_entity_entry = r.id_finance_entity_entry AND r.account_number = sl_entry.account_number
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
 ),
 
 assertions_base AS (
   SELECT
-    'RTSK-T'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||COALESCE(account_number, '') AS id_accounting_process,
+    'RTSK-P'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||COALESCE(account_number, '') AS id_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
