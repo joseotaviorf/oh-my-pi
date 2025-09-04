@@ -53,8 +53,9 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, execution_date={args.execution_date},
-            datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, msg=print spark jobs args"
+            m={JOB_NAME}, environment={args.environment}, source={args.source}, load_start_date={args.load_start_date},
+            load_end_date={args.load_end_date}, datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, 
+            msg=print spark jobs args"
         """
     )
 
@@ -95,8 +96,9 @@ if __name__ == "__main__":
     if not api_response:
         logger.warn(
             f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, execution_date={args.execution_date},
-            datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, msg=result is empty"
+            m={JOB_NAME}, environment={args.environment}, source={args.source}, load_start_date={args.load_start_date},
+            load_end_date={args.load_end_date}, datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, 
+            msg=result is empty"
         """
         )
 
