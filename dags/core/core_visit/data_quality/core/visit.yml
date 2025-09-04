@@ -1,6 +1,9 @@
 ---
 table_name: core_visit.visit
 alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: ts_updated
+  incremental_date_mask: yyyy-MM-dd
 table_level_validations:
   has_size:
     greater_than: 30000
