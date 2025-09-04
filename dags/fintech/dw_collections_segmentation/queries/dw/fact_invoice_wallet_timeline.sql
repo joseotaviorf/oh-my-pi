@@ -248,11 +248,11 @@ delay_contamination_contract AS (
     GROUP BY 1,2
 )
 SELECT
-    i.id_contract,
+    i.id_contract AS sk_contract,
+    i.id_invoice AS sk_invoice,
+    i.id_negotiation_parent AS sk_negotiation_parent,
+    i.id_negotiation_child AS sk_negotiation_child,
     i.dt_reference,
-    i.id_invoice,
-    i.id_negotiation_parent,
-    i.id_negotiation_child,
     i.is_child_negotiation,
     i.is_negative_eligible,
     i.has_child,
@@ -316,6 +316,9 @@ SELECT
     i.dt_begin,
     i.dt_contract_start,
     i.dt_contract_annulled,
+    YEAR(i.dt_reference) AS year,
+    MONTH(i.dt_reference) AS month,
+    DAY(i.dt_reference) AS day,
     NOW() AS ts_load
 FROM
     delay_contamination_invoice AS i

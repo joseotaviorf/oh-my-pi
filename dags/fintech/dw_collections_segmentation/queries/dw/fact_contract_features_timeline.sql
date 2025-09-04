@@ -16,7 +16,7 @@ contract_info AS (
 ),
 essential_features AS (
     SELECT
-        id_contract,
+        sk_contract,
         dt_reference,
         reference_contract_status,
         max_delay_contaminated_contract_t1,
@@ -76,114 +76,114 @@ contract_features_with_acc AS (
     SELECT
         *,
         COALESCE(MAX(n_reparos_invoices) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS acc_max_n_repairs,
         COALESCE(SUM(cpc) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 90 PRECEDING AND CURRENT ROW
         ), 0) AS acc_cpc_l90,
         COALESCE(SUM(qt_acordo_quebrado) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS acc_broken_multiple_deals_lifetime,
         COALESCE(SUM(qt_promessa_quebrada_fp) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS acc_broken_promessas_lifetime,
         COALESCE(SUM(qt_aco_desconto) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                 ), 0) AS acc_deals_principal_discount_lifetime,
         (12*(YEAR(dt_reference) - YEAR(dt_contract_start)) +
          (MONTH(dt_reference) - MONTH(dt_contract_start))) AS mob_months,
         SIZE(COLLECT_SET(id_process_evictions) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         )) AS n_evictions_processes_lifetime,
         COALESCE(SUM(sum_monthly_overdue_days_paid_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS acc_sum_monthly_overdue_days_paid_t1,
         COALESCE(SUM(count_monthly_overdue_invoices_paid_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS acc_count_monthly_overdue_invoices_paid_t1,
         CAST(COALESCE(MAX(CAST(has_overdue_balance_over0_t1_at_ending AS INT)) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS INT) AS has_overdue_balance_over0_t1_at_ending_ffill,
         CAST(COALESCE(MAX(CAST(has_overdue_balance_over5_t1_at_ending AS INT)) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ), 0) AS INT) AS has_overdue_balance_over5_t1_at_ending_ffill,
         COALESCE(SUM(n_monthly_invoices) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_monthly_invoices_l12m,
         COALESCE(SUM(n_monthly_invoices_paid_ontime_t2) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_monthly_invoices_paid_ontime_t2_l12m,
         COALESCE(SUM(n_monthly_invoices_paid_ontime_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_monthly_invoices_paid_ontime_t1_l12m,
         COALESCE(SUM(n_monthly_overdue_invoices_paid_t2) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_monthly_overdue_invoices_paid_t2_l12m,
         COALESCE(SUM(n_monthly_overdue_invoices_paid_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_monthly_overdue_invoices_paid_t1_l12m,
         COALESCE(SUM(n_invoices_paid_ontime_t2) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_invoices_paid_ontime_t2_l12m,
         COALESCE(SUM(n_invoices_paid_ontime_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_invoices_paid_ontime_t1_l12m,
         COALESCE(SUM(n_overdue_invoices_paid_t2) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_overdue_invoices_paid_t2_l12m,
         COALESCE(SUM(n_overdue_invoices_paid_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_n_overdue_invoices_paid_t1_l12m,
         COALESCE(SUM(n_monthly_invoices_created) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_count_monthly_invoices_created,
         COALESCE(SUM(n_monthly_invoices_paid_ontime_t1) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 365 PRECEDING AND CURRENT ROW
         ), 0) AS acc_count_monthly_invoices_paid_ontime_t1,
         COALESCE(SUM(CASE WHEN max_delay_contaminated_contract_t2 > 0 THEN 1 ELSE 0 END) OVER (
-            PARTITION BY id_contract
+            PARTITION BY sk_contract
             ORDER BY dt_reference
             ROWS BETWEEN 180 PRECEDING AND CURRENT ROW
         ), 0) AS n_days_over1_t2_l180
@@ -384,7 +384,7 @@ prob_payment_calculation AS (
         calculate_monthly_payment_ratios AS f
     LEFT JOIN
         contract_info AS c
-            ON c.sk_contract = f.id_contract
+            ON c.sk_contract = f.sk_contract
 ),
 segmentation_features AS (
     SELECT
@@ -517,7 +517,7 @@ segmentation_features AS (
         prob_payment_calculation AS p
 )
 SELECT
-    CAST(f.id_contract AS BIGINT) AS id_contract,
+    CAST(f.sk_contract AS BIGINT) AS sk_contract,
     f.dt_reference,
     f.reference_contract_status,
     f.segment_comms,
@@ -601,5 +601,8 @@ SELECT
     f.array_paid_invoices,
     f.array_negotiated_invoices,
     f.dt_contract_start,
+    YEAR(f.dt_reference) AS year,
+    MONTH(f.dt_reference) AS month,
+    DAY(f.dt_reference) AS day,
     NOW() AS ts_load
 FROM segmentation_features AS f

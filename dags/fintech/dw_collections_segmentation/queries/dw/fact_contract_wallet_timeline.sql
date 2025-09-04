@@ -2,41 +2,41 @@ WITH
 contract_features AS (
     SELECT
         dt_reference,
-        id_contract,
+        sk_contract,
         CAST(MAX(has_negotiation_in_contract) AS BOOLEAN) AS has_negotiation_in_contract,
-        COUNT(CASE WHEN NOT(is_negative_eligible) AND order_invoice_wallet_risk = 1 THEN id_invoice END)  AS n_anchor_invoices_not_negativable,
-        COUNT(IF(is_negative_eligible, id_invoice, NULL)) AS n_invoices_negativable,
-        COUNT(IF(has_bill_item_condominio, id_invoice, NULL)) AS n_condominio_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_condominio, id_invoice, NULL)) AS n_condominio_open_invoices,
+        COUNT(CASE WHEN NOT(is_negative_eligible) AND order_invoice_wallet_risk = 1 THEN sk_invoice END)  AS n_anchor_invoices_not_negativable,
+        COUNT(IF(is_negative_eligible, sk_invoice, NULL)) AS n_invoices_negativable,
+        COUNT(IF(has_bill_item_condominio, sk_invoice, NULL)) AS n_condominio_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_condominio, sk_invoice, NULL)) AS n_condominio_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_condominio, ABS(balance_bill_item_condominio), 0)) AS open_condominio_balance,
-        COUNT(IF(has_bill_item_multa_recisoria, id_invoice, NULL)) AS n_multa_recisoria_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_multa_recisoria, id_invoice, NULL)) AS n_multa_recisoria_open_invoices,
+        COUNT(IF(has_bill_item_multa_recisoria, sk_invoice, NULL)) AS n_multa_recisoria_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_multa_recisoria, sk_invoice, NULL)) AS n_multa_recisoria_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_multa_recisoria, ABS(balance_bill_item_multa_recisoria), 0)) AS open_multa_recisoria_balance,
-        COUNT(IF(has_bill_item_acordo, id_invoice, NULL)) AS n_acordo_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_acordo, id_invoice, NULL)) AS n_acordo_open_invoices,
+        COUNT(IF(has_bill_item_acordo, sk_invoice, NULL)) AS n_acordo_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_acordo, sk_invoice, NULL)) AS n_acordo_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_acordo, ABS(balance_bill_item_acordo), 0)) AS open_acordo_balance,
-        COUNT(IF(has_bill_item_rental_core, id_invoice, NULL)) AS n_rental_core_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_rental_core, id_invoice, NULL)) AS n_rental_core_open_invoices,
+        COUNT(IF(has_bill_item_rental_core, sk_invoice, NULL)) AS n_rental_core_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_rental_core, sk_invoice, NULL)) AS n_rental_core_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_rental_core, ABS(balance_bill_item_rental_core), 0)) AS open_rental_core_balance,
-        COUNT(IF(has_bill_item_reparos, id_invoice, NULL)) AS n_reparos_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_reparos, id_invoice, NULL)) AS n_reparos_open_invoices,
+        COUNT(IF(has_bill_item_reparos, sk_invoice, NULL)) AS n_reparos_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_reparos, sk_invoice, NULL)) AS n_reparos_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_reparos, ABS(balance_bill_item_reparos), 0)) AS open_reparos_balance,
-        COUNT(IF(has_bill_item_multas_ongoing, id_invoice, NULL)) AS n_multas_ongoing_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_multas_ongoing, id_invoice, NULL)) AS n_multas_ongoing_open_invoices,
+        COUNT(IF(has_bill_item_multas_ongoing, sk_invoice, NULL)) AS n_multas_ongoing_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_multas_ongoing, sk_invoice, NULL)) AS n_multas_ongoing_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_multas_ongoing, ABS(balance_bill_item_multas_ongoing), 0)) AS open_multas_ongoing_balance,
-        COUNT(IF(has_bill_item_utilidades, id_invoice, NULL)) AS n_utilidades_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_utilidades, id_invoice, NULL)) AS n_utilidades_open_invoices,
+        COUNT(IF(has_bill_item_utilidades, sk_invoice, NULL)) AS n_utilidades_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_utilidades, sk_invoice, NULL)) AS n_utilidades_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_utilidades, ABS(balance_bill_item_utilidades), 0)) AS open_utilidades_balance,
-        COUNT(IF(has_bill_item_outros, id_invoice, NULL)) AS n_outros_invoices,
-        COUNT(IF(payment_status = 'open' AND has_bill_item_outros, id_invoice, NULL)) AS n_outros_open_invoices,
+        COUNT(IF(has_bill_item_outros, sk_invoice, NULL)) AS n_outros_invoices,
+        COUNT(IF(payment_status = 'open' AND has_bill_item_outros, sk_invoice, NULL)) AS n_outros_open_invoices,
         SUM(IF(payment_status = 'open' AND has_bill_item_outros, ABS(balance_bill_item_outros), 0)) AS open_outros_balance,
-        COUNT(CASE WHEN is_first_invoice_contract AND payment_status = 'open' THEN id_invoice ELSE NULL END) AS n_first_invoices_open,
-        COUNT(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t1 > 0 THEN id_invoice END)  AS n_overdue_monthlys_t1,
-        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t1 > 0 THEN id_invoice END)  AS n_overdue_deals_t1,
-        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t1 > 0 THEN id_invoice END)  AS n_overdue_others_t1,
-        COUNT(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t2 > 0 THEN id_invoice END)  AS n_overdue_monthlys_t2,
-        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t2 > 0 THEN id_invoice END)  AS n_overdue_deals_t2,
-        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t2 > 0 THEN id_invoice END)  AS n_overdue_others_t2,
+        COUNT(CASE WHEN is_first_invoice_contract AND payment_status = 'open' THEN sk_invoice ELSE NULL END) AS n_first_invoices_open,
+        COUNT(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t1 > 0 THEN sk_invoice END)  AS n_overdue_monthlys_t1,
+        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t1 > 0 THEN sk_invoice END)  AS n_overdue_deals_t1,
+        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t1 > 0 THEN sk_invoice END)  AS n_overdue_others_t1,
+        COUNT(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t2 > 0 THEN sk_invoice END)  AS n_overdue_monthlys_t2,
+        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t2 > 0 THEN sk_invoice END)  AS n_overdue_deals_t2,
+        COUNT(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t2 > 0 THEN sk_invoice END)  AS n_overdue_others_t2,
         SUM(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t2 > 0 THEN ABS(due_amount) ELSE 0 END)  AS sum_overdue_monthlys_t2,
         SUM(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t2 > 0 THEN ABS(due_amount) ELSE 0 END)  AS sum_overdue_deals_t2,
         SUM(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t2 > 0 THEN ABS(due_amount) ELSE 0 END)  AS sum_overdue_others_t2,
@@ -72,37 +72,37 @@ contract_features AS (
         SUM(overdue_recovered_amount_t3) AS overdue_recovered_amount_t3,
         SUM(on_time_paid_amount_t3)   AS on_time_paid_amount_t3,
         SUM(CASE WHEN is_invoice_overdue_t1 AND overdue_recovered_amount_t1 > 0 AND invoice_type IN ('monthly') THEN invoice_delay_t1 ELSE 0 END) AS sum_monthly_overdue_days_paid_t1,
-        COUNT(DISTINCT CASE WHEN is_invoice_overdue_t1 AND overdue_recovered_amount_t1 > 0 AND invoice_type IN ('monthly') THEN id_invoice END) AS count_monthly_overdue_invoices_paid_t1,
+        COUNT(DISTINCT CASE WHEN is_invoice_overdue_t1 AND overdue_recovered_amount_t1 > 0 AND invoice_type IN ('monthly') THEN sk_invoice END) AS count_monthly_overdue_invoices_paid_t1,
         COLLECT_SET(CASE
-            WHEN payment_status = 'open' THEN id_invoice
+            WHEN payment_status = 'open' THEN sk_invoice
             ELSE NULL
         END)  AS array_open_invoices,
         COLLECT_SET(CASE
-            WHEN payment_status = 'paid' THEN id_invoice
+            WHEN payment_status = 'paid' THEN sk_invoice
             ELSE NULL
         END)  AS array_paid_invoices,
         COLLECT_SET(CASE
-            WHEN payment_status = 'written-down' THEN id_invoice
+            WHEN payment_status = 'written-down' THEN sk_invoice
             ELSE NULL
         END)  AS array_negotiated_invoices,
-        COUNT(CASE WHEN invoice_type IN ('monthly') THEN id_invoice ELSE NULL END) AS n_monthly_invoices,
-        COUNT(CASE WHEN payment_status = 'paid' THEN id_invoice ELSE NULL END) AS n_invoices_paid,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t2 <= 0 THEN id_invoice ELSE NULL END) AS n_invoices_paid_ontime_t2,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t2 > 0 THEN id_invoice ELSE NULL END) AS n_overdue_invoices_paid_t2,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t1 <= 0 THEN id_invoice ELSE NULL END) AS n_invoices_paid_ontime_t1,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t1 > 0 THEN id_invoice ELSE NULL END) AS n_overdue_invoices_paid_t1,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t2 <= 0 THEN id_invoice ELSE NULL END) AS n_monthly_invoices_paid_ontime_t2,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t1 <= 0 THEN id_invoice ELSE NULL END) AS n_monthly_invoices_paid_ontime_t1,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t2 > 0 THEN id_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t2,
-        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t1 > 0 THEN id_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t1,
-        COUNT(CASE WHEN invoice_type IN ('monthly') AND dt_reference = dt_begin THEN id_invoice ELSE NULL END) AS n_monthly_invoices_created,
-        COUNT(DISTINCT id_invoice) AS n_invoices_in_wallet_total
+        COUNT(CASE WHEN invoice_type IN ('monthly') THEN sk_invoice ELSE NULL END) AS n_monthly_invoices,
+        COUNT(CASE WHEN payment_status = 'paid' THEN sk_invoice ELSE NULL END) AS n_invoices_paid,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t2 <= 0 THEN sk_invoice ELSE NULL END) AS n_invoices_paid_ontime_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t2 > 0 THEN sk_invoice ELSE NULL END) AS n_overdue_invoices_paid_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t1 <= 0 THEN sk_invoice ELSE NULL END) AS n_invoices_paid_ontime_t1,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_delay_t1 > 0 THEN sk_invoice ELSE NULL END) AS n_overdue_invoices_paid_t1,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t2 <= 0 THEN sk_invoice ELSE NULL END) AS n_monthly_invoices_paid_ontime_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t1 <= 0 THEN sk_invoice ELSE NULL END) AS n_monthly_invoices_paid_ontime_t1,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t2 > 0 THEN sk_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t2,
+        COUNT(CASE WHEN payment_status = 'paid' AND invoice_type IN ('monthly') AND invoice_delay_t1 > 0 THEN sk_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t1,
+        COUNT(CASE WHEN invoice_type IN ('monthly') AND dt_reference = dt_begin THEN sk_invoice ELSE NULL END) AS n_monthly_invoices_created,
+        COUNT(DISTINCT sk_invoice) AS n_invoices_in_wallet_total
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
     GROUP BY 1, 2
 ),
 get_invoice_date_range AS (
     SELECT
-        id_contract,
+        sk_contract,
         dt_contract_annulled AS dt_contract_end,
         dt_contract_start,
         MIN(dt_reference) AS dt_first_invoice,
@@ -112,7 +112,7 @@ get_invoice_date_range AS (
 ),
 get_date_array AS (
     SELECT
-        id_contract,
+        sk_contract,
         dt_contract_end,
         dt_contract_start,
         SEQUENCE(dt_first_invoice,
@@ -128,7 +128,7 @@ get_date_array AS (
 ),
 contract_date_references AS (
     SELECT
-        id_contract,
+        sk_contract,
         dt_contract_end,
         dt_contract_start,
         dt_reference
@@ -303,7 +303,7 @@ contract_timeline AS (
         contract_date_references m
     LEFT JOIN
         contract_features f
-            ON m.id_contract = f.id_contract
+            ON m.sk_contract = f.sk_contract
             AND m.dt_reference = f.dt_reference
     LEFT JOIN
         get_dates_billing d
@@ -562,26 +562,26 @@ contract_enhanced AS (
     LEFT JOIN
         evictions_timeline AS e
             ON e.dt_reference = m.dt_reference
-            AND CAST(e.id_contract AS BIGINT) = m.id_contract
+            AND CAST(e.id_contract AS BIGINT) = m.sk_contract
     LEFT JOIN
         collections_efforts AS be
             ON be.dt_reference = m.dt_reference
-            AND be.sk_contract = m.id_contract
+            AND be.sk_contract = m.sk_contract
     LEFT JOIN
         app_events_features AS app
-            ON app.id_contract = m.id_contract
+            ON app.id_contract = m.sk_contract
             AND app.dt_reference = m.dt_reference
     LEFT JOIN
         contract_blocklist_timeline AS bl
-            ON bl.id_contract = m.id_contract
+            ON bl.id_contract = m.sk_contract
             AND bl.dt_reference = m.dt_reference
     LEFT JOIN
         negotiations AS d
-            ON d.sk_contract = m.id_contract
+            ON d.sk_contract = m.sk_contract
             AND d.dt_reference = m.dt_reference
 )
 SELECT
-    CAST(id_contract AS BIGINT) AS id_contract,
+    CAST(sk_contract AS BIGINT) AS sk_contract,
     dt_reference,
     reference_contract_status,
     CAST(max_delay_contaminated_contract_t1 AS BIGINT) AS max_delay_contaminated_contract_t1,
@@ -722,5 +722,9 @@ SELECT
     CAST(max_open_delay_contaminated_contract_t1 AS BIGINT) AS max_open_delay_contaminated_contract_t1,
     CAST(max_open_delay_contaminated_contract_t2 AS BIGINT) AS max_open_delay_contaminated_contract_t2,
     dt_contract_end,
-    dt_contract_start
+    dt_contract_start,
+    YEAR(dt_reference) AS year,
+    MONTH(dt_reference) AS month,
+    DAY(dt_reference) AS day,
+    NOW() AS ts_load
 FROM contract_enhanced
