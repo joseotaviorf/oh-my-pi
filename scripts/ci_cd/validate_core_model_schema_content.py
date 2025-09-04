@@ -18,9 +18,10 @@ import yaml
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any
 
-# Import GitService for git-based validation
+# Import GitService for git-based validation and SchemaValidator for centralized types
 sys.path.append(str(Path(__file__).parent.parent))
 from services.git_service import GitService
+from bietlejuice.base.core_models.helpers.schema_validator import SchemaValidator
 
 
 def validate_and_sanitize_file_path(file_path: str) -> Path:
@@ -169,7 +170,7 @@ def validate_schema_structure(content: Dict, schema_file: Path) -> List[str]:
 
                 # Validate field types and values
                 if 'type' in col_def:
-                    valid_types = ['string', 'bigint', 'int', 'double', 'boolean', 'date', 'timestamp', 'decimal']
+                    valid_types = SchemaValidator.VALID_SCHEMA_TYPES
                     if col_def['type'] not in valid_types:
                         errors.append(f"Column '{col_name}' has invalid type '{col_def['type']}'. Valid types: {', '.join(valid_types)}")
 
@@ -396,7 +397,7 @@ def validate_core_model_schema_content(mode="all_files", input=None, verbose=Fal
         print(f"\n💡 Schema file structure should follow this format:")
         print(f"   columns:")
         print(f"     column_name:")
-        print(f"       type: string|bigint|int|double|boolean|date|timestamp|decimal")
+        print(f"       type: {'|'.join(SchemaValidator.VALID_SCHEMA_TYPES)}")
         print(f"       required: true|false")
         print(f"       nullable: true|false  # Optional: not validated (Spark auto-infers)")
         print(f"   min_columns: <number>  # Required: minimum column count")

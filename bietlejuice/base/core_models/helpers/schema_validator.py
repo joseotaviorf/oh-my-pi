@@ -1,6 +1,16 @@
-from pyspark.sql import DataFrame
-from pyspark.sql.types import DataType
 from typing import Dict, List, Union
+
+# Conditional PySpark imports - only import when needed to avoid CI/CD issues
+try:
+    from pyspark.sql import DataFrame
+    from pyspark.sql.types import DataType
+
+    PYSPARK_AVAILABLE = True
+except ImportError:
+    # Define dummy types for when PySpark is not available
+    DataFrame = None
+    DataType = None
+    PYSPARK_AVAILABLE = False
 
 
 class SchemaValidationError(Exception):
@@ -29,21 +39,51 @@ class SchemaValidator:
     }
     """
 
+    # PySpark availability flag
+    PYSPARK_AVAILABLE = PYSPARK_AVAILABLE
+
+    # Centralized type mappings - can be used by other validation scripts
+    VALID_SCHEMA_TYPES = [
+        "string",
+        "bigint",
+        "int",
+        "double",
+        "boolean",
+        "date",
+        "timestamp",
+        "decimal",
+    ]
+
+    TYPE_TO_SPARK_MAPPING = {
+        "string": "StringType",
+        "int": "IntegerType",
+        "integer": "IntegerType",
+        "long": "LongType",
+        "bigint": "LongType",
+        "double": "DoubleType",
+        "float": "FloatType",
+        "boolean": "BooleanType",
+        "timestamp": "TimestampType",
+        "date": "DateType",
+        "binary": "BinaryType",
+        "decimal": "DecimalType",
+    }
+
+    SPARK_TO_TYPE_MAPPING = {
+        "stringtype": "string",
+        "integertype": "int",
+        "longtype": "long",
+        "doubletype": "double",
+        "floattype": "float",
+        "booleantype": "boolean",
+        "timestamptype": "timestamp",
+        "datetype": "date",
+        "binarytype": "binary",
+        "decimaltype": "decimal",
+    }
+
     def __init__(self):
-        self._type_mapping = {
-            "string": "StringType",
-            "int": "IntegerType",
-            "integer": "IntegerType",
-            "long": "LongType",
-            "bigint": "LongType",
-            "double": "DoubleType",
-            "float": "FloatType",
-            "boolean": "BooleanType",
-            "timestamp": "TimestampType",
-            "date": "DateType",
-            "binary": "BinaryType",
-            "decimal": "DecimalType",
-        }
+        self._type_mapping = self.TYPE_TO_SPARK_MAPPING
 
     def validate_schema(self, df: DataFrame, schema: dict) -> bool:
         """
@@ -58,7 +98,13 @@ class SchemaValidator:
 
         Raises:
             SchemaValidationError: If validation fails
+            ImportError: If PySpark is not available
         """
+        if not PYSPARK_AVAILABLE:
+            raise ImportError(
+                "PySpark is required for DataFrame validation but is not installed"
+            )
+
         errors = []
 
         # Validate basic structure
@@ -260,6 +306,9 @@ class SchemaValidator:
 
     def get_schema_summary(self, df: DataFrame) -> dict:
         """Get a summary of the DataFrame schema for debugging."""
+        if not PYSPARK_AVAILABLE:
+            return {"error": "PySpark is not available"}
+
         if df is None:
             return {"error": "DataFrame is None"}
 
@@ -278,6 +327,11 @@ class SchemaValidator:
 
     def create_schema_from_dataframe(self, df: DataFrame, strict: bool = False) -> dict:
         """Create a schema definition from an existing DataFrame."""
+        if not PYSPARK_AVAILABLE:
+            raise ImportError(
+                "PySpark is required for DataFrame operations but is not installed"
+            )
+
         if df is None:
             raise ValueError("DataFrame is None")
 
@@ -300,21 +354,8 @@ class SchemaValidator:
         """Convert Spark type string to simple type name."""
         spark_type_lower = spark_type.lower()
 
-        # Reverse mapping from Spark types to simple types
-        reverse_mapping = {
-            "stringtype": "string",
-            "integertype": "int",
-            "longtype": "long",
-            "doubletype": "double",
-            "floattype": "float",
-            "booleantype": "boolean",
-            "timestamptype": "timestamp",
-            "datetype": "date",
-            "binarytype": "binary",
-            "decimaltype": "decimal",
-        }
-
-        for spark_t, simple_t in reverse_mapping.items():
+        # Use centralized reverse mapping
+        for spark_t, simple_t in self.SPARK_TO_TYPE_MAPPING.items():
             if spark_t in spark_type_lower:
                 return simple_t
 
