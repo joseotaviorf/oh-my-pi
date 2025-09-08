@@ -1,158 +1,136 @@
 ---
 database_name: datalake_crawler_zap_imoveis
-table_name: zap_imoveis
+table_name: zap_imoveis_latest
 description: |
-  This table contains enriched fields regarding the Zap Imóveis crawler data.
-  It transforms and flattens the original struct fields from the clean table into
-  individual columns for easier analysis and consumption.
+  This table contains the latest/most recent update for each property from the Zap Imóveis crawler data.
+  It provides a deduplicated view of the datalake_crawler_zap_imoveis.zap_imoveis table, showing only
+  the most recent record per property (id_house) based on the ts_updated timestamp.
 
-  **Key Transformations:**
-  - Extracts and flattens JSON struct fields (address, geolocation, house_info, etc.) into individual columns
-  - Applies data type casting (integers for numeric fields, booleans for flags)
-  - Calculates derived fields like price_m2_rental and price_m2_sale
-  - Handles complex city name parsing with regex cleaning
-  - Creates composite fields like id_house (id + 'ZapImoveis') and is_hybrid flag
+  **Deduplication Logic:**
+  - Only includes records where ts_updated is not null
+  - Returns the latest update per property using ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_updated DESC) = 1
+  - Filters data within the specified load date range
 
-  **Data Source:**
-  Sources data from datalake_crawler_zap_imoveis_clean.zap_imoveis, filtering by the specified load date range.
+  **Use Case:**
+  This table is ideal for analytics requiring the current state of each property without historical duplicates,
+  providing a clean, point-in-time view of the latest available information for each listing.
 
   **Update Schedule:**
-  The table is updated weekly, every Friday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis
+  The table is updated weekly, every Friday, after the datalake_crawler_zap_imoveis.zap_imoveis
   table is refreshed. This ensures data consistency and maintains the dependency chain.
 domain: Cross
 owner: andre.melo@quintoandar.com.br
 columns:
   id_house_platform:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.id
+      - datalake_crawler_zap_imoveis.zap_imoveis.id_house_platform
     description: |
       The id of the house in the zap imoveis platform.
   id_house:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.id
+      - datalake_crawler_zap_imoveis.zap_imoveis.id_house
     description: |
       It concatenates the id of the house in the zap imoveis platform with the
       string "ZapImoveis".
   platform:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.origin
+      - datalake_crawler_zap_imoveis.zap_imoveis.platform
     description: |
       The origin of the house.
-      If the original value is null, then it assumes the value "ZapImoveis".
   country:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.country
     description: |
       The country of the house.
-      It is provided by the original struct field "address".
   state:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.state
     description: |
       The state of the house.
-      It is provided by the original struct field "address".
   address_city:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.address_city
     description: |
       The city of the house.
-      It is provided by the original struct field "address".
-      If the original value is null, then it assumes the clean table partition,
-      which is the "city" field.
       It doens't assume null values, and it is used as a z_order field for the
       delta table.
   neighborhood:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.neighborhood
     description: |
       The neighborhood of the house.
-      It is provided by the original struct field "address".
   street:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.street
     description: |
       The street of the house.
-      It is provided by the original struct field "address".
   street_number:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.street_number
     description: |
       The number of the house.
-      It is provided by the original struct field "address".
   zip_code:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
+      - datalake_crawler_zap_imoveis.zap_imoveis.zip_code
     description: |
       The zip code of the house.
-      It is provided by the original struct field "address".
   latitude:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.geolocation
+      - datalake_crawler_zap_imoveis.zap_imoveis.latitude
     description: |
       The latitude of the house.
-      It is provided by the original struct field "geolocation".
   longitude:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.geolocation
+      - datalake_crawler_zap_imoveis.zap_imoveis.longitude
     description: |
       The longitude of the house.
-      It is provided by the original struct field "geolocation".
   listing_name:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.listing_name
+      - datalake_crawler_zap_imoveis.zap_imoveis.listing_name
     description: |
       The name of the listing.
       It is the listing description provided in the origin platform.
   total_area:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.total_area
     description: |
       The total area of the house in square meters.
-      It is extracted from the house_info struct field and cast as integer.
   amenities:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.amenities
     description: |
       The amenities available in the house, such as pool, balcony, elevator, gym,
       among others.
-      It is provided by the original struct field "house_info".
   bathrooms:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.bathrooms
     description: |
       The number of bathrooms in the house.
-      It is extracted from the house_info struct field and cast as integer.
   bedrooms:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.bedrooms
     description: |
       The number of bedrooms in the house.
-      It is extracted from the house_info struct field and cast as integer.
   floors:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.floors
     description: |
       The floor number where the house is located.
-      It is extracted from the house_info struct field and cast as integer.
   parking_spaces:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.parking_spaces
     description: |
       The number of parking spaces available for the house.
-      It is extracted from the house_info struct field and cast as integer.
   suites:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.suites
     description: |
       The number of suites in the house.
-      It is extracted from the house_info struct field and cast as integer.
   unit_type:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.unit_type
     description: |
       The type of the housing unit (e.g., apartment, house, etc.).
-      It is provided by the original struct field "house_info, and it can
-      assume null values.
     categories:
       ALLOTMENT_LAND: "Undivided land that can be subdivided for development purposes"
       APARTMENT: "Individual residential unit within a multi-story building or complex"
@@ -180,113 +158,79 @@ columns:
       VILLAGE_HOUSE: "Residential property located in a small community or village setting"
   usage_type:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.usage_type
     description: |
       The intended usage type of the property (e.g., residential, commercial).
-      It is provided by the original struct field "house_info", and it can
-      assume null values.
     categories:
       COMMERCIAL: "Property designated for business or commercial use"
       RESIDENTIAL: "Property designated for residential use"
   advertiser_name:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_name
     description: |
       The name of the advertiser/agent responsible for the listing.
-      It is provided by the original struct field "contact_information".
   advertiser_phone:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_phone
     description: |
       The phone number of the advertiser/agent responsible for the listing.
-      It is provided by the original struct field "contact_information".
   condo_fee:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+      - datalake_crawler_zap_imoveis.zap_imoveis.condo_fee
     description: |
       The condominium fee for the property.
-      It is extracted from the price struct field, considering both rent and sale scenarios,
-      and cast as double.
   iptu:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+      - datalake_crawler_zap_imoveis.zap_imoveis.iptu
     description: |
       The yearly IPTU (property tax) for the house.
-      It is extracted from the price struct field, considering both rent and sale scenarios,
-      and cast as double.
   price_rental:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+      - datalake_crawler_zap_imoveis.zap_imoveis.price_rental
     description: |
       The rental price of the property.
-      It is extracted from the price.rent.price field and cast as double.
   price_sale:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
+      - datalake_crawler_zap_imoveis.zap_imoveis.price_sale
     description: |
       The sale price of the property.
-      It is extracted from the price.sale.price field and cast as double.
   price_m2_rental:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.price_m2_rental
     description: |
       The rental price per square meter.
       It is calculated by dividing the rental price by the total area,
       rounded to 2 decimal places.
   price_m2_sale:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.price
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.house_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.price_m2_sale
     description: |
       The sale price per square meter.
       It is calculated by dividing the sale price by the total area,
       rounded to 2 decimal places.
   is_for_rent:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.type
+      - datalake_crawler_zap_imoveis.zap_imoveis.is_for_rent
     description: |
       Boolean flag indicating if the property is available for rent.
-      It is extracted from the type.rentable field and cast as boolean.
   is_for_sale:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.type
+      - datalake_crawler_zap_imoveis.zap_imoveis.is_for_sale
     description: |
       Boolean flag indicating if the property is available for sale.
-      It is extracted from the type.buyable field and cast as boolean.
   is_hybrid:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.type
+      - datalake_crawler_zap_imoveis.zap_imoveis.is_hybrid
     description: |
       Boolean flag indicating if the property is available for both rent and sale.
       It is true when both type.rentable and type.buyable are true, false otherwise.
   ts_created:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.date_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.ts_created
     description: |
       The timestamp when the listing was created.
-      It is provided by the original struct field "date_info".
   ts_updated:
     lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.date_info
+      - datalake_crawler_zap_imoveis.zap_imoveis.ts_updated
     description: |
       The timestamp when the listing was last updated.
-      It is provided by the original struct field "date_info".
-  year:
-    lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.year
-    description: |
-      The year of the crawler date.
-      It is used for data partitioning and filtering purposes.
-  month:
-    lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.month
-    description: |
-      The month of the crawler date.
-      It is used for data partitioning and filtering purposes.
-  day:
-    lineage:
-      - datalake_crawler_zap_imoveis_clean.zap_imoveis.day
-    description: |
-      The day of the crawler date.
-      It is used for data partitioning and filtering purposes.

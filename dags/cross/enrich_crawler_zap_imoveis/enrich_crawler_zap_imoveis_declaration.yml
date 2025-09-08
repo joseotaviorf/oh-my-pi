@@ -8,19 +8,27 @@ dag:
       It split the original struct fields into multiple columns, and creates
       generic enriched fields for the house domain.
       It is weekly updated, every Friday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis table
-      is updated.
+      is updated. It also creates a full table, zap_imoveis_latest, with the latest data for the house.
 workflow:
   layer: enrich
   type: query_delta
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
   has_hive_sync: false
+  inner_dependencies:
+    zap_imoveis_latest:
+      - zap_imoveis
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   tables_customization:
     zap_imoveis:
-      z_order_by: [address_city]
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+      z_order_by: ["address_city"]
+    zap_imoveis_latest:
+      extraction_type: full
+      merge_on: ["id_house"]
+      when_matched_update_condition: "source.ts_updated > target.ts_updated"
+      z_order_by: ["address_city"]
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
@@ -32,4 +40,4 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    spark_version: 14.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
