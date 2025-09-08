@@ -24,12 +24,6 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-    init_scripts:
-      - s3:
-          destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_spark_3_5.sh"
-          region: ""
-    spark_env_vars:
-      SPARK_VERSION: "3.5"
 
 workflow:
   layer: raw
