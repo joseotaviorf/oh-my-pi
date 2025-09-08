@@ -29,9 +29,10 @@ WITH terminations AS (
 mediations AS (
     SELECT
         id_termination,
-        id_ticket,
+        id_mediation_ticket,
         squad,
         has_mediation_ticket,
+        has_mediation,
         has_ac_repairs,
         is_ticket_opened_via_terminator,
         dt_inspection
@@ -42,7 +43,7 @@ mediations AS (
 )
 SELECT
     t.id_termination AS sk_termination,
-    m.id_ticket AS sk_mediation_ticket,
+    m.id_mediation_ticket AS sk_mediation_ticket,
     t.team,
     t.cancellation_info,
     t.category,
@@ -60,7 +61,7 @@ SELECT
     t.decline_person,
     t.task_type,
     t.responsible_off_manager_email,
-    IF(((m.has_ac_repairs = TRUE) AND ((m.has_mediation_ticket = TRUE AND m.squad <> 'both_agreed') OR (m.has_mediation_ticket = FALSE AND m.squad IS NULL))), TRUE, FALSE) AS has_mediation,
+    m.has_mediation,
     m.has_mediation_ticket,
     m.has_ac_repairs,
     m.is_ticket_opened_via_terminator,

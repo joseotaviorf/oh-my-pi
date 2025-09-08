@@ -11,7 +11,7 @@ columns:
       - datalake_terminator.termination.id_termination
   sk_mediation_ticket:
     lineage:
-      - datalake_offboarding.mediations.id_ticket
+      - datalake_offboarding.mediations.id_mediation_ticket
     description: Mediation ticket linked to the termination, if it exists.
   team:
     description: Name of the team responsible for the termination.
@@ -86,7 +86,14 @@ columns:
       - datalake_terminator.termination.responsible_off_manager_email
     description: Email of SPOC responsible analyst.
   has_mediation:
-    description: Flag indicating whether a mediation record exists for the termination.
+    lineage:
+      - datalake_offboarding.mediations.has_mediation
+    description: |
+      Flag indicating if a mediation occurred.
+      This flag is true if the following scenarios are true:
+        - If the tenant has repairs and the type of BA is not Both Agreed
+        - If the tenant has early mediation
+        - If the tenant has unset repairs
   has_mediation_ticket:
     lineage:
       - datalake_offboarding.mediations.has_mediation_ticket
