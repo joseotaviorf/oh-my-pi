@@ -82,7 +82,6 @@ workflow:
 
     demographics_answers:
       extraction_type: incremental
-      z_order_by: ["name"]
       merge_on: ["id"]
       extra_spark_job_arguments:
         - endpoint: "demographics/answers"
