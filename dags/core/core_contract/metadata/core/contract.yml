@@ -1,0 +1,181 @@
+database_name: core_contract
+table_name: contract
+domain: For Rent
+owner: marcio.gomes@quintoandar.com.br
+description: Core model for rent contracts. One row per contract, enriched with owner info via house and house_listing_relation.
+columns:
+  sk_core_contract:
+    lineage:
+      - datalake_ebdb_test_clean.contract.id
+    description: Surrogate key of the contract, generated as a SHA2 hash from the literal 'CONTRACT' and the contract id.
+  id_contract:
+    lineage:
+      - datalake_ebdb_test_clean.contract.id
+    description: Id of the contract, which must be unique.
+  id_house:
+    lineage:
+      - datalake_ebdb_test_clean.contract.id_house
+    description: Id of the house that belongs to the contract, which may not be unique (a house can be related to different contracts).
+  id_tenant:
+    lineage:
+      - datalake_ebdb_test_clean.contract.id_user
+    description: Id of the tenant that belongs to the contract.
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
+    description: Id of the owner user related to the contract (coalesced from house and house_listing_relation).
+  id_proposal:
+    lineage:
+      - datalake_ebdb_test_clean.contract.id_proposal
+    description: Id of the proposal that belongs to the contract, which must be unique.
+  status:
+    lineage:
+      - datalake_ebdb_test_clean.contract.status
+    description: Status of the contract, directly from the Main.
+    categories:
+      Ativo: The contract is active.
+      Cancelado: The contract has been canceled.
+      Finalizado: The contract was active for a period and has been terminated.
+      Minuta: The contract is in draft.
+      PreAssinaturas: The contract is in pre signature, which means it was sent and is waiting for signatures.
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_test_clean.contract.contract_rent_model:rentalAdministrator
+    description: The rental administrator type of the contract.
+    categories:
+      OWNER: Owner is the rental administrator, which means that the contract is brokerage-only. This program is no longer active.
+      QUINTOANDAR: Default rental administrator, which is QuintoAndar.
+  paying_condo:
+    lineage:
+      - datalake_ebdb_test_clean.contract.paying_condo
+    description: Who is responsible to make the payment of the condo.
+    categories:
+      Inquilino: The tenant is responsible for making the payment of the condo.
+      Proprietario: The property owner is responsible for making the payment of the condo.
+      QuintoAndar: QuintoAndar is responsible for making the payment of the condo.
+      "null": If the responsible for making the payment of the condo is null.
+  responsible_for_condo:
+    lineage:
+      - datalake_ebdb_test_clean.contract.responsible_for_condo
+    description: Who is responsible to pay the amount of the condo.
+    categories:
+      Inquilino: The tenant is responsible for paying the condo.
+      Proprietario: The property owner is responsible for paying the condo.
+      QuintoAndar: QuintoAndar is responsible for paying the condo.
+      "null": If the responsible of paying the condo is null.
+  paying_iptu:
+    lineage:
+      - datalake_ebdb_test_clean.contract.paying_iptu
+    description: Who is responsible to make the payment of the IPTU (if the country of origin has it).
+    categories:
+      Inquilino: The tenant is responsible for making the payment of the IPTU.
+      Proprietario: The property owner is responsible for making the payment of the IPTU.
+      QuintoAndar: QuintoAndar is responsible for making the payment of the IPTU.
+      "null": If the responsible for making the payment of the IPTU is null.
+  responsible_for_iptu:
+    lineage:
+      - datalake_ebdb_test_clean.contract.responsible_for_iptu
+    description: Who is responsible to pay the amount of the IPTU (if the country of origin has it).
+    categories:
+      Inquilino: The tenant is responsible for paying the IPTU.
+      Proprietario: The property owner is responsible for paying the IPTU.
+      QuintoAndar: QuintoAndar is responsible for paying the IPTU.
+      "null": If the responsible of paying the IPTU is null.
+  signature_type:
+    lineage:
+      - datalake_ebdb_test_clean.contract.signature_type
+    description: Type of contract signature.
+    categories:
+      Eletronica: If the signature is eletronic (e.g. Docusign).
+      "null": If the signature type is null.
+  status_closing:
+    lineage:
+      - datalake_ebdb_test_clean.contract.status_closing
+    description: Closing status of the contract.
+    categories:
+      ApoliceEmitida: Policy was issued.
+      ApoliceSolicitada: Policiy was requested.
+      ChavesEntregues: Keys were handed over.
+      ContratoAssinado: Contract has been signed.
+      ContratoEnviado: Contract has been sent.
+      EntregaDeChavesAgendada: Keys' handover is scheduled.
+      PendenciaMinuta: Contract is pending in minuta (draft).
+      RedacaoContrato: Contract is being written.
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_test_clean.contract.is_relisting_enabled
+    description: Boolean indicating if the listing is enabled to relist during the early relisting.
+  rent:
+    lineage:
+      - datalake_ebdb_test_clean.contract.rent
+    description: Rent value (the currency type is related to the country of the contract).
+  iptu:
+    lineage:
+      - datalake_ebdb_test_clean.contract.iptu
+    description: Iptu price, if the country of origin has it (the currency type is also related to the country).
+  rental_guarantee_installment:
+    lineage:
+      - datalake_ebdb_test_clean.contract.rental_guarantee_installment
+    description: Rental guarantee installment number of the contract.
+  rental_guarantee_value:
+    lineage:
+      - datalake_ebdb_test_clean.contract.rental_guarantee_value
+    description: The value of the rental guarantee (the currency type is related to the country of the contract).
+  home_insurance_installment:
+    lineage:
+      - datalake_ebdb_test_clean.contract.home_insurance_installment
+    description: Installment number for paying the home insurance in the contract.
+  home_insurance_value:
+    lineage:
+      - datalake_ebdb_test_clean.contract.home_insurance_value
+    description: Value of the home insurance (the currency type is related to the country of the contract).
+  first_rent_comission_fee:
+    lineage:
+      - datalake_ebdb_test_clean.contract.fist_rent_comission_fee
+    description: The first rent comission fee (the currency type is related to the country of the contract).
+  tenant_service_fee:
+    lineage:
+      - datalake_ebdb_test_clean.contract.tenant_service_fee
+    description: Rent percentage paid monthly by the tenant as a Service Fee.
+  agent_brokerage_share:
+    lineage:
+      - datalake_ebdb_test_clean.contract.agent_brokerage_share
+    description: The monthly value splitted between QuintoAndar/Brokerage Partners (CIQ and Partner), in decimals.
+  dt_started:
+    lineage:
+      - datalake_ebdb_test_clean.contract.dt_started
+    description: Date when the contract officially begins. In practice, this value is almost always aligned with `dt_entered`, but it may serve as a pre-filled field that can be updated later.
+
+  dt_entered:
+    lineage:
+      - datalake_ebdb_test_clean.contract.dt_entered
+    description: Date specified in the contract when the tenant is expected to take possession of the property. Typically matches `dt_started` in nearly all cases (≈99.9%), but exists as a distinct field for contractual clarity.
+  dt_termination:
+    lineage:
+      - datalake_ebdb_test_clean.contract.dt_termination
+    description: Date of the contract's termination.
+  dt_contract_expected_end:
+    lineage:
+      - datalake_ebdb_test_clean.contract.ts_contract_expected_end
+    description: Date of when the contract is expected to end.
+  ts_signed:
+    lineage:
+      - datalake_ebdb_test_clean.contract.ts_signed
+    description: Timestamp of when the contract was signed.
+  ts_expected_termination:
+    lineage:
+      - datalake_ebdb_test_clean.contract.ts_expected_termination
+    description: Timestamp of when the contract termination is expected.
+  ts_minuta_approved:
+    lineage:
+      - datalake_ebdb_test_clean.contract.ts_minuta_approved
+    description: Timestamp of when the minuta (draft) was approved.
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_clean.contract.ts_created
+    description: Timestamp of when the contract was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_clean.contract.ts_updated
+    description: Timestamp of when the contract was updated.

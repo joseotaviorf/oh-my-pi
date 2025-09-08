@@ -1,6 +1,8 @@
 ---
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.core_contract:
+  - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.core_offer:
   - bietlejuice.rental_transact_fast_lane:load-clean-offer
 bietlejuice.core_visit:

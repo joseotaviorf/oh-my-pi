@@ -1,0 +1,30 @@
+dag:
+  name: core_contract
+  schedule_start_date: 2025, 9, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      This is a DAG responsible to create Contract's Core Model
+workflow:
+  type: query_delta
+  layer: core
+  default_extraction_type: full
+  tables_customization:
+    contract:
+      z_order_by: [id_house]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r-fleet.xlarge
+    node_type_id: r-fleet.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
