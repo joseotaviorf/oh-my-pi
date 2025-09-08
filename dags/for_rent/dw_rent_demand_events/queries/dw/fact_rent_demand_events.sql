@@ -8,16 +8,16 @@ WITH rent_flow_type AS (
     datalake_rent_flows.rent_flows AS rf
   JOIN
     datalake_rent_flows.rent_flows_types AS rt
-        ON rf.country_code <=> rt.country_code
-        AND rf.first_touchpoint <=> rt.first_touchpoint
-        AND rf.status <=> rt.status
-        AND rf.is_step_rejected <=> rt.is_step_rejected
-        AND rf.is_valid_rent_flow <=> rt.is_valid_rent_flow
-        AND rf.has_visit_flow <=> rt.has_visit_flow
-        AND rf.has_offer_flow <=> rt.has_offer_flow
-        AND rf.has_direct_offer_flow <=> rt.has_direct_offer_flow
-        AND rf.has_tta_flow <=> rt.has_tta_flow
-        AND IF(rf.ts_contract_signed IS NOT NULL, TRUE, FALSE) <=> rt.had_contract_signed
+        ON COALESCE(rf.country_code, -1) = COALESCE(rt.country_code, -1)
+        AND COALESCE(rf.first_touchpoint, -1) = COALESCE(rt.first_touchpoint, -1)
+        AND COALESCE(rf.status, -1) = COALESCE(rt.status, -1)
+        AND COALESCE(CAST(rf.is_step_rejected AS INTEGER), -1) = COALESCE(CAST(rt.is_step_rejected AS INTEGER), -1)
+        AND COALESCE(CAST(rf.is_valid_rent_flow AS INTEGER), -1) = COALESCE(CAST(rt.is_valid_rent_flow AS INTEGER), -1)
+        AND COALESCE(CAST(rf.has_visit_flow AS INTEGER), -1) = COALESCE(CAST(rt.has_visit_flow AS INTEGER), -1)
+        AND COALESCE(CAST(rf.has_offer_flow AS INTEGER), -1) = COALESCE(CAST(rt.has_offer_flow AS INTEGER), -1)
+        AND COALESCE(CAST(rf.has_direct_offer_flow AS INTEGER), -1) = COALESCE(CAST(rt.has_direct_offer_flow AS INTEGER), -1)
+        AND COALESCE(CAST(rf.has_tta_flow AS INTEGER), -1) = COALESCE(CAST(rt.has_tta_flow AS INTEGER), -1)
+        AND IF(rf.ts_contract_signed IS NOT NULL, TRUE, FALSE) = IF(rt.had_contract_signed IS NOT NULL, rt.had_contract_signed, FALSE)
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_rent_flow ORDER BY ts_rent_flow_event DESC) = 1
 )
