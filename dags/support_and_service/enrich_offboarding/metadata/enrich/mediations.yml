@@ -30,13 +30,24 @@ columns:
     description: Flag indicating if a mediation ticket exists for the contract.
   has_ac_repairs:
     lineage:
-      - datalake_terminator.termination.repairs_absorbed_ac
+      - datalake_terminator.termination.ts_termination_finished
       - datalake_terminator.termination.total_tentant_repair_ac
-    description: Flag indicating whether absorption of repairs occurred.
+    description: Flag indicating if the tenant had repairs in AC.
   has_mediation:
     lineage:
-      - datalake_zendesk.tickets_current.id_ticket
-    description: Flag indicating if a mediation occurred.
+      - datalake_inspections.inspection_status_change.ts_budget_approval_sent_to_owner
+      - datalake_inspections.report_approvals.approval_type
+      - datalake_inspections.report_approvals.owner_approved
+      - datalake_inspections.report_approvals.tenant_approved
+      - datalake_terminator.termination.total_tentant_repair_ac
+      - datalake_inspections.inspection_booking.has_early_mediation
+      - datalake_inspections.inspection_booking.total_unset_repairs
+    description: |
+      Flag indicating if a mediation occurred.
+      This flag is true if the following scenarios are true:
+        - If the tenant has repairs and the type of BA is not Both Agreed
+        - If the tenant has early mediation
+        - If the tenant has unset repairs
   is_ticket_opened_via_terminator:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket

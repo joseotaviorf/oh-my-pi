@@ -55,6 +55,14 @@ inspection as (
   QUALIFY
       ROW_NUMBER() OVER(PARTITION BY ib.id_contract ORDER BY ib.ts_updated DESC) = 1
 ),
+unset_repairs AS (
+  SELECT
+    rr.id_contract,
+    COUNT_IF(rr.responsibility IN ('UNSET', 'UNDEFINED') AND rr.comment IS NOT NULL) AS total_unset_repairs
+  FROM
+    datalake_inspections.repair_request AS rr
+  GROUP BY ALL
+),
 terminations AS (
   SELECT
     t.id_termination,
@@ -63,6 +71,7 @@ terminations AS (
     c.rent,
     t.repairs_absorbed_ac,
     t.total_tentant_repair_ac,
+    ur.total_unset_repairs,
     tc.is_pro_owner,
     CASE
       WHEN DATE(ib.ts_synced - INTERVAL 3 HOUR) > DATE(t.ts_termination_request) THEN DATE(ib.ts_synced - INTERVAL 3 HOUR)
@@ -81,6 +90,9 @@ terminations AS (
   LEFT JOIN
     datalake_inspections.inspection_booking AS ib
       ON t.id_contract = ib.id_contract
+  LEFT JOIN
+    unset_repairs AS ur
+      ON t.id_contract = ur.id_contract
   LEFT JOIN
     inspection AS i
       ON t.id_contract = i.id_contract
@@ -169,18 +181,26 @@ mediation_via_zendesk AS (
     ROW_NUMBER() OVER(PARTITION BY tc.id_contract ORDER BY tc.ts_created DESC) = 1
 )
 
-SELECT DISTINCT
+SELECT
   t.id_termination,
   t.id_contract,
   COALESCE(mtr.id_ticket, STRING(mtk.id_ticket)) AS id_mediation_ticket,
   COALESCE(mtr.squad, mtk.squad) AS squad,
-  COALESCE(mtr.id_ticket, STRING(mtk.id_ticket)) IS NOT NULL AS has_mediation_ticket,
   CASE
     WHEN t.ts_termination_finished IS NULL THEN NULL
     WHEN t.total_tentant_repair_ac > 0 THEN TRUE
     ELSE FALSE
   END has_ac_repairs,
-  IF(COALESCE(mtr.id_ticket, STRING(mtk.id_ticket)) IS NOT NULL, TRUE, FALSE) has_mediation,
+  t.total_unset_repairs > 0 AS has_unset_repairs,
+  i.has_early_mediation,
+  i.is_early_both_agree,
+  COALESCE(mtr.id_ticket, STRING(mtk.id_ticket)) IS NOT NULL AS has_mediation_ticket,
+  IF(
+    (t.total_tentant_repair_ac > 0 AND i.type_ba != 'Both Agreed')
+    OR i.has_early_mediation
+    OR t.total_unset_repairs > 0
+    , TRUE, FALSE
+  ) AS has_mediation,
   mtr.id_ticket IS NOT NULL AS is_ticket_opened_via_terminator,
   t.dt_inspection,
   t.ts_termination_request,
@@ -193,3 +213,6 @@ LEFT JOIN
 LEFT JOIN
   mediation_via_zendesk AS mtk
     ON t.id_contract = mtk.id_contract
+LEFT JOIN
+  inspection AS i
+    ON t.id_contract = i.id_contract

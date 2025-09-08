@@ -2667,6 +2667,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspection-status-change:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-report-approvals:first-run-of-day
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
