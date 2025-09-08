@@ -2664,6 +2664,8 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-inspection-status-change:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-report-approvals:first-run-of-day
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.enrich_terminator:load-enrich-termination:first-run-of-day
@@ -2680,6 +2682,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-negotiation:first-run-of-day
   - bietlejuice.terminator:load-clean-rev-info:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-aud:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-fee-negotiation:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-fee:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-task:first-run-of-day
