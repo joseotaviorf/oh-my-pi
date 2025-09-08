@@ -52,6 +52,7 @@ if __name__ == "__main__":
     parser.add_argument("load_start_date", help="execution date in str format")
     parser.add_argument("load_end_date", help="end execution date in str format")
     parser.add_argument("endpoint_name", help="endpoint to call the API")
+    parser.add_argument("partitions", help="Partition columns name")
 
     args = parser.parse_args()
 

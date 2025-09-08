@@ -1,5 +1,6 @@
 import json
 import logging
+import ast
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -36,25 +37,31 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the API")
     parser.add_argument("load_start_date", help="start execution date in str format")
     parser.add_argument("load_end_date", help="end execution date in str format")
-    parser.add_argument("endpoint_name", help="endpoint to call the API")
+    parser.add_argument("table_name")
+    parser.add_argument("partitions", help="Partition columns name")
     parser.add_argument("endpoint_params", help="")
 
     args = parser.parse_args()
 
+    environment = args.environment
+    datalake_bucket = args.datalake_bucket
+    source = args.source
+    table_name = args.table_name
+    partitions = ast.literal_eval(args.partitions)
     endpoint_params = json.loads(args.endpoint_params)
-    endpoint_enum = endpoint_params.get("endpoint_enum")
-    jql_query_filter = endpoint_params.get("jql_query_filter")
-
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
+    
+    endpoint_enum = endpoint_params.get("endpoint_enum")
 
     dt_start_execution = datetime.strptime(load_start_date, "%Y-%m-%d").date()
     dt_end_execution = datetime.strptime(load_end_date, "%Y-%m-%d").date()
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, load_start_date={args.load_start_date},
-            load_end_date={args.load_end_date}, datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, 
+            m={JOB_NAME}, environment={args.environment}, datalake_bucket={args.datalake_bucket}, source={args.source}, 
+            table_name={args.table_name}, partitions={args.partitions}, endpoint_params={args.endpoint_params},
+            load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, 
             msg=print spark jobs args"
         """
     )
@@ -66,17 +73,7 @@ if __name__ == "__main__":
     json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.JIRA)
     credentials = json.loads(json_credentials)
 
-    startTime = int(
-        datetime.combine(dt_start_execution, datetime.min.time()).timestamp()
-    )
-    endTime = int(
-        datetime.combine(dt_end_execution, datetime.max.time()).timestamp()
-    )
-
-    jql_query_filter = (
-        jql_query_filter + f" AND created >= {startTime} AND created <= {endTime}"
-    )
-
+    jql_query_filter = f'created >= "{dt_start_execution} 00:00" and created <= "{dt_end_execution} 23:59"'
 
     params = {
         'jql': jql_query_filter,
@@ -96,8 +93,10 @@ if __name__ == "__main__":
     if not api_response:
         logger.warn(
             f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, load_start_date={args.load_start_date},
-            load_end_date={args.load_end_date}, datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, 
+            m={JOB_NAME}, environment={args.environment}, source={args.source}, 
+            load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, 
+            datalake_bucket={args.datalake_bucket}, table_name={args.table_name}, 
+            params={params}, endpoint_enum={endpoint_enum}, 
             msg=result is empty"
         """
         )
@@ -109,13 +108,13 @@ if __name__ == "__main__":
         df = (
             SparkDataFrameService()
             .input(df)
-            .create_year_month_day_columns_from_date(dt_execution)
+            .create_year_month_day_columns_from_date(dt_end_execution)
             .optimize_partition(200000)
             .output()
         )
 
         datalake_info = DatalakeMetastoreService.get_db_info(
-            args.environment, args.source, args.datalake_bucket
+            environment, source, datalake_bucket
         )
         spark_metastore_service = SparkMetastoreService(spark_client)
         database_name = datalake_info["db_raw_databricks"]
@@ -123,13 +122,8 @@ if __name__ == "__main__":
 
         database_location = datalake_info["db_raw_path"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
-        table_name = (
-            args.endpoint_name
-        )  # the table will have the same name as the endpoint
-
+        
         # loaders
-        partition_cols = ["year", "month", "day"]
-
         s3_loader = S3Loader()
         s3_loader.load_incremental_table(
             df=df,
@@ -137,7 +131,7 @@ if __name__ == "__main__":
             table_name=table_name,
             format_options=format_options,
             database_location=database_location,
-            partition_cols=partition_cols,
+            partition_cols=partitions,
         )
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -147,13 +141,13 @@ if __name__ == "__main__":
             table_name,
             format_options,
             database_location,
-            partition_cols,
+            partitions,
             force_recreate=False,
         )
         spark_metastore_service.create_new_partitions_from_df(
             database_name=database_name,
             table_name=table_name,
             df=df,
-            partition_cols=partition_cols,
+            partition_cols=partitions,
         )
         spark_metastore_service.refresh_table(database_name, table_name)
