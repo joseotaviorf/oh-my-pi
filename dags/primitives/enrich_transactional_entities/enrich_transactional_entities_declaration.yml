@@ -8,12 +8,25 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_extraction_type: full
+  default_extraction_type: incremental
   extra_query_template_params:
     sk_entity: "SHA2(CONCAT_WS('||', entity, id_entity, persona, id_user), 256)"
     house_address: "CONCAT(h.address, ', ', h.number, ' - ', h.complement, '. ', h.neighborhood, ', ', h.city)"
   tables_customization:
     entities:
+      merge_on: [sk_entity]
+      when_matched_update_condition: |
+        source.ts_updated > target.ts_updated OR
+        source.id_entity <> target.id_entity OR
+        source.id_house <> target.id_house OR
+        source.id_contract <> target.id_contract OR 
+        source.id_user <> target.id_user OR
+        source.uuid_person <> target.uuid_person OR
+        source.entity <> target.entity OR
+        source.persona <> target.persona OR
+        source.house_address <> target.house_address OR
+        source.is_active <> target.is_active OR
+        source.ts_created <> target.ts_created
       z_order_by: [id_user, id_house, persona]
       table_properties:
         "delta.enableChangeDataFeed": "true"
