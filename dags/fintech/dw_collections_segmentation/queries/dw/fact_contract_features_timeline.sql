@@ -306,11 +306,11 @@ prob_payment_calculation AS (
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_promessas_lifetime <= 1.5 THEN 'ALTA'
+                AND f.acc_broken_promessas_lifetime <= 1.5 THEN 'MEDIA'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'BAIXA'
+                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'MEDIA'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 > 20 THEN 'BAIXA'
@@ -419,6 +419,13 @@ segmentation_features AS (
                 AND p.prob_payment = 'ALTA'
                 AND p.max_delay_contaminated_contract_t2 > 19
                 AND p.max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-high'
+            WHEN p.reference_contract_status = 'Ativo'
+                AND p.prob_payment = 'MEDIA'
+                AND p.max_delay_contaminated_contract_t2 <= 19 THEN 'active-new-defaulter-early-medium'
+            WHEN p.reference_contract_status = 'Ativo'
+                AND p.prob_payment = 'MEDIA'
+                AND p.max_delay_contaminated_contract_t2 > 19
+                AND p.max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-medium'
             WHEN p.reference_contract_status = 'Ativo'
                 AND p.prob_payment = 'BAIXA'
                 AND p.max_delay_contaminated_contract_t2 <= 4 THEN 'active-new-defaulter-early-low'
