@@ -394,9 +394,6 @@ bietlejuice.enrich_house_feature_inference:
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
     - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
     - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
-bietlejuice.enrich_jira:
-  remove:
-    - bietlejuice.jira:load-clean-issues:first-run-of-day
 bietlejuice.enrich_lead:
   remove:
     - bietlejuice.ebdb:load-clean-ownerlead:first-run-of-day
@@ -475,9 +472,6 @@ bietlejuice.enrich_open_external_data_addresses:
     - bietlejuice.iptu_sp:load-clean-iptu-sp:first-run-of-day
     - bietlejuice.itbi_sp:load-clean-itbi-sp:first-run-of-day
     - bietlejuice.itbi_bh:load-clean-itbi-bh:first-run-of-day
-bietlejuice.enrich_opsgenie:
-  remove:
-    - bietlejuice.enrich_jira:load-enrich-issues:first-run-of-day
 bietlejuice.enrich_pipeline:
   # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
   # our intention to run this DAG the same amount of times.
