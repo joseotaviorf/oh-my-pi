@@ -7,10 +7,15 @@ description: A table containing all transactional entities, providing a comprehe
 columns:
   sk_entity:
     lineage:
-      - core_visit.visit.sk_core_visit
-      - core_offer.offer.sk_core_offer
+      - core_visit.visit.id_visit
+      - core_offer.offer.id_offer
+      - core_visit.visit.id_agent
+      - core_visit.visit.id_visitor
+      - core_visit.visit.id_owner
+      - core_offer.offer.id_tenant
+      - core_offer.offer.id_owner
     description: Surrogate key of all transactional entities.
-      It's made by concatenating "<entity>||<id_entity>" and then applying the SHA256 hash.
+      It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique. 
   id_entity:
     lineage:

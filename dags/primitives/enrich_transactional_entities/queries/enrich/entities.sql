@@ -1,7 +1,6 @@
 WITH visit AS (
     WITH visit_base AS (
         SELECT
-            sk_core_visit AS sk_entity,
             id_visit AS id_entity,
             id_house,
             id_owner,
@@ -22,7 +21,6 @@ WITH visit AS (
             core_visit.visit
     )
     SELECT
-        sk_entity,
         id_entity,
         id_house,
         id_owner AS id_user,
@@ -35,7 +33,6 @@ WITH visit AS (
         visit_base
     UNION ALL
     SELECT
-        sk_entity,
         id_entity,
         id_house,
         id_visitor AS id_user,
@@ -51,7 +48,6 @@ WITH visit AS (
         visit_base
     UNION ALL
     SELECT
-        sk_entity,
         id_entity,
         id_house,
         id_agent AS id_user,
@@ -62,11 +58,12 @@ WITH visit AS (
         ts_updated
     FROM
         visit_base
+    WHERE
+        id_agent IS NOT NULL
 ),
 offer AS (
     WITH offer_base AS (
         SELECT
-            sk_core_offer AS sk_entity,
             id_offer AS id_entity,
             id_house,
             id_tenant,
@@ -83,7 +80,6 @@ offer AS (
             core_offer.offer
     )
     SELECT
-        sk_entity,
         id_entity,
         id_house,
         id_tenant AS id_user,
@@ -96,7 +92,6 @@ offer AS (
         offer_base
     UNION ALL
     SELECT
-        sk_entity,
         id_entity,
         id_house,
         id_owner AS id_user,
@@ -110,7 +105,7 @@ offer AS (
 ),
 base AS (
     SELECT
-        sk_entity,
+        {sk_entity} AS sk_entity,
         id_entity,
         id_house,
         CAST(NULL AS BIGINT) AS id_contract,
@@ -124,7 +119,7 @@ base AS (
         visit
     UNION ALL
     SELECT
-        sk_entity,
+        {sk_entity} AS sk_entity,
         id_entity,
         id_house,
         CAST(NULL AS BIGINT) AS id_contract,

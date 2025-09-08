@@ -10,6 +10,7 @@ workflow:
   layer: enrich
   default_extraction_type: full
   extra_query_template_params:
+    sk_entity: "SHA2(CONCAT_WS('||', entity, id_entity, persona, id_user), 256)"
     house_address: "CONCAT(h.address, ', ', h.number, ' - ', h.complement, '. ', h.neighborhood, ', ', h.city)"
   tables_customization:
     entities:
