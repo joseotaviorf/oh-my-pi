@@ -11,15 +11,18 @@ logger = QuintoAndarLogger("schema_changes_alert")
 class SchemaChangesNotifier:
     @staticmethod
     def alert_schema_changes(
-        table_name: str, new_df: DataFrame, webhook_url: str
+        table_name: str,
+        new_df: DataFrame,
+        webhook_url: str,
+        spark=BaseSparkContext.spark,
     ) -> None:
         """
         Send alert through a webhook  when the schema of a table changes
         """
-        if not BaseSparkContext.spark.catalog.tableExists(table_name):
+        if not spark.catalog.tableExists(table_name):
             return
 
-        existing_df = BaseSparkContext.spark.table(table_name)
+        existing_df = spark.table(table_name)
         if set(new_df.columns) != set(existing_df.columns):
             logger.info(
                 f"m=alert_schema_changes, table_name={table_name}, msg=Schema of table has changed. Sending alert..."

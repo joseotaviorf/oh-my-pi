@@ -311,6 +311,7 @@ def main():
         dbutils.secrets.get(
             scope="quintoandar", key=GchatWebhooksEnum.GCHAT_SCHEMA_CHANGES
         ),
+        spark=spark,
     )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")

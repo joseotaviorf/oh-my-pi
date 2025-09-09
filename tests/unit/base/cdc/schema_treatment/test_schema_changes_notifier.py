@@ -77,7 +77,9 @@ class TestSchemaChangesNotifier(unittest.TestCase):
         mock_spark_table_property_helper.get_property.return_value = None
 
         # act
-        SchemaChangesNotifier.alert_schema_changes(table_name, new_df_mock, webhook_key)
+        SchemaChangesNotifier.alert_schema_changes(
+            table_name, new_df_mock, webhook_key, mock_base_spark_context.spark
+        )
 
         # assert
         expected_message = Message(
@@ -116,7 +118,9 @@ class TestSchemaChangesNotifier(unittest.TestCase):
         mock_spark_table_property_helper.get_property.return_value = "column3"
 
         # act
-        SchemaChangesNotifier.alert_schema_changes(table_name, new_df_mock, webhook_key)
+        SchemaChangesNotifier.alert_schema_changes(
+            table_name, new_df_mock, webhook_key, mock_base_spark_context.spark
+        )
 
         # assert
         expected_message = Message(
