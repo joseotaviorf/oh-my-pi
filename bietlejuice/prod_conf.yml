@@ -78,6 +78,8 @@ metrics_bucket: 5a-business-metrics-com-br-prod
 datahub_host: https://datahub.apps.data-prd.habitat.zone
 spectrum_iam_role: arn:aws:iam::206390561754:role/SpectrumCrossAccount
 spark_jobs_logs_path: s3://5a-databricks/logs/jobs/
+volume_databricks_bucket: /Volumes/quintoandar_prod/default/5a-databricks/
+databricks_default_service_credential_name: databricks_default_service_credential_prod
 default_libraries:
     [
         {

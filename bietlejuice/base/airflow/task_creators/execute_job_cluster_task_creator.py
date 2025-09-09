@@ -144,6 +144,20 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
         except KeyError as exc:
             raise ValueError(f"Invalid Spark version: {spark_version}") from exc
 
+    def __input_databricks_default_service_credential_name(
+        self, cluster_configuration: dict
+    ) -> dict:
+        dbr_version = cluster_configuration["spark_version"]
+        data_security_mode = cluster_configuration["data_security_mode"]
+
+        if data_security_mode == "USER_ISOLATION" and dbr_version >= "16.4":
+            cluster_configuration["spark_env_vars"][
+                "DATABRICKS_DEFAULT_SERVICE_CREDENTIAL_NAME"
+            ] = self.config_service.get_config(
+                "databricks_default_service_credential_name"
+            )
+        return cluster_configuration
+
     def __input_spark_env_vars(self, cluster_configuration: dict) -> dict:
         cluster_configuration["spark_env_vars"][
             "SPARK_VERSION"
@@ -157,5 +171,8 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             "DEEQU_JAR_VERSION"
         ] = self.__input_deequ_version(
             cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
+        )
+        cluster_configuration = self.__input_databricks_default_service_credential_name(
+            cluster_configuration
         )
         return cluster_configuration

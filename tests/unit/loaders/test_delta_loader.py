@@ -77,7 +77,9 @@ class TestDeltaLoader:
         path = "test_path"
         partition_by = ["column1", "column2"]
         mock_spark_context.spark.catalog.tableExists.return_value = False
-
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
 
         delta_loader.load_table(table_name, path, mock_source_df, partition_by)
@@ -131,7 +133,9 @@ class TestDeltaLoader:
     ):
         table_name = "test_table"
         mock_spark_context.spark.catalog.tableExists.return_value = True
-        mock_delta_table.isDeltaTable.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
 
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(table_name, None, mock_source_df)
@@ -147,7 +151,9 @@ class TestDeltaLoader:
     ):
         table_name = "test_table"
         mock_spark_context.spark.catalog.tableExists.return_value = True
-        mock_delta_table.isDeltaTable.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
         expected_error = Py4JJavaError("File not found", mock.MagicMock())
         expected_error.java_exception.getClass().getName.return_value = (
             "java.io.FileNotFoundException"
@@ -176,7 +182,9 @@ class TestDeltaLoader:
     ):
         table_name = "test_table"
         mock_spark_context.spark.catalog.tableExists.return_value = True
-        mock_delta_table.isDeltaTable.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
         mock_analysis_exception_class.return_value = "DELTA_TABLE_NOT_FOUND"
         mock_spark_context.spark.sql.side_effect = [
             mock.MagicMock(),
@@ -202,7 +210,9 @@ class TestDeltaLoader:
     ):
         table_name = "test_table"
         mock_spark_context.spark.catalog.tableExists.return_value = True
-        mock_delta_table.isDeltaTable.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
         mock_analysis_exception_class.return_value = (
             "DELTA_CONVERSION_NO_PARTITION_FOUND"
         )
@@ -221,14 +231,12 @@ class TestDeltaLoader:
         mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
         delta_table_builder_mock.execute.assert_called_once()
 
-    def test_write_to_table(self, mock_spark_context, mock_source_df):
+    def test_write_to_table(self, mock_spark_context, mock_source_df, mock_delta_table):
         table_name = "test_table"
         path = "test_path"
         partition_by = ["column1", "column2"]
         merge_schema = True
-
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
-
         delta_loader.load_table(
             table_name, path, mock_source_df, partition_by, merge_schema
         )
@@ -238,7 +246,7 @@ class TestDeltaLoader:
         mock_source_df.write.option.assert_any_call("overwriteSchema", False)
         mock_source_df.write.mode.assert_called_once_with("overwrite")
         mock_source_df.write.saveAsTable.assert_called_once_with(
-            table_name, path=path, partitionBy=partition_by
+            table_name, partitionBy=partition_by
         )
 
     def test_merge_to_table_without_delete(
@@ -270,8 +278,11 @@ class TestDeltaLoader:
             mock_source_df.alias("source"),
             "source.column1 = target.column1 AND source.column2 = target.column2",
         )
-        mock_delta_table.forName.assert_called_once_with(
-            mock_spark_context.spark, table_name
+        mock_delta_table.forName.assert_has_calls(
+            [
+                mock.call(mock_spark_context.spark, table_name),
+                mock.call(mock_spark_context.spark, table_name),
+            ]
         )
         merge_builder_mock.whenNotMatchedInsertAll.assert_called_once_with(
             condition=when_not_matched_insert_condition
@@ -313,8 +324,11 @@ class TestDeltaLoader:
             mock_source_df.alias("source"),
             "source.column1 = target.column1 AND source.column2 = target.column2",
         )
-        mock_delta_table.forName.assert_called_once_with(
-            mock_spark_context.spark, table_name
+        mock_delta_table.forName.assert_has_calls(
+            [
+                mock.call(mock_spark_context.spark, table_name),
+                mock.call(mock_spark_context.spark, table_name),
+            ]
         )
         merge_builder_mock.whenNotMatchedInsertAll.assert_called_once_with(
             condition=when_not_matched_insert_condition

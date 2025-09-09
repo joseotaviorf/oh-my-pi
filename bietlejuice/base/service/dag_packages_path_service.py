@@ -1,6 +1,7 @@
 import re
 from glob import glob
 from os import path, scandir
+import boto3
 
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
@@ -80,32 +81,85 @@ class DAGPackagesPathService:
             )
 
     @staticmethod
-    def _read_dag_package_file_from_s3(sql_file_relative_path: str):
+    def _copy_file_from_s3_pyspark(bucket: str, sql_file_key: str):
+        """
+        Open a file from the s3
+
+        * Method used only in Spark *
+        * Not available with Databricks Shared Cluster *
+
+        :param bucket: s3 bucket name
+        :param sql_file_key: relative file path
+        :return: file content
+        """
+
+        from pyspark import SparkFiles
+        from bietlejuice.base.spark import sc
+
+        sc.addFile(f"s3a://{bucket}/{sql_file_key}")
+        with open(
+            SparkFiles.get(sql_file_key.split("/")[-1]), mode="r", encoding="utf-8"
+        ) as s3_file:
+            return s3_file.read()
+
+    @staticmethod
+    def _copy_file_from_s3_databricks_volume(volume: str, sql_file_key: str):
+        """
+        Open a file from the databricks volume
+
+        * Method used only in Databricks *
+
+        :param volume: databricks volume path
+        :param sql_file_key: relative file path
+        :return: file content
+        """
+
+        with open(f"{volume}/{sql_file_key}", "r", encoding="utf-8") as f:
+            query = f.read()
+        return query
+
+    @staticmethod
+    def _read_file_from_s3_boto3(bucket: str, sql_file_key: str):
+        """
+        Read a file from the s3
+        """
+        s3 = boto3.resource("s3")
+        return s3.Object(bucket, sql_file_key).get()["Body"].read().decode("utf-8")
+
+    @staticmethod
+    def _read_dag_package_file_from_s3(
+        sql_file_relative_path: str, engine: str = "spark"
+    ):
         """
         Read the DAG Package's file stored in S3 based on the relative file path.
 
         * Method used only in Databricks *
 
+        :param sql_file_relative_path: relative file path
+        :param engine: engine to read the file from. Options: "spark" or "databricks_volume"
+
         :return: file content.
         """
-        from pyspark import SparkFiles
-        from bietlejuice.base.spark import sc
 
         global_confs = HierarchicalConf([BIETLEJUICE_PROJECT_ROOT])
         dags_packages_files_prefix = global_confs.get_config(
             "dags_packages_files_path_in_s3"
         )
-
         sql_file_key = path.join(dags_packages_files_prefix, sql_file_relative_path)
-        sc.addFile(
-            "s3a://{}/{}".format(
-                global_confs.get_config("databricks_bucket"), sql_file_key
-            )
-        )
-        with open(SparkFiles.get(sql_file_relative_path.split("/")[-1])) as s3_file:
-            query = s3_file.read()
+        bucket = global_confs.get_config("databricks_bucket")
+        volume = global_confs.get_config("volume_databricks_bucket")
 
-        return query
+        if engine == "spark":
+            return DAGPackagesPathService._copy_file_from_s3_pyspark(
+                bucket, sql_file_key
+            )
+        if engine == "databricks_volume":
+            return DAGPackagesPathService._copy_file_from_s3_databricks_volume(
+                volume, sql_file_key
+            )
+        if engine == "boto3":
+            return DAGPackagesPathService._read_file_from_s3_boto3(bucket, sql_file_key)
+        raise ValueError(f"Invalid s3 reader engine: {engine}")
 
     @staticmethod
     def _transform_into_intermediate_path(dag_name: str) -> str:
@@ -169,7 +223,11 @@ class DAGPackagesPathService:
 
     @staticmethod
     def get_query_file_content_in_spark_jobs(
-        dag_name: str, table_name: str, layer: str = "", intermediate_path: str = ""
+        dag_name: str,
+        table_name: str,
+        layer: str = "",
+        intermediate_path: str = "",
+        engine: str = "spark",
     ):
         """
         Opens the SQL file according to the place it is stored (if it is in
@@ -181,6 +239,7 @@ class DAGPackagesPathService:
         :param table_name: the name of the table that the file is related to
         :param layer: the layer that the file is related to.
         :param intermediate_path: off intermediate path structure used in some DAGs
+        :param engine: engine to read the file from. Options: "spark", "boto3" or "databricks_volume"
         :return: query content (the SQL)
         """
         intermediate_path = intermediate_path if intermediate_path is not None else ""
@@ -188,7 +247,7 @@ class DAGPackagesPathService:
             "queries", dag_name, layer, intermediate_path, f"{table_name}.sql"
         )
         query_content = DAGPackagesPathService._read_dag_package_file_from_s3(
-            sql_file_relative_path=sql_file_relative_path
+            sql_file_relative_path=sql_file_relative_path, engine=engine
         )
 
         if not query_content:

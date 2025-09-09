@@ -119,6 +119,7 @@ def main():
         dag_name=dag_name,
         layer="clean",
         table_name=table_name,
+        engine="boto3"
     )
 
     cdc_columns = ["op_cdc", "ts_cdc_transaction", "ts_database_transaction"]

@@ -53,7 +53,12 @@ class DeltaLoader:
         self.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
         exists = self.spark.catalog.tableExists(table_name)
-        is_delta = DeltaTable.isDeltaTable(self.spark, path)
+        try:
+            DeltaTable.forName(self.spark, table_name)
+            is_delta = True
+        except AnalysisException:
+            is_delta = False
+
         if exists and not is_delta:
             logger.info(f"Path {path} is not a Delta Table. Running conversion.")
             self._convert_to_delta_table(table_name)
@@ -67,9 +72,7 @@ class DeltaLoader:
 
         if not merge_on:
             logger.info(f"Writing to table {table_name} on path {path}.")
-            self._write_to_table(
-                table_name, path, source_df, partition_by, merge_schema
-            )
+            self._write_to_table(table_name, source_df, partition_by, merge_schema)
         else:
             logger.info(f"Merging to table {table_name}.")
             self._merge_to_table(
@@ -143,7 +146,6 @@ class DeltaLoader:
     def _write_to_table(
         self,
         table_name: str,
-        path: str,
         source_df: DataFrame,
         partition_by: list = None,
         merge_schema: bool = True,
@@ -151,7 +153,7 @@ class DeltaLoader:
         """Write a DataFrame to a Delta table"""
         source_df.write.format("delta").option("mergeSchema", merge_schema).option(
             "overwriteSchema", not merge_schema
-        ).mode("overwrite").saveAsTable(table_name, path=path, partitionBy=partition_by)
+        ).mode("overwrite").saveAsTable(table_name, partitionBy=partition_by)
 
     def _merge_to_table(
         self,

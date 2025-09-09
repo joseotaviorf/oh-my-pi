@@ -49,6 +49,7 @@ def main():
         dag_name=args.relative_query_path,
         layer=args.layer,
         table_name=args.table_name,
+        engine="boto3"
     )
 
     if table_privileges_dict is not None:
