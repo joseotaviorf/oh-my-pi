@@ -7,6 +7,8 @@ description: A table containing all transactional entities, providing a comprehe
 columns:
   sk_entity:
     lineage:
+      - core_contract.contract.id_owner
+      - core_contract.contract.id_tenant
       - core_visit.visit.id_visit
       - core_offer.offer.id_offer
       - core_visit.visit.id_agent
@@ -21,14 +23,18 @@ columns:
     lineage:
       - core_visit.visit.id_visit
       - core_offer.offer.id_offer
+      - core_contract.contract.id_contract
     description: The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
   id_house:
     lineage:
       - core_visit.visit.id_house
       - core_offer.offer.id_house
+      - core_contract.contract.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
+    lineage:
+      - core_contract.contract.id_contract
     description: Contract id related to the entity, if it has any.
       It's the id of the Contrato/Contract table, from Main's database (EBDB).
   id_user:
@@ -38,6 +44,8 @@ columns:
       - core_visit.visit.id_visitor
       - core_offer.offer.id_tenant
       - core_offer.offer.id_owner
+      - core_contract.contract.id_owner
+      - core_contract.contract.id_tenant
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -79,11 +87,13 @@ columns:
     lineage:
       - core_visit.visit.ts_created
       - core_offer.offer.ts_created
+      - core_contract.contract.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
       - core_visit.visit.ts_updated
       - core_offer.offer.ts_updated
+      - core_contract.contract.ts_updated
     description: Last timestamp of when the entity was updated in our product.
   ts_load:
     description: Timestamp of when the entity was updated and loaded for the last time in this table.

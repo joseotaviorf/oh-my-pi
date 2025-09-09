@@ -309,10 +309,13 @@ bietlejuice.core_visit:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
 bietlejuice.core_contract:
+  add:
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract
   remove:
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_listing:load-clean-house-listing-relation:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:
@@ -734,11 +737,13 @@ bietlejuice.enrich_transactional_entities:
   add:
     - bietlejuice.core_offer:load-core-offer
     - bietlejuice.core_visit:load-core-visit
+    - bietlejuice.core_contract:load-core-contract
   remove:
     - bietlejuice.core_offer:load-core-offer:first-run-of-day
     - bietlejuice.core_visit:load-core-visit:first-run-of-day
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.core_contract:load-core-contract:first-run-of-day
 bietlejuice.dw_quintocred_ifrs:
   remove:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows:first-run-of-day

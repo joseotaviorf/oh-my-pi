@@ -2,7 +2,7 @@
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.core_contract:
-  - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
+  - bietlejuice.ebdb_contract_fast_lane:load-clean-contract
 bietlejuice.core_offer:
   - bietlejuice.rental_transact_fast_lane:load-clean-offer
 bietlejuice.core_visit:
@@ -3652,6 +3652,7 @@ bietlejuice.enrich_tracksale_dispatches:
   - bietlejuice.gsheets_for_rent:done-clean-nps-offboarding-contracts-dispatched:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
 bietlejuice.enrich_transactional_entities:
+  - bietlejuice.core_contract:load-core-contract
   - bietlejuice.core_offer:load-core-offer
   - bietlejuice.core_visit:load-core-visit
 bietlejuice.enrich_trino_detractor:

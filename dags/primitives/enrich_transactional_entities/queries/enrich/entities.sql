@@ -103,6 +103,55 @@ offer AS (
     FROM
         offer_base
 ),
+contract AS (
+    WITH contract_base AS (
+        SELECT
+            id_contract AS id_entity,
+            id_house,
+            id_contract,
+            id_owner,
+            id_tenant,
+            'CONTRACT' AS entity,
+            CASE
+                WHEN status IN ('Cancelado', 'Finalizado') THEN FALSE
+                WHEN status IN ('Ativo', 'Minuta', 'PreAssinaturas') THEN TRUE
+                ELSE NULL
+            END AS is_active,
+            ts_signed,
+            ts_created,
+            ts_updated
+        FROM
+            core_contract.contract
+    )
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_owner AS id_user,
+        entity,
+        'OWNER' AS persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        contract_base
+    UNION ALL
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_tenant AS id_user,
+        entity,
+        CASE
+            WHEN ts_signed IS NOT NULL THEN 'TENANT'
+            ELSE 'TENANT_PROSPECT'
+        END AS persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        contract_base
+),
 base AS (
     SELECT
         {sk_entity} AS sk_entity,
@@ -131,6 +180,20 @@ base AS (
         ts_updated
     FROM
         offer
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        contract
 )
 SELECT
     b.sk_entity,
