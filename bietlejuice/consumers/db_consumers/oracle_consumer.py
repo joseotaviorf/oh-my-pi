@@ -199,7 +199,7 @@ class OracleConsumer(DBConsumer):
             SELECT DISTINCT
                 COLUMN_NAME
             FROM
-                USER_TAB_COLUMNS
+                ALL_TAB_COLUMNS
             WHERE
                 table_name = '{table_name}'
         """
