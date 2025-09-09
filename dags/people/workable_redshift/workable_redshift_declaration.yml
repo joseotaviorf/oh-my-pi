@@ -28,7 +28,6 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-      availability: ON_DEMAND
 
 workflow:
   type: database_pull_delta
@@ -84,9 +83,7 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     custom_attributes_settings:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     departments:
       date_filter_column: updated_at
       extraction_type: incremental
@@ -140,9 +137,7 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     job_boards:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     job_locations:
       date_filter_column: updated_at
       extraction_type: incremental
