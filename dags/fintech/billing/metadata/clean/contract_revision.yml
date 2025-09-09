@@ -1,0 +1,33 @@
+database_name: datalake_billing_clean
+table_name: contract_revision
+domain: Fintech
+description: Data from the contract revision table containing contract revision details and processing information
+columns:
+  id:
+    description: Unique identifier of the contract revision record
+    lineage:
+      - datalake_billing_raw.contract_revision.id
+  id_contract:
+    description: Identifier of the related contract
+    lineage:
+      - datalake_billing_raw.contract_revision.contract_id
+  id_idempotency:
+    description: Idempotency identifier for ensuring unique processing
+    lineage:
+      - datalake_billing_raw.contract_revision.idempotency_id
+  revision:
+    description: Revision number of the contract
+    lineage:
+      - datalake_billing_raw.contract_revision.revision
+  contract_data:
+    description: Contract data content in JSON format
+    lineage:
+      - datalake_billing_raw.contract_revision.contract_data
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.contract_revision.created_at
+  ts_processed:
+    description: Record processing timestamp
+    lineage:
+      - datalake_billing_raw.contract_revision.processed_at

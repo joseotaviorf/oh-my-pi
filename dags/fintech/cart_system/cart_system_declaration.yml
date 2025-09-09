@@ -1,0 +1,22 @@
+dag:
+  name: cart_system
+  schedule_start_date: 2025, 9, 8
+  schedule_interval: 0 12 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG load tables from Cart System, the service that calculates the revenue with external partners and executives.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: CART_SYSTEM_DB
+  lineage_product_database_name: cart_system
+  tables_customization:
+    cart:
+      clean_table_name: cart
+    cart_item:
+      clean_table_name: cart_item
+cluster:
+  type: databricks_13_3_med_general_cluster

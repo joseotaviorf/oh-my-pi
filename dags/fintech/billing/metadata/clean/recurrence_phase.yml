@@ -1,0 +1,29 @@
+database_name: datalake_billing_clean
+table_name: recurrence_phase
+domain: Fintech
+description: Data from the recurrence phase table containing phase information and revision details
+columns:
+  id:
+    description: Unique identifier of the recurrence phase record
+    lineage:
+      - datalake_billing_raw.recurrence_phase.id
+  id_recurrence:
+    description: Identifier of the related recurrence
+    lineage:
+      - datalake_billing_raw.recurrence_phase.recurrence_id
+  uuid_ecurrence_phase:
+    description: UUID identifier of the recurrence phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase.recurrence_phase_uuid
+  current_revision:
+    description: Current revision number of the phase
+    lineage:
+      - datalake_billing_raw.recurrence_phase.current_revision
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase.updated_at

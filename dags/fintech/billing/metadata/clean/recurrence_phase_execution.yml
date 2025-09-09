@@ -1,0 +1,45 @@
+database_name: datalake_billing_clean
+table_name: recurrence_phase_execution
+domain: Fintech
+description: Data from the recurrence phase execution table containing execution details and status information
+columns:
+  id:
+    description: Unique identifier of the phase execution record
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.id
+  id_external:
+    description: External identifier for the execution
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.external_id
+  id_recurrence_phase_revision:
+    description: Identifier of the related recurrence phase revision
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.recurrence_phase_revision_id
+  status:
+    description: Current status of the phase execution
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.status
+  status_reason:
+    description: Reason associated with the execution status
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.status_reason
+  dt_accrual:
+    description: Accrual date of the execution
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.accrual
+  dt_opened:
+    description: Opening date of the execution
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.opened_at
+  dt_closed:
+    description: Closing date of the execution
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.closed_at
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.recurrence_phase_execution.updated_at

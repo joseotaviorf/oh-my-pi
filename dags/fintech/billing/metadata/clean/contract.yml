@@ -1,0 +1,29 @@
+database_name: datalake_billing_clean
+table_name: contract
+domain: Fintech
+description: Data from the contract table containing contract information and status details
+columns:
+  id:
+    description: Unique identifier of the contract record
+    lineage:
+      - datalake_billing_raw.contract.id
+  uuid_recurrence:
+    description: UUID identifier of the related recurrence
+    lineage:
+      - datalake_billing_raw.contract.recurrence_uuid
+  status:
+    description: Current status of the contract
+    lineage:
+      - datalake_billing_raw.contract.status
+  current_revision:
+    description: Current revision number of the contract
+    lineage:
+      - datalake_billing_raw.contract.current_revision
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.contract.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.contract.updated_at

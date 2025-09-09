@@ -14,9 +14,19 @@ workflow:
   dbutils_secret_key: BILLING_DB
   lineage_product_database_name: billing
   tables_customization:
+    contract_revision:
+      clean_table_name: contract_revision
+    contract:
+      clean_table_name: contract
     recurrence_phase_control:
       clean_table_name: recurrence_phase_control
+    recurrence_phase_execution:
+      clean_table_name: recurrence_phase_execution
     recurrence_phase_revision:
       clean_table_name: recurrence_phase_revision
+    recurrence_phase:
+      clean_table_name: recurrence_phase
+    recurrence_revision:
+      clean_table_name: recurrence_revision
 cluster:
   type: databricks_13_3_med_general_cluster

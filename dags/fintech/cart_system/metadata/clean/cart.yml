@@ -1,0 +1,47 @@
+database_name: datalake_cart_system_clean
+table_name: cart
+domain: Fintech
+description: data from the new cart table
+columns:
+  id:
+    description: Unique identifier of the cart
+    lineage:
+      - datalake_cart_system_raw.cart.id
+  id_business_entity:
+    description: Identifier of the related business entity
+    lineage:
+      - datalake_cart_system_raw.cart.business_entity_id
+  uuid_cart:
+    description: Unique UUID of the cart
+    lineage:
+      - datalake_cart_system_raw.cart.cart_uuid
+  business_context:
+    description: Business context of the cart
+    lineage:
+      - datalake_cart_system_raw.cart.business_context
+  status:
+    description: Current status of the cart
+    lineage:
+      - datalake_cart_system_raw.cart.status
+  currency:
+    description: Currency code of the cart
+    lineage:
+      - datalake_cart_system_raw.cart.currency
+  source:
+    description: Source system identifier
+    lineage:
+      - datalake_cart_system_raw.cart.source
+  metadata:
+    description: Free form metadata
+    lineage:
+      - datalake_cart_system_raw.cart.metadata
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_cart_system_raw.cart.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_cart_system_raw.cart.updated_at
+
+

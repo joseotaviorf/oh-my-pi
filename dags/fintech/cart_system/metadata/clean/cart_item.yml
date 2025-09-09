@@ -1,0 +1,75 @@
+database_name: datalake_cart_system_clean
+table_name: cart_item
+domain: Fintech
+description: data from the cart item table
+columns:
+  id:
+    description: Unique identifier of the cart item
+    lineage:
+      - datalake_cart_system_raw.cart_item.id
+  id_cart:
+    description: Identifier of the related cart
+    lineage:
+      - datalake_cart_system_raw.cart_item.cart_id
+  id_actor_from:
+    description: Identifier of the sender actor
+    lineage:
+      - datalake_cart_system_raw.cart_item.from_actor_id
+  id_actor_to:
+    description: Identifier of the recipient actor
+    lineage:
+      - datalake_cart_system_raw.cart_item.to_actor_id
+  uuid_cart_item:
+    description: Unique UUID of the cart item
+    lineage:
+      - datalake_cart_system_raw.cart_item.cart_item_uuid
+  description:
+    description: Text description of the cart item
+    lineage:
+      - datalake_cart_system_raw.cart_item.description
+  actor_from_role:
+    description: Role of the sender actor
+    lineage:
+      - datalake_cart_system_raw.cart_item.from_actor_role
+  actor_to_role:
+    description: Role of the recipient actor
+    lineage:
+      - datalake_cart_system_raw.cart_item.to_actor_role
+  metadata:
+    description: Free form metadata
+    lineage:
+      - datalake_cart_system_raw.cart_item.metadata
+      - datalake_cart_system_raw.cart_item.slug
+  source:
+    description: Source system identifier
+    lineage:
+  slug:
+    description: Slug identifier of the cart item
+    lineage:
+      - datalake_cart_system_raw.cart_item.source
+  financial_category:
+    description: Financial category of the item
+    lineage:
+      - datalake_cart_system_raw.cart_item.financial_category
+  amount:
+    description: Monetary amount of the item
+    lineage:
+      - datalake_cart_system_raw.cart_item.amount
+  dt_due:
+    description: Due date of the item
+    lineage:
+      - datalake_cart_system_raw.cart_item.due_date
+  dt_accrual_year_month:
+    description: Accrual year and month of the item
+    lineage:
+      - datalake_cart_system_raw.cart_item.accrual_year_month
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_cart_system_raw.cart_item.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_cart_system_raw.cart_item.updated_at
+
+
