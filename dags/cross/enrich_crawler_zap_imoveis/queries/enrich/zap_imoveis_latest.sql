@@ -15,6 +15,7 @@ SELECT
     total_area,
     amenities,
     bathrooms,
+    bedrooms,
     floors,
     parking_spaces,
     suites,
