@@ -34,8 +34,8 @@ WITH ticket_history_base AS (
   FROM
     datalake_zendesk.tickets AS t
   WHERE
-    MAKE_DATE(t.year,t.month,t.day) >= CURRENT_DATE - INTERVAL 1 YEAR
-    AND t.ts_updated >= CURRENT_DATE - INTERVAL 1 YEAR
+    MAKE_DATE(t.year,t.month,t.day) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
+    AND t.ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   GROUP BY
     ALL
 )
@@ -58,7 +58,7 @@ WITH ticket_history_base AS (
     END AS contestation_task_origin,
     IF(tc.tags LIKE '%closed_by_merge%', TRUE, FALSE) AS is_closed_by_merge,
     IF(
-      ww.dt_end_1 > (CURRENT_DATE - INTERVAL 1 DAY)
+      ww.dt_end_1 > (DATE('{load_start_date}') - INTERVAL 1 DAY)
       AND ts_resolution_contestation IS NULL
       AND DATE(tc.ts_solved - INTERVAL 3 HOUR
     ) IS NULL, TRUE, FALSE) AS is_contestation_backlog,
@@ -74,7 +74,7 @@ WITH ticket_history_base AS (
     datalake_date.workday_window AS ww
       ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
   WHERE
-    tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
+    tc.year >= YEAR(DATE('{load_start_date}') - INTERVAL 1 YEAR)
     AND tc.group_name IN (
       'FullService [Back]',
       'Reparos [BACK]',
@@ -100,7 +100,7 @@ WITH ticket_history_base AS (
       datalake_ebdb_listing.house AS h
         ON rf.id_house = h.id
     WHERE
-      hl.ts_listing_version_start BETWEEN CURRENT_DATE - INTERVAL 3 YEAR AND CURRENT_DATE - 1
+      hl.ts_listing_version_start BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_start_date}') - 1
       AND (hl.listing_category = 'Re-Listing')
       AND ((h.country_code <> 'MX') OR (h.country_code IS NULL))
 )
@@ -124,7 +124,7 @@ WITH ticket_history_base AS (
     datalake_repairs_clean.repair_request AS rr
   WHERE
     (STRING(GET_JSON_OBJECT(rr.owner_approval, '$.approved')) IS NOT NULL)
-    AND CAST(rr.ts_created AS DATE) >= CURRENT_DATE - INTERVAL 1 YEAR
+    AND CAST(rr.ts_created AS DATE) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
     AND rr.id_third_party_crm_ticket_external IS NOT NULL
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY rr.id, rr.id_third_party_crm_ticket_external ORDER BY rr.ts_updated ASC) = 1
@@ -140,7 +140,7 @@ WITH ticket_history_base AS (
     repairs_interaction AS ri
       ON ri.id_request = sr.id_repair_request
   WHERE
-    CAST(sr.ts_created AS DATE) >= CURRENT_DATE - INTERVAL 1 YEAR
+    CAST(sr.ts_created AS DATE) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
     AND sr.id_third_party_crm_ticket_external IS NOT NULL
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY sr.id_repair_request, ri.id_contract ORDER BY sr.id_third_party_crm_ticket_external ASC) = 1
@@ -193,7 +193,7 @@ WITH ticket_history_base AS (
   GROUP BY 1
 )
 SELECT
-  tc.id_ticket,
+  tck.id_ticket,
   REPLACE(CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Ticket do contato"]') AS STRING),'#','') AS id_contact_ticket,
   sr.id_repair_request AS id_request,
   CAST(tc.id_contract AS INTEGER) AS id_contract,
@@ -271,7 +271,10 @@ SELECT
   MONTH(tc.ts_updated - INTERVAL 3 HOUR ) AS month,
   DAY(tc.ts_updated - INTERVAL 3 HOUR ) AS day
 FROM
+  datalake_zendesk.tickets AS tck
+JOIN
   datalake_zendesk.tickets_current AS tc
+    ON tc.id_ticket = tck.id_ticket
 LEFT JOIN
   datalake_customer_support.tickets AS t
     ON t.id_ticket = tc.id_ticket
@@ -316,7 +319,9 @@ LEFT JOIN
   ticket_comment_metrics AS tcm
     ON tcm.id_ticket = t.id_ticket
 WHERE
-  tc.group_name IN (
+  MAKE_DATE(tck.year,tck.month,tck.day) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
+  AND tck.ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
+  AND tck.group_name IN (
     'Reparos [BACK]',
     'Triagem Reparos [Back]',
     'FullService [BACK]',
@@ -325,8 +330,8 @@ WHERE
     'Reparos PP Multi [BACK]',
     'ReparAção Comum [BACK]')
   AND (
-    tc.ts_created >= CURRENT_DATE - INTERVAL 6 MONTH
-    OR tc.ts_solved >= CURRENT_DATE - INTERVAL 2 YEAR
+    tc.ts_created >= DATE('{load_start_date}') - INTERVAL 6 MONTH
+    OR tc.ts_solved >= DATE('{load_start_date}') - INTERVAL 2 YEAR
     OR tc.ts_solved IS NULL
   )
   AND tc.channel NOT IN ('call')
