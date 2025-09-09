@@ -1,0 +1,101 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: invoices
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table contains records of invoices generated for job postings and other services purchased through the Workable platform.
+columns:
+  id:
+    description: A unique identifier for the invoice.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.id
+  id_purchased_posting:
+    description: The unique identifier of the purchased job posting associated with the invoice.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.purchased_posting_id
+  id_refund:
+    description: The unique identifier of the refund associated with the invoice, if applicable.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.refund_id
+  reference_code:
+    description: The reference code of the invoice.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.reference_code
+  purchase_type:
+    description: The type of purchase, such as a job posting or another service.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.purchase_type
+  amount_currency:
+    description: The currency in which the amount is billed.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.amount_currency
+  billing_company:
+    description: The name of the company on the invoice.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_company
+  billing_company_vat:
+    description: The company's VAT number.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_company_vat
+  billing_address:
+    description: The street address for billing.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_address
+  billing_city:
+    description: The city for billing.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_city
+  billing_zip:
+    description: The zip code for billing.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_zip
+  billing_state:
+    description: The state for billing.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_state
+  billing_country_code:
+    description: The country code for billing.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_country_code
+  amount:
+    description: The subtotal amount of the invoice before VAT and discounts.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.amount
+  discount:
+    description: The discount applied to the invoice.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.discount
+  amount_vat:
+    description: The VAT amount on the invoice.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.amount_vat
+  amount_total:
+    description: The total amount of the invoice, including VAT and discounts.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.amount_total
+  dt_billed:
+    description: The date when the invoice was billed.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.billing_date
+  ts_invoice_created:
+    description: The timestamp when the invoice was created in the source system.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.invoice_created_at
+  ts_updated:
+    description: The timestamp when the invoice record was last updated.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.updated_at
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the invoice record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.year
+  month:
+    description: Month of the update to the invoice record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.month
+  day:
+    description: Day of the update to the invoice record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.invoices.day

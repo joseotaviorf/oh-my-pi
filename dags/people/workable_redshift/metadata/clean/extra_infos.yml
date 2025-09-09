@@ -1,0 +1,69 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: surveys
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table contains records of surveys and questionnaires used to gather additional information from candidates, including details about the questions and their responses.
+columns:
+  id:
+    description: A unique identifier for the survey.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.id
+  id_candidate:
+    description: The unique identifier of the candidate who responded to the survey.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.candidate_id
+  id_location:
+    description: The unique identifier of the location associated with the survey.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.location_id
+  section_title:
+    description: The title of the survey section.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.section_title
+  question_title:
+    description: The title of the survey question.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.question_title
+  description:
+    description: The description of the survey or question.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.description
+  responses_count:
+    description: The number of responses received for the survey.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.responses_count
+  is_enabled:
+    description: A boolean flag indicating if the survey is active.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.enabled
+  ts_submitted:
+    description: The timestamp when the survey was submitted.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.submitted_at
+  ts_published:
+    description: The timestamp when the survey was published.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.published_at
+  ts_created:
+    description: The timestamp when the survey record was created.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.created_at
+  ts_updated:
+    description: The timestamp when the survey record was last updated.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.updated_at
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the survey record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.year
+  month:
+    description: Month of the update to the survey record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.month
+  day:
+    description: Day of the update to the survey record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.surveys.day

@@ -1,0 +1,53 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: requisition_templates
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table defines templates for job requisitions, which are used to standardize the process of requesting and approving new job openings within the Workable platform.
+columns:
+  id:
+    description: A unique identifier for the requisition template.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.id
+  code_generation:
+    description: The method used for generating a unique code for each requisition.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.code_generation
+  code_prefix:
+    description: The prefix used for the requisition code.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.code_prefix
+  meta:
+    description: A JSON field containing metadata related to the requisition template.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.meta
+  is_active:
+    description: A boolean flag indicating if the requisition template is currently active.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.active
+  code_seed:
+    description: A seed value used for generating the requisition code.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.code_seed
+  ts_created:
+    description: The timestamp when the requisition template was created.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.created_at
+  ts_updated:
+    description: The timestamp when the requisition template was last updated.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.updated_at
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the requisition template record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.year
+  month:
+    description: Month of the update to the requisition template record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.month
+  day:
+    description: Day of the update to the requisition template record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.requisition_templates.day

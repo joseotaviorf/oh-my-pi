@@ -1,0 +1,53 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: redsync_metro_source
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table provides a source-based breakdown of metrics for job postings, including views, candidate applications, and hires, helping to analyze the effectiveness of different recruitment channels.
+columns:
+  id_job:
+    description: The unique identifier of the job posting.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.job_id
+  category:
+    description: The category of the traffic source (e.g., 'Referral', 'Social', 'Job Board').
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.category
+  source:
+    description: The specific name of the source (e.g., 'LinkedIn', 'Indeed').
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.source
+  source_domain:
+    description: The domain of the traffic source.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.source_domain
+  num_views:
+    description: The number of views from this source.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.num_views
+  num_candidates:
+    description: The number of candidates sourced from this channel.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.num_candidates
+  num_hired:
+    description: The number of candidates hired from this source.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.num_hired
+  num_moved:
+    description: The number of candidates who progressed to the next stage from this source.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.num_moved
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.year
+  month:
+    description: Month of the update to the record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.month
+  day:
+    description: Day of the update to the record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.redsync_metro_source.day

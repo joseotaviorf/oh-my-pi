@@ -1,0 +1,57 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: ratings
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table stores ratings and scores given by team members to candidates during the recruitment process, typically for interviews or assessments.
+columns:
+  id:
+    description: A unique identifier for the rating record.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.id
+  id_candidate:
+    description: The unique identifier of the candidate who received the rating.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.candidate_id
+  id_stage:
+    description: The unique identifier of the hiring stage where the rating was provided.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.stage_id
+  id_member:
+    description: The unique identifier of the team member who provided the rating.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.member_id
+  scale:
+    description: The rating scale used (e.g., '1-5').
+    lineage:
+      - datalake_workable_redshift_raw.ratings.scale
+  score_card:
+    description: A JSON object containing the detailed breakdown of the score based on different criteria.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.score_card
+  score:
+    description: The final numerical score given to the candidate.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.score
+  ts_created:
+    description: The timestamp when the rating was created.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.created_at
+  ts_updated:
+    description: The timestamp when the rating record was last updated.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.updated_at
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the ratings record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.year
+  month:
+    description: Month of the update to the ratings record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.month
+  day:
+    description: Day of the update to the ratings record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.ratings.day

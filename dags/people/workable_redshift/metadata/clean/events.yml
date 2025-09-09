@@ -1,0 +1,85 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: events
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table contains records of events, such as interviews and meetings, that are part of the recruitment process within the Workable platform.
+columns:
+  id:
+    description: A unique identifier for the event.
+    lineage:
+      - datalake_workable_redshift_raw.events.id
+  id_candidate:
+    description: The unique identifier of the candidate linked to this event.
+    lineage:
+      - datalake_workable_redshift_raw.events.candidate_id
+  id_organizer:
+    description: The unique identifier of the user who organized the event.
+    lineage:
+      - datalake_workable_redshift_raw.events.organizer_id
+  id_stage:
+    description: The unique identifier of the hiring stage the event is associated with.
+    lineage:
+      - datalake_workable_redshift_raw.events.stage_id
+  candidate_name:
+    description: The name of the candidate involved in the event.
+    lineage:
+      - datalake_workable_redshift_raw.events.candidate_name
+  type:
+    description: The type of event, such as 'interview' or 'meeting'.
+    lineage:
+      - datalake_workable_redshift_raw.events.type
+  title:
+    description: The title of the event.
+    lineage:
+      - datalake_workable_redshift_raw.events.title
+  location:
+    description: The physical or virtual location of the event.
+    lineage:
+      - datalake_workable_redshift_raw.events.location
+  organizer_name:
+    description: The name of the event's organizer.
+    lineage:
+      - datalake_workable_redshift_raw.events.organizer_name
+  stage_name:
+    description: The name of the hiring stage.
+    lineage:
+      - datalake_workable_redshift_raw.events.stage_name
+  language:
+    description: The language associated with the event.
+    lineage:
+      - datalake_workable_redshift_raw.events.language
+  is_cancelled:
+    description: A boolean flag indicating whether the event was cancelled.
+    lineage:
+      - datalake_workable_redshift_raw.events.cancelled
+  ts_event_created:
+    description: The timestamp when the event was originally created.
+    lineage:
+      - datalake_workable_redshift_raw.events.event_created_at
+  ts_started:
+    description: The timestamp when the event started.
+    lineage:
+      - datalake_workable_redshift_raw.events.starts_at
+  ts_ended:
+    description: The timestamp when the event ended.
+    lineage:
+      - datalake_workable_redshift_raw.events.ends_at
+  ts_updated:
+    description: The timestamp when the event was last updated.
+    lineage:
+      - datalake_workable_redshift_raw.events.updated_at
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the event record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.events.year
+  month:
+    description: Month of the update to the event record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.events.month
+  day:
+    description: Day of the update to the event record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.events.day

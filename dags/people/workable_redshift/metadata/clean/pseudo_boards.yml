@@ -1,0 +1,33 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: pseudo_boards
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table lists custom or internal job boards (pseudo boards) created within the Workable platform, which may not be public-facing.
+columns:
+  id:
+    description: A unique identifier for the pseudo board.
+    lineage:
+      - datalake_workable_redshift_raw.pseudo_boards.id
+  domain:
+    description: The custom domain associated with the pseudo board.
+    lineage:
+      - datalake_workable_redshift_raw.pseudo_boards.domain
+  is_enabled:
+    description: A boolean flag indicating if the pseudo board is currently enabled.
+    lineage:
+      - datalake_workable_redshift_raw.pseudo_boards.enabled
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the pseudo board record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.pseudo_boards.year
+  month:
+    description: Month of the update to the pseudo board record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.pseudo_boards.month
+  day:
+    description: Day of the update to the pseudo board record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.pseudo_boards.day

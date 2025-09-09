@@ -1,0 +1,61 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: job_boards
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: This table lists the various job boards and platforms where job postings can be published or syndicated through Workable.
+columns:
+  id:
+    description: A unique identifier for the job board.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.id
+  name:
+    description: The name of the job board (e.g., 'LinkedIn', 'Indeed').
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.name
+  slug:
+    description: A URL-friendly identifier for the job board.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.slug
+  domain:
+    description: The domain of the job board.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.domain
+  provider_slug:
+    description: The unique identifier for the job board provider.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.provider_slug
+  job_board_type:
+    description: The type of job board, such as 'free', 'premium', or 'affiliate'.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.job_board_type
+  is_available:
+    description: A boolean flag indicating whether the job board is currently available for use.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.available
+  is_free:
+    description: A boolean flag indicating if the job board is a free service.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.free
+  is_feed:
+    description: A boolean flag indicating if the job board is populated via a data feed.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.is_feed
+  is_affiliate:
+    description: A boolean flag indicating if the job board is an affiliate partner.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.affiliate
+  ts_load:
+    description: The timestamp when this record was loaded into the table.
+  year:
+    description: Year of the update to the job board record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.year
+  month:
+    description: Month of the update to the job board record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.month
+  day:
+    description: Day of the update to the job board record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.job_boards.day

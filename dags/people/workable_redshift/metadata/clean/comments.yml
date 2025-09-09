@@ -1,0 +1,61 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: comments
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Stores all textual comments made by team members about candidates throughout the recruitment process. Each row represents a single comment associated with a specific candidate and job application.
+columns:
+  id:
+    description: Unique identifier for the comment. Primary key for this table.
+    lineage:
+      - datalake_workable_redshift_raw.comments.id
+  id_candidate:
+    description: Identifier for the candidate to whom the comment refers. Foreign key to the candidates table.
+    lineage:
+      - datalake_workable_redshift_raw.comments.candidate_id
+  id_job:
+    description: Identifier for the job application to which this comment is related. Foreign key to the jobs table.
+    lineage:
+      - datalake_workable_redshift_raw.comments.job_id
+  id_member:
+    description: Identifier for the team member who wrote the comment. Foreign key to the members table.
+    lineage:
+      - datalake_workable_redshift_raw.comments.member_id
+  name:
+    description: A name associated with the comment, which may be used for categorization or identification.
+    lineage:
+      - datalake_workable_redshift_raw.comments.name
+  title:
+    description: The title or subject line of the comment, if provided.
+    lineage:
+      - datalake_workable_redshift_raw.comments.title
+  member_name:
+    description: The full name of the team member who wrote the comment.
+    lineage:
+      - datalake_workable_redshift_raw.comments.member_name
+  body:
+    description: The full text content of the comment.
+    lineage:
+      - datalake_workable_redshift_raw.comments.body
+  ts_created:
+    description: Timestamp indicating when the comment was created in the source system (Workable).
+    lineage:
+      - datalake_workable_redshift_raw.comments.created_at
+  ts_updated:
+    description: Timestamp of the last update to the comment in the source system.
+    lineage:
+      - datalake_workable_redshift_raw.comments.updated_at
+  ts_load:
+    description: Timestamp indicating when the record was loaded into this clean table.
+  year:
+    description: Year of the update to the comment record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.comments.year
+  month:
+    description: Month of the update to the comment record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.comments.month
+  day:
+    description: Day of the update to the comment record. Used for table partitioning.
+    lineage:
+      - datalake_workable_redshift_raw.comments.day

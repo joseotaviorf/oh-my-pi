@@ -6,8 +6,9 @@ dag:
   documentation:
     dag_purpose: |
       This DAG brings data from Workable instance on Redshift to datalake.
+
 cluster:
-  type: databricks_13_3_med_people_cluster
+  type: custom_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
@@ -20,6 +21,14 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 5
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+
 workflow:
   type: database_pull_delta
   layer: raw
@@ -32,6 +41,10 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+
   tables_customization:
     activities:
       date_filter_column: updated_at
@@ -41,11 +54,37 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id", "answer"]
+    assessments:
+      extraction_type: full
+    attendances:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    candidate_evaluations:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     candidate_referrals:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
     candidates:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    collaboration_rules:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    comments:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    custom_attributes:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    custom_attributes_settings:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
@@ -57,11 +96,27 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
+    events:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     experience_records:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
+    extra_infos:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    field_choice_translations:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     field_choices:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    field_translations:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
@@ -81,11 +136,33 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
+    invoices:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    job_boards:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    job_locations:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    job_views:
+      extraction_type: full
     jobs:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
+    locations:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     members:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    offer_templates:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
@@ -101,16 +178,43 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
+    postings:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    pseudo_boards:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     questions:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    ratings:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    redsync_metro_source:
+      extraction_type: full
+    requisition_attributes:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
+    requisition_templates:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
     requisitions:
       extraction_type: full
+    signable_templates:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     stages:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
-  default_table_privileges:
-    people-team:
-      - ALL PRIVILEGES
+    surveys:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
