@@ -75,6 +75,11 @@ WITH listing_rent_flows AS (
             ON dim_booking.sk_booking = rent_flow.id_booking
         WHERE dim_house_listing.is_for_sale
             AND dim_booking.visit_intent = 'SALE'
+        QUALIFY ROW_NUMBER() OVER (
+            PARTITION BY rent_flow.id_house_rent_flow
+            ORDER BY ts_listing_version_start 
+            DESC
+        ) = 1
     )
     SELECT
         *,
