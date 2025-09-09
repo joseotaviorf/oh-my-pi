@@ -12,10 +12,10 @@ WITH first_run_ever AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_event ASC) = 1
 ),
-/** 
+/**
   Using DAG Inventory, we can related the id_task with the table. Usually we use the cluster termination task to understand if a DAG was
   inside or outside the SLA, but in Q3 and Q4/2023, we wrongly removed this task and we ended up with a gap in our SLA.
-  In order to "fix" it, we're using the id_task timestamp of success to understand if the DAG was inside or outside the SLA. 
+  In order to "fix" it, we're using the id_task timestamp of success to understand if the DAG was inside or outside the SLA.
   If by some reason we don't have information related to the task (some error with DAG Inventory, for example), we'll be considering
   the cluster termination successful timestamp.
 **/
@@ -80,7 +80,7 @@ expected_task_sla AS (
     ts_success_event,
     ts_expected_sla
   FROM
-    table_task_success AS tts 
+    table_task_success AS tts
 ),
 expected_tasks AS (
   SELECT
@@ -131,7 +131,7 @@ success_run AS (
     AND (l.id_task IN ('terminate-cluster', 'job-cluster-finished')
       OR l.id_task LIKE '%-skip-execution%') -- Some DAGs may have as the first task a short-circuit that skips the cluster/job creation
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY l.id_dag, DATE(l.ts_executed) ORDER BY l.ts_event ASC) = 1
+    ROW_NUMBER() OVER (PARTITION BY l.id_dag, DATE(l.ts_event) ORDER BY l.ts_event ASC) = 1
 ),
 dag_clear AS (
   -- Checking if the DAG run suffered any clear, which indicates that it ran more than once
@@ -150,7 +150,7 @@ composer_run AS (
     It is a DAG that runs D0 and several times a day, which means that if today is 2024-04-10, the execution date will also be 2024-04-10.
     On the next day (2024-04-11) in its first extraction, it will extract the data related to the end of the day of the 2024-04-10.
     So in this case, the execution date 2024-04-10 will have as it last run marked as the date of 2024-04-11
-  ***/ 
+  ***/
   SELECT
     DATE(ts_executed) AS dt_execution,
     MAX(ts_started) AS ts_last_execution_started,
@@ -176,7 +176,7 @@ SELECT
   IF(dr.state = 'failed', FALSE, TRUE) AS is_run_successful,
   CASE
     WHEN fre.id_dag IS NOT NULL OR ds.dag IS NOT NULL OR dr.id_run LIKE 'manual%' THEN NULL -- Excluding DAGs on the SLA exclusion list
-    WHEN s.ts_success_event <= s.ts_expected_sla THEN TRUE 
+    WHEN s.ts_success_event <= s.ts_expected_sla THEN TRUE
     WHEN s.ts_success_event > s.ts_expected_sla AND is_all_tables_inside_sla <> TRUE THEN FALSE
     WHEN s.ts_success_event > s.ts_expected_sla AND is_all_tables_inside_sla = TRUE THEN TRUE
     WHEN s.ts_success_event IS NULL THEN is_all_tables_inside_sla
@@ -186,7 +186,7 @@ SELECT
   dr.ts_executed AS ts_run,
   FROM_UTC_TIMESTAMP(dr.ts_executed, 'America/Sao_Paulo') AS ts_run_brt,
   dr.ts_data_interval_started,
-  FROM_UTC_TIMESTAMP(dr.ts_data_interval_started, 'America/Sao_Paulo') AS ts_data_interval_started_brt,  
+  FROM_UTC_TIMESTAMP(dr.ts_data_interval_started, 'America/Sao_Paulo') AS ts_data_interval_started_brt,
   dr.ts_started,
   FROM_UTC_TIMESTAMP(dr.ts_started, 'America/Sao_Paulo') AS ts_started_brt,
   dr.ts_ended,
@@ -229,4 +229,4 @@ LEFT JOIN
         ON ds.dag = dr.id_dag
         AND DATE(dr.ts_executed)
           BETWEEN IF(ds.is_d0 = FALSE, DATE_ADD(ds.dt_dag_added, -1), ds.dt_dag_added)  -- Runs usually are D-1
-            AND IF(ds.is_d0 = FALSE, DATE_ADD(COALESCE(ds.dt_dag_removed, CURRENT_DATE), -1), COALESCE(ds.dt_dag_removed, CURRENT_DATE)) 
+            AND IF(ds.is_d0 = FALSE, DATE_ADD(COALESCE(ds.dt_dag_removed, CURRENT_DATE), -1), COALESCE(ds.dt_dag_removed, CURRENT_DATE))
