@@ -1,5 +1,4 @@
-
-SELECT distinct
+SELECT DISTINCT
     hl.new_id AS leadId,
     hl.created_at AS createdAt,
     'lead' AS eventType,
@@ -42,6 +41,17 @@ LEFT JOIN
 LEFT JOIN 
     datalake_rene_descartes_raw.phone p 
     ON hl.house_owner_id = p.owner_id
-WHERE  hl.new_id  IS NOT NULL
-AND a.street_name IS NOT NULL 
-OR (a.lat IS NOT NULL AND a.lng IS NOT NULL)
+LEFT JOIN 
+    datalake_rene_descartes_raw.lead_rejection lr 
+    ON hl.id = lr.house_lead_id
+WHERE hl.status = 'DISCARDED'
+  AND lr.reason NOT IN (
+    'CONTACT_DIDNT_EXIST',
+    'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
+    'CONTACT_WASNT_THE_HOUSE_OWNER'
+  )
+  AND hl.new_id IS NOT NULL
+  AND (
+    a.street_name IS NOT NULL 
+    OR (a.lat IS NOT NULL AND a.lng IS NOT NULL)
+  );
