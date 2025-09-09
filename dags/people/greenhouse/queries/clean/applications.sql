@@ -48,3 +48,5 @@ FROM
     datalake_greenhouse_raw.applications
 WHERE
     DATE(last_activity_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY last_activity_at DESC) = 1

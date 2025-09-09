@@ -57,3 +57,5 @@ FROM
     datalake_greenhouse_raw.candidates
 WHERE
     DATE(last_activity) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY last_activity DESC) = 1
