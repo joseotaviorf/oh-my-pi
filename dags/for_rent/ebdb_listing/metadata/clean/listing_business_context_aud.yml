@@ -1,93 +1,137 @@
 database_name: datalake_ebdb_clean
 table_name: listing_business_context_aud
+description: Audit table tracking all changes made to the listing_business_context table, including revision history and modification flags for each field.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_listing_business_context:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.id
-  rev:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.rev
-  rev_type:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.revtype
-  ts_last_publication:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.lastpublicationdate
-  mod_ts_last_publication:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.lastpublicationdate_mod
-  business_context:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.businesscontext
-  mod_business_context:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.businesscontext_mod
-  short_url:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.shorturl
-  mod_short_url:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.shorturl_mod
-  status:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.status
-  mod_status:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.status_mod
-  status_closing:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.closingstatus
-  mod_status_closing:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.closingstatus_mod
+    description: Identifier of the listing business context record. Not a primary key.
   id_house:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.imovelid
+    description: Key reference to the house being listed.
+  rev:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.rev
+    description: Revision number for audit tracking.
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.revtype
+    description: Number representing the type of revision operation.
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.businesscontext
+    description: Business context of the listing.
+    categories:
+      RENT: The listing belongs to the RENT business context.
+      SALE: The listing belongs to the SALE business context.
+  mod_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.businesscontext_mod
+    description: Flag indicating if business_context field was modified in this record.
+  short_url:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.shorturl
+    description: Shortened URL of the listing.
+  mod_short_url:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.shorturl_mod
+    description: Flag indicating if short_url field was modified in this record.
+  status:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.status
+    description: Current status of the listing.
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.status_mod
+    description: Flag indicating if status field was modified in this record.
+  status_closing:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.closingstatus
+    description: Status indicating the closing state of the listing deal. Applicable only in the SALE business context.
+  mod_status_closing:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.closingstatus_mod
+    description: Flag indicating if status_closing field was modified in this record.
   selected_action:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.selectedaction
+    description: Action selected for this listing.
   mod_selected_action:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.selectedaction_mod
+    description: Flag indicating if selected_action field was modified in this record.
   status_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.statusreason
+    description: Detailed reason or explanation for the current listing status.
   mod_status_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.statusreason_mod
+    description: Flag indicating if status_reason field was modified in this record.
   ownership:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.ownership
+    description: Type of ownership of the listing.
   mod_ownership:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.ownership_mod
+    description: Flag indicating if ownership field was modified in this record.
   calculator_price:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.calculatorprice
+    description: Estimated price for the house based on Calculator algorithm.
   mod_calculator_price:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.calculatorprice_mod
+    description: Flag indicating if calculator_price field was modified in this record.
   suspension_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.suspensionReason
+    description: Reason why the listing was suspended, if applicable.
   mod_suspension_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.suspensionReason_MOD
-  mod_suspended_until:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext_aud.suspendedUntil_MOD
+    description: Flag indicating if suspension_reason field was modified in this record.
   ts_suspended_until:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.suspendedUntil
+    description: Timestamp until when the listing is suspended.
+  mod_suspended_until:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.suspendedUntil_MOD
+    description: Flag indicating if ts_suspended_until field was modified in this record.
   ts_first_publication:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.firstpublicationdate
+    description: Timestamp when the listing was first published.
   mod_ts_first_publication:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.firstpublicationdate_mod
+    description: Flag indicating if ts_first_publication field was modified in this record.
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.lastpublicationdate
+    description: Timestamp when the listing was last published or republished.
+  mod_ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.lastpublicationdate_mod
+    description: Flag indicating if ts_last_publication field was modified in this record.
+  ts_last_status_changed:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.lastStatusChangedAt
+    description: Timestamp when the listing status was last changed.
+  mod_ts_last_status_changed:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.lastStatusChangedAt_MOD
+    description: Flag indicating if ts_last_status_changed field was modified in this record.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.atualizadoem
+    description: Timestamp when the listing business context record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.criadoem
+    description: Timestamp when the listing business context record was created.

@@ -8,12 +8,14 @@ SELECT
   suspensionReason AS suspension_reason,
   shortUrl AS short_url,
   calculatorPrice AS calculator_price,
+  version,
   selectedAction AS selected_action,
   ownership,
   dealObjective AS deal_objective,
   criadoEm AS ts_created,
   atualizadoEm AS ts_updated,
   firstPublicationDate AS ts_first_publication,
-  lastPublicationDate AS ts_last_publication
+  lastPublicationDate AS ts_last_publication,
+  lastStatusChangedAt AS ts_last_status_changed
 FROM
   datalake_ebdb_raw.listingbusinesscontext

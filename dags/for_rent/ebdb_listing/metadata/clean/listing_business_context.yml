@@ -1,51 +1,81 @@
 database_name: datalake_ebdb_clean
 table_name: listing_business_context
+description: Information about house listings for both RENT and SALE business contexts.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.id
+    description: Unique identifier for the listing business context record.
   id_house:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.imovelid
+    description: Key reference to the house being listed.
   business_context:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.businesscontext
+    description: Business context of the listing.
+    categories:
+      RENT: The listing belongs to the RENT business context.
+      SALE: The listing belongs to the SALE business context.
   status:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.status
+    description: Current status of the listing.
   status_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.statusreason
+    description: Detailed reason or explanation for the current listing status.
   status_closing:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.closingstatus
+    description: Status indicating the closing state of the listing deal. Applicable only in the SALE business context.
   suspension_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.suspensionReason
+    description: Reason why the listing was suspended, if applicable.
   short_url:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.shorturl
+    description: Shortened URL of the listing.
   calculator_price:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.calculatorprice
+    description: Estimated price for the house based on Calculator algorithm.
+  version:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.version
+    description: Version number of the listing business context record.
   selected_action:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.selectedaction
+    description: Action selected for this listing.
   ownership:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.ownership
+    description: Type of ownership of the listing.
   deal_objective:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.dealObjective
+    description: Primary objective or goal for the house deal.
   ts_created:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.criadoem
+    description: Timestamp when the listing business context record was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.atualizadoem
+    description: Timestamp when the listing business context record was last updated.
   ts_first_publication:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.firstpublicationdate
+    description: Timestamp when the listing was first published.
   ts_last_publication:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.lastpublicationdate
+    description: Timestamp when the listing was last published or republished.
+  ts_last_status_changed:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.lastStatusChangedAt
+    description: Timestamp when the listing status was last changed.
