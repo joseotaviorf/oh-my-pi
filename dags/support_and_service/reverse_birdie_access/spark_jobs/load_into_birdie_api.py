@@ -10,7 +10,7 @@ import numpy as np
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services import ConfigurationService
-from pyspark.sql.functions import date_format
+from pyspark.sql.functions import date_format, to_timestamp
 from quintoandar_logger import QuintoAndarLogger
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -41,6 +41,8 @@ def get_df(database_name, table_name, execution_date):
             df = df.fillna({col: np.NaN })
         else:
             df = df.fillna({col: ""})
+
+    df = df.withColumn("posted_at", date_format(to_timestamp("posted_at"), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
 
     return df
 
@@ -232,30 +234,6 @@ def send_accounts_payload(api_url, accounts_endpoint, headers, accounts_results_
     else:
         logger.info(f"m=All data sent successfully. Total_dispatches={total_dispatches}") 
 
-def convert_datetime_to_string(payload):
-    """
-    Convert datetime objects to strings in ISO 8601 format,
-    adjusting for a more compatible format with APIs.
-    """
-    for item_dict in payload:
-        for key, value in item_dict.items():
-            # Itera pelo dicionário interno que contém os dados
-            if 'posted_at' in value:
-                posted_at_value = value['posted_at']
-                # Verifica se o valor é um objeto datetime
-                if isinstance(posted_at_value, datetime):
-                    # Formata a data para ISO 8601, incluindo apenas milissegundos
-                    # Exemplo: '2025-08-13T12:15:32.212Z'
-                    value['posted_at'] = posted_at_value.isoformat(timespec='milliseconds') + 'Z'
-                # Ou se já for uma string, tenta formatar para garantir a consistência
-                elif isinstance(posted_at_value, str):
-                    try:
-                        dt_obj = datetime.fromisoformat(posted_at_value)
-                        value['posted_at'] = dt_obj.isoformat(timespec='milliseconds') + 'Z'
-                    except ValueError:
-                        # Trata strings que não são datas válidas, se necessário
-                        pass
-    return payload
 def main():
     dag_name, database_name, table_name, execution_date, feedbacks_endpoint, accounts_endpoint, api_url = (
         parse_arguments()
@@ -275,7 +253,6 @@ def main():
 
     feedbacks_results_payload = create_feedbacks_results_payload(df, table_name)
     accounts_results_payload = create_accounts_results_payload(df)
-    feedbacks_results_payload = convert_datetime_to_string(feedbacks_results_payload)
     send_feedbacks_payload(api_url, feedbacks_endpoint, headers, feedbacks_results_payload)
     send_accounts_payload(api_url, accounts_endpoint, headers, accounts_results_payload)
 
