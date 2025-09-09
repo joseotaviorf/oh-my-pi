@@ -19,15 +19,3 @@ columns:
       - datalake_workable_redshift_raw.pseudo_boards.enabled
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the pseudo board record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.pseudo_boards.year
-  month:
-    description: Month of the update to the pseudo board record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.pseudo_boards.month
-  day:
-    description: Day of the update to the pseudo board record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.pseudo_boards.day

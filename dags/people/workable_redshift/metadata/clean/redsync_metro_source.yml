@@ -39,15 +39,3 @@ columns:
       - datalake_workable_redshift_raw.redsync_metro_source.num_moved
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.redsync_metro_source.year
-  month:
-    description: Month of the update to the record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.redsync_metro_source.month
-  day:
-    description: Day of the update to the record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.redsync_metro_source.day

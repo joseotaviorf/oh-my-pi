@@ -28,6 +28,7 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+      availability: ON_DEMAND
 
 workflow:
   type: database_pull_delta
@@ -73,9 +74,7 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     collaboration_rules:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     comments:
       date_filter_column: updated_at
       extraction_type: incremental
@@ -163,9 +162,7 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     offer_templates:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     offer_variables:
       date_filter_column: updated_at
       extraction_type: incremental
@@ -183,9 +180,7 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     pseudo_boards:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     questions:
       date_filter_column: updated_at
       extraction_type: incremental
@@ -207,9 +202,7 @@ workflow:
     requisitions:
       extraction_type: full
     signable_templates:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     stages:
       date_filter_column: updated_at
       extraction_type: incremental

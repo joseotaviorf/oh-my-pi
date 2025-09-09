@@ -23,15 +23,3 @@ columns:
       - datalake_workable_redshift_raw.custom_attributes_settings.profile
   ts_load:
     description: Timestamp indicating when the record was loaded into this clean table.
-  year:
-    description: Year of the update to the custom attribute setting record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.custom_attributes_settings.year
-  month:
-    description: Month of the update to the custom attribute setting record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.custom_attributes_settings.month
-  day:
-    description: Day of the update to the custom attribute setting record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.custom_attributes_settings.day

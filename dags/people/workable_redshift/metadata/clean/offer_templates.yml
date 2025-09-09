@@ -39,15 +39,3 @@ columns:
       - datalake_workable_redshift_raw.offer_templates.zip_code
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the offer template record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.offer_templates.year
-  month:
-    description: Month of the update to the offer template record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.offer_templates.month
-  day:
-    description: Day of the update to the offer template record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.offer_templates.day

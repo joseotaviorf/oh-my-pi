@@ -55,15 +55,3 @@ columns:
       - datalake_workable_redshift_raw.assessments.updated_at
   ts_load:
     description: Timestamp indicating when the record was loaded into this clean table.
-  year:
-    description: Year of the update to the assessment record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.assessments.year
-  month:
-    description: Month of the update to the assessment record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.assessments.month
-  day:
-    description: Day of the update to the assessment record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.assessments.day

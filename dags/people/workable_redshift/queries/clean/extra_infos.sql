@@ -4,7 +4,7 @@ SELECT
     posting_id AS id_posting,
 
     -- non-metrics
-    TO_JSON("values") AS values,
+    values,
 
     -- timestamps
     TO_TIMESTAMP(created_at) AS ts_created,

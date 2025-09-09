@@ -9,7 +9,7 @@ SELECT
     subregion,
     zip_code,
     location_string,
-    TO_JSON(coords) AS coords,
+    coords,
 
     -- timestamps
     TO_TIMESTAMP(location_created_at) AS ts_location_created,

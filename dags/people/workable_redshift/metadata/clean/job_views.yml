@@ -31,15 +31,3 @@ columns:
       - datalake_workable_redshift_raw.job_views.last_view_at
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the job view record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.job_views.year
-  month:
-    description: Month of the update to the job view record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.job_views.month
-  day:
-    description: Day of the update to the job view record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.job_views.day

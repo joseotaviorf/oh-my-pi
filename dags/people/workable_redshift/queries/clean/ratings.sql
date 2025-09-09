@@ -7,7 +7,7 @@ SELECT
 
     -- non-metrics
     scale,
-    TO_JSON(score_card) AS score_card,
+    score_card,
 
     -- metrics
     CAST(score AS DECIMAL(10, 2)) AS score,

@@ -14,12 +14,7 @@ SELECT
     CAST(num_moved AS BIGINT) AS num_moved,
 
     -- timestamps
-    NOW() AS ts_load,
-
-    -- partitions
-    year,
-    month,
-    day
+    NOW() AS ts_load
 
 FROM
     datalake_workable_redshift_raw.redsync_metro_source

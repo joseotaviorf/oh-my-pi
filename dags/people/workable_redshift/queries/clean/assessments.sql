@@ -9,8 +9,8 @@ SELECT
     provider_name,
     provider_slug,
     provider_type,
-    TO_JSON(results) AS results,
-    TO_JSON(meta) AS meta,
+    results,
+    meta,
 
     -- metrics
     CAST(overall_score AS DECIMAL(10, 2)) AS overall_score,
@@ -18,12 +18,7 @@ SELECT
     -- timestamps
     TO_TIMESTAMP(created_at) AS ts_created,
     TO_TIMESTAMP(updated_at) AS ts_updated,
-    NOW() AS ts_load,
-
-    -- partitions
-    year,
-    month,
-    day
+    NOW() AS ts_load
 
 FROM
     datalake_workable_redshift_raw.assessments

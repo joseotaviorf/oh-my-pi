@@ -5,7 +5,7 @@ SELECT
     -- non-metrics
     code_generation,
     code_prefix,
-    TO_JSON(meta) AS meta,
+    meta,
 
     -- metrics
     active AS is_active,

@@ -39,15 +39,3 @@ columns:
       - datalake_workable_redshift_raw.collaboration_rules.zip_code
   ts_load:
     description: Timestamp indicating when the record was loaded into this clean table.
-  year:
-    description: Year of the record update. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.year
-  month:
-    description: Month of the record update. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.month
-  day:
-    description: Day of the record update. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.day
