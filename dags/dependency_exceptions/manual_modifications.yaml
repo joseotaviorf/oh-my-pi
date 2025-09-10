@@ -930,6 +930,7 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-tarefas-salesforce:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-nps-offboarding:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-vistoria-spoc:first-run-of-day
 bietlejuice.reverse_supply_access:
   add:
     - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry:first-run-of-day

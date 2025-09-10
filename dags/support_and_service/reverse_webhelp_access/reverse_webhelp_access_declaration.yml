@@ -49,6 +49,9 @@ workflow:
     offboarding_perspective_metrics:
       extra_spark_job_arguments:
       - services
+    vistoria_spoc:
+      extra_spark_job_arguments:
+      - services
     repair_tickets:
       extra_spark_job_arguments:
       - services

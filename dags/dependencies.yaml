@@ -1603,10 +1603,10 @@ bietlejuice.enrich_company:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
 bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
-  - bietlejuice.house_listing_search:load-clean-recommendation-use-case:first-run-of-day
-  - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
+  - bietlejuice.house_listing_search:load-clean-recommendation-use-case:first-run-of-day
+  - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case:first-run-of-day
 bietlejuice.enrich_condo_monitoring:
   - bietlejuice.condominium_payments:load-clean-non-payment-report:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
@@ -4289,7 +4289,9 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches:first-run-of-day
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call:first-run-of-day
+  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_contract:load-dw-rent-fact-contracts:first-run-of-day
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer:first-run-of-day
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign:first-run-of-day
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-dispatches:first-run-of-day
@@ -4303,6 +4305,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspector:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-dim-reviewer:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection:first-run-of-day
   - bietlejuice.dw_inspections:load-dw-inspections-fact-repair-request:first-run-of-day
@@ -4316,8 +4319,10 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
+  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
   - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks:first-run-of-day
@@ -4362,6 +4367,7 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
   - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
+  - bietlejuice.reverse_webhelp:load-reverse-vistoria-spoc:first-run-of-day
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:first-run-of-day
 bietlejuice.survicate_respondent_attributes:
