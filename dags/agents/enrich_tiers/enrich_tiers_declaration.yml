@@ -12,6 +12,9 @@ workflow:
     agent_offers:
       - ciq_first_listing
     agent_performance:
+      - metric_events
+    metric_events:
+      - agent_allocation
       - agent_offers
       - agent_prospects
       - ciq_first_listing

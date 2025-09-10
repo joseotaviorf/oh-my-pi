@@ -14,6 +14,9 @@ workflow:
     agent_hub_alocation:
       - member_profile
       - users
+    member_hub_allocation:
+      - member_profile
+      - users
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   tables_customization:
