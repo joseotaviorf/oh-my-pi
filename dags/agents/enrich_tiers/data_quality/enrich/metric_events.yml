@@ -1,0 +1,46 @@
+---
+table_name: datalake_tiers.metric_events
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_metric_event:
+    is_complete:
+      severity_level: Error
+  id_user:
+    is_complete:
+      severity_level: Error
+  id_external_domain:
+    is_complete:
+      severity_level: Error
+  id_metric_period:
+    is_complete:
+      severity_level: Error
+  agent_profile:
+    is_complete:
+      severity_level: Error
+  final_metric:
+    is_complete:
+      severity_level: Error
+  is_cumulative_metric:
+    is_complete:
+      severity_level: Error
+  is_valid:
+    is_complete:
+      severity_level: Error
+  is_compound_metric_part:
+    is_complete:
+      severity_level: Error
+  dt_become_valid:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

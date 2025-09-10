@@ -24,6 +24,10 @@ columns:
     description: |
       Agent unique identifier.
       Attention: This ID refers to the agent in main/admin/ebdb.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: Unique person UUID in admin/main (person registry identifier).
   name:
     lineage:
       - datalake_hub_services_clean.users.name
@@ -42,7 +46,7 @@ columns:
   cpf:
     lineage:
       - datalake_ebdb_clean.user.cpf
-    description: User CPF.
+    description: Brazilian CPF document number.
   is_active:
     lineage:
       - datalake_ebdb_clean.user.is_active

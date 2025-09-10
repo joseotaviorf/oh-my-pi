@@ -1,7 +1,7 @@
 ---
 database_name: datalake_hub_services
 table_name: agent_hub_alocation
-description: 
+description: Materializes the daily allocation of agents to Hub Services business units, including profile, user and agent identifiers, hub information, business_context, agent type, and the relationship reference date (dt_reference).
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:

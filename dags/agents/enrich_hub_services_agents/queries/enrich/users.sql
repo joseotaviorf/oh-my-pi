@@ -22,6 +22,7 @@ SELECT
     u.id AS id_user,
     u.id_external AS id_main_user,
     ua.id_agent,
+    ua.uuid_person,
     COALESCE(u.name, ua.name) AS name,
     COALESCE(u.email, ua.email) AS email,
     COALESCE(u.phone_number, ua.number) AS phone_number,

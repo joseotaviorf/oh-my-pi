@@ -1,87 +1,26 @@
 ---
 table_name: datalake_tiers.agent_performance
 alert_channel: "#alerts-de-airflow-dags"
-table_level_validations:
-  has_size:
-    greater_than: 60000
-    severity_level: Error
 column_level_validations:
   id_user:
     is_complete:
       severity_level: Error
-  id_business_unit:
+  id_metric_period:
     is_complete:
       severity_level: Error
-  total_offer_submitted:
+  uuid_person:
     is_complete:
       severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_regular_offer_signed:
+  metric:
     is_complete:
       severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_offer_signed_with_agent_intermediation:
+  value:
     is_complete:
       severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_offer_signed_with_demand_supply_capture:
+  dt_metric_period_started:
     is_complete:
       severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_offer_signed_with_tqc:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_offer_signed_with_ciq:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_first_listing:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  total_gross_merchandise_volume:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  ratio_buyer_offer_submitted_to_signed:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-    has_max_value:
-      less_than_or_equal_to: 1
-      severity_level: Error
-  ratio_prospect_to_offer_signed:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-    has_max_value:
-      less_than_or_equal_to: 1
-      severity_level: Error
-  year:
-    is_complete:
-      severity_level: Error
-  bimester:
+  dt_metric_period_ended:
     is_complete:
       severity_level: Error
 

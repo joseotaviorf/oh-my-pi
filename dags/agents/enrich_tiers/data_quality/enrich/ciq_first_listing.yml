@@ -6,15 +6,24 @@ table_level_validations:
     greater_than: 145000
     severity_level: Error
 column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
   id_user:
     is_complete:
       severity_level: Error
+  id_partner:
+    is_complete:
+      severity_level: Warning
   id_house:
     is_complete:
       severity_level: Error
   year:
     is_complete:
       severity_level: Error
-  bimester:
+  month:
+    is_complete:
+      severity_level: Error
+  day:
     is_complete:
       severity_level: Error

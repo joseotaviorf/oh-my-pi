@@ -1,16 +1,4 @@
--- Do not reprocess the table, as the source tables are still fully loaded
-WITH filter_bimester AS (
-    SELECT DISTINCT
-        ad.bimester_start,
-        ad.bimester_end,
-        ad.bimester,
-        ad.year
-    FROM 
-        datalake_quintoandar.aux_date AS ad
-    WHERE
-        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-),
-house_listing_consultant AS (
+WITH house_listing_consultant AS (
     SELECT 
         hslc.id_house,
         hslc.id_user,
@@ -54,32 +42,33 @@ ciq_first_listing AS (
         Example: if it was published on the 1st of the month, and remained published until the 15th, 
         then it will be considered valid on this date.
     **/
-    SELECT DISTINCT
+    SELECT
         hlc.id_house,
         hlc.id_user,
+        COALESCE(so.id_offer, rde.id_offer) AS if_offer,
         hlc.consultant_type,
         lbc.status,
         lbc.business_context,
         lbc.ts_first_listing IS NOT NULL AND (
             u.ts_first_unpublished IS NOT NULL
             AND DATE_DIFF(u.ts_first_unpublished, lbc.ts_first_listing) < 14 
-            AND so.dt_sale_agreement_signed IS NULL
+            AND COALESCE(so.dt_sale_agreement_signed, rde.ts_event) IS NULL
         ) IS FALSE AS is_valid_first_listing,
-        so.dt_sale_agreement_signed AS ts_sale_agreement_signed,
+        COALESCE(so.dt_sale_agreement_signed, rde.ts_event) AS ts_contract_signed,
         lbc.ts_first_listing,
         u.ts_first_unpublished,
         CASE
             WHEN 
-                so.dt_sale_agreement_signed IS NOT NULL
-                AND so.dt_sale_agreement_signed < lbc.ts_first_listing + INTERVAL 14 DAY
-                THEN so.dt_sale_agreement_signed
+                COALESCE(so.dt_sale_agreement_signed, rde.ts_event) IS NOT NULL
+                AND COALESCE(so.dt_sale_agreement_signed, rde.ts_event) < lbc.ts_first_listing + INTERVAL 14 DAY
+                THEN COALESCE(so.dt_sale_agreement_signed, rde.ts_event)
             ELSE lbc.ts_first_listing + INTERVAL 14 DAY 
         END AS ts_valid_first_listing,
         GREATEST(
             lbc.ts_first_listing, 
             TIMESTAMP(hlc.ts_enrollment_started), 
             TIMESTAMP(hlc.dt_consultant_started), 
-            so.dt_sale_agreement_signed,
+            COALESCE(so.dt_sale_agreement_signed, rde.ts_event),            
             u.ts_first_unpublished
         ) AS ts_updated
     FROM
@@ -95,15 +84,39 @@ ciq_first_listing AS (
     LEFT JOIN
         datalake_offer.sale_offer AS so
             ON so.id_house = hlc.id_house
+            AND lbc.ts_first_listing <= so.dt_sale_agreement_signed
             AND hlc.business_context = "SALE"
+    LEFT JOIN
+        datalake_rent_demand_events.rent_demand_events AS rde
+            ON rde.id_house = hlc.id_house
+            AND lbc.ts_first_listing <= rde.ts_event
+            AND hlc.business_context = "RENT"
+            AND rde.id_event_type = 9
     WHERE
         hlc.is_last_ciq_on_listing = True
         AND hlc.id_user IS NOT NULL
         AND hlc.consultant_type IN ('CIQ_FULL', 'CIQ_MANAGER')
+),
+first_contract_signed AS (
+    SELECT
+        cfl.id_house,
+        cfl.id_user,
+        cfl.if_offer,
+        cfl.business_context,
+        cfl.ts_contract_signed
+    FROM
+        ciq_first_listing AS cfl
+    WHERE
+        cfl.ts_contract_signed IS NOT NULL
+    QUALIFY
+        1 = ROW_NUMBER() OVER (PARTITION BY cfl.id_house, cfl.id_user, cfl.business_context ORDER BY cfl.ts_contract_signed)
 )
 SELECT
     cfl.id_house,
-    cfl.id_user,
+    CAST(cfl.id_user AS BIGINT) AS id_user,
+    pa.id_partner,
+    u.id_agent,
+    u.uuid_person,
     cfl.consultant_type,
     cfl.business_context,
     cfl.status,
@@ -111,13 +124,29 @@ SELECT
     cfl.is_valid_first_listing,
     cfl.ts_first_listing,
     cfl.ts_first_unpublished,
-    cfl.ts_sale_agreement_signed,
+    cfl.ts_contract_signed,
     cfl.ts_valid_first_listing,
-    cfl.ts_updated,
-    fb.year,
-    fb.bimester
+    MAX(cfl.ts_updated) AS ts_updated,
+    YEAR(MAX(cfl.ts_updated)) AS year,
+    MONTH(MAX(cfl.ts_updated)) AS month,
+    DAY(MAX(cfl.ts_updated)) AS day
 FROM
     ciq_first_listing AS cfl
-JOIN
-    filter_bimester AS fb
-        ON DATE(cfl.ts_updated) BETWEEN fb.bimester_start AND fb.bimester_end
+LEFT JOIN
+    first_contract_signed AS fcs
+        ON fcs.id_house = cfl.id_house
+        AND fcs.id_user = cfl.id_user
+        AND fcs.business_context = cfl.business_context
+LEFT JOIN
+    datalake_ebdb_user.user AS u
+        ON u.id = cfl.id_user
+LEFT JOIN
+    datalake_ebdb_clean.partner_agent AS pa
+        ON pa.id_user = cfl.id_user
+WHERE
+    DATE(cfl.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND (
+        fcs.id_house IS NULL
+        OR fcs.ts_contract_signed = cfl.ts_contract_signed
+    )
+GROUP BY ALL

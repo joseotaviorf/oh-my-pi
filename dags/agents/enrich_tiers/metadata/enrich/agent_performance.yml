@@ -1,97 +1,39 @@
 ---
-database_name: datalake_tiers
+database_name: datalake_tiers_test
 table_name: agent_performance
 description: |
-  This table calculates the performance indicators of Broker and Negotiation Executive agents.
+  Aggregated performance metrics per agent and metric period, derived from metric_events
+  (simple, invalid and compound metrics). Each row represents a metric value for an
+  agent in a given metric period.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
-  id_agent:
-    lineage:
-      - datalake_hub_services.users.id_agent
-    description: Agent unique identifier.
   id_user:
     lineage:
-      - datalake_hub_services.users.id_main_user
+      - datalake_tiers.metric_events.id_user
     description: |
-      User unique identifier.
-      Attention: This ID refers to the user in main/admin/ebdb.
-  id_business_unit:
+      Main/admin (ebdb) user identifier associated with the agent.
+  id_agent:
     lineage:
-      - datalake_hub_services.member_profile.id_business_unit
-    description: Business Unit unique identifier.
-  business_context:
+      - datalake_tiers.metric_events.id_agent
+    description: Agent unique identifier.
+  uuid_person:
     lineage:
-      - datalake_hub_services_clean.business_unit.business_context
-    description: What context does the business unit operate in, which could be Sales or Rental.
-  bimester_name:
+      - datalake_tiers.metric_events.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the agent.
+  id_metric_period:
     lineage:
-      - datalake_quintoandar.aux_date.bimester_name
-    description: Name of the tier consolidation bimester.
-  name: 
+      - datalake_big_agent_clean.metric_period.id
+    description: Identifier of the metric period.
+  metric:
+    description: Metric name aggregated (e.g., CCV, GMV, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
+  value:
+    description: Aggregated metric value for the period (count or ratio depending on the metric definition).
+  dt_metric_period_started:
     lineage:
-      - datalake_hub_services.users.name
-    description: User name.
-  email:
+      - datalake_big_agent_clean.metric_period.dt_init
+    description: Start date of the metric period window.
+  dt_metric_period_ended:
     lineage:
-      - datalake_hub_services.users.email
-    description: User email.
-  cpf:
-    lineage:
-      - datalake_hub_services.users.cpf
-    description: User CPF.
-  phone_number:
-    lineage:
-      - datalake_hub_services.users.phone_number
-    description: User phone number.
-  profile:
-    lineage:
-      - datalake_hub_services.member_profile.profile
-    description: Describes the member's profile.
-    categories:
-      AGENT: Brokers.
-      NEGOTIATION_EXECUTIVE: Responsible for intermediating the offer negotiation stage between buyer and seller, until this results in a CCV (signed contract).
-  hub_name:
-    lineage:
-      - datalake_hub_services.business_unit.hub_name
-    description: Business unit name.
-  total_offer_submitted:
-    description: Total number of submitted offers, in which the agent participated in one of the funnel stages
-  total_regular_offer_signed:
-    description: Total number of signed offers, in which the agent was responsible for visiting or negotiating the offer
-  total_buyer_with_offer_submitted:
-    description: Total number of buyers with submitted offers, in which the agent participated in one of the funnel stages
-  total_offer_signed_with_agent_intermediation:
-    description: 
-      Total number of signed offers, in which the agent participated in one of 
-      the funnel stages (supply capture (CIQ), demand capture (TQC), visits stage or offer negotiation)
-  total_offer_signed_with_demand_supply_capture:
-    description: Total number of signed offers, in which the agent participated with the CIQ or 'Traz Quem Compra' (TQC) programs.
-  total_offer_signed_with_tqc:
-    description: 
-      Total number of offers signed, in which the agent participated in one of the funnel stages, 
-      but with a buyer indicated by the Agent through the 'Traz Quem Compra' (TQC) program.
-  total_offer_signed_with_ciq:
-    description: 
-      Total number of offers signed, in which the agent participated in one of the funnel stages, 
-      but was also the one who recommended the property for listing through the CIQ program.
-  total_first_listing:
-    description: Total CIQ houses nominations that resulted in a first publication.
-  total_gross_merchandise_volume:
-    description: 
-      Gross merchandise volume (GMV) is the total sales value of all offers in which the 
-      Agent participated in one of the funnel stages.
-  ratio_buyer_offer_submitted_to_signed:
-    description: 
-      Proportion between the total number of offers that converted into a 
-      purchase and sale contract, by the total number of buyers with offer submited.
-  ratio_prospect_to_offer_signed:
-    description: Proportion of the total number of purchase and sale contracts closed by the agent to the total number of prospects.
-  year:
-    lineage:
-      - datalake_quintoandar.aux_date.year
-    description: Year of tier consolidation.
-  bimester:
-    lineage:
-      - datalake_quintoandar.aux_date.bimester
-    description: Bimester of tier consolidation.
+      - datalake_big_agent_clean.metric_period.dt_end
+    description: End date of the metric period window.

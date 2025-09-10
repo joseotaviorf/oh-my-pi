@@ -1,66 +1,101 @@
 ---
-database_name: datalake_tiers
+database_name: datalake_tiers_test
 table_name: agent_offers
-description: Data on offers and the agents involved in the process.
+description: Aggregated view of RENT and SALE offer events with agent attribution (broker and negotiation executive), including prospect, CIQ attribution, TQC presence, contract status, key timestamps, and partition fields.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_offer:
     lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_offer
       - datalake_offer.sale_offer.id_offer
     description: Unique identifier of the offer.
+  id_house:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_house
+      - datalake_offer.sale_offer.id_house
+    description: Unique identifier of the house associated with the offer.
+  id_prospect:
+    lineage:
+      - datalake_offer.sale_offer.id_buyer
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+    description: Prospect identifier (buyer on SALE, tenant prospect on RENT).
   id_user:
     lineage:
-      - datalake_offer.sale_offer.id_user
-    description: Unique identifier of the user.
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+      - datalake_offer.sale_offer.id_user_agent
+      - datalake_offer.sale_offer.id_user_consultant
+    description: User identifier linked to the agent responsible for the offer event.
   id_agent:
     lineage:
-      - datalake_offer.sale_offer.id_agent
       - datalake_sale_offer_flows.offer_specialists.id_agent
       - datalake_ebdb_user.user.id_agent
-    description: Unique identifier of the agent.
+      - datalake_offer.sale_offer.id_agent
+    description: Agent identifier associated to the user (broker or negotiation executive).
+  uuid_person:
+    lineage:
+      - datalake_ebdb_user.user.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the user.
   id_user_ciq:
     lineage:
       - datalake_tiers.ciq_first_listing.id_user
     description: Unique identifier of the CIQ user who captured/recommended the house through the CIQ program.
   agent_profile:
-    description: Type of Agents (Negotiation Executive or Broker)
-  sale_price_agreed:
+    description: Agent role for the attribution (Negotiation Executive or Broker).
+  business_context:
+    description: Business context of the offer (RENT or SALE).
+  agreement_value:
     lineage:
       - datalake_offer.sale_offer.sale_price_agreed
-    description: Final price agreed for this offer.
+    description: Final price agreed for the SALE offer (null for RENT).
   has_tqc:
     description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
   is_ciq_first_listing:
     description: 
       Indicates that this house was recommended through the CIQ program, i.e. its first listing is linked to a CIQ user.
+  is_contract_cancelled:
+    description: Indicates whether the offer contract was cancelled after signing the agreement.
   is_contract_signed:
     description: Indicates whether the offer was signed and generated a purchase and sale agreement.
-  ts_sale_agreement_signed:
+  dt_contract_cancelled:
     lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_cancelled
+    description: Contract cancellation date when applicable (SALE only).
+  ts_contract_signed:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
       - datalake_offer.sale_offer.dt_sale_agreement_signed
-    description: Timestamp of sale agreement signature.
+    description: Contract signature timestamp (SALE agreement date or RENT contract signed event).
   ts_offer_submitted:
     lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
       - datalake_offer.sale_offer.ts_offer_submitted
-    description: Timestamp of offer submission.
+    description: Offer submission timestamp (SALE offer submitted or RENT offer submitted event).
   ts_updated:
     lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
       - datalake_offer.sale_offer.dt_sale_agreement_signed
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
+      - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Record update date.
   day:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
-    description: Day of the record update date.
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Day extracted from the record update date (ts_updated).
   month:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
-    description: Month of the record update date.
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Month extracted from the record update date (ts_updated).
   year:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
-    description: Year of the record update date.
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Year extracted from the record update date (ts_updated).

@@ -16,10 +16,20 @@ workflow:
       - agent_prospects
       - ciq_first_listing
   default_extraction_type: incremental
-  default_partitions: [year, bimester]
+  default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    agent_allocation:
+      merge_on: [id_metric_period, id_user]
+      z_order_by: [id_metric_period, id_user]
+    agent_performance:
+      merge_on: [id_metric_period, id_user]
+      z_order_by: [id_metric_period, id_user]
+    metric_events:
+      merge_on: [id_metric_event]
+      z_order_by: [id_metric_period, id_user]
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new

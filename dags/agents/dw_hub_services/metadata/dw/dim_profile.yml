@@ -14,6 +14,19 @@ columns:
     lineage:
       - datalake_hub_services.profile.profile
     description: Profile type description
+    categories:
+      MANAGEMENT_SECRETARIAT: Exclusive ForSale profile. Manages a secretarial team.
+      TREATMENT_SECRETARIAT: Exclusive ForSale profile. Works directly on converting new buyer prospects.
+      ADMINISTRATIVE_SECRETARIAT: Exclusive ForSale profile. Directly administers a group of secretaries.
+      DISTRIBUTION_SECRETARIAT: Exclusive ForSale profile. Directly distributes leads to a group of secretaries.
+      NEGOTIATION_EXECUTIVE: Exclusive ForSale profile. Responsible for intermediating the offer negotiation stage between a buyer and seller until it results in a signed contract (CCV).
+      AGENT: Can belong to ForSale or ForRent. Acts as a visit broker.
+      TREATMENT_SECRETARIAT_NBP: Exclusive ForSale profile. A secretary who works directly on converting new buyer prospects.
+      THIRD_PARTY_TREATMENT_SECRETARIAT: Exclusive ForSale profile. Works directly on converting new buyer prospects, but the secretaries are third-party.
+      SELECT_EXECUTIVE: Exclusive ForRent profile. Responsible for supporting and managing the work of a group of brokers.
+      ASSOCIATED_EXECUTIVE: Exclusive ForSale profile. Responsible for managing the work of a group of business units (HUBs).
+      SUPERVISION_SECRETARIAT: Exclusive ForSale profile. Supervises a group of secretaries.
+      TREATMENT_SECRETARIAT_TWILIO: Exclusive ForSale profile. Works directly on converting new buyer prospects, with communication via Twilio (a CX tool).
   dt_created:
     lineage:
       - datalake_hub_services.profile.dt_created

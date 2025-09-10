@@ -1,15 +1,4 @@
-WITH filter_bimester AS (
-    SELECT DISTINCT
-        ad.bimester_start,
-        ad.bimester_end,
-        ad.bimester,
-        ad.year
-    FROM 
-        datalake_quintoandar.aux_date AS ad
-    WHERE
-        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-),
-prospect_daily_results AS (
+WITH prospect_daily_results AS (
     SELECT
         pdr.id_prospect,
         pdr.id_booking,
@@ -17,7 +6,11 @@ prospect_daily_results AS (
         pdr.event_name,
         pdr.business_context,
         pdr.referral_type,
-        DATE(pdr.ts_event) AS dt_event
+        pdr.ts_event,
+        DATE(pdr.ts_event) AS dt_event,
+        pdr.year,
+        pdr.month,
+        pdr.day
     FROM
         datalake_demand_flows.prospect_daily_results AS pdr
     QUALIFY
@@ -25,24 +18,22 @@ prospect_daily_results AS (
 )
 SELECT
     pdr.id_agent,
-    aha.id_user,
-    aha.id_user_negotiation_executive AS id_user_parent,
+    u.id AS id_user,
+    u.uuid_person,
     pdr.id_prospect,
-    pdr.business_context,
+    UPPER(pdr.business_context) AS business_context,
     pdr.event_name,
-    pdr.dt_event,
-    fb.year,
-    fb.bimester
+    pdr.ts_event,
+    pdr.year,
+    pdr.month,
+    pdr.day
 FROM
     prospect_daily_results AS pdr
 JOIN
-    filter_bimester AS fb
-        ON pdr.dt_event BETWEEN fb.bimester_start AND fb.bimester_end
-LEFT JOIN
-    datalake_hub_services.agent_hub_alocation AS aha
-        ON aha.id_agent = pdr.id_agent
-        AND aha.dt_reference = pdr.dt_event
+    datalake_ebdb_user.user AS u
+        ON u.id_agent = pdr.id_agent
 WHERE
-    pdr.id_agent IS NOT NULL
+    MAKE_DATE(pdr.year, pdr.month, pdr.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND pdr.id_agent IS NOT NULL
     AND pdr.event_name in ("USER FIRST ACTIVATION", "USER RECOVERY", "USER RECOVERY IN OTHER CITY GROUP")
     AND pdr.referral_type <> 'Rede'

@@ -1,10 +1,10 @@
 ---
-database_name: datalake_tiers
+database_name: datalake_tiers_test
 table_name: agent_prospects
 description: |
-  This table aims to map the prospects attended by agents, enriching this information with visit scheduling 
-  events and agent hub allocation data at the time of the visit. 
-  The granularity of the table is at the agent level and by the first purchase visit recorded for each buyer.
+  Maps new or recovered prospects attributed to agents for key conversion events.
+  Granularity is per agent, prospect and day for the first occurrence of each
+  conversion event type within the flow.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -14,16 +14,14 @@ columns:
     description: Agent unique identifier.
   id_user:
     lineage:
-      - datalake_hub_services.agent_hub_alocation.id_user
+      - datalake_ebdb_user.user.id
     description: |
       User unique identifier.
       Attention: This ID refers to the user in main/admin/ebdb.
-  id_user_parent:
+  uuid_person:
     lineage:
-      - datalake_hub_services.agent_hub_alocation.id_user_negotiation_executive
-    description: |
-      User unique identifier to the parent member.
-      Attention: This ID refers to the user in main/admin/ebdb.
+      - datalake_ebdb_user.user.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the user.
   id_prospect:
     lineage:
       - datalake_demand_flows.prospect_daily_results.id_prospect
@@ -38,15 +36,19 @@ columns:
     lineage:
       - datalake_demand_flows.prospect_daily_results.event_name
     description: Name of the demand prospect conversion event.
-  dt_event:
+  ts_event:
     lineage:
       - datalake_demand_flows.prospect_daily_results.ts_event
-    description: Timestamp in witch the interaction with the prospect happened.
+    description: Timestamp in which the interaction with the prospect happened.
   year:
     lineage:
-      - datalake_quintoandar.aux_date.year
-    description: Year of event happened.
-  bimester:
+      - datalake_demand_flows.prospect_daily_results.year
+    description: Year when the event happened.
+  month:
     lineage:
-      - datalake_quintoandar.aux_date.bimester
-    description: Bimester of event happened.
+      - datalake_demand_flows.prospect_daily_results.month
+    description: Month when the event happened.
+  day:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.day
+    description: Day when the event happened.

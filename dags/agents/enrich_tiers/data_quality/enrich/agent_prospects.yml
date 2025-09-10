@@ -5,13 +5,24 @@ column_level_validations:
   id_agent:
     is_complete:
       severity_level: Error
-  dt_event:
+  id_user:
+    is_complete:
+      severity_level: Error
+  uuid_person:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  ts_event:
     is_complete:
       severity_level: Error
   year:
     is_complete:
       severity_level: Error
-  bimester:
+  month:
     is_complete:
       severity_level: Error
-
+  day:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,77 @@
+---
+database_name: datalake_tiers
+table_name: agent_allocation
+description: |
+  Latest hub allocation snapshot per agent within the valid metric period window,
+  including user/agent identifiers, parent hierarchy, business unit and reference date.
+  This table's primary purpose is to map the broker (CR) <> negotiation executive (EN)
+  relationship during the valid metric period. It enables correct EN attribution in
+  downstream metrics and use cases — for example, prospect aggregations where the
+  total prospects of an EN equals the sum of the prospects from all brokers (CRs)
+  associated to that EN within the period.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_metric_period:
+    lineage:
+      - datalake_big_agent_clean.metric_period.id
+    description: Identifier of the metric period used to filter the allocation.
+  id_member_profile:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.id_member_profile
+    description: Unique identifier of the member profile.
+  id_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Main/admin (ebdb) user identifier associated to the allocated member.
+  id_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: Agent unique identifier.
+  id_parent_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: Parent member main/admin (ebdb) user identifier.
+  id_parent_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: Parent agent unique identifier.
+  uuid_parent_person:
+    lineage:
+      - datalake_hub_services.users.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the parent member.
+  uuid_person:
+    lineage:
+      - datalake_hub_services.users.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the user.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.id_business_unit
+    description: Business unit identifier.
+  hub_name:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.hub_name
+    description: Business unit name.
+  profile:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.profile
+    description: Member profile role (AGENT or NEGOTIATION_EXECUTIVE).
+  dt_reference:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.dt_reference
+    description: Reference date of the allocation.
+  year:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.year
+    description: Year extracted from the reference date.
+  month:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.month
+    description: Month extracted from the reference date.
+  day:
+    lineage:
+      - datalake_hub_services.member_hub_allocation.day
+    description: Day extracted from the reference date.
+
+

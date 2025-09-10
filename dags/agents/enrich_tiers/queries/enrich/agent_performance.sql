@@ -1,253 +1,165 @@
-WITH filter_bimester AS (
-    SELECT
-        ad.bimester_name,
-        ad.date,
-        ad.bimester,
-        ad.bimester_start,
-        ad.bimester_end,
-        ad.year
-    FROM 
+WITH metric_period_process AS (
+    SELECT DISTINCT
+        mp.id AS id_metric_period,
+        mp.dt_init AS dt_metric_period_started,
+        mp.dt_end AS dt_metric_period_ended
+    FROM
+        datalake_big_agent_clean.metric_period AS mp
+    JOIN
         datalake_quintoandar.aux_date AS ad
+            ON ad.date BETWEEN mp.dt_init AND mp.dt_end
     WHERE
         ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND mp.status = "VALID"
 ),
-offer_price_agreed AS (
-    SELECT DISTINCT
-        oa.id_offer,
-        oa.sale_price_agreed
+simple_metrics AS (
+    SELECT
+        me.id_user,
+        me.id_agent,
+        me.uuid_person,
+        me.id_metric_period,
+        me.final_metric AS metric,
+        COUNT(DISTINCT me.id_external_domain) AS value,
+        mp.dt_metric_period_started,
+        mp.dt_metric_period_ended
     FROM
-        datalake_tiers.agent_offers AS oa
+        datalake_tiers.metric_events AS me
     JOIN
-        filter_bimester AS fb
-            ON DATE(oa.ts_sale_agreement_signed) BETWEEN fb.bimester_start AND fb.bimester_end
+        metric_period_process AS mp
+            ON mp.id_metric_period = me.id_metric_period
+    WHERE 
+        me.is_compound_metric_part IS FALSE
+        AND me.is_cumulative_metric IS FALSE
+        AND me.is_valid IS TRUE
     GROUP BY ALL
 ),
-offer_signed AS (
+cumulative_metrics AS (
     SELECT
-        oa.id_user,
-        COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
-        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
-        SUM(opa.sale_price_agreed) AS total_gross_merchandise_volume, 
-        fb.year,
-        fb.bimester
+        me.id_user,
+        me.id_agent,
+        me.uuid_person,
+        me.id_metric_period,
+        me.final_metric AS metric,
+        SUM(COALESCE(me.cumulative_value, 0)) AS value,
+        mp.dt_metric_period_started,
+        mp.dt_metric_period_ended
     FROM
-        datalake_tiers.agent_offers AS oa
+        datalake_tiers.metric_events AS me
     JOIN
-        filter_bimester AS fb
-            ON DATE(oa.ts_sale_agreement_signed) BETWEEN fb.bimester_start AND fb.bimester_end
-    JOIN
-        offer_price_agreed AS opa
-            ON opa.id_offer = oa.id_offer
+        metric_period_process AS mp
+            ON mp.id_metric_period = me.id_metric_period
+    WHERE 
+        me.is_compound_metric_part IS FALSE
+        AND me.is_cumulative_metric IS TRUE
+        AND me.is_valid IS TRUE
     GROUP BY ALL
 ),
-offer_submitted AS (
+compound_metrics AS (
     SELECT
-        oa.id_user,
-        COUNT(DISTINCT oa.id_offer) AS total_offer_submitted,
-        COUNT(DISTINCT oa.id_buyer) AS total_buyer_with_offer_submitted,
-        fb.year,
-        fb.bimester
+        me.id_user,
+        me.id_agent,
+        me.uuid_person,
+        me.id_metric_period,
+        me.partial_metric,
+        me.final_metric AS metric,
+        COUNT(DISTINCT me.id_external_domain) AS value,
+        mp.dt_metric_period_started,
+        mp.dt_metric_period_ended
     FROM
-        datalake_tiers.agent_offers AS oa
+        datalake_tiers.metric_events AS me
     JOIN
-        filter_bimester AS fb
-            ON DATE(oa.ts_offer_submitted) BETWEEN fb.bimester_start AND fb.bimester_end
+        metric_period_process AS mp
+            ON mp.id_metric_period = me.id_metric_period
+    WHERE 
+        me.is_valid IS TRUE
+        AND me.is_compound_metric_part IS TRUE
+        AND me.is_cumulative_metric IS FALSE
     GROUP BY ALL
 ),
-ciq_offer_signed AS (
+BP2CCV_compound_metric AS (
     SELECT
-        oa.id_user_ciq AS id_user,
-        COUNT(DISTINCT oa.id_offer) AS total_offer_signed_with_ciq,
-        fb.year,
-        fb.bimester
-    FROM
-        datalake_tiers.agent_offers AS oa
-    JOIN
-        filter_bimester AS fb
-            ON fb.bimester = oa.bimester
-            AND fb.year = oa.year
-    WHERE
-        oa.is_contract_signed IS TRUE
-        AND oa.is_ciq_first_listing IS TRUE
-    GROUP BY ALL
-),
-ciq_first_listing AS (
-    SELECT
-        cfl.id_user,
-        COUNT(DISTINCT cfl.id_house) AS total_first_listing,
-        fb.year,
-        fb.bimester
-    FROM
-        datalake_tiers.ciq_first_listing AS cfl
-    JOIN
-        filter_bimester AS fb
-            ON DATE(cfl.ts_valid_first_listing) BETWEEN fb.bimester_start AND fb.bimester_end
-    WHERE
-        cfl.has_first_listing IS TRUE
-        AND cfl.is_valid_first_listing IS TRUE
-    GROUP BY ALL
-),
-member_profile AS (
-    SELECT
-        fb.bimester_name,
-        u.id_main_user,
-        u.id_agent,
-        u_parent.id_main_user AS id_main_user_parent,
-        u_parent.id_agent AS id_agent_parent,
-        mp.id_business_unit,
-        bu.hub_name,
-        bu.business_context,
+        cm.id_user,
+        cm.id_agent,
+        cm.uuid_person,
+        cm.id_metric_period,
+        cm.metric,
         CASE
-            WHEN mp.profile = 'AGENT' THEN 'Broker'
-            WHEN mp.profile = 'NEGOTIATION_EXECUTIVE' THEN "Negotiation Executive"
-        END AS profile,
-        u.name,
-        u.email,
-        u.cpf,
-        u.phone_number,
-        mp.is_active,
-        mp.ts_relationship_started,
-        COALESCE(mp.ts_relationship_ended, mp.ts_load) AS ts_relationship_ended,
-        fb.bimester,
-        fb.year
+            WHEN COALESCE(cm.value/ cms.value, 0) > 1 THEN 1
+            ELSE ROUND(COALESCE(cm.value/ cms.value, 0), 2)
+        END AS value,
+        cm.dt_metric_period_started,
+        cm.dt_metric_period_ended
     FROM
-        datalake_hub_services.member_profile AS mp
-    JOIN
-        datalake_hub_services.users AS u
-            ON u.id_user = mp.id_user
-    JOIN
-        datalake_hub_services.users AS u_parent
-            ON u_parent.id_user = mp.id_parent_user
-    JOIN
-        datalake_hub_services_clean.business_unit AS bu
-            ON bu.id = mp.id_business_unit
-    JOIN 
-        filter_bimester AS fb
-            ON (DATE(mp.ts_relationship_ended) BETWEEN fb.bimester_start AND fb.bimester_end)
-            OR mp.ts_relationship_ended IS NULL
+        compound_metrics AS cm
+    LEFT JOIN
+        compound_metrics AS cms
+            ON cms.id_user = cm.id_user
+            AND cms.id_metric_period = cm.id_metric_period
+            AND cms.partial_metric = "BP"
+            AND cms.metric = "BP2CCV"
     WHERE
-        mp.profile IN ('AGENT', 'NEGOTIATION_EXECUTIVE')
-),
-user_with_multiple_roles AS (
-    SELECT
-        mp.id_main_user,
-        COUNT(DISTINCT business_context) AS total_business_contexts
-    FROM
-        member_profile AS mp
-    WHERE
-        mp.is_active IS TRUE
-    GROUP BY 1
-    HAVING total_business_contexts > 1
-),
-agent_prospects AS (
-    SELECT
-        mp.id_main_user AS id_user,
-        mp.id_main_user_parent AS id_user_parent,
-        ap.id_prospect,
-        ap.year,
-        ap.bimester
-    FROM
-        datalake_tiers.agent_prospects AS ap
-    JOIN
-        member_profile AS mp
-            ON mp.id_agent = ap.id_agent
-            AND mp.year = ap.year
-            AND mp.bimester = ap.bimester
-    WHERE
-        mp.profile = "Broker"
-        AND ap.business_context = 'sale'
-),
-union_agent_prospects AS (
-    SELECT
-        ap.id_user,
-        "Broker" AS profile,
-        COUNT(DISTINCT ap.id_prospect) AS total_prospect,
-        ap.year,
-        ap.bimester
-    FROM
-        agent_prospects AS ap
+        cm.partial_metric = "CCV"
+        AND cm.metric = "BP2CCV"
     GROUP BY ALL
-    UNION ALL
+),
+TP2CS_compound_metric AS (
     SELECT
-        ap.id_user_parent AS id_user,
-        "Negotiation Executive" AS profile,
-        COUNT(DISTINCT ap.id_prospect) AS total_prospect,
-        ap.year,
-        ap.bimester
+        cm.id_user,
+        cm.id_agent,
+        cm.uuid_person,
+        cm.id_metric_period,
+        cm.metric,
+        CASE
+            WHEN COALESCE(cm.value/ cms.value, 0) > 1 THEN 1
+            ELSE ROUND(COALESCE(cm.value/ cms.value, 0), 2)
+        END AS value,
+        cm.dt_metric_period_started,
+        cm.dt_metric_period_ended
     FROM
-        agent_prospects AS ap
+        compound_metrics AS cm
+    LEFT JOIN
+        compound_metrics AS cms
+            ON cms.id_user = cm.id_user
+            AND cms.id_metric_period = cm.id_metric_period
+            AND cms.partial_metric = "TP"
+            AND cms.metric = "TP2CS"
+    WHERE
+        cm.partial_metric = "CS"
+        AND cm.metric = "TP2CS"
+    GROUP BY ALL
+),
+OS2CCV_BY_compound_metric AS (
+    SELECT
+        cm.id_user,
+        cm.id_agent,
+        cm.uuid_person,
+        cm.id_metric_period,
+        cm.metric,
+        CASE
+            WHEN COALESCE(cm.value/ cms.value, 0) > 1 THEN 1
+            ELSE ROUND(COALESCE(cm.value/ cms.value, 0), 2)
+        END AS value,
+        cm.dt_metric_period_started,
+        cm.dt_metric_period_ended
+    FROM
+        compound_metrics AS cm
+    LEFT JOIN
+        compound_metrics AS cms
+            ON cms.id_user = cm.id_user
+            AND cms.id_metric_period = cm.id_metric_period
+            AND cms.partial_metric = "OS"
+            AND cms.metric = "OS2CCV_BY"
+    WHERE
+        cm.partial_metric = "CCV"
+        AND cm.metric = "OS2CCV_BY"
     GROUP BY ALL
 )
-SELECT 
-    mp.id_agent,
-    mp.id_main_user AS id_user,
-    mp.id_business_unit,
-    mp.business_context,
-    mp.bimester_name,
-    mp.name,
-    mp.email,
-    mp.cpf,
-    mp.phone_number,
-    mp.profile,
-    mp.hub_name,
-    COALESCE(osu.total_offer_submitted, 0) AS total_offer_submitted,
-    COALESCE(os.total_offer_signed, 0) AS total_regular_offer_signed,
-    COALESCE(osu.total_buyer_with_offer_submitted, 0) AS total_buyer_with_offer_submitted,
-    COALESCE(uap.total_prospect, 0) AS total_prospect,
-    (
-        COALESCE(os.total_offer_signed, 0) 
-        + COALESCE(cos.total_offer_signed_with_ciq, 0)
-    ) AS total_offer_signed_with_agent_intermediation,
-    (
-        COALESCE(os.total_offer_signed_with_tqc, 0) 
-        + COALESCE(cos.total_offer_signed_with_ciq, 0)
-    ) AS total_offer_signed_with_demand_supply_capture,
-    COALESCE(os.total_offer_signed_with_tqc, 0) AS total_offer_signed_with_tqc,
-    COALESCE(cos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
-    COALESCE(cql.total_first_listing, 0) AS total_first_listing,
-    COALESCE(os.total_gross_merchandise_volume, 0) AS total_gross_merchandise_volume,
-    CASE
-        WHEN COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0) > 1 THEN 1
-        ELSE ROUND(COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0), 2)
-    END AS ratio_buyer_offer_submitted_to_signed,
-    CASE
-        WHEN COALESCE(os.total_offer_signed/ uap.total_prospect, 0) > 1 THEN 1
-        ELSE ROUND(COALESCE(os.total_offer_signed/ uap.total_prospect, 0), 2)
-    END AS ratio_prospect_to_offer_signed,
-    mp.year,
-    mp.bimester
-FROM
-    member_profile AS mp
-LEFT JOIN
-    user_with_multiple_roles AS uwmr
-        ON uwmr.id_main_user = mp.id_main_user
-LEFT JOIN
-    offer_signed AS os
-        ON os.id_user = mp.id_main_user
-        AND os.bimester = mp.bimester
-        AND os.year = mp.year
-LEFT JOIN
-    offer_submitted AS osu
-        ON osu.id_user = mp.id_main_user
-        AND osu.bimester = mp.bimester
-        AND osu.year = mp.year
-LEFT JOIN
-    ciq_offer_signed AS cos
-        ON cos.id_user = mp.id_main_user
-        AND cos.bimester = mp.bimester
-        AND cos.year = mp.year
-LEFT JOIN
-    ciq_first_listing AS cql
-        ON cql.id_user = mp.id_main_user 
-        AND cql.bimester = mp.bimester
-        AND cql.year = mp.year
-LEFT JOIN
-    union_agent_prospects AS uap
-        ON uap.id_user = mp.id_main_user 
-        AND uap.profile = mp.profile
-        AND uap.bimester = mp.bimester
-        AND uap.year = mp.year
-WHERE
-    NOT (uwmr.id_main_user IS NOT NULL AND mp.business_context = 'RENT')
-QUALIFY
-    1 = ROW_NUMBER() OVER (PARTITION BY mp.id_main_user, mp.bimester, mp.year ORDER BY mp.ts_relationship_started DESC, mp.ts_relationship_ended DESC)
+SELECT * FROM simple_metrics
+UNION ALL
+SELECT * FROM cumulative_metrics
+UNION ALL
+SELECT * FROM BP2CCV_compound_metric
+UNION ALL
+SELECT * FROM TP2CS_compound_metric
+UNION ALL
+SELECT * FROM OS2CCV_BY_compound_metric
