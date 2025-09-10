@@ -18,5 +18,7 @@ workflow:
       clean_table_name: cart
     cart_item:
       clean_table_name: cart_item
+      transactional_datatype_overrides:
+        amount: decimal(38,20)
 cluster:
   type: databricks_13_3_med_general_cluster
