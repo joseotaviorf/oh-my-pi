@@ -10,6 +10,8 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     sk_entity: "SHA2(CONCAT_WS('||', entity, id_entity, persona, id_user), 256)"
     house_address: "CONCAT(h.address, ', ', h.number, ' - ', h.complement, '. ', h.neighborhood, ', ', h.city)"
   tables_customization:

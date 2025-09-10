@@ -2,8 +2,12 @@ database_name: datalake_transactional_entities
 table_name: entities
 domain: Primitives
 owner: isadora.gallerani@quintoandar.com.br
-description: A table containing all transactional entities, providing a comprehensive view of our customers'
-  activities on the platform. Its format is specifically designed for use by AI initiatives like our chatbots.
+description: A table containing transactional entities with intelligent filtering to provide a comprehensive 
+  yet optimized view of our customers' activities on the platform.
+  Includes all active entities (is_active = TRUE) regardless of date, and inactive entities (is_active = FALSE)
+  from the last 3 months based on ts_updated. 
+  This filtering strategy ensures relevant, recent data while maintaining complete active entity coverage. 
+  The format is specifically designed for use by AI initiatives like our chatbots.
 columns:
   sk_entity:
     lineage:
@@ -79,10 +83,12 @@ columns:
       It combines address, number, complement, neighborhood and city (in this exactly order)
       from EBDB's House/Imovel table.
   is_active:
-    description: Boolean flag indicating if the entity is currently active.
-      An entity is considered active as long as it is still receiving interactions.
+    description: Boolean flag indicating if the entity is currently active, used as primary filter for data inclusion.
+      Active entities (TRUE) are always included regardless of date. Inactive entities (FALSE) are only included 
+      if updated within the last 3 months. An entity is considered active as long as it is still receiving interactions.
       A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsucessfull.
-      An offer entity will be considered as active for status proposed, and inactive for statuses accepted, dismissed or rejected. 
+      An offer entity will be considered as active for status proposed, and inactive for statuses accepted, dismissed or rejected.
+      A contract entity will be considered as active for statuses ativo, minuta or pre-assinaturas, and inactive for statuses cancelado or finalizado. 
   ts_created:
     lineage:
       - core_visit.visit.ts_created
@@ -94,6 +100,8 @@ columns:
       - core_visit.visit.ts_updated
       - core_offer.offer.ts_updated
       - core_contract.contract.ts_updated
-    description: Last timestamp of when the entity was updated in our product.
+    description: Last timestamp of when the entity was updated in our product. 
+      This field is used as the filtering criterion for inactive entities - only inactive entities 
+      updated within the last 3 months are included in this table.
   ts_load:
     description: Timestamp of when the entity was updated and loaded for the last time in this table.
