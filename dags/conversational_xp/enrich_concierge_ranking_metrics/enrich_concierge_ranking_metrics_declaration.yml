@@ -10,7 +10,7 @@ workflow:
   layer: enrich
   default_extraction_type: full
   extra_query_template_params:
-    "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    "load_start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
   tables_customization:
     ranking_metrics:
       partitions:

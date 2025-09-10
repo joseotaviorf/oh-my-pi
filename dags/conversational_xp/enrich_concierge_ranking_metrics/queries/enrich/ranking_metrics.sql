@@ -11,8 +11,8 @@ WITH clicked_properties as (
   
   WHERE 
     get_json_object(event_properties, '$.recset_showcase') = 'CONCIERGE_WHATSAPP'
-    and make_date(year, month, day) < '{start_date}'
-    and make_date(year, month, day) >= DATE_SUB('{start_date}', 4)
+    and make_date(year, month, day) < '{load_start_date}'
+    and make_date(year, month, day) >= DATE_SUB('{load_start_date}', 4)
 
 ),
 
@@ -28,7 +28,7 @@ base as (
   FROM datalake_house_listing_search_clean.recommendation_user_use_case ruuc
   LEFT JOIN datalake_house_listing_search_clean.recommendation_use_case ruc
     on ruuc.id=ruc.id_user_use_case
-    and CAST(ruc.ts_created AS DATE) = DATE_SUB('{start_date}', 4)
+    and CAST(ruc.ts_created AS DATE) = DATE_SUB('{load_start_date}', 4)
   LEFT JOIN clicked_properties cp 
     on cp.house_id = ruc.id_listing
     and cp.recommendation_id=ruuc.id_recommendation
@@ -38,7 +38,7 @@ base as (
     ruuc.id_recommendation is not null
     AND ruc.id_listing is not null
     AND ruuc.use_case = 'FEED_CONCIERGE'
-    AND CAST(ruuc.ts_created AS DATE) = DATE_SUB('{start_date}', 4)
+    AND CAST(ruuc.ts_created AS DATE) = DATE_SUB('{load_start_date}', 4)
 ),
 
 metrics AS (

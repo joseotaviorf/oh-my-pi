@@ -110,7 +110,7 @@ clusters AS (
     GET_JSON_OBJECT(uspc.rent_cluster1_user_search_profile, '$.qty_suites') AS cluster_qty_suites,
     GET_JSON_OBJECT(uspc.rent_cluster1_user_search_profile, '$.perc_pets_friendly') AS cluster_perc_pets_friendly,
     CASE 
-      WHEN GET_JSON_OBJECT(uspc.rent_cluster1_user_search_profile, '$.type') == '{}' THEN NULL 
+      WHEN GET_JSON_OBJECT(uspc.rent_cluster1_user_search_profile, '$.type') == '{{}}' THEN NULL 
       ELSE GET_JSON_OBJECT(uspc.rent_cluster1_user_search_profile, '$.type')
     END AS cluster_type,
     CASE
@@ -148,7 +148,7 @@ clusters AS (
     GET_JSON_OBJECT(uspc.sale_cluster1_user_search_profile, '$.qty_suites') AS cluster_qty_suites,
     GET_JSON_OBJECT(uspc.sale_cluster1_user_search_profile, '$.perc_pets_friendly') AS cluster_perc_pets_friendly,
     CASE 
-      WHEN GET_JSON_OBJECT(uspc.sale_cluster1_user_search_profile, '$.type') == '{}' THEN NULL 
+      WHEN GET_JSON_OBJECT(uspc.sale_cluster1_user_search_profile, '$.type') == '{{}}' THEN NULL 
       ELSE GET_JSON_OBJECT(uspc.sale_cluster1_user_search_profile, '$.type')
     END AS cluster_type,
     CASE
