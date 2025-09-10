@@ -310,7 +310,7 @@ prob_payment_calculation AS (
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'MEDIA'
+                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'BAIXA'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 > 20 THEN 'BAIXA'
