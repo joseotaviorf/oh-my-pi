@@ -139,6 +139,14 @@ columns:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
     description: Total handling time during the contact.
+  total_inactivity_time:
+    lineage:
+      - datalake_customer_support.chats.total_inactivity_time
+    description: Total inactivity time during Twilio task, in seconds.
+  last_inactivity_time:
+    lineage:
+      - datalake_customer_support.chats.last_inactivity_time
+    description: Last inactivity time during each Twilio task, in seconds.
   is_per_team_task:
     lineage:
       - datalake_customer_support.chats.is_per_team_task

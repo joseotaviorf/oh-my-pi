@@ -67,6 +67,8 @@ twilio_demand AS (
     NULL AS customer_email,
     waiting_time_sec,
     NULL AS seconds_to_first_response,
+    NULL AS total_inactivity_time, 
+    NULL AS last_inactivity_time,
     NULL AS is_per_team_task,
     is_call_answered AS is_contact_answered,
     is_reservation_answered AS is_interaction_answered,
@@ -108,6 +110,8 @@ twilio_demand AS (
     customer_email,
     NULL AS waiting_time_sec,
     seconds_to_first_response,
+    CAST(total_inactivity_time AS DOUBLE) / 1000 AS total_inactivity_time, 
+    CAST(last_inactivity_time AS DOUBLE) / 1000 AS last_inactivity_time,
     is_per_team_task,
     TRUE AS is_contact_answered,
     CASE
@@ -160,6 +164,8 @@ twilio_contacts AS (
     tm.total_queue_time,
     tm.total_wrap_up_time,
     tm.total_waiting_time,
+    d.total_inactivity_time,
+    d.last_inactivity_time,
     CASE
       WHEN d.channel = 'chat' THEN d.seconds_to_first_response
       WHEN d.channel = 'call' THEN d.waiting_time_sec
@@ -224,6 +230,8 @@ front_contacts AS (
     total_queue_time,
     total_wrap_up_time,
     total_waiting_time,
+    total_inactivity_time,
+    last_inactivity_time,
     first_reply_time,
     total_handling_time,
     CASE
@@ -285,6 +293,8 @@ front_contacts AS (
     NULL AS total_queue_time,
     NULL AS total_wrap_up_time,
     NULL AS total_waiting_time,
+    NULL AS total_inactivity_time,
+    NULL AS last_inactivity_time,
     NULL AS first_reply_time,
     NULL AS total_handling_time,
     TRUE AS is_first_interaction,
@@ -344,6 +354,8 @@ SELECT DISTINCT
   total_waiting_time,
   first_reply_time,
   total_handling_time,
+  total_inactivity_time,
+  last_inactivity_time,
   is_first_interaction,
   is_last_interaction,
   is_first_department_interaction,
