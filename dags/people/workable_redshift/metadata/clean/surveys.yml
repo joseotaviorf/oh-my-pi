@@ -55,15 +55,3 @@ columns:
       - datalake_workable_redshift_raw.surveys.updated_at
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the survey record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.surveys.year
-  month:
-    description: Month of the update to the survey record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.surveys.month
-  day:
-    description: Day of the update to the survey record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.surveys.day

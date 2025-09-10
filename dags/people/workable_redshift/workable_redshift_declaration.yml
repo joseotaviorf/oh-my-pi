@@ -203,6 +203,4 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     surveys:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
