@@ -36,7 +36,7 @@ cluster:
   type: custom_cluster
   custom_libraries:
   - pypi:
-      package: "langfuse==3.0.0"
+      package: "langfuse==3.3.0"
   custom_configurations:
     driver_node_type_id: r7a.2xlarge
     node_type_id: r7a.2xlarge

@@ -1,9 +1,12 @@
 import json
 import logging
+import os
+import time
+import random
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import os
+
 
 from langfuse import Langfuse
 from pyspark.sql.functions import lit, to_json, col
@@ -20,7 +23,6 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
 from quintoandar_logger import QuintoAndarLogger
 
 
@@ -29,8 +31,49 @@ JOB_NAME = "load_langfuse_raw"
 SOURCE = "langfuse"
 PAGE_SIZE = 100
 
+# retry and performance constants
+MAX_RETRIES = 5
+EXPONENTIAL_BACKOFF_BASE = 2
+JITTER_MIN = 0.1
+JITTER_MAX = 0.5
+ERROR_SAMPLE_LIMIT = 5
+MINUTES_INTERVAL = 30
+CPU_USAGE_PERCENTAGE = 0.5
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger(JOB_NAME)
+logger = QuintoAndarLogger(
+    name=JOB_NAME,
+    fmt='%(levelname)s:%(name)s:%(asctime)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+
+def fetch_page_with_retry(langfuse, table_name, start_timestamp, end_timestamp, page, limit=PAGE_SIZE, max_retries=MAX_RETRIES):
+    """Fetch a single page with exponential backoff retry."""
+    interval_str = f"{start_timestamp.strftime('%Y-%m-%d %H:%M')}-{end_timestamp.strftime('%H:%M')}"
+    for attempt in range(max_retries + 1):
+        try:
+            result = fetch_page(langfuse, table_name, start_timestamp, end_timestamp, page, limit)
+
+            if attempt > 0:
+                logger.info(f"Interval {interval_str}: Request succeeded for page {page} after {attempt} retries")
+            
+            return result
+        except Exception as e:
+            if attempt == max_retries:
+                raise e
+            
+            base_delay = EXPONENTIAL_BACKOFF_BASE ** attempt  # 1s, 2s, 4s
+            jitter = random.uniform(JITTER_MIN, JITTER_MAX)  # add 10-50% jitter
+            delay = base_delay + jitter
+            
+            logger.warning(
+                f"Interval {interval_str}: Error on page {page} "
+                f"attempt {attempt + 1}/{max_retries + 1}. Retrying in {delay:.2f}s. Error: {str(e)}"
+            )
+            time.sleep(delay)
+    
+    # this should never be reached, but just in case
+    raise RuntimeError(f"Interval {interval_str}: Unexpected error in retry logic for page {page}")
 
 
 def fetch_page(langfuse, table_name, start_timestamp, end_timestamp, page, limit=PAGE_SIZE):
@@ -66,13 +109,13 @@ def fetch_page(langfuse, table_name, start_timestamp, end_timestamp, page, limit
     }
 
 
-def generate_4hr_intervals(start_timestamp, end_timestamp):
-    """Generate two-hour intervals between start and end timestamps."""
+def generate_time_intervals(start_timestamp, end_timestamp):
+    """Generate time intervals between start and end timestamps based on MINUTES_INTERVAL."""
     intervals = []
     current_start = start_timestamp
     
     while current_start < end_timestamp:
-        current_end = min(current_start + timedelta(hours=4), end_timestamp)
+        current_end = min(current_start + timedelta(minutes=MINUTES_INTERVAL), end_timestamp)
         intervals.append((current_start, current_end))
         current_start = current_end
     
@@ -82,9 +125,7 @@ def generate_4hr_intervals(start_timestamp, end_timestamp):
 def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name, max_workers):
     """Retrieves data from Langfuse API using parallel requests for better performance."""
 
-    logger.info(f"Fetching data from {start_timestamp} to {end_timestamp}")
-
-    first_page_result = fetch_page(langfuse, table_name, start_timestamp, end_timestamp, 1, PAGE_SIZE)
+    first_page_result = fetch_page_with_retry(langfuse, table_name, start_timestamp, end_timestamp, 1, PAGE_SIZE)
     all_json_data = first_page_result['data']
     
     # according to Langfuse API docs, meta.totalPages should always be present
@@ -98,7 +139,7 @@ def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name, max_
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_page = {
-            executor.submit(fetch_page, langfuse, table_name, start_timestamp, end_timestamp, page, PAGE_SIZE): page
+            executor.submit(fetch_page_with_retry, langfuse, table_name, start_timestamp, end_timestamp, page, PAGE_SIZE): page
             for page in pages_to_fetch
         }
         
@@ -114,10 +155,9 @@ def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name, max_
                 errors.append((page, e))
 
         if errors:
-            sample = ", ".join([f"page={p}: {str(e)}" for p, e in errors[:5]])
+            sample = ", ".join([f"page={p}: {str(e)}" for p, e in errors[:ERROR_SAMPLE_LIMIT]])
             raise RuntimeError(f"{len(errors)} page request(s) failed: {sample}")
-    
-    logger.info(f"Total records from {start_timestamp} to {end_timestamp}: {len(all_json_data)}")
+
     return all_json_data
 
 if __name__ == "__main__":
@@ -138,10 +178,9 @@ if __name__ == "__main__":
     start_timestamp_str = args.start_timestamp
     end_timestamp_str = args.end_timestamp
 
-    # fetch the last 2 hours of data, 1 + 1 from airflow
-    # remove timezone info
+    # fetch the last 1.5 hours of data, 30min + 1hr from airflow schedule
     end_timestamp = datetime.fromisoformat(end_timestamp_str).replace(tzinfo=None)
-    start_timestamp = datetime.fromisoformat(start_timestamp_str).replace(tzinfo=None) - timedelta(hours=1)
+    start_timestamp = datetime.fromisoformat(start_timestamp_str).replace(tzinfo=None) - timedelta(minutes=MINUTES_INTERVAL)
     partition_cols = ["year", "month", "day", "hour"]
 
     config_service = ConfigurationService(dag_name)
@@ -171,43 +210,42 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
+    max_workers = max(1, int((os.cpu_count() or 1) * CPU_USAGE_PERCENTAGE))
+    logger.info(f"Using {max_workers} workers")
+    logger.info(f"Using {PAGE_SIZE} page size")
+
+    intervals = generate_time_intervals(start_timestamp, end_timestamp)
+    logger.info(f"Fetching from {start_timestamp.strftime('%Y-%m-%d %H:%M')} to {end_timestamp.strftime('%Y-%m-%d %H:%M')}")
+    logger.info(f"{len(intervals)} {MINUTES_INTERVAL}min intervals")
+
     langfuse = Langfuse(
         secret_key=langfuse_sk,
         public_key=langfuse_pk,
         host=langfuse_host
     )
 
-    # use 80% of available CPU cores for the worker pool, minimum of 1
-    max_workers = max(1, int((os.cpu_count() or 1) * 0.8))
-    logger.info(f"Using {max_workers} workers")
-    logger.info(f"Using {PAGE_SIZE} page size")
-
-    intervals = generate_4hr_intervals(start_timestamp, end_timestamp)
-    logger.info(f"start_timestamp={start_timestamp} end_timestamp={end_timestamp}")
-    logger.info(f"{len(intervals)} 4hr intervals")
-
     all_json_data = []
     for i, (interval_start, interval_end) in enumerate(intervals, 1):
-        logger.info(f"Processing interval {i}/{len(intervals)}: {interval_start} to {interval_end}")
+        interval_str = f"{interval_start.strftime('%Y-%m-%d %H:%M')}-{interval_end.strftime('%H:%M')}"
+        logger.info(f"Interval {i}/{len(intervals)}: {interval_start.strftime('%Y-%m-%d %H:%M')} to {interval_end.strftime('%Y-%m-%d %H:%M')}")
         try:
             interval_data = get_langfuse_data(langfuse, interval_start, interval_end, table_name, max_workers)
             if interval_data:
                 all_json_data.extend(interval_data)
-                logger.info(f"{len(interval_data)} records from interval {i}")
+                logger.info(f"Found {len(interval_data)} records for interval {interval_str}")
             else:
-                logger.info(f"No data found for interval {i}")
+                logger.info(f"No data found for interval {interval_str}")
         except Exception as e:
-            logger.error(f"Failed to fetch data for interval {i} ({interval_start} to {interval_end}): {str(e)}")
+            logger.error(f"Failed to fetch data for interval {interval_str}: {str(e)}")
             raise
     
     logger.info(f"Total records: {len(all_json_data)}")
-    json_data = all_json_data
 
-    if not json_data:
+    if not all_json_data:
         logger.warning(f"No data found, skipping processing...")
     else:
 
-        rdd = spark.sparkContext.parallelize(json_data)
+        rdd = spark.sparkContext.parallelize(all_json_data)
         df = spark.read.json(rdd)
 
         if "metadata" in df.columns:
