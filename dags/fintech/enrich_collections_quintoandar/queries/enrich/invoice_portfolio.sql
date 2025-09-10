@@ -201,9 +201,6 @@ create_recovery_channel AS (
                 THEN 'Paid outside App'
             WHEN b.status = 'written-down'
                 AND bn.id_negotiation_child IS NULL
-                AND (b.reason IS NULL
-                    OR (b.reason NOT LIKE '%negotiation%'
-                    AND b.reason NOT LIKE '%agreement%'))
                 THEN 'Manual Written Down'
             WHEN b.status = 'written-down'
                 AND bn.id_negotiation_child IS NOT NULL
@@ -242,11 +239,6 @@ create_recovery_channel AS (
             WHEN b.status = 'written-down'
                 AND bn.id_negotiation_child IS NOT NULL
                 THEN 'Negotiation - Unclassified'
-            WHEN b.status = 'written-down'
-                AND bn.id_negotiation_child IS NULL
-                    AND (b.reason LIKE '%negotiation%'
-                    OR b.reason LIKE '%agreement%')
-                THEN 'Negotiation - Not Tracked'
             ELSE 'Unknown'
         END AS recovery_channel,
         b.paid_via,
@@ -346,7 +338,7 @@ SELECT
     recovery_channel,
     CASE
         WHEN recovery_channel in ('Negotiation - Advisory','Paid Installment in App', 'Paid Installment outside App') THEN 'BPO'
-        WHEN recovery_channel in ('Negotiation - SSN', 'Paid in App','Paid outside App') THEN 'DIGITAL'
+        WHEN recovery_channel in ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN 'DIGITAL'
         WHEN recovery_channel in ('Negotiation - Serasa') THEN 'DIGITAL EXTERNAL PARTNERS'
         ELSE 'NON DIGITAL OTHERS'
     END AS digital_recovery,
