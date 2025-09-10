@@ -278,18 +278,11 @@ LEFT JOIN
   service_provider AS rr
     ON sr.id_repair_request = rr.id_repair_request
 LEFT JOIN
-  repairs_interaction AS ri
-    ON ri.id_request = rr.id_repair_request
-LEFT JOIN
   relisting_distinct AS rd
     ON rd.id_contract = tc.id_contract
 LEFT JOIN
   datalake_survicate.repairs_surveys AS csat
     ON csat.id_ticket = tc.id_ticket
-LEFT JOIN
-  datalake_repairs_clean.repair_request AS rr_first_interaction
-    ON tc.id_ticket = rr_first_interaction.id_third_party_crm_ticket_external
-    AND rr_first_interaction.id_third_party_crm_ticket_external IS NOT NULL
 LEFT JOIN
   first_interaction AS fi
     ON fi.id_third_party_crm_ticket_external = tc.id_ticket
@@ -309,15 +302,16 @@ LEFT JOIN
   ticket_comment_metrics AS tcm
     ON tcm.id_ticket = t.id_ticket
 WHERE
-  tc.group_name IN 
+  tc.group_name IN
     (
       'Reparos [BACK]',
       'Triagem Reparos [Back]',
       'FullService [BACK]',
       'Autosserviço Reparos [BACK]',
       'ReparAção (Piloto Urgente)',
-      'Reparos PP Multi [BACK]',  
-      'ReparAção Comum [BACK]'
+      'Reparos PP Multi [BACK]',
+      'ReparAção Comum [BACK]',
+      'Reembolso de Reparos [Back]'
     )
   AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
   AND tc.channel NOT IN ('call', 'whatsapp')
