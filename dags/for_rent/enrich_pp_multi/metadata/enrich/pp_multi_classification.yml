@@ -14,3 +14,13 @@ columns:
     categories:
       "ACTIVE": The owner have more than 5 ongoing houses and at least 1 rented house.
       "POTENTIAL": The owner at some time had more than 5 ongoing houses and at least 1 rented house.
+  ongoing_houses:
+    description: The number of ongoing houses of the owner persona.
+  max_ongoing_houses_in_two_years:
+    description: The maximum number of ongoing houses of the owner persona in the last two years.
+  max_ongoing_houses_in_lifetime:
+    description: The maximum number of ongoing houses of the owner persona in the lifetime.
+  visits_booked_last_month:
+    description: The number of visits booked from house listings of the owner persona in the last month.
+  visits_completed_last_month:
+    description: The number of visits completed from house listings of the owner persona in the last month.
