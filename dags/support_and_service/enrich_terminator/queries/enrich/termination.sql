@@ -96,42 +96,51 @@ terminations_finished AS (
 ),
 repair_metrics AS (
     SELECT
-        id_contract,
+        rr.id_contract,
         COUNT(CASE
-          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+          WHEN rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
         END) AS total_tentant_repair_ar,
         COUNT(CASE
-          WHEN requester_type = 'OWNER' THEN 1
+          WHEN rr.requester_type = 'OWNER' THEN 1
         END) AS repairs_added_by_owner_review,
         COUNT(CASE
-          WHEN is_exempted_by_owner = true THEN 1
+          WHEN rr.is_exempted_by_owner = true THEN 1
         END) AS repairs_exempted_by_owner_review,
         COUNT(CASE
-          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+          WHEN rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
         END) +
           COUNT(CASE
-            WHEN requester_type = 'OWNER' THEN 1
+            WHEN rr.requester_type = 'OWNER' THEN 1
           END) -
             COUNT(CASE
-              WHEN is_exempted_by_owner = true THEN 1
+              WHEN rr.is_exempted_by_owner = true THEN 1
             END) AS total_tentant_repair_review,
         COUNT(CASE
-          WHEN is_finished = true AND is_exempted = true THEN 1
+          WHEN rr.is_finished = true AND rr.is_exempted = true THEN 1
         END) AS repairs_exempted_ac,
         COUNT(
           CASE
-            WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
+            WHEN rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false THEN 1
         END) AS repairs_absorbed_ac,
-        COUNT_IF(
-          (exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE')) OR (requester_type = 'OWNER')
-        ) - COUNT_IF(
-          (is_exempted_by_owner = true) OR (is_finished = true AND is_exempted = true) OR (responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false)
-        ) AS total_tentant_repair_ac
+        CASE
+            WHEN MAX(ra.is_early_both_agree) = TRUE OR MAX(ib.has_early_mediation) = TRUE THEN 0
+            ELSE COUNT_IF(
+                    (rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE')) OR (rr.requester_type = 'OWNER')
+                ) - COUNT_IF(
+                    (rr.is_exempted_by_owner = true) OR (rr.is_finished = true AND rr.is_exempted = true) OR (rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false)
+                )
+        END AS total_tentant_repair_ac
     FROM
-        datalake_inspections.repair_request
+        datalake_inspections.repair_request AS rr
+    LEFT JOIN
+        datalake_inspections.report_approvals AS ra
+            ON rr.id_inspection = ra.id_inspection
+    LEFT JOIN
+        datalake_inspections.inspection_booking AS ib
+            ON rr.id_inspection = ib.id_inspection
     WHERE
-        comment IS NOT NULL
-        AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
+        rr.comment IS NOT NULL
+        AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
     GROUP BY
           1
 )
