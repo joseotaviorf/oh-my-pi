@@ -1,0 +1,59 @@
+---
+database_name: datalake_rene_descartes_clean
+table_name: portfolio
+description: |
+  Curated portfolio dimension consolidating core identifiers, portfolio type and
+  external application linkage for Growth use cases. Records are standardized
+  from `datalake_rene_descartes_raw.portfolio`, with normalized timestamps and
+  consistent naming, and are ready for analytics and enrichment.
+domain: Growth
+owner: michele.carvalho@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.id
+    description: Unique identifier of the portfolio record.
+  portfolio_type:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.portfolio_type
+    description: Business classification of the portfolio (e.g., possible_house, house).
+  identifier_key:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.identifier_key
+    description: Type of external identifier used to link the portfolio (key name).
+  identifier_value:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.identifier_value
+    description: External identifier value corresponding to `identifier_key`.
+  identifier_anonymized:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.identifier_anonymized
+    description: Anonymized representation of the external identifier.
+  id_external_app:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.external_app_id
+    description: Identifier of the external application that originated the record.
+  external_app_name:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.external_app_name
+    description: Name of the external application that originated the record.
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.created_at
+    description: Record creation timestamp (UTC).
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.updated_at
+    description: Most recent update timestamp (UTC).
+  year:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.year
+    description: Partition year of the record.
+  month:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.month
+    description: Partition month of the record.
+  day:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio.day
+    description: Partition day of the record.

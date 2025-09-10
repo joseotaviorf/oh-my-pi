@@ -26,6 +26,8 @@ workflow:
     lead_rejection: {}
     phone: {}
     revinfo: {}
+    portfolio: {}
+    portfolio_enrichment: {}
 cluster:
   type: databricks_13_3_med_memory_cluster
   databricks_conn_id: databricks_new

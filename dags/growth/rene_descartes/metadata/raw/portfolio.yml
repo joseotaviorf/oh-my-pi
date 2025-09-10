@@ -1,0 +1,12 @@
+database_name: datalake_rene_descartes_raw
+table_name: portfolio
+owner: michele.carvalho@quintoandar.com.br
+domain: Growth
+description: |
+  Raw snapshot of portfolio records ingested from source applications used by
+  Growth initiatives. Each row represents a portfolio entity associated with a
+  user or lead and contains the identifiers that link it back to the
+  originating system. Data is stored as received from the source (no business
+  transformations beyond technical partitioning and ingestion handling) and
+  serves as the authoritative landing table for downstream cleaning and
+  enrichment.

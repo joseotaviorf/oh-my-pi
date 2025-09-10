@@ -1,0 +1,67 @@
+---
+database_name: datalake_rene_descartes_clean
+table_name: portfolio_enrichment
+description: |
+  Curated enrichment table for portfolios, combining Dejavu matching metadata,
+  listing price snapshots and model prediction outputs, standardized from the
+  raw enrichment feed. Designed to support Growth analyses and downstream
+  feature generation with consistent semantics and timestamps.
+domain: Growth
+owner: michele.carvalho@quintoandar.com.br
+columns:
+  id_portfolio:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.portfolio_id
+    description: Primary key and foreign referencing the portfolio record.
+  id_dejavu:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.dejavu_id
+    description: Identifier produced by Dejavu for the matched entity.
+  dejavu_reliability:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.dejavu_reliability
+    description: Reliability score from Dejavu matching (0–1 scale when available).
+  dejavu_version:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.dejavu_version
+    description: Version of the Dejavu model or API that generated the result.
+  price_listing_rent:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.price_listing_rent
+    description: Listing rent price observed at ingestion time.
+  price_listing_sale:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.price_listing_sale
+    description: Listing sale price observed at ingestion time.
+  property_prediction_price_rent:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.property_prediction_price_rent
+    description: Predicted rent price for the property or lead.
+  property_prediction_response_rent:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.property_prediction_response_rent
+    description: Full response payload for the rent price prediction.
+  property_prediction_origin_rent:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.property_prediction_origin_rent
+    description: Source service of the rent prediction (e.g., vespucio, casio).
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.created_at
+    description: Record creation timestamp (UTC).
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.updated_at
+    description: Most recent update timestamp (UTC).
+  year:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.year
+    description: Partition year of the record.
+  month:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.month
+    description: Partition month of the record.
+  day:
+    lineage:
+      - datalake_rene_descartes_raw.portfolio_enrichment.day
+    description: Partition day of the record.
