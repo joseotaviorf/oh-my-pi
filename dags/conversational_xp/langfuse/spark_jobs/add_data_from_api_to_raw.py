@@ -29,16 +29,18 @@ from quintoandar_logger import QuintoAndarLogger
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_langfuse_raw"
 SOURCE = "langfuse"
-PAGE_SIZE = 100
 
 # retry and performance constants
+MINUTES_INTERVAL = 30
+MAX_WORKERS = 10
+ERROR_SAMPLE_LIMIT = 5
+PAGE_SIZE = 50
 MAX_RETRIES = 5
 EXPONENTIAL_BACKOFF_BASE = 2
-JITTER_MIN = 0.1
-JITTER_MAX = 0.5
-ERROR_SAMPLE_LIMIT = 5
-MINUTES_INTERVAL = 30
-CPU_USAGE_PERCENTAGE = 0.5
+JITTER_MIN = 0.15
+JITTER_MAX = 0.6
+
+
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(
@@ -122,7 +124,7 @@ def generate_time_intervals(start_timestamp, end_timestamp):
     return intervals
 
 
-def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name, max_workers):
+def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name):
     """Retrieves data from Langfuse API using parallel requests for better performance."""
 
     first_page_result = fetch_page_with_retry(langfuse, table_name, start_timestamp, end_timestamp, 1, PAGE_SIZE)
@@ -137,7 +139,7 @@ def get_langfuse_data(langfuse, start_timestamp, end_timestamp, table_name, max_
 
     pages_to_fetch = list(range(2, total_pages + 1))
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future_to_page = {
             executor.submit(fetch_page_with_retry, langfuse, table_name, start_timestamp, end_timestamp, page, PAGE_SIZE): page
             for page in pages_to_fetch
@@ -210,8 +212,7 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    max_workers = max(1, int((os.cpu_count() or 1) * CPU_USAGE_PERCENTAGE))
-    logger.info(f"Using {max_workers} workers")
+    logger.info(f"Using {MAX_WORKERS} workers")
     logger.info(f"Using {PAGE_SIZE} page size")
 
     intervals = generate_time_intervals(start_timestamp, end_timestamp)
@@ -229,7 +230,7 @@ if __name__ == "__main__":
         interval_str = f"{interval_start.strftime('%Y-%m-%d %H:%M')}-{interval_end.strftime('%H:%M')}"
         logger.info(f"Interval {i}/{len(intervals)}: {interval_start.strftime('%Y-%m-%d %H:%M')} to {interval_end.strftime('%Y-%m-%d %H:%M')}")
         try:
-            interval_data = get_langfuse_data(langfuse, interval_start, interval_end, table_name, max_workers)
+            interval_data = get_langfuse_data(langfuse, interval_start, interval_end, table_name)
             if interval_data:
                 all_json_data.extend(interval_data)
                 logger.info(f"Found {len(interval_data)} records for interval {interval_str}")
