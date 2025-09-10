@@ -220,7 +220,7 @@ SELECT DISTINCT
   END group_type,
   IF(eca.id_credit_evaluation IS NULL, COALESCE(cm.variant, ca.variant_name), eca.variant) AS variant,
   cm.policy_dti,
-  IF(eca.id_credit_evaluation IS NULL, COALESCE(cm.category, ca.category), eca.variant) AS category,
+  COALESCE(cm.category, ca.category) AS category,
   IF(eca.id_credit_evaluation IS NULL, cm.risk_category_canon, eca.risk_category_canon) AS risk_category_canon,
   COALESCE(pp.total_proposal_proponents, gp.total_group_proponents) AS number_of_proponents,
   ce.is_automatic,
