@@ -1,0 +1,137 @@
+database_name: datalake_concierge_ranking_metrics
+table_name: user_search_profile_metrics
+owner: rafael.guedes@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores user search profile metrics and clustering analysis for both rent and sale business contexts. It captures user behavior patterns by comparing actual house properties that users visited or made offers on against their predicted search cluster preferences, providing match scores and accuracy metrics for concierge ranking optimization."
+columns:
+  id_user:
+    description: "The user identifier (tenant prospect for rent, buyer for sale)"
+    lineage:
+    - datalake_rent_flows.rent_flows.id_tenant_prospect
+    - datalake_sale_flows.sale_flow.id_buyer
+  id_house:
+    description: "The house identifier for the property the user interacted with"
+    lineage:
+    - datalake_rent_flows.rent_flows.id_house
+    - datalake_sale_flows.sale_flow.id_house
+  business_context:
+    description: "The business context type: 'rent' or 'sale'"
+  neighborhood:
+    description: "The neighborhood where the house is located"
+    lineage:
+    - wonka.house_main.neighborhood
+  city:
+    description: "The city where the house is located"
+    lineage:
+    - wonka.house_main.city
+  type:
+    description: "The property type (apartment, house, etc.)"
+    lineage:
+    - wonka.house_main.type
+  suite_count:
+    description: "Number of suites in the property"
+    lineage:
+    - wonka.house_main.suite_count
+  total_price:
+    description: "Total price of the property (monthly rent for rent context, sale price for sale context)"
+    lineage:
+    - wonka.house_main.total_price
+  total_area:
+    description: "Total area of the property in square meters"
+    lineage:
+    - wonka.house_main.total_area
+  bathroom_count:
+    description: "Number of bathrooms in the property"
+    lineage:
+    - wonka.house_main.bathroom_count
+  bedroom_count:
+    description: "Number of bedrooms in the property"
+    lineage:
+    - wonka.house_main.bedroom_count
+  parking_slots_count:
+    description: "Number of parking slots available for the property"
+    lineage:
+    - wonka.house_main.parking_slots_count
+  cluster_city:
+    description: "The city preference from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_neighborhoods:
+    description: "The neighborhood preferences from the user's search profile cluster (JSON array)"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_max_price:
+    description: "The maximum price preference from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_qty_bedrooms:
+    description: "The preferred number of bedrooms from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_qty_bathrooms:
+    description: "The preferred number of bathrooms from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_qty_parking:
+    description: "The preferred number of parking slots from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_type:
+    description: "The property type preferences from the user's search profile cluster (JSON map with scores)"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_min_area:
+    description: "The minimum area preference from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_qty_suites:
+    description: "The preferred number of suites from the user's search profile cluster"
+    lineage:
+    - wonka.user_search_profile_clustering.rent_cluster1_user_search_profile
+    - wonka.user_search_profile_clustering.sale_cluster1_user_search_profile
+  cluster_city_match:
+    description: "Binary flag (0/1) indicating if the actual house city matches the cluster city preference"
+  cluster_neighborhoods_match:
+    description: "Binary flag (0/1) indicating if the actual house neighborhood matches any cluster neighborhood preference"
+  cluster_max_price_mape:
+    description: "Mean Absolute Percentage Error between cluster max price preference and actual house price"
+  cluster_qty_bedrooms_match:
+    description: "Binary flag (0/1) indicating if the actual bedroom count matches cluster preference (within ±1 tolerance)"
+  cluster_qty_bathrooms_match:
+    description: "Binary flag (0/1) indicating if the actual bathroom count matches cluster preference (within ±1 tolerance)"
+  cluster_qty_parking_match:
+    description: "Binary flag (0/1) indicating if the actual parking count matches cluster preference (within ±1 tolerance)"
+  cluster_type_match:
+    description: "Binary flag (0/1) indicating if the actual property type matches cluster preference (score > 0.6)"
+  cluster_min_area_mape:
+    description: "Mean Absolute Percentage Error between cluster minimum area preference and actual house area"
+  cluster_qty_suites_match:
+    description: "Binary flag (0/1) indicating if the actual suite count matches cluster preference (within ±1 tolerance)"
+  bc_flow_date:
+    description: "The business context flow date when the user interaction occurred (first visit or offer submission)"
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    - datalake_sale_flows.sale_flow.ts_first_event
+  year:
+    description: "The year component extracted from the business context flow date"
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    - datalake_sale_flows.sale_flow.ts_first_event
+  month:
+    description: "The month component extracted from the business context flow date"
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    - datalake_sale_flows.sale_flow.ts_first_event
+  day:
+    description: "The day component extracted from the business context flow date"
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_rent_flow_event
+    - datalake_sale_flows.sale_flow.ts_first_event

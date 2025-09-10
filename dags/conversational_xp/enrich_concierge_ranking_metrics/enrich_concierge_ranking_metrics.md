@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG is responsible for calculating and loading concierge ranking metrics into our Data Lake.
+This DAG is responsible for calculating and loading concierge metrics into our Data Lake.
 
 <details>
   <summary><strong> DAG details (click to expand)</strong></summary>
@@ -18,5 +18,6 @@ More information about run time [here]({chart_url}{dag_id}).
 This DAG produces the following tables in enrich layer:
 
 - `concierge_ranking_metrics`
+- `user_search_profile_metrics`
 
 </details>

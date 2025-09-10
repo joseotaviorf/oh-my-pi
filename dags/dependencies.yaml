@@ -1605,6 +1605,8 @@ bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.house_listing_search:load-clean-recommendation-use-case:first-run-of-day
   - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case:first-run-of-day
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
 bietlejuice.enrich_condo_monitoring:
   - bietlejuice.condominium_payments:load-clean-non-payment-report:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
