@@ -1,0 +1,60 @@
+database_name: datalake_cyber_audit_log_clean
+table_name: audit_log
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Clean audit log table from CyberFinancial system with available audit fields for security and compliance tracking
+columns:
+  id_audit_log:
+    description: Unique identifier for each audit log entry
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALID
+  path_called:
+    description: Path or endpoint called during the audited operation
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALPATH
+  method_called:
+    description: HTTP method or database operation method used
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALMETHOD
+  ts_action:
+    description: Timestamp when the audited action occurred
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALDATE
+  id_user:
+    description: Identifier of the user who performed the action
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALUSER
+  ip_address:
+    description: IP address from which the action was performed
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALIP
+  record_content:
+    description: Content or details of the record affected by the action
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALRECORD
+  source:
+    description: Source system identifier
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.source
+  ts_ingestion:
+    description: Timestamp when the record was ingested into the data lake
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ts_ingestion
+  table_partition:
+    description: Partition identifier for data organization
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.table_partition
+  ts_load:
+    description: Timestamp when the record was processed and loaded into clean layer
+  year:
+    description: Year partition column for data organization
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.year
+  month:
+    description: Month partition column for data organization
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.month
+  day:
+    description: Day partition column for data organization
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.day

@@ -1,0 +1,58 @@
+dag:
+  name: cyber_audit_log
+  schedule_start_date: 2025, 9, 1
+  schedule_interval: 0 10 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestão específica da tabela AUDIT_LOG do sistema CyberFinancial para auditoria e segurança.
+      Esta tabela é fundamental para registrar atividades dos usuários, capturando informações de
+      "quem, o quê, quando e onde" todas as operações foram realizadas no sistema.
+
+      A tabela audit_log funciona como um diário de bordo completo, essencial para:
+      - Compliance e governança de dados
+      - Rastreabilidade de mudanças no sistema
+      - Investigação de incidentes de segurança
+      - Análise de comportamento de usuários
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_cyber_audit_log_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 2), 'load_end_date') }}"
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
+  tables_customization:
+    audit_log:
+      clean_table_name: audit_log
+      clean_extraction_type: incremental
+      clean_partitions: [year, month, day]
+      merge_on: [year, month, day, id_audit_log]
+      extra_spark_job_arguments:
+        - "['ALDATE']"
+        - False
+        - "[]"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5.xlarge
+    node_type_id: r5a.large
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  databricks_conn_id: databricks_new

@@ -1,0 +1,34 @@
+database_name: datalake_cyber_audit_log_raw
+table_name: audit_log
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Raw audit log table from CyberFinancial system capturing all user activities and system operations for security and compliance tracking
+columns:
+  ALPATH:
+    description: Path or endpoint called during the audited operation
+  ALMETHOD:
+    description: HTTP method or database operation method used
+  ALDATE:
+    description: Timestamp when the audited action occurred
+  ALUSER:
+    description: Identifier of the user who performed the action
+  ALIP:
+    description: IP address from which the action was performed
+  ALRECORD:
+    description: Content or details of the record affected by the action
+  ALID:
+    description: Unique identifier for each audit log entry
+  source:
+    description: Source system identifier
+    categories:
+      cyber: CyberFinancial system
+  ts_ingestion:
+    description: Timestamp when the record was ingested into the data lake
+  table_partition:
+    description: Partition identifier for data organization
+  year:
+    description: Year partition column for data organization
+  month:
+    description: Month partition column for data organization
+  day:
+    description: Day partition column for data organization
