@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.id_agent
     description: The id of the agent.
+  id_pfa_history:
+    lineage:
+      - datalake_ebdb_clean.visit.id_pfa_history
+    description: The id of the related preferred fixed agent in the visit.
   id_visitor:
     lineage:
       - datalake_ebdb_clean.visit.id_visitor
@@ -20,6 +24,22 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.business_model
     description: The business model of the visit.
+  is_pfa_tqc_3p_agent:
+    lineage:
+      - datalake_ebdb_clean.visit.is_pfa_tqc_3p_agent
+    description: Whether the preferred fixed agent is in TQC 3P and its the same agent that the visit.
+  is_visit_scheduled_pfa_origin:
+    lineage:
+      - datalake_ebdb_clean.visit.is_visit_scheduled_pfa_origin
+    description: Whether the visit is scheduled by the preferred fixed agent. This is used to identify if the visit is scheduled by the preferred fixed agent.
+  is_visit_tqc_3p_agent:
+    lineage:
+      - datalake_ebdb_clean.visit.is_visit_tqc_3p_agent
+    description: Whether the visit is in TQC 3P PoC. This is used to identify if the visit is in TQC 3P.
+  has_pfa:
+    lineage:
+      - datalake_ebdb_clean.visit.has_pfa
+    description: Whether the visit has a preferred fixed agent. This is used to identify if the visit has a preferred fixed agent.
   ts_created:
     lineage:
       - datalake_ebdb_clean.visit.ts_created

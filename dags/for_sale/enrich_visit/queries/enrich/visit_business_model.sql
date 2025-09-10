@@ -1,50 +1,65 @@
-WITH preferred_fixed_agent AS (
+WITH pfa_history AS (
   SELECT
-    pfa.id,
-    pfa.id_agent_data AS id_agent,
-    at.id_user AS id_user_agent,
-    uvp.id_user AS id_visitor,
-    at.dt_start,
-    at.dt_end
+    pfa.id_pfa_history,
+    pfa.id_visitor,
+    pfa.id_user_agent,
+    pfa.origin,
+    pfa.is_enabled,
+    pfa.origin = 'VISIT_SCHEDULED' AS is_visit_scheduled_pfa_origin,
+    pfa.ts_started,
+    pfa.ts_ended
   FROM
-    datalake_ebdb_clean.preferred_fixed_agent AS pfa
-  LEFT JOIN
-    datalake_ebdb_clean.user_visit_preferences AS uvp
-      ON pfa.id_user_visit_preferences = uvp.id
-  INNER JOIN
-    datalake_gsheets_clean.agents_3p_tqc AS at
-      ON pfa.id_agent_data = at.id_agent
-      AND DATE(pfa.ts_created) BETWEEN at.dt_start AND COALESCE(at.dt_end, CURRENT_DATE)
+    datalake_visit.preferred_fixed_agent_history AS pfa
   WHERE
-    pfa.origin = 'AGENT_LEAD_REFERRAL'
+    pfa.business_context = 'SALE'
+),
+visit_business_rules AS (
+  SELECT
+    v.id AS id_visit,
+    pfa.id_pfa_history,
+    pfa.origin,
+    atqc.id_user = pfa.id_user_agent AS is_pfa_tqc_3p_agent,
+    pfa.is_visit_scheduled_pfa_origin,
+    atqc.id_user IS NOT NULL AS is_visit_tqc_3p_agent,
+    pfa.id_pfa_history IS NOT NULL AS has_pfa
+  FROM
+    datalake_ebdb_clean.visit AS v
+  LEFT JOIN
+    datalake_gsheets_clean.agents_3p_tqc AS atqc
+      ON v.id_agent = atqc.id_user
+      AND DATE(v.ts_created) BETWEEN atqc.dt_start AND COALESCE(atqc.dt_end, CURRENT_DATE)
+  LEFT JOIN
+    pfa_history AS pfa
+      ON v.id_visitor = pfa.id_visitor
+      AND v.ts_created >= pfa.ts_started
+      AND v.ts_created < COALESCE(pfa.ts_ended, CURRENT_DATE)
 )
 SELECT
-  v.id AS id_visit,
+  vbr.id_visit,
   v.id_agent,
+  vbr.id_pfa_history,
   v.id_visitor,
   CASE
-    WHEN pfa.id IS NOT NULL AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
-    WHEN pfa.id IS NOT NULL AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
-    WHEN (at.id_agent IS NOT NULL AND pfah.id_visitor IS NOT NULL) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
-    WHEN (at.id_agent IS NOT NULL AND pfah.id_visitor IS NOT NULL) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
+    -- Agent in TQC 3P PoC, PFA from same agent and PFA origin not VISIT_SCHEDULED
+    WHEN (vbr.is_visit_tqc_3p_agent AND vbr.is_pfa_tqc_3p_agent AND NOT(vbr.is_visit_scheduled_pfa_origin)) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
+    WHEN (vbr.is_visit_tqc_3p_agent AND vbr.is_pfa_tqc_3p_agent AND NOT(vbr.is_visit_scheduled_pfa_origin)) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
+    -- Agent in TQC 3P PoC, PFA from another agent
+    WHEN (vbr.is_visit_tqc_3p_agent AND NOT(vbr.is_pfa_tqc_3p_agent)) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
+    WHEN (vbr.is_visit_tqc_3p_agent AND NOT(vbr.is_pfa_tqc_3p_agent)) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
+    -- Agent in TQC 3P PoC and visitor without PFA
+    WHEN (vbr.is_visit_tqc_3p_agent AND NOT(vbr.has_pfa)) AND v.business_model = 'BM_3P_LEAD_GEN_3P_SUPPLY' THEN 'BM_3P_DEMAND_3P_SUPPLY_6P'
+    WHEN (vbr.is_visit_tqc_3p_agent AND NOT(vbr.has_pfa)) AND v.business_model = 'BM_3P_LEAD_GEN_1P_SUPPLY' THEN 'BM_3P_DEMAND_1P_SUPPLY'
+    -- Agents not in TQC 3P
     ELSE v.business_model
   END AS business_model,
+  vbr.is_pfa_tqc_3p_agent,
+  vbr.is_visit_scheduled_pfa_origin,
+  vbr.is_visit_tqc_3p_agent,
+  vbr.has_pfa,
   v.ts_created,
   v.ts_updated
 FROM
+  visit_business_rules AS vbr
+LEFT JOIN
   datalake_ebdb_clean.visit AS v
-LEFT JOIN
-  preferred_fixed_agent AS pfa
-    ON v.id_agent = pfa.id_user_agent
-    AND v.id_visitor = pfa.id_visitor
-    AND DATE(v.ts_created) BETWEEN pfa.dt_start AND COALESCE(pfa.dt_end, CURRENT_DATE)
-LEFT JOIN
-  datalake_gsheets_clean.agents_3p_tqc AS at
-    ON v.id_agent = at.id_user
-    AND DATE(v.ts_created) BETWEEN at.dt_start AND COALESCE(at.dt_end, CURRENT_DATE)
-LEFT JOIN
-  datalake_visit.preferred_fixed_agent_history AS pfah
-    ON v.id_visitor = pfah.id_visitor
-    AND v.ts_created BETWEEN pfah.ts_started AND COALESCE(pfah.ts_ended, CURRENT_DATE)
-    AND pfah.is_enabled
-    AND pfah.business_context = 'SALE'
+  ON vbr.id_visit = v.id
