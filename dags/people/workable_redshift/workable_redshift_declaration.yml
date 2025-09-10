@@ -181,9 +181,7 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     ratings:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     redsync_metro_source:
       extraction_type: full
     requisition_attributes:
