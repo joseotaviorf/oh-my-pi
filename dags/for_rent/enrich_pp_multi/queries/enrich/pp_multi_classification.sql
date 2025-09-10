@@ -58,30 +58,30 @@ SELECT
   ys.id_owner,
   CASE
     WHEN
-      ys.ongoing_houses >= 5
+      COALESCE(ys.ongoing_houses, 0) >= 5
     THEN 
       'ACTIVE'
     WHEN 
-      tym.max_ongoing_houses >= 5
+      COALESCE(tym.max_ongoing_houses, 0) >= 5
     THEN
       'POTENTIAL'
     ELSE 'LIFETIME'
   END AS pp_multi_classification,
-  ys.ongoing_houses AS ongoing_houses,
-  tym.max_ongoing_houses AS max_ongoing_houses_in_two_years,
-  lm.max_ongoing_houses AS max_ongoing_houses_in_lifetime,
-  vlm.visits_booked AS visits_booked_last_month,
-  vlm.visits_completed AS visits_completed_last_month
+  COALESCE(ys.ongoing_houses, 0) AS ongoing_houses,
+  COALESCE(tym.max_ongoing_houses, 0) AS max_ongoing_houses_in_two_years,
+  COALESCE(lm.max_ongoing_houses, 0) AS max_ongoing_houses_in_lifetime,
+  COALESCE(vlm.visits_booked, 0) AS visits_booked_last_month,
+  COALESCE(vlm.visits_completed, 0) AS visits_completed_last_month
 FROM
-  yesterday_stats AS ys
-JOIN
-  two_year_max AS tym
-    ON ys.id_owner = tym.id_owner
-JOIN 
   lifetime_max AS lm
-    ON ys.id_owner = lm.id_owner
-JOIN
+LEFT JOIN 
+  yesterday_stats AS ys
+    ON lm.id_owner = ys.id_owner
+LEFT JOIN
+  two_year_max AS tym
+    ON lm.id_owner = tym.id_owner
+LEFT JOIN
   visits_last_month AS vlm
-    ON ys.id_owner = vlm.id_owner
+    ON lm.id_owner = vlm.id_owner
 WHERE
   lm.max_ongoing_houses >= 5
