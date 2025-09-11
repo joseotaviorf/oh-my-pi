@@ -123,7 +123,11 @@ SELECT
     cap.status AS status_sorting_hat,
     p.tenant_documentation_status,
     p.owner_documentation_status,
-    cap.package,
+    CASE
+        WHEN cap.package IS NULL THEN
+            CAST((house.rent + COALESCE(house.condo, 0) + COALESCE(house.iptu, 0) + COALESCE(house.insurance_value, 0)) AS decimal(10, 2))
+        ELSE cap.package
+    END AS package,
     p.rejection_reason,
     cap.dti,
     cap.number_evaluations,
@@ -190,3 +194,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_country.house AS ch
         ON ch.id_house = p.id_house
+LEFT JOIN
+    datalake_ebdb_clean.house AS house
+        ON house.id = p.id_house
