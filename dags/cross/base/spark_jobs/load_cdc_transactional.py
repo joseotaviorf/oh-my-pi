@@ -318,11 +318,8 @@ def main():
     load_df_into_transactional(
         transactional_df, datalake_bucket, schema, table_name.lower(), partitions
     )
-    
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

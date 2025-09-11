@@ -180,30 +180,27 @@ def main():
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     loader = DeltaLoader(spark)
-    if (has_soft_delete):
+    if has_soft_delete:
         loader.load_table(
-        table_name=full_raw_table_name,
-        path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
-        source_df=transactional_df,
-        merge_on=primary_keys,
-        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction AND source.op_cdc != 'd'",
-    )
+            table_name=full_raw_table_name,
+            path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+            source_df=transactional_df,
+            merge_on=primary_keys,
+            when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction AND source.op_cdc != 'd'",
+        )
     else:
-      loader.load_table(
-        table_name=full_raw_table_name,
-        path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
-        source_df=transactional_df,
-        merge_on=primary_keys,
-        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
-    )
+        loader.load_table(
+            table_name=full_raw_table_name,
+            path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+            source_df=transactional_df,
+            merge_on=primary_keys,
+            when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
+        )
     SparkTablePropertyHelper.set_property(
         full_raw_table_name, "primary_keys", ",".join(primary_keys), spark
     )
 
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

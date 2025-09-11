@@ -27,6 +27,10 @@ class TableAttributes:
         self.table_privileges = self._get_table_privileges()
         self.table_properties = self._get_table_properties()
         self.has_soft_delete = self.get_has_soft_delete()
+        self.row_filter_column_key = self.table_customization.get(
+            "row_filter_column_key", ""
+        )
+        self.row_filter_function_name = self._get_row_filter_function_name()
 
     @staticmethod
     def from_attributes(
@@ -174,6 +178,13 @@ class TableAttributes:
             )
 
         return table_privileges
+
+    def _get_row_filter_function_name(self) -> str:
+        self.row_filter = self.table_customization.get("row_filter", "")
+        if self.row_filter == "has_3p_access":
+            return "data_governance_policies.has_3p_access_control_row_filter"
+
+        return ""
 
     def get_has_soft_delete(self) -> bool:
         """

@@ -6,6 +6,8 @@ from typing import List
 from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier import (
     CleanPrimaryKeyIdentifier,
 )
+from bietlejuice.base.databricks.row_filter import RowFilter
+
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -37,6 +39,22 @@ def parse_arguments():
         "--table-privileges",
         type=lambda arg: None if not arg else arg,
         help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-rfck",
+        "--row-filter-column-key",
+        type=lambda arg: None if not arg else arg,
+        help="Column key to be used in row filter",
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-rf",
+        "--row-filter-function-name",
+        type=lambda arg: None if not arg else arg,
+        help="Name of the function to be used in row filter",
         required=False,
         default=None,
     )
@@ -97,8 +115,9 @@ def main():
         table_privileges_dict = json.loads(args.table_privileges)
     else:
         table_privileges_dict = None
+    row_filter_column_key = args.row_filter_column_key
+    row_filter_function_name = args.row_filter_function_name
     has_soft_delete = args.has_soft_delete
-
     if not clean_primary_keys:
         raise ValueError(
             f"The primary keys of the table {table_name} could not be automatically identified."
@@ -135,17 +154,19 @@ def main():
             table_privileges_dict, full_clean_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
+        table_privileges = TablePrivileges.from_environment_default(
+            full_clean_table_name
+        )
 
     loader = DeltaLoader(spark)
-    if (has_soft_delete):
+    if has_soft_delete:
         loader.load_table(
-        table_name=full_clean_table_name,
-        path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
-        source_df=clean_updates_df,
-        merge_on=clean_primary_keys,
-        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction AND source.op_cdc != 'd'",
-    )
+            table_name=full_clean_table_name,
+            path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
+            source_df=clean_updates_df,
+            merge_on=clean_primary_keys,
+            when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction AND source.op_cdc != 'd'",
+        )
     else:
         loader.load_table(
             table_name=full_clean_table_name,
@@ -157,11 +178,15 @@ def main():
             when_matched_delete_condition="source.op_cdc = 'd'",
         )
 
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
+
+    rowfilter = RowFilter(spark)
+
+    if row_filter_column_key and not rowfilter.has_row_filter(full_clean_table_name):
+        rowfilter.apply_row_filter(
+            full_clean_table_name, row_filter_column_key, row_filter_function_name
+        )
 
 
 if __name__ == "__main__":

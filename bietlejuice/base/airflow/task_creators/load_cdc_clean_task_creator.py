@@ -40,6 +40,10 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
             clean_primary_keys,
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),
+            "--row-filter-column-key",
+            table_attributes.row_filter_column_key,
+            "--row-filter-function-name",
+            table_attributes.row_filter_function_name,
         ]
 
         if table_attributes.has_soft_delete:
