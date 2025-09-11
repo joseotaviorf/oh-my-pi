@@ -16,4 +16,4 @@ SELECT
     updated_at AS ts_updated,
     expires_at AS ts_expiration
 FROM
-    datalake_rental_transact_test_raw.offer
+    datalake_rental_transact_raw.offer

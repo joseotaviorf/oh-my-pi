@@ -2722,7 +2722,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   - bietlejuice.rental_transact:load-clean-event-log:first-run-of-day
-  - bietlejuice.rental_transact:load-clean-offer:first-run-of-day
+  - bietlejuice.rental_transact_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.enrich_olos_dialer:
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-attempts-raw-data:first-run-of-day
@@ -3024,9 +3024,9 @@ bietlejuice.enrich_rental_transact:
   - bietlejuice.rental_transact:load-clean-offer-topic-message-aud:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic-message:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic:first-run-of-day
-  - bietlejuice.rental_transact:load-clean-offer:first-run-of-day
   - bietlejuice.rental_transact:load-clean-resident-info:first-run-of-day
   - bietlejuice.rental_transact:load-clean-rev-info:first-run-of-day
+  - bietlejuice.rental_transact_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.enrich_repairs:
   - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day

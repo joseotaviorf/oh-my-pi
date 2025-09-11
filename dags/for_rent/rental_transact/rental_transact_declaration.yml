@@ -19,10 +19,6 @@ workflow:
       clean_table_name: event_log
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-    offer:
-      clean_table_name: offer
-      raw_primary_keys: [id]
-      clean_primary_keys: [id]
     offer_aud:
       clean_table_name: offer_aud
     offer_topic:

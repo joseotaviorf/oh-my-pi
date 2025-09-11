@@ -13,7 +13,7 @@ workflow:
   database_type: postgres
   source_database: rental_transact
   source_schema: public
-  custom_schema: rental_transact_test
+  custom_schema: rental_transact
   dbutils_secret_key: RENTAL_TRANSACT_DB
   has_soft_delete: true
   tables_customization:
