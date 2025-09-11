@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: Centralizes employee registration data, such as basic contact information, documents, and educational background.
 cluster:
-  type: databricks_13_3_min_memory_people_cluster
+  type: databricks_16_4_small_memory_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE

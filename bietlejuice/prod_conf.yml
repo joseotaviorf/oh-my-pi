@@ -910,67 +910,34 @@ databricks_12_2_max_io-memory_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
-databricks_13_3_min_memory_people_cluster:
+databricks_16_4_small_memory_people_cluster:
     <<: *cluster_anchor
     node_type_id: r5a.large
     driver_node_type_id: r5a.large
-    num_workers: 2
-    spark_version: 13.3.x-scala2.12
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
-databricks_13_3_med_people_cluster:
+databricks_16_4_medium_general_people_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.xlarge
     node_type_id: m5a.xlarge
     num_workers: 3
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
-databricks_13_3_large_people_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.2xlarge
-    node_type_id: m5a.2xlarge
-    num_workers: 3
-    spark_version: 13.3.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
-        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-
-databricks_13_3_large_driver_people_cluster:
-    <<: *cluster_anchor
-    node_type_id: r5a.large
-    driver_node_type_id: c5a.4xlarge
-    num_workers: 3
-    spark_version: 13.3.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
-        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-
-databricks_13_3_med_memory_people_cluster:
+databricks_16_4_medium_memory_people_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.xlarge
     node_type_id: r5a.xlarge
     num_workers: 3
-    spark_version: 13.3.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
-        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-
-databricks_13_3_high_memory_people_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5.4xlarge
-    node_type_id: r5a.xlarge
-    num_workers: 3
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
