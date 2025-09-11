@@ -11,18 +11,3 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  house_external_id:
-    is_complete:
-      severity_level: Error
-  tenant_external_id:
-    is_complete:
-      severity_level: Error
-  owner_external_id:
-    is_complete:
-      severity_level: Error
-  status:
-    is_complete:
-      severity_level: Error
-  created_at:
-    is_complete:
-      severity_level: Error
