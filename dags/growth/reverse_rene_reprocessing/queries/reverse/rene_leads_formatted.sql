@@ -50,8 +50,8 @@ WHERE hl.status = 'DISCARDED'
     'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT',
     'CONTACT_WASNT_THE_HOUSE_OWNER'
   )
-  AND hl.new_id IS NOT NULL
-  AND (
-    a.street_name IS NOT NULL 
-    OR (a.lat IS NOT NULL AND a.lng IS NOT NULL)
-  );
+  AND 
+    hl.new_id  IS NOT NULL
+    AND a.street_name IS NOT NULL 
+    AND a.house_number IS NOT NULL
+    AND (a.lat IS NOT NULL AND a.lng IS NOT NULL)
