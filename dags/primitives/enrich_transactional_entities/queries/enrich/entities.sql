@@ -182,7 +182,7 @@ termination AS (
       END AS is_active,
       ts_created,
       ts_updated
-    FROM datalake_terminator_clean.termination
+    FROM datalake_terminator_test_clean.termination
   )
   SELECT
         tb.id_entity,
