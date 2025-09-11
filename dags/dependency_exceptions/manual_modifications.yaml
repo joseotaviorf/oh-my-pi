@@ -280,6 +280,7 @@ bietlejuice.enrich_collections_quintoandar:
     - bietlejuice.webhelp:load-clean-login:first-run-of-day
     - bietlejuice.grb:load-clean-operators:first-run-of-day
     - bietlejuice.meetcall:load-clean-operators:first-run-of-day
+    - bietlejuice.langfuse:load-clean-scores:first-run-of-day
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes:first-run-of-day
