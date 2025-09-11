@@ -1,0 +1,21 @@
+SELECT
+  id,
+  imovelId AS id_house,
+  businessContext AS business_context,
+  status,
+  statusReason AS status_reason,
+  closingStatus AS status_closing,
+  suspensionReason AS suspension_reason,
+  shortUrl AS short_url,
+  calculatorPrice AS calculator_price,
+  version,
+  selectedAction AS selected_action,
+  ownership,
+  dealObjective AS deal_objective,
+  criadoEm AS ts_created,
+  atualizadoEm AS ts_updated,
+  firstPublicationDate AS ts_first_publication,
+  lastPublicationDate AS ts_last_publication,
+  lastStatusChangedAt AS ts_last_status_changed
+FROM
+  datalake_ebdb_test_raw.listingbusinesscontext
