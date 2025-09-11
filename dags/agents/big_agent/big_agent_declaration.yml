@@ -21,6 +21,7 @@ workflow:
     agency_aud: {}
     agent: {}
     agent_aud: {}
+    earning_remuneration_log: {}
     earnings: {}
     earnings_aud: {}
     enrollment: {}
@@ -29,15 +30,41 @@ workflow:
     external_invoice_aud: {}
     house: {}
     house_aud: {}
+    # incentive_engine: {}
+    # incentive_engine_aud: {}
+    incentive_system_configuration: {}
+    incentive_system_configuration_aud: {}
     installment: {}
     installment_aud: {}
+    listing: {}
+    listing_aud: {}
+    message: {}
     metric_period: {}
+    metric_period_aud: {}
+    metric_period_history: {}
+    metric_period_history_aud: {}
+    # new_points_rule: {}
+    # new_points_rule_aud: {}
+    partner_classification: {}
+    partner_classification_aud: {}
+    partner_classification_schedule: {}
+    partner_classification_schedule_aud: {}
+    # partner_incentive_system: {}
+    # partner_incentive_system_aud: {}
+    partner_metric: {}
+    partner_metric_aud: {}
+    # partner_tier: {}
+    # partner_tier_aud: {}
     points_rule: {}
     points_rule_aud: {}
     program: {}
     program_aud: {}
+    # score_rule: {}
+    # score_rule_aud: {}
     share_rule: {}
     share_rule_aud: {}
+    # tier: {}
+    # tier_aud: {}
     user_revision_entity: {}
 cluster:
   type: custom_cluster

@@ -1,0 +1,87 @@
+---
+database_name: datalake_big_agent_clean
+table_name: metric_period_aud
+description: |
+  Audit view for metric period changes with revision metadata, modification flags,
+  validity dates and timestamps, plus partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.id
+    description: Metric period identifier (audited).
+  rev:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.rev
+    description: Revision identifier of the audit record.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.revtype
+    description: Revision type (INSERT/UPDATE/DELETE semantics in audit).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.revend
+    description: End revision where this version ceased to be current.
+  id_invalidated_by:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.invalidated_by
+    description: Identifier of the metric period that invalidated this one, when applicable.
+  metric:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.metric
+    description: Metric label associated to this period.
+  status:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.status
+    description: Status of the metric period.
+  mod_metric:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.metric_mod
+    description: Modification flag/column for metric.
+  mod_id_invalidated_by:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.invalidated_by_mod
+    description: Modification flag/column for invalidated_by.
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.status_mod
+    description: Modification flag/column for status.
+  mod_dt_init:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.init_date_mod
+    description: Modification flag/column for init date.
+  mod_dt_end:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.end_date_mod
+    description: Modification flag/column for end date.
+  dt_init:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.init_date
+    description: Start date of the metric period (audited).
+  dt_end:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.end_date
+    description: End date of the metric period (audited).
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.created_at
+    description: Creation timestamp of the raw audit record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.updated_at
+    description: Update timestamp of the raw audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.metric_period_aud.day
+    description: Partition day.
+
+

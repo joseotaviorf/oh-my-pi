@@ -1,0 +1,80 @@
+---
+database_name: datalake_big_agent_clean
+table_name: listing_aud
+description: |
+  Listing audit with revision metadata, modification flags, and audited
+  timestamps.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.id
+    description: Audited record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.revend
+    description: End revision.
+  id_house:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.house_id
+    description: Related house identifier.
+  business_context:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.business_context
+    description: Listing business context.
+  status:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.status
+    description: Listing status.
+  mod_id_house:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.house_id_mod
+    description: Modification flag/column for house_id.
+  mod_business_context:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.business_context_mod
+    description: Modification flag/column for business_context.
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.status_mod
+    description: Modification flag/column for status.
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.created_at_mod
+    description: Modification flag/column for created_at.
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.updated_at_mod
+    description: Modification flag/column for updated_at.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.created_at
+    description: Creation timestamp (audited).
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.updated_at
+    description: Update timestamp (audited).
+  year:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.listing_aud.day
+    description: Partition day.
+
+
+

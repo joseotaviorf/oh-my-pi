@@ -1,0 +1,81 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_metric_aud
+description: |
+  Audit view for partner metrics with revision metadata and modification flags,
+  plus partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.id
+    description: Partner metric record identifier (audited).
+  rev:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.rev
+    description: Revision identifier of the audit record.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.revtype
+    description: Revision type (INSERT/UPDATE/DELETE semantics in audit).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.revend
+    description: End revision where this version ceased to be current.
+  id_metric_period:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.metric_period_id
+    description: Metric period identifier associated to this record.
+  id_metric_period_history:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.metric_period_history_id
+    description: Reference to the metric period history entry.
+  id_partner_external:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.partner_external_id
+    description: External identifier of the partner.
+  partner_external_type:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.partner_external_type
+    description: External partner type discriminator.
+  total:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.total
+    description: Aggregated total value (audited value).
+  mod_id_metric_period:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.metric_period_id_mod
+    description: Modification flag/column for metric_period_id.
+  mod_id_metric_period_history:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.metric_period_history_id_mod
+    description: Modification flag/column for metric_period_history_id.
+  mod_id_partner_external:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.partner_external_id_mod
+    description: Modification flag/column for partner_external_id.
+  mod_partner_external_type:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.partner_external_type_mod
+    description: Modification flag/column for partner_external_type.
+  mod_total:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.total_mod
+    description: Modification flag/column for total.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.created_at
+    description: Creation timestamp of the raw audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_aud.day
+    description: Partition day.

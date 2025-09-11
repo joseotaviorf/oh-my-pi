@@ -1,7 +1,7 @@
 SELECT
     id, 
+    invalidated_by AS id_invalidated_by, 
     metric, 
-    invalidated_by, 
     status, 
     DATE(init_date) AS dt_init,
     DATE(end_date) AS dt_end,

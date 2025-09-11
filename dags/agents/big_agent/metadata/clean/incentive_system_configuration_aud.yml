@@ -1,0 +1,88 @@
+---
+database_name: datalake_big_agent_clean
+table_name: incentive_system_configuration_aud
+description: |
+  Incentive system configuration audit with revision metadata and modification
+  columns, plus audited timestamps.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.id
+    description: Audited record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.revend
+    description: End revision.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.incentive_system
+    description: Incentive system.
+  performance_evaluation_period:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.performance_evaluation_period
+    description: Performance evaluation period.
+  tier_validity_period:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.tier_validity_period
+    description: Tier validity period.
+  mod_incentive_system:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.incentive_system_mod
+    description: Modification flag/column for incentive_system.
+  mod_performance_evaluation_period:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.performance_evaluation_period_mod
+    description: Modification flag/column for performance_evaluation_period.
+  mod_tier_validity_period:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.tier_validity_period_mod
+    description: Modification flag/column for tier_validity_period.
+  mod_ts_classification_start:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.classification_start_at_mod
+    description: Modification flag/column for classification_start_at.
+  mod_ts_classification_end:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.classification_end_at_mod
+    description: Modification flag/column for classification_end_at.
+  ts_classification_start:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.classification_start_at
+    description: Classification window start (audited).
+  ts_classification_end:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.classification_end_at
+    description: Classification window end (audited).
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.created_at
+    description: Creation timestamp (audited).
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.updated_at
+    description: Update timestamp (audited).
+  year:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.day
+    description: Partition day.
+
+
+

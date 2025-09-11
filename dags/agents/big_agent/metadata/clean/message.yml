@@ -1,0 +1,55 @@
+---
+database_name: datalake_big_agent_clean
+table_name: message
+description: |
+  Messages/delivery with payload and publication metadata, including partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.message.id
+    description: Message identifier.
+  id_incremental:
+    lineage:
+      - datalake_big_agent_raw.message.incremental_id
+    description: Incremental identifier.
+  destination:
+    lineage:
+      - datalake_big_agent_raw.message.destination
+    description: Message destination.
+  headers:
+    lineage:
+      - datalake_big_agent_raw.message.headers
+    description: Message headers.
+  payload:
+    lineage:
+      - datalake_big_agent_raw.message.payload
+    description: Message payload content.
+  published:
+    lineage:
+      - datalake_big_agent_raw.message.published
+    description: Publication indicator.
+  message_partition:
+    lineage:
+      - datalake_big_agent_raw.message.message_partition
+    description: Logical message partition.
+  creation_time:
+    lineage:
+      - datalake_big_agent_raw.message.creation_time
+    description: Producer creation timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_raw.message.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.message.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.message.day
+    description: Partition day.
+
+
+

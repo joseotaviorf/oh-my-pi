@@ -1,0 +1,56 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_classification_schedule
+description: |
+  Partner classification schedules with incentive system, status, and timestamps,
+  including partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.id
+    description: Schedule identifier.
+  id_partner_classification:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.partner_classification_id
+    description: Related partner classification identifier.
+  id_reminder_external:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.reminder_external_id
+    description: Reminder external identifier.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.incentive_system
+    description: Incentive system.
+  status:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.status
+    description: Schedule status.
+  ts_scheduled_to:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.scheduled_to
+    description: Scheduled execution timestamp.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.created_at
+    description: Record creation timestamp.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.updated_at
+    description: Record last update timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_classification_schedule.day
+    description: Partition day.
+
+
+

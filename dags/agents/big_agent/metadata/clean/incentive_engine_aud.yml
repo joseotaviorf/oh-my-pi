@@ -1,0 +1,96 @@
+---
+database_name: datalake_big_agent_clean
+table_name: incentive_engine_aud
+description: |
+  Incentive engine audit with revision metadata, modification columns, and
+  audited validity windows.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.id
+    description: Audited record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.revend
+    description: End revision.
+  id_external_condition:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.external_condition_id
+    description: Associated external condition.
+  external_condition_type:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.external_condition_type
+    description: External condition type.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.incentive_system
+    description: Incentive system.
+  status:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.status
+    description: Record status.
+  mod_id_external_condition:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.external_condition_id_mod
+    description: Modification flag/column for external_condition_id.
+  mod_external_condition_type:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.external_condition_type_mod
+    description: Modification flag/column for external_condition_type.
+  mod_incentive_system:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.incentive_system_mod
+    description: Modification flag/column for incentive_system.
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.status_mod
+    description: Modification flag/column for status.
+  mod_ts_validity_start:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_start_at_mod
+    description: Modification flag/column for validity_start_at.
+  mod_ts_validity_end:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_end_at_mod
+    description: Modification flag/column for validity_end_at.
+  ts_validity_start:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_start_at
+    description: Validity start (audited).
+  ts_validity_end:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_end_at
+    description: Validity end (audited).
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.created_at
+    description: Record creation timestamp.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.updated_at
+    description: Record last update timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.day
+    description: Partition day.
+
+
+

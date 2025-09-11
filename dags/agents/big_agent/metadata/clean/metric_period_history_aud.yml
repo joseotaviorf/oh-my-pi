@@ -1,0 +1,84 @@
+---
+database_name: datalake_big_agent_clean
+table_name: metric_period_history_aud
+description: |
+  Metric period history audit with revision metadata, modification flags, and
+  audited timestamps.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.id
+    description: Audited record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.revend
+    description: End revision.
+  id_metric_period:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.metric_period_id
+    description: Related metric period identifier.
+  id_created_by:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.created_by
+    description: Identifier of the creator.
+  metric_link_file:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.metric_link_file
+    description: Metric file link.
+  query_link_file:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.query_link_file
+    description: Query file link.
+  status:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.status
+    description: History status.
+  mod_id_metric_period:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.metric_period_id_mod
+    description: Modification flag/column for metric_period_id.
+  mod_metric_link_file:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.metric_link_file_mod
+    description: Modification flag/column for metric_link_file.
+  mod_query_link_file:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.query_link_file_mod
+    description: Modification flag/column for query_link_file.
+  mod_id_created_by:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.created_by_mod
+    description: Modification flag/column for created_by.
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.status_mod
+    description: Modification flag/column for status.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.created_at
+    description: Creation timestamp (audited).
+  year:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history_aud.day
+    description: Partition day.
+
+
+

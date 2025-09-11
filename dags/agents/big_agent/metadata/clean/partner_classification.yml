@@ -1,0 +1,45 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_classification
+description: |
+  Cleaned partner classification status per external partner, with timestamps and
+  partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.id
+    description: Partner classification record identifier.
+  id_partner_external:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.partner_external_id
+    description: External identifier of the partner.
+  partner_external_type:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.partner_external_type
+    description: External partner type discriminator.
+  status:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.status
+    description: Partner classification status.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.created_at
+    description: Creation timestamp of the raw record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.updated_at
+    description: Update timestamp of the raw record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_classification.day
+    description: Partition day.

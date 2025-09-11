@@ -1,0 +1,47 @@
+---
+database_name: datalake_big_agent_clean
+table_name: listing
+description: |
+  Listings with business context and status, including timestamps and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.listing.id
+    description: Listing identifier.
+  id_house:
+    lineage:
+      - datalake_big_agent_raw.listing.house_id
+    description: Related house identifier.
+  business_context:
+    lineage:
+      - datalake_big_agent_raw.listing.business_context
+    description: Listing business context.
+  status:
+    lineage:
+      - datalake_big_agent_raw.listing.status
+    description: Listing status.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.listing.created_at
+    description: Record creation timestamp.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.listing.updated_at
+    description: Record last update timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_raw.listing.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.listing.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.listing.day
+    description: Partition day.
+
+
+

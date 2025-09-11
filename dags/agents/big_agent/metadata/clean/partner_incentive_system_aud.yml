@@ -1,0 +1,80 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_incentive_system_aud
+description: |
+  Partner incentive system audit with revision metadata, modification flags, and
+  audited timestamps.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.id
+    description: Audited record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.revend
+    description: End revision.
+  id_external_partner:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.external_partner_id
+    description: External partner identifier.
+  external_partner_type:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.external_partner_type
+    description: External partner type.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.incentive_system
+    description: Incentive system.
+  mod_id_external_partner:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.external_partner_id_mod
+    description: Modification flag/column for external_partner_id.
+  mod_external_partner_type:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.external_partner_type_mod
+    description: Modification flag/column for external_partner_type.
+  mod_incentive_system:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.incentive_system_mod
+    description: Modification flag/column for incentive_system.
+  mod_active:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.active_mod
+    description: Modification flag/column for active.
+  is_active:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.active
+    description: Active indicator (audited).
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.created_at
+    description: Creation timestamp (audited).
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.updated_at
+    description: Update timestamp (audited).
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_incentive_system_aud.day
+    description: Partition day.
+
+
+

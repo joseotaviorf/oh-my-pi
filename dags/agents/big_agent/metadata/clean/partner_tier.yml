@@ -1,0 +1,65 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_tier
+description: |
+  Cleaned partner tier mapping with validity window, link to tier and incentive
+  system, overwrite metadata, and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.id
+    description: Partner tier mapping unique identifier.
+  id_partner_external:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.partner_external_id
+    description: External identifier of the partner.
+  id_tier:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.tier_id
+    description: Tier identifier linked to the partner.
+  id_overwritten_by:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.overwritten_by
+    description: Identifier of the record/user that overwrote this mapping, if any.
+  partner_external_type:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.partner_external_type
+    description: External partner type discriminator.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.incentive_system
+    description: Incentive system label applied to this mapping.
+  overwritten_reason:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.overwritten_reason
+    description: Reason for overwrite when present.
+  ts_validity_start:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.validity_start_at
+    description: Validity window start timestamp for the tier mapping.
+  ts_validity_end:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.validity_end_at
+    description: Validity window end timestamp for the tier mapping.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.created_at
+    description: Creation timestamp of the raw record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.updated_at
+    description: Update timestamp of the raw record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.day
+    description: Partition day.

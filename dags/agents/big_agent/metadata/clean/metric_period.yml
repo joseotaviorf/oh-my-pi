@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_big_agent_raw.metric_period.metric
     description: Metric name or identifier to which the period applies.
-  invalidated_by:
+  id_invalidated_by:
     lineage:
       - datalake_big_agent_raw.metric_period.invalidated_by
     description: Identifier of the entity or action that invalidated this metric period, when applicable.

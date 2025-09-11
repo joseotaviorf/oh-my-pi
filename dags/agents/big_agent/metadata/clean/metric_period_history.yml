@@ -1,0 +1,49 @@
+---
+database_name: datalake_big_agent_clean
+table_name: metric_period_history
+description: |
+  Metric periods history with file links, status, and creation timestamp,
+  including partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.id
+    description: Period history identifier.
+  id_metric_period:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.metric_period_id
+    description: Related metric period identifier.
+  id_created_by:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.created_by
+    description: Record creator identifier.
+  metric_link_file:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.metric_link_file
+    description: Metric file link.
+  query_link_file:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.query_link_file
+    description: Query file link.
+  status:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.status
+    description: History status.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.created_at
+    description: Creation timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.metric_period_history.day
+    description: Partition day.

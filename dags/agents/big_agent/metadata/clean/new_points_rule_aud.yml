@@ -1,0 +1,88 @@
+---
+database_name: datalake_big_agent_clean
+table_name: new_points_rule_aud
+description: |
+  Points rule audit with revision metadata and modification flags, including
+  audited timestamps.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.id
+    description: Audited record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.revend
+    description: End revision.
+  id_score_rule:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.score_rule_id
+    description: Score rule identifier.
+  operation:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.operation
+    description: Operation that generates points.
+  trigger:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.trigger
+    description: Rule trigger.
+  points:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.points
+    description: Points awarded.
+  max_points:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.max_points
+    description: Maximum points limit.
+  mod_id_score_rule:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.score_rule_id_mod
+    description: Modification flag/column for score_rule_id.
+  mod_operation:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.operation_mod
+    description: Modification flag/column for operation.
+  mod_trigger:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.trigger_mod
+    description: Modification flag/column for trigger.
+  mod_points:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.points_mod
+    description: Modification flag/column for points.
+  mod_max_points:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.max_points_mod
+    description: Modification flag/column for max_points.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.created_at
+    description: Creation timestamp (audited).
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.updated_at
+    description: Update timestamp (audited).
+  year:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.new_points_rule_aud.day
+    description: Partition day.
+
+
+
