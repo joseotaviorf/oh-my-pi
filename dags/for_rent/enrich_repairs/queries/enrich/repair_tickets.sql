@@ -328,7 +328,11 @@ WHERE
     'Autosserviço Reparos [BACK]',
     'ReparAção (Piloto Urgente)',
     'Reparos PP Multi [BACK]',
-    'ReparAção Comum [BACK]')
+    'ReparAção Comum [BACK]',
+    'Reembolso de Reparos [Back]',
+    '[Porto] Triagem',
+    '[Porto] Atendimento'
+)
   AND (
     tc.ts_created >= DATE('{load_start_date}') - INTERVAL 6 MONTH
     OR tc.ts_solved >= DATE('{load_start_date}') - INTERVAL 2 YEAR

@@ -216,7 +216,10 @@ tickets_whatsapp AS (
         'FullService [BACK]',
         'ReparAção (Piloto Urgente)',
         'ReparAção Comum [BACK]',
-        'Reparos PP Multi [BACK]'
+        'Reparos PP Multi [BACK]',
+        'Reembolso de Reparos [Back]',
+        '[Porto] Triagem',
+        '[Porto] Atendimento'
       )
     AND tc.channel = 'whatsapp'
     AND tc.custom_fields['Ticket do contato'] IS NOT NULL

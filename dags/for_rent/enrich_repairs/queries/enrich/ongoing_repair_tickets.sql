@@ -311,7 +311,9 @@ WHERE
       'ReparAção (Piloto Urgente)',
       'Reparos PP Multi [BACK]',
       'ReparAção Comum [BACK]',
-      'Reembolso de Reparos [Back]'
+      'Reembolso de Reparos [Back]',
+      '[Porto] Triagem',
+      '[Porto] Atendimento'
     )
   AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
   AND tc.channel NOT IN ('call', 'whatsapp')
