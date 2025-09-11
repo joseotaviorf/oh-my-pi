@@ -17,27 +17,11 @@ WITH terminations AS (
         decline_person,
         task_type,
         responsible_off_manager_email,
-        NOW() AS ts_load,
         year,
         month,
         day
     FROM
         datalake_terminator.termination
-    WHERE
-        DATE(ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-),
-mediations AS (
-    SELECT
-        id_termination,
-        id_mediation_ticket,
-        squad,
-        has_mediation_ticket,
-        has_mediation,
-        has_ac_repairs,
-        is_ticket_opened_via_terminator,
-        dt_inspection
-    FROM
-        datalake_offboarding.mediations
     WHERE
         DATE(ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
@@ -73,5 +57,5 @@ SELECT
 FROM
     terminations AS t
 LEFT JOIN
-    mediations AS m
+    datalake_offboarding.mediations AS m
         ON m.id_termination = t.id_termination
