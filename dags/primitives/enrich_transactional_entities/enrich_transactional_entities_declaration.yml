@@ -17,11 +17,16 @@ workflow:
   tables_customization:
     entities:
       merge_on: [sk_entity]
+      when_not_matched_insert_condition: |
+        source.is_active = true OR (
+          source.is_active = false AND
+          CAST(source.ts_updated AS DATE) >= CURRENT_DATE - INTERVAL 3 MONTH
+        )
       when_matched_update_condition: |
         source.ts_updated > target.ts_updated OR
         source.id_entity <> target.id_entity OR
         source.id_house <> target.id_house OR
-        source.id_contract <> target.id_contract OR 
+        source.id_contract <> target.id_contract OR
         source.id_user <> target.id_user OR
         source.uuid_person <> target.uuid_person OR
         source.entity <> target.entity OR
@@ -29,6 +34,9 @@ workflow:
         source.house_address <> target.house_address OR
         source.is_active <> target.is_active OR
         source.ts_created <> target.ts_created
+      when_matched_delete_condition: |
+        source.is_active = false AND
+        CAST(source.ts_updated AS DATE) < CURRENT_DATE - INTERVAL 3 MONTH
       z_order_by: [id_user, id_house, persona]
       table_properties:
         "delta.enableChangeDataFeed": "true"

@@ -194,6 +194,63 @@ contract AS (
     FROM
         contract_filtered
 ),
+termination AS (
+  WITH termination_base AS (
+    SELECT
+      id AS id_entity,
+      id_contract,
+      'TERMINATION' AS entity,
+      CASE
+          WHEN status IN ('DONE', 'CANCELED') THEN FALSE
+          WHEN status IN (
+            'REQUESTED',
+            'INSPECTION_UNDER_REVIEW',
+            'INSPECTION_SCHEDULED',
+            'INSPECTION_OPTED_OUT',
+            'INSPECTION_EXECUTED',
+            'INSPECTION_CANCELED'
+          ) THEN TRUE
+          ELSE NULL
+      END AS is_active,
+      ts_created,
+      ts_updated
+    FROM datalake_terminator_clean.termination
+  )
+  SELECT
+        tb.id_entity,
+        c.id_house,
+        c.id_owner as id_user,
+        c.id_contract AS id_contract,
+        tb.entity,
+        'OWNER' AS persona,
+        tb.is_active,
+        tb.ts_created,
+        tb.ts_updated
+  FROM
+        termination_base tb
+  INNER JOIN
+        core_contract.contract c
+        ON tb.id_contract = c.id_contract
+
+  UNION ALL
+
+  SELECT
+    tb.id_entity,
+    c.id_house,
+    c.id_tenant as id_user,
+    c.id_contract AS id_contract,
+    tb.entity,
+    'TENANT' AS persona,
+    tb.is_active,
+    tb.ts_created,
+    tb.ts_updated
+  FROM
+        termination_base tb
+  INNER JOIN
+        core_contract.contract c
+        ON tb.id_contract = c.id_contract
+
+),
 base AS (
     SELECT
         {sk_entity} AS sk_entity,
@@ -236,6 +293,20 @@ base AS (
         ts_updated
     FROM
         contract
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        termination
 )
 SELECT
     b.sk_entity,

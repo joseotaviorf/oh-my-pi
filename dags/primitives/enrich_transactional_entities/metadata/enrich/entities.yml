@@ -2,11 +2,12 @@ database_name: datalake_transactional_entities
 table_name: entities
 domain: Primitives
 owner: isadora.gallerani@quintoandar.com.br
-description: A table containing transactional entities with intelligent filtering to provide a comprehensive 
+description:
+  A table containing transactional entities with intelligent filtering to provide a comprehensive
   yet optimized view of our customers' activities on the platform.
   Includes all active entities (is_active = TRUE) regardless of date, and inactive entities (is_active = FALSE)
-  from the last 3 months based on ts_updated. 
-  This filtering strategy ensures relevant, recent data while maintaining complete active entity coverage. 
+  from the last 3 months based on ts_updated.
+  This filtering strategy ensures relevant, recent data while maintaining complete active entity coverage.
   The format is specifically designed for use by AI initiatives like our chatbots.
 columns:
   sk_entity:
@@ -20,15 +21,21 @@ columns:
       - core_visit.visit.id_owner
       - core_offer.offer.id_tenant
       - core_offer.offer.id_owner
+      - core_visit.visit.id_visit
+      - core_offer.offer.id_offer
+      - core_contract.contract.id_contract
+      - datalake_terminator_clean.termination.id
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
-      This key must always be unique. 
+      This key must always be unique.
   id_entity:
     lineage:
       - core_visit.visit.id_visit
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
-    description: The primary identifier for an entity, directly from our production systems.
+      - datalake_terminator_clean.termination.id
+    description:
+      The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
   id_house:
     lineage:
@@ -64,14 +71,17 @@ columns:
     categories:
       VISIT: The entity is a visit, with its id_entity mapping directly to the id_visit from the Visit table in EBDB database.
       OFFER: The entity is an offer, with its id_entity mapping directly to the id_offer from the Rental Transact system.
+      TERMINATION: The entity is a termination, with its id_entity mapping directly to the id from the Termination table in the terminator system.
   persona:
-    description: A persona describes the primary role of a user (id_user) in relation to a specific
+    description:
+      A persona describes the primary role of a user (id_user) in relation to a specific
       entity within our platform's business context.
     categories:
       AGENT_BROKER: A broker who acts as an agent, managing client demands and mediating communication.
       BUYER_PROSPECT: A potential customer interested in purchasing a property.
       TENANT_PROSPECT: A potential customer interested in renting a property.
       OWNER: The owner of one or more properties registered on the platform.
+      TENANT: A current tenant who has signed a contract for a property.
   house_address:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -83,25 +93,29 @@ columns:
       It combines address, number, complement, neighborhood and city (in this exactly order)
       from EBDB's House/Imovel table.
   is_active:
-    description: Boolean flag indicating if the entity is currently active, used as primary filter for data inclusion.
-      Active entities (TRUE) are always included regardless of date. Inactive entities (FALSE) are only included 
+    description:
+      Boolean flag indicating if the entity is currently active, used as primary filter for data inclusion.
+      Active entities (TRUE) are always included regardless of date. Inactive entities (FALSE) are only included
       if updated within the last 3 months. An entity is considered active as long as it is still receiving interactions.
       A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsucessfull.
       An offer entity will be considered as active for status proposed, and inactive for statuses accepted, dismissed or rejected.
-      A contract entity will be considered as active for statuses ativo, minuta or pre-assinaturas, and inactive for statuses cancelado or finalizado. 
+      A contract entity will be considered as active for statuses ativo, minuta or pre-assinaturas, and inactive for statuses cancelado or finalizado.
+      A termination entity will be considered as active for statuses requested, inspection_under_review, inspection_scheduled, inspection_opted_out, inspection_executed, or inspection_canceled, and inactive for statuses done or canceled.
   ts_created:
     lineage:
       - core_visit.visit.ts_created
       - core_offer.offer.ts_created
       - core_contract.contract.ts_created
+      - datalake_terminator_clean.termination.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
       - core_visit.visit.ts_updated
       - core_offer.offer.ts_updated
       - core_contract.contract.ts_updated
-    description: Last timestamp of when the entity was updated in our product. 
-      This field is used as the filtering criterion for inactive entities - only inactive entities 
+      - datalake_terminator_clean.termination.ts_updated
+    description: Last timestamp of when the entity was updated in our product.
+      This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.
   ts_load:
     description: Timestamp of when the entity was updated and loaded for the last time in this table.
