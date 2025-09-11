@@ -82,6 +82,15 @@ columns:
       TENANT_PROSPECT: A potential customer interested in renting a property.
       OWNER: The owner of one or more properties registered on the platform.
       TENANT: A current tenant who has signed a contract for a property.
+  business_context:
+    lineage:
+      - core_visit.visit.business_context
+    description: Business context that categorizes the type of transaction or interaction.
+      This field indicates whether the entity is related to rental (RENT) or sale (SALE) operations,
+      helping to differentiate business flows and customer journeys within our platform.
+    categories:
+      RENT: The entity is related to rental transactions, for example visits, offers and contracts for rental properties.
+      SALE: The entity is related to sale transactions, for example visits property purchases.
   house_address:
     lineage:
       - datalake_ebdb_clean.house.address

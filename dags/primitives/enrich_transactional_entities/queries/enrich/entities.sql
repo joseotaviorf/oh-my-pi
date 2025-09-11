@@ -26,6 +26,7 @@ WITH visit AS (
         id_owner AS id_user,
         entity,
         'OWNER' AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -41,6 +42,7 @@ WITH visit AS (
             WHEN business_context = 'RENT' THEN 'TENANT_PROSPECT'
             WHEN business_context = 'SALE' THEN 'BUYER_PROSPECT'
         END AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -53,6 +55,7 @@ WITH visit AS (
         id_agent AS id_user,
         entity,
         'AGENT_BROKER' AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -69,6 +72,7 @@ offer AS (
             id_tenant,
             id_owner,
             'OFFER' AS entity,
+            'RENT' AS business_context,
             CASE
                 WHEN status = 'PROPOSED' THEN TRUE
                 WHEN status IN ('ACCEPTED', 'DISMISSED', 'REJECTED') THEN FALSE
@@ -85,6 +89,7 @@ offer AS (
         id_tenant AS id_user,
         entity,
         'TENANT_PROSPECT' AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -97,6 +102,7 @@ offer AS (
         id_owner AS id_user,
         entity,
         'OWNER' AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -112,6 +118,7 @@ contract AS (
             id_owner,
             id_tenant,
             'CONTRACT' AS entity,
+            'RENT' AS business_context,
             CASE
                 WHEN status IN ('Cancelado', 'Finalizado') THEN FALSE
                 WHEN status IN ('Ativo', 'Minuta', 'PreAssinaturas') THEN TRUE
@@ -130,6 +137,7 @@ contract AS (
         id_owner AS id_user,
         entity,
         'OWNER' AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -146,6 +154,7 @@ contract AS (
             WHEN ts_signed IS NOT NULL THEN 'TENANT'
             ELSE 'TENANT_PROSPECT'
         END AS persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -158,6 +167,7 @@ termination AS (
       id AS id_entity,
       id_contract,
       'TERMINATION' AS entity,
+      'RENT' AS business_context,
       CASE
           WHEN status IN ('DONE', 'CANCELED') THEN FALSE
           WHEN status IN (
@@ -181,6 +191,7 @@ termination AS (
         c.id_contract AS id_contract,
         tb.entity,
         'OWNER' AS persona,
+        tb.business_context,
         tb.is_active,
         tb.ts_created,
         tb.ts_updated
@@ -189,9 +200,7 @@ termination AS (
   INNER JOIN
         core_contract.contract c
         ON tb.id_contract = c.id_contract
-
   UNION ALL
-
   SELECT
     tb.id_entity,
     c.id_house,
@@ -199,6 +208,7 @@ termination AS (
     c.id_contract AS id_contract,
     tb.entity,
     'TENANT' AS persona,
+    tb.business_context,
     tb.is_active,
     tb.ts_created,
     tb.ts_updated
@@ -217,6 +227,7 @@ base AS (
         id_user,
         entity,
         persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -231,6 +242,7 @@ base AS (
         id_user,
         entity,
         persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -245,6 +257,7 @@ base AS (
         id_user,
         entity,
         persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -259,6 +272,7 @@ base AS (
         id_user,
         entity,
         persona,
+        business_context,
         is_active,
         ts_created,
         ts_updated
@@ -274,6 +288,7 @@ SELECT
     u.uuid_person,
     b.entity,
     b.persona,
+    business_context,
     {house_address} AS house_address,
     b.is_active,
     b.ts_created,
