@@ -55,6 +55,8 @@ columns:
     description: "Neighborhood from source data (string)"
     lineage:
       - datalake_ebdb_clean.house.neighborhood
+  complement_analysis:
+    description: "Structured analysis of the complement field processed by Edwiges, containing parsed apartment/unit information, floor details, and other property-specific data"
   complement_raw:
     description: "Original complement string from source data (apartment/unit information), preserved for reference (string)"
     lineage:

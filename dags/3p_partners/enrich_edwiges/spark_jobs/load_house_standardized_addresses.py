@@ -169,6 +169,7 @@ def apply_edwiges_transformations(df: DataFrame) -> DataFrame:
         col("number"),
         col("number_raw"),
         col("neighborhood"),
+        col("complement_analysis"),
         col("complement_raw"),
         col("total_area"),
         col("lat"),
