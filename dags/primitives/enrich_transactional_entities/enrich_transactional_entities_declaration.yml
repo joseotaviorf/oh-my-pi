@@ -31,6 +31,7 @@ workflow:
         source.uuid_person <> target.uuid_person OR
         source.entity <> target.entity OR
         source.persona <> target.persona OR
+        source.business_context <> target.business_context OR
         source.house_address <> target.house_address OR
         source.is_active <> target.is_active OR
         source.ts_created <> target.ts_created
