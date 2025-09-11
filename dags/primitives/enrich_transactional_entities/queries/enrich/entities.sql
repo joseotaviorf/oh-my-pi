@@ -19,20 +19,6 @@ WITH visit AS (
             ts_updated
         FROM
             core_visit.visit
-    ),
-    visit_filtered AS (
-        SELECT *
-        FROM
-            visit_base
-        WHERE
-            is_active = TRUE 
-            OR (
-                is_active = FALSE 
-                AND DATE(ts_updated) BETWEEN 
-                 ADD_MONTHS(COALESCE(DATE('{load_start_date}'), CURRENT_DATE()), -3)
-                 AND COALESCE(DATE('{load_end_date}'), CURRENT_DATE())
-            )
-            OR is_active IS NULL
     )
     SELECT
         id_entity,
@@ -44,7 +30,7 @@ WITH visit AS (
         ts_created,
         ts_updated
     FROM
-        visit_filtered
+        visit_base
     UNION ALL
     SELECT
         id_entity,
@@ -59,7 +45,7 @@ WITH visit AS (
         ts_created,
         ts_updated
     FROM
-        visit_filtered
+        visit_base
     UNION ALL
     SELECT
         id_entity,
@@ -71,7 +57,7 @@ WITH visit AS (
         ts_created,
         ts_updated
     FROM
-        visit_filtered
+        visit_base
     WHERE
         id_agent IS NOT NULL
 ),
@@ -92,20 +78,6 @@ offer AS (
             ts_updated
         FROM
             core_offer.offer
-    ),
-    offer_filtered AS (
-        SELECT *
-        FROM
-            offer_base
-        WHERE
-            is_active = TRUE 
-            OR (
-                is_active = FALSE 
-                AND DATE(ts_updated) BETWEEN 
-                 ADD_MONTHS(COALESCE(DATE('{load_start_date}'), CURRENT_DATE()), -3)
-                 AND COALESCE(DATE('{load_end_date}'), CURRENT_DATE())
-            )
-            OR is_active IS NULL
     )
     SELECT
         id_entity,
@@ -117,7 +89,7 @@ offer AS (
         ts_created,
         ts_updated
     FROM
-        offer_filtered
+        offer_base
     UNION ALL
     SELECT
         id_entity,
@@ -129,7 +101,7 @@ offer AS (
         ts_created,
         ts_updated
     FROM
-        offer_filtered
+        offer_base
 ),
 contract AS (
     WITH contract_base AS (
@@ -150,20 +122,6 @@ contract AS (
             ts_updated
         FROM
             core_contract.contract
-    ),
-    contract_filtered AS (
-        SELECT *
-        FROM
-            contract_base
-        WHERE
-            is_active = TRUE 
-            OR (
-                is_active = FALSE 
-                AND DATE(ts_updated) BETWEEN 
-                 ADD_MONTHS(COALESCE(DATE('{load_start_date}'), CURRENT_DATE()), -3)
-                 AND COALESCE(DATE('{load_end_date}'), CURRENT_DATE())
-            )
-            OR is_active IS NULL
     )
     SELECT
         id_entity,
@@ -176,7 +134,7 @@ contract AS (
         ts_created,
         ts_updated
     FROM
-        contract_filtered
+        contract_base
     UNION ALL
     SELECT
         id_entity,
@@ -192,7 +150,7 @@ contract AS (
         ts_created,
         ts_updated
     FROM
-        contract_filtered
+        contract_base
 ),
 termination AS (
   WITH termination_base AS (
@@ -249,7 +207,6 @@ termination AS (
   INNER JOIN
         core_contract.contract c
         ON tb.id_contract = c.id_contract
-
 ),
 base AS (
     SELECT
