@@ -170,7 +170,63 @@ WITH recontact_data AS (
     ro.id_agent IS NOT NULL
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY ro.id_ticket ORDER BY ro.ts_updated_local DESC) = 1
-)
+), pause_metrics AS 
+(SELECT 
+  DATE(ts_created) AS date,
+  worker_email, 
+  SUM(CAST(total_inactivity_time AS DOUBLE) / 1000) AS total_inactivity_time_sum, 
+  SUM(CAST(last_inactivity_time AS DOUBLE) / 1000) AS last_inactivity_time_sum
+FROM 
+  datalake_customer_support.chats
+WHERE 
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  AND task_status = 'completed'
+GROUP BY 
+  worker_email, 
+  DATE(ts_created)),
+activity_times AS (
+  SELECT 
+    date,
+    analyst_email, 
+    SUM(total_activity_time) AS total_activity_time,
+    SUM(CASE 
+      WHEN activity LIKE 'Pausa%' THEN total_activity_time 
+      ELSE 0 
+    END) AS total_paused,
+    SUM(CASE 
+      WHEN activity LIKE 'Offline%' THEN total_activity_time 
+      ELSE 0 
+    END) AS total_offline,
+    SUM(CASE 
+      WHEN activity LIKE 'Dispon%' THEN total_activity_time 
+      ELSE 0 
+    END) AS total_available,
+    SUM(CASE 
+      WHEN activity LIKE 'Indispon%' THEN total_activity_time 
+      ELSE 0 
+    END) AS total_unavailable
+  FROM 
+    datalake_twilio_flex_insights_clean.analyst_activity_time 
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GROUP BY 
+    date, 
+    analyst_email
+), twilio_metrics AS (
+SELECT
+  at.date,
+  MD5(at.analyst_email) as id_agent,
+  at.total_activity_time,
+  at.total_paused,
+  at.total_offline,
+  at.total_available,
+  at.total_unavailable,
+  pm.total_inactivity_time_sum,
+  pm.last_inactivity_time_sum
+FROM activity_times AS at
+INNER JOIN pause_metrics as pm
+ON at.analyst_email = pm.worker_email
+AND at.date = pm.date)
 SELECT
   wa.id_agent || dt_reference AS sk_snapshot,
   wa.id_agent AS sk_agent,
@@ -183,6 +239,12 @@ SELECT
   COUNT_IF(wa.is_recontact_ticket = TRUE) AS total_tickets_recontact,
   COUNT_IF(wa.is_received_demand = TRUE) AS total_received_demand,
   COUNT_IF(wa.is_productive_ticket = TRUE) AS total_productivity,
+  tm.total_activity_time,
+  tm.total_paused AS total_status_paused,
+  tm.total_offline AS total_status_offline,
+  tm.total_available AS total_status_available,
+  tm.total_unavailable AS total_status_unavailable,
+  ROUND(tm.total_inactivity_time_sum, 2) AS total_tasks_inactivity_time,
   COUNT(DISTINCT
     CASE
       WHEN
@@ -251,5 +313,8 @@ SELECT
   NOW() AS ts_load
 FROM
   without_agg_infos AS wa
+LEFT JOIN twilio_metrics AS tm
+ON wa.id_agent = tm.id_agent
+AND wa.dt_reference = tm.date
 GROUP BY
   ALL

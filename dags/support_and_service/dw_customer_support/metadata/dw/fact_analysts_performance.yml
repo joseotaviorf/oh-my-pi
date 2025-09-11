@@ -77,6 +77,40 @@ columns:
       - datalake_repairs.repair_tickets.ts_solved_local
       - datalake_repairs.repair_tickets.ts_closed_local
       - datalake_customer_support.tickets.ts_solved
+  total_activity_time:
+    description:
+      Total activity time of the analyst in the reference date of the calculation, sum of all activity states.
+    lineage:
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.total_activity_time
+  total_status_paused:
+    description:
+      Total time of how long the analyst was in any of pause status in the reference date of the calculation.
+    lineage:
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.total_activity_time
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.activity
+  total_status_offline:
+    description:
+      Total time of how long the analyst was in any of offline status in the reference date of the calculation.
+    lineage:
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.total_activity_time
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.activity
+  total_status_available:
+    description:
+      Total time of how long the analyst was in any of available status in the reference date of the calculation.
+    lineage:
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.total_activity_time
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.activity
+  total_status_unavailable:
+    description:
+      Total time of how long the analyst was in any of unavailable status in the reference date of the calculation.
+    lineage:
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.total_activity_time
+      - datalake_twilio_flex_insights_clean.analyst_activity_time.activity
+  total_tasks_inactivity_time:
+    description:
+      Total inactivity time all Twilio tasks completed by the analyst in the reference date of the calculation, in seconds.
+    lineage:
+      - datalake_customer_support.chats.total_inactivity_time
   tickets_with_csat_score:
     description: Bigint type column that represents the number of tickets that received some response to the satisfaction survey.
     lineage:
