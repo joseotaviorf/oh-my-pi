@@ -73,7 +73,7 @@ if __name__ == "__main__":
     json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.JIRA)
     credentials = json.loads(json_credentials)
 
-    jql_query_filter = f'created >= "{dt_start_execution} 00:00" and created <= "{dt_end_execution} 23:59"'
+    jql_query_filter = f'updated >= "{dt_start_execution} 00:00" and updated <= "{dt_end_execution} 23:59"'
 
     params = {
         'jql': jql_query_filter,
