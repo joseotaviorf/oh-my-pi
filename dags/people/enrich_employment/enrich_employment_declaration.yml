@@ -9,7 +9,7 @@ dag:
       employee's position, organizational assignment and status (active/inactive), 
       preparing the data for analytical consumption in the enriched layer.
 cluster:
-  type: databricks_16_4_small_memory_people_cluster
+  type: databricks_13_3_min_memory_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE

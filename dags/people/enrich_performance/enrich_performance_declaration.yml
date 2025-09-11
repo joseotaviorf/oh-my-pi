@@ -13,7 +13,7 @@ workflow:
     people-team: ["ALL PRIVILEGES"]
   custom_schema: pin
 cluster:
-  type: databricks_16_4_small_memory_people_cluster
+  type: databricks_13_3_min_memory_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
