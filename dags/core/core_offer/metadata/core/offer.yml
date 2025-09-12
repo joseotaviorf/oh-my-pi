@@ -7,13 +7,13 @@ description: Offer Core Model for Rental Transact offers.
 columns:
   sk_core_offer:
     lineage:
-      - datalake_rental_transact_test_clean.offer.id
+      - datalake_rental_transact_clean.offer.id
     description: Surrogate key related to the Offer Core Model.
       It's made by concatenating "OFFER||id_offer" and then applying the SHA256 hash.
       This key must always be unique.
   id_offer:
     lineage:
-      - datalake_rental_transact_test_clean.offer.id
+      - datalake_rental_transact_clean.offer.id
     description: Identifier of the offer. It's the id of the Offer table from rental transact database.
       This identifier is used internally in our systems.
       This key must always be unique.
@@ -24,7 +24,7 @@ columns:
       This is the internal ID that corresponds to the tenant identifier.
   id_tenant_external:
     lineage:
-      - datalake_rental_transact_test_clean.offer.id_tenant_external
+      - datalake_rental_transact_clean.offer.id_tenant_external
     description: External identifier of the tenant related to this offer.
       This references the tenant from Person's database.
   id_owner:
@@ -34,27 +34,27 @@ columns:
       This is the internal ID that corresponds to the owner identifier.
   id_owner_external:
     lineage:
-      - datalake_rental_transact_test_clean.offer.id_owner_external
+      - datalake_rental_transact_clean.offer.id_owner_external
     description: External identifier of the property owner related to this offer.
       This references the owner from Person's database.
   id_resident_info:
     lineage:
-      - datalake_rental_transact_test_clean.offer.id_resident_info
+      - datalake_rental_transact_clean.offer.id_resident_info
     description: Identifier of the resident information associated with this offer.
       Contains details about the potential tenant.
   id_house:
     lineage:
-      - datalake_rental_transact_test_clean.offer.id_house_external
+      - datalake_rental_transact_clean.offer.id_house_external
     description: External identifier of the house/property related to this offer.
       This references the property from external systems.
   status:
     lineage:
-      - datalake_rental_transact_test_clean.offer.status
+      - datalake_rental_transact_clean.offer.status
     description: Current status of the offer in the rental transaction process.
       Indicates the stage of the offer lifecycle.
   type:
     lineage:
-      - datalake_rental_transact_test_clean.offer.type
+      - datalake_rental_transact_clean.offer.type
     description: Type of the rental offer.
       Categorizes the kind of rental transaction offer.
     categories:
@@ -64,50 +64,50 @@ columns:
         and makes no other requests.
   turn:
     lineage:
-      - datalake_rental_transact_test_clean.offer.turn
+      - datalake_rental_transact_clean.offer.turn
     description: Turn number in the negotiation process.
       Indicates the sequence of offers/counter-offers.
   iteration:
     lineage:
-      - datalake_rental_transact_test_clean.offer.iteration
+      - datalake_rental_transact_clean.offer.iteration
     description: Iteration number within the current turn.
       Tracks revisions within the same negotiation turn.
   rejection_reason:
     lineage:
-      - datalake_rental_transact_test_clean.offer.rejection_reason
+      - datalake_rental_transact_clean.offer.rejection_reason
     description: Reason why the offer was rejected, if applicable.
       Provides context when an offer is not accepted.
   original_rent_value:
     lineage:
-      - datalake_rental_transact_test_clean.offer.original_rent_value
+      - datalake_rental_transact_clean.offer.original_rent_value
     description: Original rental value proposed in the offer.
       The monetary amount initially offered for the rental.
   ts_created:
     lineage:
-      - datalake_rental_transact_test_clean.offer.ts_created
+      - datalake_rental_transact_clean.offer.ts_created
     description: Timestamp when the offer was originally created.
       Records the creation time in the rental transaction system.
   ts_updated:
     lineage:
-      - datalake_rental_transact_test_clean.offer.ts_updated
+      - datalake_rental_transact_clean.offer.ts_updated
     description: Timestamp when the offer was last updated.
       Tracks the most recent modification to the offer.
   ts_expiration:
     lineage:
-      - datalake_rental_transact_test_clean.offer.ts_expiration
+      - datalake_rental_transact_clean.offer.ts_expiration
     description: Timestamp when the offer expires.
       Indicates the deadline for accepting the offer.
   ts_load:
     description: Timestamp of when the Offer Core Model was updated and loaded for the last time.
   year:
     lineage:
-      - datalake_rental_transact_test_clean.offer.ts_updated
+      - datalake_rental_transact_clean.offer.ts_updated
     description: Year of when the offer was updated. Also, it's a table partition.
   month:
     lineage:
-      - datalake_rental_transact_test_clean.offer.ts_updated
+      - datalake_rental_transact_clean.offer.ts_updated
     description: Month of when the offer was updated. Also, it's a table partition.
   day:
     lineage:
-      - datalake_rental_transact_test_clean.offer.ts_updated
+      - datalake_rental_transact_clean.offer.ts_updated
     description: Day of when the offer was updated. Also, it's a table partition.

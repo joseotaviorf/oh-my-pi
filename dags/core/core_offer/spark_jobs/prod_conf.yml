@@ -1,4 +1,4 @@
-RENTAL_TRANSACT_OFFER_TABLE: "datalake_rental_transact_test_clean.offer"
+RENTAL_TRANSACT_OFFER_TABLE: "datalake_rental_transact_clean.offer"
 EBDB_USER_TABLE: "datalake_ebdb_clean.user"
 ENTITY_TYPE: "OFFER"
 merge_on: ["sk_core_offer"]
