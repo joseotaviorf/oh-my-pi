@@ -423,22 +423,6 @@ final_documents_raw AS (
     documents_processed
   WHERE
     COALESCE(statements_array, payslips_array) IS NOT NULL
-),
-renamed_documents AS (
-  SELECT
-    id_proposal,
-    name,
-    TRANSFORM(
-      documents,
-      file_name -> SUBSTRING(file_name, 38, LENGTH(file_name) - 37)
-    ) AS renamed_documents_array,
-    type,
-    ts_credit_analysis_updated,
-    result,
-    reason,
-    analyst
-  FROM
-    final_documents_raw
 )
 SELECT
   id_proposal,
@@ -448,15 +432,15 @@ SELECT
   result,
   reason,
   analyst,
-  ELEMENT_AT(renamed_documents_array, 1) AS document_1,
-  ELEMENT_AT(renamed_documents_array, 2) AS document_2,
-  ELEMENT_AT(renamed_documents_array, 3) AS document_3,
-  ELEMENT_AT(renamed_documents_array, 4) AS document_4,
-  ELEMENT_AT(renamed_documents_array, 5) AS document_5,
-  ELEMENT_AT(renamed_documents_array, 6) AS document_6,
-  ELEMENT_AT(renamed_documents_array, 7) AS document_7,
-  ELEMENT_AT(renamed_documents_array, 8) AS document_8,
-  ELEMENT_AT(renamed_documents_array, 9) AS document_9,
-  ELEMENT_AT(renamed_documents_array, 10) AS document_10
+  ELEMENT_AT(documents, 1) AS document_1,
+  ELEMENT_AT(documents, 2) AS document_2,
+  ELEMENT_AT(documents, 3) AS document_3,
+  ELEMENT_AT(documents, 4) AS document_4,
+  ELEMENT_AT(documents, 5) AS document_5,
+  ELEMENT_AT(documents, 6) AS document_6,
+  ELEMENT_AT(documents, 7) AS document_7,
+  ELEMENT_AT(documents, 8) AS document_8,
+  ELEMENT_AT(documents, 9) AS document_9,
+  ELEMENT_AT(documents, 10) AS document_10
 FROM
-  renamed_documents
+  final_documents_raw
