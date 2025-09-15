@@ -7,12 +7,12 @@ SELECT
     credited_to.id AS id_credited_to,
     recruiter.id AS id_recruiter,
     coordinator.id AS id_coordinator,
-    rejection_reason.id AS id_rejection_reason,
+    FROM_JSON(CAST(rejection_reason AS STRING), 'struct<id:bigint, name:string>').id AS id_rejection_reason,
     -- text fields
     status,
     source.public_name AS source_name,
     current_stage.name AS current_stage_name,
-    rejection_reason.name AS rejection_reason_name,
+    FROM_JSON(CAST(rejection_reason AS STRING), 'struct<id:bigint, name:string>').name AS rejection_reason_name,
     credited_to.name AS credited_to_name,
     credited_to.first_name AS credited_to_first_name,
     credited_to.last_name AS credited_to_last_name,
@@ -22,13 +22,32 @@ SELECT
     coordinator.name AS coordinator_name,
     coordinator.first_name AS coordinator_first_name,
     coordinator.last_name AS coordinator_last_name,
-    prospect_detail.prospect_pool.name AS prospect_pool_name,
-    prospect_detail.prospect_stage.name AS prospect_stage_name,
-    prospect_detail.prospect_owner.name AS prospect_owner_name,
-    keyed_custom_fields.preferred_name___social_name__optional_.value AS social_name,
-    keyed_custom_fields.are_you_legally_authorized_to_work_in_the_country_where_this_job_is_located_.value AS work_authorization_status,
-    COALESCE(keyed_custom_fields.qual_o_seu_tipo_de_defici_ncia_.value, keyed_custom_fields._cu_l_es_su_tipo_de_discapacidad_.value) AS disability_type_details,
-    COALESCE(keyed_custom_fields.pc_d_necessidade_de_acessibilidade.value, keyed_custom_fields.pc_d_necesidad_de_accesibilidad.value) AS accessibility_needs,
+    FROM_JSON(
+        CAST(prospect_detail AS STRING), 
+        'struct<prospect_pool:struct<name:string>, prospect_stage:struct<name:string>, prospect_owner:struct<name:string>>').prospect_pool.name 
+    AS prospect_pool_name,
+    FROM_JSON(
+        CAST(prospect_detail AS STRING), 
+        'struct<prospect_pool:struct<name:string>, prospect_stage:struct<name:string>, prospect_owner:struct<name:string>>').prospect_stage.name 
+    AS prospect_stage_name,
+    FROM_JSON(
+        CAST(prospect_detail AS STRING), 
+        'struct<prospect_pool:struct<name:string>, prospect_stage:struct<name:string>, prospect_owner:struct<name:string>>').prospect_owner.name
+    AS prospect_owner_name,
+    FROM_JSON(
+        CAST(keyed_custom_fields.preferred_name___social_name__optional_ AS STRING), 'struct<value:string>').value
+    AS social_name,
+    FROM_JSON(
+        CAST(keyed_custom_fields.are_you_legally_authorized_to_work_in_the_country_where_this_job_is_located_ AS STRING), 
+    'struct<value:string>').value AS work_authorization_status,
+    COALESCE(
+        FROM_JSON(CAST(keyed_custom_fields.qual_o_seu_tipo_de_defici_ncia_ AS STRING), 'struct<value:string>').value,
+        FROM_JSON(CAST(keyed_custom_fields._cu_l_es_su_tipo_de_discapacidad_ AS STRING), 'struct<value:string>').value
+    ) AS disability_type_details,
+    COALESCE(
+        FROM_JSON(CAST(keyed_custom_fields.pc_d_necessidade_de_acessibilidade AS STRING), 'struct<value:string>').value,
+        FROM_JSON(CAST(keyed_custom_fields.pc_d_necesidad_de_accesibilidad AS STRING), 'struct<value:string>').value
+    ) AS accessibility_needs,
     -- boolean
     CAST(prospect AS BOOLEAN) AS is_prospect,
     -- timestamps

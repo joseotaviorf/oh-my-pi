@@ -38,16 +38,7 @@ SELECT
     website_addresses,
     social_media_addresses,
     attachments,
-    TRANSFORM(
-        educations,
-        edu -> STRUCT(
-            edu.id,
-            edu.school_name,
-            edu.degree,
-            edu.start_date,
-            edu.end_date
-        )
-    ) AS educations,
+    educations,
     employments,
     -- partitions
     year,
