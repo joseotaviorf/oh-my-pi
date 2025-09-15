@@ -150,6 +150,9 @@ class DeltaLoader:
         partition_by: list = None,
         merge_schema: bool = True,
     ) -> None:
+        # Force partitioned tables to use mergeSchema. DBR 16.4+ doesn't allow overwriteSchema in this case
+        if partition_by:
+            merge_schema = True
         """Write a DataFrame to a Delta table"""
         source_df.write.format("delta").option("mergeSchema", merge_schema).option(
             "overwriteSchema", not merge_schema
