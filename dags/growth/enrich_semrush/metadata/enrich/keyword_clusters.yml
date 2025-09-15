@@ -5,7 +5,9 @@ domain: Growth
 description: |
   Keyword clustering and categorization derived from `keyword_attributes`.
   Provides macro and micro clusters as well as consolidated flags and types
-  (transactional, informational, location, house, player, amenities).
+  (transactional, informational, location, house, player, amenities). Includes
+  URL structure analysis and comprehensive clustering logic for SEO strategy
+  and competitive intelligence across real estate platforms.
 columns:
   id_region_match_operation_city:
     description: "Identifier for the city-level region match rule that produced the city match."
@@ -43,6 +45,18 @@ columns:
     description: "Landing page URL that ranks for the keyword for the respective player."
     lineage:
       - datalake_semrush.keyword_attributes.url
+  structure:
+    description: "URL structure classification based on URL patterns and content type (e.g., 'Help', 'Informacional', 'Transacional', 'Home', 'Other')."
+    lineage:
+      - datalake_semrush.keyword_attributes.structure
+  page_structure:
+    description: "Page structure classification based on URL patterns and content type (e.g., 'Help', 'Content', 'Transacional', 'Condominium', 'Home', 'Other')."
+    lineage:
+      - datalake_semrush.keyword_attributes.page_structure
+  page_cluster:
+    description: "Page cluster classification based on URL patterns and content type (e.g., 'Help', 'Conteúdos', 'Regiões atendidas', 'Listing', 'Busca Compra', 'Busca Aluguel', 'Imobiliaria', 'Busca Genérica', 'Condominio', 'Home', 'Other')."
+    lineage:
+      - datalake_semrush.keyword_attributes.page_cluster
   trends:
     description: "Monthly trend values from SEMrush with brackets removed; comma‑separated list representing the last 12 months."
     lineage:
@@ -80,7 +94,7 @@ columns:
     lineage:
       - datalake_semrush.keyword_attributes.search_volume
   max_seach_volume_by_kw:
-    description: "Maximum search volume for the same `keyword_clean` within the same year and month window."
+    description: "Maximum search volume for the same `keyword_clean` within the same year and month window. Calculated using window function MAX(search_volume) OVER (PARTITION BY keyword_clean, year, month)."
     lineage:
       - datalake_semrush.keyword_attributes.search_volume
   cpc:

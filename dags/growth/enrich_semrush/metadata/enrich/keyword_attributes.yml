@@ -3,9 +3,11 @@ table_name: keyword_attributes
 owner: erica.bertan@quintoandar.com.br
 domain: Growth
 description: |
-  Keywords enriched with semantic and regional attributes computed from
-  `keyword_region_attributes`. Includes inferred city and neighborhood matches,
-  plus multiple boolean indicators for location, product and intent categories.
+  Keywords enriched with comprehensive semantic, regional, and structural attributes computed from
+  `keyword_region_attributes`. Includes inferred city and neighborhood matches, URL structure
+  classification, plus extensive boolean indicators for location, product, intent, and content
+  categories. This table provides detailed keyword analysis for SEO strategy and competitive
+  intelligence across real estate platforms.
 columns:
   id_region_match_operation_city:
     description: "Identifier for the city-level region match rule that produced the city match."
@@ -28,19 +30,31 @@ columns:
     lineage:
       - datalake_semrush.keyword_region_attributes.keyword_clean
   match_igbe_city:
-    description: "Matched IBGE city name inferred from the keyword or URL, when applicable."
+    description: "Matched IBGE city name inferred from the keyword or URL, when applicable. Enhanced with additional logic to handle common city abbreviations and patterns."
     lineage:
       - datalake_semrush.keyword_region_attributes.match_igbe_city
   match_operation_city:
-    description: "Normalized operation city matched to the keyword or landing URL."
+    description: "Normalized operation city matched to the keyword or landing URL. Enhanced with additional logic to handle common city abbreviations and patterns."
     lineage:
       - datalake_semrush.keyword_region_attributes.match_operation_city
   match_operation_neighborhood:
-    description: "Normalized operation neighborhood matched to the keyword or landing URL."
+    description: "Normalized operation neighborhood matched to the keyword or landing URL. Enhanced with additional logic to handle neighborhood patterns."
     lineage:
       - datalake_semrush.keyword_region_attributes.match_operation_neighborhood
   url:
     description: "Landing page URL that ranks for the keyword for the respective player."
+    lineage:
+      - datalake_semrush.keyword_region_attributes.url
+  structure:
+    description: "URL structure classification based on URL patterns and content type (e.g., 'Help', 'Informacional', 'Transacional', 'Home', 'Other')."
+    lineage:
+      - datalake_semrush.keyword_region_attributes.url
+  page_structure:
+    description: "Page structure classification based on URL patterns and content type (e.g., 'Help', 'Content', 'Transacional', 'Condominium', 'Home', 'Other')."
+    lineage:
+      - datalake_semrush.keyword_region_attributes.url
+  page_cluster:
+    description: "Page cluster classification based on URL patterns and content type (e.g., 'Help', 'Conteúdos', 'Regiões atendidas', 'Listing', 'Busca Compra', 'Busca Aluguel', 'Imobiliaria', 'Busca Genérica', 'Condominio', 'Home', 'Other')."
     lineage:
       - datalake_semrush.keyword_region_attributes.url
   trends:

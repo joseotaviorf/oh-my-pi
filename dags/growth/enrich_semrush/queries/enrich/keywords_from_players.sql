@@ -254,6 +254,30 @@ SELECT DISTINCT -- There are duplicates in the source table
   WHERE
     year = YEAR(DATE('{load_start_date}'))
     AND month = MONTH(DATE('{load_start_date}'))
+    -- Filtering out car-related keywords
+    AND url NOT LIKE '%tabela-fipe%'
+    AND url NOT LIKE '%moto%'            
+    AND url NOT LIKE '%carro%'          
+    AND url NOT LIKE '%concessionaria%'  
+    AND url NOT LIKE '%/suv/%'
+    AND url NOT LIKE '%/hatch%'
+    AND url NOT LIKE '%/seda%'          
+    AND url NOT LIKE '%/perua%'
+    AND url NOT LIKE '%crosstrek%'
+    AND url NOT LIKE '%peugeot%'
+    AND url NOT LIKE '%fiat%'
+    AND url NOT LIKE '%mitsubishi%'
+    AND url NOT LIKE '%volkswagen%'
+    AND url NOT LIKE '%citroen%'
+    AND url NOT LIKE '%cadillac%'
+    AND url NOT LIKE '%picape%'
+    AND url NOT LIKE '%hyundai%'
+    AND url NOT LIKE '%chevrolet%'
+    AND url NOT LIKE '%renault%'
+    AND url NOT LIKE '%ford%'
+    AND url NOT LIKE '%toyota%'
+    AND url NOT LIKE '%nissan%'
+    AND url NOT LIKE '%honda%'
 UNION ALL
 SELECT DISTINCT -- There are duplicates in the source table
     'imoveisestadao' AS player,

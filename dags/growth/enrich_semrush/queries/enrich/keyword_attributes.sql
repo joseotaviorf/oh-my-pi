@@ -36,6 +36,175 @@ SELECT
   END AS match_operation_neighborhood,
   
   url,
+
+  CASE
+    WHEN url LIKE '%ajuda.%' OR url LIKE '%ajuda/%' OR url LIKE '%fale-conosco%' OR url LIKE '%help%' THEN 'Help'
+    WHEN 
+      url LIKE '%blog%' OR 
+      url LIKE '%noticias%' OR 
+      url LIKE '%article%' OR 
+      url LIKE '%guia%' OR 
+      url LIKE '%dicas%' OR 
+      url LIKE '%decoracao%' OR 
+      url LIKE '%/mercado-imobiliario/%' OR 
+      url LIKE '%knowledge%' OR 
+      url LIKE '%forum%' OR 
+      url LIKE '%portal.loft.com%' OR 
+      url LIKE '%/integradores-parceiros/%' OR 
+      url LIKE '%melhores-bairros%' OR 
+      url LIKE '%onde-morar%' THEN 'Informacional'
+    WHEN url LIKE '%regioes-atendidas%' THEN 'Informacional'
+    WHEN url LIKE '%logradouro%' OR url LIKE '%/ponto-de-interesse/%' AND player IN ('imovelweb' , 'casamineira') THEN 'Other'
+    WHEN
+      url LIKE '%quintoandar.com.br/imovel/%' OR 
+      url LIKE '%/loft.com.br/imovel/%' OR 
+      url LIKE '%imovelweb.com.br/propriedades/%' OR 
+      url LIKE '%wimoveis.com.br/propriedades/%' THEN 'Transacional'
+    WHEN url LIKE '%comprar%' OR url LIKE '%compra%' OR url LIKE '%venda%' THEN 'Transacional'
+    WHEN url LIKE '%alugar%' OR url LIKE '%aluguel%' OR url LIKE '%alugue%' THEN 'Transacional'
+    WHEN url LIKE '%corretor%' THEN 'Transacional'
+    WHEN url LIKE '%anunciante%' THEN 'Transacional'
+    WHEN url LIKE '%imobiliaria%' THEN 'Transacional'
+    WHEN url LIKE '%logradouro%' THEN 'Transacional'
+    WHEN url LIKE '%temporada%' THEN 'Transacional'
+    WHEN url LIKE '%leilao%' THEN 'Transacional'
+    WHEN url LIKE '%lancamento%' THEN 'Transacional'
+    WHEN
+      url LIKE '%/casa%' OR 
+      url LIKE '%/apartamento%' OR 
+      url LIKE '%terreno%' OR 
+      url LIKE '%comerciais%' OR 
+      url LIKE '%comercial%' OR 
+      url LIKE '%imovel%' OR 
+      url LIKE '%chacaras%' OR 
+      url LIKE '%/loft/%' OR 
+      url LIKE '%flat%' OR 
+      url LIKE '%predio%' OR 
+      url LIKE '%kitnet%' OR 
+      url LIKE '%studio%' OR 
+      url LIKE '%fazenda%' OR 
+      url LIKE '%cobertura%' OR 
+      url LIKE '%galpao%' OR 
+      url LIKE '%empreendimento%' OR 
+      url LIKE '%garagem%' THEN 'Transacional'
+    WHEN (url LIKE '%imoveis%' OR url LIKE '%propriedade%') AND url NOT LIKE '%wimoveis.com%' THEN 'Transacional'
+    WHEN url LIKE '%/condominio%' THEN 'Informacional'
+    WHEN url LIKE '%.com.br' OR url LIKE '%.com/' OR url LIKE '%.com.br/' OR url LIKE '%.com/home' OR url LIKE '%.com.br/home' THEN 'Home'
+    ELSE 'Other'
+  END AS structure,
+
+  CASE
+    WHEN url LIKE '%ajuda.%' OR url LIKE '%ajuda/%' OR url LIKE '%fale-conosco%' OR url LIKE '%help%' THEN 'Help'
+    WHEN 
+      url LIKE '%blog%' OR 
+      url LIKE '%noticias%' OR 
+      url LIKE '%article%' OR 
+      url LIKE '%guia%' OR 
+      url LIKE '%dicas%' OR 
+      url LIKE '%decoracao%' OR 
+      url LIKE '%/mercado-imobiliario/%' OR 
+      url LIKE '%knowledge%' OR 
+      url LIKE '%forum%' OR 
+      url LIKE '%portal.loft.com%' OR 
+      url LIKE '%/integradores-parceiros/%' OR 
+      url LIKE '%melhores-bairros%' OR 
+      url LIKE '%onde-morar%' THEN 'Content'
+    WHEN url LIKE '%regioes-atendidas%' THEN 'Content'
+    WHEN url LIKE '%logradouro%' OR url LIKE '%/ponto-de-interesse/%' AND player IN ('imovelweb' , 'casamineira') THEN 'Other'
+    WHEN
+      url LIKE '%quintoandar.com.br/imovel/%' OR 
+      url LIKE '%/loft.com.br/imovel/%' OR 
+      url LIKE '%imovelweb.com.br/propriedades/%' OR 
+      url LIKE '%wimoveis.com.br/propriedades/%' THEN 'Transacional'
+    WHEN url LIKE '%comprar%' OR url LIKE '%compra%' OR url LIKE '%venda%' THEN 'Transacional'
+    WHEN url LIKE '%alugar%' OR url LIKE '%aluguel%' OR url LIKE '%alugue%' THEN 'Transacional'
+    WHEN url LIKE '%corretor%' THEN 'Transacional'
+    WHEN url LIKE '%anunciante%' THEN 'Transacional'
+    WHEN url LIKE '%imobiliaria%' THEN 'Transacional'
+    WHEN url LIKE '%logradouro%' THEN 'Transacional'
+    WHEN url LIKE '%temporada%' THEN 'Transacional'
+    WHEN url LIKE '%leilao%' THEN 'Transacional'
+    WHEN url LIKE '%lancamento%' THEN 'Transacional'
+    WHEN
+      url LIKE '%/casa%' OR 
+      url LIKE '%/apartamento%' OR 
+      url LIKE '%terreno%' OR 
+      url LIKE '%comerciais%' OR 
+      url LIKE '%comercial%' OR 
+      url LIKE '%imovel%' OR 
+      url LIKE '%chacaras%' OR 
+      url LIKE '%/loft/%' OR 
+      url LIKE '%flat%' OR 
+      url LIKE '%predio%' OR 
+      url LIKE '%kitnet%' OR 
+      url LIKE '%studio%' OR 
+      url LIKE '%fazenda%' OR 
+      url LIKE '%cobertura%' OR 
+      url LIKE '%galpao%' OR 
+      url LIKE '%empreendimento%' OR 
+      url LIKE '%garagem%' THEN 'Transacional'
+    WHEN (url LIKE '%imoveis%' OR url LIKE '%propriedade%') AND url NOT LIKE '%wimoveis.com%' THEN 'Transacional'
+    WHEN url LIKE '%/condominio%' THEN 'Condominium'
+    WHEN url LIKE '%.com.br' OR url LIKE '%.com/' OR url LIKE '%.com.br/' OR url LIKE '%.com/home' OR url LIKE '%.com.br/home' THEN 'Home'
+    ELSE 'Other'
+  END AS page_structure,
+
+  CASE
+    WHEN url LIKE '%ajuda.%' OR url LIKE '%ajuda/%' OR url LIKE '%fale-conosco%' OR url LIKE '%help%' THEN 'Help'
+    WHEN 
+      url LIKE '%blog%' OR 
+      url LIKE '%noticias%' OR 
+      url LIKE '%article%' OR 
+      url LIKE '%guia%' OR 
+      url LIKE '%dicas%' OR 
+      url LIKE '%decoracao%' OR 
+      url LIKE '%/mercado-imobiliario/%' OR 
+      url LIKE '%knowledge%' OR 
+      url LIKE '%forum%' OR 
+      url LIKE '%portal.loft.com%' OR 
+      url LIKE '%/integradores-parceiros/%' OR 
+      url LIKE '%melhores-bairros%' OR 
+      url LIKE '%onde-morar%' THEN 'Conteúdos'
+    WHEN url LIKE '%regioes-atendidas%' THEN 'Regiões atendidas'
+    WHEN url LIKE '%logradouro%' OR url LIKE '%/ponto-de-interesse/%' AND player IN ('imovelweb' , 'casamineira') THEN 'Other'
+    WHEN
+      url LIKE '%quintoandar.com.br/imovel/%' OR 
+      url LIKE '%/loft.com.br/imovel/%' OR 
+      url LIKE '%imovelweb.com.br/propriedades/%' OR 
+      url LIKE '%wimoveis.com.br/propriedades/%' THEN 'Listing'
+    WHEN url LIKE '%comprar%' OR url LIKE '%compra%' OR url LIKE '%venda%' THEN 'Busca Compra'
+    WHEN url LIKE '%alugar%' OR url LIKE '%aluguel%' OR url LIKE '%alugue%' THEN 'Busca Aluguel'
+    WHEN url LIKE '%corretor%' THEN 'Imobiliaria'
+    WHEN url LIKE '%anunciante%' THEN 'Imobiliaria'
+    WHEN url LIKE '%imobiliaria%' THEN 'Imobiliaria'
+    WHEN url LIKE '%logradouro%' THEN 'Busca Genérica'
+    WHEN url LIKE '%temporada%' THEN 'Other'
+    WHEN url LIKE '%leilao%' THEN 'Other'
+    WHEN url LIKE '%lancamento%' THEN 'Other'
+    WHEN
+      url LIKE '%/casa%' OR 
+      url LIKE '%/apartamento%' OR 
+      url LIKE '%terreno%' OR 
+      url LIKE '%comerciais%' OR 
+      url LIKE '%comercial%' OR 
+      url LIKE '%imovel%' OR 
+      url LIKE '%chacaras%' OR 
+      url LIKE '%/loft/%' OR 
+      url LIKE '%flat%' OR 
+      url LIKE '%predio%' OR 
+      url LIKE '%kitnet%' OR 
+      url LIKE '%studio%' OR 
+      url LIKE '%fazenda%' OR 
+      url LIKE '%cobertura%' OR 
+      url LIKE '%galpao%' OR 
+      url LIKE '%empreendimento%' OR 
+      url LIKE '%garagem%' THEN 'Busca Genérica'
+    WHEN (url LIKE '%imoveis%' OR url LIKE '%propriedade%') AND url NOT LIKE '%wimoveis.com%' THEN 'Listing'
+    WHEN url LIKE '%/condominio%' THEN 'Condominio'
+    WHEN url LIKE '%.com.br' OR url LIKE '%.com/' OR url LIKE '%.com.br/' OR url LIKE '%.com/home' OR url LIKE '%.com.br/home' THEN 'Home'
+    ELSE 'Other'
+  END AS page_cluster,
+
   trends,
   position,
   previous_position,

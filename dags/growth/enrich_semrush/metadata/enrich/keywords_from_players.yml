@@ -5,10 +5,11 @@ domain: Growth
 description: |
   Table of SEO keywords and SERP features consolidated from multiple real-estate competitors (SEMrush exports).
   All fields are derived from specific organic_search_kw tables in datalake_semrush_clean for 21 different players. Accents are normalized,
-  intents and SERP features are mapped to human-readable labels in lower case.
+  intents and SERP features are mapped to human-readable labels in lower case. Includes comprehensive car-related keyword filtering
+  for chavesnamao player (excluding automotive brands, models, and related terms) and golden set keyword identification.
 columns:
   player:
-    description: "Source competitor/classified site from which the keyword ranking was extracted."
+    description: "Source competitor/classified site from which the keyword ranking was extracted. Note: chavesnamao player data includes comprehensive car-related keyword filtering to exclude automotive content."
   keyword:
     description: "Original search keyword as provided by SEMrush for the given player and URL."
     lineage:
@@ -58,7 +59,7 @@ columns:
       - datalake_semrush_clean.loft_organic_search_kw.keyword
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword
   url:
-    description: "Landing page URL that ranks for the keyword for the respective player."
+    description: "Landing page URL that ranks for the keyword for the respective player. Note: chavesnamao player URLs are filtered to exclude automotive-related content (car brands, models, dealerships, etc.)."
     lineage:
       - datalake_semrush_clean.quintoandar_organic_search_kw.url
       - datalake_semrush_clean.imovelweb_organic_search_kw.url
