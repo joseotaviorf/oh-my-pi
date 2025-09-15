@@ -1,4 +1,4 @@
-base_url: "https://capital.sp.gov.br"
+base_url: "https://prefeitura.sp.gov.br"
 site_download_page_url: "/web/fazenda/w/acesso_a_informacao/31501"
 
 blocklist_urls:
