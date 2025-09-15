@@ -1,3 +1,4 @@
+import math
 from typing import Tuple, List
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
@@ -20,6 +21,8 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
     sparkjobs to load data from API's or databases
     """
 
+    MAX_TABLES_PER_CLUSTER = 14
+
     def build_dag(self):
         dag = super().dag_instance()
 
@@ -30,7 +33,12 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             dag, bucket, load_start_date=load_start_date, load_end_date=load_end_date
         )
         self._initialize_task_creators(self.dag_execution_context)
-        self._create_all_tasks()
+
+        first_tasks_of_dag = self._create_all_tasks_in_clusters()
+
+        if self._check_include_skip_run_task():
+            skip_run_task = self.skip_run_task_creator.create_task()
+            skip_run_task >> first_tasks_of_dag
 
         return dag
 
@@ -79,23 +87,81 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             TaskEnum.SKIP_RUN
         )
 
-    def _create_all_tasks(self) -> None:
+    def _create_all_tasks_in_clusters(self) -> List:
         """
         Creates all the tasks for the workflow, and sets their internal dependencies
         """
-        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+        tables_customization = self.workflow_args["tables_customization"]
+        table_names = sorted(list(tables_customization.keys()))
 
-        if self._check_include_skip_run_task():
-            skip_run_task = self.skip_run_task_creator.create_task()
-            skip_run_task >> execute_job_cluster_task
+        n_tables = len(table_names)
+        if n_tables == 0:
+            return []
 
+        n_clusters = math.ceil(n_tables / self.MAX_TABLES_PER_CLUSTER)
+        tables_per_cluster = math.ceil(n_tables / n_clusters)
+
+        first_tasks_of_dag = []
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
-        clean_delta_tables = self._get_tables()
-        optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
-            clean_delta_tables
+
+        for i in range(0, n_tables, tables_per_cluster):
+            cluster_table_names = table_names[i : i + tables_per_cluster]
+            cluster_tables_customization = {
+                name: tables_customization[name] for name in cluster_table_names
+            }
+            execute_job_cluster_local_id = (i // tables_per_cluster) + 1
+
+            execute_job_cluster_task = self._create_tasks_for_cluster(
+                cluster_tables_customization,
+                execute_job_cluster_local_id,
+                dummy_terminate_job_cluster_task,
+            )
+            first_tasks_of_dag.append(execute_job_cluster_task)
+
+        return first_tasks_of_dag
+
+    def _create_tasks_for_cluster(
+        self,
+        tables_customization_cluster: dict,
+        execute_job_cluster_local_id: int,
+        dummy_terminate_job_cluster_task,
+    ):
+        """
+        Creates all the tasks for a specific cluster and sets their dependencies.
+        """
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
+            execute_job_cluster_local_id if execute_job_cluster_local_id > 1 else None
         )
+
+        clean_tables_in_dag = self._get_tables()
+        clean_table_names_in_dag = {t.table_name for t in clean_tables_in_dag}
+
+        cluster_clean_tables = []
+        for raw_name, params in tables_customization_cluster.items():
+            clean_name = params.get("clean_table_name", raw_name).lower()
+            if clean_name in clean_table_names_in_dag:
+                cluster_clean_tables.append(
+                    TableAttributes(
+                        self.dag_args,
+                        self.workflow_args,
+                        LayerEnum.CLEAN,
+                        clean_name,
+                        params,
+                    )
+                )
+
+        if cluster_clean_tables:
+            optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
+                cluster_clean_tables,
+                optimize_delta_table_local_id=execute_job_cluster_local_id,
+            )
+            optimize_delta_tables_task >> dummy_terminate_job_cluster_task
+        else:
+            optimize_delta_tables_task = dummy_terminate_job_cluster_task
+
+        raw_first_tasks = {}
         raw_last_tasks = {}
         clean_first_tasks = {}
         clean_last_tasks = {}
@@ -103,14 +169,9 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         (
             tables_customization_raw_dependency,
             tables_customization_without_raw_dependency,
-        ) = self._generate_filtered_tables_customizations(
-            self.workflow_args["tables_customization"]
-        )
+        ) = self._generate_filtered_tables_customizations(tables_customization_cluster)
 
-        raw_tables_with_raw_inner_dependencies = set(
-            self._get_lowercase_inner_dependencies("raw_inner_dependencies").keys()
-        )
-
+        # Raw tasks and their clean dependencies
         for (
             raw_table_name,
             table_parameters,
@@ -119,52 +180,53 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                 table_name=raw_table_name, last_task=dummy_terminate_job_cluster_task
             )
 
+            raw_first_tasks[raw_table_name.lower()] = raw_initial_task
+            raw_last_tasks[raw_table_name.lower()] = raw_final_task
+            execute_job_cluster_task >> raw_initial_task
+
             clean_table_name = table_parameters.get(
                 "clean_table_name", raw_table_name
             ).lower()
-            clean_initial_task, clean_final_task = self._create_clean_tasks(
-                table_name=clean_table_name,
-                table_customization=table_parameters,
-                optimize_delta_tables_task=optimize_delta_tables_task,
-            )
-
-            if raw_table_name not in raw_tables_with_raw_inner_dependencies:
-                execute_job_cluster_task >> raw_initial_task
-
-            raw_final_task >> clean_initial_task
-
-            raw_last_tasks[raw_table_name] = raw_final_task
-            clean_first_tasks[clean_table_name] = clean_initial_task
-            clean_last_tasks[clean_table_name] = clean_final_task
+            if clean_table_name in clean_table_names_in_dag:
+                clean_initial_task, clean_final_task = self._create_clean_tasks(
+                    table_name=clean_table_name,
+                    table_customization=table_parameters,
+                    optimize_delta_tables_task=optimize_delta_tables_task,
+                )
+                raw_final_task >> clean_initial_task
+                clean_first_tasks[clean_table_name] = clean_initial_task
+                clean_last_tasks[clean_table_name] = clean_final_task
 
         self._set_inner_dependencies(
-            table_first_tasks=raw_last_tasks,
+            table_first_tasks=raw_first_tasks,
             table_last_tasks=raw_last_tasks,
             inner_dependencies_key="raw_inner_dependencies",
         )
 
+        # Clean tasks with explicit raw dependency
         for (
             table_name,
             table_parameters,
         ) in tables_customization_raw_dependency.items():
-            # It runs after the tables with no dependency to guarantee that the raw_dependency exists and can be referenced below
-            raw_table_dependency = table_parameters.get("raw_table_dependency")
+            raw_table_dependency = table_parameters.get("raw_table_dependency").lower()
             clean_table_name = table_parameters.get(
                 "clean_table_name", table_name
             ).lower()
 
-            clean_initial_task, clean_final_task = self._create_clean_tasks(
-                table_name=clean_table_name,
-                table_customization=table_parameters,
-                optimize_delta_tables_task=optimize_delta_tables_task,
-            )
+            if clean_table_name in clean_table_names_in_dag:
+                clean_initial_task, clean_final_task = self._create_clean_tasks(
+                    table_name=clean_table_name,
+                    table_customization=table_parameters,
+                    optimize_delta_tables_task=optimize_delta_tables_task,
+                )
 
-            raw_last_tasks[raw_table_dependency] >> clean_initial_task
+                if raw_table_dependency in raw_last_tasks:
+                    raw_last_tasks[raw_table_dependency] >> clean_initial_task
+                # If the dependency is not in the cluster, _set_inner_dependencies will fail,
+                # which is the expected behavior for an incorrect configuration.
 
-            clean_first_tasks[clean_table_name] = clean_initial_task
-            clean_last_tasks[clean_table_name] = clean_final_task
-
-        optimize_delta_tables_task >> dummy_terminate_job_cluster_task
+                clean_first_tasks[clean_table_name] = clean_initial_task
+                clean_last_tasks[clean_table_name] = clean_final_task
 
         self._set_inner_dependencies(
             clean_first_tasks,
@@ -172,6 +234,8 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             next_task_if_no_dependents=optimize_delta_tables_task,
             inner_dependencies_key="clean_inner_dependencies",
         )
+
+        return execute_job_cluster_task
 
     def _create_raw_tasks(self, table_name: str, last_task) -> Tuple:
         """
@@ -193,7 +257,6 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         )
 
         if self._check_include_sync_hive_tasks(raw_table_attributes):
-
             if self._check_include_propagate_metadata_task(raw_table_attributes):
                 sync_metadata = self.sync_metadata_task_creator.create_task(
                     raw_table_attributes
@@ -202,7 +265,6 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                 sync_metadata = self.sync_metadata_task_creator.create_task(
                     raw_table_attributes, "--bypass-propagate"
                 )
-
             (load_raw_task >> sync_metadata >> last_task)
 
         if self._check_include_data_quality_task(raw_table_attributes):
