@@ -1,0 +1,21 @@
+dag:
+  name: enrich_databricks_table_usage
+  owner: Data Life Cycle
+  documentation: 
+    dag_purpose: |
+      Generate metrics about table usage on Databricks.
+  schedule_interval: 0 0 * * *
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: databricks
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  has_hive_sync: false
+  default_table_privileges:
+    data-platform-engineers:
+      - ALL PRIVILEGES
+  extra_query_template_params:
+    catalog_name: "quintoandar_{{ var.value.environment }}"
+cluster:
+  type: databricks_16_4_med_general_cluster

@@ -1,0 +1,49 @@
+
+---
+database_name: datalake_databricks
+table_name: daily_table_usage_per_user
+description: |
+  Each row has the granularity of (table, user, day) and contains information about how many times the user accessed the table in the day on Databricks.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  user_email:
+    description: Email of the user that queried the table.
+    lineage:
+      - system.access.audit.user_identity.email
+  catalog_name:
+    description: Name of the catalog where the table is located.
+    lineage:
+      - system.access.audit.request_params.table_full_name
+  schema_name:
+    description: Name of the schema where the table is located.
+    lineage:
+      - system.access.audit.request_params.table_full_name
+  table_name:
+    description: Name of the table that was queried.
+    lineage:
+      - system.access.audit.request_params.table_full_name
+  table_full_name:
+    description: Full name of the table that was queried, in the format catalog.schema.table.
+    lineage:
+      - system.access.audit.request_params.table_full_name
+  read_operations:
+    description: Number of read operations (SELECT) performed by the user on the table in the day.
+  write_operations:
+    description: Number of write operations performed by the user on the table in the day.
+  dt_event:
+    description: Date when the events occurred.
+    lineage:
+      - system.access.audit.event_date
+  year:
+    description: Year when the events occurred.
+    lineage:
+      - system.access.audit.event_date
+  month:
+    description: Month when the events occurred.
+    lineage:
+      - system.access.audit.event_date
+  day:
+    description: Day when the events occurred.
+    lineage:
+      - system.access.audit.event_date
