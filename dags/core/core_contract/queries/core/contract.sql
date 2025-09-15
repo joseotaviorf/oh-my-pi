@@ -39,7 +39,7 @@ SELECT
   ct.ts_created,
   ct.ts_updated
 FROM 
-  datalake_ebdb_test_clean.contract AS ct
+  datalake_ebdb_clean.contract AS ct
 LEFT JOIN
     datalake_ebdb_clean.house AS h
         ON h.id = ct.id_house

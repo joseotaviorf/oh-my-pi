@@ -90,4 +90,4 @@ SELECT
     dataMinutaAprovada AS ts_minuta_approved,
     fairfaxStartDate AS ts_fair_fax_started
 FROM
-    datalake_ebdb_test_raw.contrato
+    datalake_ebdb_raw.contrato

@@ -27,8 +27,6 @@ workflow:
       clean_table_name: contract_start_date_request
     ContractVersion:
       clean_table_name: contract_version
-    Contrato:
-      clean_table_name: contract
     ContratoFull:
       clean_table_name: full_contract
     ContratoFull_AUD:

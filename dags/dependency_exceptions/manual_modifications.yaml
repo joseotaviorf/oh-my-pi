@@ -4,7 +4,7 @@ bietlejuice.core_visit_test:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
-    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.cyber_complement:
   add:
     - bietlejuice.cyber:load-raw-delqmst:first-run-of-day
@@ -41,7 +41,7 @@ bietlejuice.dw_crm:
     - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
     - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
     - bietlejuice.ebdb:load-clean-rent-flow:first-run-of-day
-    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day
     - bietlejuice.enrich_crm:load-enrich-tasks:first-run-of-day
@@ -613,7 +613,7 @@ bietlejuice.enrich_sale_firestore:
     - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day
 bietlejuice.enrich_sale_lead_flows:
   add:
-    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
     - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   remove:
     - bietlejuice.casa_mineira_crm:load-clean-neighborhood:first-run-of-day
@@ -714,7 +714,7 @@ bietlejuice.enrich_supply_outbound_flows:
     - bietlejuice.wololo:load-clean-prospect:first-run-of-day
 bietlejuice.enrich_survicate:
   remove:
-    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.enrich_talk_to_agent:
   override: []
 bietlejuice.enrich_top_of_funnel_demand:
@@ -731,7 +731,7 @@ bietlejuice.enrich_tracked_events:
 bietlejuice.enrich_tracksale:
   remove:
     - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
-    - bietlejuice.ebdb_contract:load-clean-contract:first-run-of-day
+    - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
     - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
