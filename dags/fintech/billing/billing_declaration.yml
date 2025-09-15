@@ -15,8 +15,14 @@ workflow:
   lineage_product_database_name: billing
   tables_customization:
     contract_revision:
+      source_schema: contract
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
       clean_table_name: contract_revision
     contract:
+      source_schema: contract
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
       clean_table_name: contract
     recurrence_phase_control:
       clean_table_name: recurrence_phase_control

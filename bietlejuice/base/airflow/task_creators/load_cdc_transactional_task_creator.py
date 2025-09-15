@@ -31,8 +31,11 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
         source_database = self.dag_execution_context.workflow_args.get(
             "source_database", table_attributes.schema
         )
-        source_schema = self.dag_execution_context.workflow_args.get(
+        default_source_schema = self.dag_execution_context.workflow_args.get(
             "source_schema", "public"
+        )
+        source_schema = table_attributes.table_customization.get(
+            "source_schema", default_source_schema
         )
         primary_keys = ",".join(
             table_attributes.table_customization.get("raw_primary_keys", [])

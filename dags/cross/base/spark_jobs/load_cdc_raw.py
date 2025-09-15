@@ -129,10 +129,9 @@ def main():
     if args.primary_keys:
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
-        # Hardcoded for now, while we don't have other sources such as Postgres
         pk_identifier = RawPrimaryKeyIdentifier(
             CdcSchemaFinderFactory(
-                dbutils_secret_key=dbutils_secret_key,
+                dbutils_secret_key=dbutils_secret_key, schema=source_schema
             ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
             datalake_table_schema=f"datalake_{schema}_raw",
             spark=spark,

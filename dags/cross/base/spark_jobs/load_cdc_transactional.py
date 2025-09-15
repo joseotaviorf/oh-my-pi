@@ -232,7 +232,7 @@ def main():
     else:
         table_privileges = TablePrivileges.from_environment_default(full_table_name)
     schema_finder = CdcSchemaFinderFactory(
-        dbutils_secret_key=dbutils_secret_key
+        dbutils_secret_key=dbutils_secret_key, schema=source_schema
     ).get_cdc_schema_finder(DatabaseTypeEnum(database_type))
 
     if args.primary_keys:

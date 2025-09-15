@@ -14,8 +14,9 @@ from bietlejuice.consumers.db_consumers.mysql_consumer import MySqlConsumer
 
 
 class CdcSchemaFinderFactory:
-    def __init__(self, dbutils_secret_key: str) -> None:
+    def __init__(self, dbutils_secret_key: str, schema: str = None) -> None:
         self.dbutils_secret_key = dbutils_secret_key
+        self.schema = schema
 
     def get_cdc_schema_finder(self, database_type: DatabaseTypeEnum) -> CdcSchemaFinder:
         if database_type == DatabaseTypeEnum.POSTGRES:
@@ -42,5 +43,8 @@ class CdcSchemaFinderFactory:
         conn_config_json = dbutils.secrets.get(
             scope="quintoandar", key=self.dbutils_secret_key
         )
+        conn_config = json.loads(conn_config_json)
+        if self.schema is not None:
+            conn_config["schema"] = self.schema
 
-        return json.loads(conn_config_json)
+        return conn_config
