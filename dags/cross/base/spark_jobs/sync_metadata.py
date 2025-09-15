@@ -165,8 +165,8 @@ def sync_metastore_table_structure(bucket, layer, schema, table_name, all_tables
         storage_description,
     )
 
-    df = spark.createDataFrame(tables_metadata.keys())
-    df.foreach(
+    rdd = BaseSparkContext.sc.parallelize(tables_metadata.keys())
+    rdd.foreach(
         lambda table_name: func(
             table_name,
             tables_metadata[table_name]["columns"],
@@ -211,8 +211,8 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
         update_table_partitions, hive_ms_loader, spark_ms.spark_database_name
     )
 
-    df = spark.createDataFrame(tables_partition_values.keys())
-    df.foreach(
+    rdd = BaseSparkContext.sc.parallelize(tables_partition_values.keys())
+    rdd.foreach(
         lambda table_name: func(table_name, tables_partition_values[table_name])
     )
 
@@ -262,7 +262,7 @@ def propagate_metadata(layer, metadata_type, db_name_part, table_name):
 def _get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file_path):
     """
     Fetches all database tables metadata for the specified metadata type (tags or lineage)
-    This metadata will be shared during the Datafram processing
+    This metadata will be shared during the parallelized processing of table names RDD.
     """
     tables_spark_metadata = dict()
     for table_name in spark_metastore_helper.get_table_names():
@@ -381,8 +381,8 @@ def propagate_raw_metadata(
         spark_ms.spark_database_name,
     )
 
-    df = spark.createDataFrame(spark_table_names)
-    df.foreach(
+    rdd = BaseSparkContext.sc.parallelize(spark_table_names)
+    rdd.foreach(
         lambda _table_name: func(
             tables_metadata.get(_table_name), product_database_name
         )
