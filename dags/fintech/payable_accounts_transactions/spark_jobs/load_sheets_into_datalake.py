@@ -160,15 +160,28 @@ def __get_drive_file_ownership(drive_client, file_id):
     return request["id"]
 
 
-def __delete_drive_file(drive_client, file_id):
-    drive_client.files().delete(fileId=file_id).execute()
+def __clear_temporary_drive_folder(drive_client, folder_id):
+    query = f"'{folder_id}' in parents"
+    results = drive_client.files().list(q=query, fields='files(id, name, mimeType)').execute()
+    file_ids_to_delete = results.get('files', [])
+    
+    def delete_callback(request_id, response, exception):
+        if exception:
+            print(f"Error deleting file {request_id}: {exception}")
+        else:
+            print(f"File {request_id} deleted successfully.")
+
+    for file_id in file_ids_to_delete:
+        batch.add(drive_client.files().delete(fileId=file_id), callback=delete_callback, request_id=file_id)
+
+    batch.execute()
+
     return True
 
 
 def __drive_file_download(drive_client, file_id):
     new_id = __get_drive_file_ownership(drive_client, file_id)
     file = __download_drive_file_as_bytes(drive_client, new_id)
-    __delete_drive_file(drive_client, new_id)
     return file
   
 def __create_dataframes_for_items(items):
@@ -408,6 +421,9 @@ if __name__ == "__main__":
     gdrive_client = build(
         "drive", "v3", credentials=__get_gdrive_credentials(credentials)
     )
+
+    # Clear temporary folder
+    __clear_temporary_drive_folder(gdrive_client, TEMPORARY_DRIVE_FOLDER_ID)
 
     # Loaders
     s3_loader = S3Loader()
