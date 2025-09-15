@@ -1,6 +1,14 @@
 import re
 
-from pyspark.sql.functions import col, year, month, dayofmonth, to_json, lit
+from pyspark.sql.functions import (
+    col,
+    year,
+    month,
+    dayofmonth,
+    to_json,
+    lit,
+    spark_partition_id,
+)
 from pyspark.sql.types import StructType, ArrayType
 from quintoandar_logger import QuintoAndarLogger
 
@@ -236,9 +244,22 @@ class SparkDataFrameService:
         if not partitions:
             len_data = self.df.count()
             partitions = max(-(-len_data // records_by_partition), 1)
-        if partitions > self.df.rdd.getNumPartitions():
+
+        if partitions > self._get_number_of_partitions():
             return SparkDataFrameService(self.df.repartition(partitions))
         return SparkDataFrameService(self.df.coalesce(partitions))
+
+    def _get_number_of_partitions(self):
+        try:
+            return self.df.rdd.getNumPartitions()
+        except Exception:
+            # Fallback for shared clusters where RDD access is restricted
+            logger.warning(
+                "RDD access not available, using spark_partition_id() to count partitions. "
+                "This operation is more expensive as it requires an action. "
+                "Consider calling repartition() or coalesce() directly if you know which one to use."
+            )
+            return self.df.select(spark_partition_id()).distinct().count()
 
     def optimize_partitions_by_partition_columns(self, partition_by_list):
         """
