@@ -2862,12 +2862,12 @@ bietlejuice.enrich_product_tech:
 bietlejuice.enrich_property_tax:
   - bietlejuice.property_tax:load-clean-tax-report:first-run-of-day
 bietlejuice.enrich_proposal:
+  - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-proposal:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
-  - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
 bietlejuice.enrich_prospect_status:
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person:first-run-of-day

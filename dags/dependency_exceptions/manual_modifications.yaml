@@ -1019,6 +1019,9 @@ bietlejuice.enrich_agreement_hourly:
     - bietlejuice.trato_feito_hourly:load-clean-installment
     - bietlejuice.trato_feito_hourly:load-clean-negotiation
     - bietlejuice.trato_feito_hourly:load-clean-payment
+bietlejuice.payable_accounts_transactions:
+  remove:
+    - bietlejuice.payable_accounts_transactions:load-clean-payable-accounts-transactions-history:first-run-of-day
 bietlejuice.dw_pipeline:
   remove:
     - bietlejuice.enrich_pipeline:load-enrich-dag-run:first-run-of-day

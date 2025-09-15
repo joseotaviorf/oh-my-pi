@@ -170,70 +170,15 @@ def __drive_file_download(drive_client, file_id):
     file = __download_drive_file_as_bytes(drive_client, new_id)
     __delete_drive_file(drive_client, new_id)
     return file
+  
+def __create_dataframes_for_items(items):
+    """
+    This method creates the dataframe from the data returned by the API.
+    @param data: list with data returned by the API.
+    """
 
-
-if __name__ == "__main__":
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
-    parser.add_argument("table_name", help="table name to insert into datalake")
-    parser.add_argument(
-        "root_folder_id",
-        help="sheets sheet name, sheet id, and (optional) preload time in seconds",
-    )
-    parser.add_argument(
-        "columns_to_read",
-        help="List of columns names in the sheet files that will be retrieved",
-    )
-
-    args = parser.parse_args()
-
-    environment = args.environment
-    datalake_bucket = args.datalake_bucket
-    source = args.source
-    table_name = args.table_name
-    root_folder_id = args.root_folder_id
-    columns_to_read = ast.literal_eval(args.columns_to_read)
-
-    logger.info(
-        f"""
-                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-                table_name={table_name}, root_folder_id={root_folder_id}, columns_to_read={columns_to_read}
-                execution_date=execution_date msg=Starting spark job...
-        """
-    )
-
-    # Initializing GoogleDrive Client
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-
-    credentials, scope = __get_auth(dbutils)
-
-    gdrive_client = build(
-        "drive", "v3", credentials=__get_gdrive_credentials(credentials)
-    )
-
-    # Initializing clients
-    spark_client = SparkClient()
-
-    datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
-    )
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    database_name = datalake_info["db_raw_databricks"]
-    spark_metastore_service.create_database(database_name)
-
-    database_location = datalake_info["db_raw_path"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-
-    # Google Drive folder listing
-    root_query = f"'{root_folder_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
-    items = __list_files_gdrive(gdrive_client, root_query)
     cap_year_folders_ids = []
+
     for item in items:
         if any(
             str(year) in item["name"] for year in range(2021, datetime.now().year + 1)
@@ -387,9 +332,84 @@ if __name__ == "__main__":
 
     # Add ts_load column
 
-    df = df.withColumn("ts_load", functions.current_timestamp())
+    return df.withColumn("ts_load", functions.current_timestamp())
 
-    # loaders
+if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("environment", help="forno/prod values")
+    parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("table_name", help="table name to insert into datalake")
+    parser.add_argument(
+        "root_folder_id",
+        help="sheets sheet name, sheet id, and (optional) preload time in seconds",
+    )
+    parser.add_argument(
+        "columns_to_read",
+        help="List of columns names in the sheet files that will be retrieved",
+    )
+
+    args = parser.parse_args()
+
+    environment = args.environment
+    datalake_bucket = args.datalake_bucket
+    source = args.source
+    table_name = args.table_name
+    root_folder_id = args.root_folder_id
+    columns_to_read = ast.literal_eval(args.columns_to_read)
+
+    logger.info(
+        f"""
+                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                table_name={table_name}, root_folder_id={root_folder_id}, columns_to_read={columns_to_read}
+                execution_date=execution_date msg=Starting spark job...
+        """
+    )
+
+    # Initializing GoogleDrive Client
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    credentials, scope = __get_auth(dbutils)
+
+    gdrive_client = build(
+        "drive", "v3", credentials=__get_gdrive_credentials(credentials)
+    )
+
+    # Initializing clients
+    spark_client = SparkClient()
+
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, source, datalake_bucket
+    )
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    database_name = datalake_info["db_raw_databricks"]
+    spark_metastore_service.create_database(database_name)
+
+    database_location = datalake_info["db_raw_path"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+
+    # Google Drive folder listing of new items - old items in payable_accounts_transactions_history static ingestion: 
+    #https://dbc-931ee6e0-6803.cloud.databricks.com/editor/notebooks/2020209387599480?o=4531937035440038
+    root_query = f"'{root_folder_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+    items = __list_files_gdrive(gdrive_client, root_query)
+    new_items = []
+    for item in items:
+        if item["name"] >= "2024":
+            new_items.append(item)
+        else:
+            pass
+
+    df = __create_dataframes_for_items(new_items)
+
+    gdrive_client = build(
+        "drive", "v3", credentials=__get_gdrive_credentials(credentials)
+    )
+
+    # Loaders
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     s3_loader.load_df(
