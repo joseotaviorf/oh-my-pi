@@ -715,3 +715,5 @@ FROM
 LEFT JOIN
   session_contracts AS sc
     ON sc.id_session = tc.id_session
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
