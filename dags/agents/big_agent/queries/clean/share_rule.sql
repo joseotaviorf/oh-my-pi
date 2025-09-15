@@ -5,6 +5,7 @@ SELECT
     program_code,
     name,
     value,
+    extra_value,
     min_score,
     max_score,
     status,

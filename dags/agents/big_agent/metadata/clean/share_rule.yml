@@ -44,6 +44,11 @@ columns:
       Indicates the percentage of compensation earned by the agent, based on the program and performance (name).
       For example, for the AGENT_SALE program, each diamond, gold and silver band (name) will have a percentage 
       value corresponding to the broker's compensation under each purchase and sale agreement (CCV).
+  extra_value:
+    lineage:
+      - datalake_big_agent_raw.share_rule.extra_value
+    description:
+      Additional compensation percentage or value complementing the base value.
   min_score:
     lineage:
       - datalake_big_agent_raw.share_rule.min_score
