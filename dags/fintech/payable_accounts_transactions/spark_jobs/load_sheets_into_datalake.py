@@ -161,7 +161,7 @@ def __get_drive_file_ownership(drive_client, file_id):
 
 
 def __clear_temporary_drive_folder(drive_client, folder_id):
-    query = f"'{folder_id}' in parents"
+    query = f"'{folder_id}' in parents and trashed=false"
     results = drive_client.files().list(q=query, fields='files(id, name, mimeType)').execute()
     file_ids_to_delete = results.get('files', [])
     
@@ -172,7 +172,7 @@ def __clear_temporary_drive_folder(drive_client, folder_id):
             print(f"File {request_id} deleted successfully.")
 
     for file_id in file_ids_to_delete:
-        batch.add(drive_client.files().delete(fileId=file_id), callback=delete_callback, request_id=file_id)
+        batch.add(drive_client.files().delete(fileId=file_id["id"]), callback=delete_callback, request_id=file_id["id"])
 
     batch.execute()
 
@@ -193,10 +193,7 @@ def __create_dataframes_for_items(items):
     cap_year_folders_ids = []
 
     for item in items:
-        if any(
-            str(year) in item["name"] for year in range(2021, datetime.now().year + 1)
-        ):
-            cap_year_folders_ids.append(item["id"])
+        cap_year_folders_ids.append(item["id"])
     cap_year_folder_queries = [
         f"'{cap_year_folder_id}' in parents and trashed=false"
         for cap_year_folder_id in cap_year_folders_ids
@@ -206,137 +203,32 @@ def __create_dataframes_for_items(items):
         for cap_year_folder_query in cap_year_folder_queries
     ]
     infos_sheets = reduce(operator.concat, infos_sheets)
-
     # Retrieve all sheets
-    dfs = {"itau": [], "bradesco": [], "citi": []}
-    dfs_2021 = {"itau": [], "bradesco": [], "citi": []}
-
+    dfs = []
     for i in infos_sheets:
+        engine = None if "xlsb" not in i["name"] else "pyxlsb"
+        sheetname = None
+        for year in range(2021, datetime.now().year + 1):
+            if str(year) in i["name"]:
+                sheetname = str(year)
+        usecols = columns_to_read
+        df = pd.read_excel(
+            __drive_file_download(gdrive_client, i["id"]),
+            dtype=str,
+            header=1,
+            sheet_name=sheetname,
+            usecols=usecols,
+            engine=engine,
+        )
+        df = spark_client.create_dataframe(df, __generate_schema(df))
+        dfs.append(df)
+        df = (
+                  reduce(DataFrame.unionAll, dfs)
+                  .drop("")
+              )
 
-        if "2021" in i["name"]:
-            if (
-                not i["name"].lower().endswith(".tmp")
-                and "Controle Financeiro - CAP" in i["name"]
-            ):
-                engine = None if "xlsb" not in i["name"] else "pyxlsb"
-                if "Terceiros" in i["name"]:
-                    sheetname = str(2021)
-                    usecols = columns_to_read + ["Itaú"] + ["Description"]
-                    df_2021 = pd.read_excel(
-                        __drive_file_download(gdrive_client, i["id"]),
-                        dtype=str,
-                        header=1,
-                        sheet_name=sheetname,
-                        usecols=usecols,
-                        engine=engine,
-                    )
-                    df_2021 = spark_client.create_dataframe(df_2021, __generate_schema(df_2021))
-                    dfs_2021["itau"].append(df_2021)
-                else:
-                    for sheetname in ["Bradesco", "Citi"]:
-                        usecols = columns_to_read + [sheetname] + ["Description"]
-                        df_2021 = pd.read_excel(
-                            __drive_file_download(gdrive_client, i["id"]),
-                            dtype=str,
-                            header=1,
-                            sheet_name=sheetname,
-                            usecols=usecols,
-                            engine=engine,
-                        )
-                        df_2021 = spark_client.create_dataframe(df_2021, __generate_schema(df_2021))
-                        dfs_2021[sheetname.lower()].append(df_2021)
-        else:
-            if (
-                not i["name"].lower().endswith(".tmp")
-                and "Controle Financeiro - CAP" in i["name"]
-            ):
-                engine = None if "xlsb" not in i["name"] else "pyxlsb"
-                if "Terceiros" in i["name"]:
-                    sheetname = None
-                    for year in range(2021, datetime.now().year + 1):
-                        if str(year) in i["name"]:
-                            sheetname = str(year)
-                    usecols = columns_to_read + ["Itaú"]
-                    df = pd.read_excel(
-                        __drive_file_download(gdrive_client, i["id"]),
-                        dtype=str,
-                        header=1,
-                        sheet_name=sheetname,
-                        usecols=usecols,
-                        engine=engine,
-                    )
-                    df = spark_client.create_dataframe(df, __generate_schema(df))
-                    dfs["itau"].append(df)
-                else:
-                    for sheetname in ["Bradesco", "Citi"]:
-                        usecols = columns_to_read + [sheetname]
-                        df = pd.read_excel(
-                            __drive_file_download(gdrive_client, i["id"]),
-                            dtype=str,
-                            header=1,
-                            sheet_name=sheetname,
-                            usecols=usecols,
-                            engine=engine,
-                        )
-                        df = spark_client.create_dataframe(df, __generate_schema(df))
-                        dfs[sheetname.lower()].append(df)
-
-
-    # Create a pattern and union all sheets for not 2021 files
-    df_itau = (
-        reduce(DataFrame.unionAll, dfs["itau"])
-        .drop("")
-    )
-    df_bradesco = (
-        reduce(DataFrame.unionAll, dfs["bradesco"])
-        .drop("")
-    )
-    df_citi = reduce(DataFrame.unionAll, dfs["citi"])
-
-    df_itau = __columns_to_alphanumeric_snake_case(df_itau)
-    df_bradesco = __columns_to_alphanumeric_snake_case(df_bradesco)
-    df_citi = __columns_to_alphanumeric_snake_case(df_citi)
-
-    df_itau = df_itau.withColumnRenamed("itau", "saldo_total")
-    df_bradesco = df_bradesco.withColumnRenamed("bradesco", "saldo_total")
-    df_citi = df_citi.withColumnRenamed("citi", "saldo_total")
-
-    df = reduce(DataFrame.unionAll, [df_itau, df_bradesco, df_citi])
-
-    # Create a pattern and union all sheets for 2021 files
-
-    df_itau_2021 = (
-        reduce(DataFrame.unionAll, dfs_2021["itau"])
-        .drop("")
-    )
-    df_bradesco_2021 = (
-        reduce(DataFrame.unionAll, dfs_2021["bradesco"])
-        .drop("")
-    )
-    df_citi_2021 = reduce(DataFrame.unionAll, dfs_2021["citi"])
-
-    df_itau_2021 = __columns_to_alphanumeric_snake_case(df_itau_2021)
-    df_bradesco_2021 = __columns_to_alphanumeric_snake_case(df_bradesco_2021)
-    df_citi_2021 = __columns_to_alphanumeric_snake_case(df_citi_2021)
-
-    df_itau_2021 = df_itau_2021.withColumnRenamed("itau", "saldo_total")
-    df_bradesco_2021 = df_bradesco_2021.withColumnRenamed("bradesco", "saldo_total")
-    df_citi_2021 = df_citi_2021.withColumnRenamed("citi", "saldo_total")
-
-    df_2021 = reduce(DataFrame.unionAll, [df_itau_2021, df_bradesco_2021, df_citi_2021])
-
-    # Remove non-standard 'saldo inicial' rows and remove 'Description' only present in 2021 files and used for removing 'saldo inicial
-    filter_all_columns = [
-        functions.lower(functions.col(col)).contains("saldo inicial")
-        for col in df_2021.columns
-    ]
-    df_2021 = df_2021.filter(~functions.greatest(*filter_all_columns)).drop("description")
-
-    # Union 2021 and not 2021 files
-
-    df = reduce(DataFrame.unionAll, [df, df_2021])
-
-    # Fix ordinal excel dates
+    # Fix columns format and ordinal excel dates
+    df = __columns_to_alphanumeric_snake_case(df)
     convert_numeric_date_udf = functions.udf(__convert_excel_numeric_date, StringType())
 
     df = df.withColumn("pagamento", convert_numeric_date_udf(df.pagamento)).withColumn(
@@ -344,7 +236,6 @@ def __create_dataframes_for_items(items):
     )
 
     # Add ts_load column
-
     return df.withColumn("ts_load", functions.current_timestamp())
 
 if __name__ == "__main__":
@@ -371,6 +262,7 @@ if __name__ == "__main__":
     root_folder_id = args.root_folder_id
     columns_to_read = ast.literal_eval(args.columns_to_read)
 
+
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
@@ -384,11 +276,13 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
+    # Authorization #1
     credentials, scope = __get_auth(dbutils)
-
     gdrive_client = build(
         "drive", "v3", credentials=__get_gdrive_credentials(credentials)
     )
+
+    batch = gdrive_client.new_batch_http_request()
 
     # Initializing clients
     spark_client = SparkClient()
@@ -416,11 +310,13 @@ if __name__ == "__main__":
         else:
             pass
 
-    df = __create_dataframes_for_items(new_items)
-
+    # Authorization #2 - Time out reasons.
+    credentials, scope = __get_auth(dbutils)
     gdrive_client = build(
         "drive", "v3", credentials=__get_gdrive_credentials(credentials)
     )
+
+    df = __create_dataframes_for_items(new_items)
 
     # Clear temporary folder
     __clear_temporary_drive_folder(gdrive_client, TEMPORARY_DRIVE_FOLDER_ID)
