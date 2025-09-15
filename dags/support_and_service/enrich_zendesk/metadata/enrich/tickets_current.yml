@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets.custom_fields
   id_job:
-    description: Job ID
+    description: Job ID from a specific custom_field related to the ticket.
     lineage:
       - datalake_zendesk.tickets.custom_fields
   id_house_so:
@@ -78,6 +78,38 @@ columns:
     description: Name of the company where the analyst works.
   analyst_email:
     description: Email of the support analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  first_analyst_name:
+    description: Name of the first analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  last_analyst_name:
+    description: Name of the last analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  first_analyst_email:
+    description: Email of the first analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  last_analyst_email:
+    description: Email of the last analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  first_analyst_phone:
+    description: Phone of the first analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  last_analyst_phone:
+    description: Phone of the last analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  first_analyst_organization:
+    description: Organization of the first analyst associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
+  last_analyst_organization:
+    description: Organization of the last analyst associated with the ticket
     lineage:
       - datalake_zendesk.tickets.custom_fields
   offer_ids:
@@ -197,7 +229,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets.custom_fields
   repair_reanalysis:
-    description:
+    description: Boolean indicating if the repair was reanalysed
     lineage:
       - datalake_zendesk.tickets.custom_fields
   repairs_sent_to_ll:
