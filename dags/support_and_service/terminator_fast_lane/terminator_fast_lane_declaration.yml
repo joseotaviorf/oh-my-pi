@@ -14,7 +14,7 @@ workflow:
   database_type: postgres
   source_database: terminator
   source_schema: public
-  custom_schema: terminator_test
+  custom_schema: terminator
   dbutils_secret_key: TERMINATOR_DB
   lineage_product_database_name: terminator
   tables_customization:
@@ -26,7 +26,7 @@ cluster:
     driver_node_type_id: r-fleet.xlarge
     node_type_id: r-fleet.xlarge
     num_workers: 2
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
       availability: ON_DEMAND
     single_user_name: "{{ var.value.databricks_single_user_name }}"

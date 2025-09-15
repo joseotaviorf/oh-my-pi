@@ -39,7 +39,6 @@ workflow:
     termination_task: {}
     termination_workflow_aud: {}
     termination_workflow: {}
-    termination: {}
     utility_bill_aud: {}
     utility_bill: {}
     inspection_opted_out:
