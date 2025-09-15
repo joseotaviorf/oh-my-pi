@@ -87,7 +87,7 @@ SELECT
     CASE
       WHEN domain IN ('For Rent', 'Support & Services') THEN 'carolina.cavalcante@quintoandar.com.br'
       WHEN domain IN ('Data Engineering', 'Data Ingestion', 'Tech Platform Cyber Security', 'Tech Platform Dev Foundation', 'Data Platform') THEN 'mario.abreu@quintoandar.com.br'
-      WHEN domain IN ('Partners','Agents','Rede') THEN 'nailane.oliveira@quintoandar.com.br'
+      WHEN domain IN ('Partners','Agents','Rede') THEN 'gustavo.rompe@quintoandar.com.br'
       WHEN domain IN ('Data Governance') THEN 'peter.reichel@quintoandar.com.br'
       WHEN domain IN ('Fintech Platform', 'Growth', 'Primitives' ) THEN 'tadeu.kanashiro@quintoandar.com.br'
       WHEN domain IN ('For Sale', 'People') THEN 'thiago.bueno@quintoandar.com.br'
