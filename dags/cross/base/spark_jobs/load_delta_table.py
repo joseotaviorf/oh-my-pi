@@ -48,8 +48,7 @@ def main():
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=args.relative_query_path,
         layer=args.layer,
-        table_name=args.table_name,
-        engine="boto3"
+        table_name=args.table_name
     )
 
     if table_privileges_dict is not None:

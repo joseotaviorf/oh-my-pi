@@ -137,8 +137,7 @@ def main():
     clean_query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=dag_name,
         layer="clean",
-        table_name=table_name,
-        engine="boto3"
+        table_name=table_name
     )
 
     cdc_columns = ["op_cdc", "ts_cdc_transaction", "ts_database_transaction"]
