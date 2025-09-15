@@ -19,9 +19,9 @@ SELECT
     rm.ts_updated AS ts_media_updated,
     r.ts_created,
     r.ts_updated,
-    r.year,
-    r.month,
-    r.day
+    YEAR(r.ts_updated) AS year,
+    MONTH(r.ts_updated) AS month,
+    DAY(r.ts_updated) AS day
 FROM
     datalake_inspection_services_clean.review r
 LEFT JOIN

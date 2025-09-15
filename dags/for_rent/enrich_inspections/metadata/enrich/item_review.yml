@@ -81,12 +81,12 @@ columns:
   year:
     description: Year referring to date of update.
     lineage:
-      - datalake_inspection_services_clean.review.year
+      - datalake_inspection_services_clean.review.ts_updated
   month:
     description: Month referring to date of update.
     lineage:
-      - datalake_inspection_services_clean.review.month
+      - datalake_inspection_services_clean.review.ts_updated
   day:
     description: Day referring to date of update.
     lineage:
-      - datalake_inspection_services_clean.review.day
+      - datalake_inspection_services_clean.review.ts_updated
