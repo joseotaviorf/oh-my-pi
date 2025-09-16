@@ -71,15 +71,3 @@ columns:
       - datalake_workable_redshift_raw.events.updated_at
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the event record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.events.year
-  month:
-    description: Month of the update to the event record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.events.month
-  day:
-    description: Day of the update to the event record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.events.day

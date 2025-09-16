@@ -47,15 +47,3 @@ columns:
       - datalake_workable_redshift_raw.comments.updated_at
   ts_load:
     description: Timestamp indicating when the record was loaded into this clean table.
-  year:
-    description: Year of the update to the comment record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.comments.year
-  month:
-    description: Month of the update to the comment record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.comments.month
-  day:
-    description: Day of the update to the comment record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.comments.day

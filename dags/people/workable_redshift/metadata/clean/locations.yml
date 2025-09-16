@@ -47,15 +47,3 @@ columns:
       - datalake_workable_redshift_raw.locations.updated_at
   ts_load:
     description: The timestamp when this record was loaded into the table.
-  year:
-    description: Year of the update to the location record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.locations.year
-  month:
-    description: Month of the update to the location record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.locations.month
-  day:
-    description: Day of the update to the location record. Used for table partitioning.
-    lineage:
-      - datalake_workable_redshift_raw.locations.day

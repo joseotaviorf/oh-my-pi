@@ -2,7 +2,7 @@
 database_name: datalake_workable_redshift_clean
 table_name: questions
 owner: gabriel.berger@quintoandar.com.br
-domain: people
+domain: People
 description: 'Stores information regarding job application forms questions.'
 columns:
   id:
@@ -55,15 +55,3 @@ columns:
     - datalake_workable_redshift_raw.questions.updated_at
   ts_load:
     description: 'Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.'
-  year:
-    description: 'Year of the update of the question record. It is a partition of the table.'
-    lineage:
-    - datalake_workable_redshift_raw.questions.year
-  month:
-    description: 'Month of the update of the question record. It is a partition of the table.'
-    lineage:
-    - datalake_workable_redshift_raw.questions.month
-  day:
-    description: 'Day of the update of the question record. It is a partition of the table.'
-    lineage:
-    - datalake_workable_redshift_raw.questions.day
