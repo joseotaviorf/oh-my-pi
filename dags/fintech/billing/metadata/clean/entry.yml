@@ -1,0 +1,71 @@
+database_name: datalake_billing_clean
+table_name: entry
+domain: Fintech
+description: Data from the entry table containing billing entry details and accounting information
+columns:
+  id:
+    description: Unique identifier of the entry record
+    lineage:
+      - datalake_billing_raw.entry.id
+  id_invoice:
+    description: Identifier of the related invoice
+    lineage:
+      - datalake_billing_raw.entry.invoice_id
+  id_source_entry:
+    description: Identifier of the source entry
+    lineage:
+      - datalake_billing_raw.entry.source_entry_id
+  description:
+    description: Description of the entry
+    lineage:
+      - datalake_billing_raw.entry.description
+  status:
+    description: Current status of the entry
+    lineage:
+      - datalake_billing_raw.entry.status
+  from_account:
+    description: Origin account of the entry
+    lineage:
+      - datalake_billing_raw.entry.from_account
+  to_account:
+    description: Destination account of the entry
+    lineage:
+      - datalake_billing_raw.entry.to_account
+  bill_item:
+    description: Billing item associated with the entry
+    lineage:
+      - datalake_billing_raw.entry.bill_item
+  producer:
+    description: Producer associated with the entry
+    lineage:
+      - datalake_billing_raw.entry.producer
+  transaction_type:
+    description: Type of transaction for the entry
+    lineage:
+      - datalake_billing_raw.entry.transaction_type
+  accounting_transaction_identifier:
+    description: Accounting transaction identifier
+    lineage:
+      - datalake_billing_raw.entry.accounting_transaction_identifier
+  amount:
+    description: Monetary amount of the entry
+    lineage:
+      - datalake_billing_raw.entry.amount
+  dt_accrual_year_month:
+    description: Accrual year-month of the entry
+    lineage:
+      - datalake_billing_raw.entry.accrual_year_month
+  dt_due_year_month:
+    description: Due year-month of the entry
+    lineage:
+      - datalake_billing_raw.entry.due_year_month
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.entry.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.entry.updated_at
+
+

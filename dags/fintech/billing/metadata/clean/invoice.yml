@@ -1,0 +1,67 @@
+database_name: datalake_billing_clean
+table_name: invoice
+domain: Fintech
+description: Data from the invoice table containing invoice information and status details
+columns:
+  id:
+    description: Unique identifier of the invoice record
+    lineage:
+      - datalake_billing_raw.invoice.id
+  id_account:
+    description: Identifier of the related account
+    lineage:
+      - datalake_billing_raw.invoice.account_id
+  id_contract:
+    description: Identifier of the related contract
+    lineage:
+      - datalake_billing_raw.invoice.contract_id
+  id_source_invoice:
+    description: Identifier of the source invoice
+    lineage:
+      - datalake_billing_raw.invoice.source_invoice_id
+  account_type:
+    description: Type of the related account
+    lineage:
+      - datalake_billing_raw.invoice.account_type
+  status:
+    description: Current status of the invoice
+    lineage:
+      - datalake_billing_raw.invoice.status
+  sub_status:
+    description: Sub-status of the invoice
+    lineage:
+      - datalake_billing_raw.invoice.sub_status
+  purpose:
+    description: Purpose of the invoice
+    lineage:
+      - datalake_billing_raw.invoice.purpose
+  transaction_type:
+    description: Type of transaction for the invoice
+    lineage:
+      - datalake_billing_raw.invoice.transaction_type
+  payload:
+    description: Raw payload associated with the invoice
+    lineage:
+      - datalake_billing_raw.invoice.payload
+  due_amount:
+    description: Total amount due for the invoice
+    lineage:
+      - datalake_billing_raw.invoice.due_amount
+  dt_accrual_year_month:
+    description: Accrual year-month of the invoice
+    lineage:
+      - datalake_billing_raw.invoice.accrual_year_month
+  dt_due:
+    description: Due date of the invoice
+    lineage:
+      - datalake_billing_raw.invoice.due_date
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.invoice.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.invoice.updated_at
+
+
