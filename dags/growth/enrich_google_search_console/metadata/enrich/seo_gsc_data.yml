@@ -65,6 +65,10 @@ columns:
       description: Identifies the page structure based on a bussiness rule.
       lineage:
         - datalake_google_search_console_clean.report_by_page_and_query.page
+    page_structure:
+      description: Page structure classification based on URL patterns and content type (e.g., 'Home', 'Help', 'Transactional', 'Supply', 'Condominium', 'Content', 'Other').
+      lineage:
+        - datalake_google_search_console_clean.report_by_page_and_query.page
     location_level:
       description: Level of Location of the page showed - neighborhood, city, etc
       lineage:

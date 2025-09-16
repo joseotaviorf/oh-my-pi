@@ -40,6 +40,7 @@ SELECT
   branded,
   page_cluster,
   structure,
+  page_structure,
   page_path,
   state,
   city,

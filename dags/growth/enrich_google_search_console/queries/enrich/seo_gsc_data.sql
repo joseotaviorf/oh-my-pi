@@ -257,6 +257,15 @@ layer1 AS (
             ELSE 'Other'
         END AS estruturas,
         CASE
+            WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br' THEN 'Home'
+            WHEN page LIKE '%help.quintoandar%' THEN 'Help'
+            WHEN page LIKE '%br/alugar/%' OR page LIKE '%br/comprar/%' OR page LIKE '%br/imovel/%' OR page LIKE '%br/apartamento/%' THEN 'Transactional'
+            WHEN page LIKE '%proprietario.quintoandar%' THEN 'Supply'
+            WHEN page LIKE '%br/condominio/%' THEN 'Condominium'
+            WHEN page LIKE '%br/regioes-atendidas%' OR page LIKE '%br/morar/%' OR page LIKE '%/guias/%' OR page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'Content'
+            ELSE 'Other'
+        END AS estruturas_de_pagina,
+        CASE
             WHEN page LIKE '%meulugar.quintoandar%' OR page LIKE '%conteudos.quintoandar%' THEN 'n/a'
             WHEN page LIKE '%proprietario.quintoandar%' OR page LIKE '%help.quintoandar%' THEN 'n/a'
             WHEN page LIKE 'https://www.quintoandar.com.br/' OR page LIKE 'https://www.quintoandar.com.br/auth%' OR page LIKE 'https://www.quintoandar.com.br/tenants%' THEN 'n/a'
@@ -332,6 +341,7 @@ layer2 AS (
         cluster_de_paginas,
         estado,
         estruturas,
+        estruturas_de_pagina,
         nivel_localizacao,
         street_abbreviations,
         tipo_poi,
@@ -516,6 +526,7 @@ SELECT
     cidades AS city,
     cluster_de_paginas AS page_cluster,
     estruturas AS structure,
+    estruturas_de_pagina AS page_structure,
     nivel_localizacao AS location_level,
     street_abbreviations,
     tipo_poi AS poi_type,

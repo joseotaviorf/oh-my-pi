@@ -40,6 +40,10 @@ columns:
     description: "Page structure according to business rules."
     lineage:
       - datalake_google_search_console.seo_gsc_data.structure
+  page_structure:
+    description: "Page structure classification based on URL patterns and content type (e.g., 'Home', 'Help', 'Transactional', 'Supply', 'Condominium', 'Content', 'Other')."
+    lineage:
+      - datalake_google_search_console.seo_gsc_data.page_structure
   page_path:
     description: "Page path within the domain."
     lineage:
