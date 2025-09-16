@@ -7,7 +7,7 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_action_reason:
-    id_action_reason:
+    is_complete:
       severity_level: Warning
     is_unique:
       severity_level: Warning

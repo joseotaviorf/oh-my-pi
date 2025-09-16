@@ -7,6 +7,6 @@ table_level_validations:
     severity_level: Error
 
 column_level_validations:
-  id_flexfield_context:
+  id_application:
     is_unique:
       severity_level: Warning

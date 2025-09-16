@@ -6,6 +6,6 @@ table_level_validations:
     greater_than: 1
     severity_level: Error
 column_level_validations:
-  id_grade_ladder:
+  id_grade:
     is_complete:
       severity_level: Warning

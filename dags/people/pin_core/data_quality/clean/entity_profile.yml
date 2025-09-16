@@ -6,7 +6,7 @@ table_level_validations:
     greater_than: 1
     severity_level: Error
 column_level_validations:
-  id_entity_profile:
+  id_legal_entity:
     is_complete:
       severity_level: Warning
     is_unique:
