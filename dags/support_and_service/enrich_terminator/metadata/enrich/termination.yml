@@ -108,6 +108,10 @@ columns:
     lineage:
       - datalake_terminator_clean.termination.responsible_off_manager_email
     description: Email of SPOC responsible analyst.
+  repair_resolution:
+    description: Classifies type of repair when there is one in the Offboarding process
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_resolution
   is_spoc:
     description: Boolean information indicating whether the termination is part of the spoc control group.
     lineage:
@@ -170,6 +174,10 @@ columns:
     lineage:
       - datalake_terminator_clean.termination_characteristics.is_automatic_repair_analysis_opted_out
     description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
+  has_landlord_comment:
+    description: Indicates whether the landlord has provided any comments related to the negotiation.
+    lineage:
+      - datalake_terminator_clean.negotiation.has_landlord_comment
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -207,6 +215,10 @@ columns:
     description:
       Total repairs are the tenant's responsibility in the contestation analysis.
       If the inspection has early mediation or early both agree, the value will be 0, because there's no AC step when one of them happens.
+  repair_cost:
+    description: Cost of Repair to be performed in the Offboarding process
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_cost
   spoc_wave:
     description: Information of type int that indicates in which wave of the spoc the termination entered.
     lineage:
