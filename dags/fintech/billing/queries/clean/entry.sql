@@ -16,4 +16,4 @@ SELECT
 	created_at AS ts_created,
 	updated_at AS ts_updated
 FROM 
-	public.entry
+	datalake_billing_raw.entry
