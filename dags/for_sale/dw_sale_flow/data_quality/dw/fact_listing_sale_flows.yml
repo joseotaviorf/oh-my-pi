@@ -59,9 +59,6 @@ column_level_validations:
   flg_visit_performed:
     is_complete:
       severity_level: Error
-  flg_visit_last_updated_from_app:
-    is_complete:
-      severity_level: Error
   days_booking_created_to_visit:
     is_complete:
       severity_level: Error
