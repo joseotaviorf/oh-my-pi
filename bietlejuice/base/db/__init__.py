@@ -11,7 +11,7 @@ from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMappin
 from bietlejuice.base.db.metric_metastore_mapping import MetricMetastoreMapping
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 
-# TODO: Refactor project to import directly from base.paths
+# TODO: Refactor project to import directly from bietlejuice.basepaths
 from bietlejuice.base.paths import (
     DB_SQL_PATH,
     DATALAKE_METADATA_PATH,
