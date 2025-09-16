@@ -1220,9 +1220,13 @@ bietlejuice.enrich_agent_accreditation:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_agents_validation:
+  - bietlejuice.ebdb_agent:load-clean-agent-data-types-aud:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-house-listing-relation:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-agency:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-agents:first-run-of-day
 bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation

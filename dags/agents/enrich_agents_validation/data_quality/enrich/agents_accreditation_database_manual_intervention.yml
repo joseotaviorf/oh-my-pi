@@ -1,0 +1,7 @@
+---
+table_name: datalake_agents_validation.agents_accreditation_database_manual_intervention
+alert_channel: "#alerts-data-quality-agents"
+table_level_validations:
+  has_size:
+    less_than_or_equal_to: 518
+    severity_level: Error
