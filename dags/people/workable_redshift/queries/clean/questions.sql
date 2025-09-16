@@ -10,9 +10,6 @@ SELECT
     required AS is_required,
     question_created_at AS ts_created,
     updated_at AS ts_updated,
-    NOW() AS ts_load,
-    year,
-    month,
-    day
+    NOW() AS ts_load
 FROM
     datalake_workable_redshift_raw.questions
