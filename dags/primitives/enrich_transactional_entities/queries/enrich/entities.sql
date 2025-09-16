@@ -226,7 +226,16 @@ termination AS (
         ON tb.id_contract = c.id_contract
 ),
 listing AS (
-    WITH listing_base AS (
+    WITH last_contract AS (
+        SELECT
+            id_house,
+            id_contract
+        FROM
+            core_contract.contract
+        QUALIFY
+            ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_created DESC) = 1
+    ),
+    listing_base AS (
         SELECT
             lbc.id AS id_entity,
             lbc.id_house,
@@ -251,7 +260,7 @@ listing AS (
             datalake_ebdb_clean.house AS h
                 ON h.id = lbc.id_house
         LEFT JOIN
-            core_contract.contract AS c
+            last_contract AS c
                 ON c.id_house = lbc.id_house
     )
     SELECT
