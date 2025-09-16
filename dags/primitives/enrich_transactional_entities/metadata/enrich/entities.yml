@@ -25,6 +25,7 @@ columns:
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
+      - datalake_ebdb_test_clean.listing_business_context.id
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique.
@@ -34,6 +35,7 @@ columns:
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
+      - datalake_ebdb_test_clean.listing_business_context.id
     description:
       The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
@@ -42,6 +44,7 @@ columns:
       - core_visit.visit.id_house
       - core_offer.offer.id_house
       - core_contract.contract.id_house
+      - datalake_ebdb_test_clean.listing_business_context.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     lineage:
@@ -57,6 +60,7 @@ columns:
       - core_offer.offer.id_owner
       - core_contract.contract.id_owner
       - core_contract.contract.id_tenant
+      - datalake_ebdb_clean.house.id_user
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -71,7 +75,9 @@ columns:
     categories:
       VISIT: The entity is a visit, with its id_entity mapping directly to the id_visit from the Visit table in EBDB database.
       OFFER: The entity is an offer, with its id_entity mapping directly to the id_offer from the Rental Transact system.
+      CONTRACT: The entity is a contract, with its id_entity mapping directly to the id_contract from the Contract table in the core model.
       TERMINATION: The entity is a termination, with its id_entity mapping directly to the id from the Termination table in the terminator system.
+      LISTING: The entity is a property listing, with its id_entity mapping directly to the id from the Listing Business Context table, representing property listings.
   persona:
     description:
       A persona describes the primary role of a user (id_user) in relation to a specific
@@ -85,12 +91,13 @@ columns:
   business_context:
     lineage:
       - core_visit.visit.business_context
+      - datalake_ebdb_test_clean.listing_business_context.business_context
     description: Business context that categorizes the type of transaction or interaction.
       This field indicates whether the entity is related to rental (RENT) or sale (SALE) operations,
       helping to differentiate business flows and customer journeys within our platform.
     categories:
-      RENT: The entity is related to rental transactions, for example visits, offers and contracts for rental properties.
-      SALE: The entity is related to sale transactions, for example visits property purchases.
+      RENT: The entity is related to rental transactions, including visits, contracts, terminations, and listings for rental properties.
+      SALE: The entity is related to sale transactions, including visits and listings for property purchases.
   house_address:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -106,16 +113,18 @@ columns:
       Boolean flag indicating if the entity is currently active, used as primary filter for data inclusion.
       Active entities (TRUE) are always included regardless of date. Inactive entities (FALSE) are only included
       if updated within the last 3 months. An entity is considered active as long as it is still receiving interactions.
-      A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsucessfull.
+      A visit entity will be considered as active for statuses confirmed, requested or scheduled, and inactive for statuses canceled, done, request_canceled or unsuccessful.
       An offer entity will be considered as active for status proposed, and inactive for statuses accepted, dismissed or rejected.
-      A contract entity will be considered as active for statuses ativo, minuta or pre-assinaturas, and inactive for statuses cancelado or finalizado.
+      A contract entity will be considered as active for statuses ativo, minuta or PreAssinaturas, and inactive for statuses cancelado or finalizado.
       A termination entity will be considered as active for statuses requested, inspection_under_review, inspection_scheduled, inspection_opted_out, inspection_executed, or inspection_canceled, and inactive for statuses done or canceled.
+      A listing entity will be considered as active for statuses published, editing, or suspended (except when suspended for specific owner-related reasons like giving up renting, consequences management, reforming, temporarily suspended, or traveling), and inactive for statuses opted_out, unpublished, or suspended with owner-related reasons.
   ts_created:
     lineage:
       - core_visit.visit.ts_created
       - core_offer.offer.ts_created
       - core_contract.contract.ts_created
       - datalake_terminator_clean.termination.ts_created
+      - datalake_ebdb_test_clean.listing_business_context.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
@@ -123,8 +132,7 @@ columns:
       - core_offer.offer.ts_updated
       - core_contract.contract.ts_updated
       - datalake_terminator_clean.termination.ts_updated
+      - datalake_ebdb_test_clean.listing_business_context.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.
-  ts_load:
-    description: Timestamp of when the entity was updated and loaded for the last time in this table.

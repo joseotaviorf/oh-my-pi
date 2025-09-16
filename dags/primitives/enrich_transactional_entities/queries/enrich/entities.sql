@@ -3,6 +3,7 @@ WITH visit AS (
         SELECT
             id_visit AS id_entity,
             id_house,
+            CAST(NULL AS BIGINT) AS id_contract,
             id_owner,
             id_visitor,
             id_agent,
@@ -23,6 +24,7 @@ WITH visit AS (
     SELECT
         id_entity,
         id_house,
+        id_contract,
         id_owner AS id_user,
         entity,
         'OWNER' AS persona,
@@ -36,6 +38,7 @@ WITH visit AS (
     SELECT
         id_entity,
         id_house,
+        id_contract,
         id_visitor AS id_user,
         entity,
         CASE
@@ -52,6 +55,7 @@ WITH visit AS (
     SELECT
         id_entity,
         id_house,
+        id_contract,
         id_agent AS id_user,
         entity,
         'AGENT_BROKER' AS persona,
@@ -69,6 +73,7 @@ offer AS (
         SELECT
             id_offer AS id_entity,
             id_house,
+            CAST(NULL AS BIGINT) AS id_contract,
             id_tenant,
             id_owner,
             'OFFER' AS entity,
@@ -86,6 +91,7 @@ offer AS (
     SELECT
         id_entity,
         id_house,
+        id_contract,
         id_tenant AS id_user,
         entity,
         'TENANT_PROSPECT' AS persona,
@@ -99,6 +105,7 @@ offer AS (
     SELECT
         id_entity,
         id_house,
+        id_contract,
         id_owner AS id_user,
         entity,
         'OWNER' AS persona,
@@ -187,7 +194,7 @@ termination AS (
   SELECT
         tb.id_entity,
         c.id_house,
-        c.id_owner as id_user,
+        c.id_owner AS id_user,
         c.id_contract AS id_contract,
         tb.entity,
         'OWNER' AS persona,
@@ -204,7 +211,7 @@ termination AS (
   SELECT
     tb.id_entity,
     c.id_house,
-    c.id_tenant as id_user,
+    c.id_tenant AS id_user,
     c.id_contract AS id_contract,
     tb.entity,
     'TENANT' AS persona,
@@ -218,12 +225,55 @@ termination AS (
         core_contract.contract c
         ON tb.id_contract = c.id_contract
 ),
+listing AS (
+    WITH listing_base AS (
+        SELECT
+            lbc.id AS id_entity,
+            lbc.id_house,
+            IF(lbc.business_context = 'RENT', c.id_contract, NULL) AS id_contract,
+            h.id_user AS id_owner,
+            'LISTING' AS entity,
+            lbc.business_context,
+            CASE
+                WHEN lbc.status IN ('PUBLISHED', 'EDITING')
+                    OR (lbc.status = 'SUSPENDED'
+                        AND lbc.status_reason NOT IN ('OWNER_GAVE_UP_RENTING', 'OwnerConsequencesManagement', 'OwnerReforming', 'OwnerTemporarilySuspended', 'OwnerTraveling')) THEN TRUE
+                WHEN lbc.status IN ('OPTED_OUT', 'UNPUBLISHED')
+                    OR (lbc.status = 'SUSPENDED'
+                        AND lbc.status_reason IN ('OWNER_GAVE_UP_RENTING', 'OwnerConsequencesManagement', 'OwnerReforming', 'OwnerTemporarilySuspended', 'OwnerTraveling')) THEN FALSE
+                ELSE NULL
+            END AS is_active,
+            lbc.ts_created,
+            lbc.ts_updated
+        FROM
+            datalake_ebdb_test_clean.listing_business_context AS lbc
+        LEFT JOIN
+            datalake_ebdb_clean.house AS h
+                ON h.id = lbc.id_house
+        LEFT JOIN
+            core_contract.contract AS c
+                ON c.id_house = lbc.id_house
+    )
+    SELECT
+        lb.id_entity,
+        lb.id_house,
+        lb.id_contract,
+        lb.id_owner AS id_user,
+        lb.entity,
+        'OWNER' AS persona,
+        lb.business_context,
+        lb.is_active,
+        lb.ts_created,
+        lb.ts_updated
+    FROM
+        listing_base AS lb
+),
 base AS (
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
         id_house,
-        CAST(NULL AS BIGINT) AS id_contract,
+        id_contract,
         id_user,
         entity,
         persona,
@@ -238,7 +288,7 @@ base AS (
         {sk_entity} AS sk_entity,
         id_entity,
         id_house,
-        CAST(NULL AS BIGINT) AS id_contract,
+        id_contract,
         id_user,
         entity,
         persona,
@@ -278,6 +328,21 @@ base AS (
         ts_updated
     FROM
         termination
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        listing
 )
 SELECT
     b.sk_entity,
@@ -288,7 +353,7 @@ SELECT
     u.uuid_person,
     b.entity,
     b.persona,
-    business_context,
+    b.business_context,
     {house_address} AS house_address,
     b.is_active,
     b.ts_created,

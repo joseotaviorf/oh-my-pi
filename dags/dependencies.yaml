@@ -3663,6 +3663,7 @@ bietlejuice.enrich_transactional_entities:
   - bietlejuice.core_contract:load-core-contract
   - bietlejuice.core_offer:load-core-offer
   - bietlejuice.core_visit:load-core-visit
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
   - bietlejuice.terminator_fast_lane:load-clean-termination
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries:first-run-of-day
