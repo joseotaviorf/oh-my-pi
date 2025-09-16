@@ -7,7 +7,7 @@ dag:
       Retrieve data from Oracle HR System API, a sub product of Oracle Human Capital Resources (Oracle HCM).
       HCM is a cloud-based software application suite for human resources, talent management, and customer experience.
 cluster:
-  type: databricks_16_4_medium_memory_people_cluster
+  type: custom_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
@@ -19,6 +19,14 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"  
+
 workflow:
   layer: raw
   type: custom_ingestion
