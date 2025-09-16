@@ -6,6 +6,7 @@ from functools import partial
 
 from hive_metastore_client import HiveMetastoreClient
 from quintoandar_logger import QuintoAndarLogger
+from pyspark.sql.types import StructType, StructField, StringType
 
 from bietlejuice.base.db import DatalakeMetastoreMapping, MetricMetastoreMapping
 from bietlejuice.base.db.database_enum import DatabaseEnum
@@ -165,12 +166,14 @@ def sync_metastore_table_structure(bucket, layer, schema, table_name, all_tables
         storage_description,
     )
 
-    rdd = BaseSparkContext.sc.parallelize(tables_metadata.keys())
-    rdd.foreach(
-        lambda table_name: func(
-            table_name,
-            tables_metadata[table_name]["columns"],
-            tables_metadata[table_name]["partition_keys"],
+    schema = StructType([StructField("table_name", StringType(), True)])
+    spark_table_names = list(tables_metadata.keys())
+    df = spark.createDataFrame([(name,) for name in spark_table_names], schema=schema)
+    df.foreach(
+        lambda row: func(
+            row.table_name,
+            tables_metadata[row.table_name]["columns"],
+            tables_metadata[row.table_name]["partition_keys"],
         )
     )
     logger.info(f"m={logger.name}, msg=Finished synchronization.")
@@ -211,9 +214,11 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
         update_table_partitions, hive_ms_loader, spark_ms.spark_database_name
     )
 
-    rdd = BaseSparkContext.sc.parallelize(tables_partition_values.keys())
-    rdd.foreach(
-        lambda table_name: func(table_name, tables_partition_values[table_name])
+    schema = StructType([StructField("table_name", StringType(), True)])
+    spark_table_names = list(tables_partition_values.keys())
+    df = spark.createDataFrame([(name,) for name in spark_table_names], schema=schema)
+    df.foreach(
+        lambda row: func(row.table_name, tables_partition_values[row.table_name])
     )
 
     logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
@@ -381,10 +386,11 @@ def propagate_raw_metadata(
         spark_ms.spark_database_name,
     )
 
-    rdd = BaseSparkContext.sc.parallelize(spark_table_names)
-    rdd.foreach(
-        lambda _table_name: func(
-            tables_metadata.get(_table_name), product_database_name
+    schema = StructType([StructField("table_name", StringType(), True)])
+    df = spark.createDataFrame([(name,) for name in spark_table_names], schema)
+    df.foreach(
+        lambda row: func(
+            tables_metadata.get(row.table_name), product_database_name
         )
     )
 
