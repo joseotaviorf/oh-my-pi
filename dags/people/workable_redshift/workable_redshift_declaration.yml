@@ -43,48 +43,48 @@ workflow:
       - ALL PRIVILEGES
 
   tables_customization:
-    activities:
-    answers:
-    assessments:
-    attendances:
-    candidate_evaluations:
-    candidate_referrals:
-    candidates:
-    collaboration_rules:
-    comments:
-    custom_attributes:
-    custom_attributes_settings:
-    departments:
-    education_records:
-    events:
-    experience_records:
-    extra_infos:
-    field_choice_translations:
-    field_choices:
-    field_translations:
-    field_value_choices:
-    field_values:
-    fields:
-    hiring_team:
-    invoices:
-    job_boards:
-    job_locations:
-    job_views:
-    jobs:
-    locations:
-    members:
-    offer_templates:
-    offer_variables:
-    offers:
-    pipelines:
-    postings:
-    pseudo_boards:
-    questions:
-    ratings:
-    redsync_metro_source:
-    requisition_attributes:
-    requisition_templates:
-    requisitions:
-    signable_templates:
-    stages:
-    surveys:
+    activities: {}
+    answers: {}
+    assessments: {}
+    attendances: {}
+    candidate_evaluations: {}
+    candidate_referrals: {}
+    candidates: {}
+    collaboration_rules: {}
+    comments: {}
+    custom_attributes: {}
+    custom_attributes_settings: {}
+    departments: {}
+    education_records: {}
+    events: {}
+    experience_records: {}
+    extra_infos: {}
+    field_choice_translations: {}
+    field_choices: {}
+    field_translations: {}
+    field_value_choices: {}
+    field_values: {}
+    fields: {}
+    hiring_team: {}
+    invoices: {}
+    job_boards: {}
+    job_locations: {}
+    job_views: {}
+    jobs: {}
+    locations: {}
+    members: {}
+    offer_templates: {}
+    offer_variables: {}
+    offers: {}
+    pipelines: {}
+    postings: {}
+    pseudo_boards: {}
+    questions: {}
+    ratings: {}
+    redsync_metro_source: {}
+    requisition_attributes: {}
+    requisition_templates: {}
+    requisitions: {}
+    signable_templates: {}
+    stages: {}
+    surveys: {}
