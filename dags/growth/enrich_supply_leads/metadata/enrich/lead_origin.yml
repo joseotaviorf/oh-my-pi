@@ -137,3 +137,8 @@ columns:
       - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
   ts_load:
     description: The timestamp of the data load.
+  database_tracking_ctwa:
+    description: The source responsible for the ctwa information.
+    lineage: 
+    - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+    - datalake_sauron_clean.session.metadata
