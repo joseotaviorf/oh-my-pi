@@ -1537,6 +1537,14 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-rent-comission-for-strategic-region:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region:first-run-of-day
+bietlejuice.enrich_collections_aud:
+  - bietlejuice.ebdb_contract:load-clean-contract-aud:first-run-of-day
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity:first-run-of-day
+  - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+  - bietlejuice.retsuko:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
+  - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-button-tapped-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-failure-view-events:first-run-of-day

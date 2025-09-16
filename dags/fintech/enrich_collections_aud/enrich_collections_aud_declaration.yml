@@ -1,0 +1,44 @@
+dag:
+  name: enrich_collections_aud
+  schedule_start_date: 2025, 9, 10
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched audit tables for invoice and contract collections analysis.
+      Contains historical snapshots and daily aggregations of invoice and contract audit data
+      for comprehensive collections and losses tracking.
+workflow:
+  type: query_delta
+  layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  inner_dependencies:
+    invoice_aud_daily:
+      - invoice_aud
+    contract_aud_daily:
+      - contract_aud
+    invoice_aud_at_closing:
+      - invoice_aud_daily
+    contract_aud_at_closing:
+      - contract_aud_daily
+  tables_customization:
+    invoice_aud:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    invoice_aud_daily:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    contract_aud:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    contract_aud_daily:
+      extraction_type: incremental
+      partitions: [year, month, day]
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12

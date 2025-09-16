@@ -1,0 +1,66 @@
+---
+database_name: datalake_collections_aud
+table_name: contract_aud
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Audit trail of contract transactions with enriched data from related entities. Contains historical changes to contracts with termination tracking and analyst annulment information."
+columns:
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_ebdb_transactional.contrato.id
+  country_code:
+    description: "Country code where the house is located"
+    lineage:
+      - datalake_ebdb_country.house.country_code
+  guarantee:
+    description: "Type of guarantee for the contract"
+    lineage:
+      - datalake_ebdb_transactional.contrato.garantia
+  status:
+    description: "Current status of the contract"
+    lineage:
+      - datalake_ebdb_transactional.contrato.status
+  dt_termination_original:
+    description: "Original termination date of the contract"
+    lineage:
+      - datalake_ebdb_transactional.contrato.dataRescisao
+  dt_annulment:
+    description: "Effective annulment date, considering termination process completion"
+    lineage:
+      - datalake_ebdb_transactional.contrato.dataRescisao
+      - datalake_terminator_clean.termination.dt_vacancy
+      - datalake_terminator_clean.termination.status
+  dt_started:
+    description: "Contract start date"
+    lineage:
+      - datalake_ebdb_transactional.contrato.dataInicio
+  ts_signature:
+    description: "Timestamp when contract was signed"
+    lineage:
+      - datalake_ebdb_transactional.contrato.dataAssinado
+  ts_analyst_annulment_input:
+    description: "Timestamp when analyst input was made for contract annulment"
+    lineage:
+      - datalake_ebdb_clean.contract_aud.dt_termination
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_database_transaction:
+    description: "Timestamp of database transaction"
+    lineage:
+      - datalake_ebdb_transactional.contrato.ts_database_transaction
+  ts_snapshot:
+    description: "Timestamp of CDC transaction snapshot"
+    lineage:
+      - datalake_ebdb_transactional.contrato.ts_cdc_transaction
+  year:
+    description: "Year from database transaction"
+    lineage:
+      - datalake_ebdb_transactional.contrato.year
+  month:
+    description: "Month from database transaction"
+    lineage:
+      - datalake_ebdb_transactional.contrato.month
+  day:
+    description: "Day from database transaction"
+    lineage:
+      - datalake_ebdb_transactional.contrato.day

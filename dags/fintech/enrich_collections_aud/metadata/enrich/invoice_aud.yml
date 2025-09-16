@@ -1,0 +1,225 @@
+---
+database_name: datalake_collections_aud
+table_name: invoice_aud
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Audit trail of invoice transactions with enriched data from related entities. Contains historical changes to invoices with CDC tracking and business day adjustments."
+columns:
+  id:
+    description: "Invoice record ID"
+    lineage:
+      - datalake_retsuko_transactional.invoice.id
+  id_invoice:
+    description: "Invoice external ID"
+    lineage:
+      - datalake_retsuko_transactional.invoice.external_id
+  id_original_invoice_external:
+    description: "Original invoice external ID for corrections or adjustments"
+    lineage:
+      - datalake_retsuko_transactional.invoice.original_invoice_external_id
+  id_account:
+    description: "Account ID associated with the invoice"
+    lineage:
+      - datalake_retsuko_transactional.invoice.account_id
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_retsuko_transactional.invoice.contract_id
+  id_checkout_order:
+    description: "Checkout order ID"
+    lineage:
+      - datalake_retsuko_transactional.invoice.checkout_order_id
+  id_checkout_charge:
+    description: "Checkout charge ID"
+    lineage:
+      - datalake_retsuko_transactional.invoice.checkout_charge_id
+  id_idempotency:
+    description: "Idempotency key for duplicate prevention"
+    lineage:
+      - datalake_retsuko_transactional.invoice.idempotency_id
+  id_contract_external:
+    description: "External contract ID"
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  log_type:
+    description: "Type of CDC operation performed (CREATE, READ, UPDATE, DELETE)"
+    lineage:
+      - datalake_retsuko_transactional.invoice.op_cdc
+  user:
+    description: "Account type performing the operation (tenant, landlord, etc.)"
+    lineage:
+      - datalake_retsuko_clean.account.type
+  cdc_binlog_position:
+    description: "CDC binlog position for change tracking"
+    lineage:
+      - datalake_retsuko_transactional.invoice.cdc_binlog_position
+  status:
+    description: "Invoice status"
+    lineage:
+      - datalake_retsuko_transactional.invoice.status
+  substatus:
+    description: "Invoice substatus for additional detail"
+    lineage:
+      - datalake_retsuko_transactional.invoice.sub_status
+  payment_status:
+    description: "Payment status of the invoice"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_status
+  paid_via:
+    description: "Payment method used"
+    lineage:
+      - datalake_retsuko_transactional.invoice.paid_via
+  purpose:
+    description: "Purpose of the invoice"
+    lineage:
+      - datalake_retsuko_transactional.invoice.purpose
+  closing_mode:
+    description: "How the invoice was closed"
+    lineage:
+      - datalake_retsuko_transactional.invoice.closing_mode
+  reason:
+    description: "Reason for invoice creation or status change"
+    lineage:
+      - datalake_retsuko_transactional.invoice.reason
+  due_amount:
+    description: "Amount due for the invoice"
+    lineage:
+      - datalake_retsuko_transactional.invoice.due_amount
+  paid_amount:
+    description: "Amount paid for the invoice"
+    lineage:
+      - datalake_retsuko_transactional.invoice.paid_amount
+  payment_paid_interest_amount:
+    description: "Interest amount paid"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_paid_interest_amount
+  payment_paid_fine_amount:
+    description: "Fine amount paid"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_paid_fine_amount
+  accrual_year_month:
+    description: "Year-month of accrual"
+    lineage:
+      - datalake_retsuko_transactional.invoice.accrual_year_month
+  should_request_boleto:
+    description: "Flag indicating if boleto should be requested"
+    lineage:
+      - datalake_retsuko_transactional.invoice.should_request_boleto
+  sispag_file:
+    description: "SISPAG file reference"
+    lineage:
+      - datalake_retsuko_transactional.invoice.sispag_file
+  payment_company_use_number:
+    description: "Company use number for payment"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_company_use_number
+  payment_bank_code:
+    description: "Bank code for payment"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_bank_code
+  payment_style_mapped:
+    description: "Mapped payment style"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_style_mapped
+  is_write_off:
+    description: "Flag indicating if invoice was written off"
+    lineage:
+      - datalake_retsuko_transactional.invoice.write_off
+  accrual_year_month_count:
+    description: "Count of accrual year-month entries"
+    lineage:
+      - datalake_retsuko_transactional.invoice.accrual_year_month_count
+  dt_due_adjusted:
+    description: "Due date adjusted for Brazilian fintech business days"
+    lineage:
+      - datalake_retsuko_transactional.invoice.due_date
+      - datalake_quintoandar.aux_date.is_brz_fintech_business_day
+      - datalake_quintoandar.aux_date.next_brz_fintech_business_day
+  ts_write_off:
+    description: "Timestamp when invoice was written off"
+    lineage:
+      - datalake_retsuko_transactional.invoice.write_off_at
+  ts_paid:
+    description: "Timestamp when invoice was paid"
+    lineage:
+      - datalake_retsuko_transactional.invoice.paid_date
+  ts_payment_confirmation:
+    description: "Timestamp of payment confirmation"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_confirmation_at
+  ts_payment_event:
+    description: "Timestamp of payment event"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_event_at
+  ts_payment_divergent_fixed:
+    description: "Timestamp when payment divergence was fixed"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_divergent_fixed_at
+  ts_payment_processing:
+    description: "Timestamp when payment processing started"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_processing_at
+  ts_payment_credit:
+    description: "Timestamp when payment was credited"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_credit_date
+  ts_payment_chargeback:
+    description: "Timestamp of payment chargeback"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_chargeback_at
+  ts_payment_refunded:
+    description: "Timestamp when payment was refunded"
+    lineage:
+      - datalake_retsuko_transactional.invoice.payment_refunded_at
+  ts_canceled:
+    description: "Timestamp when invoice was canceled"
+    lineage:
+      - datalake_retsuko_transactional.invoice.canceled_at
+  ts_sent:
+    description: "Timestamp when invoice was sent"
+    lineage:
+      - datalake_retsuko_transactional.invoice.sent_at
+  ts_due:
+    description: "Timestamp when invoice is due"
+    lineage:
+      - datalake_retsuko_transactional.invoice.due_date
+  ts_created:
+    description: "Timestamp when invoice was created"
+    lineage:
+      - datalake_retsuko_transactional.invoice.created_at
+  ts_synced:
+    description: "Timestamp when invoice was synced"
+    lineage:
+      - datalake_retsuko_transactional.invoice.synced_at
+  ts_nf_requested:
+    description: "Timestamp when nota fiscal was requested"
+    lineage:
+      - datalake_retsuko_transactional.invoice.nf_requested_at
+  ts_retsuko_created:
+    description: "Timestamp when record was created in Retsuko"
+    lineage:
+      - datalake_retsuko_transactional.invoice.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Timestamp when record was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_transactional.invoice.retsuko_updated_at
+  ts_cdc_transaction:
+    description: "Timestamp of CDC transaction"
+    lineage:
+      - datalake_retsuko_transactional.invoice.ts_cdc_transaction
+  ts_database_transaction:
+    description: "Timestamp of database transaction"
+    lineage:
+      - datalake_retsuko_transactional.invoice.ts_database_transaction
+  year:
+    description: "Year from database transaction"
+    lineage:
+      - datalake_retsuko_transactional.invoice.year
+  month:
+    description: "Month from database transaction"
+    lineage:
+      - datalake_retsuko_transactional.invoice.month
+  day:
+    description: "Day from database transaction"
+    lineage:
+      - datalake_retsuko_transactional.invoice.day
