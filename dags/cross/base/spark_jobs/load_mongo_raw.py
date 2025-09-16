@@ -31,7 +31,7 @@ def _load_dataframe_in_datalake(
     By default, this parameter is set to False.
     @param force_recreate: bool. Indicates if it must force table recreation in metastore.
     """
-    if not df.rdd.isEmpty():
+    if not df.isEmpty():
         logger.info(
             f"m=_load_dataframe_in_datalake, msg=Loading data into s3 bucket..."
         )
