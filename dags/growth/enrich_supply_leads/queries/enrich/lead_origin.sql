@@ -70,11 +70,17 @@ phone_number AS (
   SELECT DISTINCT
     id_task,
     twilio_phone_number as quinto_andar_phone_number,
-    id_source_ctwa,
-    url_source_ctwa,
-    type_source_ctwa
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') as ctwa_clid,
+    COALESCE(id_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id')) AS id_source_ctwa,
+    COALESCE(url_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url')) AS url_source_ctwa,
+    COALESCE(type_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type')) AS type_source_ctwa
   FROM
-    datalake_customer_support.chats
+    datalake_customer_support.chats c 
+  LEFT JOIN 
+    datalake_sauron_clean.session s
+  ON REGEXP_EXTRACT(s.user_phone, '[0-9]+', 0) = REGEXP_EXTRACT(c.customer_phone_number, '[0-9]+', 0) 
+    AND GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY c.id_task ORDER BY s.ts_created DESC) = 1
   UNION ALL
   SELECT DISTINCT
     id_task,
@@ -82,11 +88,20 @@ phone_number AS (
       WHEN direction = 'inbound' THEN to_phone_number
       WHEN direction = 'outbound' THEN from_phone_number
     END AS quinto_andar_phone_number,
-    NULL AS id_source_ctwa,
-    NULL AS url_source_ctwa,
-    NULL AS type_source_ctwa
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa ,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type') AS type_source_ctwa
   FROM
-    datalake_customer_support.calls
+    datalake_customer_support.calls ca 
+  LEFT JOIN 
+    datalake_sauron_clean.session s
+  ON REGEXP_EXTRACT(s.user_phone, '[0-9]+', 0) = 
+    CASE
+      WHEN ca.direction = 'outbound' THEN REGEXP_EXTRACT(ca.to_phone_number, '[0-9]+', 0)
+      WHEN ca.direction = 'inbound' THEN REGEXP_EXTRACT(ca.from_phone_number , '[0-9]+', 0) END
+    AND GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') is not null
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY ca.id_task ORDER BY s.ts_created DESC) = 1
 ),
 click_to_whatsapp_campaigns AS (
   SELECT 
@@ -125,7 +140,7 @@ mid_table AS (
     r.id_task,
     r.gclid,
     r.fbclid,
-    r.ctwa_clid,
+    COALESCE(r.ctwa_clid, pn.ctwa_clid) as ctwa_clid,
     pn.quinto_andar_phone_number,
     pn.id_source_ctwa,
     pn.url_source_ctwa,
@@ -136,6 +151,7 @@ mid_table AS (
     NVL2(r.source, 'rene_descartes', NVL2(a.source, 'amplitude', NVL2(a2.source, 'amplitude', NVL2(ctwac.utm_source, 'facebook_api', 'lost_tracking')))) AS database_tracking_source,
     NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(a2.content, 'amplitude', NVL2(ctwac.utm_content, 'facebook_api', 'lost_tracking')))) AS database_tracking_content,
     NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(a2.term, 'amplitude', NVL2(ctwac.utm_term, 'facebook_api', 'lost_tracking')))) AS database_tracking_term,
+    NVL2(r.ctwa_clid, 'rene_descartes',NVL2(pn.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
     COALESCE(r.ts_event, a.ts_event) AS ts_event
   FROM
     lead_origin_rene_descartes AS r
@@ -196,6 +212,7 @@ SELECT DISTINCT
   database_tracking_source,
   database_tracking_content,
   database_tracking_term,
+  database_tracking_ctwa,
   ts_event,
   CURRENT_TIMESTAMP AS ts_load
 FROM
