@@ -30,7 +30,7 @@ session_contracts AS (
   FROM
     datalake_greenseer_clean.session
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 90 DAY AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 90 DAY AND DATE('{load_end_date}')
     AND GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") IS NOT NULL
 ),
 incoming_tickets AS (
@@ -55,6 +55,8 @@ incoming_tickets AS (
     description,
     status,
     analyst_email,
+    first_analyst_email,
+    last_analyst_email,
     channel,
     request_type,
     client_type,
@@ -209,6 +211,8 @@ tickets_per_task AS (
       WHEN ut.channel = 'call' THEN COALESCE(ca1.worker_email, ca2.worker_email)
       ELSE t.analyst_email
     END AS analyst_email,
+    t.first_analyst_email,
+    t.last_analyst_email,
     CASE
       WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
       WHEN COALESCE(ca1.direction, ca2.direction) IS NOT NULL
@@ -271,9 +275,8 @@ tickets_per_task AS (
       ON ca2.id_call = t.id_call
       AND STARTSWITH(t.id_call, "CA")
       AND ca2.is_reservation_answered IS TRUE
-),
-ticket_twilio_data AS (
-  WITH twilio_attr AS (
+), 
+twilio_attr AS (
     SELECT DISTINCT
       id_ticket,
       CASE WHEN channel NOT IN ('call', 'chat')
@@ -295,13 +298,14 @@ ticket_twilio_data AS (
       MAX(ts_created_twilio) OVER(PARTITION BY id_ticket) AS ts_created_twilio
     FROM
       tickets_per_task
-  )
+  ), 
+  ticket_twilio_data AS (
   SELECT
     ta.id_ticket,
     ta.first_queue,
     ta.last_queue,
-    ta.first_analyst_email,
-    ta.last_analyst_email,
+    COALESCE(tp.first_analyst_email, ta.first_analyst_email) AS first_analyst_email,
+    COALESCE(tp.last_analyst_email, ta.last_analyst_email) AS last_analyst_email,
     LOWER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
@@ -309,6 +313,8 @@ ticket_twilio_data AS (
     ta.ts_created_twilio
   FROM
     twilio_attr AS ta
+  LEFT JOIN tickets_per_task as tp
+ON ta.id_ticket = tp.id_ticket
   LEFT JOIN
     departments AS dc
       ON dc.department = ta.last_queue
