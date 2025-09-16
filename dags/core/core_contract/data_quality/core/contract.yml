@@ -5,6 +5,9 @@ table_level_validations:
   has_size:
     greater_than: 30000
     severity_level: Error
+is_incremental:
+  incremental_date_column: ts_updated
+  incremental_date_mask: yyyy-MM-dd
 column_level_validations:
   sk_core_contract:
     is_unique:
