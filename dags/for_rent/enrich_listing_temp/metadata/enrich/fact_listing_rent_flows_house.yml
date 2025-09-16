@@ -249,17 +249,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.country_code
     description: Country code of origin related to the property of the rent flow. It must be the same value for all events in the same property.
-  visit_created_type:
-    lineage:
-      - datalake_ebdb_rent_flow.rent_flow.visit_created_type
-    description: The origin type of the visit creation related to the rent flow. A rent flow can have none, one or more values, since many visits from different origins may happen.
-    categories:
-      Admin: Visit was created through Admin, our internal service.
-      CidadeAlerta: Visit was automatically created through a schedule slot request from the Cidade Alerta internal product (which is deprecated).
-      Corretores: Visit was created through the Agents app.
-      Encaixe: Visit was created from a schedule slot request.
-      Inquilinos: Visit was created through the Tenants app.
-      SelfServiceWeb: Visit was created through our PWA, which means that the tenant prospect created it.
   booking_utm_campaign:
     lineage:
       - dw_public.dim_booking.utm_campaign
@@ -299,14 +288,6 @@ columns:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
     description: Boolean flag that indicates if only the agent was present in the visit or if the owner didn't show up on a visit to a property with entrance restrictions, which means that the visit didn't happen.
-  flg_visit_created_from_app:
-    lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
-    description: Boolean flag that indicates if the visit was created from the app.
-  flg_visit_last_updated_from_app:
-    lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
-    description: Boolean flag that indicates if the last visit's update was from the app.
   days_booking_created_to_contract_signed:
     description: Number of days between the booking creation and the contract signed.
   days_booking_created_to_visit:

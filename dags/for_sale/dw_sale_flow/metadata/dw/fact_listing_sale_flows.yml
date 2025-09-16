@@ -64,16 +64,6 @@ columns:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_visit
     description: "[DEPRECATED]"
-  visit_created_type:
-    lineage:
-      - datalake_ebdb_rent_flow.rent_flow.visit_created_type
-    description: "[DEPRECATED]"
-    categories:
-      Admin: ""
-      CidadeAlerta: ""
-      Corretores: ""
-      Inquilinos: ""
-      SelfServiceWeb: ""
   funnel_step_drop_reason:
     lineage:
       - dw_public.dim_booking.cancellation_reason
@@ -85,14 +75,6 @@ columns:
   flg_visit_performed:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
-    description: "[DEPRECATED]"
-  flg_visit_created_from_app:
-    lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
-    description: "[DEPRECATED]"
-  flg_visit_last_updated_from_app:
-    lineage:
-      - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
     description: "[DEPRECATED]"
   days_booking_created_to_visit:
     description: "[DEPRECATED]"

@@ -28,10 +28,9 @@ WITH listing_rent_flows AS (
             COALESCE(rent_flow.id_contract, -1) AS sk_contract,
             COALESCE(reservation.id_reservation, -1) AS sk_reservation,
             COALESCE(dim_booking.sk_rent_flow_taxonomy, -1) AS sk_rent_flow_taxonomy,
-            COALESCE(cs.sk_company, -1) AS sk_company_supply,
+            COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
             h.country_code,
             proposal.status AS proposal_status,
-            rent_flow.visit_created_type,
             dim_booking.utm_campaign AS booking_utm_campaign,
             dim_booking.utm_content AS booking_utm_content,
             dim_booking.utm_term AS booking_utm_term,
@@ -64,8 +63,6 @@ WITH listing_rent_flows AS (
             rent_flow.is_visit_completed,
             rent_flow.is_visit_performed,
             CAST(proposal.tenant_doc_sent_count AS BOOLEAN) AS has_tenant_sent_doc,
-            rent_flow.is_visit_created_from_app,
-            rent_flow.is_visit_last_updated_from_app,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_house_first_listing, "yyyyMMdd") AS BIGINT), -1) AS sk_house_first_listing_date,
             MAX(COALESCE(CAST(DATE_FORMAT(house_listing.ts_listing_version_start, "yyyyMMdd") AS BIGINT), -1)) OVER (PARTITION BY rent_flow.id_house, rent_flow.id_house_rent_flow) AS sk_house_listing_date,
             MAX(COALESCE(CAST(DATE_FORMAT(house_listing.ts_last_unpublished, "yyyyMMdd") AS BIGINT), -1)) OVER (PARTITION BY rent_flow.id_house, rent_flow.id_house_rent_flow) AS sk_house_listing_de_publication_date,
@@ -173,20 +170,17 @@ WITH listing_rent_flows AS (
             dw_public.dim_booking
                 ON dim_booking.sk_booking = rent_flow.id_booking
         LEFT JOIN
-            datalake_company.company_sks AS cs
+            datalake_company.company_sks AS cs_company
                 ON h.is_rent_3p_supply
-                AND ((
-                    h.uuid_company IS NOT NULL
-                    AND h.uuid_company = cs.uuid_company
-                ) OR (
-                    h.uuid_company IS NULL
-                    AND h.id_company_hubspot IS NOT NULL
-                    AND h.id_company_hubspot = cs.id_hubspot
-                ) OR (
-                     h.uuid_company IS NULL
-                     AND h.id_company_hubspot IS NULL
-                     AND h.partner_3p_supply = cs.extracted_3p_tag
-                ))
+                AND h.uuid_company = cs_company.uuid_company
+        LEFT JOIN
+            datalake_company.company_sks AS cs_hubspot
+                ON h.is_rent_3p_supply
+                AND h.id_company_hubspot = cs_hubspot.id_hubspot
+        LEFT JOIN
+            datalake_company.company_sks AS cs_tag
+                ON h.is_rent_3p_supply
+                AND h.partner_3p_supply = cs_tag.extracted_3p_tag
         WHERE
             house_listing.is_for_rent
             AND (
@@ -412,7 +406,6 @@ SELECT
     sk_last_doc_analysis_rejected_date AS sk_last_doc_analysis_rejected,
     sk_guarantee_paid_date,
     country_code,
-    visit_created_type,
     booking_utm_campaign,
     booking_utm_content,
     booking_utm_term,
@@ -435,8 +428,6 @@ SELECT
     END AS funnel_step_drop_reason,
     is_visit_completed AS flg_visit_completed,
     is_visit_performed AS flg_visit_performed,
-    is_visit_created_from_app AS flg_visit_created_from_app,
-    is_visit_last_updated_from_app AS flg_visit_last_updated_from_app,
     reservation_attempts,
     days_booking_created_to_visit,
     days_user_created_to_visit,

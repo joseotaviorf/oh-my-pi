@@ -79,10 +79,6 @@ rent_flow_offer_and_pre_proposal AS (
             ON user.id = rf.id_client
         LEFT JOIN datalake_ebdb_clean.visit
             ON visit.id = booking.id_visit
-        LEFT JOIN datalake_ebdb_clean.visit_origin vo_cr
-            ON vo_cr.id = visit.id_creation_origin
-        LEFT JOIN datalake_ebdb_clean.visit_origin vo_up
-            ON vo_up.id = visit.id_last_update_origin
         LEFT JOIN datalake_ebdb_clean.user user_agent
             ON user_agent.id_agent = booking.id_agent
         LEFT JOIN datalake_ebdb_clean.pre_proposal prep
@@ -178,9 +174,6 @@ rent_flow_offer_and_pre_proposal AS (
             user.ts_created AS dt_client_sign_up,
             user_agent.ts_created AS dt_agent_sign_up,
             visit.id AS id_visit,
-            vo_cr.is_app AS is_visit_created_from_app,
-            vo_cr.name AS visit_created_type,
-            COALESCE(vo_up.is_app, FALSE) AS is_visit_last_updated_from_app,
             rf.id AS id_rent_flow,
             rf.ts_created AS dt_rent_flow_created,
             CASE
@@ -209,10 +202,6 @@ rent_flow_offer_and_pre_proposal AS (
             ON user.id = rf.id_client
         LEFT JOIN datalake_ebdb_clean.visit
             ON visit.id = booking.id_visit
-        LEFT JOIN datalake_ebdb_clean.visit_origin vo_cr
-            ON vo_cr.id = visit.id_creation_origin
-        LEFT JOIN datalake_ebdb_clean.visit_origin vo_up
-            ON vo_up.id = visit.id_last_update_origin
         LEFT JOIN datalake_ebdb_clean.user user_agent
             ON user_agent.id_agent = booking.id_agent
         LEFT JOIN datalake_ebdb_clean.offer
@@ -249,9 +238,6 @@ rent_flow_offer_and_pre_proposal AS (
             dt_client_sign_up,
             dt_agent_sign_up,
             id_visit,
-            is_visit_created_from_app,
-            visit_created_type,
-            is_visit_last_updated_from_app,
             id_rent_flow,
             dt_rent_flow_created,
             id_offer,
@@ -276,9 +262,6 @@ rent_flow_offer_and_pre_proposal AS (
         pp.id_pre_proposal,
         COALESCE(o.id_proposal, pp.id_proposal) AS id_proposal,
         COALESCE(o.id_contract, pp.id_contract) AS id_contract,
-        o.visit_created_type,
-        o.is_visit_created_from_app,
-        o.is_visit_last_updated_from_app,
         o.is_visit_completed,
         o.is_visit_performed,
         COALESCE(o.dt_proposal_approved, pp.dt_proposal_approved) AS dt_proposal_approved,
@@ -310,9 +293,6 @@ contract_with_rent_flow_portability AS (
         NULL AS id_pre_proposal,
         contract.id_proposal AS id_proposal,
         contract.id AS id_contract,
-        NULL AS visit_created_type,
-        NULL AS is_visit_created_from_app,
-        NULL AS is_visit_last_updated_from_app,
         NULL AS is_visit_completed,
         NULL AS is_visit_performed,
         proposal.ts_approved AS dt_proposal_approved,
@@ -353,9 +333,6 @@ contract_with_rent_flow AS (
         proposal.id_pre_proposal AS id_pre_proposal,
         contract.id_proposal AS id_proposal,
         contract.id AS id_contract,
-        NULL AS visit_created_type,
-        NULL AS is_visit_created_from_app,
-        NULL AS is_visit_last_updated_from_app,
         NULL AS is_visit_completed,
         NULL AS is_visit_performed,
         proposal.ts_approved AS dt_proposal_approved,
@@ -413,9 +390,6 @@ SELECT
           THEN (id_pre_proposal * 100) + 1
         ELSE NULL
     END AS id_offer_context,
-    visit_created_type,
-    is_visit_created_from_app,
-    is_visit_last_updated_from_app,
     is_visit_completed,
     is_visit_performed,
     dt_proposal_approved,

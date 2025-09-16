@@ -34,7 +34,6 @@ WITH listing_rent_flows AS (
             COALESCE(rent_flow.id_client, -1) AS sk_client,
             COALESCE(rent_flow.id_visit, -1) AS sk_visit,
             COALESCE(reservation.id_reservation, -1) AS sk_reservation,
-            rent_flow.visit_created_type,
             CASE
                 WHEN dim_booking.status = 'Cancelado'
                     THEN dim_booking.cancellation_reason
@@ -46,8 +45,6 @@ WITH listing_rent_flows AS (
             rent_flow.dt_client_sign_up,
             CAST(rent_flow.is_visit_completed AS BOOLEAN) AS is_visit_completed,
             CAST(rent_flow.is_visit_performed AS BOOLEAN) AS is_visit_performed,
-            CAST(rent_flow.is_visit_created_from_app AS BOOLEAN) AS is_visit_created_from_app,
-            CAST(rent_flow.is_visit_last_updated_from_app AS BOOLEAN) AS is_visit_last_updated_from_app,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_house_first_listing, "yyyyMMdd") AS BIGINT), -1) AS sk_house_first_listing_date,
             COALESCE(CAST(DATE_FORMAT(dim_house_listing.ts_listing_version_start, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_date,
             COALESCE(CAST(DATE_FORMAT(dim_house_listing.ts_last_de_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_de_publication_date,
@@ -116,7 +113,6 @@ SELECT
     sk_house_listing_de_publication_date,
     sk_booking_created_date,
     sk_visit_date,
-    visit_created_type,
     funnel_step,
     CASE
         WHEN funnel_step IN ('visit_completed',
@@ -126,8 +122,6 @@ SELECT
     END AS funnel_step_drop_reason,
     is_visit_completed AS flg_visit_completed,
     is_visit_performed AS flg_visit_performed,
-    is_visit_created_from_app AS flg_visit_created_from_app,
-    is_visit_last_updated_from_app AS flg_visit_last_updated_from_app,
     days_booking_created_to_visit,
     days_user_created_to_visit,
     days_house_listing_to_visit,

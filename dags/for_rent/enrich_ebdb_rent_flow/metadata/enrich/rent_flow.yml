@@ -61,18 +61,6 @@ columns:
       - datalake_ebdb_clean.proposal.id_offer
       - datalake_ebdb_clean.proposal.id_pre_proposal
     description: Key related to the context. Can be key from offer, pre proposal or proposal.
-  visit_created_type:
-    lineage:
-      - datalake_ebdb_clean.visit_origin.name
-    description: Origin of visit.
-  is_visit_created_from_app:
-    lineage:
-      - datalake_ebdb_clean.visit_origin.is_app
-    description: If the visit was created directly from the mobile app.
-  is_visit_last_updated_from_app:
-    lineage:
-      - datalake_ebdb_clean.visit_origin.is_app
-    description: If the visit was updated from the mobile app.
   is_visit_completed:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
