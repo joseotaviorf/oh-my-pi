@@ -1,4 +1,4 @@
-WITH francesinha AS (
+WITH pre_francesinha AS (
     SELECT
         CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS our_number,
         bank_account,
@@ -33,6 +33,16 @@ WITH francesinha AS (
     WHERE 
         ext.operation in ('C') 
         AND ext.literal_code in ('9489')
+),
+
+francesinha AS (
+    SELECT 
+        IF(LENGTH(our_number) > 30, LEFT(our_number, LENGTH(our_number)-2), our_number) AS our_number,
+        bank_account,
+        dt_paid,
+        amount
+    FROM 
+        pre_francesinha
 ),
 
 sap AS (
@@ -117,7 +127,21 @@ checkout_union AS (
         AND b.id NOT IN (5855, 5856, 5857)
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
         AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
-        AND COALESCE(dt_credit, DATE(ts_paid)) >= current_date - 180    
+        AND COALESCE(dt_credit, DATE(ts_paid)) >= current_date - 180
+    
+    UNION ALL
+
+    SELECT
+      IF(LENGTH(id_transaction) > 30, LEFT(id_transaction, LENGTH(id_transaction)-2), id_transaction) AS our_number,
+      b.due_amount AS amount,
+      DATE(b.ts_paid) AS dt_paid
+    FROM 
+        datalake_checkout_clean.pix b
+    WHERE
+        b.requester_name = 'trato-feito'
+        AND b.id NOT IN (5855, 5856, 5857)
+        AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
+        AND DATE(ts_paid) >= current_date - 180   
 ),
 
 trato_feito AS (
@@ -137,6 +161,19 @@ trato_feito AS (
     LEFT JOIN 
         datalake_trato_feito_clean.bill b 
             ON b.id_external = aci.id_external
+
+    UNION ALL 
+
+    SELECT 
+        LEFT(px.id_transaction, LENGTH(px.id_transaction)-2) AS our_number,
+        CAST(NULL AS STRING) AS id_invoice,
+        ic.paid_amount AS amount,
+        ic.dt_paid
+    FROM 
+        datalake_trato_feito_clean.installment_charges AS ic
+    LEFT JOIN
+        datalake_checkout_clean.pix AS px
+            ON ic.id_charge = px.id_charge
 ),
 
 seu_barriga_sap AS (

@@ -1342,6 +1342,7 @@ bietlejuice.enrich_b2b:
 bietlejuice.enrich_bank_conciliation:
   - bietlejuice.checkout:load-clean-bolecode:first-run-of-day
   - bietlejuice.checkout:load-clean-boleto:first-run-of-day
+  - bietlejuice.checkout:load-clean-pix:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-payment-platforms:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
@@ -1358,6 +1359,7 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.rental_guarantee_platform:load-clean-billing-report:first-run-of-day
   - bietlejuice.trato_feito:load-clean-accounting-installment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-bill:first-run-of-day
+  - bietlejuice.trato_feito:load-clean-installment-charges:first-run-of-day
   - bietlejuice.trato_feito:load-clean-installment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-negotiation:first-run-of-day
   - bietlejuice.trato_feito:load-clean-payment:first-run-of-day
