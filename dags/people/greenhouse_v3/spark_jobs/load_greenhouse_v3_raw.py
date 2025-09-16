@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from pyspark.sql import SparkSession
 
 from bietlejuice.clients.db_clients import SparkClient
-from base.api.common.client import BaseAPIClient
+from bietlejuice.base.api.common.client import BaseAPIClient
 from bietlejuice.base.api.parser.argument_parser import BaseJobArgumentParser
 from bietlejuice.base.api.auth.oauth2 import BasicAuthOAuth2ClientCredentials
 from bietlejuice.jobs.common.helpers import json_to_dataframe, insert_partitions
