@@ -2842,7 +2842,7 @@ bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-charge:first-run-of-day
   - bietlejuice.pixar:load-clean-refund:first-run-of-day
 bietlejuice.enrich_pp_multi:
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
+  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info:first-run-of-day
 bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb_administration:load-clean-pro-owner-fee-aud:first-run-of-day

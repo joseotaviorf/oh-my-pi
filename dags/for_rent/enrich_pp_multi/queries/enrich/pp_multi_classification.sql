@@ -1,87 +1,242 @@
-WITH visits_last_month AS (
+-- Early filter the owners that don't have at least 5 potential ongoing houses
+WITH owners_to_process AS (
   SELECT
-    id_owner,
-    COUNT(DISTINCT IF(id_event_type = 1, id_event, NULL)) AS visits_booked,
-    COUNT(DISTINCT IF(id_event_type = 2, id_event, NULL)) AS visits_completed
-  FROM
-    datalake_rent_demand_events.rent_demand_events
-  WHERE
-    ts_event >= DATE('{load_start_date}') - INTERVAL '1' MONTH
-  GROUP BY ALL
-),
-
-ongoing_houses_stats AS (
-  SELECT
-    id_owner,
-    day,
-    month,
-    year,
-    COUNT(DISTINCT IF(status_history IN ('alugado', 'publicado', 'suspenso', 'SUSPENDED', 'PUBLISHED'), id_house, NULL)) AS ongoing_houses
+    id_owner
   FROM
     datalake_rental_historical_follow_up.house_listings_daily_info
-  GROUP BY ALL
+  GROUP BY
+    id_owner
+  HAVING
+    COUNT(DISTINCT id_house) >= 5
 ),
-
-yesterday_stats AS (
+daily_house_listing AS (
   SELECT
-    ohs.id_owner,
-    ohs.ongoing_houses
+    hldi.id_owner,
+    COALESCE(l.dejavuid, CAST(hldi.id_house AS STRING)) AS uniqueid,
+    hldi.id_house,
+    CASE
+      WHEN
+        hldi.status_history = 'alugado'
+        OR (
+          hldi.status_history = 'SUSPENDED'
+          AND hldi.status_change_reason = 'RENTED'
+        )
+      THEN
+        'RENTED'
+      WHEN hldi.status_history IN ('edicao', 'EDITING') THEN 'EDITING'
+      WHEN hldi.status_history IN ('excluido', 'OPTED_OUT') THEN 'OPTED_OUT'
+      WHEN hldi.status_history IN ('publicado', 'PUBLISHED') THEN 'PUBLISHED'
+      WHEN hldi.status_history IN ('despublicado', 'UNPUBLISHED') THEN 'UNPUBLISHED'
+      WHEN
+        hldi.status_history = 'suspenso'
+        OR (
+          hldi.status_history = 'SUSPENDED'
+          AND hldi.status_change_reason != 'RENTED'
+        )
+      THEN
+        'SUSPENDED'
+      ELSE 'OTHER'
+    END AS status,
+    hldi.year,
+    hldi.month,
+    hldi.day
   FROM
-    ongoing_houses_stats AS ohs
+    datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
+      JOIN
+        owners_to_process AS otp
+          ON hldi.id_owner = otp.id_owner
+      LEFT JOIN
+        vespucio_prod_delta.listings AS l
+          ON l.source_id::bigint = hldi.id_house
+),
+daily_owner_stats AS (
+  SELECT
+    id_owner,
+    uniqueid,
+    collect_set(id_house) AS id_houses,
+    CASE
+      WHEN array_contains(collect_set(status), 'RENTED') THEN 'RENTED'
+      WHEN array_contains(collect_set(status), 'SUSPENDED') THEN 'SUSPENDED'
+      WHEN array_contains(collect_set(status), 'PUBLISHED') THEN 'PUBLISHED'
+      WHEN array_contains(collect_set(status), 'EDITING') THEN 'EDITING'
+      WHEN array_contains(collect_set(status), 'UNPUBLISHED') THEN 'UNPUBLISHED'
+      WHEN array_contains(collect_set(status), 'OPTED_OUT') THEN 'OPTED_OUT'
+      ELSE 'OTHER'
+    END AS status,
+    year,
+    month,
+    day
+  FROM
+    daily_house_listing
+  GROUP BY
+    ALL
+),
+pp_multi_daily_stats AS (
+  SELECT
+    id_owner,
+    collect_list(struct(uniqueid, id_houses, status)) AS houses,
+    CASE
+      WHEN MAKE_DATE(year, month, day) = DATE('{load_start_date}')  THEN 'ACTIVE'
+      WHEN MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL '2' YEAR THEN 'POTENTIAL'
+      ELSE 'LIFETIME'
+    END AS classification_window,
+    make_date(year, month, day) AS stats_date,
+    COUNT_IF(status IN ('RENTED', 'SUSPENDED', 'PUBLISHED')) AS ongoing_houses,
+    COUNT_IF(status = 'RENTED') AS houses_rented,
+    COUNT_IF(status = 'SUSPENDED') AS houses_suspended,
+    COUNT_IF(status = 'PUBLISHED') AS houses_published,
+    COUNT_IF(status = 'EDITING') AS houses_in_edition,
+    COUNT_IF(status = 'OPTED_OUT') AS houses_opted_out,
+    COUNT_IF(status = 'UNPUBLISHED') AS houses_unpublished,
+    COUNT(uniqueid) AS total_houses
+  FROM
+    daily_owner_stats
+  GROUP BY
+    ALL
+  HAVING
+    ongoing_houses >= 5
+),
+pp_multi_classification_window AS (
+  SELECT
+    id_owner,
+    classification_window,
+    MAX_BY(houses, stats_date) AS houses,
+    MAX(ongoing_houses) AS max_ongoing_houses,
+    MAX(houses_rented) AS max_houses_rented,
+    MAX(houses_suspended) AS max_houses_suspended,
+    MAX(houses_published) AS max_houses_published,
+    MAX(houses_in_edition) AS max_houses_in_edition,
+    MAX(houses_opted_out) AS max_houses_opted_out,
+    MAX(houses_unpublished) AS max_houses_unpublished,
+    MAX(total_houses) AS max_total_houses
+  FROM
+    pp_multi_daily_stats
+  GROUP BY
+    id_owner,
+    classification_window
+),
+pp_multi_stats AS (
+  SELECT
+    id_owner,
+    active_houses,
+    active_ongoing_houses,
+    active_houses_in_edition,
+    active_houses_opted_out,
+    active_houses_published,
+    active_houses_suspended,
+    active_houses_rented,
+    active_houses_unpublished,
+    active_total_houses,
+    two_year_max_houses,
+    two_year_max_ongoing_houses,
+    two_year_max_houses_in_edition,
+    two_year_max_houses_opted_out,
+    two_year_max_houses_published,
+    two_year_max_houses_suspended,
+    two_year_max_houses_rented,
+    two_year_max_houses_unpublished,
+    two_year_max_total_houses,
+    lifetime_max_houses,
+    lifetime_max_ongoing_houses,
+    lifetime_max_houses_in_edition,
+    lifetime_max_houses_opted_out,
+    lifetime_max_houses_published,
+    lifetime_max_houses_suspended,
+    lifetime_max_houses_rented,
+    lifetime_max_houses_unpublished,
+    lifetime_max_total_houses
+  FROM
+    pp_multi_classification_window
+      PIVOT (
+        MAX(houses) AS houses,
+        MAX(max_ongoing_houses) AS ongoing_houses,
+        MAX(max_houses_rented) AS houses_rented,
+        MAX(max_houses_suspended) AS houses_suspended,
+        MAX(max_houses_published) AS houses_published,
+        MAX(max_houses_in_edition) AS houses_in_edition,
+        MAX(max_houses_opted_out) AS houses_opted_out,
+        MAX(max_houses_unpublished) AS houses_unpublished,
+        MAX(max_total_houses) AS total_houses FOR classification_window IN (
+          'ACTIVE' AS active,
+          'POTENTIAL' AS two_year_max,
+          'LIFETIME' AS lifetime_max
+        )
+      )
+),
+pp_multi_houses AS (
+  SELECT DISTINCT
+    pms.id_owner,
+    exploded_id_house AS id_house
+  FROM
+    pp_multi_stats AS pms
+    LATERAL VIEW EXPLODE(pms.active_houses) exploded_houses_table AS house_struct
+    LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
+),
+pp_multi_visits AS (
+  SELECT
+    pmh.id_owner,
+    NULLIF(COUNT(b.id), 0) AS total_visits,
+    COUNT_IF(
+      b.status = 'Cancelado'
+      AND b.reason_category = 'Owner'
+    ) AS canceled_visits,
+    COALESCE(canceled_visits / total_visits, 0) AS owner_cancellation_rate
+  FROM
+    pp_multi_houses AS pmh
+      JOIN
+        datalake_booking.booking AS b
+          ON pmh.id_house = b.id_house
   WHERE
-    MAKE_DATE(ohs.year, ohs.month, ohs.day) = DATE('{load_start_date}')
-  GROUP BY ALL
-),
-
-two_year_max AS (
-  SELECT
-    ohs.id_owner,
-    MAX(ohs.ongoing_houses) AS max_ongoing_houses
-  FROM
-    ongoing_houses_stats AS ohs
-  WHERE
-    MAKE_DATE(ohs.year, ohs.month, ohs.day) = DATE('{load_start_date}') - INTERVAL '2' YEAR
-  GROUP BY ALL
-),
-
-
-lifetime_max AS (
-  SELECT
-    ohs.id_owner,
-    MAX(ohs.ongoing_houses) AS max_ongoing_houses
-  FROM
-    ongoing_houses_stats AS ohs
-  GROUP BY ALL
+    b.is_visit = TRUE
+    AND b.ts_booking_utc >= DATE('{load_start_date}') - INTERVAL '150' DAYS
+  GROUP BY
+    pmh.id_owner
 )
-
 SELECT
-  ys.id_owner,
+  pms.id_owner,
+  ---
   CASE
-    WHEN
-      COALESCE(ys.ongoing_houses, 0) >= 5
-    THEN 
-      'ACTIVE'
-    WHEN 
-      COALESCE(tym.max_ongoing_houses, 0) >= 5
-    THEN
-      'POTENTIAL'
+    WHEN pms.active_ongoing_houses >= 5 THEN 'ACTIVE'
+    WHEN pms.two_year_max_ongoing_houses >= 5 THEN 'POTENTIAL'
     ELSE 'LIFETIME'
   END AS pp_multi_classification,
-  COALESCE(ys.ongoing_houses, 0) AS ongoing_houses,
-  COALESCE(tym.max_ongoing_houses, 0) AS max_ongoing_houses_in_two_years,
-  COALESCE(lm.max_ongoing_houses, 0) AS max_ongoing_houses_in_lifetime,
-  COALESCE(vlm.visits_booked, 0) AS visits_booked_last_month,
-  COALESCE(vlm.visits_completed, 0) AS visits_completed_last_month
+  ---
+  pms.active_houses AS houses,
+  pms.two_year_max_houses,
+  pms.lifetime_max_houses,
+  ---
+  COALESCE(pms.active_ongoing_houses, 0) AS ongoing_houses,
+  COALESCE(pms.active_houses_in_edition, 0) AS houses_in_edition,
+  COALESCE(pms.active_houses_opted_out, 0) AS houses_opted_out,
+  COALESCE(pms.active_houses_published, 0) AS houses_published,
+  COALESCE(pms.active_houses_suspended, 0) AS houses_suspended,
+  COALESCE(pms.active_houses_rented, 0) AS houses_rented,
+  COALESCE(pms.active_houses_unpublished, 0) AS houses_unpublished,
+  COALESCE(pms.active_total_houses, 0) AS total_houses,
+  ---
+  COALESCE(pms.two_year_max_ongoing_houses, 0) AS two_year_max_ongoing_houses,
+  COALESCE(pms.two_year_max_houses_in_edition, 0) AS two_year_max_houses_in_edition,
+  COALESCE(pms.two_year_max_houses_opted_out, 0) AS two_year_max_houses_opted_out,
+  COALESCE(pms.two_year_max_houses_published, 0) AS two_year_max_houses_published,
+  COALESCE(pms.two_year_max_houses_suspended, 0) AS two_year_max_houses_suspended,
+  COALESCE(pms.two_year_max_houses_rented, 0) AS two_year_max_houses_rented,
+  COALESCE(pms.two_year_max_houses_unpublished, 0) AS two_year_max_houses_unpublished,
+  COALESCE(pms.two_year_max_total_houses, 0) AS two_year_max_total_houses,
+  ---
+  COALESCE(pms.lifetime_max_ongoing_houses, 0) AS lifetime_max_ongoing_houses,
+  COALESCE(pms.lifetime_max_houses_in_edition, 0) AS lifetime_max_houses_in_edition,
+  COALESCE(pms.lifetime_max_houses_opted_out, 0) AS lifetime_max_houses_opted_out,
+  COALESCE(pms.lifetime_max_houses_published, 0) AS lifetime_max_houses_published,
+  COALESCE(pms.lifetime_max_houses_suspended, 0) AS lifetime_max_houses_suspended,
+  COALESCE(pms.lifetime_max_houses_rented, 0) AS lifetime_max_houses_rented,
+  COALESCE(pms.lifetime_max_houses_unpublished, 0) AS lifetime_max_houses_unpublished,
+  COALESCE(pms.lifetime_max_total_houses, 0) AS lifetime_max_total_houses,
+  ---
+  COALESCE(v.total_visits, 0) AS total_visits,
+  COALESCE(v.canceled_visits, 0) AS canceled_visits,
+  COALESCE(v.owner_cancellation_rate, 0) AS owner_cancellation_rate
 FROM
-  lifetime_max AS lm
-LEFT JOIN 
-  yesterday_stats AS ys
-    ON lm.id_owner = ys.id_owner
-LEFT JOIN
-  two_year_max AS tym
-    ON lm.id_owner = tym.id_owner
-LEFT JOIN
-  visits_last_month AS vlm
-    ON lm.id_owner = vlm.id_owner
-WHERE
-  lm.max_ongoing_houses >= 5
+  pp_multi_stats AS pms
+    LEFT JOIN
+      pp_multi_visits AS v
+        ON v.id_owner = pms.id_owner

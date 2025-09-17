@@ -1,26 +1,84 @@
 database_name: datalake_pp_multi
 table_name: pp_multi_classification
 description:
-  This table is used to store the PP Multi classification of Owner Persona. It contains just the users that are classified as ACTIVE or POTENTIAL PP Multi.
+  Owner persona PP Multi classification and supporting metrics. Includes ACTIVE, POTENTIAL and LIFETIME classes,
+  deduplicated houses per listing unique identifier, windowed maximums (active day, last 2 years, lifetime) and
+  visit-based cancellation signals.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
-  sk_owner:
-    description: The key of the owner persona.
+  id_owner:
+    description: Identifier of the owner persona.
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner
   pp_multi_classification:
-    description: The PP Multi classification of the owner persona. Can be ACTIVE or POTENTIAL.
+    description: PP Multi classification of the owner persona.
     categories:
-      "ACTIVE": The owner have more than 5 ongoing houses and at least 1 rented house.
-      "POTENTIAL": The owner at some time had more than 5 ongoing houses and at least 1 rented house.
+      ACTIVE: The owner has at least 5 ongoing houses on the load date.
+      POTENTIAL: The owner had at least 5 ongoing houses at some point in the last two years.
+      LIFETIME: The owner had at least 5 ongoing houses historically, but not in the last two years.
+  houses:
+    description: Array with grouped house information for the ACTIVE snapshot (deduplicated by unique listing id).
+  two_year_max_houses:
+    description: Array with grouped house information for the maximum snapshot over the last two years.
+  lifetime_max_houses:
+    description: Array with grouped house information for the maximum snapshot over the owner's lifetime.
   ongoing_houses:
-    description: The number of ongoing houses of the owner persona.
-  max_ongoing_houses_in_two_years:
-    description: The maximum number of ongoing houses of the owner persona in the last two years.
-  max_ongoing_houses_in_lifetime:
-    description: The maximum number of ongoing houses of the owner persona in the lifetime.
-  visits_booked_last_month:
-    description: The number of visits booked from house listings of the owner persona in the last month.
-  visits_completed_last_month:
-    description: The number of visits completed from house listings of the owner persona in the last month.
+    description: Ongoing houses in the ACTIVE snapshot (RENTED, SUSPENDED, PUBLISHED).
+  houses_in_edition:
+    description: Houses in EDITING in the ACTIVE snapshot.
+  houses_opted_out:
+    description: Houses in OPTED_OUT in the ACTIVE snapshot.
+  houses_published:
+    description: Houses in PUBLISHED in the ACTIVE snapshot.
+  houses_suspended:
+    description: Houses in SUSPENDED in the ACTIVE snapshot.
+  houses_rented:
+    description: Houses in RENTED in the ACTIVE snapshot.
+  houses_unpublished:
+    description: Houses in UNPUBLISHED in the ACTIVE snapshot.
+  total_houses:
+    description: Total distinct houses in the ACTIVE snapshot (post-deduplication).
+  two_year_max_ongoing_houses:
+    description: Maximum ongoing houses over the last two years.
+  two_year_max_houses_in_edition:
+    description: Maximum houses in EDITING over the last two years.
+  two_year_max_houses_opted_out:
+    description: Maximum houses in OPTED_OUT over the last two years.
+  two_year_max_houses_published:
+    description: Maximum houses in PUBLISHED over the last two years.
+  two_year_max_houses_suspended:
+    description: Maximum houses in SUSPENDED over the last two years.
+  two_year_max_houses_rented:
+    description: Maximum houses in RENTED over the last two years.
+  two_year_max_houses_unpublished:
+    description: Maximum houses in UNPUBLISHED over the last two years.
+  two_year_max_total_houses:
+    description: Maximum total distinct houses over the last two years (post-deduplication).
+  lifetime_max_ongoing_houses:
+    description: Maximum ongoing houses over the owner's lifetime.
+  lifetime_max_houses_in_edition:
+    description: Maximum houses in EDITING over the owner's lifetime.
+  lifetime_max_houses_opted_out:
+    description: Maximum houses in OPTED_OUT over the owner's lifetime.
+  lifetime_max_houses_published:
+    description: Maximum houses in PUBLISHED over the owner's lifetime.
+  lifetime_max_houses_suspended:
+    description: Maximum houses in SUSPENDED over the owner's lifetime.
+  lifetime_max_houses_rented:
+    description: Maximum houses in RENTED over the owner's lifetime.
+  lifetime_max_houses_unpublished:
+    description: Maximum houses in UNPUBLISHED over the owner's lifetime.
+  lifetime_max_total_houses:
+    description: Maximum total distinct houses over the owner's lifetime (post-deduplication).
+  total_visits:
+    lineage:
+      - datalake_booking.booking.id
+    description: Number of visits in the last 150 days for the owner's active houses.
+  canceled_visits:
+    lineage:
+      - datalake_booking.booking.status
+      - datalake_booking.booking.reason_category
+    description: Number of visits canceled by Owner in the last 150 days.
+  owner_cancellation_rate:
+    description: Ratio of canceled to total visits (0 when there are no visits).
