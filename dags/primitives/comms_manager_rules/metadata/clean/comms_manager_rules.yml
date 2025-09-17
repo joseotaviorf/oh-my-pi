@@ -1,0 +1,107 @@
+database_name: datalake_comms_manager_clean
+domain: Primitives
+owner: eduardo.soares@quintoandar.com.br
+description: >
+  Communication manager notification rules table containing business rules and actions for automated customer communications across the QuintoAndar platform. Each record represents a unique rule-action combination that defines when, how, and what communications should be sent to users based on their context, journey step, and profile. The table includes rule definitions, action specifications, message templates, and metadata for comprehensive communication orchestration.
+table_name: comms_manager_rules
+columns:
+  id_rule:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.rule_id
+    description: Unique identifier of the communication rule. Primary key for rule identification and serves as the main reference for rule management and tracking across the communication system.
+  id_action:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.action_id
+    description: Unique identifier of the specific action within a rule. Combined with id_rule forms the composite primary key, as each rule can have multiple actions (email, SMS, push notification, etc.).
+  status:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.status
+    description: Current operational status of the communication rule (active, inactive, draft, archived). Determines whether the rule is eligible for execution in the communication engine.
+  business_context:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.business_context
+    description: Business domain context for the communication rule (rental, sale, services, support). Used for rule categorization and business line segmentation in communication strategies.
+  category:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.category
+    description: Communication category classification (notification, marketing, transactional, reminder). Helps organize and filter rules by communication purpose and regulatory requirements.
+  company:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.company
+    description: Company or brand identifier associated with the communication rule (quintoandar, loft, etc.). Enables multi-brand communication management within the same platform.
+  context:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.context
+    description: Specific user or business context where the rule applies (tenant, landlord, agent, visitor). Defines the target audience segment for the communication.
+  cost_center:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.cost_center
+    description: Cost center responsible for the communication expenses. Used for budget allocation, cost tracking, and financial reporting of communication campaigns.
+  journey_step:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.journey_step
+    description: Specific step in the customer journey where the communication is triggered (onboarding, viewing, application, contract_signing, move_in). Critical for journey-based marketing automation.
+  line:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.line
+    description: Business line identifier (for_rent, for_sale, services). Used for business line specific communication strategies and performance tracking.
+  rule_profile:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.rule_profile
+    description: Profile or persona associated with the rule scope (tenant, landlord, agent, lead). Defines the primary target profile for rule application and segmentation.
+  team:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.team
+    description: Team or department responsible for managing the communication rule (growth, operations, customer_success). Used for ownership and accountability in rule management.
+  notification_type:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.notification_type
+    description: Type of notification channel for the action (email, sms, push_notification, in_app, whatsapp). Determines the delivery mechanism for the communication.
+  action_profile:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.action_profile
+    description: Specific profile or persona targeted by the action. Can differ from rule_profile to enable cross-profile communications (e.g., rule for tenant but action targets landlord).
+  reason:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.reason
+    description: Business reason or trigger for the communication action (welcome, reminder, confirmation, alert, promotion). Provides context for why the communication is being sent.
+  deep_link:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.deep_link
+    description: Deep link URL to direct users to specific app screens or web pages. Enhances user experience by providing direct navigation to relevant content or actions.
+  subject_template:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.subject_template
+    description: Template for email subject line with placeholder variables. Supports dynamic content generation using user and context-specific data for personalized communications.
+  body_template:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.body_template
+    description: Template for the main communication body content with placeholder variables. Core template for message content that gets personalized with user-specific information.
+  body_template_path:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.body_template_path
+    description: File system path to external template files for complex message layouts. Used for rich HTML templates or when template content is managed in separate files.
+  subject_content:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.subject_content
+    description: Pre-rendered or static subject line content. Used when dynamic templating is not required or as fallback content for subject lines.
+  body_content:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.body_content
+    description: Pre-rendered or static body content for the communication. Used for simple messages or as fallback content when dynamic templating fails.
+  ts_export_generated_at:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.generated_at
+    description: Timestamp when the rule configuration was generated or exported from the communication management system. Used for version control and change tracking of rule configurations.
+  year:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.generated_at
+    description: Year extracted from the rule generation timestamp. Used for data partitioning and time-based analysis of rule configurations and performance.
+  month:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.generated_at
+    description: Month extracted from the rule generation timestamp. Used for data partitioning and monthly analysis of communication rule changes and effectiveness.
+  day:
+    lineage:
+      - datalake_comms_manager_raw.comms_manager_rules.generated_at
+    description: Day extracted from the rule generation timestamp. Used for data partitioning and daily tracking of rule configuration updates and deployment cycles.
