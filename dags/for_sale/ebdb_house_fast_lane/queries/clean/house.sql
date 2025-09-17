@@ -1,5 +1,7 @@
 SELECT
     id,
+    usuario_id AS id_user,
+    regiao_id AS id_region,
     aluguel AS rent,
     andar AS floor,
     andaresPredio AS building_floors,
@@ -42,7 +44,6 @@ SELECT
     tipoVagas AS parking_slot_type,
     verificado AS is_verified,
     estado_id AS id_state,
-    usuario_id AS id_user,
     codigoPromocao AS promotion_code,
     cotarSeguro AS is_quote_insurance_needed,
     valorTotal AS total_value,
@@ -99,7 +100,6 @@ SELECT
     ultimoEmailDeConfirmacaoEnviado AS last_confirmation_email_sent,
     latlng AS lat_lng,
     ultimoUpdateIndice AS ts_last_index_update,
-    regiao_id AS id_region,
     titulo AS title,
     atualizadoEm AS ts_updated,
     condominioPai_id AS id_condo_parent,
