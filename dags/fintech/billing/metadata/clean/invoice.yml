@@ -19,6 +19,10 @@ columns:
     description: Identifier of the source invoice
     lineage:
       - datalake_billing_raw.invoice.source_invoice_id
+  id_original:
+    description: Identifier of the retsuko invoice
+    lineage:
+      - datalake_billing_raw.invoice.payload
   account_type:
     description: Type of the related account
     lineage:
