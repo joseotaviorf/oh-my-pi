@@ -256,9 +256,12 @@ SELECT DISTINCT -- There are duplicates in the source table
     AND month = MONTH(DATE('{load_start_date}'))
     -- Filtering out car-related keywords
     AND url NOT LIKE '%tabela-fipe%'
+    AND url NOT LIKE '%fipe%'
     AND url NOT LIKE '%moto%'            
     AND url NOT LIKE '%carro%'          
-    AND url NOT LIKE '%concessionaria%'  
+    AND url NOT LIKE '%concessionaria%'
+    AND url NOT LIKE '%/noticias-automotivas/%'
+    AND url NOT LIKE '%/revenda/%'
     AND url NOT LIKE '%/suv/%'
     AND url NOT LIKE '%/hatch%'
     AND url NOT LIKE '%/seda%'          
