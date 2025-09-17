@@ -98,6 +98,7 @@ contract_features AS (
         COUNT(CASE WHEN invoice_type IN ('monthly') AND dt_reference = dt_begin THEN sk_invoice ELSE NULL END) AS n_monthly_invoices_created,
         COUNT(DISTINCT sk_invoice) AS n_invoices_in_wallet_total
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
+    WHERE dt_reference BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY 1, 2
 ),
 get_invoice_date_range AS (
@@ -119,9 +120,9 @@ get_date_array AS (
             IF(dt_contract_end IS NOT NULL,
                 LEAST(
                     GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
-                    CURRENT_DATE()
+                    DATE('{load_end_date}')
                 ),
-                CURRENT_DATE()
+                DATE('{load_end_date}')
             )
         ) AS dt_reference_array
     FROM get_invoice_date_range
@@ -144,7 +145,8 @@ invoices AS (
     FROM datalake_retsuko.invoice
     WHERE purpose = 'monthly'
         AND due_amount < 0
-        AND DATE(DATE_TRUNC('MONTH', ts_due)) >= DATE('2023-01-01')
+        AND DATE(DATE_TRUNC('MONTH', ts_due))
+            BETWEEN DATE(DATE_TRUNC('MONTH', DATE('{load_start_date}'))) AND LAST_DAY(DATE('{load_end_date}'))
 ),
 pipeline_dates AS (
     SELECT
@@ -317,8 +319,8 @@ fact_collection_base AS (
         SUM(total_alo) AS alo,
         SUM(total_cpc) AS cpc
     FROM dw_collection_recovery_quintoandar.fact_collection
-    WHERE DATE(dt_occurrence) >= DATE('2023-01-01')
-        AND DATE(dt_occurrence) <= CURRENT_DATE()
+    WHERE DATE(dt_occurrence) >= DATE('{load_start_date}')
+        AND DATE(dt_occurrence) <= DATE('{load_end_date}')
     GROUP BY 1,2
 ),
 collections_efforts AS (
@@ -351,7 +353,8 @@ app_events_features AS (
         END) > 0 AS BOOLEAN) AS has_app_events_overdue
     FROM datalake_collections_quintoandar.delinquency_app_events
     WHERE id_contract IS NOT NULL
-        AND DATE(ts_event) >= DATE('2023-01-01')
+        AND DATE(ts_event) >= DATE('{load_start_date}')
+        AND DATE(ts_event) <= DATE('{load_end_date}')
     GROUP BY 1, 2
 ),
 contract_blocklist_timeline AS (
@@ -369,7 +372,7 @@ contract_blocklist_timeline AS (
     LATERAL VIEW EXPLODE(
         SEQUENCE(
             DATE(ts_created),
-            IF(is_blocked, CURRENT_DATE(), DATE(ts_updated))
+            IF(is_blocked, DATE('{load_end_date}'), DATE(ts_updated))
         )) AS dt_reference
     WHERE
         (id_debtor_external > 1
@@ -388,7 +391,7 @@ base_evictions AS (
         datalake_gsheets_clean.evictions_base
     WHERE
         DATE(dt_registered) IS NOT NULL
-        AND DATE(dt_registered) >= DATE('2023-01-01')
+        AND DATE(dt_registered) BETWEEN DATE('2023-01-01') AND DATE('{load_end_date}')
         AND (
             DATE(dt_elaw_closure) > LEAST(DATE(dt_registered), DATE(dt_arbitral_distribution))
             OR DATE(dt_elaw_closure) IS NULL
@@ -399,7 +402,7 @@ evictions_with_date_array AS (
         *,
         SEQUENCE(
             GREATEST(dt_begin, DATE('2023-01-01')),
-            LEAST(COALESCE(DATE(dt_elaw_closure), CURRENT_DATE()), CURRENT_DATE())
+            LEAST(COALESCE(DATE(dt_elaw_closure), DATE('{load_end_date}')), DATE('{load_end_date}'))
         ) AS dt_reference_array
     FROM base_evictions
 ),
@@ -519,8 +522,7 @@ base_negotiations AS (
             'broken',
             'finished',
             'canceled')
-        AND DATE(dt_promisse) >= DATE('2023-01-01')
-        AND DATE(dt_promisse) <= CURRENT_DATE()
+        AND DATE(dt_promisse) <= DATE('{load_end_date}')
     GROUP BY 1,2
 ),
 negotiations AS (

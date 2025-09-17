@@ -10,6 +10,11 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: collections_segmentation
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   inner_dependencies:
     fact_contract_features_timeline:
       - fact_contract_wallet_timeline
@@ -18,13 +23,10 @@ workflow:
   tables_customization:
     fact_invoice_wallet_timeline:
       z_order_by: [dt_reference, sk_contract, sk_invoice]
-      partitions: [year, month, day]
     fact_contract_wallet_timeline:
       z_order_by: [dt_reference, sk_contract]
-      partitions: [year, month, day]
     fact_contract_features_timeline:
       z_order_by: [dt_reference, sk_contract]
-      partitions: [year, month, day]
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -32,5 +34,3 @@ cluster:
     node_type_id: m5d.8xlarge
     spark_version: 13.3.x-scala2.12
     num_workers: 4
-    spark_conf:
-      spark.sql.sources.partitionOverwriteMode: static

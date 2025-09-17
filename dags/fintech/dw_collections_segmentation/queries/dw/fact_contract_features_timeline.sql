@@ -613,3 +613,5 @@ SELECT
     DAY(f.dt_reference) AS day,
     NOW() AS ts_load
 FROM segmentation_features AS f
+WHERE f.dt_reference >= DATE('{load_start_date}')
+    AND f.dt_reference <= DATE('{load_end_date}')

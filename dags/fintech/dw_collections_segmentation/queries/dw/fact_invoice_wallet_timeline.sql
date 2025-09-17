@@ -75,10 +75,7 @@ base AS (
         i.dt_created_negotiation_parent,
         DATE(i.ts_paid) AS dt_paid,
         DATE(i.ts_created) AS dt_created,
-        CASE
-            WHEN i.ts_paid IS NOT NULL THEN LEAST(DATE(i.ts_created), DATE(i.ts_paid))
-            ELSE DATE(i.ts_created)
-        END AS dt_begin
+        LEAST(DATE(i.ts_created), COALESCE(DATE(i.ts_paid), DATE(i.ts_created))) AS dt_begin
     FROM datalake_collections_quintoandar.invoice_portfolio AS i
     LEFT JOIN add_bill_items_flags as d
         ON d.id_invoice = i.id_invoice
@@ -88,12 +85,13 @@ base AS (
       AND (i.negotiation_installment_number IS NULL
         OR (i.negotiation_installment_number > 1
             AND COALESCE(i.negotiation_promisse_payment_method, 'UNFOUND') <> 'CREDIT-CARD'))
+
 ),
 days_array AS (
     SELECT
         id_contract,
         id_invoice,
-        SEQUENCE(dt_begin, COALESCE(dt_paid, CURRENT_DATE())) AS dt_reference_array
+        SEQUENCE(dt_begin, COALESCE(dt_paid, DATE('{load_end_date}'))) AS dt_reference_array
     FROM base
 ),
 date_range AS (
@@ -103,6 +101,7 @@ date_range AS (
         dt_reference
     FROM days_array
     LATERAL VIEW EXPLODE(dt_reference_array) AS dt_reference
+    WHERE dt_reference BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 invoice_timeline AS (
     SELECT
@@ -190,7 +189,6 @@ invoice_timeline AS (
     FROM date_range AS asdt
     LEFT JOIN base rdb
       ON rdb.id_invoice = asdt.id_invoice AND rdb.id_contract = asdt.id_contract
-    WHERE asdt.dt_reference >= date('2023-01-01')
 ),
 contract_flags AS (
     SELECT
