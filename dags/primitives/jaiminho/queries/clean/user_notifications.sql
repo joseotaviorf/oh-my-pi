@@ -18,6 +18,8 @@ SELECT
 	ccost AS cost_center,
 	scope,
 	notificationCenterAcknowledge AS notification_center_acknowledge,
+	errorInfo AS error_info,
+	errorCode AS error_code,
 	CAST(COALESCE(sentAt, sent_at) AS TIMESTAMP) AS ts_sent,
 	CAST(COALESCE(createdAt, created_at) AS TIMESTAMP) AS ts_created,
 	CAST(COALESCE(updatedAt, updated_at) AS TIMESTAMP) AS ts_updated,

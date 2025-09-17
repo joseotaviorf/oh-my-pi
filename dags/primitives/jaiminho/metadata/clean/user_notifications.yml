@@ -85,6 +85,14 @@ columns:
     description: Acknowledgment status for notifications displayed in the notification center.
     lineage:
       - datalake_jaiminho_raw.user_notifications.notificationCenterAcknowledge
+  error_info:
+    description: Description of the error associated with the failure status.
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.errorInfo
+  error_code:
+    description: Code of the error associated with the failure status.
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.errorCode
   ts_sent:
     description: Timestamp when the notification was sent to the user.
     lineage:
