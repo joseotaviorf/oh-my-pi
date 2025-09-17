@@ -32,11 +32,17 @@ get_contract_by_month AS (
     imovel_id AS id_house,
     garantia AS guarantee_type,
     status,
+    CASE
+      WHEN op_cdc = 'c' THEN "CREATE"
+      WHEN op_cdc = 'r' THEN "READ"
+      WHEN op_cdc = 'u' THEN "UPDATE"
+      WHEN op_cdc = 'd' THEN "DELETE"
+    END AS log_type,
     dataRescisao AS dt_termination,
     dataInicio AS dt_started,
     dataAssinado AS ts_signature,
     ts_database_transaction,
-    ts_cdc_transaction AS ts_snapshot,
+    ts_cdc_transaction,
     year,
     month,
     day
@@ -49,13 +55,14 @@ SELECT
   h.city,
   c.guarantee_type AS guarantee,
   c.status,
+  c.log_type,
   c.dt_termination AS dt_termination_original,
   IF(t.status = 'DONE' AND c.dt_termination > DATE('2020-01-07'), t.dt_vacancy, c.dt_termination) AS dt_annulment,
   c.dt_started,
   c.ts_signature,
   CAST(aad.ts_analyst_annulment_input AS TIMESTAMP) AS ts_analyst_annulment_input,
   c.ts_database_transaction,
-  c.ts_snapshot,
+  c.ts_cdc_transaction,
   c.year,
   c.month,
   c.day,
