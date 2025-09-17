@@ -489,6 +489,11 @@ def schema_define():
                             StructField("TaskManagement__c", StringType()),
                             StructField("WasDisagreement__c", StringType()),
                             StructField("UnlistingReason__c", StringType()),
+                            StructField("CommunicationTask__c", StringType()),
+                            StructField("HSMSent__c", StringType()),
+                            StructField("SourceTask__c", StringType()),
+                            StructField("EmailSent__c", StringType()),
+                            StructField("CommunicationStatus__c", StringType()),
                         ]
                     )
             },

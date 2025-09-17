@@ -36,6 +36,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.FeedItemId
     description: Feed item identification key associated with the task.
+  id_source_task:
+    lineage:
+      - datalake_salesforce_raw.task.SourceTask__c
+    description: Custom field to record the ID of the task that originated another.
   who_count:
     lineage:
       - datalake_salesforce_raw.task.WhoCount
@@ -176,6 +180,30 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.ContractIdOddOrEven
     description: Descriptive column indicating if the case contract ID is odd or even.
+  communication_task:
+    lineage:
+      - datalake_salesforce_raw.task.CommunicationTask
+    description: Picklist field that identifies whether the task is linked to an HSM submission.
+    categories:
+      AgentTask: "This value is when an error occurs while sending and returns to the agent's action."
+      HSMAutomation: "Sending HSM Whatsapp."
+      EmailAutomation: "Sending email."
+  communication_status:
+    lineage:
+      - datalake_salesforce_raw.task.CommunicationStatus
+    description: Indicates the sending status of the HSM message associated with the task.
+    categories:
+      Sent: "The message was transmitted successfully."
+      Pending: "The message is waiting to be sent or processed."
+      Error: "There was a failure to send or the return was error."
+  is_hsm_sent:
+    lineage:
+      - datalake_salesforce_raw.task.HSMSent
+    description: Indicates if the task is an HSM sent.
+  is_email_sent:
+    lineage:
+      - datalake_salesforce_raw.task.EmailSent
+    description: Indicates if the task is an email sent.
   responsability_contesting_is_good:
     lineage:
       - datalake_salesforce_raw.task.ResponsabilityContestingIsGood
