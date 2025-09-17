@@ -83,7 +83,7 @@ phone_number AS (
   QUALIFY ROW_NUMBER() OVER (PARTITION BY c.id_task ORDER BY s.ts_created DESC) = 1
   UNION ALL
   SELECT DISTINCT
-    c.id_task,
+    ca.id_task,
     CASE
       WHEN ca.direction = 'inbound' THEN to_phone_number
       WHEN ca.direction = 'outbound' THEN from_phone_number
