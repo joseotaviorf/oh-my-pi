@@ -18,4 +18,4 @@ SELECT
   lastPublicationDate AS ts_last_publication,
   lastStatusChangedAt AS ts_last_status_changed
 FROM
-  datalake_ebdb_test_raw.listingbusinesscontext
+  datalake_ebdb_raw.listingbusinesscontext

@@ -25,7 +25,7 @@ columns:
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
-      - datalake_ebdb_test_clean.listing_business_context.id
+      - datalake_ebdb_clean.listing_business_context.id
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique.
@@ -35,7 +35,7 @@ columns:
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
-      - datalake_ebdb_test_clean.listing_business_context.id
+      - datalake_ebdb_clean.listing_business_context.id
     description:
       The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
@@ -44,7 +44,7 @@ columns:
       - core_visit.visit.id_house
       - core_offer.offer.id_house
       - core_contract.contract.id_house
-      - datalake_ebdb_test_clean.listing_business_context.id_house
+      - datalake_ebdb_clean.listing_business_context.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     lineage:
@@ -91,7 +91,7 @@ columns:
   business_context:
     lineage:
       - core_visit.visit.business_context
-      - datalake_ebdb_test_clean.listing_business_context.business_context
+      - datalake_ebdb_clean.listing_business_context.business_context
     description: Business context that categorizes the type of transaction or interaction.
       This field indicates whether the entity is related to rental (RENT) or sale (SALE) operations,
       helping to differentiate business flows and customer journeys within our platform.
@@ -124,7 +124,7 @@ columns:
       - core_offer.offer.ts_created
       - core_contract.contract.ts_created
       - datalake_terminator_clean.termination.ts_created
-      - datalake_ebdb_test_clean.listing_business_context.ts_created
+      - datalake_ebdb_clean.listing_business_context.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
@@ -132,7 +132,7 @@ columns:
       - core_offer.offer.ts_updated
       - core_contract.contract.ts_updated
       - datalake_terminator_clean.termination.ts_updated
-      - datalake_ebdb_test_clean.listing_business_context.ts_updated
+      - datalake_ebdb_clean.listing_business_context.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.

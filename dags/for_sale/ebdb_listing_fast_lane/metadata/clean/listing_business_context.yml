@@ -1,4 +1,4 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: listing_business_context
 description: Information about house listings for both Rent and Sale business contexts in the fast lane processing.
   This table contains the core listing configuration, status information, and business context that drives property availability and marketplace behavior.
@@ -7,22 +7,22 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.id
+      - datalake_ebdb_raw.listingbusinesscontext.id
     description: Unique identifier for the listing business context record, serving as the primary key for tracking specific listing configurations.
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.imovelid
+      - datalake_ebdb_raw.listingbusinesscontext.imovelid
     description: Foreign key reference to the house being listed, linking this listing context to specific property records in the system.
   business_context:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.businesscontext
+      - datalake_ebdb_raw.listingbusinesscontext.businesscontext
     description: Business context categorizing the type of transaction or listing purpose, fundamental for routing and business logic.
     categories:
       RENT: The listing is configured for rental transactions, enabling rental-specific features and workflows.
       SALE: The listing is configured for sale transactions, enabling sale-specific features and workflows.
   status:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.status
+      - datalake_ebdb_raw.listingbusinesscontext.status
     description: Current operational status of the listing, indicating whether it's under edition, published, or in specific workflow states.
     categories:
       EDITING: The listing is under edition, not published yet.
@@ -32,60 +32,60 @@ columns:
       OPTED_OUT: The owner of the listing has opted out of the platform.
   status_reason:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.statusreason
+      - datalake_ebdb_raw.listingbusinesscontext.statusreason
     description: Detailed reason or explanation for the current listing status, providing context for operational decisions.
   status_closing:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.closingstatus
+      - datalake_ebdb_raw.listingbusinesscontext.closingstatus
     description: Specific status information related to the closing or completion phase of the ForSale listing lifecycle.
   suspension_reason:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.suspensionreason
+      - datalake_ebdb_raw.listingbusinesscontext.suspensionreason
     description: Reason for listing suspension when the listing has been temporarily or permanently removed from our platform.
   short_url:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.shorturl
+      - datalake_ebdb_raw.listingbusinesscontext.shorturl
     description: Shortened URL for easy sharing and marketing of the property listing, used in marketing campaigns and communications.
   calculator_price:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.calculatorprice
+      - datalake_ebdb_raw.listingbusinesscontext.calculatorprice
     description: System-calculated price for the property, used for pricing recommendations and market analysis.
   version:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.version
+      - datalake_ebdb_raw.listingbusinesscontext.version
     description: Version number for tracking changes and updates to the listing configuration over time.
   selected_action:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.selectedaction
+      - datalake_ebdb_raw.listingbusinesscontext.selectedaction
     description: Currently selected or active action for this listing, determining the operational workflow and user interface behavior.
   ownership:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.ownership
+      - datalake_ebdb_raw.listingbusinesscontext.ownership
     description: Ownership model for the listing, indicating how the property is managed and what services are provided.
     categories:
       STANDARD: The listing is standard, owned by QuintoAndar's platform.
       THIRD_PARTY: The listing is third party, owned by a third party partner.
   deal_objective:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.dealobjective
+      - datalake_ebdb_raw.listingbusinesscontext.dealobjective
     description: Primary objective or goal for this listing deal, influencing pricing strategies and marketing approaches.
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.criadoem
+      - datalake_ebdb_raw.listingbusinesscontext.criadoem
     description: Timestamp when the listing business context was initially created in the system.
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.atualizadoem
+      - datalake_ebdb_raw.listingbusinesscontext.atualizadoem
     description: Timestamp of the most recent update to the listing business context, used for tracking data freshness and change management.
   ts_first_publication:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.firstpublicationdate
+      - datalake_ebdb_raw.listingbusinesscontext.firstpublicationdate
     description: Timestamp when the listing was first published and made available to the public marketplace.
   ts_last_publication:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.lastpublicationdate
+      - datalake_ebdb_raw.listingbusinesscontext.lastpublicationdate
     description: Timestamp of the most recent publication or republication of the listing to the marketplace.
   ts_last_status_changed:
     lineage:
-      - datalake_ebdb_test_raw.listingbusinesscontext.laststatuschangedat
+      - datalake_ebdb_raw.listingbusinesscontext.laststatuschangedat
     description: Timestamp when the listing status was last modified, essential for tracking operational workflow changes and analytics.

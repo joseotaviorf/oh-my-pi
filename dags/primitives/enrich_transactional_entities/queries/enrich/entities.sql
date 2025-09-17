@@ -255,7 +255,7 @@ listing AS (
             lbc.ts_created,
             lbc.ts_updated
         FROM
-            datalake_ebdb_test_clean.listing_business_context AS lbc
+            datalake_ebdb_clean.listing_business_context AS lbc
         LEFT JOIN
             datalake_ebdb_clean.house AS h
                 ON h.id = lbc.id_house
