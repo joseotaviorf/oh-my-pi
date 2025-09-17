@@ -4,7 +4,8 @@ invoice_range AS (
         id_invoice,
         DATE(MIN(ts_database_transaction)) AS dt_first_transaction,
         DATE(COALESCE(
-                MAX(CASE WHEN ts_paid IS NOT NULL THEN ts_database_transaction END),
+                MAX(CASE WHEN ts_paid IS NOT NULL
+                    OR ts_canceled IS NOT NULL THEN ts_database_transaction END),
                 DATE('{load_end_date}')
         )) AS dt_last_transaction
     FROM datalake_collections_aud.invoice_aud
