@@ -140,7 +140,7 @@ mid_table AS (
     r.id_task,
     r.gclid,
     r.fbclid,
-    COALESCE(r.ctwa_clid, pn.ctwa_clid) as ctwa_clid,
+    COALESCE(r.ctwa_clid, pn.ctwa_clid) AS ctwa_clid,
     pn.quinto_andar_phone_number,
     pn.id_source_ctwa,
     pn.url_source_ctwa,
