@@ -1,6 +1,25 @@
-WITH tickets AS (
-  SELECT
+WITH first_last_infos AS (
+  SELECT DISTINCT
     id_ticket,
+    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_group_name,
+    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_group_name,
+    FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_name,
+    FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_name,
+    FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_email,
+    FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_email,
+    FIRST(analyst_phone) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_phone,
+    FIRST(analyst_phone) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_phone,
+    FIRST(analyst_organization) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_organization,
+    FIRST(analyst_organization) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_organization
+  FROM
+    datalake_zendesk.tickets
+  WHERE
+    ts_updated >= DATE('{load_start_date}')
+    AND id_assignee IS NOT NULL
+), 
+tickets AS (
+  SELECT
+    t.id_ticket,
     id_ticket_form,
     id_assignee,
     id_requester,
@@ -15,14 +34,14 @@ WITH tickets AS (
     id_house_so,
     id_house_aq,
     group_name,
-    FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_name,
-    FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_name,
-    FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_email,
-    FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_email,
-    FIRST(analyst_phone) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_phone,
-    FIRST(analyst_phone) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_phone,
-    FIRST(analyst_organization) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_organization,
-    FIRST(analyst_organization) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_organization,
+    fli.first_analyst_name,
+    fli.last_analyst_name,
+    fli.first_analyst_email,
+    fli.last_analyst_email,
+    fli.first_analyst_phone,
+    fli.last_analyst_phone,
+    fli.first_analyst_organization,
+    fli.last_analyst_organization,
     analyst_name,
     analyst_email,
     analyst_phone,
@@ -102,12 +121,13 @@ WITH tickets AS (
     month,
     day
   FROM
-    datalake_zendesk.tickets
+    datalake_zendesk.tickets AS t
+  LEFT JOIN first_last_infos AS fli
+    ON t.id_ticket = fli.id_ticket
   WHERE
     ts_updated >= DATE('{load_start_date}')
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
-)
+    ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1)
 SELECT
   t.id_ticket,
   t.id_ticket_form,
