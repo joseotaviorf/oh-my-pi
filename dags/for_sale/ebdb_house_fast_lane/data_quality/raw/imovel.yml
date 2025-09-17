@@ -1,0 +1,21 @@
+---
+table_name: datalake_ebdb_test_raw.imovel
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  usuario_id:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Error
+  regiao_id:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Error
+  status:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
