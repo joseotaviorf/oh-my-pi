@@ -312,8 +312,8 @@ WHERE
       'Reparos PP Multi [BACK]',
       'ReparAção Comum [BACK]',
       'Reembolso de Reparos [Back]',
-      '[Porto] Triagem',
-      '[Porto] Atendimento'
+      'Atendimento [Porto]',
+      'Atendimento [Porto]'
     )
   AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
   AND tc.channel NOT IN ('call', 'whatsapp')

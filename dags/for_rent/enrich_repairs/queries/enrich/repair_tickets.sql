@@ -330,8 +330,8 @@ WHERE
     'Reparos PP Multi [BACK]',
     'ReparAção Comum [BACK]',
     'Reembolso de Reparos [Back]',
-    '[Porto] Triagem',
-    '[Porto] Atendimento'
+    'Atendimento [Porto]',
+    'Atendimento [Porto]'
 )
   AND (
     tc.ts_created >= DATE('{load_start_date}') - INTERVAL 6 MONTH
