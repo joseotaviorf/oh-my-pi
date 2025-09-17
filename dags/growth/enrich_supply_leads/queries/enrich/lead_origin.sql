@@ -68,8 +68,8 @@ lead_origin_amplitude AS (
 ),
 phone_number AS (
   SELECT DISTINCT
-    id_task,
-    twilio_phone_number as quinto_andar_phone_number,
+    c.id_task,
+    c.twilio_phone_number as quinto_andar_phone_number,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') as ctwa_clid,
     COALESCE(c.id_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id')) AS id_source_ctwa,
     COALESCE(c.url_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url')) AS url_source_ctwa,
@@ -83,7 +83,7 @@ phone_number AS (
   QUALIFY ROW_NUMBER() OVER (PARTITION BY c.id_task ORDER BY s.ts_created DESC) = 1
   UNION ALL
   SELECT DISTINCT
-    id_task,
+    c.id_task,
     CASE
       WHEN ca.direction = 'inbound' THEN to_phone_number
       WHEN ca.direction = 'outbound' THEN from_phone_number
