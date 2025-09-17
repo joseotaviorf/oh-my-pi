@@ -1,0 +1,90 @@
+database_name: datalake_facebook_insights_impression_device_clean
+table_name: facebook_insights_832880310585080_impression_device
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: Table of Facebook Insights data with impression device breakdown for account 832880310585080. 
+columns:
+  id_ad:
+    description: The unique ID of the ad you're viewing in reporting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.ad_id
+  id_account:
+    description: The ID number of your ad account, which groups your advertising activity. Your ad account includes your campaigns, ads and billing
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.account_id
+  id_adset:
+    description: The unique ID of the ad set you're viewing in reporting. An ad set is a group of ads that share the same budget, schedule, delivery optimization and targeting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.adset_id
+  id_campaign:
+    description: The unique ID number of the ad campaign you're viewing in reporting. Your campaign contains ad sets and ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.campaign_id
+  account_name:
+    description: The name of the account name you're viewing in reporting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.account_name
+  account_name_snake_case:
+    description: Account name pos string transformation
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.account_name_snake_case
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.account_name_snake_case
+  ad_name:
+    description: The name of the ad you're viewing in reporting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.ad_name
+  adset_name:
+    description: The name of the ad set you're viewing in reporting. An ad set is a group of ads that share the same budget, schedule, delivery optimization and targeting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.adset_name
+  campaign_name:
+    description: The name of the ad campaign you're viewing in reporting. Your campaign contains ad sets and ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.campaign_name
+  impression_device:
+    description: The device where the ad impression was displayed
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.impression_device
+  clicks:
+    description: The number of clicks on your ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.clicks
+  impressions:
+    description: The number of times your ads were on screen
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.impressions
+  inline_link_clicks:
+    description: The number of clicks on links to select destinations or experiences, on or off Facebook-owned properties. Inline link clicks use a fixed 1-day-click attribution window
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.inline_link_clicks
+  spend:
+    description: The estimated total amount of money you've spent on your campaign, ad set or ad during its schedule. This metric is estimated
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.spend
+  actions:
+    description: The number of actions taken on your ads. Actions may include Page likes, app installs, conversions, event responses or link clicks
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.actions
+  dt_start:
+    description: The start date for your data. This is controlled by the date range you've selected for your reporting view
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.date_start
+  dt_stop:
+    description: The end date for your data. This is controlled by the date range you've selected for your reporting view
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.date_stop
+  year:
+    description: Year of dt_start
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.date_start
+  month:
+    description: Month of dt_start
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.date_start
+  day:
+    description: Day of dt_start
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights_832880310585080_impression_device.date_start

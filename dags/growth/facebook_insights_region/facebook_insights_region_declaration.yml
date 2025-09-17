@@ -1,0 +1,71 @@
+dag:
+  name: facebook_insights_region
+  owner: Data Growth
+  schedule_start_date: 2025, 9, 1
+  schedule_interval: "0 3 * * *"
+  documentation:
+    dag_purpose: |
+      Facebook Insights brings our marketing campaigns data from facebook platform by region. 
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_facebook_insights_region_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -27), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+  - "{environment}"       # env
+  - "{bucket}"            # datalake_bucket
+  - "{dag_name}"          # source
+  - "{load_start_date}"   # load_start_date
+  - "{load_end_date}"     # load_end_date
+  - "{partitions}"        # partition_cols
+  tables_customization:
+    facebook_insights_832880310585080_region:
+      extra_spark_job_arguments:
+        - 832880310585080
+        - facebook_insights_832880310585080_region
+        - region
+    facebook_insights_517800565488302_region:
+      extra_spark_job_arguments:
+        - 517800565488302
+        - facebook_insights_517800565488302_region
+        - region
+    facebook_insights_455006745173996_region:
+      extra_spark_job_arguments:
+        - 455006745173996
+        - facebook_insights_455006745173996_region
+        - region
+    facebook_insights_1023497688122195_region:
+      extra_spark_job_arguments:
+        - 1023497688122195
+        - facebook_insights_1023497688122195_region
+        - region
+    facebook_insights_994734287259853_region:
+      extra_spark_job_arguments:
+        - 994734287259853
+        - facebook_insights_994734287259853_region
+        - region
+    facebook_insights_994644903935458_region:
+      extra_spark_job_arguments:
+        - 994644903935458
+        - facebook_insights_994644903935458_region
+        - region
+    facebook_insights_1130906744424280_region:
+      extra_spark_job_arguments:
+        - 1130906744424280
+        - facebook_insights_1130906744424280_region
+        - region
+cluster:
+  type: databricks_13_3_med_memory_on_demand_cluster
+  custom_libraries:
+    - pypi:
+        package: facebook-business==23.0.1
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
