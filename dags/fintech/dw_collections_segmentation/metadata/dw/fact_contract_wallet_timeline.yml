@@ -8,40 +8,60 @@ description: |
   Contains comprehensive contract-level information including evictions, collection efforts, negotiations,
   and aggregated wallet metrics across multiple delay methodologies for collections analysis.
 columns:
-  id_contract:
-    description: Contract identifier
+  sk_contract:
+    description: Contract identifier (surrogate key)
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.id_contract
-  id_process_evictions:
-    description: Eviction process identifier when contract has active eviction
-    lineage:
-      - datalake_gsheets_clean.evictions_base.id_process
-  contract_status_beginning_of_month:
-    description: Contract status at the beginning of the reference month (Active/Finished)
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_contract
+  dt_reference:
+    description: Reference date for the timeline
   reference_contract_status:
     description: Contract status at the reference date (Active/Finished)
-  is_pipeturn_day:
-    description: Flag indicating if reference date is the pipeline turn day for the month
-  is_first_day:
-    description: Flag indicating if reference date is the first day of the month
-  is_last_day:
-    description: Flag indicating if reference date is the last day of the month
-  is_quitacao_t1:
-    description: Flag indicating if contract achieved quitação (full payment) using T1 methodology
-  is_quitacao_t2:
-    description: Flag indicating if contract achieved quitação (full payment) using T2 methodology
-  is_quitacao_t3:
-    description: Flag indicating if contract achieved quitação (full payment) using T3 methodology
-  is_regular_t1:
-    description: Flag indicating if contract is regular (no overdue balance) using T1 methodology
-  is_current_at_month_start_t1:
-    description: Flag indicating if contract was current at month start using T1 methodology
-  num_has_negotiation_in_contract:
-    description: Flag indicating if contract has any negotiation (0 or 1)
-  n_anchor_invoices_not_negativable:
-    description: Number of anchor invoices that are not eligible for negative operations
-  n_invoices_negativable:
-    description: Number of invoices eligible for negative operations
+  max_delay_contaminated_contract_t1:
+    description: Maximum delay with contamination at contract level using T1 methodology
+  max_delay_contaminated_contract_t2:
+    description: Maximum delay with contamination at contract level using T2 methodology
+  max_delay_original_invoices_t1:
+    description: Maximum delay for original invoices using T1 methodology
+  max_delay_deal_invoices_t1:
+    description: Maximum delay for deal invoices using T1 methodology
+  max_delay_original_invoices_t2:
+    description: Maximum delay for original invoices using T2 methodology
+  max_delay_deal_invoices_t2:
+    description: Maximum delay for deal invoices using T2 methodology
+  max_delay_contaminated_contract_t3_losses:
+    description: Maximum delay with contamination for loss calculations using T3 methodology
+  max_open_delay_contaminated_contract_t3_losses:
+    description: Maximum open delay with contamination for loss calculations using T3 methodology
+  n_overdue_monthlys_t1:
+    description: Number of overdue monthly invoices using T1 methodology
+  n_overdue_deals_t1:
+    description: Number of overdue deal invoices using T1 methodology
+  n_overdue_others_t1:
+    description: Number of overdue other invoices using T1 methodology
+  n_overdue_monthlys_t2:
+    description: Number of overdue monthly invoices using T2 methodology
+  n_overdue_deals_t2:
+    description: Number of overdue deal invoices using T2 methodology
+  n_overdue_others_t2:
+    description: Number of overdue other invoices using T2 methodology
+  sum_overdue_monthlys_t2:
+    description: Sum of overdue monthly invoice amounts using T2 methodology
+  sum_overdue_deals_t2:
+    description: Sum of overdue deal invoice amounts using T2 methodology
+  sum_overdue_others_t2:
+    description: Sum of overdue other invoice amounts using T2 methodology
+  has_negotiation_in_contract:
+    description: Flag indicating if contract has any negotiation
+  sum_monthly_overdue_days_paid_t1:
+    description: Sum of days overdue for monthly invoices that were paid using T1 methodology
+  count_monthly_overdue_invoices_paid_t1:
+    description: Count of monthly overdue invoices that were paid using T1 methodology
+  days_since_ending:
+    description: Number of days since contract ended
+  days_since_contract_start:
+    description: Number of days since contract started
+  n_reparos_invoices:
+    description: Number of invoices with repair bill items
   n_condominio_invoices:
     description: Number of invoices with condominium bill items
   n_condominio_open_invoices:
@@ -66,8 +86,6 @@ columns:
     description: Number of open invoices with rental core bill items
   open_rental_core_balance:
     description: Open balance amount for rental core bill items
-  n_reparos_invoices:
-    description: Number of invoices with repair bill items
   n_reparos_open_invoices:
     description: Number of open invoices with repair bill items
   open_reparos_balance:
@@ -90,94 +108,14 @@ columns:
     description: Number of open invoices with other bill items
   open_outros_balance:
     description: Open balance amount for other bill items
-  n_overdue_monthlys_t1:
-    description: Number of overdue monthly invoices using T1 methodology
-  n_overdue_deals_t1:
-    description: Number of overdue deal invoices using T1 methodology
-  n_overdue_others_t1:
-    description: Number of overdue other invoices using T1 methodology
-  n_overdue_monthlys_t2:
-    description: Number of overdue monthly invoices using T2 methodology
-  n_overdue_deals_t2:
-    description: Number of overdue deal invoices using T2 methodology
-  n_overdue_others_t2:
-    description: Number of overdue other invoices using T2 methodology
-  sum_overdue_monthlys_t2:
-    description: Sum of overdue monthly invoice amounts using T2 methodology
-  sum_overdue_deals_t2:
-    description: Sum of overdue deal invoice amounts using T2 methodology
-  sum_overdue_others_t2:
-    description: Sum of overdue other invoice amounts using T2 methodology
-  max_delay_original_invoices_t1:
-    description: Maximum delay for original invoices using T1 methodology
-  max_delay_deal_invoices_t1:
-    description: Maximum delay for deal invoices using T1 methodology
-  max_delay_original_invoices_t2:
-    description: Maximum delay for original invoices using T2 methodology
-  max_delay_deal_invoices_t2:
-    description: Maximum delay for deal invoices using T2 methodology
-  max_delay_contaminated_contract_t2:
-    description: Maximum delay with contamination at contract level using T2 methodology
-  max_delay_contaminated_contract_t3_losses:
-    description: Maximum delay with contamination for loss calculations using T3 methodology
-  max_delay_contaminated_contract_t1:
-    description: Maximum delay with contamination at contract level using T1 methodology
-  max_open_delay_contaminated_contract_t2:
-    description: Maximum open delay with contamination at contract level using T2 methodology
-  max_open_delay_contaminated_contract_t3_losses:
-    description: Maximum open delay with contamination for loss calculations using T3 methodology
-  max_open_delay_contaminated_contract_t1:
-    description: Maximum open delay with contamination at contract level using T1 methodology
-  open_wallet:
-    description: Total open wallet amount for the contract
-  wallet:
-    description: Total wallet amount for the contract
-  recovered_amount:
-    description: Total recovered amount for the contract
-  wallet_on_time_t1:
-    description: Wallet amount paid on time using T1 methodology
-  wallet_overdue_t1:
-    description: Wallet amount overdue using T1 methodology
-  open_wallet_on_time_t1:
-    description: Open wallet amount on time using T1 methodology
-  open_wallet_overdue_t1:
-    description: Open wallet amount overdue using T1 methodology
-  overdue_recovered_amount_t1:
-    description: Amount recovered from overdue invoices using T1 methodology
-  on_time_paid_amount_t1:
-    description: Amount paid on time using T1 methodology
-  wallet_on_time_t2:
-    description: Wallet amount paid on time using T2 methodology
-  wallet_overdue_t2:
-    description: Wallet amount overdue using T2 methodology
-  open_wallet_on_time_t2:
-    description: Open wallet amount on time using T2 methodology
-  open_wallet_overdue_t2:
-    description: Open wallet amount overdue using T2 methodology
-  overdue_recovered_amount_t2:
-    description: Amount recovered from overdue invoices using T2 methodology
-  on_time_paid_amount_t2:
-    description: Amount paid on time using T2 methodology
-  wallet_on_time_t3:
-    description: Wallet amount paid on time using T3 methodology
-  wallet_overdue_t3:
-    description: Wallet amount overdue using T3 methodology
-  open_wallet_on_time_t3:
-    description: Open wallet amount on time using T3 methodology
-  open_wallet_overdue_t3:
-    description: Open wallet amount overdue using T3 methodology
-  overdue_recovered_amount_t3:
-    description: Amount recovered from overdue invoices using T3 methodology
-  on_time_paid_amount_t3:
-    description: Amount paid on time using T3 methodology
-  sum_monthly_overdue_days_paid_t1:
-    description: Sum of days overdue for monthly invoices that were paid using T1 methodology
-  count_monthly_overdue_invoices_paid_t1:
-    description: Count of monthly overdue invoices that were paid using T1 methodology
-  is_evictions:
-    description: Flag indicating if contract has active eviction process
+  cpc:
+    description: Total CPC (contact completions) for the contract on reference date
     lineage:
-      - datalake_gsheets_clean.evictions_base
+      - dw_collection_recovery_quintoandar.fact_collection.total_cpc
+  alo:
+    description: Total ALO (contact attempts) for the contract on reference date
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_collection.total_alo
   has_app_events:
     description: Flag indicating if contract has app events on reference date
     lineage:
@@ -186,38 +124,6 @@ columns:
     description: Flag indicating if contract has overdue-related app events on reference date
     lineage:
       - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
-  is_blocklisted:
-    description: Flag indicating if contract is blocklisted on reference date
-    lineage:
-      - datalake_trato_feito_clean.blocklist.is_blocked
-  has_esforco:
-    description: Flag indicating if contract has collection efforts on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_esforco
-  has_alo:
-    description: Flag indicating if contract has ALO (contact attempts) on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_alo
-  has_cpc:
-    description: Flag indicating if contract has CPC (contact completions) on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_cpc
-  esforco:
-    description: Total collection efforts for the contract on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_esforco
-  alo:
-    description: Total ALO (contact attempts) for the contract on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_alo
-  cpc:
-    description: Total CPC (contact completions) for the contract on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_cpc
-  promessas:
-    description: Number of payment promises made on reference date
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
   qt_app_events:
     description: Quantity of app events for the contract on reference date
     lineage:
@@ -234,43 +140,157 @@ columns:
     description: Quantity of broken first payment promises for the contract
     lineage:
       - dw_collection_recovery_quintoandar.fact_negotiation
-  qt_acordo_parcelado:
-    description: Quantity of installment agreements for the contract
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_negotiation
-  qt_aco_deconto:
+  qt_aco_desconto:
     description: Quantity of discount agreements for the contract
     lineage:
       - dw_collection_recovery_quintoandar.fact_negotiation.discount_to_original_amount
-  mob_finalizacao:
-    description: Months on book at finalization (contract duration in months)
-  has_overdue_balance_over5_t1_at_ending:
-    description: Flag indicating if contract has overdue balance over 5 days using T1 methodology at ending
-  has_overdue_balance_over5_t2_at_ending:
-    description: Flag indicating if contract has overdue balance over 5 days using T2 methodology at ending
-  has_overdue_balance_over5_t3_at_ending:
-    description: Flag indicating if contract has overdue balance over 5 days using T3 methodology at ending
+  id_process_evictions:
+    description: Eviction process identifier when contract has active eviction
+    lineage:
+      - datalake_gsheets_clean.evictions_base.id_process
   has_overdue_balance_over0_t1_at_ending:
     description: Flag indicating if contract has any overdue balance using T1 methodology at ending
+  has_overdue_balance_over5_t1_at_ending:
+    description: Flag indicating if contract has overdue balance over 5 days using T1 methodology at ending
   has_overdue_balance_over0_t2_at_ending:
     description: Flag indicating if contract has any overdue balance using T2 methodology at ending
+  has_overdue_balance_over5_t2_at_ending:
+    description: Flag indicating if contract has overdue balance over 5 days using T2 methodology at ending
   has_overdue_balance_over0_t3_at_ending:
     description: Flag indicating if contract has any overdue balance using T3 methodology at ending
-  days_since_ending:
-    description: Number of days since contract ended
-  days_since_contract_start:
-    description: Number of days since contract started
-  dt_reference:
-    description: Reference date for the timeline
-  dt_pipe:
-    description: Pipeline date for the reference month
+  has_overdue_balance_over5_t3_at_ending:
+    description: Flag indicating if contract has overdue balance over 5 days using T3 methodology at ending
+  is_evictions:
+    description: Flag indicating if contract has active eviction process
+    lineage:
+      - datalake_gsheets_clean.evictions_base
+  is_blocklisted:
+    description: Flag indicating if contract is blocklisted on reference date
+    lineage:
+      - datalake_trato_feito_clean.blocklist.is_blocked
+  n_anchor_invoices_not_negativable:
+    description: Number of anchor invoices that are not eligible for negative operations
+  n_invoices_negativable:
+    description: Number of invoices eligible for negative operations
+  n_first_invoices_open:
+    description: Number of first invoices that are open
+  has_fpd_in_wallet:
+    description: Flag indicating if contract has first payment default in wallet
+  array_open_invoices:
+    description: Array of open invoice identifiers for the contract
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+  array_paid_invoices:
+    description: Array of paid invoice identifiers for the contract
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+  array_negotiated_invoices:
+    description: Array of negotiated invoice identifiers for the contract
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+  n_monthly_invoices:
+    description: Number of monthly invoices for the contract
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+  n_invoices_paid:
+    description: Number of invoices paid for the contract
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_invoices_paid_ontime_t2:
+    description: Number of invoices paid on time using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_overdue_invoices_paid_t2:
+    description: Number of overdue invoices paid using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_invoices_paid_ontime_t1:
+    description: Number of invoices paid on time using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_overdue_invoices_paid_t1:
+    description: Number of overdue invoices paid using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_monthly_invoices_paid_ontime_t2:
+    description: Number of monthly invoices paid on time using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_monthly_invoices_paid_ontime_t1:
+    description: Number of monthly invoices paid on time using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_monthly_overdue_invoices_paid_t2:
+    description: Number of monthly overdue invoices paid using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_monthly_overdue_invoices_paid_t1:
+    description: Number of monthly overdue invoices paid using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+  n_monthly_invoices_created:
+    description: Number of monthly invoices created for the contract
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_begin
+  n_invoices_in_wallet:
+    description: Total number of invoices in the contract wallet
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+  open_wallet_overdue_t1:
+    description: Open wallet amount overdue using T1 methodology
+  open_wallet_overdue_t2:
+    description: Open wallet amount overdue using T2 methodology
+  open_wallet_overdue_t3:
+    description: Open wallet amount overdue using T3 methodology
+  wallet_overdue_t2:
+    description: Wallet amount overdue using T2 methodology
+  overdue_recovered_amount_t2:
+    description: Amount recovered from overdue invoices using T2 methodology
+  open_wallet:
+    description: Total open wallet amount for the contract
+  wallet:
+    description: Total wallet amount for the contract
+  recovered_amount:
+    description: Total recovered amount for the contract
+  wallet_on_time_t1:
+    description: Wallet amount paid on time using T1 methodology
+  wallet_overdue_t1:
+    description: Wallet amount overdue using T1 methodology
+  open_wallet_on_time_t1:
+    description: Open wallet amount on time using T1 methodology
+  overdue_recovered_amount_t1:
+    description: Amount recovered from overdue invoices using T1 methodology
+  on_time_paid_amount_t1:
+    description: Amount paid on time using T1 methodology
+  wallet_on_time_t2:
+    description: Wallet amount paid on time using T2 methodology
+  open_wallet_on_time_t2:
+    description: Open wallet amount on time using T2 methodology
+  on_time_paid_amount_t2:
+    description: Amount paid on time using T2 methodology
+  wallet_on_time_t3:
+    description: Wallet amount paid on time using T3 methodology
+  wallet_overdue_t3:
+    description: Wallet amount overdue using T3 methodology
+  open_wallet_on_time_t3:
+    description: Open wallet amount on time using T3 methodology
+  overdue_recovered_amount_t3:
+    description: Amount recovered from overdue invoices using T3 methodology
+  on_time_paid_amount_t3:
+    description: Amount paid on time using T3 methodology
+  max_open_delay_contaminated_contract_t1:
+    description: Maximum open delay with contamination at contract level using T1 methodology
+  max_open_delay_contaminated_contract_t2:
+    description: Maximum open delay with contamination at contract level using T2 methodology
   dt_contract_end:
     description: Contract end date
   dt_contract_start:
     description: Contract start date
-  dt_month_start:
-    description: First day of the reference month
-  dt_month_end:
-    description: Last day of the reference month
-  ts_laod:
+  year:
+    description: Year extracted from reference date
+  month:
+    description: Month extracted from reference date
+  day:
+    description: Day extracted from reference date
+  ts_load:
     description: Timestamp when the record was loaded
