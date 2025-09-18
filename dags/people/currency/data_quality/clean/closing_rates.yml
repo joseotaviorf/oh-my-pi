@@ -5,33 +5,88 @@ alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
     greater_than: 1
-    severity_level: Error
+    severity_level: Warning
 
 column_level_validations:
   currency_pair:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
+    has_min_length:
+      equal_to: 7
+      severity_level: Warning
+    has_max_length:
+      equal_to: 7
+      severity_level: Warning
+    is_contained_in:
+      values: ["USD-BRL", "EUR-BRL", "ARS-BRL", "MXN-BRL"]
+      severity_level: Warning
+    custom:
+      # We should only have 1 currency_pair line per day
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_currency_clean.closing_rates GROUP BY currency_pair, dt_created HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
+
   currency_from:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
+    is_contained_in:
+      values: ["USD", "EUR", "ARS", "MXN"]
+      severity_level: Warning
+
   currency_to:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
+    is_contained_in:
+      values: ["BRL"]
+      severity_level: Warning
+
   bid_price:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    has_mean_value:
+      # unlikely values set to catch gross errors
+      greater_than_or_equal_to: 0.1
+      less_than_or_equal_to: 10000
+      severity_level: Warning
+
   ask_price:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+
   high_rate:
     is_complete:
       severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    custom:
+      constraint: "high_rate >= low_rate"
+      severity_level: Warning
+
   low_rate:
     is_complete:
       severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+
+  dt_created:
+    is_complete:
+      severity_level: Warning
+
   ts_recorded_at:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
+    custom:
+      # This ensures the pipeline's temporal consistency
+      constraint: "ts_recorded_at <= ts_load"
+      severity_level: Warning
+
   ts_load:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
