@@ -1,0 +1,217 @@
+---
+database_name: growth_facebook_insights
+table_name: facebook_insights_region
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: This enrich table consolidates Facebook advertising insights data by region from multiple Facebook advertising accounts
+columns:
+  id_ad:
+    description: Unique identifier for the Facebook ad
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.id_ad
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.id_ad
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.id_ad
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.id_ad
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.id_ad
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.id_ad
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.id_ad
+  id_account:
+    description: Unique identifier for the Facebook advertising account
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.id_account
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.id_account
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.id_account
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.id_account
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.id_account
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.id_account
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.id_account
+  id_adset:
+    description: Unique identifier for the Facebook ad set
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.id_adset
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.id_adset
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.id_adset
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.id_adset
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.id_adset
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.id_adset
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.id_adset
+  id_campaign:
+    description: Unique identifier for the Facebook campaign
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.id_campaign
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.id_campaign
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.id_campaign
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.id_campaign
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.id_campaign
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.id_campaign
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.id_campaign
+  account_name:
+    description: Name of the Facebook advertising account
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.account_name
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.account_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.account_name
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.account_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.account_name
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.account_name
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.account_name
+  account_name_snake_case:
+    description: Name of the Facebook advertising account in snake_case format
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.account_name_snake_case
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.account_name_snake_case
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.account_name_snake_case
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.account_name_snake_case
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.account_name_snake_case
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.account_name_snake_case
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.account_name_snake_case
+  country_code:
+    description: Country code where the ad was served or user interaction occurred
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.country_code
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.country_code
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.country_code
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.country_code
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.country_code
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.country_code
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.country_code
+  ad_name:
+    description: Name of the Facebook ad
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.ad_name
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.ad_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.ad_name
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.ad_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.ad_name
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.ad_name
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.ad_name
+  adset_name:
+    description: Name of the Facebook ad set
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.adset_name
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.adset_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.adset_name
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.adset_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.adset_name
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.adset_name
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.adset_name
+  campaign_name:
+    description: Name of the Facebook campaign
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.campaign_name
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.campaign_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.campaign_name
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.campaign_name
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.campaign_name
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.campaign_name
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.campaign_name
+  region:
+    description: Geographic region where the ad was served or user interaction occurred
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.region
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.region
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.region
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.region
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.region
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.region
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.region
+  clicks:
+    description: Number of clicks recorded for the Facebook ad
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.clicks
+  impressions:
+    description: Number of impressions recorded for the Facebook ad
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.impressions
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.impressions
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.impressions
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.impressions
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.impressions
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.impressions
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.impressions
+  inline_link_clicks:
+    description: Number of inline link clicks recorded for the Facebook ad
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.inline_link_clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.inline_link_clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.inline_link_clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.inline_link_clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.inline_link_clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.inline_link_clicks
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.inline_link_clicks
+  actions:
+    description: Actions taken by users on the Facebook ad (could be JSON or string format)
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.actions
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.actions
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.actions
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.actions
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.actions
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.actions
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.actions
+  spend:
+    description: Amount spent on the Facebook ad campaign
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.spend
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.spend
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.spend
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.spend
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.spend
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.spend
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.spend
+  dt_start:
+    description: Start date of the reporting period for the Facebook ad insights
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.dt_start
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.dt_start
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.dt_start
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.dt_start
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.dt_start
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.dt_start
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.dt_start
+  dt_stop:
+    description: End date of the reporting period for the Facebook ad insights
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.dt_stop
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.dt_stop
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.dt_stop
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.dt_stop
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.dt_stop
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.dt_stop
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.dt_stop
+  year:
+    description: Year extracted from the reporting period
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.year
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.year
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.year
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.year
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.year
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.year
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.year
+  month:
+    description: Month extracted from the reporting period
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.month
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.month
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.month
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.month
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.month
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.month
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.month
+  day:
+    description: Day extracted from the reporting period
+    lineage:
+      - datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region.day
+      - datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region.day
+      - datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region.day
+      - datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region.day
+      - datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region.day
+      - datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region.day
+      - datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region.day

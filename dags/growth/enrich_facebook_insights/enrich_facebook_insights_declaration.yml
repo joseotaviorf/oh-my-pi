@@ -1,0 +1,24 @@
+dag:
+  name: enrich_facebook_insights
+  schedule_start_date: 2025,09,01
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for consolidating facebook insights data.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: growth_facebook_insights
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -27), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

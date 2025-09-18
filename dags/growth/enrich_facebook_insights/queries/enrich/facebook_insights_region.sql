@@ -1,0 +1,188 @@
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_994644903935458_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_517800565488302_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_1130906744424280_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_832880310585080_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_1023497688122195_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_994734287259853_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    region,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_region_clean.facebook_insights_455006745173996_region
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

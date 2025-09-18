@@ -2182,6 +2182,21 @@ bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
+bietlejuice.enrich_facebook_insights:
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-1023497688122195-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-1130906744424280-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-455006745173996-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-517800565488302-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-832880310585080-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-994644903935458-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_impression_device:load-clean-facebook-insights-994734287259853-impression-device:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-1023497688122195-region:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-1130906744424280-region:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-455006745173996-region:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-517800565488302-region:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-832880310585080-region:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994644903935458-region:first-run-of-day
+  - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994734287259853-region:first-run-of-day
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all:first-run-of-day

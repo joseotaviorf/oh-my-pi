@@ -1,0 +1,217 @@
+---
+database_name: enrich_growth_facebook_insights
+table_name: facebook_insights_impression_device
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: This enrich table consolidates Facebook Insights data with impression device breakdown from multiple Facebook ad accounts
+columns:
+  id_ad:
+    description: Unique identifier for the Facebook ad
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.id_ad
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.id_ad
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.id_ad
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.id_ad
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.id_ad
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.id_ad
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.id_ad
+  id_account:
+    description: Unique identifier for the Facebook ad account
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.id_account
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.id_account
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.id_account
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.id_account
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.id_account
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.id_account
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.id_account
+  id_adset:
+    description: Unique identifier for the Facebook ad set
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.id_adset
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.id_adset
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.id_adset
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.id_adset
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.id_adset
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.id_adset
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.id_adset
+  id_campaign:
+    description: Unique identifier for the Facebook campaign
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.id_campaign
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.id_campaign
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.id_campaign
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.id_campaign
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.id_campaign
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.id_campaign
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.id_campaign
+  account_name:
+    description: Name of the Facebook ad account
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.account_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.account_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.account_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.account_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.account_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.account_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.account_name
+  account_name_snake_case:
+    description: Snake case formatted version of the Facebook ad account name
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.account_name_snake_case
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.account_name_snake_case
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.account_name_snake_case
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.account_name_snake_case
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.account_name_snake_case
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.account_name_snake_case
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.account_name_snake_case
+  country_code:
+    description: Country code where the ad was served
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.country_code
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.country_code
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.country_code
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.country_code
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.country_code
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.country_code
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.country_code
+  ad_name:
+    description: Name of the Facebook ad
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.ad_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.ad_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.ad_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.ad_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.ad_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.ad_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.ad_name
+  adset_name:
+    description: Name of the Facebook ad set
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.adset_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.adset_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.adset_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.adset_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.adset_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.adset_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.adset_name
+  campaign_name:
+    description: Name of the Facebook campaign
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.campaign_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.campaign_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.campaign_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.campaign_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.campaign_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.campaign_name
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.campaign_name
+  impression_device:
+    description: Device type where the impression was served (e.g., mobile, desktop, tablet)
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.impression_device
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.impression_device
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.impression_device
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.impression_device
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.impression_device
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.impression_device
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.impression_device
+  clicks:
+    description: Total number of clicks on the ad
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.clicks
+  impressions:
+    description: Total number of times the ad was shown
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.impressions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.impressions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.impressions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.impressions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.impressions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.impressions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.impressions
+  inline_link_clicks:
+    description: Number of clicks on inline links within the ad
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.inline_link_clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.inline_link_clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.inline_link_clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.inline_link_clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.inline_link_clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.inline_link_clicks
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.inline_link_clicks
+  actions:
+    description: JSON object containing various action metrics (conversions, reactions, etc.)
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.actions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.actions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.actions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.actions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.actions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.actions
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.actions
+  spend:
+    description: Amount spent on the ad in the account currency
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.spend
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.spend
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.spend
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.spend
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.spend
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.spend
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.spend
+  dt_start:
+    description: Start date of the reporting period
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.dt_start
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.dt_start
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.dt_start
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.dt_start
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.dt_start
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.dt_start
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.dt_start
+  dt_stop:
+    description: End date of the reporting period
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.dt_stop
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.dt_stop
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.dt_stop
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.dt_stop
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.dt_stop
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.dt_stop
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.dt_stop
+  year:
+    description: Year extracted from the start date
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.year
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.year
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.year
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.year
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.year
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.year
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.year
+  month:
+    description: Month extracted from the start date
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.month
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.month
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.month
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.month
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.month
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.month
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.month
+  day:
+    description: Day extracted from the start date
+    lineage:
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device.day
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device.day
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device.day
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device.day
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device.day
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device.day
+      - datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device.day 

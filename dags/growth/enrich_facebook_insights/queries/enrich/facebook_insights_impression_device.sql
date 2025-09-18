@@ -1,0 +1,188 @@
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_994644903935458_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_517800565488302_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_1130906744424280_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_832880310585080_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_1023497688122195_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_994734287259853_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+UNION ALL
+SELECT
+    id_ad,
+    id_account,
+    id_adset,
+    id_campaign,
+    account_name,
+    account_name_snake_case,
+    country_code,
+    ad_name,
+    adset_name,
+    campaign_name,
+    impression_device,
+    clicks,
+    impressions,
+    inline_link_clicks,
+    actions,
+    spend,
+    dt_start,
+    dt_stop,
+    year,
+    month,
+    day
+FROM
+    datalake_facebook_insights_impression_device_clean.facebook_insights_455006745173996_impression_device
+WHERE
+    DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
