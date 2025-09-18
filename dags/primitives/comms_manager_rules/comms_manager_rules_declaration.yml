@@ -27,9 +27,88 @@ workflow:
       partitions: [year, month, day]
       merge_on: [id_rule, id_action]
       when_matched_update_condition: |
-        source.ts_export_generated_at > target.ts_export_generated_at
+        source.ts_export_generated > target.ts_export_generated AND
+        (
+          COALESCE(source.status, '') <> COALESCE(target.status, '') OR
+          COALESCE(source.business_context, '') <> COALESCE(target.business_context, '') OR
+          COALESCE(source.category, '') <> COALESCE(target.category, '') OR
+          COALESCE(source.company, '') <> COALESCE(target.company, '') OR
+          COALESCE(source.context, '') <> COALESCE(target.context, '') OR
+          COALESCE(source.cost_center, '') <> COALESCE(target.cost_center, '') OR
+          COALESCE(source.journey_step, '') <> COALESCE(target.journey_step, '') OR
+          COALESCE(source.line, '') <> COALESCE(target.line, '') OR
+          COALESCE(source.rule_profile, '') <> COALESCE(target.rule_profile, '') OR
+          COALESCE(source.team, '') <> COALESCE(target.team, '') OR
+          COALESCE(source.notification_type, '') <> COALESCE(target.notification_type, '') OR
+          COALESCE(source.action_profile, '') <> COALESCE(target.action_profile, '') OR
+          COALESCE(source.reason, '') <> COALESCE(target.reason, '') OR
+          COALESCE(source.deep_link, '') <> COALESCE(target.deep_link, '') OR
+          COALESCE(source.subject_template, '') <> COALESCE(target.subject_template, '') OR
+          COALESCE(source.body_template, '') <> COALESCE(target.body_template, '') OR
+          COALESCE(source.body_template_path, '') <> COALESCE(target.body_template_path, '') OR
+          COALESCE(source.subject_content, '') <> COALESCE(target.subject_content, '') OR
+          COALESCE(source.body_content, '') <> COALESCE(target.body_content, '')
+
+        )
       when_not_matched_insert_condition: |
         source.id_rule IS NOT NULL AND source.id_action IS NOT NULL
+      when_matched_operation:
+        {
+          "ts_updated": "source.ts_export_generated",
+          "ts_created": "target.ts_created",
+          "ts_export_generated": "source.ts_export_generated",
+          "year": "source.year",
+          "month": "source.month",
+          "day": "source.day",
+          "status": "source.status",
+          "business_context": "source.business_context",
+          "category": "source.category",
+          "company": "source.company",
+          "context": "source.context",
+          "cost_center": "source.cost_center",
+          "journey_step": "source.journey_step",
+          "line": "source.line",
+          "rule_profile": "source.rule_profile",
+          "team": "source.team",
+          "notification_type": "source.notification_type",
+          "action_profile": "source.action_profile",
+          "reason": "source.reason",
+          "deep_link": "source.deep_link",
+          "subject_template": "source.subject_template",
+          "body_template": "source.body_template",
+          "body_template_path": "source.body_template_path",
+          "subject_content": "source.subject_content",
+          "body_content": "source.body_content",
+        }
+      when_not_matched_operation:
+        {
+          "ts_updated": "source.ts_export_generated",
+          "ts_created": "source.ts_export_generated",
+          "ts_export_generated": "source.ts_export_generated",
+          "year": "source.year",
+          "month": "source.month",
+          "day": "source.day",
+          "status": "source.status",
+          "business_context": "source.business_context",
+          "category": "source.category",
+          "company": "source.company",
+          "context": "source.context",
+          "cost_center": "source.cost_center",
+          "journey_step": "source.journey_step",
+          "line": "source.line",
+          "rule_profile": "source.rule_profile",
+          "team": "source.team",
+          "notification_type": "source.notification_type",
+          "action_profile": "source.action_profile",
+          "reason": "source.reason",
+          "deep_link": "source.deep_link",
+          "subject_template": "source.subject_template",
+          "body_template": "source.body_template",
+          "body_template_path": "source.body_template_path",
+          "subject_content": "source.subject_content",
+          "body_content": "source.body_content",
+        }
+
 cluster:
   type: databricks_13_3_high_mem_driver_high_mem_nodes
   databricks_conn_id: databricks_new

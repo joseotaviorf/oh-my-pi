@@ -14,6 +14,7 @@ spark_jobs_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'
 sys.path.append(spark_jobs_path)
 
 from load_comms_manager_rules import (
+    collect_all_files,
     get_last_version,
     read_communication_rules_json,
     explode_rules,
@@ -33,25 +34,62 @@ class TestGetLastVersion(unittest.TestCase):
     @patch('load_comms_manager_rules.BaseDBUtils')
     @patch('load_comms_manager_rules.spark')
     def test_get_last_version_success(self, mock_spark, mock_base_dbutils, mock_col):
-        """Test successful retrieval of latest file."""
+        """Test successful retrieval of latest JSON file with recursive search."""
         # Mock dbutils and file listing
         mock_dbutils = Mock()
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
 
-        # Mock file list
-        mock_files = [
-            Mock(path="s3://path/file1.json", modificationTime=1000),
-            Mock(path="s3://path/file2.json", modificationTime=2000),
-            Mock(path="s3://path/file3.json", modificationTime=1500)
+        # Mock directory structure with files and subdirectories
+        # First call to ls returns a mix of directories and files
+        mock_root_items = [
+            Mock(path="s3://path/2024/", isDir=lambda: True),
+            Mock(path="s3://path/old_file.txt", isDir=lambda: False),  # Non-JSON file
         ]
-        mock_dbutils.fs.ls.return_value = mock_files
 
-        # Mock DataFrame operations
+        # Second call to ls (for 2024/ directory) returns more subdirectories
+        mock_2024_items = [
+            Mock(path="s3://path/2024/01/", isDir=lambda: True),
+            Mock(path="s3://path/2024/02/", isDir=lambda: True),
+        ]
+
+        # Third call to ls (for 2024/01/ directory) returns JSON files
+        mock_jan_items = [
+            Mock(path="s3://path/2024/01/file1.json", isDir=lambda: False, modificationTime=1000, size=1024),
+            Mock(path="s3://path/2024/01/file2.json", isDir=lambda: False, modificationTime=2000, size=2048),
+        ]
+
+        # Fourth call to ls (for 2024/02/ directory) returns JSON files
+        mock_feb_items = [
+            Mock(path="s3://path/2024/02/file3.json", isDir=lambda: False, modificationTime=1500, size=1536),
+        ]
+
+        # Set up the side_effect to return different results for different paths
+        def ls_side_effect(path):
+            if path == "s3://test-path/":
+                return mock_root_items
+            elif path == "s3://path/2024/":
+                return mock_2024_items
+            elif path == "s3://path/2024/01/":
+                return mock_jan_items
+            elif path == "s3://path/2024/02/":
+                return mock_feb_items
+            else:
+                return []
+
+        mock_dbutils.fs.ls.side_effect = ls_side_effect
+
+        # Mock DataFrame operations - should only be called with JSON files
+        expected_json_files = [
+            Mock(path="s3://path/2024/01/file1.json", modificationTime=1000, size=1024),
+            Mock(path="s3://path/2024/01/file2.json", modificationTime=2000, size=2048),
+            Mock(path="s3://path/2024/02/file3.json", modificationTime=1500, size=1536),
+        ]
+
         mock_df = Mock()
         mock_spark.createDataFrame.return_value = mock_df
         mock_df.orderBy.return_value = mock_df
         mock_df.limit.return_value = mock_df
-        mock_df.collect.return_value = [Mock(path="s3://path/file2.json", modificationTime=2000)]
+        mock_df.collect.return_value = [Mock(path="s3://path/2024/01/file2.json", modificationTime=2000, size=2048)]
 
         # Mock col function
         mock_col.return_value = Mock()
@@ -61,13 +99,18 @@ class TestGetLastVersion(unittest.TestCase):
         result = get_last_version("s3://test-path/")
 
         # Assertions
-        self.assertEqual(result, "s3://path/file2.json")
-        mock_dbutils.fs.ls.assert_called_once_with("s3://test-path/")
-        mock_spark.createDataFrame.assert_called_once_with(mock_files)
+        self.assertEqual(result, "s3://path/2024/01/file2.json")
+        # Verify that createDataFrame was called with only JSON files (3 files)
+        mock_spark.createDataFrame.assert_called_once()
+        called_args = mock_spark.createDataFrame.call_args[0][0]
+        self.assertEqual(len(called_args), 3)  # Should have 3 JSON files
+        # Verify all files in the call are JSON files
+        for file_obj in called_args:
+            self.assertTrue(file_obj.path.endswith('.json'))
 
     @patch('load_comms_manager_rules.BaseDBUtils')
     def test_get_last_version_no_files(self, mock_base_dbutils):
-        """Test behavior when no files are found."""
+        """Test behavior when no JSON files are found."""
         # Mock dbutils with empty file list
         mock_dbutils = Mock()
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
@@ -81,17 +124,195 @@ class TestGetLastVersion(unittest.TestCase):
 
     @patch('load_comms_manager_rules.BaseDBUtils')
     def test_get_last_version_exception(self, mock_base_dbutils):
-        """Test exception handling."""
+        """Test graceful handling of S3 access errors."""
         # Mock dbutils to raise exception
         mock_dbutils = Mock()
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
         mock_dbutils.fs.ls.side_effect = Exception("S3 access failed")
 
-        # Test
-        with self.assertRaises(Exception) as context:
-            get_last_version("s3://error-path/")
+        # Test - should handle exception gracefully and return None
+        result = get_last_version("s3://error-path/")
 
-        self.assertIn("S3 access failed", str(context.exception))
+        # Assertions - should return None when S3 access fails
+        self.assertIsNone(result)
+
+
+class TestCollectAllFiles(unittest.TestCase):
+    """Test cases for collect_all_files function."""
+
+    @patch('load_comms_manager_rules.BaseDBUtils')
+    def test_collect_all_files_json_only(self, mock_base_dbutils):
+        """Test collecting only JSON files from a flat directory structure."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock file listing - mix of JSON and non-JSON files
+        mock_items = [
+            Mock(path="s3://path/file1.json", isDir=lambda: False),
+            Mock(path="s3://path/file2.txt", isDir=lambda: False),
+            Mock(path="s3://path/file3.JSON", isDir=lambda: False),  # Test case insensitive
+            Mock(path="s3://path/file4.csv", isDir=lambda: False),
+        ]
+        mock_dbutils.fs.ls.return_value = mock_items
+
+        # Test
+        result = collect_all_files("s3://path/")
+
+        # Assertions
+        self.assertEqual(len(result), 2)  # Only JSON files
+        self.assertEqual(result[0].path, "s3://path/file1.json")
+        self.assertEqual(result[1].path, "s3://path/file3.JSON")
+        mock_dbutils.fs.ls.assert_called_once_with("s3://path/")
+
+    @patch('load_comms_manager_rules.BaseDBUtils')
+    def test_collect_all_files_recursive_search(self, mock_base_dbutils):
+        """Test recursive search through directory structure."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock directory structure
+        mock_root_items = [
+            Mock(path="s3://path/subdir1/", isDir=lambda: True),
+            Mock(path="s3://path/subdir2/", isDir=lambda: True),
+            Mock(path="s3://path/root_file.json", isDir=lambda: False),
+        ]
+
+        mock_subdir1_items = [
+            Mock(path="s3://path/subdir1/file1.json", isDir=lambda: False),
+            Mock(path="s3://path/subdir1/file1.txt", isDir=lambda: False),
+        ]
+
+        mock_subdir2_items = [
+            Mock(path="s3://path/subdir2/file2.json", isDir=lambda: False),
+        ]
+
+        # Set up side_effect for different paths
+        def ls_side_effect(path):
+            if path == "s3://path/":
+                return mock_root_items
+            elif path == "s3://path/subdir1/":
+                return mock_subdir1_items
+            elif path == "s3://path/subdir2/":
+                return mock_subdir2_items
+            else:
+                return []
+
+        mock_dbutils.fs.ls.side_effect = ls_side_effect
+
+        # Test
+        result = collect_all_files("s3://path/")
+
+        # Assertions
+        self.assertEqual(len(result), 3)  # 3 JSON files total
+        json_paths = [item.path for item in result]
+        self.assertIn("s3://path/root_file.json", json_paths)
+        self.assertIn("s3://path/subdir1/file1.json", json_paths)
+        self.assertIn("s3://path/subdir2/file2.json", json_paths)
+
+        # Verify recursive calls
+        expected_calls = [
+            call("s3://path/"),
+            call("s3://path/subdir1/"),
+            call("s3://path/subdir2/")
+        ]
+        mock_dbutils.fs.ls.assert_has_calls(expected_calls, any_order=True)
+
+    @patch('load_comms_manager_rules.BaseDBUtils')
+    def test_collect_all_files_custom_extension(self, mock_base_dbutils):
+        """Test collecting files with custom extension."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock file listing
+        mock_items = [
+            Mock(path="s3://path/file1.csv", isDir=lambda: False),
+            Mock(path="s3://path/file2.json", isDir=lambda: False),
+            Mock(path="s3://path/file3.CSV", isDir=lambda: False),  # Test case insensitive
+            Mock(path="s3://path/file4.txt", isDir=lambda: False),
+        ]
+        mock_dbutils.fs.ls.return_value = mock_items
+
+        # Test with .csv extension
+        result = collect_all_files("s3://path/", file_extension='.csv')
+
+        # Assertions
+        self.assertEqual(len(result), 2)  # Only CSV files
+        csv_paths = [item.path for item in result]
+        self.assertIn("s3://path/file1.csv", csv_paths)
+        self.assertIn("s3://path/file3.CSV", csv_paths)
+
+    @patch('load_comms_manager_rules.BaseDBUtils')
+    def test_collect_all_files_empty_directory(self, mock_base_dbutils):
+        """Test behavior with empty directory."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+        mock_dbutils.fs.ls.return_value = []
+
+        # Test
+        result = collect_all_files("s3://empty-path/")
+
+        # Assertions
+        self.assertEqual(len(result), 0)
+        mock_dbutils.fs.ls.assert_called_once_with("s3://empty-path/")
+
+    @patch('load_comms_manager_rules.BaseDBUtils')
+    def test_collect_all_files_access_error(self, mock_base_dbutils):
+        """Test graceful handling of S3 access errors."""
+        # Mock dbutils to raise exception
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+        mock_dbutils.fs.ls.side_effect = Exception("S3 access failed")
+
+        # Test - should handle exception gracefully
+        result = collect_all_files("s3://error-path/")
+
+        # Assertions
+        self.assertEqual(len(result), 0)  # Should return empty list
+        mock_dbutils.fs.ls.assert_called_once_with("s3://error-path/")
+
+    @patch('load_comms_manager_rules.BaseDBUtils')
+    def test_collect_all_files_mixed_access_errors(self, mock_base_dbutils):
+        """Test handling mixed success/error scenarios in recursive search."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock directory structure where one subdirectory fails
+        mock_root_items = [
+            Mock(path="s3://path/good_subdir/", isDir=lambda: True),
+            Mock(path="s3://path/bad_subdir/", isDir=lambda: True),
+            Mock(path="s3://path/root_file.json", isDir=lambda: False),
+        ]
+
+        mock_good_subdir_items = [
+            Mock(path="s3://path/good_subdir/file1.json", isDir=lambda: False),
+        ]
+
+        # Set up side_effect - good_subdir works, bad_subdir fails
+        def ls_side_effect(path):
+            if path == "s3://path/":
+                return mock_root_items
+            elif path == "s3://path/good_subdir/":
+                return mock_good_subdir_items
+            elif path == "s3://path/bad_subdir/":
+                raise Exception("Access denied")
+            else:
+                return []
+
+        mock_dbutils.fs.ls.side_effect = ls_side_effect
+
+        # Test
+        result = collect_all_files("s3://path/")
+
+        # Assertions - should get files from accessible paths
+        self.assertEqual(len(result), 2)  # root_file.json + good_subdir/file1.json
+        json_paths = [item.path for item in result]
+        self.assertIn("s3://path/root_file.json", json_paths)
+        self.assertIn("s3://path/good_subdir/file1.json", json_paths)
 
 
 class TestDataProcessingFunctions(unittest.TestCase):
@@ -204,6 +425,80 @@ class TestDataProcessingFunctions(unittest.TestCase):
         mock_flat_df.withColumn.assert_called_once()
         mock_with_year_df.withColumn.assert_called_once()
         mock_with_month_df.withColumn.assert_called_once()
+
+    @patch('load_comms_manager_rules.dayofmonth')
+    @patch('load_comms_manager_rules.month')
+    @patch('load_comms_manager_rules.year')
+    @patch('load_comms_manager_rules.explode')
+    @patch('load_comms_manager_rules.col')
+    def test_explode_and_flatten_actions_with_optional_fields(self, mock_col, mock_explode, mock_year, mock_month, mock_dayofmonth):
+        """Test that explode_and_flatten_actions handles optional fields gracefully using col()."""
+        # Mock DataFrame chain
+        mock_rules_df = Mock(spec=DataFrame)
+        mock_with_actions_df = Mock(spec=DataFrame)
+        mock_flat_df = Mock(spec=DataFrame)
+
+        mock_with_year_df = Mock(spec=DataFrame)
+        mock_with_month_df = Mock(spec=DataFrame)
+        mock_with_day_df = Mock(spec=DataFrame)
+
+        mock_rules_df.select.return_value = mock_with_actions_df
+        mock_with_actions_df.select.return_value = mock_flat_df
+
+        # Chain the withColumn calls
+        mock_flat_df.withColumn.return_value = mock_with_year_df
+        mock_with_year_df.withColumn.return_value = mock_with_month_df
+        mock_with_month_df.withColumn.return_value = mock_with_day_df
+        mock_with_day_df.count.return_value = 10
+
+        # Mock col() to return objects with alias method (for optional fields)
+        mock_col_instance = Mock()
+        mock_col_instance.alias.return_value = "mocked_col_with_alias"
+        mock_col.return_value = mock_col_instance
+
+        # Mock explode function
+        mock_explode_instance = Mock()
+        mock_explode_instance.alias.return_value = "mocked_explode_with_alias"
+        mock_explode.return_value = mock_explode_instance
+
+        # Mock date functions
+        mock_year.return_value = "mocked_year"
+        mock_month.return_value = "mocked_month"
+        mock_dayofmonth.return_value = "mocked_day"
+
+        # Test - this calls the REAL function
+        result = explode_and_flatten_actions(mock_rules_df)
+
+        # Verify the function completed successfully
+        self.assertEqual(result, mock_with_day_df)
+
+        # Verify col() was called for optional fields (should be called multiple times)
+        # The function uses col() for: generated_at, status, and all scope/action fields except IDs
+        self.assertGreater(mock_col.call_count, 10, "col() should be called multiple times for optional fields")
+
+        # Verify specific col() calls for key optional fields
+        expected_col_calls = [
+            call("generated_at"),
+            call("rule.status"),
+            call("rule.scope.business_context"),
+            call("rule.scope.category"),
+            call("action.notification_type"),
+            call("action.templates.subject_template"),
+        ]
+
+        # Check that some of our expected col() calls were made
+        for expected_call in expected_col_calls[:3]:  # Check first 3 to avoid over-asserting
+            self.assertIn(expected_call, mock_col.call_args_list,
+                         f"Expected col() call {expected_call} not found")
+
+        # Verify select operations were called properly
+        mock_rules_df.select.assert_called_once()
+        mock_with_actions_df.select.assert_called_once()
+
+        # Verify date columns were added
+        self.assertEqual(mock_flat_df.withColumn.call_count, 1)
+        self.assertEqual(mock_with_year_df.withColumn.call_count, 1)
+        self.assertEqual(mock_with_month_df.withColumn.call_count, 1)
 
         # Verify Spark functions were called correctly
         mock_col.assert_any_call("rule.scope.profile")

@@ -20,36 +20,71 @@ from bietlejuice.loaders.s3_loader import S3Loader
 JOB_NAME = "Load Comms Manager Rules"
 
 
+def collect_all_files(path, file_extension='.json'):
+    """
+    Recursively collect all files with specified extension from the given path and subdirectories.
+
+    Args:
+        path (str): S3 path to search for files
+        file_extension (str): File extension to filter by (default: '.json')
+
+    Returns:
+        list: List of file objects matching the extension
+    """
+    dbutils = BaseDBUtils().get_dbutils()
+    all_files = []
+
+    try:
+        items = dbutils.fs.ls(path)
+        for item in items:
+            if item.isDir():
+                # If it's a directory, recursively search inside
+                logging.debug(f"Exploring directory: {item.path}")
+                all_files.extend(collect_all_files(item.path, file_extension))
+            else:
+                # If it's a file, check if it matches the extension
+                if item.path.lower().endswith(file_extension.lower()):
+                    all_files.append(item)
+                    logging.debug(f"Found {file_extension} file: {item.path}")
+                else:
+                    logging.debug(f"Skipping non-{file_extension} file: {item.path}")
+    except Exception as e:
+        logging.warning(f"Could not access path {path}: {str(e)}")
+
+    return all_files
+
+
 def get_last_version(comms_manager_rules_path):
     """
-    Retrieves the most recently modified file from the communication manager rules S3 directory.
+    Retrieves the most recently modified JSON file from the communication manager rules S3 directory.
 
-    This function lists all files in the specified S3 path, creates a Spark DataFrame
-    from the file metadata, and returns the path of the file with the latest modification time.
+    This function recursively searches through folders to find JSON files, then returns the
+    path of the file with the latest modification time. It handles nested folder structures
+    like date-based partitioning (e.g., 2024/01/15/rules.json).
 
     Args:
         comms_manager_rules_path (str): S3 path to search for communication manager rules files
 
     Returns:
-        str: S3 path to the most recently modified file, or None if no files found
+        str: S3 path to the most recently modified JSON file, or None if no files found
 
     Raises:
         Exception: If S3 access fails
     """
     try:
-        # Initialize Databricks utilities for S3 file operations
-        dbutils = BaseDBUtils().get_dbutils()
+        # Collect all JSON files recursively
+        logging.info(f"Searching for JSON files in: {comms_manager_rules_path}")
+        all_json_files = collect_all_files(comms_manager_rules_path)
 
-        # List all files in the communication manager rules S3 directory
-        files = dbutils.fs.ls(comms_manager_rules_path)
-
-        # Check if any files were found
-        if not files:
-            logging.warning(f"No files found in path: {comms_manager_rules_path}")
+        # Check if any JSON files were found
+        if not all_json_files:
+            logging.warning(f"No JSON files found in path: {comms_manager_rules_path}")
             return None
 
+        logging.info(f"Found {len(all_json_files)} JSON files")
+
         # Convert file metadata to Spark DataFrame for easier manipulation
-        df = spark.createDataFrame(files)
+        df = spark.createDataFrame(all_json_files)
 
         # Find the file with the most recent modification time
         # Sort by modification time in descending order and take the first record
@@ -60,8 +95,9 @@ def get_last_version(comms_manager_rules_path):
         )
 
         # Log the details of the most recently updated file using proper f-string formatting
-        logging.info(f"Last updated path: {last_updated.path}")
+        logging.info(f"Most recent JSON file: {last_updated.path}")
         logging.info(f"Modified at (ms): {last_updated.modificationTime}")
+        logging.info(f"File size: {last_updated.size} bytes")
 
         return last_updated.path
 
@@ -142,49 +178,51 @@ def explode_and_flatten_actions(rules_df):
     logging.info("Exploding actions and flattening rule structure")
 
     # Step 1: Explode actions within each rule and extract rule-level fields
+    # Using col() for all fields except IDs to handle optional fields gracefully
     rules_with_actions = rules_df.select(
-        "generated_at",
-        "rule.rule_id",
-        "rule.status",
-        "rule.scope.business_context",
-        "rule.scope.category",
-        "rule.scope.company",
-        "rule.scope.context",
-        "rule.scope.cost_center",
-        "rule.scope.journey_step",
-        "rule.scope.line",
+        col("generated_at"),
+        "rule.rule_id",  # ID fields use direct access
+        col("rule.status").alias("status"),
+        col("rule.scope.business_context").alias("business_context"),
+        col("rule.scope.category").alias("category"),
+        col("rule.scope.company").alias("company"),
+        col("rule.scope.context").alias("context"),
+        col("rule.scope.cost_center").alias("cost_center"),
+        col("rule.scope.journey_step").alias("journey_step"),
+        col("rule.scope.line").alias("line"),
         col("rule.scope.profile").alias("rule_profile"),
-        "rule.scope.team",
+        col("rule.scope.team").alias("team"),
         explode("rule.actions").alias("action")
     )
 
     # Step 2: Flatten all action fields into the final structure
+    # Using col() for all fields except IDs to handle optional fields gracefully
     flat_df = rules_with_actions.select(
         # Rule-level fields
-        "generated_at",
-        "rule_id",
-        "status",
-        "business_context",
-        "category",
-        "company",
-        "context",
-        "cost_center",
-        "journey_step",
-        "line",
-        "rule_profile",
-        "team",
+        col("generated_at"),
+        "rule_id",  # ID fields use direct access
+        col("status"),
+        col("business_context"),
+        col("category"),
+        col("company"),
+        col("context"),
+        col("cost_center"),
+        col("journey_step"),
+        col("line"),
+        col("rule_profile"),
+        col("team"),
         # Action-level fields
-        "action.action_id",
-        "action.notification_type",
+        "action.action_id",  # ID fields use direct access
+        col("action.notification_type").alias("notification_type"),
         col("action.profile").alias("action_profile"),
-        "action.reason",
-        "action.deep_link",
+        col("action.reason").alias("reason"),
+        col("action.deep_link").alias("deep_link"),
         # Template fields
-        "action.templates.subject_template",
-        "action.templates.body_template",
-        "action.templates.body_template_path",
-        "action.templates.subject_content",
-        "action.templates.body_content"
+        col("action.templates.subject_template").alias("subject_template"),
+        col("action.templates.body_template").alias("body_template"),
+        col("action.templates.body_template_path").alias("body_template_path"),
+        col("action.templates.subject_content").alias("subject_content"),
+        col("action.templates.body_content").alias("body_content")
     )
 
     flat_df = flat_df.withColumn("year", year(col("generated_at")))

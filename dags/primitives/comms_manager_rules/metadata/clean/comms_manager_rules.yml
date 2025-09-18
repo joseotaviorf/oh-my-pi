@@ -89,10 +89,14 @@ columns:
     lineage:
       - datalake_comms_manager_raw.comms_manager_rules.body_content
     description: Pre-rendered or static body content for the communication. Used for simple messages or as fallback content when dynamic templating fails.
-  ts_export_generated_at:
+  ts_export_generated:
     lineage:
       - datalake_comms_manager_raw.comms_manager_rules.generated_at
     description: Timestamp when the rule configuration was generated or exported from the communication management system. Used for version control and change tracking of rule configurations.
+  ts_created:
+    description: Timestamp when the record was first created in the target table. Remains unchanged after initial insertion and provides audit trail for record lifecycle tracking.
+  ts_updated:
+    description: Timestamp when the record was last updated in the target table. Updated on every merge operation when changes are detected, providing audit trail for data freshness and modification history.
   year:
     lineage:
       - datalake_comms_manager_raw.comms_manager_rules.generated_at

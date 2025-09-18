@@ -393,6 +393,184 @@ class TestSchemaContract(unittest.TestCase):
             "day"
         ]
 
+    def test_explode_and_flatten_actions_with_missing_optional_fields(self):
+        """
+        Test that explode_and_flatten_actions handles missing optional fields gracefully.
+        This tests the corner case where some records have missing optional fields.
+        """
+        from datetime import datetime
+
+        # Test data with missing optional fields
+        rules_data_with_missing_fields = [
+            # Record 1: Complete record with all fields
+            {
+                "generated_at": datetime(2024, 1, 1, 12, 0, 0),
+                "rule": {
+                    "rule_id": "rule_complete",
+                    "status": "active",  # This field is present
+                    "scope": {
+                        "business_context": "rental",
+                        "category": "notification",
+                        "company": "quintoandar",
+                        "context": "tenant",
+                        "cost_center": "operations",
+                        "journey_step": "onboarding",
+                        "line": "for_rent",
+                        "profile": "tenant",
+                        "team": "growth"
+                    },
+                    "actions": [
+                        {
+                            "action_id": "action_complete",
+                            "notification_type": "email",
+                            "profile": "tenant",
+                            "reason": "welcome",
+                            "deep_link": "https://app.com/welcome",
+                            "templates": {
+                                "subject_template": "Welcome {{name}}",
+                                "body_template": "Hello {{name}}, welcome!",
+                                "body_template_path": "/templates/welcome.html",
+                                "subject_content": "Welcome John",
+                                "body_content": "Hello John, welcome!"
+                            }
+                        }
+                    ]
+                }
+            },
+            # Record 2: Missing status field and some scope fields
+            {
+                "generated_at": datetime(2024, 1, 2, 12, 0, 0),
+                "rule": {
+                    "rule_id": "rule_missing_status",
+                    # "status" field is missing
+                    "scope": {
+                        "business_context": "rental",
+                        "company": "quintoandar",
+                        "line": "for_rent",
+                        "profile": "tenant"
+                        # Missing: category, context, cost_center, journey_step, team
+                    },
+                    "actions": [
+                        {
+                            "action_id": "action_minimal",
+                            "notification_type": "sms",
+                            # Missing: profile, reason, deep_link, templates
+                        }
+                    ]
+                }
+            },
+            # Record 3: Missing templates entirely
+            {
+                "generated_at": datetime(2024, 1, 3, 12, 0, 0),
+                "rule": {
+                    "rule_id": "rule_no_templates",
+                    "status": "inactive",
+                    "scope": {
+                        "business_context": "sale",
+                        "company": "quintoandar"
+                        # Missing most scope fields
+                    },
+                    "actions": [
+                        {
+                            "action_id": "action_no_templates",
+                            "notification_type": "push"
+                            # Missing: templates object entirely
+                        }
+                    ]
+                }
+            }
+        ]
+
+        # Create DataFrame with proper schema to handle missing fields
+        from pyspark.sql.types import StructType, StructField, StringType, ArrayType, TimestampType
+
+        schema = StructType([
+            StructField("generated_at", TimestampType(), True),
+            StructField("rule", StructType([
+                StructField("rule_id", StringType(), True),
+                StructField("status", StringType(), True),
+                StructField("scope", StructType([
+                    StructField("business_context", StringType(), True),
+                    StructField("category", StringType(), True),
+                    StructField("company", StringType(), True),
+                    StructField("context", StringType(), True),
+                    StructField("cost_center", StringType(), True),
+                    StructField("journey_step", StringType(), True),
+                    StructField("line", StringType(), True),
+                    StructField("profile", StringType(), True),
+                    StructField("team", StringType(), True),
+                ]), True),
+                StructField("actions", ArrayType(StructType([
+                    StructField("action_id", StringType(), True),
+                    StructField("notification_type", StringType(), True),
+                    StructField("profile", StringType(), True),
+                    StructField("reason", StringType(), True),
+                    StructField("deep_link", StringType(), True),
+                    StructField("templates", StructType([
+                        StructField("subject_template", StringType(), True),
+                        StructField("body_template", StringType(), True),
+                        StructField("body_template_path", StringType(), True),
+                        StructField("subject_content", StringType(), True),
+                        StructField("body_content", StringType(), True),
+                    ]), True),
+                ])), True),
+            ]), True)
+        ])
+
+        rules_df = self.spark.createDataFrame(rules_data_with_missing_fields, schema)
+
+        # Call the REAL function - should handle missing fields gracefully
+        result_df = explode_and_flatten_actions(rules_df)
+
+        # Verify the function completes without errors
+        self.assertIsNotNone(result_df, "Function should return a DataFrame even with missing fields")
+
+        # Verify we get the expected number of rows (3 actions from 3 rules)
+        row_count = result_df.count()
+        self.assertEqual(row_count, 3, f"Expected 3 rows, got {row_count}")
+
+        # Collect the results to verify null handling
+        results = result_df.collect()
+
+        # Verify first record (complete) has all values
+        complete_record = next(r for r in results if r.rule_id == "rule_complete")
+        self.assertEqual(complete_record.status, "active")
+        self.assertEqual(complete_record.business_context, "rental")
+        self.assertEqual(complete_record.subject_template, "Welcome {{name}}")
+
+        # Verify second record (missing status) has null for status
+        missing_status_record = next(r for r in results if r.rule_id == "rule_missing_status")
+        self.assertIsNone(missing_status_record.status, "Missing status field should be null")
+        self.assertIsNone(missing_status_record.category, "Missing category field should be null")
+        self.assertIsNone(missing_status_record.reason, "Missing reason field should be null")
+
+        # Verify third record (no templates) has null template fields
+        no_templates_record = next(r for r in results if r.rule_id == "rule_no_templates")
+        self.assertEqual(no_templates_record.status, "inactive")
+        self.assertIsNone(no_templates_record.subject_template, "Missing subject_template should be null")
+        self.assertIsNone(no_templates_record.body_content, "Missing body_content should be null")
+
+        # Verify all records have mandatory ID fields
+        for record in results:
+            self.assertIsNotNone(record.rule_id, "rule_id should never be null")
+            self.assertIsNotNone(record.action_id, "action_id should never be null")
+
+        # Verify all expected columns are still present (with nulls where appropriate)
+        expected_columns = [
+            "generated_at", "rule_id", "status", "business_context", "category",
+            "company", "context", "cost_center", "journey_step", "line",
+            "rule_profile", "team", "action_id", "notification_type",
+            "action_profile", "reason", "deep_link", "subject_template",
+            "body_template", "body_template_path", "subject_content",
+            "body_content", "year", "month", "day"
+        ]
+
+        actual_columns = result_df.columns
+        for expected_col in expected_columns:
+            self.assertIn(expected_col, actual_columns, f"Missing expected column: {expected_col}")
+
+        print(f"✅ Successfully handled {row_count} records with missing optional fields")
+
 
 class TestDataContractIntegration(unittest.TestCase):
     """
