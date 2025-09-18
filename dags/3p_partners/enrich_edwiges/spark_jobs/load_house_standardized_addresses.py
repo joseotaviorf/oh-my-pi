@@ -16,6 +16,8 @@ from edwiges import __version__ as edwiges_version
 # Bietlejuice imports
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -26,7 +28,6 @@ JOB_NAME = "load_standardized_addresses"
 def main():
     """Main function to process addresses using Edwiges"""
     args = parse_args()
-    
     # Load source data
     houses_df = load_source_data()
     
@@ -205,6 +206,13 @@ def save_df(df: DataFrame, args: Namespace) -> None:
     spark_metastore_service.refresh_table(
             database_name, args.table_name
     )
+
+    table_privileges = TablePrivileges.from_environment_default(full_table_name)
+    if (
+        table_privileges
+        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+    ):
+        table_privileges.apply()
 
 if __name__ == "__main__":
     main()
