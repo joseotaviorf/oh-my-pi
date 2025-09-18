@@ -116,7 +116,7 @@ get_date_array AS (
         sk_contract,
         dt_contract_end,
         dt_contract_start,
-        SEQUENCE(dt_first_invoice,
+        SEQUENCE(GREATEST(dt_first_invoice, DATE('{load_start_date}')),
             IF(dt_contract_end IS NOT NULL,
                 LEAST(
                     GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
@@ -735,3 +735,5 @@ SELECT
     DAY(dt_reference) AS day,
     NOW() AS ts_load
 FROM contract_enhanced
+WHERE dt_reference >= DATE('{load_start_date}')
+    AND dt_reference <= DATE('{load_end_date}')
