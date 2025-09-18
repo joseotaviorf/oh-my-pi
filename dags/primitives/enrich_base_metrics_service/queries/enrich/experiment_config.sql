@@ -123,11 +123,12 @@ FROM VALUES
                                 )
         )
     ),
-    -- Concierge VS Secretaria experiment
+
+    -- Demand balancer v1 Recs rent experiment
     (
-        "ab_beakman_search_services_concierge_v1",
+        "ab_beakman_search_services_demand_concentration_v1_recs_rent_experiment",
         named_struct(
-            'begin_date', DATE('2025-08-08'),
+            'begin_date', DATE('2025-09-15'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -135,7 +136,29 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL,
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
+    ),
+
+    -- UCB Sale experiment
+    (
+        "ab_beakman_search_services_demand_sufficiency_v1_sale_experiment",
+        named_struct(
+            'begin_date', DATE('2025-09-22'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'",
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
