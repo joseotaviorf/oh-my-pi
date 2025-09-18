@@ -218,7 +218,7 @@ tickets_whatsapp AS (
         'ReparAção Comum [BACK]',
         'Reparos PP Multi [BACK]',
         'Reembolso de Reparos [Back]',
-        'Atendimento [Porto]',
+        'Triagem [Porto]',
         'Atendimento [Porto]'
       )
     AND tc.channel = 'whatsapp'

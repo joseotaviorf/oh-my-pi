@@ -82,7 +82,10 @@ WITH ticket_history_base AS (
       'FullService [BACK]',
       'ReparAção (Piloto Urgente)',
       'ReparAção Comum [BACK]',
-      'Reparos PP Multi [BACK]')
+      'Reparos PP Multi [BACK]',
+      'Reembolso de Reparos [Back]',
+      'Triagem [Porto]',
+      'Atendimento [Porto]')
     AND tc.channel NOT IN ('call')
     AND tc.status NOT IN ('deleted')
     AND tc.tags NOT LIKE '%caso_ticket_agregador%'
@@ -330,7 +333,7 @@ WHERE
     'Reparos PP Multi [BACK]',
     'ReparAção Comum [BACK]',
     'Reembolso de Reparos [Back]',
-    'Atendimento [Porto]',
+    'Triagem [Porto]',
     'Atendimento [Porto]'
 )
   AND (

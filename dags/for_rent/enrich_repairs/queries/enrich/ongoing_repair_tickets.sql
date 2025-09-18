@@ -312,7 +312,7 @@ WHERE
       'Reparos PP Multi [BACK]',
       'ReparAção Comum [BACK]',
       'Reembolso de Reparos [Back]',
-      'Atendimento [Porto]',
+      'Triagem [Porto]',
       'Atendimento [Porto]'
     )
   AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
