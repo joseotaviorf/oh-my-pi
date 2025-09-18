@@ -1,0 +1,132 @@
+database_name: datalake_sale_offer
+table_name: core_sale_offer
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: Core consolidated table that unifies sale offer information from both SalesFlow and Firestore sources, providing a comprehensive view of all offers with standardized fields and agent information.
+columns:
+  id_offer:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+      - datalake_firestore_clean.sale_offer.id
+    description: Offer unique identifier from both SalesFlow and Firestore sources.
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id
+    description: SalesFlow identification key linked to an offer. Only available for SalesFlow originated offers.
+  id_sale_flow:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id_buyer
+      - datalake_sales_flow_clean.house.id_external
+    description: Concatenated identification key for the sales flow (buyer_id + house_id).
+  id_house:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id_house
+      - datalake_firestore_clean.sale_offer.house.id
+    description: Identification key of the house linked to the offer.
+  id_buyer:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id_buyer
+      - datalake_firestore_clean.sale_offer.submitterId
+    description: Identification key of the user who sent the offer.
+  id_owner:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.id_seller
+      - datalake_firestore_clean.sale_offer.house.ownerId
+    description: House owner identification key to whom an offer has been sent.
+  id_agent:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_user
+      - datalake_sales_flow_clean.users.id_external
+      - datalake_firestore_clean.sale_offer.text1.value
+    description: Agent identification key linked to the offer. For SalesFlow offers, obtained from specialist table where kind='AGENT'. For Firestore offers, extracted from JSON text1.value field.
+  status:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.status
+    description: Current status of the sales flow. Only available for SalesFlow originated offers.
+  current_payment_method:
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_method
+      - datalake_firestore_clean.sale_offer.paymentOptions.paymentMethod
+    description: Current payment method chosen for the offer (Cash, financed, etc).
+  sale_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.sale_price
+      - datalake_firestore_clean.sale_offer.salePrice
+    description: Sale listing price set by the seller.
+  first_price_offered_by_buyer:
+    lineage:
+      - datalake_sales_flow_clean.offer_aud.offer_price
+      - datalake_firestore_clean.sale_offer.offerPrice
+    description: First value offered by the buyer for the property.
+  last_price_offered_by_buyer:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+      - datalake_firestore_clean.sale_offer.updatedOfferPrice
+    description: Last value offered by the buyer for the property.
+  last_discount_proposed:
+    description: Last discount percentage proposed by the buyer calculated as (sale_price - last_offer_price) / sale_price.
+  first_discount_proposed:
+    description: First discount percentage proposed by the buyer calculated as (sale_price - first_offer_price) / sale_price.
+  registry_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.registry_price
+      - datalake_firestore_clean.sale_offer.registryPrice
+    description: Property registry price for legal documentation.
+  itbi_price:
+    lineage:
+      - datalake_sales_flow_clean.offer.itbi_price
+      - datalake_firestore_clean.sale_offer.itbiPrice
+    description: ITBI (Real Estate Transfer Tax) value for the property transaction.
+  payment_entry_amount:
+    lineage:
+      - datalake_sales_flow_clean.payment.entry_amount
+      - datalake_firestore_clean.sale_offer.paymentOptions.entryAmount
+    description: Entry amount paid by the buyer at the beginning of the contract.
+  financing_value:
+    lineage:
+      - datalake_monopoly_clean.sale_revision.financed_amount
+      - datalake_firestore_clean.sale_offer.financingValue
+    description: Value that will be financed through a bank or financial institution.
+  fgts_value:
+    lineage:
+      - datalake_sales_flow_clean.payment.fgts_value
+      - datalake_firestore_clean.sale_offer.fgtsValue
+    description: FGTS (Employment Compensation Fund) value used in the purchase.
+  earnest_value:
+    lineage:
+      - datalake_sales_flow_clean.payment.down_payment_value
+      - datalake_firestore_clean.sale_offer.earnestValue
+    description: Earnest money or down payment value paid by the buyer to signal purchase intention.
+  giroffer_brokerage_fee:
+    lineage:
+      - datalake_sales_flow_clean.brokerage.brokerage_fee
+      - datalake_firestore_clean.sale_offer.brokerageFee
+    description: Brokerage fee percentage paid on this offer transaction.
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_method
+      - datalake_firestore_clean.sale_offer.paymentOptions.fgts
+    description: Boolean flag indicating if FGTS was used in the payment method.
+  has_used_negotiation_chat:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_type
+      - datalake_firestore_clean.sale_offer.createNegotiationChat
+    description: Boolean flag indicating if the negotiation chat feature was used for this offer.
+  is_canceled:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.is_canceled
+    description: Boolean flag indicating if the sales flow is canceled. Only available for SalesFlow originated offers.
+  ts_offer_created:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_created
+      - datalake_firestore_clean.sale_offer.createdAt._seconds
+    description: Timestamp when the offer was created by the buyer.
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_updated
+      - datalake_firestore_clean.sale_offer.ts_updated
+    description: Timestamp when the offer was last updated.
+  ts_canceled:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.ts_canceled
+    description: Timestamp when the offer was canceled. Only available for SalesFlow originated offers.
