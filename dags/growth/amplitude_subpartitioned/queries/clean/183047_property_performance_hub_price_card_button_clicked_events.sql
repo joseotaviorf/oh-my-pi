@@ -19,6 +19,7 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_sale_toggle') AS up_rc_beakman_owners_listing_performance_sale_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_rent_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_rent_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_sale_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_sale_toggle,
+    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_hybrid_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_hybrid_toggle,
     GET_JSON_OBJECT(event_properties, '$.business_contexts') AS ep_business_context,
     GET_JSON_OBJECT(event_properties, '$.content_business_context') AS ep_content_business_context,
     city,
@@ -60,5 +61,6 @@ SELECT
 FROM 
     datalake_amplitude_clean.events
 WHERE
-    id_app = '183047' AND event_type = 'property_performance_hub_price_card_button_clicked'
+    id_app = '183047'
+    AND event_type = 'property_performance_hub_price_card_button_clicked'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

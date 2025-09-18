@@ -19,6 +19,7 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_sale_toggle') AS up_rc_beakman_owners_listing_performance_sale_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_rent_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_rent_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_sale_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_sale_toggle,
+    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_hybrid_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_hybrid_toggle,
     GET_JSON_OBJECT(event_properties, '$.house_business_contexts') AS ep_business_context,
     GET_JSON_OBJECT(event_properties, '$.ad_improvements_button_available') AS ep_ad_improvements_button_available,
     GET_JSON_OBJECT(event_properties, '$.ad_performance_button_available') AS ep_ad_performance_button_available,
@@ -63,5 +64,6 @@ SELECT
 FROM
     datalake_amplitude_clean.events
 WHERE
-    id_app = '183047' AND event_type = 'property_page_viewed'
+    id_app = '183047' 
+    AND event_type = 'property_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

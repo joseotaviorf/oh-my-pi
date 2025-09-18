@@ -14,14 +14,8 @@ SELECT
     idfa,
     event_type,
     amplitude_event_type,
-    GET_JSON_OBJECT(user_properties, '$.ab_beakman_owner_house_setup') AS up_ab_beakman_owner_house_setup,
-    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_rent_toggle') AS up_rc_beakman_owners_listing_performance_rent_toggle,
-    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_sale_toggle') AS up_rc_beakman_owners_listing_performance_sale_toggle,
-    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_rent_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_rent_toggle,
-    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_sale_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_sale_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_hybrid_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_hybrid_toggle,
-    GET_JSON_OBJECT(event_properties, '$.business_contexts') AS ep_business_context,
-    GET_JSON_OBJECT(event_properties, '$.content_business_context') AS ep_content_business_context,
+    GET_JSON_OBJECT(event_properties, '$.business_context') AS ep_business_context,
     city,
     country,
     data,
@@ -57,10 +51,10 @@ SELECT
     ts_processed,
     year,
     month,
-    day
+    day 
 FROM 
     datalake_amplitude_clean.events
 WHERE
-    id_app = '183047' 
-    AND event_type = 'property_performance_hub_available_hours_button_clicked'
+    id_app = '183047'
+    AND event_type = 'property_performance_hub_switched'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

@@ -1,10 +1,9 @@
 database_name: datalake_amplitude_clean
-table_name: 183047_property_performance_hub_price_button_clicked_events
+table_name: 183047_property_performance_hub_switched_events
 owner: camila.simoes@quintoandar.com.br
 domain: Growth
-description: This table contains property_performance_hub_price_button_clicked events
-  from app 183047. It tracks user interactions and includes relevant metadata and
-  user properties.
+description: This table contains property_performance_hub_switched events from app 183047. It tracks
+  user interactions and includes relevant metadata and user properties.
 columns:
   id_amplitude:
     lineage:
@@ -17,7 +16,7 @@ columns:
   id_house:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Unique identifier for the property/house where the price button was clicked in the performance hub. Extracted from event properties.
+    description: Unique identifier for the property/house being viewed or interacted with. Extracted from event properties.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
@@ -61,43 +60,19 @@ columns:
   event_type:
     lineage:
     - datalake_amplitude_clean.events.event_type
-    description: Name of the event action performed by the user ('property_performance_hub_price_button_clicked'). Tracks clicks on the price optimization button.
+    description: Name of the event action performed by the user (e.g., 'property_performance_hub_switched'). Defines the specific user behavior being tracked.
   amplitude_event_type:
     lineage:
     - datalake_amplitude_clean.events.amplitude_event_type
     description: Amplitude's internal event type classification. May differ from event_type for system events or special handling.
-  up_ab_beakman_owner_house_setup:
-    lineage:
-    - datalake_amplitude_clean.events.user_properties
-    description: A/B test feature flag for house setup experiment. Controls owner onboarding flow variations and setup process optimization.
-  up_rc_beakman_owners_listing_performance_rent_toggle:
-    lineage:
-    - datalake_amplitude_clean.events.user_properties
-    description: A/B test feature flag for listing performance experiment (Wave 0) in rental flow. Controls performance dashboard features for rental properties.
-  up_rc_beakman_owners_listing_performance_sale_toggle:
-    lineage:
-    - datalake_amplitude_clean.events.user_properties
-    description: A/B test feature flag for listing performance experiment (Wave 0) in sale flow. Controls performance dashboard features for sale properties.
-  up_rc_beakman_owners_listing_performance_wave_one_rent_toggle:
-    lineage:
-    - datalake_amplitude_clean.events.user_properties
-    description: A/B test feature flag for listing performance experiment (Wave 1) in rental flow. Enhanced version of performance dashboard for rental properties.
-  up_rc_beakman_owners_listing_performance_wave_one_sale_toggle:
-    lineage:
-    - datalake_amplitude_clean.events.user_properties
-    description: A/B test feature flag for listing performance experiment (Wave 1) in sale flow. Enhanced version of performance dashboard for sale properties.
   up_rc_beakman_owners_listing_performance_wave_one_hybrid_toggle:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: A/B test feature flag for listing performance experiment (Wave 1) on hybrid properties. Controls enhanced performance hub for properties with both rent/sale options.
+    description: A/B test feature flag for listing performance experiment. Controls whether users see the enhanced property performance hub for hybrid properties.
   ep_business_context:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Business context of the property where the price button was clicked.  'RENT' (rental properties) or 'SALE' (properties for sale).
-  ep_content_business_context:
-    lineage:
-    - datalake_amplitude_clean.events.event_properties
-    description: Content-specific business context for the price button interaction.  'RENT' or 'SALE', may differ from main business context for hybrid properties.
+    description: Business context of the property interaction.  'RENT' (rental properties) or 'SALE' (properties for sale). Extracted from event properties.
   city:
     lineage:
     - datalake_amplitude_clean.events.city
@@ -137,7 +112,7 @@ columns:
   dma:
     lineage:
     - datalake_amplitude_clean.events.dma
-    description: Designated Market Area - geographic region identifier used for location-based analytics and content targeting (e.g., 'São Paulo-Campinas, BR').
+    description: Designated Market Area - geographic region identifier used for location-based analytics and content targeting.
   ip_address:
     lineage:
     - datalake_amplitude_clean.events.ip_address
@@ -189,7 +164,7 @@ columns:
   event_properties:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: JSON object containing event-specific custom properties. Includes contextual data about the price button click and related pricing optimization context.
+    description: JSON object containing event-specific custom properties. Includes contextual data about the specific action performed by the user.
   user_properties:
     lineage:
     - datalake_amplitude_clean.events.user_properties
@@ -197,7 +172,7 @@ columns:
   is_paying:
     lineage:
     - datalake_amplitude_clean.events.is_paying
-    description: Boolean flag indicating if the user is a paying customer. Set to true at first revenue event and persists thereafter. Used for customer segment analysis and monetization tracking.
+    description: Boolean flag indicating if the user is a paying customer at the time of the event. Used for customer segment analysis and monetization tracking.
   is_attribution_event:
     lineage:
     - datalake_amplitude_clean.events.is_attribution_event
@@ -209,7 +184,7 @@ columns:
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: Timestamp when the price button click occurred in the performance hub. Primary timestamp for event ordering and time-based analysis.
+    description: Timestamp when the actual user action occurred. Primary timestamp for event ordering and time-based analysis.
   ts_server_uploaded:
     lineage:
     - datalake_amplitude_clean.events.ts_server_uploaded
