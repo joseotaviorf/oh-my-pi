@@ -144,6 +144,28 @@ columns:
     description: If is waiting for response.
     lineage:
       - datalake_visit.visits.is_waiting_for_response
+  num_agents_associated:
+    description: Number of agents associated with the visit.
+    lineage:
+      - datalake_visit.visits.nbr_agent
+  num_visit_booked:
+    description: Number of visit booked. The sum aggregate function can be used to get the total number of booked visits grouped in some way.
+  num_visit_confirmed:
+    description: Number of visit confirmed. The sum aggregate function can be used to get the total number of confirmed visits grouped in some way.
+    lineage:
+      - datalake_visit.visits.is_visit_confirmed
+  num_visit_completed:
+    description: Number of visit completed. The sum aggregate function can be used to get the total number of completed visits grouped in some way.
+    lineage:
+      - datalake_visit.visits.is_visit_completed
+  num_visit_canceled:
+    description: Number of visit canceled. The sum aggregate function can be used to get the total number of canceled visits grouped in some way.
+    lineage:
+      - datalake_visit.visits.is_visit_canceled
+  num_visit_unsuccessful:
+    description: Number of visit unsuccessful. The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
+    lineage:
+      - datalake_visit.visits.is_visit_unsuccessful
   is_confirmed:
     description: If the visit is confirmed.
     lineage:

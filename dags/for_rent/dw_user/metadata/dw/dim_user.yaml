@@ -104,6 +104,11 @@ columns:
     categories:
       '1': Active.
       '0': Not active.
+  dadossecretaria_ativo:
+    lineage:
+    - datalake_hub_services.secretariat_allocation_history.id_secretariat_user
+    - datalake_hub_services.secretariat_allocation_history.ts_allocation_ended
+    description: Boolean flag that indicates if the user is an active secretariat or not.
   flg_doorman_affiliate:
     lineage:
     - datalake_ebdb_user.affiliate_data.is_doorman_affiliate
@@ -126,6 +131,10 @@ columns:
     lineage:
     - datalake_ebdb_user.agent_data.is_rent_agent
     description: Boolean flag that indicates if the user is an Agent in QuintoAndar working with Rentals.
+  is_secretariat_user:
+    lineage:
+    - datalake_hub_services.secretariat_allocation_history.id_secretariat_user
+    description: Boolean flag that indicates if the user is a Secretariat user.
   is_user_merged:
     description: Boolean flag that indicates if the user was merged into a new one.
   dadosbancarios_outro_titular:
@@ -159,7 +168,7 @@ columns:
   aceita_sms:
     lineage:
     - datalake_ebdb_user.user.has_accepted_sms
-    description: Integer flag that indicates if the user has accepted to receive SMS. 
+    description: Integer flag that indicates if the user has accepted to receive SMS.
     categories:
       '1': True.
       '0': False.
@@ -170,12 +179,12 @@ columns:
   cpf:
     lineage:
     - datalake_ebdb_user.user.cpf
-    description: CPF (Tax Identification Number) of user or the CNPJ (Brazilian National Registry of Legal Entities) if the user is a legal entity, 
+    description: CPF (Tax Identification Number) of user or the CNPJ (Brazilian National Registry of Legal Entities) if the user is a legal entity,
       with dot and hyphen formatting.
   rg:
     lineage:
     - datalake_ebdb_user.user.rg
-    description: RG (Brazilian national lD) of user. 
+    description: RG (Brazilian national lD) of user.
       In most cases the RG is linked with a non entity user, but there's no rule that an entity user can't fill the RG field.
   sexo:
     lineage:

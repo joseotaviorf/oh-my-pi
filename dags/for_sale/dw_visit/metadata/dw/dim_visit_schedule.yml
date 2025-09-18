@@ -18,6 +18,18 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.channel_creation
     description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED)
+  schedule_requested_user_role:
+    lineage:
+      - datalake_visit.visit_schedules.user_role_creation
+    description: Role of user who requested the schedule.
+  schedule_first_confirmed_channel:
+    lineage:
+      - datalake_visit.visit_schedules.first_confirmed_channel
+    description: Channel from first confirmation of schedule.
+  schedule_first_confirmed_user_role:
+    lineage:
+      - datalake_visit.visit_schedules.first_confirmed_user_role
+    description: Role of user who is related to the first visit confirmation.
   last_confirm_answer_supply:
     lineage:
       - datalake_visit.visit_schedules.last_answer_supply

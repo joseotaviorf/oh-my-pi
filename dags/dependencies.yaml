@@ -1099,6 +1099,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+  - bietlejuice.enrich_hub_services:load-enrich-secretariat-allocation-history:first-run-of-day
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history:first-run-of-day
   - bietlejuice.enrich_pro_owners:load-enrich-owner-category:first-run-of-day
 bietlejuice.dw_user_affiliate:

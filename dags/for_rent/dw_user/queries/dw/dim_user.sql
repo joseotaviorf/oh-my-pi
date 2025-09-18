@@ -11,7 +11,7 @@ WITH user_dates (
         MIN(p.ts_created) AS ts_first_proposal_accepted,
         MIN(c.ts_created) AS ts_first_contract,
         MIN(c.ts_signed) AS ts_first_signed_contract
-    FROM 
+    FROM
         datalake_ebdb_user.user AS u
     LEFT JOIN
         datalake_booking.booking AS b
@@ -40,7 +40,7 @@ booking_counts AS (
         CAST(COUNT(1) AS INTEGER) AS visits_booked,
         CAST(SUM(if(is_visit_completed, 1, 0)) AS INTEGER) AS visits_realized,
         CAST(SUM(if(visit_fup IS NOT NULL, 1, 0)) AS INTEGER) AS visits_expected_to_happen
-    FROM 
+    FROM
         datalake_booking.booking
     GROUP BY
         id_visitor
@@ -56,6 +56,15 @@ booking_counts AS (
     WHERE
         dt_houses_owned = DATE_ADD(DATE(CURRENT_DATE()), -1)
     GROUP BY 1
+ ),
+ user_secretariat AS (
+    SELECT
+        id_secretariat_user,
+        ts_allocation_ended
+    FROM
+        datalake_hub_services.secretariat_allocation_history
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_secretariat_user ORDER BY version DESC) = 1
  )
 SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
     u.id AS sk_user,
@@ -78,10 +87,12 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     CAST(ad.is_active AS INTEGER) AS dadosafiliado_ativo,
     CAST(ag.is_active AS INTEGER) AS dadosagente_ativo,
     CAST(p.is_active AS INTEGER) AS dadosfotografo_ativo,
+    IF(sec.id_secretariat_user IS NOT NULL AND sec.ts_allocation_ended IS NULL, TRUE, FALSE) as dadossecretaria_ativo,
     CAST(COALESCE(ad.is_doorman_affiliate, false) AS INTEGER) AS flg_doorman_affiliate,
     CAST(CAST(u.is_tenant AS INTEGER) AS VARCHAR(10)) AS inquilino,
     ag.is_sale_agent,
     ag.is_rent_agent,
+    IF(sec.id_secretariat_user IS NOT NULL, TRUE, FALSE) AS is_secretariat_user,
     IF(um.id_user IS NULL, FALSE, TRUE) AS is_user_merged,
     CAST(u.bank_another_holder AS INTEGER) AS dadosbancarios_outro_titular,
     CAST(CAST(u.has_house AS INTEGER) AS VARCHAR(10)) AS tem_imovel,
@@ -158,6 +169,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_user.agent_data AS ag
         ON ag.id = u.id_agent
+LEFT JOIN
+    user_secretariat AS sec
+        ON sec.id_secretariat_user = u.id
 LEFT JOIN
     datalake_ebdb_clean.bank AS b
         ON b.id = u.id_bank

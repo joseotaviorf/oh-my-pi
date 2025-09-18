@@ -130,6 +130,14 @@ columns:
       - datalake_ebdb_clean.visit_status_log.channel
     description:
       Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED)
+  first_confirmed_channel:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Channel from first confirmation of schedule.
+  first_confirmed_user_role:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.author_user_role
+    description: Role of user who is related to the first visit confirmation.
   hub_agent_region:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
