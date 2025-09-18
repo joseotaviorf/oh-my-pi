@@ -60,7 +60,7 @@ columns:
       - core_offer.offer.id_owner
       - core_contract.contract.id_owner
       - core_contract.contract.id_tenant
-      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_test_clean.house.id_user
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -100,11 +100,11 @@ columns:
       SALE: The entity is related to sale transactions, including visits and listings for property purchases.
   house_address:
     lineage:
-      - datalake_ebdb_clean.house.address
-      - datalake_ebdb_clean.house.number
-      - datalake_ebdb_clean.house.complement
-      - datalake_ebdb_clean.house.neighborhood
-      - datalake_ebdb_clean.house.city
+      - datalake_ebdb_test_clean.house.address
+      - datalake_ebdb_test_clean.house.number
+      - datalake_ebdb_test_clean.house.complement
+      - datalake_ebdb_test_clean.house.neighborhood
+      - datalake_ebdb_test_clean.house.city
     description: The full address of the property related to the entity.
       It combines address, number, complement, neighborhood and city (in this exactly order)
       from EBDB's House/Imovel table.

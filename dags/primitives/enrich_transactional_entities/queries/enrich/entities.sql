@@ -257,7 +257,7 @@ listing AS (
         FROM
             datalake_ebdb_clean.listing_business_context AS lbc
         LEFT JOIN
-            datalake_ebdb_clean.house AS h
+            datalake_ebdb_test_clean.house AS h
                 ON h.id = lbc.id_house
         LEFT JOIN
             last_contract AS c
@@ -370,7 +370,7 @@ SELECT
 FROM
     base AS b
 LEFT JOIN
-    datalake_ebdb_clean.house AS h
+    datalake_ebdb_test_clean.house AS h
         ON h.id = b.id_house
 LEFT JOIN
     datalake_ebdb_clean.user AS u
