@@ -1,0 +1,108 @@
+---
+database_name: datalake_crawler_olx_clean
+table_name: olx
+description: |
+  This table contains the data from the OLX crawler.
+  Only the listings that have the city available are included in the table,
+  following the same logic of the raw table.
+  It is updated weekly, every Friday at 00:00 BRT, to update the data from the current week,
+  which is provided every Thursday by the crawler provider. 
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crawler_olx_raw.olx.id
+    description: |
+      The ID of the listing.
+  origin:
+    lineage:
+      - datalake_crawler_olx_raw.olx.origin
+    description: |
+      The origin of the listing, in this case, it is always "olx".
+  address:
+    lineage:
+      - datalake_crawler_olx_raw.olx.address
+    description: |
+      The address of the listing.
+      It has the following address values: city, country, neighborhood,
+      state, address, and zip_code.  
+  city:
+    lineage:
+      - datalake_crawler_olx_raw.olx.city
+    description: |
+      The city of the listing.
+      It is obtained from the address field, which contains the city.
+      All the listings where the city is not available are removed from the table.
+  region:
+    lineage:
+      - datalake_crawler_olx_raw.olx.region
+    description: |
+      The region of the listing.
+  listing_name:
+    lineage:
+      - datalake_crawler_olx_raw.olx.name
+    description: |
+      The name of the listing.
+  crawl_metadata:
+    lineage:
+      - datalake_crawler_olx_raw.olx.crawl_metadata
+    description: |
+      The metadata of the crawl, with the listing url.
+  house_info:
+    lineage:
+      - datalake_crawler_olx_raw.olx.house_info
+    description: |
+      The house info of the listing.
+      It has all the main information about the house, such as, features, size,
+      bathrooms, rooms, description, garage_spaces, unity_type, re_type.
+  type:
+    lineage:
+      - datalake_crawler_olx_raw.olx.type
+    description: |
+      The type of the listing, describe if it is buyable or rentable.
+    categories:
+      buyable: "For Sale"
+      rentable: "For Rent"
+  image_urls:
+    lineage:
+      - datalake_crawler_olx_raw.olx.image_urls
+    description: |
+      The list of image urls of the listing.
+  contact_information:
+    lineage:
+      - datalake_crawler_olx_raw.olx.contact_information
+    description: |
+      The advertiser information from the listing.
+      It has the advertiser id, name, url, phone, address, etc.
+  price:
+    lineage:
+      - datalake_crawler_olx_raw.olx.price
+    description: |
+      The price of the listing.
+      It has the fields rent and sale.
+      Each one provides information about the price of the listing.
+  date_info:
+    lineage:
+      - datalake_crawler_olx_raw.olx.date_info
+    description: |
+      It has information about the crawler date and when the listing
+      was created.
+  year:
+    lineage:
+      - datalake_crawler_olx_raw.olx.year
+    description: |
+      The year of the crawler date.
+      It is a partition column.
+  month:
+    lineage:
+      - datalake_crawler_olx_raw.olx.month
+    description: |
+      The month of the crawler date.
+      It is a partition column.
+  day:
+    lineage:
+      - datalake_crawler_olx_raw.olx.day
+    description: |
+      The day of the crawler date.
+      It is a partition column.
