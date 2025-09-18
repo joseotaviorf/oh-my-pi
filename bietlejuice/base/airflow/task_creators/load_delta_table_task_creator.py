@@ -58,6 +58,10 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
             json.dumps(table_attributes.table_privileges),
             "--table-properties",
             json.dumps(table_attributes.table_properties),
+            "--row-filter-column-key",
+            table_attributes.row_filter_column_key,
+            "--row-filter-function-name",
+            table_attributes.row_filter_function_name,
         ]
 
     def _get_extra_query_template_params(

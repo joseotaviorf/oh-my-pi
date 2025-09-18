@@ -9,6 +9,8 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
+from bietlejuice.base.databricks.row_filter import RowFilter
+
 
 JOB_NAME = "load_delta_table"
 
@@ -21,6 +23,9 @@ def main():
         table_privileges_dict = json.loads(args.table_privileges)
     else:
         table_privileges_dict = None
+
+    row_filter_column_key = args.row_filter_column_key
+    row_filter_function_name = args.row_filter_function_name
 
     logger.info(
         f"m={JOB_NAME}, env={args.env}, bucket={args.bucket}, layer={args.layer}, "
@@ -44,6 +49,7 @@ def main():
     spark_ms = SparkMetastoreHelper(args.bucket, args.layer, args.database_base_name, args.table_name, all_tables=False)
     database_name = spark_ms.spark_database_name
     database_location = spark_ms.database_location.replace("s3a://", "s3://") # Seems to be faster
+    full_table_name = f"{database_name}.{args.table_name}"
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=args.relative_query_path,
@@ -53,10 +59,10 @@ def main():
 
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
-            table_privileges_dict, f"{database_name}.{args.table_name}"
+            table_privileges_dict, full_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{args.table_name}")
+        table_privileges = TablePrivileges.from_environment_default(full_table_name)
 
     table_loader_pipeline = DeltaTableLoaderPipeline(
         database_name=database_name,
@@ -79,6 +85,14 @@ def main():
         spark=spark
     )
     table_loader_pipeline.run()
+
+    rowfilter = RowFilter(spark)
+
+    if row_filter_column_key and not rowfilter.has_row_filter(full_table_name):
+        rowfilter.apply_row_filter(
+            full_table_name, row_filter_column_key, row_filter_function_name
+        )
+
 
 def parse_arguments() -> Namespace:
     parser = ArgumentParser(description=JOB_NAME)
@@ -158,6 +172,22 @@ def parse_arguments() -> Namespace:
         "--table-properties",
         type=lambda arg: None if not arg else arg,
         help="json string with dict of custom table properties",
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-rfck",
+        "--row-filter-column-key",
+        type=lambda arg: None if not arg else arg,
+        help="Column key to be used in row filter",
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-rf",
+        "--row-filter-function-name",
+        type=lambda arg: None if not arg else arg,
+        help="Name of the function to be used in row filter",
         required=False,
         default=None,
     )
