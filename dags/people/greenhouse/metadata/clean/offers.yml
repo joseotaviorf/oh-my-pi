@@ -29,10 +29,6 @@ columns:
     description: The current status of the offer (e.g., created, accepted, rejected).
     lineage:
       - datalake_greenhouse_raw.offers.status
-  performance_bonus_type:
-    description: The type of performance bonus offered.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['performance_bonus_type']['value']
   workplace_address:
     description: The workplace address for the offer.
     lineage:
@@ -49,14 +45,6 @@ columns:
     description: The name of the hiring manager.
     lineage:
       - datalake_greenhouse_raw.offers.keyed_custom_fields['reporting_to_manager']['value']['name']
-  car_allowance:
-    description: Details about the car allowance.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['car_allowance']['value']
-  medical_plan:
-    description: Details about the medical plan.
-    lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['plan_m_dico']['value']
   opening_status:
     description: The status of the opening.
     lineage:

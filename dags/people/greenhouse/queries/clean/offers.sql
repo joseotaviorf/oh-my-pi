@@ -7,13 +7,10 @@ SELECT
     opening.id AS id_opening,
     -- text fields
     status,
-    keyed_custom_fields.performance_bonus_type.value AS performance_bonus_type,
     keyed_custom_fields.workplace_address.value AS workplace_address,
     keyed_custom_fields.employment_type.value AS employment_type,
     keyed_custom_fields.workplace.value AS workplace,
     keyed_custom_fields.reporting_to_manager.value.name AS reporting_to_manager_name,
-    keyed_custom_fields.car_allowance.value AS car_allowance,
-    keyed_custom_fields.plan_m_dico.value AS medical_plan,
     CAST(opening.status AS STRING) AS opening_status,
     -- numeric
     version,
