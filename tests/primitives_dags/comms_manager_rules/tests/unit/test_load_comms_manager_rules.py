@@ -349,7 +349,7 @@ class TestS3LoaderFunction(unittest.TestCase):
 class TestArgumentParsing(unittest.TestCase):
     """Test cases for argument parsing function."""
 
-    @patch('sys.argv', ['script.py', 'prod', 'bucket', 'dag', 'schema', 'table', "['year']", '2024-01-01', 's3://path/'])
+    @patch('sys.argv', ['script.py', 'prod', 'bucket', 'dag', 'schema', 'table', "['year']", 's3://path/', '2024-01-01'])
     def test_parse_arguments_success(self):
         """Test successful argument parsing."""
         args = parse_arguments()
@@ -363,7 +363,7 @@ class TestArgumentParsing(unittest.TestCase):
         self.assertEqual(args.execution_date, '2024-01-01')
         self.assertEqual(args.comms_manager_rules_path, 's3://path/')
 
-    @patch('sys.argv', ['script.py', 'prod', 'bucket', 'dag', 'schema', 'table', '2024-01-01', 's3://path/'])
+    @patch('sys.argv', ['script.py', 'prod', 'bucket', 'dag', 'schema', 'table', 's3://path/', '2024-01-01'])
     def test_parse_arguments_optional_partitions(self):
         """Test argument parsing with optional partitions."""
         args = parse_arguments()

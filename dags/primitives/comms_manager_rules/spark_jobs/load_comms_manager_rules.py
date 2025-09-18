@@ -311,10 +311,10 @@ def parse_arguments():
                        help="Table name")
     parser.add_argument("partitions",
                        help="Partition information", nargs="?", default=None)
+    parser.add_argument("comms_manager_rules_path",
+                       help="S3 path for communication manager rules")
     parser.add_argument("execution_date",
                        help="Execution date in YYYY-MM-DD format")
-    parser.add_argument("comms_manager_rules_path",
-                       help="S3 path template for communication manager rules")
 
     return parser.parse_args()
 

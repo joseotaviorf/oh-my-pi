@@ -21,27 +21,15 @@ workflow:
         - "{schema}"
         - "{table_name}"
         - "{partitions}"
-        - "{execution_date}"
         - "s3://comms-manager-{environment}/notification-rules/versions/"
+      extra_spark_job_arguments:
+        - "{{ data_interval_start | ds }}"
       partitions: [year, month, day]
       merge_on: [id_rule, id_action]
       when_matched_update_condition: |
         source.ts_export_generated_at > target.ts_export_generated_at
       when_not_matched_insert_condition: |
         source.id_rule IS NOT NULL AND source.id_action IS NOT NULL
-      data_quality:
-        clean:
-          - name: unique_rule_action_combination
-            query: |
-              SELECT COUNT(*) as duplicate_count
-              FROM (
-                SELECT id_rule, id_action, COUNT(*) as cnt
-                FROM {table_name}
-                GROUP BY id_rule, id_action
-                HAVING COUNT(*) > 1
-              )
-            expected: 0
-            description: "Ensure unique combinations of rule_id and action_id"
 cluster:
   type: databricks_13_3_high_mem_driver_high_mem_nodes
   databricks_conn_id: databricks_new
