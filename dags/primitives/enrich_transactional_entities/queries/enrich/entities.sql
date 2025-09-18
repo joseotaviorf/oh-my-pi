@@ -10,7 +10,7 @@ WITH visit AS (
             'VISIT' AS entity,
             business_context,
             CASE
-                WHEN computed_status IN ('CANCELED', 'DONE', 'REQUEST_CANCELED', 'UNSUCCESSFUL') THEN FALSE
+                WHEN computed_status IN ('CANCELED', 'DONE', 'REQUEST_CANCELED', 'UNSUCCESSFUL', 'STALLED') THEN FALSE
                 WHEN computed_status IN ('CONFIRMED', 'REQUESTED') THEN TRUE
                 WHEN computed_status IS NULL AND status IN ('Canceled', 'Done') THEN FALSE
                 WHEN computed_status IS NULL AND status = 'Scheduled' THEN TRUE
