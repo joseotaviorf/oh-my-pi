@@ -300,12 +300,18 @@ twilio_attr AS (
       tickets_per_task
   ), 
   ticket_twilio_data AS (
-  SELECT
+  SELECT DISTINCT
     ta.id_ticket,
     ta.first_queue,
     ta.last_queue,
-    COALESCE(tp.first_analyst_email, ta.first_analyst_email) AS first_analyst_email,
-    COALESCE(tp.last_analyst_email, ta.last_analyst_email) AS last_analyst_email,
+    CASE WHEN tp.channel IN ('call', 'chat') 
+      THEN ta.first_analyst_email
+      ELSE tp.first_analyst_email
+    END as first_analyst_email,
+    CASE WHEN tp.channel IN ('call', 'chat') 
+      THEN ta.last_analyst_email
+      ELSE tp.last_analyst_email
+    END as last_analyst_email,
     LOWER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
