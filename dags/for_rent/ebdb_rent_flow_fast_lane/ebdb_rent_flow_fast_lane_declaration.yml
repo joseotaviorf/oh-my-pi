@@ -1,0 +1,25 @@
+dag:
+  name: ebdb_rent_flow_fast_lane
+  schedule_start_date: 2024,01,01
+  schedule_interval: 0,30 * * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      <<TEST>> High-frequency DAG containing tables from rental flow context that are running every 30 minutes. 
+      This DAG provides fast data ingestion for onboarding and rental process monitoring in a test environment.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  dbutils_secret_key: EBDB_DB
+  source_database: ebdb
+  source_schema: ebdb
+  custom_schema: ebdb_test
+  tables_customization:
+    Onboarding:
+      clean_table_name: onboarding
+      clean_primary_keys: [id]
+      clean_z_order_by: [id_contrato]
+cluster:
+  type: databricks_13_3_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

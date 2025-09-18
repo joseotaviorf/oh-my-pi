@@ -1,0 +1,113 @@
+database_name: datalake_ebdb_test_clean
+table_name: onboarding
+description: "HIGH-FREQUENCY TEST VERSION: Clean layer table containing comprehensive rental property onboarding process data with 30-minute refresh intervals. Tracks all stages of tenant and landlord onboarding workflow, including policy management, document delivery, utility transfers, key handover, and financial processing. This fast-lane version serves as the test environment for monitoring onboarding completion status and identifying bottlenecks in real-time rental flow processes."
+domain: For Rent
+columns:
+  id:
+    description: "Unique identifier for each onboarding record. Primary key that distinguishes individual onboarding processes across all rental contracts."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.id
+  ts_updated:
+    description: "Timestamp indicating when the onboarding record was last modified. Critical for tracking data freshness and identifying recent changes in the onboarding process."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.atualizadoem
+  ts_created:
+    description: "Timestamp when the onboarding process was initially created in the system. Marks the official start of the tenant onboarding workflow."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.criadoem
+  ts_validity:
+    description: "Date when the onboarding process becomes or became valid. Represents the official effective date for rental agreement activation and tenant occupancy."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.datavigencia
+  status:
+    description: "Current status of the onboarding process (e.g., 'pending', 'in_progress', 'completed', 'cancelled'). Key indicator for operational monitoring and identifying stalled onboardings."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.status
+  id_contrato:
+    description: "Foreign key reference to the rental contract associated with this onboarding. Links onboarding activities to specific rental agreements for comprehensive contract lifecycle tracking."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.contrato_id
+  id_rent_flow:
+    description: "Foreign key reference to the rent flow process. Connects onboarding activities to the broader rental workflow, enabling end-to-end rental process analytics."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.fluxolocacao_id
+  ts_policy_sent:
+    description: "Timestamp when the rental policy was sent to relevant parties. Critical milestone for compliance and customer communication tracking in the onboarding workflow."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.dataenvioapolice
+  ts_long_form_policy_sent_via_email_tenant:
+    description: "Timestamp when the comprehensive long-form policy document was emailed to the tenant. Important for tenant communication tracking and legal documentation compliance."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.dataenvioemailvigencialongainquilino
+  ts_long_form_policy_sent_via_email_landlord:
+    description: "Timestamp when the comprehensive long-form policy document was emailed to the landlord. Ensures both parties receive complete policy information for transparency."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.dataenvioemailvigencialongaproprietario
+  ts_policy_solicited:
+    description: "Timestamp when the policy was formally requested or solicited. Tracks the initiation of policy processing and helps measure policy delivery timelines."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.datasolicitacaoapolice
+  id_google_drive:
+    description: "Google Drive identifier where onboarding documents are stored. Enables document management and provides reference for accessing shared onboarding files and paperwork."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.googledriveid
+  terms_of_item_delivery:
+    description: "Terms and conditions related to property item delivery during onboarding. Details the logistics and responsibilities for furnishings, appliances, and other property items handover."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.termoentregaitens
+  has_transfered_payment_slip_condominium:
+    description: "Boolean flag indicating whether the condominium payment slip has been transferred to the tenant. Critical for ensuring proper billing responsibility transition."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.boletocondominiotransferencia
+  ts_confirmed_data_change:
+    description: "Timestamp when data changes in the onboarding process were confirmed. Important for audit trails and validating updates to onboarding information."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.dataconfirmadadosmudanca
+  number_of_open_payments:
+    description: "Count of outstanding payment slips or bills that remain unpaid. Key metric for financial risk assessment and onboarding completion readiness."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.numeroboletosabertos
+  value_of_open_payment:
+    description: "Total monetary value of outstanding unpaid bills or payment slips. Critical for financial analysis and determining payment resolution requirements before onboarding completion."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.valorboletoaberto
+  open_energy_bill:
+    description: "Status or amount of outstanding energy bills that need to be resolved. Part of utility transition management ensuring clean handover of energy account responsibilities."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.openenergybill
+  open_gas_bill:
+    description: "Status or amount of outstanding gas bills that need to be resolved. Ensures proper gas utility account transition and prevents service interruption for new tenants."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.opengasbill
+  open_water_bill:
+    description: "Status or amount of outstanding water bills that need to be resolved. Critical for water utility account transition and maintaining continuous service for property occupancy."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.openwaterbill
+  ts_short_term_sent:
+    description: "Timestamp when short-term rental documentation was sent. Relevant for properties with short-term rental arrangements or temporary occupancy agreements."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.shorttermsent
+  key_location:
+    description: "Physical location where property keys are stored or will be handed over. Essential for coordinating key exchange logistics during tenant move-in process."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.keylocation
+  key_location_details:
+    description: "Detailed instructions or additional information about the key location. Provides specific guidance for key pickup, access codes, or special instructions for key handover."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.keylocationdetails
+  is_missing_financial_data:
+    description: "Boolean flag indicating whether required financial data is missing from the onboarding process. Important for identifying incomplete onboardings that cannot proceed without financial verification."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.missingfinancedata
+  ts_short_term_tenant_sent:
+    description: "Timestamp when short-term rental information was specifically sent to the tenant. Tracks tenant-specific communication for short-term arrangements."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.shorttermtenantsent
+  ts_short_term_landlord_sent:
+    description: "Timestamp when short-term rental information was specifically sent to the landlord. Ensures landlord awareness and consent for short-term rental arrangements."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.shorttermlandlordsent
+  version:
+    description: "Version number of the onboarding record. Enables tracking of record changes over time and maintaining data version control for audit and rollback purposes."
+    lineage:
+      - datalake_ebdb_test_raw.onboarding.version
