@@ -48,7 +48,7 @@ SELECT
   impressions,
   posimp,
   is_branded,
-  MAKE_DATE(YEAR(dt_created), MONTH(dt_created), 01) AS dt_created,
+  dt_created,
   year,
   month,
   day

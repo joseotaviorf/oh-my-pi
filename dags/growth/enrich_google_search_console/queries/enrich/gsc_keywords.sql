@@ -44,7 +44,7 @@ WITH base_gsc AS (
     DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
-  MAKE_DATE(YEAR(dt_created), MONTH(dt_created), 01) AS dt_created,
+  dt_created,
   keyword,
 
   -- Replaces the UDF SF_SET_ALPHANUMERIC_LOWER
