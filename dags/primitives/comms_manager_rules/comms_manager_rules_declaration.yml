@@ -107,6 +107,8 @@ workflow:
           "body_template_path": "source.body_template_path",
           "subject_content": "source.subject_content",
           "body_content": "source.body_content",
+          "id_action": "source.id_action",
+          "id_rule": "source.id_rule",
         }
 
 cluster:
