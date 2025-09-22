@@ -56,3 +56,21 @@ class TablePrivileges:
             },
             catalog,
         )
+
+    @staticmethod
+    def from_environment_default_for_view(
+        view_name: str, catalog: str = None
+    ) -> "TablePrivileges":
+        """
+        Creates default permissions for views.
+        """
+        env = os.environ.get("ENVIRONMENT").lower()
+
+        return TablePrivileges(
+            view_name,
+            {
+                f"{env}-read-only": [TablePrivilegeTypeEnum.SELECT],
+                f"{env}-read-write": [TablePrivilegeTypeEnum.SELECT],
+            },
+            catalog,
+        )

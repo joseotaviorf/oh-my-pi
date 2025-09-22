@@ -10,6 +10,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_workf
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.dw_query_delta_workflow import (
     DwQueryDeltaWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.query_view_workflow import (
+    QueryViewWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -24,6 +27,7 @@ class DWFactory(BaseFactory):
     _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
         WorkflowEnum.QUERY_WORKFLOW: DWQueryWorkflow,
         WorkflowEnum.QUERY_DELTA_WORKFLOW: DwQueryDeltaWorkflow,
+        WorkflowEnum.QUERY_VIEW_WORKFLOW: QueryViewWorkflow,
     }
 
     def get_workflow(self) -> BaseWorkflow:

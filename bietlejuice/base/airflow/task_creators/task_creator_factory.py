@@ -59,6 +59,9 @@ from bietlejuice.base.airflow.task_creators.skip_run_task_creator import (
 from bietlejuice.base.airflow.task_creators.sync_metadata_task_creator import (
     SyncMetadataTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.create_query_view_task_creator import (
+    CreateQueryViewTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -90,6 +93,7 @@ class TaskCreatorFactory:
         TaskEnum.REPROCESSING_GUARD: ReprocessingGuardTaskCreator,
         TaskEnum.SKIP_RUN: SkipRunTaskCreator,
         TaskEnum.SYNC_METADATA: SyncMetadataTaskCreator,
+        TaskEnum.CREATE_QUERY_VIEW: CreateQueryViewTaskCreator,
     }
 
     def __init__(self, dag_execution_context: DagExecutionContext) -> None:

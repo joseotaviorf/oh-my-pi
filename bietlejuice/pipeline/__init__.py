@@ -5,3 +5,4 @@ from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipel
 from bietlejuice.pipeline.incremental_table_loader_pipeline import (
     IncrementalTableLoaderPipeline,
 )
+from bietlejuice.pipeline.query_view_creator_pipeline import QueryViewCreatorPipeline

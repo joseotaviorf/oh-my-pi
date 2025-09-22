@@ -105,3 +105,25 @@ class TestTablePrivileges(unittest.TestCase):
                 ],
             },
         )
+
+    @patch.dict(os.environ, {"ENVIRONMENT": "forno"})
+    def test_from_environment_default_for_view(self):
+        # arrange
+        view_name = "view_name"
+        catalog = "catalog"
+
+        # act
+        table_privileges = TablePrivileges.from_environment_default_for_view(
+            view_name, catalog
+        )
+
+        # assert
+        self.assertEqual(table_privileges.table_name, view_name)
+        self.assertEqual(table_privileges.catalog, catalog)
+        self.assertEqual(
+            table_privileges.permissions_by_principal,
+            {
+                f"forno-read-only": [TablePrivilegeTypeEnum.SELECT],
+                f"forno-read-write": [TablePrivilegeTypeEnum.SELECT],
+            },
+        )

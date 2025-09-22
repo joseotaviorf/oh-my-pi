@@ -10,6 +10,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.enrich_query_d
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.enrich_query_workflow import (
     EnrichQueryWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.query_view_workflow import (
+    QueryViewWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -24,6 +27,7 @@ class EnrichFactory(BaseFactory):
     _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
         WorkflowEnum.QUERY_WORKFLOW: EnrichQueryWorkflow,
         WorkflowEnum.QUERY_DELTA_WORKFLOW: EnrichQueryDeltaWorkflow,
+        WorkflowEnum.QUERY_VIEW_WORKFLOW: QueryViewWorkflow,
     }
 
     def get_workflow(self) -> BaseWorkflow:

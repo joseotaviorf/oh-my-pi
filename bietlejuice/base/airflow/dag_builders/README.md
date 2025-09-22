@@ -30,6 +30,7 @@ There are main modules - in which almost every new development or maintenance th
 ```mermaid
  classDiagram
       direction LR
+      CreateQueryViewTaskCreator <|-- BaseTaskCreator
       DataQualityTestsTaskCreator <|-- BaseTaskCreator
       DummyJobClusterFinishedTaskCreator <|-- BaseTaskCreator
       ExecuteJobClusterTaskCreator <|-- BaseTaskCreator
@@ -40,6 +41,7 @@ There are main modules - in which almost every new development or maintenance th
       LoadPostgresRawTaskCreator <|-- BaseTaskCreator
       LoadQueryTaskCreator <|-- BaseTaskCreator
       SyncMetadataTaskCreator <|-- BaseTaskCreator
+      TaskCreatorFactory <|-- CreateQueryViewTaskCreator
       TaskCreatorFactory <|-- DataQualityTestsTaskCreator
       TaskCreatorFactory <|-- DummyJobClusterFinishedTaskCreator
       TaskCreatorFactory <|-- ExecuteJobClusterTaskCreator
@@ -57,6 +59,13 @@ There are main modules - in which almost every new development or maintenance th
          _create_spark_job_task()
          *create_task()
          generate_task_id()
+      }
+     class CreateQueryViewTaskCreator{
+         String _TASK_ID_TEMPLATE
+         String SPARK_JOB_NAME
+         _get_parameters()
+         _get_extra_query_template_params()
+         create_task()
       }
      class DataQualityTestsTaskCreator{
          Integer _DEFAULT_EXECUTION_TIMEOUT_HOURS
@@ -185,7 +194,7 @@ Each layer has its own factory, so it will not be necessary to create new factor
 
 ### **Workflows**
 
-This folder contains various types of workflows that can be used to create DAGs with the DAG builder. For now, we have implemented the following workflows: `DWQueryWorkflow`, `EnrichQueryWorkflow`, `MetricQueryWorkflow`, `RawCDCWorkflow`, `RawDatabasePullWorkflow`, `RawGsheetsWorkflow`, and `BaseWorkflow`, which is responsible for all methods that are used in multiple workflows.
+This folder contains various types of workflows that can be used to create DAGs with the DAG builder. For now, we have implemented the following workflows: `DWQueryWorkflow`, `EnrichQueryWorkflow`, `MetricQueryWorkflow`, `QueryViewWorkflow`, `RawCDCWorkflow`, `RawDatabasePullWorkflow`, `RawGsheetsWorkflow`, and `BaseWorkflow`, which is responsible for all methods that are used in multiple workflows.
 
 The concept of Workflow is: a DAG with previously and well defined group of tasks and its dependencies. If a specific type of DAG requires a new Workflow, you can create it, add its reference on `WorkflowEnum`, and everything should work seamlessly.
 
