@@ -97,6 +97,8 @@ terminations_finished AS (
 repair_metrics AS (
     SELECT
         rr.id_contract,
+        MAX(ra.is_early_both_agree) AS is_early_both_agree,
+        MAX(ib.has_early_mediation) AS has_early_mediation,
         COUNT(CASE
           WHEN rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
         END) AS total_tentant_repair_ar,
@@ -188,6 +190,12 @@ SELECT
     tc.has_automatic_repair_analysis,
     tc.is_automatic_repair_analysis_opted_out,
     neg.has_landlord_comment,
+    CASE
+        WHEN rm.total_tentant_repair_ac > 0
+            OR (rm.total_tentant_repair_ac = 0 AND rm.total_tentant_repair_review > 0 AND (rm.has_early_mediation OR rm.is_early_both_agree))
+        THEN TRUE
+        ELSE FALSE
+    END AS has_repairs,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
     ln.fee_discount_value,

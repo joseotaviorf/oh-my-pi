@@ -178,6 +178,11 @@ columns:
     description: Indicates whether the landlord has provided any comments related to the negotiation.
     lineage:
       - datalake_terminator_clean.negotiation.has_landlord_comment
+  has_repairs:
+    description: Indicates whether the termination had repairs.
+      It will be true if
+      (1) the count of tenant repairs in AC is greater than 0
+      or (2) if the count of tenant repairs in AC is 0 but there were tenant repairs in AR AND the termination had early mediation or early both agree.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
