@@ -34,6 +34,7 @@ SELECT
     t.repairs_exempted_ac,
     t.repairs_absorbed_ac,
     t.total_tentant_repair_ac,
+    t.repair_cost,
     t.spoc_wave,
     t.is_spoc AS is_spoc_contract,
     t.is_spoc_control_group,
@@ -64,8 +65,9 @@ SELECT
     day
 FROM
     datalake_terminator.termination AS t
-LEFT JOIN spoc_contracts AS sc
-    ON t.id_contract = sc.id_contract
-    AND t.id_termination = sc.id_termination
+LEFT JOIN
+    spoc_contracts AS sc
+        ON t.id_contract = sc.id_contract
+        AND t.id_termination = sc.id_termination
 WHERE
-  DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

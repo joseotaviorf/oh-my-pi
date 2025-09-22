@@ -85,6 +85,10 @@ columns:
     lineage:
       - datalake_terminator.termination.responsible_off_manager_email
     description: Email of SPOC responsible analyst.
+  repair_resolution:
+    description: Classifies the type of repair when there is one in the Offboarding process.
+    lineage:
+      - datalake_terminator.termination.repair_resolution
   has_mediation:
     lineage:
       - datalake_offboarding.mediations.has_mediation
@@ -106,6 +110,14 @@ columns:
     lineage:
       - datalake_offboarding.mediations.is_ticket_opened_via_terminator
     description: Indicator if the mediation ticket was initiated via the terminator system.
+  has_landlord_comment:
+    description: Flag indicating if the landlord has commented on the termination.
+    lineage:
+      - datalake_terminator.termination.has_landlord_comment
+  has_repair_by_tenant_needed:
+    description: Flag indicating if the tenant needs to repair the property.
+    lineage:
+      - datalake_terminator.termination.has_repair_by_tenant_needed
   dt_inspection:
     lineage:
       - datalake_offboarding.mediations.dt_inspection

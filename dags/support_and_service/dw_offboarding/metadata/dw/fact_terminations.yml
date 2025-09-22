@@ -103,6 +103,10 @@ columns:
     description: Total repairs are the tenant's responsibility in the contestation analysis.
     lineage:
       - datalake_terminator.termination.total_tentant_repair_ac
+  repair_cost:
+    description: Cost of Repair to be performed in the Offboarding process
+    lineage:
+      - datalake_terminator.termination.repair_cost
   spoc_wave:
     description: Information of type int that indicates in which wave of the spoc the termination entered.
     lineage:
