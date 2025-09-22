@@ -1,1 +1,1 @@
-langfuse_host: https://langfuse.apps.core-prd-green.habitat.zone
+langfuse_integration_bucket_path: s3://langfuse-export-integration-prod/integration/cma4b5v5l000f2n07551cc2v8/

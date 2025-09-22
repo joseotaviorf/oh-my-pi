@@ -1,22 +1,16 @@
 SELECT
     id AS id_score,
-    traceId AS id_trace,
-    observationId AS id_observation,
-    sessionId AS id_session,
-    authorUserId AS id_author_user,
-    configId AS id_config,
-    queueId AS id_queue,
-    projectId AS id_project,
+    trace_id AS id_trace,
+    observation_id AS id_observation,
+    project_id AS id_project,
     comment,
-    metadata,
-    dataType AS data_type,
+    data_type,
     environment,
     name,
     source,
-    stringValue AS string_value,
+    string_value,
     value,
-    createdAt AS ts_created,
-    updatedAt AS ts_updated,
+    CAST(timestamp AS TIMESTAMP) AS ts_created,
     year,
     month,
     day,
@@ -24,6 +18,6 @@ SELECT
 FROM
     datalake_langfuse_raw.scores
 WHERE
-    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}')
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_score ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_score ORDER BY ts_created DESC) = 1

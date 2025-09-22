@@ -1,25 +1,18 @@
 SELECT
     id AS id_trace,
-    projectId AS id_project,
-    sessionId AS id_session,
-    userId AS id_user,
-    externalId AS id_external,
+    project_id AS id_project,
+    session_id AS id_session,
+    user_id AS id_user,
     environment,
-    htmlPath AS html_path,
     CAST(input AS STRING) AS input,
     CAST(output AS STRING) AS output,
-    latency,
     name,
-    observations,
-    scores,
     release,
     tags,
     version,
-    totalCost AS total_cost,
     bookmarked AS is_bookmarked,
     public AS is_public,
-    CAST(createdAt AS TIMESTAMP) AS ts_created,
-    CAST(updatedAt AS TIMESTAMP) AS ts_updated,
+    CAST(timestamp AS TIMESTAMP) AS ts_created,
     year,
     month,
     day,
@@ -27,6 +20,6 @@ SELECT
 FROM
     datalake_langfuse_raw.traces
 WHERE
-    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}')
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_trace ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_trace ORDER BY ts_created DESC) = 1

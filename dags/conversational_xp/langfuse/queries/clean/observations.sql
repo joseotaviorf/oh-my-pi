@@ -1,34 +1,21 @@
 SELECT
     id AS id_observation,
-    parentObservationId AS id_parent_observation,
-    traceId AS id_trace,
-    modelId AS id_model,
-    projectId AS id_project,
-    promptId AS id_prompt,
+    parent_observation_id AS id_parent_observation,
+    trace_id AS id_trace,
+    project_id AS id_project,
     CAST(input AS STRING) AS input,
     CAST(output AS STRING) AS output,
     environment,
-    model,
-    modelParameters AS model_parameters,
+    metadata,
+    provided_model_name,
+    model_parameters,
     name,
-    promptName AS prompt_name,
-    promptTokens AS prompt_tokens,
-    promptVersion AS prompt_version,
     type,
-    unit,
-    usage,
-    usageDetails AS usage_details,
-    latency,
     level,
-    inputPrice AS input_price,
-    outputPrice AS output_price,
-    completionTokens AS completion_tokens,
-    calculatedInputCost AS calculated_input_cost,
-    calculatedOutputCost AS calculated_output_cost,
-    calculatedTotalCost AS calculated_total_cost,
-    costDetails AS cost_details,
-    CAST(createdAt AS TIMESTAMP) AS ts_created,
-    CAST(updatedAt AS TIMESTAMP) AS ts_updated,
+    usage_details,
+    cost_details,
+    CAST(start_time AS TIMESTAMP) AS ts_started,
+    CAST(end_time AS TIMESTAMP) AS ts_ended,
     year,
     month,
     day,
@@ -36,6 +23,6 @@ SELECT
 FROM
     datalake_langfuse_raw.observations
 WHERE
-    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}')
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_observation ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_observation ORDER BY ts_started DESC) = 1

@@ -11,7 +11,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
-  load_spark_job: add_data_from_api_to_raw
+  load_spark_job: fetch_data_from_s3
   spark_job_arguments:
   - "{dag_name}"
   - "{environment}"
@@ -20,28 +20,28 @@ workflow:
   - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
   - "{table_name}"
 
-  default_partitions: [year, month, day, hour]
+  default_raw_partitions: [year, month, day, hour]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
   tables_customization:
     scores:
       merge_on: [id_score]
+      z_order_by: [ts_created]
     traces:
       merge_on: [id_trace]
+      z_order_by: [ts_created]
     observations:
       merge_on: [id_observation]
+      z_order_by: [ts_started]
 
 cluster:
   type: custom_cluster
-  custom_libraries:
-  - pypi:
-      package: "langfuse==3.0.0"
   custom_configurations:
     driver_node_type_id: r7a.2xlarge
     node_type_id: r7a.2xlarge
     num_workers: 2
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
       availability: ON_DEMAND
     spark_conf:
