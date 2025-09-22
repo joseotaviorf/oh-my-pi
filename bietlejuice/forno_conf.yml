@@ -1174,7 +1174,6 @@ databricks_13_3_rfleet_instance_cluster:
     instance_pool_id: *pool_rfleet_xlarge_on_demand
     num_workers: 2
     spark_version: 13.3.x-scala2.12
-
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK

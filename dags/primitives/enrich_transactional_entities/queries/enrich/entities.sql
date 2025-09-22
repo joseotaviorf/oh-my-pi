@@ -9,11 +9,14 @@ WITH visit AS (
             id_agent,
             'VISIT' AS entity,
             business_context,
+            TO_JSON(
+                STRUCT(
+                    computed_status AS computed_status
+                )
+            ) AS properties,
             CASE
                 WHEN computed_status IN ('CANCELED', 'DONE', 'REQUEST_CANCELED', 'UNSUCCESSFUL', 'STALLED') THEN FALSE
                 WHEN computed_status IN ('CONFIRMED', 'REQUESTED') THEN TRUE
-                WHEN computed_status IS NULL AND status IN ('Canceled', 'Done') THEN FALSE
-                WHEN computed_status IS NULL AND status = 'Scheduled' THEN TRUE
                 ELSE NULL
             END AS is_active,
             ts_created,
@@ -29,6 +32,7 @@ WITH visit AS (
         entity,
         'OWNER' AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -46,6 +50,7 @@ WITH visit AS (
             WHEN business_context = 'SALE' THEN 'BUYER_PROSPECT'
         END AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -60,6 +65,7 @@ WITH visit AS (
         entity,
         'AGENT_BROKER' AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -78,6 +84,11 @@ offer AS (
             id_owner,
             'OFFER' AS entity,
             'RENT' AS business_context,
+            TO_JSON(
+                STRUCT(
+                    status AS status
+                )
+            ) AS properties,
             CASE
                 WHEN status = 'PROPOSED' THEN TRUE
                 WHEN status IN ('ACCEPTED', 'DISMISSED', 'REJECTED') THEN FALSE
@@ -96,6 +107,7 @@ offer AS (
         entity,
         'TENANT_PROSPECT' AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -110,6 +122,7 @@ offer AS (
         entity,
         'OWNER' AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -126,6 +139,11 @@ contract AS (
             id_tenant,
             'CONTRACT' AS entity,
             'RENT' AS business_context,
+            TO_JSON(
+                STRUCT(
+                    status AS status
+                )
+            ) AS properties,
             CASE
                 WHEN status IN ('Cancelado', 'Finalizado') THEN FALSE
                 WHEN status IN ('Ativo', 'Minuta', 'PreAssinaturas') THEN TRUE
@@ -145,6 +163,7 @@ contract AS (
         entity,
         'OWNER' AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -162,6 +181,7 @@ contract AS (
             ELSE 'TENANT_PROSPECT'
         END AS persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -175,6 +195,11 @@ termination AS (
       id_contract,
       'TERMINATION' AS entity,
       'RENT' AS business_context,
+      TO_JSON(
+        STRUCT(
+          status AS status
+        )
+      ) AS properties,
       CASE
           WHEN status IN ('DONE', 'CANCELED') THEN FALSE
           WHEN status IN (
@@ -199,6 +224,7 @@ termination AS (
         tb.entity,
         'OWNER' AS persona,
         tb.business_context,
+        tb.properties,
         tb.is_active,
         tb.ts_created,
         tb.ts_updated
@@ -216,6 +242,7 @@ termination AS (
     tb.entity,
     'TENANT' AS persona,
     tb.business_context,
+    tb.properties,
     tb.is_active,
     tb.ts_created,
     tb.ts_updated
@@ -243,6 +270,12 @@ listing AS (
             h.id_user AS id_owner,
             'LISTING' AS entity,
             lbc.business_context,
+            TO_JSON(
+                STRUCT(
+                    lbc.status AS status,
+                    lbc.status_reason AS status_reason
+                )
+            ) AS properties,
             CASE
                 WHEN lbc.status IN ('PUBLISHED', 'EDITING')
                     OR (lbc.status = 'SUSPENDED'
@@ -271,6 +304,7 @@ listing AS (
         lb.entity,
         'OWNER' AS persona,
         lb.business_context,
+        lb.properties,
         lb.is_active,
         lb.ts_created,
         lb.ts_updated
@@ -287,6 +321,7 @@ base AS (
         entity,
         persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -302,6 +337,7 @@ base AS (
         entity,
         persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -317,6 +353,7 @@ base AS (
         entity,
         persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -332,6 +369,7 @@ base AS (
         entity,
         persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -347,6 +385,7 @@ base AS (
         entity,
         persona,
         business_context,
+        properties,
         is_active,
         ts_created,
         ts_updated
@@ -363,8 +402,13 @@ SELECT
     b.entity,
     b.persona,
     b.business_context,
+    b.properties,
     {house_address} AS house_address,
     b.is_active,
+    CASE 
+        WHEN b.is_active = FALSE THEN b.ts_updated
+        ELSE NULL
+    END AS ts_inactive,
     b.ts_created,
     b.ts_updated
 FROM

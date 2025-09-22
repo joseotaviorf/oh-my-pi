@@ -98,6 +98,21 @@ columns:
     categories:
       RENT: The entity is related to rental transactions, including visits, contracts, terminations, and listings for rental properties.
       SALE: The entity is related to sale transactions, including visits and listings for property purchases.
+  properties:
+    lineage:
+      - core_visit.visit.computed_status
+      - core_offer.offer.status
+      - core_contract.contract.status
+      - datalake_terminator_clean.termination.status
+      - datalake_ebdb_clean.listing_business_context.status
+      - datalake_ebdb_clean.listing_business_context.status_reason
+    description: Struct containing entity-specific properties and status information, used to create labels for chatbots.
+      This field provides detailed contextual information about the current state of each entity.
+      For VISIT entities - contains computed_status field.
+      For OFFER entities - contains status field.
+      For CONTRACT entities - contains status field.
+      For TERMINATION entities - contains status field.
+      For LISTING entities - contains status and status_reason fields.
   house_address:
     lineage:
       - datalake_ebdb_test_clean.house.address
@@ -118,13 +133,23 @@ columns:
       A contract entity will be considered as active for statuses ativo, minuta or PreAssinaturas, and inactive for statuses cancelado or finalizado.
       A termination entity will be considered as active for statuses requested, inspection_under_review, inspection_scheduled, inspection_opted_out, inspection_executed, or inspection_canceled, and inactive for statuses done or canceled.
       A listing entity will be considered as active for statuses published, editing, or suspended (except when suspended for specific owner-related reasons like giving up renting, consequences management, reforming, temporarily suspended, or traveling), and inactive for statuses opted_out, unpublished, or suspended with owner-related reasons.
+  ts_inactive:
+    lineage:
+      - core_visit.visit.ts_updated
+      - core_offer.offer.ts_updated
+      - core_contract.contract.ts_updated
+      - datalake_terminator_clean.termination.ts_updated
+      - datalake_ebdb_clean.listing_business_context.ts_updated
+    description: Timestamp when the entity became inactive (is_active = FALSE).
+      This field captures the ts_updated timestamp for entities that are currently inactive.
+      For active entities (is_active = TRUE), this field will be NULL.
+      This is useful for tracking when entities transitioned to an inactive state.
   ts_created:
     lineage:
       - core_visit.visit.ts_created
       - core_offer.offer.ts_created
       - core_contract.contract.ts_created
       - datalake_terminator_clean.termination.ts_created
-      - datalake_ebdb_clean.listing_business_context.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
