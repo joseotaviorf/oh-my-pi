@@ -31,7 +31,6 @@ bietlejuice.dw_agent:
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
   - bietlejuice.enrich_agenda_allocation:load-enrich-agent-region-group:first-run-of-day
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
-  - bietlejuice.enrich_visit_agent_performance:load-enrich-agent-performance-daily-summary:first-run-of-day
   - bietlejuice.gsheets_3p:done-clean-agents-3p-tqc:first-run-of-day
 bietlejuice.dw_agent_contract:
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly:first-run-of-day
@@ -3825,19 +3824,6 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs:first-run-of-day
   - bietlejuice.gsheets_3p:done-clean-agents-3p-tqc:first-run-of-day
   - bietlejuice.insider:load-clean-review:first-run-of-day
-bietlejuice.enrich_visit_agent_performance:
-  - bietlejuice.enrich_agenda_allocation:load-enrich-agenda-hourly-allocations:first-run-of-day
-  - bietlejuice.enrich_agent_accreditation:load-enrich-agent-major-region-code:first-run-of-day
-  - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile-activity:first-run-of-day
-  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context-activity:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking-cancellation:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day
-  - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
-  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
-  - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
-  - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified:first-run-of-day
 bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-contact:first-run-of-day
   - bietlejuice.wololo:load-clean-prospect-aud:first-run-of-day
@@ -3867,8 +3853,6 @@ bietlejuice.enrich_zendesk:
   - bietlejuice.zendesk:load-clean-ticket-fields:first-run-of-day
   - bietlejuice.zendesk:load-clean-ticket-metrics:first-run-of-day
   - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
-bietlejuice.metric_agents__performance:
-  - bietlejuice.dw_agent:load-dw-agent-fact-visit-agent-performance:first-run-of-day
 bietlejuice.metric_fintech__atta:
   - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
