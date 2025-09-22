@@ -1,7 +1,7 @@
 dag:
-  name: enrich_landlord_journey
+  name: enrich_tenant_journey
   schedule_start_date: 2023, 7, 2
-  owner: Data SS
+  owner: Data Conversational XP
   documentation:
     dag_purpose: |
       This DAG creates an enriched table containing the Tenant Journey Step.
@@ -20,16 +20,16 @@ workflow:
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
   tables_customization:
-    landlord_journey_step:
-      z_order_by: [id_owner, id_snapshot]
+    tenant_journey_step:
+      z_order_by: [id_client, id_snapshot]
 cluster:
   type: custom_cluster
   custom_configurations:
     autotermination_minutes: 20
     driver_node_type_id: m5d.4xlarge
     node_type_id: m5d.4xlarge
-    runtime_engine: PHOTON
     spark_version: 13.3.x-scala2.12
+    runtime_engine: PHOTON
     num_workers: 4
     aws_attributes:
       first_on_demand: 1
