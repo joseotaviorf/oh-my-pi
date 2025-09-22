@@ -104,3 +104,4 @@ recognizers:
 skip_list:
   - datalake_amplitude_clean.events
   - datalake_amplitude_events_clean.events
+  - datalake_amplitude_backup_clean.events
