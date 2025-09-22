@@ -44,10 +44,10 @@ daily_house_listing AS (
     datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
       JOIN
         owners_to_process AS otp
-          ON hldi.id_owner = otp.id_owner
+        ON hldi.id_owner = otp.id_owner
       LEFT JOIN
         vespucio_prod_delta.listings AS l
-          ON l.source_id::bigint = hldi.id_house
+        ON l.source_id::bigint = hldi.id_house
 ),
 daily_owner_stats AS (
   SELECT
@@ -171,26 +171,105 @@ pp_multi_houses AS (
     pp_multi_stats AS pms
     LATERAL VIEW EXPLODE(pms.active_houses) exploded_houses_table AS house_struct
     LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
+  UNION
+  SELECT DISTINCT
+    pms.id_owner,
+    exploded_id_house AS id_house
+  FROM
+    pp_multi_stats AS pms
+    LATERAL VIEW EXPLODE(pms.two_year_max_houses) exploded_houses_table AS house_struct
+    LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
+  UNION
+  SELECT DISTINCT
+    pms.id_owner,
+    exploded_id_house AS id_house
+  FROM
+    pp_multi_stats AS pms
+    LATERAL VIEW EXPLODE(pms.lifetime_max_houses) exploded_houses_table AS house_struct
+    LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
 ),
 pp_multi_visits AS (
   SELECT
     pmh.id_owner,
-    NULLIF(COUNT(b.id), 0) AS total_visits,
-    COUNT_IF(
-      b.status = 'Cancelado'
-      AND b.reason_category = 'Owner'
+    COALESCE(NULLIF(COUNT(b.id), 0), 0) AS total_visits,
+    COALESCE(
+      COUNT_IF(
+        b.status = 'Cancelado'
+        AND b.reason_category = 'Owner'
+      ),
+      0
     ) AS canceled_visits,
     COALESCE(canceled_visits / total_visits, 0) AS owner_cancellation_rate
   FROM
     pp_multi_houses AS pmh
-      JOIN
+      LEFT JOIN 
         datalake_booking.booking AS b
-          ON pmh.id_house = b.id_house
-  WHERE
-    b.is_visit = TRUE
-    AND b.ts_booking_utc >= DATE('{load_start_date}') - INTERVAL '150' DAYS
+        ON pmh.id_house = b.id_house
+        AND b.is_visit = TRUE
+        AND b.ts_booking_utc >= DATE('{load_start_date}') - INTERVAL '150' DAYS
   GROUP BY
     pmh.id_owner
+),
+key_location_stats AS (
+  SELECT
+    pmh.id_owner,
+    COALESCE(
+      MAX(
+        CASE
+          WHEN he.key_location = 'AGENT' THEN 1
+          ELSE 0
+        END
+      ) = 1,
+      false
+    ) AS agent_had_key
+  FROM
+    pp_multi_houses AS pmh
+  LEFT JOIN
+    datalake_ebdb_listing.house_entrance AS he
+        ON pmh.id_house = he.id_house
+  GROUP BY
+    pmh.id_owner
+),
+contract_stats AS (
+  SELECT
+    pmh.id_owner,
+    COALESCE(
+      MAX(
+        CASE
+          WHEN c.status IN ('Ativo', 'Finalizado') THEN 1
+          ELSE 0
+        END
+      ) = 1,
+      false
+    ) AS has_owner_singed_contract
+  FROM
+    pp_multi_houses AS pmh
+  LEFT JOIN
+    datalake_ebdb_contract.contract AS c
+      ON pmh.id_house = c.id_house
+  GROUP BY
+    pmh.id_owner
+),
+possible_fraud AS (
+  SELECT
+    pmv.id_owner,
+    pmv.total_visits,
+    pmv.canceled_visits,
+    pmv.owner_cancellation_rate,
+    kls.agent_had_key,
+    cs.has_owner_singed_contract,
+    IF(pmv.total_visits - pmv.canceled_visits <= 0 
+      AND kls.agent_had_key = FALSE
+      AND cs.has_owner_singed_contract = FALSE, TRUE, FALSE
+    ) AS is_possible_fraud
+  FROM
+    pp_multi_visits pmv
+  JOIN
+    key_location_stats kls
+      ON pmv.id_owner = kls.id_owner
+  JOIN
+    contract_stats cs
+      ON pmv.id_owner = cs.id_owner
 )
 SELECT
   pms.id_owner,
@@ -232,11 +311,14 @@ SELECT
   COALESCE(pms.lifetime_max_houses_unpublished, 0) AS lifetime_max_houses_unpublished,
   COALESCE(pms.lifetime_max_total_houses, 0) AS lifetime_max_total_houses,
   ---
-  COALESCE(v.total_visits, 0) AS total_visits,
-  COALESCE(v.canceled_visits, 0) AS canceled_visits,
-  COALESCE(v.owner_cancellation_rate, 0) AS owner_cancellation_rate
+  pf.total_visits,
+  pf.canceled_visits,
+  pf.owner_cancellation_rate,
+  pf.agent_had_key,
+  pf.has_owner_singed_contract,
+  pf.is_possible_fraud
 FROM
   pp_multi_stats AS pms
-    LEFT JOIN
-      pp_multi_visits AS v
-        ON v.id_owner = pms.id_owner
+LEFT JOIN
+  possible_fraud AS pf
+    ON pf.id_owner = pms.id_owner

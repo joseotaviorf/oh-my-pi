@@ -3,7 +3,7 @@ table_name: pp_multi_classification
 description:
   Owner persona PP Multi classification and supporting metrics. Includes ACTIVE, POTENTIAL and LIFETIME classes,
   deduplicated houses per listing unique identifier, windowed maximums (active day, last 2 years, lifetime) and
-  visit-based cancellation signals.
+  visit-based cancellation signals, key custody and contract indicators for fraud detection.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
@@ -74,11 +74,21 @@ columns:
   total_visits:
     lineage:
       - datalake_booking.booking.id
-    description: Number of visits in the last 150 days for the owner's active houses.
+    description: Number of visits in the last 150 days across active, 2 years max and lifetime max houses.
   canceled_visits:
     lineage:
       - datalake_booking.booking.status
       - datalake_booking.booking.reason_category
-    description: Number of visits canceled by Owner in the last 150 days.
+    description: Number of visits canceled by Owner in the last 150 days across the considered houses.
   owner_cancellation_rate:
     description: Ratio of canceled to total visits (0 when there are no visits).
+  agent_had_key:
+    lineage:
+      - datalake_ebdb_listing.house_entrance.key_location
+    description: True if at least one associated house has key_location = 'AGENT'.
+  has_owner_singed_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.status
+    description: True if at least one associated house has a contract with status 'Ativo' or 'Finalizado'.
+  is_possible_fraud:
+    description: Flag indicating potential fraud when there are no successful visits and there is neither agent key custody nor a signed contract.
