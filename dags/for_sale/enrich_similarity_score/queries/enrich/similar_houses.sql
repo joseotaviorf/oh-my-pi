@@ -25,6 +25,7 @@ WITH get_rent_houses AS (
     WHERE
         MAKE_DATE(hldi.year, hldi.month, hldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND hldi.status_history = 'PUBLISHED'
+        AND hldi.days_published >= 1
 ),
 get_sale_houses AS (
     SELECT
@@ -52,6 +53,7 @@ get_sale_houses AS (
             ON h.id = oldi.id_house
     WHERE
         MAKE_DATE(oldi.year, oldi.month, oldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND oldi.days_published >= 1
 ),
 get_rent_sale_houses AS (
     SELECT * FROM get_rent_houses
