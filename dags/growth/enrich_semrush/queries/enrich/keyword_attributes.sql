@@ -104,7 +104,6 @@ SELECT
       url LIKE '%decoracao%' OR 
       url LIKE '%/mercado-imobiliario/%' OR 
       url LIKE '%knowledge%' OR 
-      url LIKE '%forum%' OR 
       url LIKE '%portal.loft.com%' OR 
       url LIKE '%/integradores-parceiros/%' OR 
       url LIKE '%melhores-bairros%' OR 
@@ -131,7 +130,7 @@ SELECT
       url LIKE '%terreno%' OR 
       url LIKE '%comerciais%' OR 
       url LIKE '%comercial%' OR 
-      url LIKE '%imovel%' OR 
+      url LIKE '%/imovel/%' OR
       url LIKE '%chacaras%' OR 
       url LIKE '%/loft/%' OR 
       url LIKE '%flat%' OR 
@@ -143,9 +142,18 @@ SELECT
       url LIKE '%galpao%' OR 
       url LIKE '%empreendimento%' OR 
       url LIKE '%garagem%' THEN 'Transacional'
-    WHEN (url LIKE '%imoveis%' OR url LIKE '%propriedade%') AND url NOT LIKE '%wimoveis.com%' THEN 'Transacional'
+    WHEN (url LIKE '%/imoveis%' OR url LIKE '%propriedade%') AND url NOT LIKE '%wimoveis.com%' THEN 'Transacional'
     WHEN url LIKE '%/condominio%' THEN 'Condominium'
-    WHEN url LIKE '%.com.br' OR url LIKE '%.com/' OR url LIKE '%.com.br/' OR url LIKE '%.com/home' OR url LIKE '%.com.br/home' THEN 'Home'
+    WHEN
+      url LIKE 'https://www.%.com.br/' OR
+      url LIKE 'https://lrt.lopes.com.br/' OR
+      url LIKE 'https://www.%.com/' OR
+      url LIKE 'https://www.%.com/home' OR
+      url LIKE 'https://www.%.com.br/home' OR
+      url LIKE 'https://loft.com.br/' OR
+      url LIKE 'https://emcasa.com/' OR
+      url LIKE 'https://secovi.com.br/' OR
+      url LIKE 'https://imovelguide.com.br/' THEN 'Home'
     ELSE 'Other'
   END AS page_structure,
 
