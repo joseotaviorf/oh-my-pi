@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
 import boto3
-from pyspark.sql.functions import lit, to_json, col
+from pyspark.sql.functions import lit, col
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             logger.warning(f"Dataframe is empty for table {table_name} between {start_timestamp} and {end_timestamp}. Skipping data loading operations.")
         else:
             if "metadata" in df.columns:
-                df = df.withColumn("metadata", to_json(col("metadata")))
+                df = df.withColumn("metadata", col("metadata").cast("string"))
             
             df = (
                 df.withColumn("year", lit(start_timestamp.year))
