@@ -62,7 +62,3 @@ SELECT
     day
 FROM
     datalake_greenhouse_raw.jobs
-WHERE
-    DATE(updated_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
