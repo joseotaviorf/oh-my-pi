@@ -84,6 +84,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.entry_access_tracking.key_holder_identifier
     description: ID of key holder from new entry model.
+  key_holder_name:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.key_holder_name
+    description: Name of key holder from new entry model.
+  key_holder_contact:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.key_holder_contact
+    description: Contact of key holder from new entry model.
   key_holder_business_context:
     lineage:
       - datalake_ebdb_clean.entry_access_tracking.key_holder_business_context
