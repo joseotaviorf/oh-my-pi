@@ -11,7 +11,6 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -66,7 +65,6 @@ if __name__ == "__main__":
     ]
 
     spark_client = SparkClient()
-    s3_consumer = S3Consumer(spark_client)
     s3_loader = S3Loader()
     s3_service = S3Service(boto3.resource("s3"))
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -88,10 +86,7 @@ if __name__ == "__main__":
     logger.info(f"Found {len(valid_files)} files")
     if valid_files:
 
-        df = s3_consumer.get_data_from_file(
-            valid_files,
-            format="json",
-        )
+        df = spark.read.json(valid_files)
 
         if df.isEmpty():
             logger.warning(f"Dataframe is empty for table {table_name} between {start_timestamp} and {end_timestamp}. Skipping data loading operations.")
