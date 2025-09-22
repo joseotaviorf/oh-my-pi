@@ -15,6 +15,7 @@ workflow:
   source_database: ebdb
   source_schema: ebdb
   custom_schema: ebdb_test
+  execution_timeout_hours: 0.5
   tables_customization:
     Onboarding:
       clean_table_name: onboarding

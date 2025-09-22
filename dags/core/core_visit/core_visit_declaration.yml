@@ -10,6 +10,7 @@ workflow:
   layer: core
   default_extraction_type: incremental
   load_spark_job: load_core_visit
+  execution_timeout_hours: 1
   tables_customization:
     visit:
       spark_job_arguments:

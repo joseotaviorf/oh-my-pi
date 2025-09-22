@@ -9,6 +9,7 @@ workflow:
   type: query_delta
   layer: core
   default_extraction_type: full
+  execution_timeout_hours: 1
   tables_customization:
     contract:
       z_order_by: [id_house]

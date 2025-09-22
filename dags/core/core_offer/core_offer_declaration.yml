@@ -14,6 +14,7 @@ workflow:
   layer: core
   default_extraction_type: incremental
   load_spark_job: load_core_offer
+  execution_timeout_hours: 1
   tables_customization:
     offer:
       spark_job_arguments:

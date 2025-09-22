@@ -1,0 +1,169 @@
+# Schema validation file for core contract table
+# This file defines the expected schema for the core.contract table
+# Path: dags/core/core_contract/schemas/core/contract.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_contract:
+    type: string
+    required: true
+
+  # Contract identifier
+  id_contract:
+    type: bigint
+    required: true
+
+  # House information
+  id_house:
+    type: bigint
+    required: true
+
+  # Tenant information
+  id_tenant:
+    type: bigint
+    required: true
+
+  # Owner information (resolved from house_listing_relation or house)
+  id_owner:
+    type: bigint
+    required: true
+
+  # Proposal information
+  id_proposal:
+    type: bigint
+    required: false
+
+  # Contract status
+  status:
+    type: string
+    required: true
+
+  # Rental administrator
+  rental_administrator:
+    type: string
+    required: false
+
+  # Condominium responsibility
+  paying_condo:
+    type: boolean
+    required: false
+
+  responsible_for_condo:
+    type: string
+    required: false
+
+  # IPTU responsibility  
+  paying_iptu:
+    type: boolean
+    required: false
+
+  responsible_for_iptu:
+    type: string
+    required: false
+
+  # Contract details
+  signature_type:
+    type: string
+    required: false
+
+  status_closing:
+    type: string
+    required: false
+
+  is_relisting_enabled:
+    type: boolean
+    required: false
+
+  # Financial information
+  rent:
+    type: decimal
+    required: false
+
+  iptu:
+    type: decimal
+    required: false
+
+  rental_guarantee_installment:
+    type: decimal
+    required: false
+
+  rental_guarantee_value:
+    type: decimal
+    required: false
+
+  home_insurance_installment:
+    type: decimal
+    required: false
+
+  home_insurance_value:
+    type: decimal
+    required: false
+
+  first_rent_comission_fee:
+    type: decimal
+    required: false
+
+  tenant_service_fee:
+    type: decimal
+    required: false
+
+  agent_brokerage_share:
+    type: decimal
+    required: false
+
+  # Contract dates
+  dt_started:
+    type: date
+    required: true
+
+  dt_entered:
+    type: date
+    required: true
+
+  dt_termination:
+    type: date
+    required: false
+
+  # Contract timestamps
+  ts_contract_expected_end:
+    type: timestamp
+    required: false
+
+  ts_signed:
+    type: timestamp
+    required: false
+
+  ts_expected_termination:
+    type: timestamp
+    required: false
+
+  ts_minuta_approved:
+    type: timestamp
+    required: false
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: true
+
+  ts_updated:
+    type: timestamp
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 36
+max_columns: 36
+strict: true

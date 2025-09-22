@@ -17,6 +17,7 @@ workflow:
   custom_schema: terminator
   dbutils_secret_key: TERMINATOR_DB
   lineage_product_database_name: terminator
+  execution_timeout_hours: 0.5
   tables_customization:
     termination: {}
 cluster:

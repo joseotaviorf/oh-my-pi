@@ -16,6 +16,7 @@ workflow:
   custom_schema: rental_transact
   dbutils_secret_key: RENTAL_TRANSACT_DB
   has_soft_delete: true
+  execution_timeout_hours: 0.5
   tables_customization:
     offer:
       clean_table_name: offer
