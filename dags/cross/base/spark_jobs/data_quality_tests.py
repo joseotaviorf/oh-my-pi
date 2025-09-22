@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import datetime
+
 from argparse import ArgumentParser
 
 import yamale
@@ -19,28 +20,26 @@ from inmetro.validators import PyDeequValidator
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DwMetastoreMapping
-from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.base.service import ServiceEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
+from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.metadata_propagator_pipeline.atlas_quality_metrics_pipeline import (
     AtlasQualityMetricsPipeline,
 )
+
 from pyspark.sql.functions import col, to_timestamp
 
-from bietlejuice.services.messaging_services.alert_channel_service import AlertChannelService
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services import ConfigurationService
-
 
 JOB_NAME = "data_quality_tests"
 DATAHUB_URL_TEMPLATE = (
     "{DATAHUB_HOST}/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,"
     "hive.{DATABASE_NAME}.{TABLE_NAME},PROD)/Validation"
 )
-
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -232,14 +231,20 @@ if __name__ == "__main__":
     )
 
     base_dbutils = BaseDBUtils()
-    dbutils = base_dbutils.get_dbutils()
 
-    if dbutils is None:
-        raise RuntimeError(
-            "Could not get DBUtils instance. This job cannot run without it because it needs to access secrets."
-        )
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+    
+    config_service = ConfigurationService()
+    webhook_key = config_service.get_config("notification_webhooks_keys")[
+        "data_quality"
+    ]
 
-    # ############################# Getting Validation Configs ###############################
+    gchat_webhook = dbutils.secrets.get(
+        scope="quintoandar", key=webhook_key
+    )
+
+    # ############################# Getting Validation Results ###############################
     validation_file_content = DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
         dag_name=relative_file_path,
         layer=layer,
@@ -247,27 +252,14 @@ if __name__ == "__main__":
         intermediate_path=intermediate_path,
     )
 
+    # ConfigReader(path).read() does not handle S3 paths, so we extracted some of its
+    #  behaviours until the lib is enhanced.
     validation_file_content = yamale.make_data(content=validation_file_content)
     validate_input_config(input_config=validation_file_content)
     input_configs = validation_file_content[0][0]
 
-    alert_channel_service = AlertChannelService(dbutils=dbutils)
-    channel_keyword_from_config = input_configs.get("alert_channel")
-
-    # The service is now generic. The CALLER (this job) decides the default.
-    dynamic_gchat_webhook = alert_channel_service.get_gchat_webhook_url(
-        channel_keyword=channel_keyword_from_config,
-        default_keyword=GchatWebhooksEnum.DATA_QUALITY_DEFAULT,
-    )
-    logger.info(
-        f"Alerts will be sent via webhook. Provided keyword: '{channel_keyword_from_config}'. "
-        f"Default fallback: '{GchatWebhooksEnum.DATA_QUALITY_DEFAULT}'"
-    )
-
-    # ############################# Executing Validations ###############################
-    spark_session = BaseSparkContext.spark
-    spark_client = InmetroSparkClient(spark_session)
-    validation_suite_builder = ValidationSuiteBuilder(spark_session)
+    spark_client = InmetroSparkClient()
+    validation_suite_builder = ValidationSuiteBuilder(spark_client.conn)
     validation_suite = validation_suite_builder.build_validation_suite_from_input_config(
         input_configs
     )
@@ -295,7 +287,11 @@ if __name__ == "__main__":
     else:
         df = input_df
 
+    """
+    PyDeequValidator fails when try to execute 'column_level_validations' with an empty dataframe.
+    """
     if df.rdd.isEmpty():
+
         message_content = (
             f"⚠️\n"
             f"Validation suite: `Pipeline Validations:`\n"
@@ -306,11 +302,12 @@ if __name__ == "__main__":
 
         if is_incremental:
             message_content += f" No data found for the date {execution_date}."
-        
-        message = Message(content=message_content, destination=dynamic_gchat_webhook)
+        message = Message(content=message_content, destination=gchat_webhook)
+
         GChatService.send_message(message)
 
     else:
+
         pydeequ_validator = PyDeequValidator(
             suite_name=f"Pipeline Validations: {database_name}.{table_name}",
             validation_suite=validation_suite,
@@ -320,6 +317,7 @@ if __name__ == "__main__":
         validation_results = pydeequ_validator.execute_and_parse(df)
 
         # ################################ Writing to Inmetro's S3 Bucket ##################################
+
         s3_client = InmetroS3Client()
         s3_loader = InmetroS3Loader(bucket=inmetro_bucket, file_name=f"{table_name}.json")
         destination_directory = f"bietlejuice/{database_name}/{table_name}/validation"
@@ -331,10 +329,17 @@ if __name__ == "__main__":
         )
 
         # ################################ Mapping from DW_STAGING to DW  #################################
+        # In this case, tests will run on dw_staging, but metadata will associated to dw entities.
+
         if layer == "dw_staging":
             database_name = mapping_dw_schema(database=database_name)
 
         # ############################## Metadata Propagator Call ################################
+
+        base_dbutils = BaseDBUtils()
+        if base_dbutils.get_dbutils() is not None:
+            dbutils = base_dbutils.get_dbutils()
+
         metadata_propagator_credentials = json.loads(
             dbutils.secrets.get(
                 scope="quintoandar", key=ServiceEnum.METADATA_PROPAGATOR.value
@@ -349,17 +354,15 @@ if __name__ == "__main__":
         ).run()
 
         # #################################### GChat Alert ######################################
-        config_service = ConfigurationService()
         datahub_host = config_service.get_config("datahub_host")
 
         if validation_results["metadata"]["suite_result"] != "SUCCESS":
             message_content = create_message_from_validation_results(
                 datahub_host, database_name, table_name, validation_results
             )
-            message = Message(content=message_content, destination=dynamic_gchat_webhook)
+            message = Message(content=message_content, destination=gchat_webhook)
             GChatService.send_message(message)
 
         logger.info(
             f"m={JOB_NAME}, msg=Data quality tests executed for table {table_name}."
         )
-
