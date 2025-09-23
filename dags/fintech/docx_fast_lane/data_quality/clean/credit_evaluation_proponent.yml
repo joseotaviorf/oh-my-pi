@@ -1,5 +1,5 @@
 ---
-table_name: datalake_docx_test_raw.credit_evaluation
+table_name: datalake_docx_test_clean.credit_evaluation_proponent
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:
@@ -7,9 +7,9 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  user_id:
+  id_credit_evaluation:
     is_complete:
       severity_level: Error
-  created_at:
+  ts_created:
     is_complete:
       severity_level: Error
