@@ -8,6 +8,19 @@ WITH house_status AS (
     datalake_ebdb_listing.lbc_status_version_order
   WHERE
     is_last_state_of_day
+    AND status IN ('publicado', 'PUBLISHED')
+),
+filtered_date AS (
+    SELECT
+        sk_date,
+        date,
+        year,
+        month,
+        day
+    FROM
+        dw_public.dim_date
+    WHERE
+        date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
   UUID() AS id,
@@ -27,16 +40,13 @@ INNER JOIN
   dw_rent.dim_house_listing AS dl
     ON dl.id_house = fdi.sk_house
       AND dl.is_last_version = TRUE
-LEFT JOIN
-  dw_public.dim_date AS dd
+INNER JOIN
+  filtered_date AS dd
     ON dd.sk_date = fdi.sk_date
 INNER JOIN
   house_status AS hs
     ON hs.id_house = dl.id_house
-    AND MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE(hs.ts_state_started) AND COALESCE(DATE(hs.ts_state_ended), CURRENT_DATE)
-WHERE
-  MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  AND hs.status IN ('publicado', 'PUBLISHED')
+    AND dd.date BETWEEN DATE(hs.ts_state_started) AND COALESCE(DATE(hs.ts_state_ended), CURRENT_DATE)
 GROUP BY
   2, 3, 4, 5, 6, 8, 9, 10, 11
 HAVING

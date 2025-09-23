@@ -1,3 +1,28 @@
+WITH rent_daily_info AS (
+    SELECT
+        id_house,
+        year,
+        month,
+        day,
+        dt_day,
+        uuid_company
+    FROM
+        datalake_rental_historical_follow_up.house_listings_daily_info
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+WITH sale_daily_info AS (
+    SELECT
+        id_house,
+        year,
+        month,
+        day,
+        sk_company
+    FROM
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+)
 SELECT
     UUID() AS id,
     CAST(CONCAT(hms.id_house, DATE_FORMAT(MAKE_DATE(hms.year, hms.month, hms.day), 'yyyyMMdd')) AS STRING) AS business_id,
@@ -56,23 +81,23 @@ SELECT
 FROM
     datalake_similarity_score.house_metrics_score AS hms
 LEFT JOIN
-    datalake_rental_historical_follow_up.house_listings_daily_info AS hdi
-        ON hdi.year = hms.year
-        AND hdi.month = hms.month
-        AND hdi.day = hms.day
-        AND hdi.id_house = hms.id_house
+    rent_daily_info AS rdi
+        ON rdi.year = hms.year
+        AND rdi.month = hms.month
+        AND rdi.day = hms.day
+        AND rdi.id_house = hms.id_house
         AND hms.business_context = 'RENT'
 LEFT JOIN
-    datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
-        ON oldi.year = hms.year
-        AND oldi.month = hms.month
-        AND oldi.day = hms.day
-        AND oldi.id_house = hms.id_house
+    sale_daily_info AS sdi
+        ON sdi.year = hms.year
+        AND sdi.month = hms.month
+        AND sdi.day = hms.day
+        AND sdi.id_house = hms.id_house
         AND hms.business_context = 'SALE'
 WHERE
     MAKE_DATE(hms.year, hms.month, hms.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    AND hdi.uuid_company IS NULL
-    AND oldi.sk_company IS NULL
+    AND rdi.uuid_company IS NULL
+    AND sdi.sk_company IS NULL
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY hms.id_house, hms.business_context ORDER BY hdi.dt_day DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY hms.id_house, hms.business_context, hms.year, hms.month, hms.day ORDER BY rdi.dt_day DESC) = 1
 
