@@ -17,6 +17,16 @@ clone-local-airflow-plugins:
 	@rm -fR ./local/astro/plugins/databricks_plugin.py
 	@echo "Cloning succeeded at ./local/astro/plugins"
 
+clone-local-beethoven:
+	@echo "Cloning 'beethoven' from branch '$(branch)'"
+	@echo "=========="
+	@echo ""
+	@mkdir -p ./local/astro/plugins
+	@rm -fR ./local/astro/plugins_temp || true
+	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/beethoven.git ./local/astro/plugins_temp
+	@cp -Rf ./local/astro/plugins_temp/airflow/plugins/ ./local/astro/plugins
+	@rm -fR ./local/astro/plugins_temp
+	@echo "Cloning succeeded at ./local/astro/plugins"
 .PHONY: setup-bietlejuice
 setup-bietlejuice:
 	@echo "Setup bietlejuice at local airflow deployment"
@@ -70,6 +80,7 @@ branch ?= forno
 run-local-environment:
 	@make setup-bietlejuice
 	@make clone-local-airflow-plugins branch=$(branch)
+	@make clone-local-beethoven branch=$(branch)
 	@echo "Recreating local Airflow environment"
 	@echo "=========="
 	@echo ""
