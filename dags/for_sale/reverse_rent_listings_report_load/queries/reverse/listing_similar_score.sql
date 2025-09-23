@@ -11,7 +11,7 @@ WITH rent_daily_info AS (
     WHERE
         MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
-WITH sale_daily_info AS (
+sale_daily_info AS (
     SELECT
         id_house,
         year,
