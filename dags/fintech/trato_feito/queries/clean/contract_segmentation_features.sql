@@ -1,0 +1,27 @@
+SELECT
+    CAST(id AS BIGINT) AS id_contract_segmentation_features,
+    contract_id AS id_contract,
+    customer_ids AS id_customer,
+    invoice_ids AS id_invoices,
+    version,
+    contract_status,
+    segment,
+    has_any_deal,
+    is_blocked,
+    is_evic_active AS is_eviction_active,
+    number_of_not_negativable_invoices,
+    number_of_monthly_invoices,
+    number_of_deals_installments,
+    number_of_invoices_type_other,
+    number_of_overdue_monthly_invoices,
+    number_of_overdue_deals_installments,
+    number_of_overdue_invoices_type_other,
+    delay_contaminated_original_invoices,
+    delay_contaminated_deal_invoices,
+    delay_contaminated_contract,
+    contract_start_date AS dt_contract_start,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    NOW() AS ts_load
+FROM
+    datalake_trato_feito_raw.contract_segmentation_features
