@@ -3686,6 +3686,7 @@ bietlejuice.enrich_transactional_entities:
   - bietlejuice.core_offer:load-core-offer
   - bietlejuice.core_visit:load-core-visit
   - bietlejuice.ebdb_house_fast_lane:load-clean-house
+  - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
   - bietlejuice.terminator_fast_lane:load-clean-termination
 bietlejuice.enrich_trino_detractor:

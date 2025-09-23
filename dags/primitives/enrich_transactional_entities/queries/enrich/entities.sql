@@ -311,6 +311,82 @@ listing AS (
     FROM
         listing_base AS lb
 ),
+inspection AS (
+  WITH inspection_base AS (
+    SELECT
+      id as id_entity,
+      id_contract,
+      id_user_inspector,
+      'FR_INSPECTION' AS entity,
+      'RENT' AS business_context,
+       TO_JSON(
+        STRUCT(
+          status AS status
+        )
+      ) AS properties,
+      CASE
+        WHEN status IN ('Finalizada', 'Cancelada', 'ContratoCancelado') THEN FALSE
+        WHEN status IN ('Agendada', 'Comentada', 'EmAcordo', 'EmRevisao', 'Nova', 'Revisada') THEN TRUE
+        ELSE NULL
+      END AS is_active,
+      ts_created,
+      ts_updated
+      FROM datalake_ebdb_test_clean.inspection
+  )
+  SELECT
+          ib.id_entity,
+          c.id_house,
+          c.id_owner AS id_user,
+          c.id_contract AS id_contract,
+          ib.entity,
+          'OWNER' AS persona,
+          ib.business_context,
+          ib.properties,
+          ib.is_active,
+          ib.ts_created,
+          ib.ts_updated
+    FROM
+          inspection_base ib
+    INNER JOIN
+          core_contract.contract c
+          ON ib.id_contract = c.id_contract
+    UNION ALL
+    SELECT
+      ib.id_entity,
+      c.id_house,
+      c.id_tenant AS id_user,
+      c.id_contract AS id_contract,
+      ib.entity,
+      'TENANT' AS persona,
+      ib.business_context,
+      ib.properties,
+      ib.is_active,
+      ib.ts_created,
+      ib.ts_updated
+    FROM
+          inspection_base ib
+    INNER JOIN
+          core_contract.contract c
+          ON ib.id_contract = c.id_contract
+    UNION ALL
+    SELECT
+      ib.id_entity,
+      c.id_house,
+      ib.id_user_inspector AS id_user,
+      c.id_contract AS id_contract,
+      ib.entity,
+      'AGENT_INSPECTOR' AS persona,
+      ib.business_context,
+      ib.properties,
+      ib.is_active,
+      ib.ts_created,
+      ib.ts_updated
+    FROM
+          inspection_base ib
+    INNER JOIN
+          core_contract.contract c
+          ON ib.id_contract = c.id_contract
+),
 base AS (
     SELECT
         {sk_entity} AS sk_entity,
@@ -391,6 +467,22 @@ base AS (
         ts_updated
     FROM
         listing
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        inspection
 )
 SELECT
     b.sk_entity,
@@ -405,7 +497,7 @@ SELECT
     b.properties,
     {house_address} AS house_address,
     b.is_active,
-    CASE 
+    CASE
         WHEN b.is_active = FALSE THEN b.ts_updated
         ELSE NULL
     END AS ts_inactive,
