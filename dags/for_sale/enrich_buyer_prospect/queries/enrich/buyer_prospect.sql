@@ -11,7 +11,7 @@ visit_events AS (
     COUNT(DISTINCT id) AS bookings_created,
     COUNT(DISTINCT
       CASE
-        WHEN first_update_source = 'Corretores' THEN id
+        WHEN first_update_source = 'AGENT_PWA' THEN id
       END) AS bookings_created_by_agent,
     COUNT(DISTINCT
       CASE

@@ -198,26 +198,11 @@ columns:
     lineage:
     - datalake_ebdb_user.user.email
     description: Email from who had created the booking.
-  last_update_source:
-    lineage:
-    - datalake_ebdb_clean.visit_origin.name
-    description: Show origin of last source to alter the booking
   first_update_source:
     lineage:
-    - datalake_ebdb_clean.visit_origin.name
-    description: Shows the origin from the booking, self service web, booked by agent
-  first_cancelation_source:
-    lineage:
       - datalake_ebdb_clean.visit_origin.name
-    description: Shows the source of the exact action where the cancellation of the visit occurred.
-  is_visit_created_from_app:
-    lineage:
-    - datalake_ebdb_clean.visit_origin.is_app
-    description: Boolean column that indicates if the visit was created in any of the different applications (Corretores, Inquilinos, Proprietarios,  Vistoriadores, Porfolio, MagicLink). True if it was.
-  is_visit_last_updated_from_app:
-    lineage:
-    - datalake_ebdb_clean.visit_origin.is_app
-    description: Boolean column that indicates if the last update on that visit came from any of the different applications (Corretores, Inquilinos, Proprietarios, Vistoriadores, Porfolio, MagicLink). True if it was.
+      - datalake_ebdb_clean.visit_status_log.channel
+    description: Shows the origin from the booking, self service web, booked by agent
   code:
     lineage:
     - datalake_ebdb_clean.visit.code

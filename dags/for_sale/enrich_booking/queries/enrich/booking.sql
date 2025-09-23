@@ -26,13 +26,9 @@ canceled_date AS (
     WITH min_canceled_date AS (
         SELECT
             b_aud.id AS id_booking,
-            vo.name AS first_cancelation_source,
             b_aud.REV AS rev_canceled
         FROM
             datalake_ebdb_clean.booking_aud AS b_aud
-        LEFT JOIN
-            datalake_ebdb_clean.visit_origin AS vo
-                ON b_aud.id_last_update_origin = vo.id
         WHERE
             b_aud.status = 'Cancelado'
             AND b_aud.mod_status = 1
@@ -42,7 +38,6 @@ canceled_date AS (
     SELECT
         mcd.id_booking,
         ure.id_user AS id_user_cancelation,
-        mcd.first_cancelation_source,
         -- TODO [ODS] check if milliseconds is really needed for this column
         CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP)
           + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS
@@ -53,23 +48,84 @@ canceled_date AS (
         datalake_ebdb_clean.user_revision_entity AS ure
             ON ure.id = mcd.rev_canceled
 ),
-visit_origin AS (
+visit_origin_unified AS (
+    WITH old_origin AS (
+        SELECT
+            v.id AS id_visit,
+            v.id_real_estate_agent_rating,
+            v.code,
+            CASE
+                WHEN vo.name = 'SelfServiceWeb' THEN 'TENANT_PWA'
+                WHEN vo.name = 'Admin' THEN 'MAGIC_LINK'
+                WHEN vo.name = 'Sistema' THEN 'SYSTEM'
+                WHEN vo.name = 'Corretores' THEN 'AGENT_PWA'
+                WHEN vo.name = 'Inquilinos' THEN 'TENANT_NATIVE'
+                WHEN vo.name = 'Proprietarios' THEN 'OWNER_PWA'
+                WHEN vo.name = 'Portfolio' THEN 'PORTFOLIO_MANAGER'
+                WHEN vo.name = 'MagicLink' THEN 'MAGIC_LINK'
+                WHEN vo.name = 'WhatsApp' THEN 'WHATSAPP'
+                ELSE UPPER(vo.name)
+            END AS first_update_source,
+            CASE
+                WHEN vo_update.name = 'SelfServiceWeb' THEN 'TENANT_PWA'
+                WHEN vo_update.name = 'Admin' THEN 'MAGIC_LINK'
+                WHEN vo_update.name = 'Sistema' THEN 'SYSTEM'
+                WHEN vo_update.name = 'Corretores' THEN 'AGENT_PWA'
+                WHEN vo_update.name = 'Inquilinos' THEN 'TENANT_NATIVE'
+                WHEN vo_update.name = 'Proprietarios' THEN 'OWNER_PWA'
+                WHEN vo_update.name = 'Portfolio' THEN 'PORTFOLIO_MANAGER'
+                WHEN vo_update.name = 'MagicLink' THEN 'MAGIC_LINK'
+                WHEN vo_update.name = 'WhatsApp' THEN 'WHATSAPP'
+                ELSE UPPER(vo_update.name)
+            END AS last_update_source,
+            v.ts_created AS ts_visit_requested
+        FROM
+            datalake_ebdb_clean.visit AS v
+        LEFT JOIN
+            datalake_ebdb_clean.visit_origin AS vo
+                ON v.id_creation_origin = vo.id
+        LEFT JOIN
+            datalake_ebdb_clean.visit_origin AS vo_update
+                ON v.id_last_update_origin = vo_update.id
+        WHERE
+            DATE(v.ts_created) < '2024-11-01'
+    ),
+    new_origin AS (
+        SELECT
+            id_visit,
+            MIN(channel) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS first_update_source,
+            MAX_BY(channel, ts_created) AS last_update_source,
+            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_visit_requested
+        FROM
+            datalake_ebdb_clean.visit_status_log
+        WHERE
+            DATE(ts_created) >= '2024-11-01'
+        GROUP BY 1
+    )
     SELECT
-        v.id AS id_visit,
+        id_visit,
+        id_real_estate_agent_rating,
+        code,
+        first_update_source,
+        last_update_source,
+        ts_visit_requested
+    FROM
+        old_origin
+    UNION ALL
+    SELECT
+        new.id_visit,
         v.id_real_estate_agent_rating,
         v.code,
-        vo_create.is_app AS is_visit_created_from_app,
-        vo_update.is_app AS is_visit_last_updated_from_app,
-        vo_update.name AS last_update_source,
-        vo_create.name AS first_update_source
+        new.first_update_source,
+        new.last_update_source,
+        new.ts_visit_requested
     FROM
+        new_origin AS new
+    LEFT JOIN
         datalake_ebdb_clean.visit AS v
-    LEFT JOIN
-        datalake_ebdb_clean.visit_origin AS vo_create
-            ON vo_create.id = v.id_creation_origin
-    LEFT JOIN
-        datalake_ebdb_clean.visit_origin AS vo_update
-            ON vo_update.id = v.id_last_update_origin
+            ON new.id_visit = v.id
+    WHERE
+        new.ts_visit_requested IS NOT NULL
 ),
 visitor_attendance AS (
     SELECT
@@ -358,7 +414,7 @@ base_booking AS (
           CONCAT(b.id_visitor, '_', b.id_house),
           NULL
         ) AS id_sale_flow,
-        vo.id_real_estate_agent_rating,
+        vou.id_real_estate_agent_rating,
         IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
         hl.id_company_hubspot AS id_company_supply,
         hl.uuid_company AS uuid_company_supply,
@@ -379,12 +435,8 @@ base_booking AS (
         b.slot_day,
         b.checkin_status,
         u.email AS user_creation_email,
-        vo.last_update_source,
-        vo.first_update_source,
-        cd.first_cancelation_source,
-        vo.is_visit_created_from_app,
-        vo.is_visit_last_updated_from_app,
-        vo.code,
+        vou.first_update_source,
+        vou.code,
         REPLACE(sc.reason, '\n', '') AS last_status_change_reason,
         sc.reason_enum AS last_status_change_reason_enum,
         sc.reason_category AS last_status_change_reason_category,
@@ -452,8 +504,8 @@ base_booking AS (
             COALESCE(
               NULLIF(gsheets_cancel.new_reason,'CHECK ORIGEM'),
               CASE
-                WHEN vo.last_update_source IN ('Inquilinos', 'SelfServiceWeb') THEN 'Tenant'
-                WHEN vo.last_update_source IN ('Proprietarios', 'ProprietariosEmail') THEN 'Owner'
+                WHEN vou.last_update_source IN ('TENANT_NATIVE', 'TENANT_PWA') THEN 'Tenant'
+                WHEN vou.last_update_source IN ('OWNER_PWA', 'PROPRIETARIOSEMAIL') THEN 'Owner'
               END,
               CASE
                 WHEN sc.reason_enum = 'CANCELED_BY_OWNER_FROM_APP' THEN 'Owner'
@@ -539,7 +591,7 @@ base_booking AS (
         COALESCE(
             CASE
                 -- Bookings migrated from Casa Mineira don't have a visit_fup
-                WHEN vo.first_update_source = 'MigracaoCasaMineira' THEN (b.status = 'Realizado')
+                WHEN vou.first_update_source = 'MIGRACAOCASAMINEIRA' THEN (b.status = 'Realizado')
                 ELSE (b.visit_fup IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'))
             END,
             FALSE
@@ -562,8 +614,8 @@ base_booking AS (
     FROM
         datalake_ebdb_clean.booking AS b
     LEFT JOIN
-        visit_origin AS vo
-            ON b.id_visit = vo.id_visit
+        visit_origin_unified AS vou
+            ON b.id_visit = vou.id_visit
     LEFT JOIN
         status_change AS sc
             ON sc.id_booking = b.id

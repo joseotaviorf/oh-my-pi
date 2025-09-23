@@ -1,16 +1,32 @@
 -- removing duplicates rows due to CASE difference in the taxonomy
 WITH taxonomy_demand AS (
-    WITH taxonomy_min_ids AS (
+    WITH taxonomy_unified AS (
+        SELECT *,
+            CASE
+                WHEN first_update_source = 'SelfServiceWeb' THEN 'TENANT_PWA'
+                WHEN first_update_source = 'Admin' THEN 'MAGIC_LINK'
+                WHEN first_update_source = 'Sistema' THEN 'SYSTEM'
+                WHEN first_update_source = 'Corretores' THEN 'AGENT_PWA'
+                WHEN first_update_source = 'Inquilinos' THEN 'TENANT_NATIVE'
+                WHEN first_update_source = 'Proprietarios' THEN 'OWNER_PWA'
+                WHEN first_update_source = 'Portfolio' THEN 'PORTFOLIO_MANAGER'
+                WHEN first_update_source = 'MagicLink' THEN 'MAGIC_LINK'
+                WHEN first_update_source = 'WhatsApp' THEN 'WHATSAPP'
+                ELSE UPPER(first_update_source)
+            END AS first_update_source_unified
+        FROM datalake_gsheets_clean.taxonomy_demand
+    ),
+    taxonomy_min_ids AS (
         SELECT
             MIN(CAST(id AS BIGINT)) AS id
         FROM
-            datalake_gsheets_clean.taxonomy_demand
+            taxonomy_unified
         GROUP BY
             LOWER(app_type),
             LOWER(utm_source),
             LOWER(utm_medium),
             LOWER(branded),
-            LOWER(first_update_source),
+            LOWER(first_update_source_unified),
             flg_via_reschedule
     )
     SELECT
@@ -20,6 +36,7 @@ WITH taxonomy_demand AS (
         td.utm_medium,
         td.branded,
         td.first_update_source,
+        td.first_update_source_unified,
         CAST(td.flg_via_reschedule AS BOOLEAN) AS flg_via_reschedule,
         td.category AS mkt_category,
         td.flow AS mkt_flow,
@@ -30,7 +47,7 @@ WITH taxonomy_demand AS (
         td.source AS mkt_source,
         td.platform AS mkt_platform
     FROM
-        datalake_gsheets_clean.taxonomy_demand AS td
+        taxonomy_unified AS td
     JOIN
         taxonomy_min_ids AS td_min
             ON td.id = td_min.id
@@ -62,8 +79,6 @@ booking AS (
         -- TODO [ODS] review this rule
         CAST(COALESCE(b.has_owner_arrived, true) AS VARCHAR(255)) AS owner_arrived,
         CAST(CAST(b.is_entrance_successful AS INT) AS VARCHAR(255)) AS successful_entrance,
-        b.is_visit_created_from_app,
-        b.is_visit_last_updated_from_app,
         b.visit_fup AS visit_follow_up,
         b.status,
         b.slot_day AS slot_dia,
@@ -77,9 +92,7 @@ booking AS (
         b.visit_checkin_status,
         b.checkin_fail_reason,
         b.checkin_fail_commentary,
-        b.last_update_source,
         b.first_update_source,
-        b.first_cancelation_source,
         b.tenant_absence_reason AS visitor_missing_reason,
         b.agent_absence_reason AS agent_missing_reason,
         b.owner_missing_reason,
@@ -149,9 +162,7 @@ SELECT
     b.cancellation_reason_category,
     b.reason_category,
     b.responsible,
-    b.last_update_source,
     b.first_update_source,
-    b.first_cancelation_source,
     b.visitor_missing_reason,
     b.agent_missing_reason,
     b.owner_missing_reason,
@@ -185,8 +196,6 @@ SELECT
     b.is_visit_completed,
     b.is_rescheduled,
     b.is_first_booking_auto,
-    b.is_visit_created_from_app,
-    b.is_visit_last_updated_from_app,
     b.is_3p_supply,
     b.is_3p_supply_5a,
     b.is_3p_supply_bh,
@@ -212,5 +221,5 @@ LEFT JOIN
         AND LOWER(COALESCE(td.utm_medium, '')) = LOWER(COALESCE(b.utm_medium, ''))
         -- TODO [ODS] use flag is_branded FROM datalake_amplitude_visit.amplitude_visit
         AND LOWER(COALESCE(td.branded, '')) = LOWER(COALESCE(b.branded,''))
-        AND LOWER(COALESCE(td.first_update_source, '')) = LOWER(COALESCE(b.first_update_source, ''))
+        AND LOWER(COALESCE(td.first_update_source_unified, '')) = LOWER(COALESCE(b.first_update_source, ''))
         AND COALESCE(td.flg_via_reschedule, FALSE) = COALESCE(b.flg_via_reschedule, FALSE)

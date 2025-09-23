@@ -5,13 +5,13 @@ WITH adhoc_rules AS (
     dpce.business_context,
     dpce.id_event_type,
     dpce.event_name,
-    CASE 
+    CASE
       WHEN dpce.utm_medium = 'TQC'
-        OR (dpce.product_origin = 'Corretores' AND dpce.id_agent = sef.id_agent)
+        OR (dpce.product_origin = 'AGENT_PWA' AND dpce.id_agent = sef.id_agent)
       THEN "sale.acq.nonorg.na.d.referral.tqc"
-      WHEN dpce.product_origin = 'Corretores'
+      WHEN dpce.product_origin = 'AGENT_PWA'
       THEN "hybr.acq.nonorg.na.d.referral.agents"
-      WHEN  dpce.utm_medium = 'plaquinhas_ada_whatsapp'   
+      WHEN  dpce.utm_medium = 'plaquinhas_ada_whatsapp'
       THEN "hybr.acq.nonorg.na.d.placas.na"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
@@ -22,10 +22,10 @@ WITH adhoc_rules AS (
         AND utm_source IS NULL
         AND utm_medium IS NULL
         AND app_type IS NOT NULL
-      THEN "na.acq.org.na.d.direct.na" 
+      THEN "na.acq.org.na.d.direct.na"
     END AS utm_adhoc_rule,
     dpce.id_rent_flow,
-    dpce.id_sale_flow, 
+    dpce.id_sale_flow,
     dpce.id_booking,
     dpce.id_offer,
     dpce.id_talk_to_agent,
@@ -36,7 +36,7 @@ WITH adhoc_rules AS (
     CASE WHEN dpce.utm_medium = 'plaquinhas_ada_whatsapp' AND dpce.utm_campaign = 'offline_table'
       THEN "hybr.acq.nonorg.na.d.placas.na.ada_whatsapp"
       ELSE dpce.utm_campaign
-    END AS utm_campaign, 
+    END AS utm_campaign,
     dpce.utm_medium,
     dpce.utm_source,
     dpce.utm_term,
@@ -49,9 +49,9 @@ WITH adhoc_rules AS (
     CASE
       WHEN dpce.booking_creator IS NULL AND dpce.id_booking IS NOT NULL THEN "Lost Tracking"
       WHEN dpce.booking_creator IS NULL AND dpce.id_booking IS NULL THEN "SelfService"
-      WHEN dpce.booking_creator = 'SelfService' THEN 'SelfService' 
+      WHEN dpce.booking_creator = 'SelfService' THEN 'SelfService'
       WHEN dpce.booking_creator = 'Admin/CX' THEN 'CX'
-      ELSE dpce.booking_creator 
+      ELSE dpce.booking_creator
     END AS operation_channel,
     CASE
       WHEN utm_medium = 'TQC'
@@ -61,7 +61,7 @@ WITH adhoc_rules AS (
       WHEN dpce.booking_creator = 'Agent' AND dpce.is_3p_demand = FALSE THEN 'Agent'
       ELSE 'NA' -- TQC
     END AS referral_type,
-    CASE 
+    CASE
       WHEN dpce.product_origin IS NULL THEN 'Lost Tracking'
       ELSE dpce.product_origin
     END AS origin,
@@ -80,10 +80,10 @@ WITH adhoc_rules AS (
     dpce.day
   FROM
     datalake_demand_flows.demand_prospect_conversion_events AS dpce
-    LEFT JOIN datalake_tqc_referral.sale_events_flow sef 
+    LEFT JOIN datalake_tqc_referral.sale_events_flow sef
       ON dpce.visit_code = sef.visit_code
-  WHERE 
-    DATE(dpce.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')  
+  WHERE
+    DATE(dpce.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
 media_setup_ids AS (
@@ -98,7 +98,7 @@ media_setup_ids AS (
     concat_ws('.', slice(split(ef.correct_utm_campaign, '[.]'), 2, 7)) AS media_setup_from_exception_flow,
     dict.naming_convention_sufix AS media_setup_from_dictionary,
     dpce.id_rent_flow,
-    dpce.id_sale_flow, 
+    dpce.id_sale_flow,
     dpce.id_booking,
     dpce.id_offer,
     dpce.id_talk_to_agent,
@@ -107,7 +107,7 @@ media_setup_ids AS (
     dpce.id_owner,
     dpce.id_agent,
     dpce.utm_adhoc_rule,
-    dpce.utm_campaign, 
+    dpce.utm_campaign,
     dpce.utm_medium,
     dpce.utm_source,
     dpce.utm_term,
@@ -163,7 +163,7 @@ SELECT
     WHEN media_setup_from_naming_convention IS NOT NULL THEN "naming convention"
   END AS naming_convention_sufix_origin,
   id_rent_flow,
-  id_sale_flow, 
+  id_sale_flow,
   id_booking,
   id_offer,
   id_talk_to_agent,
@@ -172,7 +172,7 @@ SELECT
   id_owner,
   id_agent,
   utm_adhoc_rule,
-  utm_campaign, 
+  utm_campaign,
   utm_medium,
   utm_source,
   utm_term,

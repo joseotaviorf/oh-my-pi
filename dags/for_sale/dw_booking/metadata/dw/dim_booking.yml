@@ -333,16 +333,6 @@ columns:
         Cancelled by tenant.
       Unknown: >
         Unknown reason
-  last_update_source:
-    lineage:
-      - datalake_booking.booking.last_update_source
-    description: >
-      Shows the source of the last booking information change.
-    categories:
-      SelfServiceWeb: >
-        The booking was updated by the tenant through the website.
-      Corretores: The booking was updated by the agent.
-      Inquilinos: The booking was updated by the tenant.
   first_update_source:
     lineage:
       - datalake_booking.booking.first_update_source
@@ -365,36 +355,6 @@ columns:
         The booking was created by the Route Booster.
       SelfServiceWeb: >
         The booking was created by the tenant through the website.
-  first_cancelation_source:
-    lineage:
-      - datalake_booking.booking.first_cancelation_source
-    description: >
-      Shows the source of the exact action where the cancellation of the visit occurred.
-    categories:
-      Admin: >
-        The booking was cancelled by an admin.
-      CRM: >
-        The booking was cancelled by the CRM team.
-      CidadeAlerta: >
-        The booking was cancelled by CidadeAlerta, QuintoAndar alert/push system.
-      Corretores: >
-        The booking was cancelled by a broker.
-      Encaixe: >
-        The booking was cancelled in order to fit in a schedule.
-      Inquilinos: >
-        The booking was cancelled by the tenant.
-      Proprietarios: >
-        The booking was cancelled by the owner.
-      ProprietariosEmail: >
-        The booking was cancelled by the owner through email.
-      SelfServiceWeb: >
-        The booking was cancelled by the tenant through the website.
-      Sistema: >
-        The booking was cancelled by the system.
-      TimelineInquilinoOffboarding: >
-        The booking was cancelled due to tenant offboarding.
-      Vistoriadores: >
-        The survey was cancelled by the inspector.
   visitor_missing_reason:
     lineage:
       - datalake_booking.booking.tenant_absence_reason
@@ -745,16 +705,6 @@ columns:
       - datalake_booking.booking.is_first_booking_auto
     description: >
       Boolean column indicating if the booking was originally created through planner (program that allocates 5A personnel to inspections and jobs). True if the visit originated via planner flow.
-  is_visit_created_from_app:
-    lineage:
-      - datalake_booking.booking.is_visit_created_from_app
-    description: >
-      Boolean column that indicates if the visit was created in the application. True if it was.
-  is_visit_last_updated_from_app:
-    lineage:
-      - datalake_booking.booking.is_visit_last_updated_from_app
-    description: >
-      Boolean column indicating whether the last update of visit information was done via the app. True if it was.
   is_3p_supply:
     lineage:
       - datalake_booking.booking.is_3p_supply

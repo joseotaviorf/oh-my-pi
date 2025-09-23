@@ -6,7 +6,7 @@ WITH booking AS (
         b.id_agent,
         bc.cancelled_by = "Agent" AS is_booking_cancellation_by_agent,
         vcu.on_behalf_of = "AGENT" AS is_visit_cancellation_by_agent,
-        b.first_update_source = "Corretores" AS is_visit_booking_by_agent,
+        b.first_update_source = "AGENT_PWA" AS is_visit_booking_by_agent,
         b.status NOT IN ('Done', 'Realizado', 'Cancelado', 'Canceled') AS is_booking_stalled,
         b.is_visit_completed,
         b.ts_created,

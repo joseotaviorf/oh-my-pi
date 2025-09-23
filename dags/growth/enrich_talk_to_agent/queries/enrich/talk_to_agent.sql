@@ -111,7 +111,7 @@ bookings_agent_tenant AS (
             ON id_agent=CAST(u.dados_agente_id AS BIGINT)
     WHERE
         db.dt_created > DATE('2020-03-01') --After feature has started
-        AND db.first_update_source='Corretores' --Bookings created by Agents
+        AND db.first_update_source='AGENT_PWA' --Bookings created by Agents
         AND u.id IS NOT NULL
         AND id_visitor IS NOT NULL
         AND id_property IS NOT NULL
