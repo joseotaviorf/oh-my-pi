@@ -77,6 +77,28 @@ columns:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.revend
     description: Number of the next revision of this id.
+  ai_processing_failure_reason:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.ai_processing_failure_reason
+    description:
+      Indicates the reason why Kirk failed to process the request. This column is only populated when a failure occurs.
+  repair_request_ai_flow:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.repair_request_ai_flow
+    description:
+      Boolean flag indicating whether the AI flow succeeded.
+  ai_repair_analysis_control_group:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.ai_repair_analysis_control_group
+    description:
+      Boolean flag indicating whether the assessment belongs to the Control Group. 
+      If TRUE, the case passed the eligibility criteria for its current wave but was 
+      not processed by Kirk.
+  ai_repair_analysis_wave_name:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.ai_repair_analysis_wave_name
+    description:
+      Specifies the rollout wave of the Kirk launch. Possible values are Shadow Mode, Wave 1, Wave 2, Wave 3, Wave 4.
   mod_id_previous_assessment:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.previous_assessment_id_mod
@@ -117,6 +139,22 @@ columns:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.key_information_mod
     description: Indicates if the key_information field has been changed
+  mod_ai_processing_failure_reason:
+    lineage:
+      - datalake_inspection_services_raw.assessment_aud.ai_processing_failure_reason_mod
+    description: Indicates if the ai_processing_failure_reason field has been changed
+  mod_repair_request_ai_flow:
+    lineage:
+      - datalake_inspection_services_raw.assessment_aud.repair_request_ai_flow_mod
+    description: Indicates if the repair_request_ai_flow field has been changed
+  mod_ai_repair_analysis_control_group:
+    lineage:
+      - datalake_inspection_services_raw.assessment_aud.ai_repair_analysis_control_group_mod
+    description: Indicates if the ai_repair_analysis_control_group field has been changed
+  mod_ai_repair_analysis_wave_name:
+    lineage:
+      - datalake_inspection_services_raw.assessment_aud.ai_repair_analysis_wave_name_mod
+    description: Indicates if the ai_repair_analysis_wave_name field has been changed
   mod_ts_created:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.created_at_mod

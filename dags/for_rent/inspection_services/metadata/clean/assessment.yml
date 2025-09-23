@@ -57,6 +57,28 @@ columns:
     description:
       Indicates the place where the keys were left after the inspection
       was carried out
+  ai_processing_failure_reason:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.ai_processing_failure_reason
+    description:
+      Indicates the reason why Kirk failed to process the request. This column is only populated when a failure occurs.
+  repair_request_ai_flow:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.repair_request_ai_flow
+    description:
+      Boolean flag indicating whether the AI flow succeeded.
+  ai_repair_analysis_control_group:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.ai_repair_analysis_control_group
+    description:
+      Boolean flag indicating whether the assessment belongs to the Control Group. 
+      If TRUE, the case passed the eligibility criteria for its current wave but was 
+      not processed by Kirk.
+  ai_repair_analysis_wave_name:
+    lineage: 
+      - datalake_inspection_services_raw.assessment.ai_repair_analysis_wave_name
+    description:
+      Specifies the rollout wave of the Kirk launch. Possible values are Shadow Mode, Wave 1, Wave 2, Wave 3, Wave 4.
   dt_owner_limit_revision:
     lineage:
       - datalake_inspection_services_raw.assessment.owner_limit_revision_date
