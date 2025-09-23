@@ -1,0 +1,26 @@
+dag:
+  name: docx_fast_lane
+  owner: Data Fintech
+  schedule_interval: 0,30 * * * *
+  documentation:
+    dag_purpose: |
+      Extraction of DocX tables into data lake, in which the data is related to the credit evaluation process.
+      Docx is the backend application for documents and credit simulation.
+      This DAG has only tables that must run every 30 minutes.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: docx
+  custom_schema: docx_test
+  dbutils_secret_key: DOCX_DB
+  tables_customization:
+    credit_evaluation:
+      clean_table_name: credit_evaluation
+      raw_primary_keys: ["id"]
+    credit_evaluation_proponent:
+      clean_table_name: credit_evaluation_proponent
+      raw_primary_keys: ["id"]
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

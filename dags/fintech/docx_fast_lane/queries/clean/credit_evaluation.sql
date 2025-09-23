@@ -1,0 +1,25 @@
+SELECT
+    id,
+    proposal_id AS id_proposal,
+    house_id AS id_house,
+    user_id AS id_user,
+    city_id AS id_city,
+    group_id AS id_group,
+    CAST(get_json_object(early_result, '$[0].analysisRequestId') AS BIGINT) AS analysis_request_id,
+    scope,
+    limit_value,
+    proponent_group_type,
+    reason,
+    result,
+    status,
+    type,
+    automatic AS is_automatic,
+    get_json_object(early_result, '$[0].guaranteeType') AS early_result_guarantee_type,
+    CAST(get_json_object(early_result, '$[0].guaranteeFactor') AS DECIMAL(10,2)) AS guarantee_factor,
+    CAST(get_json_object(early_result, '$[0].preApprovedLimit') AS DECIMAL(10,2)) AS pre_approved_limit,
+    early_result,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    expires_at AS ts_expires
+FROM
+    datalake_docx_test_raw.credit_evaluation
