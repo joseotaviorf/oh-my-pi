@@ -175,6 +175,13 @@ columns:
     lineage:
       - datalake_terminator.termination.is_automatic_repair_analysis_opted_out
     description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
+  has_repairs:
+    description: Indicates whether the termination had repairs.
+      It will be true if
+      (1) the count of tenant repairs in AC is greater than 0
+      or (2) if the count of tenant repairs in AC is 0 but there were tenant repairs in AR and the termination had early mediation or early both agree.  
+    lineage:
+      - datalake_terminator.termination.has_repairs
   ts_termination_request:
     description: Date in timestamp format that indicates when the termination request occurred.
     lineage:

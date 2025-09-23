@@ -52,6 +52,7 @@ SELECT
     t.is_fee_prior_notice,
     t.has_automatic_repair_analysis,
     t.is_automatic_repair_analysis_opted_out,
+    t.has_repairs,
     t.ts_termination_request,
     t.ts_termination_updated,
     t.ts_termination_canceled,
