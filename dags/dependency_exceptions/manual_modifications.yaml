@@ -482,6 +482,10 @@ bietlejuice.enrich_open_external_data_addresses:
     - bietlejuice.iptu_sp:load-clean-iptu-sp:first-run-of-day
     - bietlejuice.itbi_sp:load-clean-itbi-sp:first-run-of-day
     - bietlejuice.itbi_bh:load-clean-itbi-bh:first-run-of-day
+bietlejuice.enrich_onboarding_entities:
+  remove:
+    - bietlejuice.core_contract:load-core-contract:first-run-of-day
+    - bietlejuice.ebdb_rent_flow:load-clean-onboarding:first-run-of-day
 bietlejuice.enrich_pipeline:
   # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
   # our intention to run this DAG the same amount of times.
