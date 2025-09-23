@@ -1031,6 +1031,7 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-accounting:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-share:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-third-parties:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-write-off:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420001-420002-420004:first-run-of-day
@@ -3342,7 +3343,6 @@ bietlejuice.enrich_sap:
 bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.checkout:load-clean-bolecode:first-run-of-day
   - bietlejuice.checkout:load-clean-boleto:first-run-of-day
-  - bietlejuice.checkout:load-clean-pix:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-erp-gateway-stages-status:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
@@ -3353,21 +3353,12 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-879200452685:first-run-of-day
-  - bietlejuice.itau_statements:load-clean-statement-879200494588:first-run-of-day
   - bietlejuice.kill_queue:load-clean-reservation:first-run-of-day
   - bietlejuice.monopoly:load-clean-accounting-entry:first-run-of-day
   - bietlejuice.monopoly:load-clean-nota-fiscal-emission-error:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
-  - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2:first-run-of-day
-  - bietlejuice.pixar:load-clean-charge:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-bill:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-billing-report:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-accounting:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-delinquency:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-payment:first-run-of-day
   - bietlejuice.retsuko:load-clean-account:first-run-of-day
   - bietlejuice.retsuko:load-clean-contract:first-run-of-day
   - bietlejuice.retsuko:load-clean-sap-entity:first-run-of-day
@@ -3376,9 +3367,6 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.sap_gateway:load-clean-invoice:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-sync-sap-job:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-webhook-log:first-run-of-day
-  - bietlejuice.trato_feito:load-clean-installment:first-run-of-day
-  - bietlejuice.trato_feito:load-clean-negotiation:first-run-of-day
-  - bietlejuice.trato_feito:load-clean-payment:first-run-of-day
   - bietlejuice.vans:load-clean-boleto:first-run-of-day
 bietlejuice.enrich_sap_gateway:
   - bietlejuice.sap_gateway:load-clean-sync-sap-job:first-run-of-day
