@@ -6,6 +6,7 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: collection_recovery_quintoandar
+  default_extraction_type: full
   spark_session_configs:
     udfs: [FINTECH_COLLECTIONS_RENEGOTIATION]
   inner_dependencies:
@@ -23,6 +24,10 @@ workflow:
       - fact_debt
       - fact_negotiation
       - fact_negotiation_installment
+  tables_customization:
+    fact_overdue_portfolio_timeline_incremental:
+      extraction_type: incremental
+      partitions: [year, month, day]
 cluster:
   type: custom_cluster
   custom_configurations:
