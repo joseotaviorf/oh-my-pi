@@ -1494,13 +1494,6 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
-bietlejuice.enrich_bureaus:
-  - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud:first-run-of-day
-  - bietlejuice.arquivo_confidencial:load-clean-rev-info:first-run-of-day
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-proponent:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-proposal:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-screening-result-version:first-run-of-day
 bietlejuice.enrich_buyer_prospect:
   - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day

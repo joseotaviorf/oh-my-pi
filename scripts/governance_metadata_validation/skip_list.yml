@@ -6,7 +6,6 @@ metadata_files_out_of_pattern:
   - growth/enrich_supply_outbound_flows/metadata/enrich/supply_outbound_contacts.yml
   - growth/rene_descartes/metadata/clean/lead_rejection_aud.yml
   - growth/rene_descartes/metadata/clean/lead_rejection.yml
-  - fintech/enrich_bureaus/metadata/enrich/all_bureau_analysis.yml
   - for_rent/dw_proposal_temp/metadata/dw/dim_proposal_person.yml
   - for_rent/metric_rent__contracts/metadata/metric/new_tenant_prospect_to_contract_signed_4w.yml
   - agents/dw_agent/metadata/dw/dim_agent_region.yml

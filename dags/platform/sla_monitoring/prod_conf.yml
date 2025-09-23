@@ -194,7 +194,6 @@ expected_times_to_finish:
   bietlejuice.enrich_braze_webhook_notification: 07:28
   bietlejuice.enrich_brokerage: '16:44'
   bietlejuice.enrich_brokers_supply_processor: 04:51
-  bietlejuice.enrich_bureaus: 08:37
   bietlejuice.enrich_buyer_prospect: 07:57
   bietlejuice.enrich_cdp_personas: 07:48
   bietlejuice.enrich_chatbot: 07:39
