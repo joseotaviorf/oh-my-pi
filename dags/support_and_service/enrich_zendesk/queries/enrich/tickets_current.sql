@@ -14,7 +14,7 @@ WITH first_last_infos AS (
   FROM
     datalake_zendesk.tickets
   WHERE
-    ts_updated >= DATE('{load_start_date}')
+    ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
     AND id_assignee IS NOT NULL
 ), 
 tickets AS (
@@ -125,7 +125,7 @@ tickets AS (
   LEFT JOIN first_last_infos AS fli
     ON t.id_ticket = fli.id_ticket
   WHERE
-    ts_updated >= DATE('{load_start_date}')
+    ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1)
 SELECT
