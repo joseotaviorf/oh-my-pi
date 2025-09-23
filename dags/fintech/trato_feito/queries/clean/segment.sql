@@ -3,7 +3,6 @@ SELECT
     name,
     description,
     version,
-    CAST(priority AS INT) AS priority,
     active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
