@@ -1,0 +1,186 @@
+database_name: datalake_ebdb_test_clean
+table_name: inspection
+domain: For Rent
+description: |
+  Table containing comprehensive property inspection data for rental properties. This table tracks the complete
+  inspection lifecycle including scheduling, execution, approvals from both tenants and owners, and final reporting.
+  Inspections are typically conducted at move-in, move-out, or during tenancy to assess property condition,
+  document any damages or issues, and facilitate security deposit processes. The table includes inspector assignments,
+  approval workflows, comments from all parties, and timestamps for all key inspection milestones.
+columns:
+  id:
+    description: Unique identifier for the inspection record
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.id
+  id_house:
+    description: Foreign key reference to the property being inspected
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.imovel_id
+  id_user_inspector:
+    description: Foreign key reference to the user assigned as the inspector for this inspection
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.vistoriador_id
+  id_contract:
+    description: Foreign key reference to the rental contract associated with this inspection
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.contrato_id
+  id_booking:
+    description: Foreign key reference to the scheduling/booking record for the inspection appointment
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.schedule_id
+  id_ref:
+    description: Reference identifier used for external system integration or tracking purposes
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.ref_id
+  id_final_report_pdf:
+    description: Foreign key reference to the final inspection report PDF document
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.finalreportpdfid
+  status:
+    description: Current status of the inspection (e.g., scheduled, in progress, completed, cancelled)
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.status
+  comment:
+    description: General comments or notes about the inspection from the inspector
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.comentario
+  hash:
+    description: Hash value used for data integrity verification or deduplication purposes
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.hash
+  browser_tenant_approval:
+    description: Browser information captured when the tenant approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.browseraprovacaoinquilino
+  browser_owner_approval:
+    description: Browser information captured when the property owner approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.browseraprovacaoproprietario
+  tenant_comment:
+    description: Comments or feedback provided by the tenant regarding the inspection
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.comentarioinquilino
+  owner_comment:
+    description: Comments or feedback provided by the property owner regarding the inspection
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.comentarioproprietario
+  ip_tenant_approval:
+    description: IP address captured when the tenant approved the inspection report for audit purposes
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.ipaprovacaoinquilino
+  ip_owner_approval:
+    description: IP address captured when the property owner approved the inspection report for audit purposes
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.ipaprovacaoproprietario
+  os_tenant_approval:
+    description: Operating system information captured when the tenant approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.soaprovacaoinquilino
+  os_owner_approval:
+    description: Operating system information captured when the property owner approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.soaprovacaoproprietario
+  type:
+    description: Type of inspection (e.g., move-in, move-out, periodic, maintenance)
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.tipo
+  mode:
+    description: Mode of inspection execution (e.g., in-person, remote, hybrid)
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.mode
+  short_review_tenant:
+    description: Shortened review or summary provided by the tenant for quick reference
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.shortrevisarinq
+  short_review_owner:
+    description: Shortened review or summary provided by the property owner for quick reference
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.shortrevisarprop
+  last_report_sent:
+    description: Timestamp of when the most recent inspection report was sent to stakeholders
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.lastreportsent
+  key_location:
+    description: Location where the property keys are stored or can be accessed for the inspection
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.keylocation
+  key_location_details:
+    description: Additional details about the key location, access instructions, or special requirements
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.keylocationdetails
+  version:
+    description: Version number of the inspection record, used for tracking changes and updates
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.version
+  schedule_observations:
+    description: Special observations or notes related to the inspection scheduling (e.g., access restrictions, timing preferences)
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.scheduleobservations
+  report_revised:
+    description: Indicator or details about whether the inspection report has been revised after initial completion
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.reportrevised
+  is_tenant_approved:
+    description: Boolean flag indicating whether the tenant has approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.aprovadoinquilino
+  is_owner_approved:
+    description: Boolean flag indicating whether the property owner has approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.aprovadoproprietario
+  is_schedule_double_checked:
+    description: Boolean flag indicating whether the inspection schedule has been double-checked for accuracy
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.scheduledoublechecked
+  is_report_finished:
+    description: Boolean flag indicating whether the inspection report has been completed
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.reportfinished
+  is_item_commented:
+    description: Boolean flag indicating whether inspection items have been commented on or annotated
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.itencommented
+  is_final_report_created:
+    description: Boolean flag indicating whether the final inspection report document has been generated
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.finalreportcreated
+  has_inspector_got_all_info:
+    description: Boolean flag indicating whether the inspector has collected all necessary information for the inspection
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.inspectorgotallinfo
+  dt_final_report_sent:
+    description: Date when the final inspection report was sent to all relevant parties
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.finalreportsentat
+  dt_inspected:
+    description: Date when the physical inspection of the property was conducted
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.datavistoria
+  ts_tenant_approved:
+    description: Timestamp when the tenant approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.dataaprovacaoinquilino
+  ts_owner_approved:
+    description: Timestamp when the property owner approved the inspection report
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.dataaprovacaoproprietario
+  ts_partial_tenant_report_sent:
+    description: Timestamp when a partial inspection report was sent to the tenant
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.partialtenantreportsentat
+  ts_partial_owner_report_sent:
+    description: Timestamp when a partial inspection report was sent to the property owner
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.partialownerreportsentat
+  ts_expired:
+    description: Timestamp when the inspection or its associated approvals expire
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.expiraem
+  ts_created:
+    description: Timestamp when the inspection record was created in the system
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.criadoem
+  ts_updated:
+    description: Timestamp when the inspection record was last updated
+    lineage:
+      - datalake_ebdb_test_raw.vistoria.atualizadoem

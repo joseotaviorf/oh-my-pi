@@ -1,0 +1,27 @@
+dag:
+  name: ebdb_inspections_fast_lane
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 0,30 * * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Fast lane DAG for high-frequency extraction of critical EBDB Inspection tables into data lake.
+      This DAG runs every 30 minutes to provide near real-time updates for inspection data,
+      complementing the main ebdb_inspections DAG that processes all inspection-related tables less frequently.
+      EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb_test
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    Vistoria:
+      raw_primary_keys: ["id"]
+      clean_table_name: inspection
+
+cluster:
+  type: databricks_13_3_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
