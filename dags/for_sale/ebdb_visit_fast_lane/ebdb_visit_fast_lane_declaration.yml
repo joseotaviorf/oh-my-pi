@@ -27,5 +27,5 @@ workflow:
       raw_z_order_by: [visit_id, ts_database_transaction]
       clean_z_order_by: [id_visit, event_type]
 cluster:
-  type: databricks_13_3_rfleet_instance_cluster
+  type: databricks_16_4_rfleet_instance_cluster
   databricks_conn_id: databricks_new

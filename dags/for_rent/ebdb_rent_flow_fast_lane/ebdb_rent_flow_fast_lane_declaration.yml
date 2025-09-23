@@ -22,5 +22,5 @@ workflow:
       clean_primary_keys: [id]
       clean_z_order_by: [id_contrato]
 cluster:
-  type: databricks_13_3_rfleet_instance_cluster
+  type: databricks_16_4_rfleet_instance_cluster
   databricks_conn_id: databricks_new
