@@ -2,7 +2,7 @@ dag:
   name: crawler_olx
   owner: Data Growth
   schedule_start_date: 2025, 9, 9
-  schedule_interval: "0 0 * * 5" 
+  schedule_interval: "0 0 * * 5"
   documentation:
     dag_purpose: |
       This DAG ingests weekly data from the OLX crawler,
@@ -12,16 +12,18 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
-  load_spark_job: load_crawler_olx_raw
+  spark_job_prefix: base
+  load_spark_job: load_growth_intel_crawler_raw
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   has_hive_sync: false
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}" 
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}" # env
     - "{bucket}" # datalake_bucket
+    - "crawler_olx" # source
     - "{table_name}" # table_name
     - "{partitions}" # partition_cols
     - "{load_start_date}" # load_start_date
@@ -42,4 +44,4 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    spark_version: 14.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12

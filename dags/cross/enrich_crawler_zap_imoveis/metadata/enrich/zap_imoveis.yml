@@ -13,8 +13,11 @@ description: |
   - Handles complex city name parsing with regex cleaning
   - Creates composite fields like id_house (id + 'ZapImoveis') and is_hybrid flag
 
-  **Data Source:**
-  Sources data from datalake_crawler_zap_imoveis_clean.zap_imoveis, filtering by the specified load date range.
+  **Data Sources:**
+  - **2025 onwards:** Sources data from datalake_crawler_zap_imoveis_clean.zap_imoveis
+  - **2021-2024:** Sources data from datalake_crawlers_listings_clean.zap_imoveis
+
+  Data is filtered by the specified load date range to ensure the correct source table is used for each time period.
 
   **Update Schedule:**
   The table is updated weekly, every Friday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis

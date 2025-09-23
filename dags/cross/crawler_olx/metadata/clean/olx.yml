@@ -6,7 +6,7 @@ description: |
   Only the listings that have the city available are included in the table,
   following the same logic of the raw table.
   It is updated weekly, every Friday at 00:00 BRT, to update the data from the current week,
-  which is provided every Thursday by the crawler provider. 
+  which is provided every Thursday by the crawler provider.
 domain: Cross
 owner: mateus.aferreira@quintoandar.com.br
 columns:
@@ -26,7 +26,7 @@ columns:
     description: |
       The address of the listing.
       It has the following address values: city, country, neighborhood,
-      state, address, and zip_code.  
+      state, address, and zip_code.
   city:
     lineage:
       - datalake_crawler_olx_raw.olx.city
@@ -74,6 +74,14 @@ columns:
       - datalake_crawler_olx_raw.olx.contact_information
     description: |
       The advertiser information from the listing.
+      Has info until August, 2025.
+      It has the advertiser id, name, url, phone, address, etc.
+  advertiser:
+    lineage:
+      - datalake_crawler_olx_raw.olx.advertiser
+    description: |
+      The advertiser information from the listing.
+      Has info after August, 2025.
       It has the advertiser id, name, url, phone, address, etc.
   price:
     lineage:
