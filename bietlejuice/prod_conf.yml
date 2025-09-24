@@ -953,6 +953,16 @@ databricks_16_4_medium_memory_people_cluster:
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
+databricks_16_4_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_12_2_min_analytical_costs_cluster:
     <<: *cluster_anchor
     node_type_id: m5a.large

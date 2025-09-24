@@ -210,7 +210,7 @@ def load_dataframe_into_datalake(
     format_options=format_options,
     database_location=database_location,
     partitions=partition_cols,
-    force_recreate=True,
+    force_recreate=False,
   )
 
   spark_metastore_service.create_new_partitions_from_df(

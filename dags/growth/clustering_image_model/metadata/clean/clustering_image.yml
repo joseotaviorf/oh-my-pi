@@ -2,7 +2,7 @@
 database_name: datalake_clustering_image_model_clean
 table_name: clustering_image
 owner: andre.melo@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: |
   Table with information on the data science image clustering model results for houses similarity by images.
   This model use Atlas DB database to generate the results of the clustering algorithm.
@@ -26,7 +26,8 @@ columns:
       - datalake_clustering_image_model_raw.clustering_image.sourcenameid_pair
   region_name:
     description: |
-      "The houses region name."
+      "The houses region name.
+      It is a partition column and is provided by the Data Science Team."
     categories:
       sp_bh: "Houses from São Paulo and Belo Horizonte cities."
     lineage:

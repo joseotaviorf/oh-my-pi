@@ -34,7 +34,7 @@ workflow:
       merge_on: ["id_sourcename_anchor", "id_sourcename_pair"]
       when_matched_update_condition: "source.dt_model >= target.dt_model"
 cluster:
-  type: databricks_13_3_med_memory_cluster
+  type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
