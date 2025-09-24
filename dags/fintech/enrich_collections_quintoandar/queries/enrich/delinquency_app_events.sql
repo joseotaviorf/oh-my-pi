@@ -104,7 +104,7 @@ overdue_invoices_events AS (
     id_amplitude,
     id_session,
     id_user,
-    CAST(ep_id_contract AS BIGINT) AS id_contract,
+    ARRAY(ep_id_contract) AS id_contract,
     FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_family,
     "pending_invoices_pay_total_cta_clicked" AS event_name,
