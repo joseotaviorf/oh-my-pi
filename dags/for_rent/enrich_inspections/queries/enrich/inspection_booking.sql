@@ -150,6 +150,10 @@ SELECT DISTINCT
         ELSE FALSE
     END AS is_not_canceled_by_inspector,
     COALESCE(i.has_early_mediation, FALSE) AS has_early_mediation,
+    a.ai_processing_failure_reason,
+    a.repair_request_ai_flow,
+    a.ai_repair_analysis_control_group,
+    a.ai_repair_analysis_wave_name,
     ic.dt_contract_entrance,
     ic.dt_contract_termination,
     ic.dt_execution_limit,
