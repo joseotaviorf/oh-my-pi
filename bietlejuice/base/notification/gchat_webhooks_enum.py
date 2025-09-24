@@ -21,9 +21,15 @@ class GchatWebhooksEnum:
     FINTECH_ALERTS_PROD = "GCHAT_FINTECH_ALERTS_PROD_WEBHOOK"
     GCHAT_CORE_MODEL_SCHEMA_VALIDATION = "CORE_MODEL_WEBHOOK"
     PEOPLE_ALERTS = "GCHAT_PEOPLE_ALERTS_WEBHOOK"
+    DATA_ALARMS = "GCHAT_DATA_ALARMS_WEBHOOK"
+    DATA_AGENTS_ALERTS = "GCHAT_DATA_AGENTS_ALARMS_WEBHOOK"
 
     # --- Alias mapping for legacy or alternative names ---
-    _ALIAS_MAP = {"#alerts-de-airflow-dags": DATA_QUALITY_DEFAULT}
+    _ALIAS_MAP = {
+        "#alerts-de-airflow-dags": DATA_QUALITY_DEFAULT,
+        "#data-alarms": DATA_ALARMS,
+        "#alerts-data-quality-agents": DATA_AGENTS_ALERTS,
+    }
 
     @classmethod
     def get_secret_key(cls, channel_keyword: str) -> Optional[str]:
