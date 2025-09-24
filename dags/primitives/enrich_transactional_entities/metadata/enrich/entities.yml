@@ -77,11 +77,11 @@ columns:
     description: String that specifies the type of entity.
     categories:
       VISIT: The entity is a visit, with its id_entity mapping directly to the id_visit from the Visit table in EBDB database.
-      OFFER: The entity is an offer, with its id_entity mapping directly to the id_offer from the Rental Transact system.
-      CONTRACT: The entity is a contract, with its id_entity mapping directly to the id_contract from the Contract table in the core model.
-      TERMINATION: The entity is a termination, with its id_entity mapping directly to the id from the Termination table in the terminator system.
+      FR_OFFER: The entity is a ForRent offer, with its id_entity mapping directly to the id_offer from the Rental Transact system.
+      FR_CONTRACT: The entity is a contract, with its id_entity mapping directly to the id_contract from the Contract table in the core model.
+      FR_TERMINATION: The entity is a termination, with its id_entity mapping directly to the id from the Termination table in the terminator system.
       LISTING: The entity is a property listing, with its id_entity mapping directly to the id from the Listing Business Context table, representing property listings.
-      INSPECTION: The entity is an inspection, with its id_entity mapping directly to the id from the Inspection table in EBDB database.
+      FR_INSPECTION: The entity is an inspection, with its id_entity mapping directly to the id from the Inspection table in EBDB database.
   persona:
     description:
       A persona describes the primary role of a user (id_user) in relation to a specific
@@ -117,11 +117,11 @@ columns:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
       For VISIT entities - contains computed_status field.
-      For OFFER entities - contains status field.
-      For CONTRACT entities - contains status field.
-      For TERMINATION entities - contains status field.
+      For FR_OFFER entities - contains status field.
+      For FR_CONTRACT entities - contains status field.
+      For FR_TERMINATION entities - contains status field.
       For LISTING entities - contains status and status_reason fields.
-      For INSPECTION entities - contains status field.
+      For FR_INSPECTION entities - contains status field.
   house_address:
     lineage:
       - datalake_ebdb_test_clean.house.address

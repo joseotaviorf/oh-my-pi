@@ -82,7 +82,7 @@ offer AS (
             CAST(NULL AS BIGINT) AS id_contract,
             id_tenant,
             id_owner,
-            'OFFER' AS entity,
+            'FR_OFFER' AS entity,
             'RENT' AS business_context,
             TO_JSON(
                 STRUCT(
@@ -137,7 +137,7 @@ contract AS (
             id_contract,
             id_owner,
             id_tenant,
-            'CONTRACT' AS entity,
+            'FR_CONTRACT' AS entity,
             'RENT' AS business_context,
             TO_JSON(
                 STRUCT(
@@ -193,7 +193,7 @@ termination AS (
     SELECT
       id AS id_entity,
       id_contract,
-      'TERMINATION' AS entity,
+      'FR_TERMINATION' AS entity,
       'RENT' AS business_context,
       TO_JSON(
         STRUCT(
