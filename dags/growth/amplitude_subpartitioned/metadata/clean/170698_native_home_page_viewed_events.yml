@@ -177,6 +177,10 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.up_ab_beakman_native_home_bff_invoices
     description: Column up_ab_beakman_native_home_bff_invoices from Amplitude events
+  up_ab_beakman_native_demand_property_card_toggle:
+    lineage:
+      - datalake_amplitude_clean.events.up_ab_beakman_native_demand_property_card_toggle
+    description: Column up_ab_beakman_native_demand_property_card_toggle from Amplitude events
   ts_client_event:
     lineage:
     - datalake_amplitude_clean.events.ts_client_event

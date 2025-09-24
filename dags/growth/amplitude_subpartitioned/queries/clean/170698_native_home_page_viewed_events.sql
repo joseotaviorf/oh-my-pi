@@ -41,6 +41,7 @@ SELECT
     sample_rate,
     GET_JSON_OBJECT(event_properties, '$.infos') AS ep_infos,
     STRING(GET_JSON_OBJECT(user_properties, '$.ab_beakman_native_home_bff_invoices')) AS up_ab_beakman_native_home_bff_invoices,
+    STRING(GET_JSON_OBJECT(user_properties, '$.ab_beakman_native_demand_property_card_toggle')) AS up_ab_beakman_native_demand_property_card_toggle,
     ts_client_event,
     ts_client_uploaded,
     ts_server_received,
