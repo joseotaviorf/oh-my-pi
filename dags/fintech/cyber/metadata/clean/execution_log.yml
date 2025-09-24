@@ -1,0 +1,33 @@
+---
+database_name: datalake_cyber_clean
+table_name: execution_log
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Table containing execution log data from cyber system.
+  Stores execution history with start and end times, status, and error messages for monitoring and auditing purposes.
+columns:
+  id_execution:
+    description: "Unique identifier for each execution instance"
+    lineage:
+      - datalake_cyber_raw.tb_execution_log.EXECUTION_ID
+  ts_start:
+    description: "Timestamp when the execution started"
+    lineage:
+      - datalake_cyber_raw.tb_execution_log.START_DATETIME
+  ts_end:
+    description: "Timestamp when the execution ended"
+    lineage:
+      - datalake_cyber_raw.tb_execution_log.END_DATETIME
+  status:
+    description: "Execution status (SUCCESS, FAILED, RUNNING, etc.)"
+    lineage:
+      - datalake_cyber_raw.tb_execution_log.STATUS
+  error_message:
+    description: "Error message if execution failed, NULL for successful executions"
+    lineage:
+      - datalake_cyber_raw.tb_execution_log.ERROR_MESSAGE
+  duration_minutes:
+    description: "Calculated duration of execution in minutes"
+  ts_load:
+    description: "Timestamp when the record was loaded into the clean layer"

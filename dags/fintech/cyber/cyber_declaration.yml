@@ -182,6 +182,22 @@ workflow:
         - "[]"
         - False
         - "[]"
+    tb_historico_bureau:
+      clean_table_name: bureau_history
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    execution_log:
+      clean_table_name: execution_log
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:
