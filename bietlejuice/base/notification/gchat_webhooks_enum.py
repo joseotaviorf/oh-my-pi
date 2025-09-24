@@ -27,6 +27,7 @@ class GchatWebhooksEnum:
     # --- Alias mapping for legacy or alternative names ---
     _ALIAS_MAP = {
         "#alerts-de-airflow-dags": DATA_QUALITY_DEFAULT,
+        "#alerts-data-quality": DATA_QUALITY_DEFAULT,
         "#data-alarms": DATA_ALARMS,
         "#alerts-data-quality-agents": DATA_AGENTS_ALERTS,
     }
