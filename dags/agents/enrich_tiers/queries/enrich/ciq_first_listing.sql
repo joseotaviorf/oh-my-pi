@@ -5,8 +5,7 @@ WITH house_listing_consultant AS (
         hslc.consultant_type,
         "SALE" AS business_context,
         hslc.is_last_ciq_on_listing,
-        hslc.ts_enrollment_started,
-        hslc.dt_consultant_started
+        hslc.ts_enrollment_started
     FROM
         datalake_big_agent.house_sale_listing_consultant AS hslc
     UNION
@@ -16,8 +15,7 @@ WITH house_listing_consultant AS (
         hrlc.consultant_type,
         "RENT" AS business_context,
         hrlc.is_last_ciq_on_listing,
-        hrlc.ts_enrollment_started,
-        hrlc.dt_consultant_started
+        hrlc.ts_enrollment_started
     FROM
         datalake_big_agent.house_rent_listing_consultant AS hrlc
 ),
@@ -67,7 +65,6 @@ ciq_first_listing AS (
         GREATEST(
             lbc.ts_first_listing, 
             TIMESTAMP(hlc.ts_enrollment_started), 
-            TIMESTAMP(hlc.dt_consultant_started), 
             COALESCE(so.dt_sale_agreement_signed, rde.ts_event),            
             u.ts_first_unpublished
         ) AS ts_updated
