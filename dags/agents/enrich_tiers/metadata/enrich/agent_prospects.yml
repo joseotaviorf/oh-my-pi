@@ -1,5 +1,5 @@
 ---
-database_name: datalake_tiers_test
+database_name: datalake_tiers
 table_name: agent_prospects
 description: |
   Maps new or recovered prospects attributed to agents for key conversion events.

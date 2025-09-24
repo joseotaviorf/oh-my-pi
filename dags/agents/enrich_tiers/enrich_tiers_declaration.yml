@@ -9,6 +9,8 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
+    agent_allocation:
+      - metric_period
     agent_offers:
       - ciq_first_listing
     agent_performance:
@@ -17,7 +19,6 @@ workflow:
       - agent_allocation
       - agent_offers
       - agent_prospects
-      - ciq_first_listing
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   extra_query_template_params:
@@ -33,6 +34,8 @@ workflow:
     metric_events:
       merge_on: [id_metric_event]
       z_order_by: [id_metric_period, id_user]
+    metric_period:
+      partitions: [year, bimester]
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new

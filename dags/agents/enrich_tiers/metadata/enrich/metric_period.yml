@@ -1,0 +1,42 @@
+---
+database_name: datalake_tiers
+table_name: metric_period
+description: |
+  Reference table of metric validity periods by bimester for the Agents domain.
+  Each row represents a metric label and its validity window (start/end) for a
+  given bimester. Identifiers are deterministic hashes of (metric, dt_init).
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    description: Deterministic hash identifier of (metric, dt_init).
+  metric:
+    description: Metric label (e.g., CCV, GMV, OS_BY, BP2CCV, TP2CS).
+  status:
+    description: Period status. Set as "VALID" for generated rows.
+  dt_init:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_start
+    description: Start date of the bimester validity window for the metric.
+  dt_end:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_end
+    description: End date of the bimester validity window for the metric.
+  ts_created:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_start
+    description: Creation timestamp derived from the period start date.
+  ts_updated:
+    description: Record update timestamp (generation time).
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_start
+    description: Partition year derived from dt_init.
+  month:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_start
+    description: Partition month derived from dt_init.
+  day:
+    lineage:
+      - datalake_quintoandar.aux_date.bimester_start
+    description: Partition day derived from dt_init.

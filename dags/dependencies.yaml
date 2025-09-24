@@ -3609,7 +3609,6 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:
-  - bietlejuice.big_agent:load-clean-metric-period:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant:first-run-of-day

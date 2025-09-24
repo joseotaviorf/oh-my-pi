@@ -9,7 +9,7 @@ WITH metric_period_process AS (
         MONTH(mp.dt_init) AS month,
         DAY(mp.dt_init) AS day
     FROM
-        datalake_big_agent_clean.metric_period AS mp
+        datalake_tiers.metric_period AS mp
     JOIN
         datalake_quintoandar.aux_date AS ad
             ON ad.date BETWEEN mp.dt_init AND mp.dt_end

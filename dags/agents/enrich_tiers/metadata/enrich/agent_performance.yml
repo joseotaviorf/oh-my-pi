@@ -1,5 +1,5 @@
 ---
-database_name: datalake_tiers_test
+database_name: datalake_tiers
 table_name: agent_performance
 description: |
   Aggregated performance metrics per agent and metric period, derived from metric_events
@@ -23,7 +23,7 @@ columns:
     description: Person-level UUID from main/admin (ebdb) for the agent.
   id_metric_period:
     lineage:
-      - datalake_big_agent_clean.metric_period.id
+      - datalake_tiers.metric_period.id
     description: Identifier of the metric period.
   metric:
     description: Metric name aggregated (e.g., CCV, GMV, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
@@ -31,9 +31,9 @@ columns:
     description: Aggregated metric value for the period (count or ratio depending on the metric definition).
   dt_metric_period_started:
     lineage:
-      - datalake_big_agent_clean.metric_period.dt_init
+      - datalake_tiers.metric_period.dt_init
     description: Start date of the metric period window.
   dt_metric_period_ended:
     lineage:
-      - datalake_big_agent_clean.metric_period.dt_end
+      - datalake_tiers.metric_period.dt_end
     description: End date of the metric period window.

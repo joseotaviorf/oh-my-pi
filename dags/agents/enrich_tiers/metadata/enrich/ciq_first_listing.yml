@@ -1,5 +1,5 @@
 ---
-database_name: datalake_tiers_test
+database_name: datalake_tiers
 table_name: ciq_first_listing
 description: Dataset of houses recommended by CIQ consultants (SALE and RENT) with first listing information, validity window (15 days), publication/unpublication timestamps, and contract signature checks.
 domain: Agents

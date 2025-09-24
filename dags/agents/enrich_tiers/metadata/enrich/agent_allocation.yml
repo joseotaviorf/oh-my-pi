@@ -14,7 +14,7 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   id_metric_period:
     lineage:
-      - datalake_big_agent_clean.metric_period.id
+      - datalake_tiers.metric_period.id
     description: Identifier of the metric period used to filter the allocation.
   id_member_profile:
     lineage:

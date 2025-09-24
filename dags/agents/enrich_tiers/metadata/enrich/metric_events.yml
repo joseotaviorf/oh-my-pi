@@ -1,5 +1,5 @@
 ---
-database_name: datalake_tiers_test
+database_name: datalake_tiers
 table_name: metric_events
 description: |
   Consolidated metric events for agent performance. It unifies OFFER and PROSPECT
@@ -34,7 +34,7 @@ columns:
       or prospect id for PROSPECT domain.
   id_metric_period:
     lineage:
-      - datalake_big_agent_clean.metric_period.id
+      - datalake_tiers.metric_period.id
     description: Identifier of the metric period used to classify the event.
   external_domain:
     description: |
@@ -49,7 +49,7 @@ columns:
       Null for simple metrics.
   final_metric:
     lineage:
-      - datalake_big_agent_clean.metric_period.metric
+      - datalake_tiers.metric_period.metric
     description: |
       Final metric label from the metric period mapping (e.g., "CCV", "GMV",
       "CCV_TQC", "CCV_CIQ", "OS_BY", "OS2CCV_BY", "BP2CCV", "BP", "TP").
@@ -87,14 +87,14 @@ columns:
     description: Record update timestamp used for partition derivations and recency checks.
   year:
     lineage:
-      - datalake_big_agent_clean.metric_period.dt_init
+      - datalake_tiers.metric_period.dt_init
     description: Partition year derived from the metric period start date (dt_init).
   month:
     lineage:
-      - datalake_big_agent_clean.metric_period.dt_init
+      - datalake_tiers.metric_period.dt_init
     description: Partition month derived from the metric period start date (dt_init).
   day:
     lineage:
-      - datalake_big_agent_clean.metric_period.dt_init
+      - datalake_tiers.metric_period.dt_init
     description: Partition day derived from the metric period start date (dt_init).
 
