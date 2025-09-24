@@ -26,7 +26,7 @@ columns:
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
       - datalake_ebdb_clean.listing_business_context.id
-      - datalake_ebdb_clean.inspection.id
+      - datalake_ebdb_test_clean.inspection.id
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique.
@@ -62,7 +62,7 @@ columns:
       - core_offer.offer.id_owner
       - core_contract.contract.id_owner
       - core_contract.contract.id_tenant
-      - datalake_ebdb_test_clean.house.id_user
+      - datalake_ebdb_clean.house.id_user
       - datalake_ebdb_test_clean.inspection.id_user_inspector
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
@@ -124,11 +124,11 @@ columns:
       For FR_INSPECTION entities - contains status field.
   house_address:
     lineage:
-      - datalake_ebdb_test_clean.house.address
-      - datalake_ebdb_test_clean.house.number
-      - datalake_ebdb_test_clean.house.complement
-      - datalake_ebdb_test_clean.house.neighborhood
-      - datalake_ebdb_test_clean.house.city
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
+      - datalake_ebdb_clean.house.neighborhood
+      - datalake_ebdb_clean.house.city
     description: The full address of the property related to the entity.
       It combines address, number, complement, neighborhood and city (in this exactly order)
       from EBDB's House/Imovel table.

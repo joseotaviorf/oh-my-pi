@@ -135,4 +135,4 @@ SELECT
     forRent AS is_for_rent,
     forSale AS is_for_sale
 FROM
-    datalake_ebdb_test_raw.imovel
+    datalake_ebdb_raw.imovel

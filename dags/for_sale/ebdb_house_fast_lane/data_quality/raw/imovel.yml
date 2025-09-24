@@ -1,5 +1,5 @@
 ---
-table_name: datalake_ebdb_test_raw.imovel
+table_name: datalake_ebdb_raw.imovel
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:

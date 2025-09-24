@@ -41,8 +41,6 @@ workflow:
       clean_table_name: house_rent_costs_aud
     HouseSpecialCondition:
       clean_table_name: house_special_condition
-    Imovel:
-      clean_table_name: house
     Imovel_AUD:
       clean_table_name: house_aud
 cluster:

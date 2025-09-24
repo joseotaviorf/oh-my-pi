@@ -1,4 +1,4 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 domain: For Sale
 owner: bruna.prates@quintoandar.com.br
 description: >
@@ -7,542 +7,542 @@ table_name: house
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.imovel.id
+      - datalake_ebdb_raw.imovel.id
     description: Unique identifier of the house record in EBDB database. Primary key for house identification across all QuintoAndar systems.
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.imovel.usuario_id
+      - datalake_ebdb_raw.imovel.usuario_id
     description: Unique identifier of the house owner in the QuintoAndar system. Links house to user account for management and communication.
   id_region:
     lineage:
-      - datalake_ebdb_test_raw.imovel.regiao_id
+      - datalake_ebdb_raw.imovel.regiao_id
     description: Unique identifier for the geographic region where the house is located. Used for regional market segmentation and analysis.
   id_state:
     lineage:
-      - datalake_ebdb_test_raw.imovel.estado_id
+      - datalake_ebdb_raw.imovel.estado_id
     description: Unique identifier for the Brazilian state where the house is located. Used for regional market analysis and operations.
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.imovel.dadoscorretor_id
+      - datalake_ebdb_raw.imovel.dadoscorretor_id
     description: Unique identifier of the real estate agent responsible for the house. Links house to agent for commission and relationship management.
   id_user_registrant:
     lineage:
-      - datalake_ebdb_test_raw.imovel.originalusuarioquecadastrou_id
-      - datalake_ebdb_test_raw.imovel.usuarioquecadastrou_id
+      - datalake_ebdb_raw.imovel.originalusuarioquecadastrou_id
+      - datalake_ebdb_raw.imovel.usuarioquecadastrou_id
     description: Unique identifier of the user who originally registered the house. Uses COALESCE to prioritize original registrant over current registrant.
   id_announced_by:
     lineage:
-      - datalake_ebdb_test_raw.imovel.announcedby_id
+      - datalake_ebdb_raw.imovel.announcedby_id
     description: Unique identifier of the entity that announced the house listing. Used for lead attribution and partner relationship management.
   id_salesforce:
     lineage:
-      - datalake_ebdb_test_raw.imovel.salesforceid
+      - datalake_ebdb_raw.imovel.salesforceid
     description: Unique identifier linking the house to Salesforce CRM records. Used for sales process tracking and customer relationship management.
   id_condo_parent:
     lineage:
-      - datalake_ebdb_test_raw.imovel.condominiopai_id
+      - datalake_ebdb_raw.imovel.condominiopai_id
     description: Reference to parent condominium if the house is part of a larger condominium complex. Used for grouping and management purposes.
   id_closest_station:
     lineage:
-      - datalake_ebdb_test_raw.imovel.estacaomaisproxima_id
+      - datalake_ebdb_raw.imovel.estacaomaisproxima_id
     description: Identifier of the closest public transportation station. Used for location benefits analysis and tenant convenience evaluation.
   id_external:
     lineage:
-      - datalake_ebdb_test_raw.imovel.externalid
+      - datalake_ebdb_raw.imovel.externalid
     description: External system identifier for house integration. Used for cross-system data synchronization and third-party integrations.
   id_condo_payment_info:
     lineage:
-      - datalake_ebdb_test_raw.imovel.infopagamentocondominio_id
+      - datalake_ebdb_raw.imovel.infopagamentocondominio_id
     description: Reference to condominium payment information record. Links house to specific payment terms and billing arrangements.
   rent:
     lineage:
-      - datalake_ebdb_test_raw.imovel.aluguel
+      - datalake_ebdb_raw.imovel.aluguel
     description: Monthly rental price in Brazilian Reais (BRL) for rental properties. Used for properties available for rent.
   sale_price:
     lineage:
-      - datalake_ebdb_test_raw.imovel.saleprice
+      - datalake_ebdb_raw.imovel.saleprice
     description: House sale price in Brazilian Reais (BRL). Key pricing information for properties available for purchase.
   predicted_price:
     lineage:
-      - datalake_ebdb_test_raw.imovel.predictedprice
+      - datalake_ebdb_raw.imovel.predictedprice
     description: Predicted market value of the house in Brazilian Reais. Used for pricing recommendations and market analysis.
   floor:
     lineage:
-      - datalake_ebdb_test_raw.imovel.andar
+      - datalake_ebdb_raw.imovel.andar
     description: Floor level where the house is located within the building. Ground floor is typically 0, first floor is 1, etc.
   building_floors:
     lineage:
-      - datalake_ebdb_test_raw.imovel.andarespredio
+      - datalake_ebdb_raw.imovel.andarespredio
     description: Total number of floors in the building where the house is located. Used for building classification and accessibility considerations.
   houses_per_floor:
     lineage:
-      - datalake_ebdb_test_raw.imovel.aptosporandar
+      - datalake_ebdb_raw.imovel.aptosporandar
     description: Number of apartment units per floor in the building. Indicates building density and layout characteristics.
   total_area:
     lineage:
-      - datalake_ebdb_test_raw.imovel.areatotal
+      - datalake_ebdb_raw.imovel.areatotal
     description: Total built area of the house in square meters. Includes all internal spaces and sometimes common areas proportional share.
   neighborhood:
     lineage:
-      - datalake_ebdb_test_raw.imovel.bairro
+      - datalake_ebdb_raw.imovel.bairro
     description: Neighborhood name where the house is located. Key geographic identifier for location-based searches and pricing analysis.
   zipcode:
     lineage:
-      - datalake_ebdb_test_raw.imovel.cep
+      - datalake_ebdb_raw.imovel.cep
     description: Brazilian postal code (CEP) for the house address. Used for precise location identification and logistics operations.
   city:
     lineage:
-      - datalake_ebdb_test_raw.imovel.cidade
+      - datalake_ebdb_raw.imovel.cidade
     description: City name where the house is located. Primary geographic filter for house searches and regional analysis.
   complement:
     lineage:
-      - datalake_ebdb_test_raw.imovel.complemento
+      - datalake_ebdb_raw.imovel.complemento
     description: Additional address information such as apartment number, block, or building name to complete the house address.
   condo:
     lineage:
-      - datalake_ebdb_test_raw.imovel.condominio
+      - datalake_ebdb_raw.imovel.condominio
     description: Monthly condominium fee in Brazilian Reais (BRL). Essential cost information for house evaluation and tenant decision-making.
   construction_year:
     lineage:
-      - datalake_ebdb_test_raw.imovel.anoconstrucao
+      - datalake_ebdb_raw.imovel.anoconstrucao
     description: Year when the house construction was completed. Used for house age classification and condition assessment.
   house_description:
     lineage:
-      - datalake_ebdb_test_raw.imovel.descricaoimovel
+      - datalake_ebdb_raw.imovel.descricaoimovel
     description: Detailed text description of the house including special features, amenities, and characteristics provided by the owner or agent.
   furnishing_details:
     lineage:
-      - datalake_ebdb_test_raw.imovel.detalhesmobilia
+      - datalake_ebdb_raw.imovel.detalhesmobilia
     description: Detailed description of furniture and appliances included with the house. Important for furnished rental evaluations.
   contact_email:
     lineage:
-      - datalake_ebdb_test_raw.imovel.emailcontato
+      - datalake_ebdb_raw.imovel.emailcontato
     description: Primary email address for house inquiries and communication with the owner or responsible agent.
   photo_session_email:
     lineage:
-      - datalake_ebdb_test_raw.imovel.emailsessaofotos
+      - datalake_ebdb_raw.imovel.emailsessaofotos
     description: Email address designated for coordinating professional photography sessions of the house.
   address:
     lineage:
-      - datalake_ebdb_test_raw.imovel.endereco
+      - datalake_ebdb_raw.imovel.endereco
     description: Street address of the house including street name. Main component of the complete house address.
   conservation_status:
     lineage:
-      - datalake_ebdb_test_raw.imovel.estadoconservacao
+      - datalake_ebdb_raw.imovel.estadoconservacao
     description: Current maintenance and conservation condition of the house. Used for house quality assessment and pricing evaluation.
   does_photographer_fill_information:
     lineage:
-      - datalake_ebdb_test_raw.imovel.fotografopreenchedados
+      - datalake_ebdb_raw.imovel.fotografopreenchedados
     description: Boolean flag indicating whether the photographer is responsible for filling house information during photo sessions.
   iptu:
     lineage:
-      - datalake_ebdb_test_raw.imovel.iptu
+      - datalake_ebdb_raw.imovel.iptu
     description: Annual house tax (IPTU) value in Brazilian Reais. Important cost component for house ownership and rental pricing.
   lat:
     lineage:
-      - datalake_ebdb_test_raw.imovel.lat
+      - datalake_ebdb_raw.imovel.lat
     description: Geographic latitude coordinate of the house location. Used for mapping, distance calculations, and location-based services.
   lng:
     lineage:
-      - datalake_ebdb_test_raw.imovel.lng
+      - datalake_ebdb_raw.imovel.lng
     description: Geographic longitude coordinate of the house location. Used for mapping, distance calculations, and location-based services.
   finishing_level:
     lineage:
-      - datalake_ebdb_test_raw.imovel.nivelacabamento
+      - datalake_ebdb_raw.imovel.nivelacabamento
     description: Quality level of house finishes and materials. Used for house classification and market positioning.
   number:
     lineage:
-      - datalake_ebdb_test_raw.imovel.numero
+      - datalake_ebdb_raw.imovel.numero
     description: Street number of the house address. Essential component for complete address identification and logistics.
   bathrooms:
     lineage:
-      - datalake_ebdb_test_raw.imovel.numerobanheiros
+      - datalake_ebdb_raw.imovel.numerobanheiros
     description: Total number of bathrooms in the house. Key search filter and important factor for house valuation and user experience.
   bedrooms:
     lineage:
-      - datalake_ebdb_test_raw.imovel.numeroquartos
+      - datalake_ebdb_raw.imovel.numeroquartos
     description: Total number of bedrooms in the house. Primary search criteria and fundamental factor for house classification and pricing.
   suites:
     lineage:
-      - datalake_ebdb_test_raw.imovel.numerosuites
+      - datalake_ebdb_raw.imovel.numerosuites
     description: Number of master bedrooms with private bathrooms (suites). Premium feature that affects house value and target market.
   parking_slots:
     lineage:
-      - datalake_ebdb_test_raw.imovel.numerovagas
+      - datalake_ebdb_raw.imovel.numerovagas
     description: Number of parking spaces included with the house. Critical amenity for urban properties and important pricing factor.
   register_percent_complete:
     lineage:
-      - datalake_ebdb_test_raw.imovel.porcentagemcadastrocompleta
+      - datalake_ebdb_raw.imovel.porcentagemcadastrocompleta
     description: Percentage indicating how complete the house registration is. Used for data quality assessment and listing completeness validation.
   status:
     lineage:
-      - datalake_ebdb_test_raw.imovel.status
+      - datalake_ebdb_raw.imovel.status
     description: Current listing status of the house (e.g., Published, Suspended, Unpublished). Critical for house availability and business operations.
   contact_phone_1:
     lineage:
-      - datalake_ebdb_test_raw.imovel.telefonecontato1
+      - datalake_ebdb_raw.imovel.telefonecontato1
     description: Primary phone number for house inquiries and owner contact. Main communication channel for scheduling visits.
   contact_phone_2:
     lineage:
-      - datalake_ebdb_test_raw.imovel.telefonecontato2
+      - datalake_ebdb_raw.imovel.telefonecontato2
     description: Secondary phone number for house inquiries. Backup communication channel for owner contact.
   photos_session_phone:
     lineage:
-      - datalake_ebdb_test_raw.imovel.telefonesessaofotos
+      - datalake_ebdb_raw.imovel.telefonesessaofotos
     description: Phone number designated for coordinating professional photography sessions of the house.
   type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipo
+      - datalake_ebdb_raw.imovel.tipo
     description: Property type classification (e.g., apartment, house, studio, commercial). Fundamental categorization for house searches and market analysis.
   doorman_type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipoporteiro
+      - datalake_ebdb_raw.imovel.tipoporteiro
     description: Type of doorman service available in the building (full-time, part-time, electronic, none). Important security and service amenity.
   parking_slot_type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipovagas
+      - datalake_ebdb_raw.imovel.tipovagas
     description: Type of parking spaces available (covered, uncovered, garage, street). Affects house value and tenant preferences.
   promotion_code:
     lineage:
-      - datalake_ebdb_test_raw.imovel.codigopromocao
+      - datalake_ebdb_raw.imovel.codigopromocao
     description: Promotional discount code applicable to the house. Used for marketing campaigns and special offers.
   total_value:
     lineage:
-      - datalake_ebdb_test_raw.imovel.valortotal
+      - datalake_ebdb_raw.imovel.valortotal
     description: Total monthly cost including rent, condominium, and other fees. Complete cost information for tenant decision-making.
   short_url:
     lineage:
-      - datalake_ebdb_test_raw.imovel.shorturl
+      - datalake_ebdb_raw.imovel.shorturl
     description: Shortened URL for easy sharing of the house listing. Used in marketing campaigns and social media sharing.
   insurance_value:
     lineage:
-      - datalake_ebdb_test_raw.imovel.valorseguro
+      - datalake_ebdb_raw.imovel.valorseguro
     description: House insurance value in Brazilian Reais. Required for rental contracts and risk assessment.
   booking_instructions:
     lineage:
-      - datalake_ebdb_test_raw.imovel.instrucoesagendamento
+      - datalake_ebdb_raw.imovel.instrucoesagendamento
     description: Special instructions for scheduling house visits. Important for visit coordination and owner preferences.
   plan_accepted:
     lineage:
-      - datalake_ebdb_test_raw.imovel.planoaceito
+      - datalake_ebdb_raw.imovel.planoaceito
     description: Type of QuintoAndar service plan accepted by the house owner. Determines service level and commission structure.
   lead_description:
     lineage:
-      - datalake_ebdb_test_raw.imovel.descricaolead
+      - datalake_ebdb_raw.imovel.descricaolead
     description: Description of the lead source or how the house came to be listed. Used for lead attribution and marketing analysis.
   listing_highlight_priority:
     lineage:
-      - datalake_ebdb_test_raw.imovel.prioridadedestaqueclassificado
+      - datalake_ebdb_raw.imovel.prioridadedestaqueclassificado
     description: Priority level for highlighting the house listing. Used for featured listing placement and marketing visibility.
   corretoramigo:
     lineage:
-      - datalake_ebdb_test_raw.imovel.corretoramigo
+      - datalake_ebdb_raw.imovel.corretoramigo
     description: Information about broker referral program participation. Used for agent network and commission tracking.
   porteiroamigo:
     lineage:
-      - datalake_ebdb_test_raw.imovel.porteiroamigo
+      - datalake_ebdb_raw.imovel.porteiroamigo
     description: Information about doorman referral program participation. Used for building relationship management and referral tracking.
   condo_management_information:
     lineage:
-      - datalake_ebdb_test_raw.imovel.dadosadministradoracondominio
+      - datalake_ebdb_raw.imovel.dadosadministradoracondominio
     description: Information about the condominium management company. Important for house management and maintenance coordination.
   references:
     lineage:
-      - datalake_ebdb_test_raw.imovel.referencias
+      - datalake_ebdb_raw.imovel.referencias
     description: Additional reference points or landmarks near the house. Used for location description and ease of finding the house.
   lead_collision_type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipocolisaolead
+      - datalake_ebdb_raw.imovel.tipocolisaolead
     description: Type of lead collision or conflict identified for the house. Used for lead management and attribution analysis.
   cover_image_name:
     lineage:
-      - datalake_ebdb_test_raw.imovel.nomeimagemcapa
+      - datalake_ebdb_raw.imovel.nomeimagemcapa
     description: Filename of the cover image for the house listing. Used for display and marketing purposes.
   geo_hash:
     lineage:
-      - datalake_ebdb_test_raw.imovel.geohash
+      - datalake_ebdb_raw.imovel.geohash
     description: Geohash encoding of the house location. Used for spatial indexing and proximity-based searches.
   listing_type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipoanuncio
+      - datalake_ebdb_raw.imovel.tipoanuncio
     description: Classification of the listing type (premium, standard, basic). Affects visibility and marketing treatment of the house.
   admin_info:
     lineage:
-      - datalake_ebdb_test_raw.imovel.infosadmin
+      - datalake_ebdb_raw.imovel.infosadmin
     description: Administrative information and notes about the house. Internal use for operational management and special considerations.
   internal_admin_info:
     lineage:
-      - datalake_ebdb_test_raw.imovel.infosadmininterna
+      - datalake_ebdb_raw.imovel.infosadmininterna
     description: Internal administrative information not visible to public. Used for internal operations and team communication.
   photo_booking_historic:
     lineage:
-      - datalake_ebdb_test_raw.imovel.historicoagendamentofotos
+      - datalake_ebdb_raw.imovel.historicoagendamentofotos
     description: Historical record of photo session bookings and appointments. Used for photography workflow management.
   default_neighborhood:
     lineage:
-      - datalake_ebdb_test_raw.imovel.bairropadrao
+      - datalake_ebdb_raw.imovel.bairropadrao
     description: Standardized neighborhood name used for consistency in location references and search functionality.
   condo_type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipocondominio
+      - datalake_ebdb_raw.imovel.tipocondominio
     description: Classification of condominium type (residential, commercial, mixed). Used for house categorization and market analysis.
   iptu_type:
     lineage:
-      - datalake_ebdb_test_raw.imovel.tipoiptu
+      - datalake_ebdb_raw.imovel.tipoiptu
     description: Classification of IPTU tax calculation method. Important for understanding house tax structure and costs.
   compare_price_with_average:
     lineage:
-      - datalake_ebdb_test_raw.imovel.flagverificarprecocomparandocommedia
+      - datalake_ebdb_raw.imovel.flagverificarprecocomparandocommedia
     description: Flag indicating whether to compare house price with market average. Used for pricing analysis and recommendations.
   code_cartographic:
     lineage:
-      - datalake_ebdb_test_raw.imovel.codcartografico
+      - datalake_ebdb_raw.imovel.codcartografico
     description: Official cartographic code for the house location. Used for precise geographic identification and mapping.
   code_water_consumer:
     lineage:
-      - datalake_ebdb_test_raw.imovel.codconsumidoragua
+      - datalake_ebdb_raw.imovel.codconsumidoragua
     description: Water utility consumer code for the house. Used for utility account identification and billing management.
   code_power_consumer:
     lineage:
-      - datalake_ebdb_test_raw.imovel.codconsumidorenergia
+      - datalake_ebdb_raw.imovel.codconsumidorenergia
     description: Electric utility consumer code for the house. Used for utility account identification and billing management.
   code_taxpayer:
     lineage:
-      - datalake_ebdb_test_raw.imovel.codcontribuinte
+      - datalake_ebdb_raw.imovel.codcontribuinte
     description: Tax contributor code for the house. Official identifier for tax purposes and municipal records.
   code_reference_iptu:
     lineage:
-      - datalake_ebdb_test_raw.imovel.codigorefiptu
+      - datalake_ebdb_raw.imovel.codigorefiptu
     description: IPTU reference code for house tax identification. Used for tax calculation and municipal house records.
   house_conversion_status:
     lineage:
-      - datalake_ebdb_test_raw.imovel.statusconversaoimovel
+      - datalake_ebdb_raw.imovel.statusconversaoimovel
     description: Status of house conversion process (if applicable). Used for tracking house modifications and compliance.
   registration:
     lineage:
-      - datalake_ebdb_test_raw.imovel.matricula
+      - datalake_ebdb_raw.imovel.matricula
     description: Official registration number of the house. Legal identifier used in house documentation and transactions.
   last_confirmation_email_sent:
     lineage:
-      - datalake_ebdb_test_raw.imovel.ultimoemaildeconfirmacaoenviado
+      - datalake_ebdb_raw.imovel.ultimoemaildeconfirmacaoenviado
     description: Timestamp of the last confirmation email sent to the house owner. Used for communication tracking and follow-up management.
   lat_lng:
     lineage:
-      - datalake_ebdb_test_raw.imovel.latlng
+      - datalake_ebdb_raw.imovel.latlng
     description: Combined latitude and longitude coordinates in a single field. Alternative format for geographic location data.
   title:
     lineage:
-      - datalake_ebdb_test_raw.imovel.titulo
+      - datalake_ebdb_raw.imovel.titulo
     description: House listing title or headline. Used for display purposes and search optimization.
   cardiff_rejection_reason:
     lineage:
-      - datalake_ebdb_test_raw.imovel.motivorecusacardiff
+      - datalake_ebdb_raw.imovel.motivorecusacardiff
     description: Reason for Cardiff system rejection if applicable. Used for quality control and listing validation processes.
   lat_bkp:
     lineage:
-      - datalake_ebdb_test_raw.imovel.latbkp
+      - datalake_ebdb_raw.imovel.latbkp
     description: Backup latitude coordinate for the house location. Used as fallback for location data integrity.
   lng_bkp:
     lineage:
-      - datalake_ebdb_test_raw.imovel.lngbkp
+      - datalake_ebdb_raw.imovel.lngbkp
     description: Backup longitude coordinate for the house location. Used as fallback for location data integrity.
   registry:
     lineage:
-      - datalake_ebdb_test_raw.imovel.cartorio
+      - datalake_ebdb_raw.imovel.cartorio
     description: Name of the public registry office (cartório) where the house is registered. Legal requirement for house documentation in Brazil.
   penalization_score:
     lineage:
-      - datalake_ebdb_test_raw.imovel.penalizationscore
+      - datalake_ebdb_raw.imovel.penalizationscore
     description: Score indicating house or owner penalties. Used for risk assessment and quality control in listing management.
   rank_score:
     lineage:
-      - datalake_ebdb_test_raw.imovel.rankscore
+      - datalake_ebdb_raw.imovel.rankscore
     description: Ranking score for the house based on various factors. Used for search result ordering and house prioritization.
   home_owners_insurance_value:
     lineage:
-      - datalake_ebdb_test_raw.imovel.homeownersinsurancevalue
+      - datalake_ebdb_raw.imovel.homeownersinsurancevalue
     description: Value of homeowner's insurance for the house. Used for insurance calculation and risk assessment.
   suspension_reason:
     lineage:
-      - datalake_ebdb_test_raw.imovel.suspensionreason
+      - datalake_ebdb_raw.imovel.suspensionreason
     description: Reason why the house listing was suspended. Important for operational analysis and listing lifecycle management.
   land_area:
     lineage:
-      - datalake_ebdb_test_raw.imovel.areaterreno
+      - datalake_ebdb_raw.imovel.areaterreno
     description: Total land area of the house in square meters. Particularly important for houses and commercial properties with outdoor space.
   announced_by:
     lineage:
-      - datalake_ebdb_test_raw.imovel.announcedby
+      - datalake_ebdb_raw.imovel.announcedby
     description: Name or identifier of the entity that announced the house listing. Used for lead attribution and partner relationship management.
   unpublished_reason:
     lineage:
-      - datalake_ebdb_test_raw.imovel.unpublishedreason
+      - datalake_ebdb_raw.imovel.unpublishedreason
     description: Reason why the house listing was unpublished. Used for operational analysis and house lifecycle management.
   is_for_rent:
     lineage:
-      - datalake_ebdb_test_raw.imovel.forrent
+      - datalake_ebdb_raw.imovel.forrent
     description: Boolean flag indicating whether the house is available for rental. Primary filter for rental house searches.
   is_for_sale:
     lineage:
-      - datalake_ebdb_test_raw.imovel.forsale
+      - datalake_ebdb_raw.imovel.forsale
     description: Boolean flag indicating whether the house is available for sale. Primary filter for house purchase searches.
   is_photographer_job_pending:
     lineage:
-      - datalake_ebdb_test_raw.imovel.jobfotografopendente
+      - datalake_ebdb_raw.imovel.jobfotografopendente
     description: Boolean flag indicating whether there is a pending photographer job for the house. Used for photo session workflow management.
   has_requested_professional_photos:
     lineage:
-      - datalake_ebdb_test_raw.imovel.requisitoufotosprofissionais
+      - datalake_ebdb_raw.imovel.requisitoufotosprofissionais
     description: Boolean flag indicating whether professional photos have been requested. Used for photography workflow and listing quality management.
   is_visit_information_confirmed:
     lineage:
-      - datalake_ebdb_test_raw.imovel.confirmadoinformacoesvisita
+      - datalake_ebdb_raw.imovel.confirmadoinformacoesvisita
     description: Boolean flag indicating whether visit information has been confirmed. Used for visit scheduling and house showing management.
   is_receive_default_contract_copy_needed:
     lineage:
-      - datalake_ebdb_test_raw.imovel.recebercopiacontratopadrao
+      - datalake_ebdb_raw.imovel.recebercopiacontratopadrao
     description: Boolean flag indicating whether owner needs to receive default contract copy. Used for contract management and legal compliance.
   is_in_negotiation:
     lineage:
-      - datalake_ebdb_test_raw.imovel.emnegociacao
+      - datalake_ebdb_raw.imovel.emnegociacao
     description: Boolean flag indicating whether the house is currently in negotiation. Used for availability status and business process management.
   is_in_external_negotiation:
     lineage:
-      - datalake_ebdb_test_raw.imovel.emnegociacaoexterna
+      - datalake_ebdb_raw.imovel.emnegociacaoexterna
     description: Boolean flag indicating whether the house is in negotiation with external parties. Used for availability tracking and competitive analysis.
   is_listing_notifying_owner_email_sent:
     lineage:
-      - datalake_ebdb_test_raw.imovel.emailpublicacaoproprietarioenviado
+      - datalake_ebdb_raw.imovel.emailpublicacaoproprietarioenviado
     description: Boolean flag indicating whether listing notification email has been sent to owner. Used for communication workflow management.
   is_warn_owner_of_visits_needed:
     lineage:
-      - datalake_ebdb_test_raw.imovel.sempreconsultarproprietariovisita
+      - datalake_ebdb_raw.imovel.sempreconsultarproprietariovisita
     description: Boolean flag indicating whether owner should always be consulted before visits. Used for visit scheduling and owner preference management.
   is_condo_price_included:
     lineage:
-      - datalake_ebdb_test_raw.imovel.condominioincluso
+      - datalake_ebdb_raw.imovel.condominioincluso
     description: Boolean flag indicating whether condominium fee is included in the rent price. Important for transparent pricing and tenant decision-making.
   has_manual_coordinates:
     lineage:
-      - datalake_ebdb_test_raw.imovel.coordenadasmanuais
+      - datalake_ebdb_raw.imovel.coordenadasmanuais
     description: Boolean flag indicating whether geographic coordinates were manually entered. Used for location data quality assessment.
   is_iptu_included:
     lineage:
-      - datalake_ebdb_test_raw.imovel.iptuincluso
+      - datalake_ebdb_raw.imovel.iptuincluso
     description: Boolean flag indicating whether IPTU tax is included in the rent price. Important for transparent pricing and cost calculation.
   is_follow_up_owner_upload_photos:
     lineage:
-      - datalake_ebdb_test_raw.imovel.followupproprietariosubirfotos
+      - datalake_ebdb_raw.imovel.followupproprietariosubirfotos
     description: Boolean flag indicating whether follow-up is needed for owner to upload photos. Used for photo management workflow.
   has_service_bathroom:
     lineage:
-      - datalake_ebdb_test_raw.imovel.possuibanheiroservico
+      - datalake_ebdb_raw.imovel.possuibanheiroservico
     description: Boolean flag indicating whether the house has a service bathroom. Additional amenity information for house evaluation.
   has_service_bedroom:
     lineage:
-      - datalake_ebdb_test_raw.imovel.possuiquartoservico
+      - datalake_ebdb_raw.imovel.possuiquartoservico
     description: Boolean flag indicating whether the house has a service bedroom (maid's room). Additional space information for house classification.
   has_elevator:
     lineage:
-      - datalake_ebdb_test_raw.imovel.elevador
+      - datalake_ebdb_raw.imovel.elevador
     description: Boolean flag indicating whether the building has an elevator. Key accessibility feature for house evaluation.
   has_price_adjustment_suggestion:
     lineage:
-      - datalake_ebdb_test_raw.imovel.sugerirreajustedepreco
+      - datalake_ebdb_raw.imovel.sugerirreajustedepreco
     description: Boolean flag indicating whether the system should suggest price adjustments for the house. Used for dynamic pricing optimization.
   has_rent_sign_permission:
     lineage:
-      - datalake_ebdb_test_raw.imovel.permiteplacaalugase
+      - datalake_ebdb_raw.imovel.permiteplacaalugase
     description: Boolean flag indicating whether owner permits placing rental signs on the house. Marketing and visibility preference.
   is_furnished:
     lineage:
-      - datalake_ebdb_test_raw.imovel.mobiliado
+      - datalake_ebdb_raw.imovel.mobiliado
     description: Boolean flag indicating whether the house comes furnished. Key filter for rental house searches and pricing evaluation.
   is_verified:
     lineage:
-      - datalake_ebdb_test_raw.imovel.verificado
+      - datalake_ebdb_raw.imovel.verificado
     description: Boolean flag indicating whether the house has been verified by QuintoAndar team. Quality assurance indicator for listings.
   is_quote_insurance_needed:
     lineage:
-      - datalake_ebdb_test_raw.imovel.cotarseguro
+      - datalake_ebdb_raw.imovel.cotarseguro
     description: Boolean flag indicating whether house insurance quotation is required. Part of the rental process workflow.
   has_session_photos_email_preference:
     lineage:
-      - datalake_ebdb_test_raw.imovel.prefereemailsessaofotos
+      - datalake_ebdb_raw.imovel.prefereemailsessaofotos
     description: Boolean indicating owner's preference to be contacted via email for photo session coordination.
   has_owner_incomplete_listing_notification:
     lineage:
-      - datalake_ebdb_test_raw.imovel.notificacaoanuncioincompletoproprietario
+      - datalake_ebdb_raw.imovel.notificacaoanuncioincompletoproprietario
     description: Boolean flag indicating whether owner has been notified about incomplete listing information. Part of listing quality management workflow.
   has_admin_incomplete_listing_notification:
     lineage:
-      - datalake_ebdb_test_raw.imovel.notificacaoanuncioincompletoadmin
+      - datalake_ebdb_raw.imovel.notificacaoanuncioincompletoadmin
     description: Boolean flag indicating whether admin team has been notified about incomplete listing information. Internal quality control flag.
   dt_built:
     lineage:
-      - datalake_ebdb_test_raw.imovel.dataconstrucao
+      - datalake_ebdb_raw.imovel.dataconstrucao
     description: Construction completion date of the house. Used for house age calculation and market analysis.
   dt_moving_in:
     lineage:
-      - datalake_ebdb_test_raw.imovel.dataparamudar
+      - datalake_ebdb_raw.imovel.dataparamudar
     description: Date when the house becomes available for occupancy. Critical for rental scheduling and house availability management.
   dt_vacant_on:
     lineage:
-      - datalake_ebdb_test_raw.imovel.vacanton
+      - datalake_ebdb_raw.imovel.vacanton
     description: Date when the house will become vacant. Important for availability planning and tenant transition management.
   dt_availability_end:
     lineage:
-      - datalake_ebdb_test_raw.imovel.disponivelate
+      - datalake_ebdb_raw.imovel.disponivelate
     description: Date until when the house will remain available. Used for availability window management and planning.
   dt_expiration:
     lineage:
-      - datalake_ebdb_test_raw.imovel.expirationdate
+      - datalake_ebdb_raw.imovel.expirationdate
     description: Date when the house listing expires and needs renewal. Used for listing lifecycle management.
   dt_first_publication:
     lineage:
-      - datalake_ebdb_test_raw.imovel.firstpublication
+      - datalake_ebdb_raw.imovel.firstpublication
     description: Date when the house was first published on the platform. Used for house lifecycle tracking and market analysis.
   dt_creation:
     lineage:
-      - datalake_ebdb_test_raw.imovel.datacriacao
+      - datalake_ebdb_raw.imovel.datacriacao
     description: Date and time when the house record was first created in the system. Used for house lifecycle tracking and historical analysis.
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.imovel.atualizadoem
+      - datalake_ebdb_raw.imovel.atualizadoem
     description: Timestamp of the last update made to the house record. Used for change tracking and data freshness validation.
   ts_suspension_end:
     lineage:
-      - datalake_ebdb_test_raw.imovel.suspensoate
+      - datalake_ebdb_raw.imovel.suspensoate
     description: Timestamp when the house suspension period ends. Used for automatic reactivation and availability management.
   ts_external_negotiation_start:
     lineage:
-      - datalake_ebdb_test_raw.imovel.entrouemnegociacaoexterna
+      - datalake_ebdb_raw.imovel.entrouemnegociacaoexterna
     description: Timestamp when external negotiation began. Used for negotiation timeline tracking and competitive analysis.
   ts_last_publication:
     lineage:
-      - datalake_ebdb_test_raw.imovel.ultimapublicacao
+      - datalake_ebdb_raw.imovel.ultimapublicacao
     description: Timestamp of the last time the house was published. Used for listing activity tracking and performance analysis.
   ts_last_confirmation_availability:
     lineage:
-      - datalake_ebdb_test_raw.imovel.lastconfirmationavailability
+      - datalake_ebdb_raw.imovel.lastconfirmationavailability
     description: Timestamp of the last availability confirmation. Used for data freshness and house status validation.
   ts_last_index_update:
     lineage:
-      - datalake_ebdb_test_raw.imovel.ultimoupdateindice
+      - datalake_ebdb_raw.imovel.ultimoupdateindice
     description: Timestamp of the last search index update for the house. Used for search optimization and data synchronization.
   ts_recapture:
     lineage:
-      - datalake_ebdb_test_raw.imovel.recaptadoem
+      - datalake_ebdb_raw.imovel.recaptadoem
     description: Timestamp when the house was recaptured or re-acquired. Used for business development and market expansion tracking.
   ts_affiliate_lead_payment_calculated:
     lineage:
-      - datalake_ebdb_test_raw.imovel.calculopagamentoleadafiliado
+      - datalake_ebdb_raw.imovel.calculopagamentoleadafiliado
     description: Timestamp when affiliate lead payment was calculated. Used for commission tracking and financial management.
   ts_first_verified:
     lineage:
-      - datalake_ebdb_test_raw.imovel.dataprimeiroverificado
+      - datalake_ebdb_raw.imovel.dataprimeiroverificado
     description: Timestamp of the first house verification. Used for quality control tracking and verification process management.
   ts_agent_lead_payment_calculated:
     lineage:
-      - datalake_ebdb_test_raw.imovel.calculopagamentoleadcorretor
+      - datalake_ebdb_raw.imovel.calculopagamentoleadcorretor
     description: Timestamp when agent lead payment was calculated. Used for agent commission tracking and financial management.
