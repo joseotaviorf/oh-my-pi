@@ -1326,8 +1326,6 @@ bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-partner-info:first-run-of-day
   - bietlejuice.atta:load-clean-proposal:first-run-of-day
   - bietlejuice.atta:load-clean-track-step-detail:first-run-of-day
-bietlejuice.enrich_availability_check_events:
-  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.enrich_b2b:
   - bietlejuice.ebdb_contract:load-clean-portability:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
@@ -3852,18 +3850,6 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
-bietlejuice.metric_rede__performance:
-  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
-  - bietlejuice.dw_company:load-dw-public-fact-company-events:first-run-of-day
-  - bietlejuice.dw_person:load-dw-public-dim-person:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-flows:first-run-of-day
-  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
-  - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
-  - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
-  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings:first-run-of-day
-  - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing:first-run-of-day
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
