@@ -501,6 +501,7 @@ SELECT
     partner_3p_supply,
     is_3p_supply,
     is_3p_supply_bh,
+    TRUE AS has_3p_access_control,
     ts_status_started,
     ts_status_ended
 FROM
