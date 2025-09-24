@@ -53,5 +53,5 @@ SELECT
     day
 FROM datalake_amplitude_clean.events
 WHERE
-    id_app = '170698' AND event_type = 'pending_invoices_pay_total_cta_clicked'
+    id_app = '170698' AND event_type = 'pending_invoices_pay_invoice_cta_clicked'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

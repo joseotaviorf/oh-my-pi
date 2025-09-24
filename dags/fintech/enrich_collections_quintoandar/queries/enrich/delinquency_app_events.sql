@@ -104,6 +104,31 @@ overdue_invoices_events AS (
     id_amplitude,
     id_session,
     id_user,
+    CAST(ep_id_contract AS BIGINT) AS id_contract,
+    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
+    device_family,
+    "pending_invoices_pay_total_cta_clicked" AS event_name,
+    event_properties,
+    "Overdue Self Service Action" AS funnel_step,
+    4 AS level,
+    "Triggers when user clicks the 'Pagar total' button on the 'Faturas em atraso' card on the 'Pending Invoices' page" AS event_description,
+    "pix_cc" AS feature,
+    TRUE AS is_active,
+    year,
+    month,
+    day,
+    ts_event
+  FROM
+    datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+  UNION ALL
+
+  SELECT
+    id_amplitude,
+    id_session,
+    id_user,
     ARRAY(ep_id_contract) AS id_contract,
     FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_family,
@@ -439,31 +464,6 @@ SELECT
   id_session,
   id_user,
   CAST(ep_id_contract AS BIGINT) AS id_contract,
-  CAST(NULL AS BIGINT) AS id_invoice,
-  device_family,
-  "pending_invoices_pay_total_cta_clicked" AS event_name,
-  event_properties,
-  "Overdue Self Service Action" AS funnel_step,
-  4 AS level,
-  "Triggers when user clicks the 'Pagar total' button on the 'Faturas em atraso' card on the 'Pending Invoices' page" AS event_description,
-  "pix_cc" AS feature,
-  TRUE AS is_active,
-  year,
-  month,
-  day,
-  ts_event
-FROM
-  datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events
-WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-
-UNION ALL
-
-SELECT
-  id_amplitude,
-  id_session,
-  id_user,
-  CAST(ep_id_contract AS BIGINT) AS id_contract,
   CAST(ep_id_invoice AS BIGINT) AS id_invoice,
   device_family,
   "overdue_invoices_invoice_pay_button_clicked" AS event_name,
@@ -479,6 +479,31 @@ SELECT
   ts_event
 FROM
   datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(ep_id_contract AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "my_rent_pending_invoices_card_view" AS event_name,
+  event_properties,
+  "Overdue Self Service Action" AS funnel_step,
+  4 AS level,
+  "Triggers when user clicks the 'Pagar fatura' button on the 'Pending Invoices' page" AS event_description,
+  "pwa" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_pending_invoices_pay_invoice_cta_clicked_events
 WHERE
   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 

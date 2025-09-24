@@ -1569,6 +1569,7 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-invoice-pay-button-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-negotiation-cta-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-page-viewed-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-pay-invoice-cta-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-pay-total-cta-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-payment-option-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-payment-option-clicked-events:first-run-of-day

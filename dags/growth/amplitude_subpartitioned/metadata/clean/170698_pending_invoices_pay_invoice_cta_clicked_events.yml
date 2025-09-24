@@ -1,9 +1,9 @@
 database_name: datalake_amplitude_clean
-table_name: 170698_pending_invoices_pay_total_cta_clicked_events
+table_name: 170698_pending_invoices_pay_invoice_cta_clicked_events
 domain: Growth
 owner: eduardo.soares@quintoandar.com.br
 description:
-  This table contains pending_invoices_pay_total_cta_clicked events from
+  This table contains pending_invoices_pay_invoice_cta_clicked events from
   app 170698. It tracks user interactions and includes relevant metadata and user
   properties.
 columns:

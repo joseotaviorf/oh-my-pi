@@ -771,6 +771,9 @@ workflow:
     170698_overdue_invoices_total_payment_option_clicked_events:
       run_optimize: false
       run_vacuum: false
+    170698_pending_invoices_pay_invoice_cta_clicked_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new
