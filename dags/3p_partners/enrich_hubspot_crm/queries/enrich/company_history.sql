@@ -191,6 +191,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.digito_creci'), '') = 'PF' AS is_natural_person,
     NULLIF(GET_JSON_OBJECT(properties, '$.digito_creci'), '') = 'PJ' AS is_juridical_person,
     is_archived,
+    TRUE AS has_3p_access_control,
     GET_JSON_OBJECT(properties, '$.first_conversion_date')::TIMESTAMP AS ts_first_conversion,
     GET_JSON_OBJECT(properties, '$.recent_deal_close_date')::TIMESTAMP AS ts_recent_deal_close,
     GET_JSON_OBJECT(properties, '$.hubspot_owner_assigneddate')::TIMESTAMP AS ts_hubspot_owner_assigned,

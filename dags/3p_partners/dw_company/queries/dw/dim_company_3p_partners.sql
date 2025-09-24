@@ -24,6 +24,7 @@ SELECT
   COALESCE(cm.extracted_3p_tag, 'Unknown') AS hubspot_company_tag,
   cm.sale_lead_status = 'Membro' AS is_active_company_rede_partner,
   cm.is_flagged_as_leadgen AS is_flagged_as_leadgen_in_hubspot,
+  TRUE AS has_3p_access_control,
   MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_start ELSE NULL END) AS ts_membership_start,
   CASE
     WHEN cm.sale_lead_status != 'Membro' THEN MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_end ELSE NULL END)

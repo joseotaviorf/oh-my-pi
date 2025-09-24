@@ -30,3 +30,7 @@ columns:
     description: True if there is any image with room_type = walk_in_closet.
   has_unobstructed_view:
     description: True if there is any image with room_type = mountain_view or city_view.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.

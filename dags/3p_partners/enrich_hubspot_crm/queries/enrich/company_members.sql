@@ -11,6 +11,7 @@ SELECT
   c.member_category,
   c.sale_lead_status,
   c.is_flagged_as_leadgen,
+  TRUE AS has_3p_access_control,
   c.ts_created,
   c.ts_updated,
   c.year,

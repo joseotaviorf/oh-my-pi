@@ -47,6 +47,7 @@ SELECT
   e.event_type,
   e.event_source,
   e.is_current_cohort,
+  TRUE AS has_3p_access_control,
   e.ts_start,
   e.ts_end
 FROM

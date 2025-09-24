@@ -52,6 +52,10 @@ columns:
     description: The number of days the company has been in the status.
   is_partner:
     description: Whether the company is a partner or not at that point.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   ts_status_started:
     lineage:
       - datalake_hubspot.company.lead_status_history

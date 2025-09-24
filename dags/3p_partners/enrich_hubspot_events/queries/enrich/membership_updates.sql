@@ -26,6 +26,7 @@ SELECT
   CONCAT(ch.id_company, DATE_FORMAT(ch.ts_start, 'yyyyMMddHHmmss')) AS id_membership_update,
   ch.id_company AS id_hubspot,
   ch.sale_lead_status AS hubspot_status,
+  TRUE AS has_3p_access_control,
   ch.ts_end IS NULL AS is_current_cohort,
   ch.ts_start,
   ch.ts_end

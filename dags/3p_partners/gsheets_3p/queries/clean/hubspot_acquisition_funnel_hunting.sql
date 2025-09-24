@@ -5,6 +5,7 @@ SELECT
     NULLIF(cleaned_stage, '') AS cleaned_stage,
     NULLIF(city, '') AS city,
     CAST(NULLIF(days_in_stage, '') AS FLOAT) AS days_in_stage,
+    TRUE AS has_3p_access_control,
     CAST(NULLIF(dt_stage_started, '') AS DATE) AS dt_stage_started,
     CAST(NULLIF(dt_stage_ended, '') AS DATE) AS dt_stage_ended,
     CAST(NULLIF(dt_first_contract, '') AS DATE) AS dt_first_contract,

@@ -69,6 +69,10 @@ columns:
     lineage:
       - datalake_hubspot.company.is_flagged_as_leadgen
     description: Whether or not the company has agents in Lead Gen program.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
   ts_created:
     lineage:
       - datalake_hubspot.company.ts_created

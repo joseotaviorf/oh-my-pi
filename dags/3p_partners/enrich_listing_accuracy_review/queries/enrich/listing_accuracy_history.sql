@@ -38,6 +38,7 @@ visits_review_changes AS (
 SELECT 
    id_house,
    is_listing_accurate,
+   TRUE AS has_3p_access_control,
    dt_change,
    LEAD(dt_change) OVER (PARTITION BY id_house ORDER BY dt_change DESC) AS ts_next_change
 FROM

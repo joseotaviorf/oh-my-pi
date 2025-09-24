@@ -4,6 +4,7 @@ SELECT
   ce.sk_company,
   ce.event_update,
   ce.is_current_cohort,
+  TRUE AS has_3p_access_control,
   ce.ts_start,
   ce.ts_end,
   NOW() AS ts_load

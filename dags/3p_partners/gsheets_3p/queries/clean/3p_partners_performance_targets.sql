@@ -32,6 +32,7 @@ SELECT
     NULLIF(input_metric_4_value, '') AS input_metric_4_value,
     NULLIF(input_metric_5_name, '') AS input_metric_5_name,
     NULLIF(input_metric_5_value, '') AS input_metric_5_value,
+    TRUE AS has_3p_access_control,
     NULLIF(month, '') AS dt_month,
     NULLIF(day, '') AS dt_day,
     NOW() AS ts_load

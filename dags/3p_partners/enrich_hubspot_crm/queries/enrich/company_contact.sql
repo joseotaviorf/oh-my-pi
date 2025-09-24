@@ -44,6 +44,7 @@ SELECT
             ) = 1 THEN 'DECIDING_CONTACT'
             ELSE 'NON_DECIDING_CONTACT'
         END AS contact_association_type,
-    occupation
+    occupation,
+    TRUE AS has_3p_access_control
 FROM
     company_contacts

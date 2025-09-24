@@ -54,6 +54,7 @@ SELECT
     ABS(days_crawler_to_supply_processor) < 15 AS is_fresh,
     days_crawler_to_supply_processor BETWEEN -14 AND -1 AS is_early_fresh,
     days_crawler_to_supply_processor,
+    TRUE AS has_3p_access_control,
     dt_crawler,
     dt_supply_processor
 FROM

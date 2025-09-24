@@ -19,6 +19,7 @@ SELECT
     valor AS price,
     gc_leads,
     gc_views,
+    TRUE AS has_3p_access_control,
     `data_criação_anuncio`::DATE AS dt_listing_created,
     `data_ultima_atualização_do_anuncio`::DATE AS dt_listing_updated,
     `data_geração`::DATE AS dt_generated,

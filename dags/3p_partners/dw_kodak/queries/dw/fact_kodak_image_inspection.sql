@@ -67,6 +67,7 @@ SELECT
   ia.has_toy_library AS has_restb_amenity_toy_library,
   ia.has_unobstructed_view AS has_restb_amenity_unobstructed_view,
   ia.has_walk_in_closet AS has_restb_amenity_walk_in_closet,
+  TRUE AS has_3p_access_control,
   im.ts_created,
   im.ts_updated,
   NOW() AS ts_load

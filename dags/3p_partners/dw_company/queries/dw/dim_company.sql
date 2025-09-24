@@ -19,6 +19,7 @@ SELECT
   cs.is_company_pp_multi,
   cs.is_company_rede_broker,
   cs.is_company_rental_guarantee,
+  cs.is_company_rede_broker AS has_3p_access_control,
   c.ts_created,
   c.ts_updated,
   NOW() AS ts_load

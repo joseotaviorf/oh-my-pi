@@ -11,6 +11,7 @@ SELECT
     CAST(NULLIF(dt_contract, '') AS DATE) AS dt_contract,
     NULLIF(stage, '') AS stage,
     CAST(NULLIF(is_flagged_as_leadgen, '') AS BOOLEAN) AS is_flagged_as_leadgen,
+    TRUE AS has_3p_access_control,
     NOW() AS ts_load
 FROM
     datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding

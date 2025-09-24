@@ -289,6 +289,7 @@ SELECT
     ch.is_juridical_person,
     mc.id_merged_company IS NOT NULL OR ch.is_archived AS is_archived,
     mc.id_merged_company IS NOT NULL AS is_merged_into_other_company,
+    TRUE AS has_3p_access_control,
     ch.ts_first_conversion,
     ch.ts_recent_deal_close,
     ch.ts_hubspot_owner_assigned,

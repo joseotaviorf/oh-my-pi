@@ -85,6 +85,12 @@ columns:
     description: Flag to indicate if the company is a rental guarantee.
     lineage:
       - datalake_company_clean.company_product.id_product
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
+    lineage:
+      - datalake_company_clean.company_product.is_company_rede_broker
   ts_created:
     description: Timestamp of the creation of the Company record.
     lineage:

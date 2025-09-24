@@ -4,6 +4,7 @@ SELECT
     properties_with_history,
     associations,
     archived AS is_archived,
+    TRUE AS has_3p_access_control,
     archived_at AS ts_archived,
     created_at AS ts_created,
     updated_at AS ts_updated,

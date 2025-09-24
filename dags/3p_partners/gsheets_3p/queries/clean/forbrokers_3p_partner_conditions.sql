@@ -25,6 +25,7 @@ SELECT
     CAST(NULLIF(supply_partner_revenue_share, '') AS FLOAT) AS supply_partner_revenue_share,
     CAST(NULLIF(lead_gen_revenue_share, '') AS FLOAT) AS lead_gen_revenue_share,
     CAST(IF(valido = 'Sim', TRUE, FALSE) AS BOOLEAN) AS is_valid,
+    TRUE AS has_3p_access_control,
     CAST(NULLIF(dt_term_signature, '') AS DATE) AS dt_term_signature,
     CAST(NULLIF(dt_payment, '') AS DATE) AS dt_payment,
     CAST(NULLIF(dt_category_end, '') AS DATE) AS dt_category_end

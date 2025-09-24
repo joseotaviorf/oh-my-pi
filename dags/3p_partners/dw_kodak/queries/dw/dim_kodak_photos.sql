@@ -8,6 +8,7 @@ SELECT
   p.path,
   GET_JSON_OBJECT(p.metadata, '$.source_name') AS source_name,
   GET_JSON_OBJECT(p.metadata, '$.source_url') AS source_url,
+  TRUE AS has_3p_access_control,
   NOW() AS ts_load
 FROM
   datalake_kodak_clean.photo AS p

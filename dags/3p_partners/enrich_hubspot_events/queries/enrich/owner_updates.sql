@@ -27,6 +27,7 @@ SELECT
   ch.id_company AS id_hubspot,
   am.uuid_person,
   ch.ts_end IS NULL AS is_current_cohort,
+  TRUE AS has_3p_access_control,
   ch.ts_start,
   ch.ts_end
 FROM

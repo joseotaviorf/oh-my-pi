@@ -3,6 +3,7 @@ SELECT
     NULLIF(id_user, '') AS id_user,
     NULLIF(rollout_phase, '') AS rollout_phase,
     IF(is_currently_active = 'TRUE', TRUE, FALSE) AS is_currently_active,
+    TRUE AS has_3p_access_control,
     CAST(dt_start AS DATE) AS dt_start,
     CAST(dt_end AS DATE) AS dt_end
 FROM

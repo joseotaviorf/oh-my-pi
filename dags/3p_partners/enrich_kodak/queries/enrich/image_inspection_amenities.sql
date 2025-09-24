@@ -31,7 +31,8 @@ SELECT
     NULLIF(MAX(room_type = 'game_room' OR room_type = 'playground'), FALSE) AS has_toy_library,
     NULLIF(MAX(room_type = 'balcony'), FALSE) AS has_balcony,
     NULLIF(MAX(room_type = 'walk_in_closet'), FALSE) AS has_walk_in_closet,
-    NULLIF(MAX(room_type = 'mountain_view' OR room_type = 'city_view'), FALSE) AS has_unobstructed_view
+    NULLIF(MAX(room_type = 'mountain_view' OR room_type = 'city_view'), FALSE) AS has_unobstructed_view,
+    TRUE AS has_3p_access_control
 FROM
     room_types
 GROUP BY

@@ -97,6 +97,7 @@ SELECT
   cp.is_company_pp_multi,
   cp.is_company_rede_broker,
   cp.is_company_rental_guarantee,
+  cp.is_company_rede_broker AS has_3p_access_control,
   c.ts_created,
   c.ts_updated
 FROM
