@@ -13,9 +13,6 @@ workflow:
   source_database: ebdb
   source_schema: ebdb
   tables_customization:
-    Vistoria:
-      raw_primary_keys: ["id"]
-      clean_table_name: inspection
     Vistoria_AUD:
       clean_table_name: inspection_aud
       raw_primary_keys: ["id", "REV"]

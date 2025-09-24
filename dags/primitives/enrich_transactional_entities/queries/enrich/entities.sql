@@ -331,7 +331,7 @@ inspection AS (
       END AS is_active,
       ts_created,
       ts_updated
-      FROM datalake_ebdb_test_clean.inspection
+      FROM datalake_ebdb_clean.inspection
   )
   SELECT
           ib.id_entity,
