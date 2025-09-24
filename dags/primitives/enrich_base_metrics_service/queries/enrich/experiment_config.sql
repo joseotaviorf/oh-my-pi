@@ -148,9 +148,9 @@ FROM VALUES
 
     -- UCB Sale experiment
     (
-        "ab_beakman_search_services_demand_sufficiency_v1_sale_experiment",
+        "ab_beakman_search_services_demand_sufficiency_v1_sale_experiment_v1",
         named_struct(
-            'begin_date', DATE('2025-09-22'),
+            'begin_date', DATE('2025-09-24'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
