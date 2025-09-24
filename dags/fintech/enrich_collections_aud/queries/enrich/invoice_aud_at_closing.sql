@@ -10,12 +10,15 @@ first_business_day AS (
         END AS is_first_business_day_month,
         LEAD(date) OVER(ORDER BY date) AS dt_snapshot
     FROM datalake_quintoandar.aux_date
-    WHERE DATE(date) BETWEEN '2024-04-24' AND CURRENT_DATE
+    WHERE DATE(date) BETWEEN '2024-04-01' AND DATEADD(MONTH, 1, CURRENT_DATE)
 ),
 snapshot_days AS (
   SELECT
-      *,
-      LAST_DAY(DATEADD(MONTH, -1, month_start)) AS dt_previous_end_month
+    month_start,
+    date AS dt_first_business_day,
+    dt_snapshot,
+    LEAD(dt_snapshot) OVER(ORDER BY dt_snapshot) AS dt_next_snapshot,
+    LAST_DAY(DATEADD(MONTH, -1, month_start)) AS dt_previous_end_month
   FROM first_business_day
   WHERE is_first_business_day_month = TRUE
 ),
@@ -54,11 +57,18 @@ calculate_dt_closing AS (
         i.dt_due_adjusted,
         LAST_DAY(i.dt_reference) AS dt_month_end,
         CASE
-            WHEN DATE(i.ts_database_transaction) BETWEEN sd.dt_previous_end_month AND sd.dt_snapshot
+            WHEN DATE(i.dt_reference) >= sd.dt_previous_end_month
+                AND DATE(i.dt_reference) < sd.dt_snapshot
             THEN sd.dt_previous_end_month
             ELSE LAST_DAY(i.dt_reference)
         END AS dt_closing,
-        sd.dt_snapshot,
+        CASE
+            WHEN DATE(i.dt_reference) >= sd.dt_previous_end_month
+                AND DATE(i.dt_reference) < sd.dt_snapshot
+            THEN sd.dt_snapshot
+            ELSE sd.dt_next_snapshot
+        END AS dt_snapshot,
+        i.dt_reference,
         i.ts_write_off,
         i.ts_paid,
         i.ts_payment_confirmation,
@@ -147,4 +157,4 @@ SELECT
     day,
     ts_load
 FROM calculate_dt_closing
-QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice, dt_closing ORDER BY ts_database_transaction DESC) = 1
+QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice, dt_closing ORDER BY dt_reference DESC) = 1
