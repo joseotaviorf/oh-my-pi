@@ -360,7 +360,6 @@ app_events_features AS (
 contract_blocklist_timeline AS (
     SELECT DISTINCT
         id_debtor_external AS id_contract,
-        is_blocked,
         CASE
             WHEN dt_reference <> DATE(ts_updated)
                 AND NOT(is_blocked) THEN TRUE
