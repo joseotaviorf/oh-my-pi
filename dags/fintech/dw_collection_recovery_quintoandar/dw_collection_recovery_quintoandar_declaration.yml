@@ -28,6 +28,8 @@ workflow:
     fact_overdue_portfolio_timeline_incremental:
       extraction_type: incremental
       partitions: [year, month, day]
+      z_order_by: [dt_reference, sk_overdue_portfolio_timeline]
+      merge_on: [sk_overdue_portfolio_timeline, dt_reference]
 cluster:
   type: custom_cluster
   custom_configurations:
