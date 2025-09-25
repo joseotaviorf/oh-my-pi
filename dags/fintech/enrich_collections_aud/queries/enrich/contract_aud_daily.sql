@@ -5,10 +5,9 @@ contract_range AS (
         DATE(MIN(ts_database_transaction)) AS dt_first_transaction,
         DATE(COALESCE(
                 MAX(CASE WHEN dt_annulment IS NOT NULL THEN ts_database_transaction END),
-                DATE('{load_end_date}')
+                CURRENT_DATE
         )) AS dt_last_transaction
     FROM datalake_collections_aud.contract_aud
-    WHERE MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY 1
 ),
 daily_changes AS (
@@ -30,7 +29,6 @@ daily_changes AS (
         day,
         DATE(ts_database_transaction) AS dt_reference
     FROM datalake_collections_aud.contract_aud
-    WHERE MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, DATE(ts_database_transaction) ORDER BY ts_database_transaction DESC) = 1
 ),
 get_next_day AS (

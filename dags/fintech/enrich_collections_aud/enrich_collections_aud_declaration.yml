@@ -26,13 +26,7 @@ workflow:
     invoice_aud:
       extraction_type: incremental
       partitions: [year, month, day]
-    invoice_aud_daily:
-      extraction_type: incremental
-      partitions: [year, month, day]
     contract_aud:
-      extraction_type: incremental
-      partitions: [year, month, day]
-    contract_aud_daily:
       extraction_type: incremental
       partitions: [year, month, day]
 cluster:
