@@ -1,0 +1,100 @@
+database_name: datalake_pp_multi
+table_name: pp_multi_classification_history
+description:
+  Daily snapshot of PP Multi classification and supporting metrics per owner. It reconstructs history using
+  the full historical sources, so each partition (year, month, day) reflects the view as of that date.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_owner:
+    description: Identifier of the owner persona.
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner
+  pp_multi_classification:
+    description: PP Multi classification of the owner persona on the anchor day.
+    categories:
+      ACTIVE: Owner has at least 5 ongoing houses on the anchor day.
+      POTENTIAL: Owner had at least 5 ongoing houses at some point in the last 2 years up to the anchor day.
+      LIFETIME: Owner had at least 5 ongoing houses historically, but not in the last 2 years up to the anchor day.
+  houses:
+    description: Array of grouped house information for the ACTIVE snapshot (deduplicated by unique listing id) as of the anchor day.
+  two_year_max_houses:
+    description: Array of grouped house information for the maximum snapshot over the last two years up to the anchor day.
+  lifetime_max_houses:
+    description: Array of grouped house information for the maximum snapshot over the entire available lifetime up to the anchor day.
+  ongoing_houses:
+    description: Ongoing houses in the ACTIVE snapshot (RENTED, SUSPENDED, PUBLISHED) on the anchor day.
+  houses_in_edition:
+    description: Houses in EDITING in the ACTIVE snapshot on the anchor day.
+  houses_opted_out:
+    description: Houses in OPTED_OUT in the ACTIVE snapshot on the anchor day.
+  houses_published:
+    description: Houses in PUBLISHED in the ACTIVE snapshot on the anchor day.
+  houses_suspended:
+    description: Houses in SUSPENDED in the ACTIVE snapshot on the anchor day.
+  houses_rented:
+    description: Houses in RENTED in the ACTIVE snapshot on the anchor day.
+  houses_unpublished:
+    description: Houses in UNPUBLISHED in the ACTIVE snapshot on the anchor day.
+  total_houses:
+    description: Total distinct houses in the ACTIVE snapshot (post-deduplication) on the anchor day.
+  two_year_max_ongoing_houses:
+    description: Maximum ongoing houses over the last two years up to the anchor day.
+  two_year_max_houses_in_edition:
+    description: Maximum houses in EDITING over the last two years up to the anchor day.
+  two_year_max_houses_opted_out:
+    description: Maximum houses in OPTED_OUT over the last two years up to the anchor day.
+  two_year_max_houses_published:
+    description: Maximum houses in PUBLISHED over the last two years up to the anchor day.
+  two_year_max_houses_suspended:
+    description: Maximum houses in SUSPENDED over the last two years up to the anchor day.
+  two_year_max_houses_rented:
+    description: Maximum houses in RENTED over the last two years up to the anchor day.
+  two_year_max_houses_unpublished:
+    description: Maximum houses in UNPUBLISHED over the last two years up to the anchor day.
+  two_year_max_total_houses:
+    description: Maximum total distinct houses over the last two years (post-deduplication) up to the anchor day.
+  lifetime_max_ongoing_houses:
+    description: Maximum ongoing houses over the owner's lifetime up to the anchor day.
+  lifetime_max_houses_in_edition:
+    description: Maximum houses in EDITING over the owner's lifetime up to the anchor day.
+  lifetime_max_houses_opted_out:
+    description: Maximum houses in OPTED_OUT over the owner's lifetime up to the anchor day.
+  lifetime_max_houses_published:
+    description: Maximum houses in PUBLISHED over the owner's lifetime up to the anchor day.
+  lifetime_max_houses_suspended:
+    description: Maximum houses in SUSPENDED over the owner's lifetime up to the anchor day.
+  lifetime_max_houses_rented:
+    description: Maximum houses in RENTED over the owner's lifetime up to the anchor day.
+  lifetime_max_houses_unpublished:
+    description: Maximum houses in UNPUBLISHED over the owner's lifetime up to the anchor day.
+  lifetime_max_total_houses:
+    description: Maximum total distinct houses over the owner's lifetime (post-deduplication) up to the anchor day.
+  total_visits:
+    lineage:
+      - datalake_booking.booking.id
+    description: Number of visits in the last 150 days (ending on anchor day) across active, 2 years max and lifetime max houses.
+  canceled_visits:
+    lineage:
+      - datalake_booking.booking.status
+      - datalake_booking.booking.reason_category
+    description: Number of visits canceled by Owner in the last 150 days (ending on anchor day) across the considered houses.
+  owner_cancellation_rate:
+    description: Ratio of canceled to total visits (0 when there are no visits) computed as of the anchor day.
+  agent_had_key:
+    lineage:
+      - datalake_ebdb_listing.house_entrance.key_location
+    description: True if at least one associated house has key_location = 'AGENT' (ever observed up to anchor day).
+  has_owner_singed_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.status
+    description: True if at least one associated house has a contract with status 'Ativo' or 'Finalizado' (ever observed up to anchor day).
+  is_possible_fraud:
+    description: Flag indicating potential fraud when there are no successful visits and there is neither agent key custody nor a signed contract.
+  year:
+    description: Partition year of the anchor day.
+  month:
+    description: Partition month of the anchor day.
+  day:
+    description: Partition day of the anchor day.
+

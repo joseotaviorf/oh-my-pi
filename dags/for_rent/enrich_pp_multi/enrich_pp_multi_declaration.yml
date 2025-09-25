@@ -5,6 +5,13 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  tables_customization:
+    pp_multi_classification_history:
+      partitions:
+        - year
+        - month
+        - day
+      extraction_type: incremental
 cluster:
   type: databricks_16_4_med_2xlarge_general_cluster
   access_control_list:
