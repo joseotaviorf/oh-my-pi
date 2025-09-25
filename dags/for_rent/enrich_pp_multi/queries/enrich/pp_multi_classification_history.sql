@@ -320,7 +320,7 @@ SELECT
   ---
   EXTRACT(YEAR FROM DATE('{load_start_date}')) AS year,
   EXTRACT(MONTH FROM DATE('{load_start_date}')) AS month,
-  EXTRACT(DAY FROM DATE('{load_start_date}')) AS day,
+  EXTRACT(DAY FROM DATE('{load_start_date}')) AS day
 FROM
   pp_multi_stats AS pms
 LEFT JOIN
