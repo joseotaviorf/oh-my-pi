@@ -1,0 +1,33 @@
+database_name: datalake_ledger_clean
+table_name: transaction
+domain: Fintech
+description: Data from the transaction table containing transaction details and timing information
+columns:
+  id_transaction:
+    description: id column stores the unique identifier of the transaction using UUID (V7) format
+    lineage:
+      - datalake_ledger_raw.transaction.id
+  id_batch:
+    description: batch_id column stores the identifier of the batch that the transaction belongs to
+    lineage:
+      - datalake_ledger_raw.transaction.batch_id
+  metadata:
+    description: metadata column stores additional information about the transaction in JSONB format, it has information for accounting and other purposes
+    lineage:
+      - datalake_ledger_raw.transaction.metadata
+  reverted_by:
+    description: reverted_by column stores the identifier of the transaction that reverted this transaction
+    lineage:
+      - datalake_ledger_raw.transaction.reverted_by
+  ts_request_time:
+    description: request_time column stores the date and time when the transaction was requested
+    lineage:
+      - datalake_ledger_raw.transaction.request_time
+  ts_transaction_time:
+    description: transaction_time column stores the date and time when the transaction actually happened in the external systems
+    lineage:
+      - datalake_ledger_raw.transaction.transaction_time
+  ts_reverted_at:
+    description: reverted_at column stores the date and time when the transaction was reverted
+    lineage:
+      - datalake_ledger_raw.transaction.reverted_at

@@ -1,0 +1,41 @@
+database_name: datalake_ledger_clean
+table_name: message
+domain: Fintech
+description: Data from the message table containing message details and publishing information
+columns:
+  id_message:
+    description: Unique identifier of the message
+    lineage:
+      - datalake_ledger_raw.message.id
+  id_incremental:
+    description: Incremental identifier of the message
+    lineage:
+      - datalake_ledger_raw.message.incremental_id
+  destination:
+    description: Destination of the message
+    lineage:
+      - datalake_ledger_raw.message.destination
+  headers:
+    description: Headers associated with the message
+    lineage:
+      - datalake_ledger_raw.message.headers
+  payload:
+    description: Payload content of the message
+    lineage:
+      - datalake_ledger_raw.message.payload
+  published:
+    description: Flag indicating if the message was published
+    lineage:
+      - datalake_ledger_raw.message.published
+  message_partition:
+    description: Partition information for the message
+    lineage:
+      - datalake_ledger_raw.message.message_partition
+  creation_time:
+    description: Creation time of the message
+    lineage:
+      - datalake_ledger_raw.message.creation_time
+  ts_creation_datetime:
+    description: Creation datetime timestamp of the message
+    lineage:
+      - datalake_ledger_raw.message.creation_datetime

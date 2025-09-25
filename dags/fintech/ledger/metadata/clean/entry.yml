@@ -1,0 +1,29 @@
+database_name: datalake_ledger_clean
+table_name: entry
+domain: Fintech
+description: Data from the entry table containing ledger entry details and transaction information
+columns:
+  id_entry:
+    description: id column stores the unique identifier of the entry inside a transaction using integer format
+    lineage:
+      - datalake_ledger_raw.entry.id
+  id_transaction:
+    description: transaction_id column stores the identifier of the transaction using UUID (V7) format
+    lineage:
+      - datalake_ledger_raw.entry.transaction_id
+  account_name:
+    description: account_name column stores the name of the account in a text format, it is a foreign key to the account table
+    lineage:
+      - datalake_ledger_raw.entry.account_name
+  amount:
+    description: amount column stores the amount of the entry, it is a NUMERIC(40, 10) to store large values
+    lineage:
+      - datalake_ledger_raw.entry.amount
+  type:
+    description: type column stores the type of the entry using entry_type enum
+    lineage:
+      - datalake_ledger_raw.entry.type
+  metadata:
+    description: metadata column stores additional information about the entry in JSONB format
+    lineage:
+      - datalake_ledger_raw.entry.metadata
