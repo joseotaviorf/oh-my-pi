@@ -771,6 +771,12 @@ workflow:
     170698_overdue_invoices_total_payment_option_clicked_events:
       run_optimize: false
       run_vacuum: false
+    183047_atlas_db_address_search_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_atlas_db_house_characteristics_events:
+      run_optimize: false
+      run_vacuum: false
     170698_pending_invoices_pay_invoice_cta_clicked_events:
       run_optimize: false
       run_vacuum: false

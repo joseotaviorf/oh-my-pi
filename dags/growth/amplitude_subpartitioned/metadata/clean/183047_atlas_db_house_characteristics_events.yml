@@ -1,0 +1,188 @@
+database_name: datalake_amplitude_clean
+table_name: 183047_atlas_db_house_characteristics_events
+owner: alexandre.gimenez@quintoandar.com.br
+domain: Growth
+description:
+  This table contains Amplitude events for tracking the requests to vespucio from fss and calculators.
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean.events.id_amplitude
+    description: Amplitude identifier.
+  id_app:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+    description: Application identifier in Amplitude.
+  id_device:
+    lineage:
+      - datalake_amplitude_clean.events.id_device
+    description: Device identifier in Amplitude.
+  id_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_event
+    description: Event identifier in Amplitude.
+  id_session:
+    lineage:
+      - datalake_amplitude_clean.events.id_session
+    description: Session identifier in Amplitude.
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: User identifier in Amplitude.
+  id_inserted:
+    lineage:
+      - datalake_amplitude_clean.events.id_inserted
+    description: Id inserted identifier in Amplitude.
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+    description: City identified by Amplitude event.
+  country:
+    lineage:
+      - datalake_amplitude_clean.events.country
+    description: Country identified by Amplitude event.
+  data:
+    lineage:
+      - datalake_amplitude_clean.events.data
+    description: Metadata from event.
+  device_family:
+    lineage:
+      - datalake_amplitude_clean.events.device_family
+    description: Device family of the device triggering the event.
+  device_type:
+    lineage:
+      - datalake_amplitude_clean.events.device_type
+    description: Device type of the device triggering the event.
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+    description: type of the event.
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Properties of the event.
+  operation_customer_edition:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Editions made by the user.
+  product:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Product in which the event is being triggered.
+  operation_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Type of the operation made by the user.
+  dejavuid:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description:  Dejavuid matched to the complement inputted by user.
+  match_response:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Characteristics pre-filled by match from AtlasDB.
+  user_response:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Characteristics inputted by the user.
+  login_status:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Login status of the user.
+  form_step:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: The step in which the event was triggered
+  match_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Type of the match.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context in which the event was triggered.
+  lead_id:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Lead identifier.
+  ip_address:
+    lineage:
+      - datalake_amplitude_clean.events.ip_address
+    description: Users IP Address.
+  os_name:
+    lineage:
+      - datalake_amplitude_clean.events.os_name
+    description: Users OS in which the event in triggered.
+  os_version:
+    lineage:
+      - datalake_amplitude_clean.events.os_version
+    description: Users OS version.
+  platform:
+    lineage:
+      - datalake_amplitude_clean.events.platform
+    description: Users plataform.
+  library:
+    lineage:
+      - datalake_amplitude_clean.events.library
+    description: Amplitude library.
+  region:
+    lineage:
+      - datalake_amplitude_clean.events.region
+    description: User region registered by amplitude.
+  start_version:
+    lineage:
+      - datalake_amplitude_clean.events.start_version
+    description: Amplitude start version.
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: User properties registerd by Amplitude.
+  language:
+    lineage:
+      - datalake_amplitude_clean.events.language
+    description: Language registered by Amplitude
+  uuid:
+    lineage:
+      - datalake_amplitude_clean.events.uuid
+    description: Event uuid.
+  version_name:
+    lineage:
+      - datalake_amplitude_clean.events.version_name
+    description: Version name.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp of the event
+  ts_server_received:
+    lineage:
+      - datalake_amplitude_clean.events.ts_server_received
+    description: Timestamp server received the event.
+  ts_server_uploaded:
+    lineage:
+      - datalake_amplitude_clean.events.ts_server_uploaded
+    description: Timestamp server uploaded the event.
+  ts_processed:
+    lineage:
+      - datalake_amplitude_clean.events.ts_processed
+    description: Timestamp in which server processed the event.
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_client_event
+    description: Timestamp of the event on client side.
+  ts_client_uploaded:
+    lineage:
+      - datalake_amplitude_clean.events.ts_client_uploaded
+    description: Timestamp of the event uploaded on client side.
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year of the event.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month of the event.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day of the event.
+  
