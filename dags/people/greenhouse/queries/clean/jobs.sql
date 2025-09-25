@@ -92,7 +92,7 @@ SELECT
       )
     ) AS coordinators,
     hiring_team.sourcers AS sourcers,
-    openings,
+    TO_JSON(openings) AS openings,
     -- partitions
     year,
     month,
