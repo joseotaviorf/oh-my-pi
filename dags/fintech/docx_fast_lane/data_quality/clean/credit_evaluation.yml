@@ -1,5 +1,5 @@
 ---
-table_name: datalake_docx_test_clean.credit_evaluation
+table_name: datalake_docx_clean.credit_evaluation
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:

@@ -12,7 +12,7 @@ workflow:
   layer: raw
   database_type: postgres
   source_database: docx
-  custom_schema: docx_test
+  custom_schema: docx
   dbutils_secret_key: DOCX_DB
   tables_customization:
     credit_evaluation:

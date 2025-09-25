@@ -1,5 +1,5 @@
 ---
-database_name: datalake_docx_test_clean
+database_name: datalake_docx_clean
 table_name: credit_evaluation
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
@@ -8,72 +8,72 @@ columns:
   id:
     description: Unique identifier for the credit evaluation record
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.id
+      - datalake_docx_raw.credit_evaluation.id
   id_proposal:
     description: Identifier of the rental proposal being evaluated
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.proposal_id
+      - datalake_docx_raw.credit_evaluation.proposal_id
   id_house:
     description: Identifier of the house/property related to the evaluation
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.house_id
+      - datalake_docx_raw.credit_evaluation.house_id
   id_user:
     description: Identifier of the user/tenant being evaluated
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.user_id
+      - datalake_docx_raw.credit_evaluation.user_id
   id_city:
     description: Identifier of the city where the property is located
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.city_id
+      - datalake_docx_raw.credit_evaluation.city_id
   id_group:
     description: Identifier of the proponent group for the evaluation
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.group_id
+      - datalake_docx_raw.credit_evaluation.group_id
   scope:
     description: Scope or context of the credit evaluation
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.scope
+      - datalake_docx_raw.credit_evaluation.scope
   reason:
     description: Reason for the credit evaluation result or decision
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.reason
+      - datalake_docx_raw.credit_evaluation.reason
   limit_value:
     description: Credit limit value determined by the evaluation
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.limit_value
+      - datalake_docx_raw.credit_evaluation.limit_value
   proponent_group_type:
     description: Type of proponent group (individual, joint, etc.)
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.proponent_group_type
+      - datalake_docx_raw.credit_evaluation.proponent_group_type
   result:
     description: Final result of the credit evaluation (approved, rejected, etc.)
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.result
+      - datalake_docx_raw.credit_evaluation.result
   status:
     description: Current status of the credit evaluation process
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.status
+      - datalake_docx_raw.credit_evaluation.status
   automatic:
     description: Flag indicating if the evaluation was performed automatically
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.automatic
+      - datalake_docx_raw.credit_evaluation.automatic
   type:
     description: Type of credit evaluation performed
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.type
+      - datalake_docx_raw.credit_evaluation.type
   early_result:
     description: Early result obtained during the evaluation process
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.early_result
+      - datalake_docx_raw.credit_evaluation.early_result
   ts_expires:
     description: Timestamp when the credit evaluation expires
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.expires_at
+      - datalake_docx_raw.credit_evaluation.expires_at
   ts_created:
     description: Timestamp when the credit evaluation was created
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.created_at
+      - datalake_docx_raw.credit_evaluation.created_at
   ts_updated:
     description: Timestamp when the credit evaluation was last updated
     lineage:
-      - datalake_docx_test_raw.credit_evaluation.updated_at
+      - datalake_docx_raw.credit_evaluation.updated_at

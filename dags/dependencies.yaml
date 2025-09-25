@@ -257,8 +257,8 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_terminator:load-enrich-termination:first-run-of-day
 bietlejuice.dw_credit_analysis:
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report:first-run-of-day
-  - bietlejuice.docx:load-clean-credit-evaluation-proponent:first-run-of-day
-  - bietlejuice.docx:load-clean-credit-evaluation:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation-proponent:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
@@ -299,8 +299,8 @@ bietlejuice.dw_credit_evers:
   - bietlejuice.retsuko:load-clean-account:first-run-of-day
 bietlejuice.dw_credit_passport:
   - bietlejuice.docx:load-clean-credit-evaluation-aud:first-run-of-day
-  - bietlejuice.docx:load-clean-credit-evaluation-proponent:first-run-of-day
-  - bietlejuice.docx:load-clean-credit-evaluation:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation-proponent:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.docx:load-clean-group-member:first-run-of-day
   - bietlejuice.docx:load-clean-group:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
@@ -1919,7 +1919,7 @@ bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-lineage-and-tags:first-run-of-day
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation-aud:first-run-of-day
-  - bietlejuice.docx:load-clean-credit-evaluation:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.docx:load-clean-document-context:first-run-of-day
   - bietlejuice.docx:load-clean-document-type:first-run-of-day
   - bietlejuice.docx:load-clean-document:first-run-of-day
@@ -4264,7 +4264,7 @@ bietlejuice.reverse_supply:
 bietlejuice.reverse_supply_access:
   - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry:first-run-of-day
 bietlejuice.reverse_tracksale:
-  - bietlejuice.docx:load-clean-credit-evaluation:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day

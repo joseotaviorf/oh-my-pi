@@ -12,15 +12,9 @@ workflow:
   custom_schema: docx
   dbutils_secret_key: DOCX_DB
   tables_customization:
-    credit_evaluation:
-      get_table_metrics:
-        count: id
     credit_evaluation_aud:
       clean_table_name: credit_evaluation_aud
       raw_primary_keys: ["id", "rev"]
-    credit_evaluation_proponent:
-      get_table_metrics:
-        count: id
     credit_evaluation_proponent_aud:
       clean_table_name: credit_evaluation_proponent_aud
       raw_primary_keys: ["id", "rev"]

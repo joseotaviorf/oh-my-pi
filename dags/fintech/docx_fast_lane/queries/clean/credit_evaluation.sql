@@ -22,4 +22,4 @@ SELECT
     updated_at AS ts_updated,
     expires_at AS ts_expires
 FROM
-    datalake_docx_test_raw.credit_evaluation
+    datalake_docx_raw.credit_evaluation

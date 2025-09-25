@@ -1,5 +1,5 @@
 ---
-database_name: datalake_docx_test_clean
+database_name: datalake_docx_clean
 table_name: credit_evaluation_proponent
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
@@ -8,69 +8,69 @@ columns:
   id:
     description: Unique identifier for the credit evaluation proponent record
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.id
+      - datalake_docx_raw.credit_evaluation_proponent.id
   id_credit_evaluation:
     description: Identifier linking to the parent credit evaluation
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.credit_evaluation_id
+      - datalake_docx_raw.credit_evaluation_proponent.credit_evaluation_id
   id_reference:
     description: Reference identifier for the proponent.
       Whenever reference_type = CPF, this field will be the user's CPF.
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.reference_id
+      - datalake_docx_raw.credit_evaluation_proponent.reference_id
   name:
     description: Full name of the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.name
+      - datalake_docx_raw.credit_evaluation_proponent.name
   cpf:
     description: CPF (Brazilian taxpayer ID) of the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.cpf
+      - datalake_docx_raw.credit_evaluation_proponent.cpf
   occupation_area:
     description: Area or field of occupation of the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.occupation_area
+      - datalake_docx_raw.credit_evaluation_proponent.occupation_area
   status:
     description: Current status of the proponent in the evaluation process
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.status
+      - datalake_docx_raw.credit_evaluation_proponent.status
   resident:
     description: Flag indicating if the proponent is a resident
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.resident
+      - datalake_docx_raw.credit_evaluation_proponent.resident
   proponent_type:
     description: Type of proponent (main tenant, co-tenant, guarantor, etc.)
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.proponent_type
+      - datalake_docx_raw.credit_evaluation_proponent.proponent_type
   income_nature:
     description: Nature or source of the proponent's income (employed, self-employed, etc.)
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.income_nature
+      - datalake_docx_raw.credit_evaluation_proponent.income_nature
   monthly_income:
     description: Monthly income amount declared by the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.monthly_income
+      - datalake_docx_raw.credit_evaluation_proponent.monthly_income
   score:
     description: Credit score assigned to the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.score
+      - datalake_docx_raw.credit_evaluation_proponent.score
   phone:
     description: Contact phone number of the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.phone
+      - datalake_docx_raw.credit_evaluation_proponent.phone
   identity_number:
     description: Identity document number of the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.identity_number
+      - datalake_docx_raw.credit_evaluation_proponent.identity_number
   reference_type:
     description: Type of reference for the proponent
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.reference_type
+      - datalake_docx_raw.credit_evaluation_proponent.reference_type
   ts_created:
     description: Timestamp when the proponent record was created
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.created_at
+      - datalake_docx_raw.credit_evaluation_proponent.created_at
   ts_updated:
     description: Timestamp when the proponent record was last updated
     lineage:
-      - datalake_docx_test_raw.credit_evaluation_proponent.updated_at
+      - datalake_docx_raw.credit_evaluation_proponent.updated_at

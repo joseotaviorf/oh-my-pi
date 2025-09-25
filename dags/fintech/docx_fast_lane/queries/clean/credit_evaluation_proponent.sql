@@ -17,4 +17,4 @@ SELECT
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
-    datalake_docx_test_raw.credit_evaluation_proponent
+    datalake_docx_raw.credit_evaluation_proponent
