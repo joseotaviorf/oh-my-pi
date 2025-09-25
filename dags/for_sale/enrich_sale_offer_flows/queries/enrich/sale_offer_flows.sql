@@ -1,4 +1,4 @@
-  -- FLOW TYPE CTE
+-- FLOW TYPE CTE
 WITH flow_type AS (
     WITH last_sf_entry AS (
         SELECT
@@ -537,15 +537,43 @@ tag AS (
 ),
 -- OFFER/SALE AGREEMENT RESCUE FLOW CTE
 rescue_flow AS (
-    WITH offers_history AS (
+    WITH base_offers_history AS (
         SELECT
             id_sales_flow,
             id_firestore AS id_offer,
-            MAX(ts_accepted) ts_last_offer_accepted,
+            MAX(ts_accepted) AS ts_last_offer_accepted,
             MAX(ts_discarded) AS ts_last_offer_discarded,
-            IF(MAX(ts_accepted) > MAX(ts_discarded), True, False) AS is_a_rescued_offer
-        FROM
+            IF(MAX(ts_accepted) > MAX(ts_discarded), TRUE, FALSE) AS is_a_rescued_offer
+        FROM 
             datalake_sales_flow_clean.offer_aud
+        GROUP BY 1, 2
+
+        UNION 
+
+        SELECT
+            SF.id AS id_sales_flow,
+            O.id_firestore AS id_offer,    
+            O.ts_accepted, 
+            O.ts_discarded,
+            CASE
+              WHEN SF.is_canceled = FALSE AND SF.ts_canceled IS NOT NULL THEN TRUE
+              ELSE FALSE
+            END AS is_a_rescued_offer  
+        FROM 
+            datalake_sales_flow_clean.sales_flow AS SF
+        LEFT JOIN 
+            datalake_sales_flow_clean.offer AS O
+        ON SF.id = O.id_sales_flow
+    ),    
+    offers_history AS (
+        SELECT
+            id_sales_flow,
+            id_offer,
+            MAX(ts_last_offer_accepted) AS ts_last_offer_accepted,
+            MAX(ts_last_offer_discarded) AS ts_last_offer_discarded,
+            MAX(is_a_rescued_offer) AS is_a_rescued_offer
+        FROM 
+            base_offers_history
         GROUP BY 1, 2
    ),
    cancelation_history AS (
@@ -647,6 +675,7 @@ brokerage AS (
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
 )
+
 SELECT
     off.id_offer,
     sp.id_user_consultant,
