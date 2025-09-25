@@ -31,5 +31,6 @@ workflow:
       raw_primary_keys: [key]
       clean_primary_keys: [key]
       clean_table_name: idempotency_record
+      merge_on: [key]
 cluster:
   type: databricks_13_3_med_general_cluster
