@@ -387,6 +387,61 @@ inspection AS (
           core_contract.contract c
           ON ib.id_contract = c.id_contract
 ),
+onboarding AS (
+    WITH onboarding_base AS (
+        SELECT
+            id_entity,
+            id_house,
+            id_contract,
+            id_owner,
+            id_tenant,
+            'FR_ONBOARDING' AS entity,
+            'RENT' AS business_context,
+            TO_JSON(
+                STRUCT(
+                    status AS status,
+                    ts_created AS ts_created
+                )
+            ) AS properties,
+            CASE
+                WHEN status IN ('Finished', 'Aborted') THEN FALSE
+                ELSE TRUE
+            END AS is_active,
+            ts_created,
+            ts_updated
+        FROM
+            datalake_onboarding_entities.onboarding
+    )
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_owner AS id_user,
+        entity,
+        'OWNER' AS persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        onboarding_base
+    UNION ALL
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_tenant AS id_user,
+        entity,
+        'TENANT' AS persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        onboarding_base
+),
 base AS (
     SELECT
         {sk_entity} AS sk_entity,
@@ -483,6 +538,22 @@ base AS (
         ts_updated
     FROM
         inspection
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        onboarding
 )
 SELECT
     b.sk_entity,

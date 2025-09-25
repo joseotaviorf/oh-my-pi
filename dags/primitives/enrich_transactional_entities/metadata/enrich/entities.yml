@@ -26,7 +26,8 @@ columns:
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
       - datalake_ebdb_clean.listing_business_context.id
-      - datalake_ebdb_test_clean.inspection.id
+      - datalake_ebdb_clean.inspection.id
+      - datalake_onboarding_entities.onboarding.id_entity
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique.
@@ -38,6 +39,7 @@ columns:
       - datalake_terminator_clean.termination.id
       - datalake_ebdb_clean.listing_business_context.id
       - datalake_ebdb_clean.inspection.id
+      - datalake_onboarding_entities.onboarding.id_entity
     description:
       The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
@@ -47,10 +49,12 @@ columns:
       - core_offer.offer.id_house
       - core_contract.contract.id_house
       - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_onboarding_entities.onboarding.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     lineage:
       - core_contract.contract.id_contract
+      - datalake_onboarding_entities.onboarding.id_contract
     description: Contract id related to the entity, if it has any.
       It's the id of the Contrato/Contract table, from Main's database (EBDB).
   id_user:
@@ -62,8 +66,10 @@ columns:
       - core_offer.offer.id_owner
       - core_contract.contract.id_owner
       - core_contract.contract.id_tenant
-      - datalake_ebdb_clean.inspection.id_user_inspector
       - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.inspection.id_user_inspector
+      - datalake_onboarding_entities.onboarding.id_owner
+      - datalake_onboarding_entities.onboarding.id_tenant
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -82,6 +88,7 @@ columns:
       FR_TERMINATION: The entity is a termination, with its id_entity mapping directly to the id from the Termination table in the terminator system.
       LISTING: The entity is a property listing, with its id_entity mapping directly to the id from the Listing Business Context table, representing property listings.
       FR_INSPECTION: The entity is an inspection, with its id_entity mapping directly to the id from the Inspection table in EBDB database.
+      FR_ONBOARDING: The entity is an onboarding process, with its id_entity mapping directly to the id from the Onboarding table in EBDB database.
   persona:
     description:
       A persona describes the primary role of a user (id_user) in relation to a specific
@@ -113,6 +120,8 @@ columns:
       - datalake_ebdb_clean.listing_business_context.status
       - datalake_ebdb_clean.listing_business_context.status_reason
       - datalake_ebdb_clean.inspection.status
+      - datalake_onboarding_entities.onboarding.status
+      - datalake_onboarding_entities.onboarding.ts_created
     description:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
@@ -122,6 +131,7 @@ columns:
       For FR_TERMINATION entities - contains status field.
       For LISTING entities - contains status and status_reason fields.
       For FR_INSPECTION entities - contains status field.
+      For FR_ONBOARDING entities - contains status and ts_created fields.
   house_address:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -143,6 +153,7 @@ columns:
       A termination entity will be considered as active for statuses requested, inspection_under_review, inspection_scheduled, inspection_opted_out, inspection_executed, or inspection_canceled, and inactive for statuses done or canceled.
       A listing entity will be considered as active for statuses published, editing, or suspended (except when suspended for specific owner-related reasons like giving up renting, consequences management, reforming, temporarily suspended, or traveling), and inactive for statuses opted_out, unpublished, or suspended with owner-related reasons.
       An inspection entity will be considered as active for statuses Agendada, Comentada, EmAcordo, EmRevisao, Nova, or Revisada, and inactive for statuses Finalizada, Cancelada, or ContratoCancelado.
+      An onboarding entity will be considered as active for all statuses except "Finished" and "Aborted", which are considered inactive.
   ts_inactive:
     lineage:
       - core_visit.visit.ts_updated
@@ -151,6 +162,7 @@ columns:
       - datalake_terminator_clean.termination.ts_updated
       - datalake_ebdb_clean.listing_business_context.ts_updated
       - datalake_ebdb_clean.inspection.ts_updated
+      - datalake_onboarding_entities.onboarding.ts_updated
     description: Timestamp when the entity became inactive (is_active = FALSE).
       This field captures the ts_updated timestamp for entities that are currently inactive.
       For active entities (is_active = TRUE), this field will be NULL.
@@ -162,6 +174,7 @@ columns:
       - core_contract.contract.ts_created
       - datalake_terminator_clean.termination.ts_created
       - datalake_ebdb_clean.inspection.ts_created
+      - datalake_onboarding_entities.onboarding.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
@@ -171,6 +184,7 @@ columns:
       - datalake_terminator_clean.termination.ts_updated
       - datalake_ebdb_clean.listing_business_context.ts_updated
       - datalake_ebdb_clean.inspection.ts_updated
+      - datalake_onboarding_entities.onboarding.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.
