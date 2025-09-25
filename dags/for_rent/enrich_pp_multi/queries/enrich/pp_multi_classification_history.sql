@@ -14,6 +14,7 @@ daily_house_listing AS (
     hldi.id_owner,
     COALESCE(l.dejavuid, CAST(hldi.id_house AS STRING)) AS uniqueid,
     hldi.id_house,
+    IF(c.status = 'Ativo', TRUE, FALSE) AS has_ongoing_contract,
     CASE
       WHEN
         hldi.status_history = 'alugado'
@@ -48,12 +49,17 @@ daily_house_listing AS (
       LEFT JOIN
         vespucio_prod_delta.listings AS l
         ON l.source_id::bigint = hldi.id_house
+      LEFT JOIN 
+        datalake_ebdb_contract.contract AS c
+        ON c.id_house = hldi.id_house
+          AND c.is_ongoing_contract = true
 ),
 daily_owner_stats AS (
   SELECT
     id_owner,
     uniqueid,
     collect_set(id_house) AS id_houses,
+    COUNT_IF(has_ongoing_contract) AS ongoing_contracts,
     CASE
       WHEN array_contains(collect_set(status), 'RENTED') THEN 'RENTED'
       WHEN array_contains(collect_set(status), 'SUSPENDED') THEN 'SUSPENDED'
@@ -81,7 +87,7 @@ pp_multi_daily_stats AS (
       ELSE 'LIFETIME'
     END AS classification_window,
     make_date(year, month, day) AS stats_date,
-    COUNT_IF(status IN ('RENTED', 'SUSPENDED', 'PUBLISHED')) AS ongoing_houses,
+    SUM(ongoing_contracts) AS ongoing_contracts,
     COUNT_IF(status = 'RENTED') AS houses_rented,
     COUNT_IF(status = 'SUSPENDED') AS houses_suspended,
     COUNT_IF(status = 'PUBLISHED') AS houses_published,
@@ -93,15 +99,13 @@ pp_multi_daily_stats AS (
     daily_owner_stats
   GROUP BY
     ALL
-  HAVING
-    ongoing_houses >= 5
 ),
 pp_multi_classification_window AS (
   SELECT
     id_owner,
     classification_window,
     MAX_BY(houses, stats_date) AS houses,
-    MAX(ongoing_houses) AS max_ongoing_houses,
+    MAX(GREATEST(houses_rented, ongoing_contracts) + houses_suspended + houses_published) AS max_ongoing_houses,
     MAX(houses_rented) AS max_houses_rented,
     MAX(houses_suspended) AS max_houses_suspended,
     MAX(houses_published) AS max_houses_published,
@@ -112,8 +116,7 @@ pp_multi_classification_window AS (
   FROM
     pp_multi_daily_stats
   GROUP BY
-    id_owner,
-    classification_window
+    ALL
 ),
 pp_multi_stats AS (
   SELECT
@@ -162,6 +165,10 @@ pp_multi_stats AS (
           'LIFETIME' AS lifetime_max
         )
       )
+  WHERE
+    active_ongoing_houses >= 5
+    OR two_year_max_ongoing_houses >= 5
+    OR lifetime_max_ongoing_houses >= 5
 ),
 pp_multi_houses AS (
   SELECT DISTINCT
