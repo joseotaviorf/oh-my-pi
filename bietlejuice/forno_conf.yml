@@ -286,6 +286,16 @@ databricks_13_3_min_general_cluster:
         <<: *aws_anchor
         availability: SPOT_WITH_FALLBACK
 
+databricks_16_4_min_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
+
 databricks_13_3_med_2_fixed_workers_general_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.large
@@ -513,6 +523,16 @@ databricks_12_2_xmin_memory_cluster:
     node_type_id: r5a.large
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_xmin_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
