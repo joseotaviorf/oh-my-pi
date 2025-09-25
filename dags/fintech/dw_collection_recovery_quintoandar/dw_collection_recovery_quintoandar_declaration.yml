@@ -24,10 +24,6 @@ workflow:
       - fact_debt
       - fact_negotiation
       - fact_negotiation_installment
-  tables_customization:
-    fact_overdue_portfolio_timeline_incremental:
-      extraction_type: incremental
-      partitions: [year, month, day]
 cluster:
   type: custom_cluster
   custom_configurations:
