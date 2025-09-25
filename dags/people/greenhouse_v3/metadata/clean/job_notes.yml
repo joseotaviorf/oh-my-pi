@@ -1,0 +1,57 @@
+---
+database_name: datalake_greenhouse_v3_clean
+table_name: job_notes
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: >-
+  This table contains notes associated with specific jobs, sourced from the Greenhouse Harvest API v3. 
+  It includes the note's content, author, visibility, and relevant timestamps.
+  The data is partitioned by the updated_at date.
+
+columns:
+  id:
+    description: 'Unique identifier for the job note.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.id
+  id_user:
+    description: 'Identifier for the user who created the note.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.user_id
+  id_job:
+    description: 'Identifier for the job to which this note is attached.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.job_id
+  body:
+    description: 'The text content of the note.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.body
+  ts_created:
+    description: 'Timestamp indicating when the note was created.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.created_at
+  ts_updated:
+    description: 'Timestamp indicating the last time the note was updated.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.updated_at
+  visibility:
+    description: 'The visibility setting for the note.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.visibility
+    categories:
+      visibility: 'Note is visible to all internal users with access to the job.'
+      privately_visible: 'Note is only visible to the creator, hiring managers for the job, and admins.'
+      admin_only_visible: 'Note is visible only to users with Admin permissions.'
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean layer.'
+  year:
+    description: 'Year of the updated_at timestamp, used for partitioning.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.year
+  month:
+    description: 'Month of the updated_at timestamp, used for partitioning.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.month
+  day:
+    description: 'Day of the updated_at timestamp, used for partitioning.'
+    lineage:
+      - datalake_greenhouse_v3_raw.job_notes.day

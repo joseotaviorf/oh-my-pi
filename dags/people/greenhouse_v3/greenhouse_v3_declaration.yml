@@ -56,3 +56,17 @@ workflow:
           date_column_to_partition: "updated_at"
           params:
             per_page: 500
+
+    job_interview_stages:
+      extra_spark_job_arguments:
+        - endpoint: "job_interview_stages"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    job_notes:
+      extra_spark_job_arguments:
+        - endpoint: "job_notes"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
