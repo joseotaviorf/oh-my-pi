@@ -813,6 +813,106 @@ SELECT
   id_amplitude,
   id_session,
   id_user,
+  CAST(ep_id_contract AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "pending_invoices_exception_cta_goback_clicked" AS event_name,
+  event_properties,
+  "Overdue Self Service Action" AS funnel_step,
+  11 AS level,
+  "Triggers when user clicks the 'Voltar para Faturas' button on the error page in the negotiation process" AS event_description,
+  "pix_cc" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_pending_invoices_exception_cta_goback_clicked_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(NULL AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "coll_negotiation_waiting_page_swipe" AS event_name,
+  event_properties,
+  "Overdue Self Service Action" AS funnel_step,
+  11 AS level,
+  "Triggers when user swipes to go back on the 'Sua negociação foi gerada' page" AS event_description,
+  "pix_cc" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_coll_negotiation_waiting_page_swipe_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(ep_id_contract AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "coll_negotiation_waiting_button_clicked" AS event_name,
+  event_properties,
+  "Overdue Self Service Action" AS funnel_step,
+  11 AS level,
+  "Triggers when user clicks the 'Voltar para faturas' button on the 'Sua negociação foi gerada' page" AS event_description,
+  "pix_cc" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_coll_negotiation_waiting_button_clicked_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(ep_id_contract AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "coll_negotiation_waiting_page_viewed" AS event_name,
+  event_properties,
+  "Overdue Self Service Action" AS funnel_step,
+  11 AS level,
+  "Triggers when user views the 'Sua negociação foi gerada' page" AS event_description,
+  "pix_cc" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_coll_negotiation_waiting_page_viewed_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
   CAST(NULL AS BIGINT) AS id_contract,
   CAST(NULL AS BIGINT) AS id_invoice,
   device_family,

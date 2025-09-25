@@ -774,6 +774,18 @@ workflow:
     170698_pending_invoices_pay_invoice_cta_clicked_events:
       run_optimize: false
       run_vacuum: false
+    170698_coll_negotiation_waiting_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_coll_negotiation_waiting_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_exception_cta_goback_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_coll_negotiation_waiting_page_swipe_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new

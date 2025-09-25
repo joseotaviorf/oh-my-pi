@@ -1552,6 +1552,9 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-menu-page-onload-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-menu-page-payment-cta-onclick-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-menu-page-payment-option-select-onclick-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-waiting-button-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-waiting-page-swipe-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-negotiation-waiting-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-review-check-negotiation-cta-onclick-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-review-check-negotiation-page-onload-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-contract-page-viewed-events:first-run-of-day
@@ -1565,6 +1568,7 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-total-payment-option-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-total-payment-option-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-cta-clicked-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-cta-goback-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-exception-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-invoice-pay-button-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-negotiation-cta-clicked-events:first-run-of-day
