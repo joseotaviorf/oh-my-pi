@@ -27,6 +27,9 @@ workflow:
         amount: decimal(38,20)
     transaction: {}
     message: {}
-    idempotency_record: {}
+    idempotency_record:
+      raw_primary_keys: [key]
+      clean_primary_keys: [key]
+      clean_table_name: idempotency_record
 cluster:
   type: databricks_13_3_med_general_cluster
