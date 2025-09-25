@@ -9,11 +9,13 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_table_privileges:
-    3p-readers:
-      - SELECT
-    data-engineers:
-      - ALL PRIVILEGES
+  tables_customization:
+    rede_house_history:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new

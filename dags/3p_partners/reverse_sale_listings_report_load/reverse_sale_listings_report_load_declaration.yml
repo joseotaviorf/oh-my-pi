@@ -12,16 +12,70 @@ workflow:
   default_partitions: ["year", "month", "day"]
   tables_customization:
     demand_score:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
       merge_on: ['id_house', 'demand_score']
       z_order_by: ["id_house"]
+    sale_lead_not_converted:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_offer_accepted:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_offer_sent:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_published:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_signed_contract:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_traffic:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_visit_confirmed:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_listing_visit_scheduled:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    sale_ongoing_listings:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
-  default_table_privileges:
-    3p-readers:
-      - SELECT
-    data-engineers:
-      - ALL PRIVILEGES
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new

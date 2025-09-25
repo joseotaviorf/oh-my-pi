@@ -8,16 +8,36 @@ workflow:
   type: query_delta
   layer: enrich
   custom_schema: hubspot
+  tables_customization:
+    cluster_updates:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    company_events:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    membership_updates:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    owner_updates:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
   inner_dependencies:
     company_events:
       - cluster_updates
       - membership_updates
       - owner_updates
-  default_table_privileges:
-    3p-readers:
-      - SELECT
-    data-engineers:
-      - ALL PRIVILEGES
 cluster:
   type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new

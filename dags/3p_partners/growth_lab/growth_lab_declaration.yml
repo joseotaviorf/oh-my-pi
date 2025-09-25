@@ -20,13 +20,13 @@ workflow:
   tables_customization:
     supply_recurrence:
       extra_spark_job_arguments:
-      - "growthlab-factory"
-      - "supply_recurrence/{{ macros.ds_add(data_interval_start | ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
-  default_table_privileges:
-    3p-readers:
-      - SELECT
-    data-engineers:
-      - ALL PRIVILEGES
+        - "growthlab-factory"
+        - "supply_recurrence/{{ macros.ds_add(data_interval_start | ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
+      clean_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
 cluster:
   type: databricks_16_4_med_general_cluster
   custom_libraries:

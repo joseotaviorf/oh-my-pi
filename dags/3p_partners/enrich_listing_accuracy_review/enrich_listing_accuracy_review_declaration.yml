@@ -10,11 +10,19 @@ workflow:
   inner_dependencies:
     listing_accuracy:
     - listing_accuracy_history
-  default_table_privileges:
-    3p-readers:
-      - SELECT
-    data-engineers:
-      - ALL PRIVILEGES
+  tables_customization:
+    listing_accuracy_history:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    listing_accuracy:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
 cluster:
   type: databricks_16_4_xmin_memory_cluster
   databricks_conn_id: databricks_new

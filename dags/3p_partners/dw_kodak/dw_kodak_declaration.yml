@@ -51,11 +51,19 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: public
-  default_table_privileges:
-    3p-readers:
-      - SELECT
-    data-engineers:
-      - ALL PRIVILEGES
+  tables_customization:
+    dim_kodak_photos:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+    fact_kodak_image_inspection:
+      default_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
 cluster:
   type: custom_cluster
   custom_configurations:
