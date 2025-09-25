@@ -1,0 +1,160 @@
+database_name: core_credit_evaluation
+table_name: credit_evaluation
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+description: Credit Evaluation Core Model containing standardized and enriched credit evaluation data with comprehensive business logic applied.
+  This model consolidates credit evaluation information from DocX system including derived flags, financial limits and evaluation outcomes.
+columns:
+  sk_core_credit_evaluation:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id
+    description: Surrogate key related to the Credit Evaluation Core Model.
+      It's made by concatenating "CREDIT_EVALUATION||id_credit_evaluation" and then applying the SHA256 hash.
+      This key must always be unique.
+  id_credit_evaluation:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id
+    description: Identifier of the credit evaluation. It's the id of the credit_evaluation table from DocX system.
+      This identifier is used internally in our products and is not visible to customers.
+      This key must always be unique.
+  id_house:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_house
+    description: House identifier related to the credit evaluation.
+      It's the id of the House table, from Main's database (EBDB).
+      Represents the property for which the credit evaluation was performed.
+  id_proposal:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_proposal
+    description: Proposal identifier related to the credit evaluation.
+      It's the id of the Proposal table, from Main's database (EBDB).
+      Represents the rental proposal being evaluated for creditworthiness when the offer was approved. This column is null for credit pre-evaluations (credit passport or early credit analysis)
+  id_user:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_user
+    description: User identifier of the person being evaluated for credit.
+      It's the id of the User table, from Main's database (EBDB).
+      This is typically the tenant prospect requesting the rental.
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
+    description: User identifier of the property owner related to the credit evaluation.
+      Resolved through house_listing_relation table to get the property owner.
+      Uses COALESCE(user.id, house.id_user) to get owner ID from User table or fallback to House's id_user.
+  id_city:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_city
+    description: City identifier where the credit evaluation applies.
+      Used for city-level credit passport evaluations and geographic risk assessment.
+  id_group:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_group
+    description: Group identifier for a credit evaluation.
+      A group can represent a group of tenants or a single tenant, if the person is renting alone.
+  reason:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.reason
+    description: Reason code or explanation for the credit evaluation result.
+      Provides context about why a specific result was determined.
+    categories:
+      BAD_SCORE: When the user has a bad score evaluation.
+      BAD_SCORE_ALL_PROPONENTS: When the user has a bad score evaluation and all proponents have a bad score as well.
+      BLOCKLIST: When the user is on the blocklist.
+      CLEAR_NO: When the user has a clear no evaluation by different reasons (such as income reasons, fraud risk or other reasons evaluated by the credit model).
+      HIGH_DTI: When the user has a high DTI evaluation.
+      INSTABLE_INCOME: When the user has an unstable income evaluation.
+      INSUFFICIENT_INCOME: When the user has an insufficient income evaluation.
+      MISSING_SCORE_5A: When the user has a missing score 5A evaluation.
+      NO_BEST_SUBSET_CAN_AFFORD: When the user has no best subset that can afford the rent.
+      NO_SCORE: When the user has no score evaluation.
+      OTHER: When the user has a other evaluation reason, not listed here.
+      PENDING_INVOICES: When the user has pending invoices evaluation.
+      PRE_APPROVAL_POLICY: When the user has a pre-approval policy evaluation, which it might mean a free or paid guarantee (depends on the result columns as well).
+      SERASA_SCORE_BLOCKED: When the user has a reported serasa score blocked evaluation.
+      'NULL': When the credit evaluation reason is not known.
+  result:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+    description: Final result of the credit evaluation process.
+      Credit evaluation results for Early Credit will be on early_result column.
+      This means that Early Credit evaluations have this column as NULL, and most of evaluations are from Early Credit.
+    categories:
+      BYPASSED: When the credit evaluation was bypassed.
+      PRE_APPROVED: When the credit evaluation was pre-approved.
+      PRE_APPROVED_WITH_GUARANTEE: When the credit evaluation was pre-approved but with a guarantee.
+      PRE_REJECTED: When the credit evaluation was pre-rejected.
+      REGULAR: When the credit evaluation was regular.
+      'NULL': When the credit evaluation result is not known (i.e. credit evaluation was canceled, failed, on hold or still processing).
+  early_result:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.early_result
+    description: Early result of the credit evaluation before full analysis.
+      Used for fast-track evaluations and preliminary assessments.
+      This is a JSON field and its structure might vary depending on the evaluation type.
+  limit_value:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.limit_value
+    description: The limit value specified by the user when the person filled up the credit evaluation form.
+      Represents the maximum rental amount the user is approved for.
+  user_pre_approved_limit:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.pre_approved_limit
+    description: The user pre-approved limit value attached to the credit passport and presented to the user.
+      Used for expedited evaluation processes and credit passport scenarios.
+  status:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.status
+    description: Current status of the credit evaluation process, indicating the lifecycle stage of the evaluation.
+    categories:
+      CANCELLED: When the credit evaluation was cancelled.
+      FAILED: When the credit evaluation has failed.
+      FINISHED: When the credit evaluation has finished.
+      NOT_SENT: When the credit evaluation was not submitted yet.
+      ON_HOLD: When the credit evaluation is blocked.
+      PROCESSING: When the credit evaluation is being processed.
+  documentation_policy_type:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.type
+    description: Documentation policy type applied to the credit evaluation proposal.
+      Indicates the level of documentation required for completing the credit assessment process.
+    categories:
+      REGULAR: When the documentation policy applied to the proposal is FULL or FLEX. It indicates that further documentation may be requested to the tenant to complete the credit analysis.
+      LIGHT_APPROVAL: When the credit evaluation is a light approval credit evaluation and no further documents are requested to the user.
+      'NULL': When the documentation policy has not been executed (credit passport or early credit analysis)
+  is_early_credit:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_group
+      - datalake_docx_clean.credit_evaluation.id_proposal
+    description: Boolean flag indicating if this is an early credit evaluation.
+      Set to TRUE when both id_group and id_proposal are NULL, FALSE otherwise.
+      Early credit evaluations are performed before a specific proposal is made.
+  is_credit_passport:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.scope
+    description: Boolean flag indicating if this is a Credit Passport evaluation.
+      Set to TRUE when scope equals 'CITY', FALSE otherwise.
+      Credit passport allows users to be pre-approved for rentals ranges within a city.
+  is_bypass:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+    description: Boolean flag indicating if the credit evaluation was bypassed.
+      Set to TRUE when result equals 'BYPASSED', FALSE otherwise.
+      Bypassed evaluations skip normal credit analysis processes.
+  ts_created:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_created
+    description: Timestamp of when the credit evaluation was initially created in the system.
+  ts_updated:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_updated
+    description: Last timestamp of when the credit evaluation was updated in the system.
+      Used for incremental data loading and change detection.
+  ts_expires:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_expires
+    description: Timestamp of when the credit passport expires and is no longer valid.
+      Credit evaluations might have limited validity periods for risk management.
+  ts_load:
+    description: Timestamp of when the Credit Evaluation Core Model was updated and loaded for the last time.
+      Generated during the ETL process execution.

@@ -1,0 +1,7 @@
+ENTITY_TYPE: "CREDIT_EVALUATION"
+CREDIT_EVALUATION_TABLE: "datalake_docx_clean.credit_evaluation"
+HOUSE_TABLE: "datalake_ebdb_clean.house"
+HOUSE_LISTING_RELATION_TABLE: "datalake_ebdb_clean.house_listing_relation"
+EBDB_USER_TABLE: "datalake_ebdb_clean.user"
+merge_on: ["sk_core_credit_evaluation"]
+when_matched_update_condition: "source.ts_updated > target.ts_updated"

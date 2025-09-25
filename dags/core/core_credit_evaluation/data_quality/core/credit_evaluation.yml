@@ -1,0 +1,38 @@
+---
+table_name: core_credit_evaluation.credit_evaluation
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: ts_updated
+  incremental_date_mask: yyyy-MM-dd
+column_level_validations:
+  sk_core_credit_evaluation:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_credit_evaluation:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_user:
+    is_complete:
+      severity_level: Error
+  status:
+    is_complete:
+      severity_level: Error
+  is_early_credit:
+    is_complete:
+      severity_level: Error
+  is_credit_passport:
+    is_complete:
+      severity_level: Error
+  is_bypass:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error

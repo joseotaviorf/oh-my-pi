@@ -317,6 +317,14 @@ bietlejuice.core_contract:
     - bietlejuice.ebdb_listing:load-clean-house-listing-relation:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
     - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
+bietlejuice.core_credit_evaluation:
+  add:
+    - bietlejuice.docx_fast_lane:load-clean-credit-evaluation
+  remove:
+    - bietlejuice.ebdb_house:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_listing:load-clean-house-listing-relation:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
 bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:

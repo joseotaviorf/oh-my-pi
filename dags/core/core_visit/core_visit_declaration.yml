@@ -4,7 +4,7 @@ dag:
   owner: Data ForSale
   documentation:
     dag_purpose: |
-      This is a test DAG related to Core Models proposal
+      This is a DAG related to the Visit Core Model
 workflow:
   type: core_model
   layer: core

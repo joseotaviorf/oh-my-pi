@@ -1,0 +1,131 @@
+# Schema validation file for core credit evaluation table
+# This file defines the expected schema for the core.credit_evaluation table
+# Path: dags/core/core_credit_evaluation/spark_jobs/schemas/core/core_credit_evaluation.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_credit_evaluation:
+    type: string
+    required: true
+
+  # Credit evaluation identifier
+  id_credit_evaluation:
+    type: bigint
+    required: true
+
+  # House information
+  id_house:
+    type: bigint
+    required: false
+
+  # Proposal information
+  id_proposal:
+    type: bigint
+    required: false
+
+  # User information
+  id_user:
+    type: bigint
+    required: false
+
+  # Property owner information
+  id_owner:
+    type: bigint
+    required: false
+
+  # City information
+  id_city:
+    type: bigint
+    required: false
+
+  # Group information (for credit passport evaluations)
+  id_group:
+    type: bigint
+    required: false
+
+  # Credit evaluation reason
+  reason:
+    type: string
+    required: false
+
+  # Credit evaluation result
+  result:
+    type: string
+    required: false
+
+  # Early credit evaluation result
+  early_result:
+    type: string
+    required: false
+
+  # Credit limit value
+  limit_value:
+    type: double
+    required: false
+
+  # User pre-approved limit amount
+  user_pre_approved_limit:
+    type: decimal
+    required: false
+
+  # Credit evaluation status
+  status:
+    type: string
+    required: false
+
+  # Documentation policy type for credit evaluation
+  documentation_policy_type:
+    type: string
+    required: false
+
+  # Flag indicating if it's an early credit evaluation
+  is_early_credit:
+    type: boolean
+    required: true
+
+  # Flag indicating if it's a credit passport evaluation
+  is_credit_passport:
+    type: boolean
+    required: true
+
+  # Flag indicating if the evaluation was bypassed
+  is_bypass:
+    type: boolean
+    required: true
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: true
+
+  ts_updated:
+    type: timestamp
+    required: true
+
+  # Expiration timestamp
+  ts_expires:
+    type: timestamp
+    required: false
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 25
+max_columns: 25
+strict: true

@@ -1,0 +1,41 @@
+dag:
+  name: core_credit_evaluation
+  schedule_start_date: 2025, 8, 13
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates and maintains the Credit Evaluation Core Model, which standardizes and enriches 
+      credit evaluation data from the DocX system. The model consolidates all credit assessments including 
+      regular evaluations, early credit approvals and Credit Passport validations with comprehensive 
+      business logic applied.
+      
+      Key features:
+      - Generates standardized surrogate keys (sk_core_credit_evaluation) for unique identification;
+      - Reflects the product data found in the data lake's DocX clean layer;
+      - Applies business rules to derive evaluation flags (is_early_credit, is_credit_passport, is_bypass);
+      - Enables incremental processing with optimized z-ordering for query performance;
+      - Provides foundation for downstream analytics and reporting on credit decision processes.
+workflow:
+  type: core_model
+  layer: core
+  default_extraction_type: incremental
+  load_spark_job: load_core_credit_evaluation
+  execution_timeout_hours: 1
+  tables_customization:
+    credit_evaluation:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [year, month, day]
+      z_order_by: [id_proposal, id_user, status]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
