@@ -13,30 +13,6 @@ SELECT DISTINCT
     n.down_payment_net_amount_paid != 0
   QUALIFY ROW_NUMBER() OVER(PARTITION BY ip.id_invoice, ip.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, ip.ts_paid))) = 1
 ),
-recupera AS (
-  SELECT
-    id_contract,
-    dt_reference,
-    COALESCE(partner, LAG(partner) IGNORE NULLS OVER(PARTITION BY id_contract ORDER BY dt_reference)) AS partner
-  FROM datalake_recupera.contract_advisory_distribution
-  WHERE COALESCE(partner, '') NOT IN ("DBAIXAS", "DCARGA")
-),
-get_last_advisory_recupera AS (
-  SELECT
-    o.id_invoice,
-    o.id_contract,
-    o.dt_reference,
-    o.dt_invoice_paid,
-    rc.partner AS advisory
-  FROM
-    datalake_collections_quintoandar.overdue_portfolio_timeline AS o
-  LEFT JOIN
-    recupera AS rc
-      ON o.id_contract = rc.id_contract
-      AND o.dt_reference = rc.dt_snapshot
-  WHERE dt_reference BETWEEN  DATE_ADD(max_dt_invoice_paid,-1) AND dt_reference <= max_dt_invoice_paid
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
-),
 add_all_dimensions AS (
 SELECT
     CONCAT(o.id_invoice, o.id_contract, DATE_FORMAT(o.dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
@@ -79,15 +55,14 @@ SELECT
     o.has_app_action_event,
     o.has_matthew_interaction,
     n.is_ssn_boletao,
-    cad.main_agency_name AS advisory,
-    -- COALESCE(cad.main_agency_name, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
+    COALESCE(cad.main_agency_name, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
     q.segmentation_queue,
     q.segmentation_queue_description,
     q.agreement_queue,
     q.agreement_queue_description,
     q.eviction_queue,
     q.eviction_queue_description,
-    -- MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
+    MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
     o.dt_invoice_paid,
     o.dt_invoice_due,
     o.dt_invoice_due_adjust,
@@ -106,19 +81,14 @@ LEFT JOIN
     datalake_collections_quintoandar.agency_timeline AS cad
       ON o.id_contract = cad.id_contract
       AND o.dt_reference = cad.dt_reference
-      AND cad.dt_reference BETWEEN DATE_TRUNC('MONTH',DATE_ADD('{load_start_date}', -30)) AND '{load_end_date}'
 LEFT JOIN
     datalake_cyber.queue_timeline AS q
       ON o.id_contract = q.id_contract_external
       AND o.dt_reference = q.dt_reference
-      AND q.dt_reference BETWEEN DATE_TRUNC('MONTH',DATE_ADD('{load_start_date}', -30)) AND '{load_end_date}'
 LEFT JOIN
     negotiation_data AS n
       ON o.id_invoice = n.id_invoice
       AND o.id_contract = n.id_contract
-
-WHERE o.dt_reference BETWEEN DATE_TRUNC('MONTH',DATE_ADD('{load_start_date}', -30)) AND '{load_end_date}'
-
 ),
 get_last_valid_partner AS (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
@@ -134,8 +104,9 @@ get_last_valid_partner AS (
     eviction_queue,
     eviction_queue_description
   FROM add_all_dimensions
-  WHERE dt_invoice_paid IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference) = 1
+  WHERE dt_reference >= DATE_ADD(max_dt_invoice_paid,-1) AND dt_reference <= max_dt_invoice_paid
+  AND (advisory IS NULL OR advisory NOT IN ("DBAIXAS", "DCARGA")) -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
 )
 SELECT
     a.sk_overdue_portfolio_timeline,
@@ -197,9 +168,10 @@ FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
   ON a.id_contract = g.id_contract
     AND a.id_invoice = g.id_invoice
+LEFT JOIN datalake_cyber.queue_timeline AS q
+  ON a.id_contract = q.id_contract_external
+    AND a.dt_reference = q.dt_reference
 WHERE
-  (sk_origin_negotiation IS NULL
+  sk_origin_negotiation IS NULL
   OR (sk_origin_negotiation IS NOT NULL
-    AND negotiation_installment_number <> 1))
-  AND a.dt_reference BETWEEN DATE_ADD('{load_start_date}', -30) AND '{load_end_date}'
--- ORDER BY dt_reference
+    AND negotiation_installment_number <> 1)
