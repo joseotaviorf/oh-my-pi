@@ -13,13 +13,17 @@ workflow:
   source_database: rentalguarantee
   dbutils_secret_key: RENTAL_GUARANTEE_DB
   tables_customization:
-    charge_aud: {}
+    charge_aud:
+      clean_table_name: charge_aud
+      raw_primary_keys: ["id", "rev"]
     charge:
       clean_table_name: charge
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
-    guarantee_aud: {}
+    guarantee_aud:
+      clean_table_name: guarantee_aud
+      raw_primary_keys: ["id", "rev"]
     guarantee:
       clean_table_name: guarantee
       get_table_metrics:
@@ -34,13 +38,15 @@ workflow:
       extraction_type: incremental
       unixtime_measure: milliseconds
       partitions: [year, month, day]
-    risk_category_aud: {}
+    risk_category_aud:
+      clean_table_name: risk_category_aud
+      raw_primary_keys: ["id", "rev"]
     risk_category: {}
     sap: {}
     message: {}
     processed_message: {}
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'

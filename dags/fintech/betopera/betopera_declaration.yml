@@ -13,23 +13,35 @@ workflow:
   dbutils_secret_key: BETOPERA_DB
   lineage_product_database_name: betopera
   tables_customization:
-    certificate_aud: {}
-    certificate_request_aud: {}
+    certificate_aud:
+      clean_table_name: certificate_aud
+      raw_primary_keys: ["id", "rev"]
+    certificate_request_aud:
+      clean_table_name: certificate_request_aud
+      raw_primary_keys: ["id", "rev"]
     certificate_request: {}
     certificate: {}
-    endorsement_aud: {}
+    endorsement_aud:
+      clean_table_name: endorsement_aud
+      raw_primary_keys: ["id", "rev"]
     endorsement: {}
-    insurance_aud: {}
+    insurance_aud:
+      clean_table_name: insurance_aud
+      raw_primary_keys: ["id", "rev"]
     insurance: {}
-    payment_aud: {}
+    payment_aud:
+      clean_table_name: payment_aud
+      raw_primary_keys: ["id", "rev"]
     payment: {}
     reminder: {}
-    reminder_aud: {}
+    reminder_aud:
+      clean_table_name: reminder_aud
+      raw_primary_keys: ["id", "rev"]
     renewal: {}
     revinfo:
       clean_table_name: rev_info
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
