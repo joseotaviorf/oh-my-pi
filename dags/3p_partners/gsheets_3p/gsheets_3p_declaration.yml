@@ -3,7 +3,7 @@ dag:
   schedule_interval: 20 00 * * *
   owner: Data 3P Partners
 cluster:
-  type: databricks_16_4_min_general_cluster
+  type: databricks_12_2_min_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
@@ -23,40 +23,3 @@ workflow:
   type: gsheets
   layer: raw
   custom_schema: gsheets
-  tables_customization:
-    3p_partners_performance_targets:
-      default_table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
-    agents_3p_tqc:
-      default_table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
-    forbrokers_3p_partner_conditions:
-      default_table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
-    hubspot_acquisition_funnel_hunting:
-      default_table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
-    hubspot_acquisition_funnel_onboarding:
-      default_table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
-    work_contract_matches:
-      default_table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
