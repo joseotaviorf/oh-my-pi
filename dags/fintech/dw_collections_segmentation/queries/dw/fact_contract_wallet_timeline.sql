@@ -104,12 +104,12 @@ contract_features AS (
 get_invoice_date_range AS (
     SELECT
         sk_contract,
-        dt_contract_annulled AS dt_contract_end,
-        dt_contract_start,
+        MAX(dt_contract_annulled) AS dt_contract_end,
+        MAX(dt_contract_start) AS dt_contract_start,
         MIN(dt_reference) AS dt_first_invoice,
         MAX(dt_reference) AS dt_last_invoice
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
-    GROUP BY 1, 2, 3
+    GROUP BY 1
 ),
 get_date_array AS (
     SELECT
