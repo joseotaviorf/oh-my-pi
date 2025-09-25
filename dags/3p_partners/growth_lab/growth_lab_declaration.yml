@@ -22,8 +22,13 @@ workflow:
       extra_spark_job_arguments:
       - "growthlab-factory"
       - "supply_recurrence/{{ macros.ds_add(data_interval_start | ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
+  default_table_privileges:
+    3p-readers:
+      - SELECT
+    data-engineers:
+      - ALL PRIVILEGES
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   custom_libraries:
   - pypi:
       package: "google-cloud-storage==2.11.0"

@@ -40,6 +40,11 @@ workflow:
   default_partitions: [year, month, day]
   tables_customization:
     company:
+      clean_table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
@@ -95,7 +100,7 @@ cluster:
     driver_node_type_id: r5a.2xlarge
     node_type_id: r5a.xlarge
     num_workers: 2
-    spark_version: 12.2.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
