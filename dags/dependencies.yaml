@@ -318,8 +318,8 @@ bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-proposal:first-run-of-day
-  - bietlejuice.ebdb_rent_flow:load-clean-onboarding:first-run-of-day
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow:first-run-of-day
+  - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow:first-run-of-day
@@ -3686,6 +3686,7 @@ bietlejuice.enrich_transactional_entities:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house
   - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
+  - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding
   - bietlejuice.terminator_fast_lane:load-clean-termination
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries:first-run-of-day

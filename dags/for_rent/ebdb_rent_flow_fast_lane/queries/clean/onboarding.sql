@@ -26,4 +26,4 @@ SELECT
   shortTermTenantSent AS ts_short_term_tenant_sent,
   shortTermLandlordSent AS ts_short_term_landlord_sent,
   version
-FROM datalake_ebdb_test_raw.onboarding
+FROM datalake_ebdb_raw.onboarding
