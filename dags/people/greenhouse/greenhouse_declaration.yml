@@ -31,7 +31,6 @@ workflow:
   type: custom_ingestion
   bucket_config_name: people_bucket
   load_spark_job: load_greenhouse_raw
-  default_partitions: ["year", "month", "day"]
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
