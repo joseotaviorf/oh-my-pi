@@ -88,10 +88,6 @@ columns:
     description: Flag indicating if contract has eviction process
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
-  is_blocklisted:
-    description: Flag indicating if contract is blocklisted
-    lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.is_blocklisted
   n_anchor_invoices_not_negativable:
     description: Number of anchor invoices that are not negativable
     lineage:
@@ -168,7 +164,6 @@ columns:
   segment_comms:
     description: Communication segmentation for collections strategy - includes categories like FPD, NEW DEFAULTER, EVEX, BLOCKLIST, etc.
     lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.is_blocklisted
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_contract_start

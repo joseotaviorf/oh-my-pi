@@ -164,10 +164,6 @@ columns:
     description: Flag indicating if contract has active eviction process
     lineage:
       - datalake_gsheets_clean.evictions_base
-  is_blocklisted:
-    description: Flag indicating if contract is blocklisted on reference date
-    lineage:
-      - datalake_trato_feito_clean.blocklist.is_blocked
   n_anchor_invoices_not_negativable:
     description: Number of anchor invoices that are not eligible for negative operations
   n_invoices_negativable:

@@ -232,7 +232,6 @@ bietlejuice.dw_collections_segmentation:
   - bietlejuice.enrich_retsuko:load-enrich-bill-items:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-proponent:first-run-of-day
-  - bietlejuice.trato_feito:load-clean-blocklist:first-run-of-day
 bietlejuice.dw_company:
   - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day

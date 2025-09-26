@@ -41,7 +41,6 @@ essential_features AS (
         has_overdue_balance_over0_t3_at_ending,
         has_overdue_balance_over5_t3_at_ending,
         is_evictions,
-        is_blocklisted,
         n_anchor_invoices_not_negativable,
         array_open_invoices,
         array_paid_invoices,
@@ -247,7 +246,6 @@ prob_payment_calculation AS (
             ELSE 'h. acima de 180'
         END AS t2_delay_bucket,
         CASE
-            WHEN f.is_blocklisted THEN 'BLOCKLIST'
             WHEN f.max_delay_contaminated_contract_t2 <= 0
                 AND f.reference_contract_status = 'Ativo' THEN 'ACTIVE - CURRENT'
             WHEN f.max_delay_contaminated_contract_t2 <= 0
@@ -540,7 +538,6 @@ SELECT
     CAST(f.has_overdue_balance_over0_t1_at_ending_ffill AS INT) AS has_overdue_balance_over0_t1_at_ending_ffill,
     CAST(f.has_overdue_balance_over5_t1_at_ending_ffill AS INT) AS has_overdue_balance_over5_t1_at_ending_ffill,
     CAST(f.is_evictions AS BOOLEAN) AS is_evictions,
-    CAST(f.is_blocklisted AS BOOLEAN) AS is_blocklisted,
     CAST(f.has_fpd_in_wallet AS BOOLEAN) AS has_fpd_in_wallet,
     f.t1_delay_bucket,
     f.t2_delay_bucket,

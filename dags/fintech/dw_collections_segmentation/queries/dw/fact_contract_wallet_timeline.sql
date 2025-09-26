@@ -357,26 +357,6 @@ app_events_features AS (
         AND DATE(ts_event) <= DATE('{load_end_date}')
     GROUP BY 1, 2
 ),
-contract_blocklist_timeline AS (
-    SELECT DISTINCT
-        id_debtor_external AS id_contract,
-        CASE
-            WHEN dt_reference <> DATE(ts_updated)
-                AND NOT(is_blocked) THEN TRUE
-            ELSE is_blocked
-        END AS is_blocked_timeline,
-        dt_reference
-    FROM
-        datalake_trato_feito_clean.blocklist
-    LATERAL VIEW EXPLODE(
-        SEQUENCE(
-            DATE(ts_created),
-            IF(is_blocked, DATE('{load_end_date}'), DATE(ts_updated))
-        )) AS dt_reference
-    WHERE
-        (id_debtor_external > 1
-            AND id_debtor_external IS NOT NULL)
-),
 base_evictions AS (
     SELECT
         id_process,
@@ -552,7 +532,6 @@ contract_enhanced AS (
         COALESCE(app.has_app_events_overdue, FALSE) AS has_app_events_overdue,
         COALESCE(app.qnt_app_events, 0) AS qt_app_events,
         COALESCE(app.qnt_app_events_overdue, 0) AS qt_app_events_overdue,
-        COALESCE(bl.is_blocked_timeline, FALSE) AS is_blocklisted,
         COALESCE(d.promessas, 0) AS promessas,
         COALESCE(d.qt_acordo_quebrado, 0) AS qt_acordo_quebrado,
         COALESCE(d.qt_promessa_quebrada_fp, 0) AS qt_promessa_quebrada_fp,
@@ -572,10 +551,6 @@ contract_enhanced AS (
         app_events_features AS app
             ON app.id_contract = m.sk_contract
             AND app.dt_reference = m.dt_reference
-    LEFT JOIN
-        contract_blocklist_timeline AS bl
-            ON bl.id_contract = m.sk_contract
-            AND bl.dt_reference = m.dt_reference
     LEFT JOIN
         negotiations AS d
             ON d.sk_contract = m.sk_contract
@@ -684,7 +659,6 @@ SELECT
         ELSE FALSE
     END AS BOOLEAN) AS has_overdue_balance_over5_t3_at_ending,
     CAST(is_evictions AS BOOLEAN) AS is_evictions,
-    CAST(is_blocklisted AS BOOLEAN) AS is_blocklisted,
     CAST(n_anchor_invoices_not_negativable AS BIGINT) AS n_anchor_invoices_not_negativable,
     CAST(n_invoices_negativable AS BIGINT) AS n_invoices_negativable,
     CAST(n_first_invoices_open AS BIGINT) AS n_first_invoices_open,
