@@ -265,9 +265,8 @@ if __name__ == "__main__":
     )
 
     # ############################# Executing Validations ###############################
-    spark_session = BaseSparkContext.spark
-    spark_client = InmetroSparkClient(spark_session)
-    validation_suite_builder = ValidationSuiteBuilder(spark_session)
+    spark_client = InmetroSparkClient(spark)
+    validation_suite_builder = ValidationSuiteBuilder(spark)
     validation_suite = validation_suite_builder.build_validation_suite_from_input_config(
         input_configs
     )
