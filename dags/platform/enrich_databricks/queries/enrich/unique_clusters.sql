@@ -13,7 +13,7 @@ SELECT
         WHEN c.cluster_name LIKE 'bietlejuice%' OR c.cluster_name LIKE 'job-%'
           THEN NULLIF(REPLACE(REGEXP_EXTRACT(
             c.cluster_name,
-            '(bietlejuice(?:\.|-)(?:(?:\w|\.)+))_(?:manual|scheduled|mediator_trig)'
+            '(bietlejuice(?:\.|-)(?:(?:\w|\.)+))_(?:manual|scheduled|mediator_trig|dataset)'
           ), '-', '.'), '')
     END AS bietlejuice_dag_name,
     CASE
