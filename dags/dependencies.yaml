@@ -2641,8 +2641,6 @@ bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
 bietlejuice.enrich_neurotech_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose:first-run-of-day
-  - bietlejuice.velo_neurotech:load-clean-logs-credit-granting:first-run-of-day
-  - bietlejuice.velo_neurotech:load-clean-logs-scoping-policy:first-run-of-day
 bietlejuice.enrich_nexxera:
   - bietlejuice.nexxera:load-clean-adjustments:first-run-of-day
   - bietlejuice.nexxera:load-clean-cnab-charges-341:first-run-of-day
@@ -3756,7 +3754,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-tenant-company:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-user-account:first-run-of-day
-  - bietlejuice.velo_neurotech:load-clean-logs-credit-granting:first-run-of-day
 bietlejuice.enrich_velo_zendesk:
   - bietlejuice.enrich_survicate:load-enrich-response-content:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-responses:first-run-of-day
