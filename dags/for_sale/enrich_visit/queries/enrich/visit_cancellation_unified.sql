@@ -14,6 +14,8 @@ new_model AS (
   WHERE
     event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
     AND DATE(ts_created) >= '2025-01-01'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
 ),
 old_model AS (
   SELECT
