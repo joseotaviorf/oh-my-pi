@@ -2,10 +2,8 @@ SELECT
   id,
   dados_agente_id AS id_agent_data,
   rev,
-  rev_type,
+  revtype AS rev_type,
   program,
-  BOOLEAN(eligible) AS is_eligible,
-  created_at AS ts_created,
-  updated_at AS ts_updated
+  BOOLEAN(eligible) AS is_eligible
 FROM
   datalake_ebdb_raw.DadosAgente_programs_aud

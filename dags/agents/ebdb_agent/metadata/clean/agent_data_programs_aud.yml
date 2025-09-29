@@ -19,7 +19,7 @@ columns:
     description: Table primary key. Identification of a revision
   rev_type:
     lineage:
-      - datalake_ebdb_raw.dadosagente_programs_aud.rev_type
+      - datalake_ebdb_raw.dadosagente_programs_aud.revtype
     description: Identification of a revision type(category)
   program:
     lineage:
@@ -29,11 +29,3 @@ columns:
     lineage:
       - datalake_ebdb_raw.dadosagente_programs_aud.elegible
     description: Program elegibility status (boolean)
-  ts_created:
-    lineage:
-      - datalake_ebdb_raw.dadosagente_programs_aud.created_at
-    description: timestamp of agent <> program relation info creation
-  ts_updated:
-    lineage:
-      - datalake_ebdb_raw.dadosagente_programs_aud.updated_at
-    description: timestamp registering the information last update
