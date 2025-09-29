@@ -1,0 +1,101 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: contract_segmentation_features
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Contract segmentation features table containing calculated features and metrics used for contract segmentation in collection workflows.
+columns:
+  id_contract_segmentation_features:
+    description: "Unique identifier for the contract segmentation features record (Primary Key)"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.id
+  id_contract:
+    description: "Contract identifier associated with these features"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.contract_id
+  id_customer:
+    description: "Array or list of customer IDs associated with this contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.customer_ids
+  id_invoices:
+    description: "Array or list of invoice IDs associated with this contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.invoice_ids
+  version:
+    description: "Version of the segmentation logic or configuration"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.version
+  contract_status:
+    description: "Current status of the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.contract_status
+  number_of_not_negativable_invoices:
+    description: "Number of invoices that cannot be negatived"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_not_negativable_invoices
+  number_of_monthly_invoices:
+    description: "Number of monthly invoices for the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_monthly_invoices
+  number_of_deals_installments:
+    description: "Number of deal installments for the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_deals_installments
+  number_of_invoices_type_other:
+    description: "Number of invoices with type other"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_invoices_type_other
+  number_of_overdue_monthly_invoices:
+    description: "Number of overdue monthly invoices"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_overdue_monthly_invoices
+  number_of_overdue_deals_installments:
+    description: "Number of overdue deal installments"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_overdue_deals_installments
+  number_of_overdue_invoices_type_other:
+    description: "Number of overdue invoices with type other"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.number_of_overdue_invoices_type_other
+  delay_contaminated_original_invoices:
+    description: "Delay contaminated original invoices metric"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.delay_contaminated_original_invoices
+  delay_contaminated_deal_invoices:
+    description: "Delay contaminated deal invoices metric"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.delay_contaminated_deal_invoices
+  delay_contaminated_contract:
+    description: "Delay contaminated contract metric"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.delay_contaminated_contract
+  segment:
+    description: "Segment classification for the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.segment
+  has_any_deal:
+    description: "Flag indicating if the contract has any deals"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.has_any_deal
+  is_blocked:
+    description: "Flag indicating if the contract is blocked"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.is_blocked
+  is_evic_active:
+    description: "Flag indicating if eviction is active for the contract"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.is_evic_active
+  dt_contract_start:
+    description: "Date when the contract started"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.contract_start_date
+  ts_created:
+    description: "Timestamp when the record was initially created in the source system"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.created_at
+  ts_updated:
+    description: "Timestamp of the most recent update to the record in the source system"
+    lineage:
+      - datalake_trato_feito_raw.contract_segmentation_features.updated_at
+  ts_load:
+    description: "Timestamp when the record was loaded into the clean table"

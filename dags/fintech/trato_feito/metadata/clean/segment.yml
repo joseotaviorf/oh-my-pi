@@ -21,6 +21,10 @@ columns:
     description: "Version number for optimistic locking"
     lineage:
       - datalake_trato_feito_raw.segment.version
+  priority:
+    description: "Priority level of the segment for processing order"
+    lineage:
+      - datalake_trato_feito_raw.segment.priority
   is_active:
     description: "Indicates if the segment is currently active"
     lineage:
