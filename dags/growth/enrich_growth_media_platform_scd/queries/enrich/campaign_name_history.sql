@@ -5,7 +5,7 @@ WITH facebook AS (
     campaign_name,
     MIN(dt_start) AS dt_start
   FROM 
-    datalake_facebook_insights_clean.facebook_ads_insights_by_region
+    datalake_growth_facebook_insights.facebook_insights_region
   WHERE 
     DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL

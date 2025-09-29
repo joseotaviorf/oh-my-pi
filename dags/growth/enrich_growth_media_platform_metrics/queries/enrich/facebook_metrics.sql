@@ -36,6 +36,6 @@ SELECT
     MONTH(dt_start) AS month,
     DAY(dt_start) AS day
 FROM 
-    datalake_facebook_insights_clean.facebook_ads_insights_by_region
+    datalake_growth_facebook_insights.facebook_insights_region
 WHERE 
     dt_start::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE

@@ -1633,12 +1633,12 @@ bietlejuice.enrich_condo_monitoring:
 bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns:first-run-of-day
   - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes:first-run-of-day
+  - bietlejuice.enrich_facebook_insights:load-enrich-facebook-insights-impression-device:first-run-of-day
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules:first-run-of-day
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a028a:first-run-of-day
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a:first-run-of-day
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-  - bietlejuice.facebook_insights:load-clean-facebook-insights:first-run-of-day
   - bietlejuice.google_ads:load-clean-ads-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-keywords-performance:first-run-of-day
@@ -2276,9 +2276,9 @@ bietlejuice.enrich_growth_manual_media_platform_metrics:
   - bietlejuice.gsheets_growth:done-clean-marketing-manual-costs:first-run-of-day
 bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns:first-run-of-day
+  - bietlejuice.enrich_facebook_insights:load-enrich-facebook-insights-region:first-run-of-day
   - bietlejuice.enrich_growth_media_platform_scd:load-enrich-campaign-name-history:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-  - bietlejuice.facebook_insights:load-clean-facebook-ads-insights-by-region:first-run-of-day
   - bietlejuice.google_ads:load-clean-ad-group-geo-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-geo-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-geo-target-constant:first-run-of-day
@@ -2286,7 +2286,7 @@ bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_growth_media_platform_scd:
   - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns:first-run-of-day
-  - bietlejuice.facebook_insights:load-clean-facebook-ads-insights-by-region:first-run-of-day
+  - bietlejuice.enrich_facebook_insights:load-enrich-facebook-insights-region:first-run-of-day
   - bietlejuice.google_ads:load-clean-ad-group-geo-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-geo-performance:first-run-of-day
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day

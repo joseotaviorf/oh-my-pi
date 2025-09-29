@@ -1,8 +1,8 @@
 ---
 database_name: datalake_growth_media_platform
 table_name: campaign_name_history
-owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
 description: 'This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization.'
 
 columns:
@@ -11,7 +11,7 @@ columns:
   id_campaign:
     description: "Unique identifier for each campaign across different media platforms."
     lineage:
-      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.id_campaign
+      - datalake_growth_facebook_insights.facebook_insights_region.id_campaign
       - datalake_criteo.criteo_campaigns.id_campaign
       - datalake_lifull_campaigns_clean.trovit_campaigns.id_campaign
       - datalake_google_ads_clean.ad_group_geo_performance.id_campaign
@@ -22,7 +22,7 @@ columns:
   campaign_name:
     description: "Name of the campaign provided by each media platform."
     lineage:
-      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.campaign_name
+      - datalake_growth_facebook_insights.facebook_insights_region.campaign_name
       - datalake_criteo.criteo_campaigns.campaign_name
       - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
       - datalake_google_ads_clean.ad_group_geo_performance.campaign_name
@@ -32,7 +32,7 @@ columns:
   dt_start:
     description: "Earliest start date of the campaign as per platform data."
     lineage:
-      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.dt_start
+      - datalake_growth_facebook_insights.facebook_insights_region.dt_start
       - datalake_criteo.criteo_campaigns.dt_report
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded

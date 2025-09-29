@@ -2,7 +2,7 @@ dag:
   name: facebook_insights_impression_device
   owner: Data Growth
   schedule_start_date: 2025, 9, 1
-  schedule_interval: "0 5 * * *"
+  schedule_interval: "0 3 * * *"
   documentation:
     dag_purpose: |
       Facebook Insights brings our marketing campaigns data from facebook platform by impression device.

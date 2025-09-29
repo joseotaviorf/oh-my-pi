@@ -1,40 +1,40 @@
 ---
 database_name: datalake_consolidated_growth_metrics
 table_name: facebook_consolidated_metrics
-owner: '@data-growth'
+owner: 'henrique.paulo@quintoandar.com.br'
 domain: Growth
 description: Table that consolidates metrics extracted from facebook ads platform
 columns:
   id_date:
     description: Date segmentation
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.day
-      - datalake_facebook_insights_clean.facebook_insights.month
-      - datalake_facebook_insights_clean.facebook_insights.year
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.day
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.month
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.year
   campaign_name:
     description: Name of campaign segmentation
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.campaign_name
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.campaign_name
   account_name:
     description: Accont name at facebook ads platform
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.account_name_snake_case
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.account_name_snake_case
   country_code:
     description: Country code the account belongs to.
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.country_code
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.country_code
   utm_campaign:
     description: utm_campaign applied on growth marketing platform
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.campaign_name
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.campaign_name
   utm_term:
     description: utm_term applied on growth marketing platform
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.adset_name
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.adset_name
   utm_content:
     description: utm_content applied on growth marketing platform
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.ad_name
+      - datalake_growth_facebook_insights.facebook_insights_impression_device.ad_name
   mobile_cost:
     description: Cost from mobile platform
   desktop_cost:

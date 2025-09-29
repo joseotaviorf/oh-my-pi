@@ -1,5 +1,5 @@
 ---
-database_name: enrich_growth_facebook_insights
+database_name: datalake_growth_facebook_insights
 table_name: facebook_insights_impression_device
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth

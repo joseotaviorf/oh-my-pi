@@ -13,7 +13,7 @@ SELECT
     SUM(impressions) AS impressions,
     SUM(inline_link_clicks) AS clicks
 FROM
-    datalake_facebook_insights_clean.facebook_insights
+    datalake_growth_facebook_insights.facebook_insights_impression_device
 WHERE
     dt_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 GROUP BY 1,2,3,4,5,6,7
