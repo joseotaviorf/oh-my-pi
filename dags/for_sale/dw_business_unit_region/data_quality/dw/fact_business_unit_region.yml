@@ -14,10 +14,7 @@ column_level_validations:
       severity_level: Error
   sk_coverage_ended_date:
     is_complete:
-      severity_level: Error
-  business_model:
-    is_complete:
-      severity_level: Error
+      severity_level: Error  
   business_unit:
     is_complete:
       severity_level: Error
