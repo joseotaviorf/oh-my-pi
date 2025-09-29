@@ -24,7 +24,7 @@ last_departament AS (
 ),
 segments AS (
   SELECT DISTINCT
-    fcc.sk_contact AS sk_ticket,
+    fcc.sk_ticket,
     fcc.sk_task AS sk_segment,
     dd.department,
     dd.team,
