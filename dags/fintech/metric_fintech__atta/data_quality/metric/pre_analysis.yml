@@ -1,6 +1,6 @@
 ---
 table_name: metric_fintech.pre_analysis
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   dt_pre_analysis:
     is_unique:

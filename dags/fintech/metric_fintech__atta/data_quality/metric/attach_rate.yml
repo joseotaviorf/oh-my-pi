@@ -1,6 +1,6 @@
 ---
 table_name: metric_fintech.attach_rate
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   credit_analysis_ended_month:
     is_unique:

@@ -1,6 +1,6 @@
 ---
 table_name: dw_velo_staging.dim_velo_house
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   sk_house:
     is_unique:

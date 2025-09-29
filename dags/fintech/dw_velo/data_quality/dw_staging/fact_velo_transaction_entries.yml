@@ -1,6 +1,6 @@
 ---
 table_name: dw_velo_staging.fact_velo_transaction_entries
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 table_level_validations:
   has_size:
     greater_than: 0

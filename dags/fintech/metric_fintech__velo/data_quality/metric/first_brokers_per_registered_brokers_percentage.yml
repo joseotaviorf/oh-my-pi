@@ -1,6 +1,6 @@
 ---
 table_name: metric_fintech.first_brokers_per_registered_brokers_percentage
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   month:
     is_unique:

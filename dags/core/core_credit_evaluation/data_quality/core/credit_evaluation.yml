@@ -1,6 +1,6 @@
 ---
 table_name: core_credit_evaluation.credit_evaluation
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 is_incremental:
   incremental_date_column: ts_updated
   incremental_date_mask: yyyy-MM-dd

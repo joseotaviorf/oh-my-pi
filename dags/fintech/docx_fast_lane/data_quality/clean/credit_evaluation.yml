@@ -1,6 +1,6 @@
 ---
 table_name: datalake_docx_clean.credit_evaluation
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   id:
     is_unique:

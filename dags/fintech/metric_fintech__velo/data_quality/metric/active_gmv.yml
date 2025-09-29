@@ -1,6 +1,6 @@
 ---
 table_name: metric_fintech.active_gmv
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   month_signed:
     is_unique:
