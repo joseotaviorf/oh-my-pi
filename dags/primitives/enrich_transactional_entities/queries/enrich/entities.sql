@@ -11,7 +11,8 @@ WITH visit AS (
             business_context,
             TO_JSON(
                 STRUCT(
-                    computed_status AS computed_status
+                    computed_status AS computed_status,
+                    ts_visit AS ts_visit
                 )
             ) AS properties,
             CASE
@@ -86,7 +87,8 @@ offer AS (
             'RENT' AS business_context,
             TO_JSON(
                 STRUCT(
-                    status AS status
+                    status AS status,
+                    ts_expiration AS ts_expiration
                 )
             ) AS properties,
             CASE
@@ -273,7 +275,8 @@ listing AS (
             TO_JSON(
                 STRUCT(
                     lbc.status AS status,
-                    lbc.status_reason AS status_reason
+                    lbc.status_reason AS status_reason,
+                    lbc.ts_created AS ts_created
                 )
             ) AS properties,
             CASE
@@ -314,48 +317,52 @@ listing AS (
 inspection AS (
   WITH inspection_base AS (
     SELECT
-      id as id_entity,
-      id_contract,
-      id_user_inspector,
+      ib.id AS id_entity,
+      ib.id_contract,
+      ib.id_house,
+      ib.id_user_inspector,
+      c.id_owner,
+      c.id_tenant,
       'FR_INSPECTION' AS entity,
       'RENT' AS business_context,
        TO_JSON(
         STRUCT(
-          status AS status
+          ib.status AS status
         )
       ) AS properties,
       CASE
-        WHEN status IN ('Finalizada', 'Cancelada', 'ContratoCancelado') THEN FALSE
-        WHEN status IN ('Agendada', 'Comentada', 'EmAcordo', 'EmRevisao', 'Nova', 'Revisada') THEN TRUE
+        WHEN ib.status IN ('Finalizada', 'Cancelada', 'ContratoCancelado') THEN FALSE
+        WHEN ib.status IN ('Agendada', 'Comentada', 'EmAcordo', 'EmRevisao', 'Nova', 'Revisada') THEN TRUE
         ELSE NULL
       END AS is_active,
-      ts_created,
-      ts_updated
-      FROM datalake_ebdb_clean.inspection
+      ib.ts_created,
+      ib.ts_updated
+    FROM
+        datalake_ebdb_clean.inspection AS ib
+    INNER JOIN
+        core_contract.contract AS c
+            ON ib.id_contract = c.id_contract
   )
   SELECT
-          ib.id_entity,
-          c.id_house,
-          c.id_owner AS id_user,
-          c.id_contract AS id_contract,
-          ib.entity,
-          'OWNER' AS persona,
-          ib.business_context,
-          ib.properties,
-          ib.is_active,
-          ib.ts_created,
-          ib.ts_updated
+        ib.id_entity,
+        ib.id_house,
+        ib.id_owner AS id_user,
+        ib.id_contract,
+        ib.entity,
+        'OWNER' AS persona,
+        ib.business_context,
+        ib.properties,
+        ib.is_active,
+        ib.ts_created,
+        ib.ts_updated
     FROM
-          inspection_base ib
-    INNER JOIN
-          core_contract.contract c
-          ON ib.id_contract = c.id_contract
+        inspection_base AS ib
     UNION ALL
     SELECT
       ib.id_entity,
-      c.id_house,
-      c.id_tenant AS id_user,
-      c.id_contract AS id_contract,
+      ib.id_house,
+      ib.id_tenant AS id_user,
+      ib.id_contract,
       ib.entity,
       'TENANT' AS persona,
       ib.business_context,
@@ -364,16 +371,13 @@ inspection AS (
       ib.ts_created,
       ib.ts_updated
     FROM
-          inspection_base ib
-    INNER JOIN
-          core_contract.contract c
-          ON ib.id_contract = c.id_contract
+        inspection_base AS ib
     UNION ALL
     SELECT
       ib.id_entity,
-      c.id_house,
+      ib.id_house,
       ib.id_user_inspector AS id_user,
-      c.id_contract AS id_contract,
+      ib.id_contract,
       ib.entity,
       'AGENT_INSPECTOR' AS persona,
       ib.business_context,
@@ -382,10 +386,64 @@ inspection AS (
       ib.ts_created,
       ib.ts_updated
     FROM
-          inspection_base ib
-    INNER JOIN
-          core_contract.contract c
-          ON ib.id_contract = c.id_contract
+        inspection_base AS ib
+),
+credit_evaluation AS (
+    WITH credit_evaluation_base AS (
+        SELECT
+            ce.id_credit_evaluation AS id_entity,
+            ce.id_house,
+            CAST(NULL AS BIGINT) AS id_contract,
+            ce.id_user,
+            ce.id_owner,
+            'FR_CREDIT_EVALUATION' AS entity,
+            'RENT' AS business_context,
+            TO_JSON(
+                STRUCT(
+                    ce.status AS status,
+                    ce.ts_created AS ts_created,
+                    ce.ts_expires AS ts_expires
+                )
+            ) AS properties,
+            CASE
+                WHEN ce.status IN ('NOT_SENT', 'ON_HOLD', 'PROCESSING') THEN TRUE
+                WHEN ce.status IN ('CANCELLED', 'FAILED', 'FINISHED') THEN FALSE
+                ELSE NULL
+            END AS is_active,
+            ce.ts_created,
+            ce.ts_updated
+        FROM
+            core_credit_evaluation.credit_evaluation AS ce
+        )
+    SELECT
+        ce.id_entity,
+        ce.id_house,
+        ce.id_owner AS id_user,
+        ce.id_contract,
+        ce.entity,
+        'OWNER' AS persona,
+        ce.business_context,
+        ce.properties,
+        ce.is_active,
+        ce.ts_created,
+        ce.ts_updated
+    FROM
+        credit_evaluation_base AS ce
+    UNION ALL
+    SELECT
+        ce.id_entity,
+        ce.id_house,
+        ce.id_user,
+        ce.id_contract,
+        ce.entity,
+        'TENANT_PROSPECT' AS persona,
+        ce.business_context,
+        ce.properties,
+        ce.is_active,
+        ce.ts_created,
+        ce.ts_updated
+    FROM
+        credit_evaluation_base AS ce
 ),
 onboarding AS (
     WITH onboarding_base AS (
@@ -538,6 +596,22 @@ base AS (
         ts_updated
     FROM
         inspection
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        credit_evaluation
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,

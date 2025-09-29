@@ -3686,6 +3686,7 @@ bietlejuice.enrich_tracksale_dispatches:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
 bietlejuice.enrich_transactional_entities:
   - bietlejuice.core_contract:load-core-contract
+  - bietlejuice.core_credit_evaluation:load-core-credit-evaluation
   - bietlejuice.core_offer:load-core-offer
   - bietlejuice.core_visit:load-core-visit
   - bietlejuice.ebdb_house_fast_lane:load-clean-house

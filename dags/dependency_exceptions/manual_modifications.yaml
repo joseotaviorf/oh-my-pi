@@ -759,25 +759,27 @@ bietlejuice.enrich_tracksale_dispatches:
     - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
 bietlejuice.enrich_transactional_entities:
   add:
+    - bietlejuice.core_contract:load-core-contract
+    - bietlejuice.core_credit_evaluation:load-core-credit-evaluation
     - bietlejuice.core_offer:load-core-offer
     - bietlejuice.core_visit:load-core-visit
-    - bietlejuice.core_contract:load-core-contract
     - bietlejuice.ebdb_house_fast_lane:load-clean-house
-    - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
-    - bietlejuice.terminator_fast_lane:load-clean-termination
     - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection
+    - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
     - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding
+    - bietlejuice.terminator_fast_lane:load-clean-termination
   remove:
+    - bietlejuice.core_contract:load-core-contract:first-run-of-day
+    - bietlejuice.core_credit_evaluation:load-core-credit-evaluation:first-run-of-day
     - bietlejuice.core_offer:load-core-offer:first-run-of-day
     - bietlejuice.core_visit:load-core-visit:first-run-of-day
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
-    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection:first-run-of-day
     - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
     - bietlejuice.ebdb_test:load-clean-house:first-run-of-day
-    - bietlejuice.core_contract:load-core-contract:first-run-of-day
-    - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
-    - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
     - bietlejuice.enrich_onboarding_entities:load-enrich-onboarding:first-run-of-day
+    - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.dw_quintocred_ifrs:
   remove:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows:first-run-of-day
