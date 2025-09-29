@@ -1,6 +1,7 @@
-hierarchical-conf==1.0.3
+hierarchical-conf==1.0.4
 quintoandar-logger>=0.4.0
 sql-metadata==2.3.0
 yamale==3.0.8
 boto3==1.24.0
-sqlglot==11.5.3
+sqlglot==25.0.0
+PyYAML==6.0.1
