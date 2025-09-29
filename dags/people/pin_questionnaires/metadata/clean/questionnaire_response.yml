@@ -2,7 +2,7 @@
 database_name: datalake_pin_questionnaires_clean
 table_name: questionnaire_response
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Contains participant's attempts at responding to a questionnaire. In some cases, a participant may have more than one attempt.
 columns:
   id_business_group:
@@ -33,9 +33,6 @@ columns:
     description: Yes, identifies the latest submitted attempt by the participant.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_responses.latest_attempt_flag
-    categories:
-      true: This is the latest attempt.
-      false: This is not the latest attempt.
   object_version_number:
     description: Counter for optimistic locking, incremented on each update.
     lineage:

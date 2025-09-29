@@ -1,0 +1,65 @@
+---
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_section_base
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: This table stores information about Questionnaire Sections, and is responsible to link Questionnaires to Questions.
+columns:
+  id_business_group:
+    description: The business group's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.business_group_id
+  id_questionnaire_section:
+    description: The Questionnaire Section's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.qstnr_section_id
+  id_questionnaire:
+    description: The Questionnaire's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.questionnaire_id
+  created_by:
+    description: Who created the Section
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.created_by
+  updated_by:
+    description: Last person or process to update the section
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.last_updated_by
+  object_version_number:
+    description: Version number of the section
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.object_version_number
+  questionnaire_version_number:
+    description: Version number of the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.qstnr_version_num
+  section_sequence_number:
+    description: Sequential number of the section, for ordening purposes
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.section_seq_num
+  is_mandatory:
+    description: If this section is mandatory or not
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.mandatory
+  ts_created:
+    description: Date of creation of the row
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.creation_date
+  ts_updated:
+    description: Last update date of the section
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.last_update_date
+  ts_load:
+    description: the timestamp when the record was loaded into the clean layer
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_qstnr_sections_b.day

@@ -2,7 +2,7 @@
 database_name: datalake_pin_questionnaires_clean
 table_name: question_response
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Contains a participant's response to a specific question within a questionnaire. This may reference the selected answer, a rating level, or entered text. For multi-part questions, it may also reference a sub-question.
 columns:
   id_business_group:

@@ -1,0 +1,93 @@
+---
+database_name: datalake_pin_core_clean
+table_name: allocated_task_translation
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: This table stores tasks related only to Offboarding Surveys, filtered on HCM based on task description and name. Each row represents a task that links a specific employee to a questionnaire.
+columns:
+  id_allocated_task:
+    description: The allocated task unique identifier.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.allocated_task_id
+  id_business_group:
+    description: The business group's unique identifier
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.business_group_id
+  id_performer_orig_sys:
+    description: The person ID for the performer of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.performer_orig_sys_id
+  id_questionnaire:
+    description: The questionnaire's unique identifier
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.questionnaire_id
+  id_task_owner_person:
+    description: The Person ID for the owner of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_owner_person_id
+  description:
+    description: Description of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.description
+  task_details:
+    description: Details of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_details
+  task_status:
+    description: Status of the Task (completed, initiated, in progress, rejected or expired)
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_status
+  task_name:
+    description: Name of the Task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_name
+  reject_action_label:
+    description: The label shown to reject the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.reject_action_label
+  language:
+    description: Language of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.language
+  source_language:
+    description: Language in which the task was created
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.source_lang
+  created_by:
+    description: Who created the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.created_by
+  updated_by:
+    description: The last person or process to update the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.last_updated_by
+  object_version_number:
+    description: Version number of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.object_version_number
+  dt_expired:
+    description: Date of expiration of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.expiry_date
+  ts_created:
+    description: Date of cretion of the task
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.creation_date
+  ts_updated:
+    description: Date of last task update
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.last_update_date
+  ts_load:
+    description: the timestamp when the record was loaded into the clean layer
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.day

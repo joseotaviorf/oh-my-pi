@@ -2,7 +2,7 @@
 database_name: datalake_pin_questionnaires_clean
 table_name: questionnaire_participant
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: A list of participants who have responded to a questionnaire.
 columns:
   id_business_group:
@@ -41,6 +41,10 @@ columns:
     description: Status of the questionnaire participant.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.status
+  object_version_number:
+    description: Version number of the object
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.object_version_number
   ts_created:
     description: Timestamp of the creation of the row.
     lineage:

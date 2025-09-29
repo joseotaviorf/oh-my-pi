@@ -1,0 +1,85 @@
+---
+database_name: datalake_pin_core_clean
+table_name: contact_relationship
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: This table stores data related to employee's personal and profissional contacts registered on Oracle HCM
+columns:
+  id_business_group:
+    description: The business group's unique identifier
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.business_group_id
+  id_contact_person:
+    description: Person ID of the employee's contact
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.contact_person_id
+  id_contact_relationship:
+    description: The relationship contact's unique identifier
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.contact_relationship_id
+  id_person:
+    description: Person ID of the employee
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.person_id
+  contact_type:
+    description: Type of contact between the employee and the contact
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.contact_type
+  legislation_code:
+    description: Code of the legislation regarding this contact row
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.legislation_code
+  created_by:
+    description: Who created the task
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.created_by
+  updated_by:
+    description: The last person or process to update the task
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.last_updated_by
+  is_dependent:
+    description: If the contact is a dependent of the employee
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.dependent_flag
+  is_emergency_contact:
+    description: If the contact is an emergency contact of the employee
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.emergency_contact_flag
+  is_personal:
+    description: If the contact is a personal contact of the employee
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.personal_flag
+  is_primary_contact:
+    description: If the contact is a primary contact of the employee
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.primary_contact_flag
+  dt_effective_started:
+    description: Date in which this relationship started being valid
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.effective_start_date
+  dt_effective_ended:
+    description: Date on which this relationship ceases to being valid
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.effective_end_date
+  ts_created:
+    description: Date of cretion of the relationship
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.creation_date
+  ts_updated:
+    description: Date of last record update
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.last_update_date
+  ts_load:
+    description: the timestamp when the record was loaded into the clean layer
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_core_raw.per_contact_relships_f.day

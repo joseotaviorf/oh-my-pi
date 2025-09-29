@@ -1,0 +1,73 @@
+---
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_translation
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: Defines Questionnaires configuration translations
+columns:
+  id_questionnaire:
+    description: Questionnaire's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.questionnaire_id
+  id_business_group:
+    description: The business group's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.business_group_id
+  name:
+    description: Name of the Questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.name
+  description:
+    description: Description of the Questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.description
+  intro_text:
+    description: Introduction text, prior to questions
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.intro_text
+  language:
+    description: Language of the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.language
+  source_language:
+    description: Language in which the questionnaire was created
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.source_lang
+  created_by:
+    description: Person who created the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.created_by
+  updated_by:
+    description: The last person or process to update the record
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.last_updated_by
+  object_version_number:
+    description: Version number of the object
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.object_version_number
+  questionnaire_version_number:
+    description: Version number of the Questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.qstnr_version_num
+  ts_created:
+    description: Date of creation of the row
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.creation_date
+  ts_updated:
+    description: Last update date of the row
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.last_update_date
+  ts_load:
+    description: the timestamp when the record was loaded into the clean layer
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.day

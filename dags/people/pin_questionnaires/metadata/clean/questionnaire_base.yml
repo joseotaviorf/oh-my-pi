@@ -1,0 +1,81 @@
+---
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_base
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: Defines Questionnaires, or a set of questions, a user needs to respond to
+columns:
+  id_questionnaire:
+    description: Questionnaire's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.questionnaire_id
+  id_business_group:
+    description: The business group's unique identifier
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.business_group_id
+  questionnaire_code:
+    description: Code of the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.questionnaire_code
+  status:
+    description: Status of the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.status
+  created_by:
+    description: Person who created the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.created_by
+  updated_by:
+    description: The last person or process to update the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.last_updated_by
+  object_version_number:
+    description: Version number of the object
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.object_version_number
+  questionnaire_version_number:
+    description: Version number of the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.qstnr_version_num
+  is_in_use:
+    description: If the Questionnaire is active or not
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.in_use
+  is_latest_version:
+    description: If it is the latest version of the questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.latest_version
+  is_privacy:
+    description: If the questionnaire is private or not
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.privacy_flag
+  is_scored:
+    description: If the Questionnaire is scored of not
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.scored_flag
+  is_template:
+    description: If it is a template questionnaire
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.template_flag
+  ts_created:
+    description: Date of creation of the row
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.creation_date
+  ts_updated:
+    description: Last update date of the row
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.last_update_date
+  ts_load:
+    description: the timestamp when the record was loaded into the clean layer
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.day

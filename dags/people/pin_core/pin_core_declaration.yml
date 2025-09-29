@@ -129,6 +129,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_allocated_tasks_tl:
+      clean_table_name: allocated_task_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_asg_representatives:
       clean_table_name: assignment_representative
       extra_spark_job_arguments:
@@ -146,6 +151,11 @@ workflow:
           date_column_to_partition: last_update_date
     per_assignment_supervisors_f:
       clean_table_name: assignment_supervisor
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_contact_relships_f:
+      clean_table_name: contact_relationship
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
