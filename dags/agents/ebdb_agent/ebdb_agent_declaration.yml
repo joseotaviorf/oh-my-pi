@@ -30,6 +30,10 @@ workflow:
       raw_primary_keys: ["DadosAgente_id", "businessContextsServed"]
     DadosAgente_businessContextsServed_AUD:
       clean_table_name: agent_data_business_contexts_served_aud
+    DadosAgente_programs:
+      clean_table_name: agent_data_programs
+    DadosAgente_programs_AUD:
+      clean_table_name: agent_data_programs_aud
     DadosAgente_tipos:
       clean_table_name: agent_data_types
       raw_primary_keys: ["DadosAgente_id", "tipos"]

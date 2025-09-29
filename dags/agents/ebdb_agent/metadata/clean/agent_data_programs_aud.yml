@@ -1,0 +1,39 @@
+---
+database_name: datalake_ebdb_clean
+table_name: agent_data_programs_aud
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: This table contains audit information about agent elegibility to incentive programs.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.id
+    description: Table primary key. Identify the agent <> program relation
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.dados_agent_id
+    description: Identification of a 5A agent
+  rev:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.rev
+    description: Table primary key. Identification of a revision
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.rev_type
+    description: Identification of a revision type(category)
+  program:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.program
+    description: Program name
+  is_elegible:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.elegible
+    description: Program elegibility status (boolean)
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.created_at
+    description: timestamp of agent <> program relation info creation
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_programs_aud.updated_at
+    description: timestamp registering the information last update
