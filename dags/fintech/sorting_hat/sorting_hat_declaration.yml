@@ -1,7 +1,7 @@
 dag:
   name: sorting_hat
   owner: Data Fintech
-  schedule_interval: 0 0,8,12,21 * * *
+  schedule_interval: 0 8,12,18,21 * * *
   documentation:
     dag_purpose: |
       Sorting Hat is a microservice responsible for credit policy and analysis for tenants' rental process. This DAG brings its data from a postgreSQL database.
