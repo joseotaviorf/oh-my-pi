@@ -4,7 +4,7 @@ from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.metadata_propagator_pipeline import MetadataPropagatorPipeline
 
 
-class AtlasQualityMetricsPipeline(MetadataPropagatorPipeline):
+class DatahubQualityMetricsPipeline(MetadataPropagatorPipeline):
     def __init__(
         self,
         metadata_propagator_host,
@@ -13,7 +13,7 @@ class AtlasQualityMetricsPipeline(MetadataPropagatorPipeline):
         metadata_type: MetadataTypeEnum,
         validation_results,
     ):
-        super(AtlasQualityMetricsPipeline, self).__init__(
+        super(DatahubQualityMetricsPipeline, self).__init__(
             metadata_propagator_host, database_name, table_name, metadata_type
         )
         self.validation_results = validation_results

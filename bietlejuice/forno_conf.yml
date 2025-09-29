@@ -81,6 +81,7 @@ spectrum_iam_role: arn:aws:iam::713278628093:role/SpectrumAccess
 spark_jobs_logs_path: s3://databricks.s3.forno.data.quintoandar.com.br/logs/jobs/
 volume_databricks_bucket: /Volumes/quintoandar_forno/default/databricks_s3_forno_data_quintoandar_com_br/
 databricks_default_service_credential_name: databricks_default_service_credential_forno
+data_quality_tests_kafka_topic: forno_databricks.events.data_quality
 default_libraries:
     [
         {
@@ -89,6 +90,10 @@ default_libraries:
         {
             "whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl",
         },
+        {
+            # To be used with data quality tests job
+            "jar": "s3://artifacts.s3.forno.data.quintoandar.com.br/jars/kafka-clients-3.5.0.jar",
+        }
     ]
 default_access_control_list:
     - group_name: analytics-engineers
