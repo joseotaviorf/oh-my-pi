@@ -269,3 +269,31 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Column top5_house_id from Amplitude events
+  visit_status:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Status of visit
+  nbr_days_available:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of days available
+  nbr_hours_available:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of hours available
+  rent_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Rent value of house
+  condo_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Condominium value of house
+  total_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Total value of house
+  sale_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Sale value of house

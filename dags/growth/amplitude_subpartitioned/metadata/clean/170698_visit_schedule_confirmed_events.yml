@@ -253,3 +253,39 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Column ep_business_context extracted from event_properties fields
+  nbr_days_available:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of days available extracted from event_properties JSON field using get_json_object function
+  nbr_hours_available:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of hours available extracted from event_properties JSON field using get_json_object function
+  rent_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Rent value of house (some records are from listing.valor_aluguel and others from valor_aluguel)
+  condo_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Condominium value of house (some records are from listing.valor_condominio and others from valor_condomínio)
+  total_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Total value of house (some records are from listing.valor_total and others from valor_total)
+  sale_value:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Sale value of house (some records are from listing.valor_venda and others from valor_venda)
+  dt_schedule:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Scheduled date extracted from event_properties JSON field using get_json_object function
+  hour_schedule_started:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Scheduled hour started extracted from event_properties JSON field using get_json_object function (some records are from scheduled_hour_from and others from scheduled_hours_from)
+  hour_schedule_ended:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Scheduled hour ended extracted from event_properties JSON field using get_json_object function

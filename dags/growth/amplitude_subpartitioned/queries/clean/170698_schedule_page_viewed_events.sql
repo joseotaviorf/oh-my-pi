@@ -6,7 +6,7 @@ SELECT
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_campaign=([^&|$]+)', 1), ''), 'direct') AS up_utm_campaign,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_content=([^&|$]+)', 1), ''), 'direct') AS up_utm_content,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_term=([^&|$]+)', 1), ''), 'direct') AS up_utm_term,
-    GET_JSON_OBJECT(event_properties, '$.business_context') AS business_context,
+    LOWER(GET_JSON_OBJECT(event_properties, '$.business_context')) AS business_context,
     GET_JSON_OBJECT(user_properties, '$.utm_source') AS utm_source,
     GET_JSON_OBJECT(user_properties, '$.utm_medium') AS utm_medium,
     GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS utm_campaign,
@@ -18,7 +18,14 @@ SELECT
     CASE WHEN GET_JSON_OBJECT(event_properties , '$.top5_house_id') <> '[]'
       THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
       ELSE NULL
-    END AS top5_house_id
+    END AS top5_house_id,
+    GET_JSON_OBJECT(event_properties, '$.visit_status') AS visit_status,
+    CAST(GET_JSON_OBJECT(event_properties, '$.nbr_days_available') AS INTEGER) AS nbr_days_available,
+    CAST(GET_JSON_OBJECT(event_properties, '$.nbr_hours_available') AS INTEGER) AS nbr_hours_available,
+    CAST(GET_JSON_OBJECT(event_properties, '$.valor_aluguel') AS BIGINT) AS rent_value,
+    CAST(COALESCE(GET_JSON_OBJECT(event_properties, '$.valor_condominio'), GET_JSON_OBJECT(event_properties, '$.valor_condomínio')) AS BIGINT) AS condo_value,
+    CAST(GET_JSON_OBJECT(event_properties, '$.valor_total') AS BIGINT) AS total_value,
+    CAST(GET_JSON_OBJECT(event_properties, '$.valor_venda') AS BIGINT) AS sale_value
 FROM
     datalake_amplitude_clean.events
 WHERE

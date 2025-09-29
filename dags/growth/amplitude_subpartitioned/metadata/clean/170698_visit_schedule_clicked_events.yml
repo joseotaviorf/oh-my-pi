@@ -17,6 +17,26 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.event_properties
     description: Business context information extracted from event_properties JSON field using get_json_object function.
+  nbr_days_available:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Number of days available extracted from event_properties JSON field using get_json_object function.
+  nbr_hours_available:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Number of hours available extracted from event_properties JSON field using get_json_object function.
+  dt_schedule:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Scheduled date extracted from event_properties JSON field using get_json_object function.
+  hour_schedule_started:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Scheduled hour started extracted from event_properties JSON field using get_json_object function.
+  hour_schedule_ended:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Scheduled hour ended extracted from event_properties JSON field using get_json_object function.
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
