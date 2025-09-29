@@ -837,9 +837,6 @@ bietlejuice.metric_agents__performance:
 bietlejuice.enrich_viva_real_crawler_listings:
   remove:
     - bietlejuice.listings.viva_real:load-clean-viva-real:first-run-of-day
-bietlejuice.enrich_zap_imoveis_crawler_listings:
-  remove:
-    - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis:first-run-of-day
 bietlejuice.reverse_atento_access:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
