@@ -21,6 +21,7 @@ workflow:
   - "{table_name}"
 
   default_raw_partitions: [year, month, day, hour]
+  execution_timeout_hours: 0.5
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
