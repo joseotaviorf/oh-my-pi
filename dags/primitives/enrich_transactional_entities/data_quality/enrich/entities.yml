@@ -7,7 +7,8 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_house:
-    is_complete:
+    has_completeness:
+      greater_than: 0.95
       severity_level: Error
   id_user:
     is_complete:
