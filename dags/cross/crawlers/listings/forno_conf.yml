@@ -1,14 +1,12 @@
 ---
 em_casa:
-  origin: 'emcasa'
+  origin: "emcasa"
 loft:
-  origin: 'loft'
+  origin: "loft"
 olx:
-  origin: 'olx'
+  origin: "olx"
 viva_real:
-  origin: 'vivareal'
-zap_imoveis:
-  origin: 'zapimoveis'
+  origin: "vivareal"
 partition_cols: ["city", "year", "month", "day"]
 custom_cluster:
   driver_node_type_id: m5a.2xlarge
