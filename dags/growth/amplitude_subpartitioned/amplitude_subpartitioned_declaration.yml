@@ -450,6 +450,15 @@ workflow:
     233592_chatcrpp_warning_message_alert_shown_events:
       run_optimize: false
       run_vacuum: false
+    233592_shortcut_more_visits_intent_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_shortcut_more_visits_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_shortcut_more_visits_viewed_events:
+      run_optimize: false
+      run_vacuum: false
     233592_tts_helps_button_clicked_events:
       run_optimize: false
       run_vacuum: false

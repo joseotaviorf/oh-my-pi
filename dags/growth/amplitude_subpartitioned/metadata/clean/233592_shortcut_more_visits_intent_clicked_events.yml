@@ -1,0 +1,65 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_shortcut_more_visits_intent_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  This table contains shortcut_more_visits_intent_clicked events from app 233592.
+  It tracks when users actively click on shortcuts with the intent to see more property visits, capturing user engagement
+  with property suggestions, visit details, user context, and business metadata for conversion and behavior analysis.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: Unique identifier for the user who clicked the shortcut more visits intent button
+  ids_suggestion_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: List of suggested houses (id_house)
+  visit_code:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Unique code identifying the visit that the user clicked to explore further
+  visit_status:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Current status of the visit when the user clicked the shortcut
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context of the clicked visit
+  current_page:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Page where the user clicked the shortcut intent button
+  is_rent_agent:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Boolean flag indicating whether the user is a rental agent at the time of the event
+  is_sale_agent:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Boolean flag indicating whether the user is a sales agent at the time of the event
+  is_sale_3p:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Boolean flag indicating whether the user is a 3P sales agent
+  count_suggestion:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Total number of property suggestions available when the user clicked the shortcut intent button
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the user clicked the shortcut more visits intent button (UTC timezone)
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year component of the event date, used for data partitioning
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month component of the event date, used for data partitioning
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day component of the event date, used for data partitioning
