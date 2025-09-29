@@ -141,7 +141,7 @@ columns:
       - dw_rent.fact_listing_rent_flows.sk_contract
       - dw_rent.dim_contract.sk_contract
   segments_risk:
-    description: Risk segmentation based on contract status and payment behavior - categorizes contracts into ALTA, MEDIA, BAIXA, BAIXISSIMA probability segments
+    description: Risk segmentation based on contract status and payment behavior - categorizes contracts into HIGH, MEDIUM, LOW, BAIXISSIMA probability segments
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1

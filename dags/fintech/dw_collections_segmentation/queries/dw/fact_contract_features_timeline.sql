@@ -297,21 +297,21 @@ prob_payment_calculation AS (
         CASE
             WHEN f.reference_contract_status = 'Ativo'
                 AND (f.n_days_over1_t2_l180 - 3) <= 0
-                AND f.max_delay_contaminated_contract_t2 <= 3 THEN 'ALTISSIMA'
+                AND f.max_delay_contaminated_contract_t2 <= 3 THEN 'VERY_HIGH'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 <= 5 THEN 'ALTA'
-            WHEN f.reference_contract_status = 'Ativo'
-                AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_promessas_lifetime <= 1.5 THEN 'MEDIA'
+                AND f.avg_days_overdue_invoices_paid_t1 <= 5 THEN 'HIGH'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'BAIXA'
+                AND f.acc_broken_promessas_lifetime <= 1.5 THEN 'MEDIUM'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 > 20 THEN 'BAIXA'
+                AND f.avg_days_overdue_invoices_paid_t1 <= 20
+                AND f.acc_broken_promessas_lifetime > 1.5 THEN 'LOW'
+            WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 <= 30
+                AND f.avg_days_overdue_invoices_paid_t1 > 20 THEN 'LOW'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'NULL PROB ACTIVE [1-30]'
             WHEN f.reference_contract_status = 'Ativo'
@@ -319,31 +319,31 @@ prob_payment_calculation AS (
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 11
-                AND f.days_since_ending <= 30 THEN 'ALTA'
+                AND f.days_since_ending <= 30 THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 11
                 AND f.days_since_ending > 30
-                AND (c.monthly_income <= 8100 OR c.monthly_income IS NULL) THEN 'BAIXA'
+                AND (c.monthly_income <= 8100 OR c.monthly_income IS NULL) THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 11
                 AND f.days_since_ending > 30
-                AND c.monthly_income > 8100 THEN 'ALTA'
+                AND c.monthly_income > 8100 THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 > 11
                 AND f.acc_max_n_repairs = 0
-                AND f.acc_broken_multiple_deals_lifetime = 0 THEN 'ALTA'
+                AND f.acc_broken_multiple_deals_lifetime = 0 THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 > 11
                 AND f.acc_max_n_repairs = 0
-                AND f.acc_broken_multiple_deals_lifetime > 0 THEN 'BAIXA'
+                AND f.acc_broken_multiple_deals_lifetime > 0 THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 > 11
-                AND f.acc_max_n_repairs > 0 THEN 'BAIXA'
+                AND f.acc_max_n_repairs > 0 THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'NULL PROB ENDED [1-30]'
             WHEN f.reference_contract_status = 'Finalizado'
@@ -353,29 +353,29 @@ prob_payment_calculation AS (
                     (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices > 0) OR
                     (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices = 0 AND f.acc_cpc_l90 > 0) OR
                     (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices = 0 AND f.share_monthly_paid_ontime_t1 > 0.68)
-                ) THEN 'ALTA'
+                ) THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
                 AND f.max_delay_contaminated_contract_t2 <= 90
-                AND (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices > 0) THEN 'BAIXA'
+                AND (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices > 0) THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
-                AND f.max_delay_contaminated_contract_t2 <= 90 THEN 'BAIXA'
+                AND f.max_delay_contaminated_contract_t2 <= 90 THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 90
-                AND f.n_reparos_invoices = f.n_invoices_in_wallet THEN 'BAIXISSÍMA'
+                AND f.n_reparos_invoices = f.n_invoices_in_wallet THEN 'VERY_LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 90
                 AND (
                     (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices > 0) OR
                     (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices = 0 AND f.acc_cpc_l90 > 0) OR
                     (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices = 0 AND f.share_monthly_paid_ontime_t1 > 0.68)
-                ) THEN 'ALTA'
+                ) THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 90
-                AND (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices > 0) THEN 'BAIXA'
+                AND (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices > 0) THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 > 90 THEN 'BAIXA'
+                AND f.max_delay_contaminated_contract_t2 > 90 THEN 'LOW'
             ELSE 'NULL UNDEFINED'
         END AS prob_payment
     FROM
@@ -409,26 +409,26 @@ segmentation_features AS (
                 AND p.mob_months <= 6
                 AND p.max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-under-mob6'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'ALTISSIMA' THEN 'active-new-defaulter-early-very-high'
+                AND p.prob_payment = 'VERY_HIGH' THEN 'active-new-defaulter-early-very-high'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'ALTA'
+                AND p.prob_payment = 'HIGH'
                 AND p.max_delay_contaminated_contract_t2 <= 19 THEN 'active-new-defaulter-early-high'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'ALTA'
+                AND p.prob_payment = 'HIGH'
                 AND p.max_delay_contaminated_contract_t2 > 19
                 AND p.max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-high'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'MEDIA'
+                AND p.prob_payment = 'MEDIUM'
                 AND p.max_delay_contaminated_contract_t2 <= 19 THEN 'active-new-defaulter-early-medium'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'MEDIA'
+                AND p.prob_payment = 'MEDIUM'
                 AND p.max_delay_contaminated_contract_t2 > 19
                 AND p.max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-medium'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'BAIXA'
+                AND p.prob_payment = 'LOW'
                 AND p.max_delay_contaminated_contract_t2 <= 4 THEN 'active-new-defaulter-early-low'
             WHEN p.reference_contract_status = 'Ativo'
-                AND p.prob_payment = 'BAIXA'
+                AND p.prob_payment = 'LOW'
                 AND p.max_delay_contaminated_contract_t2 > 4
                 AND p.max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-low'
             WHEN p.reference_contract_status = 'Ativo'
@@ -450,71 +450,71 @@ segmentation_features AS (
                 AND p.acc_deals_principal_discount_lifetime > 0 THEN 'ended-had-forgiveness'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 <= 30
-                AND p.prob_payment = 'ALTA' THEN 'ended-new-defaulter-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-new-defaulter-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 <= 30
-                AND p.prob_payment = 'BAIXA' THEN 'ended-new-defaulter-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-new-defaulter-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 30
                 AND p.max_delay_contaminated_contract_t2 <= 60
-                AND p.prob_payment = 'ALTA' THEN 'ended-stock-roll1-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-stock-roll1-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 30
                 AND p.max_delay_contaminated_contract_t2 <= 60
-                AND p.prob_payment = 'BAIXA' THEN 'ended-stock-roll1-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-stock-roll1-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 60
                 AND p.max_delay_contaminated_contract_t2 <= 90
-                AND p.prob_payment = 'ALTA' THEN 'ended-stock-roll2-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-stock-roll2-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 60
                 AND p.max_delay_contaminated_contract_t2 <= 90
-                AND p.prob_payment = 'BAIXA' THEN 'ended-stock-roll2-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-stock-roll2-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 90
                 AND p.max_delay_contaminated_contract_t2 <= 180
-                AND p.prob_payment = 'ALTA' THEN 'ended-stock-roll3-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-stock-roll3-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 90
                 AND p.max_delay_contaminated_contract_t2 <= 180
-                AND p.prob_payment = 'BAIXA' THEN 'ended-stock-roll3-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-stock-roll3-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 90
                 AND p.max_delay_contaminated_contract_t2 <= 180
-                AND p.prob_payment = 'BAIXISSÍMA' THEN 'ended-stock-roll3-very-low'
+                AND p.prob_payment = 'VERY_LOW' THEN 'ended-stock-roll3-very-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 180
                 AND p.max_delay_contaminated_contract_t2 <= 360
-                AND p.prob_payment = 'ALTA' THEN 'ended-stock-roll4-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-stock-roll4-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 180
                 AND p.max_delay_contaminated_contract_t2 <= 360
-                AND p.prob_payment = 'BAIXA' THEN 'ended-stock-roll4-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-stock-roll4-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 180
                 AND p.max_delay_contaminated_contract_t2 <= 360
-                AND p.prob_payment = 'BAIXISSÍMA' THEN 'ended-stock-roll4-very-low'
+                AND p.prob_payment = 'VERY_LOW' THEN 'ended-stock-roll4-very-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 360
                 AND p.max_delay_contaminated_contract_t2 <= 1440
-                AND p.prob_payment = 'ALTA' THEN 'ended-stock-roll5-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-stock-roll5-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 360
                 AND p.max_delay_contaminated_contract_t2 <= 1440
-                AND p.prob_payment = 'BAIXA' THEN 'ended-stock-roll5-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-stock-roll5-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 360
                 AND p.max_delay_contaminated_contract_t2 <= 1440
-                AND p.prob_payment = 'BAIXISSÍMA' THEN 'ended-stock-roll5-very-low'
+                AND p.prob_payment = 'VERY_LOW' THEN 'ended-stock-roll5-very-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 1440
-                AND p.prob_payment = 'ALTA' THEN 'ended-stock-roll6-high'
+                AND p.prob_payment = 'HIGH' THEN 'ended-stock-roll6-high'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 1440
-                AND p.prob_payment = 'BAIXA' THEN 'ended-stock-roll6-low'
+                AND p.prob_payment = 'LOW' THEN 'ended-stock-roll6-low'
             WHEN p.reference_contract_status = 'Finalizado'
                 AND p.max_delay_contaminated_contract_t2 > 1440
-                AND p.prob_payment = 'BAIXISSÍMA' THEN 'ended-stock-roll6-very-low'
+                AND p.prob_payment = 'VERY_LOW' THEN 'ended-stock-roll6-very-low'
             WHEN p.reference_contract_status = 'Finalizado' THEN 'UNCLASSIFIED-ENDED'
             ELSE 'MISTERY'
         END AS segmentation
