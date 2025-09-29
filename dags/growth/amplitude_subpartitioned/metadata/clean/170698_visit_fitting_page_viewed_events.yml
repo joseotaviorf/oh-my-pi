@@ -1,0 +1,56 @@
+database_name: datalake_amplitude_clean
+table_name: 170698_visit_fitting_page_viewed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  This table contains visit_fitting_page_viewed events from app 170698.
+  It tracks when users view the visit fitting page.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: Unique identifier for the user who viewed the visit fitting page.
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Identifier of the house displayed on the visit fitting page that was viewed.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context of the property viewing (rent or sale) converted to lowercase.
+  visit_status:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Status of the visit associated with the property on the fitting page.
+  rent_value:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Rental value of the property related to the fitting page.
+  condo_value:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Condominium fee value of the property related to the fitting page.
+  total_value:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Total value combining rent and fees for the property related to the fitting page.
+  sale_value:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Sale price of the property related to the fitting page.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the visit fitting page was viewed by the user (UTC timezone).
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year component of the event date, used for data partitioning.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month component of the event date, used for data partitioning.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day component of the event date, used for data partitioning.

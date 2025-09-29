@@ -219,6 +219,12 @@ workflow:
     170698_user_tried_to_call_again_after_blocked_events:
       run_optimize: false
       run_vacuum: false
+    170698_visit_fitting_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_visit_fitting_requested_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
     170698_visit_hoursalert_confirmed_events:
       run_optimize: false
       run_vacuum: false
@@ -229,6 +235,9 @@ workflow:
       run_optimize: false
       run_vacuum: false
     170698_visit_schedule_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_visit_schedule_continue_clicked_events:
       run_optimize: false
       run_vacuum: false
     183047_ad_improvements_first_access_page_viewed_events:

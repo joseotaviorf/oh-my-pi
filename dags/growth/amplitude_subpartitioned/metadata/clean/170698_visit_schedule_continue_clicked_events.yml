@@ -1,0 +1,36 @@
+database_name: datalake_amplitude_clean
+table_name: 170698_visit_schedule_continue_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  This table contains visit_schedule_continue_clicked events from app 170698.
+  It tracks when users click the continue button during the visit scheduling process.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: Unique identifier for the user who clicked the continue button in the visit scheduling flow.
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Identifier of the house for which the user is scheduling a visit and clicked continue.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context of the visit scheduling (rent or sale) converted to lowercase.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the user clicked the continue button during visit scheduling (UTC timezone).
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year component of the event date, used for data partitioning.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month component of the event date, used for data partitioning.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day component of the event date, used for data partitioning.
