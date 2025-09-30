@@ -28,7 +28,7 @@ class TestValidateAndSanitizeFilePath:
     def test_valid_yaml_file_path(self):
         """Test valid YAML file path."""
         # Arrange
-        valid_path = "dags/core/core_visit_test/schemas/core/visit.yml"
+        valid_path = "dags/core/core_visit/schemas/core/visit.yml"
 
         # Act
         result = validate_and_sanitize_file_path(valid_path)
@@ -70,7 +70,7 @@ class TestFindCoreModelDags:
         # Arrange
         mock_core_dir = Mock()
         mock_dag_dir = Mock()
-        mock_dag_dir.name = "core_visit_test"
+        mock_dag_dir.name = "core_visit"
         mock_dag_dir.is_dir.return_value = True
 
         mock_declaration_file = Mock()
@@ -108,7 +108,7 @@ class TestFindCoreModelDags:
         # Arrange
         mock_core_dir = Mock()
         mock_dag_dir = Mock()
-        mock_dag_dir.name = "core_visit_test"
+        mock_dag_dir.name = "core_visit"
         mock_dag_dir.is_dir.return_value = True
 
         mock_declaration_file = Mock()
@@ -133,11 +133,8 @@ class TestExtractTablesFromDeclaration:
         """Test successful table extraction."""
         # Arrange
         declaration_content = {
-            "dag": {"name": "core_visit_test"},
-            "workflow": {
-                "layer": "core",
-                "tables_customization": {"visit": {}, "visit_incremental": {}},
-            },
+            "dag": {"name": "core_visit"},
+            "workflow": {"layer": "core", "tables_customization": {"visit": {}}},
         }
 
         mock_file = Mock()
@@ -154,9 +151,9 @@ class TestExtractTablesFromDeclaration:
             dag_name, layer, table_names = extract_tables_from_declaration(mock_file)
 
             # Assert
-            assert dag_name == "core_visit_test"
+            assert dag_name == "core_visit"
             assert layer == "core"
-            assert table_names == {"visit", "visit_incremental"}
+            assert table_names == {"visit"}
 
     def test_extract_tables_missing_dag_name(self):
         """Test extraction with missing DAG name."""
@@ -186,7 +183,7 @@ class TestExtractTablesFromDeclaration:
         """Test extraction with missing layer."""
         # Arrange
         declaration_content = {
-            "dag": {"name": "core_visit_test"},
+            "dag": {"name": "core_visit"},
             "workflow": {"tables_customization": {"visit": {}}},
         }
 
@@ -203,7 +200,7 @@ class TestExtractTablesFromDeclaration:
             dag_name, layer, table_names = extract_tables_from_declaration(mock_file)
 
             # Assert
-            assert dag_name == "core_visit_test"
+            assert dag_name == "core_visit"
             assert layer == ""
             assert table_names == {"visit"}
 
@@ -211,7 +208,7 @@ class TestExtractTablesFromDeclaration:
         """Test extraction with missing tables_customization."""
         # Arrange
         declaration_content = {
-            "dag": {"name": "core_visit_test"},
+            "dag": {"name": "core_visit"},
             "workflow": {"layer": "core"},
         }
 
@@ -228,7 +225,7 @@ class TestExtractTablesFromDeclaration:
             dag_name, layer, table_names = extract_tables_from_declaration(mock_file)
 
             # Assert
-            assert dag_name == "core_visit_test"
+            assert dag_name == "core_visit"
             assert layer == "core"
             assert table_names == set()
 
@@ -253,7 +250,7 @@ class TestGetSchemaFilesToValidate:
     def test_file_mode_valid_path(self):
         """Test file mode with valid path."""
         # Arrange
-        valid_path = "dags/core/core_visit_test/schemas/core/visit.yml"
+        valid_path = "dags/core/core_visit/schemas/core/visit.yml"
 
         # Act
         files = get_schema_files_to_validate("file", valid_path)

@@ -1,7 +1,0 @@
-CONTRACT_TABLE: "datalake_ebdb_clean.contract"
-HOUSE_TABLE: "datalake_ebdb_clean.house"
-VISIT_TABLE: "datalake_ebdb_clean.visit"
-VISIT_STATUS_LOG_TABLE: "datalake_ebdb_clean.visit_status_log"
-ENTITY_TYPE: "VISIT"
-merge_on: ["id_entity"]
-when_matched_update_condition: "source.ts_updated > target.ts_updated"

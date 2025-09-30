@@ -10,7 +10,6 @@ dags_out_of_pattern:
         "core_credit_evaluation",
         "core_offer",
         "core_visit",
-        "core_visit_test",
         "cyber",
         "cyber_complement",
         "dw_contract_test",

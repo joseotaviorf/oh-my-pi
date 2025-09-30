@@ -248,7 +248,7 @@ class BaseCoreModelSparkJob(ABC):
         Load schema definition from S3 YAML file.
 
         Schema file should be stored as: schemas/{dag_name}/{layer}/{table_name}.yml
-        where layer is inferred from the schema argument (e.g., 'core' for core_visit_test)
+        where layer is inferred from the schema argument (e.g., 'core' for core_visit)
 
         Args:
             dag_name: DAG name without bietlejuice prefix
@@ -264,7 +264,7 @@ class BaseCoreModelSparkJob(ABC):
             )
             import yaml
 
-            # Get the layer from the schema argument (e.g., 'core' from 'core_visit_test')
+            # Get the layer from the schema argument (e.g., 'core' from 'core_visit')
             # The schema argument typically follows the pattern: {layer}_{context}
             layer = args.schema.split("_")[0] if args.schema else "core"
 

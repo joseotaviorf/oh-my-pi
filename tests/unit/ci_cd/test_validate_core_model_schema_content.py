@@ -32,7 +32,7 @@ class TestValidateAndSanitizeFilePath:
     def test_valid_yaml_file_path(self):
         """Test valid YAML file path."""
         # Arrange
-        valid_path = "dags/core/core_visit_test/schemas/core/visit.yml"
+        valid_path = "dags/core/core_visit/schemas/core/visit.yml"
 
         # Act
         result = validate_and_sanitize_file_path(valid_path)
@@ -45,7 +45,7 @@ class TestValidateAndSanitizeFilePath:
     def test_valid_yaml_file_path_with_yaml_extension(self):
         """Test valid YAML file path with .yaml extension."""
         # Arrange
-        valid_path = "dags/core/core_visit_test/schemas/core/visit.yaml"
+        valid_path = "dags/core/core_visit/schemas/core/visit.yaml"
 
         # Act
         result = validate_and_sanitize_file_path(valid_path)
@@ -522,7 +522,7 @@ class TestGetSchemaFilesToValidate:
     def test_file_mode_valid_path(self):
         """Test file mode with valid path."""
         # Arrange
-        valid_path = "dags/core/core_visit_test/schemas/core/visit.yml"
+        valid_path = "dags/core/core_visit/schemas/core/visit.yml"
 
         # Act
         files = get_schema_files_to_validate("file", valid_path)
