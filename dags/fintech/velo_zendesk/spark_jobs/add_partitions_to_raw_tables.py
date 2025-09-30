@@ -6,7 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 SOURCE = "velo_zendesk"
 JOB_NAME = "add_partitions_to_raw_tables"

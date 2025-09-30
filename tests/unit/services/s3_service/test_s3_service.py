@@ -3,7 +3,7 @@ import json
 import boto3
 
 from moto import mock_s3
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 
 BUCKET = "mocked-bucket"

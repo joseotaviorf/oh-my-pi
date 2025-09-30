@@ -128,7 +128,7 @@ class DAGPackagesPathService:
 
     @staticmethod
     def _read_dag_package_file_from_s3(
-        sql_file_relative_path: str, engine: str = "boto3"
+        sql_file_relative_path: str, engine: str = "databricks_volume"
     ):
         """
         Read the DAG Package's file stored in S3 based on the relative file path.
@@ -227,7 +227,7 @@ class DAGPackagesPathService:
         table_name: str,
         layer: str = "",
         intermediate_path: str = "",
-        engine: str = "boto3",
+        engine: str = "databricks_volume",
     ):
         """
         Opens the SQL file according to the place it is stored (if it is in

@@ -19,7 +19,7 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 def _format_requests(endpoint:str, configs: dict, display_limit: int) -> list:
     """

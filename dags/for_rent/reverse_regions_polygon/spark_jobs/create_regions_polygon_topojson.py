@@ -12,7 +12,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 JOB_NAME = "regions_polygon_topojson_to_s3"
 DESTINATION_DATABASE_SOURCE = "ebdb"

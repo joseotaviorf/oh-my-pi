@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from http.client import HTTPException
 
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 from bietlejuice.clients.db_clients import SparkClient
 
 from quintoandar_logger import QuintoAndarLogger

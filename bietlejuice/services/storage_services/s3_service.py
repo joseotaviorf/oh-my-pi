@@ -3,11 +3,12 @@ import re
 from os import path, makedirs
 
 from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.services.storage_services.storage_service import StorageService
 
 logger = QuintoAndarLogger("S3Service")
 
 
-class S3Service:
+class S3Service(StorageService):
     def __init__(self, s3_resource):
         """
         Handle the execution of common tasks on S3.
@@ -31,27 +32,27 @@ class S3Service:
         return bucket_name, suffix
 
     @logger
-    def upload_file(self, file_content, s3_file_path):
+    def upload_file(self, file_content, file_path: str):
         """
         Upload a file to s3 giving raw file string and a full s3 path
         :param file_content: raw file content string
         :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
         :return: None
         """
-        bucket_name, key = self._split_s3_path(s3_file_path)
+        bucket_name, key = self._split_s3_path(file_path)
         self.s3_resource.Bucket(bucket_name).put_object(
             Key=key, Body=file_content.encode()
         )
 
     @logger
-    def list_objects(self, s3_folder_path, include_size=False):
+    def list_objects(self, folder_path: str, include_size: bool = False):
         """
         Recursively list all objects under a folder path in s3
         :param s3_folder_path: full path to the target folder in s3, ex: "s3://bucket-name/path/to/folder/"
         :param include_size: boolean parameter to include size of the objects alongside with the paths
         :return: list of all the objects discovered under the folder
         """
-        bucket_name, objects_filter = self._split_s3_path(s3_folder_path)
+        bucket_name, objects_filter = self._split_s3_path(folder_path)
         path_prefix = "s3://{}/".format(bucket_name)
         if include_size:
             return [
@@ -68,32 +69,32 @@ class S3Service:
         ]
 
     @logger
-    def download_file(self, s3_file_path, folder_destination):
+    def download_file(self, file_path: str, folder_destination: str):
         """
-        Donwload a file from s3 to a specific location.
+        Download a file from s3 to a specific location.
 
-        :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
+        :param file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
         :param folder_destination: path to the target folder where the s3 file will be saved"
         :return: None
         """
         if not path.exists(folder_destination):
             makedirs(folder_destination)
 
-        bucket_name, key = self._split_s3_path(s3_file_path)
+        bucket_name, key = self._split_s3_path(file_path)
         filename = key.split("/")[-1]
         self.s3_resource.Bucket(bucket_name).download_file(
             key, f"{folder_destination}/{filename}"
         )
 
     @logger
-    def read_file(self, s3_file_path):
+    def read_file(self, file_path: str):
         """
-        Read a file from s3 and return the file content.
+        Read a file from s3  and return the file content.
 
-        :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
-        :return: query string
+        :param file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
+        :return: file content
         """
-        bucket_name, key = self._split_s3_path(s3_file_path)
+        bucket_name, key = self._split_s3_path(file_path)
         return (
             self.s3_resource.Bucket(bucket_name)
             .Object(key)
@@ -103,33 +104,47 @@ class S3Service:
         )
 
     @logger
-    def list_sql_files(self, s3_file_path):
+    def list_sql_files(self, file_path: str):
         """
         List all sql files from a given s3 path
 
         :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
         :return: list of sql files
         """
-        return list(
-            filter(lambda x: x.endswith(".sql"), self.list_objects(s3_file_path))
-        )
+        return list(filter(lambda x: x.endswith(".sql"), self.list_objects(file_path)))
 
     @logger
-    def delete_object(self, s3_object_path):
+    def delete_object(self, object_path: str):
         """
         Delete a specific object from s3.
         :param s3_object_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/object"
         :return: None
         """
-        bucket_name, key = self._split_s3_path(s3_object_path)
+        bucket_name, key = self._split_s3_path(object_path)
         self.s3_resource.Object(bucket_name, key).delete()
 
     @logger
-    def create_empty_object(self, s3_object_path):
+    def create_empty_object(self, object_path: str):
         """
         Create a empty object in an s3 bucket.
         :param s3_object_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/object"
         :return: None
         """
-        bucket_name, key = self._split_s3_path(s3_object_path)
+        bucket_name, key = self._split_s3_path(object_path)
         self.s3_resource.Bucket(bucket_name).put_object(Key=key)
+
+    @logger
+    def list_objects_by_prefix(self, prefix: str):
+        """
+        List all objects from a given s3 path by prefix
+        :param prefix: prefix to filter the objects ex: "s3://bucket-name/path/to/table.y"
+        :return: list of objects
+        """
+        bucket_name, treated_prefix = self._split_s3_path(prefix)
+        path_prefix = "s3://{}/".format(bucket_name)
+        return [
+            path_prefix + obj.key
+            for obj in self.s3_resource.Bucket(bucket_name).objects.filter(
+                Prefix=treated_prefix
+            )
+        ]

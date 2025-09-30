@@ -4,7 +4,7 @@ import boto3
 from io import StringIO
 from http.client import HTTPException
 from argparse import ArgumentParser
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 from quintoandar_logger import QuintoAndarLogger
 

@@ -1,12 +1,13 @@
-import boto3
 import yaml
 from typing import List
 from delta.tables import DeltaTable
+
 
 from bietlejuice.base.cdc.primary_key_identifiers.primary_key_identifier import (
     PrimaryKeyIdentifier,
 )
 from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.services.storage_services import VolumeService, VolumeMapper
 
 
 class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
@@ -19,6 +20,9 @@ class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
         """
 
         self.data_documentation_bucket = data_documentation_bucket
+        self.data_documentation_volume_path = VolumeMapper().get_volume_path_by_bucket_name(
+            self.data_documentation_bucket
+        )
         self.spark = spark
 
     def find_primary_keys(self, schema: str, table_name: str) -> List[str]:
@@ -35,27 +39,24 @@ class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
     def _read_table_metadata(self, schema: str, table_name: str):
         """Returns the metadata of a clean table from the data documentation bucket."""
 
-        s3_client = boto3.client("s3")
         try:
             # ".y" in the end of the prefix to include both ".yaml" and ".yml" files
+            volume_service = VolumeService()
             lineage_path_pattern = f"metadata/datalake_{schema}_clean/{table_name}.y"
-            objects_metadata = s3_client.list_objects_v2(
-                Bucket=self.data_documentation_bucket, Prefix=lineage_path_pattern
+            volume_objects = volume_service.list_objects_by_prefix(
+                f"{self.data_documentation_volume_path}/{lineage_path_pattern}"
             )
-            object_key = objects_metadata["Contents"][0]["Key"]
-            object_body = s3_client.get_object(
-                Bucket=self.data_documentation_bucket, Key=object_key
-            )["Body"]
-            metadata = yaml.safe_load(object_body)
+            object_key = volume_objects[0]
+            metadata = yaml.safe_load(volume_service.read_file(object_key))
         except KeyError:
             raise ValueError(
                 f"The primary keys of the table {schema}.{table_name} could not be automatically identified, because the metadata file was not found in expected "
-                f"path: s3://{self.data_documentation_bucket}/{lineage_path_pattern}ml. Please, create the lineage file or provide the primary keys manually in DAG Declaration file."
+                f"path: {self.data_documentation_volume_path}/{lineage_path_pattern}ml. Please, create the lineage file or provide the primary keys manually in DAG Declaration file."
             )
         except yaml.YAMLError:
             raise ValueError(
                 f"The primary keys of the table {schema}.{table_name} could not be automatically identified, because "
-                f"s3://{self.data_documentation_bucket}/{object_key} is not a valid YAML file. Please, fix the lineage file or "
+                f"{self.data_documentation_volume_path}/{object_key} is not a valid YAML file. Please, fix the lineage file or "
                 "provide the primary keys manually in DAG Declaration file."
             )
 

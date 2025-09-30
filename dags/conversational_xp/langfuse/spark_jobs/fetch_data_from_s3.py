@@ -15,7 +15,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 
 JOB_NAME = "load_langfuse_raw"

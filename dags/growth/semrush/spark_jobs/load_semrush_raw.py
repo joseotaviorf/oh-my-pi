@@ -25,7 +25,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services import S3Service
+from bietlejuice.services.storage_services import S3Service
 
 def _create_dataframe_with_standard_columns(response_data: dict, display_date: str) -> DataFrame:
 
