@@ -91,6 +91,7 @@ invoice_days AS (
 SELECT
     dc.id,
     dc.id_invoice,
+    id.dt_reference,
     dc.id_original_invoice_external,
     dc.id_account,
     dc.id_contract,
@@ -120,7 +121,6 @@ SELECT
     dc.is_write_off,
     dc.accrual_year_month_count,
     dc.dt_due_adjusted,
-    id.dt_reference,
     dc.ts_write_off,
     dc.ts_paid,
     dc.ts_payment_confirmation,

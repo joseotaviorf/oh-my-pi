@@ -101,6 +101,7 @@ calculate_dt_closing AS (
 SELECT
     id,
     id_invoice,
+    dt_closing,
     id_original_invoice_external,
     id_contract,
     id_account,
@@ -131,7 +132,6 @@ SELECT
     accrual_year_month_count,
     dt_due_adjusted,
     dt_month_end,
-    dt_closing,
     dt_snapshot,
     ts_write_off,
     ts_paid,

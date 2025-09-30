@@ -39,11 +39,10 @@ workflow:
       z_order_by: [dt_reference, id_contract]
     contract_aud_at_closing:
       z_order_by: [dt_closing, id_contract]
-
 cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: r5d.2xlarge
-    node_type_id: m5d.12xlarge
+    node_type_id: m5d.16xlarge
     num_workers: 4
     spark_version: 16.4.x-scala2.12
