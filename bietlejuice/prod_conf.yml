@@ -794,6 +794,14 @@ databricks_12_2_min_memory_photon_cluster:
     num_workers: 2
     spark_version: 12.2.x-scala2.12
 
+databricks_16_4_min_memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
 databricks_10_4_med_memory_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.8xlarge
