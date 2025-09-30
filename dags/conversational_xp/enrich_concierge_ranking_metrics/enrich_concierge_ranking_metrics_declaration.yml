@@ -9,14 +9,9 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
+  default_partitions: [year, month, day]
   extra_query_template_params:
     "load_start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-  tables_customization:
-    ranking_metrics:
-      partitions:
-      - year
-      - month
-      - day
 
 cluster:
   type: databricks_13_3_med_general_cluster
