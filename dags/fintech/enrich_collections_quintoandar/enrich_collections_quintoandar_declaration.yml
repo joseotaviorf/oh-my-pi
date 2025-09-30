@@ -22,6 +22,8 @@ workflow:
       - matthew_interaction
     overdue_portfolio_timeline:
       - invoice_portfolio
+    collection_events:
+      - operators
   tables_customization:
     delinquency_app_events:
       extraction_type: incremental
