@@ -8,12 +8,12 @@ union_all_sources AS (
         'Interno' AS user_type,
         NULL AS user_department,
         NULL AS agency_type,
-        'COBRANÇA_INTERNA_QA' AS agency_name,
+        'COBRANÇA_INTERNA' AS agency_name,
         CASE
           WHEN UPPER(id_operator_registration) = "PASCHOAL" THEN "PASCHOALOTTO"
           WHEN UPPER(id_operator_registration) LIKE "%PORTAL%" THEN "PORTAL_QUINTOANDAR"
-          WHEN LOWER(operator_login_code) LIKE "%@quintoandar.com.br" THEN "COBRANÇA_INTERNA_QA"
-          WHEN UPPER(id_operator_registration) = "QUINTO" THEN "COBRANÇA_INTERNA_QA"
+          WHEN LOWER(operator_login_code) LIKE "%@quintoandar.com.br" THEN "COBRANÇA_INTERNA"
+          WHEN UPPER(id_operator_registration) = "QUINTO" THEN "COBRANÇA_INTERNA"
           WHEN LOWER(operator_login_code) LIKE "%@sysopen.com.br" THEN "SYSOPEN"
           WHEN UPPER(id_operator_registration) LIKE "SERASA%" THEN "SERASA"
           ELSE UPPER(id_operator_registration)
@@ -130,4 +130,4 @@ SELECT DISTINCT
     ts_user_created,
     NOW() AS ts_load
 FROM union_all_sources
-QUALIFY ROW_NUMBER() OVER(PARTITION BY id_operator, company_name ORDER BY priority, ts_user_created DESC) = 1
+QUALIFY ROW_NUMBER() OVER(PARTITION BY id_operator ORDER BY priority, ts_user_created DESC) = 1

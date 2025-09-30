@@ -68,7 +68,10 @@ union_logs AS (
         COALESCE(o.company_name, c.operator_agency, r.operator_agency) AS operator_agency,
         CONCAT_WS(" | ", c.source, r.source) AS source,
         c.phone_number,
-        COALESCE(IF(c.source = 'Cyber (Migração)', r.action, c.action), r.action) AS action,
+        CASE
+            WHEN c.source = 'Cyber (Migração)' THEN COALESCE(r.action, c.action)
+            ELSE COALESCE(c.action, r.action)
+        END AS action,
         c.action_code_type,
         c.action_description,
         c.result,
