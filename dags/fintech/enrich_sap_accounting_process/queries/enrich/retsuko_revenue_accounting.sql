@@ -1,4 +1,45 @@
-WITH sap_entity AS (
+WITH invoice AS (
+  SELECT
+    i.id,
+    i.id_contract,
+    i.id_external,
+    i.accrual_year_month,
+    DATE(CASE 
+          WHEN LOWER(paid_via) IN (
+            'bank-transfer'
+            ,'checkout-credit-card'
+            ,'credit-card'
+            ,'cyber-credit-card'
+            ,'recupera-credit-card'
+            ,'recurrent-credit-card'
+            ,'seumadruga-credit-card'
+            ,'collector-5a-pix'
+            ,'cyber-pix'
+            ,'recupera-pix'
+            ,'icatu-paid'
+            ,'paypal'
+            ,'unknown'
+            ,'internet-banking'
+            ,'non-specified')
+          THEN i.ts_paid
+          WHEN LOWER(paid_via) IN (
+            'cnab'
+            ,'checkout-boleto'
+            ,'cyber-boleto'
+            ,'recupera'
+            ,'collector-5a')
+            THEN dd.next_brz_fintech_business_day
+          ELSE i.ts_paid
+    END) AS ts_paid,
+    i.is_write_off
+  FROM 
+    datalake_retsuko.invoice AS i
+  LEFT JOIN 
+    dw_public.dim_date AS dd 
+      ON DATE(i.ts_paid) = dd.date
+),
+
+  sap_entity AS (
   SELECT
     id_finance_entity,
     id_sap_gateway_feature,
@@ -42,7 +83,7 @@ retsuko_entry AS (
     datalake_retsuko_clean.account AS at
       ON e.id_to_account = at.id
   LEFT JOIN
-    datalake_retsuko.invoice i
+    invoice i
       ON e.id_invoice = i.id
   LEFT JOIN
     datalake_retsuko_clean.contract ct
@@ -85,7 +126,7 @@ retsuko_invoice AS (
   FROM
     datalake_retsuko.entry  e
   INNER JOIN
-    datalake_retsuko.invoice i
+    invoice i
       ON e.id_invoice = i.id
   INNER JOIN
     datalake_retsuko_clean.contract ct

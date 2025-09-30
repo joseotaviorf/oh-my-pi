@@ -295,10 +295,10 @@ bietlejuice.dw_credit_evers:
   - bietlejuice.retsuko:load-clean-account:first-run-of-day
 bietlejuice.dw_credit_passport:
   - bietlejuice.docx:load-clean-credit-evaluation-aud:first-run-of-day
-  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation-proponent:first-run-of-day
-  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.docx:load-clean-group-member:first-run-of-day
   - bietlejuice.docx:load-clean-group:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation-proponent:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine:first-run-of-day
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation-events:first-run-of-day
@@ -1916,7 +1916,6 @@ bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-lineage-and-tags:first-run-of-day
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation-aud:first-run-of-day
-  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
   - bietlejuice.docx:load-clean-document-context:first-run-of-day
   - bietlejuice.docx:load-clean-document-type:first-run-of-day
   - bietlejuice.docx:load-clean-document:first-run-of-day
@@ -1927,6 +1926,7 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-person-document:first-run-of-day
   - bietlejuice.docx:load-clean-person:first-run-of-day
   - bietlejuice.docx:load-clean-rev-info:first-run-of-day
+  - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_finance:load-clean-account-transaction:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
@@ -3304,6 +3304,8 @@ bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead:first-run-of-day
   - bietlejuice.enrich_listing_flow:load-enrich-sales-listing-flows-with-reprocessed-leads:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks:first-run-of-day
+bietlejuice.enrich_sale_salesforce:
+  - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_status:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
