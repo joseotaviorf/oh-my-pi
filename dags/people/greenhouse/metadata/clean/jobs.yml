@@ -2,7 +2,11 @@ database_name: datalake_greenhouse_clean
 table_name: jobs
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: Table containing job data, sourced from the Greenhouse Harvest API's 'jobs' endpoint.
+description: >-
+  Table containing job data, sourced from the Greenhouse Harvest API's 'jobs' endpoint.
+  Although present in this table, the following specific custom fields belong to the 'job_openings' table and should be consulted there: affirmative_focus, band, company, equity_options_exception, internal_job_name, salary_range, plr, rvv, sop, salary_table, work_hours, workplace.
+  Additionally, the 'notes' field is null and its data should be consumed from the 'datalake_greenhouse_v3_clean.job_notes' table.
+
 columns:
   id:
     description: "The job's unique identifier."
@@ -36,38 +40,14 @@ columns:
     description: "The current status of the job."
     lineage:
       - datalake_greenhouse_raw.jobs.status
-  internal_job_name:
-    description: "The internal name for the job position."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.internal_position_name___quinto_andar_sp.value
-  band:
-    description: "The salary band for the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.band.value
   career_path:
     description: "The career path associated with the job."
     lineage:
       - datalake_greenhouse_raw.jobs.keyed_custom_fields.career_path.value
-  salary_table:
-    description: "The salary scale or table for the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.salary_scale.value
-  affirmative_focus:
-    description: "Specifies the affirmative action focus for the job, if any."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.affirmative_focus.value
-  company:
-    description: "The company associated with the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.company.value
   l1_full_name:
     description: "The full name of the primary leadership (L1) for this position."
     lineage:
       - datalake_greenhouse_raw.jobs.keyed_custom_fields.l1.value
-  workplace:
-    description: "The workplace model for the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.workplace.value
   careers_page_area:
     description: "Name of the area of interest associated with the job on the careers page."
     lineage:
@@ -76,58 +56,6 @@ columns:
     description: "The employment type for the job."
     lineage:
       - datalake_greenhouse_raw.jobs.keyed_custom_fields.employment_type.value
-  work_hours:
-    description: "The expected work hours for the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.work_hours.value
-  notes:
-    description: "Notes associated with the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.notes
-  salary_range_currency:
-    description: "The currency for the monthly salary range."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.monthly_salary_range.value.unit
-  plr_currency:
-    description: "The currency for the PLR (Profit Sharing) value."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.plr.value.unit
-  rvv_currency:
-    description: "The currency for the RVV (Variable Sales Commission) value."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.rvv.value.unit
-  sop_currency:
-    description: "The currency for the SOP (Stock Options Plan) value."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.sop.value.unit
-  equity_options_min:
-    description: "The minimum monetary value/amount for equity options approval exception range."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.equity_options_approval_exception_range.value.min_value
-  equity_options_max:
-    description: "The maximum monetary value/amount for equity options approval exception range."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.equity_options_approval_exception_range.value.max_value
-  salary_range_min:
-    description: "The minimum monthly salary for the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.monthly_salary_range.value.min_value
-  salary_range_max:
-    description: "The maximum monthly salary for the job."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.monthly_salary_range.value.max_value
-  plr:
-    description: "The PLR (Profit Sharing) monetary value/amount."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.plr.value.value
-  rvv:
-    description: "The RVV (Variable Sales Commission) monetary value/amount."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.rvv.value.value
-  sop:
-    description: "The SOP (Stock Options Plan) monetary value/amount."
-    lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.sop.value.value
   is_confidential:
     description: "A boolean flag indicating if the job is confidential."
     lineage:
