@@ -12,9 +12,35 @@ WITH owners_to_process AS (
 daily_house_listing AS (
   SELECT
     hldi.id_owner,
-    COALESCE(l.dejavuid, CAST(hldi.id_house AS STRING)) AS uniqueid,
+    CONCAT(
+      COALESCE(l.dejavuid, CAST(hldi.id_house AS STRING)),
+      CASE 
+        -- Only process complement if it exists and is not empty after trimming
+        WHEN h.complement IS NOT NULL AND TRIM(h.complement) != '' 
+        THEN CONCAT('.', 
+          -- Remove multiple consecutive spaces and replace with empty string
+          -- This cleans up any extra spaces left after removing keywords
+          REGEXP_REPLACE(
+            -- Remove common property-related keywords that add noise
+            -- This regex matches any of the specified keywords and removes them entirely
+            REGEXP_REPLACE(
+              -- Remove all special characters, keeping only letters, numbers, and spaces
+              -- [^a-zA-Z0-9\\s] matches any character that is NOT alphanumeric or space
+              -- This normalizes the text by removing punctuation, etc.
+              REGEXP_REPLACE(LOWER(TRIM(h.complement)), '[^a-zA-Z0-9\\s]', ''),
+              -- Matches common property terms that don't add uniqueness
+              -- Groups keywords with | (OR operator) to match any of them
+              '(?i)(apto|apartamento|casa|sobrado|kitnet|studio|cobertura|casas|terrea|duplex|flat|loft|bloco|torre|apt|aptm|ap[êe]|bl|ap|edificio|condominio|edif[íi]cio|condom[íi]nio|residencial|unidade|bloc|edf|predio|residence|conj)',
+              '' -- Replace matches with empty string (remove them)
+            ),
+            '\\s+', -- Match one or more consecutive whitespace characters
+            ''      -- Replace with empty string to remove all spaces
+          )
+        )
+        ELSE '' -- If complement is null or empty, don't add anything to the unique ID
+      END
+    ) AS uniqueid,
     hldi.id_house,
-    IF(c.status = 'Ativo', TRUE, FALSE) AS has_ongoing_contract,
     CASE
       WHEN
         hldi.status_history = 'alugado'
@@ -49,17 +75,15 @@ daily_house_listing AS (
       LEFT JOIN
         vespucio_prod_delta.listings AS l
         ON l.source_id::bigint = hldi.id_house
-      LEFT JOIN 
-        datalake_ebdb_contract.contract AS c
-        ON c.id_house = hldi.id_house
-          AND c.is_ongoing_contract = true
+      LEFT JOIN
+        datalake_ebdb_listing.house AS h
+        ON h.id = hldi.id_house
 ),
 daily_owner_stats AS (
   SELECT
     id_owner,
     uniqueid,
     collect_set(id_house) AS id_houses,
-    COUNT_IF(has_ongoing_contract) AS ongoing_contracts,
     CASE
       WHEN array_contains(collect_set(status), 'RENTED') THEN 'RENTED'
       WHEN array_contains(collect_set(status), 'SUSPENDED') THEN 'SUSPENDED'
@@ -87,7 +111,7 @@ pp_multi_daily_stats AS (
       ELSE 'LIFETIME'
     END AS classification_window,
     make_date(year, month, day) AS stats_date,
-    SUM(ongoing_contracts) AS ongoing_contracts,
+    COUNT_IF(status IN ('RENTED', 'SUSPENDED', 'PUBLISHED')) AS ongoing_houses,
     COUNT_IF(status = 'RENTED') AS houses_rented,
     COUNT_IF(status = 'SUSPENDED') AS houses_suspended,
     COUNT_IF(status = 'PUBLISHED') AS houses_published,
@@ -105,7 +129,7 @@ pp_multi_classification_window AS (
     id_owner,
     classification_window,
     MAX_BY(houses, stats_date) AS houses,
-    MAX(GREATEST(houses_rented, ongoing_contracts) + houses_suspended + houses_published) AS max_ongoing_houses,
+    MAX(ongoing_houses) AS max_ongoing_houses,
     MAX(houses_rented) AS max_houses_rented,
     MAX(houses_suspended) AS max_houses_suspended,
     MAX(houses_published) AS max_houses_published,
