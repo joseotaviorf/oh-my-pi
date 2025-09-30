@@ -223,6 +223,7 @@ rent_flows AS (
     END AS is_guarantee_accepted, --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
     pp.is_single_tenant,
     IF(pt.proposal_proponent_type = 'PERSON', TRUE, FALSE) AS is_renting_for_others,
+    IF(sh_p.proposal_source = 'PASSPORT', TRUE, FALSE) AS is_credit_passport,
     pp.total_proposal_proponents
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
@@ -256,6 +257,9 @@ rent_flows AS (
   LEFT JOIN
     first_credit_evaluation AS cev
       ON cev.id_proposal = flrf.sk_proposal
+  LEFT JOIN
+    datalake_sorting_hat_clean.proposal AS sh_p
+      ON sh_p.id = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
@@ -338,6 +342,7 @@ proposal_credit_flows AS (
     END AS is_early_credit,
     rf.is_single_tenant,
     rf.is_renting_for_others,
+    rf.is_credit_passport,
     rf.total_proposal_proponents,
     rf.dt_tenant_doc_complete_date,
     rf.dt_credit_analysis_approved_date,
@@ -422,6 +427,7 @@ early_credit_full (
     TRUE AS is_early_credit,
     CAST(NULL AS BOOLEAN) AS is_single_tenant,
     CAST(NULL AS BOOLEAN) AS is_renting_for_others,
+    CAST(NULL AS BOOLEAN) AS is_credit_passport,
     CAST(NULL AS INTEGER) AS total_proposal_proponents,
     eca.dt_early_credit_created,
     eca.dt_early_credit_expired,
@@ -499,6 +505,7 @@ SELECT
   is_early_credit,
   is_single_tenant,
   is_renting_for_others,
+  is_credit_passport,
   total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
@@ -583,6 +590,7 @@ SELECT
   is_early_credit,
   is_single_tenant,
   is_renting_for_others,
+  is_credit_passport,
   total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
@@ -715,6 +723,7 @@ SELECT
   IF(dt_tenant_first_doc_sent_date IS NOT NULL AND rr.resend_request IS NOT NULL, TRUE, FALSE) AS is_resend_request,
   is_single_tenant,
   is_renting_for_others,
+  is_credit_passport,
   total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
