@@ -225,6 +225,10 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Column ep_house_id from Amplitude events
+  up_ab_beakman_native_demand_property_card_toggle:
+    lineage:
+      - datalake_amplitude_clean.events.up_ab_beakman_native_demand_property_card_toggle
+    description: Column with the feature flag for the natives property card demand experiment
   id_search:
     lineage:
     - datalake_amplitude_clean.events.event_properties

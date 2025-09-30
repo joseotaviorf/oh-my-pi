@@ -12,6 +12,7 @@ SELECT
     id_inserted,
     idfa,
     STRING(GET_JSON_OBJECT(event_properties, '$.house_id')) AS ep_house_id,
+    STRING(GET_JSON_OBJECT(user_properties, '$.ab_beakman_native_demand_property_card_toggle')) AS up_ab_beakman_native_demand_property_card_toggle,
     GET_JSON_OBJECT(event_properties, '$.search_id') AS id_search,
     TRANSFORM(FROM_JSON(GET_JSON_OBJECT(event_properties, '$.search_results_list'), 'array<string>'), x -> X::BIGINT) AS ids_search_results_list,
     event_type,
@@ -60,7 +61,7 @@ SELECT
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_campaign=([^&|$]+)', 1), ''), 'direct') AS up_utm_campaign,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_content=([^&|$]+)', 1), ''), 'direct') AS up_utm_content,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_term=([^&|$]+)', 1), ''), 'direct') AS up_utm_term,
-    CASE 
+    CASE
         WHEN GET_JSON_OBJECT(event_properties , '$.top5_house_id') <> '[]'
             THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
         ELSE NULL
