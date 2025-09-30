@@ -33,6 +33,31 @@ get_agency_group_name AS (
   FROM deduplicate_agency_group AS ag
   LEFT JOIN datalake_cyber_clean.agency AS a
     ON ag.id_agency = a.id_agency
+),
+ordered_logs AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number) AS rn
+  FROM datalake_cyber_clean.logs
+),
+concatenate_comments AS (
+  SELECT
+    id_contract,
+    contract_group,
+    id_user,
+    ts_activity,
+    CONCAT_WS('', COLLECT_LIST(comment)) AS comment,
+    MAX(CASE WHEN rn = 1 THEN creditor END) AS creditor,
+    MAX(CASE WHEN rn = 1 THEN region_code END) AS region_code,
+    MAX(CASE WHEN rn = 1 THEN action END) AS action,
+    MAX(CASE WHEN rn = 1 THEN result END) AS result,
+    MAX(CASE WHEN rn = 1 THEN complement END) AS complement,
+    MAX(CASE WHEN rn = 1 THEN phone_number END) AS phone_number,
+    MAX(CASE WHEN rn = 1 THEN phone_extension END) AS phone_extension,
+    MAX(CASE WHEN rn = 1 THEN latitude END) AS latitude,
+    MAX(CASE WHEN rn = 1 THEN longitude END) AS longitude
+  FROM ordered_logs
+  GROUP BY id_contract, contract_group, id_user, ts_activity
 )
 SELECT
   l.creditor,
@@ -94,7 +119,7 @@ SELECT
   END AS promessa,
   l.ts_activity AS ts_occurrence,
   NOW() AS ts_load
-FROM datalake_cyber_clean.logs AS l
+FROM concatenate_comments AS l
 LEFT JOIN datalake_cyber_clean.contracts AS c
   ON l.id_contract = c.id_contract
 LEFT JOIN datalake_cyber_clean.users AS u
@@ -124,4 +149,3 @@ LEFT JOIN map_type_occurrence AS mto
       (mto.complement_code IS NULL AND l.complement IS NULL)
         OR mto.complement_code = l.complement
     )
-QUALIFY ROW_NUMBER() OVER(PARTITION BY l.id_contract, l.contract_group, UPPER(l.id_user), l.action, l.result, l.complement, l.comment, l.ts_activity ORDER BY l.ts_activity) = 1

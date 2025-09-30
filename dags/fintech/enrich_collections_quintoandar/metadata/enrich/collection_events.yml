@@ -1,0 +1,59 @@
+---
+database_name: datalake_collections_quintoandar
+table_name: collection_events
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Table containing logs and events of collection actions for delinquent customers, consolidating data from Cyber and Recupera sources. Records include automated dialer attempts, email campaigns, SMS messages, and other collection activities with their outcomes."
+columns:
+  id_collection:
+    description: "Unique identifier for the collection event generated through MD5 hash based on key event fields (customer, contract, creditor, operator, phone number, action, result, complement, occurrence description, and timestamp)"
+  id_customer:
+    description: "Unique identifier of the delinquent customer (e.g., '00001735683')"
+  id_contract:
+    description: "Identifier of the contract associated with the collection event (e.g., '719450')"
+  creditor:
+    description: "Creditor name associated with the contract ('IQ QuintoAndar' for creditor IDs 1,4,7,8,9 or 'PP QuintoAndar' for creditor IDs 2,6)"
+  id_operator:
+    description: "Identifier of the collection operator responsible for the action (e.g., 'PSC09999', 'PSC02001')"
+  operator_agency:
+    description: "Name of the collection agency/company (e.g., 'PASCHOALOTTO', 'WEBHELP')"
+  phone_number:
+    description: "Phone number used for the collection contact attempt (only available from Cyber source)"
+  source:
+    description: "Data source of the event ('Cyber' for automated systems, 'Recupera' for manual collection, 'Cyber (Migração)' for migrated records, or combined sources separated by ' | ')"
+  action:
+    description: "Action code executed in the collection process (e.g., 'DI' for dialer, 'EM' for email, 'HS' for high structured message)"
+  action_code_type:
+    description: "Type or category of the executed action code (e.g., 'Ação')"
+  action_description:
+    description: "Textual description of the executed action (e.g., 'Discador', 'Email', 'High Structured Message')"
+  result:
+    description: "Result code obtained after executing the collection action (e.g., 'DD' for dialer result, 'NN' for no result)"
+  result_code_type:
+    description: "Type or category of the result code (e.g., 'Resultado')"
+  result_description:
+    description: "Textual description of the result obtained (e.g., 'Ligação Sem Sucesso', 'Enviado')"
+  complement:
+    description: "Complementary information about the executed collection action (e.g., 'DF' for document/letter)"
+  complement_code_type:
+    description: "Type or category of the complement code (e.g., 'Carta')"
+  complement_description:
+    description: "Textual description of the complementary information (e.g., 'Telefone Caixa Postal')"
+  occurrence_description:
+    description: "Detailed description of the occurrence/event (e.g., 'DISCADOR ATENDIDO POR MÁQUINA 31987641279', 'EMAIL MASSIVO DIGITAL')"
+  esforco:
+    description: "Effort level indicator applied in the collection process (1 = effort applied, 0 = no effort)"
+  alo:
+    description: "ALO (Local Origin Service) indicator related to the event (1 = ALO applied, 0 = not applied)"
+  cpc:
+    description: "CPC (Contact Per Customer) indicator related to the collection event (1 = CPC applied, 0 = not applied)"
+  promisse:
+    description: "Payment promise indicator made by the customer (1 = promise made, 0 = no promise)"
+  agreement:
+    description: "Agreement indicator established with the customer for debt settlement (1 = agreement made, 0 = no agreement)"
+  failure:
+    description: "Failure or unsuccessful indicator in the collection process (null = no failure, 1 = failure occurred, only available from Recupera source)"
+  ts_occurrence:
+    description: "Timestamp of when the collection event occurred (e.g., '2025-09-25T16:21:33.000+00:00')"
+  ts_load:
+    description: "Timestamp of data loading into the table (e.g., '2025-09-29T20:59:16.729+00:00')"

@@ -172,8 +172,8 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-negotiation:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-operators:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-collection-events:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-agencies:first-run-of-day
-  - bietlejuice.enrich_cyber:load-enrich-collection:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-queue-timeline:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-debt:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-installment:first-run-of-day
@@ -1594,6 +1594,7 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.trato_feito:load-clean-client:first-run-of-day
   - bietlejuice.trato_feito:load-clean-contract:first-run-of-day
   - bietlejuice.trato_feito:load-clean-debt:first-run-of-day
+  - bietlejuice.enrich_cyber:load-enrich-collection:first-run-of-day
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose-person:first-run-of-day
   - bietlejuice.enrich_velo:load-enrich-propose:first-run-of-day

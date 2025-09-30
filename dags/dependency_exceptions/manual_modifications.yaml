@@ -134,7 +134,6 @@ bietlejuice.dw_losses:
     - bietlejuice.enrich_losses:load-enrich-provision-factor:first-run-of-day
 bietlejuice.dw_collection_recovery_quintoandar:
   remove:
-    - bietlejuice.enrich_recupera:load-enrich-collection:first-run-of-day
     - bietlejuice.enrich_recupera:load-enrich-contract-advisory-distribution:first-run-of-day
     - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
     - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
@@ -271,6 +270,7 @@ bietlejuice.enrich_collections_quintoandar:
     - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
     - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
     - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-collection:first-run-of-day
     - bietlejuice.webhelp:load-clean-login:first-run-of-day
     - bietlejuice.grb:load-clean-operators:first-run-of-day
     - bietlejuice.meetcall:load-clean-operators:first-run-of-day
