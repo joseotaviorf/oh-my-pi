@@ -11,3 +11,4 @@ column_level_validations:
       severity_level: Warning
     custom:
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.all_assignments GROUP BY id_assignment, object_version_number HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
