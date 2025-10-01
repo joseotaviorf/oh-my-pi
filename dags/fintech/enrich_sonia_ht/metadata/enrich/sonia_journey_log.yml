@@ -1,0 +1,64 @@
+database_name: datalake_sonia_ht
+table_name: sonia_journey_log
+description: |
+  This table consolidates experimentation data from Sonia, the AI agent designed
+  to proactively engage users and reduce friction in the rental process.
+
+  Data is sourced from HighTouch journey logs, metadata and sync changelog.
+  Each row represents a user journey transition with experiment segmentation
+  (Test, Control, Out of Experiment) and proposal-level attributes synced via HighTouch.
+domain: Fintech
+owner: luana.silvia@quintoandar.com.br
+columns:
+  row_instance_id:
+    lineage:
+      - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.row_instance_id
+    description: "Unique identifier of the journey instance, used to link with sync changelog."
+  user_id:
+    lineage:
+      - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.row_id
+    description: "User identifier associated with the journey row."
+  timestamp:
+    lineage:
+      - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.timestamp
+    description: "Timestamp of the journey transition."
+  sync_id:
+    lineage:
+      - hightouch_audit.sync_changelog.sync_id
+    description: "Identifier of the HighTouch sync definition."
+  sync_run_id:
+    lineage:
+      - hightouch_audit.sync_changelog.sync_run_id
+    description: "Identifier of the specific HighTouch sync run."
+  group_name:
+    lineage:
+      - hightouch_planner.journey_metadata_93d2e2b5d82c486db22aa5209dddf354.node_name
+    description: "Experiment assignment label derived from journey metadata (Test, Control, Out of Experiment)."
+  proposal_id:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.id_proposal
+    description: "Proposal identifier from fields JSON."
+  is_bypass:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.is_bypass
+    description: "Boolean flag indicating if the proposal bypassed standard credit evaluation."
+  is_credit_passport:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.is_credit_passport
+    description: "Boolean flag indicating if the proposal originated from a Credit Passport flow."
+  is_free_guarantee_offered:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.is_free_guarantee_offered
+    description: "Boolean flag indicating if a free guarantee was offered."
+  is_light_approval:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.is_light_approval
+    description: "Boolean flag indicating if the proposal was a light approval."
+  is_only_one_active_offer:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.is_only_one_active_offer
+    description: "Boolean flag indicating if the user had only one active offer at the time."
+  is_single_tenant:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.is_single_tenant
+    description: "Boolean flag indicating if the proposal had a single tenant."
