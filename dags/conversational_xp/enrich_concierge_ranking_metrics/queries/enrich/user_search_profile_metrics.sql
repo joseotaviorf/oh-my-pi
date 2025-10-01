@@ -9,8 +9,8 @@ WITH actuals AS (
     datalake_rent_flows.rent_flows
 
   WHERE
-    DATE(ts_rent_flow_event) < DATE('{load_start_date}') 
-    AND DATE(ts_rent_flow_event) >= DATE_SUB(DATE('{load_start_date}'), 1)
+    DATE(ts_rent_flow_event) <= DATE('{load_end_date}') 
+    AND DATE(ts_rent_flow_event) >= DATE('{load_start_date}')
     AND country_code = 'BR'
     AND (
       ts_visit_completed IS NOT NULL 
@@ -33,8 +33,8 @@ WITH actuals AS (
     datalake_sale_flows.sale_flow
 
   WHERE
-    DATE(ts_first_event) < DATE('{load_start_date}') 
-    AND DATE(ts_first_event) >= DATE_SUB(DATE('{load_start_date}'), 1)
+    DATE(ts_first_event) <= DATE('{load_end_date}') 
+    AND DATE(ts_first_event) >= DATE('{load_start_date}')
     AND (
       ts_first_visit_completed IS NOT NULL 
       OR ts_first_offer_submitted IS NOT NULL
@@ -66,7 +66,7 @@ house_main AS (
     wonka.house_main 
 
   WHERE
-    MAKE_DATE(year, month, day) <= DATE('{load_start_date}')
+    MAKE_DATE(year, month, day) <= DATE('{load_end_date}')
     AND is_for_rent = TRUE
 
   UNION ALL
@@ -89,7 +89,7 @@ house_main AS (
     wonka.house_main 
 
   WHERE
-    MAKE_DATE(year, month, day) <= DATE('{load_start_date}')
+    MAKE_DATE(year, month, day) <= DATE('{load_end_date}')
     AND is_for_sale = TRUE
 
 ),
@@ -129,7 +129,7 @@ clusters AS (
       AND act.business_context = 'rent'
 
   WHERE
-    MAKE_DATE(uspc.year, uspc.month, uspc.day) < DATE('{load_start_date}')
+    MAKE_DATE(uspc.year, uspc.month, uspc.day) <= DATE('{load_end_date}')
 
   UNION ALL
 
@@ -167,7 +167,7 @@ clusters AS (
       AND act.business_context = 'sale'
 
   WHERE
-    MAKE_DATE(uspc.year, uspc.month, uspc.day) < DATE('{load_start_date}')
+    MAKE_DATE(uspc.year, uspc.month, uspc.day) <= DATE('{load_end_date}')
 
 ),
 
