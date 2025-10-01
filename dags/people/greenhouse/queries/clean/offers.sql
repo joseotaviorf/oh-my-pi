@@ -26,7 +26,7 @@ SELECT
     CAST(keyed_custom_fields.include_hiring_bonus.value AS BOOLEAN) AS has_hiring_bonus,
     -- dates & timestamps
     CAST(keyed_custom_fields.offer_expiration_date.value AS DATE) AS dt_offer_expires,
-    CAST(FROM_JSON(keyed_custom_fields.trial_period, 'struct<value:string>').value AS DATE) AS dt_trial_period_ends,
+    CAST(keyed_custom_fields.trial_period.value AS DATE) AS dt_trial_period_ends,
     CAST(created_at AS TIMESTAMP) AS ts_created,
     CAST(updated_at AS TIMESTAMP) AS ts_updated,
     CAST(sent_at AS TIMESTAMP) AS ts_sent,
