@@ -47,6 +47,7 @@ WITH adhoc_rules AS (
     dpce.product_origin,
     dpce.is_3p_demand,
     CASE
+      WHEN dpce.product_origin = 'WHATSAPP_CONCIERGE' THEN "Concierge"
       WHEN dpce.booking_creator IS NULL AND dpce.id_booking IS NOT NULL THEN "Lost Tracking"
       WHEN dpce.booking_creator IS NULL AND dpce.id_booking IS NULL THEN "SelfService"
       WHEN dpce.booking_creator = 'SelfService' THEN 'SelfService'
