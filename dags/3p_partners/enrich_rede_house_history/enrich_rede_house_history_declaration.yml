@@ -11,7 +11,7 @@ workflow:
   layer: enrich
   tables_customization:
     rede_house_history:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:

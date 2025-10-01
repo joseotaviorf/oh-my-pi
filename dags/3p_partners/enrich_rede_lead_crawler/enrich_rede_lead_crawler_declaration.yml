@@ -11,7 +11,7 @@ workflow:
   layer: enrich
   tables_customization:
     lead_3p_freshness:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:

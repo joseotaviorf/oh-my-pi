@@ -12,13 +12,13 @@ workflow:
     - listing_accuracy_history
   tables_customization:
     listing_accuracy_history:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     listing_accuracy:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:

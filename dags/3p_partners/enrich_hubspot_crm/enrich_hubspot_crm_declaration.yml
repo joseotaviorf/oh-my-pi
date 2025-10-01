@@ -53,13 +53,13 @@ workflow:
     - ticket
   tables_customization:
     company_contact:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     company_history:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
@@ -70,19 +70,19 @@ workflow:
         - month
         - day
     company_members:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     company_status:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     company:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:

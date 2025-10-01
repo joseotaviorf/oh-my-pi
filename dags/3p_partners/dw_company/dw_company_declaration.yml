@@ -10,19 +10,19 @@ workflow:
   custom_schema: public
   tables_customization:
     dim_company_3p_partners:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     dim_company_event_type:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     fact_company_events:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:

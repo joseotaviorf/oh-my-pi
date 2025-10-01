@@ -10,25 +10,25 @@ workflow:
   custom_schema: hubspot
   tables_customization:
     cluster_updates:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     company_events:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     membership_updates:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     owner_updates:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:

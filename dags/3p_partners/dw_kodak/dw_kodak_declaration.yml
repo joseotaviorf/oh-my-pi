@@ -53,13 +53,13 @@ workflow:
   custom_schema: public
   tables_customization:
     dim_kodak_photos:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
     fact_kodak_image_inspection:
-      default_table_privileges:
+      table_privileges:
         3p-readers:
           - SELECT
         data-engineers:
