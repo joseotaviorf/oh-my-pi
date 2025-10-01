@@ -124,6 +124,8 @@ columns:
   properties:
     lineage:
       - core_contract.contract.status
+      - core_contract.contract.dt_started
+      - core_contract.contract.dt_termination
       - core_credit_evaluation.credit_evaluation.status
       - core_credit_evaluation.credit_evaluation.ts_created
       - core_credit_evaluation.credit_evaluation.ts_expires
@@ -132,7 +134,9 @@ columns:
       - core_visit.visit.computed_status
       - core_visit.visit.ts_visit
       - datalake_terminator_clean.termination.status
+      - datalake_terminator_clean.termination.ts_created
       - datalake_ebdb_clean.inspection.status
+      - datalake_ebdb_clean.inspection.dt_inspected
       - datalake_ebdb_clean.listing_business_context.status
       - datalake_ebdb_clean.listing_business_context.status_reason
       - datalake_ebdb_clean.listing_business_context.ts_created

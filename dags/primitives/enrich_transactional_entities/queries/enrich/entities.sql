@@ -143,7 +143,9 @@ contract AS (
             'RENT' AS business_context,
             TO_JSON(
                 STRUCT(
-                    status AS status
+                    status AS status,
+                    dt_started AS dt_started,
+                    dt_termination AS dt_termination
                 )
             ) AS properties,
             CASE
@@ -199,7 +201,8 @@ termination AS (
       'RENT' AS business_context,
       TO_JSON(
         STRUCT(
-          status AS status
+          status AS status,
+          ts_created AS ts_created
         )
       ) AS properties,
       CASE
@@ -327,7 +330,8 @@ inspection AS (
       'RENT' AS business_context,
        TO_JSON(
         STRUCT(
-          ib.status AS status
+          ib.status AS status,
+          ib.dt_inspected AS dt_inspected
         )
       ) AS properties,
       CASE
