@@ -15,6 +15,10 @@ columns:
       - datalake_rent_demand_events.rent_demand_events.id_house
       - datalake_offer.sale_offer.id_house
     description: Unique identifier of the house associated with the offer.
+  id_contract:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_contract
+    description: Unique identifier of the contract (RENT only).
   id_prospect:
     lineage:
       - datalake_offer.sale_offer.id_buyer

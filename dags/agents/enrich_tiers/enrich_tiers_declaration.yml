@@ -29,8 +29,8 @@ workflow:
       merge_on: [id_metric_period, id_user]
       z_order_by: [id_metric_period, id_user]
     agent_performance:
-      merge_on: [id_metric_period, id_user]
-      z_order_by: [id_metric_period, id_user]
+      merge_on: [id_metric_period, id_user, is_valid]
+      z_order_by: [id_metric_period, id_user, is_valid]
     metric_events:
       merge_on: [id_metric_event]
       z_order_by: [id_metric_period, id_user]

@@ -20,6 +20,7 @@ simple_metrics AS (
         me.id_metric_period,
         me.final_metric AS metric,
         COUNT(DISTINCT me.id_external_domain) AS value,
+        me.is_valid,
         mp.dt_metric_period_started,
         mp.dt_metric_period_ended
     FROM
@@ -30,7 +31,6 @@ simple_metrics AS (
     WHERE 
         me.is_compound_metric_part IS FALSE
         AND me.is_cumulative_metric IS FALSE
-        AND me.is_valid IS TRUE
     GROUP BY ALL
 ),
 cumulative_metrics AS (
@@ -41,6 +41,7 @@ cumulative_metrics AS (
         me.id_metric_period,
         me.final_metric AS metric,
         SUM(COALESCE(me.cumulative_value, 0)) AS value,
+        me.is_valid,
         mp.dt_metric_period_started,
         mp.dt_metric_period_ended
     FROM
@@ -51,7 +52,6 @@ cumulative_metrics AS (
     WHERE 
         me.is_compound_metric_part IS FALSE
         AND me.is_cumulative_metric IS TRUE
-        AND me.is_valid IS TRUE
     GROUP BY ALL
 ),
 compound_metrics AS (
@@ -63,6 +63,7 @@ compound_metrics AS (
         me.partial_metric,
         me.final_metric AS metric,
         COUNT(DISTINCT me.id_external_domain) AS value,
+        me.is_valid,
         mp.dt_metric_period_started,
         mp.dt_metric_period_ended
     FROM
@@ -87,6 +88,7 @@ BP2CCV_compound_metric AS (
             WHEN COALESCE(cm.value/ cms.value, 0) > 1 THEN 1
             ELSE ROUND(COALESCE(cm.value/ cms.value, 0), 2)
         END AS value,
+        cm.is_valid,
         cm.dt_metric_period_started,
         cm.dt_metric_period_ended
     FROM
@@ -113,6 +115,7 @@ TP2CS_compound_metric AS (
             WHEN COALESCE(cm.value/ cms.value, 0) > 1 THEN 1
             ELSE ROUND(COALESCE(cm.value/ cms.value, 0), 2)
         END AS value,
+        cm.is_valid,
         cm.dt_metric_period_started,
         cm.dt_metric_period_ended
     FROM
@@ -139,6 +142,7 @@ OS2CCV_BY_compound_metric AS (
             WHEN COALESCE(cm.value/ cms.value, 0) > 1 THEN 1
             ELSE ROUND(COALESCE(cm.value/ cms.value, 0), 2)
         END AS value,
+        cm.is_valid,
         cm.dt_metric_period_started,
         cm.dt_metric_period_ended
     FROM

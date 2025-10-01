@@ -32,11 +32,7 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.bimester_start
     description: Partition year derived from dt_init.
-  month:
+  bimester:
     lineage:
-      - datalake_quintoandar.aux_date.bimester_start
-    description: Partition month derived from dt_init.
-  day:
-    lineage:
-      - datalake_quintoandar.aux_date.bimester_start
-    description: Partition day derived from dt_init.
+      - datalake_quintoandar.aux_date.bimester
+    description: Bimester number derived from dt_init.

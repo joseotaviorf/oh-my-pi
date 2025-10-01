@@ -371,6 +371,7 @@ negotiation_executive_prospects_simple_metrics AS (
             AND aa.id_metric_period = mp.id
     WHERE
         ap.business_context = "SALE"
+        AND aa.id_parent_user IS NOT NULL
     GROUP BY ALL
 ),
 negotiation_executive_prospects_compound_metrics AS (
@@ -408,6 +409,7 @@ negotiation_executive_prospects_compound_metrics AS (
             AND aa.id_metric_period = mp.id
     WHERE
         ap.business_context = "SALE"
+        AND aa.id_parent_user IS NOT NULL
     GROUP BY ALL
 ),
 union_metrics AS (

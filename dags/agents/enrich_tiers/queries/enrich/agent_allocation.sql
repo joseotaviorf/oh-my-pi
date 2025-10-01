@@ -49,4 +49,4 @@ WHERE
     mha.profile IN ('AGENT', 'NEGOTIATION_EXECUTIVE')
     AND mha.id_agent IS NOT NULL
 QUALIFY
-    1 = ROW_NUMBER() OVER(PARTITION BY mp.id, u.id_main_user ORDER BY mha.dt_reference DESC)
+    1 = ROW_NUMBER() OVER(PARTITION BY mp.id, u.id_main_user ORDER BY IF(mha.id_parent_user IS NOT NULL, 1, 0) DESC, mha.dt_reference DESC)

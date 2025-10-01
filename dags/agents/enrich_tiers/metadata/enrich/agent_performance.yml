@@ -29,6 +29,10 @@ columns:
     description: Metric name aggregated (e.g., CCV, GMV, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
   value:
     description: Aggregated metric value for the period (count or ratio depending on the metric definition).
+  is_valid:
+    lineage:
+      - datalake_tiers.metric_events.is_valid
+    description: Indicates whether the metric value is valid for the period and definition.
   dt_metric_period_started:
     lineage:
       - datalake_tiers.metric_period.dt_init
