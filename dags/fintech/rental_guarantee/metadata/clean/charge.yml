@@ -15,6 +15,22 @@ columns:
     lineage:
       - datalake_rental_guarantee_raw.charge.checkout_order_id
     description: "Identifier of the Checkout order associated with this charge."
+  id_subscription:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.subscription_id
+    description: "Identifier of the subscription associated with this charge."
+  id_invoice:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.invoice_id
+    description: "Identifier of the invoice associated with this charge."
+  id_external:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.external_id
+    description: "External identifier for the charge from third-party systems."
+  id_renewal:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.renewal_id
+    description: "Identifier of the renewal associated with this charge."
   cancellation_reason:
     lineage:
       - datalake_rental_guarantee_raw.charge.cancellation_reason
@@ -59,6 +75,22 @@ columns:
     lineage:
       - datalake_rental_guarantee_raw.charge.checkout_order_hash
     description: "Hash reference for the associated Checkout order."
+  value:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.value
+    description: "Monetary value of the charge."
+  fee:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.fee
+    description: "Fee amount associated with the charge."
+  external_info:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.external_info
+    description: "Additional information from external systems."
+  invoice_charge_code:
+    lineage:
+      - datalake_rental_guarantee_raw.charge.invoice_charge_code
+    description: "Code used for invoice charging purposes."
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.charge.created_at

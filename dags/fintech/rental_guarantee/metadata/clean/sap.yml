@@ -2,38 +2,96 @@
 database_name: datalake_rental_guarantee_clean
 table_name: sap
 owner: ae-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
+description: "SAP integration records for Rental Guarantee, including transaction details, payment entries, and metadata extracted from JSON requests."
 columns:
   id:
     lineage:
     - datalake_rental_guarantee_raw.sap.id
+    description: "Unique identifier of the SAP record."
   id_business_entity:
     lineage:
     - datalake_rental_guarantee_raw.sap.business_entity_id
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Business entity identifier from SAP record and JSON request."
   id_finance_entity:
     lineage:
     - datalake_rental_guarantee_raw.sap.finance_entity_id
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Finance entity identifier from SAP record and JSON request."
   id_feature:
     lineage:
     - datalake_rental_guarantee_raw.sap.feature_id
+    description: "Feature identifier associated with the SAP transaction."
+  id_external_payment:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "External payment identifier extracted from JSON request."
   transaction_name:
     lineage:
     - datalake_rental_guarantee_raw.sap.transaction_name
+    description: "Name of the SAP transaction."
   sap_status:
     lineage:
     - datalake_rental_guarantee_raw.sap.status
+    description: "Current status of the SAP transaction."
   request:
     lineage:
     - datalake_rental_guarantee_raw.sap.request
+    description: "Raw JSON request payload sent to SAP."
+  payment_entries:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Parsed payment entries array from JSON request, containing amount, payment details, transaction type, and finance entity entry ID."
+  description:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Description extracted from JSON request."
+  source_client:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Source client identifier extracted from JSON request."
+  reference_city:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Reference city extracted from JSON request."
+  reference_state:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Reference state extracted from JSON request."
+  unique_identifier:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Unique identifier extracted from JSON request."
+  finance_entity_type:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Finance entity type extracted from JSON request."
+  reference_year_month:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Reference year and month extracted from JSON request."
   response:
     lineage:
     - datalake_rental_guarantee_raw.sap.response
+    description: "Raw response payload received from SAP."
   trigger:
     lineage:
     - datalake_rental_guarantee_raw.sap.trigger
+    description: "Trigger that initiated the SAP transaction."
+  dt_due_date:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Due date extracted from JSON request and cast to DATE."
+  dt_event_date:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Event date extracted from JSON request and cast to DATE."
   ts_created:
     lineage:
     - datalake_rental_guarantee_raw.sap.created_at
+    description: "Creation timestamp of the SAP record."
   ts_updated:
     lineage:
     - datalake_rental_guarantee_raw.sap.updated_at
+    description: "Last update timestamp of the SAP record."

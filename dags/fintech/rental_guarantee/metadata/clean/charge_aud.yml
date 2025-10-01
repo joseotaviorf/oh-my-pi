@@ -15,6 +15,22 @@ columns:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.checkout_order_id
     description: "Identifier of the Checkout order associated with this charge."
+  id_subscription:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.subscription_id
+    description: "Identifier of the subscription associated with this charge."
+  id_invoice:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.invoice_id
+    description: "Identifier of the invoice associated with this charge."
+  id_external:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.external_id
+    description: "External identifier for the charge from third-party systems."
+  id_renewal:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.renewal_id
+    description: "Identifier of the renewal associated with this charge."
   rev:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.rev
@@ -71,6 +87,22 @@ columns:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.external_source
     description: "External system that originated the charge, when present."
+  value:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.value
+    description: "Monetary value of the charge."
+  fee:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.fee
+    description: "Fee amount associated with the charge."
+  external_info:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.external_info
+    description: "Additional information from external systems."
+  invoice_charge_code:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.invoice_charge_code
+    description: "Code used for invoice charging purposes."
   mod_id_guarantee:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.guarantee_id_mod
@@ -119,6 +151,26 @@ columns:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.checkout_order_id_mod
     description: "Flag indicating modification of checkout_order_id on this revision."
+  mod_value:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.value_mod
+    description: "Flag indicating modification of value on this revision."
+  mod_fee:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.fee_mod
+    description: "Flag indicating modification of fee on this revision."
+  mod_external_source:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.external_source_mod
+    description: "Flag indicating modification of external_source on this revision."
+  mod_external_info:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.external_info_mod
+    description: "Flag indicating modification of external_info on this revision."
+  mod_invoice_charge_code:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.invoice_charge_code_mod
+    description: "Flag indicating modification of invoice_charge_code on this revision."
   mod_ts_created:
     lineage:
       - datalake_rental_guarantee_raw.charge_aud.created_at_mod
