@@ -457,22 +457,19 @@ onboarding AS (
             id_contract,
             id_owner,
             id_tenant,
-            'FR_ONBOARDING' AS entity,
-            'RENT' AS business_context,
+            entity,
+            business_context,
             TO_JSON(
                 STRUCT(
                     status AS status,
                     ts_created AS ts_created
                 )
             ) AS properties,
-            CASE
-                WHEN status IN ('Finished', 'Aborted') THEN FALSE
-                ELSE TRUE
-            END AS is_active,
+            is_active,
             ts_created,
             ts_updated
         FROM
-            datalake_onboarding_entities.onboarding
+            datalake_entities_views.onboarding
     )
     SELECT
         id_entity,

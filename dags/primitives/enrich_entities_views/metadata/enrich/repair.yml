@@ -1,0 +1,71 @@
+database_name: datalake_entities_views
+table_name: repair
+description: Enriched view of repair requests data that consolidates repair information with tenant, house and owner details from associated contracts.
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.id
+    description: Primary key of the repair request entity.
+      It's the id from repair_request table, from Repairs service.
+  id_house:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.id_house
+      - core_contract.contract.id_house
+    description: Foreign key referencing the house entity where the repair is requested.
+      Uses COALESCE to get id_house from repair_request table first, fallback to core_contract.id_house if null.
+      It's the id from House table, from EBDB service (Main).
+  id_contract:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.id_contract
+    description: Foreign key referencing the contract entity associated with the repair request.
+      It's the id from Contract table, from EBDB service (Main).
+  id_tenant:
+    lineage:
+      - core_contract.contract.id_tenant
+    description: Foreign key referencing the tenant entity, sourced from the contract.
+      It's the id from User table, from EBDB service (Main).
+  id_owner:
+    lineage:
+      - core_contract.contract.id_owner
+    description: Foreign key referencing the property owner, sourced from the contract.
+      It's the id from User table, from EBDB service (Main).
+  entity:
+    description: Fixed value 'FR_ONGOING_REPAIR' indicating the type of entity.
+  business_context:
+    description: Fixed value 'RENT' indicating this entity is related to rental transactions.
+  status:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.status
+    description: Current status of the repair request process.
+    categories:
+      AWAITING_BUDGET: The repair request is awaiting a budget.
+      AWAITING_BUDGET_APPROVAL: The repair request is awaiting budget approval.
+      AWAITING_OWNER_ACTION: The repair request is awaiting owner action.
+      BUDGETING_IN_PROGRESS: The repair request is in budgeting in progress.
+      CANCELED: The repair request was canceled.
+      COMPULSORY: The repair request has become compulsory due to owner inaction.
+        This status is automatically assigned when the property owner fails to take action regarding the repair request within the expected timeframe, making the repair mandatory to proceed.
+      FINISHED: The repair request has already been finished.
+      IN_EXECUTION: The repair request is in execution.
+      IN_NEGOTIATION: The repair request is in negotiation.
+      IN_PROGRESS: The repair request is in progress.
+      REQUESTED: The repair request was requested.
+      RESOLVED: The repair request was resolved.
+      TENANT_NEEDS_CX_HELP: The repair request needs CX help.
+      'NULL': The repair request has no status.
+  is_active:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.status
+    description: Boolean flag indicating if the repair request is currently active.
+      Set to TRUE for statuses like AWAITING_BUDGET, COMPULSORY, IN_PROGRESS, etc. Set to FALSE for FINISHED, RESOLVED, CANCELED.
+      Active repair requests are those that can still receive interactions.
+  ts_created:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.ts_created
+    description: Timestamp when the repair request was created.
+  ts_updated:
+    lineage:
+      - datalake_repairs_test_clean.repair_request.ts_updated
+    description: Timestamp when the repair request was last updated.

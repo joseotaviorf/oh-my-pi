@@ -27,7 +27,7 @@ columns:
       - datalake_terminator_clean.termination.id
       - datalake_ebdb_clean.listing_business_context.id
       - datalake_ebdb_clean.inspection.id
-      - datalake_onboarding_entities.onboarding.id_entity
+      - datalake_entities_views.onboarding.id_entity
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
       - core_credit_evaluation.credit_evaluation.id_user
       - core_credit_evaluation.credit_evaluation.id_owner
@@ -42,7 +42,7 @@ columns:
       - datalake_terminator_clean.termination.id
       - datalake_ebdb_clean.listing_business_context.id
       - datalake_ebdb_clean.inspection.id
-      - datalake_onboarding_entities.onboarding.id_entity
+      - datalake_entities_views.onboarding.id_entity
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
     description:
       The primary identifier for an entity, directly from our production systems.
@@ -54,14 +54,14 @@ columns:
       - core_contract.contract.id_house
       - datalake_ebdb_clean.inspection.id_house
       - datalake_ebdb_clean.listing_business_context.id_house
-      - datalake_onboarding_entities.onboarding.id_house
+      - datalake_entities_views.onboarding.id_house
       - core_credit_evaluation.credit_evaluation.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     lineage:
       - core_contract.contract.id_contract
       - datalake_ebdb_clean.inspection.id_contract
-      - datalake_onboarding_entities.onboarding.id_contract
+      - datalake_entities_views.onboarding.id_contract
     description: Contract id related to the entity, if it has any.
       It's the id of the Contrato/Contract table, from Main's database (EBDB).
   id_user:
@@ -75,8 +75,8 @@ columns:
       - core_contract.contract.id_tenant
       - datalake_ebdb_clean.house.id_user
       - datalake_ebdb_clean.inspection.id_user_inspector
-      - datalake_onboarding_entities.onboarding.id_owner
-      - datalake_onboarding_entities.onboarding.id_tenant
+      - datalake_entities_views.onboarding.id_owner
+      - datalake_entities_views.onboarding.id_tenant
       - core_credit_evaluation.credit_evaluation.id_user
       - core_credit_evaluation.credit_evaluation.id_owner
     description: The unique identifier for a user associated with the entity.
@@ -140,8 +140,8 @@ columns:
       - datalake_ebdb_clean.listing_business_context.status
       - datalake_ebdb_clean.listing_business_context.status_reason
       - datalake_ebdb_clean.listing_business_context.ts_created
-      - datalake_onboarding_entities.onboarding.status
-      - datalake_onboarding_entities.onboarding.ts_created
+      - datalake_entities_views.onboarding.status
+      - datalake_entities_views.onboarding.ts_created
     description:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
@@ -184,7 +184,7 @@ columns:
       - datalake_terminator_clean.termination.ts_updated
       - datalake_ebdb_clean.listing_business_context.ts_updated
       - datalake_ebdb_clean.inspection.ts_updated
-      - datalake_onboarding_entities.onboarding.ts_updated
+      - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
     description: Timestamp when the entity became inactive (is_active = FALSE).
       This field captures the ts_updated timestamp for entities that are currently inactive.
@@ -197,7 +197,7 @@ columns:
       - core_contract.contract.ts_created
       - datalake_terminator_clean.termination.ts_created
       - datalake_ebdb_clean.inspection.ts_created
-      - datalake_onboarding_entities.onboarding.ts_created
+      - datalake_entities_views.onboarding.ts_created
       - core_credit_evaluation.credit_evaluation.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
@@ -208,7 +208,7 @@ columns:
       - datalake_terminator_clean.termination.ts_updated
       - datalake_ebdb_clean.listing_business_context.ts_updated
       - datalake_ebdb_clean.inspection.ts_updated
-      - datalake_onboarding_entities.onboarding.ts_updated
+      - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities

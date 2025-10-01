@@ -489,13 +489,12 @@ bietlejuice.enrich_open_external_data_addresses:
     - bietlejuice.iptu_sp:load-clean-iptu-sp:first-run-of-day
     - bietlejuice.itbi_sp:load-clean-itbi-sp:first-run-of-day
     - bietlejuice.itbi_bh:load-clean-itbi-bh:first-run-of-day
-bietlejuice.enrich_onboarding_entities:
+bietlejuice.enrich_entities_views:
   remove:
     - bietlejuice.core_contract:load-core-contract:first-run-of-day
     - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding:first-run-of-day
+    - bietlejuice.repairs:load-clean-repair-request:first-run-of-day
 bietlejuice.enrich_pipeline:
-  # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
-  # our intention to run this DAG the same amount of times.
   remove:
     - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
     - bietlejuice.enrich_airflow:load-enrich-dag-run:first-run-of-day
@@ -773,7 +772,7 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
     - bietlejuice.ebdb_test:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
-    - bietlejuice.enrich_onboarding_entities:load-enrich-onboarding:first-run-of-day
+    - bietlejuice.enrich_entities_views:load-enrich-onboarding:first-run-of-day
     - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.dw_quintocred_ifrs:
   remove:

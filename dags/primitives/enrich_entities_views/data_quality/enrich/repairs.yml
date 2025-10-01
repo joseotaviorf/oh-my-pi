@@ -1,5 +1,5 @@
 ---
-table_name: datalake_onboarding_entities.onboarding
+table_name: datalake_entities_views.repairs
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
