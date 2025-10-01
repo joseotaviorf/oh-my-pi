@@ -26,8 +26,6 @@ workflow:
       raw_primary_keys: ["id", "rev"]
     guarantee:
       clean_table_name: guarantee
-      get_table_metrics:
-        count: id
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]

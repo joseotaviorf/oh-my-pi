@@ -44,8 +44,6 @@ SELECT
     external_source_mod AS mod_external_source,
     external_info_mod AS mod_external_info,
     invoice_charge_code_mod AS mod_invoice_charge_code,
-    external_info_mod AS mod_external_info,
-    invoice_charge_code_mod AS mod_invoice_charge_code,
     created_at_mod AS mod_ts_created,
     updated_at_mod AS mod_ts_updated,
     created_at AS ts_created,

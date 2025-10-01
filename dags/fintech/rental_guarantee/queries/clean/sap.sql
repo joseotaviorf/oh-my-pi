@@ -3,8 +3,6 @@ SELECT
     business_entity_id AS id_business_entity,
     finance_entity_id AS id_finance_entity,
     feature_id AS id_feature,
-    get_json_object(request, '$.finance-entity-id') AS id_finance_entity,
-    get_json_object(request, '$.business-entity-id') AS id_business_entity,
     get_json_object(request, '$.external-payment-id') AS id_external_payment,
     transaction_name,
     status AS sap_status,
