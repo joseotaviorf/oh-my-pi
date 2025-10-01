@@ -23,7 +23,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from bietlejuice.services.s3_service import S3Service
+from bietlejuice.services.storage_services.s3_service import S3Service
 
 from quintoandar_logger import QuintoAndarLogger
 

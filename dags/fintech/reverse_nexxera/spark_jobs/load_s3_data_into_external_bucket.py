@@ -7,7 +7,7 @@ from http.client import HTTPException
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.services.s3_service import S3Service
+from bietlejuice.services.storage_services.s3_service import S3Service
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import BaseDBUtils
 

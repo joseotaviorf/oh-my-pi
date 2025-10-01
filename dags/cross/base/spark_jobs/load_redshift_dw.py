@@ -9,7 +9,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient, PostgresClient
 from bietlejuice.loaders.redshift_loader import RedshiftLoader
-from bietlejuice.services.s3_service import S3Service
+from bietlejuice.services.storage_services.s3_service import S3Service
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_redshift_dw"

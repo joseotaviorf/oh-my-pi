@@ -18,7 +18,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.s3_service import S3Service
+from bietlejuice.services.storage_services.s3_service import S3Service
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.base.pipeline import LayerEnum
 
@@ -164,10 +164,10 @@ if __name__ == "__main__":
     filtered_files = list_files(table_name, source_root_path, format, datetime_to_ingest)
 
     if len(filtered_files) > 0:
-        
+
         logger.info(
             f"m=__main__, msg= The following files were found for {datetime_to_ingest} and will be loaded: {filtered_files}"
-        )    
+        )
 
         if format == 'csv':
             schema = generate_schema(col_names)
@@ -230,7 +230,7 @@ if __name__ == "__main__":
                     df.value.substr(9, 5).alias('record_sequence_number'),
                     df.value.substr(14, 1).alias('segment_type'),
                     df.value.substr(15,225).alias('metadata'),
-                    )    
+                    )
                 if any(account in path for account in ['426879']):
                     date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
                     date_obj = datetime.strptime(date_str, '%d%m%y')
