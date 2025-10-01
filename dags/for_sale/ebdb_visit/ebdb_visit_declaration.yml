@@ -59,8 +59,6 @@ workflow:
       clean_table_name: visit_checkin_aud
     VisitFitting:
       clean_table_name: visit_fitting
-    VisitaOrigem:
-      clean_table_name: visit_origin
     Visitor:
       clean_table_name: visitor
     Visitor_AUD:
