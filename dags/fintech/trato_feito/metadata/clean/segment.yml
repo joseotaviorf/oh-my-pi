@@ -29,6 +29,10 @@ columns:
     description: "Indicates if the segment is currently active"
     lineage:
       - datalake_trato_feito_raw.segment.active
+  collector_key:
+    description: "Collector key identifier"
+    lineage:
+      - datalake_trato_feito_raw.segment.collector_key
   ts_created:
     description: "Timestamp when the segment was created"
     lineage:

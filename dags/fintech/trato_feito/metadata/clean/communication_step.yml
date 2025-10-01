@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: communication_step
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Entity represents a single step in a communication sequence
 columns:
   id_communication_step:
@@ -17,6 +17,10 @@ columns:
     description: "Identification of the comms rule in comms manager"
     lineage:
       - datalake_trato_feito_raw.communication_step.internal_comms_id
+  id_action:
+    description: "On the comms platform, the internal_comms_id represents a file that can have multiple actions. The action_id represents one of these actions."
+    lineage:
+      - datalake_trato_feito_raw.communication_step.action_id
   day_offset:
     description: "Day offset for the step, starting from 1"
     lineage:
@@ -38,4 +42,4 @@ columns:
     lineage:
       - datalake_trato_feito_raw.communication_step.updated_at
   ts_load:
-    description: ""
+    description: "Timestamp when the table was updated"

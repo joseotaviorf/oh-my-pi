@@ -1,5 +1,6 @@
 SELECT
     CAST(id AS BIGINT) AS id_segment,
+    collector_key,
     name,
     description,
     version,
