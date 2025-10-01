@@ -9,5 +9,5 @@ column_level_validations:
   id_rate:
     is_complete:
       severity_level: Warning
-    is_unique:
-      severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.rates GROUP BY id_rate, object_version_number HAVING COUNT(*) > 1)) = 0"

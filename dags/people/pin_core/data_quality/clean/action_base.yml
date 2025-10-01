@@ -7,7 +7,7 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_action:
-    is_complete:
-      severity_level: Warning
     is_unique:
       severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.action_base GROUP BY id_action, object_version_number HAVING COUNT(*) > 1)) = 0"

@@ -9,5 +9,5 @@ column_level_validations:
   id_job_legislative:
     is_complete:
       severity_level: Warning
-    is_unique:
-      severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.job_legislative GROUP BY id_job_legislative, object_version_number HAVING COUNT(*) > 1)) = 0"

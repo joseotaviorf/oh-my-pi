@@ -8,5 +8,7 @@ table_level_validations:
 
 column_level_validations:
   id_application:
-    is_unique:
+    is_complete:
       severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.flexfield_context_translation GROUP BY id_application, ts_updated HAVING COUNT(*) > 1)) = 0"

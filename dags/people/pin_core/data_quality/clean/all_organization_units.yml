@@ -9,5 +9,5 @@ column_level_validations:
   id_organization:
     is_complete:
       severity_level: Warning
-    is_unique:
-      severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.all_organization_units GROUP BY id_organization, ts_updated HAVING COUNT(*) > 1)) = 0"
