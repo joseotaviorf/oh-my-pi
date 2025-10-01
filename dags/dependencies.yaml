@@ -178,7 +178,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_debt_recovery:load-enrich-debt:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-installment:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation:first-run-of-day
-  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.trato_feito:load-clean-accounting-installment:first-run-of-day

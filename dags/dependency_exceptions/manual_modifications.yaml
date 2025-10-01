@@ -145,6 +145,7 @@ bietlejuice.dw_collection_recovery_quintoandar:
     - bietlejuice.paschoalotto:load-clean-contract:first-run-of-day
     - bietlejuice.paschoalotto:load-clean-debt:first-run-of-day
     - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
+    - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
 bietlejuice.dw_collection_recovery_quintocred:
   remove:
     - bietlejuice.paschoalotto:load-clean-agreement-detail:first-run-of-day
