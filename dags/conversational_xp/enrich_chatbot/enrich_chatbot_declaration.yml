@@ -9,6 +9,9 @@ workflow:
   type: query_delta
   layer: enrich
   tables_customization:
+    sessions:
+      merge_on: [id_session]
+      z_order_by: [ts_created, id_session]
     support_sessions:
       merge_on: [id_session]
       z_order_by: [id_session, ts_created]

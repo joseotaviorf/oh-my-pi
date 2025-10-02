@@ -1,0 +1,63 @@
+---
+database_name: datalake_chatbot
+table_name: sessions
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: Table containing session data for all chatbot hosts.
+columns:
+  id_session:
+    description: 'Copilot Service session ID'
+    lineage:
+    - datalake_copilot_service_clean.session.id
+  id_sauron_session:
+    description: 'Sauron session ID'
+    lineage:
+    - datalake_sauron_clean.session.id
+  id_external:
+    description: 'External session ID in Copilot'
+    lineage:
+    - datalake_copilot_service_clean.session.id_external
+  id_ticket:
+    description: 'Latest support ticket ID'
+    lineage:
+    - datalake_customer_support.tickets.id_ticket
+  id_user:
+    description: 'User ID for the session'
+    lineage:
+    - datalake_copilot_service_clean.session.id_user
+  bot:
+    description: 'Bot persona handling the session'
+    categories:
+      sonia: 'Sonia'
+      wall-e: 'Wall-E'
+      isaias: 'Isaias'
+      matthew: 'Matthew'
+      concierge: 'Concierge'
+      copilot: 'Copilot'
+      unknown: 'Unknown host'
+    lineage:
+    - datalake_copilot_service_clean.message.channel
+  status:
+    description: 'Sauron session status'
+    lineage:
+    - datalake_sauron_clean.session.status
+  first_queue:
+    description: 'First support queue'
+    lineage:
+    - datalake_customer_support.tickets.first_queue
+  last_queue:
+    description: 'Last support queue'
+    lineage:
+    - datalake_customer_support.tickets.last_queue
+  is_escalation:
+    description: 'True if escalated to support'
+    lineage:
+    - datalake_customer_support.tickets.id_session
+  ts_created:
+    description: 'Session creation timestamp'
+    lineage:
+    - datalake_copilot_service_clean.session.ts_created
+  ts_updated:
+    description: 'Session last updated timestamp'
+    lineage:
+    - datalake_sauron_clean.session.ts_updated
