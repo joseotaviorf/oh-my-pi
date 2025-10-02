@@ -179,7 +179,15 @@ WITH
                     WHEN l.sale_price IS NULL OR l.offer_price IS NULL
                         THEN NULL
                     ELSE 1-1.00*l.offer_price/l.sale_price
-                END AS last_discount_proposed
+                END AS last_discount_proposed,
+                lre.reason AS drop_reason,
+                CASE 
+                    WHEN LOWER(lre.reason) LIKE '%buyer%' THEN 'Buyer'
+                    WHEN LOWER(lre.reason) LIKE '%seller%' THEN 'Seller'
+                    WHEN LOWER(lre.reason) LIKE '%agent%' THEN 'Agent'
+                    ELSE 'Other'
+                END AS drop_reason_responsible,
+                l.id_reject_reason
             FROM
                 latest_offer AS l
             LEFT JOIN
@@ -287,7 +295,53 @@ SELECT
         p.down_payment_value,
         COALESCE(b.brokerage_fee, 0.06::DECIMAL(5,4)) AS brokerage_fee,
         CONCAT(sf.id_buyer,'_', h.id_external) AS id_sale_flow,
-        a.id_agent
+        a.id_agent,
+        CASE 
+            WHEN sf.status in ('ACCEPTED', 'SALE_AGREEMENT_SIGNED') THEN off.last_price_offered_by_buyer            
+            ELSE NULL
+        END AS sale_price_agreed,
+        CASE 
+            WHEN sf.status = 'PENDING' THEN 'OFFER SENT'
+            WHEN sf.status = 'ACCEPTED' THEN 'OFFER ACCEPTED'
+            WHEN sf.status = 'REJECTED' THEN 'OFFER REJECTED'
+            WHEN sf.status = 'CANCELLED' THEN 'OFFER CANCELLED'
+            WHEN sf.status = 'SALE_AGREEMENT_SIGNED' THEN 'SALE AGREEMENT SIGNED'
+            ELSE 'UNKNOWN'
+        END AS offer_status,
+        off.drop_reason AS drop_reason,
+        off.drop_reason_responsible AS drop_reason_responsible,
+        CASE 
+            WHEN ROW_NUMBER() OVER (
+                PARTITION BY sf.id_buyer 
+                ORDER BY off.ts_created ASC
+            ) = 1 THEN TRUE
+            ELSE FALSE
+        END AS is_buyer_first_offer,
+        CASE 
+            WHEN ROW_NUMBER() OVER (
+                PARTITION BY sf.id_house 
+                ORDER BY off.ts_created ASC
+            ) = 1 THEN TRUE
+            ELSE FALSE
+        END AS is_house_first_offer,
+        CASE 
+            WHEN sf.status = 'ACCEPTED' THEN DATE(off.ts_updated)
+            ELSE NULL
+        END AS dt_offer_accepted,
+        CASE 
+            WHEN sf.status = 'REJECTED' THEN DATE(off.ts_updated)
+            ELSE NULL
+        END AS dt_offer_dismissed,
+        CASE 
+            WHEN sf.status IN ('SALE_AGREEMENT_CREATED', 'SALE_AGREEMENT_SIGNED') 
+            THEN DATE(off.ts_updated)
+            ELSE NULL
+        END AS dt_sale_agreement_created,
+        CASE 
+            WHEN sf.status = 'SALE_AGREEMENT_SIGNED' THEN DATE(off.ts_updated)
+            ELSE NULL
+        END AS dt_sale_agreement_signed
+        
     FROM
         offers AS off
     LEFT JOIN
@@ -315,44 +369,105 @@ SELECT
 )
 , unified_offers AS (
     SELECT 
-            COALESCE(vo.id_offer, g.id) AS id_offer,
-            vo.id_sales_flow AS id_sales_flow,
-            COALESCE(vo.id_sale_flow, g.id_sale_flow) AS id_sale_flow,            
-            COALESCE(vo.id_house, g.id_house) AS id_house,
-            COALESCE(vo.id_buyer, g.id_buyer) AS id_buyer,            
-            COALESCE(vo.id_seller, g.id_owner) AS id_owner,
-            COALESCE(vo.id_agent, g.id_agent) AS id_agent,
-            vo.status AS status,            
-            COALESCE(vo.payment_method, g.current_payment_method) AS current_payment_method,
-            --COALESCE(vo.planned_payment_method, g.planned_payment_method) AS planned_payment_method,
-
-            ROUND(COALESCE(vo.sale_listing_price, g.sale_price), 2) AS sale_price,
-            ROUND(COALESCE(vo.first_price_offered_by_buyer, g.first_price_offered_by_buyer), 2) AS first_price_offered_by_buyer,
-            ROUND(COALESCE(vo.last_price_offered_by_buyer, g.last_price_offered_by_buyer), 2) AS last_price_offered_by_buyer,
-            ROUND(COALESCE(vo.last_discount_proposed, g.last_discount_proposed), 2) AS last_discount_proposed,
-            ROUND(COALESCE(vo.first_discount_proposed, g.first_discount_proposed), 2) AS first_discount_proposed,
-            ROUND(COALESCE(vo.registry_price, g.registry_price), 2) AS registry_price,
-            ROUND(COALESCE(vo.itbi_price, g.itbi_price), 2) AS itbi_price,
-            ROUND(COALESCE(vo.entry_amount, g.payment_entry_amount), 2) AS payment_entry_amount,
-            ROUND(COALESCE(vo.financing_value, g.financing_value), 2) AS financing_value,
-            ROUND(COALESCE(vo.fgts_value, g.fgts_value), 2) AS fgts_value,
-            ROUND(COALESCE(vo.down_payment_value, g.earnest_value), 2) AS earnest_value,
-            ROUND(COALESCE(vo.brokerage_fee, g.brokerage_fee), 2) AS giroffer_brokerage_fee,
-
-            COALESCE(vo.has_used_fgts_in_payment, g.has_used_fgts_in_payment) AS has_used_fgts_in_payment,
-            COALESCE(vo.has_used_negotiation_chat, g.has_used_negotiation_chat) AS has_used_negotiation_chat,
-            vo.is_canceled AS is_canceled,
-            
-            COALESCE(vo.ts_offer_created, g.ts_created) AS ts_offer_created,
-            COALESCE(vo.ts_offer_updated, g.ts_updated) AS ts_updated,            
-            vo.ts_canceled AS ts_canceled
-            
+        COALESCE(vo.id_offer, g.id) AS id_offer,
+        vo.id_sales_flow AS id_sales_flow,
+        COALESCE(vo.id_sale_flow, g.id_sale_flow) AS id_sale_flow,            
+        COALESCE(vo.id_house, g.id_house) AS id_house,
+        COALESCE(vo.id_buyer, g.id_buyer) AS id_buyer,            
+        COALESCE(vo.id_seller, g.id_owner) AS id_owner,
+        COALESCE(vo.id_agent, g.id_agent) AS id_agent,
+        vo.status AS status,            
+        COALESCE(vo.payment_method, g.current_payment_method) AS current_payment_method,
+        ROUND(COALESCE(vo.sale_listing_price, g.sale_price), 2) AS sale_price,
+        ROUND(COALESCE(vo.first_price_offered_by_buyer, g.first_price_offered_by_buyer), 2) AS first_price_offered_by_buyer,
+        ROUND(COALESCE(vo.last_price_offered_by_buyer, g.last_price_offered_by_buyer), 2) AS last_price_offered_by_buyer,
+        ROUND(COALESCE(vo.last_discount_proposed, g.last_discount_proposed), 2) AS last_discount_proposed,
+        ROUND(COALESCE(vo.first_discount_proposed, g.first_discount_proposed), 2) AS first_discount_proposed,
+        ROUND(COALESCE(vo.registry_price, g.registry_price), 2) AS registry_price,
+        ROUND(COALESCE(vo.itbi_price, g.itbi_price), 2) AS itbi_price,
+        ROUND(COALESCE(vo.entry_amount, g.payment_entry_amount), 2) AS payment_entry_amount,
+        ROUND(COALESCE(vo.financing_value, g.financing_value), 2) AS financing_value,
+        ROUND(COALESCE(vo.fgts_value, g.fgts_value), 2) AS fgts_value,
+        ROUND(COALESCE(vo.down_payment_value, g.earnest_value), 2) AS earnest_value,
+        ROUND(COALESCE(vo.brokerage_fee, g.brokerage_fee), 2) AS giroffer_brokerage_fee,
+        COALESCE(vo.has_used_fgts_in_payment, g.has_used_fgts_in_payment) AS has_used_fgts_in_payment,
+        COALESCE(vo.has_used_negotiation_chat, g.has_used_negotiation_chat) AS has_used_negotiation_chat,
+        vo.is_canceled AS is_canceled,
+        COALESCE(vo.ts_offer_created, g.ts_created) AS ts_offer_created,
+        COALESCE(vo.ts_offer_updated, g.ts_updated) AS ts_updated,            
+        vo.ts_canceled AS ts_canceled,
+        COALESCE(vo.sale_price_agreed, 
+            CASE 
+                WHEN g.status = 'ACCEPTED' THEN g.last_price_offered_by_buyer
+                ELSE NULL
+            END
+        ) AS sale_price_agreed,
+        COALESCE(vo.offer_status,
+            CASE 
+                WHEN g.status = 'ACCEPTED' THEN 'OFFER ACCEPTED'
+                WHEN g.status = 'REJECTED' THEN 'OFFER REJECTED'
+                WHEN g.status = 'CANCELLED' THEN 'OFFER CANCELLED'
+                ELSE 'OFFER SENT'
+            END
+        ) AS offer_status,
+        vo.drop_reason AS drop_reason,
+        vo.drop_reason_responsible AS drop_reason_responsible,
+        vo.is_buyer_first_offer AS is_buyer_first_offer,
+        vo.is_house_first_offer AS is_house_first_offer,
+        COALESCE(vo.dt_offer_accepted,
+            CASE 
+                WHEN g.status = 'ACCEPTED' THEN DATE(g.ts_updated)
+                ELSE NULL
+            END
+        ) AS dt_offer_accepted,
+        COALESCE(vo.dt_offer_dismissed,
+            CASE 
+                WHEN g.status = 'REJECTED' THEN DATE(g.ts_updated)
+                ELSE NULL
+            END
+        ) AS dt_offer_dismissed,
+        vo.dt_sale_agreement_created AS dt_sale_agreement_created,
+        vo.dt_sale_agreement_signed AS dt_sale_agreement_signed        
     FROM firestore_sale_offer AS g
     FULL OUTER JOIN sale_offer AS vo ON vo.id_offer = g.id
-
 )
 
-SELECT 
-        *
-FROM    
-        unified_offers
+SELECT     
+    id_offer,
+    id_sales_flow,
+    id_sale_flow,
+    id_house,
+    id_buyer,
+    id_owner,
+    id_agent,
+    status,
+    offer_status,        
+    current_payment_method,
+    drop_reason,
+    drop_reason_responsible,    
+    sale_price,
+    sale_price_agreed,
+    first_price_offered_by_buyer,
+    last_price_offered_by_buyer,
+    first_discount_proposed,
+    last_discount_proposed,
+    registry_price,
+    itbi_price,
+    payment_entry_amount,
+    financing_value,
+    fgts_value,
+    earnest_value,
+    giroffer_brokerage_fee,
+    has_used_negotiation_chat,
+    has_used_fgts_in_payment,
+    is_canceled,
+    is_buyer_first_offer,
+    is_house_first_offer,
+    ts_offer_created,
+    dt_offer_accepted,
+    dt_offer_dismissed,
+    dt_sale_agreement_created,        
+    dt_sale_agreement_signed,
+    ts_updated,
+    ts_canceled
+FROM unified_offers

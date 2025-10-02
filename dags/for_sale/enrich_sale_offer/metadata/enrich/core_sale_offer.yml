@@ -43,6 +43,30 @@ columns:
     lineage:
       - datalake_sales_flow_clean.sales_flow.status
     description: Current status of the sales flow. Only available for SalesFlow originated offers.
+  offer_status:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.status
+      - datalake_firestore_clean.sale_offer.status
+    description: Current status of the offer in the negotiation process.
+    categories:
+      "OFFER SENT": "Offer submitted by buyer, awaiting response"
+      "OFFER ACCEPTED": "Offer accepted by seller"
+      "OFFER REJECTED": "Offer rejected by seller"
+      "OFFER CANCELLED": "Offer cancelled by either party"
+      "SALE AGREEMENT SIGNED": "Sale agreement (CCV) has been signed"
+  drop_reason:
+    lineage:
+      - datalake_sales_flow_clean.reject_reason.reject_reason
+    description: Reason why the offer was dropped or rejected before sale agreement signature. Only available for SalesFlow originated offers.
+  drop_reason_responsible:
+    lineage:
+      - datalake_sales_flow_clean.reject_reason.reject_reason
+    description: Type of user responsible for dropping the offer (Buyer, Seller, Agent, or Other).
+    categories:
+      "Buyer": "Buyer was responsible for dropping the offer"
+      "Seller": "Seller was responsible for dropping the offer"
+      "Agent": "Agent was responsible for dropping the offer"
+      "Other": "Other party or reason not specified"
   current_payment_method:
     lineage:
       - datalake_sales_flow_clean.payment.payment_method
@@ -53,6 +77,11 @@ columns:
       - datalake_sales_flow_clean.offer.sale_price
       - datalake_firestore_clean.sale_offer.salePrice
     description: Sale listing price set by the seller.
+  sale_price_agreed:
+    lineage:
+      - datalake_sales_flow_clean.offer.offer_price
+      - datalake_firestore_clean.sale_offer.updatedOfferPrice
+    description: Final price agreed between buyer and seller for the property. Only populated when offer is accepted or sale agreement is signed.
   first_price_offered_by_buyer:
     lineage:
       - datalake_sales_flow_clean.offer_aud.offer_price
@@ -116,11 +145,33 @@ columns:
     lineage:
       - datalake_sales_flow_clean.sales_flow.is_canceled
     description: Boolean flag indicating if the sales flow is canceled. Only available for SalesFlow originated offers.
+  is_buyer_first_offer:
+    description: Boolean flag indicating if this is the first offer submitted by this buyer across all properties.
+  is_house_first_offer:
+    description: Boolean flag indicating if this is the first offer received for this property.
   ts_offer_created:
     lineage:
       - datalake_sales_flow_clean.offer.ts_created
       - datalake_firestore_clean.sale_offer.createdAt._seconds
     description: Timestamp when the offer was created by the buyer.
+  dt_offer_accepted:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.ts_updated
+      - datalake_firestore_clean.sale_offer.ts_updated
+    description: Date when the offer was accepted by the seller. Only populated when offer status is 'OFFER ACCEPTED' or beyond.
+  dt_offer_dismissed:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.ts_updated
+      - datalake_firestore_clean.sale_offer.ts_updated
+    description: Date when the offer was dismissed or rejected by the seller. Only populated when offer status is 'OFFER REJECTED'.
+  dt_sale_agreement_created:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.ts_updated
+    description: Date when the sale agreement (CCV) was created. Only available for SalesFlow originated offers.
+  dt_sale_agreement_signed:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.ts_updated
+    description: Date when the sale agreement (CCV) was signed by both parties. Only available for SalesFlow originated offers.
   ts_updated:
     lineage:
       - datalake_sales_flow_clean.offer.ts_updated
