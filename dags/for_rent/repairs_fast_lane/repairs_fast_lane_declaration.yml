@@ -1,0 +1,25 @@
+dag:
+  name: repairs_fast_lane
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0,30 * * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      This DAG handles the ingestion of the raw and clean data for our Repairs Service, \n
+      which is a Service that was created to make repairs experience faster and easier for \n
+      Tenants and Landlords. Check [its own repository](https://github.com/quintoandar/repairs) \n
+      for more informations.
+workflow:
+  type: cdc
+  layer: raw
+  source_database: repairs
+  source_schema: public
+  database_type: postgres
+  custom_schema: repairs_test
+  lineage_product_database_name: repairs
+  dbutils_secret_key: REPAIRS_DB
+  tables_customization:
+    repair_request: {}
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
