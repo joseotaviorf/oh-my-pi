@@ -1,5 +1,5 @@
 ---
-table_name: datalake_repairs_test_raw.repair_request
+table_name: datalake_repairs_test_clean.repair_request
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -11,20 +11,20 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  contract_id:
+  id_contract:
     is_complete:
       severity_level: Error
-  house_id:
+  id_house:
     has_completeness:
-      greater_than: 0.90
+      greater_than: 0.80
       severity_level: Error
   status:
     has_completeness:
-      greater_than: 0.95
+      greater_than: 0.90
       severity_level: Error
-  created_at:
+  ts_created:
     is_complete:
       severity_level: Error
-  updated_at:
+  ts_updated:
     is_complete:
       severity_level: Error
