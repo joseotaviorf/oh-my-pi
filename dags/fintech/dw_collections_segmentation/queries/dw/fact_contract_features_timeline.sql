@@ -477,15 +477,15 @@ segmentation_features AS (
                 AND max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-low'
             WHEN reference_contract_status = 'Ativo'
                 AND max_delay_contaminated_contract_t2 > 30
-                AND n_overdue_monthlys_t1 <= 1 THEN 'active-stock-hold'
-            WHEN reference_contract_status = 'Ativo'
-                AND max_delay_contaminated_contract_t2 > 30
                 AND (
                     (n_overdue_monthlys_t1 > 1) OR
                     ((has_negotiation_in_contract
                         AND (max_delay_original_invoices_t1 > 7
                             OR max_delay_deal_invoices_t1 > 7)))
                 ) THEN 'active-stock-pre-evictions'
+            WHEN reference_contract_status = 'Ativo'
+                AND max_delay_contaminated_contract_t2 > 30
+                AND n_overdue_monthlys_t1 <= 1 THEN 'active-stock-hold'
             WHEN reference_contract_status = 'Ativo' THEN 'UNCLASSIFIED-ACTIVE'
             WHEN reference_contract_status = 'Finalizado'
                 AND has_negotiation_in_contract
@@ -608,15 +608,15 @@ segmentation_features AS (
                 AND max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-late-low'
             WHEN reference_contract_status = 'Ativo'
                 AND max_delay_contaminated_contract_t2 > 30
-                AND n_overdue_monthlys_t1 <= 1 THEN 'active-stock-hold'
-            WHEN reference_contract_status = 'Ativo'
-                AND max_delay_contaminated_contract_t2 > 30
                 AND (
                     (n_overdue_monthlys_t1 > 1) OR
                     ((has_negotiation_in_contract
                         AND (max_delay_original_invoices_t1 > 7
                             OR max_delay_deal_invoices_t1 > 7)))
                 ) THEN 'active-stock-pre-evictions'
+            WHEN reference_contract_status = 'Ativo'
+                AND max_delay_contaminated_contract_t2 > 30
+                AND n_overdue_monthlys_t1 <= 1 THEN 'active-stock-hold'
             WHEN reference_contract_status = 'Ativo' THEN 'UNCLASSIFIED-ACTIVE'
             WHEN reference_contract_status = 'Finalizado'
                 AND has_negotiation_in_contract
