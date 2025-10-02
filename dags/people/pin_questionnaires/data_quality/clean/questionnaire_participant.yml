@@ -9,5 +9,7 @@ column_level_validations:
   id_questionnaire_participant:
     is_complete:
       severity_level: Warning
-    is_unique:
+    custom:
+      # id_questionnaire_participant + object_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_questionnaires_clean.questionnaire_participant GROUP BY id_questionnaire_participant, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

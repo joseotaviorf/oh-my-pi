@@ -9,5 +9,7 @@ column_level_validations:
   id_goal_plan_to_goal:
     is_complete:
       severity_level: Warning
-    is_unique:
+    custom:
+      # id_goal_plan_to_goal + object_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_goal_clean.goal_plan_to_goal GROUP BY id_goal_plan_to_goal, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

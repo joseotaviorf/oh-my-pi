@@ -9,5 +9,7 @@ column_level_validations:
   id_eligible_person_electable_choice:
     is_complete:
       severity_level: Warning
-    is_unique:
+    custom:
+      # id_eligible_person_electable_choice + object_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_benefits_clean.person_electable_benefit_choices GROUP BY id_eligible_person_electable_choice, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

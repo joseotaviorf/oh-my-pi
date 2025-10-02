@@ -9,5 +9,7 @@ column_level_validations:
   id_meeting_talent_pool:
     is_complete:
       severity_level: Warning
-    is_unique:
+    custom:
+      # id_meeting_talent_pool + object_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_hr_review_clean.meeting_talent_pool GROUP BY id_meeting_talent_pool, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

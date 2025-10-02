@@ -9,5 +9,7 @@ column_level_validations:
   id_template_role:
     is_complete:
       severity_level: Warning
-    is_unique:
+    custom:
+      # id_template_role + object_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_performance_clean.template_role GROUP BY id_template_role, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

@@ -9,5 +9,7 @@ column_level_validations:
   id_participant_rate_value:
     is_complete:
       severity_level: Warning
-    is_unique:
+    custom:
+      # id_participant_rate_value + object_version_number should be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_benefits_clean.participant_rate_values GROUP BY id_participant_rate_value, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
