@@ -3426,7 +3426,6 @@ bietlejuice.enrich_secretariat:
   - bietlejuice.hub_services:load-clean-visitor:first-run-of-day
 bietlejuice.enrich_semrush:
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-  - bietlejuice.gsheets_static:load-clean-seo-goldenset:first-run-of-day
   - bietlejuice.semrush:load-clean-123i-organic-search-kw:first-run-of-day
   - bietlejuice.semrush:load-clean-ape11-organic-search-kw:first-run-of-day
   - bietlejuice.semrush:load-clean-arboimoveis-organic-search-kw:first-run-of-day
