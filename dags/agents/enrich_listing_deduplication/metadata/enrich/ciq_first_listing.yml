@@ -1,0 +1,89 @@
+---
+database_name: datalake_listing_deduplication
+table_name: ciq_first_listing
+description: Dataset of houses recommended by CIQ consultants (SALE and RENT) with first listing information, publication/unpublication timestamps, and contract signature checks.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.id_house
+      - datalake_big_agent.house_rent_listing_consultant.id_house
+    description: Unique identifier of the house.
+  id_user:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.id_user
+      - datalake_big_agent.house_rent_listing_consultant.id_user
+    description: Unique identifier of the CIQ consultant user attached to the listing.
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_partner
+    description: Partner identifier associated with the CIQ user, if any.
+  id_agent:
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+    description: Agent identifier of the CIQ consultant.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_user.user.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the CIQ consultant user.
+  consultant_type:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.consultant_type
+      - datalake_big_agent.house_rent_listing_consultant.consultant_type
+    description: CIQ profile (e.g., CIQ_FULL, CIQ_MANAGER).
+  business_context:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.business_context
+    description: Business context where the supply capture was carried out by CIQ (SALE or RENT).
+  status:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.status
+    description: The status of the listing. 
+  has_first_listing:
+    description: Indicates that this property has already had its first publication made.
+  ts_first_listing:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+    description: Timestamp of when the opportunity became a first listing.
+  ts_first_unpublished:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the first time the listing was unpublished (derived from audit history revisions).
+  ts_contract_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Timestamp representing the date the contract was signed (SALE agreement or RENT contract signed event), if it exists.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Record update date.
+  day:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Day of the record update date.
+  month:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Month of the record update date.
+  year:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Year of the record update date.

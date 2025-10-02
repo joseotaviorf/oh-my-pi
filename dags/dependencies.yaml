@@ -2530,6 +2530,22 @@ bietlejuice.enrich_listing_contracts:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
+bietlejuice.enrich_listing_deduplication:
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud:first-run-of-day
+  - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
+  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant:first-run-of-day
+  - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant:first-run-of-day
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context-status-history:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts:first-run-of-day
+  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day
+  - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking:first-run-of-day
 bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb_lead:load-clean-lead-aud:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-affiliate-data:first-run-of-day

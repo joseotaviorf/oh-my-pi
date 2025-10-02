@@ -1,0 +1,9 @@
+---
+table_name: datalake_listing_deduplication.valid_first_listing
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

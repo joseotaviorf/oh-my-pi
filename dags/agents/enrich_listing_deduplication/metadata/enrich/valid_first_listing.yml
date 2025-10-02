@@ -1,0 +1,201 @@
+---
+database_name: datalake_tiers
+table_name: valid_first_listing
+description: |
+  Comprehensive analysis of house first listings with validation metrics, hybrid house detection,
+  contract signing patterns, and publication performance tracking. This table combines data from
+  multiple sources to provide insights into listing behavior, contract execution timing, and
+  agent performance indicators.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.id_house
+    description: Unique identifier of the house.
+  id_user_listing_registrant_sale:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.id_user
+    description: CIQ user identifier responsible for the SALE listing registration.
+  id_uuid_person_sale:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.uuid_person
+    description: Person-level UUID of the CIQ user for the SALE context.
+  id_partner_sale:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.id_partner
+    description: Partner identifier associated with the SALE CIQ user, when available.
+  id_user_listing_registrant_rent:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.id_user
+    description: CIQ user identifier responsible for the RENT listing registration.
+  id_uuid_person_rent:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.uuid_person
+    description: Person-level UUID of the CIQ user for the RENT context.
+  id_partner_rent:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.id_partner
+    description: Partner identifier associated with the RENT CIQ user, when available.
+  id_house_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.id_house
+    description: Identifier of the duplicated house when the current house is identified as a duplicate.
+      Only populated when the house is marked as duplicated in the deduplication process.
+  id_user_listing_registrant_rent_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.id_user_listing_registrant_rent
+    description: User identifier who registered the rent listing for the duplicated house.
+      Tracks the original registrant for accountability and analysis.
+  id_user_listing_registrant_sale_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.id_user_listing_registrant_sale
+    description: User identifier who registered the sale listing for the duplicated house.
+      Tracks the original registrant for accountability and analysis.
+  days_between_fl_to_cs:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_contract_signed
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Number of days between the first rent listing publication and the first
+      rent contract signing. Negative values indicate contract was signed before listing.
+  days_between_fl_to_ccv:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_contract_signed
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Number of days between the first sale listing publication and the sale
+      agreement signing. Negative values indicate agreement was signed before listing.
+  days_between_fl_hybrid:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Absolute difference in days between rent and sale first listing publications
+      for hybrid houses. Only applicable when is_hybrid_house is true.
+  total_days_published_within_60_days_rent:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_ended
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_first_publication
+    description: Total number of days the rent listing was published within the first 60 days
+      after initial publication. Calculated using PUBLISHED status periods.
+  total_days_published_within_60_days_sale:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_ended
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_first_publication
+    description: Total number of days the sale listing was published within the first 60 days
+      after initial publication. Calculated using PUBLISHED status periods.
+  hybrid_creation_order:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: "For hybrid houses, indicates the order of business context creation.
+      Possible values: 'RENT > SALE', 'SALE > RENT', 'CREATED AS A HYBRID', or NULL for non-hybrid houses."
+    categories:
+      RENT > SALE: Rent listing was created first, then sale listing was added.
+      SALE > RENT: Sale listing was created first, then rent listing was added.
+      CREATED AS A HYBRID: Both listings were created simultaneously.
+  supply_source_rent_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.supply_source_rent
+    description: Supply source for the rent context of the duplicated house.
+      Indicates how the duplicated rent listing was originally sourced.
+  supply_source_sale_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.supply_source_sale
+    description: Supply source for the sale context of the duplicated house.
+      Indicates how the duplicated sale listing was originally sourced.
+  is_hybrid_house:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.business_context
+    description: Boolean flag indicating if the house operates in both RENT and SALE business contexts.
+      True when both ts_first_listing_rent and ts_first_listing_sale are not null.
+  is_draft_contract:
+    lineage:
+      - datalake_listing_contracts.listing_contracts.ts_contract_created
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Boolean flag indicating if a draft contract ('Minuta') was created within 15 days
+      of the first rent listing publication.
+  is_signed_cs_within_60_days:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_contract_signed
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Boolean flag indicating if a rent contract was signed within 60 days
+      of the first rent listing publication.
+  is_signed_ccv_within_60_days:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_contract_signed
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Boolean flag indicating if a sale agreement (CCV) was signed within 60 days
+      of the first sale listing publication.
+  is_indica_ai:
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_referred_by
+      - datalake_supply_flows.supply_events_tracking.application
+      - datalake_supply_flows.supply_events_tracking.supply_source
+    description: Boolean flag indicating if the house was captured through the Indica AI program.
+      True when id_referred_by > -1, application is not in ('consultantpwa', 'supplyprocessor'),
+      and supply_source is not 'CIQ'.
+  is_sold_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.ts_contract_signed_sale
+    description: Boolean flag indicating if the duplicated house has a signed sale agreement (CCV).
+      True when ts_contract_signed_sale is not null for the duplicated house.
+  is_rented_duplicated:
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.ts_contract_signed_rent
+    description: Boolean flag indicating if the duplicated house has a signed rent contract.
+      True when ts_contract_signed_rent is not null for the duplicated house.
+  dt_15_published_accumulated_days_rent:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+      - datalake_quintoandar.aux_date.date
+    description: Date when the rent listing reached 15 accumulated published days within
+      the first 60 days after initial publication.
+  dt_15_published_accumulated_days_sale:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+      - datalake_quintoandar.aux_date.date
+    description: Date when the sale listing reached 15 accumulated published days within
+      the first 60 days after initial publication.
+  ts_first_contract_signed_rent:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_contract_signed
+    description: Timestamp of the first rent contract signing.
+      Minimum date from all rent contracts for the house.
+  ts_first_contract_signed_sale:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_contract_signed
+    description: Timestamp of the first sale agreement (CCV) signing.
+      Direct mapping from the aggregated sale agreement timestamp.
+  ts_initial_first_listing_rent:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Timestamp of the first rent listing publication. Direct mapping from
+      the aggregated rent first listing timestamp.
+  ts_initial_first_listing_sale:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Timestamp of the initial first listing based on creation order.
+      For 'RENT > SALE' uses rent timestamp, for 'SALE > RENT' uses sale timestamp.
+  ts_first_listing_sale:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Timestamp of the first sale listing publication.
+      Direct mapping from the aggregated sale first listing timestamp.
+  ts_first_listing_rent:
+    lineage:
+      - datalake_listing_deduplication.ciq_first_listing.ts_first_listing
+    description: Timestamp of the first rent listing publication.
+      Direct mapping from the aggregated rent first listing timestamp.
+  ts_last_depublication_rent_duplicated:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+    description: Timestamp of the last depublication (UNPUBLISHED, SUSPENDED, or OPTED-OUT) for the rent context
+      of the duplicated house. Used to track listing lifecycle events.
+  ts_last_depublication_sale_duplicated:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+    description: Timestamp of the last depublication (UNPUBLISHED, SUSPENDED, or OPTED-OUT) for the sale context
+      of the duplicated house. Used to track listing lifecycle events.
+  ts_created_draft_contract_rent:
+    lineage:
+      - datalake_listing_contracts.listing_contracts.ts_contract_created
+    description: Timestamp when the draft rent contract ('Minuta') was created.

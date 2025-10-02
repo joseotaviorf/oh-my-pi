@@ -1,0 +1,29 @@
+---
+dag:
+  name: enrich_listing_deduplication
+  schedule_start_date: 2024, 5, 22
+  owner: Data Agents
+  documentation:
+    dag_purpose: This DAG is responsible for the deduplication flow of listings registered in 5A and for verifying their validity when transferring payments to CIQs via First Listing.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    valid_first_listing:
+      - listing_deduplication
+      - ciq_first_listing
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    ciq_first_listing:
+      extraction_type: incremental
+      partitions: [year, month, day]
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
