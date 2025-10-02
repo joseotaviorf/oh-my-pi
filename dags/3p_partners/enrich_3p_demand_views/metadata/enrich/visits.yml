@@ -1,0 +1,264 @@
+database_name: datalake_3p_demand_views
+table_name: visits
+description: View of visits data that consolidates related information. It will be used to test the semantic layer datasets.
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_visit:
+    lineage:
+    - dw_visit.fact_visits.sk_visit
+    description: Visit's id.
+  sk_visitor:
+    lineage:
+    - dw_visit.fact_visits.sk_visitor
+    description: Visitor's id. (Connect with dim_user)
+  sk_owner:
+    lineage:
+    - dw_visit.fact_visits.sk_owner
+    description: Owner's id. (Connect with dim_user)
+  sk_first_associated_agent:
+    lineage:
+    - dw_visit.fact_visits.sk_first_associated_agent
+    description: Is the Id of the first agent who was associated with the visit.
+  sk_last_associated_agent:
+    lineage:
+    - dw_visit.fact_visits.sk_last_associated_agent
+    description: Is the Id of the last agent who was associated with the visit.
+  sk_house:
+    lineage:
+    - dw_visit.fact_visits.sk_house
+    description: House's Id.
+  sk_house_listing:
+    lineage:
+    - dw_visit.fact_visits.sk_house_listing
+    description: House's Id.
+  sk_company_demand:
+    lineage:
+    - datalake_company.company_sks.sk_company
+    description: Id of company demand.
+  sk_company_supply:
+    lineage:
+    - dw_visit.fact_visits.sk_company_supply
+    description: Id of company supply.
+  sk_business_context:
+    lineage:
+    - dw_visit.fact_visits.sk_business_context
+    description: Context type Id.
+  sk_house_entrance:
+    lineage:
+    - dw_visit.fact_visits.sk_house_entrance
+    description: Foreign key from dw_house.dim_house_entrance_history. Last event before the visit.
+  sk_business_model:
+    lineage:
+    - dw_visit.fact_visits.sk_business_model
+    description: Business model Id.
+  sk_behavior_type:
+    lineage:
+    - dw_visit.fact_visits.sk_behavior_type
+    description: Behavior type Id.
+  sk_visit_status:
+    lineage:
+    - dw_visit.fact_visits.sk_visit_status
+    description: Visit status Id.
+  sk_funnel_offer_submitted:
+    lineage:
+    - dw_visit.fact_visits.sk_funnel_offer_submitted
+    description: Foreign key from dim_visit_funnel about visits with offer submitted.
+  sk_funnel_offer_accepted:
+    lineage:
+    - dw_visit.fact_visits.sk_funnel_offer_accepted
+    description: Foreign key from dim_visit_funnel about visits with offer accepted.
+  sk_funnel_contract_signed:
+    lineage:
+    - dw_visit.fact_visits.sk_funnel_contract_signed
+    description: Foreign key from dim_visit_funnel about visits with contract signed.
+  sk_visit_request_date:
+    lineage:
+    - dw_visit.fact_visits.sk_visit_request_date
+    description: Requested date of the visit.
+  sk_visit_created_date:
+    lineage:
+    - dw_visit.fact_visits.sk_visit_created_date
+    description: First event of the visit.
+  sk_visit_date_local_tz:
+    lineage:
+    - dw_visit.fact_visits.sk_visit_date_local_tz
+    description: Date of the visit.
+  sk_first_visit_confirmed_date:
+    lineage:
+    - dw_visit.fact_visits.sk_first_visit_confirmed_date
+    description: First confirmed date of the visit.
+  sk_last_visit_confirmed_date:
+    lineage:
+    - dw_visit.fact_visits.sk_last_visit_confirmed_date
+    description: Last confirmed date of the visit.
+  sk_first_visit_reschedule_date:
+    lineage:
+    - dw_visit.fact_visits.sk_first_visit_reschedule_date
+    description: First reschedule date.
+  sk_last_visit_reschedule_date:
+    lineage:
+    - dw_visit.fact_visits.sk_last_visit_reschedule_date
+    description: Last reschedule date.
+  sk_visit_done:
+    lineage:
+    - dw_visit.fact_visits.sk_visit_done
+    description: Date of the end of the visit.
+  sk_visit_canceled:
+    lineage:
+    - dw_visit.fact_visits.sk_visit_canceled
+    description: Date of the canceled of the visit. (If applicable)
+  business_model:
+    lineage:
+    - datalake_visit.visit_business_model.business_model
+    description: Business model associated with the visit.
+  company_name_supply:
+    lineage:
+    - dw_public.dim_company_3p_partners.company_name
+    description: Name of the supply company.
+  hubspot_company_tag_supply:
+    lineage:
+    - dw_public.dim_company_3p_partners.hubspot_company_tag
+    description: Hubspot company tag for the supply company.
+  company_name_demand:
+    lineage:
+    - dw_public.dim_company_3p_partners.company_name
+    description: Name of the demand company.
+  hubspot_company_tag_demand:
+    lineage:
+    - dw_public.dim_company_3p_partners.hubspot_company_tag
+    description: Hubspot company tag for the demand company.
+  nbr_reschedule:
+    lineage:
+    - dw_visit.fact_visits.nbr_reschedule
+    description: Number of reschedules.
+  nbr_bookings:
+    lineage:
+    - dw_visit.fact_visits.nbr_bookings
+    description: Number of bookings from this visit.
+  num_visit_booked:
+    lineage:
+    - dw_visit.fact_visits.num_visit_booked
+    description: Number of visit booked. The sum aggregate function can be used to get the total number of booked visits grouped in some way.
+  num_agents_associated:
+    lineage:
+    - dw_visit.fact_visits.num_agents_associated
+    description: Number of agents associated with the visit.
+  num_visit_confirmed:
+    lineage:
+    - dw_visit.fact_visits.num_visit_confirmed
+    description: Number of visit confirmed. The sum aggregate function can be used to get the total number of confirmed visits grouped in some way.
+  num_visit_completed:
+    lineage:
+    - dw_visit.fact_visits.num_visit_completed
+    description: Number of visit completed. The sum aggregate function can be used to get the total number of completed visits grouped in some way.
+  num_visit_canceled:
+    lineage:
+    - dw_visit.fact_visits.num_visit_canceled
+    description: Number of visit canceled. The sum aggregate function can be used to get the total number of canceled visits grouped in some way.
+  num_visit_unsuccessful:
+    lineage:
+    - dw_visit.fact_visits.num_visit_unsuccessful
+    description: Number of visit unsuccessful. The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
+  journey_days:
+    lineage:
+    - dw_visit.fact_visits.journey_days
+    description: Journey days since the first created event.
+  hours_between_created_and_visit_day:
+    lineage:
+    - dw_visit.fact_visits.hours_between_created_and_visit_day
+    description: Hours between the creation of visit and visit day.
+  hours_between_request_and_cancellation:
+    lineage:
+    - dw_visit.fact_visits.hours_between_request_and_cancellation
+    description: Hours between requested date and visit day.
+  hours_between_first_booked_and_visit_day:
+    lineage:
+    - dw_visit.fact_visits.hours_between_first_booked_and_visit_day
+    description: Hours first booking and visit day.
+  hours_between_last_booked_and_visit_day:
+    lineage:
+    - dw_visit.fact_visits.hours_between_last_booked_and_visit_day
+    description: Hours between last booking and visit day.
+  hours_between_cancellation_and_visit_date:
+    lineage:
+    - dw_visit.fact_visits.hours_between_cancellation_and_visit_date
+    description: Hours between cancellation and visit day.
+  hours_waiting_for_answers:
+    lineage:
+    - dw_visit.fact_visits.hours_waiting_for_answers
+    description: Hours waiting for the answers.
+  is_confirmed:
+    lineage:
+    - dw_visit.fact_visits.is_confirmed
+    description: If the visit is confirmed.
+  is_completed:
+    lineage:
+    - dw_visit.fact_visits.is_completed
+    description: If the visit is completed.
+  is_registered:
+    lineage:
+    - dw_visit.fact_visits.is_registered
+    description: If the visit was registered by the agent.
+  is_reschedule:
+    lineage:
+    - dw_visit.fact_visits.is_reschedule
+    description: If the visit is reschedule.
+  is_canceled:
+    lineage:
+    - dw_visit.fact_visits.is_canceled
+    description: If the visit is canceled.
+  is_unsuccessful:
+    lineage:
+    - dw_visit.fact_visits.is_unsuccessful
+    description: If the visit is unsuccessful.
+  is_waiting_for_response:
+    lineage:
+    - dw_visit.fact_visits.is_waiting_for_response
+    description: If is waiting for response.
+  has_tenant_living:
+    lineage:
+    - dw_visit.fact_visits.has_tenant_living
+    description: If have a tenant living in the house.
+  has_3p_access_control:
+    description: Flag indicating if the business model has 3P access control.
+  ts_visit_requested:
+    lineage:
+    - dw_visit.fact_visits.ts_visit_requested
+    description: Requested timestamp of the visit.
+  ts_visit_created:
+    lineage:
+    - dw_visit.fact_visits.ts_visit_created
+    description: Timestamp of visit creation, its first event.
+  ts_visit_local_tz:
+    lineage:
+    - dw_visit.fact_visits.ts_visit_local_tz
+    description: Timestamp of the visit.
+  ts_first_visit_confirmed:
+    lineage:
+    - dw_visit.fact_visits.ts_first_visit_confirmed
+    description: Timestamp of the first visit confirmed.
+  ts_last_visit_confirmed:
+    lineage:
+    - dw_visit.fact_visits.ts_last_visit_confirmed
+    description: Timestamp of the last visit confirmed.
+  ts_first_visit_rescheduled:
+    lineage:
+    - dw_visit.fact_visits.ts_first_visit_rescheduled
+    description: Timestamp of the first visit rescheduled.
+  ts_last_visit_rescheduled:
+    lineage:
+    - dw_visit.fact_visits.ts_last_visit_rescheduled
+    description: Timestamp of the last visit rescheduled.
+  ts_visit_done:
+    lineage:
+    - dw_visit.fact_visits.ts_visit_done
+    description: Timestamp of the end of the visit.
+  ts_visit_canceled:
+    lineage:
+    - dw_visit.fact_visits.ts_visit_canceled
+    description: Timestamp of the visit cancellation (if applicable).
+  ts_load:
+    lineage:
+    - dw_visit.fact_visits.ts_load
+    description: Timestamp of the load of the table.

@@ -1223,6 +1223,17 @@ bietlejuice.enrich_agents_validation:
   - bietlejuice.enrich_big_agent:load-enrich-agency:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-agents:first-run-of-day
+bietlejuice.enrich_3p_demand_views:
+  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
+  - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
+  - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
+  - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
+  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
+  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-business-model:first-run-of-day
 bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation
