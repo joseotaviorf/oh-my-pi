@@ -6,8 +6,9 @@ dag:
     dag_purpose: |
       This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
       It downloads, decrypts, parses, and loads the files into both the `incoming` and `raw` layers of the Data Lake.
+
 cluster:
-  type: databricks_16_4_small_memory_people_cluster
+  type: custom_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
@@ -20,6 +21,14 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+
 workflow:
   layer: raw
   type: custom_ingestion
