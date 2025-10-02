@@ -7,6 +7,7 @@ WITH sap_b1 AS (
         id_external_payment,
         id_document,
         id_branch,
+        id_line,
         account_type,
         account_number,
         account_name,
@@ -46,6 +47,7 @@ WITH sap_b1 AS (
         id_external_payment,
         NULL AS id_document,
         id_company AS id_branch,
+        id_line,
         -- CASE
         --     SUBSTR(account, 1, 1)
         --     WHEN '1' THEN 'Ativo'
@@ -100,6 +102,7 @@ SELECT
     id_external_payment,
     id_document,
     id_branch,
+    id_line,
     account_type,
     account_number,
     account_name,

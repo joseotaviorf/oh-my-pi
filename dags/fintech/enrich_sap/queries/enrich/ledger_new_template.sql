@@ -252,6 +252,7 @@ WITH cte_b1_ledger AS (
         dh.id_external_payment,
         db.id_document,
         db.id_branch,
+        db.id_line,
         CASE
             SUBSTR(db.account, 1, 1)
             WHEN '1' THEN 'Ativo'
