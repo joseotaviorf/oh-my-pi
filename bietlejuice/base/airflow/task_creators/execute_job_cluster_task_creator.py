@@ -129,7 +129,12 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             raise ValueError(f"Invalid DBR version: {databricks_version}") from exc
 
     def __input_inmetro_version(self, spark_version: str) -> str:
-        inmetro_map = {"3.2": "2.3.0", "3.3": "4.9.0", "3.4": "4.9.0", "3.5": "4.9.0"}
+        inmetro_map = {
+            "3.2": "2.3.0",  # Databricks 12.2 and 13.3 - keep compatibility
+            "3.3": "4.10.1",  # Databricks 14.3+ - new version with content parameter support
+            "3.4": "4.10.1",
+            "3.5": "4.10.1",
+        }
 
         try:
             return inmetro_map[spark_version]

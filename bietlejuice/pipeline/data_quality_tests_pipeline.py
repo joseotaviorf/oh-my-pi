@@ -1,23 +1,22 @@
 import json
 import logging
 from datetime import datetime
-
-import yamale
-from yamale import YamaleError
+import inspect
 
 from inmetro.builders.validations.pydeequ.validation_suite_builder import (
     ValidationSuiteBuilder,
 )
-from inmetro.clients import (
-    SparkClient as InmetroSparkClient,
-    S3Client as InmetroS3Client,
-)
+from inmetro.clients import S3Client as InmetroS3Client
+from inmetro.clients import SparkClient as InmetroSparkClient
 from inmetro.config_reader import ConfigReader
 from inmetro.loaders import S3Loader as InmetroS3Loader
 from inmetro.validators import PyDeequValidator
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import col, to_timestamp
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DwMetastoreMapping
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.base.service import ServiceEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -25,17 +24,12 @@ from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.metadata_propagator_pipeline.datahub_quality_metrics_pipeline import (
     DatahubQualityMetricsPipeline,
 )
-
-from pyspark.sql.functions import col, to_timestamp
-from pyspark.sql import DataFrame
-
-from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services import ConfigurationService
 from bietlejuice.services.messaging_services.alert_channel_service import (
     AlertChannelService,
 )
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from bietlejuice.services import ConfigurationService
 
 JOB_NAME = "data_quality_tests"
 DATAHUB_URL_TEMPLATE = (
@@ -45,6 +39,51 @@ DATAHUB_URL_TEMPLATE = (
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def _create_compatible_config_reader(validation_file_content: str) -> ConfigReader:
+    """Creates ConfigReader compatible with inmetro 2.3.0 and 4.10.1+."""
+    try:
+        config_reader_signature = inspect.signature(ConfigReader.__init__)
+
+        if "content" in config_reader_signature.parameters:
+            logger.info("Using inmetro 4.10.1+ ConfigReader with content parameter")
+            return ConfigReader(content=validation_file_content)
+        else:
+            logger.info(
+                "Using inmetro 2.3.0 ConfigReader - saving content to temporary file"
+            )
+            import tempfile
+            import os
+
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".yml", delete=False
+            ) as temp_file:
+                temp_file.write(validation_file_content)
+                temp_file_path = temp_file.name
+
+            try:
+                config_reader = ConfigReader(config_file_path=temp_file_path)
+                input_configs = config_reader.read()
+
+                class CachedConfigReader:
+                    def __init__(self, cached_config):
+                        self.cached_config = cached_config
+
+                    def read(self):
+                        return self.cached_config
+
+                return CachedConfigReader(input_configs)
+            finally:
+                if os.path.exists(temp_file_path):
+                    os.unlink(temp_file_path)
+
+    except Exception as e:
+        logger.error(f"Error creating ConfigReader: {e}")
+        logger.warning(
+            "Falling back to content parameter method - this may fail on inmetro 2.3.0"
+        )
+        return ConfigReader(content=validation_file_content)
 
 
 class DataQualityTestsPipeline:
@@ -70,8 +109,9 @@ class DataQualityTestsPipeline:
 
     def run(self):
         logger.info(
-            f"m={JOB_NAME}, env={self.env}, inmetro_bucket={self.inmetro_bucket}, layer={self.layer.value}, "
-            f"relative_file_path={self.relative_file_path}, table_name={self.table_name},  msg=Job execution started."
+            f"m={JOB_NAME}, env={self.env}, inmetro_bucket={self.inmetro_bucket}, "
+            f"layer={self.layer.value}, relative_file_path={self.relative_file_path}, "
+            f"table_name={self.table_name},  msg=Job execution started."
         )
         input_configs = self._get_input_configs_from_yaml()
         gchat_webhook = self._get_gchat_webhook(input_configs.get("alert_channel"))
@@ -103,13 +143,12 @@ class DataQualityTestsPipeline:
 
     def _get_gchat_webhook(self, channel_keyword_from_config: str):
         base_dbutils = BaseDBUtils()
-
+        dbutils = None
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
 
         alert_channel_service = AlertChannelService(dbutils=dbutils)
 
-        # The service is now generic. The CALLER (this job) decides the default.
         dynamic_gchat_webhook = alert_channel_service.get_gchat_webhook_url(
             channel_keyword=channel_keyword_from_config,
             default_keyword=GchatWebhooksEnum.DATA_QUALITY_DEFAULT,
@@ -121,6 +160,9 @@ class DataQualityTestsPipeline:
         return dynamic_gchat_webhook
 
     def _get_input_configs_from_yaml(self) -> dict:
+        """
+        Reads and validates the YAML configuration file content using the inmetro library.
+        """
         validation_file_content = DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
             dag_name=self.relative_file_path,
             layer=self.layer.value,
@@ -128,11 +170,10 @@ class DataQualityTestsPipeline:
             intermediate_path=self.intermediate_path,
         )
 
-        # ConfigReader(path).read() does not handle S3 paths, so we extracted some of its
-        #  behaviours until the lib is enhanced.
-        validation_file_content = yamale.make_data(content=validation_file_content)
-        self._validate_input_config(input_config=validation_file_content)
-        return validation_file_content[0][0]
+        config_reader = _create_compatible_config_reader(validation_file_content)
+        input_configs = config_reader.read()
+
+        return input_configs
 
     def _parse_complete_table_name(self, complete_table_name):
         name_components = complete_table_name.split(".")
@@ -249,6 +290,7 @@ class DataQualityTestsPipeline:
         self, validation_results: dict, database_name: str, table_name: str
     ) -> None:
         base_dbutils = BaseDBUtils()
+        dbutils = None
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
 
@@ -329,62 +371,3 @@ class DataQualityTestsPipeline:
             ]
 
         return database
-
-    def _check_input_config_schema(self, input_config: list) -> bool:
-        """Method extracted from inmetro.config_reader.ConfigReader"""
-        try:
-            config_schema = yamale.make_schema(ConfigReader.CONFIG_FILE_SCHEMA_PATH)
-            yamale.validate(config_schema, input_config)
-        except YamaleError as error:
-            raise Exception(
-                "The input config file does not match the yaml schema. Please, check it again"
-            ) from error
-        return True
-
-    def _check_validation_sections_exist(self, input_validations: dict) -> bool:
-        """Method extracted from inmetro.config_reader.ConfigReader"""
-        input_root_validations = list(input_validations.keys())
-        intersection = set(ConfigReader.VALIDATION_SECTIONS) & set(
-            input_root_validations
-        )
-
-        if len(intersection) == 0:
-            raise Exception(
-                f"The input configuration file does not contain any of the available validation sections: "
-                f"{ConfigReader.VALIDATION_SECTIONS}. Please, check your input file."
-            )
-        return True
-
-    def _check_conflicting_validations_on_same_column(
-        self, input_validations: dict
-    ) -> bool:
-        """Method extracted from inmetro.config_reader.ConfigReader"""
-        column_validations = input_validations.get(
-            ConfigReader.COLUMN_VALIDATIONS_SECTION, {}
-        )
-
-        for column, validations in column_validations.items():
-            validation_keys = list(validations.keys())
-            intersection = set(validation_keys) & set(
-                ConfigReader.CONFLICTING_VALIDATIONS
-            )
-
-            if len(intersection) > 1:
-                raise Exception(
-                    f"There are conflicting validations on column {column}. "
-                    f"Please, verify that only one of the following validations occurs: "
-                    f"{ConfigReader.CONFLICTING_VALIDATIONS}"
-                )
-        return True
-
-    def _validate_input_config(self, input_config) -> None:
-        """
-        Reads the input file, converting it to a dict with all the validations,
-        and executes some verifications on the final structure.
-        Method extracted from inmetro.config_reader.ConfigReader
-        :return: Dict with all the validations contained in the input file.
-        """
-        input_validations = input_config[0][0]
-        self._check_input_config_schema(input_config)
-        self._check_validation_sections_exist(input_validations)
-        self._check_conflicting_validations_on_same_column(input_validations)
