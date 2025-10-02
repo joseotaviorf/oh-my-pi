@@ -1,0 +1,42 @@
+---
+database_name: datalake_hightouch
+table_name: sync_changelog
+owner: eduardo.soares@quintoandar.com.br
+domain: Primitives
+description: Clean Hightouch reverse ETL sync changelog tracking data synchronization operations and status
+columns:
+  id_sync:
+    description: Unique identifier for the sync configuration
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.sync_id
+      - datalake_hightouch_logs_raw.sync_changelog_trino.sync_id
+  id_sync_run:
+    description: Unique identifier for the specific sync run execution
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.sync_run_id
+      - datalake_hightouch_logs_raw.sync_changelog_trino.sync_run_id
+  id_row:
+    description: Unique identifier for the individual row being synchronized
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.row_id
+      - datalake_hightouch_logs_raw.sync_changelog_trino.row_id
+  op_type:
+    description: Type of operation performed (insert, update, delete)
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.op_type
+      - datalake_hightouch_logs_raw.sync_changelog_trino.op_type
+  status:
+    description: Status of the synchronization operation (success, failed, pending)
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.status
+      - datalake_hightouch_logs_raw.sync_changelog_trino.status
+  failure_reason:
+    description: Detailed reason for failure if the operation was unsuccessful
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.failure_reason
+      - datalake_hightouch_logs_raw.sync_changelog_trino.failure_reason
+  fields:
+    description: JSON string containing the field data that was synchronized
+    lineage:
+      - datalake_hightouch_logs_raw.sync_changelog_databricks.fields
+      - datalake_hightouch_logs_raw.sync_changelog_trino.fields

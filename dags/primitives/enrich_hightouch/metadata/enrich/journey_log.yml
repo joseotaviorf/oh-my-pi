@@ -1,0 +1,43 @@
+---
+database_name: datalake_hightouch
+table_name: journey_log
+owner: eduardo.soares@quintoandar.com.br
+domain: Primitives
+description: Clean Hightouch journey log tracking customer journey execution events and node transitions
+columns:
+  id_row:
+    description: Unique identifier for the journey log row
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.row_id
+  id_row_instance:
+    description: Unique identifier for the row instance in the journey
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.row_instance_id
+  id_run:
+    description: Unique identifier for the journey run execution
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.run_id
+  id_journey:
+    description: Unique identifier for the customer journey
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.journey_id
+  id_from_node:
+    description: Identifier of the source node in the journey transition
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.from_node_id
+  id_to_node:
+    description: Identifier of the destination node in the journey transition
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.to_node_id
+  event_type:
+    description: Type of journey event (enter, exit, transition, action)
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.event_type
+  source_table:
+    description: Source table used for the journey event
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.source_table
+  ts_event:
+    description: Timestamp when the journey event occurred
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.timestamp

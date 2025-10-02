@@ -1,0 +1,80 @@
+dag:
+  name: hightouch_logs
+  owner: Data Primitives
+  schedule_interval: 0 8-18 * * *
+  documentation:
+    dag_purpose: |
+      This DAG ingests data from Hightouch
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_hightouch_logs_raw
+  custom_schema: hightouch_logs
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    sync_changelog_databricks:
+      load_spark_job: load_hightouch_logs
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "s3://5a-cdp-processed-data-{environment}/hightouch/hightouch_audit/sync_changelog"
+        - "delta"
+
+    sync_changelog_trino:
+      load_spark_job: load_hightouch_logs
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_changelog"
+        - "parquet"
+    sync_runs_databricks:
+      load_spark_job: load_hightouch_logs
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "s3://5a-cdp-processed-data-{environment}/hightouch/hightouch_audit/sync_runs"
+        - "delta"
+    sync_runs_trino:
+      load_spark_job: load_hightouch_logs
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_runs"
+        - "parquet"
+    audience_membership_databricks:
+      load_spark_job: load_hightouch_logs
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "hightouch_planner.audience_membership"
+        - "table"
+    audience_membership_trino:
+      load_spark_job: load_hightouch_logs
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_planner/audience_membership"
+        - "parquet"
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

@@ -1,0 +1,94 @@
+---
+database_name: datalake_hightouch_logs_clean
+table_name: sync_runs_databricks
+domain: Primitives
+description: Clean Hightouch sync run metrics from Databricks source tracking execution performance and statistics
+columns:
+  id_sync:
+    description: Unique identifier for the sync configuration
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.sync_id
+  id_sync_run:
+    description: Unique identifier for the specific sync run execution
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.sync_run_id
+  id_model:
+    description: Unique identifier for the data model
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.model_id
+  primary_key:
+    description: Primary key configuration used for the sync
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.primary_key
+  destination:
+    description: Target destination where data is being synchronized
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.destination
+  model_name:
+    description: Name of the data model being synchronized
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.model_name
+  error:
+    description: Error message if the sync run encountered issues
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.error
+  status:
+    description: Overall status of the sync run (success, failed, running)
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.status
+  num_planned_add:
+    description: Number of records planned to be added
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_planned_add
+  num_planned_change:
+    description: Number of records planned to be changed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_planned_change
+  num_planned_remove:
+    description: Number of records planned to be removed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_planned_remove
+  num_attempted_add:
+    description: Number of records attempted to be added
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_attempted_add
+  num_attempted_change:
+    description: Number of records attempted to be changed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_attempted_change
+  num_attempted_remove:
+    description: Number of records attempted to be removed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_attempted_remove
+  num_succeeded_add:
+    description: Number of records successfully added
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_succeeded_add
+  num_succeeded_change:
+    description: Number of records successfully changed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_succeeded_change
+  num_succeeded_remove:
+    description: Number of records successfully removed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_succeeded_remove
+  num_failed_add:
+    description: Number of records that failed to be added
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_failed_add
+  num_failed_change:
+    description: Number of records that failed to be changed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_failed_change
+  num_failed_remove:
+    description: Number of records that failed to be removed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.num_failed_remove
+  ts_started:
+    description: Timestamp when the sync run was initiated
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.started_at
+  ts_finished:
+    description: Timestamp when the sync run completed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_databricks.finished_at

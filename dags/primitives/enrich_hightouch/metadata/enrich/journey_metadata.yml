@@ -1,0 +1,35 @@
+---
+database_name: datalake_hightouch
+table_name: journey_metadata
+owner: eduardo.soares@quintoandar.com.br
+domain: Primitives
+description: Clean Hightouch journey metadata containing customer journey configuration and node definitions
+columns:
+  id_journey:
+    description: Unique identifier for the customer journey
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.journey_id
+  id_node:
+    description: Unique identifier for the journey node
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.node_id
+  id_to_node:
+    description: Array of destination node identifiers for journey flow
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.to_node_id
+  journey_name:
+    description: Name of the customer journey
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.journey_name
+  node_name:
+    description: Name of the journey node
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.node_name
+  node_type:
+    description: Type of journey node (trigger, action, condition, etc.)
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.node_type
+  source_table:
+    description: Source table used for the journey node
+    lineage:
+      - hightouch_audit.journey_metadata_view_quinto_production.source_table

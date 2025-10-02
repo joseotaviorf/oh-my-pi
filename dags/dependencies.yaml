@@ -2320,6 +2320,13 @@ bietlejuice.enrich_hefesto:
   - bietlejuice.hefesto:load-clean-worker:first-run-of-day
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity:first-run-of-day
+bietlejuice.enrich_hightouch:
+  - bietlejuice.hightouch_logs:load-clean-audience-membership-databricks
+  - bietlejuice.hightouch_logs:load-clean-audience-membership-trino
+  - bietlejuice.hightouch_logs:load-clean-sync-changelog-databricks
+  - bietlejuice.hightouch_logs:load-clean-sync-changelog-trino
+  - bietlejuice.hightouch_logs:load-clean-sync-runs-databricks
+  - bietlejuice.hightouch_logs:load-clean-sync-runs-trino
 bietlejuice.enrich_house_feature_inference:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
