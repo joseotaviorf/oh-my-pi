@@ -8,35 +8,30 @@ columns:
   id_sync:
     description: Unique identifier for the sync configuration
     lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.sync_id
-      - datalake_hightouch_logs_raw.sync_changelog_trino.sync_id
+      - datalake_hightouch_logs_clean.sync_changelog_databricks.id_sync
+      - datalake_hightouch_logs_clean.sync_changelog_trino.id_sync
   id_sync_run:
     description: Unique identifier for the specific sync run execution
     lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.sync_run_id
-      - datalake_hightouch_logs_raw.sync_changelog_trino.sync_run_id
+      - datalake_hightouch_logs_clean.sync_changelog_databricks.id_sync_run
+      - datalake_hightouch_logs_clean.sync_changelog_trino.id_sync_run
   id_row:
     description: Unique identifier for the individual row being synchronized
     lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.row_id
-      - datalake_hightouch_logs_raw.sync_changelog_trino.row_id
+      - datalake_hightouch_logs_clean.sync_changelog_databricks.id_row
+      - datalake_hightouch_logs_clean.sync_changelog_trino.id_row
   op_type:
     description: Type of operation performed (insert, update, delete)
     lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.op_type
-      - datalake_hightouch_logs_raw.sync_changelog_trino.op_type
+      - datalake_hightouch_logs_clean.sync_changelog_databricks.op_type
+      - datalake_hightouch_logs_clean.sync_changelog_trino.op_type
   status:
     description: Status of the synchronization operation (success, failed, pending)
     lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.status
-      - datalake_hightouch_logs_raw.sync_changelog_trino.status
+      - datalake_hightouch_logs_clean.sync_changelog_databricks.status
+      - datalake_hightouch_logs_clean.sync_changelog_trino.status
   failure_reason:
     description: Detailed reason for failure if the operation was unsuccessful
     lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.failure_reason
-      - datalake_hightouch_logs_raw.sync_changelog_trino.failure_reason
-  fields:
-    description: JSON string containing the field data that was synchronized
-    lineage:
-      - datalake_hightouch_logs_raw.sync_changelog_databricks.fields
-      - datalake_hightouch_logs_raw.sync_changelog_trino.fields
+      - datalake_hightouch_logs_clean.sync_changelog_databricks.failure_reason
+      - datalake_hightouch_logs_clean.sync_changelog_trino.failure_reason

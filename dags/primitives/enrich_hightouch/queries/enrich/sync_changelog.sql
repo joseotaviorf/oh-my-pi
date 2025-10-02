@@ -1,10 +1,10 @@
 SELECT
-    CAST(sync_id AS STRING) AS id_sync,
-    CAST(sync_run_id AS STRING) AS id_sync_run,
-    CAST(row_id AS STRING) AS id_row,
-    CAST(op_type AS STRING) AS op_type,
-    CAST(status AS STRING) AS status,
-    CAST(failure_reason AS STRING) AS failure_reason
+    id_sync,
+    id_sync_run,
+    id_row,
+    op_type,
+    status,
+    failure_reason
 
 FROM
     datalake_hightouch_logs_clean.sync_changelog_databricks
@@ -12,12 +12,12 @@ FROM
 UNION ALL
 
 SELECT
-    CAST(sync_id AS STRING) AS id_sync,
-    CAST(sync_run_id AS STRING) AS id_sync_run,
-    CAST(row_id AS STRING) AS id_row,
-    CAST(op_type AS STRING) AS op_type,
-    CAST(status AS STRING) AS status,
-    CAST(failure_reason AS STRING) AS failure_reason
+    id_sync,
+    id_sync_run,
+    id_row,
+    op_type,
+    status,
+    failure_reason
 
 FROM
     datalake_hightouch_logs_clean.sync_changelog_trino
