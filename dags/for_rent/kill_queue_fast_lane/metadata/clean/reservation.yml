@@ -1,0 +1,109 @@
+database_name: datalake_kill_queue_test_clean
+table_name: reservation
+domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
+description: Clean layer table containing reservation data from the Kill Queue micro-service.
+  This service is responsible for managing property reservations in the rental flow, tracking the complete reservation lifecycle
+  including payment processing, status transitions, and cancellation management. The table stores the latest updates for each reservation
+  with comprehensive financial and status information for rental transactions.
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.id
+    description: Unique identifier for the reservation.
+      It's the primary key from the reservation table in the Kill Queue service.
+  id_house:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.house_id
+    description: Foreign key referencing the house entity for which the reservation was made.
+      It's the id from House table, from EBDB service (Main).
+  id_rent_flow:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.rent_flow_id
+    description: Foreign key referencing the rent flow process associated with this reservation.
+      Used to track the rental workflow and process steps in the reservation system.
+      It's the id from Rent Flow (FluxoLocacao) table, from EBDB service (Main).
+  id_tenant:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.tenant_id
+    description: Foreign key referencing the tenant prospect who made the reservation.
+      It's the id from User table, from EBDB service (Main).
+  cancellation_reason:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.cancellation_reason
+    description: The reason provided when a reservation is cancelled.
+      Used for analytics and understanding cancellation patterns in the reservation process.
+  last_charge_status:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.last_charge_status
+    description: Status of the most recent payment charge attempt for this reservation.
+      Tracks the financial transaction status to determine if payment was successful.
+  mundipagg_token:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.mundipagg_token
+    description: Token identifier from Mundipagg payment gateway for this reservation.
+      Used for payment processing and transaction tracking in the financial system.
+  status:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.status
+    description: Current status of the reservation in the Kill Queue system.
+      Indicates the lifecycle stage of the reservation (e.g., active, cancelled, completed).
+    categories:
+      CANCELLED: The reservation has been cancelled.
+      CHARGED: The reservation has been charged.
+      FAILED: The reservation has failed.
+      FINISHED: The reservation has been finished.
+      RETURNED: The reservation has been returned.
+      START: The reservation has been started.
+      TOKEN_RECEIVED: The reservation has received a token.
+      WAITING_REFUND: The reservation is waiting for a refund.
+  version:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.version
+    description: Version number of the reservation record.
+      Used for optimistic locking and tracking changes to the reservation data.
+  attempt:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.attempt
+    description: Number of attempts made for processing this reservation.
+      Tracks retry attempts for payment processing or other reservation operations.
+  installments:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.installments
+    description: Number of payment installments configured for this reservation.
+      Defines the payment plan structure for the rental transaction.
+  tenant_refund_percentage:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.tenant_refund_percentage
+    description: Percentage of refund amount that the tenant is eligible to receive.
+      Used for calculating refund amounts in case of reservation cancellation.
+  value:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.value
+    description: Total monetary value of the reservation.
+      Represents the financial amount associated with the reservation transaction.
+  is_ongoing:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.is_ongoing
+    description: Boolean flag indicating if the reservation is currently ongoing.
+      Used to quickly identify active reservations that are still in progress.
+  ts_created:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.created_at
+    description: Timestamp when the reservation was created in the system.
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.updated_at
+    description: Timestamp when the reservation was last updated.
+  year:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.year
+    description: Year extracted from the creation date for partitioning purposes.
+  month:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.month
+    description: Month extracted from the creation date for partitioning purposes.
+  day:
+    lineage:
+      - datalake_kill_queue_test_raw.reservation.day
+    description: Day extracted from the creation date for partitioning purposes.

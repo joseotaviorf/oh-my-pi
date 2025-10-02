@@ -1,0 +1,21 @@
+dag:
+  name: kill_queue_fast_lane
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0,30 * * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction and load database kill_queue (MySQL), a reservations application database.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: killqueue
+  source_schema: killqueue
+  custom_schema: kill_queue_test
+  lineage_product_database_name: killqueue
+  dbutils_secret_key: KILL_QUEUE_DB
+  tables_customization:
+    reservation: {}
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
