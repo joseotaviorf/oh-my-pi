@@ -7,11 +7,15 @@ description: |
   Essential contract features timeline for machine learning and advanced analytics in QuintoAndar collections context.
   Contains key accumulated features, calculated metrics, and forward-fill variables optimized for risk modeling
   and collection strategy analysis. This table focuses on the most critical features for predictive analytics.
+
+  This table implements a frozen payment probability logic where probability values are calculated on the first day
+  a contract enters each decision tree class (based on status and delay range) and remain constant until the contract
+  moves to a different tree or until month end. This provides stable segmentation for operational and strategic planning.
 columns:
-  id_contract:
-    description: Contract identifier
+  sk_contract:
+    description: Contract surrogate key identifier
     lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.id_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
   dt_reference:
     description: Reference date for the timeline
     lineage:
@@ -40,6 +44,22 @@ columns:
     description: Maximum Contract Delay within T2 Contamination methodology
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+  max_delay_original_invoices_t1:
+    description: Maximum delay of original (non-deal) invoices using T1 contamination methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+  max_delay_deal_invoices_t1:
+    description: Maximum delay of deal/negotiation invoices using T1 contamination methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
+  n_overdue_monthlys_t1:
+    description: Number of overdue monthly rent invoices using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
+  n_overdue_others_t1:
+    description: Number of overdue non-monthly (other types) invoices using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_others_t1
   days_since_contract_start:
     description: Number of days since contract start
     lineage:
@@ -48,6 +68,66 @@ columns:
     description: Number of repair invoices
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
+  n_rental_core_invoices:
+    description: Number of core rental invoices (monthly rent)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_rental_core_invoices
+  n_acordo_invoices:
+    description: Number of deal/negotiation invoices
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_acordo_invoices
+  n_invoices_in_wallet:
+    description: Total number of invoices currently in the contract wallet
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_in_wallet
+  n_monthly_invoices:
+    description: Number of monthly invoices
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices
+  n_monthly_invoices_created:
+    description: Number of monthly invoices created
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_created
+  n_invoices_paid:
+    description: Number of invoices paid
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_paid
+  n_invoices_paid_ontime_t2:
+    description: Number of invoices paid on time using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_paid_ontime_t2
+  n_overdue_invoices_paid_t2:
+    description: Number of overdue invoices paid using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_invoices_paid_t2
+  n_invoices_paid_ontime_t1:
+    description: Number of invoices paid on time using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_paid_ontime_t1
+  n_overdue_invoices_paid_t1:
+    description: Number of overdue invoices paid using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_invoices_paid_t1
+  n_monthly_invoices_paid_ontime_t2:
+    description: Number of monthly invoices paid on time using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_paid_ontime_t2
+  n_monthly_invoices_paid_ontime_t1:
+    description: Number of monthly invoices paid on time using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_paid_ontime_t1
+  n_monthly_overdue_invoices_paid_t2:
+    description: Number of monthly overdue invoices paid using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_overdue_invoices_paid_t2
+  n_monthly_overdue_invoices_paid_t1:
+    description: Number of monthly overdue invoices paid using T1 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_overdue_invoices_paid_t1
+  n_first_invoices_open:
+    description: Number of first invoices that are still open
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_first_invoices_open
   cpc:
     description: Contact completion count
     lineage:
@@ -88,6 +168,14 @@ columns:
     description: Flag indicating if contract has eviction process
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
+  has_negotiation_in_contract:
+    description: Flag indicating if the contract has any active negotiation/deal
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+  has_fpd_in_wallet:
+    description: Flag indicating if contract has first payment default (FPD) in wallet
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
   n_anchor_invoices_not_negativable:
     description: Number of anchor invoices that are not negativable
     lineage:
@@ -116,6 +204,66 @@ columns:
     description: Number of broken multiple installments deals in lifetime accumulated
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.qt_acordo_quebrado
+  acc_broken_promessas_lifetime:
+    description: Accumulated number of broken promises (promessas quebradas) over the contract lifetime
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.qt_promessa_quebrada_fp
+  acc_deals_principal_discount_lifetime:
+    description: Accumulated number of deals with principal amount discount (forgiveness) over the contract lifetime
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.qt_aco_desconto
+  acc_sum_monthly_overdue_days_paid_t1:
+    description: Accumulated sum of days overdue for monthly invoices paid using T1 methodology over contract lifetime
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
+  acc_count_monthly_overdue_invoices_paid_t1:
+    description: Accumulated count of monthly overdue invoices paid using T1 methodology over contract lifetime
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+  acc_n_monthly_invoices_l12m:
+    description: Accumulated number of monthly invoices over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices
+  acc_n_monthly_invoices_paid_ontime_t2_l12m:
+    description: Accumulated number of monthly invoices paid on time (T2) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_paid_ontime_t2
+  acc_n_monthly_invoices_paid_ontime_t1_l12m:
+    description: Accumulated number of monthly invoices paid on time (T1) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_paid_ontime_t1
+  acc_n_monthly_overdue_invoices_paid_t2_l12m:
+    description: Accumulated number of monthly overdue invoices paid (T2) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_overdue_invoices_paid_t2
+  acc_n_monthly_overdue_invoices_paid_t1_l12m:
+    description: Accumulated number of monthly overdue invoices paid (T1) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_overdue_invoices_paid_t1
+  acc_n_invoices_paid_ontime_t2_l12m:
+    description: Accumulated number of all invoices paid on time (T2) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_paid_ontime_t2
+  acc_n_invoices_paid_ontime_t1_l12m:
+    description: Accumulated number of all invoices paid on time (T1) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_paid_ontime_t1
+  acc_n_overdue_invoices_paid_t2_l12m:
+    description: Accumulated number of overdue invoices paid (T2) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_invoices_paid_t2
+  acc_n_overdue_invoices_paid_t1_l12m:
+    description: Accumulated number of overdue invoices paid (T1) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_invoices_paid_t1
+  acc_count_monthly_invoices_created:
+    description: Accumulated count of monthly invoices created over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_created
+  acc_count_monthly_invoices_paid_ontime_t1:
+    description: Accumulated count of monthly invoices paid on time (T1) over the last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_paid_ontime_t1
   n_evictions_processes_lifetime:
     description: Number of distinct eviction processes accumulated over contract lifetime
     lineage:
@@ -133,6 +281,40 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+  share_monthly_paid_ontime_t1:
+    description: Share of monthly invoices paid on time using T1 methodology - ratio of monthly invoices paid on time to total monthly invoices created
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_count_monthly_invoices_paid_ontime_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_count_monthly_invoices_created
+  pct_monthly_paid_ontime_t2_l12m:
+    description: Percentage of monthly invoices paid on time (T2) over last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_monthly_invoices_paid_ontime_t2_l12m
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_monthly_invoices_l12m
+  pct_monthly_paid_ontime_t1_l12m:
+    description: Percentage of monthly invoices paid on time (T1) over last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_monthly_invoices_paid_ontime_t1_l12m
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_monthly_invoices_l12m
+  pct_invoices_paid_ontime_t2_l12m:
+    description: Percentage of all invoices (not just monthly) paid on time (T2) over last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_invoices_paid_ontime_t2_l12m
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_overdue_invoices_paid_t2_l12m
+  pct_invoices_paid_ontime_t1_l12m:
+    description: Percentage of all invoices (not just monthly) paid on time (T1) over last 12 months
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_invoices_paid_ontime_t1_l12m
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_n_overdue_invoices_paid_t1_l12m
+  mob_months:
+    description: Months on books - number of months since contract start date calculated as the difference in years and months between reference date and contract start
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_contract_start
+  n_days_over1_t2_l180:
+    description: Number of days with delay greater than 1 day (T2 methodology) over the last 180 days
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
   monthly_income:
     description: Sum of monthly income from proponentes (contract holders) who will reside in the property
     lineage:
@@ -140,19 +322,88 @@ columns:
       - dw_rent.fact_listing_rent_flows.sk_proposal
       - dw_rent.fact_listing_rent_flows.sk_contract
       - dw_rent.dim_contract.sk_contract
-  segments_risk:
-    description: Risk segmentation based on contract status and payment behavior - categorizes contracts into HIGH, MEDIUM, LOW, BAIXISSIMA probability segments
+  wallet_overdue_t2:
+    description: Total overdue amount in wallet using T2 contamination methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.wallet_overdue_t2
+  overdue_recovered_amount_t2:
+    description: Total amount recovered from overdue invoices using T2 methodology
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t2
+  tree_class:
+    description: |
+      Decision tree classification based on contract status and delay range. Used to determine when payment probability should be frozen.
+      Possible values: TREE 0 (Active 0-3 days), TREE 1 (Active 4-30 days), TREE 2 (Completed 0-30 days),
+      TREE 3 (Completed 31-90 days), TREE 4 (Completed 90+ days), NO_TREE (Active 30+ days)
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
-      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
-      - dw_collections_segmentation.fact_contract_wallet_timeline.sum_monthly_overdue_days_paid_t1
-      - dw_collections_segmentation.fact_contract_wallet_timeline.count_monthly_overdue_invoices_paid_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+  prob_payment_at_dt_reference:
+    description: |
+      Payment probability calculated at each reference date before freezing. This is the raw probability calculation
+      that changes daily based on current contract conditions. Values: VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW,
+      or NULL variations for different contract states
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_contract_features_timeline.avg_days_overdue_invoices_paid_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.n_days_over1_t2_l180
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_broken_promessas_lifetime
       - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_ending
       - datalake_sorting_hat_clean.proponent.monthly_income
-  segments_risk_ffill:
-    description: Forward-filled version of segments_risk to maintain consistency across timeline
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_max_n_repairs
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_broken_multiple_deals_lifetime
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_rental_core_invoices
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_acordo_invoices
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_cpc_l90
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
+      - dw_collections_segmentation.fact_contract_features_timeline.share_monthly_paid_ontime_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_in_wallet
+  prob_payment:
+    description: |
+      Frozen payment probability for the month. This value is set on the first day a contract enters each tree class
+      and remains constant until the contract moves to a different tree or until month end. For contracts outside
+      defined trees (e.g., Active 30+), maintains the last probability from the previous tree entry.
     lineage:
-      - dw_collections_segmentation.fact_contract_features_timeline.segments_risk
+      - dw_collections_segmentation.fact_contract_features_timeline.prob_payment_at_dt_reference
+      - dw_collections_segmentation.fact_contract_features_timeline.tree_class
+      - dw_collections_segmentation.fact_contract_features_timeline.dt_month_start
+  segmentation_with_prob_payment_at_dt_reference:
+    description: |
+      Detailed contract segmentation using the daily calculated payment probability (prob_payment_at_dt_reference).
+      This segmentation changes daily as contract conditions evolve. Includes categories like active-new-defaulter-early-high,
+      ended-stock-roll1-low, evictions, etc., differentiated by status, delay range, and daily probability assessment
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.mob_months
+      - dw_collections_segmentation.fact_contract_features_timeline.prob_payment_at_dt_reference
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_deals_principal_discount_lifetime
+  segmentation:
+    description: |
+      Detailed contract segmentation using the frozen monthly payment probability (prob_payment). This is the stable
+      segmentation that uses the probability frozen at tree entry and remains constant within each tree/month period.
+      Includes same categories as segmentation_with_prob_payment_at_dt_reference but with frozen probability logic
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.mob_months
+      - dw_collections_segmentation.fact_contract_features_timeline.prob_payment
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_deals_principal_discount_lifetime
   t1_delay_bucket:
     description: Bucketed categorization of T1 delay into ranges (Current, 1-30, 31-60, 61-90, 91-180, >180 days)
     lineage:
@@ -162,16 +413,37 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
   segment_comms:
-    description: Communication segmentation for collections strategy - includes categories like FPD, NEW DEFAULTER, EVEX, BLOCKLIST, etc.
+    description: Communication segmentation for collections strategy - includes categories like FPD, NEW DEFAULTER, EVEX, CORLEONES, PURGATORIUM, SLIPPERS, SNOWBALL, SINKING ENDED, TITANIC ENDED, etc.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.days_since_contract_start
       - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_anchor_invoices_not_negativable
-  segment_comms_ffill:
-    description: Forward-filled version of segment_comms to maintain consistency across timeline
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_others_t1
+  dt_month_start:
+    description: First day of the month for the reference date - used to control the monthly probability freezing logic
     lineage:
-      - dw_collections_segmentation.fact_contract_features_timeline.segment_comms
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+  dt_contract_start:
+    description: Contract start date
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_contract_start
+  year:
+    description: Year extracted from dt_reference
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+  month:
+    description: Month extracted from dt_reference
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+  day:
+    description: Day extracted from dt_reference
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
   ts_load:
     description: Timestamp when the record was loaded into the table
