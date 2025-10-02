@@ -71,9 +71,6 @@ SELECT
     TO_DATE(NextSalReviewDate, 'yyyy-MM-dd') AS dt_next_salary_review,
     TO_TIMESTAMP(SUBSTR(REPLACE(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
     TO_TIMESTAMP(SUBSTR(REPLACE(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
-    ts_load,
-    year,
-    month,
-    day
+    ts_load
 FROM
     datalake_hr_system_raw.salaries

@@ -2,7 +2,7 @@
 database_name: datalake_hr_system_clean
 table_name: salaries
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: "All salaries data for a worker's assignment"
 columns:
   id_salary:
@@ -118,7 +118,7 @@ columns:
     lineage:
     - datalake_hr_system_raw.salaries.LastUpdatedBy
   created_by:
-    description: ''
+    description: 'User identifier who created the salary record'
     lineage:
     - datalake_hr_system_raw.salaries.CreatedBy
   assignment_type:
@@ -277,15 +277,3 @@ columns:
     description: 'Timestamp of the load of the salary record in the data lake'
     lineage:
     - datalake_hr_system_raw.salaries.ts_load
-  year:
-    description: 'Year of the creation of the salary record [Partition]'
-    lineage:
-    - datalake_hr_system_raw.salaries.year
-  month:
-    description: 'Month of the creation of the salary record [Partition]'
-    lineage:
-    - datalake_hr_system_raw.salaries.month
-  day:
-    description: 'Day of the creation of the salary record [Partition]'
-    lineage:
-    - datalake_hr_system_raw.salaries.day

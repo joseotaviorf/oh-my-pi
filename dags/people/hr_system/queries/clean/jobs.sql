@@ -27,9 +27,6 @@ SELECT
     to_date(EffectiveEndDate, 'yyyy-MM-dd') AS dt_effective_end,
     to_timestamp(substr(replace(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
     to_timestamp(substr(replace(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
-    ts_load AS ts_load,
-    year AS year,
-    month AS month,
-    day AS day
+    ts_load AS ts_load
 FROM 
   datalake_hr_system_raw.jobs

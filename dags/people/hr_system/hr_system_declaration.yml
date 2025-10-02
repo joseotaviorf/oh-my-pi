@@ -77,7 +77,6 @@ workflow:
             expand:
               - "JobFamilyDFF"
     jobs:
-      partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "JobId"
           column_to_partition: "CreationDate"
@@ -89,7 +88,6 @@ workflow:
               - "JobCustomerFlex"
               - "validGrades"
     organizations:
-      partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "OrganizationId"
           column_to_partition: "CreationDate"
@@ -101,7 +99,6 @@ workflow:
               - "OrganizationDFF"
               - "extraInformation"
     salaries:
-      partitions: ["year", "month", "day"]
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "SalaryId"
@@ -115,7 +112,6 @@ workflow:
               - "salaryPayRateComponents"
               - "salarySimpleComponents"
     workers:
-      partitions: ["dt_effective", "year", "month", "day"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
           column_to_partition: "CreationDate"

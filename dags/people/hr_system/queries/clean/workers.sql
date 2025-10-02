@@ -35,13 +35,11 @@ SELECT
   workRelationships AS work_relationships,
   workersDFF AS workers_dff,
   workersEFF AS workers_eff,
+  dt_effective,
   to_date(DateOfBirth, 'yyyy-MM-dd') AS dt_birth,
   to_date(DateOfDeath, 'yyyy-MM-dd') AS dt_death,
   to_timestamp(substr(replace(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
   to_timestamp(substr(replace(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
-  ts_load,
-  dt_effective,
-  year,
-  month,
-  day
-FROM datalake_hr_system_raw.workers
+  ts_load
+FROM 
+  datalake_hr_system_raw.workers

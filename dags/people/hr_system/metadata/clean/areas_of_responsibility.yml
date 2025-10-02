@@ -2,7 +2,7 @@
 database_name: datalake_hr_system_clean
 table_name: areas_of_responsibility
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: "The representatives resource provides details of representatives of a person. A person can have different types of representatives such as benefits representative, human resources representative, and so on."
 columns:
   id_responsibility:

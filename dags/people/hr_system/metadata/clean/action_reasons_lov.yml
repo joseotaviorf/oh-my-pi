@@ -2,7 +2,7 @@
 database_name: datalake_hr_system_clean
 table_name: action_reasons_lov
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: 'The action_reasons_lov table provides the list of values for the employment action reasons.'
 columns:
   id_action_reason:
@@ -30,6 +30,6 @@ columns:
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.EndDate
   ts_load:
-    description: ''
+    description: 'Timestamp when the record was loaded into the data warehouse'
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.ts_load
