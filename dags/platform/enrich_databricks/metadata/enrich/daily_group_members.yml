@@ -1,0 +1,22 @@
+---
+database_name: datalake_databricks
+table_name: daily_group_members
+description: Takes daily snapshots of the relationship between each user and the groups they belong to in the Databricks account.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_user:
+    description: Unique identifier for the user on the Databricks account.
+  id_group:
+    description: Unique identifier for the group on the Databricks account.
+  directness:
+    description: Indicates whether the user is a direct member of the group or an indirect member (i.e., a member of a subgroup).
+    categories:
+      direct: The user is a direct member of the group.
+      indirect: The user is an indirect member of the group (i.e., a member of a subgroup).
+  year:
+    description: Year of the snapshot.
+  month:
+    description: Month of the snapshot.
+  day:
+    description: Day of the snapshot.

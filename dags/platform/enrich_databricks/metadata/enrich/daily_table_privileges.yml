@@ -1,0 +1,44 @@
+---
+database_name: datalake_databricks
+table_name: daily_table_privileges
+description: Takes daily snapshots of the privileges associated with each table. Each row represents
+  read access granted to a user, service principal or group on a specific table, on a given day.
+  The table only captures direct group privileges, otherwise it would get too large. If you need indirect memberships (i.e., users
+  who are members of groups or subgroups), you can use the `daily_group_members` table to resolve
+  the full membership hierarchy.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_user:
+    description: If the grantee is a user, this column contains the internal user ID.
+    lineage:
+      - datalake_databricks.daily_users.id_user
+  id_group:
+    description: If the grantee is a group, this column contains the internal group ID.
+    lineage:
+      - datalake_databricks.daily_groups.id_group
+  grantee:
+    description: If the grantee is a service principal, this column contains the service principal id. If the grantee is a user,
+      this column contains the email. If the grantee is a group, this column contains the group name.
+    lineage:
+      - system.information_schema.table_privileges.grantee
+  grantee_type:
+    description: Indicates whether the grantee is a user, group, or service principal.
+    categories:
+      User: A user account.
+      Group: A group account.
+      Service principal: A service principal account.
+  table_schema:
+    description: Schema of the table on which the privilege is granted.
+    lineage:
+      - system.information_schema.table_privileges.table_schema
+  table_name:
+    description: Name of the table on which the privilege is granted.
+    lineage:
+      - system.information_schema.table_privileges.table_name
+  year:
+    description: Year of the snapshot.
+  month:
+    description: Month of the snapshot.
+  day:
+    description: Day of the snapshot.

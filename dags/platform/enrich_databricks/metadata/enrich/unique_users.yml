@@ -1,0 +1,32 @@
+---
+database_name: datalake_databricks
+table_name: unique_users
+description: Every row is a user that has ever existed in the Databricks account. This table is
+  updated incrementally based on daily snapshots from the daily_users table.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_user:
+    description: Unique identifier for the user on the Databricks account.
+    lineage:
+      - datalake_databricks.daily_users.id_user
+  email:
+    description: Email of the user.
+    lineage:
+      - datalake_databricks.daily_users.email
+  is_active_user:
+    description: Indicates whether the user is active.
+    lineage:
+      - datalake_databricks.daily_users.is_active_user
+  is_active_employee:
+    description: Indicates whether the user is an active QuintoAndar employee.
+    lineage:
+      - datalake_databricks.daily_users.is_active_employee
+  dt_created:
+    description: Timestamp when the user was first seen in the Databricks account. The table was created 
+      on 2025-10-01, so any user created before that date will have that as their dt_created.
+  dt_updated:
+    description: Timestamp when the user was last updated in the Databricks account.
+  dt_deleted:
+    description: If the user was deleted, this column contains the timestamp of deletion. If the
+      user is active, this column is NULL.

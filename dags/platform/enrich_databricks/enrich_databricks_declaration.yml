@@ -26,6 +26,90 @@ workflow:
     # Removing this temporarily while we're fixing the issue with aws_costs_new
     # daily_pool_idle_time:
     #   partitions: [ dt_cluster_run ]
+    daily_users:
+      load_spark_job: load_daily_users
+      spark_job_arguments:
+      - "{environment}"
+      - "{bucket}"
+      - "{dag_name}"
+      - "{schema}"
+      - "{table_name}"
+      - "{partitions}"
+      partitions: [ year, month, day ]
+      extraction_type: incremental
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+      has_hive_sync: false
+    unique_users:
+      merge_on: [ id_user ]
+      # Only update when there is a change and the row is not marked as deleted
+      when_matched_update_condition: |
+        target.dt_deleted IS NULL AND (
+          target.email IS DISTINCT FROM source.email
+          OR target.is_active_user IS DISTINCT FROM source.is_active_user
+          OR target.is_active_employee IS DISTINCT FROM source.is_active_employee
+          OR target.dt_deleted IS DISTINCT FROM source.dt_deleted
+        )
+      # Update everything except dt_created
+      when_matched_operation:
+        email: "source.email"
+        is_active_user: "source.is_active_user"
+        is_active_employee: "source.is_active_employee"
+        dt_updated: "source.dt_updated"
+        dt_deleted: "source.dt_deleted"
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+      has_hive_sync: false
+    daily_groups:
+      load_spark_job: load_daily_groups
+      spark_job_arguments:
+      - "{environment}"
+      - "{bucket}"
+      - "{dag_name}"
+      - "{schema}"
+      - "{table_name}"
+      - "{partitions}"
+      partitions: [ year, month, day ]
+      extraction_type: incremental
+    unique_groups:
+      merge_on: [ id_group ]
+      # Only update when there is a change and the row is not marked as deleted
+      when_matched_update_condition: |
+        target.dt_deleted IS NULL AND (
+          target.id_group_external IS DISTINCT FROM source.id_group_external
+          OR target.display_name IS DISTINCT FROM source.display_name
+          OR target.dt_deleted IS DISTINCT FROM source.dt_deleted
+        )
+      # Update everything except dt_created
+      when_matched_operation:
+        id_group_external: "source.id_group_external"
+        display_name: "source.display_name"
+        dt_updated: "source.dt_updated"
+        dt_deleted: "source.dt_deleted"
+    daily_group_members:
+      load_spark_job: load_daily_group_members
+      spark_job_arguments:
+      - "{environment}"
+      - "{bucket}"
+      - "{dag_name}"
+      - "{schema}"
+      - "{table_name}"
+      - "{partitions}"
+      partitions: [ year, month, day ]
+      extraction_type: incremental
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+      has_hive_sync: false
+    daily_table_privileges:
+      partitions: [ year, month, day ]
+      extraction_type: incremental
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+      has_hive_sync: false
   inner_dependencies:
     unique_clusters:
       - instance_pools
@@ -33,11 +117,19 @@ workflow:
       - unique_clusters
     # daily_pool_idle_time:
     #   - daily_clusters
+    unique_users:
+      - daily_users
+    unique_groups:
+      - daily_groups
+    daily_table_privileges:
+      - daily_users
+      - daily_groups
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+    catalog: quintoandar_{{ var.value.environment }}
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'

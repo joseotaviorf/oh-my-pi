@@ -1,0 +1,19 @@
+---
+database_name: datalake_databricks
+table_name: daily_groups
+description: Takes daily snapshots of groups in the Databricks account.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_group:
+    description: Unique identifier for the group on the Databricks account.
+  id_group_external:
+    description: External identifier for the group on the Databricks account.
+  display_name:
+    description: Display name of the group.
+  year:
+    description: Year of the snapshot.
+  month:
+    description: Month of the snapshot.
+  day:
+    description: Day of the snapshot.

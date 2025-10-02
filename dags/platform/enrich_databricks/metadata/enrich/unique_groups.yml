@@ -1,0 +1,28 @@
+---
+database_name: datalake_databricks
+table_name: unique_groups
+description: Every row is a group that has ever existed in the Databricks account. This table is
+  updated incrementally based on daily snapshots from the daily_groups table.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_group:
+    description: Unique identifier for the group on the Databricks account.
+    lineage:
+      - datalake_databricks.daily_groups.id_group
+  id_group_external:
+    description: External identifier for the group, typically corresponding to an identity provider's group ID.
+    lineage:
+      - datalake_databricks.daily_groups.id_group_external
+  display_name:
+    description: Display name of the group.
+    lineage:
+      - datalake_databricks.daily_groups.display_name
+  dt_created:
+    description: Timestamp when the group was first seen in the Databricks account. The table was created
+      on 2025-10-01, so any group created before that date will have that as their dt_created.
+  dt_updated:
+    description: Timestamp when the group was last updated in the Databricks account.
+  dt_deleted:
+    description: If the group was deleted, this column contains the timestamp of deletion. If the
+      group is active, this column is NULL.
