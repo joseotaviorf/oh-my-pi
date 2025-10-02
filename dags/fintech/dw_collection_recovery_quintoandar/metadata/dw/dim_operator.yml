@@ -1,8 +1,8 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: dim_operator
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: Dimension table containing standardized information about operators, including metadata from multiple sources like Recupera, Cyber, Paschoalotto, Webhelp, GRB, and MeetCall. Used for joining operator data in analytical models.
+domain: Fintech
+description: Dimension table containing standardized information about operators, including metadata from multiple sources like Recupera, Cyber, Paschoalotto, Webhelp, Bulgarelli, and MeetCall. Used for joining operator data in analytical models.
 columns:
   sk_operator:
     description: "Surrogate key for the operator, derived directly from the unique operator ID (`id_operator`) from the source `operators` table."
@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_collections_quintoandar.operators.company_name
   source:
-    description: "Origin of the operator record, indicating the source system like 'Recupera', 'Paschoalotto', 'Webhelp', 'Cyber', 'GRB', or 'MeetCall'."
+    description: "Origin of the operator record, indicating the source system like 'Recupera', 'Paschoalotto', 'Webhelp', 'Cyber', 'Bulgarelli', or 'MeetCall'."
     lineage:
       - datalake_collections_quintoandar.operators.source
   ts_user_created:

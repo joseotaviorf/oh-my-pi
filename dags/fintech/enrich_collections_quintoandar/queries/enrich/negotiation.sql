@@ -21,7 +21,7 @@ trato_feito_negotiation AS (
     CASE
       WHEN UPPER(n.contact_type) IN ('IAPORTAL', 'IAWPP') THEN 'Matthew'
       WHEN n.consultancy_name = "PORTAL_QUINTOANDAR" THEN "Portal Auto Negociação"
-      WHEN UPPER(n.consultancy_name) IN ("PASCHOALOTTO", "MEETCALL", "TRC", "GRB", "MONEST", "PELLON", "PLC", "GONDIM") THEN "Assessoria"
+      WHEN UPPER(n.consultancy_name) IN ("PASCHOALOTTO", "MEETCALL", "TRC", "GRB", "BULGARELLI" "MONEST", "PELLON", "PLC", "GONDIM") THEN "Assessoria"
       WHEN n.consultancy_name = "SERASA" THEN "Serasa Digital"
       WHEN n.consultancy_name = "COBRANÇA_INTERNA_QA" THEN "Operador Interno"
     END AS origin_agreement,

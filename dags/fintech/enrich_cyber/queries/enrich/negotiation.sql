@@ -199,7 +199,8 @@ SELECT
     CASE
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "PASCH%" THEN "PASCHOALOTTO"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%TRC%" THEN "TRC"
-      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%GRB%" THEN "GRB"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%GRB%" THEN "BULGARELLI"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%BGR%" THEN "BULGARELLI"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%MEETC%" THEN "MEETCALL"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%MONES%" THEN "MONEST"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%PELLON%" THEN "PELLON"

@@ -66,7 +66,7 @@ union_all_sources AS (
     SELECT DISTINCT
         id_user AS id_operator,
         CAST(id_agency AS STRING) AS id_agency,
-        user_name,
+        UPPER(user_name) AS user_name,
         user_email,
         user_type,
         user_department,
@@ -88,9 +88,9 @@ union_all_sources AS (
         'Externo'  AS user_type,
         'Assessoria' AS user_department,
         'Assessoria Convencional' AS agency_type,
-        'GRB' AS agency_name,
-        'GRB' AS company_name,
-        'GRB' source,
+        'BULGARELLI' AS agency_name,
+        'BULGARELLI' AS company_name,
+        'BULGARELLI' source,
         3 AS priority,
         TIMESTAMP(dt_admission) AS ts_user_created
     FROM datalake_grb_clean.operators
