@@ -73,11 +73,7 @@ SELECT
     -- timestamps
     to_timestamp(substr(replace(o.CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
     to_timestamp(substr(replace(o.LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
-    o.ts_load,
-    -- partitions
-    o.year,
-    o.month,
-    o.day
+    o.ts_load
 FROM datalake_hr_system_raw.organizations AS o
 LEFT JOIN organization_dff AS  odff
   ON o.OrganizationId = odff.OrganizationId
