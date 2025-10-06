@@ -20,7 +20,7 @@ recupera AS (
     o.dt_reference,
     o.dt_invoice_paid,
     MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid,
-    COALESCE(rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY rc.dt_snapshot)) AS advisory
+    COALESCE(rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory
   FROM
     datalake_collections_quintoandar.overdue_portfolio_timeline AS o
   LEFT JOIN datalake_recupera.contract_advisory_distribution AS rc
@@ -37,7 +37,8 @@ get_last_advisory_recupera AS (
   FROM recupera
   WHERE
     dt_reference BETWEEN DATE_ADD(max_dt_invoice_paid,-1) AND max_dt_invoice_paid
-    AND (advisory IS NOT NULL OR advisory NOT IN ("DBAIXAS", "DCARGA"))
+    AND advisory NOT IN ("DBAIXAS", "DCARGA")
+    AND advisory IS NOT NULL
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
 ),
 get_recupera_advisory AS (
@@ -102,7 +103,7 @@ SELECT
     q.agreement_queue_description,
     q.eviction_queue,
     q.eviction_queue_description,
-    -- MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
+    MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
     o.dt_invoice_paid,
     o.dt_invoice_due,
     o.dt_invoice_due_adjust,
@@ -117,7 +118,6 @@ LEFT JOIN
     datalake_recupera.contract_advisory_distribution AS rc
       ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
-      -- AND (advisory IS NOT NULL OR advisory NOT IN ("DBAIXAS", "DCARGA"))
       AND rc.dt_snapshot BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
     datalake_collections_quintoandar.agency_timeline AS cad
@@ -150,9 +150,9 @@ get_last_valid_partner AS (
     eviction_queue,
     eviction_queue_description
   FROM add_all_dimensions
-  WHERE dt_invoice_paid IS NOT NULL
+  WHERE dt_reference >= DATE_ADD(max_dt_invoice_paid,-1) AND dt_reference <= max_dt_invoice_paid
   AND (advisory IS NULL OR advisory NOT IN ("DBAIXAS", "DCARGA"))
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
 )
 SELECT
     a.sk_overdue_portfolio_timeline,
@@ -194,7 +194,7 @@ SELECT
     a.is_first_payment_default,
     a.has_app_action_event,
     a.has_matthew_interaction,
-    COALESCE(IF(a.dt_reference >= a.dt_invoice_paid, g.advisory, a.advisory), rc.advisory) AS advisory,
+    COALESCE(IF(a.dt_reference >= a.dt_invoice_paid, COALESCE(g.advisory, rc.advisory), a.advisory), ra.advisory) AS advisory,
     IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue, a.segmentation_queue) AS segmentation_queue,
     IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue_description, a.segmentation_queue_description) AS segmentation_queue_description,
     IF(a.dt_reference >= a.dt_invoice_paid, g.agreement_queue, a.agreement_queue) AS agreement_queue,
@@ -221,7 +221,11 @@ LEFT JOIN
   get_last_advisory_recupera AS rc
      ON a.id_contract = rc.id_contract
       AND a.id_invoice = rc.id_invoice
-      AND a.dt_reference = rc.dt_reference
+LEFT JOIN
+  get_recupera_advisory AS ra
+     ON a.id_contract = ra.id_contract
+      AND a.id_invoice = ra.id_invoice
+      AND a.dt_reference = ra.dt_reference
 WHERE
   (sk_origin_negotiation IS NULL
   OR (sk_origin_negotiation IS NOT NULL
