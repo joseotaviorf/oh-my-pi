@@ -2,15 +2,11 @@ bietlejuice.enrich_hightouch:
   add:
     - bietlejuice.hightouch_logs:load-clean-audience-membership-databricks
     - bietlejuice.hightouch_logs:load-clean-audience-membership-trino
-    - bietlejuice.hightouch_logs:load-clean-sync-changelog-databricks
-    - bietlejuice.hightouch_logs:load-clean-sync-changelog-trino
     - bietlejuice.hightouch_logs:load-clean-sync-runs-databricks
     - bietlejuice.hightouch_logs:load-clean-sync-runs-trino
   remove:
     - bietlejuice.hightouch_logs:load-clean-audience-membership-databricks:first-run-of-day
     - bietlejuice.hightouch_logs:load-clean-audience-membership-trino:first-run-of-day
-    - bietlejuice.hightouch_logs:load-clean-sync-changelog-databricks:first-run-of-day
-    - bietlejuice.hightouch_logs:load-clean-sync-changelog-trino:first-run-of-day
     - bietlejuice.hightouch_logs:load-clean-sync-runs-databricks:first-run-of-day
     - bietlejuice.hightouch_logs:load-clean-sync-runs-trino:first-run-of-day
 bietlejuice.cyber_complement:

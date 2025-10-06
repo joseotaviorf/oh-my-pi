@@ -10,7 +10,6 @@ workflow:
   layer: enrich
   default_extraction_type: full
   tables_customization:
-    sync_changelog: {}
     sync_runs: {}
     audience_membership: {}
     journey_metadata: {}
