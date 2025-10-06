@@ -19,7 +19,7 @@ workflow:
         - "{environment}"
         - "{{ data_interval_start | ds }}"
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_16_4_min_memory_cluster
   access_control_list:
     group_name: data-platform-engineers
     permission_level: CAN_MANAGE
