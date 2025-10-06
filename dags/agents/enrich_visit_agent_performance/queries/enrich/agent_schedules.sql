@@ -49,7 +49,7 @@ rent_flows_touchpoint AS (
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY rf.id_booking ORDER BY rf.ts_updated DESC) = 1
 )
-SELECT
+SELECT DISTINCT
     XXHASH64(b.id_agent, b.id) AS id_agent_schedule,
     b.id_agent,
     b.id AS id_booking,
