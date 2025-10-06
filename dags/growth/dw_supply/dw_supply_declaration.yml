@@ -2,7 +2,7 @@ dag:
   name: dw_supply
   schedule_start_date: 2024,5,23
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG is responsible for extracting and loading the supply data into the DW layer.
 workflow:
@@ -12,35 +12,35 @@ workflow:
   default_extraction_type: incremental
   tables_customization:
     dim_acquisition_lead:
-      merge_on: ['bk_acq_lead']
-      z_order_by: ['sk_acquisition_lead', 'bk_acq_lead']
+      merge_on: ["bk_acq_lead"]
+      z_order_by: ["sk_acquisition_lead", "bk_acq_lead"]
       vacuum_retention_hours: 168
     dim_affiliate_tracking:
-      z_order_by: ['sk_user_affiliate']
+      z_order_by: ["sk_user_affiliate"]
       vacuum_retention_hours: 168
       extraction_type: full
     dim_funnel_step:
-      merge_on: ['bk_funnel_step']
-      z_order_by: ['sk_funnel_step', 'bk_funnel_step']
+      merge_on: ["bk_funnel_step"]
+      z_order_by: ["sk_funnel_step", "bk_funnel_step"]
       vacuum_retention_hours: 168
     dim_supply_discards:
-      merge_on: ['bk_discard']
-      z_order_by: ['sk_discard', 'bk_discard']
+      merge_on: ["bk_discard"]
+      z_order_by: ["sk_discard", "bk_discard"]
       vacuum_retention_hours: 168
     dim_supply_operation_flow:
-      merge_on: ['bk_ops']
-      z_order_by: ['sk_ops', 'bk_ops']
+      merge_on: ["bk_ops"]
+      z_order_by: ["sk_ops", "bk_ops"]
       vacuum_retention_hours: 168
     dim_supply_recovery_flow:
-      merge_on: ['bk_recovery']
-      z_order_by: ['sk_recovery', 'id_level', 'bk_recovery']
+      merge_on: ["bk_recovery"]
+      z_order_by: ["sk_recovery", "id_level", "bk_recovery"]
       vacuum_retention_hours: 168
     dim_supply_user_path:
-      merge_on: ['bk_user_path']
-      z_order_by: ['sk_user_path', 'id_level', 'bk_user_path']
+      merge_on: ["bk_user_path"]
+      z_order_by: ["sk_user_path", "id_level", "bk_user_path"]
       vacuum_retention_hours: 168
     fact_supply_events:
-      z_order_by: ['sk_supply','sk_funnel_step', 'nm_business_context']
+      z_order_by: ["sk_supply", "sk_funnel_step", "nm_business_context"]
       extraction_type: full
       vacuum_retention_hours: 168
     obt_supply:
@@ -58,10 +58,10 @@ workflow:
     obt_supply:
       - fact_supply_events
 cluster:
-  type: databricks_12_2_med_io-memory_photon_cluster
+  type: databricks_16_4_med_io-memory_photon_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
