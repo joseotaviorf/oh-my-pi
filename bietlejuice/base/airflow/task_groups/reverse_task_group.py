@@ -1,5 +1,6 @@
 import json
 from datetime import timedelta
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 from quintoandar_logger import QuintoAndarLogger
 
@@ -131,6 +132,13 @@ class ReverseTaskGroup(BaseTaskGroup):
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
             databricks_conn_id=self.databricks_conn_id,
+            params={
+                "schema": source_database_base_name,
+                "table_name": table_name,
+                "layer": layer.value,
+                "bucket": self.s3_bucket,
+                "storage_format": StorageFormatEnum.PARQUET.value,
+            },
         )
         DatasetAdder.attach_dataset_to_task(load_table_task)
 

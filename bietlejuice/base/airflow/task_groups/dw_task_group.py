@@ -4,6 +4,7 @@ from typing import Dict
 from os import path
 
 from airflow.utils.helpers import chain
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
@@ -92,6 +93,13 @@ class DWTaskGroup(BaseTaskGroup):
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            params={
+                "schema": schema,
+                "table_name": table_name,
+                "layer": layer,
+                "bucket": self.datalake_bucket,
+                "storage_format": StorageFormatEnum.PARQUET.value,
+            },
         )
         DatasetAdder.attach_dataset_to_task(load_table_task)
 

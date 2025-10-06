@@ -105,7 +105,7 @@ class ReverseLoadAccessWorkflow(BaseWorkflow):
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
         self.export_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CUSTOM, task_id_prefix="export"
+            TaskEnum.LOAD_CUSTOM, task_id_prefix="export", produce_datasets=False
         )
         self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DUMMY_JOB_CLUSTER_FINISHED

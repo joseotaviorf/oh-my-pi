@@ -1,5 +1,6 @@
 import json
-from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -8,7 +9,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
-class LoadCDCCleanTaskCreator(BaseTaskCreator):
+class LoadCDCCleanTaskCreator(LoadTaskCreator):
     """Creates the task that loads data from the raw layer of a Change Data Capture (CDC) pipeline into the clean layer."""
 
     _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
@@ -18,8 +19,13 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
         self,
         dag_execution_context: DagExecutionContext,
         config_service: ConfigurationService,
+        produce_datasets: bool = True,
     ) -> None:
-        super().__init__(dag_execution_context)
+        super().__init__(
+            dag_execution_context,
+            produce_datasets,
+            storage_format=StorageFormatEnum.DELTA,
+        )
         self.data_documentation_bucket = config_service.get_config(
             "data_documentation_bucket"
         )
@@ -51,7 +57,7 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
 
         return parameters
 
-    def create_task(
+    def _create_base_load_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         task_id = self.generate_task_id(table_attributes)

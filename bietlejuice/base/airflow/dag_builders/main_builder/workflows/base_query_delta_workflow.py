@@ -5,6 +5,7 @@ from airflow.models.baseoperator import BaseOperator
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
     TaskEnum,
@@ -215,7 +216,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             TaskEnum.LOAD_DELTA
         )
         self.load_custom_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CUSTOM
+            TaskEnum.LOAD_CUSTOM, storage_format=StorageFormatEnum.DELTA
         )
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service

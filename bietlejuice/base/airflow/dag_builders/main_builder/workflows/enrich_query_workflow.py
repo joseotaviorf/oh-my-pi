@@ -3,6 +3,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
     TaskEnum,
@@ -124,7 +125,7 @@ class EnrichQueryWorkflow(BaseWorkflow):
             TaskEnum.LOAD_QUERY
         )
         self.load_custom_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CUSTOM
+            TaskEnum.LOAD_CUSTOM, storage_format=StorageFormatEnum.PARQUET
         )
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service

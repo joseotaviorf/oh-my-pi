@@ -1,16 +1,24 @@
-from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
 
 
-class LoadMongoRawTaskCreator(BaseTaskCreator):
+class LoadMongoRawTaskCreator(LoadTaskCreator):
     """Creates the task that extracts data from a MongoDB table and sink into the raw layer."""
 
     _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
     SPARK_JOB_NAME = "load_mongo_raw"
 
-    def create_task(
+    def __init__(self, dag_execution_context, produce_datasets=True):
+        super().__init__(
+            dag_execution_context,
+            produce_datasets,
+            storage_format=StorageFormatEnum.JSON,
+        )
+
+    def _create_base_load_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         task_id = self.generate_task_id(table_attributes)

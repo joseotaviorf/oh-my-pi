@@ -1,15 +1,23 @@
-from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
 
 
-class LoadDeltaTableTaskCreator(BaseTaskCreator):
+class LoadDeltaTableTaskCreator(LoadTaskCreator):
     """Creates the task that loads a delta data from using delta loaders"""
 
     _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
     SPARK_JOB_NAME = "load_delta_table"
+
+    def __init__(self, dag_execution_context, produce_datasets=True):
+        super().__init__(
+            dag_execution_context,
+            produce_datasets,
+            storage_format=StorageFormatEnum.DELTA,
+        )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         extra_query_template_params = self._get_extra_query_template_params(
@@ -84,7 +92,7 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
 
         return extra_query_template_params
 
-    def create_task(
+    def _create_base_load_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         if table_attributes.layer == LayerEnum.DW:

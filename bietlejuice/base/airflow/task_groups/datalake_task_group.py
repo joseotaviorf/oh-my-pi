@@ -4,6 +4,7 @@ from typing import Dict
 from os import path
 
 from airflow.utils.helpers import chain
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
@@ -266,6 +267,15 @@ class DatalakeTaskGroup(BaseTaskGroup):
             spark_job_extra_args=raw_spark_job_extra_args or [],
             do_output_xcom_push=do_output_xcom_push,
         )
+        load_table_task.params.update(
+            {
+                "schema": database_name,
+                "table_name": table_name,
+                "layer": layer,
+                "bucket": self.datalake_bucket,
+                "storage_format": StorageFormatEnum.JSON.value,
+            }
+        )
 
         sync_metadata_task = self._build_metadata_sync_task(
             source=source,
@@ -390,6 +400,15 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 "--table-privileges",
                 json.dumps(table_privileges),
             ],
+        )
+        load_table_task.params.update(
+            {
+                "schema": source_database_base_name,
+                "table_name": table_name,
+                "layer": layer,
+                "bucket": self.datalake_bucket,
+                "storage_format": StorageFormatEnum.PARQUET.value,
+            }
         )
 
         metadata_sync_task = self._build_metadata_sync_task(

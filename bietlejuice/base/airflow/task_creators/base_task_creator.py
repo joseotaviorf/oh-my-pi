@@ -1,5 +1,3 @@
-import bietlejuice.base.airflow.datasets.dataset_adder as dataset_adder
-
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from os import path
@@ -71,8 +69,6 @@ class BaseTaskCreator(ABC):
             },
             execution_timeout=timedelta(hours=execution_timeout_hours),
         )
-        if task_id.startswith("load-"):
-            dataset_adder.DatasetAdder.attach_dataset_to_task(operator)
 
         return operator
 

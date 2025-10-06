@@ -1,16 +1,24 @@
-from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
 
 
-class LoadQueryTaskCreator(BaseTaskCreator):
+class LoadQueryTaskCreator(LoadTaskCreator):
     """Creates the task that loads data into the enrich layer."""
 
     _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
 
-    def create_task(
+    def __init__(self, dag_execution_context, produce_datasets=True):
+        super().__init__(
+            dag_execution_context,
+            produce_datasets,
+            storage_format=StorageFormatEnum.PARQUET,
+        )
+
+    def _create_base_load_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         spark_job_name = f"load_table_{table_attributes.extraction_type}"

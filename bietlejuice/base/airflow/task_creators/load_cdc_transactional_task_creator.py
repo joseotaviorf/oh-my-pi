@@ -1,11 +1,12 @@
-from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 import json
 
 
-class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
+class LoadCDCTransactionalTaskCreator(LoadTaskCreator):
     """Creates the task that loads data from the landing zone of a Change Data Capture (CDC) pipeline into the transactional layer."""
 
     _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
@@ -14,6 +15,13 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
         DatabaseTypeEnum.POSTGRES.value,
         DatabaseTypeEnum.MYSQL.value,
     ]
+
+    def __init__(self, dag_execution_context, produce_datasets=True):
+        super().__init__(
+            dag_execution_context,
+            produce_datasets,
+            storage_format=StorageFormatEnum.DELTA,
+        )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         partitions = ["year", "month", "day", "hour"]
@@ -72,7 +80,7 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
         ]
         return parameters
 
-    def create_task(
+    def _create_base_load_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         task_id = self.generate_task_id(table_attributes)
