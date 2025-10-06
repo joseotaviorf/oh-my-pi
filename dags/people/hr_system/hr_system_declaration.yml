@@ -112,6 +112,7 @@ workflow:
               - "salaryPayRateComponents"
               - "salarySimpleComponents"
     workers:
+      partitions: ["dt_effective"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
           column_to_partition: "CreationDate"
