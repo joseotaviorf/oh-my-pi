@@ -1,0 +1,25 @@
+SELECT
+  id,
+  guarantee_id AS id_guarantee,
+  sap_id AS id_sap,
+  idempotency_id AS id_idempotency,
+  rev,
+  revtype AS rev_type,
+  revend AS rev_end,
+  hash,
+  status,
+  request,
+  guarantee_id_mod AS mod_id_guarantee,
+  sap_id_mod AS mod_id_sap,
+  idempotency_id_mod AS mod_id_idempotency,
+  hash_mod AS mod_hash,
+  status_mod AS mod_status,
+  request_mod AS mod_request,
+  event_date_mod AS mod_event_date,
+  created_at_mod AS mod_ts_created,
+  updated_at_mod AS mod_ts_updated,
+  event_date,
+  created_at AS ts_created,
+  updated_at AS ts_updated
+FROM
+  datalake_rental_guarantee_raw.invoice_aud

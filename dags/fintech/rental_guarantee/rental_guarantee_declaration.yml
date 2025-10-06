@@ -29,6 +29,10 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       partitions: [year, month, day]
+    invoice: {}
+    invoice_aud:
+      clean_table_name: invoice_aud
+      raw_primary_keys: ["id", "rev"]
     renewal: {}
     revinfo:
       clean_table_name: rev_info

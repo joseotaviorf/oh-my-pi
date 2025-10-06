@@ -1,0 +1,45 @@
+database_name: datalake_rental_guarantee_clean
+table_name: invoice
+domain: Fintech
+description: "Cleaned invoice records from Rental Guarantee, including SAP integration details and invoice status information."
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.id
+    description: "Unique identifier of the invoice."
+  id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.guarantee_id
+    description: "Identifier of the related guarantee."
+  id_sap:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.sap_id
+    description: "SAP system identifier associated with this invoice."
+  id_idempotency:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.idempotency_id
+    description: "Idempotency identifier to prevent duplicate invoice processing."
+  hash:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.hash
+    description: "Hash value for invoice integrity verification."
+  status:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.status
+    description: "Current status of the invoice processing."
+  request:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.request
+    description: "Raw request payload sent for invoice processing."
+  event_date:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.event_date
+    description: "Date when the invoice event occurred."
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.created_at
+    description: "Creation timestamp of the invoice record."
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice.updated_at
+    description: "Last update timestamp of the invoice record."

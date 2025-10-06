@@ -1,0 +1,93 @@
+database_name: datalake_rental_guarantee_clean
+table_name: invoice_aud
+domain: Fintech
+description: "Audit log of invoice records from Rental Guarantee, including revision metadata and field-level change tracking (mod_* columns)."
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.id
+    description: "Unique identifier of the invoice."
+  id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.guarantee_id
+    description: "Identifier of the related guarantee."
+  id_sap:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.sap_id
+    description: "SAP system identifier associated with this invoice."
+  id_idempotency:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.idempotency_id
+    description: "Idempotency identifier to prevent duplicate invoice processing."
+  rev:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.rev
+    description: "Audit revision identifier."
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.revtype
+    description: "Audit change type for the revision (e.g., insert, update, delete)."
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.revend
+    description: "Audit revision end identifier."
+  hash:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.hash
+    description: "Hash value for invoice integrity verification."
+  status:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.status
+    description: "Current status of the invoice processing."
+  request:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.request
+    description: "Raw request payload sent for invoice processing."
+  event_date:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.event_date
+    description: "Date when the invoice event occurred."
+  mod_id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.guarantee_id_mod
+    description: "Flag indicating modification of guarantee_id on this revision."
+  mod_id_sap:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.sap_id_mod
+    description: "Flag indicating modification of sap_id on this revision."
+  mod_id_idempotency:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.idempotency_id_mod
+    description: "Flag indicating modification of idempotency_id on this revision."
+  mod_hash:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.hash_mod
+    description: "Flag indicating modification of hash on this revision."
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.status_mod
+    description: "Flag indicating modification of status on this revision."
+  mod_request:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.request_mod
+    description: "Flag indicating modification of request on this revision."
+  mod_event_date:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.event_date_mod
+    description: "Flag indicating modification of event_date on this revision."
+  mod_ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.created_at_mod
+    description: "Flag indicating modification of created_at on this revision."
+  mod_ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.updated_at_mod
+    description: "Flag indicating modification of updated_at on this revision."
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.created_at
+    description: "Creation timestamp recorded on the audit row."
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.invoice_aud.updated_at
+    description: "Update timestamp recorded on the audit row."
