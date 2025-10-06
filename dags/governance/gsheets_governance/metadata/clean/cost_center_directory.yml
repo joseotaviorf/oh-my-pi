@@ -1,6 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: cost_center_directory
-owner: herivelto.junior@quintoandar.com.br
+owner: gustavo.alencar@quintoandar.com.br
 domain: Data Ops & Governance
 description: Information about an organization's cost centers
 
