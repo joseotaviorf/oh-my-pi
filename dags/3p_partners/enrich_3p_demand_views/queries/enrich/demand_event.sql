@@ -13,7 +13,7 @@ WITH demand_relation AS (
     datalake_company.company_sks AS cs
       ON vt.uuid_company = cs.uuid_company
 )
-SELECT
+SELECT DISTINCT
   de.sk_sale_demand_event,
   de.sk_event_date,
   de.sk_event_type,
@@ -34,15 +34,15 @@ SELECT
   de.sk_last_secretariat,
   de.sk_buyer_prospect_type,
   de.sk_listing_price_segment,
-  dr.business_model,
+  dr.business_model, 
   et.event_name AS event_name,
   et.abbreviation AS event_abbreviation,
   et.stage AS event_stage,
-  dr.business_model AS business_model,
   dcs.company_name AS company_name_supply,
   dcs.hubspot_company_tag AS hubspot_company_tag_supply,
   dcd.company_name AS company_name_demand,
   dcd.hubspot_company_tag AS hubspot_company_tag_demand,
+  dr.business_model LIKE '3P' AS has_3p_access_control,
   de.year,
   de.month,
   de.day,
@@ -62,4 +62,3 @@ LEFT JOIN
 LEFT JOIN
   dw_public.dim_company_3p_partners AS dcd
     ON dr.sk_company = dcd.sk_company
-GROUP BY ALL

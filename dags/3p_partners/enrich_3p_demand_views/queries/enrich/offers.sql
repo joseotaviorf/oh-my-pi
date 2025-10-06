@@ -20,7 +20,7 @@ WITH demand_relation AS (
     datalake_sale_offer.sale_offer AS o
       ON b.id = o.id_booking
 )
-SELECT
+SELECT DISTINCT
   fo.sk_offer,
   fo.sk_sale_flow,
   fo.sk_booking,
@@ -73,4 +73,3 @@ LEFT JOIN
 LEFT JOIN
   dw_public.dim_company_3p_partners AS dcd
     ON dr.sk_company = dcd.sk_company
-GROUP BY ALL

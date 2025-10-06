@@ -116,6 +116,10 @@ columns:
     lineage:
     - dw_public.dim_company_3p_partners.hubspot_company_tag
     description: Hubspot company tag for the demand company.
+  has_3p_access_control:
+    lineage:
+    - datalake_visit.visit_business_model.business_model
+    description: Whether the event has 3P access control.
   year:
     lineage:
     - dw_sale.fact_sale_demand_event.year
