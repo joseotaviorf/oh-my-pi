@@ -1,0 +1,50 @@
+dag:
+  name: inspection_services_fast_lane
+  schedule_start_date: 2024, 11, 21
+  schedule_interval: 0,30 * * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Inspections database (PostgreSQL). [Inspections](https://github.com/quintoandar/inspections-service) is a micro service to inspections with this database we need to measure the lead time inspections, when inspector start and finish inspection, if he follow the planner's route.
+      This DAG has only tables that must run every 30 minutes.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: inspections
+  dbutils_secret_key: INSPECTIONS_DB
+  custom_schema: inspection_services_test
+  lineage_product_database_name: inspections
+  tables_customization:
+    assessment:
+      clean_table_name: assessment
+      clean_primary_keys: [id_assessment]
+      raw_primary_keys: [id]
+      clean_z_order_by: [id_inspection]
+    inspection:
+      clean_table_name: inspection
+      clean_primary_keys: [id_inspection]
+      raw_primary_keys: [id]
+      clean_z_order_by: [id_contract, id_inspector]
+    item_group:
+      clean_table_name: item_group
+      clean_primary_keys: [id_item_group]
+      raw_primary_keys: [id]
+      clean_z_order_by: [id_room, id_item_group]
+    repair_request:
+      clean_table_name: repair_request
+      clean_primary_keys: [id_repair_request]
+      raw_primary_keys: [id]
+      clean_z_order_by: [id_item_group, id_repair_request]
+    room:
+      clean_table_name: room
+      clean_primary_keys: [id_room]
+      raw_primary_keys: [id]
+      clean_z_order_by: [id_assessment, id_room]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
