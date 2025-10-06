@@ -2,7 +2,7 @@ dag:
   name: dw_demand
   schedule_start_date: 2021,8,2
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG dw tables related to the process of demand conversion in Growth context.
 workflow:
@@ -13,15 +13,15 @@ workflow:
   default_partitions: ["year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -14), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}" 
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: databricks_16_4_med_general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
