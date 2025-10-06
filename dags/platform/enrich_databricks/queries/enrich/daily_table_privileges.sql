@@ -11,8 +11,20 @@ WITH table_privileges AS (
     FROM
         system.information_schema.table_privileges
     WHERE
-        privilege_type IN ('SELECT', 'ALL PRIVILEGES')
+        privilege_type IN ('SELECT', 'ALL_PRIVILEGES')
         AND table_catalog = '{catalog}'
+    UNION
+    SELECT
+        table_owner AS grantee, -- The owner of the table has all privileges
+        table_schema,
+        table_name,
+        YEAR(CURRENT_DATE) AS year,
+        MONTH(CURRENT_DATE) AS month,
+        DAY(CURRENT_DATE) AS day
+    FROM
+        system.information_schema.tables
+    WHERE
+        table_catalog = '{catalog}'
 )
 SELECT
     du.id_user,
