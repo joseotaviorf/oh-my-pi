@@ -1843,6 +1843,11 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.metabase:load-clean-report-dashboard:first-run-of-day
   - bietlejuice.metabase:load-clean-view-log:first-run-of-day
   - bietlejuice.metabase_pull:load-clean-report-card:first-run-of-day
+bietlejuice.enrich_data_exposure:
+  - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
+  - bietlejuice.enrich_databricks:load-enrich-daily-group-members:first-run-of-day
+  - bietlejuice.enrich_databricks:load-enrich-daily-table-privileges:first-run-of-day
+  - bietlejuice.enrich_databricks:load-enrich-daily-users:first-run-of-day
 bietlejuice.enrich_databricks_job_runs:
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-unique-clusters:first-run-of-day

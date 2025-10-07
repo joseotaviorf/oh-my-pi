@@ -25,6 +25,7 @@ dags_out_of_pattern:
         "enrich_anonymization",
         "enrich_chatbot",
         "enrich_copilot_service",
+        "enrich_databricks",
         "enrich_house_feature_inference",
         "enrich_hr_system_custom",
         "enrich_lost_listings",

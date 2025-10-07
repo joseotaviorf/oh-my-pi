@@ -1,0 +1,39 @@
+---
+database_name: datalake_data_exposure
+table_name: surface_of_access
+owner: data-platform-team@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table calculates how many users have access to each table from bietlejuice.
+columns:
+  table_schema:
+    description: The schema of the table.
+    lineage:
+      - datalake_dag_inventory_clean.table
+  table_name:
+    description: The name of the table.
+    lineage:
+      - datalake_dag_inventory_clean.table
+  total_databricks_users_with_access:
+    description: The total number of Databricks users who have access to the table.
+  total_databricks_users:
+    description: The total number of Databricks users.
+  total_databricks_active_users_with_access:
+    description: The total number of active Databricks users who have access to the table.
+  total_databricks_active_users:
+    description: The total number of active Databricks users.
+  total_databricks_active_employees_with_access:
+    description: The total number of active Databricks users who are also active QuintoAndar employees who have access to the table.
+  total_databricks_active_employees:
+    description: The total number of active Databricks users who are also active QuintoAndar employees.
+  year:
+    description: The year of the data partition.
+    lineage:
+      - datalake_databricks.daily_table_privileges.year
+  month:
+    description: The month of the data partition.
+    lineage:
+      - datalake_databricks.daily_table_privileges.month
+  day:
+    description: The day of the data partition.
+    lineage:
+      - datalake_databricks.daily_table_privileges.day

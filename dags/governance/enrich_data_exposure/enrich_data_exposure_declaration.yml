@@ -1,0 +1,17 @@
+---
+dag:
+  name: enrich_data_exposure
+  owner: Data Governance
+  documentation:
+    dag_purpose:
+      This DAG calculates and enriches data exposure metrics based on table privileges.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+cluster:
+  type: databricks_16_4_med_general_cluster
