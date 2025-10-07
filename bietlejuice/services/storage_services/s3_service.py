@@ -44,7 +44,7 @@ class S3Service(StorageService):
             Key=key, Body=file_content.encode()
         )
 
-    @logger
+    @logger(exclude_return=True)
     def list_objects(self, folder_path: str, include_size: bool = False):
         """
         Recursively list all objects under a folder path in s3

@@ -1,1 +1,2 @@
 langfuse_integration_bucket_path: s3://langfuse-forno/blob-storage-integration/cma6lgbp6000q0j07bjm07fwx/
+langfuse_host: https://langfuse.apps.core-frn-green.habitat.zone/
