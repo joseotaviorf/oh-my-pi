@@ -1,5 +1,5 @@
 ---
-table_name: datalake_kill_queue_test_clean.reservation
+table_name: datalake_kill_queue_clean.reservation
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

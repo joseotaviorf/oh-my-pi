@@ -19,4 +19,4 @@ SELECT
     month,
     day
 FROM
-    datalake_kill_queue_test_raw.reservation
+    datalake_kill_queue_raw.reservation

@@ -21,7 +21,6 @@ workflow:
     documentation: {}
     house_aud: {}
     house: {}
-    reservation: {}
     reservation_aud: {}
     revinfo:
       clean_table_name: rev_info

@@ -11,7 +11,7 @@ workflow:
   database_type: mysql
   source_database: killqueue
   source_schema: killqueue
-  custom_schema: kill_queue_test
+  custom_schema: kill_queue
   lineage_product_database_name: killqueue
   dbutils_secret_key: KILL_QUEUE_DB
   tables_customization:

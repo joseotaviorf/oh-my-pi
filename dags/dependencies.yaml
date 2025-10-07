@@ -2489,8 +2489,8 @@ bietlejuice.enrich_jira:
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-documentation:first-run-of-day
   - bietlejuice.kill_queue:load-clean-house:first-run-of-day
-  - bietlejuice.kill_queue:load-clean-reservation:first-run-of-day
   - bietlejuice.kill_queue:load-clean-user:first-run-of-day
+  - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
 bietlejuice.enrich_kodak:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
@@ -3379,7 +3379,7 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-879200452685:first-run-of-day
-  - bietlejuice.kill_queue:load-clean-reservation:first-run-of-day
+  - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
   - bietlejuice.monopoly:load-clean-accounting-entry:first-run-of-day
   - bietlejuice.monopoly:load-clean-nota-fiscal-emission-error:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
