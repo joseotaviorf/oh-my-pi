@@ -183,6 +183,9 @@ workflow:
     170698_piloto_cw_message_sent_events:
       run_optimize: false
       run_vacuum: false
+    170698_profiling_complete_clicked_events:
+      run_optimize: false
+      run_vacuum: false
     170698_rm_invoice_page_viewed_events:
       run_optimize: false
       run_vacuum: false
