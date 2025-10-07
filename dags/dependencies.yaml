@@ -92,6 +92,7 @@ bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect:first-run-of-day
 bietlejuice.dw_charging_payment_quintocred:
+  - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-proposal-signature-payment-timeline:first-run-of-day
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment:first-run-of-day
   - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person:first-run-of-day
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk:first-run-of-day

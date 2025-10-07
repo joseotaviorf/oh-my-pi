@@ -1,8 +1,8 @@
 ---
-database_name: dw_collection_recovery
+database_name: dw_collection_recovery_quintocred
 table_name: fact_portfolio_timeline
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: The table contains a timeline view of the collections portfolio for QuintoCred context.
 columns:
   sk_propose:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_velo.collections_wallet.document
   memory_origin_table:
-    description: "Last contract origin table"
+    description: "Last contract origin table stored in memory for this debt"
   mob:
     description: "Mob calculated between the date of reference (dt_base)"
     lineage:
@@ -32,7 +32,7 @@ columns:
     lineage:
       - datalake_velo.collections_wallet.major_type
   team_negotiation:
-    description: "Team that made the negotiation"
+    description: "Team that made the negotiation for this debt"
   team_distribution:
     description: "Team that received the debt via distribution"
     lineage:
@@ -66,7 +66,7 @@ columns:
     lineage:
       - datalake_velo.collections_wallet.has_month_eviction
   dt_ended_propose:
-    description: "dt_ended for this propose"
+    description: "End date for this propose/contract"
     lineage:
       - datalake_velo.collections_wallet.dt_ended_propose
   dt_base:
@@ -106,10 +106,10 @@ columns:
     lineage:
       - datalake_velo.collections_wallet.is_active_month_eviction
   dt_min_major_type:
-    description: "The first date of the major invoice type"
+    description: "The first date of the major invoice type for this debt"
     lineage:
       - datalake_velo.collections_wallet.dt_min_major_type
   dt_min_propose:
-    description: "The first date of the propose"
+    description: "The first date of the propose/contract"
     lineage:
       - datalake_velo.collections_wallet.dt_min_propose

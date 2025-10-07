@@ -1,8 +1,8 @@
 ---
-database_name: dw_collection_recovery
+database_name: dw_collection_recovery_quintocred
 table_name: fact_contract_payment_signature_timeline
 owner: juliana.hocihara@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: The table contains a timeline view of the contract payments / signatures for QuintoCred context.
 columns:
   sk_propose:
@@ -30,21 +30,21 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.gateway
   gateway_clean:
-    description: "gateway clean"
+    description: "Cleaned gateway information for contract payment"
     lineage:
       - datalake_velo.payment_contracts.gateway
   gateway_memory_transaction:
-    description: "Last contract payment gateway"
+    description: "Last contract payment gateway stored in memory"
   memory_origin_table:
-    description: "Last contract origin table"
+    description: "Last contract origin table stored in memory"
   id_memory_transaction:
-    description: "id_memory_transaction"
+    description: "Transaction ID stored in memory"
   value_memory_transaction:
-    description: "value_memory_transaction"
+    description: "Transaction value stored in memory"
   dt_created_memory_transaction:
-    description: "dt_created_memory_transaction"
+    description: "Transaction creation date stored in memory"
   status_memory_transaction:
-    description: "status_memory_transaction"
+    description: "Transaction status stored in memory"
   billing_type:
     description: "Contract billing type"
     lineage:
@@ -134,47 +134,47 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.value
   memory_annual_limit:
-    description: ""
+    description: "Annual limit stored in memory for payment contracts"
     lineage:
       - datalake_velo.payment_contracts.memory_annual_limit
   memory_annual_valid_limit:
-    description: ""
+    description: "Valid annual limit stored in memory for payment contracts"
     lineage:
       - datalake_velo.payment_contracts.memory_annual_valid_limit
   is_billing_mode_changed:
-    description: ""
+    description: "Flag indicating if the billing mode has been changed"
     lineage:
       - datalake_velo.payment_contracts.flag_dm_mod
   flag_missing_payment:
-    description: ""
+    description: "Flag indicating if there are missing payments"
     lineage:
       - datalake_velo.payment_contracts.flag_missing_payment
   flag_annual_payment:
-    description: ""
+    description: "Flag indicating if the payment is annual"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment
   memory_flag_annual_payment:
-    description: ""
+    description: "Annual payment flag stored in memory"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment
   flag_annual_payment_month:
-    description: ""
+    description: "Flag indicating the month of annual payment"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month
   flag_annual_payment_valid:
-    description: ""
+    description: "Flag indicating if the annual payment is valid"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_valid
   flag_annual_payment_month_valid:
-    description: ""
+    description: "Flag indicating if the annual payment month is valid"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_valid
   flag_annual_payment_month_limit:
-    description: ""
+    description: "Flag indicating the month limit for annual payment"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_limit
   flag_annual_payment_month_valid_limit:
-    description: ""
+    description: "Flag indicating the valid month limit for annual payment"
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_valid_limit
   dt_contract_started:
