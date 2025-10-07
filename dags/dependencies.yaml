@@ -4152,6 +4152,7 @@ bietlejuice.reverse_dsat_report_load:
 bietlejuice.reverse_house_portfolio_reprocessing:
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-person:first-run-of-day
+  - bietlejuice.rene_descartes:load-clean-house-lead-conversion:first-run-of-day
 bietlejuice.reverse_idactum_load:
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day

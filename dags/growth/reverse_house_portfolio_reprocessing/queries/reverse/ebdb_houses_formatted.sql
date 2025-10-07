@@ -1,8 +1,9 @@
 -- Query to extract formatted house data from EBDB for portfolio reprocessing
 SELECT DISTINCT
-    imovel.id AS property_id,
-    imovel.dataCriacao AS created_at,
-    'house' AS event_type,
+    imovel.id AS propertyId,
+    imovel.dataCriacao AS createdAt,
+    house_lead_conversion.id_lead AS leadId,
+    'house' AS eventType,
     TO_JSON(NAMED_STRUCT(
         'zipcode', imovel.cep,
         'state', estado.nome,
@@ -23,18 +24,10 @@ SELECT DISTINCT
         'phoneNumber', contact_info.contact_info
     )) AS owner,
     TO_JSON(NAMED_STRUCT(
-        'area', imovel.areaTotal,
-        'iptu', imovel.iptu,
-        'forRent', imovel.forRent,
-        'forSale', imovel.forSale,
         'rentValue', imovel.aluguel,
         'saleValue', imovel.salePrice,
-        'condominium', imovel.condominio,
-        'numberRooms', imovel.numeroQuartos,
-        'numberSuites', imovel.numeroSuites,
-        'numberBathrooms', imovel.numeroBanheiros,
         'houseType', imovel.tipo
-    )) AS property_info
+    )) AS propertyInfo
 FROM
     datalake_ebdb_raw.imovel AS imovel
 LEFT JOIN
@@ -49,6 +42,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_person_clean.contact_info AS contact_info
         ON person.id = contact_info.id_person
+LEFT JOIN 
+    datalake_rene_descartes_clean.house_lead_conversion AS house_lead_conversion
+        on house_lead_conversion.id_house = imovel.id
 WHERE
     imovel.id IS NOT NULL
     AND (
