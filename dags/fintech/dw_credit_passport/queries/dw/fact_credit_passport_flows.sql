@@ -10,7 +10,7 @@ WITH get_all_passport_events AS (
     g.is_active AS is_group_active,
     cee.ts_expired,
     cee.ts_credit_evaluation_created,
-    DATE_FORMAT(cee.ts_credit_evaluation_created, 'yyyy-MM-dd') AS dt_credit_passport,
+    DATE(cee.ts_credit_evaluation_created) AS dt_credit_passport,
     1 AS evaluation_started,
     CASE
       WHEN fce.is_bypass THEN 1
