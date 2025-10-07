@@ -191,6 +191,12 @@ sheets_info:
     clean_table_name: marketshare_units_and_tenants
     sheet_context: growth
 
+  mexico_regions:
+    sheet_id: 1w4Lh1DzETNYps3UpZ5Pu0r1KxQQq06maH3IAy0UE-Zs
+    sheet_name: Inmuebles 24 (Mexico)
+    clean_table_name: mexico_regions
+    sheet_context: growth
+
   mkt_cost_per_source:
     sheet_id: 1kHFTMdaRTYyLa6e6FY6G2i1UpCkivcpmxZvYqVrqe5o
     sheet_name: mkt_cost_per_source
