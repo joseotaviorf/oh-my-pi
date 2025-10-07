@@ -50,3 +50,5 @@ data-fintech:
   - "**/dags/fintech/**"
 data-people:
   - "**/dags/people/**"
+data-agents:
+  - "**/dags/agents/**"
