@@ -13,6 +13,7 @@ WITH visit_rent_flow AS (
     WHERE
         LOWER(dret.abbreviation) IN ('os','oa','cs')
         AND ts_event::date >= '2024-06-01'
+        AND sk_visit IS NOT NULL
     GROUP BY 1, 2, 3
 ),
 visit_sale_flow AS (
@@ -30,6 +31,7 @@ visit_sale_flow AS (
     WHERE
         LOWER(dset.abbreviation) IN ('os', 'oa', 'ccv')
         AND ts_event::date >= '2024-06-01'
+        AND sk_visit IS NOT NULL
     GROUP BY 1, 2, 3
 )
 SELECT
