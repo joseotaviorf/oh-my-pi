@@ -1,13 +1,35 @@
 WITH
 first_booking_author AS (
+  WITH old_source AS (
     SELECT DISTINCT
-        bsc.id_booking,
-        FIRST_VALUE(id_user) OVER (
-          PARTITION BY bsc.id_booking ORDER BY id
-            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS id_user_creation
+      bsc.id_booking,
+      FIRST_VALUE(id_user) OVER (PARTITION BY bsc.id_booking ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_user_creation
     FROM
-        datalake_ebdb_clean.booking_status_change AS bsc
+      datalake_ebdb_clean.booking_status_change AS bsc
+    WHERE
+      ts_created::date < '2025-01-01'
+  ),
+  new_source AS (
+    SELECT
+      id_schedule as id_booking,
+      MIN_BY(id_author_user, id_visit_status_log) as id_user_creation
+    FROM
+      datalake_ebdb_clean.visit_status_log
+    WHERE
+      ts_created::date >= '2025-01-01'
+    GROUP BY 1
+  )
+  SELECT
+    id_booking,
+    id_user_creation
+  FROM
+    old_source
+  UNION ALL
+  SELECT
+    id_booking,
+    id_user_creation
+  FROM
+    new_source
 ),
 base_booking AS (
 SELECT

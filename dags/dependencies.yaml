@@ -2762,6 +2762,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
@@ -3677,6 +3678,7 @@ bietlejuice.enrich_tqc_referral:
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-unified-contract-changes:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
