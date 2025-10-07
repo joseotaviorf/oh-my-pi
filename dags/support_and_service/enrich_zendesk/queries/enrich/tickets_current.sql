@@ -1,8 +1,6 @@
-WITH first_last_infos AS (
+WITH first_last_analysts_infos AS (
   SELECT DISTINCT
     id_ticket,
-    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_group_name,
-    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_group_name,
     FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_name,
     FIRST(analyst_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_analyst_name,
     FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_analyst_email,
@@ -16,6 +14,18 @@ WITH first_last_infos AS (
   WHERE
     ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
     AND id_assignee IS NOT NULL
+), 
+first_last_group_infos AS (
+  SELECT DISTINCT
+    id_ticket,
+    FIRST(id_group) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_id_group,
+    FIRST(id_group) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_id_group,
+    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated ASC) AS first_group_name,
+    FIRST(group_name) OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS last_group_name
+  FROM
+    datalake_zendesk.tickets
+  WHERE
+    ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
 ), 
 tickets AS (
   SELECT
@@ -34,14 +44,18 @@ tickets AS (
     id_house_so,
     id_house_aq,
     group_name,
-    fli.first_analyst_name,
-    fli.last_analyst_name,
-    fli.first_analyst_email,
-    fli.last_analyst_email,
-    fli.first_analyst_phone,
-    fli.last_analyst_phone,
-    fli.first_analyst_organization,
-    fli.last_analyst_organization,
+    flgi.first_id_group,
+    flgi.last_id_group,
+    flgi.first_group_name,
+    flgi.last_group_name,
+    flai.first_analyst_name,
+    flai.last_analyst_name,
+    flai.first_analyst_email,
+    flai.last_analyst_email,
+    flai.first_analyst_phone,
+    flai.last_analyst_phone,
+    flai.first_analyst_organization,
+    flai.last_analyst_organization,
     analyst_name,
     analyst_email,
     analyst_phone,
@@ -122,8 +136,10 @@ tickets AS (
     day
   FROM
     datalake_zendesk.tickets AS t
-  LEFT JOIN first_last_infos AS fli
-    ON t.id_ticket = fli.id_ticket
+  LEFT JOIN first_last_analysts_infos AS flai
+    ON t.id_ticket = flai.id_ticket
+  LEFT JOIN first_last_group_infos AS flgi
+    ON t.id_ticket = flgi.id_ticket
   WHERE
     ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   QUALIFY
@@ -157,6 +173,10 @@ SELECT
   t.last_analyst_phone,
   t.first_analyst_organization,
   t.last_analyst_organization,
+  t.first_id_group,
+  t.last_id_group,
+  t.first_group_name,
+  t.last_group_name,
   t.custom_fields,
   t.task_sid_twilio,
   t.contact_ticket,

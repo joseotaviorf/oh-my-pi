@@ -79,39 +79,55 @@ columns:
   analyst_email:
     description: Email of the support analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_email
   first_analyst_name:
     description: Name of the first analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_name
   last_analyst_name:
     description: Name of the last analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_name
   first_analyst_email:
     description: Email of the first analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_email
   last_analyst_email:
     description: Email of the last analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_email
   first_analyst_phone:
     description: Phone of the first analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_phone
   last_analyst_phone:
     description: Phone of the last analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_phone
   first_analyst_organization:
     description: Organization of the first analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_organization
   last_analyst_organization:
     description: Organization of the last analyst associated with the ticket
     lineage:
-      - datalake_zendesk.tickets.custom_fields
+      - datalake_zendesk.tickets.analyst_organization
+  first_id_group:
+    description: ID of the first group associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.id_group
+  last_id_group:
+    description: ID of the last group associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.id_group
+  first_group_name:
+    description: Name of the first group associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.group_name
+  last_group_name:
+    description: Name of the last group associated with the ticket
+    lineage:
+      - datalake_zendesk.tickets.group_name
   offer_ids:
     description: All Offer IDs present in the ticket custom fields.
     lineage:
