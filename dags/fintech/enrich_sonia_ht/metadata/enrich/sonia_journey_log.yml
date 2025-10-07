@@ -18,10 +18,22 @@ columns:
     lineage:
       - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.row_id
     description: "User identifier associated with the journey row."
+  proposal_id:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.id_proposal
+    description: "Proposal identifier from fields JSON."
   timestamp:
     lineage:
       - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.timestamp
     description: "Timestamp of the journey transition."
+  started_at:
+    lineage:
+      - hightouch_audit.sync_runs.started_at
+    description: "Timestamp indicating when the HighTouch sync run started execution for this journey instance."
+  finished_at:
+    lineage:
+      - hightouch_audit.sync_runs.finished_at
+    description: "Timestamp indicating when the HighTouch sync run finished execution for this journey instance."
   sync_id:
     lineage:
       - hightouch_audit.sync_changelog.sync_id
@@ -33,11 +45,21 @@ columns:
   group_name:
     lineage:
       - hightouch_planner.journey_metadata_93d2e2b5d82c486db22aa5209dddf354.node_name
-    description: "Experiment assignment label derived from journey metadata (Test, Control, Out of Experiment)."
-  proposal_id:
+    description: Canonical experiment group label derived from journey metadata and used in analytics and dashboards.
+    categories:
+      "Test": user assigned to the Test group and receives Sônia’s message
+      "Control": user assigned to the Control group and does not receive Sônia’s message
+      "Out of Experiment": user not eligible for the experiment
+  group_name_full:
     lineage:
-      - hightouch_audit.sync_changelog.fields.id_proposal
-    description: "Proposal identifier from fields JSON."
+      - hightouch_planner.journey_metadata_93d2e2b5d82c486db22aa5209dddf354.node_name
+    description: Detailed experiment group classification used for QA and debugging of HighTouch reactivation issues.
+    categories:
+      "Test": user consistently assigned to the Test group
+      "Control": user consistently assigned to the Control group
+      "Error - Test": user reactivated by HighTouch but still meets criteria for the Test group
+      "Error - Control": user reactivated by HighTouch but still meets criteria for the Control group
+      "Error - Out of Experiment": user should not be part of the experiment but was incorrectly assigned to a group by HighTouch
   is_bypass:
     lineage:
       - hightouch_audit.sync_changelog.fields.is_bypass

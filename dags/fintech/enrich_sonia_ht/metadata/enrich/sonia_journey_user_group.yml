@@ -1,0 +1,31 @@
+database_name: datalake_sonia_ht
+table_name: sonia_journey_user_group
+description: |
+  This derived table aggregates user-level experiment participation data from
+  `datalake_sonia_ht.sonia_journey_log`. It identifies whether a user was
+  ever assigned to Test or Control groups and resolves their final assignment
+  based on group membership consistency.
+
+  Each row represents a unique user with corresponding experiment assignment
+  flags and classification labels.
+domain: Fintech
+owner: luana.silvia@quintoandar.com.br
+columns:
+  user_id:
+    lineage:
+      - datalake_sonia_ht.sonia_journey_log.user_id
+    description: "Unique identifier of the user aggregated from the Sonia journey log source table."
+  group_name:
+    lineage:
+      - datalake_sonia_ht.sonia_journey_log.group_name
+    description: |
+      Final experiment group assigned to the user, defined as 'Test' if the user
+      participated in Test, and 'Control' otherwise.
+  group_name_full:
+    lineage:
+      - datalake_sonia_ht.sonia_journey_log.group_name
+    description: Detailed classification of the user’s experiment participation consistency.
+    categories:
+      "Test": user appeared only in Test group
+      "Control": user appeared only in Control group
+      "Error - Both": user appeared in both Test and Control groups across sync runs
