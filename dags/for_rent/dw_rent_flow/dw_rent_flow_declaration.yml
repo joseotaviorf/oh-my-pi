@@ -16,7 +16,7 @@ workflow:
     fact_rent_flows:
       partitions: [country_code]
 cluster:
-  type: databricks_12_2_med_io-general_photon_cluster
+  type: databricks_16_4_med_io-general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
@@ -26,5 +26,5 @@ cluster:
       spark.sql.shuffle.partitions: 256
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    data_security_mode: USER_ISOLATION
   databricks_conn_id: databricks_new

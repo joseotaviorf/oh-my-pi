@@ -39,10 +39,10 @@ cluster:
     node_type_id: c7i.2xlarge
     num_workers: 3
     runtime_engine: PHOTON
-    spark_version: 12.2.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
       ebs_volume_size: 200
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

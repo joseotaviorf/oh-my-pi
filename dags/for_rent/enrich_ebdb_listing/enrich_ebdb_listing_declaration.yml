@@ -113,7 +113,7 @@ cluster:
       zone_id: us-east-1d
       ebs_volume_size: 200
       availability: SPOT_WITH_FALLBACK
-    spark_version: 12.2.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    data_security_mode: USER_ISOLATION
   databricks_conn_id: databricks_new
