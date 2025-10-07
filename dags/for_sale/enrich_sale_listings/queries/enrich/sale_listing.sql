@@ -1,18 +1,36 @@
-WITH listing_depublication AS (
-  SELECT
-    lbc_aud.id_house,
-    rev.id,
-    lbc_aud.status,
-    lbc_aud.mod_status,
-    rev.ts_revision AS depublication_time
-  FROM
-    datalake_ebdb_clean.listing_business_context_aud lbc_aud
-  LEFT JOIN
-    datalake_ebdb_user.user_revision_entity rev
-      ON lbc_aud.rev = rev.id
-      AND lbc_aud.status = 'UNPUBLISHED'
-      AND lbc_aud.mod_status = 1
-  WHERE lbc_aud.business_context = 'SALE'
+WITH listing_depublication_events AS (
+    SELECT
+        lbc_aud.id_house,
+        CASE
+            WHEN lbc_aud.status = 'UNPUBLISHED'
+            AND lbc_aud.status IS DISTINCT FROM LAG(lbc_aud.status) OVER(PARTITION BY lbc_aud.id_house, lbc_aud.business_context ORDER BY lbc_aud.rev)
+            THEN rev.ts_revision
+            ELSE NULL
+        END AS depublication_time,
+        CASE
+            WHEN lbc_aud.status = 'UNPUBLISHED'
+            AND lbc_aud.status IS DISTINCT FROM LAG(lbc_aud.status) OVER(PARTITION BY lbc_aud.id_house, lbc_aud.business_context ORDER BY lbc_aud.rev)
+            THEN 1
+            ELSE 0
+        END AS is_depublication_event
+    FROM
+        datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
+    LEFT JOIN
+        datalake_ebdb_user.user_revision_entity AS rev
+            ON lbc_aud.rev = rev.id
+    WHERE
+        lbc_aud.business_context = 'SALE'
+),
+depublication_summary AS (
+    SELECT
+        id_house,
+        MIN(depublication_time) AS ts_first_depublication,
+        MAX(depublication_time) AS ts_last_depublication,
+        SUM(is_depublication_event) AS unpublications
+    FROM
+        listing_depublication_events
+    GROUP BY
+        id_house
 ),
 not_published AS (
   SELECT
@@ -29,20 +47,20 @@ not_published AS (
   GROUP BY ssvo.id_house
 ),
 listing_columns AS (
-  SELECT
-    lbc.id_house,
-    MIN(lbc.ts_first_listing) AS ts_first_publication,
-    MAX(lbc.ts_last_listing) AS ts_last_publication,
-    MIN(ld.depublication_time) AS ts_first_depublication,
-    MAX(ld.depublication_time) AS ts_last_depublication,
-    COUNT(ld.id) AS unpublications
-  FROM
-    datalake_ebdb_listing.listing_business_context lbc
-  LEFT JOIN
-    listing_depublication ld
-      ON lbc.id_house = ld.id_house
-  WHERE lbc.business_context = 'SALE'
-  GROUP BY 1
+    SELECT
+        lbc.id_house,
+        lbc.ts_first_listing AS ts_first_publication,
+        lbc.ts_last_listing AS ts_last_publication,
+        ds.ts_first_depublication,
+        ds.ts_last_depublication,
+        COALESCE(ds.unpublications, 0) AS unpublications
+    FROM
+        datalake_ebdb_listing.listing_business_context AS lbc
+    LEFT JOIN
+        depublication_summary AS ds
+            ON lbc.id_house = ds.id_house
+    WHERE
+        lbc.business_context = 'SALE'
 ),
 sale_status_version_order AS (
 SELECT
@@ -55,9 +73,9 @@ SELECT
     FALSE) AS is_last_status
 FROM
     datalake_sale_listings.sale_status_version_order
-)
+),
 -- Get information about rent context to build flags about the house
-, rental_context AS (
+rental_context AS (
   SELECT
     lbc.id_house,
     MAX(IF(c.status ='Ativo',TRUE,FALSE)) AS has_active_rental_contract,
@@ -70,7 +88,7 @@ FROM
   WHERE
     lbc.business_context = 'RENT'
   GROUP BY 1
- )
+)
 SELECT
   sls.id_sale_listing,
   lc.id_house,
