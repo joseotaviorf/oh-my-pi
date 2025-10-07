@@ -78,7 +78,7 @@ LEFT JOIN
       ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
 LEFT JOIN
-    datalake_collections_quintoandar.agency_timeline AS cad
+    datalake_cyber.agency_timeline AS cad
       ON o.id_contract = cad.id_contract
       AND o.dt_reference = cad.dt_reference
 LEFT JOIN

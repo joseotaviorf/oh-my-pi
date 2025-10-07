@@ -18,6 +18,8 @@ workflow:
       - queue_decision_tree
     queue_timeline:
       - contracts
+    agency_timeline:
+      - contract_agency_distribution
 cluster:
   type: custom_cluster
   custom_configurations:

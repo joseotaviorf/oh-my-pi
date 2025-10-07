@@ -1,5 +1,5 @@
 ---
-database_name: datalake_collections_quintoandar
+database_name: datalake_cyber
 table_name: agency_timeline
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech

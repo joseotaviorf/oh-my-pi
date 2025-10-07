@@ -120,7 +120,7 @@ LEFT JOIN
       AND o.dt_reference = rc.dt_snapshot
       AND rc.dt_snapshot BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
-    datalake_collections_quintoandar.agency_timeline AS cad
+    datalake_cyber.agency_timeline AS cad
       ON o.id_contract = cad.id_contract
       AND o.dt_reference = cad.dt_reference
       AND cad.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
