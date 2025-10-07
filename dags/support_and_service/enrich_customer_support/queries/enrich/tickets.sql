@@ -42,6 +42,11 @@ incoming_tickets AS (
     id_call,
     id_session,
     id_house,
+    id_group,
+    first_id_group AS first_id_group,
+    last_id_group AS last_id_group,
+    first_group_name AS first_ticket_queue,
+    last_group_name AS last_ticket_queue,
     group_name AS ticket_queue,
     contact_ticket,
     task_sid_twilio,
@@ -213,6 +218,8 @@ tickets_per_task AS (
     END AS analyst_email,
     t.first_analyst_email,
     t.last_analyst_email,
+    t.first_ticket_queue,
+    t.last_ticket_queue,
     CASE
       WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
       WHEN COALESCE(ca1.direction, ca2.direction) IS NOT NULL
@@ -302,8 +309,6 @@ twilio_attr AS (
   ticket_twilio_data AS (
   SELECT DISTINCT
     ta.id_ticket,
-    ta.first_queue,
-    ta.last_queue,
     CASE WHEN tp.channel IN ('call', 'chat') 
       THEN ta.first_analyst_email
       ELSE tp.first_analyst_email
@@ -312,6 +317,14 @@ twilio_attr AS (
       THEN ta.last_analyst_email
       ELSE tp.last_analyst_email
     END as last_analyst_email,
+    CASE WHEN tp.channel IN ('call', 'chat')
+      THEN ta.first_queue
+      ELSE tp.first_ticket_queue
+    END AS first_queue,
+    CASE WHEN tp.channel IN ('call', 'chat')
+      THEN ta.last_queue
+      ELSE tp.last_ticket_queue
+    END AS last_queue,
     LOWER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
