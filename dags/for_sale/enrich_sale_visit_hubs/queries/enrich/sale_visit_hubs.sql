@@ -95,7 +95,7 @@ teams_relations AS (
         users AS u2
             ON mp.id_user_parent = u2.id
     WHERE
-        bu.hub_name NOT LIKE "%[For rent]%"
+        NOT (bu.hub_name LIKE '%[For rent]%' OR bu.hub_name LIKE '%HUB FR%')
 ),
 
 work_contract AS (
@@ -131,7 +131,7 @@ business_unit_region_relations AS (
     FROM
         datalake_hub_services.business_unit_region AS bur
     WHERE 
-        bur.hub_name NOT LIKE "%[For rent]%"
+        NOT (bur.hub_name LIKE '%[For rent]%' OR bur.hub_name LIKE '%HUB FR%')
 ),
 
 visit_relation AS (
