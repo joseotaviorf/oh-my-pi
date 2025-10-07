@@ -27,6 +27,9 @@ workflow:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
+    dim_company:
+        row_filter_column_key: has_3p_access_control
+        row_filter: has_3p_access
   inner_dependencies:
     fact_company_events:
       - dim_company_event_type
