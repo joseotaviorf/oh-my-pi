@@ -106,7 +106,10 @@ SELECT
     FLATTEN(COLLECT_LIST(array_open_invoices)) AS array_open_invoices,
     FLATTEN(COLLECT_LIST(array_paid_invoices)) AS array_paid_invoices,
     FLATTEN(COLLECT_LIST(array_negotiated_invoices)) AS array_negotiated_invoices,
-    dt_reference
+    dt_reference,
+    YEAR(dt_reference) AS year,
+    MONTH(dt_reference) AS month,
+    DAY(dt_reference) AS day
 FROM
     user_timeline
 WHERE
