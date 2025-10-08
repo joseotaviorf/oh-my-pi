@@ -11,6 +11,7 @@ SELECT
 	profile,
 	tags,
 	destination,
+	sender,
 	payload,
 	COALESCE(templateName, payload:bodyTemplate) AS template,
 	payload:country AS country_code,

@@ -56,6 +56,10 @@ columns:
     description: Target destination for the notification (e.g., email address, phone number).
     lineage:
       - datalake_jaiminho_raw.user_notifications.destination
+  sender:
+    description: Whatsapp number or email address used to send the notification
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.sender
   payload:
     description: Raw payload data containing the notification content and metadata.
     lineage:
