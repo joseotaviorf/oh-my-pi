@@ -1,0 +1,24 @@
+dag:
+  name: dw_collection_ai_agents
+  schedule_start_date: 2025,10,07
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: collection_ai_agents
+  default_extraction_type: full
+  inner_dependencies:
+    fact_ai_agents_interaction:
+      - fact_user_wallet_timeline
+  tables_customization:
+    fact_user_wallet_timeline:
+      extraction_type: incremental
+      partitions: [year, month, day]
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

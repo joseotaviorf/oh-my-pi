@@ -1,0 +1,26 @@
+database_name: dw_collection_ai_agents
+table_name: fact_ai_agents_interaction
+description: AI agents interaction data with user sessions and contract information
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  score_session:
+    lineage:
+      - datalake_langfuse_clean.scores.id_session
+    description: "Session ID from the scoring system (Langfuse)"
+  id_session:
+    lineage:
+      - datalake_chatbot.support_sessions.id_session
+    description: "Internal session ID from the chatbot system"
+  id_user:
+    lineage:
+      - datalake_chatbot.support_sessions.id_user
+    description: "User ID associated with the session"
+  contracts:
+    lineage:
+      - dw_collection_ai_agents.dim_user_wallet_timeline.contracts
+    description: "Array of contract IDs associated with the user from wallet timeline"
+  ts_created:
+    lineage:
+      - datalake_chatbot.support_sessions.ts_created
+    description: "Timestamp when the session was created"

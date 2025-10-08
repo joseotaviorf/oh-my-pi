@@ -1,0 +1,79 @@
+database_name: dw_collection_ai_agents
+table_name: fact_user_wallet_timeline
+description: User wallet timeline data aggregated by user with contract information and payment details
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  sk_user:
+    lineage:
+      - dw_rent.fact_contract_people.sk_user
+      - datalake_ebdb_clean.contract.id_user
+    description: "User surrogate key. Primary identifier for the user"
+  max_delay_contaminated_contract_t2:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+    description: "Maximum delay in days for contaminated contracts (T2)"
+  invoices_in_wallet:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.invoices_in_wallet
+    description: "Total number of invoices in the user's wallet"
+  user_wallet:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.wallet
+    description: "Total wallet amount for the user across all contracts"
+  user_payment:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.recovered_amount
+    description: "Total payment amount recovered for the user"
+  user_wallet_overdue_t2:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.wallet_overdue_t2
+    description: "Total overdue wallet amount for the user (T2)"
+  user_overdue_recovered_amount_t2:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t2
+    description: "Total overdue recovered amount for the user (T2)"
+  user_payment_w_2:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.recovered_amount
+    description: "User payment amount including next 2 days recovery"
+  user_overdue_recovered_amount_t2_w_2:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t2
+    description: "User overdue recovered amount including next 2 days (T2)"
+  n_contracts:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+    description: "Total number of contracts associated with the user"
+  active_contracts:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+    description: "Number of active contracts for the user"
+  ended_contracts:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+    description: "Number of ended contracts for the user"
+  contracts:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+    description: "Array of all contract IDs associated with the user"
+  contracts_w_recovery:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+    description: "Array of contract IDs that have recovery amounts"
+  array_open_invoices:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.array_open_invoices
+    description: "Flattened array of all open invoices across user's contracts"
+  array_paid_invoices:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.array_paid_invoices
+    description: "Flattened array of all paid invoices across user's contracts"
+  array_negotiated_invoices:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.array_negotiated_invoices
+    description: "Flattened array of all negotiated invoices across user's contracts"
+  dt_reference:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+    description: "Reference date for the timeline data"
