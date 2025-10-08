@@ -14,10 +14,20 @@ columns:
     lineage:
       - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.row_instance_id
     description: "Unique identifier of the journey instance, used to link with sync changelog."
-  user_id:
+  row_id:
     lineage:
       - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.row_id
-    description: "User identifier associated with the journey row."
+    description: |
+      Primary key reference from HighTouch journey logs.
+      Represents the unique proposal identifier used as the main key in the sync logic after the primary key change and the user id before the change.
+      This column is maintained to ensure traceability with the original HighTouch source.
+  user_id:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.id_user
+      - hightouch_planner.journey_log_93d2e2b5d82c486db22aa5209dddf354.row_id
+    description: |
+      User identifier associated with the proposal, derived from the HighTouch fields JSON.
+      Created to decouple the user reference from the proposal-level primary key (`row_id`) after the HighTouch key change.
   proposal_id:
     lineage:
       - hightouch_audit.sync_changelog.fields.id_proposal
@@ -53,13 +63,13 @@ columns:
   group_name_full:
     lineage:
       - hightouch_planner.journey_metadata_93d2e2b5d82c486db22aa5209dddf354.node_name
-    description: Detailed experiment group classification used for QA and debugging of HighTouch reactivation issues.
+    description: Detailed experiment group classification used for QA and debugging of HighTouch reactivation and assignment issues.
     categories:
       "Test": user consistently assigned to the Test group
       "Control": user consistently assigned to the Control group
-      "Error - Test": user reactivated by HighTouch but still meets criteria for the Test group
-      "Error - Control": user reactivated by HighTouch but still meets criteria for the Control group
-      "Error - Out of Experiment": user should not be part of the experiment but was incorrectly assigned to a group by HighTouch
+      "Error - Assigned Test and Out of Experiment": user was correctly classified as Out of Experiment but was also incorrectly assigned to Test due to HighTouch reactivation
+      "Error - Assigned Control and Out of Experiment": user was correctly classified as Out of Experiment but was also incorrectly assigned to Control due to HighTouch reactivation
+      "Error - Assigned Control and Test": user was incorrectly assigned to both Control and Test groups due to inconsistent reactivation or segmentation logic in HighTouch
   is_bypass:
     lineage:
       - hightouch_audit.sync_changelog.fields.is_bypass
