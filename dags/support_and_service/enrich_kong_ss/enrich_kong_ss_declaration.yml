@@ -20,7 +20,7 @@ cluster:
   custom_configurations:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.2xlarge
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     num_workers: 5
     spark_conf:
       spark.sql.mapKeyDedupPolicy: "LAST_WIN"
