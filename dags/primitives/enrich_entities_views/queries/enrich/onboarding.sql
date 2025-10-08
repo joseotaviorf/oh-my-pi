@@ -1,7 +1,7 @@
 SELECT
   ob.id AS id_entity,
   ct.id_house,
-  ct.id_tenant AS id_tenant,
+  ct.id_tenant,
   ct.id_owner,
   ob.id_contrato AS id_contract,
   'FR_ONBOARDING' AS entity,

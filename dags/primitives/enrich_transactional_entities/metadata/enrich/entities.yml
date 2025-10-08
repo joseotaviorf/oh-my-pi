@@ -31,6 +31,7 @@ columns:
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
       - core_credit_evaluation.credit_evaluation.id_user
       - core_credit_evaluation.credit_evaluation.id_owner
+      - datalake_kill_queue_clean.reservation.id
     description: Surrogate key of all transactional entities.
       It's made by concatenating "<entity>||<id_entity>||<persona>||<id_user>" and then applying the SHA256 hash.
       This key must always be unique.
@@ -44,6 +45,7 @@ columns:
       - datalake_ebdb_clean.inspection.id
       - datalake_entities_views.onboarding.id_entity
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
+      - datalake_kill_queue_clean.reservation.id
     description:
       The primary identifier for an entity, directly from our production systems.
       This key might not always be unique across all entities, as different entities may share the same id.
@@ -56,6 +58,7 @@ columns:
       - datalake_ebdb_clean.listing_business_context.id_house
       - datalake_entities_views.onboarding.id_house
       - core_credit_evaluation.credit_evaluation.id_house
+      - datalake_kill_queue_clean.reservation.id_house
     description: House id related to the entity. It's the id of the Imovel/House table, from Main's database (EBDB).
   id_contract:
     lineage:
@@ -79,6 +82,8 @@ columns:
       - datalake_entities_views.onboarding.id_tenant
       - core_credit_evaluation.credit_evaluation.id_user
       - core_credit_evaluation.credit_evaluation.id_owner
+      - datalake_kill_queue_clean.reservation.id_tenant
+      - datalake_ebdb_clean.user.id
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -99,6 +104,7 @@ columns:
       FR_INSPECTION: The entity is an inspection, with its id_entity mapping directly to the id from the Inspection table in EBDB database.
       FR_ONBOARDING: The entity is an onboarding process, with its id_entity mapping directly to the id from the Onboarding table in EBDB database.
       FR_CREDIT_EVALUATION: The entity is a credit evaluation, with its id_entity mapping directly to the id_credit_evaluation from the Credit Evaluation core model.
+      FR_RESERVATION: The entity is a reservation, with its id_entity mapping directly to the id from the Reservation table in the Kill Queue system.
   persona:
     description:
       A persona describes the primary role of a user (id_user) in relation to a specific
@@ -142,6 +148,8 @@ columns:
       - datalake_ebdb_clean.listing_business_context.ts_created
       - datalake_entities_views.onboarding.status
       - datalake_entities_views.onboarding.ts_created
+      - datalake_kill_queue_clean.reservation.status
+      - datalake_kill_queue_clean.reservation.ts_created
     description:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
@@ -153,6 +161,7 @@ columns:
       For FR_INSPECTION entities - contains status field.
       For FR_ONBOARDING entities - contains status and ts_created fields.
       For FR_CREDIT_EVALUATION entities - contains status, ts_created and ts_expires fields.
+      For FR_RESERVATION entities - contains status and ts_created fields.
   house_address:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -176,6 +185,7 @@ columns:
       An inspection entity will be considered as active for statuses Agendada, Comentada, EmAcordo, EmRevisao, Nova, or Revisada, and inactive for statuses Finalizada, Cancelada, or ContratoCancelado.
       An onboarding entity will be considered as active for all statuses except "Finished" and "Aborted", which are considered inactive.
       A credit evaluation entity will be considered as active for statuses NOT_SENT, ON_HOLD or PROCESSING, and inactive for statuses CANCELLED, FAILED or FINISHED.
+      A reservation entity will be considered as active when is_ongoing = TRUE, and inactive when is_ongoing = FALSE.
   ts_inactive:
     lineage:
       - core_visit.visit.ts_updated
@@ -186,6 +196,7 @@ columns:
       - datalake_ebdb_clean.inspection.ts_updated
       - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
+      - datalake_kill_queue_clean.reservation.ts_updated
     description: Timestamp when the entity became inactive (is_active = FALSE).
       This field captures the ts_updated timestamp for entities that are currently inactive.
       For active entities (is_active = TRUE), this field will be NULL.
@@ -199,6 +210,7 @@ columns:
       - datalake_ebdb_clean.inspection.ts_created
       - datalake_entities_views.onboarding.ts_created
       - core_credit_evaluation.credit_evaluation.ts_created
+      - datalake_kill_queue_clean.reservation.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
@@ -210,6 +222,7 @@ columns:
       - datalake_ebdb_clean.inspection.ts_updated
       - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
+      - datalake_kill_queue_clean.reservation.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.
