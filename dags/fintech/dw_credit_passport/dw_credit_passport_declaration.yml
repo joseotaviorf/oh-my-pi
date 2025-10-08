@@ -18,6 +18,6 @@ cluster:
     driver_node_type_id: m5d.xlarge
     node_type_id: m5d.xlarge
     num_workers: 4
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
