@@ -73,22 +73,23 @@ SELECT
     ELSE '-1'
   END AS highest_education_level_description,
   CASE
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) < 21 * 365 THEN 'menos de 21 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 21 * 365
-    AND 25 * 365 THEN 'de 21 até 25 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 26 * 365
-    AND 30 * 365 THEN 'de 26 até 30 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 31 * 365
-    AND 35 * 365 THEN 'de 31 até 35 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 36 * 365
-    AND 40 * 365 THEN 'de 36 até 40 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 41 * 365
-    AND 45 * 365 THEN 'de 41 até 45 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 46 * 365
-    AND 50 * 365 THEN 'de 46 até 50 anos'
-    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 51 * 365
-    AND 55 * 365 THEN 'de 51 até 55 anos'
-    ELSE 'mais de 55 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) < 21 THEN 'menos de 21 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 21
+    AND 25 THEN 'de 21 até 25 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 26
+    AND 30 THEN 'de 26 até 30 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 31
+    AND 35 THEN 'de 31 até 35 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 36
+    AND 40 THEN 'de 36 até 40 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 41
+    AND 45 THEN 'de 41 até 45 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 46
+    AND 50 THEN 'de 46 até 50 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 51
+    AND 55 THEN 'de 51 até 55 anos'
+    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) > 55 THEN 'mais de 55 anos'
+    ELSE NULL
   END AS age_range,
   -- -- dates
   DATE(emp_info.dt_birth) AS dt_birth,
