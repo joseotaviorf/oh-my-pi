@@ -92,3 +92,15 @@ columns:
     description: Timestamp when the sync run completed
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.finished_at
+  year:
+    description: Partition column representing the year of the data
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_trino.year
+  month:
+    description: Partition column representing the month of the data
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_trino.month
+  day:
+    description: Partition column representing the day of the data
+    lineage:
+      - datalake_hightouch_logs_raw.sync_runs_trino.day

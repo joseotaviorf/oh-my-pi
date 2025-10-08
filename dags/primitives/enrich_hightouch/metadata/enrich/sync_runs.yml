@@ -115,3 +115,18 @@ columns:
     lineage:
       - datalake_hightouch_logs_clean.sync_runs_databricks.ts_finished
       - datalake_hightouch_logs_clean.sync_runs_trino.ts_finished
+  year:
+    description: Partition column representing the year of the data
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_databricks.year
+      - datalake_hightouch_logs_clean.sync_runs_trino.year
+  month:
+    description: Partition column representing the month of the data
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_databricks.month
+      - datalake_hightouch_logs_clean.sync_runs_trino.month
+  day:
+    description: Partition column representing the day of the data
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_databricks.day
+      - datalake_hightouch_logs_clean.sync_runs_trino.day

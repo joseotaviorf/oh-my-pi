@@ -1,14 +1,14 @@
 import logging
 import ast
 from argparse import ArgumentParser
+import pyspark.sql.functions as F
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.spark import (
     SparkTableStorageFormat,
-    SparkDataFrameService,
+    spark
 )
-from bietlejuice.base.spark import spark
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
@@ -40,7 +40,7 @@ def read_input(input_path, format, **params):
 
     return df
 
-def load_table_into_datalake(df, table_name, environment, source, datalake_bucket, **params):
+def load_table_into_datalake(df, table_name, environment, source, datalake_bucket, load_start_date, load_end_date, extraction_type, incremental_column, **params):
     """
     Writes a DataFrame using S3Loader for raw layer data.
 
@@ -65,8 +65,36 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
 
         logging.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
         spark_metastore_service.create_database(database_name)
+        df.printSchema()
+        if extraction_type == "incremental":
+        # Ensure incremental column exists
 
-        FullTableLoaderPipeline(
+            # Filter between dates
+            df = df.filter(
+                (F.col(incremental_column).cast("date") >= F.to_date(F.lit(load_start_date))) &
+                (F.col(incremental_column).cast("date") <= F.to_date(F.lit(load_end_date)))
+            )
+
+            # Extract partitions
+            df = df.selectExpr("*",
+                f"year({incremental_column}) AS year",
+                f"month({incremental_column}) AS month",
+                f"dayofmonth({incremental_column}) AS day"
+            )
+
+            partition_cols = ["year", "month", "day"]
+            df.show()
+            # Write to S3
+            s3_loader = S3Loader()
+            s3_loader.load_df(
+                df=df,
+                s3_path=f"{database_location}{table_name}",
+                format_options=SparkTableStorageFormat.DEFAULT_RAW,
+                partitions=partition_cols,
+                optimize_dataframe=False,
+            )
+        else:
+            FullTableLoaderPipeline(
             database_name, table_name, database_location, LayerEnum.RAW, None
         ).load_and_register(df, format_options)
         # Initialize S3Loader
@@ -98,6 +126,14 @@ def parse_arguments():
                        help="Source name")
     parser.add_argument("table_name",
                        help="Table name")
+    parser.add_argument("load_start_date",
+                       help="Load start date")
+    parser.add_argument("load_end_date",
+                       help="Load end date")
+    parser.add_argument("extraction_type",
+                       help="Extraction type")
+    parser.add_argument("incremental_column",
+                       help="Incremental column")
     parser.add_argument("input_path",
                        help="Input path")
     parser.add_argument("format",
@@ -124,13 +160,20 @@ def main():
         "source": args.source,                             # Source name
         "table_name": args.table_name,                    # Table name
         "input_path": args.input_path.format(environment=args.environment),          # Input path
-        "format": args.format          # Input path
+        "format": args.format,         # Input path
+        "load_start_date": args.load_start_date,
+        "load_end_date": args.load_end_date,
+        "extraction_type": args.extraction_type,
+        "incremental_column": args.incremental_column
 
     }
     logging.info(
         f"""
         m=__main__, environment={args.environment}, dag_name={JOB_NAME}
-        datalake_bucket={args.datalake_bucket}, schema={args.schema}, table_name={args.table_name}, input_path={args.input_path}, format={args.format},
+        datalake_bucket={args.datalake_bucket}, schema={args.schema},
+        table_name={args.table_name}, input_path={args.input_path},
+        format={args.format}, load_start_date={args.load_start_date},
+        load_end_date={args.load_end_date}, extraction_type={args.extraction_type},
         msg=Starting spark job...
         """
     )

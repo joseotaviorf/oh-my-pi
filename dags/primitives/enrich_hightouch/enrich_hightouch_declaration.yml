@@ -8,11 +8,17 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_extraction_type: full
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     sync_runs: {}
     audience_membership: {}
-    journey_metadata: {}
+    journey_metadata:
+      extraction_type: full
+      partitions: []
     journey_log: {}
 
 cluster:

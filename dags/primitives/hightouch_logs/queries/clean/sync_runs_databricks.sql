@@ -22,6 +22,16 @@ SELECT
     CAST(num_failed_remove AS DOUBLE) AS num_failed_remove,
 
     CAST(started_at AS TIMESTAMP) AS ts_started,
-    CAST(finished_at AS TIMESTAMP) AS ts_finished
-
-FROM datalake_hightouch_logs_raw.sync_runs_databricks
+    CAST(finished_at AS TIMESTAMP) AS ts_finished,
+    YEAR(CAST(started_at AS DATE)) AS year,
+    MONTH(CAST(started_at AS DATE)) AS month,
+    DAY(CAST(started_at AS DATE)) AS day
+FROM
+    datalake_hightouch_logs_raw.sync_runs_databricks
+WHERE
+    CAST(started_at AS DATE) BETWEEN '{load_start_date}' AND '{load_end_date}'
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY sync_id, sync_run_id, model_id
+        ORDER BY ts_started DESC
+    ) = 1

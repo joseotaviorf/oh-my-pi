@@ -22,10 +22,13 @@ SELECT
     num_failed_remove,
 
     ts_started,
-    ts_finished
-
+    ts_finished,
+    year,
+    month,
+    day
 FROM datalake_hightouch_logs_clean.sync_runs_databricks
-
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
 
 SELECT
@@ -52,6 +55,11 @@ SELECT
     num_failed_remove,
 
     ts_started,
-    ts_finished
+    ts_finished,
+    year,
+    month,
+    day
 
 FROM datalake_hightouch_logs_clean.sync_runs_trino
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

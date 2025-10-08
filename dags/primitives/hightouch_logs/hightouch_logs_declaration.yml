@@ -14,7 +14,6 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
-
     sync_runs_databricks:
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
@@ -23,8 +22,14 @@ workflow:
         - "{schema}"
         - "{dag_name}"
         - "{table_name}"
-        - "s3://5a-cdp-processed-data-{environment}/hightouch/hightouch_audit/sync_runs"
-        - "delta"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "incremental"
+        - "started_at"
+        - "hightouch_audit.sync_runs"
+        - "table"
+      extraction_type: incremental
+      partitions: [year, month, day]
     sync_runs_trino:
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
@@ -33,8 +38,14 @@ workflow:
         - "{schema}"
         - "{dag_name}"
         - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "incremental"
+        - "started_at"
         - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_runs"
         - "parquet"
+      extraction_type: incremental
+      partitions: [year, month, day]
     audience_membership_databricks:
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
@@ -43,8 +54,14 @@ workflow:
         - "{schema}"
         - "{dag_name}"
         - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "ht_timestamp"
+        - "incremental"
         - "hightouch_planner.audience_membership"
         - "table"
+      extraction_type: incremental
+      partitions: [year, month, day]
     audience_membership_trino:
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
@@ -53,8 +70,14 @@ workflow:
         - "{schema}"
         - "{dag_name}"
         - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "incremental"
+        - "ht_timestamp"
         - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_planner/audience_membership"
         - "parquet"
+      extraction_type: incremental
+      partitions: [year, month, day]
 cluster:
   type: databricks_16_4_medium_memory_cluster
   databricks_conn_id: databricks_new

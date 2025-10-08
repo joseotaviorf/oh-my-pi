@@ -20,8 +20,18 @@ SELECT
     CAST(num_failed_add AS DOUBLE) AS num_failed_add,
     CAST(num_failed_change AS DOUBLE) AS num_failed_change,
     CAST(num_failed_remove AS DOUBLE) AS num_failed_remove,
-
     CAST(started_at AS TIMESTAMP) AS ts_started,
-    CAST(finished_at AS TIMESTAMP) AS ts_finished
+    CAST(finished_at AS TIMESTAMP) AS ts_finished,
+    YEAR(CAST(started_at AS DATE)) AS year,
+    MONTH(CAST(started_at AS DATE)) AS month,
+    DAY(CAST(started_at AS DATE)) AS day
 
-FROM datalake_hightouch_logs_raw.sync_runs_trino
+FROM
+    datalake_hightouch_logs_raw.sync_runs_trino
+WHERE CAST(started_at AS DATE) BETWEEN '{load_start_date}' AND '{load_end_date}'
+
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY sync_id, sync_run_id, model_id
+        ORDER BY ts_started DESC
+    ) = 1

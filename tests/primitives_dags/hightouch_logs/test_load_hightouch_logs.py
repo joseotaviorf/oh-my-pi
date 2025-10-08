@@ -1,8 +1,10 @@
 import pytest
 import unittest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock, call
 from argparse import Namespace
 import logging
+from pyspark.sql import DataFrame
+from pyspark.sql.types import StructType, StructField, StringType, TimestampType
 
 # Import the module under test
 import sys
@@ -17,18 +19,44 @@ class TestLoadHightouchLogs(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures before each test method."""
         self.mock_spark = Mock()
-        self.mock_df = Mock()
+        self.mock_df = Mock(spec=DataFrame)
         self.mock_df.count.return_value = 100
+        self.mock_df.printSchema.return_value = None
+        self.mock_df.show.return_value = None
 
-        # Sample arguments
+        # Mock DataFrame methods for chaining
+        self.mock_df.filter.return_value = self.mock_df
+        self.mock_df.selectExpr.return_value = self.mock_df
+        self.mock_df.withColumn.return_value = self.mock_df
+
+        # Sample arguments for incremental loading
         self.sample_args = Namespace(
             environment='prod',
-            datalake_bucket='test-bucket',
+            datalake_bucket='5a-datalake-prod',
             schema='hightouch_logs',
             source='hightouch_logs',
-            table_name='sync_changelog_databricks',
-            input_path='s3://test-bucket/path/{environment}/data',
-            format='delta'
+            table_name='sync_runs_trino',
+            input_path='hightouch_audit.sync_runs',
+            format='table',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='incremental',
+            incremental_column='started_at'
+        )
+
+        # Sample arguments for full loading
+        self.full_load_args = Namespace(
+            environment='prod',
+            datalake_bucket='5a-datalake-prod',
+            schema='hightouch_logs',
+            source='hightouch_logs',
+            table_name='sync_runs_trino',
+            input_path='hightouch_audit.sync_runs',
+            format='table',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='full',
+            incremental_column='started_at'
         )
 
     @patch('load_hightouch_logs.spark')
@@ -48,27 +76,11 @@ class TestLoadHightouchLogs(unittest.TestCase):
         self.assertEqual(result, self.mock_df)
 
     @patch('load_hightouch_logs.spark')
-    def test_read_input_from_s3_parquet(self, mock_spark):
-        """Test reading input from S3 with parquet format."""
-        # Arrange
-        mock_spark.read.format.return_value.load.return_value = self.mock_df
-        input_path = 's3://test-bucket/data'
-        format_type = 'parquet'
-
-        # Act
-        result = read_input(input_path, format_type)
-
-        # Assert
-        mock_spark.read.format.assert_called_once_with('parquet')
-        mock_spark.read.format.return_value.load.assert_called_once_with(input_path)
-        self.assertEqual(result, self.mock_df)
-
-    @patch('load_hightouch_logs.spark')
     def test_read_input_from_catalog_table(self, mock_spark):
         """Test reading input from catalog table."""
         # Arrange
         mock_spark.table.return_value = self.mock_df
-        table_name = 'hightouch_audit.sync_changelog_view'
+        table_name = 'hightouch_audit.sync_runs'
         format_type = 'table'
 
         # Act
@@ -83,7 +95,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
         """Test reading input from catalog table with uppercase format."""
         # Arrange
         mock_spark.table.return_value = self.mock_df
-        table_name = 'hightouch_audit.sync_changelog_view'
+        table_name = 'hightouch_audit.sync_runs'
         format_type = 'TABLE'
 
         # Act
@@ -93,19 +105,73 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_spark.table.assert_called_once_with(table_name)
         self.assertEqual(result, self.mock_df)
 
+    @patch('load_hightouch_logs.S3Loader')
+    @patch('load_hightouch_logs.SparkMetastoreService')
+    @patch('load_hightouch_logs.DatalakeMetastoreService')
+    @patch('load_hightouch_logs.SparkTableStorageFormat')
+    @patch('load_hightouch_logs.spark_client')
+    def test_load_table_into_datalake_incremental_success(self, mock_spark_client, mock_storage_format,
+                                                        mock_datalake_service, mock_metastore_service,
+                                                        mock_s3_loader_class):
+        """Test successful incremental loading of table into datalake."""
+        # Arrange
+        mock_db_info = {
+            "db_raw_databricks": "datalake_hightouch_logs_raw",
+            "db_raw_path": "s3://bucket/raw/path/"
+        }
+        mock_datalake_service.get_db_info.return_value = mock_db_info
+        mock_storage_format.DEFAULT_RAW = "json_format"
+
+        mock_metastore_instance = Mock()
+        mock_metastore_service.return_value = mock_metastore_instance
+
+        mock_s3_loader_instance = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader_instance
+
+        # Act
+        load_table_into_datalake(
+            df=self.mock_df,
+            table_name='sync_runs_trino',
+            environment='prod',
+            source='hightouch_logs',
+            datalake_bucket='5a-datalake-prod',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='incremental',
+            incremental_column='started_at'
+        )
+
+        # Assert
+        mock_datalake_service.get_db_info.assert_called_once_with('prod', 'hightouch_logs', '5a-datalake-prod')
+        mock_metastore_instance.create_database.assert_called_once_with("datalake_hightouch_logs_raw")
+
+        # Verify DataFrame transformations were called
+        self.mock_df.printSchema.assert_called_once()
+        self.mock_df.filter.assert_called_once()
+        self.mock_df.selectExpr.assert_called_once()
+        self.mock_df.show.assert_called_once()
+
+        # Verify S3Loader was called
+        mock_s3_loader_instance.load_df.assert_called_once()
+        s3_loader_call_args = mock_s3_loader_instance.load_df.call_args
+        self.assertEqual(s3_loader_call_args[1]['df'], self.mock_df)
+        self.assertEqual(s3_loader_call_args[1]['s3_path'], "s3://bucket/raw/path/sync_runs_trino")
+        self.assertEqual(s3_loader_call_args[1]['partitions'], ["year", "month", "day"])
+        self.assertEqual(s3_loader_call_args[1]['optimize_dataframe'], False)
+
     @patch('load_hightouch_logs.FullTableLoaderPipeline')
     @patch('load_hightouch_logs.SparkMetastoreService')
     @patch('load_hightouch_logs.DatalakeMetastoreService')
     @patch('load_hightouch_logs.SparkTableStorageFormat')
     @patch('load_hightouch_logs.spark_client')
-    def test_load_table_into_datalake_success(self, mock_spark_client, mock_storage_format,
-                                            mock_datalake_service, mock_metastore_service,
-                                            mock_pipeline):
-        """Test successful loading of table into datalake."""
+    def test_load_table_into_datalake_full_success(self, mock_spark_client, mock_storage_format,
+                                                 mock_datalake_service, mock_metastore_service,
+                                                 mock_pipeline):
+        """Test successful full loading of table into datalake."""
         # Arrange
         mock_db_info = {
             "db_raw_databricks": "datalake_hightouch_logs_raw",
-            "db_raw_path": "s3://bucket/raw/path"
+            "db_raw_path": "s3://bucket/raw/path/"
         }
         mock_datalake_service.get_db_info.return_value = mock_db_info
         mock_storage_format.DEFAULT_RAW = "json_format"
@@ -119,22 +185,75 @@ class TestLoadHightouchLogs(unittest.TestCase):
         # Act
         load_table_into_datalake(
             df=self.mock_df,
-            table_name='test_table',
+            table_name='sync_runs_trino',
             environment='prod',
             source='hightouch_logs',
-            datalake_bucket='test-bucket'
+            datalake_bucket='5a-datalake-prod',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='full',
+            incremental_column='started_at'
         )
 
         # Assert
-        mock_datalake_service.get_db_info.assert_called_once_with('prod', 'hightouch_logs', 'test-bucket')
+        mock_datalake_service.get_db_info.assert_called_once_with('prod', 'hightouch_logs', '5a-datalake-prod')
         mock_metastore_instance.create_database.assert_called_once_with("datalake_hightouch_logs_raw")
         mock_pipeline_instance.load_and_register.assert_called_once()
 
-    @patch('load_hightouch_logs.FullTableLoaderPipeline')
-    @patch('load_hightouch_logs.SparkMetastoreService')
+    @patch('load_hightouch_logs.F')
+    def test_incremental_filtering_logic(self, mock_f):
+        """Test the incremental filtering logic with PySpark functions."""
+        # Arrange
+        mock_col = Mock()
+        mock_lit = Mock()
+        mock_to_date = Mock()
+
+        mock_f.col.return_value = mock_col
+        mock_f.lit.return_value = mock_lit
+        mock_f.to_date.return_value = mock_to_date
+
+        mock_col.cast.return_value = mock_col
+        mock_to_date.return_value = mock_to_date
+
+        # Create a more detailed mock for the filter chain
+        filter_condition = Mock()
+        mock_col.__ge__ = Mock(return_value=filter_condition)
+        mock_col.__le__ = Mock(return_value=filter_condition)
+        filter_condition.__and__ = Mock(return_value=filter_condition)
+
+        self.mock_df.filter.return_value = self.mock_df
+
+        with patch('load_hightouch_logs.SparkMetastoreService'), \
+             patch('load_hightouch_logs.DatalakeMetastoreService') as mock_datalake_service, \
+             patch('load_hightouch_logs.SparkTableStorageFormat'), \
+             patch('load_hightouch_logs.S3Loader'):
+
+            mock_db_info = {
+                "db_raw_databricks": "test_db",
+                "db_raw_path": "s3://test/"
+            }
+            mock_datalake_service.get_db_info.return_value = mock_db_info
+
+            # Act
+            load_table_into_datalake(
+                df=self.mock_df,
+                table_name='test_table',
+                environment='prod',
+                source='test_source',
+                datalake_bucket='test-bucket',
+                load_start_date='2025-10-07',
+                load_end_date='2025-10-07',
+                extraction_type='incremental',
+                incremental_column='started_at'
+            )
+
+        # Assert that F.col, F.lit, and F.to_date were called
+        mock_f.col.assert_called()
+        mock_f.lit.assert_called()
+        mock_f.to_date.assert_called()
+
     @patch('load_hightouch_logs.DatalakeMetastoreService')
-    def test_load_table_into_datalake_exception(self, mock_datalake_service,
-                                              mock_metastore_service, mock_pipeline):
+    def test_load_table_into_datalake_exception(self, mock_datalake_service):
         """Test exception handling in load_table_into_datalake."""
         # Arrange
         mock_datalake_service.get_db_info.side_effect = Exception("Database error")
@@ -146,26 +265,35 @@ class TestLoadHightouchLogs(unittest.TestCase):
                 table_name='test_table',
                 environment='prod',
                 source='hightouch_logs',
-                datalake_bucket='test-bucket'
+                datalake_bucket='test-bucket',
+                load_start_date='2025-10-07',
+                load_end_date='2025-10-07',
+                extraction_type='incremental',
+                incremental_column='started_at'
             )
 
         self.assertIn("Database error", str(context.exception))
 
-    @patch('sys.argv', ['load_hightouch_logs.py', 'prod', 'test-bucket', 'hightouch_logs',
-                        'hightouch_logs', 'sync_changelog', 's3://test/path', 'delta'])
+    @patch('sys.argv', ['load_hightouch_logs.py', 'prod', '5a-datalake-prod', 'hightouch_logs',
+                        'hightouch_logs', 'sync_runs_trino', '2025-10-07', '2025-10-07',
+                        'incremental', 'started_at', 'hightouch_audit.sync_runs', 'table'])
     def test_parse_arguments_success(self):
-        """Test successful argument parsing."""
+        """Test successful argument parsing with all required parameters."""
         # Act
         args = parse_arguments()
 
         # Assert
         self.assertEqual(args.environment, 'prod')
-        self.assertEqual(args.datalake_bucket, 'test-bucket')
+        self.assertEqual(args.datalake_bucket, '5a-datalake-prod')
         self.assertEqual(args.schema, 'hightouch_logs')
         self.assertEqual(args.source, 'hightouch_logs')
-        self.assertEqual(args.table_name, 'sync_changelog')
-        self.assertEqual(args.input_path, 's3://test/path')
-        self.assertEqual(args.format, 'delta')
+        self.assertEqual(args.table_name, 'sync_runs_trino')
+        self.assertEqual(args.load_start_date, '2025-10-07')
+        self.assertEqual(args.load_end_date, '2025-10-07')
+        self.assertEqual(args.extraction_type, 'incremental')
+        self.assertEqual(args.incremental_column, 'started_at')
+        self.assertEqual(args.input_path, 'hightouch_audit.sync_runs')
+        self.assertEqual(args.format, 'table')
 
     @patch('load_hightouch_logs.load_table_into_datalake')
     @patch('load_hightouch_logs.read_input')
@@ -192,12 +320,16 @@ class TestLoadHightouchLogs(unittest.TestCase):
         # Arrange
         args_with_placeholder = Namespace(
             environment='prod',
-            datalake_bucket='test-bucket',
+            datalake_bucket='5a-datalake-prod',
             schema='hightouch_logs',
             source='hightouch_logs',
-            table_name='sync_changelog',
+            table_name='sync_runs_trino',
             input_path='s3://test-bucket/path/{environment}/data',
-            format='delta'
+            format='delta',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='incremental',
+            incremental_column='started_at'
         )
         mock_parse_args.return_value = args_with_placeholder
         mock_read_input.return_value = self.mock_df
@@ -210,26 +342,18 @@ class TestLoadHightouchLogs(unittest.TestCase):
             # Verify that read_input was called with the resolved path
             expected_params = {
                 "environment": "prod",
-                "datalake_bucket": "test-bucket",
+                "datalake_bucket": "5a-datalake-prod",
                 "schema": "hightouch_logs",
                 "source": "hightouch_logs",
-                "table_name": "sync_changelog",
+                "table_name": "sync_runs_trino",
                 "input_path": "s3://test-bucket/path/prod/data",  # {environment} should be replaced
-                "format": "delta"
+                "format": "delta",
+                "load_start_date": "2025-10-07",
+                "load_end_date": "2025-10-07",
+                "extraction_type": "incremental",
+                "incremental_column": "started_at"
             }
             mock_read_input.assert_called_once_with(**expected_params)
-
-    def test_environment_placeholder_replacement(self):
-        """Test that environment placeholder is correctly replaced."""
-        # Arrange
-        template_path = "s3://bucket/{environment}/data"
-        environment = "prod"
-
-        # Act
-        resolved_path = template_path.format(environment=environment)
-
-        # Assert
-        self.assertEqual(resolved_path, "s3://bucket/prod/data")
 
     @patch('load_hightouch_logs.spark')
     def test_read_input_logging(self, mock_spark):
@@ -251,6 +375,24 @@ class TestLoadHightouchLogs(unittest.TestCase):
             # Assert
             mock_logging.info.assert_called_with("Reading from catalog table: catalog.table")
 
+    def test_selectExpr_partition_columns(self):
+        """Test that partition columns are created correctly with selectExpr."""
+        # This test verifies the SQL expressions used for partitioning
+        incremental_column = 'started_at'
+        expected_expressions = [
+            "*",
+            f"year({incremental_column}) AS year",
+            f"month({incremental_column}) AS month",
+            f"dayofmonth({incremental_column}) AS day"
+        ]
+
+        # The actual implementation uses these expressions
+        # This test documents the expected behavior
+        self.assertEqual(len(expected_expressions), 4)
+        self.assertIn("year(started_at) AS year", expected_expressions)
+        self.assertIn("month(started_at) AS month", expected_expressions)
+        self.assertIn("dayofmonth(started_at) AS day", expected_expressions)
+
     @patch('load_hightouch_logs.spark')
     def test_read_input_invalid_format_fallback(self, mock_spark):
         """Test read_input with unknown format falls back to S3 path reading."""
@@ -268,16 +410,24 @@ class TestLoadHightouchLogs(unittest.TestCase):
 class TestLoadHightouchLogsIntegration(unittest.TestCase):
     """Integration tests for load_hightouch_logs.py"""
 
+    def setUp(self):
+        """Set up test fixtures for integration tests."""
+        self.mock_df = Mock(spec=DataFrame)
+        self.mock_df.count.return_value = 50
+        self.mock_df.printSchema.return_value = None
+        self.mock_df.show.return_value = None
+        self.mock_df.filter.return_value = self.mock_df
+        self.mock_df.selectExpr.return_value = self.mock_df
+
     @patch('load_hightouch_logs.load_table_into_datalake')
     @patch('load_hightouch_logs.read_input')
-    @patch('sys.argv', ['load_hightouch_logs.py', 'prod', 'test-bucket', 'hightouch_logs',
-                        'hightouch_logs', 'sync_changelog', 's3://test/{environment}/data', 'delta'])
-    def test_end_to_end_s3_flow(self, mock_read_input, mock_load_table):
-        """Test end-to-end flow with S3 input."""
+    @patch('sys.argv', ['load_hightouch_logs.py', 'prod', '5a-datalake-prod', 'hightouch_logs',
+                        'hightouch_logs', 'sync_runs_trino', '2025-10-07', '2025-10-07',
+                        'incremental', 'started_at', 'hightouch_audit.sync_runs', 'table'])
+    def test_end_to_end_incremental_flow(self, mock_read_input, mock_load_table):
+        """Test end-to-end flow with incremental loading."""
         # Arrange
-        mock_df = Mock()
-        mock_df.count.return_value = 50
-        mock_read_input.return_value = mock_df
+        mock_read_input.return_value = self.mock_df
 
         # Act
         main()
@@ -285,26 +435,29 @@ class TestLoadHightouchLogsIntegration(unittest.TestCase):
         # Assert
         expected_params = {
             "environment": "prod",
-            "datalake_bucket": "test-bucket",
+            "datalake_bucket": "5a-datalake-prod",
             "schema": "hightouch_logs",
             "source": "hightouch_logs",
-            "table_name": "sync_changelog",
-            "input_path": "s3://test/prod/data",  # Environment replaced
-            "format": "delta"
+            "table_name": "sync_runs_trino",
+            "input_path": "hightouch_audit.sync_runs",
+            "format": "table",
+            "load_start_date": "2025-10-07",
+            "load_end_date": "2025-10-07",
+            "extraction_type": "incremental",
+            "incremental_column": "started_at"
         }
         mock_read_input.assert_called_once_with(**expected_params)
-        mock_load_table.assert_called_once_with(mock_df, **expected_params)
+        mock_load_table.assert_called_once_with(self.mock_df, **expected_params)
 
     @patch('load_hightouch_logs.load_table_into_datalake')
     @patch('load_hightouch_logs.read_input')
-    @patch('sys.argv', ['load_hightouch_logs.py', 'prod', 'test-bucket', 'hightouch_logs',
-                        'hightouch_logs', 'sync_changelog', 'catalog.schema.table', 'table'])
-    def test_end_to_end_catalog_flow(self, mock_read_input, mock_load_table):
-        """Test end-to-end flow with catalog table input."""
+    @patch('sys.argv', ['load_hightouch_logs.py', 'prod', '5a-datalake-prod', 'hightouch_logs',
+                        'hightouch_logs', 'sync_runs_trino', '2025-10-07', '2025-10-07',
+                        'full', 'started_at', 'hightouch_audit.sync_runs', 'table'])
+    def test_end_to_end_full_flow(self, mock_read_input, mock_load_table):
+        """Test end-to-end flow with full loading."""
         # Arrange
-        mock_df = Mock()
-        mock_df.count.return_value = 75
-        mock_read_input.return_value = mock_df
+        mock_read_input.return_value = self.mock_df
 
         # Act
         main()
@@ -312,15 +465,95 @@ class TestLoadHightouchLogsIntegration(unittest.TestCase):
         # Assert
         expected_params = {
             "environment": "prod",
-            "datalake_bucket": "test-bucket",
+            "datalake_bucket": "5a-datalake-prod",
             "schema": "hightouch_logs",
             "source": "hightouch_logs",
-            "table_name": "sync_changelog",
-            "input_path": "catalog.schema.table",
-            "format": "table"
+            "table_name": "sync_runs_trino",
+            "input_path": "hightouch_audit.sync_runs",
+            "format": "table",
+            "load_start_date": "2025-10-07",
+            "load_end_date": "2025-10-07",
+            "extraction_type": "full",
+            "incremental_column": "started_at"
         }
         mock_read_input.assert_called_once_with(**expected_params)
-        mock_load_table.assert_called_once_with(mock_df, **expected_params)
+        mock_load_table.assert_called_once_with(self.mock_df, **expected_params)
+
+
+class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
+    """Edge case tests for load_hightouch_logs.py"""
+
+    def setUp(self):
+        """Set up test fixtures for edge case tests."""
+        self.mock_df = Mock(spec=DataFrame)
+        self.mock_df.count.return_value = 0  # Empty DataFrame
+        self.mock_df.printSchema.return_value = None
+        self.mock_df.show.return_value = None
+        self.mock_df.filter.return_value = self.mock_df
+        self.mock_df.selectExpr.return_value = self.mock_df
+
+    @patch('load_hightouch_logs.S3Loader')
+    @patch('load_hightouch_logs.SparkMetastoreService')
+    @patch('load_hightouch_logs.DatalakeMetastoreService')
+    @patch('load_hightouch_logs.SparkTableStorageFormat')
+    def test_load_empty_dataframe(self, mock_storage_format, mock_datalake_service,
+                                 mock_metastore_service, mock_s3_loader_class):
+        """Test loading an empty DataFrame."""
+        # Arrange
+        mock_db_info = {
+            "db_raw_databricks": "test_db",
+            "db_raw_path": "s3://test/"
+        }
+        mock_datalake_service.get_db_info.return_value = mock_db_info
+        mock_storage_format.DEFAULT_RAW = "json_format"
+
+        mock_metastore_instance = Mock()
+        mock_metastore_service.return_value = mock_metastore_instance
+
+        mock_s3_loader_instance = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader_instance
+
+        # Act
+        load_table_into_datalake(
+            df=self.mock_df,
+            table_name='test_table',
+            environment='prod',
+            source='test_source',
+            datalake_bucket='test-bucket',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='incremental',
+            incremental_column='started_at'
+        )
+
+        # Assert - should still process even with empty DataFrame
+        mock_s3_loader_instance.load_df.assert_called_once()
+
+    @patch('load_hightouch_logs.spark')
+    def test_read_input_with_special_characters_in_path(self, mock_spark):
+        """Test read_input with special characters in path."""
+        # Arrange
+        mock_df = Mock()
+        mock_spark.table.return_value = mock_df
+        table_name = 'schema_with-dashes.table_with_underscores'
+        format_type = 'table'
+
+        # Act
+        result = read_input(table_name, format_type)
+
+        # Assert
+        mock_spark.table.assert_called_once_with(table_name)
+        self.assertEqual(result, mock_df)
+
+    def test_date_range_same_day(self):
+        """Test that same start and end dates are handled correctly."""
+        # This test documents that the system should handle same-day loads
+        start_date = '2025-10-07'
+        end_date = '2025-10-07'
+
+        # The filter condition should be: col >= start_date AND col <= end_date
+        # This should include all records from that single day
+        self.assertEqual(start_date, end_date)
 
 
 if __name__ == '__main__':

@@ -24,3 +24,15 @@ columns:
     description: Timestamp when the audience membership event occurred
     lineage:
       - datalake_hightouch_logs_raw.audience_membership_trino.ht_timestamp
+  year:
+    description: Partition column representing the year of the data
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.year
+  month:
+    description: Partition column representing the month of the data
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.month
+  day:
+    description: Partition column representing the day of the data
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.day

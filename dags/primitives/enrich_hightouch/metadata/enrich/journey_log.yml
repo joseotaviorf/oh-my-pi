@@ -41,3 +41,15 @@ columns:
     description: Timestamp when the journey event occurred
     lineage:
       - hightouch_audit.journey_log_view_quinto_production.timestamp
+  year:
+    description: Partition column representing the year of the data
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.timestamp
+  month:
+    description: Partition column representing the month of the data
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.timestamp
+  day:
+    description: Partition column representing the day of the data
+    lineage:
+      - hightouch_audit.journey_log_view_quinto_production.timestamp

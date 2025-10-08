@@ -7,6 +7,11 @@ SELECT
     CAST(to_node_id AS STRING) AS id_to_node,
     CAST(event_type AS STRING) AS event_type,
     CAST(source_table AS STRING) AS source_table,
-    CAST(timestamp AS TIMESTAMP) AS ts_event
+    CAST(timestamp AS TIMESTAMP) AS ts_event,
+    YEAR(CAST(timestamp AS DATE)) AS year,
+    MONTH(CAST(timestamp AS DATE)) AS month,
+    DAY(CAST(timestamp AS DATE)) AS day
 FROM
     hightouch_audit.journey_log_view_quinto_production
+WHERE
+    CAST(timestamp AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -30,3 +30,18 @@ columns:
     lineage:
       - datalake_hightouch_logs_clean.audience_membership_databricks.ts_ht
       - datalake_hightouch_logs_clean.audience_membership_trino.ts_ht
+  year:
+    description: Partition column representing the year of the data
+    lineage:
+      - datalake_hightouch_logs_clean.audience_membership_databricks.year
+      - datalake_hightouch_logs_clean.audience_membership_trino.year
+  month:
+    description: Partition column representing the month of the data
+    lineage:
+      - datalake_hightouch_logs_clean.audience_membership_databricks.month
+      - datalake_hightouch_logs_clean.audience_membership_trino.month
+  day:
+    description: Partition column representing the day of the data
+    lineage:
+      - datalake_hightouch_logs_clean.audience_membership_databricks.day
+      - datalake_hightouch_logs_clean.audience_membership_trino.day
