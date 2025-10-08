@@ -74,7 +74,7 @@ SELECT recs_impressions.id_house,
 FROM datalake_search.recs_impressions
 LEFT JOIN datalake_search.house_publication_dates
   ON house_publication_dates.id_house = recs_impressions.id_house
-  AND house_publication_dates.business_context = recs_impressions.business_context
+  AND UPPER(house_publication_dates.business_context) = recs_impressions.business_context
   AND house_publication_dates.ts_house_published <= recs_impressions.ts_recommendation
 LEFT JOIN wonka.house_main ON house_main.id = recs_impressions.id_house
 WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
