@@ -18,4 +18,5 @@ SELECT
         WHERE
             (DATE_SUB(DATE('{start_date}'), {days_past_30}) <= config.end_date OR config.end_date IS NULL)
             AND DATE('{end_date}') >= config.begin_date
+            AND config.running is True
     )

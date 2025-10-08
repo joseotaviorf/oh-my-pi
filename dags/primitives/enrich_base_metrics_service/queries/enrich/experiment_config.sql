@@ -78,7 +78,8 @@ FROM VALUES
                                                     'default_metrics', true,
                                                     'experiment_metrics', array("search_ctr")
                                                 )
-                                )
+                                ),
+           'running', False
         )
     ),
     -- Geo-embeddings on CG experiment
@@ -99,7 +100,8 @@ FROM VALUES
                                                     'default_metrics', true,
                                                     'experiment_metrics', array()
                                                 )
-                                )
+                                ),
+           'running', False
         )
     ),
      -- Demand balancer v1 map and SSR rent experiment
@@ -120,7 +122,8 @@ FROM VALUES
                                                     'default_metrics', true,
                                                     'experiment_metrics', array()
                                                 )
-                                )
+                                ),
+           'running', False
         )
     ),
 
@@ -142,7 +145,8 @@ FROM VALUES
                                                     'default_metrics', true,
                                                     'experiment_metrics', array()
                                                 )
-                                )
+                                ),
+           'running', True
         )
     ),
 
@@ -164,7 +168,8 @@ FROM VALUES
                                                     'default_metrics', true,
                                                     'experiment_metrics', array()
                                                 )
-                                )
+                                ),
+           'running', False
         )
     )
 

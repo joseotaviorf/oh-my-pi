@@ -194,6 +194,7 @@ houses_published AS (
         datalake_search.experiment_config AS experiment_config
         ON experiment_config.config.begin_date <= ts_house_published
         AND (experiment_config.config.end_date >= ts_house_published OR experiment_config.config.end_date IS NULL)
+        AND experiment_config.config.running is True
     WHERE
         COALESCE(DATEDIFF(ts_house_published, ts_house_published_shift), 1000) > 84
     GROUP BY
