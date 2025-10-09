@@ -32,13 +32,14 @@ JOB_NAME = "fetch_data"
 SOURCE = "langfuse"
 
 # retry and performance constants for API fetching
-MAX_WORKERS = 5
-MAX_RETRIES = 5
-EXPONENTIAL_BACKOFF_BASE = 2
-JITTER_MIN = 0.15
-JITTER_MAX = 0.6
-BATCH_SIZE = 100  # Number of score IDs to fetch per API call
-LOG_INTERVAL_SECONDS = 30  # Log progress every N seconds
+MAX_WORKERS = 5 # maximum number of workers to use for API fetching
+MAX_RETRIES = 5 # maximum number of times to retry a failed request
+EXPONENTIAL_BACKOFF_BASE = 2 # base for exponential backoff, e.g. 2^0 = 1s, 2^1 = 2s, 2^2 = 4s, etc.
+JITTER_MIN = 0.15 # minimum jitter added to delay API calls when retrying
+JITTER_MAX = 0.6 # maximum jitter added to delay API calls when retrying
+BATCH_SIZE = 100  # number of score IDs to fetch per API call
+LOG_INTERVAL_SECONDS = 30  # log progress every N seconds
+MAX_CONSECUTIVE_FAILURES = 10  # halt job after N consecutive batch failures
 
 
 logging.basicConfig(
@@ -48,6 +49,11 @@ logging.basicConfig(
 )
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = logging.getLogger(JOB_NAME)
+
+
+class TooManyConsecutiveFailuresError(Exception):
+    """Raised when too many consecutive batch failures occur, indicating persistent API issues."""
+    pass
 
 
 def fetch_page_with_retry(langfuse, score_ids_str, page, max_retries=MAX_RETRIES):
@@ -112,9 +118,13 @@ def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches,
                 results.extend([extract_score_data(score) for score in resp.data])
         
         elapsed = time.time() - start_time
+
         # count how many scores have actual data vs null placeholders
         valid_count = sum(1 for r in results if r.get('session_id') or r.get('metadata'))
         
+        if valid_count < len(results):
+            logger.warning(f"Batch {batch_num}: {len(results) - valid_count} scores with no data")
+
         # log based on time interval or if it's the last batch
         current_time = time.time()
         should_log = False
@@ -131,19 +141,40 @@ def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches,
                 log_state['last_log_time'] = current_time
         
         if should_log:
+            progress_pct = (batches_completed / total_batches * 100) if total_batches > 0 else 0
             logger.info(
-                f"Progress: {batches_completed}/{total_batches} batches completed. "
-                f"Latest batch ({batch_num}): {len(results)} scores ({valid_count} with data) in {elapsed:.2f}s"
+                f"Progress ({progress_pct:.1f}%): {batches_completed}/{total_batches} batches completed. "
             )
+        
+        # reset consecutive failures on success
+        with log_state['lock']:
+            log_state['consecutive_failures'] = 0
         
         return results
         
     except Exception as e:
         elapsed = time.time() - start_time
+        
+        # track consecutive failures and halt job if threshold exceeded
+        with log_state['lock']:
+            log_state['consecutive_failures'] += 1
+            consecutive_failures = log_state['consecutive_failures']
+        
         logger.error(
             f"Batch {batch_num}/{total_batches}: Failed after {elapsed:.2f}s. "
-            f"{len(score_ids)} scores affected. Error: {str(e)}"
+            f"{len(score_ids)} scores affected. Error: {str(e)} "
+            f"(consecutive failures: {consecutive_failures})"
         )
+        
+        # halt the entire job if too many consecutive failures
+        if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+            error_msg = (
+                f"Job halted after {consecutive_failures} consecutive batch failures. "
+                f"This indicates persistent API issues. Please check API health and retry the job."
+            )
+            logger.error(error_msg)
+            raise TooManyConsecutiveFailuresError(error_msg)
+        
         return [{'id': sid, 'session_id': None, 'metadata': None} for sid in score_ids]
 
 
@@ -155,7 +186,6 @@ def enrich_scores_from_api(df, langfuse):
     logger.info(f"Config: {MAX_WORKERS} workers, batch size {BATCH_SIZE}")
 
     score_ids = [row.id for row in df.select("id").distinct().collect()]
-    logger.info(f"Total scores: {len(score_ids)}")
     
     if not score_ids:
         logger.warning("No score IDs found, skipping enrichment")
@@ -163,16 +193,17 @@ def enrich_scores_from_api(df, langfuse):
 
     # split score IDs into batches
     batches = [score_ids[i:i + BATCH_SIZE] for i in range(0, len(score_ids), BATCH_SIZE)]
-    logger.info(f"Processing {len(batches)} batches (logging every {LOG_INTERVAL_SECONDS}s)")
+    logger.info(f"Processing {len(batches)} batches of {BATCH_SIZE} scores")
 
     api_data = []
     failed_batches = 0
     successful_batches = 0
     
-    # thread-safe state for time-based logging
+    # thread-safe state for time-based logging and failure tracking
     log_state = {
         'last_log_time': time.time(),
         'batches_completed': 0,
+        'consecutive_failures': 0,
         'lock': threading.Lock()
     }
     
@@ -195,6 +226,9 @@ def enrich_scores_from_api(df, langfuse):
                         failed_batches += 1
                         logger.warning(f"Batch {batch_num}/{len(batches)}: No valid data returned")
                     api_data.extend(results)
+            except TooManyConsecutiveFailuresError:
+                # re-raise to halt the entire job
+                raise
             except Exception as e:
                 failed_batches += 1
                 logger.error(f"Batch {batch_num}/{len(batches)}: Unexpected error - {str(e)}")
