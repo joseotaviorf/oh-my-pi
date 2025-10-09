@@ -76,7 +76,7 @@ WITH segments AS (
     dw_customer_support.dim_taxonomy AS dt
       ON dt.sk_taxonomy = dit.sk_taxonomy
   WHERE
-    fcc.channel = 'chat'
+    fcc.channel IN ('chat', 'call')
     AND dd.front_or_back = 'front'
     AND dd.area = 'CX'
     AND dd.department IN (
