@@ -126,7 +126,7 @@ LEFT JOIN
       AND cad.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
     datalake_cyber.queue_timeline_2 AS q
-      ON o.id_contract = q.id_contract_external
+      ON o.id_contract = q.id_contract
       AND o.dt_reference = q.dt_reference
       AND q.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
