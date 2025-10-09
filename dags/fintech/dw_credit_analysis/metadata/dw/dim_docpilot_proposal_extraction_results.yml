@@ -1,0 +1,84 @@
+database_name: dw_credit
+table_name: dim_docpilot_proposal_extraction_results
+description: "Dimension table that summarizes DocPilot income extraction processing results per proposal. This table aggregates document processing outcomes, error metrics, and income extraction statistics from the DocPilot system for credit analysis purposes."
+domain: Fintech
+owner: isabella.santos@quintoandar.com.br
+columns:
+  id_proposal:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.id_proposal
+    description: "Proposal ID. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main)."
+  proposal_number_of_errors:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.number_of_errors
+    description: "Total number of errors encountered during income extraction processing for all documents in the proposal."
+  proposal_number_of_distinct_errors:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.error_type
+    description: "Number of distinct error types encountered during income extraction processing for the proposal."
+  proposal_errors:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.error_type
+    description: "Comma-separated list of all distinct error types encountered during income extraction processing for the proposal."
+  proposal_documents_type:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.documents_type
+    description: "Type of documents processed for income extraction in the proposal."
+    categories:
+      PAYSLIP: "Only payslip documents were processed"
+      BANK_STATEMENT: "Only bank statement documents were processed"
+      HYBRID: "Both payslip and bank statement documents were processed"
+  proposal_processing_result:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.processing_result
+    description: "Overall processing result for the proposal based on all document processing outcomes."
+    categories:
+      SUCCESS: "All documents were processed successfully"
+      PARTIAL_SUCCESS: "Some documents were processed successfully, others failed or had partial success"
+      FAILURE: "Docpilot failed to process all documents"
+  proposal_sum_of_avg_net_income:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.avg_net_income
+    description: "Sum of the average net income extracted from all documents in the proposal."
+  proposal_sum_of_median_net_income:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.median_net_income
+    description: "Sum of the median net income extracted from all documents in the proposal."
+  proposal_sum_of_avg_gross_income:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.avg_gross_income
+    description: "Sum of the average gross income extracted from all documents in the proposal."
+  proposal_sum_of_median_gross_income:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.median_gross_income
+    description: "Sum of the median gross income extracted from all documents in the proposal."
+  proposal_number_of_processing_result_success:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.processing_result
+    description: "Number of documents that were processed successfully in the proposal."
+  proposal_number_of_processing_result_partial_success:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.processing_result
+    description: "Number of documents that had partial success during processing in the proposal."
+  proposal_number_of_processing_result_failure:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.processing_result
+    description: "Number of documents that failed during processing in the proposal."
+  proposal_number_of_bank_statement:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.documents_type
+    description: "Number of bank statement documents processed in the proposal."
+  proposal_number_of_payslip:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.documents_type
+    description: "Number of payslip documents processed in the proposal."
+  proposal_number_of_suspicious_documents:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.is_suspicious
+    description: "Number of documents flagged as suspicious during processing in the proposal."
+  ts_proposal_last_income_extraction_result:
+    lineage:
+      - datalake_docpilot.income_extraction_processing.ts_created
+    description: "Timestamp of the most recent income extraction result for the proposal."
+  ts_updated:
+    description: "Timestamp when the record was last updated in the data warehouse."
