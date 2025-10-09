@@ -28,7 +28,6 @@ SELECT
   v.id_company_supply AS sk_company_supply,
   bc.sk_business_context,
   dim_heh.sk_house_entrance,
-  bm.sk_business_model,
   db.sk_behavior_type,
   dvs.sk_visit_status,
   funnel_os.sk_visit_funnel AS sk_funnel_offer_submitted,
@@ -90,9 +89,6 @@ LEFT JOIN
 LEFT JOIN
   dw_visit.dim_business_context AS bc
     ON v.business_context = bc.business_context
-LEFT JOIN
-  dw_visit.dim_business_model AS bm
-    ON v.business_model = bm.business_model
 LEFT JOIN
   dw_house.dim_house_entrance_history AS dim_heh
     ON v.id_house = dim_heh.sk_house

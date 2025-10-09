@@ -46,9 +46,7 @@ schedules as (
     schedules.sk_visitor,
     schedules.sk_owner,
     schedules.sk_house,
-    bc.business_context,
-    behavior.behavior_type,
-    bm.business_model,
+    visit.business_context,
     schedules.sk_agent,
     schedules.sk_user_agent,
     schedules.sk_fixed_agent,
@@ -63,15 +61,9 @@ schedules as (
     schedules.is_unsuccessful
   FROM
     dw_visit.fact_visit_schedules AS schedules
-      left join
-        dw_visit.dim_business_context as bc
-        on bc.sk_business_context = schedules.sk_business_context
-      left join
-        dw_visit.dim_behavior as behavior
-        on schedules.sk_behavior_type = behavior.sk_behavior_type
-      left join
-        dw_visit.dim_business_model as bm
-        on schedules.sk_business_model = bm.sk_business_model
+  LEFT JOIN
+    dw_public.dim_visit AS visit
+      ON schedules.sk_visit = visit.sk_visit
   where
     schedules.sk_succeed_schedule is null
 )
@@ -88,8 +80,6 @@ select
   cancelation_details.on_behalf_of as cancelation_on_behalf_of,
   schedules.has_tenant_living,
   schedules.sk_author_creator,
-  schedules.behavior_type,
-  schedules.business_model,
   if(
     schedules.sk_author_creator = schedules.sk_visitor,
     'Demand',

@@ -4035,8 +4035,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker:first-run-of-day
   - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day
   - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-visit-dim-business-context:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-visit-dim-business-model:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-public-dim-visit:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day

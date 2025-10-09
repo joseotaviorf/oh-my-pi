@@ -9,7 +9,6 @@ SELECT
   vm.sk_visit_model,
   db.sk_behavior_type,
   fup.sk_visit_fup,
-  bm.sk_business_model,
   es.id_business_unit AS sk_business_unit,
   es.id_company_supply AS sk_company_supply,
   es.id_company_demand AS sk_company_demand,
@@ -65,9 +64,6 @@ LEFT JOIN
 LEFT JOIN
     dw_visit.dim_behavior AS db
         ON es.behavior = db.behavior_type
-LEFT JOIN
-    dw_visit.dim_business_model AS bm
-        ON es.business_model = bm.business_model
 LEFT JOIN
     dw_visit.dim_visit_fup AS fup
         ON es.visit_fup = fup.visit_fup

@@ -46,11 +46,6 @@ columns:
       - datalake_visit.visit_schedules.behavior
     description:
       What is the behavior of the visit.
-  sk_business_model:
-    lineage:
-      - datalake_visit.visit_schedules.business_model
-    description:
-      Business model of the visit.
   sk_business_unit:
     lineage:
       - datalake_visit.visit_schedules.id_business_unit
