@@ -1,6 +1,6 @@
 ---
 database_name: dw_employee
-table_name: dim_jobs
+table_name: dim_job
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: "Dimension table that stores information about job roles, including their structure, career path, and operational attributes within the QuintoAndar Group."
