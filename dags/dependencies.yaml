@@ -869,7 +869,7 @@ bietlejuice.dw_repairs:
   - bietlejuice.repairs:load-clean-repair-request-budget:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-chat:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
-  - bietlejuice.repairs:load-clean-repair-request:first-run-of-day
+  - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
   - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation:first-run-of-day

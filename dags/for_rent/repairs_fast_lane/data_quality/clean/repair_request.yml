@@ -1,5 +1,5 @@
 ---
-table_name: datalake_repairs_test_clean.repair_request
+table_name: datalake_repairs_clean.repair_request
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

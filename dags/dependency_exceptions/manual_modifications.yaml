@@ -540,8 +540,8 @@ bietlejuice.enrich_repairs:
   remove:
     - bietlejuice.repairs:load-clean-repair-expense:first-run-of-day
     - bietlejuice.repairs:load-clean-repair-expense-group:first-run-of-day
-    - bietlejuice.repairs:load-clean-repair-request:first-run-of-day
     - bietlejuice.repairs:load-clean-repair-request-item:first-run-of-day
+    - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
 bietlejuice.enrich_reverses_monitoring:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day

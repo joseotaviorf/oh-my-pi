@@ -21,4 +21,4 @@ SELECT
     month,
     day
 FROM
-    datalake_repairs_test_raw.repair_request
+    datalake_repairs_raw.repair_request

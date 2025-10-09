@@ -22,7 +22,6 @@ workflow:
     repair_evidence: {}
     repair_expense: {}
     repair_expense_group: {}
-    repair_request: {}
     repair_request_chat: {}
     repair_request_item: {}
     repair_request_tenant_negotiation_follow_up: {}

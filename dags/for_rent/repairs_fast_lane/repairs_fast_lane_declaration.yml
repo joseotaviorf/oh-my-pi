@@ -15,7 +15,7 @@ workflow:
   source_database: repairs
   source_schema: public
   database_type: postgres
-  custom_schema: repairs_test
+  custom_schema: repairs
   lineage_product_database_name: repairs
   dbutils_secret_key: REPAIRS_DB
   tables_customization:

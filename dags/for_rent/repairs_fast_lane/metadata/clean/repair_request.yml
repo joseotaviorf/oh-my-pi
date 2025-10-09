@@ -1,4 +1,4 @@
-database_name: datalake_repairs_test_clean
+database_name: datalake_repairs_clean
 table_name: repair_request
 description: Clean layer table containing repair request data from the Repairs service.
   This table stores ongoing repair requests made by tenants and property owners during active contracts, including their status, journey information,
@@ -9,47 +9,47 @@ owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_repairs_test_raw.repair_request.id
+      - datalake_repairs_raw.repair_request.id
     description: Unique identifier for the repair request.
       It's the primary key from the repair_request table in the Repairs service.
   id_contract:
     lineage:
-      - datalake_repairs_test_raw.repair_request.contract_id
+      - datalake_repairs_raw.repair_request.contract_id
     description: Foreign key referencing the contract entity associated with the repair request.
       It's the id from Contract table, from EBDB service (Main).
   id_house:
     lineage:
-      - datalake_repairs_test_raw.repair_request.house_id
+      - datalake_repairs_raw.repair_request.house_id
     description: Foreign key referencing the house entity where the repair is requested.
       It's the id from House table, from EBDB service (Main).
   id_requester_user:
     lineage:
-      - datalake_repairs_test_raw.repair_request.requester_user_id
+      - datalake_repairs_raw.repair_request.requester_user_id
     description: User identifier of who requested the repair.
       It's the id from User table, from EBDB service (Main).
   id_third_party_crm_ticket_external:
     lineage:
-      - datalake_repairs_test_raw.repair_request.third_party_crm_ticket_external_id
+      - datalake_repairs_raw.repair_request.third_party_crm_ticket_external_id
     description: External identifier for third-party CRM ticket integration.
       Used to track repair requests in external CRM systems like Zendesk.
   id_customer_user:
     lineage:
-      - datalake_repairs_test_raw.repair_request.customer_user_id
+      - datalake_repairs_raw.repair_request.customer_user_id
     description: User identifier of the customer related to the repair request.
       Typically the tenant or property owner who will be affected by the repair.
   id_taskmaster_task:
     lineage:
-      - datalake_repairs_test_raw.repair_request.taskmaster_task_id
+      - datalake_repairs_raw.repair_request.taskmaster_task_id
     description: Foreign key referencing the Taskmaster task associated with this repair request.
       Used for workflow management and task tracking within the repair process.
   allow_personal_info_sharing:
     lineage:
-      - datalake_repairs_test_raw.repair_request.allow_personal_info_sharing
+      - datalake_repairs_raw.repair_request.allow_personal_info_sharing
     description: Boolean flag indicating if the customer allows sharing of personal information.
       Used for privacy compliance and data sharing policies during the repair process.
   status:
     lineage:
-      - datalake_repairs_test_raw.repair_request.status
+      - datalake_repairs_raw.repair_request.status
     description: Current status of the repair request process.
     categories:
       AWAITING_BUDGET: The repair request is awaiting a budget.
@@ -68,7 +68,7 @@ columns:
       'NULL': The repair request has no status.
   journey:
     lineage:
-      - datalake_repairs_test_raw.repair_request.journey
+      - datalake_repairs_raw.repair_request.journey
     description: The journey or flow type of the repair request.
       Indicates the specific workflow or process path the repair request follows.
     categories:
@@ -76,49 +76,49 @@ columns:
       TENANT_PROVIDER: The repair request is handled by the tenant or provider.
   third_party_crm:
     lineage:
-      - datalake_repairs_test_raw.repair_request.third_party_crm
+      - datalake_repairs_raw.repair_request.third_party_crm
     description: Third-party CRM system identifier or name used for external integrations.
       Indicates which external system is handling or tracking this repair request.
   origin_channel:
     lineage:
-      - datalake_repairs_test_raw.repair_request.origin_channel
+      - datalake_repairs_raw.repair_request.origin_channel
     description: Channel through which the repair request was initiated, such as Magic Link or PWA.
   assumed_urgency:
     lineage:
-      - datalake_repairs_test_raw.repair_request.assumed_urgency
+      - datalake_repairs_raw.repair_request.assumed_urgency
     description: The assumed urgency level of the repair request.
       Used for prioritization and resource allocation in the repair process.
   owner_approval:
     lineage:
-      - datalake_repairs_test_raw.repair_request.owner_approval
+      - datalake_repairs_raw.repair_request.owner_approval
     description: JSON field with information about the owner approval for the repair.
   service_provider:
     lineage:
-      - datalake_repairs_test_raw.repair_request.service_provider
+      - datalake_repairs_raw.repair_request.service_provider
     description: JSON field with information about the service provider designated for the repair.
       May include provider name, contact information, etc.
   zendesk_tickets_info:
     lineage:
-      - datalake_repairs_test_raw.repair_request.zendesk_tickets_info
+      - datalake_repairs_raw.repair_request.zendesk_tickets_info
     description: JSON field containing Zendesk ticket information related to the repair request.
       Includes status and other relevant Zendesk integration data.
   ts_created:
     lineage:
-      - datalake_repairs_test_raw.repair_request.created_at
+      - datalake_repairs_raw.repair_request.created_at
     description: Timestamp when the repair request was created in the system.
   ts_updated:
     lineage:
-      - datalake_repairs_test_raw.repair_request.updated_at
+      - datalake_repairs_raw.repair_request.updated_at
     description: Timestamp when the repair request was last updated.
   year:
     lineage:
-      - datalake_repairs_test_raw.repair_request.year
+      - datalake_repairs_raw.repair_request.year
     description: Year extracted from the creation date for partitioning purposes.
   month:
     lineage:
-      - datalake_repairs_test_raw.repair_request.month
+      - datalake_repairs_raw.repair_request.month
     description: Month extracted from the creation date for partitioning purposes.
   day:
     lineage:
-      - datalake_repairs_test_raw.repair_request.day
+      - datalake_repairs_raw.repair_request.day
     description: Day extracted from the creation date for partitioning purposes.
