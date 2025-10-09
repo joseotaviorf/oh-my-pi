@@ -122,6 +122,8 @@ class LineageResolver:
             table_alias = column_leaf.table
             if table_alias:
                 source = aliases_in_scope.get(table_alias)
+                if not source and len(aliases_in_scope) == 1:
+                    source = list(aliases_in_scope.values())[0]
             elif len(aliases_in_scope) == 1:
                 source = list(aliases_in_scope.values())[0]
 
@@ -134,9 +136,14 @@ class LineageResolver:
             ):
                 field_path_expr = field_path_expr.parent
 
-            field_name = field_path_expr.sql(
+            field_sql = field_path_expr.sql(
                 dialect="spark", comments=False
             ).replace('`', "")
+            
+            if table_alias and table_alias in aliases_in_scope and field_sql.startswith(f"{table_alias}."):
+                field_name = field_sql[len(table_alias) + 1:]
+            else:
+                field_name = field_sql
 
             if isinstance(source, str):
                 origins.append(f"{source}.{field_name}")
@@ -175,7 +182,11 @@ class LineageResolver:
                   Ex: {"my_column": {"lineage": ["db.table.source_col"]}}
         """
         lineage_map = {}
-        query_body = self.expression.find(exp.Query)
+        
+        query_body = self.expression.find(exp.Union)
+        
+        if not query_body:
+            query_body = self.expression if isinstance(self.expression, exp.Select) else self.expression.find(exp.Select)
 
         if not query_body:
             return {}
@@ -213,6 +224,32 @@ class LineageResolver:
                 lineage_map[col_alias] = {"lineage": unique_origins}
 
         return lineage_map
+
+
+def normalize_sql(sql):
+    """
+    Normalizes SQL to handle edge cases like reserved keywords used as column names.
+    
+    Args:
+        sql (str): The original SQL query.
+    
+    Returns:
+        str: Normalized SQL query.
+    """
+    import re
+    
+    normalized = sql
+    
+    patterns = [
+        (r'\bvalues\s*,', r'`values`,'),
+        (r',\s*values\s*,', r', `values`,'),
+        (r',\s*values\s+AS\s+', r', `values` AS '),
+    ]
+    
+    for pattern, replacement in patterns:
+        normalized = re.sub(pattern, replacement, normalized, flags=re.IGNORECASE | re.MULTILINE)
+    
+    return normalized
 
 
 def create_yml_for_table(
@@ -254,14 +291,15 @@ def create_yml_for_table(
         "columns": {},
     }
 
-    sql_parser = parse_one(sql, read="spark")
+    normalized_sql = normalize_sql(sql)
+    sql_parser = parse_one(normalized_sql, read="spark")
     final_select = sql_parser.find(exp.Select)
     for column in final_select.expressions:
         yml_body["columns"][column.alias_or_name] = {"description": ""}
 
     if do_lineage:
         try:
-            resolver = LineageResolver(sql)
+            resolver = LineageResolver(normalized_sql)
             lineage_map = resolver.get_lineage()
             for col_name, data in lineage_map.items():
                 if col_name in yml_body["columns"]:
