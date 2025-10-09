@@ -10,6 +10,8 @@ SELECT
     discount,
     status,
     requester_name,
+    unique_hash,
+    refund_amount,
     TIMESTAMP(started_processing_at) AS ts_started_processing,
     TIMESTAMP(created_at) AS ts_created,
     DATE(due_date) AS dt_due,
