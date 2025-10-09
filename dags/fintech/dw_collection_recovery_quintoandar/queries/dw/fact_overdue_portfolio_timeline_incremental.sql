@@ -26,7 +26,7 @@ recupera AS (
   LEFT JOIN datalake_recupera.contract_advisory_distribution AS rc
      ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
-  WHERE o.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
+  WHERE o.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 ),
 get_last_advisory_recupera AS (
   SELECT
@@ -118,22 +118,22 @@ LEFT JOIN
     datalake_recupera.contract_advisory_distribution AS rc
       ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
-      AND rc.dt_snapshot BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
+      AND rc.dt_snapshot BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
     datalake_cyber.agency_timeline AS cad
       ON o.id_contract = cad.id_contract
       AND o.dt_reference = cad.dt_reference
-      AND cad.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
+      AND cad.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
-    datalake_cyber.queue_timeline AS q
+    datalake_cyber.queue_timeline_2 AS q
       ON o.id_contract = q.id_contract_external
       AND o.dt_reference = q.dt_reference
-      AND q.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
+      AND q.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 LEFT JOIN
     negotiation_data AS n
       ON o.id_invoice = n.id_invoice
       AND o.id_contract = n.id_contract
-WHERE o.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -30)) AND DATE_ADD(DATE('{load_end_date}'), 1)
+WHERE o.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)
 
 ),
 get_last_valid_partner AS (
@@ -230,4 +230,4 @@ WHERE
   (sk_origin_negotiation IS NULL
   OR (sk_origin_negotiation IS NOT NULL
     AND negotiation_installment_number <> 1))
-  AND a.dt_reference BETWEEN DATE_ADD(DATE('{load_start_date}'), -30) AND DATE_ADD(DATE('{load_end_date}'), 1)
+  AND a.dt_reference BETWEEN DATE_TRUNC('MONTH', DATE_ADD(DATE('{load_start_date}'), -90)) AND DATE_ADD(DATE('{load_end_date}'), 1)

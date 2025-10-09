@@ -141,6 +141,7 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-agencies:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-agency-timeline:first-run-of-day
+  - bietlejuice.enrich_cyber:load-enrich-queue-timeline-2:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-queue-timeline:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-debt:first-run-of-day
   - bietlejuice.enrich_debt_recovery:load-enrich-installment:first-run-of-day

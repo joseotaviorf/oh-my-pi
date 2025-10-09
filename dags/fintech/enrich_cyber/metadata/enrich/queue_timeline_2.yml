@@ -1,0 +1,29 @@
+---
+database_name: datalake_cyber
+table_name: queue_timeline_2
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Enhanced timeline table for each contract showing its position in the three existing queues (segmentation, agreement and eviction) with improved date range handling and deduplication
+columns:
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_cyber.contracts.id_contract_external
+  dt_reference:
+    description: "Reference date for the timeline"
+    lineage:
+      - datalake_cyber.contracts.ts_last_update_agreement_queue
+      - datalake_cyber.contracts.ts_last_update_segmentation_queue
+      - datalake_cyber.contracts.ts_last_update_eviction_queue
+  agreement_queue:
+    description: "Agreement queue ID for the contract on the reference date"
+    lineage:
+      - datalake_cyber.contracts.agreement_queue
+  eviction_queue:
+    description: "Eviction queue ID for the contract on the reference date"
+    lineage:
+      - datalake_cyber.contracts.eviction_queue
+  segmentation_queue:
+    description: "Segmentation queue ID for the contract on the reference date"
+    lineage:
+      - datalake_cyber.contracts.segmentation_queue
