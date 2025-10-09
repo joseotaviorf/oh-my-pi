@@ -28,6 +28,20 @@ employee_ids AS (
           assignment_number DESC
       ) = 1
 ),
+new_emails_from_mapping AS (
+  SELECT
+    emp_map.work_email,
+    emp_ids.person_number,
+    emp_ids.full_name
+  FROM
+    datalake_gsheets_people_clean.email_employee_mapping AS emp_map
+  INNER JOIN
+    employee_ids AS emp_ids
+      ON emp_map.person_number = emp_ids.person_number
+  LEFT ANTI JOIN
+    employee_ids AS existing_emails
+      ON emp_map.work_email = existing_emails.work_email
+),
 employee_ids_enrich AS (
   SELECT
     work_email,
@@ -41,14 +55,11 @@ employee_ids_enrich AS (
   UNION ALL
 
   SELECT
-    emp_map.work_email,
-    emp_ids.person_number,
-    emp_ids.full_name
+    work_email,
+    person_number,
+    full_name
   FROM
-    datalake_gsheets_people_clean.email_employee_mapping AS emp_map
-  INNER JOIN
-    datalake_employee_registration.identifier_mapping AS emp_ids
-      ON emp_map.person_number = emp_ids.person_number
+    new_emails_from_mapping
 ),
 codex_unified AS (
   SELECT
