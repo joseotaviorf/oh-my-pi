@@ -1,3 +1,7 @@
+import requests
+from typing import Union
+from datetime import datetime
+
 from airflow.datasets import Dataset
 from airflow.utils.context import Context
 from airflow.utils.types import DagRunType
@@ -5,7 +9,9 @@ from airflow.utils.db import create_session
 from airflow.models.dataset import DatasetEvent
 from airflow.models import Variable
 from sqlalchemy.exc import SQLAlchemyError
-import requests
+from airflow.utils.session import provide_session
+from sqlalchemy import text
+from airflow.exceptions import AirflowException
 
 from bietlejuice.base.airflow.datasets.dataset_parser import DatasetParser
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
@@ -14,9 +20,6 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
-from typing import Union
-from datetime import datetime
-
 from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 
 
@@ -349,8 +352,6 @@ class DatasetService:
                     context["outlet_events"][dataset_alias].add(
                         Dataset(f"{dataset_name}:first-run-of-day")
                     )
-
-            cls._update_xcoms(context)
         except Exception as e:
             webhook_url = Variable.get("DLC_GCHAT_DATASET_EVENTS", None)
             payload = DatasetService.format_alert_message(context)
@@ -394,28 +395,46 @@ class DatasetService:
 
         return dataset_event is not None
 
-    @staticmethod
-    def _is_first_run_of_date(context: Context) -> bool:
+    @provide_session
+    def _is_first_run_of_date(context: dict, session=None) -> bool:
         """
         Check if the current DAG run is the first run of the day.
         This is used to determine if we should update the dataset with a suffix of ":first-run-of-day".
         """
-        last_run_start_date = context["ti"].xcom_pull(
-            task_ids=context["task"].task_id,
-            key="last_run_start_date",
-            include_prior_dates=True,
+        if not session:
+            raise AirflowException("SQLAlchemy session not provided.")
+
+        dataset_alias = context["outlets"][0].name
+        dataset_name = DatasetService.transform_alias_into_dataset_name(
+            dataset_alias=dataset_alias
         )
-        return (
-            last_run_start_date is None
-            or context["ti"].start_date.date() != last_run_start_date.date()
+        start_date = context[
+            "task_instance"
+        ].start_date.isoformat()  # Convert datetime to ISO string for SQL comparison
+
+        sql_query = text(
+            """
+            SELECT COUNT(de.id)
+            FROM dataset_event de
+            JOIN dataset d ON de.dataset_id = d.id
+            WHERE
+                d.uri LIKE :dataset_uri_prefix || :dataset_uri_suffix
+                AND de.timestamp::date = :start_date_param;
+        """
         )
 
-    @staticmethod
-    def _update_xcoms(context: Context) -> None:
-        """
-        Update the XComs with the last run start date.
-        This is used to determine if the current DAG run is the first run of the day.
-        """
-        context["ti"].xcom_push(
-            key="last_run_start_date", value=context["ti"].start_date
-        )
+        try:
+            result = session.execute(
+                sql_query,
+                {
+                    "dataset_uri_prefix": dataset_name,
+                    "start_date_param": start_date,
+                    "dataset_uri_suffix": ":first-run-of-day",
+                },
+            )
+            first_run_event_count = result.scalar()
+            return first_run_event_count == 0
+        except Exception as e:
+            # Log the error and re-raise as an AirflowException for better error handling in DAGs
+            print(f"Error checking first run of the task '{context['ti'].task_id}: {e}")
+            raise AirflowException(f"Failed to check first run of date: {e}")

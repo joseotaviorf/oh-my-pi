@@ -169,14 +169,32 @@ class TestDatasetService:
             mock_create_session.return_value.query.return_value.filter.return_value.first
         )
 
-    def test_update_datasets_should_do_nothing_if_is_test_run(self, mock_context):
+    @pytest.fixture
+    def mock_is_first_run_of_date(self):
+        """
+        Mocka DatasetService._is_first_run_of_date e retorna o objeto mock.
+        Por padrão, ele retorna True (simulando a primeira execução).
+        """
+        with mock.patch(
+            "bietlejuice.services.dataset_service.DatasetService._is_first_run_of_date"
+        ) as _mock:
+            _mock.return_value = True  # Valor padrão para a maioria dos testes
+            yield _mock
+
+    def test_update_datasets_should_do_nothing_if_is_test_run(
+        self, mock_is_first_run_of_date, mock_context
+    ):
+        mock_is_first_run_of_date.return_value = True
         mock_context["params"]["run_type"] = "test_run"
 
         DatasetService.update_datasets(mock_context)
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_not_called()
 
-    def test_update_datasets_should_add_normal_dataset_by_default(self, mock_context):
+    def test_update_datasets_should_add_normal_dataset_by_default(
+        self, mock_is_first_run_of_date, mock_context
+    ):
+        mock_is_first_run_of_date.return_value = True
         DatasetService.update_datasets(mock_context)
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
@@ -188,8 +206,9 @@ class TestDatasetService:
         )
 
     def test_update_datasets_should_add_reprocessing_dataset_if_is_reprocessing_run(
-        self, mock_context
+        self, mock_is_first_run_of_date, mock_context
     ):
+        mock_is_first_run_of_date.return_value = True
         mock_context["params"]["run_type"] = "reprocessing_run"
         DatasetService.update_datasets(mock_context)
 
@@ -202,8 +221,9 @@ class TestDatasetService:
         )
 
     def test_update_datasets_should_add_reprocessing_dataset_if_triggering_dataset_is_reprocessing(
-        self, mock_context
+        self, mock_is_first_run_of_date, mock_context
     ):
+        mock_is_first_run_of_date.return_value = True
         dataset_event = mock.MagicMock()
         dataset_event.extra = {
             "reprocessing_source": "dag2",
@@ -223,8 +243,9 @@ class TestDatasetService:
         )
 
     def test_update_datasets_should_add_normal_dataset_if_triggering_dataset_is_not_reprocessing(
-        self, mock_context
+        self, mock_is_first_run_of_date, mock_context
     ):
+        mock_is_first_run_of_date.return_value = True
         mock_context["triggering_dataset_events"] = {"dag2:task": mock.MagicMock()}
         DatasetService.update_datasets(mock_context)
 
@@ -236,18 +257,8 @@ class TestDatasetService:
             any_order=True,
         )
 
-    def test_update_datasets_should_update_xcom(self, mock_context):
-        DatasetService.update_datasets(mock_context)
-
-        mock_context["ti"].xcom_push.assert_called_once_with(
-            key="last_run_start_date", value=mock_context["ti"].start_date
-        )
-
-    def test_if_last_start_date_is_in_the_past_add_first_run_of_day_dataset(
-        self, mock_context
-    ):
-        mock_context["ti"].xcom_pull.return_value = pendulum.datetime(2024, 12, 31)
-
+    def test_first_run_of_day_dataset(self, mock_is_first_run_of_date, mock_context):
+        mock_is_first_run_of_date.return_value = True
         DatasetService.update_datasets(mock_context)
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
@@ -259,9 +270,9 @@ class TestDatasetService:
         )
 
     def test_if_last_execution_date_is_equal_to_date_do_not_add_first_run_of_day_dataset(
-        self, mock_context
+        self, mock_is_first_run_of_date, mock_context
     ):
-        mock_context["ti"].xcom_pull.return_value = pendulum.datetime(2025, 1, 2)
+        mock_is_first_run_of_date.return_value = False
 
         DatasetService.update_datasets(mock_context)
 
@@ -270,8 +281,9 @@ class TestDatasetService:
         )
 
     def test_if_it_is_a_rerun_it_should_not_update_datasets(
-        self, mock_context, database_query_function
+        self, mock_is_first_run_of_date, mock_context, database_query_function
     ):
+        mock_is_first_run_of_date.return_value = False
         database_query_function.return_value = "dataset-event"
 
         DatasetService.update_datasets(mock_context)
@@ -279,8 +291,9 @@ class TestDatasetService:
         mock_context["outlet_events"]["dag:task:alias"].add.assert_not_called()
 
     def test_should_not_trigger_reprocessing_if_event_from_a_previous_date(
-        self, mock_context
+        self, mock_is_first_run_of_date, mock_context
     ):
+        mock_is_first_run_of_date.return_value = False
         dataset_event = mock.MagicMock()
         dataset_event.extra = {
             "reprocessing_source": "dag2",
