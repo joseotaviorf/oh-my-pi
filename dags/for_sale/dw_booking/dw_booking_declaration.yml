@@ -11,7 +11,7 @@ workflow:
     dim_booking:
       partitions: [country_code]
 cluster:
-  type: databricks_13_3_med_memory_general_cluster
+  type: databricks_16_4_med_memory_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
@@ -21,3 +21,4 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.sql.sources.partitionOverwriteMode: static
