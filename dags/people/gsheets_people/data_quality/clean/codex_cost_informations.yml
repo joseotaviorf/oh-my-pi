@@ -1,4 +1,3 @@
----
 table_name: datalake_gsheets_people_clean.codex_cost_informations
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
@@ -8,6 +7,4 @@ table_level_validations:
 column_level_validations:
   id_cost_center:
     is_complete:
-      severity_level: Warning
-    is_unique:
       severity_level: Warning

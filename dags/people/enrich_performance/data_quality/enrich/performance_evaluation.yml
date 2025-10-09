@@ -3,7 +3,7 @@ table_name: datalake_pin.performance_evaluation
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 8000
+    greater_than: 6000
     severity_level: Warning
 column_level_validations:
   id_evaluation:

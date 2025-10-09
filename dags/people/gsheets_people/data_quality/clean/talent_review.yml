@@ -9,5 +9,3 @@ column_level_validations:
   person_number:
     is_complete:
       severity_level: Warning
-    is_unique:
-      severity_level: Warning

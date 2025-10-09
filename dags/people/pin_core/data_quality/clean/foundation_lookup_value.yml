@@ -14,5 +14,5 @@ column_level_validations:
     is_complete:
       severity_level: Warning
     custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.foundation_lookup_value GROUP BY id_row, ts_updated HAVING COUNT(*) > 1)) = 0"
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.foundation_lookup_value GROUP BY id_row, language, ts_updated HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
