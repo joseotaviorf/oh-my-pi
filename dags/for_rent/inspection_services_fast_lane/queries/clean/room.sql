@@ -11,4 +11,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspection_services_test_raw.room
+    datalake_inspection_services_raw.room

@@ -35,10 +35,6 @@ workflow:
       clean_table_name: assessment_aud
       clean_primary_keys: [id_assessment, rev]
       raw_primary_keys: [id, rev]
-    assessment:
-      clean_table_name: assessment
-      clean_primary_keys: [id_assessment]
-      raw_primary_keys: [id]
     automatic_invoice: {}
     automatic_invoice_aud: {}
     budget_approval_payment_preference_aud:
@@ -77,10 +73,6 @@ workflow:
       clean_table_name: inspection_aud
       clean_primary_keys: [id_inspection, rev]
       raw_primary_keys: [id, rev]
-    inspection:
-      clean_table_name: inspection
-      clean_primary_keys: [id_inspection]
-      raw_primary_keys: [id]
     issue_type_aud:
       clean_table_name: issue_type_aud
       clean_primary_keys: [id_issue_type, rev]
@@ -101,10 +93,6 @@ workflow:
       clean_table_name: item_group_aud
       clean_primary_keys: [id_item_group, rev]
       raw_primary_keys: [id, rev]
-    item_group:
-      clean_table_name: item_group
-      clean_primary_keys: [id_item_group]
-      raw_primary_keys: [id]
     item_group_state_aud:
       clean_table_name: item_group_state_aud
       clean_primary_keys: [id, rev]
@@ -157,10 +145,6 @@ workflow:
       clean_table_name: repair_request_aud
       clean_primary_keys: [id_repair_request, rev]
       raw_primary_keys: [id, rev]
-    repair_request:
-      clean_table_name: repair_request
-      clean_primary_keys: [id_repair_request]
-      raw_primary_keys: [id]
     repair_request_history:
       clean_table_name: repair_request_history
       clean_primary_keys: [id]
@@ -201,10 +185,6 @@ workflow:
       clean_table_name: room_aud
       clean_primary_keys: [id_room, rev]
       raw_primary_keys: [id, rev]
-    room:
-      clean_table_name: room
-      clean_primary_keys: [id_room]
-      raw_primary_keys: [id]
     room_type_aud:
       clean_table_name: room_type_aud
       clean_primary_keys: [id_room_type, rev]

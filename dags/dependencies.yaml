@@ -569,9 +569,9 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-room:first-run-of-day
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-assessment:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-assessment:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-repair-request:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-repair-request:first-run-of-day
   - bietlejuice.inspection_services:load-clean-reviewer:first-run-of-day
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries:first-run-of-day
@@ -2383,19 +2383,19 @@ bietlejuice.enrich_inspections:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.inspection_services:load-clean-appointment:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-assessment:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-assessment:first-run-of-day
   - bietlejuice.inspection_services:load-clean-budget:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation-media:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation:first-run-of-day
   - bietlejuice.inspection_services:load-clean-inspection-aud:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-inspection:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-inspection:first-run-of-day
   - bietlejuice.inspection_services:load-clean-issue-type-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-issue-type:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-group-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-group-type-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-group-type:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-item-group:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-item-group:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-issue-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-issue:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-media-aud:first-run-of-day
@@ -2404,7 +2404,7 @@ bietlejuice.enrich_inspections:
   - bietlejuice.inspection_services:load-clean-item-type:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item:first-run-of-day
   - bietlejuice.inspection_services:load-clean-repair-request-media:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-repair-request:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-repair-request:first-run-of-day
   - bietlejuice.inspection_services:load-clean-review-media:first-run-of-day
   - bietlejuice.inspection_services:load-clean-review:first-run-of-day
   - bietlejuice.inspection_services:load-clean-reviewer-aud:first-run-of-day
@@ -2412,7 +2412,7 @@ bietlejuice.enrich_inspections:
   - bietlejuice.inspection_services:load-clean-room-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-room-type-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-room-type:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-room:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-room:first-run-of-day
   - bietlejuice.schedules:load-clean-appointment-history:first-run-of-day
   - bietlejuice.schedules:load-clean-appointment:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
@@ -4339,11 +4339,11 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.enrich_terminator:load-enrich-termination:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
   - bietlejuice.inspection_services:load-clean-inspection-aud:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-inspection:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-item-group:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-repair-request:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-inspection:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-item-group:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-repair-request:first-run-of-day
   - bietlejuice.inspection_services:load-clean-reviewer:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-room:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-room:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day

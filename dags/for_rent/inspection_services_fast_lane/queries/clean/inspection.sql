@@ -20,4 +20,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspection_services_test_raw.inspection
+    datalake_inspection_services_raw.inspection

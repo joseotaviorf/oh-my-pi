@@ -14,7 +14,7 @@ workflow:
   source_schema: public
   source_database: inspections
   dbutils_secret_key: INSPECTIONS_DB
-  custom_schema: inspection_services_test
+  custom_schema: inspection_services
   lineage_product_database_name: inspections
   tables_customization:
     assessment:
