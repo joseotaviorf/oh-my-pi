@@ -246,7 +246,7 @@ sale_contract AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY dt_sale_agreement_signed ASC) = 1
 ),
-supply_source_info AS (
+supply_source_info_by_context AS (
   SELECT
     id_house,
     MAX(CASE WHEN business_context = 'RENT' THEN supply_source ELSE NULL END) AS supply_source_rent,
@@ -254,6 +254,25 @@ supply_source_info AS (
   FROM
     datalake_supply_flows.conversion_lookup
   GROUP BY ALL
+),
+supply_source_info AS (
+  SELECT
+    cl.id_house,
+    cl.supply_source
+  FROM
+    datalake_supply_flows.conversion_lookup AS cl
+  LEFT JOIN
+    listing_info AS li
+      ON cl.id_house = li.id_house
+      AND li.ts_first_listing IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY cl.id_house 
+      ORDER BY
+        LEAST(li.ts_first_listing_rent, li.ts_first_listing_sale),
+        IF(cl.supply_source = 'CIQ', 1, 2),
+        cl.supply_source
+    ) = 1
 ),
 listings_full_info AS (
   SELECT
@@ -266,8 +285,9 @@ listings_full_info AS (
         WHEN COUNT(*) OVER(PARTITION BY h.address_parsed_short) > 1 THEN TRUE 
         ELSE FALSE 
     END AS is_duplicated,
-    ssi.supply_source_rent,
-    ssi.supply_source_sale,
+    ssi.supply_source,
+    ssibc.supply_source_rent,
+    ssibc.supply_source_sale,
     li.ts_first_listing_sale,
     li.ts_first_listing_rent,
     li.ts_first_listing,
@@ -288,6 +308,9 @@ listings_full_info AS (
     sale_contract AS sc
       ON h.id_house = sc.id_house
   LEFT JOIN
+    supply_source_info_by_context AS ssibc
+      ON h.id_house = ssibc.id_house
+  LEFT JOIN
     supply_source_info AS ssi
       ON h.id_house = ssi.id_house
   WHERE
@@ -301,6 +324,7 @@ SELECT
   lfi.user_listing_registrant_sale AS id_user_listing_registrant_sale,
   lfi.address_full,
   lfi.address_parsed_short,
+  lfi.supply_source,
   lfi.supply_source_rent,
   lfi.supply_source_sale,
   lfi.first_listing_order,

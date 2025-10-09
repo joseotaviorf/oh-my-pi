@@ -16,6 +16,25 @@ WITH house_agregation_dates AS (
     datalake_listing_deduplication.ciq_first_listing AS cfl
   GROUP BY ALL
 ),
+last_house_listing_status AS (
+  SELECT
+    id_house,
+    status,
+    business_context
+  FROM
+    datalake_listing_deduplication.ciq_first_listing AS cfl
+  QUALIFY 
+    ROW_NUMBER() OVER (PARTITION BY id_house, business_context ORDER BY ts_updated DESC) = 1
+),
+house_listing_status_by_context AS (
+  SELECT
+    id_house,
+    FIRST(status) FILTER(WHERE business_context = 'SALE') AS last_house_listing_status_sale,
+    FIRST(status) FILTER(WHERE business_context = 'RENT') AS last_house_listing_status_rent
+  FROM
+    last_house_listing_status AS hls
+  GROUP BY ALL
+),
 draft_contract AS (
   SELECT
     id_house,
@@ -24,6 +43,18 @@ draft_contract AS (
     datalake_listing_contracts.listing_contracts
   WHERE
     contract_status = 'Minuta'
+),
+rent_ongoing_contract AS (
+  SELECT
+    c.id_house,
+    c.is_ongoing_contract
+  FROM
+    datalake_ebdb_contract.contract AS c
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY c.id_house 
+      ORDER BY c.ts_updated DESC
+    ) = 1
 ),
 indica_ai_listings AS (
   SELECT
@@ -89,6 +120,7 @@ accumulated_published_days AS (
 last_depub_dates AS (
   SELECT
     id_house,
+    MAX(ts_state_started) AS ts_last_depub,
     MAX(ts_state_started) FILTER(WHERE business_context = 'SALE') AS ts_last_depub_sale,
     MAX(ts_state_started) FILTER(WHERE business_context = 'RENT') AS ts_last_depub_rent
   FROM
@@ -122,30 +154,57 @@ SELECT
       END
     ELSE NULL
   END AS hybrid_creation_order,
+  "CIQ" AS supply_source,
+  ld.supply_source AS supply_source_duplicated,
   ld.supply_source_rent AS supply_source_rent_duplicated,
   ld.supply_source_sale AS supply_source_sale_duplicated,
+  hls.last_house_listing_status_rent,
+  hls.last_house_listing_status_sale,
+  CASE 
+    WHEN h.ts_contract_signed_sale IS NOT NULL THEN 'SOLD'
+    WHEN roc.is_ongoing_contract IS TRUE THEN 'RENTED'
+    WHEN hls.last_house_listing_status_rent = 'PUBLISHED'
+      OR hls.last_house_listing_status_sale =  'PUBLISHED'
+      THEN 'PUBLISHED'
+    WHEN COALESCE(hls.last_house_listing_status_rent, "N/D") IN ('UNPUBLISHED', 'OPTED_OUT', "N/D") 
+      AND COALESCE(hls.last_house_listing_status_sale, "N/D") IN ('UNPUBLISHED', 'OPTED_OUT', "N/D")
+      THEN 'UNPUBLISHED'
+    WHEN COALESCE(hls.last_house_listing_status_rent, "N/D") IN ('UNPUBLISHED', 'OPTED_OUT', "N/D")
+      AND hls.last_house_listing_status_sale IS NOT NULL 
+      THEN hls.last_house_listing_status_sale
+    WHEN COALESCE(hls.last_house_listing_status_sale, "N/D") IN ('UNPUBLISHED', 'OPTED_OUT', "N/D")
+      AND hls.last_house_listing_status_rent IS NOT NULL 
+      THEN hls.last_house_listing_status_rent
+    ELSE COALESCE(hls.last_house_listing_status_rent, hls.last_house_listing_status_sale) 
+  END AS house_listing_status,
+  roc.is_ongoing_contract IS TRUE AS is_house_rented,
+  h.ts_contract_signed_sale IS NOT NULL AS is_house_sold,
   h.is_hybrid_house,
   dc.id_house IS NOT NULL AND dc.ts_contract_created < (h.ts_first_listing_rent + INTERVAL 15 DAY) AS is_draft_contract,
   DATEDIFF(h.ts_contract_signed_rent, h.ts_first_listing_rent) <= 60 AS is_signed_cs_within_60_days,
   DATEDIFF(h.ts_contract_signed_sale, h.ts_first_listing_sale) <= 60 AS is_signed_ccv_within_60_days,
   ia.is_indica_ai,
-  ld.ts_contract_signed_sale IS NOT NULL AS is_sold_duplicated,
-  ld.ts_contract_signed_rent IS NOT NULL AS is_rented_duplicated,
+  roc.is_ongoing_contract AS is_ongoing_rent_contract,
   apd.dt_15_published_accumulated_days_rent,
   apd.dt_15_published_accumulated_days_sale,
   dc.ts_contract_created AS ts_created_draft_contract_rent,
   h.ts_contract_signed_rent AS ts_first_contract_signed_rent,
   h.ts_contract_signed_sale AS ts_first_contract_signed_sale,
+  LEAST(h.ts_first_listing_rent, h.ts_first_listing_sale) AS ts_first_listing,
   h.ts_first_listing_rent AS ts_initial_first_listing_rent,
-  CASE 
-    WHEN h.ts_first_listing_sale > h.ts_first_listing_rent THEN h.ts_first_listing_rent 
-    WHEN h.ts_first_listing_sale < h.ts_first_listing_rent THEN h.ts_first_listing_sale 
-    ELSE h.ts_first_listing_rent
-  END AS ts_initial_first_listing_sale,
+  IF(
+      h.is_hybrid_house IS TRUE AND hybrid_creation_order = 'RENT > SALE', 
+      LEAST(h.ts_first_listing_rent, h.ts_first_listing_sale), 
+      h.ts_first_listing_sale
+  ) AS ts_initial_first_listing_sale,
   h.ts_first_listing_sale,
   h.ts_first_listing_rent,
-  ldd.ts_last_depub_rent AS ts_last_depublication_rent_duplicated,
-  ldd.ts_last_depub_sale AS ts_last_depublication_sale_duplicated
+  ldd.ts_last_depub AS ts_last_depublication,
+  ldd.ts_last_depub_rent AS ts_last_depublication_rent,
+  ldd.ts_last_depub_sale AS ts_last_depublication_sale,
+  ldd_duplicated.ts_last_depub AS ts_last_depublication_duplicated,
+  ldd_duplicated.ts_last_depub_rent AS ts_last_depublication_rent_duplicated,
+  ldd_duplicated.ts_last_depub_sale AS ts_last_depublication_sale_duplicated
 FROM
   house_agregation_dates AS h
 LEFT JOIN
@@ -161,9 +220,18 @@ LEFT JOIN
   draft_contract AS dc
     ON h.id_house = dc.id_house
 LEFT JOIN
+  house_listing_status_by_context AS hls
+    ON h.id_house = hls.id_house
+LEFT JOIN
+  rent_ongoing_contract AS roc
+    ON roc.id_house = h.id_house
+LEFT JOIN
+  last_depub_dates AS ldd
+    ON h.id_house = ldd.id_house
+LEFT JOIN
   datalake_listing_deduplication.listing_deduplication AS ld
     ON h.id_house = ld.id_house_duplicated
     AND ld.is_duplicated
 LEFT JOIN
-  last_depub_dates AS ldd
-    ON ld.id_house_duplicated = ldd.id_house
+  last_depub_dates AS ldd_duplicated
+    ON ld.id_house = ldd_duplicated.id_house

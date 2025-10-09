@@ -40,6 +40,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.address
       - datalake_ebdb_clean.house.number
+  supply_source:
+    description: Overall supply source prioritizing CIQ when available and aligned to the first listing.
+    lineage:
+      - datalake_supply_flows.conversion_lookup.supply_source
   supply_source_rent:
     description: Source classification for rent supply (1P, 3P, or CIQ).
     lineage:
