@@ -1,30 +1,32 @@
-WITH mathew_session AS (
-    SELECT
-    DISTINCT
-        s.id_session AS score_session,
-        ss.id_session,
-        ss.id_user,
-        ss.ts_created,
-        ss.ts_finished
-    FROM
-        datalake_chatbot.support_sessions ss
-    LEFT JOIN
-        datalake_langfuse_clean.scores s
-        ON s.id_session = ss.id_external
-    WHERE
-        name = 'SessionContainsMatthewAgentEvaluator'
-        AND value = 1
-)
-
-SELECT
-    DISTINCT
-    bs.score_session,
-    bs.id_session,
-    bs.id_user,
-    du.contracts,
-    bs.ts_created
+SELECT DISTINCT
+    m.id_session,
+    m.id_sauron_session,
+    m.id_external,
+    m.id_ticket,
+    m.id_user,
+    m.bot,
+    m.status,
+    m.first_queue,
+    m.last_queue,
+    s.name,
+    s.value,
+    CASE
+        WHEN s.value = 1 AND s.value IS NOT NULL THEN True
+        ELSE False
+    END AS flag_eval_matthew_in_chat,
+    CASE
+        WHEN s.value = 1 AND s.value IS NOT NULL THEN 'Matthew in Chat'
+        WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
+        ELSE 'Wall-e'
+    END AS ai_agent_source,
+    m.is_escalation,
+    DATE(m.ts_created) AS dt_session_created,
+    m.ts_created,
+    m.ts_updated
 FROM
-    mathew_session AS bs
-LEFT JOIN dw_collection_ai_agents.fact_user_wallet_timeline AS du
-    ON bs.id_user = du.sk_user
-    AND DATE(bs.ts_created) >= DATE(du.dt_reference)
+    datalake_chatbot.sessions as m
+LEFT JOIN
+    datalake_langfuse_clean.scores s
+        ON s.id_session = m.id_external
+        AND s.name = 'SessionContainsMatthewAgentEvaluator'
+WHERE (bot = 'matthew' OR (bot = 'wall-e'))

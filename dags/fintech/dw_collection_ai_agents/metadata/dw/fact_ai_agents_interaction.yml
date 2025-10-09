@@ -1,26 +1,75 @@
 database_name: dw_collection_ai_agents
 table_name: fact_ai_agents_interaction
-description: AI agents interaction data with user sessions and contract information
+description: AI agents interaction data with user sessions, bot information, and evaluation scores
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
-  score_session:
-    lineage:
-      - datalake_langfuse_clean.scores.id_session
-    description: "Session ID from the scoring system (Langfuse)"
   id_session:
     lineage:
-      - datalake_chatbot.support_sessions.id_session
+      - datalake_chatbot.sessions.id_session
     description: "Internal session ID from the chatbot system"
+  id_sauron_session:
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+    description: "Sauron session ID associated with the chatbot session"
+  id_external:
+    lineage:
+      - datalake_chatbot.sessions.id_external
+    description: "External session ID used for integration with other systems"
+  id_ticket:
+    lineage:
+      - datalake_chatbot.sessions.id_ticket
+    description: "Ticket ID associated with the session"
   id_user:
     lineage:
-      - datalake_chatbot.support_sessions.id_user
+      - datalake_chatbot.sessions.id_user
     description: "User ID associated with the session"
-  contracts:
+  bot:
     lineage:
-      - dw_collection_ai_agents.dim_user_wallet_timeline.contracts
-    description: "Array of contract IDs associated with the user from wallet timeline"
+      - datalake_chatbot.sessions.bot
+    description: "Bot type that handled the session (matthew or wall-e)"
+  status:
+    lineage:
+      - datalake_chatbot.sessions.status
+    description: "Status of the session"
+  first_queue:
+    lineage:
+      - datalake_chatbot.sessions.first_queue
+    description: "First queue that handled the session"
+  last_queue:
+    lineage:
+      - datalake_chatbot.sessions.last_queue
+    description: "Last queue that handled the session"
+  name:
+    lineage:
+      - datalake_langfuse_clean.scores.name
+    description: "Name of the evaluation metric from Langfuse"
+  value:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score value from Langfuse"
+  flag_eval_matthew_in_chat:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Boolean flag indicating if Matthew agent was evaluated in the chat session"
+  ai_agent_source:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+      - datalake_chatbot.sessions.bot
+    description: "Source of the AI agent: 'Matthew in Chat', 'Matthew in Whatsapp', or 'Wall-e'"
+  is_escalation:
+    lineage:
+      - datalake_chatbot.sessions.is_escalation
+    description: "Flag indicating if the session was escalated"
+  dt_session_created:
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+    description: "Date when the session was created (extracted from timestamp)"
   ts_created:
     lineage:
-      - datalake_chatbot.support_sessions.ts_created
+      - datalake_chatbot.sessions.ts_created
     description: "Timestamp when the session was created"
+  ts_updated:
+    lineage:
+      - datalake_chatbot.sessions.ts_updated
+    description: "Timestamp when the session was last updated"
