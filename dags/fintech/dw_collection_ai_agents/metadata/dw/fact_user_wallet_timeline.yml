@@ -12,7 +12,7 @@ columns:
   max_delay_contaminated_contract_t2:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
-    description: "Maximum delay in days for contaminated contracts (T2)"
+    description: "Maximum delay in days for contaminated contracts (Window 2 days)"
   invoices_in_wallet:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.invoices_in_wallet
@@ -28,11 +28,11 @@ columns:
   user_wallet_overdue_t2:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.wallet_overdue_t2
-    description: "Total overdue wallet amount for the user (T2)"
+    description: "Total overdue wallet amount for the user (Window 2 days)"
   user_overdue_recovered_amount_t2:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t2
-    description: "Total overdue recovered amount for the user (T2)"
+    description: "Total overdue recovered amount for the user (Window 2 days)"
   user_payment_w_2:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.recovered_amount
@@ -40,7 +40,7 @@ columns:
   user_overdue_recovered_amount_t2_w_2:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t2
-    description: "User overdue recovered amount including next 2 days (T2)"
+    description: "User overdue recovered amount including next 2 days (Window 2 days)"
   n_contracts:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract

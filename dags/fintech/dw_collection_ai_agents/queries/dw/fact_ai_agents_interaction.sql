@@ -14,10 +14,8 @@ WITH mathew_session AS (
     WHERE
         name = 'SessionContainsMatthewAgentEvaluator'
         AND value = 1
-),
-dim_user_contract AS (
-
 )
+
 SELECT
     DISTINCT
     bs.score_session,
@@ -27,6 +25,6 @@ SELECT
     bs.ts_created
 FROM
     mathew_session AS bs
-LEFT JOIN dim_user_wallet_timeline AS du
+LEFT JOIN dw_collection_ai_agents.fact_user_wallet_timeline AS du
     ON bs.id_user = du.sk_user
     AND DATE(bs.ts_created) >= DATE(du.dt_reference)
