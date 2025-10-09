@@ -1,10 +1,10 @@
 database_name: datalake_google_search_console_classified
-table_name: gsc_keyword_region_attributes
+table_name: gsc_keyword_region_attributes_mex
 owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
-  Keyword-level regional enrichment for Google Search Console (GSC) data.
-  Adds inferred matches for IBGE city, while preserving keyword performance metrics.
+  Keyword-level regional enrichment for Google Search Console (GSC) data for Mexican portals (Inmuebles24 and Vivanuncios).
+  Adds inferred matches for city and zone, while preserving keyword performance metrics.
 columns:
   keyword:
     description: "Original search query from GSC."
@@ -14,10 +14,15 @@ columns:
     description: "Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept)."
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.keyword_clean
-  match_igbe_city:
-    description: IBGE city name inferred from the cleaned keyword using Brazilian cities reference.
+  match_city:
+    description: City name inferred from the cleaned keyword using Mexican cities reference.
     lineage:
-      - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
+      - datalake_gsheet_clean.mexico_regions.city_clean
+      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
+  match_zone:
+    description: Zone name inferred from the cleaned keyword using Mexican cities reference.
+    lineage:
+      - datalake_gsheet_clean.mexico_regions.zone_clean
       - datalake_google_search_console_classified.gsc_keywords.keyword_clean
   page:
     description: "Full page URL."
@@ -70,8 +75,13 @@ columns:
   has_mention_to_city:
     description: Flag indicating whether the keyword mentions or implies a city.
     lineage:
-      - datalake_google_search_console.gsc_keywords.keyword_clean
-      - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
+      - datalake_gsheet_clean.mexico_regions.city_clean
+      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
+  has_mention_to_zone:
+    description: Flag indicating whether the keyword mentions or implies a zone.
+    lineage:
+      - datalake_gsheet_clean.mexico_regions.zone_clean
+      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
   dt_created:
     description: "Month reference date (first day of month) derived from the original search date."
     lineage:

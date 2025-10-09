@@ -298,6 +298,9 @@ bietlejuice.enrich_content_funnel:
     - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+bietlejuice.enrich_google_search_console_classified:
+  remove:
+    - bietlejuice.gsheets_growth:done-clean-mexico-regions:first-run-of-day
 bietlejuice.enrich_neurotech_quintocred:
   remove:
     - bietlejuice.velo_neurotech:load-clean-logs-credit-granting:first-run-of-day

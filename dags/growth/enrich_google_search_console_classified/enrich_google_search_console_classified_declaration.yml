@@ -16,7 +16,9 @@ workflow:
   inner_dependencies:
     gsc_keywords:
       - seo_gsc_data
-    gsc_keyword_region_attributes:
+    gsc_keyword_region_attributes_bra:
+      - gsc_keywords
+    gsc_keyword_region_attributes_mex:
       - gsc_keywords
   default_extraction_type: incremental
   default_partitions:

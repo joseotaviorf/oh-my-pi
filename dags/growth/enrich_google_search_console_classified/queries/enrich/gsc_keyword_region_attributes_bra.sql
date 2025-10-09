@@ -7,6 +7,15 @@ WITH cities AS (
     municipio_clean IS NOT NULL
     AND municipio_clean != ' '
 ),
+keywords AS (
+  SELECT
+    *
+  FROM 
+    datalake_google_search_console_classified.gsc_keywords
+  WHERE
+    domain IN ("imovelweb", "wimoveis", "casamineira")
+    AND dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
 general_city_level_enrichment AS (
   SELECT
     keyword,
@@ -50,14 +59,10 @@ general_city_level_enrichment AS (
     month,
     day
   FROM
-    datalake_google_search_console_classified.gsc_keywords AS kfp
+    keywords AS k
   LEFT JOIN 
     cities AS c
-      ON kfp.country = "bra"
-      AND kfp.domain IN ("imovelweb", "wimoveis")
-      AND CHARINDEX(LOWER(c.city_name), LOWER(kfp.keyword_clean)) > 0
-  WHERE
-    kfp.dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      ON CHARINDEX(LOWER(c.city_name), LOWER(k.keyword_clean)) > 0
   QUALIFY ROW_NUMBER() OVER(
     PARTITION BY dt_created, keyword_clean, page, device
     ORDER BY LENGTH(match_ibge_city) DESC, CHARINDEX(match_ibge_city, keyword_clean)
