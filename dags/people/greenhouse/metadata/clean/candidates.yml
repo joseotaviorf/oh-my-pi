@@ -1,181 +1,188 @@
----
 database_name: datalake_greenhouse_clean
-table_name: applications
-owner: isabella.araujo@quintoandar.com.br
+table_name: candidates
+owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: Table containing candidate application data, sourced from the Greenhouse Harvest API's 'applications' endpoint.
+description: >-
+  Table with candidate data, sourced from the Greenhouse Harvest API's 'candidates' endpoint.
+  The following fields are not used as they are characteristics of the application, not the candidate, and should be consulted in the 'applications' table: applications, attachments, coordinator, custom_fields, and recruiter.
+  Additionally, 'photo_url' is not included as it is a null field, 'is_this_an_intern_permanent_hire_or_an_internal_recruitment_' is an archived custom field, and the 'nome_completo' custom field is not used for the full name as it contains significantly more nulls than concatenating the first and last name fields.
 columns:
   id:
-    description: The application's unique identifier.
-    lineage:
-      - datalake_greenhouse_raw.applications.id
-  id_candidate:
     description: The candidate's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.applications.candidate_id
-  id_job_post:
-    description: The job post's unique identifier.
+      - datalake_greenhouse_raw.candidates.id
+  id_linked_user:
+    description: The unique identifier of the first user linked to the candidate.
     lineage:
-      - datalake_greenhouse_raw.applications.job_post_id
-  id_source:
-    description: The source's unique identifier.
+      - datalake_greenhouse_raw.candidates.linked_user_ids
+  first_name:
+    description: The candidate's first name.
     lineage:
-      - datalake_greenhouse_raw.applications.source.id
-  id_credited_to:
-    description: The user credited for the application's unique identifier.
+      - datalake_greenhouse_raw.candidates.first_name
+  last_name:
+    description: The candidate's last name.
     lineage:
-      - datalake_greenhouse_raw.applications.credited_to.id
-  id_recruiter:
-    description: The recruiter's unique identifier.
+      - datalake_greenhouse_raw.candidates.last_name
+  full_name:
+    description: The candidate's full name, concatenated from first and last name.
     lineage:
-      - datalake_greenhouse_raw.applications.recruiter.id
-  id_coordinator:
-    description: The coordinator's unique identifier.
+      - datalake_greenhouse_raw.candidates.first_name
+      - datalake_greenhouse_raw.candidates.last_name
+  national_document_number:
+    description: The candidate's national identification document number (mainly the CPF - Cadastro de Pessoa Física).
     lineage:
-      - datalake_greenhouse_raw.applications.coordinator.id
-  id_rejection_reason:
-    description: The rejection reason's unique identifier.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.national_id
+  nationality:
+    description: The candidate's nationality.
     lineage:
-      - datalake_greenhouse_raw.applications.rejection_reason.id
-  status:
-    description: The current status of the application (e.g., active, rejected, hired).
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.nationality
+  current_company:
+    description: The candidate's current company.
     lineage:
-      - datalake_greenhouse_raw.applications.status
-  location:
-    description: The location associated with the application.
+      - datalake_greenhouse_raw.candidates.company
+  current_job_title:
+    description: The candidate's current job title.
     lineage:
-      - datalake_greenhouse_raw.applications.location
-  source_name:
-    description: The public name of the source from which the application originated.
+      - datalake_greenhouse_raw.candidates.title
+  hired_person_number:
+    description: The hired candidate's personal number.
     lineage:
-      - datalake_greenhouse_raw.applications.source.public_name
-  current_stage_name:
-    description: The name of the current stage in the hiring process for the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.personal_number
+  hired_nif_tax_document_number:
+    description: The hired candidate's tax document number (NIF).
     lineage:
-      - datalake_greenhouse_raw.applications.current_stage.name
-  rejection_reason_name:
-    description: The name of the rejection reason, if applicable.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.nif
+  hired_passport_number:
+    description: The hired candidate's passport number (specific to offers in Portugal).
     lineage:
-      - datalake_greenhouse_raw.applications.rejection_reason.name
-  credited_to_name:
-    description: The full name of the user credited for the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.portugal_offer_passaporte
+  hired_accessibility_need:
+    description: Answer to accessibility question 1, coalesced from different custom fields. 'Now that you're getting closer to starting at QuintoAndar, we want to make sure you have everything you need to work with comfort and autonomy. Do you currently use any accessibility resources in your daily work?'
     lineage:
-      - datalake_greenhouse_raw.applications.credited_to.name
-  credited_to_first_name:
-    description: The first name of the user credited for the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.pc_d_offer_acessibilidade_1__esp_
+  hired_accessibility_hybrid_office_needs:
+    description: Answer to accessibility question 2, coalesced from different custom fields. 'If the job is hybrid/in-office:'
     lineage:
-      - datalake_greenhouse_raw.applications.credited_to.first_name
-  credited_to_last_name:
-    description: The last name of the user credited for the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.pc_d_offer_acessibilidade_2__esp_
+  hired_accessibility_funding_preference:
+    description: Answer to accessibility question 3, coalesced from different custom fields. 'How do you prefer the necessary resources for your work to be funded? Please note 1)Equipment and resources acquired by the company for work use remain with the company. 2) Equipment and resources acquired with the "work from home" benefit remain with the employee. 3) Personal use equipment (such as wheelchairs, hearing aids, lenses, and glasses, etc.) are not provided by the company.'
     lineage:
-      - datalake_greenhouse_raw.applications.credited_to.last_name
-  recruiter_name:
-    description: The full name of the recruiter associated with the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.pc_d_offer_acessibilidade_3__esp_
+  pin_internal_person_number:
+    description: The internal candidate's personal number (PIN).
     lineage:
-      - datalake_greenhouse_raw.applications.recruiter.name
-  recruiter_first_name:
-    description: The first name of the recruiter associated with the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.employee_id
+  pin_internal_job_title:
+    description: The internal candidate's job title.
     lineage:
-      - datalake_greenhouse_raw.applications.recruiter.first_name
-  recruiter_last_name:
-    description: The last name of the recruiter associated with the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_job_title
+  pin_internal_band:
+    description: The internal candidate's salary band/level.
     lineage:
-      - datalake_greenhouse_raw.applications.recruiter.last_name
-  coordinator_name:
-    description: The full name of the coordinator associated with the application.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_band
+  is_private:
+    description: A boolean flag indicating if the candidate's profile is private.
     lineage:
-      - datalake_greenhouse_raw.applications.coordinator.name
-  coordinator_first_name:
-    description: The first name of the coordinator associated with the application.
+      - datalake_greenhouse_raw.candidates.is_private
+  has_valid_email:
+    description: A boolean flag indicating if the candidate can be contacted by email.
     lineage:
-      - datalake_greenhouse_raw.applications.coordinator.first_name
-  coordinator_last_name:
-    description: The last name of the coordinator associated with the application.
+      - datalake_greenhouse_raw.candidates.can_email
+  is_previous_employee:
+    description: A boolean flag indicating if the candidate is a former employee.
     lineage:
-      - datalake_greenhouse_raw.applications.coordinator.last_name
-  prospective_department:
-    description: The department for which the candidate is being prospected.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.previous_employee
+  has_work_authorization_hired:
+    description: A boolean flag indicating if the hired candidate has work authorization to work in the destination country.
     lineage:
-      - datalake_greenhouse_raw.applications.prospective_department
-  prospective_office:
-    description: The office for which the candidate is being prospected.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.work_authorization
+  has_rvv_pin_internal:
+    description: A boolean flag indicating if the internal candidate has an RVV.
     lineage:
-      - datalake_greenhouse_raw.applications.prospective_office
-  prospect_pool_name:
-    description: The name of the prospect pool the candidate belongs to.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.has_rvv
+  pin_internal_tenure:
+    description: The internal candidate's tenure in months.
     lineage:
-      - datalake_greenhouse_raw.applications.prospect_detail.prospect_pool.name
-  prospect_stage_name:
-    description: The name of the prospect stage the candidate is in.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_tenure
+  pin_internal_months_since_last_move:
+    description: The number of months since the internal candidate's last movement.
     lineage:
-      - datalake_greenhouse_raw.applications.prospect_detail.prospect_stage.name
-  prospect_owner_name:
-    description: The name of the user who owns the prospect.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.time_since_last_movement
+  salary_pin_internal:
+    description: The internal candidate's current salary.
     lineage:
-      - datalake_greenhouse_raw.applications.prospect_detail.prospect_owner.name
-  social_name:
-    description: The candidate's social name, coalesced from different custom fields.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_salary
+  dt_birthday_hired:
+    description: The hired candidate's date of birth.
     lineage:
-      - datalake_greenhouse_raw.applications.keyed_custom_fields
-  work_authorization_status:
-    description: The candidate's work authorization status, coalesced from different custom fields.
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields.birth_date_candidate_1752263668_438955
+  ts_created:
+    description: The timestamp when the candidate's profile was created.
     lineage:
-      - datalake_greenhouse_raw.applications.keyed_custom_fields
-  disability_type_details:
-    description: Details about the candidate's disability type, coalesced from different custom fields.
+      - datalake_greenhouse_raw.candidates.created_at
+  ts_updated:
+    description: The timestamp of the last update to the candidate's profile.
     lineage:
-      - datalake_greenhouse_raw.applications.keyed_custom_fields
-  accessibility_needs:
-    description: The candidate's accessibility needs, coalesced from different custom fields.
-    lineage:
-      - datalake_greenhouse_raw.applications.keyed_custom_fields
-  rejection_details_counter_offer_company:
-    description: The name of the company that made a counter-offer, if applicable.
-    lineage:
-      - datalake_greenhouse_raw.applications.rejection_details.keyed_custom_fields
-  rejection_details_counter_offer_value:
-    description: The value of the counter-offer made to the candidate, if applicable.
-    lineage:
-      - datalake_greenhouse_raw.applications.rejection_details.keyed_custom_fields
-  is_prospect:
-    description: A boolean flag indicating if the application is from a prospected candidate.
-    lineage:
-      - datalake_greenhouse_raw.applications.prospect
-  ts_applied:
-    description: The timestamp when the application was submitted.
-    lineage:
-      - datalake_greenhouse_raw.applications.applied_at
-  ts_rejected:
-    description: The timestamp when the application was rejected.
-    lineage:
-      - datalake_greenhouse_raw.applications.rejected_at
+      - datalake_greenhouse_raw.candidates.updated_at
   ts_last_activity:
-    description: The timestamp of the last activity on the application.
+    description: The timestamp of the last activity on the candidate's profile.
     lineage:
-      - datalake_greenhouse_raw.applications.last_activity_at
+      - datalake_greenhouse_raw.candidates.last_activity
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
-  attachments:
-    description: An array of attachments associated with the application.
+  tags:
+    description: An array of tags associated with the candidate.
     lineage:
-      - datalake_greenhouse_raw.applications.attachments
-  jobs:
-    description: An array of jobs associated with the application.
+      - datalake_greenhouse_raw.candidates.tags
+  application_ids:
+    description: An array of application IDs associated with the candidate.
     lineage:
-      - datalake_greenhouse_raw.applications.jobs
-  answers:
-    description: An array of answers to custom questions on the application.
+      - datalake_greenhouse_raw.candidates.application_ids
+  linked_user_ids:
+    description: An array of user IDs linked to the candidate.
     lineage:
-      - datalake_greenhouse_raw.applications.answers
+      - datalake_greenhouse_raw.candidates.linked_user_ids
+  email_addresses:
+    description: An array of all the candidate's email addresses.
+    lineage:
+      - datalake_greenhouse_raw.candidates.email_addresses
+  phone_numbers:
+    description: An array of all the candidate's phone numbers.
+    lineage:
+      - datalake_greenhouse_raw.candidates.phone_numbers
+  social_media_addresses:
+    description: An array of all the candidate's social media addresses.
+    lineage:
+      - datalake_greenhouse_raw.candidates.social_media_addresses
+  website_addresses:
+    description: An array of all the candidate's website addresses.
+    lineage:
+      - datalake_greenhouse_raw.candidates.website_addresses
+  educations:
+    description: An array of the candidate's educational history.
+    lineage:
+      - datalake_greenhouse_raw.candidates.educations
+  employments:
+    description: An array of the candidate's employment history.
+    lineage:
+      - datalake_greenhouse_raw.candidates.employments
+  addresses:
+    description: An array of all the candidate's home addresses.
+    lineage:
+      - datalake_greenhouse_raw.candidates.addresses
+  keyed_custom_fields:
+    description: An object containing all of the candidate's custom fields.
+    lineage:
+      - datalake_greenhouse_raw.candidates.keyed_custom_fields
   year:
     description: The year the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.applications.year
+      - datalake_greenhouse_raw.candidates.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.applications.month
+      - datalake_greenhouse_raw.candidates.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.applications.day
+      - datalake_greenhouse_raw.candidates.day
