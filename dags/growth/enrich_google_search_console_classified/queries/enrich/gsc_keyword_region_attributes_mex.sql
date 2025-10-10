@@ -91,6 +91,7 @@ SELECT
   match_zone,
   page,
   structure,
+  business_context,
   site_url,
   device,
   domain,

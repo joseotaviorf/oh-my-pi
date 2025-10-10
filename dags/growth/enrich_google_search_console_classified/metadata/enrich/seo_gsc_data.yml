@@ -95,6 +95,19 @@ columns:
       True for branded queries, False for generic/non-branded queries.
     lineage:
       - datalake_google_search_console_classified_clean.report_by_page_and_query.query
+  business_context:
+    description: |
+      Business context category classification based on URL patterns (Rent, Sale, Sale primary market, Short term rent, Auction, Transfer, N/A).
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.page
+    categories:
+      Rent: "Search page for properties available for rent"
+      Sale: "Search page for properties listed for sale"
+      Sale primary market: "Search page listing real estate developments available for sale (new properties)"
+      Short term rent: "Search page with properties available for seasonal rental"
+      Auction: "Page with properties available for sale through auction"
+      Transfer: "Page with predominantly commercial properties available through transfer"
+      N/A: "Pages that don't fit into the other classifications, including all non-transactional pages"
   dt_created:
     description: |
       Date when the search interaction occurred and the data was recorded in Google Search Console.

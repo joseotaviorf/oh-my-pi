@@ -27,6 +27,10 @@ columns:
     description: "Page structure according to business rules."
     lineage:
       - datalake_google_search_console_classified.gsc_keywords.structure
+  business_context:
+    description: "Business context category classification according to business rules."
+    lineage:
+      - datalake_google_search_console_classified.gsc_keywords.business_context
   site_url:
     description: "Main property URL measured by GSC."
     lineage:

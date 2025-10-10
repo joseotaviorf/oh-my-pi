@@ -82,7 +82,69 @@ WITH layer1 AS (
       WHEN page LIKE '%www.vivanuncios.com.mx%' THEN 'Transactional'
       --
       ELSE 'Other'
-    END AS struct
+    END AS struct,
+    CASE 
+      WHEN page LIKE "%imovelweb.com.br/%aluguel%" THEN "Rent"
+      WHEN page LIKE "%imovelweb.com.br/%venda%" THEN "Sale"
+      WHEN page LIKE "%imovelweb.com.br/%temporada%" THEN "Short term rent"
+      WHEN page LIKE "%imovelweb.com.br/%lancamentos%" THEN "Sale primary market"
+      WHEN page LIKE "%imovelweb.com.br/%leilao%" THEN "Auction"
+      --
+      WHEN page LIKE "%wimoveis.com.br/%aluguel%" THEN "Rent"
+      WHEN page LIKE "%wimoveis.com.br/%venda%" THEN "Sale"
+      WHEN page LIKE "%wimoveis.com.br/%temporada%" THEN "Short term rent"
+      WHEN page LIKE "%wimoveis.com.br/%lancamento%" THEN "Sale primary market"
+      WHEN page LIKE "%wimoveis.com.br/%leilao%" THEN "Auction"
+      --
+      WHEN page LIKE "%casamineira.com.br/aluguel%" THEN "Rent"
+      WHEN page LIKE "%casamineira.com.br/venda%" THEN "Sale"
+      WHEN page LIKE "%casamineira.com.br/lancamento%" THEN "Sale primary market"
+      --
+      WHEN page LIKE "%inmuebles24.com/%en-renta%" THEN "Rent"
+      WHEN page LIKE "%inmuebles24.com/%comercializa-remates%" THEN "Auction"
+      WHEN page LIKE "%inmuebles24.com/%en-venta%" THEN "Sale"
+      WHEN page LIKE "%inmuebles24.com/%en-temporal-vacacional%" THEN "Short term rent"
+      WHEN page LIKE "%inmuebles24.com/%desarrollos%" THEN "Sale primary market"
+      WHEN page LIKE "%inmuebles24.com/%en-traspaso%" THEN "Transfer"
+      --
+      WHEN page LIKE "%vivanuncios.com.mx/%renta%" THEN "Rent"
+      WHEN page LIKE "%vivanuncios.com.mx/%venta%" THEN "Sale"
+      WHEN page LIKE "%vivanuncios.com.mx/%remate%" THEN "Auction"
+      WHEN page LIKE "%vivanuncios.com.mx/%renta-vacacional%" THEN "Short term rent"
+      WHEN page LIKE "%vivanuncios.com.mx/%desarrollo%" THEN "Sale primary market"
+      WHEN page LIKE "%vivanuncios.com.mx/%traspaso%" THEN "Transfer"
+      --
+      WHEN page LIKE "%zonaprop.com.ar/%alquiler%" THEN "Rent"
+      WHEN page LIKE "%zonaprop.com.ar/%venta%" THEN "Sale"
+      WHEN page LIKE "%zonaprop.com.ar/%temporal%" THEN "Short term rent"
+      WHEN page LIKE "%zonaprop.com.ar/%emprendimientos%" THEN "Sale primary market"
+      --
+      WHEN page LIKE "%urbania.pe/%alquiler-temporal%" THEN "Short term rent"
+      WHEN page LIKE "%urbania.pe/%alquiler%" THEN "Rent"
+      WHEN page LIKE "%urbania.pe/%venta%" THEN "Sale"
+      WHEN page LIKE "%urbania.pe/%proyectos%" THEN "Sale primary market"
+      WHEN page LIKE "%urbania.pe/%traspaso%" THEN "Transfer"
+      --
+      WHEN page LIKE "%adondevivir.com/%alquiler-temporal%" THEN "Short term rent"
+      WHEN page LIKE "%adondevivir.com/%alquiler%" THEN "Rent"
+      WHEN page LIKE "%adondevivir.com/%venta%" THEN "Sale"
+      WHEN page LIKE "%adondevivir.com/%proyectos%" THEN "Sale primary market"
+      WHEN page LIKE "%adondevivir.com/%traspaso%" THEN "Transfer"
+      --
+      WHEN page LIKE "%plusvalia.com/%alquiler%" THEN "Rent"
+      WHEN page LIKE "%plusvalia.com/%venta%" THEN "Sale"
+      WHEN page LIKE "%plusvalia.com/%temporal-vacacional%" THEN "Short term rent"
+      WHEN page LIKE "%plusvalia.com/%proyecto%" THEN "Sale primary market"
+      WHEN page LIKE "%plusvalia.com/%traspaso%" THEN "Transfer"
+      --
+      WHEN page LIKE "%compreoalquile.com/%alquiler%" THEN "Rent"
+      WHEN page LIKE "%compreoalquile.com/%venta%" THEN "Sale"
+      WHEN page LIKE "%compreoalquile.com/%temporal%" THEN "Short term rent"
+      WHEN page LIKE "%compreoalquile.com/%desarrollos%" THEN "Sale primary market"
+      WHEN page LIKE "%compreoalquile.com/%traspaso%" THEN "Transfer"
+      --
+      ELSE "N/A" 
+    END AS business_context
   FROM
     datalake_google_search_console_classified_clean.report_by_page_and_query
   WHERE
@@ -102,6 +164,7 @@ SELECT
   posimp,
   domain,
   struct,
+  business_context,
   is_branded,
   dt_created,
   year,
