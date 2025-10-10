@@ -1,3 +1,6 @@
+import re
+
+
 class DAGOwnerEnum:
     """
     Mapping of all Analytics and Data Engineering teams for defining DAG owners.
@@ -27,8 +30,14 @@ class DAGOwnerEnum:
 
     @classmethod
     def get_available_enum_values(cls):
-        return [
+        values = [
             v
             for k, v in cls.__dict__.items()
             if not k.startswith("_") and isinstance(v, str)
         ]
+        invalid_values = [v for v in values if not re.match(r"^[A-Za-z0-9 ]+$", v)]
+        if invalid_values:
+            raise ValueError(
+                f"DAGOwnerEnum contains invalid values with special characters: {invalid_values}"
+            )
+        return values
