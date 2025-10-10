@@ -56,7 +56,6 @@ workflow:
           date_column_to_partition: "last_activity_at"
 
     candidates:
-      z_order_by: ["job_title"]
       extra_spark_job_arguments:
         - endpoint: "candidates"
           date_column_to_partition: "last_activity"
