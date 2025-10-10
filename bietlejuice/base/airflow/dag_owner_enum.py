@@ -1,6 +1,7 @@
 class DAGOwnerEnum:
     """
     Mapping of all Analytics and Data Engineering teams for defining DAG owners.
+    DISCLAIMER: Values MUST NOT contain special characters
     """
 
     DEFAULT_OWNER = "Data Engineering"
@@ -17,7 +18,7 @@ class DAGOwnerEnum:
     DATA_LIFE_CYCLE = "Data Life Cycle"
     DATA_PRIMITIVES = "Data Primitives"
     DATA_SS = "Data SS"
-    DATA_PP = "Data Planning & Performance"
+    DATA_PP = "Data Planning and Performance"
     MLOPS = "MLOps"
     QCX = "QCX"
     TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"
