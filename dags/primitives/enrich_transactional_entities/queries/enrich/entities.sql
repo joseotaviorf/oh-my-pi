@@ -24,6 +24,8 @@ WITH visit AS (
             ts_updated
         FROM
             core_visit.visit
+        WHERE
+            YEAR(ts_visit) >= 2025
     )
     SELECT
         id_entity,
@@ -88,7 +90,7 @@ offer AS (
             TO_JSON(
                 STRUCT(
                     status AS status,
-                    ts_expiration AS ts_expiration
+                    ts_expiration AS when
                 )
             ) AS properties,
             CASE
@@ -144,8 +146,7 @@ contract AS (
             TO_JSON(
                 STRUCT(
                     status AS status,
-                    dt_started AS dt_started,
-                    dt_termination AS dt_termination
+                    dt_started AS when
                 )
             ) AS properties,
             CASE
@@ -346,6 +347,8 @@ inspection AS (
     INNER JOIN
         core_contract.contract AS c
             ON ib.id_contract = c.id_contract
+    WHERE
+        YEAR(ib.ts_created) >= 2025
   )
   SELECT
         ib.id_entity,
@@ -469,6 +472,8 @@ onboarding AS (
             ts_updated
         FROM
             datalake_entities_views.onboarding
+        WHERE
+            YEAR(ts_created) >= 2025
     )
     SELECT
         id_entity,
@@ -587,7 +592,8 @@ repair AS (
         FROM
             datalake_repairs_clean.repair_request AS rr
         WHERE
-            rr.status IS NOT NULL
+            rr.year >= 2025
+            AND rr.status IS NOT NULL
     ),
     offboarding_repair AS (
         SELECT
@@ -618,6 +624,8 @@ repair AS (
         LEFT JOIN
             datalake_inspection_services_clean.inspection AS ins
                 ON ins.id_inspection = asm.id_inspection
+        WHERE
+            rr.year >= 2025
     ),
     union_all AS (
         SELECT 

@@ -134,7 +134,6 @@ columns:
     lineage:
       - core_contract.contract.status
       - core_contract.contract.dt_started
-      - core_contract.contract.dt_termination
       - core_credit_evaluation.credit_evaluation.status
       - core_credit_evaluation.credit_evaluation.ts_created
       - core_offer.offer.status
@@ -162,7 +161,7 @@ columns:
       This field provides detailed contextual information about the current state of each entity.
       For VISIT entities - contains computed_status field.
       For FR_OFFER entities - contains status field.
-      For FR_CONTRACT entities - contains status and ts_created fields.
+      For FR_CONTRACT entities - contains status and dt_started fields.
       For FR_TERMINATION entities - contains status and ts_created fields.
       For LISTING entities - contains status and status_reason fields.
       For FR_INSPECTION entities - contains status field.
