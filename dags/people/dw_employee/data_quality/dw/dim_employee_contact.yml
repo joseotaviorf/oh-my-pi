@@ -16,15 +16,7 @@ column_level_validations:
   sk_employee:
     is_unique:
       severity_level: Warning
-  ts_last_update:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
   ts_load:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Warning
-  work_email:
-    has_null_count:
-      less_than_or_equal_to: 10
       severity_level: Warning

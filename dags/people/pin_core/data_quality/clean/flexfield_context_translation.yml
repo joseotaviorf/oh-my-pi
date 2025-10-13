@@ -11,5 +11,5 @@ column_level_validations:
     is_complete:
       severity_level: Warning
     custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.flexfield_context_translation GROUP BY id_application, language, ts_updated HAVING COUNT(*) > 1)) = 0"
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.flexfield_context_translation GROUP BY id_application, descriptive_flexfield_code, context_code, language HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

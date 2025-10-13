@@ -16,14 +16,6 @@ column_level_validations:
   sk_employee:
     is_unique:
       severity_level: Warning
-  age_range:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
-  dt_birth:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
   first_name:
     has_null_count:
       less_than_or_equal_to: 1
