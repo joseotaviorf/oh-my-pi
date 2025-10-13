@@ -1,0 +1,43 @@
+dag:
+  name: release_validations_tests
+  catchup: false
+  schedule_interval: '0 22 * * *'
+  schedule_start_date: 2025, 1, 1
+  owner: Tech Platform Engineering Productivity
+  documentation:
+    dag_purpose: |
+      Run release validation checks and persist results. This DAG will read inputs from S3
+      and write raw data (JSON) and clean tables (Delta) for analysis.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: release_validations_tests
+  load_spark_job: load_release_validations_tests_raw
+  default_partitions: [year, month, day]
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{load_start_date}"
+  execution_timeout_hours: 2
+  default_extraction_type: incremental
+  tables_customization:
+    playwright_results:
+      clean_table_name: playwright_results
+      partitions: [year, month, day]
+      clean_partitions: [year, month, day]
+
+cluster:
+  type: databricks_16_4_min_general_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

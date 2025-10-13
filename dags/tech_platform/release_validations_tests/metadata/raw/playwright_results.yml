@@ -1,0 +1,27 @@
+database_name: datalake_release_validations_tests_raw
+table_name: playwright_results
+domain: Tech Platform
+description: Raw Playwright results.json files from release validations with original JSON content and extracted path metadata.
+columns:
+  file_path:
+    description: Full S3 path of the results.json file.
+  content:
+    description: Raw JSON content of Playwright results.json as a string.
+  test_type:
+    description: Test type extracted from S3 path segment (e.g., e2e, integration).
+  repository:
+    description: Repository name extracted from S3 path segment.
+  deploy_group:
+    description: Deploy group extracted from S3 path segment.
+  run_date:
+    description: Run date extracted from S3 path (YYYY-MM-DD format).
+  ci_build_id:
+    description: CI build identifier extracted from S3 path.
+  service:
+    description: Service/application name extracted from S3 path, null if playwright-report.
+  year:
+    description: Year partition derived from run_date.
+  month:
+    description: Month partition derived from run_date.
+  day:
+    description: Day partition derived from run_date.

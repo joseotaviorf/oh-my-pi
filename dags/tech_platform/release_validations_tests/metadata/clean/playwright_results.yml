@@ -1,0 +1,88 @@
+---
+database_name: datalake_release_validations_tests_clean
+table_name: playwright_results
+domain: Tech Platform
+description: One row per Playwright test attempt (retry) with run context, test metadata, and execution results.
+columns:
+  file_path:
+    description: Full S3 path of the results.json file.
+  test_type:
+    description: Test type inferred from S3 path segment (e.g., e2e, integration).
+  repository:
+    description: Repository name inferred from S3 path segment.
+  deploy_group:
+    description: Deploy group inferred from S3 path segment.
+  dt_run:
+    description: Run date inferred from S3 path (YYYY-MM-DD format).
+  id_ci_build:
+    description: CI build identifier from S3 path.
+  service:
+    description: Service/application name from S3 path, null if playwright-report.
+  year:
+    description: Year partition from run_date.
+  month:
+    description: Month partition from run_date.
+  day:
+    description: Day partition from run_date.
+  commit_short_hash:
+    description: Git commit short hash from test metadata.
+  commit_hash:
+    description: Full git commit hash from test metadata.
+  commit_branch:
+    description: Git branch name from test metadata.
+  actual_workers:
+    description: Number of actual Playwright workers used in the test run.
+  spec_file:
+    description: Playwright spec/suite file path.
+  spec_title:
+    description: Spec title or description.
+  tags:
+    description: Array of tags associated with the test (e.g., device-mobile, type-smoke).
+  device:
+    description: Device type extracted from tags (mobile or desktop).
+  test_type_tag:
+    description: Test type tag extracted from tags array (type-* pattern).
+  id_project:
+    description: Playwright project id for the test configuration.
+  project_name:
+    description: Playwright project name for the test configuration.
+  expected_status:
+    description: Expected test status (passed, failed, skipped, etc.).
+  attempt:
+    description: Attempt/retry index, starting from 0 for first attempt.
+  attempt_status:
+    description: Actual status of this attempt (passed, failed, timedOut, skipped, etc.).
+  duration_ms:
+    description: Attempt duration in milliseconds.
+  ts_start_utc:
+    description: Attempt start timestamp in UTC.
+  worker_index:
+    description: Index of the worker that executed this attempt.
+  parallel_index:
+    description: Parallel execution index for this attempt.
+  attachments:
+    description: Array of attachments (videos, screenshots, traces) associated with this attempt.
+  attachments_count:
+    description: Number of attachments for this attempt.
+  has_video:
+    description: Boolean indicating if attempt has video attachment.
+  has_screenshot:
+    description: Boolean indicating if attempt has screenshot attachment.
+  has_trace:
+    description: Boolean indicating if attempt has trace attachment.
+  error_message:
+    description: Error message if attempt failed, coalesced from error.message or first error in errors array.
+  error_stack:
+    description: Error stack trace if available, empty string otherwise.
+  error_location_file:
+    description: File where error occurred, coalesced from error or errors array.
+  error_location_line:
+    description: Line number where error occurred, coalesced from error or errors array.
+  failure_reason:
+    description: Classified failure reason (timeout, assertion, other) based on error and status.
+  id_test:
+    description: Unique test identifier (SHA1 hash of spec_file, spec_title, project_id).
+  id_attempt:
+    description: Unique attempt identifier (SHA1 hash of run_date, ci_build_id, test_id, attempt).
+  is_unexpected:
+    description: Boolean indicating if attempt status differs from expected status.
