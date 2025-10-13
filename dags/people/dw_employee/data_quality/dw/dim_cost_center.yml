@@ -1,12 +1,90 @@
 ---
 table_name: dw_employee.dim_cost_center
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_cost_center:
     is_unique:
+      severity_level: Warning
+  brand:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  business:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  chapter:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  cost_center_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  cost_center_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_effective_end:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_effective_start:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  headcount_type:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  line:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  owner_leadership_layer_1_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  owner_leadership_layer_2_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  owner_leadership_layer_3_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  product:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  status:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  structure:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  team:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  vertical:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning

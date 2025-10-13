@@ -1,14 +1,52 @@
 ---
 table_name: dw_performance.fact_talent_reviews
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
 column_level_validations:
   sk_talent_review:
     has_completeness:
       greater_than: 0.95
       severity_level: Warning
     is_unique:
+      severity_level: Warning
+  is_last_cycle:
+    is_complete:
+      severity_level: Warning
+  is_regrettable_loss:
+    is_complete:
+      severity_level: Warning
+  numeric_criticality_from_calibration:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  numeric_potential_from_calibration:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  numeric_readiness_from_calibration:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  numeric_risk_of_loss_from_calibration:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  ts_created:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning
+  ts_updated:
+    is_complete:
       severity_level: Warning

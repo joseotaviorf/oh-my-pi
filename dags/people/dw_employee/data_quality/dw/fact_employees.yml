@@ -1,12 +1,42 @@
 ---
 table_name: dw_employee.fact_employees
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_employee:
     is_unique:
+      severity_level: Warning
+  assignment_age_months:
+    is_complete:
+      severity_level: Warning
+  has_self_declared_disability:
+    is_complete:
+      severity_level: Warning
+  is_active:
+    is_complete:
+      severity_level: Warning
+  is_manager:
+    is_complete:
+      severity_level: Warning
+  is_pending_worker:
+    is_complete:
+      severity_level: Warning
+  qnt_directly_led:
+    is_complete:
+      severity_level: Warning
+  qnt_undirectly_led:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
       severity_level: Warning

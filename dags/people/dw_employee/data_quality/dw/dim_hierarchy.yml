@@ -1,12 +1,54 @@
 ---
 table_name: dw_employee.dim_hierarchy
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_hierarchy:
     is_unique:
+      severity_level: Warning
+  assignment_number_leadership_0:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  assignment_number_leadership_1:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  email_leadership_0:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  email_leadership_1:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  full_name_leadership_0:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  full_name_leadership_1:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  sk_assignment_leadership_order_0:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  sk_assignment_leadership_order_1:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning

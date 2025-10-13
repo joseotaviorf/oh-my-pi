@@ -1,12 +1,53 @@
 ---
 table_name: dw_employee.fact_absence_requests
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_absence_request:
     is_unique:
+      severity_level: Warning
+  days_requested:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  days_vacation_cash_out:
+    is_complete:
+      severity_level: Warning
+  has_requested_vacation_cash_out:
+    is_complete:
+      severity_level: Warning
+  is_approved:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  is_denied:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  is_open_ended:
+    is_complete:
+      severity_level: Warning
+  is_pending:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  is_vacation_request:
+    is_complete:
+      severity_level: Warning
+  sk_request_status:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  ts_load:
+    is_complete:
       severity_level: Warning

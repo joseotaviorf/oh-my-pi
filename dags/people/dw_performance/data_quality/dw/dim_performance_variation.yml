@@ -1,14 +1,33 @@
 ---
 table_name: dw_performance.dim_performance_variation
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 4
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
 column_level_validations:
   sk_performance_trend:
     has_completeness:
       greater_than: 0.9
       severity_level: Warning
     is_unique:
+      severity_level: Warning
+  behavior:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  impact:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  leadership:
+    has_null_count:
+      less_than_or_equal_to: 10
       severity_level: Warning

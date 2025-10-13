@@ -1,12 +1,58 @@
 ---
 table_name: dw_employee.dim_demographic_information
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_demographic_information:
     is_unique:
+      severity_level: Warning
+  country_situation:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ethnicity_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ethnicity_description:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  gender_identity:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  housing_type:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  neurodiversity:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  quinto_andar_joining_method:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  religion:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  sexual_orientation:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning

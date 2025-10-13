@@ -1,12 +1,42 @@
 ---
 table_name: dw_employee.fact_vacation_balances
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_vacation_balance:
     is_unique:
+      severity_level: Warning
+  days_accrued:
+    is_complete:
+      severity_level: Warning
+  days_balance:
+    is_complete:
+      severity_level: Warning
+  days_vacation_taken_absence:
+    is_complete:
+      severity_level: Warning
+  days_vacation_taken_cash_out:
+    is_complete:
+      severity_level: Warning
+  has_available_days:
+    is_complete:
+      severity_level: Warning
+  is_accrual_period_closed:
+    is_complete:
+      severity_level: Warning
+  total_days_taken:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
       severity_level: Warning

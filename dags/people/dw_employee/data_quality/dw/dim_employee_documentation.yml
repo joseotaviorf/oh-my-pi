@@ -1,15 +1,25 @@
 ---
 table_name: dw_employee.dim_employee_documentation
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_employee:
     has_completeness:
-      greater_than: 0.80
+      greater_than: 0.8
       severity_level: Warning
     is_unique:
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning

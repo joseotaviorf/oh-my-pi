@@ -1,12 +1,70 @@
 ---
 table_name: dw_employee.dim_employee
 alert_channel: PEOPLE_ALERTS
+
 table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   sk_employee:
     is_unique:
+      severity_level: Warning
+  age_range:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  dt_birth:
+    has_null_count:
+      less_than_or_equal_to: 10
+      severity_level: Warning
+  first_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  full_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  gender:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  gender_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  highest_education_level_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  highest_education_level_description:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  last_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  marital_status_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  marital_status_description:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  person_number:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
