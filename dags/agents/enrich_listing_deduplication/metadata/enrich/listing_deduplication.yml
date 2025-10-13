@@ -1,5 +1,5 @@
 ---
-database_name: datalake_tiers
+database_name: datalake_listing_deduplication
 table_name: listing_deduplication
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br

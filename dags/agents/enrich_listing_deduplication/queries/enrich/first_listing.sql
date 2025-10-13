@@ -34,19 +34,14 @@ unpublished AS (
         AND mod_status = 1
     GROUP BY ALL
 ),
-ciq_first_listing AS (
-    /**  
-        The First Listing is valid after 14 days from its publication date. 
-        Example: if it was published on the 1st of the month, and remained published until the 15th, 
-        then it will be considered valid on this date.
-    **/
+first_listing AS (
     SELECT
         hlc.id_house,
-        hlc.id_user,
-        COALESCE(so.id_offer, rde.id_offer) AS if_offer,
+        COALESCE(hlc.id_user, -1) AS id_user,
         hlc.consultant_type,
         lbc.status,
         lbc.business_context,
+        hlc.ts_enrollment_started,
         COALESCE(so.dt_sale_agreement_signed, rde.ts_event) AS ts_contract_signed,
         lbc.ts_first_listing,
         u.ts_first_unpublished,
@@ -78,58 +73,83 @@ ciq_first_listing AS (
             AND hlc.business_context = "RENT"
             AND rde.id_event_type = 9
     WHERE
-        hlc.is_last_ciq_on_listing = True
-        AND hlc.id_user IS NOT NULL
-        AND hlc.consultant_type IN ('CIQ_FULL', 'CIQ_MANAGER')
+        hlc.is_last_ciq_on_listing IS TRUE
 ),
 first_contract_signed AS (
     SELECT
         cfl.id_house,
         cfl.id_user,
-        cfl.if_offer,
         cfl.business_context,
         cfl.ts_contract_signed
     FROM
-        ciq_first_listing AS cfl
+        first_listing AS cfl
     WHERE
         cfl.ts_contract_signed IS NOT NULL
     QUALIFY
         1 = ROW_NUMBER() OVER (PARTITION BY cfl.id_house, cfl.id_user, cfl.business_context ORDER BY cfl.ts_contract_signed)
+),
+house_first_listing AS (
+    SELECT
+        cfl.id_house,
+        cfl.id_user,
+        pa.id_partner,
+        u.id_agent,
+        u.uuid_person,
+        cfl.consultant_type,
+        cfl.business_context,
+        cfl.status,
+        cfl.ts_first_listing IS NOT NULL AS has_first_listing,
+        cfl.ts_first_listing,
+        cfl.ts_first_unpublished,
+        cfl.ts_contract_signed,
+        cfl.ts_enrollment_started,
+        MAX(cfl.ts_updated) AS ts_updated,
+        YEAR(MAX(cfl.ts_updated)) AS year,
+        MONTH(MAX(cfl.ts_updated)) AS month,
+        DAY(MAX(cfl.ts_updated)) AS day
+    FROM
+        first_listing AS cfl
+    LEFT JOIN
+        first_contract_signed AS fcs
+            ON fcs.id_house = cfl.id_house
+            AND fcs.id_user = cfl.id_user
+            AND fcs.business_context = cfl.business_context
+    LEFT JOIN
+        datalake_ebdb_user.user AS u
+            ON u.id = cfl.id_user
+    LEFT JOIN
+        datalake_ebdb_clean.partner_agent AS pa
+            ON pa.id_user = cfl.id_user
+    WHERE
+        DATE(cfl.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND (
+            fcs.id_house IS NULL
+            OR fcs.ts_contract_signed = cfl.ts_contract_signed
+        )
+    GROUP BY ALL
 )
-SELECT
-    cfl.id_house,
-    CAST(cfl.id_user AS BIGINT) AS id_user,
-    pa.id_partner,
-    u.id_agent,
-    u.uuid_person,
-    cfl.consultant_type,
-    cfl.business_context,
-    cfl.status,
-    cfl.ts_first_listing IS NOT NULL AS has_first_listing,
-    cfl.ts_first_listing,
-    cfl.ts_first_unpublished,
-    cfl.ts_contract_signed,
-    MAX(cfl.ts_updated) AS ts_updated,
-    YEAR(MAX(cfl.ts_updated)) AS year,
-    MONTH(MAX(cfl.ts_updated)) AS month,
-    DAY(MAX(cfl.ts_updated)) AS day
-FROM
-    ciq_first_listing AS cfl
-LEFT JOIN
-    first_contract_signed AS fcs
-        ON fcs.id_house = cfl.id_house
-        AND fcs.id_user = cfl.id_user
-        AND fcs.business_context = cfl.business_context
-LEFT JOIN
-    datalake_ebdb_user.user AS u
-        ON u.id = cfl.id_user
-LEFT JOIN
-    datalake_ebdb_clean.partner_agent AS pa
-        ON pa.id_user = cfl.id_user
-WHERE
-    DATE(cfl.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    AND (
-        fcs.id_house IS NULL
-        OR fcs.ts_contract_signed = cfl.ts_contract_signed
+SELECT 
+    hfl.id_house,
+    hfl.id_user,
+    hfl.id_partner,
+    hfl.id_agent,
+    hfl.uuid_person,
+    hfl.consultant_type,
+    hfl.business_context,
+    hfl.status,
+    hfl.has_first_listing,
+    hfl.ts_first_listing,
+    hfl.ts_first_unpublished,
+    hfl.ts_contract_signed,
+    hfl.ts_enrollment_started,
+    hfl.ts_updated,
+    hfl.year,
+    hfl.month,
+    hfl.day
+FROM 
+    house_first_listing AS hfl
+QUALIFY
+    1 = ROW_NUMBER() OVER (
+        PARTITION BY hfl.id_house, hfl.business_context, hfl.consultant_type, hfl.ts_first_listing 
+        ORDER BY hfl.ts_enrollment_started ASC, hfl.ts_updated DESC
     )
-GROUP BY ALL

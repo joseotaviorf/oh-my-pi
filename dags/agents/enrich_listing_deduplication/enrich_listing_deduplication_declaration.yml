@@ -11,12 +11,12 @@ workflow:
   inner_dependencies:
     valid_first_listing:
       - listing_deduplication
-      - ciq_first_listing
+      - first_listing
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
-    ciq_first_listing:
+    first_listing:
       extraction_type: incremental
       partitions: [year, month, day]
 cluster:

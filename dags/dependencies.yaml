@@ -3617,16 +3617,11 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:
-  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud:first-run-of-day
-  - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
-  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant:first-run-of-day
-  - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant:first-run-of-day
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_hub_services_agents:load-enrich-member-hub-allocation:first-run-of-day
   - bietlejuice.enrich_hub_services_agents:load-enrich-users:first-run-of-day
+  - bietlejuice.enrich_listing_deduplication:load-enrich-valid-first-listing:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day

@@ -69,14 +69,26 @@ sale_contract_signed_with_ciq_simple_metrics AS (
         "CIQ" AS agent_profile,
         NULL AS partial_metric,
         mp.metric AS final_metric,
-        IF(mp_invalid.id IS NOT NULL, "CONTRACT CANCELLED AFTER SIGNED", "CONTRACT SIGNED") AS reason,
+        IF(
+            mp_invalid.id IS NOT NULL, 
+            "CONTRACT CANCELLED AFTER SIGNED", 
+            IF(
+                cfl.is_first_listing_valid IS FALSE, 
+                ARRAY_JOIN(cfl.invalidation_reasons, ' | '),
+                "FIRST LISTING VALID | CONTRACT SIGNED"
+            )
+        ) AS reason,
         NULL AS cumulative_value_type,
         NULL AS cumulative_value,
-        mp_invalid.id IS NULL AS is_valid,
+        mp_invalid.id IS NULL AND cfl.is_first_listing_valid IS TRUE AS is_valid,
         FALSE AS is_compound_metric_part,
         FALSE AS is_cumulative_metric,
         DATE(ao.ts_contract_signed) AS dt_become_valid,
-        IF(mp_invalid.id IS NOT NULL, ao.dt_contract_cancelled, NULL) AS ts_invalidation,
+        IF(
+            mp_invalid.id IS NOT NULL OR cfl.is_first_listing_valid IS FALSE, 
+            COALESCE(ao.dt_contract_cancelled, mp.dt_end), 
+            NULL
+        ) AS ts_invalidation,
         ao.ts_updated,
         mp.year,
         mp.month,
@@ -412,6 +424,80 @@ negotiation_executive_prospects_compound_metrics AS (
         AND aa.id_parent_user IS NOT NULL
     GROUP BY ALL
 ),
+sale_first_listing_simple_metrics AS (
+    SELECT
+        cfl.id_user,
+        cfl.id_agent,
+        cfl.uuid_person,
+        cfl.id_house AS id_external_domain,
+        mp.id AS id_metric_period,
+        "HOUSE" AS external_domain,
+        "CIQ" AS agent_profile,
+        NULL AS partial_metric,
+        mp.metric AS final_metric,
+        IF(
+            cfl.is_first_listing_valid IS FALSE, 
+            ARRAY_JOIN(cfl.invalidation_reasons, ' | '),
+            "FIRST LISTING VALID"
+        ) AS reason,
+        NULL AS cumulative_value_type,
+        NULL AS cumulative_value,
+        cfl.is_first_listing_valid IS TRUE AS is_valid,
+        FALSE AS is_compound_metric_part,
+        FALSE AS is_cumulative_metric,
+        DATE(cfl.dt_compliance_general_rule) AS dt_become_valid,
+        IF(cfl.is_first_listing_valid IS FALSE, mp.dt_end, NULL) AS ts_invalidation,
+        DATE('{load_end_date}') AS ts_updated,
+        mp.year,
+        mp.month,
+        mp.day
+    FROM
+        datalake_tiers.ciq_first_listing AS cfl
+    JOIN
+        metric_period_process AS mp
+            ON DATE(cfl.ts_original_first_listing) BETWEEN mp.dt_init AND mp.dt_end
+            AND DATE(cfl.dt_compliance_general_rule) BETWEEN mp.dt_init AND mp.dt_end
+            AND mp.metric IN ("FL_FS")
+    WHERE
+        cfl.business_context = "SALE"
+),
+rent_first_listing_simple_metrics AS (
+    SELECT
+        cfl.id_user,
+        cfl.id_agent,
+        cfl.uuid_person,
+        cfl.id_house AS id_external_domain,
+        mp.id AS id_metric_period,
+        "HOUSE" AS external_domain,
+        "CIQ" AS agent_profile,
+        NULL AS partial_metric,
+        mp.metric AS final_metric,
+        IF(
+            cfl.is_first_listing_valid IS FALSE, 
+            ARRAY_JOIN(cfl.invalidation_reasons, ' | '),
+            "FIRST LISTING VALID"
+        ) AS reason,
+        NULL AS cumulative_value_type,
+        NULL AS cumulative_value,
+        cfl.is_first_listing_valid IS TRUE AS is_valid,
+        FALSE AS is_compound_metric_part,
+        FALSE AS is_cumulative_metric,
+        DATE(cfl.dt_compliance_general_rule) AS dt_become_valid,
+        IF(cfl.is_first_listing_valid IS FALSE, mp.dt_end, NULL) AS ts_invalidation,
+        DATE('{load_end_date}') AS ts_updated,
+        mp.year,
+        mp.month,
+        mp.day
+    FROM
+        datalake_tiers.ciq_first_listing AS cfl
+    JOIN
+        metric_period_process AS mp
+            ON DATE(cfl.ts_original_first_listing) BETWEEN mp.dt_init AND mp.dt_end
+            AND DATE(cfl.dt_compliance_general_rule) BETWEEN mp.dt_init AND mp.dt_end + INTERVAL 15 DAY
+            AND mp.metric IN ("FL_FR")
+    WHERE
+        cfl.business_context = "RENT"
+),
 union_metrics AS (
     SELECT * FROM sale_contract_signed_simple_metrics
     UNION ALL
@@ -434,6 +520,10 @@ union_metrics AS (
     SELECT * FROM negotiation_executive_prospects_simple_metrics
     UNION ALL
     SELECT * FROM negotiation_executive_prospects_compound_metrics
+    UNION ALL
+    SELECT * FROM sale_first_listing_simple_metrics
+    UNION ALL
+    SELECT * FROM rent_first_listing_simple_metrics
 )
 SELECT
     XXHASH64(

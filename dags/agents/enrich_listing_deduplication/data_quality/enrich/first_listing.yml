@@ -1,5 +1,5 @@
 ---
-table_name: datalake_listing_deduplication.ciq_first_listing
+table_name: datalake_listing_deduplication.first_listing
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

@@ -1,19 +1,23 @@
 WITH house_agregation_dates AS (
   SELECT
     id_house,
-    FIRST(id_user) FILTER(WHERE cfl.business_context = 'SALE') AS id_ciq_user_sale,
+    FIRST(id_user) FILTER(WHERE cfl.business_context = 'SALE' AND id_user <> -1) AS id_ciq_user_sale,
     FIRST(id_partner) FILTER(WHERE cfl.business_context = 'SALE') AS id_partner_sale,
-    FIRST(uuid_person) FILTER(WHERE cfl.business_context = 'SALE') AS id_ciq_uuid_person_sale,
-    FIRST(id_user) FILTER(WHERE cfl.business_context = 'RENT') AS id_ciq_user_rent,
+    FIRST(id_agent) FILTER(WHERE cfl.business_context = 'SALE') AS id_agent_sale,
+    FIRST(uuid_person) FILTER(WHERE cfl.business_context = 'SALE') AS uuid_person_sale,
+    FIRST(id_user) FILTER(WHERE cfl.business_context = 'RENT' AND id_user <> -1) AS id_ciq_user_rent,
     FIRST(id_partner) FILTER(WHERE cfl.business_context = 'RENT') AS id_partner_rent,
-    FIRST(uuid_person) FILTER(WHERE cfl.business_context = 'RENT') AS id_ciq_uuid_person_rent,
+    FIRST(id_agent) FILTER(WHERE cfl.business_context = 'RENT') AS id_agent_rent,
+    FIRST(uuid_person) FILTER(WHERE cfl.business_context = 'RENT') AS uuid_person_rent,
+    FIRST(consultant_type) FILTER(WHERE cfl.business_context = 'SALE') AS consultant_type_sale,
+    FIRST(consultant_type) FILTER(WHERE cfl.business_context = 'RENT') AS consultant_type_rent,
     COUNT(DISTINCT cfl.business_context) FILTER(WHERE cfl.has_first_listing IS TRUE) = 2 AS is_hybrid_house,
     MIN(cfl.ts_first_listing) FILTER(WHERE cfl.business_context = 'SALE') AS ts_first_listing_sale,
     MIN(cfl.ts_first_listing) FILTER(WHERE cfl.business_context = 'RENT') AS ts_first_listing_rent,
     MIN(cfl.ts_contract_signed) FILTER(WHERE cfl.business_context = 'SALE') AS ts_contract_signed_sale,
     MIN(cfl.ts_contract_signed) FILTER(WHERE cfl.business_context = 'RENT') AS ts_contract_signed_rent
   FROM
-    datalake_listing_deduplication.ciq_first_listing AS cfl
+    datalake_listing_deduplication.first_listing AS cfl
   GROUP BY ALL
 ),
 last_house_listing_status AS (
@@ -22,7 +26,7 @@ last_house_listing_status AS (
     status,
     business_context
   FROM
-    datalake_listing_deduplication.ciq_first_listing AS cfl
+    datalake_listing_deduplication.first_listing AS cfl
   QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY id_house, business_context ORDER BY ts_updated DESC) = 1
 ),
@@ -132,11 +136,13 @@ last_depub_dates AS (
 SELECT
   h.id_house,
   h.id_ciq_user_sale AS id_user_listing_registrant_sale,
-  h.id_ciq_uuid_person_sale AS id_uuid_person_sale,
+  h.uuid_person_sale,
   h.id_partner_sale,
+  h.id_agent_sale,
   h.id_ciq_user_rent AS id_user_listing_registrant_rent,
-  h.id_ciq_uuid_person_rent AS id_uuid_person_rent,
+  h.uuid_person_rent,
   h.id_partner_rent,
+  h.id_agent_rent,
   ld.id_house AS id_house_duplicated,
   ld.id_user_listing_registrant_rent AS id_user_listing_registrant_rent_duplicated,
   ld.id_user_listing_registrant_sale AS id_user_listing_registrant_sale_duplicated,
@@ -154,10 +160,14 @@ SELECT
       END
     ELSE NULL
   END AS hybrid_creation_order,
-  "CIQ" AS supply_source,
+  ld_source.supply_source AS supply_source,
+  ld_source.supply_source_rent AS supply_source_rent,
+  ld_source.supply_source_sale AS supply_source_sale,
   ld.supply_source AS supply_source_duplicated,
   ld.supply_source_rent AS supply_source_rent_duplicated,
   ld.supply_source_sale AS supply_source_sale_duplicated,
+  h.consultant_type_rent,
+  h.consultant_type_sale,
   hls.last_house_listing_status_rent,
   hls.last_house_listing_status_sale,
   CASE 
@@ -228,6 +238,9 @@ LEFT JOIN
 LEFT JOIN
   last_depub_dates AS ldd
     ON h.id_house = ldd.id_house
+LEFT JOIN
+  datalake_listing_deduplication.listing_deduplication AS ld_source
+    ON h.id_house = ld_source.id_house
 LEFT JOIN
   datalake_listing_deduplication.listing_deduplication AS ld
     ON h.id_house = ld.id_house_duplicated

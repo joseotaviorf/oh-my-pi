@@ -14,21 +14,27 @@ columns:
     lineage:
       - datalake_tiers.agent_offers.id_user
       - datalake_tiers.agent_prospects.id_user
+      - datalake_tiers.ciq_first_listing.id_user
     description: |
       Main/admin (ebdb) user identifier associated with the event attribution.
       Note: also used to join the user registry to enrich with uuid_person.
   id_agent:
     lineage:
-      - datalake_ebdb_user.user.id_agent
+      - datalake_tiers.agent_offers.id_agent
+      - datalake_tiers.agent_prospects.id_agent
+      - datalake_tiers.ciq_first_listing.id_agent
     description: Agent unique identifier.
   uuid_person:
     lineage:
-      - datalake_ebdb_user.user.uuid_person
+      - datalake_tiers.agent_offers.uuid_person
+      - datalake_tiers.agent_prospects.uuid_person
+      - datalake_tiers.ciq_first_listing.uuid_person
     description: Person-level UUID from main/admin (ebdb) for the user in this event.
   id_external_domain:
     lineage:
       - datalake_tiers.agent_offers.id_offer
       - datalake_tiers.agent_prospects.id_prospect
+      - datalake_tiers.ciq_first_listing.id_house
     description: |
       External identifier according to the domain: offer id for OFFER domain
       or prospect id for PROSPECT domain.
@@ -63,6 +69,8 @@ columns:
       "CONTRACT SIGNED", "CONTRACT CANCELLED AFTER SIGNED", "OFFER SUBMITED",
       and "NEW OR RECOVERED PROSPECT".
   is_valid:
+    lineage:
+      - datalake_tiers.ciq_first_listing.is_first_listing_valid
     description: Indicates whether the event is valid for the target metric/period.
   is_compound_metric_part:
     description: Flags whether the record composes a compound metric mapping.
@@ -70,6 +78,7 @@ columns:
     description: Flags whether the record represents a cumulative metric value.
   dt_become_valid:
     lineage:
+      - datalake_tiers.ciq_first_listing.dt_compliance_general_rule
       - datalake_tiers.agent_offers.ts_contract_signed
       - datalake_tiers.agent_offers.ts_offer_submitted
       - datalake_tiers.agent_prospects.ts_event
@@ -78,6 +87,7 @@ columns:
       offer submitted or prospect event date, depending on the domain/metric).
   ts_invalidation:
     lineage:
+      - datalake_tiers.metric_period.dt_end
       - datalake_tiers.agent_offers.dt_contract_cancelled
     description: Timestamp when the event became invalid (e.g., contract cancelled), when applicable.
   ts_updated:

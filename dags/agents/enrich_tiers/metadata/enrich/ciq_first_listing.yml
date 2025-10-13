@@ -1,114 +1,149 @@
 ---
 database_name: datalake_tiers
 table_name: ciq_first_listing
-description: Dataset of houses recommended by CIQ consultants (SALE and RENT) with first listing information, validity window (15 days), publication/unpublication timestamps, and contract signature checks.
+description: |
+  Dataset of houses recommended by CIQ consultants (SALE and RENT) with first listing
+  information, duplicate/ hybrid rules evaluation, invalidation reasons, and compliance to the
+  15-day publication or contract rule. Includes publication/unpublication timestamps and
+  contextual fields for both current and previously duplicated houses.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.id_house
-      - datalake_big_agent.house_rent_listing_consultant.id_house
+      - datalake_listing_deduplication.valid_first_listing.id_house
     description: Unique identifier of the house.
+  id_previous_duplicated_house:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.id_house_duplicated
+    description: Identifier of the immediately previous duplicated house, when applicable.
   id_user:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.id_user
-      - datalake_big_agent.house_rent_listing_consultant.id_user
-    description: Unique identifier of the CIQ consultant user attached to the listing.
+      - datalake_listing_deduplication.valid_first_listing.id_user_listing_registrant_rent
+      - datalake_listing_deduplication.valid_first_listing.id_user_listing_registrant_sale
+    description: CIQ user who created the first listing for the given business context.
+  uuid_person:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.uuid_person_rent
+      - datalake_listing_deduplication.valid_first_listing.uuid_person_sale
+    description: Person-level UUID of the CIQ user.
   id_partner:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id_partner
+      - datalake_listing_deduplication.valid_first_listing.id_partner_rent
+      - datalake_listing_deduplication.valid_first_listing.id_partner_sale
     description: Partner identifier associated with the CIQ user, if any.
   id_agent:
     lineage:
-      - datalake_ebdb_user.user.id_agent
-    description: Agent identifier of the CIQ consultant.
-  uuid_person:
+      - datalake_listing_deduplication.valid_first_listing.id_agent_rent
+      - datalake_listing_deduplication.valid_first_listing.id_agent_sale
+    description: Agent identifier associated with the CIQ user.
+  id_ciq_user_rent_duplicated_house:
     lineage:
-      - datalake_ebdb_user.user.uuid_person
-    description: Person-level UUID from main/admin (ebdb) for the CIQ consultant user.
+      - datalake_listing_deduplication.valid_first_listing.id_user_listing_registrant_rent
+    description: CIQ user who created the RENT listing for the previous duplicated house.
+  id_ciq_user_sale_duplicated_house:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.id_user_listing_registrant_sale
+    description: CIQ user who created the SALE listing for the previous duplicated house.
+  business_context:
+    description: Business context of the record ('RENT' or 'SALE').
+    categories:
+      RENT: Rent context
+      SALE: Sale context
   consultant_type:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.consultant_type
-      - datalake_big_agent.house_rent_listing_consultant.consultant_type
+      - datalake_listing_deduplication.valid_first_listing.consultant_type_rent
+      - datalake_listing_deduplication.valid_first_listing.consultant_type_sale
     description: CIQ profile (e.g., CIQ_FULL, CIQ_MANAGER).
-  business_context:
+  house_listing_status:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.business_context
-    description: Business context where the supply capture was carried out by CIQ (SALE or RENT).
-  status:
+      - datalake_listing_deduplication.valid_first_listing.house_listing_status
+    description: Aggregated final status for the current house considering RENT/SALE contexts and contracts.
+  house_listing_status_duplicated_house:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.status
-    description: The status of the listing. 
-  has_first_listing:
-    description: Indicates that this property has already had its first publication made.
-  is_valid_first_listing:
-    description: >
-      Boolean flag that indicates whether the first listing is considered valid.
-      A listing is valid if:
-        - ts_first_listing exists,
-        - AND it was not unpublished within 15 days,
-        - OR a contract (SALE or RENT) was signed within that period.
-
-      Important note:
-        The First Listing is valid after 15 days from its publication date.
-        The day of ts_first_listing is included in the 15-day count — this means it is not 15 full days later, which is a common misconception.
-  ts_first_listing:
+      - datalake_listing_deduplication.valid_first_listing.house_listing_status
+    description: Aggregated final status for the previous duplicated house.
+  supply_source:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-    description: Timestamp of when the opportunity became a first listing.
-  ts_first_unpublished:
+      - datalake_listing_deduplication.valid_first_listing.supply_source
+    description: Overall supply source for the current house.
+  supply_source_by_context:
     lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Timestamp of the first time the listing was unpublished (derived from audit history revisions).
-  ts_contract_signed:
+      - datalake_listing_deduplication.valid_first_listing.supply_source_rent
+      - datalake_listing_deduplication.valid_first_listing.supply_source_sale
+    description: Overall supply source for the current house by context.
+  supply_source_duplicated_house:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_rent_demand_events.rent_demand_events.ts_event
-    description: Timestamp representing the date the contract was signed (SALE agreement or RENT contract signed event), if it exists.
-  ts_valid_first_listing:
+      - datalake_listing_deduplication.valid_first_listing.supply_source
+    description: Overall supply source for the previous duplicated house.
+  days_between_fl_hybrid:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_rent_demand_events.rent_demand_events.ts_event
-    description: >
-      Timestamp considered as the start of the valid first listing period.
-      It is calculated as:
-        - If a contract (SALE or RENT) was signed before 15 days after the first listing (ts_first_listing), then the contract date is used.
-        - Otherwise, the valid first listing date is considered to be exactly 15 days after the publication.
-      Important note:
-        The First Listing is valid after 15 days from its publication date.
-        Example: If it was published on the 1st of the month and remained published until the 15th, then the listing is considered valid on the 15th.
-        This means the day of ts_first_listing also counts in the calculation — it’s not 15 full days later.
-  ts_updated:
+      - datalake_listing_deduplication.valid_first_listing.days_between_fl_hybrid
+    description: Absolute difference in days between RENT and SALE first listings for hybrid houses.
+  hybrid_creation_order:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Record update date.
-  day:
+      - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
+    description: "Creation order for hybrid houses: 'RENT > SALE', 'SALE > RENT', or 'CREATED AS A HYBRID'."
+  invalidation_reasons:
+    description: Array of messages describing why a record is not valid according to duplication, hybrid, Indica AI, or general rule checks.
+  is_first_listing_valid:
+    description: Boolean indicating if the record meets all rules for a valid first listing in its context.
+  is_valid_duplicated:
+    description: Indicates whether duplication conditions are satisfied for validity.
+  is_valid_hybrid:
+    description: Indicates whether hybrid-specific conditions are satisfied for validity in the context.
+  is_invalid_by_indica_ai:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Day of the record update date.
-  month:
+      - datalake_listing_deduplication.valid_first_listing.is_indica_ai
+    description: True when the listing was captured via Indica AI, which invalidates the first listing.
+  is_compliance_general_rule:
+    description: Compliance to the general rule (remain published 15 days or have a signed/draft contract in the period), scoped to the context.
+  is_hybrid_house:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Month of the record update date.
-  year:
+      - datalake_listing_deduplication.valid_first_listing.is_hybrid_house
+    description: True when the house has both RENT and SALE contexts.
+  is_signed_contract_within_60_days:
     lineage:
-      - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Year of the record update date.
+      - datalake_listing_deduplication.valid_first_listing.is_signed_cs_within_60_days
+      - datalake_listing_deduplication.valid_first_listing.is_signed_ccv_within_60_days
+    description: Boolean flag indicating if a RENT contract (CS) or SALE agreement (CCV) was signed within 60 days after the first listing.
+  dt_compliance_general_rule:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.dt_15_published_accumulated_days_rent
+      - datalake_listing_deduplication.valid_first_listing.dt_15_published_accumulated_days_sale
+      - datalake_listing_deduplication.valid_first_listing.ts_first_contract_signed_rent
+      - datalake_listing_deduplication.valid_first_listing.ts_first_contract_signed_sale
+      - datalake_listing_deduplication.valid_first_listing.ts_created_draft_contract_rent
+    description: Date that satisfies the general rule (15 accumulated published days or the first signed/draft contract).
+  dt_15_published_accumulated_days:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.dt_15_published_accumulated_days_rent
+      - datalake_listing_deduplication.valid_first_listing.dt_15_published_accumulated_days_sale
+    description: Date when 15 accumulated published days were reached (within the first 60 days) for the context.
+  ts_first_contract_signed:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_first_contract_signed_rent
+      - datalake_listing_deduplication.valid_first_listing.ts_first_contract_signed_sale
+    description: First contract signed timestamp for the given business context.
+  ts_created_draft_contract:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_created_draft_contract_rent
+    description: Draft contract creation timestamp (only for RENT; NULL for SALE).
+  ts_original_first_listing:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_sale
+    description: Original first listing timestamp for the given business context.
+  ts_final_first_listing:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
+      - datalake_listing_deduplication.valid_first_listing.ts_initial_first_listing_sale
+    description: Final first listing timestamp used for validity evaluation.
+  ts_last_depublication:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_last_depublication
+    description: Last depublication timestamp across contexts for the current house.
+  ts_last_depublication_duplicated_house:
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_last_depublication
+    description: Last depublication timestamp across contexts for the previous duplicated house.

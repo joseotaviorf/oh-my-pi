@@ -1,6 +1,6 @@
 ---
 database_name: datalake_listing_deduplication
-table_name: ciq_first_listing
+table_name: first_listing
 description: Dataset of houses recommended by CIQ consultants (SALE and RENT) with first listing information, publication/unpublication timestamps, and contract signature checks.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
@@ -55,6 +55,11 @@ columns:
       - datalake_offer.sale_offer.dt_sale_agreement_signed
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Timestamp representing the date the contract was signed (SALE agreement or RENT contract signed event), if it exists.
+  ts_enrollment_started:
+    lineage:
+      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_rent_listing_consultant.ts_enrollment_started
+    description: Timestamp when the CIQ consultant enrollment started for the listing context.
   ts_updated:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
