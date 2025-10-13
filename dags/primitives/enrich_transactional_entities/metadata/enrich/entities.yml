@@ -137,7 +137,6 @@ columns:
       - core_contract.contract.dt_termination
       - core_credit_evaluation.credit_evaluation.status
       - core_credit_evaluation.credit_evaluation.ts_created
-      - core_credit_evaluation.credit_evaluation.ts_expires
       - core_offer.offer.status
       - core_offer.offer.ts_expiration
       - core_visit.visit.computed_status
@@ -163,12 +162,12 @@ columns:
       This field provides detailed contextual information about the current state of each entity.
       For VISIT entities - contains computed_status field.
       For FR_OFFER entities - contains status field.
-      For FR_CONTRACT entities - contains status field.
-      For FR_TERMINATION entities - contains status field.
+      For FR_CONTRACT entities - contains status and ts_created fields.
+      For FR_TERMINATION entities - contains status and ts_created fields.
       For LISTING entities - contains status and status_reason fields.
       For FR_INSPECTION entities - contains status field.
       For FR_ONBOARDING entities - contains status and ts_created fields.
-      For FR_CREDIT_EVALUATION entities - contains status, ts_created and ts_expires fields.
+      For FR_CREDIT_EVALUATION entities - contains status and ts_created fields.
       For FR_RESERVATION entities - contains status and ts_created fields.
       For FR_REPAIR_ONGOING entities - contains status and ts_created fields.
       For FR_REPAIR_OFFBOARDING entities - contains ts_created field.

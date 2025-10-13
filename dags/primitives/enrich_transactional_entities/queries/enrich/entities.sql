@@ -202,7 +202,7 @@ termination AS (
       TO_JSON(
         STRUCT(
           status AS status,
-          ts_created AS ts_created
+          ts_created AS when
         )
       ) AS properties,
       CASE
@@ -405,8 +405,7 @@ credit_evaluation AS (
             TO_JSON(
                 STRUCT(
                     ce.status AS status,
-                    ce.ts_created AS ts_created,
-                    ce.ts_expires AS ts_expires
+                    ce.ts_created AS when
                 )
             ) AS properties,
             CASE
@@ -514,7 +513,7 @@ reservation AS (
             TO_JSON(
                 STRUCT(
                     rv.status AS status,
-                    rv.ts_created AS ts_created
+                    rv.ts_created AS when
                 )
             ) AS properties,
             IF(rv.is_ongoing = TRUE, TRUE, FALSE) is_active,
