@@ -34,6 +34,7 @@ workflow:
         source.persona <> target.persona OR
         source.business_context <> target.business_context OR
         source.house_address <> target.house_address OR
+        source.properties <> target.properties OR
         source.is_active <> target.is_active OR
         source.ts_created <> target.ts_created
       when_matched_delete_condition: |
