@@ -1,0 +1,44 @@
+database_name: datalake_kirk_clean
+table_name: ai_inspection_analysis
+domain: For Rent
+description: This table contains the analysis of the inspections created by kirk. It's also contains error defails if it's failed.
+columns:
+  id_inspection:
+    description: Inspection id (uuid) from inspection service
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.external_id
+  id_contract:
+    description: Contract id (number) from contract service
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.contract_id
+  id_analysis:
+    description: Analysis id (uuid) from kirk
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.id
+  analysis_status:
+    description: Status of the analysis, if it's 'completed' or 'failed'
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.analysis_status
+  identified_repairs:
+    description: Json of repairs identified by the analysis
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.identified_repairs
+  ts_created:
+    description: Analysis creation date
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.created_at
+    description: Analysis update date
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.updated_at
+  error_details:
+    description: Json of errors details
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.error_details
+  model_version:
+    description: Model version used for the analysis
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.model_version
+  policy_version:
+    description: Policy version used for the analysis
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.policy_version

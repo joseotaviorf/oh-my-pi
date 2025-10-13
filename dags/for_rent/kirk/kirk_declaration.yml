@@ -1,0 +1,17 @@
+dag:
+  name: kirk
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Ingest Kirk database app to datalake. Kirk is a tool of automatic repair analysis of inspections.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  lineage_product_database_name: Data ForRent
+  tables_customization:
+    ai_inspection_analysis:
+      {}
+cluster:
+  type: databricks_12_2_min_general_cluster
