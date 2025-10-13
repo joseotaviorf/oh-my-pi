@@ -490,9 +490,6 @@ bietlejuice.enrich_offer:
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing:first-run-of-day
-bietlejuice.enrich_olx_crawler_listings:
-  remove:
-    - bietlejuice.listings_olx:load-clean-olx:first-run-of-day
 bietlejuice.enrich_open_external_data:
   override: []
 bietlejuice.enrich_open_external_data_addresses:
