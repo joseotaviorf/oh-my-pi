@@ -1,0 +1,17 @@
+database_name: datalake_gsheets_clean
+table_name: ibge_cities
+owner: erica.bertan@quintoandar.com.br
+domain: Growth
+description: |
+  Cleaned IBGE (Brazilian Institute of Geography and Statistics) cities data providing standardized
+  city names and normalized municipality names for geographic matching and regional analysis.
+  Used for location-based keyword analysis and regional data enrichment across real estate platforms.
+columns:
+  city_name:
+    description: "Original city name as provided in the IBGE dataset."
+    lineage:
+      - datalake_gsheets_raw.ibge_cities.city_name
+  municipio_clean:
+    description: "Normalized municipality name used for geographic matching and regional analysis. Cleaned and standardized for consistent city identification across different data sources."
+    lineage:
+      - datalake_gsheets_raw.ibge_cities.municipio_clean

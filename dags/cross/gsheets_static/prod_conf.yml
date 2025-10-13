@@ -430,3 +430,9 @@ sheets_info:
     sheet_name: seo_goldenset
     clean_table_name: seo_goldenset
     sheet_context: static
+
+  ibge_cities:
+    sheet_id: 1VhEDwAhw90a-YjK-RIwFq-7jtEmA9WupRkp-G06AyrI
+    sheet_name: ibge_cities
+    clean_table_name: ibge_cities
+    sheet_context: static
