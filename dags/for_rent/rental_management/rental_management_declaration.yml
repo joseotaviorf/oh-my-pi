@@ -18,11 +18,10 @@ workflow:
   tables_customization:
     boleto:
       clean_table_name: invoice
-    # These tables don't have data now, but soon we will have to ingest them
-    # boleto_address:
-    #   clean_table_name: invoice_address
-    # boleto_identification:
-    #   clean_table_name: invoice_identification
+    boleto_address:
+      clean_table_name: invoice_address
+    boleto_identification:
+      clean_table_name: invoice_identification
     boleto_issuer:
       clean_table_name: invoice_issuer
     boleto_user:
