@@ -23,6 +23,6 @@ SELECT
 FROM
     datalake_langfuse_raw.observations
 WHERE
-    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    CAST(start_time AS TIMESTAMP) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_observation ORDER BY ts_started DESC) = 1

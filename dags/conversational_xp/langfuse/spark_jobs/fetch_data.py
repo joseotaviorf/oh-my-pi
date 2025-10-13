@@ -329,7 +329,7 @@ if __name__ == "__main__":
 
     # Parse timestamps
     end_timestamp = datetime.fromisoformat(end_timestamp_str).replace(tzinfo=None)
-    start_timestamp = datetime.fromisoformat(start_timestamp_str).replace(tzinfo=None)
+    start_timestamp = datetime.fromisoformat(start_timestamp_str).replace(tzinfo=None) - timedelta(hours=2)
     partition_cols = ["year", "month", "day", "hour"]
 
     # Initialize services

@@ -20,6 +20,6 @@ SELECT
 FROM
     datalake_langfuse_raw.traces
 WHERE
-    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    CAST(timestamp AS TIMESTAMP)  >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_trace ORDER BY ts_created DESC) = 1
