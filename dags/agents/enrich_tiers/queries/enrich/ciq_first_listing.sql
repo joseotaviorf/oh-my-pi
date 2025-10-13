@@ -176,7 +176,7 @@ WITH first_listing_conditions AS (
 SELECT
     t.id_house,
     t.id_previous_duplicated_house,
-    t.id_ciq_user_rent AS id_user,
+    CAST(t.id_ciq_user_rent AS BIGINT) AS id_user,
     t.uuid_person_rent AS uuid_person,
     t.id_partner_rent AS id_partner,
     t.id_agent_rent AS id_agent,
@@ -238,7 +238,7 @@ UNION ALL
 SELECT
     t.id_house,
     t.id_previous_duplicated_house,
-    t.id_ciq_user_sale AS id_user,
+    CAST(t.id_ciq_user_sale AS BIGINT) AS id_user,
     t.uuid_person_sale AS uuid_person,
     t.id_partner_sale AS id_partner,
     t.id_agent_sale AS id_agent,

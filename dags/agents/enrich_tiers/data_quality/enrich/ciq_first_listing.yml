@@ -15,12 +15,3 @@ column_level_validations:
   id_house:
     is_complete:
       severity_level: Error
-  year:
-    is_complete:
-      severity_level: Error
-  month:
-    is_complete:
-      severity_level: Error
-  day:
-    is_complete:
-      severity_level: Error
