@@ -38,6 +38,7 @@ WHERE log.timestamp >= '2025-09-24'
 rn_count AS (
   SELECT
     *,
+    IF(is_bypass = FALSE AND is_credit_passport = FALSE AND is_free_guarantee_offered AND is_light_approval AND is_only_one_active_offer AND is_single_tenant, TRUE, FALSE) AS is_poc_eligible,
     ROW_NUMBER() OVER (PARTITION BY proposal_active_offer ORDER BY IF(group_name = 'Out of Experiment', 1, IF(group_name = 'Test', 2, 3))) AS rn_latest
   FROM hightouch_data
 ),
@@ -60,14 +61,18 @@ SELECT
   rc.sync_run_id,
   CASE
     WHEN ga.all_groups IN ('Out of Experiment', 'Control', 'Test') THEN ga.all_groups
+    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Test%' AND rc.is_poc_eligible THEN 'Test'
+    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Control%' AND rc.is_poc_eligible THEN 'Control'
     WHEN ga.all_groups LIKE '%Out of Experiment%' THEN 'Error - Out of Experiment'
     WHEN ga.all_groups LIKE '%Test%' THEN 'Test'
     WHEN ga.all_groups LIKE '%Control%' THEN 'Control'
   END AS group_name,
   CASE
     WHEN ga.all_groups IN ('Out of Experiment', 'Control', 'Test') THEN ga.all_groups
-    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Test%' THEN 'Error - Assigned Test and Out of Experiment'
-    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Control%' THEN 'Error - Assigned Control and Out of Experiment'
+    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Test%' AND rc.is_poc_eligible THEN 'Error - Assigned Test and Out of Experiment, Really Test'
+    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Control%' AND rc.is_poc_eligible THEN 'Error - Assigned Control and Out of Experiment, Really Control'
+    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Test%' THEN 'Error - Assigned Test and Out of Experiment, Really Out'
+    WHEN ga.all_groups LIKE '%Out of Experiment%' AND ga.all_groups LIKE '%Control%' THEN 'Error - Assigned Control and Out of Experiment, Really Out'
     WHEN ga.all_groups LIKE '%Test%' THEN 'Error - Assigned Control and Test'
   END AS group_name_full,
   rc.is_bypass,

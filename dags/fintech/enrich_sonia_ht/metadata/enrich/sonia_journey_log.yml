@@ -65,11 +65,13 @@ columns:
       - hightouch_planner.journey_metadata_93d2e2b5d82c486db22aa5209dddf354.node_name
     description: Detailed experiment group classification used for QA and debugging of HighTouch reactivation and assignment issues.
     categories:
-      "Test": user consistently assigned to the Test group
-      "Control": user consistently assigned to the Control group
-      "Error - Assigned Test and Out of Experiment": user was correctly classified as Out of Experiment but was also incorrectly assigned to Test due to HighTouch reactivation
-      "Error - Assigned Control and Out of Experiment": user was correctly classified as Out of Experiment but was also incorrectly assigned to Control due to HighTouch reactivation
-      "Error - Assigned Control and Test": user was incorrectly assigned to both Control and Test groups due to inconsistent reactivation or segmentation logic in HighTouch
+      "Test": User consistently assigned to the Test group.
+      "Control": User consistently assigned to the Control group.
+      "Error - Assigned Test and Out of Experiment, Really Test": User was correctly eligible for Test but also incorrectly assigned as Out of Experiment due to HighTouch reactivation.
+      "Error - Assigned Control and Out of Experiment, Really Control": User was correctly eligible for Control but also incorrectly assigned as Out of Experiment due to HighTouch reactivation.
+      "Error - Assigned Test and Out of Experiment, Really Out": User was correctly Out of Experiment but also incorrectly assigned to Test due to HighTouch reactivation.
+      "Error - Assigned Control and Out of Experiment, Really Out": User was correctly Out of Experiment but also incorrectly assigned to Control due to HighTouch reactivation.
+      "Error - Assigned Control and Test": User was incorrectly assigned to both Control and Test groups due to inconsistent segmentation or reactivation logic in HighTouch.
   is_bypass:
     lineage:
       - hightouch_audit.sync_changelog.fields.is_bypass
