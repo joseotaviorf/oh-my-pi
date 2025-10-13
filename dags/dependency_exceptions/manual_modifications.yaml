@@ -769,7 +769,6 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection
     - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
     - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding
-    - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
     - bietlejuice.terminator_fast_lane:load-clean-termination
   remove:
     - bietlejuice.core_contract:load-core-contract:first-run-of-day
@@ -782,7 +781,6 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.ebdb_listing:load-clean-house-listing-relation:first-run-of-day
     - bietlejuice.ebdb_test:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
-    - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
     - bietlejuice.enrich_entities_views:load-enrich-onboarding:first-run-of-day
     - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
     - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day

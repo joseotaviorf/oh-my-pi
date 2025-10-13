@@ -1,31 +1,18 @@
 WITH visit AS (
-    WITH visit_events AS (
+    WITH visit_base AS (
         SELECT
-            id_visit, 
-            event_type,
-            ts_created
-        FROM
-            datalake_ebdb_clean.visit_status_log
-        WHERE
-            event_type IN ('VISIT_REQUESTED', 'VISIT_SCHEDULED', 'VISIT_CONFIRMED', 'VISIT_DONE',
-                'VISIT_CANCELED', 'VISIT_UNSUCCESSFUL', 'VISIT_REGISTERED', 'VISIT_RESCHEDULED')
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
-    ),
-    visit_base AS (
-        SELECT
-            v.id_visit AS id_entity,
-            v.id_house,
+            id_visit AS id_entity,
+            id_house,
             CAST(NULL AS BIGINT) AS id_contract,
-            v.id_owner,
-            v.id_visitor,
-            v.id_agent,
+            id_owner,
+            id_visitor,
+            id_agent,
             'VISIT' AS entity,
-            v.business_context,
+            business_context,
             TO_JSON(
                 STRUCT(
-                    ve.event_type AS event_name,
-                    v.ts_visit AS when
+                    computed_status AS computed_status,
+                    ts_visit AS ts_visit
                 )
             ) AS properties,
             CASE
@@ -33,13 +20,10 @@ WITH visit AS (
                 WHEN computed_status IN ('CONFIRMED', 'REQUESTED') THEN TRUE
                 ELSE NULL
             END AS is_active,
-            v.ts_created,
-            v.ts_updated
+            ts_created,
+            ts_updated
         FROM
-            core_visit.visit AS v
-        INNER JOIN
-            visit_events AS ve
-                ON v.id_visit = ve.id_visit
+            core_visit.visit
     )
     SELECT
         id_entity,
@@ -104,7 +88,7 @@ offer AS (
             TO_JSON(
                 STRUCT(
                     status AS status,
-                    ts_expiration AS when
+                    ts_expiration AS ts_expiration
                 )
             ) AS properties,
             CASE
@@ -160,7 +144,8 @@ contract AS (
             TO_JSON(
                 STRUCT(
                     status AS status,
-                    dt_started AS when
+                    dt_started AS dt_started,
+                    dt_termination AS dt_termination
                 )
             ) AS properties,
             CASE
@@ -217,7 +202,7 @@ termination AS (
       TO_JSON(
         STRUCT(
           status AS status,
-          ts_created AS when
+          ts_created AS ts_created
         )
       ) AS properties,
       CASE
@@ -293,7 +278,8 @@ listing AS (
             TO_JSON(
                 STRUCT(
                     lbc.status AS status,
-                    lbc.ts_created AS when
+                    lbc.status_reason AS status_reason,
+                    lbc.ts_created AS ts_created
                 )
             ) AS properties,
             CASE
@@ -345,7 +331,7 @@ inspection AS (
        TO_JSON(
         STRUCT(
           ib.status AS status,
-          ib.dt_inspected AS when
+          ib.dt_inspected AS dt_inspected
         )
       ) AS properties,
       CASE
@@ -419,7 +405,8 @@ credit_evaluation AS (
             TO_JSON(
                 STRUCT(
                     ce.status AS status,
-                    ce.ts_created AS when
+                    ce.ts_created AS ts_created,
+                    ce.ts_expires AS ts_expires
                 )
             ) AS properties,
             CASE
@@ -475,7 +462,7 @@ onboarding AS (
             TO_JSON(
                 STRUCT(
                     status AS status,
-                    ts_created AS when
+                    ts_created AS ts_created
                 )
             ) AS properties,
             is_active,
@@ -527,7 +514,7 @@ reservation AS (
             TO_JSON(
                 STRUCT(
                     rv.status AS status,
-                    rv.ts_created AS when
+                    rv.ts_created AS ts_created
                 )
             ) AS properties,
             IF(rv.is_ongoing = TRUE, TRUE, FALSE) is_active,
