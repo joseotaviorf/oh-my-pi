@@ -2,34 +2,50 @@ import datetime
 import businesstimedelta
 import holidays as pyholidays
 import json
+from pyspark.sql.functions import pandas_udf
+from pyspark.sql.types import FloatType
+import pandas as pd
 
 
 class FintechUDFs:
-    @staticmethod
+    @pandas_udf(FloatType())
     def fintechops_work_min_sla(
-        ts_started: datetime.datetime, ts_finished: datetime.datetime
-    ) -> float:
-        workday = businesstimedelta.WorkDayRule(
+        ts_started: pd.Series, ts_finished: pd.Series
+    ) -> pd.Series:
+        """
+        Calculates the working time in minutes between two timestamps
+        using predefined business rules.
+        """
+        WORKDAY_RULE = businesstimedelta.WorkDayRule(
             start_time=datetime.time(7),
             end_time=datetime.time(21),
             working_days=[0, 1, 2, 3, 4],
         )
-        workday_sat = businesstimedelta.WorkDayRule(
+        WORKDAY_SAT_RULE = businesstimedelta.WorkDayRule(
             start_time=datetime.time(8), end_time=datetime.time(20), working_days=[5]
         )
+        MY_HOLIDAYS = pyholidays.country_holidays("BR", subdiv="SP")
+        HOLIDAYS_RULE = businesstimedelta.HolidayRule(MY_HOLIDAYS)
 
-        my_holidays = pyholidays.country_holidays("BR", subdiv="SP")
-        holidays = businesstimedelta.HolidayRule(my_holidays)
+        BUSINESS_HOURS_RULES = businesstimedelta.Rules(
+            [WORKDAY_RULE, WORKDAY_SAT_RULE, HOLIDAYS_RULE]
+        )
 
-        business_hours = businesstimedelta.Rules([workday, workday_sat, holidays])
+        def calculate_work_minutes(start_ts, finish_ts):
+            """Helper function to apply the logic to a single pair of timestamps."""
+            working_hours_delta = BUSINESS_HOURS_RULES.difference(start_ts, finish_ts)
 
-        working_hours_delta = business_hours.difference(ts_started, ts_finished)
-        working_hours_delta_to_seconds = working_hours_delta.hours * 3600.0
+            total_seconds = (
+                working_hours_delta.hours * 3600.0 + working_hours_delta.seconds
+            )
+            return total_seconds / 60.0
 
-        ts_working_hours = (
-            working_hours_delta.seconds + working_hours_delta_to_seconds
-        ) / 60.0
-        return ts_working_hours
+        return pd.Series(
+            [
+                calculate_work_minutes(start, finish)
+                for start, finish in zip(ts_started, ts_finished)
+            ]
+        )
 
     @staticmethod
     def fintech_collections_renegotiation(
