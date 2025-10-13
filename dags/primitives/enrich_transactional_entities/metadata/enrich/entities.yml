@@ -65,10 +65,14 @@ columns:
       - core_contract.contract.id_contract
       - datalake_ebdb_clean.inspection.id_contract
       - datalake_entities_views.onboarding.id_contract
+      - datalake_inspection_services_clean.inspection.id_contract
+      - datalake_repairs_clean.repair_request.id_contract
     description: Contract id related to the entity, if it has any.
       It's the id of the Contrato/Contract table, from Main's database (EBDB).
   id_user:
     lineage:
+      - core_credit_evaluation.credit_evaluation.id_owner
+      - core_credit_evaluation.credit_evaluation.id_user
       - core_visit.visit.id_agent
       - core_visit.visit.id_owner
       - core_visit.visit.id_visitor
@@ -78,12 +82,11 @@ columns:
       - core_contract.contract.id_tenant
       - datalake_ebdb_clean.house.id_user
       - datalake_ebdb_clean.inspection.id_user_inspector
+      - datalake_ebdb_clean.user.id
       - datalake_entities_views.onboarding.id_owner
       - datalake_entities_views.onboarding.id_tenant
-      - core_credit_evaluation.credit_evaluation.id_user
-      - core_credit_evaluation.credit_evaluation.id_owner
+      - datalake_inspection_services_clean.inspection.id_inspector
       - datalake_kill_queue_clean.reservation.id_tenant
-      - datalake_ebdb_clean.user.id
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
       Each entity may be linked to multiple users.
@@ -150,6 +153,11 @@ columns:
       - datalake_entities_views.onboarding.ts_created
       - datalake_kill_queue_clean.reservation.status
       - datalake_kill_queue_clean.reservation.ts_created
+      - datalake_repairs_clean.repair_request.ts_created
+      - datalake_inspection_services_clean.repair_request.ts_created
+      - datalake_repairs_clean.repair_request.status
+      - datalake_repairs_clean.repair_request.ts_created
+      - datalake_inspection_services_clean.repair_request.ts_created
     description:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
@@ -162,6 +170,8 @@ columns:
       For FR_ONBOARDING entities - contains status and ts_created fields.
       For FR_CREDIT_EVALUATION entities - contains status, ts_created and ts_expires fields.
       For FR_RESERVATION entities - contains status and ts_created fields.
+      For FR_REPAIR_ONGOING entities - contains status and ts_created fields.
+      For FR_REPAIR_OFFBOARDING entities - contains ts_created field.
   house_address:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -186,6 +196,8 @@ columns:
       An onboarding entity will be considered as active for all statuses except "Finished" and "Aborted", which are considered inactive.
       A credit evaluation entity will be considered as active for statuses NOT_SENT, ON_HOLD or PROCESSING, and inactive for statuses CANCELLED, FAILED or FINISHED.
       A reservation entity will be considered as active when is_ongoing = TRUE, and inactive when is_ongoing = FALSE.
+      An ongoing repair entity will be considered as active for statuses AWAITING_BUDGET, AWAITING_BUDGET_APPROVAL, AWAITING_OWNER_ACTION, BUDGETING_IN_PROGRESS, COMPULSORY, IN_EXECUTION, IN_NEGOTIATION, IN_PROGRESS, REQUESTED, TENANT_NEEDS_CX_HELP, or NULL, and inactive for statuses FINISHED, RESOLVED, or CANCELED.
+      An offboarding repair entity will be considered as active when is_finished = FALSE, and inactive when is_finished = TRUE.
   ts_inactive:
     lineage:
       - core_visit.visit.ts_updated
@@ -197,6 +209,8 @@ columns:
       - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
       - datalake_kill_queue_clean.reservation.ts_updated
+      - datalake_repairs_clean.repair_request.ts_updated
+      - datalake_inspection_services_clean.repair_request.ts_updated
     description: Timestamp when the entity became inactive (is_active = FALSE).
       This field captures the ts_updated timestamp for entities that are currently inactive.
       For active entities (is_active = TRUE), this field will be NULL.
@@ -211,6 +225,8 @@ columns:
       - datalake_entities_views.onboarding.ts_created
       - core_credit_evaluation.credit_evaluation.ts_created
       - datalake_kill_queue_clean.reservation.ts_created
+      - datalake_repairs_clean.repair_request.ts_created
+      - datalake_inspection_services_clean.repair_request.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
     lineage:
@@ -223,6 +239,8 @@ columns:
       - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
       - datalake_kill_queue_clean.reservation.ts_updated
+      - datalake_repairs_clean.repair_request.ts_updated
+      - datalake_inspection_services_clean.repair_request.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities
       updated within the last 3 months are included in this table.

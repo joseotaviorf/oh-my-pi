@@ -503,7 +503,6 @@ bietlejuice.enrich_entities_views:
   remove:
     - bietlejuice.core_contract:load-core-contract:first-run-of-day
     - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding:first-run-of-day
-    - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
 bietlejuice.enrich_pipeline:
   remove:
     - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
@@ -785,6 +784,12 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.enrich_entities_views:load-enrich-onboarding:first-run-of-day
     - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
     - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
+    - bietlejuice.inspection_services_fast_lane:load-clean-assessment:first-run-of-day
+    - bietlejuice.inspection_services_fast_lane:load-clean-inspection:first-run-of-day
+    - bietlejuice.inspection_services_fast_lane:load-clean-item-group:first-run-of-day
+    - bietlejuice.inspection_services_fast_lane:load-clean-repair-request:first-run-of-day
+    - bietlejuice.inspection_services_fast_lane:load-clean-room:first-run-of-day
+    - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
 bietlejuice.dw_quintocred_ifrs:
   remove:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows:first-run-of-day
