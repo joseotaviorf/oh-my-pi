@@ -53,7 +53,7 @@ workflow:
       clean_table_name: store
       primary_keys: ["id"]
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   custom_libraries:
     - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
   databricks_conn_id: databricks_new
