@@ -1,0 +1,26 @@
+---
+database_name: datalake_cyber_clean
+table_name: values_list
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  This table contains the specific valid values and their descriptions associated with each list defined in the values_list_catalog table.
+  Each record represents a valid value that can be used in a specific field.
+  Supports data validation, UI dropdowns, and code-to-description mapping.
+columns:
+  id_value:
+    description: "Identifier of the values list (Foreign Key to values_list_catalog.id_value)"
+    lineage:
+      - datalake_cyber_raw.lov_vals.LSID
+  value_code:
+    description: "Code/identifier of the valid value (e.g., EXPTYPE1, ACTIVE)"
+    lineage:
+      - datalake_cyber_raw.lov_vals.LSCODE
+  value_description:
+    description: "Textual description of the valid value (e.g., Judicial, Active)"
+    lineage:
+      - datalake_cyber_raw.lov_vals.LSDESC
+  default_flag:
+    description: "Flag indicating if the value is the default option (Y/N)"
+    lineage:
+      - datalake_cyber_raw.lov_vals.LSDFLT
