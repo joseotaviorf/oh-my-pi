@@ -1,105 +1,105 @@
----
 database_name: datalake_greenhouse_clean
 table_name: scorecards
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing scorecard data for interviews, sourced from the Greenhouse Harvest API's 'scorecards' endpoint.
+description: |-
+  Table containing scorecard data for interviews, sourced from the Greenhouse Harvest API's 'scorecards' endpoint.
 columns:
   id:
     description: The scorecard's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.scorecards.id
+    - datalake_greenhouse_raw.scorecards.id
   id_candidate:
     description: The candidate's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.scorecards.candidate_id
+    - datalake_greenhouse_raw.scorecards.candidate_id
   id_application:
     description: The application's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.scorecards.application_id
+    - datalake_greenhouse_raw.scorecards.application_id
   id_interview_step:
     description: The interview step's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.scorecards.interview_step.id
+    - datalake_greenhouse_raw.scorecards.interview_step.id
   id_submitted_by:
     description: The unique identifier of the user who submitted the scorecard.
     lineage:
-      - datalake_greenhouse_raw.scorecards.submitted_by.id
+    - datalake_greenhouse_raw.scorecards.submitted_by.id
   id_interviewer:
     description: The interviewer's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.scorecards.interviewer.id
+    - datalake_greenhouse_raw.scorecards.interviewer.id
   interview_name:
     description: The name of the interview.
     lineage:
-      - datalake_greenhouse_raw.scorecards.interview
+    - datalake_greenhouse_raw.scorecards.interview
   interview_step_name:
     description: The name of the interview step.
     lineage:
-      - datalake_greenhouse_raw.scorecards.interview_step.name
+    - datalake_greenhouse_raw.scorecards.interview_step.name
   overall_recommendation:
     description: The overall recommendation from the interviewer.
     lineage:
-      - datalake_greenhouse_raw.scorecards.overall_recommendation
+    - datalake_greenhouse_raw.scorecards.overall_recommendation
   submitted_by_name:
     description: The name of the user who submitted the scorecard.
     lineage:
-      - datalake_greenhouse_raw.scorecards.submitted_by.name
+    - datalake_greenhouse_raw.scorecards.submitted_by.name
   interviewer_name:
     description: The name of the interviewer.
     lineage:
-      - datalake_greenhouse_raw.scorecards.interviewer.name
+    - datalake_greenhouse_raw.scorecards.interviewer.name
   ts_created:
     description: The timestamp when the scorecard was created.
     lineage:
-      - datalake_greenhouse_raw.scorecards.created_at
+    - datalake_greenhouse_raw.scorecards.created_at
   ts_updated:
     description: The timestamp when the scorecard was last updated.
     lineage:
-      - datalake_greenhouse_raw.scorecards.updated_at
+    - datalake_greenhouse_raw.scorecards.updated_at
   ts_interviewed:
     description: The timestamp when the interview took place.
     lineage:
-      - datalake_greenhouse_raw.scorecards.interviewed_at
+    - datalake_greenhouse_raw.scorecards.interviewed_at
   ts_submitted:
     description: The timestamp when the scorecard was submitted.
     lineage:
-      - datalake_greenhouse_raw.scorecards.submitted_at
+    - datalake_greenhouse_raw.scorecards.submitted_at
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   attributes:
     description: An array of attributes rated in the scorecard.
     lineage:
-      - datalake_greenhouse_raw.scorecards.attributes
+    - datalake_greenhouse_raw.scorecards.attributes
   questions:
     description: An array of questions and answers from the scorecard.
     lineage:
-      - datalake_greenhouse_raw.scorecards.questions
+    - datalake_greenhouse_raw.scorecards.questions
   ratings_mixed:
     description: An array of attributes rated as 'Mixed'.
     lineage:
-      - datalake_greenhouse_raw.scorecards.ratings.mixed
+    - datalake_greenhouse_raw.scorecards.ratings.mixed
   ratings_no:
     description: An array of attributes rated as 'No'.
     lineage:
-      - datalake_greenhouse_raw.scorecards.ratings.no
+    - datalake_greenhouse_raw.scorecards.ratings.no
   ratings_strong_yes:
     description: An array of attributes rated as 'Strong Yes'.
     lineage:
-      - datalake_greenhouse_raw.scorecards.ratings.strong_yes
+    - datalake_greenhouse_raw.scorecards.ratings.strong_yes
   ratings_yes:
     description: An array of attributes rated as 'Yes'.
     lineage:
-      - datalake_greenhouse_raw.scorecards.ratings.yes
+    - datalake_greenhouse_raw.scorecards.ratings.yes
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.scorecards.year
+    - datalake_greenhouse_raw.scorecards.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.scorecards.month
+    - datalake_greenhouse_raw.scorecards.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.scorecards.day
+    - datalake_greenhouse_raw.scorecards.day

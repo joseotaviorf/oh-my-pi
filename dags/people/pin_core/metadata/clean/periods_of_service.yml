@@ -1,105 +1,105 @@
----
 database_name: datalake_pin_core_clean
 table_name: periods_of_service
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Stores information about a person's work relationships. It details the employment period for both employees and contingent workers with a legal employer."
+description: |-
+  Stores information about a person's work relationships. It details the employment period for both employees and contingent workers with a legal employer.
 columns:
   id_period_of_service:
-    description: "System-generated unique identifier for the period of service. Primary key."
+    description: System-generated unique identifier for the period of service. Primary key.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.period_of_service_id
+    - datalake_pin_core_raw.per_periods_of_service.period_of_service_id
   id_business_group:
-    description: "Identifier of the enterprise or business group."
+    description: Identifier of the enterprise or business group.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.business_group_id
+    - datalake_pin_core_raw.per_periods_of_service.business_group_id
   id_person:
-    description: "Identifier for the person associated with this work relationship."
+    description: Identifier for the person associated with this work relationship.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.person_id
+    - datalake_pin_core_raw.per_periods_of_service.person_id
   id_legal_entity:
-    description: "Identifier for the legal entity that is the employer."
+    description: Identifier for the legal entity that is the employer.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.legal_entity_id
+    - datalake_pin_core_raw.per_periods_of_service.legal_entity_id
   id_action_occurrence:
-    description: "Identifier for the specific HR action, such as hire or termination."
+    description: Identifier for the specific HR action, such as hire or termination.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.action_occurrence_id
+    - datalake_pin_core_raw.per_periods_of_service.action_occurrence_id
   legislation_code:
-    description: "Legislation code derived from the legal entity."
+    description: Legislation code derived from the legal entity.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.legislation_code
+    - datalake_pin_core_raw.per_periods_of_service.legislation_code
   worker_type:
-    description: "Type of work relationship."
+    description: Type of work relationship.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.period_type
+    - datalake_pin_core_raw.per_periods_of_service.period_type
     categories:
-      "E": "Employee"
-      "C": "Contingent Worker"
-      "N": "Non-worker"
+      E: Employee
+      C: Contingent Worker
+      N: Non-worker
   rehire_recommendation:
-    description: "Recommendation regarding re-hiring the person after termination."
+    description: Recommendation regarding re-hiring the person after termination.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.rehire_recommendation
+    - datalake_pin_core_raw.per_periods_of_service.rehire_recommendation
   is_user_access_revoked:
-    description: "Flag indicating if the user's system access will be revoked *after* their termination date."
+    description: Flag indicating if the user's system access will be revoked *after* their termination date.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.revoke_user_access
+    - datalake_pin_core_raw.per_periods_of_service.revoke_user_access
   is_primary:
-    description: "Flag indicating if this is the primary period of service for the person within the legal entity."
+    description: Flag indicating if this is the primary period of service for the person within the legal entity.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.primary_flag
+    - datalake_pin_core_raw.per_periods_of_service.primary_flag
   is_on_military_service:
-    description: "Flag indicating if the person is on military service."
+    description: Flag indicating if the person is on military service.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.on_military_service
+    - datalake_pin_core_raw.per_periods_of_service.on_military_service
   is_fast_path_employee:
-    description: "Flag related to a specific 'fast path' business process."
+    description: Flag related to a specific 'fast path' business process.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.fast_path_employee
+    - datalake_pin_core_raw.per_periods_of_service.fast_path_employee
   created_by:
-    description: "User who created the record in the source system."
+    description: User who created the record in the source system.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.created_by
+    - datalake_pin_core_raw.per_periods_of_service.created_by
   updated_by:
-    description: "User who last updated the record in the source system."
+    description: User who last updated the record in the source system.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.last_updated_by
+    - datalake_pin_core_raw.per_periods_of_service.last_updated_by
   object_version_number:
-    description: "Version number of the record, used for optimistic locking."
+    description: Version number of the record, used for optimistic locking.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.object_version_number
+    - datalake_pin_core_raw.per_periods_of_service.object_version_number
   dt_started:
-    description: "Start date of the work relationship."
+    description: Start date of the work relationship.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.date_start
+    - datalake_pin_core_raw.per_periods_of_service.date_start
   dt_actual_termination:
-    description: "The actual termination date of the work relationship."
+    description: The actual termination date of the work relationship.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.actual_termination_date
+    - datalake_pin_core_raw.per_periods_of_service.actual_termination_date
   dt_notified_termination:
-    description: "The date when the termination was officially noted."
+    description: The date when the termination was officially noted.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.notified_termination_date
+    - datalake_pin_core_raw.per_periods_of_service.notified_termination_date
   ts_created:
-    description: "Timestamp of when the record was created in the source system."
+    description: Timestamp of when the record was created in the source system.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.creation_date
+    - datalake_pin_core_raw.per_periods_of_service.creation_date
   ts_updated:
-    description: "Timestamp of the last update to the record in the source system."
+    description: Timestamp of the last update to the record in the source system.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.last_update_date
+    - datalake_pin_core_raw.per_periods_of_service.last_update_date
   ts_load:
-    description: "Timestamp indicating when the record was loaded into the clean layer."
+    description: Timestamp indicating when the record was loaded into the clean layer.
   year:
-    description: "Year extracted from the source data, useful for data partitioning and filtering."
+    description: Year extracted from the source data, useful for data partitioning and filtering.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.year
+    - datalake_pin_core_raw.per_periods_of_service.year
   month:
-    description: "Month extracted from the source data, useful for data partitioning and filtering."
+    description: Month extracted from the source data, useful for data partitioning and filtering.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.month
+    - datalake_pin_core_raw.per_periods_of_service.month
   day:
-    description: "Day extracted from the source data, useful for data partitioning and filtering."
+    description: Day extracted from the source data, useful for data partitioning and filtering.
     lineage:
-      - datalake_pin_core_raw.per_periods_of_service.day
+    - datalake_pin_core_raw.per_periods_of_service.day

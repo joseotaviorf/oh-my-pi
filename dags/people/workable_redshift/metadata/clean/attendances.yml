@@ -1,37 +1,37 @@
----
 database_name: datalake_workable_redshift_clean
 table_name: attendances
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Tracks the attendance status of team members (e.g., interviewers) for specific recruitment events, such as interviews. Each row represents a single member's attendance record for a scheduled event slot.
+description: |-
+  Tracks the attendance status of team members (e.g., interviewers) for specific recruitment events, such as interviews. Each row represents a single member's attendance record for a scheduled event slot.
 columns:
   id:
     description: Unique identifier for the attendance record. Primary key for this table.
     lineage:
-      - datalake_workable_redshift_raw.attendances.id
+    - datalake_workable_redshift_raw.attendances.id
   id_event:
     description: Identifier for the recruitment event, such as an interview or a meeting. Foreign key to the events table.
     lineage:
-      - datalake_workable_redshift_raw.attendances.event_id
+    - datalake_workable_redshift_raw.attendances.event_id
   id_member:
     description: Identifier for the team member (e.g., interviewer, hiring manager) whose attendance is being recorded. Foreign key to the members table.
     lineage:
-      - datalake_workable_redshift_raw.attendances.member_id
+    - datalake_workable_redshift_raw.attendances.member_id
   id_event_slot:
     description: Identifier for the specific time slot within an event to which this attendance record pertains.
     lineage:
-      - datalake_workable_redshift_raw.attendances.event_slot_id
+    - datalake_workable_redshift_raw.attendances.event_slot_id
   status:
     description: The attendance status of the member for the event slot. Possible values might include 'attending', 'not_attending', 'pending'.
     lineage:
-      - datalake_workable_redshift_raw.attendances.status
+    - datalake_workable_redshift_raw.attendances.status
   ts_created:
     description: Timestamp indicating when the attendance record was created in the source system (Workable).
     lineage:
-      - datalake_workable_redshift_raw.attendances.created_at
+    - datalake_workable_redshift_raw.attendances.created_at
   ts_updated:
     description: Timestamp of the last update to the attendance record in the source system.
     lineage:
-      - datalake_workable_redshift_raw.attendances.updated_at
+    - datalake_workable_redshift_raw.attendances.updated_at
   ts_load:
     description: Timestamp indicating when the record was loaded into this clean table.

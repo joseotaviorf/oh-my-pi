@@ -1,126 +1,121 @@
----
 database_name: dw_employee
 table_name: fact_assignments
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  Fact table with consolidated information about employee work assignments. 
-  Data is sourced from multiple origins, including identification information, 
-  contract details, salaries, hierarchy, and demographic data to provide a 360-degree view of each assignment.
+description: |-
+  Fact table with consolidated information about employee work assignments.  Data is sourced from multiple origins, including identification information,  contract details, salaries, hierarchy, and demographic data to provide a 360-degree view of each assignment.
 columns:
   sk_assignment:
-    description: "Surrogate key for the assignment (period of service). Corresponds to id_period_of_service."
+    description: Surrogate key for the assignment (period of service). Corresponds to id_period_of_service.
     lineage:
-      - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_employee_registration.identifier_mapping.id_period_of_service
   sk_employee:
-    description: "Surrogate key for the person (employee) associated with the assignment."
+    description: Surrogate key for the person (employee) associated with the assignment.
     lineage:
-      - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_employee_registration.identifier_mapping.id_person
   sk_demographic_information:
-    description: "Surrogate key for the employee's demographic information."
+    description: Surrogate key for the employee's demographic information.
     lineage:
-      - datalake_hr_system.demographic_attributes.sk_demographic_information
+    - datalake_hr_system.demographic_attributes.sk_demographic_information
   sk_disability:
-    description: "Surrogate key for the employee's self-declared disability information."
+    description: Surrogate key for the employee's self-declared disability information.
     lineage:
-      - datalake_hr_system.disability.sk_disability
+    - datalake_hr_system.disability.sk_disability
   sk_cost_center:
-    description: "Surrogate key for the cost center (organization) to which the assignment is allocated."
+    description: Surrogate key for the cost center (organization) to which the assignment is allocated.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_organization
+    - datalake_pin_core_clean.all_assignments.id_organization
   sk_business_unit:
-    description: "Surrogate key for the business unit to which the assignment is allocated."
+    description: Surrogate key for the business unit to which the assignment is allocated.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_business_unit
+    - datalake_pin_core_clean.all_assignments.id_business_unit
   sk_job:
-    description: "Surrogate key for the employee's job."
+    description: Surrogate key for the employee's job.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_job
+    - datalake_pin_core_clean.all_assignments.id_job
   sk_manager:
-    description: "Surrogate key for the employee's manager."
+    description: Surrogate key for the employee's manager.
     lineage:
-      - datalake_pin.managers_history.id_manager
+    - datalake_pin.managers_history.id_manager
   sk_manager_assignment:
-    description: "Surrogate key for the manager's assignment (period of service)."
+    description: Surrogate key for the manager's assignment (period of service).
     lineage:
-      - datalake_pin.managers_history.id_manager_period_of_service
+    - datalake_pin.managers_history.id_manager_period_of_service
   sk_work_relationship_started_date:
-    description: "Start date of the work relationship, formatted as a surrogate key (YYYYMMDD)."
+    description: Start date of the work relationship, formatted as a surrogate key (YYYYMMDD).
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
+    - datalake_pin_core_clean.periods_of_service.dt_started
   sk_work_relationship_ended_date:
-    description: "End date of the work relationship, formatted as a surrogate key (YYYYMMDD)."
+    description: End date of the work relationship, formatted as a surrogate key (YYYYMMDD).
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   sk_last_salary_increase_date:
-    description: "Date of the last salary increase, formatted as a surrogate key (YYYYMMDD)."
+    description: Date of the last salary increase, formatted as a surrogate key (YYYYMMDD).
     lineage:
-      - datalake_pin_compensation_clean.salary.dt_started
+    - datalake_pin_compensation_clean.salary.dt_started
   sk_hierarchy:
-    description: "Surrogate key for the organizational hierarchy related to the assignment."
+    description: Surrogate key for the organizational hierarchy related to the assignment.
     lineage:
-      - datalake_hr_system.hierarchy_ids.sk_hierarchy
+    - datalake_hr_system.hierarchy_ids.sk_hierarchy
   assignment_number:
-    description: "Employee's registration number in the source system (PIN)."
+    description: Employee's registration number in the source system (PIN).
     lineage:
-      - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_employee_registration.identifier_mapping.assignment_number
   salary_currency_code:
-    description: "Currency code of the salary."
+    description: Currency code of the salary.
     lineage:
-      - datalake_pin_compensation_clean.salary.currency_code
+    - datalake_pin_compensation_clean.salary.currency_code
   is_last_valid_work_relationship:
-    description: "Flag (TRUE/FALSE) indicating if this is the most recent valid work relationship for the employee, prioritizing non-pending records, partitioned by person id."
+    description: Flag (TRUE/FALSE) indicating if this is the most recent valid work relationship for the employee, prioritizing non-pending records, partitioned by person id.
     lineage:
-      - datalake_employee_registration.identifier_mapping.id_period_of_service
-      - datalake_employment.employee_details.assignment_status_type
-      - datalake_employment.employee_details.assignment_type
-      - datalake_pin_core_clean.periods_of_service.dt_started
+    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_employment.employee_details.assignment_type
+    - datalake_pin_core_clean.periods_of_service.dt_started
   is_active:
-    description: "Flag (TRUE/FALSE) indicating if the assignment is active."
+    description: Flag (TRUE/FALSE) indicating if the assignment is active.
     lineage:
-      - datalake_employment.employee_details.assignment_status_type
+    - datalake_employment.employee_details.assignment_status_type
   is_pending_worker:
-    description: "Flag (TRUE/FALSE) indicating if the assignment is for a worker pending admission."
+    description: Flag (TRUE/FALSE) indicating if the assignment is for a worker pending admission.
     lineage:
-      - datalake_employment.employee_details.assignment_type
+    - datalake_employment.employee_details.assignment_type
   is_manager:
-    description: "Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports."
+    description: Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports.
     lineage:
-      - datalake_pin_core_clean.all_assignments.career_track
-      - datalake_hr_system.management_hierarchy.is_direct_manager
-      - datalake_employment.employee_details.assignment_status_type
+    - datalake_employment.employee_details.assignment_status_type
+    - datalake_hr_system.management_hierarchy.is_direct_manager
+    - datalake_pin_core_clean.all_assignments.career_track
   has_self_declared_disability:
-    description: "Flag (TRUE/FALSE) indicating if the employee has a self-declared disability."
+    description: Flag (TRUE/FALSE) indicating if the employee has a self-declared disability.
     lineage:
-      - datalake_hr_system.disability.has_self_declared_disability
+    - datalake_hr_system.disability.has_self_declared_disability
   assignment_age_months:
-    description: "Tenure in months, calculated from the start date to the end date (or current date if active)."
+    description: Tenure in months, calculated from the start date to the end date (or current date if active).
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
-      - datalake_pin_core_clean.periods_of_service.dt_started
+    - datalake_employment.employee_details.assignment_type
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+    - datalake_pin_core_clean.periods_of_service.dt_started
   qnt_directly_led:
-    description: "Number of direct reports."
+    description: Number of direct reports.
     lineage:
-      - datalake_hr_system.management_hierarchy.is_direct_manager
-      - datalake_employment.employee_details.assignment_status_type
+    - datalake_employment.employee_details.assignment_status_type
+    - datalake_hr_system.management_hierarchy.is_direct_manager
   qnt_undirectly_led:
-    description: "Number of indirect reports."
+    description: Number of indirect reports.
     lineage:
-      - datalake_hr_system.management_hierarchy.is_direct_manager
-      - datalake_employment.employee_details.assignment_status_type
+    - datalake_employment.employee_details.assignment_status_type
+    - datalake_hr_system.management_hierarchy.is_direct_manager
   salary:
-    description: "Employee's current salary amount."
+    description: Employee's current salary amount.
     lineage:
-      - datalake_pin_compensation_clean.salary.salary_amount
+    - datalake_pin_compensation_clean.salary.salary_amount
   last_salary_increase:
-    description: "Amount of the last salary adjustment."
+    description: Amount of the last salary adjustment.
     lineage:
-      - datalake_pin_compensation_clean.salary.adjustment_amount
+    - datalake_pin_compensation_clean.salary.adjustment_amount
   pct_last_salary_increase:
-    description: "Percentage of the last salary adjustment."
+    description: Percentage of the last salary adjustment.
     lineage:
-      - datalake_pin_compensation_clean.salary.adjustment_percent
+    - datalake_pin_compensation_clean.salary.adjustment_percent
   ts_load:
-    description: "Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed."
-    lineage:
-      - NOW()
+    description: Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed.

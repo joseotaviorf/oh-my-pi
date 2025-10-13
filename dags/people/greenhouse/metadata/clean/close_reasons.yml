@@ -1,29 +1,29 @@
----
 database_name: datalake_greenhouse_clean
 table_name: close_reasons
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing organization's close reasons, sourced from the Greenhouse Harvest API's 'close_reasons' endpoint.
+description: |-
+  Table containing organization's close reasons, sourced from the Greenhouse Harvest API's 'close_reasons' endpoint.
 columns:
   id:
     description: The close reason's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.close_reasons.id
+    - datalake_greenhouse_raw.close_reasons.id
   name:
     description: The name of the close reason.
     lineage:
-      - datalake_greenhouse_raw.close_reasons.name
+    - datalake_greenhouse_raw.close_reasons.name
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.close_reasons.year
+    - datalake_greenhouse_raw.close_reasons.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.close_reasons.month
+    - datalake_greenhouse_raw.close_reasons.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.close_reasons.day
+    - datalake_greenhouse_raw.close_reasons.day

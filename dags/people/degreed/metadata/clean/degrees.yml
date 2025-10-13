@@ -1,61 +1,57 @@
----
 database_name: datalake_degreed_clean
 table_name: degrees
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  This table stores information about academic degrees that users have earned
-  and registered on the Degreed platform. Each row represents a single degree
-  obtained by a user from an academic institution.
-
+description: |-
+  This table stores information about academic degrees that users have earned and registered on the Degreed platform. Each row represents a single degree obtained by a user from an academic institution.
 columns:
   id:
-    description: 'Unique identifier for the degree record within Degreed.'
+    description: Unique identifier for the degree record within Degreed.
     lineage:
-      - datalake_degreed_raw.degrees.id
+    - datalake_degreed_raw.degrees.id
   id_user:
-    description: 'The unique identifier for the user who holds the degree.'
+    description: The unique identifier for the user who holds the degree.
     lineage:
-      - datalake_degreed_raw.degrees.relationships[0].user.data.id
+    - datalake_degreed_raw.degrees.relationships[0].user.data.id
   id_external:
-    description: 'An external identifier for the degree, potentially from a third-party system or HRIS.'
+    description: An external identifier for the degree, potentially from a third-party system or HRIS.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.external_id
+    - datalake_degreed_raw.degrees.attributes.external_id
   url_degrees:
-    description: 'A URL providing more information about the degree or a link to a digital version of the diploma.'
+    description: A URL providing more information about the degree or a link to a digital version of the diploma.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.url
+    - datalake_degreed_raw.degrees.attributes.url
   url_image:
-    description: 'URL for an associated image, such as the university logo or a picture of the diploma.'
+    description: URL for an associated image, such as the university logo or a picture of the diploma.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.image_url
+    - datalake_degreed_raw.degrees.attributes.image_url
   title:
-    description: 'The title or major of the degree program (e.g., "Computer Science", "Business Administration").'
+    description: The title or major of the degree program (e.g., "Computer Science", "Business Administration").
     lineage:
-      - datalake_degreed_raw.degrees.attributes.title
+    - datalake_degreed_raw.degrees.attributes.title
   college:
-    description: 'The name of the college or university that awarded the degree.'
+    description: The name of the college or university that awarded the degree.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.college
+    - datalake_degreed_raw.degrees.attributes.college
   degree:
-    description: 'The type of degree awarded (e.g., "Bachelors", "Masters", "PhD").'
+    description: The type of degree awarded (e.g., "Bachelors", "Masters", "PhD").
     lineage:
-      - datalake_degreed_raw.degrees.attributes.degree
+    - datalake_degreed_raw.degrees.attributes.degree
   country:
-    description: 'The country where the college or university is located.'
+    description: The country where the college or university is located.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.country
+    - datalake_degreed_raw.degrees.attributes.country
   grade_point_average:
-    description: 'The Grade Point Average (GPA) the user achieved, if provided.'
+    description: The Grade Point Average (GPA) the user achieved, if provided.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.grade_point_average
+    - datalake_degreed_raw.degrees.attributes.grade_point_average
   dt_graduated:
-    description: 'The date when the user officially graduated.'
+    description: The date when the user officially graduated.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.graduated_at
+    - datalake_degreed_raw.degrees.attributes.graduated_at
   ts_created:
-    description: 'Timestamp indicating when the degree record was created in Degreed.'
+    description: Timestamp indicating when the degree record was created in Degreed.
     lineage:
-      - datalake_degreed_raw.degrees.attributes.created_at
+    - datalake_degreed_raw.degrees.attributes.created_at
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean table.'
+    description: Timestamp indicating when the record was loaded into the clean table.

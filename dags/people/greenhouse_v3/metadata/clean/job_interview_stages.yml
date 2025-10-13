@@ -1,53 +1,49 @@
----
 database_name: datalake_greenhouse_v3_clean
 table_name: job_interview_stages
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >-
-  This table contains information about the interview stages for each job posting, sourced from the Greenhouse Harvest API v3. 
-  It includes details such as the stage name, its order in the interview plan, and status. 
-  The data is partitioned by the updated_at date.
-
+description: |-
+  This table contains information about the interview stages for each job posting, sourced from the Greenhouse Harvest API v3.  It includes details such as the stage name, its order in the interview plan, and status.  The data is partitioned by the updated_at date.
 columns:
   id:
-    description: 'Unique identifier for the job interview stage.'
+    description: Unique identifier for the job interview stage.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.id
+    - datalake_greenhouse_v3_raw.job_interview_stages.id
   id_job:
-    description: 'Identifier for the job to which this interview stage belongs.'
+    description: Identifier for the job to which this interview stage belongs.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.job_id
+    - datalake_greenhouse_v3_raw.job_interview_stages.job_id
   name:
-    description: 'The name of the interview stage (e.g., "Reference Check", "Offer").'
+    description: The name of the interview stage (e.g., "Reference Check", "Offer").
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.name
+    - datalake_greenhouse_v3_raw.job_interview_stages.name
   sort_order:
-    description: 'The numerical order in which the stage appears in the interview plan.'
+    description: The numerical order in which the stage appears in the interview plan.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.sort_order
+    - datalake_greenhouse_v3_raw.job_interview_stages.sort_order
   ts_created:
-    description: 'Timestamp indicating when the interview stage was created.'
+    description: Timestamp indicating when the interview stage was created.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.created_at
+    - datalake_greenhouse_v3_raw.job_interview_stages.created_at
   ts_updated:
-    description: 'Timestamp indicating the last time the interview stage was updated.'
+    description: Timestamp indicating the last time the interview stage was updated.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.updated_at
+    - datalake_greenhouse_v3_raw.job_interview_stages.updated_at
   is_active:
-    description: 'A boolean flag indicating whether the interview stage is currently active.'
+    description: A boolean flag indicating whether the interview stage is currently active.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.active
+    - datalake_greenhouse_v3_raw.job_interview_stages.active
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean layer.'
+    description: Timestamp indicating when the record was loaded into the clean layer.
   year:
-    description: 'Year of the updated_at timestamp, used for partitioning.'
+    description: Year of the updated_at timestamp, used for partitioning.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.year
+    - datalake_greenhouse_v3_raw.job_interview_stages.year
   month:
-    description: 'Month of the updated_at timestamp, used for partitioning.'
+    description: Month of the updated_at timestamp, used for partitioning.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.month
+    - datalake_greenhouse_v3_raw.job_interview_stages.month
   day:
-    description: 'Day of the updated_at timestamp, used for partitioning.'
+    description: Day of the updated_at timestamp, used for partitioning.
     lineage:
-      - datalake_greenhouse_v3_raw.job_interview_stages.day
+    - datalake_greenhouse_v3_raw.job_interview_stages.day

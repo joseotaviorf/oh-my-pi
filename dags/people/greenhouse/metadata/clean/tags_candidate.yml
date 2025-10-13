@@ -1,29 +1,29 @@
----
 database_name: datalake_greenhouse_clean
 table_name: tags_candidate
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing candidate tags, sourced from the Greenhouse Harvest API's 'tags_candidate' endpoint.
+description: |-
+  Table containing candidate tags, sourced from the Greenhouse Harvest API's 'tags_candidate' endpoint.
 columns:
   id:
     description: The tag's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.tags_candidate.id
+    - datalake_greenhouse_raw.tags_candidate.id
   name:
     description: The name of the tag.
     lineage:
-      - datalake_greenhouse_raw.tags_candidate.name
+    - datalake_greenhouse_raw.tags_candidate.name
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.tags_candidate.year
+    - datalake_greenhouse_raw.tags_candidate.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.tags_candidate.month
+    - datalake_greenhouse_raw.tags_candidate.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.tags_candidate.day
+    - datalake_greenhouse_raw.tags_candidate.day

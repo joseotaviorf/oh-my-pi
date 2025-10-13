@@ -1,37 +1,36 @@
 ---
 database_name: dw_employee
 table_name: dim_disability
-owner: leonardo.soares@quintoandar.com.br
+owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: Dimension table that stores employee disability information.
 columns:
   sk_disability:
-    description: 'Surrogate key for the dimension table employee_disability.'
+    description: Surrogate key for the dimension table employee_disability.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
+      - datalake_hr_system.disability.sk_disability
   disability_category_code_wdoc:
-    description: 'Disability category code.'
+    description: Disability category code.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
+      - datalake_hr_system.disability.disability_category_code_wdoc
   disability_category_wdoc:
-    description: 'Disability category description.'
+    description: Disability category description.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
+      - datalake_hr_system.disability.disability_category_wdoc
   disability_status_wdoc:
-    description: 'Disability status.'
+    description: Disability status.
     categories:
-      "A": 'Active'
-      "I": 'Inactive'
+      A: Active
+      I: Inactive
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
+      - datalake_hr_system.disability.disability_status_wdoc
   disability_self_declaration_code:
-    description: 'Self-declared disability code.'
+    description: Self-declared disability code.
     lineage:
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
+      - datalake_hr_system.disability.disability_self_declaration_code
   disability_self_declaration_description:
-    description: 'Self-declared disability description.'
+    description: Self-declared disability description.
     lineage:
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_description
+      - datalake_hr_system.disability.disability_self_declaration_description
   ts_load:
-    description: 'Timestamp of when the record was loaded into the table.'
+    description: Timestamp of when the record was loaded into the table.

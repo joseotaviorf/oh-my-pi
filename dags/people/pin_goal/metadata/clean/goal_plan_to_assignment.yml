@@ -2,7 +2,7 @@
 database_name: datalake_pin_goal_clean
 table_name: goal_plan_to_assignment
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the assignments of goal plans to workers.
 columns:
   id_business_group:
@@ -38,7 +38,8 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_pln_assignments.last_updated_by
   object_version_number:
-    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    description: Counter for optimistic locking, incremented on each update to detect
+      concurrent modifications.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_pln_assignments.object_version_number
   dt_goal_plan_started:
@@ -58,16 +59,20 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_pln_assignments.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_pln_assignments.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_pln_assignments.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_pln_assignments.day

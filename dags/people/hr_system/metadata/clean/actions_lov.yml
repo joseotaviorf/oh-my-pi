@@ -1,52 +1,51 @@
 ---
 database_name: datalake_hr_system_clean
 table_name: actions_lov
-owner: leonardo.soares@quintoandar.com.br
+owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "List of values for actions available in the HR system"
+description: List of values for actions available in the HR system
 columns:
   id_action:
-    description: 'Surrogate identifier for the action'
+    description: Surrogate identifier for the action
     lineage:
-    - datalake_hr_system_raw.actions_lov.ActionId
+      - datalake_hr_system_raw.actions_lov.ActionId
   id_action_type:
-    description: 'Surrogate identifier for the action type'
+    description: Surrogate identifier for the action type
     lineage:
-    - datalake_hr_system_raw.actions_lov.ActionTypeId
+      - datalake_hr_system_raw.actions_lov.ActionTypeId
   action_code:
-    description: 'Code for the action'
+    description: Code for the action
     lineage:
-    - datalake_hr_system_raw.actions_lov.ActionCode
+      - datalake_hr_system_raw.actions_lov.ActionCode
   action_name:
-    description: 'Name of the action'
+    description: Name of the action
     lineage:
-    - datalake_hr_system_raw.actions_lov.ActionName
+      - datalake_hr_system_raw.actions_lov.ActionName
   description:
-    description: 'Description of the action'
+    description: Description of the action
     lineage:
-    - datalake_hr_system_raw.actions_lov.Description
+      - datalake_hr_system_raw.actions_lov.Description
   action_type_code:
-    description: 'Code identifying the type of action that can be performed'
+    description: Code identifying the type of action that can be performed
     lineage:
-    - datalake_hr_system_raw.actions_lov.ActionTypeCode
+      - datalake_hr_system_raw.actions_lov.ActionTypeCode
   termination_type:
-    description: 'Type of termination'
+    description: Type of termination
     lineage:
-    - datalake_hr_system_raw.actions_lov.TerminationType
+      - datalake_hr_system_raw.actions_lov.TerminationType
   is_used_in_contract:
-    description: 'Indicates whether an action is used in employment contracts'
+    description: Indicates whether an action is used in employment contracts
     lineage:
-    - datalake_hr_system_raw.actions_lov.CASE WHEN UsedInContract = 'Y' THEN TRUE
-      WHEN UsedInContract = 'N' THEN FALSE END
+      - datalake_hr_system_raw.actions_lov.UsedInContract
   dt_start:
-    description: 'Date from when the action reason is valid'
+    description: Date from when the action reason is valid
     lineage:
-    - datalake_hr_system_raw.actions_lov.DATE(StartDate)
+      - datalake_hr_system_raw.actions_lov.StartDate
   dt_end:
-    description: 'Date until when the action reason is valid'
+    description: Date until when the action reason is valid
     lineage:
-    - datalake_hr_system_raw.actions_lov.DATE(EndDate)
+      - datalake_hr_system_raw.actions_lov.EndDate
   ts_load:
-    description: 'Timestamp of the load in the data lake.'
+    description: Timestamp of the load in the data lake.
     lineage:
-    - datalake_hr_system_raw.actions_lov.ts_load
+      - datalake_hr_system_raw.actions_lov.ts_load

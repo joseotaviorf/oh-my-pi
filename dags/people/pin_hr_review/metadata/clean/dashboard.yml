@@ -2,7 +2,7 @@
 database_name: datalake_pin_hr_review_clean
 table_name: dashboards
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores data for talent review dashboards.
 columns:
   id_dashboard:

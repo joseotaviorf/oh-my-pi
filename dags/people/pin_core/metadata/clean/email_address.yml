@@ -6,7 +6,8 @@ domain: People
 description: Stores email addresses of various types for individuals.
 columns:
   id_business_group:
-    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    description: Identifier for the business unit, used for multi-tenant data separation.
+      Foreign key.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.business_group_id
   id_person:
@@ -14,7 +15,8 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_email_addresses.person_id
   id_email_address:
-    description: System-generated unique identifier for the email address record. Primary key.
+    description: System-generated unique identifier for the email address record.
+      Primary key.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.email_address_id
   created_by:
@@ -26,7 +28,8 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_email_addresses.last_updated_by
   email_address:
-    description: The email address itself. Not mandatory to allow initial record creation even without an email.
+    description: The email address itself. Not mandatory to allow initial record creation
+      even without an email.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.email_address
   email_type:
@@ -37,7 +40,8 @@ columns:
       W1: Email address used for professional purposes.
       H1: Email address used for personal communication.
   object_version_number:
-    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    description: Counter for optimistic locking, incremented on each update to detect
+      concurrent modifications.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.object_version_number
   has_mastered_in_ldap:
@@ -61,18 +65,20 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_email_addresses.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_core_raw.per_email_addresses.ts_load
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_email_addresses.day

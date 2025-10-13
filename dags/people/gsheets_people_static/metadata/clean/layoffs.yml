@@ -1,19 +1,18 @@
----
-database_name: datalake_gsheets_people_clean
+database_name: datalake_gsheets_people_static_clean
 table_name: layoffs
-owner: leonardo.soares@quintoandar.com.br
-domain: people
-description: null
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table description to be added.
 columns:
   id_employee:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.layoffs.id_colaborador
   is_layoff:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.layoffs.layoffs
   ts_load:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.layoffs.ts_load

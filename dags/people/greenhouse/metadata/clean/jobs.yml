@@ -2,123 +2,120 @@ database_name: datalake_greenhouse_clean
 table_name: jobs
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: >-
-  Table containing job data, sourced from the Greenhouse Harvest API's 'jobs' endpoint.
-  Although present in this table, the following specific custom fields belong to the 'job_openings' table and should be consulted there: affirmative_focus, band, company, equity_options_exception, internal_job_name, salary_range, plr, rvv, sop, salary_table, work_hours, workplace.
-  Additionally, the 'notes' field is null and its data should be consumed from the 'datalake_greenhouse_v3_clean.job_notes' table.
-
+description: |-
+  Table containing job data, sourced from the Greenhouse Harvest API's 'jobs' endpoint. Although present in this table, the following specific custom fields belong to the 'job_openings' table and should be consulted there: affirmative_focus, band, company, equity_options_exception, internal_job_name, salary_range, plr, rvv, sop, salary_table, work_hours, workplace. Additionally, the 'notes' field is null and its data should be consumed from the 'datalake_greenhouse_v3_clean.job_notes' table.
 columns:
   id:
-    description: "The job's unique identifier."
+    description: The job's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.jobs.id
+    - datalake_greenhouse_raw.jobs.id
   id_copied_from:
-    description: "The identifier of the original job, in case this job was copied from another."
+    description: The identifier of the original job, in case this job was copied from another.
     lineage:
-      - datalake_greenhouse_raw.jobs.copied_from_id
+    - datalake_greenhouse_raw.jobs.copied_from_id
   id_requisition:
-    description: "The requisition ID for the job."
+    description: The requisition ID for the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.requisition_id
+    - datalake_greenhouse_raw.jobs.requisition_id
   id_department:
-    description: "The unique identifier for the job's department, based on the first ID present in the department list, following the business rule that a job is associated with a single department."
+    description: The unique identifier for the job's department, based on the first ID present in the department list, following the business rule that a job is associated with a single department.
     lineage:
-      - datalake_greenhouse_raw.jobs.departments[0].id
+    - datalake_greenhouse_raw.jobs.departments[0].id
   id_recruiter_responsible:
-    description: "The unique identifier of the recruiter marked as responsible for the job."
+    description: The unique identifier of the recruiter marked as responsible for the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.recruiters
+    - datalake_greenhouse_raw.jobs.hiring_team.recruiters
   id_coordinator_responsible:
-    description: "The unique identifier of the coordinator marked as responsible for the job."
+    description: The unique identifier of the coordinator marked as responsible for the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.coordinators
+    - datalake_greenhouse_raw.jobs.hiring_team.coordinators
   name:
-    description: "The name of the job."
+    description: The name of the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.name
+    - datalake_greenhouse_raw.jobs.name
   status:
-    description: "The current status of the job."
+    description: The current status of the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.status
+    - datalake_greenhouse_raw.jobs.status
   career_path:
-    description: "The career path associated with the job."
+    description: The career path associated with the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.career_path.value
+    - datalake_greenhouse_raw.jobs.keyed_custom_fields.career_path.value
   l1_full_name:
-    description: "The full name of the primary leadership (L1) for this position."
+    description: The full name of the primary leadership (L1) for this position.
     lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.l1.value
+    - datalake_greenhouse_raw.jobs.keyed_custom_fields.l1.value
   careers_page_area:
-    description: "Name of the area of interest associated with the job on the careers page."
+    description: Name of the area of interest associated with the job on the careers page.
     lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.careers_page_area_of_interest.value
+    - datalake_greenhouse_raw.jobs.keyed_custom_fields.careers_page_area_of_interest.value
   employment_type:
-    description: "The employment type for the job."
+    description: The employment type for the job.
     lineage:
-      - datalake_greenhouse_raw.jobs.keyed_custom_fields.employment_type.value
+    - datalake_greenhouse_raw.jobs.keyed_custom_fields.employment_type.value
   is_confidential:
-    description: "A boolean flag indicating if the job is confidential."
+    description: A boolean flag indicating if the job is confidential.
     lineage:
-      - datalake_greenhouse_raw.jobs.confidential
+    - datalake_greenhouse_raw.jobs.confidential
   is_template:
-    description: "A boolean flag indicating if the job is a template."
+    description: A boolean flag indicating if the job is a template.
     lineage:
-      - datalake_greenhouse_raw.jobs.is_template
+    - datalake_greenhouse_raw.jobs.is_template
   ts_created:
-    description: "The timestamp when the job was created."
+    description: The timestamp when the job was created.
     lineage:
-      - datalake_greenhouse_raw.jobs.created_at
+    - datalake_greenhouse_raw.jobs.created_at
   ts_opened:
-    description: "The timestamp when the job was opened."
+    description: The timestamp when the job was opened.
     lineage:
-      - datalake_greenhouse_raw.jobs.opened_at
+    - datalake_greenhouse_raw.jobs.opened_at
   ts_closed:
-    description: "The timestamp when the job was closed."
+    description: The timestamp when the job was closed.
     lineage:
-      - datalake_greenhouse_raw.jobs.closed_at
+    - datalake_greenhouse_raw.jobs.closed_at
   ts_updated:
-    description: "The timestamp when the job was last updated."
+    description: The timestamp when the job was last updated.
     lineage:
-      - datalake_greenhouse_raw.jobs.updated_at
+    - datalake_greenhouse_raw.jobs.updated_at
   ts_load:
-    description: "The timestamp when the record was loaded into the clean layer."
+    description: The timestamp when the record was loaded into the clean layer.
   offices:
-    description: "An array of structs containing office information (id, name, location)."
+    description: An array of structs containing office information (id, name, location).
     lineage:
-      - datalake_greenhouse_raw.jobs.offices
+    - datalake_greenhouse_raw.jobs.offices
   departments:
-    description: "An array of structs containing department information (id, name, code)."
+    description: An array of structs containing department information (id, name, code).
     lineage:
-      - datalake_greenhouse_raw.jobs.departments
+    - datalake_greenhouse_raw.jobs.departments
   hiring_managers:
-    description: "An array of structs containing hiring manager information (id, id_employee, name)."
+    description: An array of structs containing hiring manager information (id, id_employee, name).
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.hiring_managers
+    - datalake_greenhouse_raw.jobs.hiring_team.hiring_managers
   recruiters:
-    description: "An array of structs containing recruiter information (id, id_employee, name, is_responsible)."
+    description: An array of structs containing recruiter information (id, id_employee, name, is_responsible).
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.recruiters
+    - datalake_greenhouse_raw.jobs.hiring_team.recruiters
   coordinators:
-    description: "An array of structs containing coordinator information (id, id_employee, name, is_responsible)."
+    description: An array of structs containing coordinator information (id, id_employee, name, is_responsible).
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.coordinators
+    - datalake_greenhouse_raw.jobs.hiring_team.coordinators
   sourcers:
-    description: "An array of structs containing sourcer information."
+    description: An array of structs containing sourcer information.
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.sourcers
+    - datalake_greenhouse_raw.jobs.hiring_team.sourcers
   openings:
-    description: "An array of structs containing openings information."
+    description: An array of structs containing openings information.
     lineage:
-      - datalake_greenhouse_raw.jobs.hiring_team.openings
+    - datalake_greenhouse_raw.jobs.openings
   year:
-    description: "The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer."
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.jobs.year
+    - datalake_greenhouse_raw.jobs.year
   month:
-    description: "The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer."
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.jobs.month
+    - datalake_greenhouse_raw.jobs.month
   day:
-    description: "The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer."
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.jobs.day
+    - datalake_greenhouse_raw.jobs.day

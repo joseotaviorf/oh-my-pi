@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_core_clean
 table_name: contact_relationship
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: This table stores data related to employee's personal and profissional contacts registered on Oracle HCM
+description: |-
+  This table stores data related to employee's personal and profissional contacts registered on Oracle HCM
 columns:
   id_business_group:
     description: The business group's unique identifier

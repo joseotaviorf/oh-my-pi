@@ -1,65 +1,65 @@
----
 database_name: datalake_greenhouse_clean
 table_name: users
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing user data, sourced from the Greenhouse Harvest API's 'users' endpoint.
+description: |-
+  Table containing user data, sourced from the Greenhouse Harvest API's 'users' endpoint.
 columns:
   id:
     description: The user's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.users.id
+    - datalake_greenhouse_raw.users.id
   name:
     description: The user's full name.
     lineage:
-      - datalake_greenhouse_raw.users.name
+    - datalake_greenhouse_raw.users.name
   first_name:
     description: The user's first name.
     lineage:
-      - datalake_greenhouse_raw.users.first_name
+    - datalake_greenhouse_raw.users.first_name
   last_name:
     description: The user's last name.
     lineage:
-      - datalake_greenhouse_raw.users.last_name
+    - datalake_greenhouse_raw.users.last_name
   primary_email_address:
     description: The user's primary email address.
     lineage:
-      - datalake_greenhouse_raw.users.primary_email_address
+    - datalake_greenhouse_raw.users.primary_email_address
   is_disabled:
     description: A boolean flag indicating if the user is disabled.
     lineage:
-      - datalake_greenhouse_raw.users.disabled
+    - datalake_greenhouse_raw.users.disabled
   is_site_admin:
     description: A boolean flag indicating if the user is a site admin.
     lineage:
-      - datalake_greenhouse_raw.users.site_admin
+    - datalake_greenhouse_raw.users.site_admin
   ts_created:
     description: The timestamp when the user was created.
     lineage:
-      - datalake_greenhouse_raw.users.created_at
+    - datalake_greenhouse_raw.users.created_at
   ts_updated:
     description: The timestamp when the user was last updated.
     lineage:
-      - datalake_greenhouse_raw.users.updated_at
+    - datalake_greenhouse_raw.users.updated_at
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   emails:
     description: An array of the user's email addresses.
     lineage:
-      - datalake_greenhouse_raw.users.emails
+    - datalake_greenhouse_raw.users.emails
   linked_candidate_ids:
     description: An array of linked candidate IDs.
     lineage:
-      - datalake_greenhouse_raw.users.linked_candidate_ids
+    - datalake_greenhouse_raw.users.linked_candidate_ids
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.users.year
+    - datalake_greenhouse_raw.users.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.users.month
+    - datalake_greenhouse_raw.users.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.users.day
+    - datalake_greenhouse_raw.users.day

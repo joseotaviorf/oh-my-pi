@@ -1,69 +1,71 @@
----
 database_name: dw_employee
 table_name: dim_employee_contact
-owner: leonardo.soares@quintoandar.com.br
+owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: Dimension table with contact information of employees.
 columns:
   sk_employee:
-    description: 'Surrogate key for the employee.'
+    description: Surrogate key for the employee.
     lineage:
     - datalake_hr_system_clean.workers.id_person
   work_email:
-    description: 'Work email of the employee.'
+    description: Work email of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.ew.email_address
+    - datalake_hr_system_clean.workers.emails.EmailAddress
   personal_email:
-    description: 'Personal email of the employee.'
+    description: Personal email of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.eh.email_address
+    - datalake_hr_system_clean.workers.emails.EmailAddress
   country_code_number:
-    description: 'Country code number of the employee.'
+    description: Country code number of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.country_code_number
+    - datalake_hr_system_clean.workers.phones.CountryCodeNumber
   area_code:
-    description: 'Area code of the employee.'
+    description: Area code of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.area_code
+    - datalake_hr_system_clean.workers.phones.AreaCode
   phone_number:
-    description: 'Phone number of the employee.'
+    description: Phone number of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.phone_number
+    - datalake_hr_system_clean.workers.phones.PhoneNumber
   address:
-    description: 'Address of the employee.'
+    description: Address of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.CONCAT(addresses.addl_address_attribute_3, ' ', addresses.address_line_1)
+    - datalake_hr_system_clean.workers.addresses.AddlAddressAttribute3
+    - datalake_hr_system_clean.workers.addresses.AddressLine1
   address_number:
-    description: 'Address number of the employee.'
+    description: Address number of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.address_line_2
+    - datalake_hr_system_clean.workers.addresses.AddressLine2
   address_complement:
-    description: 'Address complement of the employee.'
+    description: Address complement of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.address_line_3
+    - datalake_hr_system_clean.workers.addresses.AddressLine3
   address_district:
-    description: 'Address district of the employee.'
+    description: Address district of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.address_line_4
+    - datalake_hr_system_clean.workers.addresses.AddressLine4
   address_zip_code:
-    description: 'Address zip code of the employee.'
+    description: Address zip code of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.postal_code
+    - datalake_hr_system_clean.workers.addresses.PostalCode
   address_city:
-    description: 'Address city of the employee.'
+    description: Address city of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.town_or_city
+    - datalake_hr_system_clean.workers.addresses.TownOrCity
   address_state:
-    description: 'Address state of the employee.'
+    description: Address state of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.region_2
+    - datalake_hr_system_clean.workers.addresses.Region2
   address_country:
-    description: 'Address country of the employee.'
+    description: Address country of the employee.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.country
+    - datalake_hr_system_clean.workers.addresses.Country
   ts_last_update:
-    description: 'Timestamp of the last update of the record.'
+    description: Timestamp of the last update of the record.
     lineage:
-    - datalake_hr_system_clean.workers.addresses.dt_effective_start
+    - datalake_hr_system_clean.workers.addresses.EffectiveStartDate
+    - datalake_hr_system_clean.workers.emails.LastUpdateDate
+    - datalake_hr_system_clean.workers.phones.LastUpdateDate
   ts_load:
-    description: 'Timestamp of the load of the record.'
+    description: Timestamp of the load of the record.

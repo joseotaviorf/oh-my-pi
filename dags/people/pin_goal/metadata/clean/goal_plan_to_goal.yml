@@ -2,7 +2,7 @@
 database_name: datalake_pin_goal_clean
 table_name: goal_plan_to_goal
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the association between goal plans and individual goals.
 columns:
   id_business_group:
@@ -10,7 +10,8 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.business_group_id
   id_assignment:
-    description: Denormalized column for assignment ID, used by OTBI VOs only and not populated.
+    description: Denormalized column for assignment ID, used by OTBI VOs only and
+      not populated.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.assignment_id
   id_goal:
@@ -26,7 +27,8 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.goal_plan_id
   id_review_period:
-    description: Identifier of the review period, used for filtering goals in primary goal plans.
+    description: Identifier of the review period, used for filtering goals in primary
+      goal plans.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.review_period_id
   priority_code:
@@ -42,7 +44,8 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.weighting
   object_version_number:
-    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    description: Counter for optimistic locking, incremented on each update to detect
+      concurrent modifications.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.object_version_number
   ts_created:
@@ -54,18 +57,20 @@ columns:
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_goal_raw.hrg_goal_plan_goals.ts_load
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
       - datalake_pin_goal_raw.hrg_goal_plan_goals.day

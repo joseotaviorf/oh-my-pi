@@ -3,14 +3,17 @@ database_name: datalake_pin_core_clean
 table_name: hcm_extended_lookup_code_translation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: This table holds the translated information for extended lookup code records.
+description: This table holds the translated information for extended lookup code
+  records.
 columns:
   id_enterprise:
-    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+      Foreign key to HR_ORGANIZATION_UNITS.
     lineage:
       - datalake_pin_core_raw.hcm_extended_lookup_codes_tl.enterprise_id
   id_enterprise_extended_lookup_code:
-    description: System-generated unique identifier for the extended lookup code. Primary key.
+    description: System-generated unique identifier for the extended lookup code.
+      Primary key.
     lineage:
       - datalake_pin_core_raw.hcm_extended_lookup_codes_tl.extended_lookup_code_id
   language:

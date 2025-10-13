@@ -1,28 +1,25 @@
----
 database_name: datalake_degreed_clean
 table_name: logins
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  This table tracks user login activity. Each row represents a single
-  successful login event to the Degreed platform for a user within the organization.
-
+description: |-
+  This table tracks user login activity. Each row represents a single successful login event to the Degreed platform for a user within the organization.
 columns:
   id:
-    description: 'Unique identifier for the login event record.'
+    description: Unique identifier for the login event record.
     lineage:
-      - datalake_degreed_raw.logins.id
+    - datalake_degreed_raw.logins.id
   id_user:
-    description: 'The unique identifier for the user who logged in.'
+    description: The unique identifier for the user who logged in.
     lineage:
-      - datalake_degreed_raw.logins.relationships[0].user.data.id
+    - datalake_degreed_raw.logins.relationships[0].user.data.id
   email_employee:
-    description: 'The employee ID, typically an email, of the user who logged in.'
+    description: The employee ID, typically an email, of the user who logged in.
     lineage:
-      - datalake_degreed_raw.logins.attributes.employee_id
+    - datalake_degreed_raw.logins.attributes.employee_id
   ts_logged:
-    description: 'Timestamp indicating the exact date and time the user logged in.'
+    description: Timestamp indicating the exact date and time the user logged in.
     lineage:
-      - datalake_degreed_raw.logins.attributes.logged_in_at
+    - datalake_degreed_raw.logins.attributes.logged_in_at
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean table.'
+    description: Timestamp indicating when the record was loaded into the clean table.

@@ -1,9 +1,9 @@
----
 database_name: dw_employee
 table_name: fact_absence_requests
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Fact table that records all employee absence requests, including details such as start and end dates, requested days, and request status.
+description: |-
+  Fact table that records all employee absence requests, including details such as start and end dates, requested days, and request status.
 columns:
   sk_absence_request:
     description: Primary key that uniquely identifies each absence request.
@@ -12,70 +12,72 @@ columns:
   sk_assignment:
     description: Foreign key to the assignment dimension, identifying the employee's period of service associated with the request.
     lineage:
-     - datalake_pin_absence_clean.person_entry.id_period_of_service
+    - datalake_pin_absence_clean.person_entry.id_period_of_service
   sk_absence_type:
     description: Foreign key to the absence type dimension, indicating the category of absence requested.
     lineage:
-     - datalake_pin_absence_clean.person_entry.id_absence_type
+    - datalake_pin_absence_clean.person_entry.id_absence_type
   sk_request_status:
     description: Foreign key to the request status dimension.
     lineage:
-     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.approval_status_code
   sk_revision_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the revision/approval date of the request. Populated with -1 if the date is null.
     lineage:
-     - datalake_pin_absence_clean.person_entry.ts_approved
+    - datalake_pin_absence_clean.person_entry.ts_approved
   sk_request_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the submission date of the request. Populated with -1 if the date is null.
     lineage:
-     - datalake_pin_absence_clean.person_entry.dt_submitted
+    - datalake_pin_absence_clean.person_entry.dt_submitted
   sk_notification_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the notification date of the absence. Populated with -1 if the date is null.
     lineage:
-     - datalake_pin_absence_clean.person_entry.dt_notificated
+    - datalake_pin_absence_clean.person_entry.dt_notificated
   sk_absence_started_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the start date of the absence. Populated with -1 if the date is null.
     lineage:
-     - datalake_pin_absence_clean.person_entry.dt_started
+    - datalake_pin_absence_clean.person_entry.dt_started
   sk_absence_ended_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the end date of the absence. Populated with -1 if the date is null.
     lineage:
-     - datalake_pin_absence_clean.person_entry.dt_ended
+    - datalake_pin_absence_clean.person_entry.dt_ended
   days_requested:
     description: Total number of days requested for the absence.
     lineage:
-     - datalake_pin_absence_clean.person_entry.days_duration
+    - datalake_pin_absence_clean.person_entry.days_duration
   days_vacation_cash_out:
     description: Number of vacation days converted to cash (vacation cash-out). Returns the value for a specific absence type (ID 300000004800809) and -1 for all others.
     lineage:
-     - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
+    - datalake_pin_absence_clean.person_entry.id_absence_type
+    - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   is_vacation_request:
-    description: Identifies absence entries that are specifically for vacation leave. This flag is set to TRUE if the id_absence_type from the source system is '300000004800809', signaling a formal request for vacation time. Otherwise, it is FALSE.
+    description: |-
+      Identifies absence entries that are specifically for vacation leave. This flag is set to TRUE if the id_absence_type from the source system is '300000004800809', signaling a formal request for vacation time. Otherwise, it is FALSE.
     lineage:
-     - datalake_pin_absence_clean.person_entry.id_absence_type
+    - datalake_pin_absence_clean.person_entry.id_absence_type
   is_approved:
     description: Boolean flag indicating if the approval_status_code is 'APPROVED'.
     lineage:
-     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.approval_status_code
   is_denied:
     description: Boolean flag indicating if the approval_status_code is 'DENIED'.
     lineage:
-     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.approval_status_code
   is_pending:
     description: Boolean flag indicating if the approval_status_code is 'AWAITING'.
     lineage:
-     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.approval_status_code
   is_open_ended:
     description: Boolean flag indicating if the absence has an indefinite end date.
     lineage:
-     - datalake_pin_absence_clean.person_entry.is_open_ended
+    - datalake_pin_absence_clean.person_entry.is_open_ended
   has_requested_vacation_cash_out:
     description: Boolean flag indicating if a value for vacation_cash_out_request exists (is not null).
     lineage:
-     - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
+    - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   has_requested_13th_salary_advance:
     description: Boolean flag indicating if the employee has requested a 13th-salary advance, based on the 'S'/'N' value in the source.
     lineage:
-     - datalake_pin_absence_clean.person_entry.advance_13th_salary
+    - datalake_pin_absence_clean.person_entry.advance_13th_salary
   ts_load:
     description: Timestamp of when the record was loaded into the table.

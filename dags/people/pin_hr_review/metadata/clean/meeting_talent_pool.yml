@@ -2,7 +2,7 @@
 database_name: datalake_pin_hr_review_clean
 table_name: meeting_talent_pool
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores the talent pools associated with talent review meetings.
 columns:
   id_business_group:

@@ -1,105 +1,105 @@
----
 database_name: datalake_pin_benefits_clean
 table_name: eligible_covered_dependents
 owner: isabella.araujo@quintoandar.com.br
-domain: people
-description: This table identifies individuals designated as dependents by a participant within a benefits program, plan type, or specific plan. The level at which dependent designations occur is determined either at the program level for plans within a program, or at the plan level for plans not associated with a program. It captures key details about their benefit coverage.
+domain: People
+description: |-
+  This table identifies individuals designated as dependents by a participant within a benefits program, plan type, or specific plan. The level at which dependent designations occur is determined either at the program level for plans within a program, or at the plan level for plans not associated with a program. It captures key details about their benefit coverage.
 columns:
   id_eligible_covered_dependent:
     description: The unique system-generated primary key identifying each eligible covered dependent record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.elig_cvrd_dpnt_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.elig_cvrd_dpnt_id
   id_business_group:
     description: A foreign key referencing the business group to which this dependent's benefit eligibility belongs.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.business_group_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.business_group_id
   id_eligible_per_electable_choice:
     description: A foreign key linking to the `BEN_ELIG_PER_ELECTBL_CHC` table, representing the electable choice made by the eligible person that covers this dependent.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.elig_per_elctbl_chc_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.elig_per_elctbl_chc_id
   id_participant_enrollment_result:
     description: A foreign key linking to the `BEN_PRTT_ENRT_RSLT_F` table, identifying the enrollment result record for the participant.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.prtt_enrt_rslt_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.prtt_enrt_rslt_id
   id_dependent_person:
     description: A foreign key linking to the `PER_ALL_PEOPLE_F` table, identifying the dependent person's record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.dpnt_person_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.dpnt_person_id
   id_ended_period_in_life_event_reason:
     description: Identifier for the period within a life event reason that signifies the end of coverage.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.ended_per_in_ler_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.ended_per_in_ler_id
   id_period_in_life_event_reason:
     description: A foreign key linking to the `BEN_PER_IN_LER` table, representing the period in which the dependent's eligibility or coverage changed due to a life event reason.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.per_in_ler_id
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.per_in_ler_id
   relationship_code:
     description: A code indicating the relationship of the dependent to the primary participant (e.g., child, spouse).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.rlnshp_cd
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.rlnshp_cd
   created_by:
     description: The user account that initially created this record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.created_by
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.created_by
   updated_by:
     description: The user account that last modified this record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.last_updated_by
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.last_updated_by
   is_coverage_pending:
     description: A boolean flag indicating whether the dependent's coverage is currently pending (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.cvg_pndg_flag
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.cvg_pndg_flag
   is_overridden:
     description: A boolean flag indicating whether the dependent's coverage has been administratively overridden (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.ovrdn_flag
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.ovrdn_flag
   object_version_number:
     description: A version number used for optimistic locking, incremented with each update to detect concurrent modifications.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.object_version_number
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.object_version_number
   dt_coverage_started:
     description: The date from which the dependent's coverage became effective.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.cvg_strt_dt
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.cvg_strt_dt
   dt_coverage_ended:
     description: The date on which the dependent's coverage ceased to be effective.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.cvg_thru_dt
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.cvg_thru_dt
   dt_ended_coverage_ended:
     description: The actual date when the dependent's coverage was formally ended in the system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.ended_cvg_thru_dt
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.ended_cvg_thru_dt
   dt_original_option_in_plan_coverage_started:
     description: The original start date of the dependent's coverage at the specific option within a plan level.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.orgnl_oipl_cvg_strt_dt
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.orgnl_oipl_cvg_strt_dt
   dt_original_plan_coverage_started:
     description: The original start date of the dependent's coverage at the overall plan level.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.orgnl_plan_cvg_strt_dt
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.orgnl_plan_cvg_strt_dt
   ts_created:
     description: The timestamp indicating the exact date and time when this record was created in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.creation_date
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.creation_date
   ts_updated:
     description: The timestamp indicating the exact date and time when this record was last updated in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.last_update_date
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.last_update_date
   ts_program_updated:
     description: The timestamp when a batch program or concurrent process last updated this row in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.program_update_date
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.program_update_date
   ts_load:
     description: The timestamp indicating when this record was loaded into the data lake.
   year:
     description: The year extracted from the 'ts_updated' column. This is useful for partitioning the data by year to improve query performance.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.year
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.year
   month:
     description: The month extracted from the 'ts_updated' column (represented as a number from 1 to 12). Useful for data partitioning and filtering by month.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.month
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.month
   day:
     description: The day of the month extracted from the 'ts_updated' column (represented as a number from 1 to 31). Useful for filtering data by specific days.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.day
+    - datalake_pin_benefits_raw.ben_elig_cvrd_dpnt.day

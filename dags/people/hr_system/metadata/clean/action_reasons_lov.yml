@@ -1,35 +1,35 @@
----
 database_name: datalake_hr_system_clean
 table_name: action_reasons_lov
-owner: leonardo.soares@quintoandar.com.br
+owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: 'The action_reasons_lov table provides the list of values for the employment action reasons.'
+description: |-
+  The action_reasons_lov table provides the list of values for the employment action reasons.
 columns:
   id_action_reason:
-    description: 'Surrogate identifier for the action reason.'
+    description: Surrogate identifier for the action reason.
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.ActionReasonId
   id_action:
-    description: 'Surrogate identifier for the action.'
+    description: Surrogate identifier for the action.
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.ActionId
   action_reason_code:
-    description: 'Code for the action reason.'
+    description: Code for the action reason.
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.ActionReasonCode
   action_reason:
-    description: 'Reason for the action being performed on the record.'
+    description: Reason for the action being performed on the record.
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.ActionReason
   dt_start:
-    description: 'Date from when the action reason is valid.'
+    description: Date from when the action reason is valid.
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.StartDate
   dt_end:
-    description: 'Date until when the action reason is valid.'
+    description: Date until when the action reason is valid.
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.EndDate
   ts_load:
-    description: 'Timestamp when the record was loaded into the data warehouse'
+    description: Timestamp when the record was loaded into the data warehouse
     lineage:
     - datalake_hr_system_raw.action_reasons_lov.ts_load

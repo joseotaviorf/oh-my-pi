@@ -1,173 +1,184 @@
----
 database_name: dw_employee
 table_name: dim_hierarchy
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Hierarchical order information"
+description: Hierarchical order information
 columns:
-  id_assignment:
-    description: "Surrogate key for the assignment."
+  sk_hierarchy:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_assignment
-  id_assignment_leadership_order_0:
-    description: "ID assignment of the highest manager in the hierarchy. Usually equal to the CEO id."
+    - datalake_hr_system.hierarchy_ids.sk_hierarchy
+  sk_assignment_leadership_order_0:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_1:
-    description: "ID assignment of the second highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_0
+  sk_assignment_leadership_order_1:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_2:
-    description: "ID assignment of the third highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_1
+  sk_assignment_leadership_order_2:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_3:
-    description: "ID assignment of the fourth highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_2
+  sk_assignment_leadership_order_3:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_4:
-    description: "ID assignment of the fifth highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_3
+  sk_assignment_leadership_order_4:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_5:
-    description: "ID assignment of the sixth highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_4
+  sk_assignment_leadership_order_5:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_6:
-    description: "ID assignment of the seventh highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_5
+  sk_assignment_leadership_order_6:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_7:
-    description: "ID assignment of the eighth highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_6
+  sk_assignment_leadership_order_7:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_8:
-    description: "ID assignment of the ninth highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_7
+  sk_assignment_leadership_order_8:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
-  id_assignment_leadership_order_9:
-    description: "ID assignment of the tenth highest manager in the hierarchy."
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_8
+  sk_assignment_leadership_order_9:
+    description: Column description to be added.
     lineage:
-      - datalake_hr_system.management_hierarchy.id_manager_assignment
+    - datalake_hr_system.hierarchy_ids.sk_assignment_leadership_order_9
   assignment_number_leadership_0:
-      description: "Unique identifier for the assignment of the highest manager in the hierarchy. Usually equal to the CEO's assignment number."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the highest manager in the
+      hierarchy. Usually equal to the CEO's assignment number.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_1:
-      description: "Unique identifier for the assignment of the second highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the second highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_2:
-      description: "Unique identifier for the assignment of the third highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the third highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_3:
-      description: "Unique identifier for the assignment of the fourth highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the fourth highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_4:
-      description: "Unique identifier for the assignment of the fifth highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the fifth highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_5:
-      description: "Unique identifier for the assignment of the sixth highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the sixth highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_6:
-      description: "Unique identifier for the assignment of the seventh highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the seventh highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_7:
-      description: "Unique identifier for the assignment of the eighth highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the eighth highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_8:
-      description: "Unique identifier for the assignment of the ninth highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the ninth highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   assignment_number_leadership_9:
-      description: "Unique identifier for the assignment of the tenth highest manager in the hierarchy."
-      lineage:
-        - datalake_employee_registration.identifier_mapping.assignment_number
+    description: Unique identifier for the assignment of the tenth highest manager
+      in the hierarchy.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
   full_name_leadership_0:
-    description: "Full Name of the highest manager in the hierarchy. Usually equal to the CEO id."
+    description: Full Name of the highest manager in the hierarchy. Usually equal
+      to the CEO id.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_1:
-    description: "Full Name of the second highest manager in the hierarchy."
+    description: Full Name of the second highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_2:
-    description: "Full Name of the third highest manager in the hierarchy."
+    description: Full Name of the third highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_3:
-    description: "Full Name of the fourth highest manager in the hierarchy."
+    description: Full Name of the fourth highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_4:
-    description: "Full Name of the fifth highest manager in the hierarchy."
+    description: Full Name of the fifth highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_5:
-    description: "Full Name of the sixth highest manager in the hierarchy."
+    description: Full Name of the sixth highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_6:
-    description: "Full Name of the seventh highest manager in the hierarchy."
+    description: Full Name of the seventh highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_7:
-    description: "Full Name of the eighth highest manager in the hierarchy."
+    description: Full Name of the eighth highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_8:
-    description: "Full Name of the ninth highest manager in the hierarchy."
+    description: Full Name of the ninth highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   full_name_leadership_9:
-    description: "Full Name of the tenth highest manager in the hierarchy."
+    description: Full Name of the tenth highest manager in the hierarchy.
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_employee_registration.identifier_mapping.full_name
   email_leadership_0:
-    description: "Email of the highest manager in the hierarchy. Usually equal to the CEO id."
+    description: Email of the highest manager in the hierarchy. Usually equal to the
+      CEO id.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_1:
-    description: "Email of the second highest manager in the hierarchy."
+    description: Email of the second highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_2:
-    description: "Email of the third highest manager in the hierarchy."
+    description: Email of the third highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_3:
-    description: "Email of the fourth highest manager in the hierarchy."
+    description: Email of the fourth highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_4:
-    description: "Email of the fifth highest manager in the hierarchy."
+    description: Email of the fifth highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_5:
-    description: "Email of the sixth highest manager in the hierarchy."
+    description: Email of the sixth highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_6:
-    description: "Email of the seventh highest manager in the hierarchy."
+    description: Email of the seventh highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_7:
-    description: "Email of the eighth highest manager in the hierarchy."
+    description: Email of the eighth highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_8:
-    description: "Email of the ninth highest manager in the hierarchy."
+    description: Email of the ninth highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   email_leadership_9:
-    description: "Email of the tenth highest manager in the hierarchy."
+    description: Email of the tenth highest manager in the hierarchy.
     lineage:
-      - datalake_employee_registration.identifier_mapping.work_email
+    - datalake_employee_registration.identifier_mapping.work_email
   ts_load:
-    description: "Timestamp of when the record was loaded."
+    description: Timestamp of when the record was loaded.

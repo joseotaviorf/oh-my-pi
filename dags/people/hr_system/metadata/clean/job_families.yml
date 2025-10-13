@@ -1,0 +1,42 @@
+database_name: datalake_hr_system_clean
+table_name: job_families
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table containing job family information from the HR system
+columns:
+  id_job_family:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.JobFamilyId
+  name_job_family:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.JobFamilyName
+  code_job_family:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.JobFamilyCode
+  status_active:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.ActiveStatus
+  job_family_dff:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.JobFamilyDFF
+  dt_effective_started_date:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.EffectiveStartDate
+  dt_effective_ended_date:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.EffectiveEndDate
+  ts_created:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.CreationDate
+  ts_last_updated:
+    description: Column description to be added.
+    lineage:
+    - datalake_hr_system_raw.job_families.LastUpdateDate

@@ -1,77 +1,77 @@
----
 database_name: datalake_pin_core_clean
 table_name: job_legislative
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Stores legislative information and extra details for specific jobs, sourced from Oracle HCM's PER_JOB_LEG_F table. This data is often used for legal and governmental reporting."
+description: |-
+  Stores legislative information and extra details for specific jobs, sourced from Oracle HCM's PER_JOB_LEG_F table. This data is often used for legal and governmental reporting.
 columns:
   id_job_legislative:
-    description: "Unique identifier for the job legislative record."
+    description: Unique identifier for the job legislative record.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.job_leg_id
+    - datalake_pin_core_raw.per_job_leg_f.job_leg_id
   id_business_group:
-    description: "Identifier for the business group to which this job legislative record belongs. It partitions data within the enterprise."
+    description: Identifier for the business group to which this job legislative record belongs. It partitions data within the enterprise.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.business_group_id
+    - datalake_pin_core_raw.per_job_leg_f.business_group_id
   id_job:
-    description: "Identifier for the job associated with this legislative information."
+    description: Identifier for the job associated with this legislative information.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.job_id
+    - datalake_pin_core_raw.per_job_leg_f.job_id
   id_action_occurrence:
-    description: "Identifier for the specific action or event occurrence that triggered this record's creation or update."
+    description: Identifier for the specific action or event occurrence that triggered this record's creation or update.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.action_occurrence_id
+    - datalake_pin_core_raw.per_job_leg_f.action_occurrence_id
   legislation_code:
-    description: "Legislation code for the country to which this information applies (e.g., 'US', 'BR')."
+    description: Legislation code for the country to which this information applies (e.g., 'US', 'BR').
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.legislation_code
+    - datalake_pin_core_raw.per_job_leg_f.legislation_code
   brazilian_occupation_code:
-    description: "Job occupation code according to the Brazilian Occupation Code (CBO)."
+    description: Job occupation code according to the Brazilian Occupation Code (CBO).
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.information1
+    - datalake_pin_core_raw.per_job_leg_f.information1
   created_by:
-    description: "User who originally created the record."
+    description: User who originally created the record.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.created_by
+    - datalake_pin_core_raw.per_job_leg_f.created_by
   updated_by:
-    description: "User who last modified the record."
+    description: User who last modified the record.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.last_updated_by
+    - datalake_pin_core_raw.per_job_leg_f.last_updated_by
   sequence_number:
-    description: "A number indicating the order or sequence of this record among others for the same job."
+    description: A number indicating the order or sequence of this record among others for the same job.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.sequence_number
+    - datalake_pin_core_raw.per_job_leg_f.sequence_number
   object_version_number:
-    description: "Version number of the record, used for concurrency control to prevent overwrites."
+    description: Version number of the record, used for concurrency control to prevent overwrites.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.object_version_number
+    - datalake_pin_core_raw.per_job_leg_f.object_version_number
   dt_effective_started:
-    description: "The date from which this job legislative information becomes effective."
+    description: The date from which this job legislative information becomes effective.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.effective_start_date
+    - datalake_pin_core_raw.per_job_leg_f.effective_start_date
   dt_effective_ended:
-    description: "The date until which this job legislative information is effective."
+    description: The date until which this job legislative information is effective.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.effective_end_date
+    - datalake_pin_core_raw.per_job_leg_f.effective_end_date
   ts_created:
-    description: "Timestamp indicating when the record was created."
+    description: Timestamp indicating when the record was created.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.creation_date
+    - datalake_pin_core_raw.per_job_leg_f.creation_date
   ts_updated:
-    description: "Timestamp indicating when the record was last updated."
+    description: Timestamp indicating when the record was last updated.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.last_update_date
+    - datalake_pin_core_raw.per_job_leg_f.last_update_date
   ts_load:
-    description: "Timestamp indicating when the record was loaded into the data lake. This value is generated during the load process."
+    description: Timestamp indicating when the record was loaded into the data lake. This value is generated during the load process.
   year:
-    description: "Year partition column, representing the year the data was loaded."
+    description: Year partition column, representing the year the data was loaded.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.year
+    - datalake_pin_core_raw.per_job_leg_f.year
   month:
-    description: "Month partition column, representing the month the data was loaded."
+    description: Month partition column, representing the month the data was loaded.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.month
+    - datalake_pin_core_raw.per_job_leg_f.month
   day:
-    description: "Day partition column, representing the day the data was loaded."
+    description: Day partition column, representing the day the data was loaded.
     lineage:
-      - datalake_pin_core_raw.per_job_leg_f.day
+    - datalake_pin_core_raw.per_job_leg_f.day

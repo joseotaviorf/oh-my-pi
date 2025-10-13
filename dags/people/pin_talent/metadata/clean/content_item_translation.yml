@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_talent_clean
 table_name: content_item_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
-description: Stores translated names and descriptions for content items used within the People (HR/Talent) domain.
+domain: People
+description: |-
+  Stores translated names and descriptions for content items used within the People (HR/Talent) domain.
 columns:
   id_content_item:
     description: Unique identifier for the content item being translated. Part of this table's composite primary key.

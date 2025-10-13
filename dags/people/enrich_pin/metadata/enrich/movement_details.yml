@@ -1,85 +1,85 @@
----
 database_name: datalake_pin
 table_name: movement_detail
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Records the details of each movement event or significant change in an employee's assignment history, such as hires, promotions, transfers, or terminations."
+description: |-
+  Records the details of each movement event or significant change in an employee's assignment history, such as hires, promotions, transfers, or terminations.
 columns:
   id_person:
-    description: "Identifier of the person (employee) associated with this movement."
+    description: Identifier of the person (employee) associated with this movement.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_person
+    - datalake_pin_core_clean.all_assignments.id_person
   id_period_of_service:
-    description: "Identifier of the employee's period of service to which this movement is associated."
+    description: Identifier of the employee's period of service to which this movement is associated.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_period_of_service
+    - datalake_pin_core_clean.all_assignments.id_period_of_service
   id_assignment:
-    description: "Unique identifier for the employee's assignment or work term related to this movement."
+    description: Unique identifier for the employee's assignment or work term related to this movement.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_assignment
+    - datalake_pin_core_clean.all_assignments.id_assignment
   id_business_unit:
-    description: "Identifier of the business unit to which the employee was associated at the time of this movement."
+    description: Identifier of the business unit to which the employee was associated at the time of this movement.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_business_unit
+    - datalake_pin_core_clean.all_assignments.id_business_unit
   id_cost_center:
-    description: "Identifier of the cost center or organizational unit to which the employee was associated at the time of this movement."
+    description: Identifier of the cost center or organizational unit to which the employee was associated at the time of this movement.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_organization
+    - datalake_pin_core_clean.all_assignments.id_organization
   id_job:
-    description: "Identifier of the employee's job at the time of this movement."
+    description: Identifier of the employee's job at the time of this movement.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_job
+    - datalake_pin_core_clean.all_assignments.id_job
   id_band_ladder:
-    description: "Identifier of the band ladder program to which the assignment was linked."
+    description: Identifier of the band ladder program to which the assignment was linked.
     lineage:
-      - datalake_pin_core_clean.all_assignments.id_grade_ladder_program
+    - datalake_pin_core_clean.all_assignments.id_grade_ladder_program
   assignment_number:
-    description: "Unique identifying number for the employee's assignment or work terms."
+    description: Unique identifying number for the employee's assignment or work terms.
     lineage:
-      - datalake_pin_core_clean.all_assignments.assignment_number
+    - datalake_pin_core_clean.all_assignments.assignment_number
   assignment_type:
-    description: "Indicates the type of individual's employment status or relationship."
+    description: Indicates the type of individual's employment status or relationship.
     lineage:
-      - datalake_pin_core_clean.all_assignments.assignment_type
+    - datalake_pin_core_clean.all_assignments.assignment_type
     categories:
-      E: "Employee"
-      C: "Contingent Worker"
-      P: "Pending Worker"
+      E: Employee
+      C: Contingent Worker
+      P: Pending Worker
   assignment_name:
-    description: "Describes the assignment or work terms (derived as [job name] - [department name] by default)."
+    description: Describes the assignment or work terms (derived as [job name] - [department name] by default).
     lineage:
-      - datalake_pin_core_clean.all_assignments.assignment_name
+    - datalake_pin_core_clean.all_assignments.assignment_name
   assignment_status_type:
-    description: "Denormalized status of the assignment at the time of movement."
+    description: Denormalized status of the assignment at the time of movement.
     lineage:
-      - datalake_pin_core_clean.all_assignments.assignment_status_type
+    - datalake_pin_core_clean.all_assignments.assignment_status_type
   action_code:
-    description: "Code specifying the action performed on the assignment record that led to this movement (e.g., HIRE, MANAGER_CHANGE)."
+    description: Code specifying the action performed on the assignment record that led to this movement (e.g., HIRE, MANAGER_CHANGE).
     lineage:
-      - datalake_pin_core_clean.all_assignments.action_code
+    - datalake_pin_core_clean.all_assignments.action_code
   band:
-    description: "The code representing the employee's band/grade."
+    description: The code representing the employee's band/grade.
     lineage:
-      - datalake_pin_core_clean.grade.grade_code
+    - datalake_pin_core_clean.grade.grade_code
   comp_ladder_directorate:
-    description: "Name of the compensation ladder directorate associated with the band ladder."
+    description: Name of the compensation ladder directorate associated with the band ladder.
     lineage:
-      - datalake_hr_system_clean.workers.work_relationships.assignments.assignmentsDFF.GradeLadderName
+    - datalake_hr_system_clean.workers.work_relationships.assignments.assignmentsDFF.GradeLadderName
   business_unit_name:
-    description: "Name of the business unit to which the employee was associated."
+    description: Name of the business unit to which the employee was associated.
     lineage:
-      - datalake_hr_system_clean.organizations.name
+    - datalake_hr_system_clean.organizations.name
   cost_center_name:
-    description: "Name of the cost center or organizational unit to which the employee was associated."
+    description: Name of the cost center or organizational unit to which the employee was associated.
     lineage:
-      - datalake_hr_system_clean.organizations.name
+    - datalake_hr_system_clean.organizations.name
   dt_effective_started:
-    description: "Effective start date of this movement or the resulting assignment state."
+    description: Effective start date of this movement or the resulting assignment state.
     lineage:
-      - datalake_pin_core_clean.all_assignments.dt_effective_started
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
   dt_effective_ended:
-    description: "Effective end date of this movement or the resulting assignment state."
+    description: Effective end date of this movement or the resulting assignment state.
     lineage:
-      - datalake_pin_core_clean.all_assignments.dt_effective_ended
+    - datalake_pin_core_clean.all_assignments.dt_effective_ended
   ts_load:
-    description: "Timestamp of when the record was loaded or last updated in this table."
+    description: Timestamp of when the record was loaded or last updated in this table.

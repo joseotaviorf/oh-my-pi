@@ -1,69 +1,69 @@
----
 database_name: datalake_pin_core_clean
 table_name: grade_ladder_translation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: 'Stores the translated names for grade ladders in multiple languages. Each record represents the name of a specific grade ladder in a specific language.'
+description: |-
+  Stores the translated names for grade ladders in multiple languages. Each record represents the name of a specific grade ladder in a specific language.
 columns:
   id_grade_ladder:
-    description: 'Foreign key to the grade_ladder table.'
+    description: Foreign key to the grade_ladder table.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.grade_ladder_id
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.grade_ladder_id
   id_business_group:
-    description: 'Identifier of the business group.'
+    description: Identifier of the business group.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.business_group_id
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.business_group_id
   name:
-    description: 'Translated name of the grade ladder.'
+    description: Translated name of the grade ladder.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.name
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.name
   language:
-    description: 'The language code for the translation.'
+    description: The language code for the translation.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.language
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.language
   source_language:
-    description: 'The source language from which the name was translated.'
+    description: The source language from which the name was translated.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.source_lang
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.source_lang
   created_by:
-    description: 'User who created the record in the source.'
+    description: User who created the record in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.created_by
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.created_by
   updated_by:
-    description: 'User who last updated the record in the source.'
+    description: User who last updated the record in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.last_updated_by
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.last_updated_by
   object_version_number:
-    description: 'Object version number, used for concurrency control and auditing.'
+    description: Object version number, used for concurrency control and auditing.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.object_version_number
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.object_version_number
   dt_effective_started:
-    description: 'Effective start date of the translation record.'
+    description: Effective start date of the translation record.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.effective_start_date
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.effective_start_date
   dt_effective_ended:
-    description: 'Effective end date of the translation record.'
+    description: Effective end date of the translation record.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.effective_end_date
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.effective_end_date
   ts_created:
-    description: 'Timestamp of when the record was created in the source.'
+    description: Timestamp of when the record was created in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.creation_date
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.creation_date
   ts_updated:
-    description: 'Timestamp of the last update of the record in the source.'
+    description: Timestamp of the last update of the record in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.last_update_date
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.last_update_date
   ts_load:
-    description: 'Timestamp of when the record was loaded into the clean layer.'
+    description: Timestamp of when the record was loaded into the clean layer.
   year:
-    description: 'Partition year, referring to the last update date in the source.'
+    description: Partition year, referring to the last update date in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.year
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.year
   month:
-    description: 'Partition month, referring to the last update date in the source.'
+    description: Partition month, referring to the last update date in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.month
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.month
   day:
-    description: 'Partition day, referring to the last update date in the source.'
+    description: Partition day, referring to the last update date in the source.
     lineage:
-      - datalake_pin_core_raw.per_grade_ladders_f_tl.day
+    - datalake_pin_core_raw.per_grade_ladders_f_tl.day

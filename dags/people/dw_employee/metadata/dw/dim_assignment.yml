@@ -1,74 +1,60 @@
----
 database_name: dw_employee
 table_name: dim_assignment
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  Dimensional table that stores employee assignment data. 
-  An "assignment" represents an employee's relationship with a specific job, containing the terms of their employment contract for a given period. 
-  This table is fundamental for analyzing personnel movements, job structure, and costs.
-
+description: |-
+  Dimensional table that stores employee assignment data.  An "assignment" represents an employee's relationship with a specific job, containing the terms of their employment contract for a given period.  This table is fundamental for analyzing personnel movements, job structure, and costs.
 columns:
   sk_assignment:
-    description: >
-      Surrogate key that uniquely identifies each assignment record in the table. 
-      It is an artificial key with no business value, used to ensure integrity and optimize relationships in the data warehouse. It corresponds to the `id_period_of_service` from the source system.
+    description: |-
+      Surrogate key that uniquely identifies each assignment record in the table.  It is an artificial key with no business value, used to ensure integrity and optimize relationships in the data warehouse. It corresponds to the `id_period_of_service` from the source system.
     lineage:
-      - datalake_employment.employee_details.id_period_of_service
+    - datalake_employment.employee_details.id_period_of_service
   assignment_number:
-    description: >
-      Natural key for the assignment, serving as the unique identifier used in the source HR systems. 
-      It represents a specific contract or position for an employee.
+    description: |
+      Natural key for the assignment, serving as the unique identifier used in the source HR systems.  It represents a specific contract or position for an employee.
     lineage:
-      - datalake_employment.employee_details.assignment_number
+    - datalake_employment.employee_details.assignment_number
   legacy_registration:
-    description: >
-      Registration number from a previous (legacy) HR system. 
-      This field is maintained for historical reference and to ensure traceability of data for former employees.
+    description: |
+      Registration number from a previous (legacy) HR system.  This field is maintained for historical reference and to ensure traceability of data for former employees.
     lineage:
-      - datalake_employment.employee_details.legacy_registration
+    - datalake_employment.employee_details.legacy_registration
   legislation_code:
-    description: >
-      Code indicating the labor legislation to which the contract is subject (e.g., CLT, Internship). 
-      This code determines the rules for benefits, work hours, vacation, and termination.
+    description: |
+      Code indicating the labor legislation to which the contract is subject (e.g., CLT, Internship).  This code determines the rules for benefits, work hours, vacation, and termination.
     lineage:
-      - datalake_employment.employee_details.legislation_code
+    - datalake_employment.employee_details.legislation_code
   worker_type:
-    description: >
-      Classification of the worker's employment type. 
-      This field is crucial for differentiating worker categories for reporting, legal compliance, and planning purposes.
+    description: |
+      Classification of the worker's employment type.  This field is crucial for differentiating worker categories for reporting, legal compliance, and planning purposes.
     categories:
-      "E": "Employee"
-      "P": "Pending Worker"
-      "C": "Contingent Worker"
-      "N": "Nonworker"
+      E: Employee
+      P: Pending Worker
+      C: Contingent Worker
+      N: Nonworker
     lineage:
-      - datalake_employment.employee_details.assignment_type
+    - datalake_employment.employee_details.assignment_type
   assignment_status_type:
-    description: >
-      Indicates the current status of the assignment (e.g., 'Active', 'Inactive', 'Suspended', 'Terminated'). 
-      It is an essential field for filtering the active workforce at any given time.
+    description: |
+      Indicates the current status of the assignment (e.g., 'Active', 'Inactive', 'Suspended', 'Terminated').  It is an essential field for filtering the active workforce at any given time.
     lineage:
-      - datalake_employment.employee_details.assignment_status_type
+    - datalake_employment.employee_details.assignment_status_type
   union_name:
-    description: >
-      Name of the union with which the employee is associated. 
-      This information is used to manage collective agreements, contributions, and union-specific benefits.
+    description: |
+      Name of the union with which the employee is associated.  This information is used to manage collective agreements, contributions, and union-specific benefits.
     lineage:
-      - datalake_hr_system_clean.workers.work_relationships.assignments.UnionName
+    - datalake_hr_system_clean.workers.a.UnionName
   dismissal_type:
-    description: >
-      Categorizes the official reason for the employee's dismissal (e.g., 'Resignation', 'Dismissal without Just Cause', 'End of Contract'). 
-      The information is derived from the action_code in the source system.
+    description: |-
+      Categorizes the official reason for the employee's dismissal (e.g., 'Resignation', 'Dismissal without Just Cause', 'End of Contract').  The information is derived from the action_code in the source system.
     lineage:
-      - datalake_employment.employee_details.dismissal_type
+    - datalake_employment.employee_details.dismissal_type
   reason_last_salary_increase:
-    description: >
-      Indicates the official justification for the employee's most recent salary increase. 
-      Common examples include 'Merit', 'Promotion', or 'Collective Bargaining Agreement'.
+    description: |
+      Indicates the official justification for the employee's most recent salary increase.  Common examples include 'Merit', 'Promotion', or 'Collective Bargaining Agreement'.
     lineage:
-      - datalake_hr_system_clean.salaries.action_reason
+    - datalake_hr_system_clean.salaries.action_reason
   ts_load:
-    description: >
-      Timestamp of the record's ingestion into the table. It indicates the exact date and time the row was last loaded or updated, serving for auditing and ETL process monitoring. 
-      This value is altered if the data is reprocessed.
+    description: |-
+      Timestamp of the record's ingestion into the table. It indicates the exact date and time the row was last loaded or updated, serving for auditing and ETL process monitoring.  This value is altered if the data is reprocessed.

@@ -2,7 +2,7 @@
 database_name: datalake_pin_talent_clean
 table_name: review_period_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores translations for review period names in multiple languages.
 columns:
   id_business_group:

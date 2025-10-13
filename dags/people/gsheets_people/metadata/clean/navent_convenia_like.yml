@@ -1,221 +1,220 @@
----
 database_name: datalake_gsheets_people_clean
 table_name: navent_convenia_like
-owner: leonardo.soares@quintoandar.com.br
-domain: people
-description: null
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table description to be added.
 columns:
   assignment_number:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.id_colaborador
   id_navent:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.id_navent
   person_number:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.person_number
   manager_assignment_number:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.id_gestor
   company:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.empresa
   employee_email:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.email
   employee_email_navent:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.email_navent
   employee_name:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.nome
   employee_status:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.status
   employee_position:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.cargo
   employee_position_class:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.classe_cargo
   employee_manager:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.gestor
   employee_nacionality:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.nacionalidade
   employee_dismissal_reason:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.motivo_desligamento
   employee_sex:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.sexo
   employee_cost_center:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.centro_de_custo
   employee_sub_directorate:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.sub_diretoria
   employee_directorate:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.diretoria
   employee_vice_presidency:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.vice_presidencia
   employee_vertical:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.vertical
   employee_product_brand:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.marca_produto_dedicado
   employee_business_navent:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.business_navent
   employee_country:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.pais
   employee_hbrp:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.hrbp
   employee_band:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.banda
   employee_job_code:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.cod_cargo
   employee_birth_city:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.naturalidade_cidade
   employee_dietary_restrictions:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.restricciones_alimentarias
   employee_resident_country:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.residencia_pais
   employee_ethnicity:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.origen_etnico
   employee_gender_identity:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.identidade_genero
   employee_sexual_orientation:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.orientacao_sexual
   employee_disability_type:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.tipo_deficiencia
   employee_neurodiversity:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.neurodiversidade
   employee_marital_status:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.estado_civil
   employee_religion:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.religiosidade
   employee_housing_type:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.tipo_de_vivienda
   employee_potential:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.potencial
   employee_criticality:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.criticidade
   employee_age_range:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.faixa_etaria
   manager_email:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.email_gestor
   email_left:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.email_left
   employee_country_situation:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.situacion_en_el_pais
   tenure:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.tenure
   currency:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.salario_moeda_local
   salary_local_currency:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.salario_moeda_local
   salary:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.salario
   is_leader:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.fl_lider
   is_manager_active:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.status_gestor
   employee_age:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.idade_pessoa
   dt_start:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.dt_inicio
   dt_dismissal:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.dt_desligamento
   dt_birth:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.navent_convenia_like.dt_nascimento
   ts_load:
-    description: ''
+    description: Column description to be added.

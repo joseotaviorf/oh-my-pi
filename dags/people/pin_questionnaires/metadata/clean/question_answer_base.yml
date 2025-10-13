@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_questionnaires_clean
 table_name: question_answer_base
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: This table stores possible answers for a question, theses answers are for a specific question only.
+description: |-
+  This table stores possible answers for a question, theses answers are for a specific question only.
 columns:
   id_business_group:
     description: The business group's unique identifier

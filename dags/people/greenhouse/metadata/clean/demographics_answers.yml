@@ -1,49 +1,49 @@
----
 database_name: datalake_greenhouse_clean
 table_name: demographics_answers
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing answers to demographic questions, sourced from the Greenhouse Harvest API's 'demographics_answers' endpoint.
+description: |-
+  Table containing answers to demographic questions, sourced from the Greenhouse Harvest API's 'demographics_answers' endpoint.
 columns:
   id:
     description: The demographic answer's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.id
+    - datalake_greenhouse_raw.demographics_answers.id
   id_application:
     description: The application's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.application_id
+    - datalake_greenhouse_raw.demographics_answers.application_id
   id_demographic_question:
     description: The demographic question's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.demographic_question_id
+    - datalake_greenhouse_raw.demographics_answers.demographic_question_id
   id_demographic_answer_option:
     description: The demographic answer option's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.demographic_answer_option_id
+    - datalake_greenhouse_raw.demographics_answers.demographic_answer_option_id
   free_form_text:
     description: Free-form text answer, if applicable.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.free_form_text
+    - datalake_greenhouse_raw.demographics_answers.free_form_text
   ts_created:
     description: The timestamp when the answer was created.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.created_at
+    - datalake_greenhouse_raw.demographics_answers.created_at
   ts_updated:
     description: The timestamp when the answer was last updated.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.updated_at
+    - datalake_greenhouse_raw.demographics_answers.updated_at
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.year
+    - datalake_greenhouse_raw.demographics_answers.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.month
+    - datalake_greenhouse_raw.demographics_answers.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.demographics_answers.day
+    - datalake_greenhouse_raw.demographics_answers.day

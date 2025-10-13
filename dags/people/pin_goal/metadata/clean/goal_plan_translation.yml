@@ -1,8 +1,7 @@
----
 database_name: datalake_pin_goal_clean
 table_name: goal_plan_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Translation table of Goal Plan.
 columns:
   id_goal_plan:
@@ -34,7 +33,8 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goal_plans_tl.last_updated_by
   object_version_number:
-    description: used to implement optimistic locking. this number is incremented every time that the row is updated. the number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    description: |-
+      used to implement optimistic locking. this number is incremented every time that the row is updated. the number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
     lineage:
     - datalake_pin_goal_raw.hrg_goal_plans_tl.object_version_number
   ts_created:
@@ -46,18 +46,17 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goal_plans_tl.last_update_date
   ts_load:
-    description: "records the moment the entry was added to the table. this indicates the precise date and time of data ingestion produced using the now() function. this value changes if the data undergoes reprocessing."
-    lineage:
-    - datalake_pin_goal_raw.hrg_goal_plans_tl.ts_load
+    description: |-
+      records the moment the entry was added to the table. this indicates the precise date and time of data ingestion produced using the now() function. this value changes if the data undergoes reprocessing.
   year:
-    description: "represents the year component extracted from the 'ts_updated' column. useful for partitioning and filtering."
+    description: represents the year component extracted from the 'ts_updated' column. useful for partitioning and filtering.
     lineage:
     - datalake_pin_goal_raw.hrg_goal_plans_tl.year
   month:
-    description: "represents the month component extracted from the 'ts_updated' column. useful for partitioning and filtering."
+    description: represents the month component extracted from the 'ts_updated' column. useful for partitioning and filtering.
     lineage:
     - datalake_pin_goal_raw.hrg_goal_plans_tl.month
   day:
-    description: "represents the day component extracted from the 'ts_updated' column. useful for partitioning and filtering."
+    description: represents the day component extracted from the 'ts_updated' column. useful for partitioning and filtering.
     lineage:
     - datalake_pin_goal_raw.hrg_goal_plans_tl.day

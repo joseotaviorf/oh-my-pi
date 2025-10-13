@@ -2,227 +2,228 @@ database_name: datalake_greenhouse
 table_name: job_openings
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: "Represents individual headcount requisitions, corresponding to 'Job Openings' in the Greenhouse ATS. Each record is a specific vacancy for a broader job profile, sourced by exploding the 'openings' array from the `jobs` raw table. *Notes: The 'what_is_the_job_id_in_budget_' field is archived and not longer being used."
+description: |-
+  Represents individual headcount requisitions, corresponding to 'Job Openings' in the Greenhouse ATS. Each record is a specific vacancy for a broader job profile, sourced by exploding the 'openings' array from the `jobs` raw table. *Notes: The 'what_is_the_job_id_in_budget_' field is archived and not longer being used.
 columns:
   id:
-    description: "The unique identifier for the job opening."
+    description: The unique identifier for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.id
+    - datalake_greenhouse_clean.jobs.openings.id
   id_job:
-    description: "The unique identifier for the job associated with this opening."
+    description: The unique identifier for the job associated with this opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.id
+    - datalake_greenhouse_clean.jobs.id
   id_application_hired:
-    description: "The ID of the application that was hired for this opening."
+    description: The ID of the application that was hired for this opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.application_id
+    - datalake_greenhouse_clean.jobs.openings.application_id
   id_ta_responsible:
-    description: "The user ID of the Talent Acquisition person responsible for the opening."
+    description: The user ID of the Talent Acquisition person responsible for the opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.ta_responsible.value.user_id
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.ta_responsible.value.user_id
   id_close_reason:
-    description: "The unique identifier for the reason the opening was closed."
+    description: The unique identifier for the reason the opening was closed.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.close_reason.id
+    - datalake_greenhouse_clean.jobs.openings.close_reason.id
   code:
-    description: "The external identifier for the opening."
+    description: The external identifier for the opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.opening_id
+    - datalake_greenhouse_clean.jobs.openings.opening_id
   internal_position_code:
-    description: "The internal identifier for the position, consolidated from multiple company-specific fields."
+    description: The internal identifier for the position, consolidated from multiple company-specific fields.
     lineage:
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_sp.external_id"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_mg.external_id"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___classifieds.external_id"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___benvi_pt.external_id"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___mlsp.external_id"
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_sp.external_id
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_mg.external_id
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___classifieds.external_id
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___benvi_pt.external_id
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___mlsp.external_id
   internal_position_name:
-    description: "The internal name for the position, consolidated from multiple company-specific fields."
+    description: The internal name for the position, consolidated from multiple company-specific fields.
     lineage:
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_sp.value"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_mg.value"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___classifieds.value"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___benvi_pt.value"
-      - "datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___mlsp.value"
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_sp.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___quinto_andar_mg.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___classifieds.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___benvi_pt.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.internal_position_name___mlsp.value
   status:
-    description: "The current status of the job opening."
+    description: The current status of the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.status
+    - datalake_greenhouse_clean.jobs.openings.status
   close_reason:
-    description: "The name of the reason the opening was closed."
+    description: The name of the reason the opening was closed.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.close_reason.name
+    - datalake_greenhouse_clean.jobs.openings.close_reason.name
   affirmative_focus:
-    description: "Specifies the affirmative action focus for the job opening."
+    description: Specifies the affirmative action focus for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.affirmative_focus.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.affirmative_focus.value
   attention_notes:
-    description: "Any specific attention notes for this opening."
+    description: Any specific attention notes for this opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.attention.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.attention.value
   band:
-    description: "The salary band for the job opening."
+    description: The salary band for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.band.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.band.value
   career_path:
-    description: "The career path associated with the job opening."
+    description: The career path associated with the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.career_path.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.career_path.value
   ta_responsible_name:
-    description: "The name of the Talent Acquisition person responsible."
+    description: The name of the Talent Acquisition person responsible.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.ta_responsible.value.name
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.ta_responsible.value.name
   ta_responsible_email:
-    description: "The email of the Talent Acquisition person responsible."
+    description: The email of the Talent Acquisition person responsible.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.ta_responsible.value.email
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.ta_responsible.value.email
   hiring_manager_email:
-    description: "The email of the hiring manager for the opening."
+    description: The email of the hiring manager for the opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.headcount_hiring_manager_e_mail.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.headcount_hiring_manager_e_mail.value
   cost_center_code:
-    description: "The external identifier for the cost center associated with the opening."
+    description: The external identifier for the cost center associated with the opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.cost_center.external_id
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.cost_center.external_id
   cost_center:
-    description: "The name of the cost center associated with the opening."
+    description: The name of the cost center associated with the opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.cost_center.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.cost_center.value
   company:
-    description: "The company associated with the job opening."
+    description: The company associated with the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.company.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.company.value
   neotribe:
-    description: "The neotribe associated with the opening."
+    description: The neotribe associated with the opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.neotribe.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.neotribe.value
   salary_table:
-    description: "The salary scale or table for the job opening."
+    description: The salary scale or table for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.salary_scale.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.salary_scale.value
   overhead_or_capacity:
-    description: "Specifies if the position's headcount is for overhead or capacity."
+    description: Specifies if the position's headcount is for overhead or capacity.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.overhead_or_capacity.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.overhead_or_capacity.value
   recruitment_strategy:
-    description: "The recruitment strategy for this opening."
+    description: The recruitment strategy for this opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.recruitment_strategy.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.recruitment_strategy.value
   work_hours:
-    description: "The expected work hours for the job opening."
+    description: The expected work hours for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.work_hours.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.work_hours.value
   workplace:
-    description: "The workplace model for the job opening."
+    description: The workplace model for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.workplace.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.workplace.value
   question_can_ai_do_the_job:
-    description: "The answer to the question of whether AI could perform the job's tasks."
+    description: The answer to the question of whether AI could perform the job's tasks.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.can_ai_do_the_job___please_explain_.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.can_ai_do_the_job___please_explain_.value
   request_reason:
-    description: "The reason for the job opening request."
+    description: The reason for the job opening request.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.reason_for_the_position_request.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.reason_for_the_position_request.value
   request_justification:
-    description: "The justification for requesting this job opening."
+    description: The justification for requesting this job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.what_is_the_justification_for_opening_this_position_.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.what_is_the_justification_for_opening_this_position_.value
   replacement_reason:
-    description: "The reason for replacement, if applicable."
+    description: The reason for replacement, if applicable.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.what_is_the_replacement_reason_.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.what_is_the_replacement_reason_.value
   person_replaced_position_name:
-    description: "The name and level of the position being replaced, if applicable."
+    description: The name and level of the position being replaced, if applicable.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.name_of_the_position___level_of_the_position_that_is_being_replaced_opening_1755793581_1519.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.name_of_the_position___level_of_the_position_that_is_being_replaced_opening_1755793581_1519.value
   person_replaced_band:
-    description: "The band of the person being replaced, if applicable."
+    description: The band of the person being replaced, if applicable.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.band_of_the_person_being_replaced_opening_1755793711_165607.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.band_of_the_person_being_replaced_opening_1755793711_165607.value
   person_replaced_email:
-    description: "The email of the person being replaced."
+    description: The email of the person being replaced.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.email_of_the_person_being_replaced_.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.email_of_the_person_being_replaced_.value
   monthly_salary_range_currency:
-    description: "The currency for the monthly salary range."
+    description: The currency for the monthly salary range.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.monthly_salary_range.value.unit
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.monthly_salary_range.value.unit
   plr_currency:
-    description: "The currency for the PLR (Profit Sharing) value."
+    description: The currency for the PLR (Profit Sharing) value.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.plr.value.unit
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.plr.value.unit
   rvv_currency:
-    description: "The currency for the RVV (Variable Sales Commission) value."
+    description: The currency for the RVV (Variable Sales Commission) value.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.rvv.value.unit
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.rvv.value.unit
   sop_currency:
-    description: "The currency for the SOP (Stock Options Plan) value."
+    description: The currency for the SOP (Stock Options Plan) value.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.sop.value.unit
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.sop.value.unit
   equity_options_min:
-    description: "The minimum monetary value/amount for equity options approval exception range."
+    description: The minimum monetary value/amount for equity options approval exception range.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.equity_options_approval_exception_range.value.min_value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.equity_options_approval_exception_range.value.min_value
   equity_options_max:
-    description: "The maximum monetary value/amount for equity options approval exception range."
+    description: The maximum monetary value/amount for equity options approval exception range.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.equity_options_approval_exception_range.value.max_value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.equity_options_approval_exception_range.value.max_value
   monthly_salary_range_min:
-    description: "The minimum monthly salary for the job opening."
+    description: The minimum monthly salary for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.monthly_salary_range.value.min_value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.monthly_salary_range.value.min_value
   monthly_salary_range_max:
-    description: "The maximum monthly salary for the job opening."
+    description: The maximum monthly salary for the job opening.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.monthly_salary_range.value.max_value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.monthly_salary_range.value.max_value
   plr:
-    description: "The PLR (Profit Sharing) monetary value/amount."
+    description: The PLR (Profit Sharing) monetary value/amount.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.plr.value.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.plr.value.value
   plr_salary_multiplier_latam:
-    description: "The salary multiplier for PLR (Profit Sharing). For LATAM positions only."
+    description: The salary multiplier for PLR (Profit Sharing). For LATAM positions only.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.plr_latam.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.plr_latam.value
   rvv:
-    description: "The RVV (Variable Sales Commission) monetary value/amount."
+    description: The RVV (Variable Sales Commission) monetary value/amount.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.rvv.value.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.rvv.value.value
   sop:
-    description: "The SOP (Stock Options Plan) monetary value/amount."
+    description: The SOP (Stock Options Plan) monetary value/amount.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.sop.value.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.sop.value.value
   has_disabilities_pwd_person_replaced:
-    description: "A boolean flag indicating if the person being replaced had disabilities (PWD), if applicable."
+    description: A boolean flag indicating if the person being replaced had disabilities (PWD), if applicable.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.person_with_disabilties_.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.person_with_disabilties_.value
   is_dedicated_to_for_sale_team:
-    description: "A boolean flag indicating if the position is dedicated to the 'For Sale' team."
+    description: A boolean flag indicating if the position is dedicated to the 'For Sale' team.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value
   ts_opened:
-    description: "The timestamp when the job opening was opened."
+    description: The timestamp when the job opening was opened.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.opened_at
+    - datalake_greenhouse_clean.jobs.openings.opened_at
   ts_closed:
-    description: "The timestamp when the job opening was closed."
+    description: The timestamp when the job opening was closed.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.closed_at
+    - datalake_greenhouse_clean.jobs.openings.closed_at
   ts_updated_at_oracle:
-    description: "The timestamp of the last update in Oracle Integration Cloud (OIC)."
+    description: The timestamp of the last update in Oracle Integration Cloud (OIC).
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.updated_at_oic.value
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.updated_at_oic.value
   ts_load:
-    description: "The timestamp when the record was loaded into the clean layer."
+    description: The timestamp when the record was loaded into the clean layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.opened_at
+    - datalake_greenhouse_clean.jobs.openings.opened_at
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.opened_at
+    - datalake_greenhouse_clean.jobs.openings.opened_at
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_clean.jobs.openings.opened_at
+    - datalake_greenhouse_clean.jobs.openings.opened_at

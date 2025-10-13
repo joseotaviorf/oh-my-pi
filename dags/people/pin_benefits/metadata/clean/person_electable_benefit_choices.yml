@@ -1,177 +1,178 @@
----
 database_name: datalake_pin_benefits_clean
 table_name: person_electable_benefit_choices
 owner: isabella.araujo@quintoandar.com.br
-domain: people
-description: This table identifies the benefit plans or options within plans that a person is eligible to elect as a result of a life event. It takes into consideration any existing elections that must remain in force. Additionally, it specifies any available flexible credit values and outlines any automatic enrollments that were assigned due to the life event.
+domain: People
+description: |-
+  This table identifies the benefit plans or options within plans that a person is eligible to elect as a result of a life event. It takes into consideration any existing elections that must remain in force. Additionally, it specifies any available flexible credit values and outlines any automatic enrollments that were assigned due to the life event.
 columns:
   id_eligible_person_electable_choice:
     description: The unique system-generated primary key for each eligible person's electable choice record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.elig_per_elctbl_chc_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.elig_per_elctbl_chc_id
   id_benefit_relation:
     description: A foreign key linking to the `BEN_BENEFIT_RELATIONS_F` table.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.benefit_relation_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.benefit_relation_id
   id_plan:
     description: A foreign key linking to the `BEN_PL_F` table, identifying the benefit plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.pl_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.pl_id
   id_option_in_plan:
     description: A foreign key linking to the `BEN_OIPL_F` table, identifying the specific option within the plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.oipl_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.oipl_id
   id_plan_type:
     description: A foreign key linking to the `BEN_PL_TYP_F` table, identifying the type of plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.pl_typ_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.pl_typ_id
   id_period_in_life_event_reason:
     description: A foreign key linking to the `BEN_PER_IN_LER` table, representing the period within a life event reason relevant to this electable choice.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.per_in_ler_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.per_in_ler_id
   id_year_period:
     description: A foreign key linking to the `BEN_YR_PERD` table, identifying the year period for which this choice is effective.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.yr_perd_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.yr_perd_id
   id_electable_choice_population:
     description: A foreign key linking to the `BEN_PIL_ELCTBL_CHC_POPL_F` table, identifying the population of electable choices.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.pil_elctbl_chc_popl_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.pil_elctbl_chc_popl_id
   id_business_group:
     description: A foreign key referencing the business group associated with this electable choice.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.business_group_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.business_group_id
   id_option:
     description: A foreign key linking to the `BEN_OPT_F` table, identifying the specific option.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.opt_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.opt_id
   id_participant_enrollment_result:
     description: A foreign key linking to the `BEN_PRTT_ENRT_RSLT_F` table, identifying the resulting participant enrollment.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.prtt_enrt_rslt_id
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.prtt_enrt_rslt_id
   enrollment_coverage_start_date_code:
     description: A code indicating how the enrollment coverage start date is determined.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.enrt_cvg_strt_dt_cd
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.enrt_cvg_strt_dt_cd
   compensation_level_code:
     description: A code indicating the compensation level of the participant relevant to their benefit choice.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.comp_lvl_cd
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.comp_lvl_cd
   ineligible_reason_code:
     description: A code specifying the reason why a participant might be ineligible for this choice.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.inelig_rsn_cd
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.inelig_rsn_cd
   admin_category_code:
     description: A code used for administrative categorization and page rendering purposes.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.admin_category_cd
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.admin_category_cd
   self_service_category_code:
     description: A code used for categorizing the choice for display in self-service portals.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.ss_category_cd
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.ss_category_cd
   created_by:
     description: The user account that initially created this record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.created_by
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.created_by
   updated_by:
     description: The user account that last modified this record.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.last_updated_by
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.last_updated_by
   option_in_plan_order_number:
     description: The display order number for the option within the plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.oipl_ordr_num
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.oipl_ordr_num
   object_version_number:
     description: A version number used for optimistic locking, incremented with each update to detect concurrent modifications.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.object_version_number
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.object_version_number
   is_roll_across:
     description: A boolean flag indicating whether credits should roll across (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.roll_crs_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.roll_crs_flag
   is_currently_enrolled:
     description: A boolean flag indicating whether the participant is currently enrolled in this choice (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.crntly_enrd_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.crntly_enrd_flag
   is_default:
     description: A boolean flag indicating whether this choice is a default selection (TRUE) or requires explicit election (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.dflt_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.dflt_flag
   is_electable:
     description: A boolean flag indicating whether this choice is currently electable by the participant (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.elctbl_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.elctbl_flag
   is_mandatory:
     description: A boolean flag indicating whether this choice is mandatory for the participant (TRUE) or optional (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.mndtry_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.mndtry_flag
   is_allows_dependent_designation:
     description: A boolean flag indicating whether this choice allows for dependent designation (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.alws_dpnt_dsgn_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.alws_dpnt_dsgn_flag
   is_auto_enrollment:
     description: A boolean flag indicating whether enrollment in this choice is automatic (TRUE) or requires manual action (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.auto_enrt_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.auto_enrt_flag
   is_certification_required:
     description: A boolean flag indicating whether certification is required for this choice (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.ctfn_rqd_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.ctfn_rqd_flag
   is_in_pending_workflow:
     description: A boolean flag indicating whether this choice is currently part of a pending workflow (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.in_pndg_wkflow_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.in_pndg_wkflow_flag
   is_eligible:
     description: A boolean flag indicating whether the participant is eligible for this choice (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.elig_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.elig_flag
   is_savings_plan:
     description: A boolean flag indicating whether this choice pertains to a savings plan (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.svngs_pln_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.svngs_pln_flag
   is_miscellaneous_plan:
     description: A boolean flag indicating whether this choice pertains to a miscellaneous plan (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.misc_pln_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.misc_pln_flag
   is_interim:
     description: A boolean flag indicating whether this is an interim choice (TRUE) or a final one (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.interim_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.interim_flag
   is_covered:
-    description: A boolean flag indicating whether the choice is currently covered (TRUE) or not (FALSE). This flag is synchronized with enrollment results and indicates if the choice is selected, especially after default processing or elections are made.
+    description: |-
+      A boolean flag indicating whether the choice is currently covered (TRUE) or not (FALSE). This flag is synchronized with enrollment results and indicates if the choice is selected, especially after default processing or elections are made.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.cvrd_flag
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.cvrd_flag
   dt_enrollment_coverage_started:
     description: The effective start date of the enrollment coverage for this choice.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.enrt_cvg_strt_dt
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.enrt_cvg_strt_dt
   dt_processing_ended:
     description: The date when the processing for this electable choice concluded.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.procg_end_dt
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.procg_end_dt
   ts_created:
     description: The timestamp indicating the exact date and time when this record was created in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.creation_date
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.creation_date
   ts_updated:
     description: The timestamp indicating the exact date and time when this record was last updated in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.last_update_date
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.last_update_date
   ts_program_updated:
     description: The timestamp when a batch program or concurrent process last updated this row in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.program_update_date
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.program_update_date
   ts_load:
     description: The timestamp indicating when this record was loaded into the data lake.
   year:
     description: The year extracted from the 'ts_updated' column. This is useful for partitioning the data by year to improve query performance.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.year
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.year
   month:
     description: The month extracted from the 'ts_updated' column (represented as a number from 1 to 12). Useful for data partitioning and filtering by month.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.month
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.month
   day:
     description: The day of the month extracted from the 'ts_updated' column (represented as a number from 1 to 31). Useful for filtering data by specific days.
     lineage:
-      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.day
+    - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.day

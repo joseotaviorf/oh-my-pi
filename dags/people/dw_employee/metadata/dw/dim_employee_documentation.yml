@@ -1,62 +1,61 @@
----
 database_name: dw_employee
 table_name: dim_employee_documentation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: 'Dimension table that stores personal and official identification document numbers for employees, primarily for Brazilian legal and HR purposes.'
+description: |-
+  Dimension table that stores personal and official identification document numbers for employees, primarily for Brazilian legal and HR purposes.
 columns:
   sk_employee:
-    description: "Surrogate key for the employee, used to link to the main employee dimension."
+    description: Surrogate key for the employee, used to link to the main employee dimension.
     lineage:
-      - datalake_hr_system_clean.workers.id_person
+    - datalake_hr_system_clean.workers.id_person
   cpf:
-    description: "The employee's Individual Taxpayer Registry number (Cadastro de Pessoas Físicas - CPF), a key national identifier in Brazil."
+    description: The employee's Individual Taxpayer Registry number (Cadastro de Pessoas Físicas - CPF), a key national identifier in Brazil.
     lineage:
-      - datalake_hr_system_clean.workers.national_identifiers
+    - datalake_hr_system_clean.workers.national_identifiers.NationalIdentifierNumber
   pis:
-    description: "The employee's Social Integration Program number (Programa de Integração Social - PIS), used for employment benefits."
+    description: The employee's Social Integration Program number (Programa de Integração Social - PIS), used for employment benefits.
     lineage:
-      - datalake_hr_system_clean.workers.national_identifiers
+    - datalake_hr_system_clean.workers.national_identifiers.NationalIdentifierNumber
   rg:
-    description: "The employee's national identity card number (Registro Geral - RG)."
+    description: The employee's national identity card number (Registro Geral - RG).
     lineage:
-      - datalake_hr_system_clean.workers.national_identifiers
+    - datalake_hr_system_clean.workers.national_identifiers.NationalIdentifierNumber
   issuing_state_rg:
-    description: "The Brazilian state that issued the employee's RG document."
+    description: The Brazilian state that issued the employee's RG document.
     lineage:
-      - datalake_hr_system_clean.workers.national_identifiers
+    - datalake_hr_system_clean.workers.national_identifiers.nationalIdentifiersDFF.ufDeEmissao
   issuing_authority_rg:
-    description: "The authority that issued the RG document (e.g., SSP - Public Security Secretariat)."
+    description: The authority that issued the RG document (e.g., SSP - Public Security Secretariat).
     lineage:
-      - datalake_hr_system_clean.workers.national_identifiers
+    - datalake_hr_system_clean.workers.national_identifiers.nationalIdentifiersDFF.orgaoDeEmissao
   ctps_number:
-    description: "The employee's work and social security card number (Carteira de Trabalho e Previdência Social - CTPS)."
+    description: The employee's work and social security card number (Carteira de Trabalho e Previdência Social - CTPS).
     lineage:
-      - datalake_hr_system.demographic_attributes.ctps_number
+    - datalake_hr_system.demographic_attributes.ctps_number
   ctps_series:
-    description: "The series number of the employee's CTPS document."
+    description: The series number of the employee's CTPS document.
     lineage:
-      - datalake_hr_system.demographic_attributes.ctps_series
+    - datalake_hr_system.demographic_attributes.ctps_series
   issuing_state_ctps:
-    description: "The Brazilian state that issued the employee's CTPS document."
+    description: The Brazilian state that issued the employee's CTPS document.
     lineage:
-      - datalake_hr_system.demographic_attributes.issuing_state_ctps
+    - datalake_hr_system.demographic_attributes.issuing_state_ctps
   vote_registration_number:
-    description: "The employee's voter registration number (Título de Eleitor)."
+    description: The employee's voter registration number (Título de Eleitor).
     lineage:
-      - datalake_hr_system.demographic_attributes.vote_registration_number
+    - datalake_hr_system.demographic_attributes.vote_registration_number
   electoral_zone:
-    description: "The electoral zone associated with the employee's voter registration."
+    description: The electoral zone associated with the employee's voter registration.
     lineage:
-      - datalake_hr_system.demographic_attributes.electoral_zone
+    - datalake_hr_system.demographic_attributes.electoral_zone
   polling_station:
-    description: "The polling station number associated with the employee's voter registration."
+    description: The polling station number associated with the employee's voter registration.
     lineage:
-      - datalake_hr_system.demographic_attributes.polling_station
+    - datalake_hr_system.demographic_attributes.polling_station
   ts_last_update:
-    description: "Timestamp of the last update of the source document record."
+    description: Timestamp of the last update of the source document record.
     lineage:
-      - datalake_hr_system.demographic_attributes.dt_effective_start
-      - datalake_hr_system_clean.workers.national_identifiers
+    - datalake_hr_system.demographic_attributes.dt_effective_start
   ts_load:
-    description: "Timestamp indicating when the record was loaded into this table."
+    description: Timestamp indicating when the record was loaded into this table.

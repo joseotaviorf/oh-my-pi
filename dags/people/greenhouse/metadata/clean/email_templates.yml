@@ -1,61 +1,61 @@
----
 database_name: datalake_greenhouse_clean
 table_name: email_templates
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing email templates, sourced from the Greenhouse Harvest API's 'email_templates' endpoint.
+description: |-
+  Table containing email templates, sourced from the Greenhouse Harvest API's 'email_templates' endpoint.
 columns:
   id:
     description: The email template's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.email_templates.id
+    - datalake_greenhouse_raw.email_templates.id
   name:
     description: The name of the email template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.name
+    - datalake_greenhouse_raw.email_templates.name
   description:
     description: A description of the email template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.description
+    - datalake_greenhouse_raw.email_templates.description
   type:
     description: The type of the email template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.type
+    - datalake_greenhouse_raw.email_templates.type
   from_address:
     description: The sender's email address for the template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.from
+    - datalake_greenhouse_raw.email_templates.default_from
   body:
     description: The plain text body of the email template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.body
+    - datalake_greenhouse_raw.email_templates.body
   html_body:
     description: The HTML body of the email template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.html_body
+    - datalake_greenhouse_raw.email_templates.html_body
   is_default:
     description: A boolean flag indicating if this is the default template.
     lineage:
-      - datalake_greenhouse_raw.email_templates.default
+    - datalake_greenhouse_raw.email_templates.default
   ts_created:
     description: The timestamp when the template was created.
     lineage:
-      - datalake_greenhouse_raw.email_templates.created_at
+    - datalake_greenhouse_raw.email_templates.created_at
   ts_updated:
     description: The timestamp when the template was last updated.
     lineage:
-      - datalake_greenhouse_raw.email_templates.updated_at
+    - datalake_greenhouse_raw.email_templates.updated_at
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.email_templates.year
+    - datalake_greenhouse_raw.email_templates.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.email_templates.month
+    - datalake_greenhouse_raw.email_templates.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.email_templates.day
+    - datalake_greenhouse_raw.email_templates.day

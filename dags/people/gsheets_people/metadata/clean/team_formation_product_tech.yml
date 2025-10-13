@@ -1,12 +1,11 @@
----
 database_name: datalake_gsheets_people_clean
 table_name: team_formation_product_tech
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Table that contains the team formation of the Product and Tech team
 columns:
   id:
-    description: Generate a unique identifier for each row'
+    description: Generate a unique identifier for each row
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.assignment_number
     - datalake_gsheets_people_raw.team_formation_product_tech.chapter
@@ -24,109 +23,108 @@ columns:
     - datalake_gsheets_people_raw.team_formation_product_tech.line_leader
     - datalake_gsheets_people_raw.team_formation_product_tech.team_leader
   assignment_number:
-    description: 'Assignment number of the employee, from the HR system'
+    description: Assignment number of the employee, from the HR system
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.assignment_number
   employee_name:
-    description: 'Employee name'
+    description: Employee name
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.employees_name
   email:
-    description: 'Employee email'
+    description: Employee email
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.email
   manager:
-    description: 'Manager of the employee'
+    description: Manager of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.manager
   department:
-    description: 'Department of the employee'
+    description: Department of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.department
   cost_center:
-    description: 'Cost center of the employee'
+    description: Cost center of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.cost_center
   subdirectorate:
-    description: 'Subdirectorate of the employee'
+    description: Subdirectorate of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.subdirectorate
   line:
-    description: 'Line of the employee'
+    description: Line of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.line
   chapter:
-    description: 'Chapter of the employee'
+    description: Chapter of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.chapter
   team_1:
-    description: 'First team of the employee'
+    description: First team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_1_primary
   team_2:
-    description: 'Second team of the employee'
+    description: Second team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_2
   team_3:
-    description: 'Third team of the employee'
+    description: Third team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_3
   team_4:
-    description: 'Fourth team of the employee'
+    description: Fourth team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_4
   team_5:
-    description: 'Fifth team of the employee'
+    description: Fifth team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_5
   team_6:
-    description: 'Sixth team of the employee'
+    description: Sixth team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_6
   team_7:
-    description: 'Seventh team of the employee'
+    description: Seventh team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_7
   team_8:
-    description: 'Eighth team of the employee'
+    description: Eighth team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_8
   team_9:
-    description: 'Ninth team of the employee'
+    description: Ninth team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_9
   team_10:
-    description: 'Tenth team of the employee'
+    description: Tenth team of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_10
   line_leader:
-    description: 'What line the employee is a leader'
+    description: What line the employee is a leader
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.line_leader
   team_leader:
-    description: 'What team the employee is a leader'
+    description: What team the employee is a leader
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.team_leader
   career_track:
-    description: 'Career track of the employee'
+    description: Career track of the employee
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.fl_lider
   is_line_leader:
-    description: 'Flag that indicates if the employee is a line leader'
+    description: Flag that indicates if the employee is a line leader
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech. is_line_leader
   is_team_leader:
-    description: 'Flag that indicates if the employee is a team leader'
+    description: Flag that indicates if the employee is a team leader
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech. is_team_leader
   direct_headcount:
-    description: 'Number of direct headcount'
+    description: Number of direct headcount
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.direct_headcount
   dt_admission:
-    description: 'Date of admission'
+    description: Date of admission
     lineage:
     - datalake_gsheets_people_raw.team_formation_product_tech.admission
   ts_load:
-    description: 'Timestamp of load'
-
+    description: Timestamp of load

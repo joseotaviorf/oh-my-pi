@@ -1,49 +1,45 @@
----
 database_name: datalake_degreed_clean
 table_name: pathways
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  This table contains all learning pathways created within the organization.
-  Pathways are curated collections of content (like courses, articles, and videos)
-  designed to guide learners through a specific topic or skill.
-
+description: |-
+  This table contains all learning pathways created within the organization. Pathways are curated collections of content (like courses, articles, and videos) designed to guide learners through a specific topic or skill.
 columns:
   id:
-    description: 'Unique identifier for the pathway.'
+    description: Unique identifier for the pathway.
     lineage:
-      - datalake_degreed_raw.pathways.id
+    - datalake_degreed_raw.pathways.id
   id_user_created_by:
-    description: 'The unique identifier for the user who created or owns the pathway.'
+    description: The unique identifier for the user who created or owns the pathway.
     lineage:
-      - datalake_degreed_raw.pathways.relationships[0].created_by.data.id
+    - datalake_degreed_raw.pathways.relationships[0].created_by.data.id
   title:
-    description: 'The title of the pathway.'
+    description: The title of the pathway.
     lineage:
-      - datalake_degreed_raw.pathways.attributes.title
+    - datalake_degreed_raw.pathways.attributes.title
   summary:
-    description: 'A brief summary or description of the pathways objectives.'
+    description: A brief summary or description of the pathways objectives.
     lineage:
-      - datalake_degreed_raw.pathways.attributes.summary
+    - datalake_degreed_raw.pathways.attributes.summary
   visibility:
-    description: 'The privacy setting for the pathway (e.g., "Public", "Private").'
+    description: The privacy setting for the pathway (e.g., "Public", "Private").
     lineage:
-      - datalake_degreed_raw.pathways.attributes.visibility
+    - datalake_degreed_raw.pathways.attributes.visibility
   url_degreed:
-    description: 'The URL to access the pathway directly within the Degreed platform.'
+    description: The URL to access the pathway directly within the Degreed platform.
     lineage:
-      - datalake_degreed_raw.pathways.attributes.degreed_url
+    - datalake_degreed_raw.pathways.attributes.degreed_url
   is_endorsed:
-    description: 'A boolean flag indicating if the pathway is officially endorsed by the organization.'
+    description: A boolean flag indicating if the pathway is officially endorsed by the organization.
     lineage:
-      - datalake_degreed_raw.pathways.attributes.is_endorsed
+    - datalake_degreed_raw.pathways.attributes.is_endorsed
   ts_created:
-    description: 'Timestamp indicating when the pathway was created in Degreed.'
+    description: Timestamp indicating when the pathway was created in Degreed.
     lineage:
-      - datalake_degreed_raw.pathways.attributes.created_at
+    - datalake_degreed_raw.pathways.attributes.created_at
   ts_modified:
-    description: 'Timestamp indicating the last time the pathway was modified.'
+    description: Timestamp indicating the last time the pathway was modified.
     lineage:
-      - datalake_degreed_raw.pathways.attributes.modified_at
+    - datalake_degreed_raw.pathways.attributes.modified_at
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean table.'
+    description: Timestamp indicating when the record was loaded into the clean table.

@@ -1,43 +1,44 @@
----
 database_name: datalake_workable_redshift_clean
 table_name: members
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Table with members from QuintoAndar's in Workable.
 columns:
   id:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.id
   id_api:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.api_id
   role:
-    description: ''
+    description: Column description to be added.
     lineage:
-    - datalake_workable_redshift_raw.members."role"
+    - datalake_workable_redshift_raw.members.role
   email:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.email
   name:
-    description: ''
+    description: Column description to be added.
     lineage:
-    - datalake_workable_redshift_raw.members."name"
+    - datalake_workable_redshift_raw.members.name
   headline:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.headline
   is_active:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.active
   ts_member_created:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.member_created_at
   ts_updated:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.members.updated_at
+  ts_load:
+    description: Column description to be added.

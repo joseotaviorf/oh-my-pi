@@ -1,69 +1,69 @@
----
 database_name: datalake_pin_core_clean
 table_name: valid_grades
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Stores the valid grades that can be associated with jobs or positions, defining the career progression structure. Sourced from Oracle HCM's PER_VALID_GRADES_F table."
+description: |-
+  Stores the valid grades that can be associated with jobs or positions, defining the career progression structure. Sourced from Oracle HCM's PER_VALID_GRADES_F table.
 columns:
   id_valid_grade:
-    description: "Unique identifier for the valid grade record."
+    description: Unique identifier for the valid grade record.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.valid_grade_id
+    - datalake_pin_core_raw.per_valid_grades_f.valid_grade_id
   id_business_group:
-    description: "Identifier for the business group to which this valid grade belongs."
+    description: Identifier for the business group to which this valid grade belongs.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.business_group_id
+    - datalake_pin_core_raw.per_valid_grades_f.business_group_id
   id_grade:
-    description: "Identifier for the grade being associated."
+    description: Identifier for the grade being associated.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.grade_id
+    - datalake_pin_core_raw.per_valid_grades_f.grade_id
   id_job:
-    description: "Identifier for the job to which the grade is valid. Can be null if the grade is valid for a position."
+    description: Identifier for the job to which the grade is valid. Can be null if the grade is valid for a position.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.job_id
+    - datalake_pin_core_raw.per_valid_grades_f.job_id
   id_action_occurrence:
-    description: "Identifier for the specific action or event that triggered this record's creation or update."
+    description: Identifier for the specific action or event that triggered this record's creation or update.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.action_occurrence_id
+    - datalake_pin_core_raw.per_valid_grades_f.action_occurrence_id
   created_by:
-    description: "User who originally created the record."
+    description: User who originally created the record.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.created_by
+    - datalake_pin_core_raw.per_valid_grades_f.created_by
   updated_by:
-    description: "User who last modified the record."
+    description: User who last modified the record.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.last_updated_by
+    - datalake_pin_core_raw.per_valid_grades_f.last_updated_by
   object_version_number:
-    description: "Version number of the record, used for concurrency control."
+    description: Version number of the record, used for concurrency control.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.object_version_number
+    - datalake_pin_core_raw.per_valid_grades_f.object_version_number
   dt_effective_started:
-    description: "The date from which this grade association becomes effective."
+    description: The date from which this grade association becomes effective.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.effective_start_date
+    - datalake_pin_core_raw.per_valid_grades_f.effective_start_date
   dt_effective_ended:
-    description: "The date until which this grade association is effective."
+    description: The date until which this grade association is effective.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.effective_end_date
+    - datalake_pin_core_raw.per_valid_grades_f.effective_end_date
   ts_created:
-    description: "Timestamp indicating when the record was created."
+    description: Timestamp indicating when the record was created.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.creation_date
+    - datalake_pin_core_raw.per_valid_grades_f.creation_date
   ts_updated:
-    description: "Timestamp indicating when the record was last updated."
+    description: Timestamp indicating when the record was last updated.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.last_update_date
+    - datalake_pin_core_raw.per_valid_grades_f.last_update_date
   ts_load:
-    description: "Timestamp indicating when the record was loaded into the data lake. This value is generated during the load process."
+    description: Timestamp indicating when the record was loaded into the data lake. This value is generated during the load process.
   year:
-    description: "Year partition column, representing the year the data was loaded."
+    description: Year partition column, representing the year the data was loaded.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.year
+    - datalake_pin_core_raw.per_valid_grades_f.year
   month:
-    description: "Month partition column, representing the month the data was loaded."
+    description: Month partition column, representing the month the data was loaded.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.month
+    - datalake_pin_core_raw.per_valid_grades_f.month
   day:
-    description: "Day partition column, representing the day the data was loaded."
+    description: Day partition column, representing the day the data was loaded.
     lineage:
-      - datalake_pin_core_raw.per_valid_grades_f.day
+    - datalake_pin_core_raw.per_valid_grades_f.day

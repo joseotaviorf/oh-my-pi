@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_performance_clean
 table_name: section_definition_translation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Stores translated names and descriptions for various sections, likely related to Human Resources configurations.
+description: |-
+  Stores translated names and descriptions for various sections, likely related to Human Resources configurations.
 columns:
   id_section_definition:
     description: Unique identifier for the section definition being translated. Part of this table's composite primary key.

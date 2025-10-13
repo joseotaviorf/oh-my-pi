@@ -2,17 +2,18 @@ database_name: datalake_gsheets_people_clean
 table_name: codex_cost_informations
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: 'Table containing information about the type of P&L cost, further used to infer the type of headcount allocated in the cost center.'
+description: |-
+  Table containing information about the type of P&L cost, further used to infer the type of headcount allocated in the cost center.
 columns:
   id_cost_center:
-    description: 'Current unique identifier of the cost center.'
+    description: Current unique identifier of the cost center.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.cc_code
   cost_center_detail:
-    description: 'Type of P&L cost, further used to infer the type of headcount allocated in the cost center, being either Capacity or Overhead.'
+    description: Type of P&L cost, further used to infer the type of headcount allocated in the cost center, being either Capacity or Overhead.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.pl_line_type
   ts_load:
-    description: 'Timestamp of when the record was loaded.'
+    description: Timestamp of when the record was loaded.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.ts_load

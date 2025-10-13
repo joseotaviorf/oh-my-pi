@@ -1,113 +1,113 @@
----
 database_name: datalake_pin_core_clean
-table_name: per_assignment_extra_info
+table_name: assignment_extra_info
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  Stores additional information related to employee assignments, 
-  which can include details about vacation balances, leaves, and 
-  other custom attributes. 
-
+description: |-
+  Stores additional information related to employee assignments,  which can include details about vacation balances, leaves, and  other custom attributes.
 columns:
   id_assignment_extra_info:
-    description: "Primary key. Uniquely identifies a record of extra information related to an assignment."
+    description: Primary key. Uniquely identifies a record of extra information related to an assignment.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.assignment_extra_info_id
+    - datalake_pin_core_raw.per_assignment_extra_info_m.assignment_extra_info_id
   id_assignment:
-    description: "Foreign key to the assignment table, linking to the employee's assignment record."
+    description: Foreign key to the assignment table, linking to the employee's assignment record.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.assignment_id
+    - datalake_pin_core_raw.per_assignment_extra_info_m.assignment_id
   id_business_group:
-    description: "Identifier of the Enterprise or Business Group, used for multi-tenancy partitioning."
+    description: Identifier of the Enterprise or Business Group, used for multi-tenancy partitioning.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.business_group_id
+    - datalake_pin_core_raw.per_assignment_extra_info_m.business_group_id
   information_type:
-    description: "Specifies the type of extra information stored. The meaning of other 'attribute' and 'information' fields depends on this type."
+    description: Specifies the type of extra information stored. The meaning of other 'attribute' and 'information' fields depends on this type.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.information_type
+    - datalake_pin_core_raw.per_assignment_extra_info_m.information_type
     categories:
-      "Saldo de Férias": "Records details related to employee vacation balances, including acquisition periods and days acquired."
-      "Afastamento": "Captures information about various types of employee leaves and absences from work."
-      "Estabilidade": "Contains data concerning an employee's employment stability based on specific conditions or legal entitlements."
+      Saldo de Férias: Records details related to employee vacation balances, including acquisition periods and days acquired.
+      Afastamento: Captures information about various types of employee leaves and absences from work.
+      Estabilidade: Contains data concerning an employee's employment stability based on specific conditions or legal entitlements.
   type_or_status:
-    description: | 
+    description: |-
       Generic attribute field (AEI_ATTRIBUTE1). Its meaning depends on the 'information_type'.
       - For 'Saldo de Férias': Indicates the status of the acquisition period (e.g., 'Fechado', 'Aberto', 'Em andamento').
       - For 'Afastamento': Specifies the type of leave/absence (e.g., 'Licença Óbito', 'Licença Gala/Casamento', 'Licença Parental - Responsável 1', 'Licença Parental - Responsável 2', 'Atestado Médico (Possivel acidente de trabalho)', 'Férias', 'Justiça Eleitoral', 'Alistamento Militar', 'Consulta Médica/Declaração de Horas', 'Recesso de Estagiário', 'Atestado Médico', 'Declaração/Atestado de Acompanhamento de Filhos/Dependentes', 'Afastamento Temporário por Doença', 'Licença Sem Vencimentos', 'Afastamento Temporário por Acidente de Trabalho').
       - For 'Estabilidade': Describes the type of stability or specific condition (e.g., 'FERIAS' (indicates stability related to vacation), 'Auxilio Doença', 'Física', 'ACIDENTE DE TRABALHO', 'Múltiplo', 'Pré-Aposentadoria', 'Acidente de Trajeto', 'GESTANTE', 'Auditiva', 'Intelectual', 'Mental', 'AUXILIO DOENCA', 'Visual').
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.aei_attribute1
+    - datalake_pin_core_raw.per_assignment_extra_info_m.aei_attribute1
   period:
-    description: "Represents a period related to the 'information_type'. For 'Saldo de Férias', this is typically the textual range of the acquisition period (e.g., 'DD/MM/YYYY_DD/MM/YYYY'). For 'Afastamento' or 'Estabilidade', it might be null, empty, or hold supplementary text not directly a date range, as the specific start/end dates are usually found in dt_period_started and dt_period_ended."
+    description: |-
+      Represents a period related to the 'information_type'. For 'Saldo de Férias', this is typically the textual range of the acquisition period (e.g., 'DD/MM/YYYY_DD/MM/YYYY'). For 'Afastamento' or 'Estabilidade', it might be null, empty, or hold supplementary text not directly a date range, as the specific start/end dates are usually found in dt_period_started and dt_period_ended.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.aei_attribute2
+    - datalake_pin_core_raw.per_assignment_extra_info_m.aei_attribute2
   created_by:
-    description: "User who created this specific extra information record."
+    description: User who created this specific extra information record.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.created_by
+    - datalake_pin_core_raw.per_assignment_extra_info_m.created_by
   updated_by:
-    description: "User who last updated this specific extra information record."
+    description: User who last updated this specific extra information record.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.last_updated_by
+    - datalake_pin_core_raw.per_assignment_extra_info_m.last_updated_by
   information_category:
-    description: "Category of the extra information, often mirroring the 'information_type'."
+    description: Category of the extra information, often mirroring the 'information_type'.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_category
+    - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_category
     categories:
-      "Saldo de Férias": "Records details related to employee vacation balances, including acquisition periods and days acquired."
-      "Afastamento": "Captures information about various types of employee leaves and absences from work."
-      "Estabilidade": "Contains data concerning an employee's employment stability based on specific conditions or legal entitlements."
+      Saldo de Férias: Records details related to employee vacation balances, including acquisition periods and days acquired.
+      Afastamento: Captures information about various types of employee leaves and absences from work.
+      Estabilidade: Contains data concerning an employee's employment stability based on specific conditions or legal entitlements.
   days_vacation_acquired:
-    description: "Represents the initial number of vacation days acquired for the period, cast to NUMERIC(5,2). This column is populated primarily when 'information_type' is 'Saldo de Férias' and can include decimal values. It serves as the base for calculating the numeric vacation balance. It is typically NULL for other 'information_type' values."
+    description: |-
+      Represents the initial number of vacation days acquired for the period, cast to NUMERIC(5,2). This column is populated primarily when 'information_type' is 'Saldo de Férias' and can include decimal values. It serves as the base for calculating the numeric vacation balance. It is typically NULL for other 'information_type' values.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_number1
+    - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_number1
   effective_sequence:
-    description: "Sequence number for effective-dated records, cast to integer."
+    description: Sequence number for effective-dated records, cast to integer.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.effective_sequence
+    - datalake_pin_core_raw.per_assignment_extra_info_m.effective_sequence
   object_version_number:
-    description: "Version number of the record, incremented on updates, cast to integer. Used for optimistic locking."
+    description: Version number of the record, incremented on updates, cast to integer. Used for optimistic locking.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.object_version_number
+    - datalake_pin_core_raw.per_assignment_extra_info_m.object_version_number
   is_effective_latest_change:
-    description: "Boolean indicator if this is the most recent effective change for the record."
+    description: Boolean indicator if this is the most recent effective change for the record.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.effective_latest_change
+    - datalake_pin_core_raw.per_assignment_extra_info_m.effective_latest_change
   dt_effective_started:
-    description: "Start date of the record's effective period, converted to a date."
+    description: Start date of the record's effective period, converted to a date.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.effective_start_date
+    - datalake_pin_core_raw.per_assignment_extra_info_m.effective_start_date
   dt_effective_ended:
-    description: "End date of the record's effective period, converted to a date."
+    description: End date of the record's effective period, converted to a date.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.effective_end_date
+    - datalake_pin_core_raw.per_assignment_extra_info_m.effective_end_date
   dt_period_started:
-    description: "Generic date information field (AEI_INFORMATION_DATE1), converted to a date. Its meaning depends on the 'information_type'. For 'Saldo de Férias', it's the acquisition period start date. For 'Afastamento', it's the leave start date. For 'Estabilidade', it might be the start date of the stability period."
+    description: |-
+      Generic date information field (AEI_INFORMATION_DATE1), converted to a date. Its meaning depends on the 'information_type'. For 'Saldo de Férias', it's the acquisition period start date. For 'Afastamento', it's the leave start date. For 'Estabilidade', it might be the start date of the stability period.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_date1
+    - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_date1
   dt_period_ended:
-    description: "Generic date information field (AEI_INFORMATION_DATE2), converted to a date. Its meaning depends on the 'information_type'. For 'Saldo de Férias', it's the acquisition period end date. For 'Afastamento', it's the leave end date. For 'Estabilidade', it might be the end date of the stability period."
+    description: |-
+      Generic date information field (AEI_INFORMATION_DATE2), converted to a date. Its meaning depends on the 'information_type'. For 'Saldo de Férias', it's the acquisition period end date. For 'Afastamento', it's the leave end date. For 'Estabilidade', it might be the end date of the stability period.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_date2
+    - datalake_pin_core_raw.per_assignment_extra_info_m.aei_information_date2
   ts_created:
-    description: "Timestamp when the record was created in the raw table."
+    description: Timestamp when the record was created in the raw table.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.creation_date
+    - datalake_pin_core_raw.per_assignment_extra_info_m.creation_date
   ts_updated:
-    description: "Timestamp when the record was last updated in the raw table."
+    description: Timestamp when the record was last updated in the raw table.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.last_update_date
+    - datalake_pin_core_raw.per_assignment_extra_info_m.last_update_date
   ts_load:
-    description: "Timestamp of when the record was loaded into this clean table."
+    description: Timestamp of when the record was loaded into this clean table.
   year:
     description: Year extracted from the 'ts_updated' column.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.year
+    - datalake_pin_core_raw.per_assignment_extra_info_m.year
   month:
     description: Month extracted from the 'ts_updated' column.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.month
+    - datalake_pin_core_raw.per_assignment_extra_info_m.month
   day:
     description: Day extracted from the 'ts_updated' column.
     lineage:
-      - datalake_pin_core_raw.per_assignment_extra_info_m.day
+    - datalake_pin_core_raw.per_assignment_extra_info_m.day

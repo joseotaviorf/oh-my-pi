@@ -1,188 +1,157 @@
 database_name: datalake_greenhouse_clean
 table_name: candidates
-owner: gabriel.berger@quintoandar.com.br
+owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >-
-  Table with candidate data, sourced from the Greenhouse Harvest API's 'candidates' endpoint.
-  The following fields are not used as they are characteristics of the application, not the candidate, and should be consulted in the 'applications' table: applications, attachments, coordinator, custom_fields, and recruiter.
-  Additionally, 'photo_url' is not included as it is a null field, 'is_this_an_intern_permanent_hire_or_an_internal_recruitment_' is an archived custom field, and the 'nome_completo' custom field is not used for the full name as it contains significantly more nulls than concatenating the first and last name fields.
+description: |-
+  Table containing candidate application data, sourced from the Greenhouse Harvest API's 'applications' endpoint.
 columns:
   id:
-    description: The candidate's unique identifier.
+    description: The application's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.candidates.id
-  id_linked_user:
-    description: The unique identifier of the first user linked to the candidate.
+    - datalake_greenhouse_raw.candidates.id
+  id_recruiter:
+    description: The recruiter's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.candidates.linked_user_ids
+    - datalake_greenhouse_raw.candidates.recruiter.id
+  id_coordinator:
+    description: The coordinator's unique identifier.
+    lineage:
+    - datalake_greenhouse_raw.candidates.coordinator.id
+  id_employee:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.custom_fields.employee_id
+  document_number:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.custom_fields.national_id
+  personal_number:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.custom_fields.personal_number
   first_name:
-    description: The candidate's first name.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.first_name
+    - datalake_greenhouse_raw.candidates.first_name
   last_name:
-    description: The candidate's last name.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.last_name
-  full_name:
-    description: The candidate's full name, concatenated from first and last name.
+    - datalake_greenhouse_raw.candidates.last_name
+  company:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.first_name
-      - datalake_greenhouse_raw.candidates.last_name
-  national_document_number:
-    description: The candidate's national identification document number (mainly the CPF - Cadastro de Pessoa Física).
+    - datalake_greenhouse_raw.candidates.company
+  job_title:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.national_id
-  nationality:
-    description: The candidate's nationality.
+    - datalake_greenhouse_raw.candidates.title
+  recruiter_name:
+    description: The full name of the recruiter associated with the application.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.nationality
-  current_company:
-    description: The candidate's current company.
+    - datalake_greenhouse_raw.candidates.recruiter.name
+  coordinator_name:
+    description: The full name of the coordinator associated with the application.
     lineage:
-      - datalake_greenhouse_raw.candidates.company
+    - datalake_greenhouse_raw.candidates.coordinator.name
+  current_band:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.custom_fields.current_band
   current_job_title:
-    description: The candidate's current job title.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.title
-  hired_person_number:
-    description: The hired candidate's personal number.
+    - datalake_greenhouse_raw.candidates.custom_fields.current_job_title
+  full_name:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.personal_number
-  hired_nif_tax_document_number:
-    description: The hired candidate's tax document number (NIF).
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.nif
-  hired_passport_number:
-    description: The hired candidate's passport number (specific to offers in Portugal).
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.portugal_offer_passaporte
-  hired_accessibility_need:
-    description: Answer to accessibility question 1, coalesced from different custom fields. 'Now that you're getting closer to starting at QuintoAndar, we want to make sure you have everything you need to work with comfort and autonomy. Do you currently use any accessibility resources in your daily work?'
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.pc_d_offer_acessibilidade_1__esp_
-  hired_accessibility_hybrid_office_needs:
-    description: Answer to accessibility question 2, coalesced from different custom fields. 'If the job is hybrid/in-office:'
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.pc_d_offer_acessibilidade_2__esp_
-  hired_accessibility_funding_preference:
-    description: Answer to accessibility question 3, coalesced from different custom fields. 'How do you prefer the necessary resources for your work to be funded? Please note 1)Equipment and resources acquired by the company for work use remain with the company. 2) Equipment and resources acquired with the "work from home" benefit remain with the employee. 3) Personal use equipment (such as wheelchairs, hearing aids, lenses, and glasses, etc.) are not provided by the company.'
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.pc_d_offer_acessibilidade_3__esp_
-  pin_internal_person_number:
-    description: The internal candidate's personal number (PIN).
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.employee_id
-  pin_internal_job_title:
-    description: The internal candidate's job title.
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_job_title
-  pin_internal_band:
-    description: The internal candidate's salary band/level.
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_band
+    - datalake_greenhouse_raw.candidates.custom_fields.nome_completo
   is_private:
-    description: A boolean flag indicating if the candidate's profile is private.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.is_private
-  has_valid_email:
-    description: A boolean flag indicating if the candidate can be contacted by email.
+    - datalake_greenhouse_raw.candidates.is_private
+  has_email_permission:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.can_email
+    - datalake_greenhouse_raw.candidates.can_email
   is_previous_employee:
-    description: A boolean flag indicating if the candidate is a former employee.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.previous_employee
-  has_work_authorization_hired:
-    description: A boolean flag indicating if the hired candidate has work authorization to work in the destination country.
+    - datalake_greenhouse_raw.candidates.custom_fields.previous_employee
+  has_rvv:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.work_authorization
-  has_rvv_pin_internal:
-    description: A boolean flag indicating if the internal candidate has an RVV.
+    - datalake_greenhouse_raw.candidates.custom_fields.has_rvv
+  current_salary:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.has_rvv
-  pin_internal_tenure:
-    description: The internal candidate's tenure in months.
+    - datalake_greenhouse_raw.candidates.custom_fields.current_salary
+  dt_birthday:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_tenure
-  pin_internal_months_since_last_move:
-    description: The number of months since the internal candidate's last movement.
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.time_since_last_movement
-  salary_pin_internal:
-    description: The internal candidate's current salary.
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.current_salary
-  dt_birthday_hired:
-    description: The hired candidate's date of birth.
-    lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields.birth_date_candidate_1752263668_438955
+    - datalake_greenhouse_raw.candidates.custom_fields.birth_date
   ts_created:
-    description: The timestamp when the candidate's profile was created.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.created_at
+    - datalake_greenhouse_raw.candidates.created_at
   ts_updated:
-    description: The timestamp of the last update to the candidate's profile.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.updated_at
+    - datalake_greenhouse_raw.candidates.updated_at
   ts_last_activity:
-    description: The timestamp of the last activity on the candidate's profile.
+    description: The timestamp of the last activity on the application.
     lineage:
-      - datalake_greenhouse_raw.candidates.last_activity
+    - datalake_greenhouse_raw.candidates.last_activity
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   tags:
-    description: An array of tags associated with the candidate.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.tags
+    - datalake_greenhouse_raw.candidates.tags
   application_ids:
-    description: An array of application IDs associated with the candidate.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.application_ids
-  linked_user_ids:
-    description: An array of user IDs linked to the candidate.
-    lineage:
-      - datalake_greenhouse_raw.candidates.linked_user_ids
-  email_addresses:
-    description: An array of all the candidate's email addresses.
-    lineage:
-      - datalake_greenhouse_raw.candidates.email_addresses
+    - datalake_greenhouse_raw.candidates.application_ids
   phone_numbers:
-    description: An array of all the candidate's phone numbers.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.phone_numbers
-  social_media_addresses:
-    description: An array of all the candidate's social media addresses.
-    lineage:
-      - datalake_greenhouse_raw.candidates.social_media_addresses
-  website_addresses:
-    description: An array of all the candidate's website addresses.
-    lineage:
-      - datalake_greenhouse_raw.candidates.website_addresses
-  educations:
-    description: An array of the candidate's educational history.
-    lineage:
-      - datalake_greenhouse_raw.candidates.educations
-  employments:
-    description: An array of the candidate's employment history.
-    lineage:
-      - datalake_greenhouse_raw.candidates.employments
+    - datalake_greenhouse_raw.candidates.phone_numbers
   addresses:
-    description: An array of all the candidate's home addresses.
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.addresses
-  keyed_custom_fields:
-    description: An object containing all of the candidate's custom fields.
+    - datalake_greenhouse_raw.candidates.addresses
+  email_addresses:
+    description: Column description to be added.
     lineage:
-      - datalake_greenhouse_raw.candidates.keyed_custom_fields
+    - datalake_greenhouse_raw.candidates.email_addresses
+  website_addresses:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.website_addresses
+  social_media_addresses:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.social_media_addresses
+  attachments:
+    description: An array of attachments associated with the application.
+    lineage:
+    - datalake_greenhouse_raw.candidates.attachments
+  educations:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.educations
+  employments:
+    description: Column description to be added.
+    lineage:
+    - datalake_greenhouse_raw.candidates.employments
   year:
     description: The year the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.candidates.year
+    - datalake_greenhouse_raw.candidates.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.candidates.month
+    - datalake_greenhouse_raw.candidates.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning.
     lineage:
-      - datalake_greenhouse_raw.candidates.day
+    - datalake_greenhouse_raw.candidates.day

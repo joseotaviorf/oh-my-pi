@@ -6,7 +6,8 @@ domain: People
 description: Stores disability information for individuals.
 columns:
   id_business_group:
-    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    description: Identifier for the business unit, used for multi-tenant data separation.
+      Foreign key.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.business_group_id
   id_person:
@@ -14,11 +15,13 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.person_id
   id_disability:
-    description: System-generated unique identifier for the disability record. Primary key.
+    description: System-generated unique identifier for the disability record. Primary
+      key.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.disability_id
   disability_code:
-    description: User-defined code to identify a disability record, unique in combination with the effective start date.
+    description: User-defined code to identify a disability record, unique in combination
+      with the effective start date.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.disability_code
   category:
@@ -46,7 +49,8 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.legislation_code
   object_version_number:
-    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    description: Counter for optimistic locking, incremented on each update to detect
+      concurrent modifications.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.object_version_number
   dt_effective_ended:
@@ -66,18 +70,20 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_core_raw.per_disabilities_f.ts_load
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.day

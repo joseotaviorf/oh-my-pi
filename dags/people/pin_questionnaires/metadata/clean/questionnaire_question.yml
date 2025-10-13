@@ -8,62 +8,65 @@ columns:
   id_business_group:
     description: The business group's unique identifier
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.business_group_id
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.business_group_id
   id_questionnaire_question:
     description: Questionnaire Question's unique identifier
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.qstnr_question_id
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.qstnr_question_id
   id_questionnaire_section:
     description: Questionnaire Section's unique identifier
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.qstnr_section_id
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.qstnr_section_id
   id_question:
     description: Question's unique identifier
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.question_id
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.question_id
   id_response_type:
     description: Response Type's unique identifier
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.response_type_id
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.response_type_id
   created_by:
     description: The person who created the question
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.created_by
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.created_by
   updated_by:
     description: The person or process that last updated this record
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.last_updated_by
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.last_updated_by
   object_version_number:
     description: Version number of the object
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.object_version_number
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.object_version_number
   question_version_num:
     description: Version number of the Question
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.qstn_version_num
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.qstn_version_num
   sequence_number:
     description: Sequence number of the Question, for ordering purposes
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.seq_num
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.seq_num
   ts_created:
     description: Date of creation of the row
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.creation_date
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.creation_date
   ts_updated:
     description: Last update date of the row
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.last_update_date
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.last_update_date
   ts_load:
     description: the timestamp when the record was loaded into the clean layer
   year:
-    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    description: The year the data was loaded into the raw layer, used for partitioning.
+      Derived from the 'updated_at' column in the raw layer.
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.year
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.year
   month:
-    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    description: The month the data was loaded into the raw layer, used for partitioning.
+      Derived from the 'updated_at' column in the raw layer.
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.month
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.month
   day:
-    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
+    description: The day the data was loaded into the raw layer, used for partitioning.
+      Derived from the 'updated_at' column in the raw layer.
     lineage:
-    - datalake_pin_questionnaires_raw.hrq_qstnr_questions.day
+      - datalake_pin_questionnaires_raw.hrq_qstnr_questions.day

@@ -6,7 +6,8 @@ domain: People
 description: A list of participants who have responded to a questionnaire.
 columns:
   id_business_group:
-    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+      Foreign key to HR_ORGANIZATION_UNITS.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.business_group_id
   id_participant:
@@ -14,7 +15,8 @@ columns:
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.participant_id
   id_questionnaire_participant:
-    description: Unique identifier for a questionnaire participant. System-generated primary key.
+    description: Unique identifier for a questionnaire participant. System-generated
+      primary key.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_participants.qstnr_participant_id
   id_questionnaire:

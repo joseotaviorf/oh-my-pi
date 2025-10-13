@@ -1,57 +1,57 @@
----
-database_name: datalake_greenhouse_clean
+database_name: datalake_greenhouse_v3_clean
 table_name: application_stages
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: "Table containing the stages an application has gone through, sourced from the Greenhouse Harvest API v3 'application_stages' endpoint."
+description: |-
+  Table containing the stages an application has gone through, sourced from the Greenhouse Harvest API v3 'application_stages' endpoint.
 columns:
   id:
-    description: "The application stage's unique identifier."
+    description: The application stage's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.application_stages.id
+    - datalake_greenhouse_v3_raw.application_stages.id
   id_application:
-    description: "The unique identifier of the application."
+    description: The unique identifier of the application.
     lineage:
-      - datalake_greenhouse_raw.application_stages.application_id
+    - datalake_greenhouse_v3_raw.application_stages.application_id
   id_job_interview_stage:
-    description: "The unique identifier of the job interview stage."
+    description: The unique identifier of the job interview stage.
     lineage:
-      - datalake_greenhouse_raw.application_stages.job_interview_stage_id
+    - datalake_greenhouse_v3_raw.application_stages.job_interview_stage_id
   is_current:
-    description: "A boolean flag indicating if this is the current stage for the application."
+    description: A boolean flag indicating if this is the current stage for the application.
     lineage:
-      - datalake_greenhouse_raw.application_stages.current
+    - datalake_greenhouse_v3_raw.application_stages.current
   days_in_stage:
-    description: "The number of days the application has been in this stage."
+    description: The number of days the application has been in this stage.
     lineage:
-      - datalake_greenhouse_raw.application_stages.days_in_stage
+    - datalake_greenhouse_v3_raw.application_stages.days_in_stage
   ts_created:
-    description: "The timestamp when the stage entry was created."
+    description: The timestamp when the stage entry was created.
     lineage:
-      - datalake_greenhouse_raw.application_stages.created_at
+    - datalake_greenhouse_v3_raw.application_stages.created_at
   ts_updated:
-    description: "The timestamp when the stage entry was last updated."
+    description: The timestamp when the stage entry was last updated.
     lineage:
-      - datalake_greenhouse_raw.application_stages.updated_at
+    - datalake_greenhouse_v3_raw.application_stages.updated_at
   ts_entered:
-    description: "The timestamp when the application entered this stage."
+    description: The timestamp when the application entered this stage.
     lineage:
-      - datalake_greenhouse_raw.application_stages.entered_at
+    - datalake_greenhouse_v3_raw.application_stages.entered_at
   ts_exited:
-    description: "The timestamp when the application exited this stage."
+    description: The timestamp when the application exited this stage.
     lineage:
-      - datalake_greenhouse_raw.application_stages.exited_at
+    - datalake_greenhouse_v3_raw.application_stages.exited_at
   ts_load:
-    description: "The timestamp when the record was loaded into the clean layer."
+    description: The timestamp when the record was loaded into the clean layer.
   year:
-    description: "The year extracted from the 'updated_at' timestamp, used for partitioning."
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
     lineage:
-      - datalake_greenhouse_v3_raw.application_stages.updated_at
+    - datalake_greenhouse_v3_raw.application_stages.year
   month:
-    description: "The month extracted from the 'updated_at' timestamp, used for partitioning."
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
     lineage:
-      - datalake_greenhouse_v3_raw.application_stages.updated_at
+    - datalake_greenhouse_v3_raw.application_stages.month
   day:
-    description: "The day extracted from the 'updated_at' timestamp, used for partitioning."
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
     lineage:
-      - datalake_greenhouse_v3_raw.application_stages.updated_at
+    - datalake_greenhouse_v3_raw.application_stages.day

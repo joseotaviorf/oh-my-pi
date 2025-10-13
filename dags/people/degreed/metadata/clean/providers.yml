@@ -1,32 +1,29 @@
----
 database_name: datalake_degreed_clean
 table_name: providers
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  This table lists all the external and internal content providers that are
-  integrated with or configured in the organization's Degreed platform.
-
+description: |-
+  This table lists all the external and internal content providers that are integrated with or configured in the organization's Degreed platform.
 columns:
   id:
-    description: 'Unique identifier for the provider record.'
+    description: Unique identifier for the provider record.
     lineage:
-      - datalake_degreed_raw.providers.id
+    - datalake_degreed_raw.providers.id
   name:
-    description: 'The name of the content provider (e.g., "Coursera", "LinkedIn Learning").'
+    description: The name of the content provider (e.g., "Coursera", "LinkedIn Learning").
     lineage:
-      - datalake_degreed_raw.providers.attributes.name
+    - datalake_degreed_raw.providers.attributes.name
   url:
-    description: 'The base URL for the content providers website.'
+    description: The base URL for the content providers website.
     lineage:
-      - datalake_degreed_raw.providers.attributes.url
+    - datalake_degreed_raw.providers.attributes.url
   provider_content_visibility:
-    description: 'Defines the visibility level for content from this provider within the organization.'
+    description: Defines the visibility level for content from this provider within the organization.
     lineage:
-      - datalake_degreed_raw.providers.attributes.provider_content_visibility
+    - datalake_degreed_raw.providers.attributes.provider_content_visibility
   is_active:
-    description: 'A boolean flag indicating if the provider integration is currently active.'
+    description: A boolean flag indicating if the provider integration is currently active.
     lineage:
-      - datalake_degreed_raw.providers.attributes.is_active
+    - datalake_degreed_raw.providers.attributes.is_active
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean table.'
+    description: Timestamp indicating when the record was loaded into the clean table.

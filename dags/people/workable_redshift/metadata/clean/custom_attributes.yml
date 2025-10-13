@@ -1,41 +1,41 @@
----
 database_name: datalake_workable_redshift_clean
 table_name: custom_attributes
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: This table stores custom attributes, such as questions and fields, used in the recruitment process within the Workable platform, associated with candidates or job applications.
+description: |-
+  This table stores custom attributes, such as questions and fields, used in the recruitment process within the Workable platform, associated with candidates or job applications.
 columns:
   id:
     description: A unique identifier for the custom attribute.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.id
+    - datalake_workable_redshift_raw.custom_attributes.id
   code_visibility_mask:
     description: A value indicating the visibility level of the custom attribute.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.visibility_mask
+    - datalake_workable_redshift_raw.custom_attributes.visibility_mask
   hint:
     description: A brief description or hint for the custom attribute.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.hint
+    - datalake_workable_redshift_raw.custom_attributes.hint
   provider:
     description: The source or provider of the custom attribute, such as a candidate or an internal user.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.provider
+    - datalake_workable_redshift_raw.custom_attributes.provider
   is_single_answer:
     description: A boolean flag indicating if the attribute is restricted to a single answer.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.single_answer
+    - datalake_workable_redshift_raw.custom_attributes.single_answer
   is_enabled:
     description: A boolean flag indicating whether the custom attribute is currently active.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.enabled
+    - datalake_workable_redshift_raw.custom_attributes.enabled
   ts_created:
     description: The timestamp when the custom attribute was created.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.created_at
+    - datalake_workable_redshift_raw.custom_attributes.created_at
   ts_updated:
     description: The timestamp when the custom attribute was last updated.
     lineage:
-      - datalake_workable_redshift_raw.custom_attributes.updated_at
+    - datalake_workable_redshift_raw.custom_attributes.updated_at
   ts_load:
     description: The timestamp when this record was loaded into the table.

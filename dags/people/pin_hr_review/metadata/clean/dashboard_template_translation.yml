@@ -2,7 +2,7 @@
 database_name: datalake_pin_hr_review_clean
 table_name: dashboard_template_translation
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Stores translations for talent review dashboard templates.
 columns:
   id_business_group:

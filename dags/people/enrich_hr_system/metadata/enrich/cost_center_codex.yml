@@ -1,123 +1,126 @@
----
 database_name: datalake_hr_system
 table_name: cost_center_codex
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: 'Table containing consolidated information from the CODEX database about cost centers.'
+description: |-
+  Table containing consolidated information from the CODEX database about cost centers.
 columns:
   id_cost_center:
-    description: 'Unique identifier of the cost center. This can be either the current ID (id_cost_center_current) or the legacy ID (id_cost_center_legacy) from the codex_cost_centers table. The is_legacy_code flag indicates which type of ID is present in this row.'
+    description: |-
+      Unique identifier of the cost center. This can be either the current ID (id_cost_center_current) or the legacy ID (id_cost_center_legacy) from the codex_cost_centers table. The is_legacy_code flag indicates which type of ID is present in this row.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.id_cost_center_current
     - datalake_gsheets_people_clean.codex_cost_centers.id_cost_center_legacy
   cost_center_name:
-    description: 'Name of the cost center without its ID at the beginning.'
+    description: Name of the cost center without its ID at the beginning.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.cc_name
   cost_center_full_name:
-    description: 'Full name of the cost center (includes its ID at the beggining)'
+    description: Full name of the cost center (includes its ID at the beggining)
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.cc_full_name
   business:
-    description: 'Business unit to which the cost center belongs.'
+    description: Business unit to which the cost center belongs.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.business
   product:
-    description: 'Primary product associated with this cost center.'
+    description: Primary product associated with this cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.product
   brand:
-    description: 'Brand to which the cost center belongs.'
+    description: Brand to which the cost center belongs.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.brand
   vertical:
-    description: "Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product)."
+    description: |-
+      Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product).
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.structure
   structure:
-    description: 'Structure to which the cost center belongs.'
+    description: Structure to which the cost center belongs.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.structure_name
   team:
-    description: 'Team to which the cost center belongs.'
+    description: Team to which the cost center belongs.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.team_name
   chapter:
-    description: 'Chapter to which the cost center belongs.'
+    description: Chapter to which the cost center belongs.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.pt_chapter
   line:
-    description: 'Line to which the cost center belongs.'
+    description: Line to which the cost center belongs.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.pt_line
   owner_l1_person_number:
-    description: 'Person number (PIN id) of the second highest manager (L1) in the hierarchy responsible for the cost center.'
+    description: Person number (PIN id) of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l1
     - datalake_employee_registration.identifier_mapping.person_number
   owner_l2_person_number:
-    description: 'Person number (PIN id) of the third highest manager (L2) in the hierarchy responsible for the cost center.'
+    description: Person number (PIN id) of the third highest manager (L2) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l2
     - datalake_employee_registration.identifier_mapping.person_number
   owner_l3_person_number:
-    description: 'Person number (PIN id) of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
+    description: Person number (PIN id) of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l3
     - datalake_employee_registration.identifier_mapping.person_number
   owner_l1_full_name:
-    description: 'Full name of the second highest manager (L1) in the hierarchy responsible for the cost center.'
+    description: Full name of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l1
     - datalake_employee_registration.identifier_mapping.full_name
   owner_l2_full_name:
-    description: 'Full name of the third highest manager (L2) in the hierarchy responsible for the cost center.'
+    description: Full name of the third highest manager (L2) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l2
     - datalake_employee_registration.identifier_mapping.full_name
   owner_l3_full_name:
-    description: 'Full name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
+    description: Full name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l3
     - datalake_employee_registration.identifier_mapping.full_name
   owner_l1_email:
-    description: 'Email of the second highest manager (L1) in the hierarchy responsible for the cost center.'
+    description: Email of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l1
   owner_l2_email:
-    description: 'Email of the third highest manager (L2) in the hierarchy responsible for the cost center.'
+    description: Email of the third highest manager (L2) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l2
   owner_l3_email:
-    description: 'Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
+    description: Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l3
   owner_finance_email:
-    description: 'Email of the FP&A (Financial Planning and Analysis team) member responsible for the cost center.'
+    description: Email of the FP&A (Financial Planning and Analysis team) member responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.fp_owner
   headcount_type:
-    description: "Inferred type of headcount allocated in the cost center, being either 'Capacity' or 'Overhead'."
+    description: Inferred type of headcount allocated in the cost center, being either 'Capacity' or 'Overhead'.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_informations.cost_center_detail
   team_code:
-    description: "Unique identifier of the cost centers team"
+    description: Unique identifier of the cost centers team
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.team_code
   sort_number:
-    description: 'Number used to sort the cost centers in a specific order defined by the FP&A team.'
+    description: Number used to sort the cost centers in a specific order defined by the FP&A team.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.sort
   is_active:
-    description: "Boolean flag indicating the status of the cost center. TRUE if cost_center_status is 'Active', FALSE if 'End'."
+    description: Boolean flag indicating the status of the cost center. TRUE if cost_center_status is 'Active', FALSE if 'End'.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.status
   is_outdated_in_system:
-    description: "Flag indicating if a cost center's attributes are synchronized between the source of truth (cost_center_codex) and the PIN system (organizations). Derived from comparing multiple attributes between the cost_center_codex and organizations tables."
+    description: |-
+      Flag indicating if a cost center's attributes are synchronized between the source of truth (cost_center_codex) and the PIN system (organizations). Derived from comparing multiple attributes between the cost_center_codex and organizations tables.
     categories:
-      "TRUE": "At least one attribute in the PIN system (organizations table) differs from the source of truth (cost_center_codex). The record is outdated and requires an update."
-      "FALSE": "All compared attributes are perfectly synchronized between the source of truth (cost_center_codex) and the PIN system (organizations)."
-      "NULL": "The cost center exists in the source of truth (cost_center_codex) but was not found in the PIN system (organizations), so its synchronization status is unknown."
+      'TRUE': At least one attribute in the PIN system (organizations table) differs from the source of truth (cost_center_codex). The record is outdated and requires an update.
+      'FALSE': All compared attributes are perfectly synchronized between the source of truth (cost_center_codex) and the PIN system (organizations).
+      'NULL': The cost center exists in the source of truth (cost_center_codex) but was not found in the PIN system (organizations), so its synchronization status is unknown.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.business
     - datalake_gsheets_people_clean.codex_cost_centers.product

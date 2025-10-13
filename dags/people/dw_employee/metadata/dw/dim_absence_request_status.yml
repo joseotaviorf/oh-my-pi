@@ -1,17 +1,17 @@
----
 database_name: dw_employee
 table_name: dim_absence_request_status
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Dimension table that stores the different possible statuses for an absence request, such as approved, pending, or denied.
+description: |-
+  Dimension table that stores the different possible statuses for an absence request, such as approved, pending, or denied.
 columns:
   sk_request_status:
     description: Primary key (MD5 hash) that uniquely and deterministically identifies the absence request status.
     lineage:
-     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.approval_status_code
   request_status_name:
     description: Descriptive name of the absence request status (e.g., 'Approved', 'Pending', 'Denied').
     lineage:
-     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.approval_status_code
   ts_load:
     description: Timestamp of when the record was loaded into the table.

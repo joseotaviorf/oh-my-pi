@@ -1,49 +1,45 @@
----
 database_name: datalake_degreed_clean
 table_name: certifiable_skills
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  Contains a list of all skills that can be officially certified within the
-  organization's Degreed instance. These are skills that can be formally
-  assessed and validated.
-
+description: |-
+  Contains a list of all skills that can be officially certified within the organization's Degreed instance. These are skills that can be formally assessed and validated.
 columns:
   id:
-    description: 'Unique identifier for the certifiable skill entry itself.'
+    description: Unique identifier for the certifiable skill entry itself.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.id
+    - datalake_degreed_raw.certifiable_skills.id
   id_skill:
-    description: 'The unique identifier for the underlying skill that can be certified.'
+    description: The unique identifier for the underlying skill that can be certified.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.skill_unique_identifier
+    - datalake_degreed_raw.certifiable_skills.attributes.skill_unique_identifier
   name:
-    description: 'The name of the certifiable skill.'
+    description: The name of the certifiable skill.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.name
+    - datalake_degreed_raw.certifiable_skills.attributes.name
   description:
-    description: 'A detailed description of the certifiable skill and its requirements.'
+    description: A detailed description of the certifiable skill and its requirements.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.description
+    - datalake_degreed_raw.certifiable_skills.attributes.description
   visibility:
-    description: 'Defines the visibility of the certifiable skill within the platform (e.g., public, private).'
+    description: Defines the visibility of the certifiable skill within the platform (e.g., public, private).
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.visibility
+    - datalake_degreed_raw.certifiable_skills.attributes.visibility
   cost:
-    description: 'The cost associated with obtaining the certification for this skill, if any.'
+    description: The cost associated with obtaining the certification for this skill, if any.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.cost
+    - datalake_degreed_raw.certifiable_skills.attributes.cost
   is_featured:
-    description: 'A boolean flag indicating whether the certifiable skill is highlighted or featured.'
+    description: A boolean flag indicating whether the certifiable skill is highlighted or featured.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.is_featured
+    - datalake_degreed_raw.certifiable_skills.attributes.is_featured
   ts_created:
-    description: 'Timestamp indicating when the certifiable skill was created in Degreed.'
+    description: Timestamp indicating when the certifiable skill was created in Degreed.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.created_at
+    - datalake_degreed_raw.certifiable_skills.attributes.created_at
   ts_modified:
-    description: 'Timestamp indicating the last time the certifiable skill was modified in Degreed.'
+    description: Timestamp indicating the last time the certifiable skill was modified in Degreed.
     lineage:
-      - datalake_degreed_raw.certifiable_skills.attributes.modified_at
+    - datalake_degreed_raw.certifiable_skills.attributes.modified_at
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean table.'
+    description: Timestamp indicating when the record was loaded into the clean table.

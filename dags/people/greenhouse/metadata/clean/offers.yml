@@ -1,141 +1,141 @@
----
 database_name: datalake_greenhouse_clean
 table_name: offers
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table containing offer data, sourced from the Greenhouse Harvest API's 'offers' endpoint.
+description: |-
+  Table containing offer data, sourced from the Greenhouse Harvest API's 'offers' endpoint.
 columns:
   id:
     description: The offer's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.offers.id
+    - datalake_greenhouse_raw.offers.id
   id_application:
     description: The application's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.offers.application_id
+    - datalake_greenhouse_raw.offers.application_id
   id_job:
     description: The job's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.offers.job_id
+    - datalake_greenhouse_raw.offers.job_id
   id_candidate:
     description: The candidate's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.offers.candidate_id
+    - datalake_greenhouse_raw.offers.candidate_id
   id_opening:
     description: The opening's unique identifier.
     lineage:
-      - datalake_greenhouse_raw.offers.opening['id']
+    - datalake_greenhouse_raw.offers.opening.id
   status:
     description: The current status of the offer (e.g., created, accepted, rejected).
     lineage:
-      - datalake_greenhouse_raw.offers.status
+    - datalake_greenhouse_raw.offers.status
   workplace_address:
     description: The workplace address for the offer.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['workplace_address']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.workplace_address.value
   employment_type:
     description: The employment type for the offer.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['employment_type']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.employment_type.value
   workplace:
     description: The workplace type for the offer (e.g., Remote, Hybrid).
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['workplace']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.workplace.value
   reporting_to_manager_name:
     description: The name of the hiring manager.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['reporting_to_manager']['value']['name']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.reporting_to_manager.value.name
   opening_status:
     description: The status of the opening.
     lineage:
-      - datalake_greenhouse_raw.offers.opening['status']
+    - datalake_greenhouse_raw.offers.opening.status
   version:
     description: The version number of the offer.
     lineage:
-      - datalake_greenhouse_raw.offers.version
+    - datalake_greenhouse_raw.offers.version
   salary_unit:
     description: The currency unit for the monthly salary.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['salary']['value']['unit']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.salary.value.unit
   annual_salary_unit:
     description: The currency unit for the annual salary.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['brasil_annual_salary_amount']['value']['unit']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.brasil_annual_salary_amount.value.unit
   hiring_bonus_unit:
     description: The currency unit for the hiring bonus.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['sign_on_bonus']['value']['unit']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.sign_on_bonus.value.unit
   stock_options_cash_unit:
     description: The currency unit for the stock options cash amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['stock_options_cash_amount_offered']['value']['unit']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.stock_options_cash_amount_offered.value.unit
   salary_value:
     description: The monthly salary amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['salary']['value']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.salary.value.value
   annual_salary_value:
     description: The annual salary amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['brasil_annual_salary_amount']['value']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.brasil_annual_salary_amount.value.value
   hiring_bonus_value:
     description: The hiring bonus amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['sign_on_bonus']['value']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.sign_on_bonus.value.value
   stock_options_cash_value:
     description: The stock options cash amount.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['stock_options_cash_amount_offered']['value']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.stock_options_cash_amount_offered.value.value
   has_hiring_bonus:
     description: A boolean flag indicating if a hiring bonus is included.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['include_hiring_bonus']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.include_hiring_bonus.value
   dt_offer_expires:
     description: The date when the offer expires.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['offer_expiration_date']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.offer_expiration_date.value
   dt_trial_period_ends:
     description: The date when the trial period ends.
     lineage:
-      - datalake_greenhouse_raw.offers.keyed_custom_fields['trial_period']['value']
+    - datalake_greenhouse_raw.offers.keyed_custom_fields.trial_period.value
   ts_created:
     description: The timestamp when the offer was created.
     lineage:
-      - datalake_greenhouse_raw.offers.created_at
+    - datalake_greenhouse_raw.offers.created_at
   ts_updated:
     description: The timestamp when the offer was last updated.
     lineage:
-      - datalake_greenhouse_raw.offers.updated_at
+    - datalake_greenhouse_raw.offers.updated_at
   ts_sent:
     description: The timestamp when the offer was sent.
     lineage:
-      - datalake_greenhouse_raw.offers.sent_at
+    - datalake_greenhouse_raw.offers.sent_at
   ts_resolved:
     description: The timestamp when the offer was resolved.
     lineage:
-      - datalake_greenhouse_raw.offers.resolved_at
+    - datalake_greenhouse_raw.offers.resolved_at
   ts_started:
     description: The start date for the offered position.
     lineage:
-      - datalake_greenhouse_raw.offers.starts_at
+    - datalake_greenhouse_raw.offers.starts_at
   ts_opening_opened:
     description: The timestamp when the opening was opened.
     lineage:
-      - datalake_greenhouse_raw.offers.opening['opened_at']
+    - datalake_greenhouse_raw.offers.opening.opened_at
   ts_opening_closed:
     description: The timestamp when the opening was closed.
     lineage:
-      - datalake_greenhouse_raw.offers.opening['closed_at']
+    - datalake_greenhouse_raw.offers.opening.closed_at
   ts_load:
     description: The timestamp when the record was loaded into the clean layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.offers.year
+    - datalake_greenhouse_raw.offers.year
   month:
     description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.offers.month
+    - datalake_greenhouse_raw.offers.month
   day:
     description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
-      - datalake_greenhouse_raw.offers.day
+    - datalake_greenhouse_raw.offers.day

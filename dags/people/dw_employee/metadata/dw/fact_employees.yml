@@ -1,111 +1,109 @@
----
 database_name: dw_employee
 table_name: fact_employees
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  This table provides a consolidated view of employees, considering only their last work relationship 
-  and excluding pending workers.
+description: |-
+  This table provides a consolidated view of employees, considering only their last work relationship  and excluding pending workers.
 columns:
   sk_assignment:
-    description: "Surrogate key for the assignment (period of service). Corresponds to id_period_of_service."
+    description: Surrogate key for the assignment (period of service). Corresponds to id_period_of_service.
     lineage:
-      - dw_employee.fact_assignments.sk_assignment
+    - dw_employee.fact_assignments.sk_assignment
   sk_employee:
-    description: "Surrogate key for the person (employee) associated with the assignment."
+    description: Surrogate key for the person (employee) associated with the assignment.
     lineage:
-      - dw_employee.fact_assignments.sk_employee
+    - dw_employee.fact_assignments.sk_employee
   sk_demographic_information:
-    description: "Surrogate key for the employee's demographic information."
+    description: Surrogate key for the employee's demographic information.
     lineage:
-      - dw_employee.fact_assignments.sk_demographic_information
+    - dw_employee.fact_assignments.sk_demographic_information
   sk_cost_center:
-    description: "Surrogate key for the cost center (organization) to which the assignment is allocated."
+    description: Surrogate key for the cost center (organization) to which the assignment is allocated.
     lineage:
-      - dw_employee.fact_assignments.sk_cost_center
+    - dw_employee.fact_assignments.sk_cost_center
   sk_business_unit:
-    description: "Surrogate key for the business unit to which the assignment is allocated."
+    description: Surrogate key for the business unit to which the assignment is allocated.
     lineage:
-      - dw_employee.fact_assignments.sk_business_unit
+    - dw_employee.fact_assignments.sk_business_unit
   sk_job:
-    description: "Surrogate key for the employee's job."
+    description: Surrogate key for the employee's job.
     lineage:
-      - dw_employee.fact_assignments.sk_job
+    - dw_employee.fact_assignments.sk_job
   sk_manager:
-    description: "Surrogate key for the employee's manager."
+    description: Surrogate key for the employee's manager.
     lineage:
-      - dw_employee.fact_assignments.sk_manager
+    - dw_employee.fact_assignments.sk_manager
   sk_manager_assignment:
-    description: "Surrogate key for the manager's assignment (period of service)."
+    description: Surrogate key for the manager's assignment (period of service).
     lineage:
-      - dw_employee.fact_assignments.sk_manager_assignment
+    - dw_employee.fact_assignments.sk_manager_assignment
   sk_disability:
-    description: "Surrogate key for the employee's self-declared disability information."
+    description: Surrogate key for the employee's self-declared disability information.
     lineage:
-      - dw_employee.fact_assignments.sk_disability
+    - dw_employee.fact_assignments.sk_disability
   sk_work_relationship_started_date:
-    description: "Start date of the work relationship, formatted as a surrogate key (YYYYMMDD)."
+    description: Start date of the work relationship, formatted as a surrogate key (YYYYMMDD).
     lineage:
-      - dw_employee.fact_assignments.sk_work_relationship_started_date
+    - dw_employee.fact_assignments.sk_work_relationship_started_date
   sk_work_relationship_ended_date:
-    description: "End date of the work relationship, formatted as a surrogate key (YYYYMMDD)."
+    description: End date of the work relationship, formatted as a surrogate key (YYYYMMDD).
     lineage:
-      - dw_employee.fact_assignments.sk_work_relationship_ended_date
+    - dw_employee.fact_assignments.sk_work_relationship_ended_date
   sk_last_salary_increase_date:
-    description: "Date of the last salary increase, formatted as a surrogate key (YYYYMMDD)."
+    description: Date of the last salary increase, formatted as a surrogate key (YYYYMMDD).
     lineage:
-      - dw_employee.fact_assignments.sk_last_salary_increase_date
+    - dw_employee.fact_assignments.sk_last_salary_increase_date
   sk_hierarchy:
-    description: "Surrogate key for the organizational hierarchy related to the assignment."
+    description: Surrogate key for the organizational hierarchy related to the assignment.
     lineage:
-      - dw_employee.fact_assignments.sk_hierarchy
+    - dw_employee.fact_assignments.sk_hierarchy
   assignment_number:
-    description: "Employee's registration number in the source system (PIN)."
+    description: Employee's registration number in the source system (PIN).
     lineage:
-      - dw_employee.fact_assignments.assignment_number
+    - dw_employee.fact_assignments.assignment_number
   salary_currency_code:
-    description: "Currency code of the salary."
+    description: Currency code of the salary.
     lineage:
-      - dw_employee.fact_assignments.salary_currency_code
+    - dw_employee.fact_assignments.salary_currency_code
   is_active:
-    description: "Flag (TRUE/FALSE) indicating if the assignment is active."
+    description: Flag (TRUE/FALSE) indicating if the assignment is active.
     lineage:
-      - dw_employee.fact_assignments.is_active
+    - dw_employee.fact_assignments.is_active
   is_pending_worker:
-    description: "Flag (TRUE/FALSE) indicating if the assignment is for a worker pending admission."
+    description: Flag (TRUE/FALSE) indicating if the assignment is for a worker pending admission.
     lineage:
-      - dw_employee.fact_assignments.is_pending_worker
+    - dw_employee.fact_assignments.is_pending_worker
   is_manager:
-    description: "Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports."
+    description: Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports.
     lineage:
-      - dw_employee.fact_assignments.is_manager
+    - dw_employee.fact_assignments.is_manager
   has_self_declared_disability:
-    description: "Flag (TRUE/FALSE) indicating if the employee has a self-declared disability."
+    description: Flag (TRUE/FALSE) indicating if the employee has a self-declared disability.
     lineage:
-      - dw_employee.fact_assignments.has_self_declared_disability
+    - dw_employee.fact_assignments.has_self_declared_disability
   assignment_age_months:
-    description: "Tenure in months, calculated from the start date to the end date (or current date if active)."
+    description: Tenure in months, calculated from the start date to the end date (or current date if active).
     lineage:
-      - dw_employee.fact_assignments.assignment_age_months
+    - dw_employee.fact_assignments.assignment_age_months
   qnt_directly_led:
-    description: "Number of direct reports."
+    description: Number of direct reports.
     lineage:
-      - dw_employee.fact_assignments.qnt_directly_led
+    - dw_employee.fact_assignments.qnt_directly_led
   qnt_undirectly_led:
-    description: "Number of indirect reports."
+    description: Number of indirect reports.
     lineage:
-      - dw_employee.fact_assignments.qnt_undirectly_led
+    - dw_employee.fact_assignments.qnt_undirectly_led
   salary:
-    description: "Employee's current salary amount."
+    description: Employee's current salary amount.
     lineage:
-      - dw_employee.fact_assignments.salary
+    - dw_employee.fact_assignments.salary
   last_salary_increase:
-    description: "Amount of the last salary adjustment."
+    description: Amount of the last salary adjustment.
     lineage:
-      - dw_employee.fact_assignments.last_salary_increase
+    - dw_employee.fact_assignments.last_salary_increase
   pct_last_salary_increase:
-    description: "Percentage of the last salary adjustment."
+    description: Percentage of the last salary adjustment.
     lineage:
-      - dw_employee.fact_assignments.pct_last_salary_increase
+    - dw_employee.fact_assignments.pct_last_salary_increase
   ts_load:
-    description: "Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed."
+    description: Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed.

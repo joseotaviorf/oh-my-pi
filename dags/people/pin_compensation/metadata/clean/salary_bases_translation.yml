@@ -1,61 +1,61 @@
----
 database_name: datalake_pin_compensation_clean
 table_name: salary_bases_translation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Table with the name translations for salary bases into different languages. Each record represents the translation of one salary basis for a specific language.
+description: |-
+  Table with the name translations for salary bases into different languages. Each record represents the translation of one salary basis for a specific language.
 columns:
   id_salary_basis:
-    description: 'Unique identifier for the salary basis. Foreign key to the salary_bases table.'
+    description: Unique identifier for the salary basis. Foreign key to the salary_bases table.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.salary_basis_id
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.salary_basis_id
   language:
-    description: 'Language code for which the salary basis name has been translated (e.g., US, PTB, E).'
+    description: Language code for which the salary basis name has been translated (e.g., US, PTB, E).
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.language
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.language
   source_language:
-    description: 'Source language code from which the text was translated.'
+    description: Source language code from which the text was translated.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.source_lang
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.source_lang
   salary_basis_name:
-    description: 'Name of the salary basis in the language specified by the `language` field.'
+    description: Name of the salary basis in the language specified by the `language` field.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.salary_basis_name
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.salary_basis_name
   display_name:
-    description: 'Display name for the salary basis, generally used in user interfaces.'
+    description: Display name for the salary basis, generally used in user interfaces.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.display_name
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.display_name
   created_by:
-    description: 'Identifier of the user who created the translation record.'
+    description: Identifier of the user who created the translation record.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.created_by
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.created_by
   updated_by:
-    description: 'Identifier of the user who made the last update to the record.'
+    description: Identifier of the user who made the last update to the record.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.last_updated_by
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.last_updated_by
   object_version_number:
-    description: 'Version number of the record, used for concurrency control and change auditing.'
+    description: Version number of the record, used for concurrency control and change auditing.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.object_version_number
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.object_version_number
   ts_created:
-    description: 'Timestamp of when the translation record was created in the source system.'
+    description: Timestamp of when the translation record was created in the source system.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.creation_date
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.creation_date
   ts_updated:
-    description: 'Timestamp of the last update to the record in the source system.'
+    description: Timestamp of the last update to the record in the source system.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.last_update_date
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.last_update_date
   ts_load:
-    description: 'Timestamp that indicates when the data was loaded into the clean table, logging the ETL process execution.'
+    description: Timestamp that indicates when the data was loaded into the clean table, logging the ETL process execution.
   year:
-    description: 'Partitioning column representing the year of the record.'
+    description: Partitioning column representing the year of the record.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.year
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.year
   month:
-    description: 'Partitioning column representing the month of the record.'
+    description: Partitioning column representing the month of the record.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.month
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.month
   day:
-    description: 'Partitioning column representing the day of the record.'
+    description: Partitioning column representing the day of the record.
     lineage:
-      - datalake_pin_compensation_raw.cmp_salary_bases_tl.day
+    - datalake_pin_compensation_raw.cmp_salary_bases_tl.day

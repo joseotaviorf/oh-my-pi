@@ -1,40 +1,37 @@
----
 database_name: dw_performance
 table_name: dim_talent_variation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  Dimension that stores all possible variation combinations for talent indicators: 
-  criticality, readiness, potential, and risk of loss. 
-  It is used to analyze talent profiles in a combined manner.
+description: |-
+  Dimension that stores all possible variation combinations for talent indicators:  criticality, readiness, potential, and risk of loss.  It is used to analyze talent profiles in a combined manner.
 columns:
   sk_talent_variation:
-    description: "Surrogate key for the talent variation dimension. It is an MD5 hash generated from the combination of the criticality, readiness, potential, and risk of loss values."
+    description: Surrogate key for the talent variation dimension. It is an MD5 hash generated from the combination of the criticality, readiness, potential, and risk of loss values.
   criticality:
-    description: "Describes the variation in an employee's criticality to the organization."
+    description: Describes the variation in an employee's criticality to the organization.
     categories:
-      "Increased": "Indicates that the criticality has increased."
-      "Decreased": "Indicates that the criticality has decreased."
-      "Maintained": "Indicates that the criticality has remained stable."
-      "-1": "Indicates that the variation measurement is not applicable or data is unavailable."
+      Increased: Indicates that the criticality has increased.
+      Decreased: Indicates that the criticality has decreased.
+      Maintained: Indicates that the criticality has remained stable.
+      '-1': Indicates that the variation measurement is not applicable or data is unavailable.
   readiness:
-    description: "Describes the variation in an employee's readiness for a future position."
+    description: Describes the variation in an employee's readiness for a future position.
     categories:
-      "Increased": "Indicates that the readiness has increased."
-      "Decreased": "Indicates that the readiness has decreased."
-      "Maintained": "Indicates that the readiness has remained stable."
-      "-1": "Indicates that the variation measurement is not applicable or data is unavailable."
+      Increased: Indicates that the readiness has increased.
+      Decreased: Indicates that the readiness has decreased.
+      Maintained: Indicates that the readiness has remained stable.
+      '-1': Indicates that the variation measurement is not applicable or data is unavailable.
   potential:
-    description: "Describes the variation in an employee's assessed potential."
+    description: Describes the variation in an employee's assessed potential.
     categories:
-      "Increased": "Indicates that the potential has increased."
-      "Decreased": "Indicates that the potential has decreased."
-      "Maintained": "Indicates that the potential has remained stable."
-      "-1": "Indicates that the variation measurement is not applicable or data is unavailable."
+      Increased: Indicates that the potential has increased.
+      Decreased: Indicates that the potential has decreased.
+      Maintained: Indicates that the potential has remained stable.
+      '-1': Indicates that the variation measurement is not applicable or data is unavailable.
   risk_of_loss:
-    description: "Describes the variation in an employee's risk of loss (turnover)."
+    description: Describes the variation in an employee's risk of loss (turnover).
     categories:
-      "Increased": "Indicates that the risk of loss has increased."
-      "Decreased": "Indicates that the risk of loss has decreased."
-      "Maintained": "Indicates that the risk of loss has remained stable."
-      "-1": "Indicates that the variation measurement is not applicable or data is unavailable."
+      Increased: Indicates that the risk of loss has increased.
+      Decreased: Indicates that the risk of loss has decreased.
+      Maintained: Indicates that the risk of loss has remained stable.
+      '-1': Indicates that the variation measurement is not applicable or data is unavailable.

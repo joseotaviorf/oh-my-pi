@@ -58,11 +58,13 @@ columns:
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.instruction_help_text
   is_oracle_seed_set_1:
-    description: For internal Oracle use only. Indicates the Edition-Based Redefinition (EBR) context for SET1 (Y or N).
+    description: For internal Oracle use only. Indicates the Edition-Based Redefinition
+      (EBR) context for SET1 (Y or N).
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.ora_seed_set1
   is_oracle_seed_set_2:
-    description: For internal Oracle use only. Indicates the Edition-Based Redefinition (EBR) context for SET2 (Y or N).
+    description: For internal Oracle use only. Indicates the Edition-Based Redefinition
+      (EBR) context for SET2 (Y or N).
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.ora_seed_set2
   ts_created:
@@ -74,18 +76,20 @@ columns:
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_core_raw.fnd_df_contexts_tl.ts_load
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.fnd_df_contexts_tl.day

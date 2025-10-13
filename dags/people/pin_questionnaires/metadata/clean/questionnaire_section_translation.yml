@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_questionnaires_clean
 table_name: questionnaire_section_translation
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: This table stores information about Questionnaire Sections, and is responsible to link Questionnaires to Questions.
+description: |-
+  This table stores information about Questionnaire Sections, and is responsible to link Questionnaires to Questions.
 columns:
   id_business_group:
     description: The business group's unique identifier

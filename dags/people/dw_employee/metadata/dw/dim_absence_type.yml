@@ -1,21 +1,21 @@
----
 database_name: dw_employee
 table_name: dim_absence_type
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Dimension table that categorizes types of absence (e.g., vacation, sick absence, maternity absence), including information such as the maximum allowed duration.
+description: |-
+  Dimension table that categorizes types of absence (e.g., vacation, sick absence, maternity absence), including information such as the maximum allowed duration.
 columns:
   sk_absence_type:
     description: Primary key that uniquely identifies the absence type.
     lineage:
-     - datalake_pin_absence_clean.type.id_absence_type
+    - datalake_pin_absence_clean.type.id_absence_type
   absence_type:
     description: Descriptive name of the absence type in Portuguse.
     lineage:
-     - datalake_pin_absence_clean.type_translation.name
+    - datalake_pin_absence_clean.type_translation.name
   max_days_allowed:
     description: Maximum number of days allowed for this specific absence type.
     lineage:
-     - datalake_pin_absence_clean.type.maximum_duration
+    - datalake_pin_absence_clean.type.maximum_duration
   ts_load:
     description: Timestamp of when the record was loaded into the table.

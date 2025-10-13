@@ -1,76 +1,76 @@
----
 database_name: datalake_pin_core_clean
 table_name: lookup
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: This table stores predefined values used to populate drop-down lists or control application behavior.
+description: |-
+  This table stores predefined values used to populate drop-down lists or control application behavior.
 columns:
   lookup_code:
     description: Unique code identifying a lookup value within a lookup type.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.lookup_code
+    - datalake_pin_core_raw.hr_lookups.lookup_code
   lookup_type:
     description: Unique name identifying a set of related lookup values.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.lookup_type
+    - datalake_pin_core_raw.hr_lookups.lookup_type
   created_by:
     description: User who created the row.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.created_by
+    - datalake_pin_core_raw.hr_lookups.created_by
   updated_by:
     description: User who last updated the row.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.last_updated_by
-  lookup_description: 
+    - datalake_pin_core_raw.hr_lookups.last_updated_by
+  lookup_description:
     description: Description of the lookup value.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.description
-  meaning: 
+    - datalake_pin_core_raw.hr_lookups.description
+  meaning:
     description: Short description or display name of the lookup value.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.meaning
-  tag: 
+    - datalake_pin_core_raw.hr_lookups.meaning
+  tag:
     description: Optional tag to categorize or group lookup values.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.tag
-  display_sequence: 
+    - datalake_pin_core_raw.hr_lookups.tag
+  display_sequence:
     description: Number determining the display order of lookup values.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.display_sequence
-  is_enabled: 
+    - datalake_pin_core_raw.hr_lookups.display_sequence
+  is_enabled:
     description: Flag indicating if the lookup value is currently active.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.enabled_flag
+    - datalake_pin_core_raw.hr_lookups.enabled_flag
     categories:
-      "true": Lookup value is active.
-      "false": Lookup value is inactive.
+      'true': Lookup value is active.
+      'false': Lookup value is inactive.
   dt_active_started:
     description: Date and time when the lookup value becomes active.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.start_date_active
+    - datalake_pin_core_raw.hr_lookups.start_date_active
   dt_active_ended:
     description: Date and time when the lookup value becomes inactive.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.end_date_active
+    - datalake_pin_core_raw.hr_lookups.end_date_active
   ts_created:
     description: Timestamp of the creation of the row.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.creation_date
+    - datalake_pin_core_raw.hr_lookups.creation_date
   ts_updated:
     description: Timestamp of the last update of the row.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.last_update_date
+    - datalake_pin_core_raw.hr_lookups.last_update_date
   ts_load:
     description: Timestamp indicating when the record was loaded into the table.
   year:
     description: Year extracted from the 'ts_updated' column.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.year
+    - datalake_pin_core_raw.hr_lookups.year
   month:
     description: Month extracted from the 'ts_updated' column.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.month
+    - datalake_pin_core_raw.hr_lookups.month
   day:
     description: Day extracted from the 'ts_updated' column.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.day
+    - datalake_pin_core_raw.hr_lookups.day

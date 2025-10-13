@@ -6,11 +6,13 @@ domain: People
 description: This is the master table which holds all organization identifiers.
 columns:
   id_business_group:
-    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+      Foreign key to HR_ORGANIZATION_UNITS.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.business_group_id
   id_organization:
-    description: System-generated unique identifier for the organization. Primary key.
+    description: System-generated unique identifier for the organization. Primary
+      key.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.organization_id
   organization_code:
@@ -82,8 +84,6 @@ columns:
       - datalake_pin_core_raw.hr_all_organization_units_vl.effective_end_date
   ts_load:
     description: Timestamp indicating when the data was loaded into this table.
-    lineage:
-      - datalake_pin_core_raw.hr_all_organization_units_vl.ts_load
   year:
     description: Year extracted from the 'ts_updated' column.
     lineage:

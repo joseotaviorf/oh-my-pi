@@ -1,117 +1,117 @@
----
 database_name: datalake_pin_benefits_clean
 table_name: plan_option_details
 owner: isabella.araujo@quintoandar.com.br
-domain: people
-description: This table identifies the processing characteristics and attributes of an option that is specifically provided within a benefit plan. It details how the option functions and its various configurable behaviors.
+domain: People
+description: |-
+  This table identifies the processing characteristics and attributes of an option that is specifically provided within a benefit plan. It details how the option functions and its various configurable behaviors.
 columns:
   id_option_in_plan:
     description: The unique system-generated primary key identifying each option within a plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.oipl_id
+    - datalake_pin_benefits_raw.ben_oipl_f.oipl_id
   id_option:
     description: A foreign key linking to the `BEN_OPT_F` table, identifying the specific option.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.opt_id
+    - datalake_pin_benefits_raw.ben_oipl_f.opt_id
   id_plan:
     description: A foreign key linking to the `BEN_PL_F` table, identifying the plan to which this option belongs.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.pl_id
+    - datalake_pin_benefits_raw.ben_oipl_f.pl_id
   id_business_group:
     description: A foreign key referencing the business group associated with this plan option.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.business_group_id
+    - datalake_pin_benefits_raw.ben_oipl_f.business_group_id
   option_in_plan_status_code:
     description: A code indicating the current status of the option within the plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.oipl_stat_cd
+    - datalake_pin_benefits_raw.ben_oipl_f.oipl_stat_cd
   person_covered_code:
     description: A code indicating the coverage status of the person under this option.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.per_cvrd_cd
+    - datalake_pin_benefits_raw.ben_oipl_f.per_cvrd_cd
   created_by:
     description: The user account that initially created this record.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.created_by
+    - datalake_pin_benefits_raw.ben_oipl_f.created_by
   updated_by:
     description: The user account that last modified this record.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.last_updated_by
+    - datalake_pin_benefits_raw.ben_oipl_f.last_updated_by
   order_number:
     description: The display order number for the option within the plan.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.ordr_num
+    - datalake_pin_benefits_raw.ben_oipl_f.ordr_num
   object_version_number:
     description: A version number used for optimistic locking, incremented with each update to detect concurrent modifications.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.object_version_number
+    - datalake_pin_benefits_raw.ben_oipl_f.object_version_number
   is_mandatory:
     description: A boolean flag indicating whether this option is mandatory (TRUE) or optional (FALSE) for enrollment.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.mndtry_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.mndtry_flag
   is_default:
     description: A boolean flag indicating whether this option is a default selection (TRUE) or requires explicit election (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.dflt_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.dflt_flag
   is_eligibility_applies:
     description: A boolean flag indicating whether eligibility rules apply to this option (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.elig_apls_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.elig_apls_flag
   is_track_ineligible_person:
     description: A boolean flag indicating whether ineligible persons are tracked for this option (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.trk_inelig_per_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.trk_inelig_per_flag
   is_derivable_factor_proration_eligibility:
     description: A boolean flag indicating whether derivable factors influence participation eligibility for this option (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.drvbl_fctr_prtn_elig_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.drvbl_fctr_prtn_elig_flag
   is_proration_eligibility_override_allowed:
     description: A boolean flag indicating whether participation eligibility override is allowed for this option (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.prtn_elig_ovrid_alwd_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.prtn_elig_ovrid_alwd_flag
   is_derivable_factor_applies_rates:
     description: A boolean flag indicating whether derivable factors apply to rates for this option (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.drvbl_fctr_apls_rts_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.drvbl_fctr_apls_rts_flag
   is_auto_enrollment:
     description: A boolean flag indicating whether enrollment in this option is automatic (TRUE) or requires manual action (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.auto_enrt_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.auto_enrt_flag
   is_hidden:
     description: A boolean flag indicating whether this option is hidden from self-service views (TRUE) or visible (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.hidden_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.hidden_flag
   is_suspend_if_certification_not_provided:
     description: A boolean flag indicating whether enrollment should be suspended if certification is not provided for this option (TRUE) or not (FALSE).
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.susp_if_ctfn_not_prvd_flag
+    - datalake_pin_benefits_raw.ben_oipl_f.susp_if_ctfn_not_prvd_flag
   dt_effective_started:
     description: The date from which this plan option became effective.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.effective_start_date
+    - datalake_pin_benefits_raw.ben_oipl_f.effective_start_date
   dt_effective_ended:
     description: The date on which this plan option ceased to be effective.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.effective_end_date
+    - datalake_pin_benefits_raw.ben_oipl_f.effective_end_date
   ts_created:
     description: The timestamp indicating the exact date and time when this record was created in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.creation_date
+    - datalake_pin_benefits_raw.ben_oipl_f.creation_date
   ts_updated:
     description: The timestamp indicating the exact date and time when this record was last updated in the source system.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.last_update_date
+    - datalake_pin_benefits_raw.ben_oipl_f.last_update_date
   ts_load:
     description: The timestamp indicating when this record was loaded into the data lake.
   year:
     description: The year extracted from the 'ts_updated' column. This is useful for partitioning the data by year to improve query performance.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.year
+    - datalake_pin_benefits_raw.ben_oipl_f.year
   month:
     description: The month extracted from the 'ts_updated' column (represented as a number from 1 to 12). Useful for data partitioning and filtering by month.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.month
+    - datalake_pin_benefits_raw.ben_oipl_f.month
   day:
     description: The day of the month extracted from the 'ts_updated' column (represented as a number from 1 to 31). Useful for filtering data by specific days.
     lineage:
-      - datalake_pin_benefits_raw.ben_oipl_f.day
+    - datalake_pin_benefits_raw.ben_oipl_f.day

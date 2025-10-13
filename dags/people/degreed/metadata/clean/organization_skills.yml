@@ -1,36 +1,33 @@
----
 database_name: datalake_degreed_clean
 table_name: organization_skills
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: >
-  This table serves as a master list of all skills defined and available within
-  the organization's Degreed instance. Each row represents a single, unique skill.
-
+description: |-
+  This table serves as a master list of all skills defined and available within the organization's Degreed instance. Each row represents a single, unique skill.
 columns:
   id:
-    description: 'Unique identifier for the skill within Degreed.'
+    description: Unique identifier for the skill within Degreed.
     lineage:
-      - datalake_degreed_raw.organization_skills.id
+    - datalake_degreed_raw.organization_skills.id
   id_external:
-    description: 'An external identifier for the skill, potentially from a different system or HRIS.'
+    description: An external identifier for the skill, potentially from a different system or HRIS.
     lineage:
-      - datalake_degreed_raw.organization_skills.attributes.external_id
+    - datalake_degreed_raw.organization_skills.attributes.external_id
   name:
-    description: 'The name of the skill (e.g., "Python", "Project Management").'
+    description: The name of the skill (e.g., "Python", "Project Management").
     lineage:
-      - datalake_degreed_raw.organization_skills.attributes.name
+    - datalake_degreed_raw.organization_skills.attributes.name
   description:
-    description: 'A detailed description of the skill.'
+    description: A detailed description of the skill.
     lineage:
-      - datalake_degreed_raw.organization_skills.attributes.description
+    - datalake_degreed_raw.organization_skills.attributes.description
   url_degreed:
-    description: 'The URL to the skills page within the Degreed platform.'
+    description: The URL to the skills page within the Degreed platform.
     lineage:
-      - datalake_degreed_raw.organization_skills.attributes.degreed_url
+    - datalake_degreed_raw.organization_skills.attributes.degreed_url
   is_endorsed:
-    description: 'A boolean flag indicating if the skill is officially endorsed by the organization.'
+    description: A boolean flag indicating if the skill is officially endorsed by the organization.
     lineage:
-      - datalake_degreed_raw.organization_skills.attributes.is_endorsed
+    - datalake_degreed_raw.organization_skills.attributes.is_endorsed
   ts_load:
-    description: 'Timestamp indicating when the record was loaded into the clean table.'
+    description: Timestamp indicating when the record was loaded into the clean table.

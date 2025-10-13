@@ -1,12 +1,12 @@
----
 database_name: datalake_pin_goal_clean
 table_name: goal
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Worker goals and their alignment details.
 columns:
   id_assigned_by_person:
-    description: Foreign key to PER_ALL_PEOPLE_F, holding the ID of the person who assigns the goal.
+    description: Foreign key to PER_ALL_PEOPLE_F, holding the ID of the person who
+      assigns the goal.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.assigned_by_person_id
   id_assignment:
@@ -26,7 +26,8 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.business_group_id
   id_reference_goal:
-    description: Foreign key to HRT_CONTENT_ITEMS_B, holding the ID of the goal in the library (source).
+    description: Foreign key to HRT_CONTENT_ITEMS_B, holding the ID of the goal in
+      the library (source).
     lineage:
     - datalake_pin_goal_raw.hrg_goals.reference_goal_id
   id_mass_request:
@@ -38,7 +39,8 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.requester_person_id
   measure_calculation_rule_code:
-    description: Foreign key to HRG_CALCULATION_RULE_CODE, defining aggregation for sub-goals (AVG or SUM).
+    description: Foreign key to HRG_CALCULATION_RULE_CODE, defining aggregation for
+      sub-goals (AVG or SUM).
     lineage:
     - datalake_pin_goal_raw.hrg_goals.measure_calc_rule_code
     categories:
@@ -154,36 +156,36 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.allow_del_goal_flag
     categories:
-      true: Manager can delete worker goal.
-      false: Manager cannot delete worker goal.
+      'True': Manager can delete worker goal.
+      'False': Manager cannot delete worker goal.
   is_goal_published:
     description: Flag indicating if an organization goal is published.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.published_flag
     categories:
-      true: Organization goal is published.
-      false: Organization goal is not published.
+      'True': Organization goal is published.
+      'False': Organization goal is not published.
   is_goal_accessible_to_hierarchy:
     description: Flag indicating if this goal can be accessed by the hierarchy.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.access_to_hierarchy_flag
     categories:
-      true: Accessible to the hierarchy.
-      false: Not accessible to the hierarchy.
+      'True': Accessible to the hierarchy.
+      'False': Not accessible to the hierarchy.
   is_key_attribute_update_allowed:
     description: Flag indicating if key attribute modification is allowed.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.allow_key_attr_update_flag
     categories:
-      true: Key attribute update is allowed.
-      false: Key attribute update is not allowed.
+      'True': Key attribute update is allowed.
+      'False': Key attribute update is not allowed.
   is_goal_private:
     description: Flag indicating whether this goal is accessible to others.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.private_flag
     categories:
-      true: Goal is private.
-      false: Goal is not private.
+      'True': Goal is private.
+      'False': Goal is not private.
   dt_started:
     description: Start date of the goal.
     lineage:
@@ -209,18 +211,20 @@ columns:
     lineage:
     - datalake_pin_goal_raw.hrg_goals.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_goal_raw.hrg_goals.ts_load
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
-      - datalake_pin_goal_raw.hrg_goals.year
+    - datalake_pin_goal_raw.hrg_goals.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
-      - datalake_pin_goal_raw.hrg_goals.month
+    - datalake_pin_goal_raw.hrg_goals.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for partitioning
+      and filtering.
     lineage:
-      - datalake_pin_goal_raw.hrg_goals.day
+    - datalake_pin_goal_raw.hrg_goals.day

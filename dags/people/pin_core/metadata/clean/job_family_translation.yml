@@ -6,7 +6,8 @@ domain: People
 description: Contains translated attributes from the base table for job families.
 columns:
   id_business_group:
-    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    description: Identifier for the business unit, used for multi-tenant data separation.
+      Foreign key.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.business_group_id
   id_job_family:
@@ -34,7 +35,8 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.source_lang
   object_version_number:
-    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    description: Counter for optimistic locking, incremented on each update to detect
+      concurrent modifications.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.object_version_number
   dt_effective_ended:
@@ -42,7 +44,8 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.effective_end_date
   dt_effective_started:
-    description: Start date of the period for which this job family translation is valid.
+    description: Start date of the period for which this job family translation is
+      valid.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.effective_start_date
   ts_created:
@@ -54,18 +57,20 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.last_update_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
-    lineage:
-      - datalake_pin_core_raw.per_job_family_f_tl.ts_load
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
   year:
-    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.year
   month:
-    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.month
   day:
-    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
     lineage:
       - datalake_pin_core_raw.per_job_family_f_tl.day

@@ -1,19 +1,18 @@
----
-database_name: datalake_gsheets_people_clean
+database_name: datalake_gsheets_people_static_clean
 table_name: edc_roles
-owner: leonardo.soares@quintoandar.com.br
-domain: people
-description: null
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Table description to be added.
 columns:
   special_role:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.edc_roles.special_role
   email:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.edc_roles.email
   ts_load:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_gsheets_people_raw.edc_roles.ts_load

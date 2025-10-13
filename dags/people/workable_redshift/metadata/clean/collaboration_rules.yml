@@ -1,41 +1,41 @@
----
 database_name: datalake_workable_redshift_clean
 table_name: collaboration_rules
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Defines rules for team member collaboration and permissions within the recruiting process. This table typically assigns roles and geographical scopes (e.g., country, city) to specific members, determining which jobs or candidates they can access or manage.
+description: |-
+  Defines rules for team member collaboration and permissions within the recruiting process. This table typically assigns roles and geographical scopes (e.g., country, city) to specific members, determining which jobs or candidates they can access or manage.
 columns:
   id:
     description: Unique identifier for the collaboration rule. Primary key for this table.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.id
+    - datalake_workable_redshift_raw.collaboration_rules.id
   id_member:
     description: Identifier for the team member to whom this rule applies. Foreign key to the members table.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.member_id
+    - datalake_workable_redshift_raw.collaboration_rules.member_id
   role:
     description: The role assigned to the member under this rule (e.g., 'Hiring Manager', 'Recruiter'). This defines their level of access or responsibility.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.role
+    - datalake_workable_redshift_raw.collaboration_rules.role
   country_code:
     description: The country code (e.g., 'BR', 'US') that defines the geographical scope of this rule. An empty value may imply a global scope.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.country_code
+    - datalake_workable_redshift_raw.collaboration_rules.country_code
   state_code:
     description: The state or province code (e.g., 'SP', 'MG') further refining the geographical scope of the rule.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.state_code
+    - datalake_workable_redshift_raw.collaboration_rules.state_code
   city:
     description: The city name that further refines the geographical scope of the rule.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.city
+    - datalake_workable_redshift_raw.collaboration_rules.city
   subregion:
     description: A specific subregion or neighborhood that provides a more granular geographical scope for the rule.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.subregion
+    - datalake_workable_redshift_raw.collaboration_rules.subregion
   zip_code:
     description: The postal or zip code that defines the most granular geographical scope for the rule.
     lineage:
-      - datalake_workable_redshift_raw.collaboration_rules.zip_code
+    - datalake_workable_redshift_raw.collaboration_rules.zip_code
   ts_load:
     description: Timestamp indicating when the record was loaded into this clean table.

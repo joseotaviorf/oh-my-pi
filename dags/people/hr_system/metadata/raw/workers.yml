@@ -1,115 +1,141 @@
----
 database_name: datalake_hr_system_raw
 table_name: workers
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Table with data of workers from Oracle HR System
 columns:
   blood_type:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   blood_type_meaning:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   birth_country:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   birth_country_name:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   birth_region:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   birth_town:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   fullname:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   list_name:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   addresses:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   citizenships:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   disabilities:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   driver_licenses:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   emails:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   ethnicities:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   legislative_info:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   names:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   national_identifiers:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   other_communication_accounts:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   passports:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   phones:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   religions:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   visas_permits:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   work_relationships:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   workers_dff:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   workers_eff:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   dt_birth:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.
   dt_death:
     tags:
-      - Confidential
-      - PII
+    - Confidential
+    - PII
+    description: Column description to be added.

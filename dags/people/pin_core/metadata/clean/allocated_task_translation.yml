@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_core_clean
 table_name: allocated_task_translation
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: This table stores tasks related only to Offboarding Surveys, filtered on HCM based on task description and name. Each row represents a task that links a specific employee to a questionnaire.
+description: |-
+  This table stores tasks related only to Offboarding Surveys, filtered on HCM based on task description and name. Each row represents a task that links a specific employee to a questionnaire.
 columns:
   id_allocated_task:
     description: The allocated task unique identifier.

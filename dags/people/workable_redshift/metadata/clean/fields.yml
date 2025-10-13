@@ -1,47 +1,48 @@
----
 database_name: datalake_workable_redshift_clean
 table_name: fields
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Table with custom fields for Workable
 columns:
   id:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.id
   id_owner:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.owner_id
   type:
-    description: ''
+    description: Column description to be added.
     lineage:
-    - datalake_workable_redshift_raw.fields."type"
+    - datalake_workable_redshift_raw.fields.type
   label:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.label
   hint:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.hint
   preview_value:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.preview_value
   owner_type:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.owner_type
   is_single_answer:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.single_answer
   ts_created:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.created_at
   ts_updated:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.fields.updated_at
+  ts_load:
+    description: Column description to be added.

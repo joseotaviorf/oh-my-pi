@@ -1,57 +1,56 @@
----
 database_name: datalake_workable_redshift_clean
 table_name: education_records
-owner: leonardo.soares@quintoandar.com.br
-domain: people
+owner: isabella.araujo@quintoandar.com.br
+domain: People
 description: Table with information about education records.
 columns:
   id:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.id
   id_job:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.job_id
   id_candidate:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.candidate_id
   job_title:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.job_title
   candidate_name:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.candidate_name
   degree:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.degree
   school:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.school
   field_of_study:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.field_of_study
   dt_started:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.start_date
   dt_ended:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.end_date
   ts_created:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.education_record_created_at
   ts_update:
-    description: ''
+    description: Column description to be added.
     lineage:
     - datalake_workable_redshift_raw.education_records.updated_at
   ts_load:
-    description: ''
+    description: Column description to be added.

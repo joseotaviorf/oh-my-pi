@@ -1,9 +1,9 @@
----
 database_name: datalake_pin_questionnaires_clean
 table_name: question_translation
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: This tables stores definitions and translations for Questions and how they are presented to users
+description: |-
+  This tables stores definitions and translations for Questions and how they are presented to users
 columns:
   id_business_group:
     description: The business group's unique identifier
