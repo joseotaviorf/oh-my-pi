@@ -1,6 +1,7 @@
 dag:
   name: kirk
   owner: Data ForRent
+  schedule_interval: 5 0 * * *
   documentation:
     dag_purpose: |
       Ingest Kirk database app to datalake. Kirk is a tool of automatic repair analysis of inspections.
@@ -14,4 +15,4 @@ workflow:
     ai_inspection_analysis:
       {}
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_16_4_min_general_cluster
