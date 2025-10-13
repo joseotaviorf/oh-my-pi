@@ -9,6 +9,10 @@ SELECT
     offer_type,
     fup_agents_type,
     gtgc AS gt_gc,
-    TO_DATE(offer_sent_date, 'yyyy-MM-dd') AS dt_offer_sent
+    TO_DATE(offer_sent_date, 'yyyy-MM-dd') AS dt_offer_sent,
+    ts_load,
+    year,
+    month,
+    day
 FROM
     datalake_gsheets_raw.fup_agents_historico

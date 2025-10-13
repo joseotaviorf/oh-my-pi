@@ -1,37 +1,71 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: proj_fup_agents
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+description: |
+  Projection of the FUP Agents historical Google Sheet into the clean layer for
+  reporting and analysis. Provides visitor, house, owner, offer and agent identifiers,
+  region context, offer status/type, GT/GC flag, the offer sent date, and load/partition
+  fields for auditing and partitioning.
 columns:
   id_visitor:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.visitor_id
+    description: Unique identifier of the visitor.
   id_house:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.id_property
+    description: Unique identifier of the house/property.
   region_code:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.region_code
+    description: Region code associated with the record in the sheet.
   id_owner:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.owner_id
+    description: Unique identifier of the owner.
   id_offer:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.id_offer
+    description: Unique identifier of the offer.
   dt_offer_sent:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.offer_sent_date
+    description: Date when the offer was sent (parsed as yyyy-MM-dd).
   offer_status:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.offer_status
+    description: Current status of the offer from the sheet.
   offer_type:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.offer_type
+    description: Offer type classification from the sheet.
   id_agent:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.agent_id
+    description: Identifier of the agent associated with the offer.
   fup_agents_type:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.fup_agents_type
+    description: FUP agents classification/type from the sheet.
   gt_gc:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.gtgc
+    description: GT/GC flag or code from the source sheet.
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.ts_load
+    description: Load timestamp captured during raw ingestion.
+  year:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.year
+    description: Partition year of the record (from ingestion).
+  month:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.month
+    description: Partition month of the record (from ingestion).
+  day:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.day
+    description: Partition day of the record (from ingestion).

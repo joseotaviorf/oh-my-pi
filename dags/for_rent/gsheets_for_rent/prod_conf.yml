@@ -34,6 +34,7 @@ sheets_info:
     sheet_name: all_offers
     clean_table_name: proj_fup_agents
     sheet_context: for_rent
+    partitioned: true
 
   listings_with_agreed_discounts:
     sheet_id: 1Y6Z4CV1aDMey8vWnWqUZzpzPBz9os1shJ2anLtLT0Ds
