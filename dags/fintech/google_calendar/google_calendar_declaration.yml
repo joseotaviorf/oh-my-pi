@@ -35,7 +35,7 @@ workflow:
       extra_spark_job_arguments:
       - "en.mexican"
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_16_4_min_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
