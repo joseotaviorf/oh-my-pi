@@ -1,7 +1,7 @@
 WITH orchestrator_sessions AS (
   SELECT DISTINCT
     cs.id AS id_session,
-    cs.id_external,
+    cs.id_external AS id_langfuse_session,
     s.id AS id_sauron_session,
     cs.id_user,
     CASE
@@ -13,7 +13,10 @@ WITH orchestrator_sessions AS (
       WHEN m.channel = 'COPILOT_CHAT' THEN 'copilot'
       ELSE 'unknown'
     END AS bot,
-    s.status,
+    s.department AS first_queue,
+    s.source,
+    s.source_environment,
+    COALESCE(s.user_data:["user_phone"], cs.user_phone_number) AS user_phone_number,
     cs.ts_created,
     s.ts_updated
   FROM
@@ -27,55 +30,98 @@ WITH orchestrator_sessions AS (
   WHERE
     s.ts_updated >= '{load_start_date}'
 ),
+old_bot_sessions AS (
+  SELECT
+    gs.id_session,
+    ss.user_data:["user_id"] AS id_user,
+    'old bot' AS bot,
+    ss.department AS first_queue,
+    ss.source,
+    ss.source_environment,
+    ss.user_data:["user_phone"] AS user_phone_number,
+    ss.ts_created,
+    ss.ts_updated
+  FROM
+    datalake_greenseer_clean.session AS gs
+  LEFT JOIN
+    datalake_sauron_clean.session AS ss
+      ON ss.id = gs.id_session
+  WHERE
+    ss.ts_updated >= '{load_start_date}'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_started DESC) = 1
+),
+sessions AS (
+  SELECT
+    NULL AS id_session,
+    id_session AS id_sauron_session,
+    NULL AS id_langfuse_session,
+    id_user,
+    user_phone_number,
+    bot,
+    first_queue,
+    source,
+    source_environment,
+    ts_created,
+    ts_updated
+  FROM
+    old_bot_sessions
+  UNION ALL
+  SELECT
+    id_session,
+    id_sauron_session,
+    id_langfuse_session,
+    id_user,
+    user_phone_number,
+    bot,
+    first_queue,
+    source,
+    source_environment,
+    ts_created,
+    ts_updated
+  FROM
+    orchestrator_sessions
+),
 escalated_sessions AS (
   SELECT DISTINCT
-    cs.id_ticket,
-    cs.id_session,
-    cs.first_queue,
-    cs.last_queue
+    t.id_ticket,
+    t.id_session,
+    t.last_queue
   FROM
-    datalake_customer_support.tickets AS cs
+    datalake_customer_support.tickets AS t
   INNER JOIN
-    orchestrator_sessions AS bs
-      ON cs.id_session = bs.id_sauron_session
+    sessions AS s
+      ON t.id_session = s.id_sauron_session
   WHERE
-    cs.front_or_back = 'front'
-    AND cs.ticket_origin IN ('call in app', 'whatsapp', 'chat in app')
+    t.front_or_back = 'front'
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY cs.id_session ORDER BY cs.ts_updated DESC) = 1
-),
-support_sessions AS (
-  SELECT
-    os.id_session,
-    os.id_sauron_session,
-    os.id_external,
-    es.id_ticket,
-    os.id_user,
-    os.bot,
-    os.status,
-    es.first_queue,
-    es.last_queue,
-    es.id_session IS NOT NULL AS is_escalation,
-    os.ts_created,
-    Os.ts_updated
-  FROM
-    orchestrator_sessions AS os
-  LEFT JOIN
-    escalated_sessions AS es
-      ON es.id_session = os.id_sauron_session
+    ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_updated DESC) = 1
 )
-SELECT DISTINCT
-  id_session,
-  id_sauron_session,
-  id_external,
-  id_ticket,
-  id_user,
-  bot,
-  status,
-  first_queue,
-  last_queue,
-  is_escalation,
-  ts_created,
-  ts_updated
+SELECT
+  s.id_session,
+  s.id_sauron_session,
+  s.id_langfuse_session,
+  es.id_ticket,
+  s.id_user,
+  s.user_phone_number,
+  s.bot,
+  CASE
+    WHEN s.source = 'whatsapp' THEN s.source
+    WHEN s.source = 'internal_chat' THEN 'in app'
+    ELSE 'unknown'
+  END AS channel,
+  CASE
+    WHEN s.source = 'whatsapp' AND s.source_environment = 'default' THEN 'main'
+    WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'other'
+    ELSE NULL
+  END AS whatsapp_number,
+  s.first_queue,
+  es.last_queue,
+  s.first_queue IS NOT NULL AS is_escalated,
+  s.ts_created,
+  s.ts_updated
 FROM
-  support_sessions
+  sessions AS s
+LEFT JOIN
+  escalated_sessions AS es
+    ON es.id_session = s.id_sauron_session

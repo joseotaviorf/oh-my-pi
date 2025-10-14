@@ -1491,6 +1491,7 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
+  - bietlejuice.greenseer:load-clean-session:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
 bietlejuice.enrich_ciq:
   - bietlejuice.amplitude_subpartitioned:load-clean-440441-home-page-viewed-events:first-run-of-day

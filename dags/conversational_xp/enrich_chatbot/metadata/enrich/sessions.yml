@@ -13,8 +13,8 @@ columns:
     description: 'Sauron session ID'
     lineage:
     - datalake_sauron_clean.session.id
-  id_external:
-    description: 'External session ID in Copilot'
+  id_langfuse_session:
+    description: 'Langfuse session ID (external session ID in Copilot)'
     lineage:
     - datalake_copilot_service_clean.session.id_external
   id_ticket:
@@ -25,6 +25,11 @@ columns:
     description: 'User ID for the session'
     lineage:
     - datalake_copilot_service_clean.session.id_user
+  user_phone_number:
+    description: 'User phone number associated with the session'
+    lineage:
+    - datalake_copilot_service_clean.session.user_phone_number
+    - datalake_sauron_clean.session.user_data
   bot:
     description: 'Bot persona handling the session'
     categories:
@@ -34,29 +39,42 @@ columns:
       matthew: 'Matthew'
       concierge: 'Concierge'
       copilot: 'Copilot'
+      old bot: 'Old bot (Greenseer)'
       unknown: 'Unknown host'
     lineage:
     - datalake_copilot_service_clean.message.channel
-  status:
-    description: 'Sauron session status'
+  channel:
+    description: 'Communication channel for the session'
+    categories:
+      whatsapp: 'WhatsApp'
+      in app: 'In-app chat'
+      unknown: 'Unknown channel'
     lineage:
-    - datalake_sauron_clean.session.status
+    - datalake_sauron_clean.session.source
+  whatsapp_number:
+    description: 'WhatsApp number type (main or other)'
+    categories:
+      main: 'Main WhatsApp number'
+      other: 'Other numbers'
+    lineage:
+    - datalake_sauron_clean.session.source_environment
   first_queue:
-    description: 'First support queue'
+    description: 'First support queue (department)'
     lineage:
-    - datalake_customer_support.tickets.first_queue
+    - datalake_sauron_clean.session.department
   last_queue:
     description: 'Last support queue'
     lineage:
     - datalake_customer_support.tickets.last_queue
-  is_escalation:
+  is_escalated:
     description: 'True if escalated to support'
     lineage:
-    - datalake_customer_support.tickets.id_session
+    - datalake_sauron_clean.session.department
   ts_created:
     description: 'Session creation timestamp'
     lineage:
     - datalake_copilot_service_clean.session.ts_created
+    - datalake_sauron_clean.session.ts_created
   ts_updated:
     description: 'Session last updated timestamp'
     lineage:
