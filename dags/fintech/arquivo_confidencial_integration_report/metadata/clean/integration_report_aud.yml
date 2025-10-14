@@ -1,39 +1,83 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: integration_report_aud
+description: |
+  This table contains cleaned integration audit data from Serasa and Boa Vista reports.
+domain: Fintech
+owner: luana.silvia@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.id
+    description: "Unique identifier of the integration report record."
   cpf:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.cpf
+    description: "Client CPF linked to the integration report."
   rev:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.rev
+    description: "Revision number for audit tracking."
   rev_type:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.revtype
+    description: "Type of revision performed on the record."
   rev_end:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.revend
+    description: "End revision marker."
   integration_provider:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.integration_provider
+    description: "Provider name from which the integration data originated."
   raw_data:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.raw_data
+    description: "Raw payload returned by the integration provider."
   attributes:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "JSON field containing provider-specific details and credit scores."
+  score_serasa:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Unified Serasa score extracted from the JSON attributes, consolidated across provider variants."
+  hva4_serasa:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Serasa HVA4 score extracted from reports[0].score.score."
+  hspa_serasa:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Serasa HSPA score extracted from reports[0].score.score."
+  hspi_serasa:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Serasa HSPI score extracted from JSON attributes."
+  hspn_serasa:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Serasa HSPN score extracted from JSON attributes."
+  serasa_pefin_count:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Number of negative PEFIN records reported by Serasa."
+  bvs_score:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
+    description: "Boa Vista score extracted from score_p6 in the JSON attributes."
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.created_at
+    description: "Timestamp indicating when the integration record was created."
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.year
+    description: "Partitioning field representing the year of data ingestion."
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.month
+    description: "Partitioning field representing the month of data ingestion."
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.day
+    description: "Partitioning field representing the day of data ingestion."
