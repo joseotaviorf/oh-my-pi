@@ -13,6 +13,7 @@ workflow:
   default_extraction_type: full
   inner_dependencies:
     fact_tickets:
+      - fact_tickets_events
       - fact_customer_contacts
     fact_task_metrics:
       - fact_customer_contacts

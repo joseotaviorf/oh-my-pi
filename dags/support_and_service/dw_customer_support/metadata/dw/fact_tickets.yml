@@ -252,5 +252,9 @@ columns:
     description: Timestamp of the latest comment in a ticket made by a customer/end user
   ts_latest_analyst_comment:
     description: Timestamp of the latest comment in a ticket made by an analyst
+  ts_last_move_to_final_group:
+    lineage:
+      - datalake_customer_support.fact_ticket_events.ts_event
+    description: Timestamp of the last move to the final group/department
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_customer_support.

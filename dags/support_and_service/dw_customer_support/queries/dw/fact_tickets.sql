@@ -125,6 +125,39 @@ ticket_comment_metrics AS (
     datalake_support_users.zendesk_users AS zu
       ON zu.id_user_zendesk = tc.id_author
   GROUP BY 1
+), 
+group_changes AS (
+    SELECT
+        sk_ticket,
+        ts_event,
+        sk_group,
+        LAG(sk_group) OVER (PARTITION BY sk_ticket ORDER BY ts_event) AS prev_group
+    FROM dw_customer_support.fact_ticket_events
+),
+only_movements AS (
+    SELECT
+        sk_ticket,
+        ts_event,
+        sk_group
+    FROM group_changes
+    WHERE sk_group IS DISTINCT FROM prev_group 
+),
+final_group AS (
+    SELECT
+        sk_ticket,
+        FIRST_VALUE(sk_group) OVER (PARTITION BY sk_ticket ORDER BY ts_event DESC) AS last_group
+    FROM dw_customer_support.fact_ticket_events
+    GROUP BY sk_ticket, ts_event, sk_group
+), 
+last_move_to_final_group AS (
+    SELECT
+        m.sk_ticket,
+        MAX(ts_event) AS last_move_to_final_group
+    FROM only_movements m
+    JOIN final_group f
+        ON m.sk_ticket = f.sk_ticket
+       AND m.sk_group = f.last_group
+    GROUP BY m.sk_ticket
 )
 SELECT
   CAST(t.id_ticket AS BIGINT) AS sk_ticket,
@@ -193,6 +226,7 @@ SELECT
   t.ts_updated,
   tcm.ts_latest_customer_comment,
   tcm.ts_latest_analyst_comment,
+  lftfg.last_move_to_final_group AS ts_last_move_to_final_group,
   NOW() AS ts_load
 FROM
   datalake_customer_support.tickets AS t
@@ -205,3 +239,6 @@ LEFT JOIN
 LEFT JOIN
   ticket_comment_metrics AS tcm
     ON tcm.id_ticket = t.id_ticket
+LEFT JOIN
+  last_move_to_final_group AS lftfg
+    ON lftfg.sk_ticket = t.id_ticket
