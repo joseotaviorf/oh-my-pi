@@ -1,0 +1,146 @@
+---
+database_name: datalake_crawler_loft_clean
+table_name: loft
+description: |
+  This table contains the data from the Loft crawler.
+  Only the listings that have the city available are included in the table,
+  following the same logic of the raw table.
+  It is updated weekly, every Thursday at 00:00 BRT, to update the data from the current week,
+  which is provided every Wednesday by the crawler provider.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crawler_loft_raw.loft.id
+    description: |
+      The ID of the listing.
+  origin:
+    lineage:
+      - datalake_crawler_loft_raw.loft.origin
+    description: |
+      The origin of the listing, in this case, it is always "loft".
+  address:
+    lineage:
+      - datalake_crawler_loft_raw.loft.address
+    description: |
+      The address of the listing.
+      It has the following address values: city, country, neighborhood,
+      state, and street.
+  city:
+    lineage:
+      - datalake_crawler_loft_raw.loft.city
+    description: |
+      The city of the listing.
+      It is obtained from the address field, which contains the city.
+      All the listings where the city is not available are removed from the table.
+  geolocation:
+    lineage:
+      - datalake_crawler_loft_raw.loft.geolocation
+    description: |
+      The listing geolocation, with latitude and longitude.
+  listing_name:
+    lineage:
+      - datalake_crawler_loft_raw.loft.name
+    description: |
+      The name of the listing.
+  crawl_metadata:
+    lineage:
+      - datalake_crawler_loft_raw.loft.crawl_metadata
+    description: |
+      The metadata of the crawl, with the listing url.
+  house_info:
+    lineage:
+      - datalake_crawler_loft_raw.loft.house_info
+    description: |
+      The house info of the listing.
+      It has all the main information about the house, such as amenities, area, bedrooms, bathrooms, suites,
+      parking spaces, etc.
+  status:
+    lineage:
+      - datalake_crawler_loft_raw.loft.status
+    description: |
+      Indicates if the listing is FOR_SALE, FOR_RENT or FOR_SALE_OR_RENT.
+  type:
+    lineage:
+      - datalake_crawler_loft_raw.loft.type
+    description: |
+      The type of the listing, boolean indicating if it is buyable or rentable.
+    categories:
+      buyable: "For Sale"
+      rentable: "For Rent"
+  property_type:
+    lineage:
+      - datalake_crawler_loft_raw.loft.property_type
+    description: |
+      Indicates the type of the listing: rooftop, garden, duplex, studio,
+      conjugate, default, triplex, etc.
+  contract_type:
+    lineage:
+      - datalake_crawler_loft_raw.loft.contract_type
+    description: |
+      If the listing has an exclusive or non-exclusive contract with Loft.
+  image_urls:
+    lineage:
+      - datalake_crawler_loft_raw.loft.image_urls
+    description: |
+      The list of image urls of the listing.
+  contact_information:
+    lineage:
+      - datalake_crawler_loft_raw.loft.contact_information
+    description: |
+      The advertiser information of the listing. It has the advertiser name and phones.
+  agency_name:
+    lineage:
+      - datalake_crawler_loft_raw.loft.agency_name
+    description: |
+      The advertiser linked to the listing.
+  has_agency:
+    lineage:
+      - datalake_crawler_loft_raw.loft.has_agency
+    description: |
+      Indicates if the listing is linked to an advertiser.
+  is_marketplace:
+    lineage:
+      - datalake_crawler_loft_raw.loft.is_marketplace
+    description: |
+      Indicates if the listing if part of Loft's marketplace.
+  price:
+    lineage:
+      - datalake_crawler_loft_raw.loft.price
+    description: |
+      The prices of the listing for rent and sale. It has rent and sale prices, condo_fee and monthly and yearly IPTU.
+  installments_price:
+    lineage:
+      - datalake_crawler_loft_raw.loft.installments_price
+    description: |
+      Amount of the installment if the listing is financed. Currently is zero for all listings, which is the same
+      behavior of the historic Zyte data.      
+  ts_created:
+    lineage:
+      - datalake_crawler_loft_raw.loft.created_at
+    description: |
+      The timestamp of the listing creation. 
+  date_info:
+    lineage:
+      - datalake_crawler_loft_raw.loft.date_info
+    description: |
+      The timestamp of the listing creation. 
+  year:
+    lineage:
+      - datalake_crawler_loft_raw.loft.year
+    description: |
+      The year of the crawler date.
+      It is a partition column.
+  month:
+    lineage:
+      - datalake_crawler_loft_raw.loft.month
+    description: |
+      The month of the crawler date.
+      It is a partition column.
+  day:
+    lineage:
+      - datalake_crawler_loft_raw.loft.day
+    description: |
+      The day of the crawler date.
+      It is a partition column.
