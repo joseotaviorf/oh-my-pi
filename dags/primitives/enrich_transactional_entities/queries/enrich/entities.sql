@@ -332,7 +332,7 @@ inspection AS (
        TO_JSON(
         STRUCT(
           ib.status AS status,
-          ib.dt_inspected AS dt_inspected
+          ib.dt_inspected AS when
         )
       ) AS properties,
       CASE
