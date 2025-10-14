@@ -1,5 +1,6 @@
 SELECT DISTINCT
   ft.sk_ticket,
+  ft.sk_user,
   ft.sk_last_analyst AS sk_agent,
   CASE
     WHEN ft.channel = 'email' THEN  'email'
