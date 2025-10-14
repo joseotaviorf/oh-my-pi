@@ -1,41 +1,41 @@
 ---
-database_name: datalake_cyber_complement_clean
+database_name: datalake_cyber_clean
 table_name: campaign_discounts
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   Table with data on the discount fields used in the campaign offer.
   This table will contain information about the discount fields used in the offers generated in the campaigns.
   Read more at https://docs.google.com/document/d/1uSaG1Lc7px57KsEFQRT3thn-k-k2qM48/edit#heading=h.1pxezwc
 columns:
   id_campaign:
-    description: ""
+    description: "Campaign identifier code"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDID
   id_offer:
-    description: ""
+    description: "Offer number for the campaign"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDNUMOFERTA
   field_name:
-    description: ""
+    description: "Name of the field where discount is applied"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDFIELD
   amount_without_discount:
-    description: ""
+    description: "Original amount before discount is applied"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDORVL
   amount_with_discount:
-    description: ""
+    description: "Final amount after discount is applied"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDDISCVL
   discount:
-    description: ""
+    description: "Discount amount calculated from original and discounted values"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDORVL
       - datalake_cyber_raw.tb_campanha_desc.CDDISCVL
   discount_percentage:
-    description: ""
+    description: "Percentage of discount applied to the amount"
     lineage:
       - datalake_cyber_raw.tb_campanha_desc.CDDISC
   ts_load:
-    description: ""
+    description: "Timestamp when the record was loaded"

@@ -1,16 +1,16 @@
 ---
-database_name: datalake_cyber_complement_clean
+database_name: datalake_cyber_clean
 table_name: agreement_type_discount
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table with information on the fields used to compose the value that will be negotiated with the customer and the % discount that can be applied in each field.
 columns:
   agreement_type:
-    description: ""
+    description: "Agreement type identifier for discount configuration"
     lineage:
       - datalake_cyber_raw.agtpdsc.ACTYPE
   original_field_name:
-    description: ""
+    description: "Original CyberFinancial field name for discount calculation"
     lineage:
       - datalake_cyber_raw.agtpdsc.ACFIELD
   label:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agtpdsc.ACLABEL
   arithmetic_operator:
-    description: ""
+    description: "Arithmetic operator used in discount calculation"
     lineage:
       - datalake_cyber_raw.agtpdsc.ACOP
   accounting_order:

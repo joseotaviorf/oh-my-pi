@@ -1,8 +1,8 @@
 ---
-database_name: datalake_cyber_complement_clean
+database_name: datalake_cyber_clean
 table_name: queue_agreement_type
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Contains information on valid queues by type of agreement.
 columns:
   id_agreement_type:

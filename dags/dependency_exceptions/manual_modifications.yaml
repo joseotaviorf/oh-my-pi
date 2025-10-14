@@ -11,7 +11,7 @@ bietlejuice.enrich_hightouch:
     - bietlejuice.hightouch_logs:load-clean-sync-runs-trino:first-run-of-day
 bietlejuice.cyber_complement:
   add:
-    - bietlejuice.cyber:load-raw-delqmst:first-run-of-day
+    - bietlejuice.cyber:load-raw-uda1:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   remove:
     - bietlejuice.dw_losses:load-dw-losses-fact-delay:first-run-of-day

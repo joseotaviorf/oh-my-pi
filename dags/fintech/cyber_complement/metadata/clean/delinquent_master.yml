@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: delinquent_master
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   Master table with contract data. Table granularity - id_contract + contract_group.
   Records can be updated and DMHOSTUP (ts_last_update) informs the date of the last update.
@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMACCT
   id_agency:
-    description: "Agency ID"
+    description: "Agency identifier assigned to the account for collection"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGENCY
   id_product:
@@ -25,15 +25,15 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMPROD
   id_proof:
-    description: ""
+    description: "Proof identifier code"
     lineage:
       - datalake_cyber_raw.delqmst.DMCHID
   id_sample:
-    description: ""
+    description: "Sample identifier for account categorization"
     lineage:
       - datalake_cyber_raw.delqmst.DMSAMPLE
   id_work_area:
-    description: ""
+    description: "Work area identifier code"
     lineage:
       - datalake_cyber_raw.delqmst.DMBACODE
   contract_group:
@@ -45,7 +45,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMWKFLAG
   sequence_number:
-    description: ""
+    description: "Sequence number for record ordering"
     lineage:
       - datalake_cyber_raw.delqmst.DMSEQNO
   contract_status:
@@ -53,59 +53,59 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMSTATUS
   flag_promise_payment:
-    description: ""
+    description: "Flag indicating if there is a payment promise"
     lineage:
       - datalake_cyber_raw.delqmst.DMPPFLAG
   flag_account_in_agency_or_court:
-    description: ""
+    description: "Flag indicating if account is in agency or legal proceedings"
     lineage:
       - datalake_cyber_raw.delqmst.DMLAFLG
   punctuation:
-    description: ""
+    description: "Point score for account evaluation"
     lineage:
       - datalake_cyber_raw.delqmst.DMPTSCOR
   branch:
-    description: ""
+    description: "Branch identifier"
     lineage:
       - datalake_cyber_raw.delqmst.DMBRANCH
   manager:
-    description: ""
+    description: "Manager identifier responsible for the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMOFFICR
   debtor_type:
-    description: ""
+    description: "Debtor type relationship flag"
     lineage:
       - datalake_cyber_raw.delqmst.DMRELFLG
   additional_account_1:
-    description: ""
+    description: "Additional account reference 1"
     lineage:
       - datalake_cyber_raw.delqmst.DMADL1
   additional_account_2:
-    description: ""
+    description: "Additional account reference 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMADL2
   special_description:
-    description: ""
+    description: "Special description or notes for the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMSPDESC
   scheduled_letter_day:
-    description: ""
+    description: "Scheduled day for letter sending"
     lineage:
       - datalake_cyber_raw.delqmst.DMSCHDAY
   total_records_payments:
-    description: ""
+    description: "Total number of payment records"
     lineage:
       - datalake_cyber_raw.delqmst.DMPMTTOT
   times_account_assigned_agency:
-    description: ""
+    description: "Number of times account was assigned to agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUMPLC
   manager_last_payment_promisse:
-    description: ""
+    description: "Manager identifier for last payment promise"
     lineage:
       - datalake_cyber_raw.delqmst.DMENTRY
   greeting_code:
-    description: ""
+    description: "Greeting code for communications"
     lineage:
       - datalake_cyber_raw.delqmst.DMSALCD
   debtor_name:
@@ -113,15 +113,15 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMNAME
   previous_name:
-    description: ""
+    description: "Previous name of the debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVNAM
   debtor_name_complement:
-    description: ""
+    description: "Additional name information for the debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMNAME2
   previous_complement_name:
-    description: ""
+    description: "Previous additional name information"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVNM2
   residential_address:
@@ -137,11 +137,11 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMADDR3
   previous_address_1:
-    description: ""
+    description: "Previous residential address line 1"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAD1
   previous_address_2:
-    description: ""
+    description: "Previous residential address line 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAD2
   business_address:
@@ -169,7 +169,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMZIP
   email:
-    description: ""
+    description: "Contact email address"
     lineage:
       - datalake_cyber_raw.delqmst.DMEMAIL
   residencial_phone:
@@ -181,23 +181,23 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMCPHONE
   main_phone_extension:
-    description: ""
+    description: "Main phone extension number"
     lineage:
       - datalake_cyber_raw.delqmst.DMPEXT
   phone_extension:
-    description: ""
+    description: "Phone extension number"
     lineage:
       - datalake_cyber_raw.delqmst.DMCPEXT
   main_area_code:
-    description: ""
+    description: "Main phone area code"
     lineage:
       - datalake_cyber_raw.delqmst.DMACODE
   phone_area:
-    description: ""
+    description: "Cell phone area code"
     lineage:
       - datalake_cyber_raw.delqmst.DMCACODE
   company_name_work:
-    description: ""
+    description: "Company name where debtor works"
     lineage:
       - datalake_cyber_raw.delqmst.DMBNAME
   city_business_address:
@@ -217,7 +217,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMBPHONE
   phone_extension_work:
-    description: ""
+    description: "Business phone extension number"
     lineage:
       - datalake_cyber_raw.delqmst.DMBPEXT
   agreement_type:
@@ -229,19 +229,19 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMAGSTATUS
   last_payment_promisse_status:
-    description: ""
+    description: "Status of the last payment promise made"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGPPSTATUS
   previous_city:
-    description: ""
+    description: "City of previous address"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVCTY
   previous_state:
-    description: ""
+    description: "State of previous address"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVSTA
   previous_zip_code:
-    description: ""
+    description: "Zip code of previous address"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVZIP
   contract_subset:
@@ -249,27 +249,27 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMSUBSET
   previous_interest:
-    description: ""
+    description: "Previous interest rate applied to the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVINT
   company:
-    description: ""
+    description: "Company identifier associated with the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMCOMPANY
   current_priority:
-    description: ""
+    description: "Current priority level assigned to the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRI
   supervisor:
-    description: ""
+    description: "Supervisor identifier for account oversight"
     lineage:
       - datalake_cyber_raw.delqmst.DMSUPV
   reason_last_supervisor_request:
-    description: ""
+    description: "Reason for the last supervisor request"
     lineage:
       - datalake_cyber_raw.delqmst.DMSUPCOM
   status_supervisor_code:
-    description: ""
+    description: "Status code from supervisor review"
     lineage:
       - datalake_cyber_raw.delqmst.DMSCODE
   payment_type:
@@ -277,91 +277,91 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMID
   review_code:
-    description: ""
+    description: "Review code for account status assessment"
     lineage:
       - datalake_cyber_raw.delqmst.DMREVCOD
   reassignin_queues:
-    description: ""
+    description: "Queue reassignment indicator for routing changes"
     lineage:
       - datalake_cyber_raw.delqmst.DMREASSG
   last_action:
-    description: ""
+    description: "Code of the last action taken on the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMLASTAC
   last_result_code:
-    description: ""
+    description: "Result code from the last activity"
     lineage:
       - datalake_cyber_raw.delqmst.DMLASTRC
   last_letter_code:
-    description: ""
+    description: "Code of the last letter sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMLASTLC
   permanent_comment_1:
-    description: ""
+    description: "First permanent comment field for account notes"
     lineage:
       - datalake_cyber_raw.delqmst.DMP1
   permanent_comment_2:
-    description: ""
+    description: "Second permanent comment field for account notes"
     lineage:
       - datalake_cyber_raw.delqmst.DMP2
   permanent_comment_3:
-    description: ""
+    description: "Third permanent comment field for account notes"
     lineage:
       - datalake_cyber_raw.delqmst.DMP3
   times_account_was_30_days_late:
-    description: ""
+    description: "Number of times account was 30 days overdue"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUM30
   times_account_was_60_days_late:
-    description: ""
+    description: "Number of times account was 60 days overdue"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUM60
   times_account_was_90_days_late:
-    description: ""
+    description: "Number of times account was 90 days overdue"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUM90
   times_account_was_120_days_late:
-    description: ""
+    description: "Number of times account was 120 days overdue"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUM120
   times_account_was_150_days_late:
-    description: ""
+    description: "Number of times account was 150 days overdue"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUM150
   times_account_was_180_days_late:
-    description: ""
+    description: "Number of times account was 180 days overdue"
     lineage:
       - datalake_cyber_raw.delqmst.DMNUM180
   agency_automatically_assigned:
-    description: ""
+    description: "Agency automatically assigned by the system"
     lineage:
       - datalake_cyber_raw.delqmst.DMASSAGCY
   previous_agency:
-    description: ""
+    description: "Most recent previous agency assigned to account"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAGN
   previous_agency_1:
-    description: ""
+    description: "Second most recent previous agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAGN1
   previous_agency_2:
-    description: ""
+    description: "Third most recent previous agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAGN2
   previous_agency_3:
-    description: ""
+    description: "Fourth most recent previous agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAGN3
   previous_agency_4:
-    description: ""
+    description: "Fifth most recent previous agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAGN4
   previous_agency_5:
-    description: ""
+    description: "Sixth most recent previous agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAGN5
   status_agency_declined:
-    description: ""
+    description: "Status indicating if agency declined the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGNREJ
   segmentation_queue:
@@ -402,231 +402,231 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE6
   previous_segmentation_queue:
-    description: ""
+    description: "Previous portfolio segmentation queue assignment"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ
   previous_commission_queue:
-    description: ""
+    description: "Previous commission queue assignment"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ2
   previous_agreement_queue:
-    description: ""
+    description: "Previous agreement policy queue assignment"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ3
   previous_digital_channel_queue:
-    description: ""
+    description: "Previous digital channel queue assignment"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ4
   previous_eviction_queue:
-    description: ""
+    description: "Previous eviction queue assignment"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ5
   previous_credit_denial_queue:
-    description: ""
+    description: "Previous credit denial queue assignment"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ6
   most_important_action_class_1:
-    description: ""
+    description: "Most important action code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC1
   most_important_action_class_2:
-    description: ""
+    description: "Most important action code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC2
   most_important_action_class_3:
-    description: ""
+    description: "Most important action code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC3
   history_2_most_important_action_class_1:
-    description: ""
+    description: "Most important action code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC1_2
   history_2_most_important_action_class_2:
-    description: ""
+    description: "Most important action code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC2_2
   history_2_most_important_action_class_3:
-    description: ""
+    description: "Most important action code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC3_2
   history_3_most_important_action_class_1:
-    description: ""
+    description: "Most important action code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC1_3
   history_3_most_important_action_class_2:
-    description: ""
+    description: "Most important action code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC2_3
   history_3_most_important_action_class_3:
-    description: ""
+    description: "Most important action code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC3_3
   history_4_most_important_action_class_1:
-    description: ""
+    description: "Most important action code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC1_4
   history_4_most_important_action_class_2:
-    description: ""
+    description: "Most important action code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC2_4
   history_4_most_important_action_class_3:
-    description: ""
+    description: "Most important action code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC3_4
   history_5_most_important_action_class_1:
-    description: ""
+    description: "Most important action code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC1_5
   history_5_most_important_action_class_2:
-    description: ""
+    description: "Most important action code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC2_5
   history_5_most_important_action_class_3:
-    description: ""
+    description: "Most important action code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACAC3_5
   most_important_result_class_1:
-    description: ""
+    description: "Most important result code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC1
   most_important_result_class_2:
-    description: ""
+    description: "Most important result code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC2
   most_important_result_class_3:
-    description: ""
+    description: "Most important result code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC3
   history_2_most_important_result_class_1:
-    description: ""
+    description: "Most important result code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC1_2
   history_2_most_important_result_class_2:
-    description: ""
+    description: "Most important result code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC2_2
   history_2_most_important_result_class_3:
-    description: ""
+    description: "Most important result code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC3_2
   history_3_most_important_result_class_1:
-    description: ""
+    description: "Most important result code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC1_3
   history_3_most_important_result_class_2:
-    description: ""
+    description: "Most important result code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC2_3
   history_3_most_important_result_class_3:
-    description: ""
+    description: "Most important result code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC3_3
   history_4_most_important_result_class_1:
-    description: ""
+    description: "Most important result code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC1_4
   history_4_most_important_result_class_2:
-    description: ""
+    description: "Most important result code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC2_4
   history_4_most_important_result_class_3:
-    description: ""
+    description: "Most important result code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC3_4
   history_5_most_important_result_class_1:
-    description: ""
+    description: "Most important result code in class 1 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC1_5
   history_5_most_important_result_class_2:
-    description: ""
+    description: "Most important result code in class 2 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC2_5
   history_5_most_important_result_class_3:
-    description: ""
+    description: "Most important result code in class 3 for activity history"
     lineage:
       - datalake_cyber_raw.delqmst.DMACRC3_5
   most_important_letter_class_1:
-    description: ""
+    description: "Most important letter code in class 1 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC1
   most_important_letter_class_2:
-    description: ""
+    description: "Most important letter code in class 2 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC2
   most_important_letter_class_3:
-    description: ""
+    description: "Most important letter code in class 3 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC3
   history_2_most_important_letter_class_1:
-    description: ""
+    description: "Most important letter code in class 1 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC1_2
   history_2_most_important_letter_class_2:
-    description: ""
+    description: "Most important letter code in class 2 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC2_2
   history_2_most_important_letter_class_3:
-    description: ""
+    description: "Most important letter code in class 3 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC3_2
   history_3_most_important_letter_class_1:
-    description: ""
+    description: "Most important letter code in class 1 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC1_3
   history_3_most_important_letter_class_2:
-    description: ""
+    description: "Most important letter code in class 2 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC2_3
   history_3_most_important_letter_class_3:
-    description: ""
+    description: "Most important letter code in class 3 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC3_3
   history_4_most_important_letter_class_1:
-    description: ""
+    description: "Most important letter code in class 1 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC1_4
   history_4_most_important_letter_class_2:
-    description: ""
+    description: "Most important letter code in class 2 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC2_4
   history_4_most_important_letter_class_3:
-    description: ""
+    description: "Most important letter code in class 3 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC3_4
   history_5_most_important_letter_class_1:
-    description: ""
+    description: "Most important letter code in class 1 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC1_5
   history_5_most_important_letter_class_2:
-    description: ""
+    description: "Most important letter code in class 2 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC2_5
   history_5_most_important_letter_class_3:
-    description: ""
+    description: "Most important letter code in class 3 sent to debtor"
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC3_5
   score_most_important_activity_class_1:
-    description: ""
+    description: "Score for most important activity in class 1"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC1
   score_most_important_activity_class_2:
-    description: ""
+    description: "Score for most important activity in class 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC2
   score_most_important_activity_class_3:
-    description: ""
+    description: "Score for most important activity in class 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3
   pre_legal_label:
@@ -634,79 +634,79 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL5
   olos_dialer_label:
-    description: ""
+    description: "Label for Olos Dialer segmentation (dmlabel1)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL1
   label_2:
-    description: ""
+    description: "Segmentation label 2 for portfolio classification (dmlabel2)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL2
   campaign_label:
-    description: ""
+    description: "Campaign label for segmentation (dmlabel3)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL3
   label_4:
-    description: ""
+    description: "Segmentation label 4 for portfolio classification (dmlabel4)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL4
   label_6:
-    description: ""
+    description: "Segmentation label 6 for portfolio classification (dmlabel6)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL6
   history_2_most_important_ativity_score_class_1:
-    description: ""
+    description: "Score for most important activity class 1 in historical period 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC1_2
   history_2_most_important_ativity_score_class_2:
-    description: ""
+    description: "Score for most important activity class 2 in historical period 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC2_2
   history_2_most_important_ativity_score_class_3:
-    description: ""
+    description: "Score for most important activity class 3 in historical period 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3_2
   history_3_most_important_ativity_score_class_1:
-    description: ""
+    description: "Score for most important activity class 1 in historical period 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC1_3
   history_3_most_important_ativity_score_class_2:
-    description: ""
+    description: "Score for most important activity class 2 in historical period 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC2_3
   history_3_most_important_ativity_score_class_3:
-    description: ""
+    description: "Score for most important activity class 3 in historical period 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3_3
   history_4_most_important_ativity_score_class_1:
-    description: ""
+    description: "Score for most important activity class 1 in historical period 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC1_4
   history_4_most_important_ativity_score_class_2:
-    description: ""
+    description: "Score for most important activity class 2 in historical period 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC2_4
   history_4_most_important_ativity_score_class_3:
-    description: ""
+    description: "Score for most important activity class 3 in historical period 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3_4
   history_5_most_important_ativity_score_class_1:
-    description: ""
+    description: "Score for most important activity class 1 in historical period 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC1_5
   history_5_most_important_ativity_score_class_2:
-    description: ""
+    description: "Score for most important activity class 2 in historical period 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC2_5
   history_5_most_important_ativity_score_class_3:
-    description: ""
+    description: "Score for most important activity class 3 in historical period 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3_5
   broken_promisses:
-    description: ""
+    description: "Number of broken payment promises"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGNUMBK
   percentage_paid_agreement:
-    description: ""
+    description: "Percentage of agreement amount paid"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGPCT
   delay_contamined_days:
@@ -714,63 +714,63 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMDAYS
   total_promises_kept:
-    description: ""
+    description: "Total number of payment promises kept"
     lineage:
       - datalake_cyber_raw.delqmst.DMPPKEPT
   number_broken_promises:
-    description: ""
+    description: "Number of broken payment promises"
     lineage:
       - datalake_cyber_raw.delqmst.DMPPBROK
   amount_prior_agency:
-    description: ""
+    description: "Amount assigned to most recent prior agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAMT
   amount_prior_agency_1:
-    description: ""
+    description: "Amount assigned to prior agency 1"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAMT1
   amount_prior_agency_2:
-    description: ""
+    description: "Amount assigned to prior agency 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAMT2
   amount_prior_agency_3:
-    description: ""
+    description: "Amount assigned to prior agency 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAMT3
   amount_prior_agency_4:
-    description: ""
+    description: "Amount assigned to prior agency 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAMT4
   amount_prior_agency_5:
-    description: ""
+    description: "Amount assigned to prior agency 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAMT5
   payment_promisse_amount:
-    description: ""
+    description: "Amount of payment promise"
     lineage:
       - datalake_cyber_raw.delqmst.DMPPAMT
   current_agency_amount:
-    description: ""
+    description: "Amount assigned to current agency"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGNAMT
   last_amount_paid:
-    description: ""
+    description: "Amount of last payment received"
     lineage:
       - datalake_cyber_raw.delqmst.DMPAYAMT
   last_letter_amount:
-    description: ""
+    description: "Amount stated in last letter sent"
     lineage:
       - datalake_cyber_raw.delqmst.DMLTRAMT
   negotiated_amount:
-    description: ""
+    description: "Total negotiated amount for the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGAMT
   accumulated_interest_amount:
-    description: ""
+    description: "Total accumulated interest amount"
     lineage:
       - datalake_cyber_raw.delqmst.DMACUMINT
   accumulated_amount:
-    description: ""
+    description: "Total accumulated amount on account"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAINT
   overdue_amount:
@@ -782,11 +782,11 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMCURBAL
   current_total_overdue:
-    description: ""
+    description: "Current total overdue amount"
     lineage:
       - datalake_cyber_raw.delqmst.DMPAYOFF
   next_due_balance_amount:
-    description: ""
+    description: "Next due balance amount"
     lineage:
       - datalake_cyber_raw.delqmst.DMNXTPOF
   total_package_amount:
@@ -798,91 +798,91 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMAMTDLQ
   credit_limit:
-    description: ""
+    description: "Credit limit for the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMCRLIMT
   ts_credit_opening:
-    description: ""
+    description: "Timestamp when credit was opened"
     lineage:
       - datalake_cyber_raw.delqmst.DMOPNDT
   ts_reference_current_agency:
-    description: ""
+    description: "Reference timestamp for current agency assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGNREF
   ts_last_contact_account:
-    description: ""
+    description: "Timestamp of last contact on account"
     lineage:
       - datalake_cyber_raw.delqmst.DMLSTCON
   ts_next_due_balance:
-    description: ""
+    description: "Timestamp of next due balance"
     lineage:
       - datalake_cyber_raw.delqmst.DMPOFTIL
   ts_last_letter_request:
-    description: ""
+    description: "Timestamp of last letter request"
     lineage:
       - datalake_cyber_raw.delqmst.DMLTRDT
   ts_account_registered:
-    description: ""
+    description: "Timestamp when account was registered"
     lineage:
       - datalake_cyber_raw.delqmst.DMCCSDT
   ts_last_account_inactive:
-    description: ""
+    description: "Timestamp when account became inactive"
     lineage:
       - datalake_cyber_raw.delqmst.DMINACCT
   ts_last_account_reactivation:
-    description: ""
+    description: "Timestamp of last account reactivation"
     lineage:
       - datalake_cyber_raw.delqmst.DMREACT
   ts_last_update:
-    description: ""
+    description: "Timestamp of last update to account"
     lineage:
       - datalake_cyber_raw.delqmst.DMHOSTUP
   ts_last_update_manager:
-    description: ""
+    description: "Timestamp of last manager update"
     lineage:
       - datalake_cyber_raw.delqmst.DMLCLUPD
   ts_last_activity_history:
-    description: ""
+    description: "Timestamp of last activity in history"
     lineage:
       - datalake_cyber_raw.delqmst.DMHISTDT
   ts_last_payment:
-    description: ""
+    description: "Timestamp of last payment received"
     lineage:
       - datalake_cyber_raw.delqmst.DMPAYDT
   ts_next_contact:
-    description: ""
+    description: "Timestamp scheduled for next contact"
     lineage:
       - datalake_cyber_raw.delqmst.DMNXTCON
   ts_promise:
-    description: ""
+    description: "Timestamp of payment promise"
     lineage:
       - datalake_cyber_raw.delqmst.DMPPMADE
   ts_due_promisse_payment:
-    description: ""
+    description: "Due timestamp for promised payment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPPDUE
   ts_assignment_previous_agency:
-    description: ""
+    description: "Timestamp of most recent prior agency assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVREF
   ts_assignment_previous_agency_1:
-    description: ""
+    description: "Timestamp of prior agency 1 assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVREF1
   ts_assignment_previous_agency_2:
-    description: ""
+    description: "Timestamp of prior agency 2 assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVREF2
   ts_assignment_previous_agency_3:
-    description: ""
+    description: "Timestamp of prior agency 3 assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVREF3
   ts_assignment_previous_agency_4:
-    description: ""
+    description: "Timestamp of prior agency 4 assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVREF4
   ts_assignment_previous_agency_5:
-    description: ""
+    description: "Timestamp of prior agency 5 assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVREF5
   ts_due_oldest_invoice:
@@ -890,11 +890,11 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMDLQDT
   ts_last_activity:
-    description: ""
+    description: "Timestamp of last activity"
     lineage:
       - datalake_cyber_raw.delqmst.DMLSTACT
   ts_automatic_assignment:
-    description: ""
+    description: "Timestamp of automatic assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMASSAGDT
   ts_last_update_segmentation_queue:
@@ -922,86 +922,86 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT6
   ts_most_important_activity_class_1:
-    description: ""
+    description: "Timestamp of most important activity class 1"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT1
   ts_most_important_activity_class_2:
-    description: ""
+    description: "Timestamp of most important activity class 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT2
   ts_most_important_activity_class_3:
-    description: ""
+    description: "Timestamp of most important activity class 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT3
   ts_history_2_most_important_activity_class_1:
-    description: ""
+    description: "Timestamp of most important activity class 1 in historical period 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT1_2
   ts_history_2_most_important_activity_class_2:
-    description: ""
+    description: "Timestamp of most important activity class 2 in historical period 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT2_2
   ts_history_2_most_important_activity_class_3:
-    description: ""
+    description: "Timestamp of most important activity class 3 in historical period 2"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT3_2
   ts_history_3_most_important_activity_class_1:
-    description: ""
+    description: "Timestamp of most important activity class 1 in historical period 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT1_3
   ts_history_3_most_important_activity_class_2:
-    description: ""
+    description: "Timestamp of most important activity class 2 in historical period 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT2_3
   ts_history_3_most_important_activity_class_3:
-    description: ""
+    description: "Timestamp of most important activity class 3 in historical period 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT3_3
   ts_history_4_most_important_activity_class_1:
-    description: ""
+    description: "Timestamp of most important activity class 1 in historical period 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT1_4
   ts_history_4_most_important_activity_class_2:
-    description: ""
+    description: "Timestamp of most important activity class 2 in historical period 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT2_4
   ts_history_4_most_important_activity_class_3:
-    description: ""
+    description: "Timestamp of most important activity class 3 in historical period 4"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT3_4
   ts_history_5_most_important_activity_class_1:
-    description: ""
+    description: "Timestamp of most important activity class 1 in historical period 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT1_5
   ts_history_5_most_important_activity_class_2:
-    description: ""
+    description: "Timestamp of most important activity class 2 in historical period 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT2_5
   ts_history_5_most_important_activity_class_3:
-    description: ""
+    description: "Timestamp of most important activity class 3 in historical period 5"
     lineage:
       - datalake_cyber_raw.delqmst.DMACDT3_5
   ts_previous_interest_calculation:
-    description: ""
+    description: "Timestamp of previous interest calculation"
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVIDT
   ts_last_interest_calculation:
-    description: ""
+    description: "Timestamp of last interest calculation"
     lineage:
       - datalake_cyber_raw.delqmst.DMINTDT
   ts_manager_assignment:
-    description: ""
+    description: "Timestamp of manager assignment"
     lineage:
       - datalake_cyber_raw.delqmst.DMCLASSDT
   ts_status_updated:
-    description: ""
+    description: "Timestamp when status was updated"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGCHGDT
   ts_first_payment_agreement:
-    description: ""
+    description: "Timestamp of first payment in agreement"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGINIPAYDT
   ts_last_payment_agreement:
-    description: ""
+    description: "Timestamp of last payment in agreement"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGLSTPAYDT

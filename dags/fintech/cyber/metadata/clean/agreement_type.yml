@@ -1,28 +1,29 @@
 ---
-database_name: datalake_cyber_complement_clean
+database_name: datalake_cyber_clean
 table_name: agreement_type
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: null
+domain: Fintech
+description: |
+  Configuration table containing types of agreements available in the system with their rules, parameters, and conditions for contract negotiations.
 columns:
   id_agreement_type:
-    description: ""
+    description: "Agreement type identifier code"
     lineage:
       - datalake_cyber_raw.agrtype.AGTYPE
   contract_group:
-    description: ""
+    description: "Contract group classification"
     lineage:
       - datalake_cyber_raw.agrtype.AGACCTG
   agreement_type_description:
-    description: ""
+    description: "Descriptive name of the agreement type"
     lineage:
       - datalake_cyber_raw.agrtype.AGNAME
   payments_to_be_forgiven:
-    description: ""
+    description: "Number of payments to be forgiven in the agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGCNDPAYN
   fullfilled_payments_to_forgive:
-    description: ""
+    description: "Number of fulfilled payments required to forgive debt"
     lineage:
       - datalake_cyber_raw.agrtype.AGCNDPAYM
   min_delay_days:
@@ -38,39 +39,39 @@ columns:
     lineage:
       - datalake_cyber_raw.agrtype.AGSORTORD
   missed_payments_to_break_agreement:
-    description: ""
+    description: "Number of missed payments that will break the agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGBREAK
   consecutive_payments_received:
-    description: ""
+    description: "Number of consecutive payments received initially"
     lineage:
       - datalake_cyber_raw.agrtype.AGCSINITNT
   notify_central_system_periodically:
-    description: ""
+    description: "Flag to notify central system periodically about agreement status"
     lineage:
       - datalake_cyber_raw.agrtype.AGCSPERNT
   payment_type:
-    description: ""
+    description: "Type of payment structure for the agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGPYTYPE
   days_from_date_inicial_payment:
-    description: ""
+    description: "Number of days from agreement date to first payment due date"
     lineage:
       - datalake_cyber_raw.agrtype.AGINITPYDAYS
   min_down_payment_percentage:
-    description: ""
+    description: "Minimum percentage required for down payment"
     lineage:
       - datalake_cyber_raw.agrtype.AGINITPYMINP
   max_percentage_initial_payment:
-    description: ""
+    description: "Maximum percentage allowed for initial payment"
     lineage:
       - datalake_cyber_raw.agrtype.AGINITPYMAXP
   days_until_last_payment:
-    description: ""
+    description: "Number of days until the last payment is due"
     lineage:
       - datalake_cyber_raw.agrtype.AGLSTPYDAYS
   agreement_interest_rate:
-    description: ""
+    description: "Interest rate applied to the agreement installments"
     lineage:
       - datalake_cyber_raw.agrtype.AGRATE
   fine_rate:
@@ -78,7 +79,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agrtype.AGRATE2
   free_days:
-    description: ""
+    description: "Number of grace period days with no charges"
     lineage:
       - datalake_cyber_raw.agrtype.AGGRDAYS
   max_installments:
@@ -86,39 +87,39 @@ columns:
     lineage:
       - datalake_cyber_raw.agrtype.AGMAXPMTS
   valid_frequencies:
-    description: ""
+    description: "Valid payment frequency options for the agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGFREQ
   ts_start_agreement:
-    description: ""
+    description: "Start date when agreement type becomes valid"
     lineage:
       - datalake_cyber_raw.agrtype.AGINITDT
   ts_end_agreement:
-    description: ""
+    description: "End date when agreement type expires"
     lineage:
       - datalake_cyber_raw.agrtype.AGENDDT
   min_payment_amount:
-    description: ""
+    description: "Minimum payment amount required for the agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGMININITPY
   fees:
-    description: ""
+    description: "Tax rate or fees applied to the agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGTAXRATE
   valid_period:
-    description: ""
+    description: "Period in days that the agreement remains valid"
     lineage:
       - datalake_cyber_raw.agrtype.AGVALPER
   flag:
-    description: ""
+    description: "Self-cure flag indicating automatic resolution capability"
     lineage:
       - datalake_cyber_raw.agrtype.AGSELFCURE
   AGSTATUS:
-    description: ""
+    description: "Status of the agreement type configuration"
     lineage:
       - datalake_cyber_raw.agrtype.AGSTATUS
   AGMINPAR:
-    description: ""
+    description: "Minimum number of installments allowed"
     lineage:
       - datalake_cyber_raw.agrtype.AGMINPAR
   agreement_channel:

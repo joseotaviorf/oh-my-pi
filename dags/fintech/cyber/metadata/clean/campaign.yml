@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: campaign
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   The table will contain information about the campaigns that were carried out by QuintoAndar/QuintoCred and Assessorias. The table will be updated through the massive billing process.
   Read more at: https://docs.google.com/document/d/13jNOuN0S-175ijdreKjRBBYL33ynspyL/edit#bookmark=id.26in1rg
@@ -72,7 +72,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha.CAHONO
   frequency:
-    description: "Frequency"
+    description: "Payment frequency for campaign installments"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAFREQ
   origin:
@@ -116,18 +116,18 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha.CAAGING
   CATIPOBOL:
-    description: ""
+    description: "Boletagem type indicator flag"
     lineage:
       - datalake_cyber_raw.tb_campanha.CATIPOBOL
   CASTATUSCA:
-    description: ""
+    description: "Campaign status code"
     lineage:
       - datalake_cyber_raw.tb_campanha.CASTATUSCA
   CATOTPARC:
-    description: ""
+    description: "Total number of installments in campaign"
     lineage:
       - datalake_cyber_raw.tb_campanha.CATOTPARC
   CAQTDPA:
-    description: ""
+    description: "Quantity of payments for campaign"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAQTDPA

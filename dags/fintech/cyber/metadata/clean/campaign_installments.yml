@@ -1,56 +1,56 @@
 ---
-database_name: datalake_cyber_complement_clean
+database_name: datalake_cyber_clean
 table_name: campaign_installments
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   This table will contain information about the portions of the offers generated in the campaigns carried out by QuintoAndar/QuintoCred e Assessorias. The table will be updated through the massive billing process.
   Read more at https://docs.google.com/document/d/1uSaG1Lc7px57KsEFQRT3thn-k-k2qM48/edit#heading=h.3as4poj
 columns:
   id_campaign:
-    description: ""
+    description: "Campaign identifier code"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPID
   id_offer:
-    description: ""
+    description: "Offer number for the campaign"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPNUMOFERTA
   id_client:
-    description: ""
+    description: "Client identifier code"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPSSNUM
   id_agreement_installment:
-    description: ""
+    description: "Agreement installment unique identifier"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPNUMOFERTA
       - datalake_cyber_raw.tb_campanha_ofer.CPDETID
   installment_number:
-    description: ""
+    description: "Sequential number of the installment"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPDETID
   cpf_cnpj:
-    description: ""
+    description: "Client CPF or CNPJ identification number"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPCPFCGC
   installment_amount:
-    description: ""
+    description: "Total amount due for this installment"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPAMT
   installment_interest_amount:
-    description: ""
+    description: "Interest amount charged on this installment"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPINTAMT
   installment_honorarium_amount:
-    description: ""
+    description: "Honorarium amount charged on this installment"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPHONO
   tax_amount:
-    description: ""
+    description: "Tax amount charged on this installment"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPINTTAXAMT
   ts_due_installment:
-    description: ""
+    description: "Due date timestamp for this installment"
     lineage:
       - datalake_cyber_raw.tb_campanha_ofer.CPDUEDT
   ts_load:
-    description: ""
+    description: "Timestamp when the record was loaded"

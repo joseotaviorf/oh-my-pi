@@ -11,7 +11,7 @@ bietlejuice.core_visit:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
 bietlejuice.cyber_complement:
-  - bietlejuice.cyber:load-raw-delqmst:first-run-of-day
+  - bietlejuice.cyber:load-raw-uda1:first-run-of-day
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:first-run-of-day
 bietlejuice.dw_accounts_receivable:
@@ -1781,23 +1781,38 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.sauron:load-clean-session:first-run-of-day
   - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
 bietlejuice.enrich_cyber:
+  - bietlejuice.cyber:load-clean-agency-decision-tree:first-run-of-day
+  - bietlejuice.cyber:load-clean-agency-group:first-run-of-day
   - bietlejuice.cyber:load-clean-agency:first-run-of-day
+  - bietlejuice.cyber:load-clean-agreement-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-agreement-discounts:first-run-of-day
   - bietlejuice.cyber:load-clean-agreement-installments:first-run-of-day
   - bietlejuice.cyber:load-clean-agreement-invoices:first-run-of-day
+  - bietlejuice.cyber:load-clean-agreement-type-discount:first-run-of-day
+  - bietlejuice.cyber:load-clean-agreement-type:first-run-of-day
   - bietlejuice.cyber:load-clean-agreements:first-run-of-day
   - bietlejuice.cyber:load-clean-bill:first-run-of-day
+  - bietlejuice.cyber:load-clean-campaign-contracts:first-run-of-day
+  - bietlejuice.cyber:load-clean-campaign-discounts:first-run-of-day
+  - bietlejuice.cyber:load-clean-campaign-installments:first-run-of-day
+  - bietlejuice.cyber:load-clean-campaign-label-decision-tree:first-run-of-day
+  - bietlejuice.cyber:load-clean-campaign:first-run-of-day
   - bietlejuice.cyber:load-clean-contracts-agreements:first-run-of-day
   - bietlejuice.cyber:load-clean-contracts:first-run-of-day
-  - bietlejuice.cyber:load-clean-delinquent-master:first-run-of-day
+  - bietlejuice.cyber:load-clean-credit-denial-decision-tree:first-run-of-day
+  - bietlejuice.cyber:load-clean-eviction-decision-tree:first-run-of-day
+  - bietlejuice.cyber:load-clean-evictions-label-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-historical-agreements:first-run-of-day
   - bietlejuice.cyber:load-clean-history-contract-distribution:first-run-of-day
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
+  - bietlejuice.cyber:load-clean-logs-valid-result-code:first-run-of-day
   - bietlejuice.cyber:load-clean-logs:first-run-of-day
+  - bietlejuice.cyber:load-clean-olos-dialer-label-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-payments:first-run-of-day
+  - bietlejuice.cyber:load-clean-segmentation-decision-tree:first-run-of-day
+  - bietlejuice.cyber:load-clean-serasa-limpa-nome-label-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-users:first-run-of-day
-  - bietlejuice.cyber_complement:load-clean-agency-group:first-run-of-day
-  - bietlejuice.cyber_complement:load-clean-campaign:first-run-of-day
+  - bietlejuice.cyber_complement:load-clean-delinquent-master:first-run-of-day
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows:first-run-of-day

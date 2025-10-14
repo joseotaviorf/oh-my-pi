@@ -1,73 +1,74 @@
 ---
-database_name: datalake_cyber_complement_clean
+database_name: datalake_cyber_clean
 table_name: agency_decision_tree
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: null
+domain: Fintech
+description: |
+  Decision tree table for agency assignment logic containing rules and conditions for routing accounts to appropriate agencies.
 columns:
   group:
-    description: ""
+    description: "Account group identifier for decision tree classification"
     lineage:
       - datalake_cyber_raw.agn_dectbl.acct_grp
   level:
-    description: ""
+    description: "Decision tree level indicator for hierarchical rule processing"
     lineage:
       - datalake_cyber_raw.agn_dectbl.level1
   test:
-    description: ""
+    description: "Test condition identifier for rule evaluation"
     lineage:
       - datalake_cyber_raw.agn_dectbl.test
   sequence:
-    description: ""
+    description: "Sequence number for ordering rule execution"
     lineage:
       - datalake_cyber_raw.agn_dectbl.sequence
   comment:
-    description: ""
+    description: "Descriptive comment for the decision rule"
     lineage:
       - datalake_cyber_raw.agn_dectbl.comment1
   field_1:
-    description: ""
+    description: "First field name used in the decision condition"
     lineage:
       - datalake_cyber_raw.agn_dectbl.LOWER(field_1)
   operator:
-    description: ""
+    description: "Comparison operator for evaluating the condition"
     lineage:
       - datalake_cyber_raw.agn_dectbl.CASE WHEN op = '.eq.' THEN '=' WHEN op = '.ge.'
         THEN '>=' WHEN op = '.gt.' THEN '>' WHEN op = '.le.' THEN '<=' WHEN op = '.lt.'
         THEN '<' WHEN op = '.ne.' THEN '!=' ELSE op END
   field_2:
-    description: ""
+    description: "Second field name or value for comparison"
     lineage:
       - datalake_cyber_raw.agn_dectbl.LOWER(field_2)
   field_2_flag:
-    description: ""
+    description: "Flag indicating how field_2 should be interpreted"
     lineage:
       - datalake_cyber_raw.agn_dectbl.LOWER(field_2_flag)
   field_3:
-    description: ""
+    description: "Third field name or value for additional condition"
     lineage:
       - datalake_cyber_raw.agn_dectbl.LOWER(field_3)
   field_3_flag:
-    description: ""
+    description: "Flag indicating how field_3 should be interpreted"
     lineage:
       - datalake_cyber_raw.agn_dectbl.LOWER(field_3_flag)
   or_flag:
-    description: ""
+    description: "Boolean flag for OR logic in compound conditions"
     lineage:
       - datalake_cyber_raw.agn_dectbl.or_flag
   num_return:
-    description: ""
+    description: "Numeric return value when condition is met"
     lineage:
       - datalake_cyber_raw.agn_dectbl.num_return
   next_level:
-    description: ""
+    description: "Next decision tree level to evaluate"
     lineage:
       - datalake_cyber_raw.agn_dectbl.next_level
   nxt_return:
-    description: ""
+    description: "Return value to use at the next level"
     lineage:
       - datalake_cyber_raw.agn_dectbl.nxt_return
   queue:
-    description: ""
+    description: "Queue identifier for account routing"
     lineage:
       - datalake_cyber_raw.agn_dectbl.queue
