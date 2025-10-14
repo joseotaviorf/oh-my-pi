@@ -171,6 +171,29 @@ FROM VALUES
                                 ),
            'running', False
         )
+    ),
+
+    -- New feed experiment
+    (
+        "ab_beakman_native_home_feed_recommendations_experiment",
+        named_struct(
+            'begin_date', DATE('2025-10-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    'baseline', 'baseline',
+                    'treatment', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 AS experiment_config(experiment_name, config)
