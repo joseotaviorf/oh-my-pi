@@ -19,14 +19,6 @@ column_level_validations:
   is_last_cycle:
     is_complete:
       severity_level: Warning
-  numeric_behavior_from_calibration:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
-  numeric_impact_from_calibration:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning

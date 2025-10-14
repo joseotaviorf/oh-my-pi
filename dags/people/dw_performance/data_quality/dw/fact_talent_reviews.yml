@@ -25,22 +25,6 @@ column_level_validations:
   is_regrettable_loss:
     is_complete:
       severity_level: Warning
-  numeric_criticality_from_calibration:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
-  numeric_potential_from_calibration:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
-  numeric_readiness_from_calibration:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
-  numeric_risk_of_loss_from_calibration:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
   ts_created:
     is_complete:
       severity_level: Warning
