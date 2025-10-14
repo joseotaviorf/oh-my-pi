@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: seo_target_goldenset
+description: "Cleaned SEO target golden set data"
+domain: Growth
+columns:
+  year:
+    description: "Year when the keyword target was defined or scheduled for SEO campaign tracking"
+    lineage:
+      - datalake_gsheets_raw.seo_target_goldenset.year
+  month:
+    description: "Month when the keyword target was defined or scheduled for SEO campaign tracking"
+    lineage:
+      - datalake_gsheets_raw.seo_target_goldenset.month
+  dt_date:
+    description: "Date representation combining year and month. Target date for SEO keyword tracking and performance measurement"
+    lineage:
+      - datalake_gsheets_raw.seo_goldenset.dt_date
+  target_goldenset:
+    description: "Static label indicating the dataset refers to the 2025 SEO golden set target configuration"
+    lineage:
+      - datalake_gsheets_raw.seo_target_goldenset.target_goldenset

@@ -418,7 +418,7 @@ sheets_info:
     sheet_name: seo_budget_target_leads_2025
     clean_table_name: seo_budget_target_leads_2025
     sheet_context: static
-  
+
   collections_quarter_targets:
     sheet_id: 1NFHHQgYHVxeVc4yCQ9hykn9J07CCjopzCe4F0M7OnYw
     sheet_name: Quarter
@@ -429,6 +429,12 @@ sheets_info:
     sheet_id: 11i0VX84FLSxW70O0_u0yTCMGr47kMNILbpyw2dxB6nM
     sheet_name: seo_goldenset
     clean_table_name: seo_goldenset
+    sheet_context: static
+
+  seo_target_goldenset:
+    sheet_id: 1flTEIwM9Rubq68TVsXswV8O4XEBiKn38YLx0TtNqGq8
+    sheet_name: target_set_kws
+    clean_table_name: seo_target_goldenset
     sheet_context: static
 
   ibge_cities:
