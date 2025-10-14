@@ -68,7 +68,6 @@ WITH deduplicate_queues AS (
               ON h.segmentation_queue = qdts.queue AND qdts.queue_type = 'Segmentação'
           LEFT JOIN deduplicate_queues AS qdte
               ON h.eviction_queue = qdte.queue AND qdte.queue_type = 'Eviction'
-          WHERE DATE(ts_distribution) >= DATE('2025-05-29') AND DATE(ts_distribution) <= DATE('2025-07-15')
       ),
       next_ts_update AS (
           SELECT
