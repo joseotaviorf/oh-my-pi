@@ -21,6 +21,10 @@ columns:
     description: "Identifier of the user that started the session"
     lineage:
     - datalake_copilot_service_raw.session.user_id
+  user_phone_number:
+    description: "Phone number of the user associated with the session"
+    lineage:
+    - datalake_copilot_service_raw.session.user_phone_number
   chat_configuration:
     description: "Configuration of the chat session"
     lineage:

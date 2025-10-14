@@ -17,6 +17,10 @@ columns:
     description: "The session identifier"
     lineage:
     - datalake_copilot_service_raw.message.session_id
+  id_user:
+    description: "Identifier of the user associated with the message"
+    lineage:
+    - datalake_copilot_service_raw.message.user_id
   message_index:
     description: "The message index"
     lineage:
@@ -41,6 +45,18 @@ columns:
     description: "Extra data provided with the message"
     lineage:
     - datalake_copilot_service_raw.message.extra
+  processing_status:
+    description: "Processing status of the message"
+    lineage:
+    - datalake_copilot_service_raw.message.processing_status
+  media_url:
+    description: "URL of media content attached to the message"
+    lineage:
+    - datalake_copilot_service_raw.message.media_url
+  media_type:
+    description: "Type of media content attached to the message"
+    lineage:
+    - datalake_copilot_service_raw.message.media_type
   ts_created:
     description: "The message creation date"
     lineage:

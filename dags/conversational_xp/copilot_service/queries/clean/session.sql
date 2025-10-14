@@ -3,6 +3,7 @@ SELECT
   external_id AS id_external,
   external_reference AS id_sauron_session,
   user_id AS id_user,
+  user_phone_number,
   chat_configuration,
   created_at AS ts_created
 FROM
