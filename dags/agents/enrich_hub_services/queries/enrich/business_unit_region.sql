@@ -3,6 +3,7 @@ WITH hub_regions_aud AS (
         bur_aud.id,
         bur_aud.id_business_unit,
         bur_aud.id_region,
+        bur_aud.business_context,
         bur_aud.rev,
         bur_aud.rev_end,
         bur_aud.rev_type,
@@ -14,6 +15,7 @@ regions_coverage_dates AS (
     SELECT
         id_business_unit,
         id_region,
+        business_context,
         rev_type,
         ts_created AS ts_start,
         LEAD(ts_created) OVER (PARTITION BY id ORDER BY ts_created) AS ts_end
@@ -25,6 +27,7 @@ last_business_unit_info AS (
         id AS id_business_unit,
         hub_name,
         sdr_type AS business_model,
+        business_context,
         lead_types,
         negotiation_type
     FROM
@@ -37,6 +40,7 @@ hub_services_cte AS (
         rcd.id_business_unit,
         rcd.id_region,
         l_hub.hub_name,
+        l_hub.business_context,
         l_hub.business_model,
         l_hub.lead_types,
         l_hub.negotiation_type,
@@ -56,6 +60,7 @@ historical_data AS (
         bur_g.id_region,
         bur_g.business_unit AS hub_name,
         bur_g.business_model,
+        "" AS business_context,
         "[]" AS lead_types,
         CAST(NULL AS STRING) AS negotiation_type,
         TIMESTAMP(bur_g.dt_start) AS ts_start_coverage,
@@ -69,6 +74,7 @@ SELECT
     id_business_unit,
     id_region,
     hub_name,
+    business_context,
     business_model,
     lead_types,
     negotiation_type,
@@ -81,6 +87,7 @@ SELECT
     id_business_unit,
     id_region,
     hub_name,
+    business_context,
     business_model,
     lead_types,
     negotiation_type,

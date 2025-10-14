@@ -33,6 +33,11 @@ columns:
     lineage:
       - datalake_hub_services_clean.business_unit.negotiation_type
     description: BU negotiation type.
+  business_context:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region_aud.business_context
+      - datalake_hub_services_clean.business_unit.business_context
+    description: Business context served by the business unit (SALE/RENT).
   ts_start_coverage:
     lineage:
       - datalake_hub_services_clean.business_unit_region_aud.ts_created
