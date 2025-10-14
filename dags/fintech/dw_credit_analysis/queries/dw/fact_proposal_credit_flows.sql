@@ -723,6 +723,12 @@ SELECT
   IF(dt_tenant_first_doc_sent_date IS NOT NULL AND rr.resend_request IS NOT NULL, TRUE, FALSE) AS is_resend_request,
   is_single_tenant,
   is_renting_for_others,
+  CASE 
+	WHEN is_renting_for_others = TRUE THEN 'renting_for_others'
+	WHEN is_single_tenant = FALSE THEN 'multi_tenant'
+	WHEN is_single_tenant = TRUE THEN 'single_tenant'
+	ELSE NULL
+  END AS proposal_proponents_composition,
   is_credit_passport,
   total_proposal_proponents,
   dt_early_credit_created,
