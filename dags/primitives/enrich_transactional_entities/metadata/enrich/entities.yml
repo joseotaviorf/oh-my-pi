@@ -145,7 +145,6 @@ columns:
       - datalake_ebdb_clean.inspection.status
       - datalake_ebdb_clean.inspection.dt_inspected
       - datalake_ebdb_clean.listing_business_context.status
-      - datalake_ebdb_clean.listing_business_context.status_reason
       - datalake_ebdb_clean.listing_business_context.ts_created
       - datalake_entities_views.onboarding.status
       - datalake_entities_views.onboarding.ts_created
@@ -163,7 +162,7 @@ columns:
       For FR_OFFER entities - contains status field.
       For FR_CONTRACT entities - contains status and dt_started fields.
       For FR_TERMINATION entities - contains status and ts_created fields.
-      For LISTING entities - contains status and status_reason fields.
+      For LISTING entities - contains status and ts_created fields.
       For FR_INSPECTION entities - contains status field.
       For FR_ONBOARDING entities - contains status and ts_created fields.
       For FR_CREDIT_EVALUATION entities - contains status and ts_created fields.

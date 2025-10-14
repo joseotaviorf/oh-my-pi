@@ -279,8 +279,7 @@ listing AS (
             TO_JSON(
                 STRUCT(
                     lbc.status AS status,
-                    lbc.status_reason AS status_reason,
-                    lbc.ts_created AS ts_created
+                    lbc.ts_created AS when
                 )
             ) AS properties,
             CASE
