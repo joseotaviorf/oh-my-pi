@@ -464,7 +464,7 @@ onboarding AS (
             TO_JSON(
                 STRUCT(
                     status AS status,
-                    ts_created AS ts_created
+                    ts_created AS when
                 )
             ) AS properties,
             is_active,
