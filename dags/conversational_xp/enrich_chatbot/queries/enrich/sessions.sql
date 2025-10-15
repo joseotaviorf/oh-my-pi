@@ -87,6 +87,7 @@ escalated_sessions AS (
   SELECT DISTINCT
     t.id_ticket,
     t.id_session,
+    t.first_queue,
     t.last_queue
   FROM
     datalake_customer_support.tickets AS t
@@ -116,7 +117,7 @@ SELECT
     WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'other'
     ELSE NULL
   END AS whatsapp_number,
-  COALESCE(es.first_queue, s.first_queue) AS first_queue,
+  es.first_queue,
   es.last_queue,
   es.id_ticket IS NOT NULL AS is_escalated,
   s.ts_created,

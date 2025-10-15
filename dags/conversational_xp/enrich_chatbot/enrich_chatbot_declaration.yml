@@ -15,12 +15,6 @@ workflow:
     support_sessions:
       merge_on: [id_session]
       z_order_by: [id_session, ts_created]
-    csat:
-      merge_on: [id_session]
-      z_order_by: [id_session, ts_created] 
-    user_flags:
-      merge_on: [id_user]
-      z_order_by: [id_user]
 
 cluster:
   type: custom_cluster

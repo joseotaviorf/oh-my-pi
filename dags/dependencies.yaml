@@ -1486,8 +1486,6 @@ bietlejuice.enrich_cdp_personas:
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
 bietlejuice.enrich_chatbot:
-  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
-  - bietlejuice.chat_fup:load-clean-rating:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
