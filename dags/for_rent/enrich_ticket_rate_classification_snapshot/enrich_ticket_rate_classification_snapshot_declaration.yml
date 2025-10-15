@@ -4,7 +4,8 @@ dag:
   schedule_start_date: 2023, 9, 10
   owner: Data ForRent
   documentation:
-    dag_purpose: This DAG creates a snapshot of the table ticket_rate_classification
+    dag_purpose:
+      This DAG creates a snapshot of the table ticket_rate_classification
       in order to keep track of the changes that could undesirebly change ticket_rate
       metrics.
 workflow:
@@ -13,14 +14,14 @@ workflow:
   tables_customization:
     ticket_rate_classification:
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
 cluster:
-  type: databricks_12_2_min_general_photon_cluster
+  type: databricks_16_4_min_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -3,7 +3,7 @@ dag:
   name: enrich_tracksale_dispatches
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates enriched tables which contains data to be delivered to Tracksale, NPS tool.
       This DAG was created to help the dispatches already sent to Tracksale and use them to filter in reverse_tracksale DAG.
@@ -16,10 +16,10 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
