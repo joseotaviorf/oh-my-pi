@@ -48,6 +48,7 @@ old_bot_sessions AS (
       ON ss.id = gs.id_session
   WHERE
     ss.ts_updated >= '{load_start_date}'
+    AND ss.source IN ('whatsapp', 'internal_chat')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_started DESC) = 1
 ),
@@ -115,9 +116,9 @@ SELECT
     WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'other'
     ELSE NULL
   END AS whatsapp_number,
-  s.first_queue,
+  COALESCE(es.first_queue, s.first_queue) AS first_queue,
   es.last_queue,
-  s.first_queue IS NOT NULL AS is_escalated,
+  es.id_ticket IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
 FROM
