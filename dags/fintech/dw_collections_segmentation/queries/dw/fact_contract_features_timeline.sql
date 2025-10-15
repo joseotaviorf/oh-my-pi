@@ -453,6 +453,7 @@ segmentation_features AS (
                 AND mob_months <= 6
                 AND max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-under-mob6'
             WHEN reference_contract_status = 'Ativo'
+                AND max_delay_contaminated_contract_t2 <= 30
                 AND prob_payment_at_dt_reference = 'VERY_HIGH' THEN 'active-new-defaulter-early-very-high'
             WHEN reference_contract_status = 'Ativo'
                 AND prob_payment_at_dt_reference = 'HIGH'
@@ -584,6 +585,7 @@ segmentation_features AS (
                 AND mob_months <= 6
                 AND max_delay_contaminated_contract_t2 <= 30 THEN 'active-new-defaulter-under-mob6'
             WHEN reference_contract_status = 'Ativo'
+                AND max_delay_contaminated_contract_t2 <= 30
                 AND prob_payment = 'VERY_HIGH' THEN 'active-new-defaulter-early-very-high'
             WHEN reference_contract_status = 'Ativo'
                 AND prob_payment = 'HIGH'
