@@ -257,6 +257,15 @@ columns:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.proponent_type
     description: "True if the user is renting for other person (I.E proponent type is PERSON). If False, it means that the client is the main user and she/he is renting for herself/himself."
+  proposal_proponents_composition:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.proponent_type
+      - datalake_sorting_hat_clean.proponent
+    description: "Categorizes the proposal based on the composition of proponents. Can be 'renting_for_others' when the user is renting for another person, 'multi_tenant' when there are multiple tenants in the proposal, 'single_tenant' when there is only one tenant, or NULL if the composition cannot be determined."
+    categories:
+      renting_for_others: "The user is renting for another person (proponent type is PERSON)"
+      multi_tenant: "The proposal has multiple tenants (more than one proponent)"
+      single_tenant: "The proposal has only one tenant"
   is_credit_passport:
     lineage:
       - datalake_sorting_hat_clean.proposal.proposal_source
