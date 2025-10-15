@@ -104,28 +104,36 @@ contract_features AS (
 get_invoice_date_range AS (
     SELECT
         sk_contract,
-        MAX(dt_contract_annulled) AS dt_contract_end,
         MAX(dt_contract_start) AS dt_contract_start,
+        MAX(dt_contract_annulled) AS dt_contract_end,
         MIN(dt_reference) AS dt_first_invoice,
         MAX(dt_reference) AS dt_last_invoice
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
     GROUP BY 1
 ),
-get_date_array AS (
-    SELECT
+get_date_interval AS (
+  SELECT
         sk_contract,
-        dt_contract_end,
         dt_contract_start,
-        SEQUENCE(GREATEST(dt_first_invoice, DATE('{load_start_date}')),
-            IF(dt_contract_end IS NOT NULL,
+        dt_contract_end,
+        GREATEST(dt_first_invoice, DATE('{load_start_date}')) AS dt_start_interval,
+        IF(dt_contract_end IS NOT NULL,
                 LEAST(
                     GREATEST(DATE_ADD(dt_contract_end, 90), dt_last_invoice),
                     DATE('{load_end_date}')
                 ),
                 DATE('{load_end_date}')
-            )
-        ) AS dt_reference_array
+            ) AS dt_end_interval
     FROM get_invoice_date_range
+),
+get_date_array AS (
+    SELECT
+        sk_contract,
+        dt_contract_start,
+        dt_contract_end,
+        SEQUENCE(dt_start_interval, dt_end_interval) AS dt_reference_array
+    FROM get_date_interval
+    WHERE dt_end_interval BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 contract_date_references AS (
     SELECT
