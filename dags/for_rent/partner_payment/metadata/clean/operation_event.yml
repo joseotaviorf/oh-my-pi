@@ -1,0 +1,36 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: operation_event
+description: |
+  This table contains the events performed by the inspection agents payment system.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.operation_event.id
+    description: ID of the table, it's the primary key. 
+  id_operation:
+    description: ID of the operation event. 
+    lineage:
+      - datalake_partner_payment_raw.operation_event.operation_id
+  id_agent_type:
+    description: ID of the agent type.
+    lineage:
+      - datalake_partner_payment_raw.operation_event.agent_type_id
+  uuid_operation:
+    description: UUID of the operation.
+    lineage:
+      - datalake_partner_payment_raw.operation_event.operation_uuid
+  version:
+    description: Operation version. 
+    lineage:
+      - datalake_partner_payment_raw.operation_event.version 
+  ts_created:
+    description: Timestamp of the creation of the event.
+    lineage:
+      - datalake_partner_payment_raw.operation_event.created_at
+  ts_updated:
+    description: Timestamp of the update of the event. 
+    lineage:
+      - datalake_partner_payment_raw.operation_event.updated_at

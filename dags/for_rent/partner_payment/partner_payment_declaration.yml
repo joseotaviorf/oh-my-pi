@@ -1,0 +1,25 @@
+dag:
+  name: partner_payment
+  schedule_start_date: 2024, 7, 1
+  schedule_interval: 30 1,5 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      This DAG retrieves data from the partner_payment database, which is a source of payments data for inspection agents.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: PARTNER_PAYMENT_DB
+  tables_customization:
+    operation_event:
+      clean_table_name: operation_event
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
