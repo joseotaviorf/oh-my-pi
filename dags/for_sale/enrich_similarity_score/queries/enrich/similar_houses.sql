@@ -1,10 +1,65 @@
-WITH get_rent_houses AS (
+WITH get_sale_visits AS (
+    SELECT
+        oldi_1.id_house,
+        SUM(oldi_2.qt_visits_booked) AS qt_visits_booked_last_30d,
+        oldi_1.year,
+        oldi_1.month,
+        oldi_1.day
+    FROM
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi_1
+    INNER JOIN
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi_2
+            ON oldi_1.id_house = oldi_2.id_house
+            AND MAKE_DATE(oldi_2.year, oldi_2.month, oldi_2.day) BETWEEN
+                DATE_SUB(MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day), 30)
+                AND MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day)
+    WHERE
+        MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    GROUP BY
+        ALL
+),
+sale_with_visits AS (
+    SELECT
+        oldi.id_house,
+        oldi.sale_price AS price,
+        oldi.calculator_min_price AS p_10,
+        oldi.calculator_max_price AS p_90,
+        COALESCE(oldi.sale_price <= oldi.calculator_p70_price, FALSE) AS is_below_predicted_price_70,
+        COALESCE(v.qt_visits_booked_last_30d > 0, FALSE) AS has_visits_booked_last_30d,
+        h.city,
+        h.type,
+        h.total_area,
+        h.lat,
+        h.lng,
+        30 AS rule_days_published,
+        oldi.days_published,
+        'SALE' AS business_context,
+        oldi.year,
+        oldi.month,
+        oldi.day
+    FROM
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
+    INNER JOIN
+        datalake_ebdb_listing.house AS h
+            ON h.id = oldi.id_house
+    INNER JOIN
+        get_sale_visits AS v
+            ON oldi.id_house = v.id_house
+            AND oldi.year = v.year
+            AND oldi.month = v.month
+            AND oldi.day = v.day
+    WHERE
+        MAKE_DATE(oldi.year, oldi.month, oldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND oldi.days_published >= 1
+),
+get_rent_sale_houses AS (
     SELECT
         hldi.id_house,
         hldi.rent AS price,
         hldi.p_10,
         hldi.p_90,
-        IF(hldi.rent <= hldi.p_70, TRUE, FALSE) AS is_below_predicted_price_70,
+        COALESCE(hldi.rent <= hldi.p_70, FALSE) AS is_below_predicted_price_70,
+        NULL AS has_visits_booked_last_30d,
         h.city,
         h.type,
         h.total_area,
@@ -13,7 +68,6 @@ WITH get_rent_houses AS (
         15 AS rule_days_published,
         hldi.days_published,
         'RENT' AS business_context,
-        hldi.ts_last_publication,
         hldi.year,
         hldi.month,
         hldi.day
@@ -26,51 +80,41 @@ WITH get_rent_houses AS (
         MAKE_DATE(hldi.year, hldi.month, hldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND hldi.status_history = 'PUBLISHED'
         AND hldi.days_published >= 1
-),
-get_sale_houses AS (
-    SELECT
-        oldi.id_house,
-        oldi.sale_price AS price,
-        oldi.calculator_min_price,
-        oldi.calculator_max_price,
-        IF(oldi.sale_price <= oldi.calculator_p70_price, TRUE, FALSE) AS is_below_predicted_price_70,
-        h.city,
-        h.type,
-        h.total_area,
-        h.lat,
-        h.lng,
-        30 AS rule_days_published,
-        oldi.days_published,
-        'SALE' AS business_context,
-        oldi.ts_last_publication,
-        oldi.year,
-        oldi.month,
-        oldi.day
-    FROM
-        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
-    INNER JOIN
-        datalake_ebdb_listing.house AS h
-            ON h.id = oldi.id_house
-    WHERE
-        MAKE_DATE(oldi.year, oldi.month, oldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND oldi.days_published >= 1
-),
-get_rent_sale_houses AS (
-    SELECT * FROM get_rent_houses
+
     UNION ALL
-    SELECT * FROM get_sale_houses
+
+    SELECT
+        id_house,
+        price,
+        p_10,
+        p_90,
+        is_below_predicted_price_70,
+        has_visits_booked_last_30d,
+        city,
+        type,
+        total_area,
+        lat,
+        lng,
+        rule_days_published,
+        days_published,
+        business_context,
+        year,
+        month,
+        day
+    FROM
+        sale_with_visits
 ),
 get_similar AS (
     SELECT
         base.id_house AS base_id_house,
         similar.id_house AS similar_id_house,
-        base.lat AS base_lat,
-        base.lng AS base_lng,
-        similar.lat AS similar_lat,
-        similar.lng AS similar_lng,
-        default.HAVERSINE_DISTANCE(similar.lng, similar.lat, base.lng, base.lat) AS distance,
         base.days_published,
         base.business_context,
+        default.HAVERSINE_DISTANCE(similar.lng, similar.lat, base.lng, base.lat) AS distance,
+        (
+            similar.price BETWEEN base.p_10 AND base.p_90
+            AND similar.total_area BETWEEN base.total_area * 0.7 AND base.total_area * 1.3
+        ) AS has_price_and_area_match,
         base.year,
         base.month,
         base.day
@@ -78,28 +122,22 @@ get_similar AS (
         get_rent_sale_houses AS base
     LEFT JOIN
         get_rent_sale_houses AS similar
-            ON similar.id_house != base.id_house
-            AND similar.business_context = base.business_context
+            ON base.year = similar.year
+            AND base.month = similar.month
+            AND base.day = similar.day
+            AND base.id_house != similar.id_house
+            AND base.business_context = similar.business_context
+            AND base.city = similar.city
+            AND base.type = similar.type
+            AND COALESCE(similar.has_visits_booked_last_30d, TRUE)
             AND similar.is_below_predicted_price_70
-            AND similar.price BETWEEN base.p_10 AND base.p_90
-            AND similar.total_area BETWEEN base.total_area * 0.7 AND base.total_area * 1.3
-            AND similar.city = base.city
-            AND similar.type = base.type
             AND similar.days_published >= IF(base.days_published < base.rule_days_published, base.days_published, base.rule_days_published)
-            AND similar.year = base.year
-            AND similar.month = base.month
-            AND similar.day = base.day
 ),
-get_frst_distance AS (
+get_similar_rules AS (
     SELECT
-        MD5(CONCAT(base_id_house, business_context, year, month, day)) AS id,
-        base_id_house AS id_house,
+        base_id_house,
         COLLECT_LIST(similar_id_house) AS ids_similar,
-        IF(
-            business_context = 'RENT',
-            "1. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar",
-            "1. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar"
-        ) AS similar_rule,
+        1 AS rule_id,
         days_published,
         business_context,
         year,
@@ -108,111 +146,84 @@ get_frst_distance AS (
     FROM
         get_similar
     WHERE
-        distance <= 2
+        has_price_and_area_match
+        AND distance <= 2
     GROUP BY
         ALL
     HAVING
         SIZE(ids_similar) >= 3
-),
-get_scnd_distance AS (
+
+    UNION ALL
+
     SELECT
-        MD5(CONCAT(s.base_id_house, s.business_context, s.year, s.month, s.day)) AS id,
-        s.base_id_house AS id_house,
-        COLLECT_LIST(s.similar_id_house) AS ids_similar,
-        IF(
-            s.business_context = 'RENT',
-            "2. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar",
-            "2. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar"
-        ) AS similar_rule,
-        s.days_published,
-        s.business_context,
-        s.year,
-        s.month,
-        s.day
-    FROM
-        get_similar AS s
-    LEFT JOIN
-        get_frst_distance AS d1
-            ON d1.id_house = s.base_id_house
-            AND d1.business_context = s.business_context
-            AND d1.year = s.year
-            AND d1.month = s.month
-            AND d1.day = s.day
-    WHERE
-        d1.id_house IS NULL
-        AND s.distance <= 5
-    GROUP BY
-        ALL
-    HAVING
-        SIZE(ids_similar) >= 3
-),
-get_similar_fallback AS (
-    SELECT
-        base.id_house AS base_id_house,
-        similar.id_house AS similar_id_house,
-        base.days_published,
-        base.business_context,
-        base.year,
-        base.month,
-        base.day
-    FROM
-        get_rent_sale_houses AS base
-    LEFT JOIN
-        get_rent_sale_houses AS similar
-            ON similar.id_house != base.id_house
-            AND similar.business_context = base.business_context
-            AND similar.is_below_predicted_price_70
-            AND similar.city = base.city
-            AND similar.type = base.type
-            AND similar.days_published >= IF(base.days_published < base.rule_days_published, base.days_published, base.rule_days_published)
-            AND similar.year = base.year
-            AND similar.month = base.month
-            AND similar.day = base.day
-    LEFT JOIN
-        get_frst_distance AS d1
-            ON d1.id_house = base.id_house
-            AND d1.business_context = base.business_context
-            AND d1.year = base.year
-            AND d1.month = base.month
-            AND d1.day = base.day
-    LEFT JOIN
-        get_scnd_distance AS d2
-            ON d2.id_house = base.id_house
-            AND d2.business_context = base.business_context
-            AND d2.year = base.year
-            AND d2.month = base.month
-            AND d2.day = base.day
-    WHERE
-        d1.id_house IS NULL
-        AND d2.id_house IS NULL
-),
-get_filtered_similar_fallback AS (
-    SELECT
-        MD5(CONCAT(base_id_house, business_context, year, month, day)) AS id,
-        base_id_house AS id_house,
+        base_id_house,
         COLLECT_LIST(similar_id_house) AS ids_similar,
-        IF(
-            business_context = 'RENT',
-            "3. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar",
-            "3. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar"
-        ) AS similar_rule,
+        2 AS rule_id,
         days_published,
         business_context,
         year,
         month,
         day
     FROM
-        get_similar_fallback
+        get_similar
+    WHERE
+        has_price_and_area_match
+        AND distance <= 5
     GROUP BY
         ALL
     HAVING
         SIZE(ids_similar) >= 3
+
+    UNION ALL
+
+    SELECT
+        base_id_house,
+        COLLECT_LIST(similar_id_house) AS ids_similar,
+        3 AS rule_id,
+        days_published,
+        business_context,
+        year,
+        month,
+        day
+    FROM
+        get_similar
+    GROUP BY
+        ALL
+    HAVING
+        SIZE(ids_similar) >= 3
+),
+-- Choose the best rule (smallest rule_id) for each base house
+get_best_rule AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER(PARTITION BY base_id_house, business_context, year, month, day ORDER BY rule_id ASC) AS rn
+    FROM
+        get_similar_rules
 )
 SELECT
-    id,
-    id_house,
+    MD5(CONCAT(base_id_house, business_context, year, month, day)) AS id,
+    base_id_house AS id_house,
     ids_similar,
-    similar_rule,
+    CASE
+        WHEN rule_id = 1 THEN
+            IF(
+                business_context = 'RENT',
+                "1. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar",
+                "1. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2; at least 3 similar"
+            )
+        WHEN rule_id = 2 THEN
+            IF(
+                business_context = 'RENT',
+                "2. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar",
+                "2. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar_price between base p_10 and base p_90; similar_area between base_area * 0.7 and base_area * 1.3; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5; at least 3 similar"
+            )
+        WHEN rule_id = 3 THEN
+            IF(
+                business_context = 'RENT',
+                "3. status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar",
+                "3. status = PUBLISHED; if base publication time < 30 then similar publication time >= base publication time, else similar publication time >= 30; similar price <= p_70; similar has at least 1 visit booked in the last 30 days; similar city, type and business context are the same as the base; similar is not the base; at least 3 similar"
+            )
+    END AS similar_rule,
     SIZE(ids_similar) AS qty_similar,
     days_published,
     business_context,
@@ -220,32 +231,6 @@ SELECT
     month,
     day
 FROM
-    get_frst_distance
-UNION ALL
-SELECT
-    id,
-    id_house,
-    ids_similar,
-    similar_rule,
-    SIZE(ids_similar) AS qty_similar,
-    days_published,
-    business_context,
-    year,
-    month,
-    day
-FROM
-    get_scnd_distance
-UNION ALL
-SELECT
-    id,
-    id_house,
-    ids_similar,
-    similar_rule,
-    SIZE(ids_similar) AS qty_similar,
-    days_published,
-    business_context,
-    year,
-    month,
-    day
-FROM
-    get_filtered_similar_fallback
+    get_best_rule
+WHERE
+    rn = 1
