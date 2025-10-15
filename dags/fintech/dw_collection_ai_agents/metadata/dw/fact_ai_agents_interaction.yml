@@ -57,7 +57,7 @@ columns:
       - datalake_langfuse_clean.scores.value
       - datalake_chatbot.sessions.bot
     description: "Source of the AI agent: 'Matthew in Chat', 'Matthew in Whatsapp', or 'Wall-e'"
-  is_escalation:
+  is_escalated:
     lineage:
       - datalake_chatbot.sessions.is_escalation
     description: "Flag indicating if the session was escalated"
