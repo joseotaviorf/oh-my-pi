@@ -7,6 +7,7 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
     spark
 )
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -56,6 +57,13 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
         Exception: If writing fails
     """
     try:
+        # Ensure we're using the correct catalog context for Unity Catalog
+        if UnityCatalogHelper.is_cluster_unity_catalog_enabled():
+            current_catalog = UnityCatalogHelper.get_current_catalog()
+            logging.info(f"Unity Catalog enabled. Current catalog: {current_catalog}")
+            # Explicitly set catalog to ensure functions are resolved correctly
+            spark.sql(f"USE CATALOG {current_catalog}")
+
         db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
         database_name = db_info["db_raw_databricks"]
         database_location = db_info["db_raw_path"]
@@ -67,7 +75,7 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
         spark_metastore_service.create_database(database_name)
         df.printSchema()
         if extraction_type == "incremental":
-        # Ensure incremental column exists
+            # Ensure incremental column exists
 
             # Filter between dates
             df = df.filter(
@@ -95,8 +103,8 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
             )
         else:
             FullTableLoaderPipeline(
-            database_name, table_name, database_location, LayerEnum.RAW, None
-        ).load_and_register(df, format_options)
+                database_name, table_name, database_location, LayerEnum.RAW, None
+            ).load_and_register(df, format_options)
         # Initialize S3Loader
 
 
@@ -150,6 +158,9 @@ def main():
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
+
+    # Suppress verbose py4j logging
+    logging.getLogger('py4j').setLevel(logging.WARNING)
 
     args = parse_arguments()
 

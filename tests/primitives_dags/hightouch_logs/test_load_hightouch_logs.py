@@ -105,6 +105,8 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_spark.table.assert_called_once_with(table_name)
         self.assertEqual(result, self.mock_df)
 
+    @patch('load_hightouch_logs.spark')
+    @patch('load_hightouch_logs.UnityCatalogHelper')
     @patch('load_hightouch_logs.S3Loader')
     @patch('load_hightouch_logs.SparkMetastoreService')
     @patch('load_hightouch_logs.DatalakeMetastoreService')
@@ -112,7 +114,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
     @patch('load_hightouch_logs.spark_client')
     def test_load_table_into_datalake_incremental_success(self, mock_spark_client, mock_storage_format,
                                                         mock_datalake_service, mock_metastore_service,
-                                                        mock_s3_loader_class):
+                                                        mock_s3_loader_class, mock_unity_catalog, mock_spark):
         """Test successful incremental loading of table into datalake."""
         # Arrange
         mock_db_info = {
@@ -121,6 +123,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
         }
         mock_datalake_service.get_db_info.return_value = mock_db_info
         mock_storage_format.DEFAULT_RAW = "json_format"
+        mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
         mock_metastore_instance = Mock()
         mock_metastore_service.return_value = mock_metastore_instance
@@ -159,6 +162,8 @@ class TestLoadHightouchLogs(unittest.TestCase):
         self.assertEqual(s3_loader_call_args[1]['partitions'], ["year", "month", "day"])
         self.assertEqual(s3_loader_call_args[1]['optimize_dataframe'], False)
 
+    @patch('load_hightouch_logs.spark')
+    @patch('load_hightouch_logs.UnityCatalogHelper')
     @patch('load_hightouch_logs.FullTableLoaderPipeline')
     @patch('load_hightouch_logs.SparkMetastoreService')
     @patch('load_hightouch_logs.DatalakeMetastoreService')
@@ -166,7 +171,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
     @patch('load_hightouch_logs.spark_client')
     def test_load_table_into_datalake_full_success(self, mock_spark_client, mock_storage_format,
                                                  mock_datalake_service, mock_metastore_service,
-                                                 mock_pipeline):
+                                                 mock_pipeline, mock_unity_catalog, mock_spark):
         """Test successful full loading of table into datalake."""
         # Arrange
         mock_db_info = {
@@ -175,6 +180,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
         }
         mock_datalake_service.get_db_info.return_value = mock_db_info
         mock_storage_format.DEFAULT_RAW = "json_format"
+        mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
         mock_metastore_instance = Mock()
         mock_metastore_service.return_value = mock_metastore_instance
@@ -199,6 +205,57 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_datalake_service.get_db_info.assert_called_once_with('prod', 'hightouch_logs', '5a-datalake-prod')
         mock_metastore_instance.create_database.assert_called_once_with("datalake_hightouch_logs_raw")
         mock_pipeline_instance.load_and_register.assert_called_once()
+
+    @patch('load_hightouch_logs.spark')
+    @patch('load_hightouch_logs.UnityCatalogHelper')
+    @patch('load_hightouch_logs.S3Loader')
+    @patch('load_hightouch_logs.SparkMetastoreService')
+    @patch('load_hightouch_logs.DatalakeMetastoreService')
+    @patch('load_hightouch_logs.SparkTableStorageFormat')
+    @patch('load_hightouch_logs.spark_client')
+    def test_load_table_with_unity_catalog_enabled(self, mock_spark_client, mock_storage_format,
+                                                   mock_datalake_service, mock_metastore_service,
+                                                   mock_s3_loader_class, mock_unity_catalog, mock_spark):
+        """Test loading with Unity Catalog enabled - should execute USE CATALOG."""
+        # Arrange
+        mock_db_info = {
+            "db_raw_databricks": "datalake_hightouch_logs_raw",
+            "db_raw_path": "s3://bucket/raw/path/"
+        }
+        mock_datalake_service.get_db_info.return_value = mock_db_info
+        mock_storage_format.DEFAULT_RAW = "json_format"
+
+        # Unity Catalog is enabled
+        mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = True
+        mock_unity_catalog.get_current_catalog.return_value = "quintoandar_prod"
+
+        mock_metastore_instance = Mock()
+        mock_metastore_service.return_value = mock_metastore_instance
+
+        mock_s3_loader_instance = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader_instance
+
+        mock_spark_sql = Mock()
+        mock_spark.sql = mock_spark_sql
+
+        # Act
+        load_table_into_datalake(
+            df=self.mock_df,
+            table_name='sync_runs_trino',
+            environment='prod',
+            source='hightouch_logs',
+            datalake_bucket='5a-datalake-prod',
+            load_start_date='2025-10-07',
+            load_end_date='2025-10-07',
+            extraction_type='incremental',
+            incremental_column='started_at'
+        )
+
+        # Assert
+        # Verify Unity Catalog context was set
+        mock_unity_catalog.is_cluster_unity_catalog_enabled.assert_called_once()
+        mock_unity_catalog.get_current_catalog.assert_called_once()
+        mock_spark_sql.assert_called_once_with("USE CATALOG quintoandar_prod")
 
     @patch('load_hightouch_logs.F')
     def test_incremental_filtering_logic(self, mock_f):
@@ -226,13 +283,16 @@ class TestLoadHightouchLogs(unittest.TestCase):
         with patch('load_hightouch_logs.SparkMetastoreService'), \
              patch('load_hightouch_logs.DatalakeMetastoreService') as mock_datalake_service, \
              patch('load_hightouch_logs.SparkTableStorageFormat'), \
-             patch('load_hightouch_logs.S3Loader'):
+             patch('load_hightouch_logs.S3Loader'), \
+             patch('load_hightouch_logs.UnityCatalogHelper') as mock_unity_catalog, \
+             patch('load_hightouch_logs.spark'):
 
             mock_db_info = {
                 "db_raw_databricks": "test_db",
                 "db_raw_path": "s3://test/"
             }
             mock_datalake_service.get_db_info.return_value = mock_db_info
+            mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
             # Act
             load_table_into_datalake(
@@ -252,10 +312,13 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_f.lit.assert_called()
         mock_f.to_date.assert_called()
 
+    @patch('load_hightouch_logs.spark')
+    @patch('load_hightouch_logs.UnityCatalogHelper')
     @patch('load_hightouch_logs.DatalakeMetastoreService')
-    def test_load_table_into_datalake_exception(self, mock_datalake_service):
+    def test_load_table_into_datalake_exception(self, mock_datalake_service, mock_unity_catalog, mock_spark):
         """Test exception handling in load_table_into_datalake."""
         # Arrange
+        mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
         mock_datalake_service.get_db_info.side_effect = Exception("Database error")
 
         # Act & Assert
@@ -492,12 +555,15 @@ class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
         self.mock_df.filter.return_value = self.mock_df
         self.mock_df.selectExpr.return_value = self.mock_df
 
+    @patch('load_hightouch_logs.spark')
+    @patch('load_hightouch_logs.UnityCatalogHelper')
     @patch('load_hightouch_logs.S3Loader')
     @patch('load_hightouch_logs.SparkMetastoreService')
     @patch('load_hightouch_logs.DatalakeMetastoreService')
     @patch('load_hightouch_logs.SparkTableStorageFormat')
-    def test_load_empty_dataframe(self, mock_storage_format, mock_datalake_service,
-                                 mock_metastore_service, mock_s3_loader_class):
+    @patch('load_hightouch_logs.spark_client')
+    def test_load_empty_dataframe(self, mock_spark_client, mock_storage_format, mock_datalake_service,
+                                 mock_metastore_service, mock_s3_loader_class, mock_unity_catalog, mock_spark):
         """Test loading an empty DataFrame."""
         # Arrange
         mock_db_info = {
@@ -506,6 +572,7 @@ class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
         }
         mock_datalake_service.get_db_info.return_value = mock_db_info
         mock_storage_format.DEFAULT_RAW = "json_format"
+        mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
         mock_metastore_instance = Mock()
         mock_metastore_service.return_value = mock_metastore_instance
