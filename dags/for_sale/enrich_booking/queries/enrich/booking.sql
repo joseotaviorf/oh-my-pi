@@ -197,12 +197,18 @@ status_log AS (
 first_booking_author_sc AS (
     SELECT DISTINCT
         bsc.id_booking,
-        FIRST_VALUE(id_user) OVER (
-          PARTITION BY bsc.id_booking ORDER BY id
+        FIRST_VALUE(bsc.id_user) OVER (
+          PARTITION BY bsc.id_booking ORDER BY bsc.id
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS id_user_creation
     FROM
         datalake_ebdb_clean.booking_status_change AS bsc
+    LEFT JOIN
+        datalake_ebdb_clean.booking AS b
+            ON bsc.id_booking = b.id
+    WHERE
+        (b.type = 'Visita' AND bsc.ts_created::date < '2025-09-01')
+        OR (b.type != 'Visita')
 ),
 first_booking_author AS (
     SELECT DISTINCT

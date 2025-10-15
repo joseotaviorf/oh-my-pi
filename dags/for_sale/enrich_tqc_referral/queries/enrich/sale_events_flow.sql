@@ -17,6 +17,7 @@ first_booking_author AS (
       datalake_ebdb_clean.visit_status_log
     WHERE
       ts_created::date >= '2025-01-01'
+      AND event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
     GROUP BY 1
   )
   SELECT
