@@ -80,7 +80,7 @@ SELECT
   XXHASH64(c.id) AS sk_company,
   c.id AS id_company,
   ca.id_address,
-  cm.id_company AS id_hubspot,
+  COALESCE(cmu.id_company, cmc.id_company) AS id_hubspot,
   cp.uuid_banking_information,
   c.uuid_company,
   cp.uuid_integrator_partner,
@@ -89,8 +89,8 @@ SELECT
   ccr.identification_number AS creci,
   c.company_name,
   c.trade_name,
-  cm.company_name AS hubspot_company_name,
-  cm.extracted_3p_tag,
+  COALESCE(cmu.company_name, cmc.company_name) AS hubspot_company_name,
+  COALESCE(cmu.extracted_3p_tag, cmu.extracted_3p_tag) AS extracted_3p_tag,
   cp.is_company_asp,
   cp.is_company_ciq,
   cp.is_company_legal_person_rental_guarantee,
@@ -115,6 +115,8 @@ LEFT JOIN
   company_creci AS ccr
     ON c.id = ccr.id_company
 LEFT JOIN
-  company_members AS cm
-    ON c.uuid_company = cm.uuid_company
-      OR (cm.uuid_company IS NULL AND ccn.identification_number = cm.cnpj)
+  company_members AS cmu
+    ON c.uuid_company = cmu.uuid_company
+LEFT JOIN
+  company_members AS cmc
+    ON ccn.identification_number = cmc.cnpj
