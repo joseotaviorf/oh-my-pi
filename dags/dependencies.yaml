@@ -1028,6 +1028,7 @@ bietlejuice.dw_supply:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts:first-run-of-day
+  - bietlejuice.enrich_pp_multi:load-enrich-pp-multi-classification-history:first-run-of-day
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history:first-run-of-day
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-affiliate-volumetry-cluster:first-run-of-day

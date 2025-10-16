@@ -33,11 +33,26 @@ status AS (
         datalake_olos_dialer.outbound_contact_attempts AS olc
     QUALIFY first_call = 1
 ),
-pp_multi AS (
+pp_multi_segmentation AS (
 SELECT
   id_owner,
-  is_pp_multi_active,
-  dt_houses_owned
+  pp_multi_classification, 
+  MAKE_DATE(year, month, day) AS date
+FROM
+  datalake_pp_multi.pp_multi_classification_history AS ppm
+LEFT JOIN datalake_ebdb_agents.ciq_users AS ciqu
+    ON ppm.id_owner = ciqu.id_user
+    AND ciqu.is_last_status = TRUE
+WHERE 
+   ciqu.id_user IS NULL
+   AND pp_multi_classification = 'ACTIVE'
+   AND MAKE_DATE(year, month, day) >= DATE '2024-01-01'
+),
+pp_multi_channel AS (
+SELECT
+  id_owner,
+  is_pp_multi_active AS pp_multi_conversion_flag,
+  dt_houses_owned AS date
 FROM
   datalake_pro_owners.daily_owner_houses_quantity_history AS ppm
 WHERE
@@ -45,7 +60,7 @@ WHERE
    AND ppm.dt_houses_owned >= DATE '2024-01-01'
 ),
 ciq_id_users AS (
-SELECT
+SELECT  
     DISTINCT id_user
 FROM
     datalake_ebdb_agents.ciq_users 
@@ -181,7 +196,11 @@ base AS (
         fse.sk_supply,
         ac.affiliate_campaign,
         ac.affiliate_objective,
-        pp_m.is_pp_multi_active
+        pp_m_ch.pp_multi_conversion_flag, 
+        CASE 
+            WHEN pp_m_seg.pp_multi_classification = 'ACTIVE' THEN TRUE 
+            ELSE FALSE
+        END AS is_pp_multi_active
     FROM
         dw_growth.fact_supply_events AS fse
     LEFT JOIN
@@ -228,9 +247,14 @@ base AS (
         datalake_growth_taxonomy.affiliates_classification AS ac
             ON dat.sk_user_affiliate = ac.sk_user_affiliate
     LEFT JOIN
-        pp_multi AS pp_m
-            ON pp_m.id_owner = fse.sk_owner
-            AND dd.date = dt_houses_owned
+        pp_multi_channel AS pp_m_ch
+            ON pp_m_ch.id_owner = fse.sk_owner
+            AND pp_m_ch.date = dd.date
+            AND fse.nm_business_context = 'RENT'
+    LEFT JOIN
+        pp_multi_segmentation AS pp_m_seg
+            ON pp_m_seg.id_owner = fse.sk_owner
+            AND pp_m_seg.date = dd.date
             AND fse.nm_business_context = 'RENT'
     LEFT JOIN
         ciq_id_users as cu
@@ -255,7 +279,7 @@ report_origin AS (
             WHEN obt.funnel_order > 2 AND
                 obt.acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration')
                 AND obt.conversion_origin = 'ownerpwa'
-                AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
+                AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND pp_multi_conversion_flag = TRUE
             THEN 'PP Multi'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
@@ -283,7 +307,7 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
             WHEN obt.funnel_order < 3 AND
                 obt.acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration', 'ownerpwa')
-                AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
+                AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND pp_multi_conversion_flag = TRUE
             THEN 'PP Multi'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
@@ -382,7 +406,7 @@ SELECT
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'Inbound'
         WHEN full_conversion_origin = 'ownerpwa' AND is_hybrid_listing AND is_converted_by_ciq THEN 'CIQ'
         WHEN acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration', 'ownerpwa')
-                AND (LOWER(medium) = 'seo non-branded' OR LOWER(behavior_type) = 'organic') AND is_pp_multi_active = TRUE THEN 'PP Multi'
+                AND (LOWER(medium) = 'seo non-branded' OR LOWER(behavior_type) = 'organic') AND pp_multi_conversion_flag = TRUE THEN 'PP Multi'
         WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
         WHEN full_conversion_origin = 'rede' THEN 'Rede'
         WHEN full_conversion_origin = 'ciq' THEN 'CIQ'
