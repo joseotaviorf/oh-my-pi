@@ -40,6 +40,8 @@ workflow:
       raw_primary_keys: ["document_id", "company_id"]
     company_product:
       raw_primary_keys: ["product_id", "company_id"]
+    company_product_region: {}
+    company_product_tier: {}
     company: {}
     document: {}
     member_profile: {}
@@ -47,6 +49,7 @@ workflow:
     profile_hierarchy: {}
     profile: {}
     revenue_share: {}
+    tier: {}
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}" 

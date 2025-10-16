@@ -1,0 +1,58 @@
+---
+database_name: datalake_company_clean
+table_name: tier
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Classification entity representing business tiers for products or company categorizations in QuintoAndar's partner data model. Each tier corresponds to a unique business contract condition, feature bundle, or eligibility group, and can be attached to company-product relationships (e.g., for commission structure, product offering levels, or workflow gating).
+
+  BUSINESS RULES:
+  - Tiers define levels (such as Bronze, Silver, Gold) for business entities, enabling differentiated product offerings and operational flows.
+  - Each tier has a unique UUID for safe joins across systems and stable API communications.
+  - Tiers may evolve over time; versioning and audit timestamps enable traceability for compliance.
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.tier.id
+    description: |
+      Primary key (BIGSERIAL). Unique identifier for each tier row, internal use only for database relations.
+  uuid_tier:
+    lineage:
+      - datalake_company_raw.tier.tier_uuid
+    description: |
+      Unique business UUID for each tier, enabling safe cross-table joins and resilient integrations across QuintoAndar's data ecosystem.
+  tier_name:
+    lineage:
+      - datalake_company_raw.tier.tier_name
+    description: |
+      Human-readable business name of the tier (e.g., Bronze, Silver, Gold, Special). Used in UI, reporting, and API communications.
+  version:
+    lineage:
+      - datalake_company_raw.tier.version
+    description: |
+      Version number for the tier row, used for optimistic concurrency control and versioned audit.
+  ts_created:
+    lineage:
+      - datalake_company_raw.tier.created_at
+    description: |
+      Timestamp when the tier was first registered in the source system. Enables audit, time-travel queries, and ensures historical representativity.
+  ts_updated:
+    lineage:
+      - datalake_company_raw.tier.updated_at
+    description: |
+      Timestamp for the last update to the tier record. Enables audit trails for compliance and troubleshooting.
+  year:
+    lineage:
+      - datalake_company_raw.tier.year
+    description: |
+      Partitioning field. Year of the last update to the tier record.
+  month:
+    lineage:
+      - datalake_company_raw.tier.month
+    description: |
+      Partitioning field. Month of the last update to the tier record.
+  day:
+    lineage:
+      - datalake_company_raw.tier.day
+    description: |
+      Partitioning field. Day of the last update to the tier record.

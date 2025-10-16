@@ -1,0 +1,63 @@
+---
+database_name: datalake_company_clean
+table_name: company_product_region
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Table that maps the regions of a product to a company. This is used to identify the coverage that a company has in a region.
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.company_product_region.id
+    description: |
+      Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations.
+  id_company:
+    lineage:
+      - datalake_company_raw.company_product_region.company_id
+    description: |
+      Foreign key to the company table. Used to identify the company that the product is associated with.
+  id_product:
+    lineage:
+      - datalake_company_raw.company_product_region.product_id
+    description: |
+      Foreign key to the product table. Used to identify the product that the region is associated with.
+  id_region:
+    lineage:
+      - datalake_company_raw.company_product_region.region_external_id
+    description: |
+      Foreign key to the region table. Used to identify the region that the product is associated with.
+  purpose:
+    lineage:
+      - datalake_company_raw.company_product_region.purpose
+    description: |
+      Purpose of the region coverage for the company.
+  version:
+    lineage:
+      - datalake_company_raw.company_product_region.version
+    description: |
+      Optimistic locking version number (BIGINT) for concurrent update protection. Ensures document-company relationship integrity during simultaneous modifications.
+  ts_created:
+    lineage:
+      - datalake_company_raw.company_product_region.created_at
+    description: |
+      Timestamp of the creation of the product in the region.
+  ts_updated:
+    lineage:
+      - datalake_company_raw.company_product_region.updated_at
+    description: |
+      Timestamp of the last update of the product in the region.
+  year:
+    lineage:
+      - datalake_company_raw.company_product_region.year
+    description: |
+      Year of the last update of the product in the region.
+  month:
+    lineage:
+      - datalake_company_raw.company_product_region.month
+    description: |
+      Month of the last update of the product in the region.
+  day:
+    lineage:
+      - datalake_company_raw.company_product_region.day
+    description: |
+      Day of the last update of the product in the region.
