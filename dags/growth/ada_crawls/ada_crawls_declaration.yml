@@ -1,0 +1,52 @@
+dag:
+  name: ada_crawls
+  owner: Data Growth
+  schedule_start_date: 2025, 9, 3
+  schedule_interval: "0 0 * * 3"
+  documentation:
+    dag_purpose: |
+        This DAG extracts data from CSV files of weekly QuintoAndar website crawls stored in an S3 bucket.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  default_extraction_type: incremental
+  default_partitions: [year, month, day, device]
+  load_spark_job: load_ada_crawls_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds,'load_end_date') }}"
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}" #datalake_bucket
+    - "{dag_name}" #source
+    - "{load_start_date}"
+    - "{load_end_date}"
+  tables_customization:
+    internal_all:
+      extra_spark_job_arguments:
+        - internal_all #table_name
+        - "internal_all.csv" #folder_or_file_name
+        - "s3://seo-ada-cralws-{environment}/quintoandar.com.br/" #crawl_bucket_path
+    issues_overview_report:
+      extra_spark_job_arguments:
+        - issues_overview_report #table_name
+        - "issues_reports/issues_overview_report.csv" #folder_or_file_name
+        - "s3://seo-ada-cralws-{environment}/quintoandar.com.br/" #crawl_bucket_path
+    issues:
+      extra_spark_job_arguments:
+        - issues #table_name
+        - "issues_reports/" #folder_or_file_name
+        - "s3://seo-ada-cralws-{environment}/quintoandar.com.br/" #crawl_bucket_path
+
+cluster:
+  type: databricks_16_4_med_memory_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,44 @@
+---
+database_name: datalake_ada_crawls_clean
+table_name: issues
+owner: joao.lmelo@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains records of detected issues/anomalies in weekly web crawled data of QuintoAndar's 
+  website using Screaming Frog SEO Spider. It is updated weekly, every Wednesday at 00:00 BRT, to update
+  the data from the current week.
+columns:
+  address:
+    description: The URL in which the issue was detected.
+    lineage:
+      - datalake_ada_crawls_raw.issues.Address
+  issue:
+    description: | 
+      The name of the issue (e.g., "Content Readability Difficult", "H1 Missing", "Links Pages With High 
+      Internal Outlinks", "Response Codes Internal Client Error (4Xx)", etc.).
+    lineage:
+      - datalake_ada_crawls_raw.issues.issue
+  device:
+    description: |
+      The device type of the crawl (desktop or mobile).
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues.device
+  year:
+    description: |
+      The crawl date year.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues.date
+  month:
+    description: |
+      The crawl date month.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues.date
+  day:
+    description: |
+      The crawl date day.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues.date

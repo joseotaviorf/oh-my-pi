@@ -1,0 +1,67 @@
+---
+database_name: datalake_ada_crawls_clean
+table_name: issues_overview_report
+owner: joao.lmelo@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains summary records of anomalies/issues found in QuintoAndar's weekly webcrawl. It is updated weekly, 
+  every Wednesday at 00:00 BRT, to update the data from the current week.
+columns:
+  issue_name:
+    description: |
+      The name of the issue (e.g., "Content: Readability Difficult", "H1 Missing", "Links: Pages With High Internal 
+      Outlinks", "Response Codes: Internal Client Error (4Xx)", etc.).
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.`Issue Name`
+  issue_type:
+    description: The type of the issue (e.g., "Issue", "Opportunity", "Warning").
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.`Issue Type`
+  issue_priority:
+    description: The priority of the issue (e.g., "High", "Medium", "Low").
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.`Issue Priority`
+  description:
+    description: Issue short description.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.Description
+  how_to_fix:
+    description: How to fix the issue.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.`How To Fix`
+  help_url:
+    description: Help URL for the issue.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.`Help URL`
+  url_count:
+    description: The number of URLs that have the issue.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.URLs
+  percentage_of_total:
+    description: The percentage of crawled URLs that are affected by the issue.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.`% of Total`
+  device: 
+    description: |
+      The device type of the crawl (desktop or mobile).
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.device
+  year:
+    description: |
+      The crawl date year.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.date
+  month:
+    description: |
+      The crawl date month.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.date
+  day:
+    description: |
+      The crawl date day.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.date

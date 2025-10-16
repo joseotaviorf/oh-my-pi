@@ -1,0 +1,266 @@
+---
+database_name: datalake_ada_crawls_clean
+table_name: internal_all
+owner: joao.lmelo@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains records of internal_all.csv file from QuintoAndar's weekly webcrawl. It is updated weekly, 
+  every Wednesday at 00:00 BRT, to update the data from the current week.
+columns:
+  address:
+    description: The URL of the page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Address
+  content_type:
+    description: |
+      The content type of the URL, which may include the character set (e.g., text/html, text/html; 
+      charset=iso-8859-1, text/html; charset=utf-8).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Content Type`
+  status_code:
+    description: |
+      The HTTP response code returned by the server, indicating the result of the request. The codes are grouped by class 
+      (e.g., 2xx for success, 4xx for client errors).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Status Code`
+  status:
+    description: The HTTP header response, associated to the HTTP status code (e.g., OK, Moved Permanently, Not Found).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Status
+  indexability:
+    description: Indicates the permission status for content indexing by search engines, whether a URL is 'Indexable' or 'Non-indexable'.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Indexability
+  indexability_status:
+    description: |
+      The reason why a page is Non-Indexable (e.g., blocked by robots.txt, canonicalised, 
+      client error, noindex, redirected, etc.)
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Indexability Status`
+  title_content:
+    description: The (first) page title found on the page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Title 1`
+  title_pixel_width:
+    description: The width of the title in pixels.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Title 1 Pixel Width`
+  meta_description_content:
+    description: |
+      The content inside the first <meta name="description"> tag, found in the <head> section of a web page
+      source code, providing a concise description of the page. It is not not visible to users, but this tag 
+      is used by search engines to categorize the content and decide if it's relevant to be indexed and ranked.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Meta Description 1`
+  meta_description_pixel_width:
+    description: The width of the meta description in pixels.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Meta Description 1 Pixel Width`
+  meta_keywords_content:
+    description: |
+      The content inside a <meta name="keywords"> tag, found in the <head> section of a web page source code.
+      It contains a list of keywords that describe the page's content which is not visible to users.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Meta Keywords 1`
+  h1_content:
+    description: |
+      The content inside the first <h1> tag, found in the <body> section of a web page source code. 
+      It is the main heading of the page and is used to describe the main topic of the page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`H1-1`
+  secondary_h1_content:
+    description: |
+      The content inside a second <h1> tag of the page. While HTML allows multiple <h1> tags
+      on a single page, the general best practice is to use only one <h1> tag per page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`H1-2`
+  h2_content:
+    description: |
+      The content inside the first <h2> tag, found in the <body> section of a web page source code. 
+      It is a subheading of the page and is used to describe a subtopic. You can have multiple <h2> 
+      tags on a page, as they are used to delineate major sections or subheadings within the content.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`H2-1`
+  secondary_h2_content:
+    description: |
+      The content inside a second <h2> tag of the page. You can have multiple <h2> tags on a page,
+      as they are used to delineate major sections or subheadings within the content.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`H2-2`
+  meta_robots_content:
+    description: |
+      The directives inside a <meta name="robots"> tag, found in the <head> section of a web page source
+      code. It contains instructions for search engine crawlers on how to handle the page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Meta Robots 1`
+  x_robots_tag_content:
+    description: |
+      The directives for how crawlers should index URLs, defined in a HTTP header,
+      which is useful for non-HTML content such as PDFs and images.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`X-Robots-Tag 1`
+  meta_refresh_content:
+    description: |
+      The content inside a <meta http-equiv="refresh"> tag, found in the <head> section of a web page source code. 
+      It contains a specified time interval for the browser to refresh the page or redirect to a new URL.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Meta Refresh 1`
+  canonical_link_element:
+    description: |
+      The canonical version of the page defined inside a <link rel="canonical"> tag, in the <head> section of 
+      a web page source code. It specifies the preferred version of a webpage when multiple versions of a page 
+      exist with identical or very similar content. This helps prevent duplicate content issues SEO and guides 
+      search engines on which URL to prioritize for indexing and ranking. 
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Canonical Link Element 1`
+  redirect_url:
+    description: The target address to which a web browser is sent after a redirection, if the URL has a redirect.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Redirect URL`
+  redirect_type:
+    description: The method or protocol used to execute the redirection from one URL to another (e.g., HTTP Redirect).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Redirect Type`
+  language:
+    description: |
+      The ISO language code value of the HTML language tag, also known as the lang attribute, used to specify 
+      the language of the text content within an HTML document or specific elements (e.g., pt-BR).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Language
+  http_version:
+    description: The version of the Hypertext Transfer Protocol (HTTP) used by the server to send the response (e.g., 1.1).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`HTTP Version`
+  supply:
+    description: |
+      The inner HTML content extracted using a custom extraction from the Screaming Frog SEO Spider targeting
+      search pages with the following XPath: (//div[@data-testid='CONTEXTUAL_SEARCH_TITLE']//div//p//span)[1].
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Supply 1`
+  url_encoded_address: 
+    description: The encoded URL of the page requested by the SEO Spider, all non ASCII characters are percent encoded.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`URL Encoded Address`
+  size_in_bytes:
+    description: |
+      The size of the resource in bytes. The value is set by the HTTP Content-Length header if provided by the server, otherwise, 
+      it is set to zero. For HTML pages, this value considers the size of the raw, uncompressed HTML file.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Size (bytes)`
+  transferred_bytes:
+    description: |
+      The number of bytes that were transferred to load the resource, 
+      which might be less than the 'size_in_bytes' if compressed.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Transferred (bytes)`
+  total_transferred_bytes:
+    description: |
+      The total size of the of the full page load, with the sum of the transferred bytes of the main HTML page and 
+      of every single dependency and loaded resource.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Total Transferred (bytes)`
+  carbon_emissions:
+    description: The estimated carbon emissions of the page per page view in milligrams (mg).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`CO2 (mg)`
+  word_count:
+    description: |
+      The count of all words found within a content area (the <body> tag by default), excluding HTML tags, 
+      navigation, and footer elements. The calculation is based on text separated by spaces, no consideration 
+      is given to visibility of content (such as text inside a div set to hidden).
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Word Count`
+  sentence_count:
+    description: The total number of sentences detected in the main textual content of the page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Sentence Count`
+  average_words_per_sentence:
+    description: The average number of words contained within each sentence on the page.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Average Words Per Sentence`
+  flesch_reading_ease_score:
+    description: |
+      The score that measures the readability of the text. It is calculated based on average sentence length
+      and the average number of syllables per word. Higher scores indicate text that is easier to read.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Flesch Reading Ease Score`
+  readability:
+    description: |
+      The readability of the page, based on the Flesch Reading Ease Score 
+      (e.g., "Fairly Easy", "Hard", "Very Hard").
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Readability
+  text_ratio:
+    description: |
+      The percentage of of non-HTML characters found in the HTML body tag on a page (the text), 
+      relative to the total size of the HTML file
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Text Ratio`
+  crawl_depth:
+    description: |
+      The number of internal clicks required for the crawler to reach a URL from the starting URL. 
+      This measures the page's position within the internal link structure.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Crawl Depth`
+  folder_depth:
+    description: Depth of the URL based upon the number of subfolders (/sub-folder/) in the URL path.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Folder Depth`
+  inlink_count:
+    description: The number of internal links targeting the URL from other pages within the same subdomain.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Inlinks
+  unique_inlink_count:
+    description: The number of unique internal links targeting the URL from other pages within the same subdomain.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Unique Inlinks`
+  percentage_of_total:
+    description: The percentage of unique internal inlinks (considers only HTML pages with status code 200) to the URL.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`% of Total`
+  outlink_count:
+    description: The number of internal links to other URLs in the same subdomain.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.Outlinks
+  unique_outlink_count:
+    description: The number of unique internal links to other URLs in the same subdomain.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Unique Outlinks`
+  response_time:
+    description: The time taken to receive a HTTP response from the server.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Response Time`
+  ts_last_modified:
+    description: |
+      The timestamp of when the page was last modified, from the Last-Modified header in the servers HTTP response. 
+      If there is no Last-Modified header, the value will be empty.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Last Modified`
+  ts_crawl:
+    description: The timestamp of when the page was crawled.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.`Crawl Timestamp`
+  device:
+    description: |
+      The device type of the crawl (desktop or mobile).
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.device
+  year:
+    description: |
+      The crawl date year.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.date
+  month:
+    description: |
+      The crawl date month.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.date
+  day:
+    description: |
+      The crawl date day.
+      It is used for data partitioning and filtering purposes.
+    lineage:
+      - datalake_ada_crawls_raw.internal_all.date
