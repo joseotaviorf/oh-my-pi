@@ -1,9 +1,10 @@
 database_name: datalake_ebdb_clean
+table_name: house
 domain: For Sale
 owner: bruna.prates@quintoandar.com.br
 description: >
-  Comprehensive house registry test table from EBDB database, containing their characteristics, location data, pricing information, owner details, listing status and various metadata fields used across the QuintoAndar platform. Each record represents an unique house.
-table_name: house
+  Comprehensive house registry test table from EBDB database, containing their characteristics, location data, pricing information, owner details, listing status
+  and various metadata fields used across the QuintoAndar platform. Each record represents an unique house.
 columns:
   id:
     lineage:

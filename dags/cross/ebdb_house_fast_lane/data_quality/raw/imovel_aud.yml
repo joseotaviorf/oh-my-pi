@@ -1,0 +1,26 @@
+---
+table_name: datalake_ebdb_test_raw.imovel_aud
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Composite primary key (id, rev) must be unique
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_ebdb_test_raw.imovel_aud GROUP BY id, rev HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  usuario_id:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Error
+  regiao_id:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Error
+  rev:
+    is_complete:
+      severity_level: Error
+  status:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error

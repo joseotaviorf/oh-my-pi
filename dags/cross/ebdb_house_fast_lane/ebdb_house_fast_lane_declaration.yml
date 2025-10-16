@@ -20,6 +20,11 @@ workflow:
       clean_primary_keys: [id]
       clean_table_name: house
       clean_z_order_by: [id_user, id_region, status]
+    Imovel_AUD:
+      custom_schema: ebdb_test
+      clean_primary_keys: [id_house, rev]
+      clean_table_name: house_aud
+      clean_z_order_by: [id_house, id_region]
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: databricks_16_4_rfleet_instance_cluster_3_workers
   databricks_conn_id: databricks_new
