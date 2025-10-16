@@ -31,4 +31,4 @@ workflow:
     users: {}
     users_aud: {}
 cluster:
-  type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster
+  type: databricks_16_4_med_mem_driver_min_memory_2_nodes_cluster

@@ -780,6 +780,13 @@ databricks_13_3_med_general_driver_2_min_workers_cluster:
         ebs_volume_size: 200
         availability: SPOT_WITH_FALLBACK
 
+databricks_16_4_med_mem_driver_min_memory_2_nodes_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
 databricks_13_3_med_general_2_workers_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.large
