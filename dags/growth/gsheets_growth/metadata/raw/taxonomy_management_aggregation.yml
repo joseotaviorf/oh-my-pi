@@ -1,0 +1,5 @@
+---
+database_name: datalake_gsheets_raw
+table_name: taxonomy_management_aggregation
+owner: '@data-growth'
+domain: Growth

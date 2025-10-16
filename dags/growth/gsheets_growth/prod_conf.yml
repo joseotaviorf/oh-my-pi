@@ -1,22 +1,4 @@
 sheets_info:
-  affiliates_active_segmentation:
-    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
-    sheet_name: ativos
-    clean_table_name: affiliates_active_segmentation
-    sheet_context: growth
-
-  affiliates_inactive_segmentation:
-    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
-    sheet_name: inativos
-    clean_table_name: affiliates_inactive_segmentation
-    sheet_context: growth
-
-  affiliates_extra_user_bonus:
-    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
-    sheet_name: extra_user_bonus
-    clean_table_name: affiliates_extra_user_bonus
-    sheet_context: growth
-
   affiliate_type_targets:
     sheet_id: 1dK5zcAgTcFg8KaNU3FEiZbHJOBw1DuTwdFhiqGZBETE
     sheet_name: affiliate_type_targets
@@ -27,6 +9,24 @@ sheets_info:
     sheet_id: 1ZCQRTe-7OCKH56XSbfUdb7A_fDncK9eivRimO9nPot4
     sheet_name: affiliate_volumetry_cluster
     clean_table_name: affiliate_volumetry_cluster
+    sheet_context: growth
+
+  affiliates_active_segmentation:
+    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
+    sheet_name: ativos
+    clean_table_name: affiliates_active_segmentation
+    sheet_context: growth
+
+  affiliates_extra_user_bonus:
+    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
+    sheet_name: extra_user_bonus
+    clean_table_name: affiliates_extra_user_bonus
+    sheet_context: growth
+
+  affiliates_inactive_segmentation:
+    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
+    sheet_name: inativos
+    clean_table_name: affiliates_inactive_segmentation
     sheet_context: growth
 
   base_supply_souce_for_rent:
@@ -71,12 +71,6 @@ sheets_info:
     clean_table_name: demand_retention_ab_tests
     sheet_context: growth
 
-  demand_taxonomy_management_aggregation:
-    sheet_id: 14UunGBscdK3sRgRBXj-5ADDxD32OKUeh6WW3FYJeYVQ
-    sheet_name: aquisition_channel
-    clean_table_name: demand_taxonomy_management_aggregation
-    sheet_context: growth
-
   dict_taxonomy_supply:
     sheet_id: 1xhbRZ_W4GIy78LlT_yBlYV-WN7LikLFM7I2wRgMogg4
     sheet_name: mapped
@@ -88,7 +82,7 @@ sheets_info:
     sheet_name: coefficients_backward_looking
     clean_table_name: encm_coefficients_backward_looking
     sheet_context: growth
-  
+
   encm_coefficients_forward_looking:
     sheet_id: 1qAmeLFiO_W2vufA2oNK0326W5V_wbSjIYY7z32ahXns
     sheet_name: coefficients_forward_looking
@@ -137,16 +131,16 @@ sheets_info:
     clean_table_name: affiliates_manual_cost_engagement_history
     sheet_context: growth
 
-  marketing_costs_google_ad_type_flags:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: ad_type_flags
-    clean_table_name: marketing_costs_google_ad_type_flags
-    sheet_context: growth
-
   marketing_cost_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Oficial Taxonomy Composer
     clean_table_name: marketing_cost_taxonomy
+    sheet_context: growth
+
+  marketing_costs_google_ad_type_flags:
+    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
+    sheet_name: ad_type_flags
+    clean_table_name: marketing_costs_google_ad_type_flags
     sheet_context: growth
 
   marketing_manual_costs:
@@ -159,6 +153,12 @@ sheets_info:
     sheet_id: 14G3BRxBoIgutpNL7l_0xdeoJ0rnLWAc5A4ww4ZqfQvs
     sheet_name: rateio_name_convention
     clean_table_name: marketing_manual_costs_name_convetion
+    sheet_context: growth
+
+  marketing_offline_budget:
+    sheet_id: 1Ap6n1wC_jsmX8gyjcVPYlq7ckC2UV77XNULdABHp2Bo
+    sheet_name: marketing_offline_budget
+    clean_table_name: marketing_offline_budget
     sheet_context: growth
 
   marketing_offline_manual_costs:
@@ -177,12 +177,6 @@ sheets_info:
     sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
     sheet_name: offline_manual_share_cost_center
     clean_table_name: marketing_offline_manual_share_cost_center
-    sheet_context: growth
-
-  marketing_offline_budget:
-    sheet_id: 1Ap6n1wC_jsmX8gyjcVPYlq7ckC2UV77XNULdABHp2Bo
-    sheet_name: marketing_offline_budget
-    clean_table_name: marketing_offline_budget
     sheet_context: growth
 
   marketshare_units_and_tenants:
@@ -245,16 +239,16 @@ sheets_info:
     clean_table_name: rental_flows_targets
     sheet_context: growth
 
-  rental_rtp_targets:
-    sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U
-    sheet_name: rental_rtp_targets
-    clean_table_name: rental_rtp_targets
-    sheet_context: growth
-
   rental_ntp_source_targets:
     sheet_id: 1gKybsAl4m69AjJOpBgTk9VDQfqR9ViKv7ei6SXZ3DEE
     sheet_name: rental_ntp_source_targets
     clean_table_name: rental_ntp_source_targets
+    sheet_context: growth
+
+  rental_rtp_targets:
+    sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U
+    sheet_name: rental_rtp_targets
+    clean_table_name: rental_rtp_targets
     sheet_context: growth
 
   rental_tenant_prospects_budget_2024:
@@ -275,16 +269,16 @@ sheets_info:
     clean_table_name: rental_tof_daily_targets
     sheet_context: growth
 
-  rental_tof_weekly_targets:
-    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
-    sheet_name: rental_tof_weekly_targets
-    clean_table_name: rental_tof_weekly_targets
-    sheet_context: growth
-
   rental_tof_monthly_targets:
     sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
     sheet_name: rental_tof_monthly_targets
     clean_table_name: rental_tof_monthly_targets
+    sheet_context: growth
+
+  rental_tof_weekly_targets:
+    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
+    sheet_name: rental_tof_weekly_targets
+    clean_table_name: rental_tof_weekly_targets
     sheet_context: growth
 
   sale_flows_targets:
@@ -339,6 +333,12 @@ sheets_info:
     sheet_id: 1YcRJpy2PiNgZ1J0_FgimkAxY1W6TjTmaUI_-HWS-apY
     sheet_name: taxonomy_levels_values
     clean_table_name: taxonomy_levels_values
+    sheet_context: growth
+
+  taxonomy_management_aggregation:
+    sheet_id: 14UunGBscdK3sRgRBXj-5ADDxD32OKUeh6WW3FYJeYVQ
+    sheet_name: aquisition_channel
+    clean_table_name: taxonomy_management_aggregation
     sheet_context: growth
 
   tradecom_configuration:
