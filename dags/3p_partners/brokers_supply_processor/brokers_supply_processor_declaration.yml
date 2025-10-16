@@ -45,6 +45,8 @@ workflow:
     lead3p_aud:
       clean_table_name: lead_3p_aud
       raw_primary_keys: ["id", "rev"]
+    lead_update_operation_history:
+      z_order_by: [id]
     revinfo:
       clean_table_name: rev_info
   extra_query_template_params:

@@ -1,0 +1,83 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_update_operation_history
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: >
+  Tracks the update operations performed on property leads by external partners in the Rede QuintoAndar ecosystem.
+  Each record represents an audit of an operation on a lead, including action type, metadata, user who performed 
+  the change, and optional rationale for the update or deletion. Supports change tracking, regulatory audit, 
+  and analytics on lead management workflows.
+
+  BUSINESS CONTEXT: Enables transparency and traceability for operations (create, update, delete, etc.) performed 
+  on 3P property leads. Used to analyze lead update patterns, monitor partner behavior, support regulatory 
+  compliance, and identify potential data quality or operational bottlenecks.
+
+  RELATED TABLES: lead_3p (foreign key: id_lead), business_context_detail (for context of changes),
+  analytic_event (for lifecycle event correlation).
+
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.id
+    description: >
+      Unique auto-incrementing identifier for the lead update operation record (BIGINT, Primary Key, Not Nullable).
+      Used for cross-reference and audit log tracking.
+  id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.lead_id
+    description: >
+      Reference to the affected property lead in the lead_3p table (BIGINT, Foreign Key, Not Nullable).
+      Enables linkage of each operation to the corresponding property lead.
+  operation:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.operation
+    description: >
+      String indicating the type of operation performed (STRING, Not Nullable).
+      Enables classification and filtering of tracked changes.
+  metadata:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.metadata
+    description: >
+      JSON object containing extra details about the operation, such as changed fields, previous and new values, or auxiliary flags (JSON, Nullable).
+      Used for detailed auditing of what was changed in the operation.
+      Example: {"field": "price", "old_value": 1000, "new_value": 1200}
+  user_identification:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.user_identification
+    description: >
+      Identifier for the user or system actor who performed the operation (JSON, Nullable).
+      Enables tracking of who made each change; values can include partner user IDs, emails, or system process names.
+  reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.reason
+    description: >
+      Optional free-text explanation or code/reason for why the update was made (STRING, Nullable).
+      Used for compliance, traceability, and reporting on changes requiring justification.
+  deleted:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.deleted
+    description: >
+      String indicating soft deletion of the operation record.
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.created_at
+    description: >
+      Timestamp when the operation record was created in the brokers-supply-processor system (TIMESTAMP, Not Nullable).
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.updated_at
+    description: >
+      Timestamp when the operation record was last updated (TIMESTAMP, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.year
+    description: 'Partition column: Year extracted from ts_updated for data lake partitioning optimization (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.month
+    description: 'Partition column: Month extracted from ts_updated for data lake partitioning optimization (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_update_operation_history.day
+    description: 'Partition column: Day extracted from ts_updated for data lake partitioning optimization (INTEGER, Partition Key).'
