@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_visit_clean
+table_name: visit_business_model
+owner: vitor.musachio@quintoandar.com.br
+domain: For Sale
+description: >
+  Tracks the business model associated with each visit in the Marketplace QuintoAndar ecosystem.
+  Each record represents a visit's business model, indicating whether the supply or demand is 
+  from a 1P or 3P partner. Supports analytics on visit business model distribution and partner 
+  performance.
+columns:
+  id:
+    description: Unique identifier of the visit business model entry
+    lineage:
+      - datalake_ebdb_raw.visit_business_model.id
+  id_visit:
+    description: Unique identifier for the visit (visit_id)
+    lineage:
+      - datalake_ebdb_raw.visit_business_model.visit_id
+  business_model:
+    description: Business model associated with the visit, refering if the supply or demand is 1P or 3P.
+    lineage:
+      - datalake_ebdb_raw.visit_business_model.business_model
+  ts_created:
+    description: Timestamp when the entry was created (created_at)
+    lineage:
+      - datalake_ebdb_raw.visit_business_model.created_at
+  ts_updated:
+    description: Timestamp when the entry was last updated (updated_at)
+    lineage:
+      - datalake_ebdb_raw.visit_business_model.updated_at
