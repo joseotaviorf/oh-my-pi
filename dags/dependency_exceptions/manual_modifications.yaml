@@ -1047,8 +1047,6 @@ bietlejuice.enrich_pin:
     - bietlejuice.pin_talent:load-clean-rating-model-translation:first-run-of-day
     - bietlejuice.pin_talent:load-clean-review-period-base:first-run-of-day
     - bietlejuice.pin_talent:load-clean-review-period-translation:first-run-of-day
-bietlejuice.enrich_recommendations:
-  override: []
 bietlejuice.enrich_agreement_hourly:
   remove:
     - bietlejuice.trato_feito_hourly:load-clean-installment:first-run-of-day
