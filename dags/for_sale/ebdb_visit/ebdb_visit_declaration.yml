@@ -53,8 +53,6 @@ workflow:
       clean_table_name: user_visit_preferences_aud
     Visita_AUD:
       clean_table_name: visit_aud
-    VisitBusinessModel:
-      clean_table_name: visit_business_model
     VisitCheckin:
       clean_table_name: visit_checkin
     VisitCheckin_AUD:
