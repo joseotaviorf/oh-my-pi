@@ -78,7 +78,7 @@ workflow:
       - statement_id: "879200984646"
 
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
