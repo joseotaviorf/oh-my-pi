@@ -64,7 +64,7 @@ SELECT
     rr.is_exempted,
     rr.is_exempted_from_budget AS is_exempted_by_owner_from_budget,
     rev1.reviewer_type = "OWNER" AS is_requested_by_owner,
-    rev2.reviewer_type = 'OWNER' AS is_exempted_by_owner,
+    rev2.reviewer_type = 'OWNER' AND rr.is_exempted IS TRUE AS is_exempted_by_owner,
     CASE
       WHEN rr.is_finished = false AND rev2.reviewer_type = 'ADMIN' AND rr.is_exempted = true THEN true
       ELSE false
