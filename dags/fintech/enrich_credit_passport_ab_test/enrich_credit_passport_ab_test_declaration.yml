@@ -11,12 +11,11 @@ workflow:
   layer: enrich
   custom_schema: docx
 cluster:
-  type: databricks_12_2_min_io-memory_cluster
+  type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-    spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
       spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
