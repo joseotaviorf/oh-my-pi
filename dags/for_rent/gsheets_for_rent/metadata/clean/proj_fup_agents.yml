@@ -33,6 +33,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.offer_sent_date
     description: Date when the offer was sent (parsed as yyyy-MM-dd).
+  dt_sent:
+    lineage:
+      - datalake_gsheets_raw.fup_agents_historico.dt_envio
+    description: Date when the message was sent (parsed from dt_envio).
   offer_status:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.offer_status
