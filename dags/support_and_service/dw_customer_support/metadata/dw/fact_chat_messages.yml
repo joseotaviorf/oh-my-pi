@@ -1,7 +1,6 @@
 database_name: dw_customer_support
 table_name: fact_chat_messages
-description:
-  This table contains all chat messages exchanged via Twilio
+description: This table contains all chat messages exchanged via Twilio
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -34,6 +33,10 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.message_body
       - datalake_internal_chat_clean.internal_chat_messages.message
     description: Content of the message.
+  user_type:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.from_phone_number
+    description: Type of user who sent the message, either 'Bot', 'User' or 'Analyst'.
   ts_created:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.ts_created

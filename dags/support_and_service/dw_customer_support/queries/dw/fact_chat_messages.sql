@@ -3,6 +3,12 @@ WITH messages AS (
     id_channel,
     GET_JSON_OBJECT(event_payload, "$.MessageSid") AS id_message,
     REPLACE(from_phone_number, 'whatsapp:', '') AS user_sender,
+    CASE
+      WHEN from_phone_number = 'system' THEN 'Bot'
+      WHEN from_phone_number LIKE '%whatsapp%' THEN 'User'
+      WHEN from_phone_number LIKE '%@%' THEN 'Analyst'
+      ELSE NULL
+    END AS user_type,
     message_body AS message,
     'whatsapp' AS origin,
     ts_created
@@ -25,6 +31,12 @@ WITH messages AS (
     id_channel,
     id_message,
     REPLACE(REPLACE(id_user_external,'_2E', '.'), '_40', '@') AS user_sender,
+    CASE
+      WHEN id_user_external = 'system' THEN 'Bot'
+      WHEN REPLACE(REPLACE(id_user_external,'_2E', '.'), '_40', '@')  LIKE '%@%' THEN 'Analyst'
+      WHEN id_user_external IS NOT NULL THEN 'User'
+      ELSE NULL
+    END AS user_type,
     message,
     'in_app' AS origin,
     ts_created
@@ -51,6 +63,7 @@ twilio_data AS (
     m.id_message,
     REPLACE(m.user_sender, '+', '') AS user_sender,
     m.origin,
+    m.user_type,
     m.message,
     m.ts_created
   FROM
@@ -89,6 +102,7 @@ messages_with_users AS (
       END
     ) AS sk_user_sender,
     td.origin,
+    td.user_type,
     td.message,
     td.ts_created
   FROM
@@ -114,6 +128,7 @@ SELECT
   sk_message,
   sk_user_sender,
   origin,
+  user_type,
   message,
   CASE
     WHEN LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created) IS NOT NULL
