@@ -1,0 +1,57 @@
+---
+database_name: datalake_gsheets_clean
+table_name: instant_payout_history
+owner: luiz.ramos@quintoandar.com
+domain: For Sale
+description: 'Sheets with instant_payout data for A/B test tracking'
+columns:
+  sk_house_listing:
+    description: 'Key of house listing'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.sk_house_listing
+  id_house:
+    description: 'Unique identifier of the house record in EBDB database. Primary key for house identification across all QuintoAndar systems.TBD'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.id_house
+  planning_conversion:
+    description: 'Channel from which the lead was acquired'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.planning_conversion
+  planning_cluster:
+    description: 'Operation team responsible for converting the lead into first listing'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.planning_cluster
+  listing_category_start:
+    description: 'Category that house listing started as'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.ticket_range
+  ticket_range:
+    description: 'Tickets categorized by a specific value interval'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.ticket_range
+  is_with_frontdoor:
+    description: 'Boolean indicating if the house of this listing has a frontdoor'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.with_frontdoor
+  is_occupied:
+    description: 'Boolean indicating if the house of this listing is occupied'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.occupied
+  is_easy_entry:
+    description: 'Boolean indicating if the house of this listing has a easy entrance alternative for visits'
+    lineage:
+    - "datalake_gsheets_raw.instant_payout_history.easy_entry"
+  is_hybrid_pub:
+    description: 'Boolean indicating if the house of this listing was published on both rental and sale at the same time'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.hybrid_pub
+  is_exclusive:
+    description: 'Boolean indicating if this listing was published as an exclusive listing'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.is_exclusive
+  group:
+    description: 'Identifier for which group this listing belongs on the A/B testing of instant payout'
+    lineage:
+    - datalake_gsheets_raw.instant_payout_history.Group
+  ts_load:
+    description: 'Timestamp when the data was loaded'

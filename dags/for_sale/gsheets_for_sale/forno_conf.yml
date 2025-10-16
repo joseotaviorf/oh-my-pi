@@ -287,3 +287,10 @@ sheets_info:
     sheet_name: q_nps
     clean_table_name: notary_office_nps
     sheet_context: for_sale
+
+  instant_payout_history:
+    sheet_id: 1L3IvO6GbUD1pq3Vs6JdwMvoG-H-STTfSMyUSWqguLEY
+    sheet_name: data
+    clean_table_name: instant_payout_history
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
