@@ -1,18 +1,31 @@
 WITH visit AS (
-    WITH visit_base AS (
+    WITH visit_events AS (
         SELECT
-            id_visit AS id_entity,
-            id_house,
+            id_visit, 
+            event_type,
+            ts_created
+        FROM
+            datalake_ebdb_clean.visit_status_log
+        WHERE
+            event_type IN ('VISIT_REQUESTED', 'VISIT_SCHEDULED', 'VISIT_CONFIRMED', 'VISIT_DONE',
+                'VISIT_CANCELED', 'VISIT_UNSUCCESSFUL', 'VISIT_REGISTERED', 'VISIT_RESCHEDULED')
+        QUALIFY
+            ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
+    ),
+    visit_base AS (
+        SELECT
+            v.id_visit AS id_entity,
+            v.id_house,
             CAST(NULL AS BIGINT) AS id_contract,
-            id_owner,
-            id_visitor,
-            id_agent,
+            v.id_owner,
+            v.id_visitor,
+            v.id_agent,
             'VISIT' AS entity,
-            business_context,
+            v.business_context,
             TO_JSON(
                 STRUCT(
-                    computed_status AS computed_status,
-                    ts_visit AS ts_visit
+                    ve.event_type AS what,
+                    v.ts_visit AS when
                 )
             ) AS properties,
             CASE
@@ -20,12 +33,15 @@ WITH visit AS (
                 WHEN computed_status IN ('CONFIRMED', 'REQUESTED') THEN TRUE
                 ELSE NULL
             END AS is_active,
-            ts_created,
-            ts_updated
+            v.ts_created,
+            v.ts_updated
         FROM
-            core_visit.visit
+            core_visit.visit AS v
+        INNER JOIN
+            visit_events AS ve
+                ON v.id_visit = ve.id_visit
         WHERE
-            YEAR(ts_visit) >= 2025
+            YEAR(v.ts_created) >= 2025
     )
     SELECT
         id_entity,
