@@ -47,7 +47,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 DAI_CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_16_4_min_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_min_general_cluster")
 
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"

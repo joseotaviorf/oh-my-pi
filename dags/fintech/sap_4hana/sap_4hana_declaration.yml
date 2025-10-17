@@ -5,7 +5,7 @@ dag:
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      Ingestion of SAP Financial data via the new 4HANA API
+      Ingestion of SAP Financial data via the new 4HANA API using the new API client
 workflow:
   layer: raw
   type: custom_ingestion
@@ -28,7 +28,7 @@ workflow:
       extra_spark_job_arguments:
       - table_api_path: "http/PRD/QueryDatasphere"
 cluster:
-  type: databricks_16_4_med_general_cluster
+  type: databricks_13_3_med_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
