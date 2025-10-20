@@ -33,7 +33,7 @@ with DAG(
     start_date=datetime(
         2025, 7, 1, 0, 0, 0, tzinfo=pendulum.timezone("America/Sao_Paulo")
     ),
-    schedule_interval="45 20 * * *",
+    schedule_interval="55 20 * * *",
     catchup=False,
     doc_md="docs",
 ) as dag:
