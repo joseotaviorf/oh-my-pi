@@ -122,7 +122,10 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
         WITH columns_datalake AS (
             SELECT
                 CONCAT(database_name, ".", table_name, ".", column_name) AS id_entity,
-                layer,
+                CASE 
+                    WHEN database_name = "sandbox" THEN "sandbox"
+                    ELSE layer
+                END AS layer,
                 database_name,
                 table_name,
                 column_name
@@ -130,7 +133,10 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
                 datalake_documentation_metrics_clean.columns_metastore
             WHERE
                 MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
-                AND layer in ('clean', 'enrich', 'dw')
+                AND (
+                    layer in ('clean', 'enrich', 'dw')
+                    OR database_name = "sandbox"
+                )
             ),
             columns_to_sample AS (
             SELECT

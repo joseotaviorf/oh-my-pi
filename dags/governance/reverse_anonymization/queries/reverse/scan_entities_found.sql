@@ -6,7 +6,7 @@ WITH dag_info AS (
         WHEN d.owners IN ('Data SS', 'Data SS, airflow', 'airflow, Data SS') THEN 'Support & Services'
         WHEN d.owners IN ('Data Engineering', 'Data Engineering, airflow', 'airflow, Data Engineering') THEN 'Data Engineering'
         WHEN d.owners IN ('Data Ingestion', 'airflow, Data Ingestion', 'airflow, Data Ingestion', 'Data Life Cycle', 'Data Life Cycle, airflow', 'airflow, Data Life Cycle') THEN 'Data Ingestion'
-        WHEN d.owners IN ('Data Rede', 'Data Rede, airflow', 'Data Agents', 'airflow, Data Agents') THEN 'Partners'
+        WHEN d.owners IN ('Data Rede', 'Data Rede, airflow', 'Data Agents', 'airflow, Data Agents', 'airflow, Data 3P Partners', 'Data 3P Partners, airflow', 'Data 3P Partners') THEN 'Partners'
         WHEN d.owners IN ('Data Agents, airflow') THEN 'Agents'
         WHEN d.owners IN ('airflow, Data Rede') THEN 'Rede'
         WHEN d.owners IN ('Data Governance', 'Data Governance, airflow', 'airflow, Data Governance') THEN 'Data Governance'
@@ -40,7 +40,7 @@ WITH dag_info AS (
     AND month = {month}
     AND day = {day}
     AND t.layer IN ('clean','enrich','dw')
-), joined_data as (
+), clean_enrich_dw_data as (
   SELECT
     sc.id_entity,
     ti.owner_adjusted AS domain,
@@ -80,6 +80,48 @@ WITH dag_info AS (
     AND sc.month = {month}
     AND sc.day = {day}
     AND mv.id_entity IS NULL
+), sandbox_data as (
+  SELECT
+    sc.id_entity,
+    "sandbox" AS domain,
+    smp.sample,
+    sc.sample_summary,
+    sc.col_summary,
+    aggregate(
+      sample_summary,
+      CAST(NULL AS STRUCT<type: STRING, count: LONG>),
+      (acc, x) -> CASE
+                    WHEN acc IS NULL OR x.count > acc.count THEN x
+                    ELSE acc
+                  END
+    ).type AS highest_occur_sample,
+    aggregate(
+      col_summary,
+      CAST(NULL AS STRUCT<type: STRING, count: LONG>),
+      (acc, x) -> CASE
+                    WHEN acc IS NULL OR x.count > acc.count THEN x
+                    ELSE acc
+                  END
+    ).type AS highest_occur_col,
+    sc.year,
+    sc.month,
+    sc.day
+  FROM
+    datalake_anonymization.pii_scan_results as sc
+      LEFT JOIN datalake_anonymization.columns_sample_data as smp
+        ON sc.id_entity = smp.id_entity
+      LEFT JOIN datalake_anonymization_validation.manual_validation as mv
+        ON sc.id_entity = mv.id_entity
+  WHERE
+    sc.database_name = "sandbox"
+    AND sc.year = {year}
+    AND sc.month = {month}
+    AND sc.day = {day}
+    AND mv.id_entity IS NULL
+), union_data as (
+    (select * from clean_enrich_dw_data)
+    UNION ALL
+    (select * from sandbox_data)
 )
 SELECT
     id_entity,
@@ -101,8 +143,8 @@ SELECT
     TO_JSON(sample_summary) AS sample_summary,
     TO_JSON(col_summary) as col_summary,
     highest_occur_sample AS initial_eval,
-    jd.year,
-    jd.month,
-    jd.day
+    year,
+    month,
+    day
 FROM
-    joined_data AS jd
+  union_data
