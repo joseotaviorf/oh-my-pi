@@ -8,6 +8,11 @@ description: |
   Contains comprehensive contract-level information including evictions, collection efforts, negotiations,
   and aggregated wallet metrics across multiple delay methodologies for collections analysis.
 columns:
+  sk_contract_wallet_timeline:
+    description: Record unique identification (surrogate key)
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_contract
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   sk_contract:
     description: Contract identifier (surrogate key)
     lineage:

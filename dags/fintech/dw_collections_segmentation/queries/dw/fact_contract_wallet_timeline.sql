@@ -565,6 +565,7 @@ contract_enhanced AS (
             AND d.dt_reference = m.dt_reference
 )
 SELECT
+    MD5(CONCAT(sk_contract, DATE_FORMAT(dt_reference, 'yyyyMMdd'))) AS sk_contract_wallet_timeline,
     CAST(sk_contract AS BIGINT) AS sk_contract,
     dt_reference,
     reference_contract_status,

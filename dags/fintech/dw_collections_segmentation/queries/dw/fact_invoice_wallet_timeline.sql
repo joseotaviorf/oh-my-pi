@@ -246,6 +246,7 @@ delay_contamination_contract AS (
     GROUP BY 1,2
 )
 SELECT
+    MD5(CONCAT(sk_invoice, sk_contract, DATE_FORMAT(dt_reference, 'yyyyMMdd'))) AS sk_invoice_wallet_timeline,
     i.id_contract AS sk_contract,
     i.id_invoice AS sk_invoice,
     i.id_negotiation_parent AS sk_negotiation_parent,

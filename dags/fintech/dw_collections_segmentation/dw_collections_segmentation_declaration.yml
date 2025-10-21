@@ -23,13 +23,10 @@ workflow:
   tables_customization:
     fact_invoice_wallet_timeline:
       z_order_by: [dt_reference, sk_contract, sk_invoice]
-      merge_on: [sk_invoice, sk_contract, dt_reference]
     fact_contract_wallet_timeline:
       z_order_by: [dt_reference, sk_contract]
-      merge_on: [sk_contract, dt_reference]
     fact_contract_features_timeline:
       z_order_by: [dt_reference, sk_contract]
-      merge_on: [sk_contract, dt_reference]
 cluster:
   type: custom_cluster
   custom_configurations:

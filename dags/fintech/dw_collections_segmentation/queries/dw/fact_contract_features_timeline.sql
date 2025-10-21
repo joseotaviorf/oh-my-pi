@@ -699,6 +699,7 @@ segmentation_features AS (
         calculate_frozen_prob_payment
 )
 SELECT
+    MD5(CONCAT(sk_contract, DATE_FORMAT(dt_reference, 'yyyyMMdd'))) AS sk_contract_features_timeline,
     CAST(sk_contract AS BIGINT) AS sk_contract,
     dt_reference,
     reference_contract_status,

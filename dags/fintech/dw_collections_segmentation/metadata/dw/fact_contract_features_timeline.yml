@@ -12,6 +12,11 @@ description: |
   a contract enters each decision tree class (based on status and delay range) and remain constant until the contract
   moves to a different tree or until month end. This provides stable segmentation for operational and strategic planning.
 columns:
+  sk_contract_features_timeline:
+    description: Record unique identification (surrogate key)
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
   sk_contract:
     description: Contract surrogate key identifier
     lineage:

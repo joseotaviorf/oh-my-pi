@@ -8,6 +8,11 @@ description: |
   Contains detailed timeline information for each invoice including delay contamination analysis,
   recovery channel information, and bill item composition for collections analysis.
 columns:
+  sk_invoice_wallet_timeline:
+    description: Record unique identification (surrogate key)
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.id_contract
+      - datalake_collections_quintoandar.invoice_portfolio.id_invoice
   id_contract:
     description: Contract identifier
     lineage:
