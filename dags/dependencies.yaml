@@ -1621,8 +1621,8 @@ bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns:first-run-of-day
+  - bietlejuice.enrich_facebook_insights:load-enrich-facebook-insights-impression-device:first-run-of-day
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules:first-run-of-day
-  - bietlejuice.facebook_insights:load-clean-facebook-insights:first-run-of-day
   - bietlejuice.google_ads:load-clean-ads-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-keywords-performance:first-run-of-day

@@ -12,7 +12,7 @@ SELECT
     SUM(impressions) AS impressions,
     SUM(clicks) AS clicks
 FROM
-    datalake_facebook_insights_clean.facebook_insights
+    datalake_growth_facebook_insights.facebook_insights_impression_device
 WHERE
     country_code <> 'MX'
     AND dt_start BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
