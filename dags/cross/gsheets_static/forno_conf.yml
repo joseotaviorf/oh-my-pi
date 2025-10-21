@@ -431,6 +431,12 @@ sheets_info:
     clean_table_name: seo_goldenset
     sheet_context: static
 
+  seo_target_clicks_2025:
+    sheet_id: 1KhcngsDMVf-ZHHotNDjZQAA0dFE87_URVanBb4PMNEE
+    sheet_name: target_2025
+    clean_table_name: seo_target_clicks_2025
+    sheet_context: static
+  
   seo_target_goldenset:
     sheet_id: 1flTEIwM9Rubq68TVsXswV8O4XEBiKn38YLx0TtNqGq8
     sheet_name: target_set_kws
