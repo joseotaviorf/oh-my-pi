@@ -813,6 +813,9 @@ workflow:
     170698_coll_negotiation_waiting_page_swipe_events:
       run_optimize: false
       run_vacuum: false
+    233592_agenda_visit_list_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new
