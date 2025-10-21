@@ -93,7 +93,7 @@ latest_week_analyses AS (
 ),
 constants_calculator AS (
   SELECT
-    2.58 AS z_score,
+    3.29 AS z_score,
     0.055 AS error,
     0.5 AS population_proportion,
     1.4 AS resend_multiplication_factor,
