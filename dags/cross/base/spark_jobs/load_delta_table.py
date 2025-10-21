@@ -34,6 +34,7 @@ def main():
         + f"when_not_matched_insert_condition={args.when_not_matched_insert_condition}, "
         + f"when_matched_update_condition={args.when_matched_update_condition}, "
         + f"when_matched_delete_condition={args.when_matched_delete_condition}, "
+        + f"when_not_matched_by_source_delete_condition={args.when_not_matched_by_source_delete_condition}, "
         + f"when_matched_operation={args.when_matched_operation}, "
         + f"when_not_matched_operation={args.when_not_matched_operation}, "
         + "msg=Job execution started"
@@ -78,6 +79,7 @@ def main():
         when_not_matched_insert_condition=json.loads(args.when_not_matched_insert_condition),
         when_matched_update_condition=json.loads(args.when_matched_update_condition),
         when_matched_delete_condition=json.loads(args.when_matched_delete_condition),
+        when_not_matched_by_source_delete_condition=json.loads(args.when_not_matched_by_source_delete_condition),
         when_matched_operation=json.loads(args.when_matched_operation),
         when_not_matched_operation=json.loads(args.when_not_matched_operation),
         table_privileges=table_privileges,
@@ -142,6 +144,11 @@ def parse_arguments() -> Namespace:
         "when_matched_delete_condition",
         type=str,
         help="Condition to be used for delete operation",
+    )
+    parser.add_argument(
+        "when_not_matched_by_source_delete_condition",
+        type=str,
+        help="Condition to be used for delete operation when target rows don't exist in source",
     )
     parser.add_argument(
         "when_matched_operation",

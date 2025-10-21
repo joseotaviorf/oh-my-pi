@@ -68,6 +68,7 @@ class TestDataFrameDeltaTableLoaderPipeline:
             "when_matched_update_condition": "source.updated_at > target.updated_at",
             "when_not_matched_insert_condition": "source.is_active = true",
             "when_matched_delete_condition": "source.is_deleted = true",
+            "when_not_matched_by_source_delete_condition": "target.is_deleted = true",
             "when_matched_operation": {"status": "updated"},
             "when_not_matched_operation": {"status": "new"},
         }
@@ -97,6 +98,10 @@ class TestDataFrameDeltaTableLoaderPipeline:
         )
         assert pipeline.when_not_matched_insert_condition == "source.is_active = true"
         assert pipeline.when_matched_delete_condition == "source.is_deleted = true"
+        assert (
+            pipeline.when_not_matched_by_source_delete_condition
+            == "target.is_deleted = true"
+        )
         assert pipeline.when_matched_operation == {"status": "updated"}
         assert pipeline.when_not_matched_operation == {"status": "new"}
         assert pipeline.table_privileges == mock_table_privileges
@@ -196,6 +201,7 @@ class TestDataFrameDeltaTableLoaderPipeline:
             when_not_matched_insert_condition="source.is_active = true",
             when_matched_update_condition="source.updated_at > target.updated_at",
             when_matched_delete_condition="source.is_deleted = true",
+            when_not_matched_by_source_delete_condition="target.is_deleted = true",
             when_matched_operation={"status": "updated"},
             when_not_matched_operation={"status": "new"},
         )

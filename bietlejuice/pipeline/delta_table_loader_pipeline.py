@@ -31,6 +31,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         when_not_matched_insert_condition: str = None,
         when_matched_update_condition: str = None,
         when_matched_delete_condition: str = None,
+        when_not_matched_by_source_delete_condition: str = None,
         when_matched_operation: dict = None,
         when_not_matched_operation: dict = None,
         table_privileges: TablePrivileges = None,
@@ -49,6 +50,8 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         in the source dataframe as source.<column_name>, and the columns in the target table as target.<column_name>.
         - when_matched_delete_condition: it will add an operation to delete, but only if this condition is true. Again, source and
         target dataframe columns can be referred to respectively as source.<column_name> and target.<column_name>
+        - when_not_matched_by_source_delete_condition: it will delete rows from target that don't exist in source when this condition is true.
+        You can refer to target columns as target.<column_name>. Useful for full-load scenarios where missing records should be removed.
 
         :param database_name: database name to create the enriched table
         :param table_name: table name
@@ -65,6 +68,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         :param when_not_matched_insert_condition: condition to insert when not matched
         :param when_matched_update_condition: condition to update when matched
         :param when_matched_delete_condition: condition to delete when matched
+        :param when_not_matched_by_source_delete_condition: condition to delete from target when not matched by source
         :param when_matched_operation: Dictionary specifying columns and values to update on a match.
         :param when_not_matched_operation: Dictionary specifying columns and values to insert on no match.
         """
@@ -86,6 +90,9 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         self.when_not_matched_insert_condition = when_not_matched_insert_condition
         self.when_matched_update_condition = when_matched_update_condition
         self.when_matched_delete_condition = when_matched_delete_condition
+        self.when_not_matched_by_source_delete_condition = (
+            when_not_matched_by_source_delete_condition
+        )
         self.when_matched_operation = when_matched_operation
         self.when_not_matched_operation = when_not_matched_operation
         self.table_properties = table_properties
@@ -113,6 +120,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
             when_not_matched_insert_condition=self.when_not_matched_insert_condition,
             when_matched_update_condition=self.when_matched_update_condition,
             when_matched_delete_condition=self.when_matched_delete_condition,
+            when_not_matched_by_source_delete_condition=self.when_not_matched_by_source_delete_condition,
             when_matched_operation=self.when_matched_operation,
             when_not_matched_operation=self.when_not_matched_operation,
         )

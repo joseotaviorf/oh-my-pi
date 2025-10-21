@@ -33,6 +33,7 @@ class TestDeltaTableLoaderPipeline:
             when_not_matched_insert_condition="when_not_matched_insert_condition",
             when_matched_update_condition="when_matched_update_condition",
             when_matched_delete_condition="when_matched_delete_condition",
+            when_not_matched_by_source_delete_condition="when_not_matched_by_source_delete_condition",
         )
         df = "df"
         format_options = "format_options"
@@ -52,6 +53,7 @@ class TestDeltaTableLoaderPipeline:
             when_not_matched_insert_condition="when_not_matched_insert_condition",
             when_matched_update_condition="when_matched_update_condition",
             when_matched_delete_condition="when_matched_delete_condition",
+            when_not_matched_by_source_delete_condition="when_not_matched_by_source_delete_condition",
             when_matched_operation=None,
             when_not_matched_operation=None,
         )

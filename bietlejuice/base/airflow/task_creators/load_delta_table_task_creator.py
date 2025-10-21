@@ -33,6 +33,9 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
         when_matched_delete_condition = table_attributes.table_customization.get(
             "when_matched_delete_condition", None
         )
+        when_not_matched_by_source_delete_condition = table_attributes.table_customization.get(
+            "when_not_matched_by_source_delete_condition", None
+        )
         when_matched_operation = table_attributes.table_customization.get(
             "when_matched_operation", None
         )
@@ -60,6 +63,7 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
             json.dumps(when_not_matched_insert_condition),
             json.dumps(when_matched_update_condition),
             json.dumps(when_matched_delete_condition),
+            json.dumps(when_not_matched_by_source_delete_condition),
             json.dumps(when_matched_operation),
             json.dumps(when_not_matched_operation),
             "--table-privileges",
