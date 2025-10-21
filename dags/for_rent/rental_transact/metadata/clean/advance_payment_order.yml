@@ -1,0 +1,51 @@
+database_name: datalake_rental_transact_clean
+table_name: advance_payment_order
+description: This table contains order information for advance payments in the ForRent operation.
+  Each line represents a payment order and is uniquely identified by the id column.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.id
+    description: Unique id of the advance payment order.
+  id_external_order:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.external_order_id
+    description: External order id from the payment system.
+  id_advance_payment:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.advance_payment_id
+    description: Foreign key reference to the advance payment.
+  id_external_charge:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.external_charge_id
+    description: External charge id from the payment system.
+  status:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.status
+    description: Current status of the advance payment order.
+  installments:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.installments
+    description: Number of installments for this payment order.
+  payment_amount:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.payment_amount
+    description: Amount of the payment order.
+  unique_hash:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.unique_hash
+    description: Unique hash identifier for the order.
+  ts_created:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.created_at
+    description: Timestamp when the order was created.
+  ts_updated:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.updated_at
+    description: Timestamp when the order was last updated.
+  ts_paid:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_order.paid_at
+    description: Timestamp when the order was paid.

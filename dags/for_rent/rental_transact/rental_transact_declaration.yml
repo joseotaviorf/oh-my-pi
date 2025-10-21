@@ -15,6 +15,22 @@ workflow:
   dbutils_secret_key: RENTAL_TRANSACT_DB
   has_soft_delete: true
   tables_customization:
+    advance_payment:
+      clean_table_name: advance_payment
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    advance_payment_aud:
+      clean_table_name: advance_payment_aud
+      raw_primary_keys: [id, rev]
+      clean_primary_keys: [id, rev]
+    advance_payment_order:
+      clean_table_name: advance_payment_order
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    advance_payment_order_aud:
+      clean_table_name: advance_payment_order_aud
+      raw_primary_keys: [id, rev]
+      clean_primary_keys: [id, rev]
     event_log:
       clean_table_name: event_log
       raw_primary_keys: [id]

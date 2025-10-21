@@ -1,0 +1,28 @@
+SELECT
+    id,
+    advance_payment_uuid as uuid_advance_payment,
+    house_external_id as id_house_external,
+    tenant_external_id as id_tenant_external,
+    owner_external_id as id_owner_external,
+    rent_flow_uuid as uuid_offer,
+    rev,
+    revend,
+    revtype,
+    status,
+    rejection_reason,
+    payment_percentage,
+    payment_amount,
+    expires_at_mod as mod_ts_expires,
+    payment_percentage_mod as mod_payment_percentage,
+    payment_amount_mod as mod_payment_amount,
+    status_mod as mod_status,
+    rejection_reason_mod as mod_rejection_reason,
+    tenant_external_id_mod as mod_id_tenant_external,
+    owner_external_id_mod as mod_id_owner_external,
+    cancelled_at_mod as mod_ts_cancelled,
+    created_at as ts_created,
+    updated_at as ts_updated,
+    expires_at as ts_expires,
+    cancelled_at as ts_cancelled
+FROM
+    datalake_rental_transact_raw.advance_payment_aud

@@ -1,0 +1,107 @@
+database_name: datalake_rental_transact_clean
+table_name: advance_payment_aud
+description: This table contains the audit history for advance payment records in the ForRent operation.
+  Each line represents a historical version of an advance payment and is identified by id and rev columns.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.id
+    description: Unique id of the advance payment.
+  uuid_advance_payment:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.advance_payment_uuid
+    description: UUID of the advance payment.
+  id_house_external:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.house_external_id
+    description: External house id - joins with EBDB's house id.
+  id_tenant_external:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.tenant_external_id
+    description: External tenant id - joins with Person's user id.
+  id_owner_external:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.owner_external_id
+    description: External owner id - joins with Person's user id.
+  uuid_offer:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.rent_flow_uuid
+    description: UUID of the rent flow/offer.
+  rev:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.rev
+    description: Revision number for this audit entry.
+  revend:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.revend
+    description: End revision number for this audit entry.
+  revtype:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.revtype
+    description: Type of revision (0=ADD, 1=MOD, 2=DEL).
+  status:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.status
+    description: Current status of the advance payment.
+  rejection_reason:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.rejection_reason
+    description: Rejection reason of the advance payment, if it has any.
+  payment_percentage:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.payment_percentage
+    description: Percentage of the payment amount.
+  payment_amount:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.payment_amount
+    description: Amount of the advance payment.
+  mod_ts_expires:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.expires_at_mod
+    description: Flag indicating if expires_at was modified in this revision.
+  mod_payment_percentage:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.payment_percentage_mod
+    description: Flag indicating if payment_percentage was modified in this revision.
+  mod_payment_amount:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.payment_amount_mod
+    description: Flag indicating if payment_amount was modified in this revision.
+  mod_status:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.status_mod
+    description: Flag indicating if status was modified in this revision.
+  mod_rejection_reason:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.rejection_reason_mod
+    description: Flag indicating if rejection_reason was modified in this revision.
+  mod_id_tenant_external:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.tenant_external_id_mod
+    description: Flag indicating if tenant_external_id was modified in this revision.
+  mod_id_owner_external:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.owner_external_id_mod
+    description: Flag indicating if owner_external_id was modified in this revision.
+  mod_ts_cancelled:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.cancelled_at_mod
+    description: Flag indicating if cancelled_at was modified in this revision.
+  ts_created:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.created_at
+    description: Timestamp when the advance payment was originally created.
+  ts_updated:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.updated_at
+    description: Timestamp when the advance payment was last updated.
+  ts_expires:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.expires_at
+    description: Timestamp of when the advance payment expires.
+  ts_cancelled:
+    lineage:
+    - datalake_rental_transact_raw.advance_payment_aud.cancelled_at
+    description: Timestamp of when the advance payment was cancelled.
