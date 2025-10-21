@@ -7,6 +7,7 @@ SELECT
     Tipo_acao AS action_type,
     Acao AS action,
     Escritorio AS office,
+    Agencia_cobranca AS collection_agency,
     Camara AS chamber,
     Regiao AS region,
     Cidade AS city,

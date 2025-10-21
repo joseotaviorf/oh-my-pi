@@ -37,6 +37,10 @@ columns:
     description: "Escritório responsável pelo processo de despejo"
     lineage:
       - datalake_gsheets_raw.evictions_base.Escritorio
+  collection_agency:
+    description: "Assessoria responsável pela cobrança"
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Agencia_cobranca
   chamber:
     description: "Câmara ou vara judicial responsável pelo processo"
     lineage:
