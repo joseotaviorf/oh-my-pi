@@ -1,0 +1,37 @@
+---
+database_name: datalake_superset
+table_name: dataset_executions
+owner: gabriel.firmino@quintoandar.com.br
+domain: Data Ops & Governance
+description:
+  This table contains the number of executions of a dataset from Superset.
+  Also, this table has an incremental load, so use the partition columns year, month and day for performance gains.
+columns:
+  id_snapshot:
+    description: Hash of the dataset id and the execution date.
+  id_dataset:
+    lineage:
+      - datalake_superset_clean.logs.json
+    description:
+      Id of the dataset (called as table in Superset), but we decided to call id_dataset here so we won't
+      mix the concept with data lake tables.
+  dt_event:
+    lineage:
+      - datalake_superset_clean.logs.year
+      - datalake_superset_clean.logs.month
+      - datalake_superset_clean.logs.day
+    description: Date of the execution.
+  dataset_executions:
+    description: Number of executions of the dataset.
+  year:
+    description: Year of the execution. Also, a partition of the table.
+    lineage:
+      - datalake_superset_clean.logs.year
+  month:
+    description: Month of the execution. Also, a partition of the table.
+    lineage:
+      - datalake_superset_clean.logs.month
+  day:
+    description: Day of the execution. Also, a partition of the table.
+    lineage:
+      - datalake_superset_clean.logs.day

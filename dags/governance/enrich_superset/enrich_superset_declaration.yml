@@ -10,29 +10,37 @@ workflow:
   layer: enrich
   inner_dependencies:
     dashboards:
-    - ab_user
-    - tag
-    - tagged_object
+      - ab_user
+      - tag
+      - tagged_object
     slices:
-    - ab_user
-    - tables
-    - tag
-    - tagged_object
+      - ab_user
+      - tables
+      - tag
+      - tagged_object
     tables:
-    - ab_user
-    - table_columns
-    - sql_metrics
+      - ab_user
+      - table_columns
+      - sql_metrics
   tables_customization:
     ab_user:
       extraction_type: full
     dashboards:
       extraction_type: full
+    dataset_executions:
+      merge_on: [id_snapshot]
+      z_order_by: [id_snapshot]
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
     lake_tables_usage:
       extraction_type: incremental
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
     slices:
       extraction_type: full
     sql_metrics:
@@ -55,10 +63,9 @@ cluster:
   custom_configurations:
     driver_node_type_id: m5d.xlarge
     node_type_id: m5d.xlarge
-    runtime_engine: PHOTON
-    num_workers: 2
-    spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
