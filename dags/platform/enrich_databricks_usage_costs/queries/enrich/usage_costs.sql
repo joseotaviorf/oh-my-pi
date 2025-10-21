@@ -6,7 +6,7 @@ WITH granularity_ids AS (
           REPLACE(
             REPLACE(
               REGEXP_REPLACE(
-                REGEXP_REPLACE(dbu.cluster_name, '.+-bietlejuice', 'bietlejuice'), '(?:_mediator|_scheduled|_manual).+', ''
+                REGEXP_REPLACE(dbu.cluster_name, '.+-bietlejuice', 'bietlejuice'), '(?:_mediator|_scheduled|_manual|_dataset).+', ''
               ), '-', '.'
             ), '_None', ''
           ),
