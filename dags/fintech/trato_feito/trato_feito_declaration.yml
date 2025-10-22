@@ -91,8 +91,8 @@ cluster:
   type: custom_cluster
   custom_configurations:
     autotermination_minutes: 20
-    driver_node_type_id: r5.xlarge
-    node_type_id: r5.xlarge
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     aws_attributes:
