@@ -1,6 +1,6 @@
 database_name: datalake_ebdb_agents
 table_name: ciq_users
-description: Each line represents a change in the ciq status, if it has changed between active or inactive, 
+description: Each line represents a change in the ciq status, if it has changed between active or inactive,
   or has had any change in its user in main.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
@@ -36,9 +36,18 @@ columns:
   status:
     lineage:
       - datalake_ebdb_clean.partner_agent_aud.status
-    description: Status to identify wheter the agent is active or inactive.
-  is_last_status: 
-    description: Informs when the agent's most recent status.
+    description: Status to identify whether the agent is active or inactive.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.partner_agent_aud.status
+    description: boolean to identify whether the agent is active or inactive.
+  is_merge_loser_account:
+    lineage:
+      - datalake_ebdb_clean.user_merge.is_loser_account
+      - datalake_ebdb_clean.user_merge.status
+    description: boolean to identify whether the id user of an agent is the loser of a merge process.
+  is_last_status:
+    description: Characterizes a partner most recent status information.
   ts_agent_created:
     lineage:
       - datalake_ebdb_clean.partner.ts_created

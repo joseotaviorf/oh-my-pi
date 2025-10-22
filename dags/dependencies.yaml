@@ -1947,6 +1947,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_partner:load-clean-partner-agent-aud:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
+  - bietlejuice.ebdb_user:load-clean-user-merge:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-business-context:first-run-of-day
