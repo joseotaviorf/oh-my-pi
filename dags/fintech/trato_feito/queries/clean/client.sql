@@ -22,10 +22,5 @@ SELECT
     negativation_updated_at AS ts_negativation_updated,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    ts_cdc_transaction,
-    ts_database_transaction,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_trato_feito_raw.client
