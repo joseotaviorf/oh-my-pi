@@ -32,6 +32,9 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_employee.dim_cost_center WHERE is_active GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
   cost_center_name:
     has_null_count:
       less_than_or_equal_to: 1
