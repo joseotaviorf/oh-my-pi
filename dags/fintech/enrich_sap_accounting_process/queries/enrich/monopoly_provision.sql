@@ -1,48 +1,45 @@
 WITH 
 monopoly AS (
-    SELECT
-        st.id AS id_finance_entity,
-        ae.id,
-        ae.id_sale_transaction,
-        CASE
-            WHEN ae.entry_type = 'brokerage-executives' THEN '700006' 
-            WHEN ae.entry_type = 'brokerage-ciqs' THEN '700007'
-            WHEN ae.entry_type = 'brokerage' THEN '700013'
-          ELSE NULL
-        END AS account_number,
-        'Monopoly' AS source_name,
-        s.id_external_offer,
-        st.id_external_sync AS id_feature,
-        ne.error_type,
-        CASE
-          WHEN SUM(ae.credit) > 0 THEN SUM(ae.credit)
-          WHEN SUM(ae.debit) > 0 THEN SUM(ae.debit) * -1
-          ELSE 0 
-        END AS source_amount,
-        MIN(sr.dt_notary_start) AS dt_source_trigger,
-        SUM(sr.total_payment_amount * sr.brokerage_fee * sr.brokerage_quintoandar_fee) AS credit
-    FROM
-        datalake_monopoly_clean.sale s
-    LEFT JOIN datalake_monopoly_clean.sale_revision sr
-        ON s.id = sr.id
-        AND s.current_revision = sr.revision
-    LEFT JOIN datalake_monopoly_clean.sale_transaction st
-        ON st.id_sale = s.id AND st.event IN ('estate-agents-revenue-share','estate-agents-revenue-share-reversion')--EVT
-    LEFT JOIN datalake_monopoly_clean.accounting_entry ae
-        ON ae.id_sale_transaction = st.id AND ae.entry_type IN ('brokerage-executives', 'brokerage-ciqs', 'brokerage')
-    LEFT JOIN datalake_monopoly_clean.nota_fiscal_emission_error ne
-        ON s.id = ne.id_sale
-    WHERE
-      sr.dt_notary_start >= '2025-01-01'
-      AND st.id_external_sync IS NOT NULL
-    GROUP BY 
-      st.id, 
-      ae.id, 
-      ae.id_sale_transaction, 
-      ae.entry_type, 
-      s.id_external_offer, 
-      st.id_external_sync, 
-      ne.error_type
+  SELECT
+    st.id AS id_finance_entity,
+    ae.id,
+    ae.id_sale_transaction,
+    '420032' AS account_number,
+    'Monopoly' AS source_name,
+    s.id_external_offer,
+    st.id_external_sync AS id_feature,
+    ne.error_type,
+    CASE
+      WHEN st.event = 'nf-provision-reversion' THEN SUM(ae.credit) * -1
+      WHEN st.event = 'nf-provision' THEN SUM(ae.credit) 
+      ELSE 0 
+    END AS source_amount,
+    MIN(sr.dt_notary_start) AS dt_source_trigger,
+    SUM(sr.total_payment_amount * sr.brokerage_fee * sr.brokerage_quintoandar_fee) AS credit
+  FROM
+      datalake_monopoly_clean.sale s
+  LEFT JOIN datalake_monopoly_clean.sale_revision sr
+      ON s.id = sr.id
+      AND s.current_revision = sr.revision
+  LEFT JOIN datalake_monopoly_clean.sale_transaction st
+      ON st.id_sale = s.id AND st.event IN ('nf-provision', 'nf-provision-reversion')
+  LEFT JOIN datalake_monopoly_clean.accounting_entry ae
+      ON ae.id_sale_transaction = st.id AND ae.entry_type IN ('brokerage-quintoandar')
+  LEFT JOIN datalake_monopoly_clean.nota_fiscal_emission_error ne
+      ON s.id = ne.id_sale
+  WHERE
+    sr.dt_notary_start >= '2025-01-01'
+    AND st.id_external_sync IS NOT NULL
+    AND ae.credit <> 0
+  GROUP BY 
+    st.id, 
+    ae.id, 
+    ae.id_sale_transaction, 
+    ae.entry_type, 
+    s.id_external_offer, 
+    st.id_external_sync, 
+    ne.error_type, 
+    st.event
 ),
 sap_gateway AS (
   SELECT
@@ -108,7 +105,7 @@ SELECT
     sap_gateway_base sg ON l.hash = sg.hash
   WHERE 1=1
     AND dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('700006','700007','700013')
+    AND account_number = '420032'
   GROUP BY 1, 2, 3
 ),
 errors_base AS (
@@ -120,9 +117,7 @@ errors_base AS (
     m.source_name,
     m.account_number,
     CASE
-      WHEN sl.account_number = '700013' THEN 'Gross Revenue - Brokarage (For Sale)'
-      WHEN sl.account_number = '700006' THEN 'Revenue Share - Brokarage - AGENT (For Sale)'
-      WHEN sl.account_number = '700007' THEN 'Revenue Share - Brokarage - CIQ (For Sale)'
+      WHEN sl.account_number = '420032' THEN 'Brokerage For Sale (Platform)'
       ELSE CAST(NULL AS STRING)
     END AS accounting_name,
     DATE_FORMAT(m.dt_source_trigger, 'yyyyMM') AS accrual_year_month,
@@ -158,7 +153,7 @@ errors_base AS (
 ),
 assertions_base AS (
   SELECT
-    ('MNPL-R'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||COALESCE(account_number, '')) AS id_accounting_process,
+    ('MNPL-P'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||COALESCE(account_number, '')) AS id_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
@@ -188,7 +183,7 @@ SELECT
   version,
   'for sale' AS business_unit,
   source_name,
-  'revenue share' AS accounting_type,
+  'provision' AS accounting_type,
   account_number,
   accounting_name,
   source_amount,
