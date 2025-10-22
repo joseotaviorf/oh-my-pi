@@ -1,0 +1,73 @@
+database_name: datalake_terminations_view
+table_name: terminations
+description: View that consolidates main information on the termination request, including status, next published listing and information on whether an inspection is required and/or was opted out.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_termination:
+    lineage: 
+      - dw_offboarding.fact_terminations.sk_termination
+    description: Unique termination identification key.
+  termination_status:
+    lineage: 
+      - dw_offboarding.dim_termination.status
+    description: Current termination status.
+  termination_category:
+    lineage: 
+      - dw_offboarding.dim_termination.category
+    description: Descriptive information about the termination category.
+  id_contract:
+    lineage: 
+      - dw_offboarding.fact_terminations.sk_contract
+    description: Contract identification key.
+  id_house:
+    lineage: 
+      - dw_offboarding.fact_terminations.sk_house
+    description: House identification key.
+  id_house_listing:
+    lineage: 
+      - dw_offboarding.fact_terminations.sk_house_listing
+    description: House listing identification key.
+  country_code:
+    lineage: 
+      - dw_rent.fact_house_listings.country_code
+    description: Country code of the listing.
+  is_3p_supply:
+    lineage: 
+      - dw_rent.dim_house_listing.is_3p_supply
+    description: Boolean indicating if this is from Rede 3P supply.
+  ts_termination_request:
+    lineage: 
+      - dw_offboarding.fact_terminations.ts_termination_request
+    description: Date in timestamp format that irmination reqndicates when the teuest occurred.
+  ts_termination_canceled:
+    lineage: 
+      - dw_offboarding.fact_terminations.ts_termination_canceled
+    description: Date in timestamp format that indicates when the cancellation of the termination occurred.
+  dt_termination:
+    lineage: 
+      - dw_offboarding.fact_terminations.sk_termination_date
+    description: Date when the property became or will become vacant.
+  dt_ended_rental_confirmed: 
+    lineage: 
+      - dw_rent.dim_contract
+    description: Ended rental confirmed date for the contract.
+  is_erc_4w_matured:
+    lineage:
+    description: Boolean indicating whether 4 weeks have elapsed from the ended rental confirmed (ERC) date for the contract.
+  is_inspection_required:
+    lineage: 
+      - datalake_terminator_clean.termination_characteristics.is_inspection_required
+    description: Indicates whether a property inspection is required as part of the contract termination process.
+  is_exit_inspection_opted_out:
+    lineage: 
+      - dw_rent.dim_contract.is_exit_inspection_opted_out
+    description: Boolean indicating if the exit inspection is opted out.
+  id_next_house_listing:
+    lineage: 
+      - dw_rent.fact_house_listings.sk_next_house_listing_consolidated
+    description: Key of the next published house listing. This column is the consolidated of the sk_next_house_listing and sk_next_house_listing_rented columns, prioritizing the sk_next_house_listing_rented, but if it's -1, then it will get the value of sk_next_house_listing column, if it's also -1, then the value of this column will be -1, that's it, the listing doesn't have a valid next listing.
+  ts_publication_next_listing:
+    lineage: 
+      - dw_rent.dim_house_listing.ts_publication
+    description: House listing publication date of the next listing version.

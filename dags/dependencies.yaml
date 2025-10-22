@@ -3642,6 +3642,13 @@ bietlejuice.enrich_tenant_journey:
   - bietlejuice.terminator:load-clean-negotiation:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-aud:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
+bietlejuice.enrich_terminations_view:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
+  - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
+  - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
 bietlejuice.enrich_terminator:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b:first-run-of-day
