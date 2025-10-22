@@ -1,14 +1,15 @@
-SELECT DISTINCT
-    md.id_business_unit AS sk_business_unit,
-    o.name AS business_unit_name,
-    wr.legal_employer_name,
-    wr.legislation_code,
-    NOW() AS ts_load
+SELECT
+    id_organization AS sk_business_unit,
+    name AS business_unit_name,
+    created_by,
+    updated_by,
+    status = 'A' AS is_active,
+    dt_effective_started,
+    dt_effective_ended,
+    ts_created,
+    ts_updated,
+    ts_load
 FROM
-    datalake_pin.movement_details AS md
-JOIN 
-    datalake_hr_system.work_relationships AS wr 
-        ON md.id_period_of_service = wr.id_period_of_service
-JOIN 
-    datalake_hr_system_clean.organizations AS o
-        ON md.id_business_unit = o.id_organization
+    datalake_pin_core_clean.hr_organization
+WHERE
+    classification_code = 'FUN_BUSINESS_UNIT'

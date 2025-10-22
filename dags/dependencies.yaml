@@ -486,7 +486,6 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-disability:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-employee-info:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-hierarchy-ids:first-run-of-day
-  - bietlejuice.enrich_hr_system:load-enrich-work-relationships:first-run-of-day
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
@@ -502,6 +501,7 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_core:load-clean-assignment-extra-info:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-hr-organization:first-run-of-day
   - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
   - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
