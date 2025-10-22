@@ -1,0 +1,5 @@
+database_name: datalake_quires_raw
+table_name: urls
+description: Quires - Urls
+domain: Growth
+owner: data-growth@quintoandar.com.br / henrique.paulo@quintoandar.com.br

@@ -1,0 +1,38 @@
+database_name: datalake_quires_clean
+table_name: urls
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: Table containing URLs data from quires
+columns:
+  id:
+    description: Unique identifier for the URL record
+    lineage:
+      - datalake_quires_raw.urls.id
+  url:
+    description: URL associated with the record
+    lineage:
+      - datalake_quires_raw.urls.url
+  status:
+    description: Current status of the URL record
+    lineage:
+      - datalake_quires_raw.urls.status
+  ts_created:
+    description: Timestamp when the record was created
+    lineage:
+      - datalake_quires_raw.urls.createdAt
+  ts_updated:
+    description: Timestamp when the record was last updated
+    lineage:
+      - datalake_quires_raw.urls.updatedAt
+  year:
+    description: Year extracted from the load date for partitioning
+    lineage:
+      - datalake_quires_raw.urls.year
+  month:
+    description: Month extracted from the load date for partitioning
+    lineage:
+      - datalake_quires_raw.urls.month
+  day:
+    description: Day extracted from the load date for partitioning
+    lineage:
+      - datalake_quires_raw.urls.day

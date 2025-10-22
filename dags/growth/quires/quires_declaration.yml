@@ -31,6 +31,9 @@ workflow:
     properties:
       extra_spark_job_arguments:
       - properties  # table_name
+    urls:
+      extra_spark_job_arguments:
+      - urls  # table_name
 cluster:
   type: databricks_13_3_med_memory_cluster
   databricks_conn_id: databricks_new

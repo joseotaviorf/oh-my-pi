@@ -13,7 +13,7 @@ from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, coalesce, col
 
 JOB_NAME = f"load_quires_raw"
 
@@ -134,6 +134,15 @@ if __name__ == "__main__":
                 SparkDataFrameService()
                 .input(df)
                 .create_year_month_day_columns_from_dataframe_column("load_date")
+                .output()
+            )
+        elif table_name == "urls":
+            # New records in URLs don't have an updatedAt, so we use the createdAt
+            df = df.withColumn('updatedAt', coalesce(col('updatedAt'), col('createdAt')))
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_dataframe_column("updatedAt")
                 .output()
             )
         else:
