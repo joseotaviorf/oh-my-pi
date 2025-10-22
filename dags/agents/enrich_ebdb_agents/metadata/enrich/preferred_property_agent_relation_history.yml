@@ -1,0 +1,39 @@
+database_name: datalake_ebdb_agents
+table_name: preferred_property_agent_relation_history
+description: This table registers each house-listing preferred property agent relation from start to end date.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house_listing_relation:
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation_aud.id_house_listing_relation
+    description: Primary key - House-listing relation id
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation_aud.id_house
+    description: House id (main)
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation_aud.id_listing_business_context
+    description: Listing business context id
+  id_user_related_agent:
+    lineage:
+      - datalake_ebdb_user.user.id
+    description: id user (main) of the partner related to the house
+  id_related_agent:
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+    description: id agent of the partner related to the house
+  business_context:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.is_rent_context
+      - datalake_ebdb_listing.listing_business_context.is_sale_context
+    description: house-listing business context
+  ts_relation_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: relation creation date
+  ts_relation_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: relation exclusion date
