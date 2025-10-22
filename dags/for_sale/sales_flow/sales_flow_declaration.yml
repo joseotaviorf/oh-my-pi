@@ -14,6 +14,14 @@ workflow:
   custom_schema: sales_flow
   dbutils_secret_key: SALESFLOW_DB
   tables_customization:
+    addendums_aud:
+      clean_table_name: addendums_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    addendums:
+      clean_table_name: addendums
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]    
     address_data:
       clean_table_name: address_data
       raw_primary_keys: ["id"]

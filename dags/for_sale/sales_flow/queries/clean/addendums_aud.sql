@@ -1,0 +1,26 @@
+SELECT
+    id,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    sales_flow_id AS id_sales_flow,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    ccv_id AS id_ccv,
+    ccv_id_mod AS mod_id_ccv,
+    status,
+    status_mod AS mod_status,
+    signed_at AS ts_signed,
+    signed_at_mod AS mod_ts_signed,
+    signed_document_token,
+    signed_document_token_mod AS mod_signed_document_token,
+    unsigned_document_token,
+    unsigned_document_token_mod AS mod_unsigned_document_token,
+    reasons,
+    reasons_mod AS mod_reasons,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.addendums_aud
