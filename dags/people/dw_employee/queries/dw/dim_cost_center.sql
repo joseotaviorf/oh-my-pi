@@ -16,7 +16,7 @@ SELECT
   COALESCE(o.owner_leadership_layer_2_name, '-1') AS owner_leadership_layer_2_name,
   COALESCE(o.owner_leadership_layer_3_name, '-1') AS owner_leadership_layer_3_name,
   COALESCE(o.headcount_type, '-1') AS headcount_type,
-  COALESCE(o.status = 'A', '-1') AS is_active,
+  o.status = 'A' AS is_active,
   o.dt_effective_start,
   o.dt_effective_end,
   NOW () AS ts_load
