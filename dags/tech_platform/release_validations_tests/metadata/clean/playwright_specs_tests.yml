@@ -1,0 +1,258 @@
+---
+database_name: datalake_release_validations_tests_clean
+table_name: playwright_specs_tests
+domain: Tech Platform
+description: Granular Playwright executions with suite/spec/test metadata expanded to one row per retry.
+columns:
+  file_path:
+    description: Full storage path for the Playwright JSON artifact used as source.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.file_path
+  test_type:
+    description: Logical test classification derived from the artifact location (e.g. hermetic, e2e).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.test_type
+  repository:
+    description: Git repository name inferred from the artifact path.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.repository
+  deploy_group:
+    description: Deploy group or product area inferred from the artifact path.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.deploy_group
+  service:
+    description: Service or app name associated with the run, when available in the path.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.service
+  id_ci_build:
+    description: CI build identifier that produced the Playwright run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.ci_build_id
+  dt_run:
+    description: Execution date provided by the ingestion pipeline in YYYY-MM-DD.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.run_date
+  year:
+    description: Year partition extracted from run_date.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.year
+  month:
+    description: Month partition extracted from run_date.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.month
+  day:
+    description: Day partition extracted from run_date.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.day
+  run_total_expected:
+    description: Total number of expected assertions reported by Playwright for the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_total_unexpected:
+    description: Total number of unexpected assertions reported by Playwright for the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_total_flaky:
+    description: Count of tests classified as flaky in the run summary.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_total_skipped:
+    description: Total number of skipped tests reported in the run summary.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_total_duration_ms:
+    description: Total duration in milliseconds for the entire Playwright run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_start_time:
+    description: Start timestamp of the Playwright run in ISO-8601 format.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  playwright_version:
+    description: Playwright version captured in the run configuration.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  config_max_workers:
+    description: Maximum number of workers configured for the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  config_root_dir:
+    description: Root directory configured for Playwright within the repository.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  actual_workers:
+    description: Actual number of workers Playwright used during execution.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  git_commit_hash:
+    description: Full git commit hash from the run metadata.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  git_commit_short:
+    description: Short git commit hash from the run metadata.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  git_branch:
+    description: Git branch checked out for the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  git_commit_subject:
+    description: Commit subject line associated with the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  commit_author_name:
+    description: Author name for the commit associated with the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  commit_author_email:
+    description: Author email for the commit associated with the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  ts_commit_author:
+    description: Commit author timestamp (epoch millis) provided by metadata.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  suite_title:
+    description: Title of the Playwright suite containing the spec.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  suite_file:
+    description: File path of the suite definition.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  suite_line:
+    description: Line number in the suite file where the suite is declared.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  suite_column:
+    description: Column number in the suite file where the suite is declared.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  spec_title:
+    description: Title of the Playwright spec.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  id_spec:
+    description: Unique Playwright-generated spec identifier.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  spec_file:
+    description: File path where the spec is defined.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  spec_line:
+    description: Line number for the spec definition.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  spec_column:
+    description: Column number for the spec definition.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  is_spec_ok:
+    description: Boolean indicating whether the spec completed successfully across all tests.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  spec_tags:
+    description: Array of tags declared on the spec.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_timeout:
+    description: Timeout configured for the individual Playwright test (milliseconds).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_expected_status:
+    description: Status Playwright expected for the test (passed, failed, skipped, etc.).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  id_test_project:
+    description: Identifier of the Playwright project that executed the test.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_project_name:
+    description: Human-readable name of the Playwright project.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_overall_status:
+    description: Aggregated status of the test considering all retries.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_worker_index:
+    description: Index of the worker that executed the retry.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_parallel_index:
+    description: Parallel execution index reported by Playwright for the retry.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_status:
+    description: Status outcome for this specific retry (passed, failed, timedOut, skipped, etc.).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_duration_ms:
+    description: Duration in milliseconds for this retry attempt.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_retry_attempt:
+    description: Retry number starting from zero for the first execution.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_start_time:
+    description: Start timestamp of the retry attempt in ISO-8601 format.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_errors:
+    description: Array of error objects emitted by Playwright for the retry.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_attachments:
+    description: Array of attachments (screenshots, video, trace) generated for the retry.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_stdout:
+    description: Array of stdout lines captured during the retry.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  result_stderr:
+    description: Array of stderr lines captured during the retry.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  is_flaky_test:
+    description: Boolean indicating the retry passed after at least one previous failure.
+  is_passed:
+    description: Boolean flag when the retry finished with status passed.
+  is_failed:
+    description: Boolean flag when the retry finished with status failed.
+  is_skipped:
+    description: Boolean flag when the retry was skipped.
+  is_timeout:
+    description: Boolean flag when the retry ended due to timeout.
+  total_attempts_for_this_result:
+    description: Total number of attempts executed for the test up to and including this retry.
+  first_error_message:
+    description: First error message captured for the retry, when any.
+  first_error_stack:
+    description: Stack trace associated with the first error for the retry.
+  error_count:
+    description: Number of errors captured for the retry.
+  attachment_count:
+    description: Number of attachments captured for the retry.
+  stdout_line_count:
+    description: Quantity of stdout entries produced by the retry.
+  stderr_line_count:
+    description: Quantity of stderr entries produced by the retry.
+  ts_result_start:
+    description: Retry start timestamp converted to Spark timestamp type.
+  ts_run_start:
+    description: Run start timestamp converted to Spark timestamp type.
+  dt_run_parsed:
+    description: Date derived from ts_run_start for easier partitioning.
+  run_year:
+    description: Year component from ts_run_start.
+  run_month:
+    description: Month component from ts_run_start.
+  run_day:
+    description: Day component from ts_run_start.
+  run_hour:
+    description: Hour component from ts_run_start.
+  id_unique_test_result:
+    description: Concatenated identifier for the retry combining build, spec, project, and retry index.
