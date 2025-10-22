@@ -8,11 +8,14 @@ dag:
       It split the original struct fields into multiple columns, and creates
       generic enriched fields for the price_m2.
       It is weekly updated, every Friday, after the datalake_crawler_olx_clean.olx table
-      is updated.
+      is updated. It also creates a full table, olx_latest, with the latest data for each listing based on its ID.
 workflow:
   layer: enrich
   type: query_delta
   has_hive_sync: false
+  inner_dependencies:
+    olx_latest:
+      - olx
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
@@ -20,6 +23,11 @@ workflow:
     olx:
       extraction_type: incremental
       partitions: ["year", "month", "day"]
+      z_order_by: ["address_city"]
+    olx_latest:
+      extraction_type: full
+      merge_on: ["id_house"]
+      when_matched_update_condition: "MAKE_DATE(source.year, source.month, source.day) >= MAKE_DATE(target.year, target.month, target.day)" 
       z_order_by: ["address_city"]
 cluster:
   type: custom_cluster

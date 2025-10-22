@@ -1,0 +1,194 @@
+---
+database_name: datalake_crawler_olx
+table_name: olx
+description: |
+  This table contains the most recent update for each listing regarding the OLX crawler data.
+  It provides a deduplicated view of the datalake_crawler_olx.olx table, showing only
+  the most recent record per listing (id_house) based on the partition (year, month, day).
+
+  **Deduplication Logic:**
+  - Returns the latest update per listing using ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY make_date(year, month, day) DESC) = 1
+  - Filters data within the specified load date range
+
+  **Use Case:**
+  This table is ideal for analytics requiring the current state of each property without duplicates,
+  providing a clean, point-in-time view of the latest available information for each listing.
+
+  **Update Schedule:**
+  The table is updated weekly, every Friday, after the datalake_crawler_olx.olx
+  table is refreshed. This ensures data consistency and maintains the dependency chain.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns: 
+  id_house_platform:
+    lineage:
+      - datalake_crawler_olx.olx.id_house_platform
+    description: |
+      The id of the house in the OLX platform.
+  id_house:
+    lineage:
+      - datalake_crawler_olx.olx.id_house
+    description: |
+      It concatenates the id of the house in the OLX platform with the
+      string "olx".
+  platform:
+    lineage:
+      - datalake_crawler_olx.olx.platform
+    description: |
+      The origin of the house, which is always "olx" for this table.
+  country:
+    lineage:
+      - datalake_crawler_olx.olx.country
+    description: |
+      The country of the house.
+  state:
+    lineage:
+      - datalake_crawler_olx.olx.state
+    description: |
+      The state of the house.
+  address_city:
+    lineage:
+      - datalake_crawler_olx.olx.address_city
+    description: |
+      The city of the house.
+      It doens't assume null values, and it is used as a z_order field for the
+      delta table.
+  neighborhood:
+    lineage:
+      - datalake_crawler_olx.olx.neighborhood
+    description: |
+      The neighborhood of the house.
+  street:
+    lineage:
+      - datalake_crawler_olx.olx.street
+    description: |
+      The street of the house.
+  zip_code:
+    lineage:
+      - datalake_crawler_olx.olx.zip_code
+    description: |
+      The zip code of the house.
+  listing_name:
+    lineage:
+      - datalake_crawler_olx.olx.listing_name
+    description: |
+      The name of the listing.
+      It is the listing description provided in the origin platform.
+  total_area:
+    lineage:
+      - datalake_crawler_olx.olx.total_area
+    description: |
+      The total area of the house in square meters.
+  amenities:
+    lineage:
+      - datalake_crawler_olx.olx.amenities
+    description: |
+      The amenities available in the house, such as pool, balcony, elevator, gym,
+      among others.
+  bathrooms:
+    lineage:
+      - datalake_crawler_olx.olx.bathrooms
+    description: |
+      The number of bathrooms in the house.
+  bedrooms:
+    lineage:
+      - datalake_crawler_olx.olx.bedrooms
+    description: |
+      The number of bedrooms in the house.
+  parking_spaces:
+    lineage:
+      - datalake_crawler_olx.olx.parking_spaces
+    description: |
+      The number of parking spaces available for the house.
+  unit_type:
+    lineage:
+      - datalake_crawler_olx.olx.unit_type
+    description: |
+      The type of the housing unit (e.g., Apartamentos, Casas, etc.).
+  unit_subtype:
+    lineage:
+      - datalake_crawler_olx.olx.unit_subtype
+    description: |
+      The detailed type of the housing unit (e.g., Padrão, Casa de condomínio, Cobertura, etc.).
+  advertiser_name:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_name
+    description: |
+      The name of the advertiser/agent responsible for the listing.
+  advertiser_phone:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_phone
+    description: |
+      The phone number of the advertiser/agent responsible for the listing.
+  condo_fee:
+    lineage:
+      - datalake_crawler_olx.olx.condo_fee
+    description: |
+      The condominium fee for the property.
+  iptu:
+    lineage:
+      - datalake_crawler_olx.olx.iptu
+    description: |
+      The yearly IPTU (property tax) for the house.
+  rent_price:
+    lineage:
+      - datalake_crawler_olx.olx.rent_price
+    description: |
+      The rent price of the property.
+  sale_price:
+    lineage:
+      - datalake_crawler_olx.olx.sale_price
+    description: |
+      The sale price of the property.
+  price_m2_rental:
+    lineage:
+      - datalake_crawler_olx.olx.price_m2_rental
+    description: |
+      The rent price per square meter.
+      It is calculated by dividing the rental price by the total area,
+      rounded to 2 decimal places.
+  price_m2_sale:
+    lineage:
+      - datalake_crawler_olx.olx.price_m2_sale
+    description: |
+      The sale price per square meter.
+      It is calculated by dividing the sale price by the total area,
+      rounded to 2 decimal places.
+  is_for_rent:
+    lineage:
+      - datalake_crawler_olx.olx.is_for_rent
+    description: |
+      Boolean flag indicating if the property is available for rent.
+  is_for_sale:
+    lineage:
+      - datalake_crawler_olx.olx.is_for_sale
+    description: |
+      Boolean flag indicating if the property is available for sale.
+  is_hybrid:
+    lineage:
+      - datalake_crawler_olx.olx.is_hybrid
+    description: |
+      Boolean flag indicating if the property is available for both rent and sale.
+  ts_created:
+    lineage:
+      - datalake_crawler_olx.olx.ts_created
+    description: |
+      The timestamp when the listing was created.
+  year:
+    lineage:
+      - datalake_crawler_olx.olx.year
+    description: |
+      The year of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  month:
+    lineage:
+      - datalake_crawler_olx.olx.month
+    description: |
+      The month of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  day:
+    lineage:
+      - datalake_crawler_olx.olx.day
+    description: |
+      The day of the crawler date.
+      It is used for data partitioning and filtering purposes.
