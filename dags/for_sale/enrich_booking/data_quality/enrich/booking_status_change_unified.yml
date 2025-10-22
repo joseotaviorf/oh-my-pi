@@ -1,0 +1,18 @@
+---
+table_name: datalake_booking.booking_status_change_unified
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_booking_status:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_booking:
+    is_complete:
+      severity_level: Error
+  status:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error

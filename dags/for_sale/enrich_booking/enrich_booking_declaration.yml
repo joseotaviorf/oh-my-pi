@@ -11,6 +11,9 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    booking:
+      - booking_status_change_unified
 cluster:
   type: databricks_12_2_min_2xlarge_memory_cluster
   databricks_conn_id: databricks_new

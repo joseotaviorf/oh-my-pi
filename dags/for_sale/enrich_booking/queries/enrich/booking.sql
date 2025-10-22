@@ -1,26 +1,12 @@
 WITH status_change AS (
-  -- get the last status-change for each booking and status
-    WITH booking_status AS (
-        SELECT
-            bsc.id_reason_category,
-            bsc.id_booking,
-            bsc.status,
-            REPLACE(bsc.reason, '\n', '') AS reason,
-            bsc.reason_enum,
-            ROW_NUMBER() OVER (PARTITION BY bsc.id_booking, bsc.status ORDER BY bsc.id DESC) AS status_change_row_number
-        FROM
-            datalake_ebdb_clean.booking_status_change AS bsc
-    )
     SELECT
-        bs.*,
-        acrc.name AS reason_category
+        id_booking,
+        status,
+        reason,
+        reason_enum,
+        reason_category
     FROM
-        booking_status AS bs
-    LEFT JOIN
-        datalake_ebdb_clean.appointment_change_reason_category AS acrc
-            ON acrc.id = bs.id_reason_category
-    WHERE
-        bs.status_change_row_number = 1
+        datalake_booking.booking_status_change_unified
 ),
 canceled_date AS (
     WITH min_canceled_date AS (
