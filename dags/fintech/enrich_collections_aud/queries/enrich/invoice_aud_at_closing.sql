@@ -59,12 +59,14 @@ calculate_dt_closing AS (
         CASE
             WHEN DATE(i.dt_reference) >= sd.dt_previous_end_month
                 AND DATE(i.dt_reference) < sd.dt_snapshot
+                AND sd.dt_previous_end_month >= DATE(i.ts_created)
             THEN sd.dt_previous_end_month
             ELSE LAST_DAY(i.dt_reference)
         END AS dt_closing,
         CASE
             WHEN DATE(i.dt_reference) >= sd.dt_previous_end_month
                 AND DATE(i.dt_reference) < sd.dt_snapshot
+                AND sd.dt_snapshot >= DATE(i.ts_created)
             THEN sd.dt_snapshot
             ELSE sd.dt_next_snapshot
         END AS dt_snapshot,
@@ -131,6 +133,7 @@ SELECT
     is_write_off,
     accrual_year_month_count,
     dt_due_adjusted,
+    dt_reference,
     dt_month_end,
     dt_snapshot,
     ts_write_off,
