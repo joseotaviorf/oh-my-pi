@@ -172,127 +172,168 @@ WITH first_listing_conditions AS (
     WHERE
         t.consultant_type_rent IN ('CIQ_FULL', 'CIQ_MANAGER')
         AND COALESCE(t.id_user_listing_registrant_rent, t.id_user_listing_registrant_sale) IS NOT NULL
-)
-SELECT
-    t.id_house,
-    t.id_previous_duplicated_house,
-    CAST(t.id_ciq_user_rent AS BIGINT) AS id_user,
-    t.uuid_person_rent AS uuid_person,
-    t.id_partner_rent AS id_partner,
-    t.id_agent_rent AS id_agent,
-    t.id_ciq_user_rent_duplicated_house,
-    t.id_ciq_user_sale_duplicated_house,
-    "RENT" AS business_context,
-    t.consultant_type_rent AS consultant_type,
-    t.house_listing_status,
-    t.house_listing_status_duplicated_house,
-    t.supply_source,
-    t.supply_source_rent AS supply_source_by_context,
-    t.supply_source_duplicated_house,
-    t.days_between_fl_hybrid,
-    t.hybrid_creation_order,
-    IF(
+),
+union_first_listing AS (
+    SELECT
+        t.id_house,
+        t.id_previous_duplicated_house,
+        CAST(t.id_ciq_user_rent AS BIGINT) AS id_user,
+        t.uuid_person_rent AS uuid_person,
+        t.id_partner_rent AS id_partner,
+        t.id_agent_rent AS id_agent,
+        t.id_ciq_user_rent_duplicated_house,
+        t.id_ciq_user_sale_duplicated_house,
+        "RENT" AS business_context,
+        t.consultant_type_rent AS consultant_type,
+        t.house_listing_status,
+        t.house_listing_status_duplicated_house,
+        t.supply_source,
+        t.supply_source_rent AS supply_source_by_context,
+        t.supply_source_duplicated_house,
+        t.days_between_fl_hybrid,
+        t.hybrid_creation_order,
+        IF(
+            CASE
+                WHEN t.is_valid_duplicated IS FALSE THEN FALSE
+                WHEN t.is_valid_hybrid_rent IS FALSE THEN FALSE
+                WHEN t.is_invalid_by_indica_ai IS TRUE THEN FALSE
+                ELSE t.is_compliance_general_rule_rent
+            END IS FALSE,
+            FILTER(
+                ARRAY(
+                    t.reason_invalidation_duplicated,
+                    t.reason_invalidation_hybrid_rent,
+                    t.reason_invalidation_indica_ai,
+                    t.reason_invalidation_general_rule_rent
+                ),
+                x -> x IS NOT NULL
+            ),
+            NULL
+        ) AS invalidation_reasons,
         CASE
             WHEN t.is_valid_duplicated IS FALSE THEN FALSE
             WHEN t.is_valid_hybrid_rent IS FALSE THEN FALSE
             WHEN t.is_invalid_by_indica_ai IS TRUE THEN FALSE
             ELSE t.is_compliance_general_rule_rent
-        END IS FALSE,
-        FILTER(
-            ARRAY(
-                t.reason_invalidation_duplicated,
-                t.reason_invalidation_hybrid_rent,
-                t.reason_invalidation_indica_ai,
-                t.reason_invalidation_general_rule_rent
+        END AS is_first_listing_valid,
+        t.is_valid_duplicated,
+        t.is_valid_hybrid_rent AS is_valid_hybrid,
+        t.is_invalid_by_indica_ai,
+        t.is_compliance_general_rule_rent AS is_compliance_general_rule,
+        t.is_hybrid_house,
+        t.is_signed_cs_within_60_days AS is_signed_contract_within_60_days,
+        t.dt_compliance_general_rule_rent AS dt_compliance_general_rule,
+        t.dt_15_published_accumulated_days_rent AS dt_15_published_accumulated_days,
+        t.ts_first_contract_signed_rent AS ts_first_contract_signed,
+        t.ts_created_draft_contract_rent AS ts_created_draft_contract,
+        t.ts_first_listing_rent AS ts_original_first_listing,
+        t.ts_first_listing_rent AS ts_final_first_listing,
+        t.ts_last_depublication,
+        t.ts_last_depublication_duplicated_house
+    FROM
+        first_listing_conditions t
+    WHERE
+        t.ts_first_listing_rent IS NOT NULL
+        AND t.id_ciq_user_rent IS NOT NULL
+    UNION ALL
+    SELECT
+        t.id_house,
+        t.id_previous_duplicated_house,
+        CAST(t.id_ciq_user_sale AS BIGINT) AS id_user,
+        t.uuid_person_sale AS uuid_person,
+        t.id_partner_sale AS id_partner,
+        t.id_agent_sale AS id_agent,
+        t.id_ciq_user_rent_duplicated_house,
+        t.id_ciq_user_sale_duplicated_house,
+        "SALE" AS business_context,
+        t.consultant_type_sale AS consultant_type,
+        t.house_listing_status,
+        t.house_listing_status_duplicated_house,
+        t.supply_source,
+        t.supply_source_sale AS supply_source_by_context,
+        t.supply_source_duplicated_house,
+        t.days_between_fl_hybrid,
+        t.hybrid_creation_order,
+        IF(
+            CASE
+                WHEN t.is_valid_duplicated IS FALSE THEN FALSE
+                WHEN t.is_valid_hybrid_sale IS FALSE THEN FALSE
+                WHEN t.is_invalid_by_indica_ai IS TRUE THEN FALSE
+                ELSE t.is_compliance_general_rule_sale
+            END IS FALSE,
+            FILTER(
+                ARRAY(
+                    t.reason_invalidation_duplicated,
+                    t.reason_invalidation_hybrid_sale,
+                    t.reason_invalidation_indica_ai,
+                    t.reason_invalidation_general_rule_sale
+                ),
+                x -> x IS NOT NULL
             ),
-            x -> x IS NOT NULL
-        ),
-        NULL
-    ) AS invalidation_reasons,
-    CASE
-        WHEN t.is_valid_duplicated IS FALSE THEN FALSE
-        WHEN t.is_valid_hybrid_rent IS FALSE THEN FALSE
-        WHEN t.is_invalid_by_indica_ai IS TRUE THEN FALSE
-        ELSE t.is_compliance_general_rule_rent
-    END AS is_first_listing_valid,
-    t.is_valid_duplicated,
-    t.is_valid_hybrid_rent AS is_valid_hybrid,
-    t.is_invalid_by_indica_ai,
-    t.is_compliance_general_rule_rent AS is_compliance_general_rule,
-    t.is_hybrid_house,
-    t.is_signed_cs_within_60_days AS is_signed_contract_within_60_days,
-    t.dt_compliance_general_rule_rent AS dt_compliance_general_rule,
-    t.dt_15_published_accumulated_days_rent AS dt_15_published_accumulated_days,
-    t.ts_first_contract_signed_rent AS ts_first_contract_signed,
-    t.ts_created_draft_contract_rent AS ts_created_draft_contract,
-    t.ts_first_listing_rent AS ts_original_first_listing,
-    t.ts_first_listing_rent AS ts_final_first_listing,
-    t.ts_last_depublication,
-    t.ts_last_depublication_duplicated_house
-FROM
-    first_listing_conditions t
-WHERE
-    t.ts_first_listing_rent IS NOT NULL
-    AND t.id_ciq_user_rent IS NOT NULL
-UNION ALL
-SELECT
-    t.id_house,
-    t.id_previous_duplicated_house,
-    CAST(t.id_ciq_user_sale AS BIGINT) AS id_user,
-    t.uuid_person_sale AS uuid_person,
-    t.id_partner_sale AS id_partner,
-    t.id_agent_sale AS id_agent,
-    t.id_ciq_user_rent_duplicated_house,
-    t.id_ciq_user_sale_duplicated_house,
-    "SALE" AS business_context,
-    t.consultant_type_sale AS consultant_type,
-    t.house_listing_status,
-    t.house_listing_status_duplicated_house,
-    t.supply_source,
-    t.supply_source_sale AS supply_source_by_context,
-    t.supply_source_duplicated_house,
-    t.days_between_fl_hybrid,
-    t.hybrid_creation_order,
-    IF(
+            NULL
+        ) AS invalidation_reasons,
         CASE
             WHEN t.is_valid_duplicated IS FALSE THEN FALSE
             WHEN t.is_valid_hybrid_sale IS FALSE THEN FALSE
             WHEN t.is_invalid_by_indica_ai IS TRUE THEN FALSE
             ELSE t.is_compliance_general_rule_sale
-        END IS FALSE,
-        FILTER(
-            ARRAY(
-                t.reason_invalidation_duplicated,
-                t.reason_invalidation_hybrid_sale,
-                t.reason_invalidation_indica_ai,
-                t.reason_invalidation_general_rule_sale
-            ),
-            x -> x IS NOT NULL
-        ),
-        NULL
-    ) AS invalidation_reasons,
-    CASE
-        WHEN t.is_valid_duplicated IS FALSE THEN FALSE
-        WHEN t.is_valid_hybrid_sale IS FALSE THEN FALSE
-        WHEN t.is_invalid_by_indica_ai IS TRUE THEN FALSE
-        ELSE t.is_compliance_general_rule_sale
-    END AS is_first_listing_valid,
-    t.is_valid_duplicated,
-    t.is_valid_hybrid_sale AS is_valid_hybrid,
-    t.is_invalid_by_indica_ai,
-    t.is_compliance_general_rule_sale AS is_compliance_general_rule,
-    t.is_hybrid_house,
-    t.is_signed_ccv_within_60_days AS is_signed_contract_within_60_days,
-    t.dt_compliance_general_rule_sale AS dt_compliance_general_rule,
-    t.dt_15_published_accumulated_days_sale AS dt_15_published_accumulated_days,
-    t.ts_first_contract_signed_sale AS ts_first_contract_signed,
-    NULL AS ts_created_draft_contract,
-    t.ts_first_listing_sale AS ts_original_first_listing,
-    t.ts_initial_first_listing_sale AS ts_final_first_listing,
-    t.ts_last_depublication,
-    t.ts_last_depublication_duplicated_house
+        END AS is_first_listing_valid,
+        t.is_valid_duplicated,
+        t.is_valid_hybrid_sale AS is_valid_hybrid,
+        t.is_invalid_by_indica_ai,
+        t.is_compliance_general_rule_sale AS is_compliance_general_rule,
+        t.is_hybrid_house,
+        t.is_signed_ccv_within_60_days AS is_signed_contract_within_60_days,
+        t.dt_compliance_general_rule_sale AS dt_compliance_general_rule,
+        t.dt_15_published_accumulated_days_sale AS dt_15_published_accumulated_days,
+        t.ts_first_contract_signed_sale AS ts_first_contract_signed,
+        NULL AS ts_created_draft_contract,
+        t.ts_first_listing_sale AS ts_original_first_listing,
+        t.ts_initial_first_listing_sale AS ts_final_first_listing,
+        t.ts_last_depublication,
+        t.ts_last_depublication_duplicated_house
+    FROM
+        first_listing_conditions t
+    WHERE
+        t.ts_first_listing_sale IS NOT NULL
+        AND t.id_ciq_user_sale IS NOT NULL
+)
+SELECT
+    ufl.id_house,
+    ufl.id_previous_duplicated_house,
+    ufl.id_user,
+    COALESCE(u.uuid_person, ufl.uuid_person) AS uuid_person,
+    ufl.id_partner,
+    COALESCE(u.id_agent, ufl.id_agent) AS id_agent,
+    ufl.id_ciq_user_rent_duplicated_house,
+    ufl.id_ciq_user_sale_duplicated_house,
+    ufl.business_context,
+    ufl.consultant_type,
+    ufl.house_listing_status,
+    ufl.house_listing_status_duplicated_house,
+    ufl.supply_source,
+    ufl.supply_source_by_context,
+    ufl.supply_source_duplicated_house,
+    ufl.days_between_fl_hybrid,
+    ufl.hybrid_creation_order,
+    ufl.invalidation_reasons,
+    ufl.is_first_listing_valid,
+    ufl.is_valid_duplicated,
+    ufl.is_valid_hybrid,
+    ufl.is_invalid_by_indica_ai,
+    ufl.is_compliance_general_rule,
+    ufl.is_hybrid_house,
+    ufl.is_signed_contract_within_60_days,
+    ufl.dt_compliance_general_rule,
+    ufl.dt_15_published_accumulated_days,
+    ufl.ts_first_contract_signed,
+    ufl.ts_created_draft_contract,
+    ufl.ts_original_first_listing,
+    ufl.ts_final_first_listing,
+    ufl.ts_last_depublication,
+    ufl.ts_last_depublication_duplicated_house
 FROM
-    first_listing_conditions t
-WHERE
-    t.ts_first_listing_sale IS NOT NULL
-    AND t.id_ciq_user_sale IS NOT NULL
+    union_first_listing AS ufl
+LEFT JOIN
+    datalake_ebdb_user.user AS u
+        ON u.id = ufl.id_user
