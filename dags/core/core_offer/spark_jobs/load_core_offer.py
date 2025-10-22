@@ -69,6 +69,7 @@ class CoreOfferSparkJob(BaseCoreModelSparkJob):
             )
             .select(
                 col("o_rental_transact.id").alias("id_offer"),
+                col("o_rental_transact.uuid_offer"),
                 col("tenant.id").alias("id_tenant"),
                 col("o_rental_transact.id_tenant_external"),
                 col("owner.id").alias("id_owner"),

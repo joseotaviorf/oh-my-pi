@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, col
 
 # Import the actual functions from the DAG
 import sys
@@ -551,6 +551,7 @@ class TestCreateOfferCoreModel:
                 expected_columns = {
                     "sk_core_offer",
                     "id_offer",
+                    "uuid_offer",
                     "id_tenant",
                     "id_tenant_external",
                     "id_owner",
@@ -580,8 +581,126 @@ class TestCreateOfferCoreModel:
                 ), f"Missing expected columns: {missing_columns}"
                 assert not extra_columns, f"Unexpected extra columns: {extra_columns}"
                 assert (
-                    len(result_columns) == 21
-                ), f"Expected 21 columns, got {len(result_columns)}"
+                    len(result_columns) == 22
+                ), f"Expected 22 columns, got {len(result_columns)}"
+
+    def test_create_core_model_uuid_offer_mapping(
+        self, spark_session, rental_transact_offer_df, ebdb_user_df
+    ):
+        """Test that uuid_offer is correctly mapped from source and preserved through transformations."""
+        # Arrange
+        job = CoreOfferSparkJob()
+        mock_args = Mock()
+        mock_args.load_start_date = None
+        mock_args.load_end_date = None
+
+        # Mock table reads
+        with patch.object(spark_session, "table") as mock_read_table, patch.object(
+            load_core_offer, "SurrogateKeysHelper"
+        ) as mock_surrogate_helper:
+
+            mock_read_table.side_effect = [rental_transact_offer_df, ebdb_user_df]
+
+            # Mock SurrogateKeysHelper
+            def mock_generate_surrogate_key(df, entity_type, id_column):
+                return df.withColumn("sk_core_offer", lit(f"sk_{entity_type}_123"))
+
+            mock_surrogate_helper.generate_surrogate_key.side_effect = (
+                mock_generate_surrogate_key
+            )
+
+            # Mock the configuration
+            with patch.object(job, "get_offer_config") as mock_config:
+                mock_config.return_value = {
+                    "ENTITY_TYPE": "OFFER",
+                    "RENTAL_TRANSACT_OFFER_TABLE": "test_rental_transact_offer_table",
+                    "EBDB_USER_TABLE": "test_ebdb_user_table",
+                }
+
+                # Act
+                result_df = job.create_core_model(spark_session, mock_args)
+
+                # Assert - Verify uuid_offer is present and correctly mapped
+                result_data = result_df.select("id_offer", "uuid_offer").collect()
+
+                # Check that uuid_offer column exists and has correct values
+                assert (
+                    len(result_data) == 3
+                ), "Should have 3 records (excluding deleted)"
+
+                # Verify uuid_offer values are correctly mapped from source
+                expected_mappings = {
+                    1: "offer_uuid_1",
+                    2: "offer_uuid_2",
+                    3: "offer_uuid_3",
+                }
+
+                for row in result_data:
+                    id_offer = row["id_offer"]
+                    uuid_offer = row["uuid_offer"]
+
+                    # Verify uuid_offer is not null
+                    assert (
+                        uuid_offer is not None
+                    ), f"uuid_offer should not be null for id_offer={id_offer}"
+
+                    # Verify uuid_offer has correct value from source
+                    assert uuid_offer == expected_mappings[id_offer], (
+                        f"uuid_offer mismatch for id_offer={id_offer}: "
+                        f"expected {expected_mappings[id_offer]}, got {uuid_offer}"
+                    )
+
+                # Verify uuid_offer values are unique
+                uuid_values = [row["uuid_offer"] for row in result_data]
+                assert len(uuid_values) == len(
+                    set(uuid_values)
+                ), "uuid_offer values should be unique"
+
+    def test_create_core_model_uuid_offer_completeness(
+        self, spark_session, rental_transact_offer_df, ebdb_user_df
+    ):
+        """Test that uuid_offer is complete (no null values) in the output."""
+        # Arrange
+        job = CoreOfferSparkJob()
+        mock_args = Mock()
+        mock_args.load_start_date = None
+        mock_args.load_end_date = None
+
+        # Mock table reads
+        with patch.object(spark_session, "table") as mock_read_table, patch.object(
+            load_core_offer, "SurrogateKeysHelper"
+        ) as mock_surrogate_helper:
+
+            mock_read_table.side_effect = [rental_transact_offer_df, ebdb_user_df]
+
+            # Mock SurrogateKeysHelper
+            def mock_generate_surrogate_key(df, entity_type, id_column):
+                return df.withColumn("sk_core_offer", lit(f"sk_{entity_type}_123"))
+
+            mock_surrogate_helper.generate_surrogate_key.side_effect = (
+                mock_generate_surrogate_key
+            )
+
+            # Mock the configuration
+            with patch.object(job, "get_offer_config") as mock_config:
+                mock_config.return_value = {
+                    "ENTITY_TYPE": "OFFER",
+                    "RENTAL_TRANSACT_OFFER_TABLE": "test_rental_transact_offer_table",
+                    "EBDB_USER_TABLE": "test_ebdb_user_table",
+                }
+
+                # Act
+                result_df = job.create_core_model(spark_session, mock_args)
+
+                # Assert - Check that uuid_offer has no null values
+                null_count = result_df.filter(col("uuid_offer").isNull()).count()
+                assert (
+                    null_count == 0
+                ), f"uuid_offer should not have null values, found {null_count} nulls"
+
+                # Verify total count matches expected (3 non-deleted records)
+                total_count = result_df.count()
+                assert total_count == 3, f"Expected 3 records, got {total_count}"
 
 
 class TestSparkSessionInitialization:

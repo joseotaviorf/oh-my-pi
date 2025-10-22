@@ -8,6 +8,11 @@ columns:
     type: bigint
     required: true
 
+  # Offer Universally Unique Identifier
+  uuid_offer:
+    type: string
+    required: true
+
   # Tenant information
   id_tenant:
     type: bigint
@@ -99,6 +104,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 21
-max_columns: 21
+min_columns: 22
+max_columns: 22
 strict: true

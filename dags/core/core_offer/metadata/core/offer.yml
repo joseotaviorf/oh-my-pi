@@ -17,6 +17,13 @@ columns:
     description: Identifier of the offer. It's the id of the Offer table from rental transact database.
       This identifier is used internally in our systems.
       This key must always be unique.
+  uuid_offer:
+    lineage:
+      - datalake_rental_transact_clean.offer.offer_uuid
+    description: Universally Unique Identifier of the offer.
+      It's the uuid of the Offer table from rental transact database.
+      This identifier is used internally in our systems.
+      This key must always be unique.
   id_tenant:
     lineage:
       - datalake_ebdb_clean.user.id

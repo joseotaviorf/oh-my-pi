@@ -35,6 +35,7 @@ def rental_transact_offer_df(spark_session):
     schema = StructType(
         [
             StructField("id", LongType(), True),
+            StructField("uuid_offer", StringType(), True),
             StructField("id_tenant_external", StringType(), True),
             StructField("id_owner_external", StringType(), True),
             StructField("id_resident_info", LongType(), True),
@@ -57,6 +58,7 @@ def rental_transact_offer_df(spark_session):
     data = [
         (
             1,
+            "offer_uuid_1",
             "tenant_uuid_1",
             "owner_uuid_1",
             1001,
@@ -76,6 +78,7 @@ def rental_transact_offer_df(spark_session):
         ),
         (
             2,
+            "offer_uuid_2",
             "tenant_uuid_2",
             "owner_uuid_2",
             1002,
@@ -95,6 +98,7 @@ def rental_transact_offer_df(spark_session):
         ),
         (
             3,
+            "offer_uuid_3",
             "tenant_uuid_3",
             "owner_uuid_3",
             1003,
@@ -114,6 +118,7 @@ def rental_transact_offer_df(spark_session):
         ),
         (
             4,
+            "offer_uuid_4",
             "tenant_uuid_4",
             "owner_uuid_4",
             1004,
