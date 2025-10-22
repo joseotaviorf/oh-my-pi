@@ -17,21 +17,19 @@ columns:
       mix the concept with data lake tables.
   dt_event:
     lineage:
-      - datalake_superset_clean.logs.year
-      - datalake_superset_clean.logs.month
-      - datalake_superset_clean.logs.day
+      - datalake_superset_clean.logs.ts_event
     description: Date of the execution.
   dataset_executions:
     description: Number of executions of the dataset.
   year:
     description: Year of the execution. Also, a partition of the table.
     lineage:
-      - datalake_superset_clean.logs.year
+      - datalake_superset_clean.logs.ts_event
   month:
     description: Month of the execution. Also, a partition of the table.
     lineage:
-      - datalake_superset_clean.logs.month
+      - datalake_superset_clean.logs.ts_event
   day:
     description: Day of the execution. Also, a partition of the table.
     lineage:
-      - datalake_superset_clean.logs.day
+      - datalake_superset_clean.logs.ts_event
