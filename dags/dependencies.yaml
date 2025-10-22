@@ -3456,6 +3456,34 @@ bietlejuice.enrich_semrush:
   - bietlejuice.semrush:load-clean-vivareal-organic-search-kw:first-run-of-day
   - bietlejuice.semrush:load-clean-wimoveis-organic-search-kw:first-run-of-day
   - bietlejuice.semrush:load-clean-zapimoveis-organic-search-kw:first-run-of-day
+bietlejuice.enrich_semrush_classified:
+  - bietlejuice.semrush_classified:load-clean-adondevivir-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-argenprop-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-compreoalquile-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-easyaviso-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-encuentra24-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-icasas-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-infocasas-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-inmopanama-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-inmuebles-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-inmuebles24-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-inmueblesmercadolibre-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-inmueblesmercadolibreec-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-lamudi-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-mudafy-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-nexoinmobiliario-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-panama-real-estate-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-panamaequity-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-pincali-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-plusvalia-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-properati-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-properatiec-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-properatipe-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-propiedades-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-remax-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-urbania-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-vivanuncios-organic-search-kw:first-run-of-day
+  - bietlejuice.semrush_classified:load-clean-zonaprop-organic-search-kw:first-run-of-day
 bietlejuice.enrich_seo_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand:first-run-of-day
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand:first-run-of-day
