@@ -2,6 +2,7 @@ SELECT
     id,
     external_id AS id_external,
     contract_id AS id_contract,
+    person_uuid,
     status_syncs,
     creditor,
     document,
@@ -15,6 +16,16 @@ SELECT
     debtor_origin,
     will_live_in_place,
     evictions_situation,
+    deleted,
+    negativated_boavista,
+    negativated_serasa,
+    negativation_updated_at AS ts_negativation_updated,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    ts_cdc_transaction,
+    ts_database_transaction,
+    year,
+    month,
+    day,
+    NOW() AS ts_load
 FROM datalake_trato_feito_raw.client

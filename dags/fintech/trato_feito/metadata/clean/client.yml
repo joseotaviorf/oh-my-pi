@@ -2,7 +2,7 @@
 database_name: datalake_trato_feito_clean
 table_name: client
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "table to store customers that may or may not be sent to the collector, basically it is a representation of the ContraPessoa table in Main. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
   id:
@@ -17,6 +17,10 @@ columns:
     description: "Trato-Feito contract entity ID"
     lineage:
       - datalake_trato_feito_raw.client.contract_id
+  person_uuid:
+    description: "Universal unique identifier for the person"
+    lineage:
+      - datalake_trato_feito_raw.client.person_uuid
   status_syncs:
     description: "JSON object to represent entity sync status"
     lineage:
@@ -26,7 +30,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.client.creditor
   document:
-    description: ""
+    description: "Customer identification document number"
     lineage:
       - datalake_trato_feito_raw.client.document
   document_type:
@@ -66,9 +70,25 @@ columns:
     lineage:
       - datalake_trato_feito_raw.client.will_live_in_place
   evictions_situation:
-    description: ""
+    description: "Status of eviction situation for the customer"
     lineage:
       - datalake_trato_feito_raw.client.evictions_situation
+  deleted:
+    description: "Flag indicating if the record is deleted"
+    lineage:
+      - datalake_trato_feito_raw.client.deleted
+  negativated_boavista:
+    description: "Flag indicating if the customer has negative records in Boa Vista credit bureau"
+    lineage:
+      - datalake_trato_feito_raw.client.negativated_boavista
+  negativated_serasa:
+    description: "Flag indicating if the customer has negative records in Serasa credit bureau"
+    lineage:
+      - datalake_trato_feito_raw.client.negativated_serasa
+  ts_negativation_updated:
+    description: "Timestamp when the negativation information was last updated"
+    lineage:
+      - datalake_trato_feito_raw.client.negativation_updated_at
   ts_created:
     description: "Created at"
     lineage:
@@ -77,3 +97,25 @@ columns:
     description: "Updated at"
     lineage:
       - datalake_trato_feito_raw.client.updated_at
+  ts_cdc_transaction:
+    description: "CDC transaction timestamp"
+    lineage:
+      - datalake_trato_feito_raw.client.ts_cdc_transaction
+  ts_database_transaction:
+    description: "Database transaction timestamp"
+    lineage:
+      - datalake_trato_feito_raw.client.ts_database_transaction
+  year:
+    description: "Partition year"
+    lineage:
+      - datalake_trato_feito_raw.client.year
+  month:
+    description: "Partition month"
+    lineage:
+      - datalake_trato_feito_raw.client.month
+  day:
+    description: "Partition day"
+    lineage:
+      - datalake_trato_feito_raw.client.day
+  ts_load:
+    description: "Timestamp when the data was loaded"
