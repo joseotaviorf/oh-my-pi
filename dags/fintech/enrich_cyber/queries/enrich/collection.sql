@@ -36,8 +36,40 @@ get_agency_group_name AS (
 ),
 ordered_logs AS (
   SELECT
-    *,
-    ROW_NUMBER() OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number) AS rn
+    id_contract,
+    id_user,
+    contract_group,
+    creditor,
+    region_code,
+    CASE
+      WHEN action = '..' THEN
+        LAG(IF(action = '..', NULL, action)) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+      ELSE action
+    END AS action,
+    CASE
+      WHEN action = '..' THEN
+        LAG(result) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+      ELSE result
+    END AS result,
+    CASE
+      WHEN action = '..' THEN
+        LAG(complement) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+      ELSE complement
+    END AS complement,
+    sequence_number,
+    comment,
+    CASE
+      WHEN action = '..' THEN
+        LAG(phone_number) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+      ELSE phone_number
+    END AS phone_number,
+    CASE
+      WHEN action = '..' THEN
+        LAG(phone_extension) IGNORE NULLS OVER(PARTITION BY id_contract, contract_group, id_user, phone_number, ts_activity ORDER BY sequence_number)
+      ELSE phone_extension
+    END AS phone_extension,
+    ts_activity,
+    ts_load_cyber
   FROM datalake_cyber_clean.logs
 ),
 concatenate_comments AS (
@@ -45,19 +77,16 @@ concatenate_comments AS (
     id_contract,
     contract_group,
     id_user,
+    creditor,
+    action,
+    result,
+    complement,
+    phone_number,
+    phone_extension,
     ts_activity,
-    CONCAT_WS('', COLLECT_LIST(comment)) AS comment,
-    MAX(CASE WHEN rn = 1 THEN creditor END) AS creditor,
-    MAX(CASE WHEN rn = 1 THEN region_code END) AS region_code,
-    MAX(CASE WHEN rn = 1 THEN action END) AS action,
-    MAX(CASE WHEN rn = 1 THEN result END) AS result,
-    MAX(CASE WHEN rn = 1 THEN complement END) AS complement,
-    MAX(CASE WHEN rn = 1 THEN phone_number END) AS phone_number,
-    MAX(CASE WHEN rn = 1 THEN phone_extension END) AS phone_extension,
-    MAX(CASE WHEN rn = 1 THEN latitude END) AS latitude,
-    MAX(CASE WHEN rn = 1 THEN longitude END) AS longitude
+    CONCAT_WS('', COLLECT_LIST(comment)) AS comment
   FROM ordered_logs
-  GROUP BY id_contract, contract_group, id_user, ts_activity
+  GROUP BY ALL
 )
 SELECT
   l.creditor,
@@ -105,19 +134,26 @@ SELECT
   l.phone_extension,
   CASE
     WHEN UPPER(l.id_user) IN ("SISTEMA", "HOST", "RCVRY") THEN 0
-    ELSE mto.esforco
+    WHEN UPPER(l.result) IN ("UU", "BD") THEN 0
+    WHEN UPPER(l.result) IN ("AG", "AE", "AF", "AD", "AB", "AC", "BA", "BC", "XX", "YY") THEN 1
+    ELSE COALESCE(mto.esforco, 0)
   END AS esforco,
   CASE
     WHEN UPPER(l.id_user) IN ("SISTEMA", "HOST", "RCVRY") THEN 0
-    ELSE mto.alo
+    WHEN UPPER(l.result) IN ("UU", "BD", "AG", "AD") THEN 0
+    WHEN UPPER(l.result) IN ("AE", "AF", "AB", "AC", "BA", "BC", "XX", "YY") THEN 1
+    ELSE COALESCE(mto.alo, 0)
   END AS alo,
   CASE
     WHEN UPPER(l.id_user) IN ("SISTEMA", "HOST", "RCVRY") THEN 0
-    ELSE mto.cpc
+    WHEN UPPER(l.result) IN ("UU", "AG", "AE", "AD", "AB", "BA", "XX", "BD") THEN 0
+    WHEN UPPER(l.result) IN ("AF", "AC", "BC", "YY") THEN 1
+    ELSE COALESCE(mto.cpc, 0)
   END AS cpc,
   CASE
     WHEN UPPER(l.id_user) IN ("SISTEMA", "HOST", "RCVRY") THEN 0
-    ELSE mto.promessa
+    WHEN UPPER(l.complement) IN ("AE") THEN 1
+    ELSE COALESCE(mto.promessa, 0)
   END AS promessa,
   l.ts_activity AS ts_occurrence,
   NOW() AS ts_load
