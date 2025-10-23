@@ -1,0 +1,30 @@
+---
+table_name: datalake_ebdb_test_raw.imovellistingrelation
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  imovelId:
+    is_complete:
+      severity_level: Error
+  relatedId:
+    is_complete:
+      severity_level: Error
+  relatedAs:
+    is_complete:
+      severity_level: Error
+  sourceType:
+    is_complete:
+      severity_level: Error
+  imovelOriginated:
+    is_complete:
+      severity_level: Error
+  criadoEm:
+    is_complete:
+      severity_level: Error
+  atualizadoEm:
+    is_complete:
+      severity_level: Error

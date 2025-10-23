@@ -1,0 +1,94 @@
+database_name: datalake_ebdb_test_clean
+table_name: house_listing_relation_aud
+description: Audit table tracking historical changes to house-listing relationship records. This table captures all modifications
+  to the connections between houses and their listing business contexts over time, enabling change tracking, compliance, and historical
+  analysis of property-to-listing mappings. Each record represents a specific revision of a house-listing relationship entry.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_house_listing_relation:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.id
+    description: Unique identifier for the house-listing relationship record. References the primary key of the main house_listing_relation table for tracking which relationship was modified.
+  id_house:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.imovelid
+    description: Foreign key reference to the house (Imovel) entity at the time of this revision. Links this audit entry to a specific physical property in the system.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.listingbusinesscontextid
+    description: Foreign key reference to the listing business context at the time of this revision. Connects the house to a specific listing configuration that defines how the property is presented in the marketplace.
+  id_related:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.relatedid
+    description: Identifier of the related external entity or system at the time of this revision. Used to track connections between the house-listing relationship and other systems or external references. Can be a user ID, a company UUID or a person UUID depending on source_type.
+  rev:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.rev
+    description: Revision number for the audit entry. Incrementally tracks each change made to the relationship record, enabling chronological reconstruction of data changes.
+  rev_type:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.revtype
+    description: Type of revision operation performed on the relationship record. Indicates whether the change was an insert, update, or delete operation.
+    categories:
+      "0": Record was inserted.
+      "1": Record was updated.
+      "2": Record was deleted.
+  source_type:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.sourcetype
+    description: Type or origin of the source system that created or manages this relationship at the time of this revision. Indicates whether the entity is a person, user or company.
+    categories:
+      PERSON_REF: Signals that the entity is from Person system (so id_related is a Person UUID).
+      MAIN_USER: Signals that the entity is from Main/EBDB system (so id_related is a user ID).
+      COMPANY_REF: Signals that the entity is from Company system (so id_related is a Company UUID).
+  related_as:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.relatedas
+    description: Type or nature of the relationship with the external entity at the time of this revision. Defines how the property relates to the external system identified by id_related.
+    categories:
+      OWNER_AGENT: The entity is an agent representing the property owner.
+      LISTING_OWNER: The entity is the responsible for the listing.
+      PREFERRED_PROPERTY_AGENT: The entity is the preferred agent for this property.
+      LISTING_REPRESENTATIVE: The entity is a representative of the listing.
+      AUTONOMOUS_AGENT: The entity is an autonomous agent working with the property.
+      PROPERTY_OWNER: The entity is the owner of the property listed (house).
+  house_origin:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.imoveloriginated
+    description: Indicates the origin of the property (house) at the time of this revision. Used to track if the property record was created as a result of this relationship or existed independently.
+    categories:
+      IMOVEL_TABLE: Property originated from the Imovel Table.
+      LISTING_RELATION_TABLE: Property originated from the Listing Relation Table.
+  mod_id_house:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.imovelid_mod
+    description: Boolean flag indicating whether the id_house field was changed in this revision (true if modified, false or null if unchanged).
+  mod_id_listing_business_context:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.listingbusinesscontextid_mod
+    description: Boolean flag indicating whether the id_listing_business_context field was changed in this revision.
+  mod_source_type:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.sourcetype_mod
+    description: Boolean flag indicating whether the source_type field was changed in this revision.
+  mod_id_related:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.relatedid_mod
+    description: Boolean flag indicating whether the id_related field was changed in this revision.
+  mod_related_as:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.relatedas_mod
+    description: Boolean flag indicating whether the related_as field was changed in this revision.
+  mod_house_origin:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.imoveloriginated_mod
+    description: Boolean flag indicating whether the house_origin field was changed in this revision.
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.criadoem
+    description: Timestamp when the house-listing relationship was initially created in the system.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.imovellistingrelation_aud.atualizadoem
+    description: Timestamp of the most recent update to the house-listing relationship at the time of this revision, used for tracking data freshness and change management.

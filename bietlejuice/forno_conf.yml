@@ -1334,6 +1334,13 @@ databricks_16_4_rfleet_instance_cluster_3_workers:
     num_workers: 1
     spark_version: 16.4.x-scala2.12
 
+databricks_16_4_rfleet_instance_cluster_4_workers:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+    instance_pool_id: *pool_rfleet_xlarge_on_demand
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
