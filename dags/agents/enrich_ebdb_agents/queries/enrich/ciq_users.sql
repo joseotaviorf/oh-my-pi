@@ -82,6 +82,7 @@ df_partners AS (
       THEN TRUE
       ELSE FALSE
     END AS is_last_status,
+    ts_agent_created,
     ts_agent_status_start,
     ts_agent_status_end
  FROM
