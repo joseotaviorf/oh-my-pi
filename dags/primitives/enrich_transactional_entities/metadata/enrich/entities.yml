@@ -158,7 +158,7 @@ columns:
     description:
       Struct containing entity-specific properties and status information, used to create labels for chatbots.
       This field provides detailed contextual information about the current state of each entity.
-      For VISIT entities - contains computed_status field.
+      For VISIT entities - contains computed_status and ts_visit fields.
       For FR_OFFER entities - contains status field.
       For FR_CONTRACT entities - contains status and dt_started fields.
       For FR_TERMINATION entities - contains status and ts_created fields.

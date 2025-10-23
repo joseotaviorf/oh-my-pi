@@ -8,7 +8,7 @@ WITH visit AS (
             datalake_ebdb_clean.visit_status_log
         WHERE
             event_type IN ('VISIT_REQUESTED', 'VISIT_SCHEDULED', 'VISIT_CONFIRMED', 'VISIT_DONE',
-                'VISIT_CANCELED', 'VISIT_UNSUCCESSFUL', 'VISIT_REGISTERED', 'VISIT_RESCHEDULED')
+                'VISIT_CANCELED', 'VISIT_UNSUCCESSFUL', 'VISIT_REGISTERED', 'VISIT_RESCHEDULED', 'VISIT_STALLED')
         QUALIFY
             ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
     ),
