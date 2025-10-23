@@ -41,9 +41,7 @@ cluster:
     - pypi:
         package: "google-auth==2.23.0"
     - pypi:
-        package: "pandas==1.5.3"
-    - pypi:
-        package: "openpyxl==3.0.10"
+        package: "openpyxl==3.1.2"
     - pypi:
         package: "pyxlsb==1.0.9"
   databricks_conn_id: databricks_new
