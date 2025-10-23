@@ -23,7 +23,7 @@ SELECT
     is_private,
     can_email AS has_valid_email,
     keyed_custom_fields.previous_employee.value = 'Yes' AS is_previous_employee,
-    keyed_custom_fields.work_authorization = 'Yes' AS has_work_authorization_hired,
+    keyed_custom_fields.work_authorization.value = 'Yes' AS has_work_authorization_hired,
     keyed_custom_fields.has_rvv.value = 'Yes' AS has_rvv_pin_internal,
     -- numeric
     CAST(keyed_custom_fields.current_tenure.value AS INT) AS pin_internal_tenure,
