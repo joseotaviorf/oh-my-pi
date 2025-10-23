@@ -1,0 +1,27 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: case_required_document
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Contains information about required documentation when credits are transferred from CyberCredit to CyberLegal (document checklist)."
+columns:
+  contract_group:
+    description: "Contract group identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.carqdoc.CQACCTG
+  document_description:
+    description: "Document description"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.carqdoc.CQDESC
+  document_id:
+    description: "Document identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.carqdoc.CQDOCID
+  document_sequence:
+    description: "Document sequence number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.carqdoc.CQDOCSEQ
+  is_required:
+    description: "Flag indicating if document is required or not"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.carqdoc.CQREQFL

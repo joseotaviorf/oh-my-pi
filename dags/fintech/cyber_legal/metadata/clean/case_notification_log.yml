@@ -1,0 +1,75 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: case_notification_log
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Table used in CyberLegal for accounts transferred from CyberCredit to CyberLegal. Contains notifications and requests."
+columns:
+  assigned_lawyer_id:
+    description: "Assigned responsible lawyer for the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNASSLWY
+  account_number:
+    description: "Account number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNACCT
+  account_group:
+    description: "Account group"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNACCTG
+  dt_assigned_lawyer:
+    description: "Date assigned to responsible lawyer"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNASLWDT
+  case_number:
+    description: "Case number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNCASENO
+  manager_id:
+    description: "Manager identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNCOLLID
+  comment_text:
+    description: "Comment text"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNCOMM
+  dt_requested:
+    description: "Request date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNDT
+  dt_judgment_creation_approved:
+    description: "Date of case creation approval"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNLCHKDT
+  create_judgment:
+    description: "Flag to create case (Y=create case, N=do not create)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNLFLG
+  supervisor_lawyer_id:
+    description: "Supervisor lawyer who accepts or rejects the request"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNLWYRID
+  debtor_name:
+    description: "Debtor name"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNNAME
+  dt_request_approved:
+    description: "Request approval date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQDT
+  request_approved:
+    description: "Request approval flag (Y=approved, N=not approved)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQFLG
+  request_id:
+    description: "Request number identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQID
+  sequence_id:
+    description: "Sequence number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNSEQID
+  customer_ssn:
+    description: "Customer social security number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNSSNUM

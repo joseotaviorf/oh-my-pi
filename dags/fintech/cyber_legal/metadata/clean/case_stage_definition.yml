@@ -1,0 +1,51 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: case_stage_definition
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Contains the definition of procedural stages by lawsuit type. Defines stages to be controlled, duration and expense limits per stage."
+columns:
+  pre_authorized_expense_limit_amount:
+    description: "Pre-authorized expense limit amount for the stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDAMT
+  required_stage_days:
+    description: "Number of days required to perform the stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDDAYS
+  stage_description:
+    description: "Description of the legal process stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDDESC
+  stage_order:
+    description: "Order in which the stage should be performed"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDORDER
+  max_post_system_date_days:
+    description: "Maximum number of days after system date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDPOSDYS
+  max_pre_system_date_days:
+    description: "Maximum number of days prior to system date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDPREDYS
+  litigator_lawyer_days:
+    description: "Days for litigator lawyer alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDRESPDAYS
+  stage_id:
+    description: "Stage identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDSTGID
+  sub_stage_description:
+    description: "Sub-stage description"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDSUBTYPE
+  supervisor_lawyer_days:
+    description: "Days for supervisor lawyer alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDSUPVDAYS
+  case_type_code:
+    description: "Case type - Related to casetype table"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.castadf.CDTYPE

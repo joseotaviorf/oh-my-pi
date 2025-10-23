@@ -1,0 +1,19 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: case_account
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Defines the relationship between a specific case and the original accounts or credits. If no records exist for a given case, it means it was manually added in CyberLegal."
+columns:
+  account_number:
+    description: "Account number that associates with the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseacct.CCACCT
+  account_group:
+    description: "Account group code"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseacct.CCACCTG
+  case_number:
+    description: "Legal case number - Primary key"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseacct.CCCASENO

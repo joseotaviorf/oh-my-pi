@@ -158,7 +158,7 @@ SELECT
     DMLABEL1 AS olos_dialer_label,
     DMLABEL3 AS campaign_label,
     DMLABEL5 AS evictions_label,
-    DMLABEL2 AS label_2,
+    DMLABEL2 AS evictions_reason,
     DMLABEL4 AS serasa_limpa_nome_label,
     DMLABEL6 AS label_6,
     DMACAC1 AS most_important_action_class_1,

@@ -1,0 +1,235 @@
+---
+database_name: datalake_cyber_legal_homolog
+table_name: evictions_base
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Comprehensive eviction cases data from the cyber legal system, enriched with case details, agency information, court data, process phases, expenses, and financial information. Includes only current and completed process stages.
+columns:
+  id_case:
+    description: "Unique identifier for the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_case
+  id_court:
+    description: "Identifier of the court handling the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_court
+  id_external_process:
+    description: "External process identifier from the dossier system."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_dossier
+  id_contract:
+    description: "Contract identifier associated with the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_notification_log.id_account
+  id_client:
+    description: "Client identifier associated with the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_client
+  debtor_name:
+    description: "Name of the debtor in the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.debtor_name
+  account_number:
+    description: "Account group identifier for the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_account.id_account_group
+  account_group:
+    description: "Account identifier for the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_account.id_account
+  process_phase:
+    description: "Description of the current process phase or stage."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.stage_description
+  company_name:
+    description: "Business name associated with the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.business_name
+  plaintiff:
+    description: "Name of the plaintiff in the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.plaintiff_name
+  case_type:
+    description: "Type of legal case being processed."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.case_type
+  id_agency:
+    description: "Identifier of the attorney agency handling the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_attorney_agency
+  agency_name:
+    description: "Name of the attorney agency handling the case."
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+  id_previous_agency:
+    description: "Identifier of the previous attorney agency that handled the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_previous_attorney_agency
+  internal_lawyer:
+    description: "Identifier of the internal lawyer responsible for the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_responsible_attorney
+  external_lawyer:
+    description: "Identifier of the external lawyer assigned to the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_external_attorney
+  supervising_lawyer:
+    description: "Identifier of the supervising lawyer for the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_supervisor_attorney
+  process_start_comment:
+    description: "Comment provided when the process was initially requested."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_notification_log.request_comment
+  process_end_comment:
+    description: "Comment provided when the process was closed or finalized."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.close_comment
+  case_comment:
+    description: "General comment about the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.case_comment
+  possibility_of_losing_case:
+    description: "Code indicating the possibility of losing the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.cause_loss_possibility_code
+  lawsuit_date:
+    description: "Date when the lawsuit was filed."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.dt_lawsuit_filed
+  dt_case_acceptance:
+    description: "Date when the case was accepted by the legal department."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.dt_case_accepted
+  dt_case_completion:
+    description: "Date when the case was declared as unrecoverable or completed."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.dt_unrecoverable_declaration
+  dt_agency_assignment:
+    description: "Date when the case was assigned to a specific attorney agency."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.dt_case_assigned
+  case_status:
+    description: "Current status of the case (New, Active, Finalized, Pending, Completed)."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.case_status
+  court_name:
+    description: "Name of the court handling the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.court.court_name
+  phase_status:
+    description: "Status of the current process phase (Current, Scheduled, Completed)."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.stage_status
+  dt_phase_start:
+    description: "Date when the current process phase started."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.dt_stage_start
+  dt_phase_end:
+    description: "Date when the current process phase ended."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.dt_stage_end
+  phase_days_required:
+    description: "Number of days required to complete the current process phase."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.required_days_for_stage
+  phase_authorized_amount:
+    description: "Amount authorized for expenses in the current process phase."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.authorized_expenses_amount
+  phase_action:
+    description: "Subtype or action associated with the current process phase."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.case_subtype
+  case_subtype:
+    description: "Subtype of the legal process."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.process_subtype
+  court_division:
+    description: "Name of the court division handling the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.court_division_name
+  jurisdiction:
+    description: "Judicial district name where the case is being processed."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.judicial_district_name
+  case_result:
+    description: "Result of the legal case closure."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.closure_result
+  final_result_reason:
+    description: "Reason for the final case closure."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.closure_reason
+  phase_expense_amount:
+    description: "Amount of expenses incurred in the current process phase."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.expense_amount
+  estimated_risk_value:
+    description: "Estimated risk value associated with the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.dt_status_changed
+  case_amount:
+    description: "Total amount of the lawsuit or case value."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.lawsuit_amount
+  provisioned_value:
+    description: "Value provisioned for the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.provisioned_amount
+  updated_case_value:
+    description: "Updated value of the legal cause."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.updated_cause_value_amount
+  recovered_amount:
+    description: "Amount recovered from the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.cash_recovered_amount
+  judgment_subtype:
+    description: "Subtype of the judgment or legal decision."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.case_subtype
+  last_action_code:
+    description: "Code of the last action taken in the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.last_action_code
+  last_result_code:
+    description: "Code of the last result obtained in the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.last_result_code
+  id_invoice:
+    description: "Identifier of the invoice associated with the case expenses."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.id_invoice
+  debtor_state:
+    description: "State where the debtor is located."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.state
+  debtor_city:
+    description: "City where the debtor is located."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.city
+  debtor_address_1:
+    description: "Primary address line of the debtor."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.address_line_1
+  debtor_address_2:
+    description: "Secondary address line of the debtor."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.address_line_2
+  debtor_zip_code:
+    description: "ZIP code of the debtor's address."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.zip_code
+  debtor_phone:
+    description: "Home phone number of the debtor."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.home_phone
+  company_city:
+    description: "City where the company is located."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.business_city
+  company_state:
+    description: "State where the company is located."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.business_state

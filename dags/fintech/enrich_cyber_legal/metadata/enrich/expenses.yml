@@ -1,0 +1,43 @@
+---
+database_name: datalake_cyber_legal_homolog
+table_name: expenses
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: Expense report from the cyber legal system, based on 'Relatório de Custas - Fechamento de Lote', including case details, agency information, and expense type descriptions. Only includes authorized expenses that have been reimbursed.
+columns:
+  id_case:
+    description: "Unique case identifier linking the expense to a specific legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.caexpns.id_case
+  id_agency:
+    description: "Agency identifier associated with the expense, linking to the agency responsible for the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.caexpns.id_agency
+  agency_name:
+    description: "Human-readable name of the agency associated with the expense."
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+  debtor_name:
+    description: "Name of the debtor in the associated legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.debtor_name
+  case_type:
+    description: "Type of legal case associated with the expense."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.caexpns.case_type
+  expense_amount:
+    description: "Monetary amount of the expense in the original currency."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.caexpns.expense_amount
+  expense_type_description:
+    description: "Human-readable description of the expense type, enriched from the values list."
+    lineage:
+      - datalake_cyber_clean.values_list.value_description
+  expense_description:
+    description: "Detailed description of the specific expense, providing additional context about the expense purpose."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.caexpns.expense_description
+  dt_reimbursed:
+    description: "Date when the expense was reimbursed, indicating completion of the expense process."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.caexpns.dt_reimbursed

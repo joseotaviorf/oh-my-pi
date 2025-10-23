@@ -1,0 +1,20 @@
+SELECT
+    CNREQID AS id_notification_request,
+    CNSEQID AS id_notification_sequence,
+    CNACCTG AS id_contract_group,
+    CNACCT AS id_contract,
+    CNCASENO AS id_case,
+    CNASSLWY AS id_assigned_attorney,
+    CNLWYRID AS id_supervisor_attorney,
+    CNCOLLID AS id_manager,
+    CNSSNUM AS client_ssn,
+    CNNAME AS debtor_name,
+    CNCOMM AS request_comment,
+    IF(CNLFLG = 'Y', TRUE, FALSE) AS is_case_creation,
+    IF(CNREQFLG = 'Y', TRUE, FALSE) AS is_request_approved,
+    CNASLWDT AS dt_assigned_attorney,
+    CNLCHKDT AS dt_case_creation_approved,
+    CNDT AS dt_requested,
+    CNREQDT AS dt_request_approved,
+    NOW() AS ts_load
+FROM datalake_cyber_legal_homolog_raw.cantfylg

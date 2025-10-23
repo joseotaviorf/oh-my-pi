@@ -1,0 +1,67 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: case_stage
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Contains one record per procedural stage of each legal case. Stores start and end dates of each stage."
+columns:
+  pre_authorized_expense_limit_amount:
+    description: "Pre-authorized expense limit amount for the stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSAMT
+  case_number:
+    description: "Legal case number - Primary key of the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSCASENO
+  required_stage_days:
+    description: "Number of days required to complete the procedural stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSDAYS
+  stage_description:
+    description: "Description of the stage taken for this case type"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSDESC
+  dt_ended:
+    description: "Date when the stage was completed"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSENDDT
+  stage_order:
+    description: "Order in which the stage should be performed"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSORDER
+  max_post_system_date_days:
+    description: "Maximum number of days after system date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSPOSDYS
+  max_pre_system_date_days:
+    description: "Maximum number of days prior to system date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSPREDYS
+  responsible_lawyer_days:
+    description: "Days for responsible lawyer alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSRESPDAYS
+  dt_started:
+    description: "Date when the stage started"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSSTDT
+  stage_id:
+    description: "Sequence number corresponding to each stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSSTGID
+  case_subtype:
+    description: "Case subtype"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSSUBTYPE
+  supervisor_lawyer_days:
+    description: "Days for supervisor lawyer alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSSUPVDAYS
+  stage_status:
+    description: "Stage status (R=Current stage Running, S=Scheduled stage, E=Completed End stage)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSTATUS
+  case_type_code:
+    description: "Lawsuit type - Primary key related to casetype table"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSTYPE

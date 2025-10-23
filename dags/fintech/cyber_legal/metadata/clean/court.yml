@@ -1,0 +1,59 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: court
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Catalog of courts used in CyberLegal. Contains contact information and court locations."
+columns:
+  id_court:
+    description: "Court identification - Primary key"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTCRTID
+  court_name:
+    description: "Court name"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTNAME
+  address_line_1:
+    description: "Court address - Street"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTADDR1
+  address_line_2:
+    description: "Court address - District"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTADDR2
+  city:
+    description: "Court city location"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTCITY
+  state:
+    description: "Court state location"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTSTATE
+  country:
+    description: "Court country location"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTCOUNTRY
+  zip_code:
+    description: "Court zip code address"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTZIP
+  contact_name:
+    description: "Court contact name"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTCNTNAME
+  phone_1:
+    description: "Primary phone number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTPHONE1
+  phone_2:
+    description: "Secondary phone number"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTPHONE2
+  email:
+    description: "Court email address"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTEMAIL
+  url:
+    description: "Court website URL address"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.court.CTURL

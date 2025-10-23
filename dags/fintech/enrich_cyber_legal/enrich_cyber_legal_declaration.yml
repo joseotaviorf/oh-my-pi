@@ -1,0 +1,23 @@
+---
+dag:
+  name: enrich_cyber_legal
+  schedule_start_date: 2025, 10, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich pipe for Cyber Legal
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: cyber_legal_homolog
+  inner_dependencies:
+    evictions_base:
+      - process_stages
+      - process
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: m5d.8xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
