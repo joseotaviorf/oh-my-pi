@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from argparse import ArgumentParser
 from datetime import datetime, date
-from typing import Tuple
+from typing import Tuple, List
 import boto3
 from bietlejuice.services import ConfigurationService
 from pyspark.sql.functions import make_date
@@ -74,7 +74,7 @@ def load_table_into_sns(
     load_end_date: datetime,
 ):
     """
-    Load the table into SNS.
+    Load the table into SNS and log success/failure counts.
     """
 
     df = spark.table(f"{database_name}.{table_name}")
@@ -84,9 +84,20 @@ def load_table_into_sns(
         & (make_date(df.year, df.month, df.day) <= load_end_date)
     ).drop("business_id", "year", "month", "day")
 
+    # Checks if DataFrame is empty before processing
+    if filtered_df.rdd.isEmpty():
+        logger.info("No data found for the specified date range. No messages sent to SNS.")
+        return
+
     region = sns_topic_arn.split(":")[3]
 
+    # Initializes accumulators in the Driver
+    success_counter = spark.sparkContext.accumulator(0)
+    failure_counter = spark.sparkContext.accumulator(0)
+
     def send_partition_to_sns(partition):
+        partition_logger = logging.getLogger(JOB_NAME)
+
         sns_client = boto3.client("sns", region_name=region)
         batch = []
 
@@ -95,23 +106,73 @@ def load_table_into_sns(
             batch.append(message)
 
             if len(batch) >= BATCH_SIZE:
-                send_batch_to_sns(sns_client, sns_topic_arn, batch)
+                s_count, f_count = send_batch_to_sns(sns_client, sns_topic_arn, batch, partition_logger)
+
+                # Adds to global accumulators
+                success_counter.add(s_count)
+                failure_counter.add(f_count)
+
                 batch.clear()
 
         if batch:
-            send_batch_to_sns(sns_client, sns_topic_arn, batch)
+            s_count, f_count = send_batch_to_sns(sns_client, sns_topic_arn, batch, partition_logger)
+            success_counter.add(s_count)
+            failure_counter.add(f_count)
 
     filtered_df.foreachPartition(send_partition_to_sns)
 
+    # Logs the final aggregated summary
+    total_success = success_counter.value
+    total_failure = failure_counter.value
+    total_processed = total_success + total_failure
 
-def send_batch_to_sns(sns_client, sns_topic_arn: str, batch: list):
+    logger.info(
+        f"Total SNS load summary. m=load_table_into_sns, status=complete, "
+        f"total_messages_processed={total_processed}, "
+        f"total_success_count={total_success}, total_failure_count={total_failure}"
+    )
+
+    if total_failure > 0:
+        logger.warning(
+            f"Some messages FAILED to send to SNS. m=load_table_into_sns, "
+            f"failure_count={total_failure}"
+        )
+    else:
+        logger.info(
+            f"All {total_success} messages sent successfully to SNS. m=load_table_into_sns"
+        )
+
+
+def send_batch_to_sns(sns_client, sns_topic_arn: str, batch: List, logger_instance: logging.Logger) -> Tuple[int, int]:
     """
     Send a message to SNS.
     """
+    success_count = 0
+    failure_count = 0
+
     for message in batch:
-        sns_client.publish(
-            TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
-        )
+        try:
+            response = sns_client.publish(
+                TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
+            )
+
+            # Success log. This is the individual proof of message publication.
+            logger_instance.debug(
+                f"Message published successfully. m=send_batch_to_sns, "
+                f"MessageId={response.get('MessageId')}, event_type={message.get('event_type')}"
+            )
+            success_count += 1
+
+        except Exception as e:
+            # Error log
+            logger_instance.error(
+                f"Failed to publish message to SNS. m=send_batch_to_sns, "
+                f"error={e}, event_type={message.get('event_type')}, "
+                f"payload_preview={str(message.get('payload', {}))[:100]}..."  # Logs only part of the payload
+            )
+            failure_count += 1
+
+    return success_count, failure_count
 
 
 def json_serial(obj):
