@@ -54,8 +54,7 @@ columns:
     description: Twilio phone number used for the task communication.
   origin:
     lineage:
-      - datalake_quinto_messenger_clean.chat.id_session
-      - datalake_quinto_messenger_clean.channel.id_session
+      - datalake_sauron_clean.session.source
     description: Origin of the task communication, either 'in app' or 'whatsapp'.
   direction:
     description: If the task was originated from the customer (outbound) or by an analyst (inbound).

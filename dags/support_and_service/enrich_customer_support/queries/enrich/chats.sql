@@ -10,15 +10,18 @@ WITH task_queues AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 ),
+-- mas tem whastapp aqui dentro também
 inapp_sessions AS (
   SELECT DISTINCT
     id_chat,
+    attributes:["channel_type"] AS channel_type,
     CAST(id_session AS INTEGER) AS id_session
   FROM
     datalake_quinto_messenger_clean.chat
   WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
 ),
+-- em breve essa cte poderá ser removida, ja que whatsapp vai migrar pra chat
 whatsapp_sessions AS (
   SELECT DISTINCT
     id_channel,
@@ -35,6 +38,7 @@ sauron_sessions AS (
     user_data:["user_phone"] AS user_phone,
     user_data:["user_email"] AS user_email,
     created_by,
+    source,
     source_environment
   FROM
     datalake_sauron_clean.session
@@ -96,10 +100,10 @@ SELECT
   COALESCE(ss.user_email, t.customer_email) AS customer_email,
   COALESCE(ss.user_phone, t.from_phone_number) AS customer_phone_number,
   t.twilio_phone_number,
-  CASE
-    WHEN ias.id_session IS NOT NULL THEN 'in app'
-    WHEN ws.id_session IS NOT NULL THEN 'whatsapp'
-  END AS origin,
+  CASE WHEN
+    ss.source = 'internal_chat' THEN 'in app'
+    ELSE ss.source
+    END AS origin,
   CASE
     WHEN t.is_spoc_task IS TRUE AND ss.created_by = 'human_support' THEN 'inbound'
     WHEN t.is_spoc_task IS TRUE AND ss.created_by = 'user' THEN 'outbound'
