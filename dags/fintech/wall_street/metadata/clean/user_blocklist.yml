@@ -1,0 +1,14 @@
+database_name: datalake_wall_street_clean
+table_name: user_blocklist
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: This table brings the id_user from main that was blocked by fraud in chargeback credit card payments. It's a legacy table.
+columns:
+  id_user:
+    description: Main ID from blocked user
+    lineage:
+      - datalake_wall_street_raw.userblocklist.userId
+  ts_created:
+    description: Timestamp generated when the user was blocked for credit card payments
+    lineage:
+      - datalake_wall_street_raw.userblocklist.createdAt

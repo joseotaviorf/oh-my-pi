@@ -13,6 +13,7 @@ dags_not_using_builder:
   - fintech/sap/sap.py
   - fintech/velo_omie/velo_omie.py
   - fintech/velo/velo.py
+  - fintech/wall_street/wall_street.py
   - for_rent/ebdb/ebdb.py
   - for_sale/casa_mineira_crm/casa_mineira_crm.py
   - for_sale/reverse_dsat_report_access/reverse_dsat_report_access.py
