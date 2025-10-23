@@ -42,6 +42,9 @@ class MetricQueryWorkflow(BaseWorkflow):
             self.workflow_args.get("default_extraction_type") == "incremental"
         )
         inner_dependencies = self.workflow_args.get("inner_dependencies")
+        extra_query_template_params = self.workflow_args.get(
+            "extra_query_template_params"
+        )
         cluster_params = self.get_cluster_params()
 
         metrics_bucket = self.config_service.get_config("metrics_bucket")
@@ -71,6 +74,7 @@ class MetricQueryWorkflow(BaseWorkflow):
             tables_customization=tables_customization,
             partitions=default_partitions,
             is_incremental=default_is_incremental,
+            extra_query_template_params=extra_query_template_params,
         )
 
         create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
