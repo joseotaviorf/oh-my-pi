@@ -143,4 +143,4 @@ SELECT
     coalesce(originalusuarioquecadastrou_id, usuarioquecadastrou_id) as id_user_registrant,
     usuarioquecadastrou_mod as mod_user_registrant
 FROM
-    datalake_ebdb_test_raw.imovel_aud
+    datalake_ebdb_raw.imovel_aud

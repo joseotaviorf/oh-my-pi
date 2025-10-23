@@ -1,5 +1,5 @@
 ---
-table_name: datalake_ebdb_test_raw.imovel_aud
+table_name: datalake_ebdb_raw.imovel_aud
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:
@@ -7,7 +7,7 @@ column_level_validations:
       severity_level: Error
     custom:
       # Composite primary key (id, rev) must be unique
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_ebdb_test_raw.imovel_aud GROUP BY id, rev HAVING COUNT(*) > 1)) = 0"
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_ebdb_raw.imovel_aud GROUP BY id, rev HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
   usuario_id:
     has_completeness:

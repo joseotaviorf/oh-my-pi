@@ -21,7 +21,6 @@ workflow:
       clean_table_name: house
       clean_z_order_by: [id_user, id_region, status]
     Imovel_AUD:
-      custom_schema: ebdb_test
       clean_primary_keys: [id_house, rev]
       clean_table_name: house_aud
       clean_z_order_by: [id_house]
