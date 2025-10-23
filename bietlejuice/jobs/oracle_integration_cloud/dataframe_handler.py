@@ -43,8 +43,28 @@ class DataFrameHandler:
         """
         try:
             self.logger.info(f"Reading and pre-processing XML file: {file_path}")
-            with open(file_path, "r", encoding="utf-8") as f:
-                xml_content = f.read()
+
+            encodings_to_try = ["utf-8", "iso-8859-1", "windows-1252", "utf-8-sig"]
+            xml_content = None
+
+            for encoding in encodings_to_try:
+                try:
+                    with open(file_path, "r", encoding=encoding) as f:
+                        xml_content = f.read()
+                    self.logger.info(
+                        f"Successfully read file with encoding: {encoding}"
+                    )
+                    break
+                except (UnicodeDecodeError, UnicodeError):
+                    continue
+
+            if xml_content is None:
+                self.logger.warning(
+                    f"Could not decode file with standard encodings. "
+                    f"Attempting with errors='replace'."
+                )
+                with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                    xml_content = f.read()
 
             # 1. Remove control characters, mirroring REGEXP_REPLACE(..., '[[:cntrl:]]', '')
             # This regex removes characters in the C0 and C1 control blocks, which are invalid in XML 1.0.

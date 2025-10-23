@@ -12,6 +12,11 @@ from bietlejuice.base.spark import BaseDBUtils
 JOB_NAME = "load_oic_integration_raw"
 LOGGER = QuintoAndarLogger(__name__)
 
+SFTP_CONNECTION_TIMEOUT = 30
+SFTP_AUTH_TIMEOUT = 30
+SFTP_MAX_RETRIES = 3
+SFTP_RETRY_DELAY = 5
+
 
 class SFTPHandler:
     """
@@ -73,20 +78,31 @@ class SFTPHandler:
     def _connect(self) -> None:
         """
         Establishes an SFTP connection using the credentials retrieved from Databricks secrets.
-        Logs connection attempts and success or failure.
+        Adds timeout and keepalive configurations for improved connection stability.
 
         Raises:
             paramiko.AuthenticationException: If the SFTP server rejects the provided credentials.
             paramiko.SSHException: If there is an error during the SSH connection establishment.
-            Exception: For other errors encountered during the connection process,
-                    including issues resolving the host or establishing the socket.
+            Exception: For other errors encountered during the connection process.
         """
         host, port, username, password = self._get_credentials()
 
         try:
+            self.logger.info(f"Connecting to SFTP server {host}:{port}")
+
             self.transport = paramiko.Transport((host, port))
+            self.transport.set_keepalive(120)
+            self.transport.banner_timeout = SFTP_CONNECTION_TIMEOUT
+            self.transport.auth_timeout = SFTP_AUTH_TIMEOUT
+
+            self.logger.info("Authenticating...")
             self.transport.connect(username=username, password=password)
+
+            self.logger.info("Creating SFTP client...")
             self.sftp = paramiko.SFTPClient.from_transport(self.transport)
+
+            self.logger.info("SFTP connection established successfully")
+
         except paramiko.AuthenticationException as e:
             self.logger.error(f"SFTP Authentication failed: {e}")
             raise
