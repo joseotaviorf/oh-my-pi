@@ -1,0 +1,232 @@
+---
+database_name: datalake_crawler_loft
+table_name: loft
+description: |
+  This table contains the most recent update for each listing regarding the loft crawler data.
+  It provides a deduplicated view of the datalake_crawler_loft.loft table, showing only
+  the most recent record per listing (id_house) based on the partition (year, month, day).
+
+  **Deduplication Logic:**
+  - Returns the latest update per listing using ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY make_date(year, month, day) DESC) = 1
+  - Filters data within the specified load date range
+
+  **Use Case:**
+  This table is ideal for analytics requiring the current state of each property without duplicates,
+  providing a clean, point-in-time view of the latest available information for each listing.
+
+  **Update Schedule:**
+  The table is updated weekly, every Thursday, after the datalake_crawler_loft.loft
+  table is refreshed. This ensures data consistency and maintains the dependency chain.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns: 
+  id_house_platform:
+    lineage:
+      - datalake_crawler_loft.loft.id_house_platform
+    description: |
+      The id of the house in the loft platform.
+  id_house:
+    lineage:
+      - datalake_crawler_loft.loft.id_house
+    description: |
+      It concatenates the id of the house in the loft platform with the
+      string "loft".
+  platform:
+    lineage:
+      - datalake_crawler_loft.loft.platform
+    description: |
+      The origin of the house, which is always "loft" for this table.
+  country:
+    lineage:
+      - datalake_crawler_loft.loft.country
+    description: |
+      The country of the house.
+  state:
+    lineage:
+      - datalake_crawler_loft.loft.state
+    description: |
+      The state of the house.
+  address_city:
+    lineage:
+      - datalake_crawler_loft.loft.address_city
+    description: |
+      The city of the house.
+      If the original value is null, then it assumes the clean table partition,
+      which is the "city" field.
+      It doens't assume null values, and it is used as a z_order field for the
+      delta table.
+  neighborhood:
+    lineage:
+      - datalake_crawler_loft.loft.neighborhood
+    description: |
+      The neighborhood of the house.
+  street:
+    lineage:
+      - datalake_crawler_loft.loft.street
+    description: |
+      The street of the house.
+  latitude:
+    lineage:
+      - datalake_crawler_loft.loft.latitude
+    description: |
+      The latitude associated with the listing location.
+  longitude:
+    lineage:
+      - datalake_crawler_loft.loft.longitude
+    description: |
+      The longitude associated with the listing location.
+  listing_name:
+    lineage:
+      - datalake_crawler_loft.loft.listing_name
+    description: |
+      The name of the listing.
+      It is the listing description provided in the origin platform.
+  total_area:
+    lineage:
+      - datalake_crawler_loft.loft.total_area
+    description: |
+      The total area of the house in square meters.
+  area:
+    lineage:
+      - datalake_crawler_loft.loft.area
+    description: |
+      The area of the house in square meters.
+  bathrooms:
+    lineage:
+      - datalake_crawler_loft.loft.bathrooms
+    description: |
+      The number of bathrooms in the house.
+  bedrooms:
+    lineage:
+      - datalake_crawler_loft.loft.bedrooms
+    description: |
+      The number of bedrooms in the house.
+  suites:
+    lineage:
+      - datalake_crawler_loft.loft.suites
+    description: |
+      The number of suites in the house.
+  floor:
+    lineage:
+      - datalake_crawler_loft.loft.floor
+    description: |
+      The floor number of the house.
+  parking_spaces:
+    lineage:
+      - datalake_crawler_loft.loft.parking_spaces
+    description: |
+      The number of parking spaces available for the house.
+  unit_type:
+    lineage:
+      - datalake_crawler_loft.loft.unit_type
+    description: |
+      The type of the housing unit (e.g., apartment, house, etc.).
+  usage_type:
+    lineage:
+      - datalake_crawler_loft.loft.usage_type
+    description: |
+      The usege type of the housing unit (e.g., RESIDENTIAL, etc.).
+  property_type:
+    lineage:
+      - datalake_crawler_loft.loft.property_type
+    description: |
+      The property type of the housing unit (e.g., default, rooftop, etc.).
+      It can assume null values.
+  contract_type:
+    lineage:
+      - datalake_crawler_loft.loft.contract_type
+    description: |
+      The contract type of the housing unit (non_exclusive or exclusive).
+  advertiser_name:
+    lineage:
+      - datalake_crawler_loft.loft.agency_name
+    description: |
+      The name of the advertiser/agent responsible for the listing.
+  has_advertiser:
+    lineage:
+      - datalake_crawler_loft.loft.has_agency
+    description: |
+      Boolean that indicates if the listing has an advertiser/agent associated with it.
+  is_marketplace:
+    lineage:
+      - datalake_crawler_loft.loft.is_marketplace
+    description: |
+      Boolean that indicates if the listing is part of Loft's marketplace.
+  condo_fee:
+    lineage:
+      - datalake_crawler_loft.loft.condo_fee
+    description: |
+      The condominium fee for the property.
+  iptu:
+    lineage:
+      - datalake_crawler_loft.loft.iptu
+    description: |
+      The monthly IPTU (property tax) for the house.
+  rent_price:
+    lineage:
+      - datalake_crawler_loft.loft.rent_price
+    description: |
+      The rent price of the property.
+  sale_price:
+    lineage:
+      - datalake_crawler_loft.loft.sale_price
+    description: |
+      The sale price of the property.
+  price_m2_rental:
+    lineage:
+      - datalake_crawler_loft.loft.price_m2_rental
+    description: |
+      The rent price per square meter.
+      It is calculated by dividing the rental price by the total area,
+      rounded to 2 decimal places.
+  price_m2_sale:
+    lineage:
+      - datalake_crawler_loft.loft.price_m2_sale
+    description: |
+      The sale price per square meter.
+      It is calculated by dividing the sale price by the total area,
+      rounded to 2 decimal places.
+  installments_price:
+    lineage:
+      - datalake_crawler_loft.loft.installments_price
+    description: |
+      Amount of the installment if the listing is financed, currently zero for all listings.
+  is_for_rent:
+    lineage:
+      - datalake_crawler_loft.loft.is_for_rent
+    description: |
+      Boolean flag indicating if the property is available for rent.
+  is_for_sale:
+    lineage:
+      - datalake_crawler_loft.loft.is_for_sale
+    description: |
+      Boolean flag indicating if the property is available for sale.
+  is_hybrid:
+    lineage:
+      - datalake_crawler_loft.loft.is_hybrid
+    description: |
+      Boolean flag indicating if the property is available for both rent and sale.
+      It is true when both type.rentable and type.buyable are true, false otherwise.
+  ts_created:
+    lineage:
+      - datalake_crawler_loft.loft.ts_created
+    description: |
+      The timestamp when the listing was created.
+  year:
+    lineage:
+      - datalake_crawler_loft.loft.year
+    description: |
+      The year of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  month:
+    lineage:
+      - datalake_crawler_loft.loft.month
+    description: |
+      The month of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  day:
+    lineage:
+      - datalake_crawler_loft.loft.day
+    description: |
+      The day of the crawler date.
+      It is used for data partitioning and filtering purposes.

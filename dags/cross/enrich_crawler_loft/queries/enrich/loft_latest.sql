@@ -1,0 +1,46 @@
+SELECT 
+  id_house_platform,
+  id_house,
+  platform,
+  country,
+  state,
+  address_city,
+  neighborhood,
+  street,
+  latitude,
+  longitude,
+  listing_name,
+  total_area,
+  area,      
+  bathrooms,
+  bedrooms,
+  suites,
+  floor,
+  parking_spaces,
+  unit_type,
+  usage_type,
+  property_type,
+  contract_type,
+  advertiser_name,
+  has_advertiser,
+  is_marketplace,
+  condo_fee,
+  iptu,
+  rent_price,
+  sale_price,
+  price_m2_rental,
+  price_m2_sale,
+  installments_price,
+  is_for_rent, 
+  is_for_sale, 
+  is_hybrid,
+  ts_created,
+  year,
+  month,
+  day
+FROM 
+  datalake_crawler_loft.loft
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY MAKE_DATE(year, month, day) DESC) = 1

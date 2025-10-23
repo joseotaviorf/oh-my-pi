@@ -1,0 +1,43 @@
+dag:
+  name: enrich_crawler_loft
+  owner: Data Growth
+  schedule_start_date: 2025, 10, 15
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for enriching the crawler_loft data.
+      It split the original struct fields into multiple columns, and creates
+      generic enriched fields for the price_m2.
+      It is weekly updated, every Thursday, after the datalake_crawler_loft_clean.loft table
+      is updated. It also creates a full table, loft_latest, with the latest data for each listing based on its ID.
+workflow:
+  layer: enrich
+  type: query_delta
+  has_hive_sync: false
+  inner_dependencies:
+    loft_latest:
+      - loft
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  tables_customization:
+    loft:
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+      z_order_by: ["address_city"]
+    loft_latest:
+      extraction_type: full
+      merge_on: ["id_house"]
+      when_matched_update_condition: "MAKE_DATE(source.year, source.month, source.day) >= MAKE_DATE(target.year, target.month, target.day)" 
+      z_order_by: ["address_city"]
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 4
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    spark_version: 16.4.x-scala2.12
