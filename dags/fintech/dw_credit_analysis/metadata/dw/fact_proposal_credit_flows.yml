@@ -184,6 +184,28 @@ columns:
       THIRD_PARTY_GUARANTEE: "The accepted guarantee is the paid guarantee THIRD_PARTY_GUARANTEE"
       CLEAR_NO: "When no guarantee was accepted, as it was denied by some reason (such as income reasons)"
       NOT_ACCEPTED: "When 5A has offered a paid guarantee to the TP, but the person has not accepted it"
+  decision_reason:
+    lineage:
+      - datalake_credit_analysis.credit_engine.state_group_result
+      - datalake_credit_analysis.credit_engine_checklist.input_type
+      - datalake_credit_analysis.credit_engine_checklist.checklist_decision_type
+      - datalake_credit_analysis.credit_engine_checklist.checklist_decision
+    description: "Indicates the reason for the credit decision based on the credit engine analysis. This field categorizes the decision based on automation level and AI validation."
+    categories:
+      DOCPILOT_CLEAR_YES: "Approved with automatic decision, automatic input, and AI document validation (DOCPILOT)"
+      CLEAR_YES: "Approved with automatic decision and automatic input"
+      CLEAR_NO: "Rejected with automatic decision and automatic input"
+  decision_type:
+    lineage:
+      - datalake_credit_analysis.credit_engine_checklist.checklist_decision_type
+      - datalake_credit_analysis.credit_engine_checklist.checklist_decision
+      - datalake_credit_analysis.credit_engine_checklist.input_type
+    description: "Indicates the type of decision made for the credit analysis, categorizing whether it was automatic or manual, and whether it was approved or rejected."
+    categories:
+      AUTOMATIC_APPROVAL: "Approved with automatic decision type"
+      AUTOMATIC_REJECTION: "Rejected with automatic decision type"
+      MANUAL_APPROVAL: "Approved with manual input from credit desk (regardless of decision type)"
+      MANUAL_REJECTION: "Rejected with manual input from credit desk (regardless of decision type)"
   ec_flag:
     description: "When equals to 1 (TRUE), indicates if the user is in the early credit stage."
   os_flag:

@@ -144,6 +144,41 @@ FROM
 GROUP BY
     id_proposal
 ),
+get_proposal_credit_engine_decision AS (
+    SELECT DISTINCT
+      ce.id_proposal,
+      IF(
+        ce.state_group_result = 'DOCUMENT_VALIDATED_BY_INCOME_AI', 1, 0
+      ) AS is_document_validated_by_ai,
+      IF(
+        ch.input_type = 'AUTOMATIC'
+        OR ch.input_type IS NULL,
+        1,
+        0
+      ) AS is_checklist_input_automatic,
+      IF(ch.checklist_decision_type = 'AUTOMATIC', 1, 0) AS is_decision_type_automatic,
+      IF(ch.checklist_decision = 'APPROVED', 1, 0) AS is_approved,
+      IF(ch.checklist_decision = 'REJECTED', 1, 0) AS is_rejected
+    FROM
+      datalake_credit_analysis.credit_engine AS ce
+        LEFT JOIN datalake_credit_analysis.credit_engine_checklist AS ch
+          ON ch.id_analysis_request = ce.id_analysis_request
+    WHERE
+    ch.checklist_decision IS NOT NULL
+  ),
+  get_proposal_credit_decision_results AS (
+    SELECT
+      ced.id_proposal,
+      MIN(ced.is_checklist_input_automatic) AS is_checklist_input_automatic,
+      MAX(ced.is_decision_type_automatic) AS is_decision_type_automatic,
+      MAX(ced.is_approved) AS is_approved,
+      MAX(ced.is_rejected) AS is_rejected,
+      MAX(ced.is_document_validated_by_ai) AS is_document_validated_by_ai
+    FROM
+      get_proposal_credit_engine_decision AS ced
+    GROUP BY
+      ced.id_proposal
+  ),
 rent_flows AS (
   SELECT
     flrf.sk_client,
@@ -221,6 +256,33 @@ rent_flows AS (
       WHEN ca.guarantee_accepted IS NULL THEN FALSE
       ELSE TRUE
     END AS is_guarantee_accepted, --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
+    CASE
+      WHEN cd.is_approved = 1
+      AND cd.is_decision_type_automatic = 1
+      AND cd.is_checklist_input_automatic = 1
+      AND cd.is_document_validated_by_ai = 1
+      THEN 'DOCPILOT_CLEAR_YES'
+      WHEN cd.is_approved = 1
+      AND cd.is_decision_type_automatic = 1
+      AND cd.is_checklist_input_automatic = 1 THEN 'CLEAR_YES'
+      WHEN cd.is_rejected = 1
+      AND cd.is_decision_type_automatic = 1
+      AND cd.is_checklist_input_automatic = 1 THEN 'CLEAR_NO'
+      ELSE NULL
+    END AS decision_reason,
+    CASE
+      WHEN cd.is_approved = 1
+      AND cd.is_decision_type_automatic = 1 THEN 'AUTOMATIC_APPROVAL'
+      WHEN cd.is_rejected = 1
+      AND cd.is_decision_type_automatic = 1 THEN 'AUTOMATIC_REJECTION'
+      WHEN cd.is_approved = 1
+      AND (cd.is_decision_type_automatic = 1 OR cd.is_decision_type_automatic = 0)
+      AND cd.is_checklist_input_automatic = 0 THEN 'MANUAL_APPROVAL'
+      WHEN cd.is_rejected = 1
+      AND (cd.is_decision_type_automatic = 1 OR cd.is_decision_type_automatic = 0)
+      AND cd.is_checklist_input_automatic = 0 THEN 'MANUAL_REJECTION'
+      ELSE NULL
+    END AS decision_type,
     pp.is_single_tenant,
     IF(pt.proposal_proponent_type = 'PERSON', TRUE, FALSE) AS is_renting_for_others,
     IF(sh_p.proposal_source = 'PASSPORT', TRUE, FALSE) AS is_credit_passport,
@@ -260,6 +322,9 @@ rent_flows AS (
   LEFT JOIN
     datalake_sorting_hat_clean.proposal AS sh_p
       ON sh_p.id = flrf.sk_proposal
+  LEFT JOIN
+    get_proposal_credit_decision_results AS cd
+      ON cd.id_proposal = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
@@ -299,6 +364,8 @@ proposal_credit_flows AS (
     rf.funnel_step,
     rf.guarantee_offered,
     rf.guarantee_accepted,
+    rf.decision_reason,
+    rf.decision_type,
     CASE
       WHEN rf.sk_offer_submitted_date > 0
       AND rf.sk_proposal < 0 THEN 'OS2OA'
@@ -418,6 +485,8 @@ early_credit_full (
     'EC2OS' AS funnel_drop_step,
     CAST(NULL AS STRING) AS guarantee_offered,
     CAST(NULL AS STRING) AS guarantee_accepted,
+    CAST(NULL AS STRING) AS decision_reason,
+    CAST(NULL AS STRING) AS decision_type,
     hl.country_code,
     hl.rental_administrator,
     CAST(NULL AS BOOLEAN) AS is_guarantee_accepted,
@@ -496,6 +565,8 @@ SELECT
   END AS funnel_drop_step,
   guarantee_offered,
   guarantee_accepted,
+  decision_reason,
+  decision_type,
   country_code,
   rental_administrator,
   is_guarantee_accepted,
@@ -581,6 +652,8 @@ SELECT
   END AS funnel_drop_step_ordered,
   guarantee_offered,
   guarantee_accepted,
+  decision_reason,
+  decision_type,
   country_code,
   rental_administrator,
   is_guarantee_accepted,
@@ -663,6 +736,8 @@ SELECT
   umf.client_max_funnel_drop_step,
   guarantee_offered,
   guarantee_accepted,
+  decision_reason,
+  decision_type,
   country_code,
   rental_administrator,
   CASE
@@ -723,7 +798,7 @@ SELECT
   IF(dt_tenant_first_doc_sent_date IS NOT NULL AND rr.resend_request IS NOT NULL, TRUE, FALSE) AS is_resend_request,
   is_single_tenant,
   is_renting_for_others,
-  CASE 
+  CASE
 	WHEN is_renting_for_others = TRUE THEN 'renting_for_others'
 	WHEN is_single_tenant = FALSE THEN 'multi_tenant'
 	WHEN is_single_tenant = TRUE THEN 'single_tenant'

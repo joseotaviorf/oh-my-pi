@@ -232,6 +232,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis:first-run-of-day
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-analysis-request:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-checklist:first-run-of-day
   - bietlejuice.enrich_docpilot:load-enrich-income-extraction-processing:first-run-of-day
