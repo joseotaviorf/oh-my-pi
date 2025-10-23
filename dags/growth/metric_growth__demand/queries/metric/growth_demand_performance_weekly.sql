@@ -32,7 +32,7 @@ weekly_tof_metrics AS (
     LEFT JOIN dw_public.dim_region AS dr
         ON dr.sk_region = fdtof.sk_region
   WHERE 
-    DATE(fdtof.dt_event) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14)) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(fdtof.dt_event) BETWEEN DATE_TRUNC('week', DATE('{load_start_date}')) AND DATE('{load_end_date}')
   GROUP BY ALL
 
 ), 
@@ -73,7 +73,7 @@ weekly_prospect_metrics AS (
     LEFT JOIN dw_public.dim_region AS dr
       ON fdpe.sk_region = dr.sk_region
   WHERE 
-    DATE(fdpe.ts_event) BETWEEN DATE_TRUNC('week', DATE_SUB(MAKE_DATE({year},{month},{day}), 14)) AND DATE(MAKE_DATE({year},{month},{day}))
+    DATE(fdpe.ts_event) BETWEEN DATE_TRUNC('week', DATE('{load_start_date}')) AND DATE('{load_end_date}')
   GROUP BY ALL
 )
 SELECT
