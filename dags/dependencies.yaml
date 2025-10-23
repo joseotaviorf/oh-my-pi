@@ -4420,3 +4420,5 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
+bietlejuice.enrich_find_health_metrics:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
