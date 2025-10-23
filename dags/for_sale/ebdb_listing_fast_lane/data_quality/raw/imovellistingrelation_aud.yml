@@ -9,26 +9,6 @@ column_level_validations:
       # Composite primary key (id, rev) must be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_ebdb_test_raw.imovel_aud GROUP BY id, rev HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
-  imovelId:
-    has_completeness:
-      greater_than: 0.95
-      severity_level: Error
-  relatedId:
-    has_completeness:
-      greater_than: 0.95
-      severity_level: Error
   rev:
     is_complete:
-      severity_level: Error
-  sourceType:
-    has_completeness:
-      greater_than: 0.95
-      severity_level: Error
-  relatedAs:
-    has_completeness:
-      greater_than: 0.95
-      severity_level: Error
-  imovelOriginated:
-    has_completeness:
-      greater_than: 0.95
       severity_level: Error

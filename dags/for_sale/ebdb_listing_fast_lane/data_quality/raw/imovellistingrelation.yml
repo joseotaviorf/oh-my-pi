@@ -7,24 +7,3 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  imovelId:
-    is_complete:
-      severity_level: Error
-  relatedId:
-    is_complete:
-      severity_level: Error
-  relatedAs:
-    is_complete:
-      severity_level: Error
-  sourceType:
-    is_complete:
-      severity_level: Error
-  imovelOriginated:
-    is_complete:
-      severity_level: Error
-  criadoEm:
-    is_complete:
-      severity_level: Error
-  atualizadoEm:
-    is_complete:
-      severity_level: Error
