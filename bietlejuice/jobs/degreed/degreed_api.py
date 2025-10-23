@@ -1,6 +1,8 @@
 import json
 import time
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from bietlejuice.base.spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
@@ -23,6 +25,8 @@ class DegreedAPI:
         "FORNO": "https://api.betatest.degreed.com/api/v2/",
     }
     _REQUEST_DELAY_SECONDS = 0.5
+    _MAX_RETRIES = 5
+    _BACKOFF_FACTOR = 2
 
     def __init__(self, job_args: dict):
         """
@@ -50,6 +54,30 @@ class DegreedAPI:
 
         self._client_id, self._client_secret = self._get_secrets()
         self._access_tokens = {}
+        self._session = self._create_session_with_retries()
+
+    def _create_session_with_retries(self) -> requests.Session:
+        """
+        Creates a requests session with automatic retry logic for transient errors.
+
+        Returns:
+            requests.Session: A configured session with retry capabilities.
+        """
+        session = requests.Session()
+
+        retry_strategy = Retry(
+            total=self._MAX_RETRIES,
+            backoff_factor=self._BACKOFF_FACTOR,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=["GET", "POST"],
+            raise_on_status=False,
+        )
+
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+
+        return session
 
     def _get_secrets(self):
         """
@@ -92,7 +120,7 @@ class DegreedAPI:
         }
 
         try:
-            response = requests.post(url, headers=headers, data=data)
+            response = self._session.post(url, headers=headers, data=data)
             response.raise_for_status()
             response_json = response.json()
             access_token = response_json.get("access_token")
@@ -151,10 +179,30 @@ class DegreedAPI:
             current_params = processed_params if is_first_request else None
 
             try:
-                response = requests.get(
-                    next_page_url, headers=auth_headers, params=current_params
+                LOGGER.info(
+                    f"Fetching page {page_count} from {next_page_url} with params: {current_params}"
                 )
-                response.raise_for_status()
+
+                response = self._session.get(
+                    next_page_url,
+                    headers=auth_headers,
+                    params=current_params,
+                    timeout=60,
+                )
+
+                LOGGER.info(
+                    f"Response status: {response.status_code}, "
+                    f"headers: {dict(response.headers)}, "
+                    f"elapsed: {response.elapsed.total_seconds()}s"
+                )
+
+                if response.status_code >= 400:
+                    error_msg = (
+                        f"API returned status {response.status_code} on page {page_count}. "
+                        f"URL: {next_page_url}, Response: {response.text[:500]}"
+                    )
+                    LOGGER.error(error_msg)
+                    response.raise_for_status()
 
                 is_first_request = False
                 json_response = response.json()
@@ -162,21 +210,54 @@ class DegreedAPI:
 
                 if page_data:
                     results_for_params.extend(page_data)
+                    LOGGER.info(f"Page {page_count} returned {len(page_data)} records")
+                else:
+                    LOGGER.warning(f"Page {page_count} returned no data")
 
                 next_page_url = json_response.get("links", {}).get("next")
                 if next_page_url:
                     page_count += 1
                     time.sleep(self._REQUEST_DELAY_SECONDS)
 
+            except requests.exceptions.HTTPError as e:
+                error_details = {
+                    "status_code": response.status_code if response else "N/A",
+                    "response_body": response.text[:1000] if response else "N/A",
+                    "url": next_page_url,
+                    "page": page_count,
+                    "params": current_params,
+                }
+                LOGGER.error(
+                    f"HTTP error during pagination: {e}. Details: {error_details}",
+                    exc_info=True,
+                )
+
+                if response and response.status_code >= 500:
+                    LOGGER.error(
+                        f"Server error {response.status_code} persisted after {self._MAX_RETRIES} retries. "
+                        f"This may indicate an issue with the Degreed API. "
+                        f"Consider: 1) Checking Degreed API status, "
+                        f"2) Reducing the limit parameter, "
+                        f"3) Contacting Degreed support if the issue persists."
+                    )
+                raise
+            except requests.exceptions.Timeout as e:
+                LOGGER.error(
+                    f"Request timeout on page {page_count} after 60 seconds: {e}",
+                    exc_info=True,
+                )
+                raise
             except requests.exceptions.RequestException as e:
                 LOGGER.error(
-                    f"HTTP error during pagination on page {page_count}: {e}",
+                    f"Request error during pagination on page {page_count}: {e}",
                     exc_info=True,
                 )
                 raise
             except json.JSONDecodeError as e:
+                response_text = response.text if response else "No response"
                 LOGGER.error(
-                    f"Failed to decode JSON from response: {e}. Response text: {response.text}",
+                    f"Failed to decode JSON from response on page {page_count}: {e}. "
+                    f"Response text: {response_text[:1000]}",
                     exc_info=True,
                 )
                 raise

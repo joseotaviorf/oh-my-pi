@@ -78,7 +78,7 @@ workflow:
         - scope: "content:read"
           base_filters:
             "filter[include_restricted]": "true"
-            "limit": "1000"
+            "limit": "100"
     custom_attributes:
       extraction_type: full
       extra_spark_job_arguments:
