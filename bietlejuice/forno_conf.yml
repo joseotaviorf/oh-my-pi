@@ -1113,7 +1113,6 @@ databricks_12_2_med_io-general_photon_cluster:
         availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
-
 databricks_16_4_med_io-general_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5d.large

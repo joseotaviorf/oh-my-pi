@@ -1,0 +1,47 @@
+---
+database_name: datalake_notifyme_clean
+table_name: subscriptions
+description: This table consolidates subscriptions data from NotifyMe. Tracks user subscription preferences for different communication channels.
+domain: Primitives
+owner: data-primitives@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the subscription record.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.id
+  id_user_campaign_preferences:
+    description: Identifier of the user campaign preferences associated with the subscription.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.user_campaign_preferences
+  whatsapp:
+    description: WhatsApp subscription preference.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.whatsapp
+  email:
+    description: Email subscription preference.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.email
+  push:
+    description: Push notification subscription preference.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.push
+  ts_created:
+    description: Timestamp when the subscription record was created.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.created_at
+  ts_updated:
+    description: Timestamp when the subscription record was last updated.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.updated_at
+  year:
+    description: Year extracted from the subscription update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.updated_at
+  month:
+    description: Month extracted from the subscription update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.updated_at
+  day:
+    description: Day extracted from the subscription update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.subscriptions.updated_at

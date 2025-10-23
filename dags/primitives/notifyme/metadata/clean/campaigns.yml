@@ -1,0 +1,39 @@
+---
+database_name: datalake_notifyme_clean
+table_name: campaigns
+description: This table consolidates campaigns data from NotifyMe. Campaigns define notification strategies and rules.
+domain: Primitives
+owner: data-primitives@quintoandar.com.br
+columns:
+  name:
+    description: Unique name identifier for the campaign.
+    lineage:
+      - datalake_notifyme_raw.campaigns.name
+  external_reference:
+    description: External reference identifier for the campaign.
+    lineage:
+      - datalake_notifyme_raw.campaigns.external_reference
+  experimental_external_reference:
+    description: Experimental external reference identifier for the campaign.
+    lineage:
+      - datalake_notifyme_raw.campaigns.experimental_external_reference
+  ts_created:
+    description: Timestamp when the campaign was created.
+    lineage:
+      - datalake_notifyme_raw.campaigns.created_at
+  ts_updated:
+    description: Timestamp when the campaign was last updated.
+    lineage:
+      - datalake_notifyme_raw.campaigns.updated_at
+  year:
+    description: Year extracted from the campaign update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.campaigns.updated_at
+  month:
+    description: Month extracted from the campaign update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.campaigns.updated_at
+  day:
+    description: Day extracted from the campaign update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.campaigns.updated_at
