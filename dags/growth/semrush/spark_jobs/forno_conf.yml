@@ -2,42 +2,6 @@
 raw_table_name: searches
 raw_partition_cols: ["domain", "year", "month", "day"]
 report_list:
-  123i_organic_search_kw:
-    configs:
-      subdomain: 123i.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  ape11_organic_search_kw:
-    configs:
-      subdomain: ape11.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  arboimoveis_organic_search_kw:
-    configs:
-      subdomain: arboimoveis.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  auxiliadorapredial_organic_search_kw:
-    configs:
-      subdomain: auxiliadorapredial.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
   casamineira_organic_search_kw:
     configs:
       subdomain: casamineira.com.br
@@ -56,45 +20,9 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  direcional_organic_search_kw:
-    configs:
-      subdomain: direcional.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  emcasa_organic_search_kw:
-    configs:
-      subdomain: emcasa.com
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  imoveisestadao_organic_search_kw:
-    configs:
-      subdomain: imoveis.estadao.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
   imoveismercadolivre_organic_search_kw:
     configs:
       subdomain: imoveis.mercadolivre.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  imovelguide_organic_search_kw:
-    configs:
-      subdomain: imovelguide.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
@@ -131,24 +59,6 @@ report_list:
   quintoandar_organic_search_kw:
     configs:
       subdomain: quintoandar.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  secovi_organic_search_kw:
-    configs:
-      subdomain: secovi.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 2
-  trisul_organic_search_kw:
-    configs:
-      subdomain: trisul-sa.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br

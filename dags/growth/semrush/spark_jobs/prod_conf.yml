@@ -2,42 +2,6 @@
 raw_table_name: searches
 raw_partition_cols: ["domain", "year", "month", "day"]
 report_list:
-  123i_organic_search_kw:
-    configs:
-      subdomain: 123i.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 110000 # expected number of results * 1,25
-  ape11_organic_search_kw:
-    configs:
-      subdomain: ape11.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 45000 # expected number of results * 1,25
-  arboimoveis_organic_search_kw:
-    configs:
-      subdomain: arboimoveis.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 150000 # expected number of results * 1,25
-  auxiliadorapredial_organic_search_kw:
-    configs:
-      subdomain: auxiliadorapredial.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 11000 # expected number of results * 1,25
   casamineira_organic_search_kw:
     configs:
       subdomain: casamineira.com.br
@@ -56,33 +20,6 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 800000 # expected number of results * 1,25
-  direcional_organic_search_kw:
-    configs:
-      subdomain: direcional.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 30000 # expected number of results * 1,25
-  emcasa_organic_search_kw:
-    configs:
-      subdomain: emcasa.com
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 15000 # expected number of results * 1,25
-  imoveisestadao_organic_search_kw:
-    configs:
-      subdomain: imoveis.estadao.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 25000 # expected number of results * 1,25
   imoveismercadolivre_organic_search_kw:
     configs:
       subdomain: imoveis.mercadolivre.com.br
@@ -92,15 +29,6 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 20000 # expected number of results * 1,25
-  imovelguide_organic_search_kw:
-    configs:
-      subdomain: imovelguide.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 70000 # expected number of results * 1,25
   imovelweb_organic_search_kw:
     configs:
       subdomain: imovelweb.com.br
@@ -137,24 +65,6 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 450000 # expected number of results * 1,25
-  secovi_organic_search_kw:
-    configs:
-      subdomain: secovi.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 4000 # expected number of results * 1,25
-  trisul_organic_search_kw:
-    configs:
-      subdomain: trisul-sa.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: organic
-      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 5000 # expected number of results * 1,25
   vivareal_organic_search_kw:
     configs:
       subdomain: vivareal.com.br
