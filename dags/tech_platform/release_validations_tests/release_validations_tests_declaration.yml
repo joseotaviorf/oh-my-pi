@@ -29,6 +29,10 @@ workflow:
       clean_table_name: playwright_results
       partitions: [year, month, day]
       clean_partitions: [year, month, day]
+    playwright_specs_tests:
+      clean_table_name: playwright_specs_tests
+      partitions: [year, month, day]
+      clean_partitions: [year, month, day]
 
 cluster:
   type: databricks_16_4_min_general_cluster
