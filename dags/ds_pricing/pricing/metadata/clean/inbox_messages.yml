@@ -1,0 +1,71 @@
+database_name: datalake_pricing_clean
+table_name: inbox_messages
+description: |
+  This table implements the Inbox pattern for guaranteed message processing in the Pricing Worker.
+  It stores all incoming messages immediately upon receipt from SQS queues, before any processing occurs.
+  
+  Message Flow:
+  1. SQS consumers poll prediction queues (online_prediction_queue, batch_prediction_queue)
+  2. Messages are immediately persisted to this inbox table
+  3. Messages are acknowledged and removed from SQS
+  4. Inbox processor polls this table for pending messages
+  5. Messages are processed into price_prediction records
+  
+  The Inbox pattern ensures:
+  - No message loss (stored before processing)
+  - Complete audit trail of all incoming prediction requests
+  - Retry capability for failed messages (up to max_retries)
+  - Processing status tracking (pending → processing → processed/failed)
+  - Error logging for debugging and monitoring
+  
+  This decouples message consumption from processing, providing reliability and enabling
+  asynchronous background processing with configurable retry logic.
+owner: pedro.muramatsu@quintoandar.com.br
+domain: DS Pricing
+columns:
+  id_message:
+    description: "Unique identifier for the message. Primary key. Corresponds to the messaging system's MessageID."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.message_id
+  queue_name:
+    description: "Name of the source SQS queue from which the message was consumed (e.g., online_prediction_queue, batch_prediction_queue)."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.queue_name
+  message_type:
+    description: "Classification of the message type for routing and processing logic."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.message_type
+  message_body:
+    description: "Raw message content as received from the queue. Contains the complete prediction payload including all input features and metadata."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.message_body
+  status:
+    description: "Current processing status of the message. Values: pending (awaiting processing), processing (currently being processed), processed (successfully completed), failed (processing failed after max retries)."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.status
+    categories:
+      pending: "Message is awaiting processing"
+      processing: "Message is currently being processed"
+      processed: "Message was successfully processed"
+      failed: "Message processing failed after maximum retry attempts"
+  retry_count:
+    description: "Number of retry attempts made for this message. Increments with each failed processing attempt."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.retry_count
+  max_retries:
+    description: "Maximum number of retry attempts allowed before message is marked as permanently failed. Typically set to 3."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.max_retries
+  ts_created:
+    description: "Timestamp when the message was first received and stored in the inbox. Marks the beginning of message lifecycle."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.created_at
+  ts_processed:
+    description: "Timestamp when the message processing was completed (successfully or failed). Null for pending messages."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.processed_at
+  error_message:
+    description: "Error details captured when message processing fails. Used for debugging and monitoring. Null for successful processing."
+    lineage:
+      - datalake_pricing_raw.inbox_messages.error_message
+
