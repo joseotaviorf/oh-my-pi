@@ -10,6 +10,7 @@ WITH messages AS (
       ELSE NULL
     END AS user_type,
     message_body AS message,
+    'whatsapp' AS origin,
     ts_created
   FROM
     datalake_quinto_messenger_clean.channel_event
@@ -37,6 +38,7 @@ WITH messages AS (
       ELSE NULL
     END AS user_type,
     message,
+    'in_app' AS origin,
     ts_created
   FROM
     datalake_internal_chat_clean.internal_chat_messages
@@ -56,10 +58,11 @@ WITH messages AS (
 twilio_data AS (
   SELECT DISTINCT
     m.id_channel,
-    COALESCE(cht.id_session, ch.id_session) AS id_session,
+    COALESCE(ch.id_session, cht.id_session) AS id_session,
     COALESCE(t1.id_task, t2.id_task) AS id_task,
     m.id_message,
     REPLACE(m.user_sender, '+', '') AS user_sender,
+    m.origin,
     m.user_type,
     m.message,
     m.ts_created
@@ -76,10 +79,12 @@ twilio_data AS (
   LEFT JOIN
     datalake_quinto_messenger_clean.task AS t1
       ON t1.id_channel = ch.id_channel
+      AND m.origin = 'whatsapp'
       AND t1.ts_created >= '{load_start_date}' - INTERVAL 60 DAY
   LEFT JOIN
     datalake_quinto_messenger_clean.task AS t2
       ON t2.id_chat = cht.id_chat
+      AND m.origin = 'in app'
       AND t2.ts_created >= '{load_start_date}' - INTERVAL 60 DAY
 ),
 messages_with_users AS (
@@ -96,10 +101,7 @@ messages_with_users AS (
         ELSE COALESCE(u1.id, u2.id, TRY_CAST(td.user_sender AS BIGINT), -1)
       END
     ) AS sk_user_sender,
-    CASE WHEN
-      ss.source = 'internal_chat' THEN 'in app'
-      ELSE ss.source
-    END AS origin,
+    td.origin,
     td.user_type,
     td.message,
     td.ts_created

@@ -27,8 +27,6 @@ columns:
       - datalake_internal_chat_clean.internal_chat_messages.id_user_external
     description: Identifier of the user who sent the message.
   origin:
-    lineage:
-      - datalake_sauron_clean.session.origin
     description: The source of the message, either 'in_app' or 'whatsapp'.
   message:
     lineage:
