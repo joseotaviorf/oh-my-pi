@@ -44,6 +44,7 @@ raw:
 - `datalake_semrush_raw.secovi_organic_search_kw`
 - `datalake_semrush_raw.loft_organic_search_kw`
 - `datalake_semrush_raw.olximoveis_organic_search_kw`
+- `datalake_semrush_raw.dfimoveis_organic_search_kw`
 
 clean:
 - `datalake_semrush_clean.quintoandar_organic_search_kw`
@@ -67,3 +68,4 @@ clean:
 - `datalake_semrush_clean.secovi_organic_search_kw`
 - `datalake_semrush_clean.loft_organic_search_kw`
 - `datalake_semrush_clean.olximoveis_organic_search_kw`
+- `datalake_semrush_clean.dfimoveis_organic_search_kw`

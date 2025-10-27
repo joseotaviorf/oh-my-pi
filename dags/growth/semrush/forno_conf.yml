@@ -21,6 +21,7 @@ tables:
   wimoveis_organic_search_kw: wimoveis.com.br
   zapimoveis_organic_search_kw: zapimoveis.com.br
   olximoveis_organic_search_kw: olx.com.br/imoveis
+  dfimoveis_organic_search_kw: dfimoveis.com.br
 clean_partition_cols:
   - year
   - month

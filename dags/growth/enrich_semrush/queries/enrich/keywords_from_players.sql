@@ -697,6 +697,38 @@ SELECT DISTINCT -- There are duplicates in the source table
   WHERE
     year = YEAR(DATE('{load_start_date}'))
     AND month = MONTH(DATE('{load_start_date}'))
+UNION ALL
+SELECT DISTINCT -- There are duplicates in the source table
+    'dfimoveis' AS player,
+    keyword,
+    url,
+    trends,
+    position,
+    previous_position,
+    position_difference,
+    keyword_intents,
+    position_type,
+    serp_features_by_position,
+    serp_features_by_keyword,
+    search_volume,
+    cpc,
+    traffic,
+    share_of_traffic,
+    traffic_cost_percentage,
+    competition,
+    number_of_results,
+    keyword_difficulty,
+    dt_display,
+    dt_report,
+    ts_report,
+    year,
+    month,
+    day
+  FROM
+    datalake_semrush_clean.dfimoveis_organic_search_kw
+  WHERE
+    year = YEAR(DATE('{load_start_date}'))
+    AND month = MONTH(DATE('{load_start_date}'))
 )
 
 SELECT

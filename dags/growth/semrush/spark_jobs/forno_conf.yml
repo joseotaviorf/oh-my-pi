@@ -101,3 +101,12 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  dfimoveis_organic_search_kw:
+    configs:
+      subfolder: dfimoveis.com.br
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: br
+      display_positions_type: organic
+      display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2

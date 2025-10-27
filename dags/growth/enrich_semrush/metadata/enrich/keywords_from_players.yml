@@ -4,7 +4,7 @@ owner: erica.bertan@quintoandar.com.br
 domain: Growth
 description: |
   Table of SEO keywords and SERP features consolidated from multiple real-estate competitors (SEMrush exports).
-  All fields are derived from specific organic_search_kw tables in datalake_semrush_clean for 21 different players. Accents are normalized,
+  All fields are derived from specific organic_search_kw tables in datalake_semrush_clean for 22 different players. Accents are normalized,
   intents and SERP features are mapped to human-readable labels in lower case. Includes comprehensive car-related keyword filtering
   for chavesnamao player (excluding automotive brands, models, and related terms) and golden set keyword identification.
 columns:
@@ -34,6 +34,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.keyword
       - datalake_semrush_clean.loft_organic_search_kw.keyword
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.keyword
   keyword_clean:
     description: "Keyword normalized to lowercase, accents removed, and non‑alphanumeric characters stripped (spaces kept)."
     lineage:
@@ -58,6 +59,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.keyword
       - datalake_semrush_clean.loft_organic_search_kw.keyword
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.keyword
   url:
     description: "Landing page URL that ranks for the keyword for the respective player. Note: chavesnamao player URLs are filtered to exclude automotive-related content (car brands, models, dealerships, etc.)."
     lineage:
@@ -82,6 +84,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.url
       - datalake_semrush_clean.loft_organic_search_kw.url
       - datalake_semrush_clean.olximoveis_organic_search_kw.url
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.url
   trends:
     description: "Monthly trend values from SEMrush with brackets removed; comma‑separated list representing the last 12 months."
     lineage:
@@ -106,6 +109,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.trends
       - datalake_semrush_clean.loft_organic_search_kw.trends
       - datalake_semrush_clean.olximoveis_organic_search_kw.trends
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.trends
   position:
     description: "Current organic position of the URL for the keyword (1-based)."
     lineage:
@@ -130,6 +134,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.position
       - datalake_semrush_clean.loft_organic_search_kw.position
       - datalake_semrush_clean.olximoveis_organic_search_kw.position
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.position
   previous_position:
     description: "Previous organic position of the URL for the keyword as reported by SEMrush."
     lineage:
@@ -154,6 +159,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.previous_position
       - datalake_semrush_clean.loft_organic_search_kw.previous_position
       - datalake_semrush_clean.olximoveis_organic_search_kw.previous_position
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.previous_position
   position_difference:
     description: "Difference between current and previous positions (positive if improved)."
     lineage:
@@ -178,6 +184,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.position_difference
       - datalake_semrush_clean.loft_organic_search_kw.position_difference
       - datalake_semrush_clean.olximoveis_organic_search_kw.position_difference
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.position_difference
   keyword_intents:
     description: "Keyword intent(s) mapped to human‑readable labels and lowercased. Multiple intents are comma‑separated."
     lineage:
@@ -202,6 +209,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.keyword_intents
       - datalake_semrush_clean.loft_organic_search_kw.keyword_intents
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword_intents
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.keyword_intents
   position_type:
     description: "SEMrush position type classification for the ranking (e.g., organic variations)."
     lineage:
@@ -226,6 +234,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.position_type
       - datalake_semrush_clean.loft_organic_search_kw.position_type
       - datalake_semrush_clean.olximoveis_organic_search_kw.position_type
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.position_type
   serp_features_by_position:
     description: "SERP features present among the results positions, mapped to readable labels and lowercased; comma‑separated."
     lineage:
@@ -250,6 +259,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.serp_features_by_position
       - datalake_semrush_clean.loft_organic_search_kw.serp_features_by_position
       - datalake_semrush_clean.olximoveis_organic_search_kw.serp_features_by_position
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.serp_features_by_position
   serp_features_by_keyword:
     description: "SERP features associated with the keyword overall, mapped to readable labels and lowercased; comma‑separated."
     lineage:
@@ -274,6 +284,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.serp_features_by_keyword
       - datalake_semrush_clean.loft_organic_search_kw.serp_features_by_keyword
       - datalake_semrush_clean.olximoveis_organic_search_kw.serp_features_by_keyword
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.serp_features_by_keyword
   search_volume:
     description: "Average monthly search volume for the keyword according to SEMrush."
     lineage:
@@ -298,6 +309,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.search_volume
       - datalake_semrush_clean.loft_organic_search_kw.search_volume
       - datalake_semrush_clean.olximoveis_organic_search_kw.search_volume
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.search_volume
   cpc:
     description: "Estimated cost per click (CPC) for the keyword from SEMrush."
     lineage:
@@ -322,6 +334,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.cpc
       - datalake_semrush_clean.loft_organic_search_kw.cpc
       - datalake_semrush_clean.olximoveis_organic_search_kw.cpc
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.cpc
   traffic:
     description: "Estimated organic traffic generated by the URL for the keyword."
     lineage:
@@ -346,6 +359,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.traffic
       - datalake_semrush_clean.loft_organic_search_kw.traffic
       - datalake_semrush_clean.olximoveis_organic_search_kw.traffic
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.traffic
   share_of_traffic:
     description: "Estimated share of traffic captured by the URL for this keyword."
     lineage:
@@ -370,6 +384,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.share_of_traffic
       - datalake_semrush_clean.loft_organic_search_kw.share_of_traffic
       - datalake_semrush_clean.olximoveis_organic_search_kw.share_of_traffic
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.share_of_traffic
   traffic_cost_percentage:
     description: "Estimated share of traffic cost attributable to this keyword and URL."
     lineage:
@@ -394,6 +409,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.traffic_cost_percentage
       - datalake_semrush_clean.loft_organic_search_kw.traffic_cost_percentage
       - datalake_semrush_clean.olximoveis_organic_search_kw.traffic_cost_percentage
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.traffic_cost_percentage
   competition:
     description: "SEMrush competition score for the keyword in paid search."
     lineage:
@@ -418,6 +434,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.competition
       - datalake_semrush_clean.loft_organic_search_kw.competition
       - datalake_semrush_clean.olximoveis_organic_search_kw.competition
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.competition
   number_of_results:
     description: "Approximate number of results returned by the search engine for the keyword."
     lineage:
@@ -442,6 +459,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.number_of_results
       - datalake_semrush_clean.loft_organic_search_kw.number_of_results
       - datalake_semrush_clean.olximoveis_organic_search_kw.number_of_results
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.number_of_results
   keyword_difficulty:
     description: "SEMrush keyword difficulty score (0–100)."
     lineage:
@@ -466,6 +484,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.keyword_difficulty
       - datalake_semrush_clean.loft_organic_search_kw.keyword_difficulty
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword_difficulty
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.keyword_difficulty
   is_goldenset:
     description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
     lineage:
@@ -494,6 +513,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.dt_display
       - datalake_semrush_clean.loft_organic_search_kw.dt_display
       - datalake_semrush_clean.olximoveis_organic_search_kw.dt_display
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.dt_display
   dt_report:
     description: "Reporting reference date associated with the SEMrush export."
     lineage:
@@ -518,6 +538,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.dt_report
       - datalake_semrush_clean.loft_organic_search_kw.dt_report
       - datalake_semrush_clean.olximoveis_organic_search_kw.dt_report
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.dt_report
   ts_report:
     description: "Report extraction timestamp from SEMrush."
     lineage:
@@ -542,6 +563,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.ts_report
       - datalake_semrush_clean.loft_organic_search_kw.ts_report
       - datalake_semrush_clean.olximoveis_organic_search_kw.ts_report
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.ts_report
   year:
     description: "Partition year."
     lineage:
@@ -566,6 +588,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.year
       - datalake_semrush_clean.loft_organic_search_kw.year
       - datalake_semrush_clean.olximoveis_organic_search_kw.year
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.year
   month:
     description: "Partition month."
     lineage:
@@ -590,6 +613,7 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.month
       - datalake_semrush_clean.loft_organic_search_kw.month
       - datalake_semrush_clean.olximoveis_organic_search_kw.month
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.month
   day:
     description: "Partition day."
     lineage:
@@ -614,3 +638,4 @@ columns:
       - datalake_semrush_clean.secovi_organic_search_kw.day
       - datalake_semrush_clean.loft_organic_search_kw.day
       - datalake_semrush_clean.olximoveis_organic_search_kw.day
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.day
