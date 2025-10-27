@@ -157,11 +157,16 @@ brokerage AS (
 ),
 house AS (
     SELECT
-        *
+         h.id,
+         h.id_external,
+         hh.id_region
     FROM
-        datalake_sales_flow_clean.house
+        datalake_sales_flow_clean.house AS h
+    LEFT JOIN 
+        datalake_ebdb_clean.house AS hh
+            ON h.id_external = hh.id
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY h.id ORDER BY h.ts_updated DESC) = 1
 ),
 flow_type AS (
     SELECT
@@ -180,6 +185,7 @@ offers AS (
     SELECT
         l.id_firestore AS id_offer,
         l.id_sales_flow,
+        l.id_hub,
         l.sale_price,
         l.final_price,
         f.offer_price AS first_price_offered_by_buyer,
@@ -318,7 +324,9 @@ sale_offer AS (
         sf.id_buyer,
         sf.id_seller,
         h.id_external AS id_house,
+        h.id_region,
         sf.id AS id_sales_flow,
+        off.id_hub,
         sf.status,
         sf.is_canceled,
         sf.ts_canceled,
@@ -394,12 +402,15 @@ unified_offers AS (
     SELECT
         vo.id_offer AS id_offer,
         vo.id_sales_flow,
-        vo.id_sale_flow,
+        vo.id_sale_flow, 
         vo.id_house,
+        vo.id_region,
+        vo.id_hub,
         vo.id_buyer,
         vo.id_seller AS id_owner,
         vo.id_agent,
         vo.payment_method AS current_payment_method,
+        vo.planned_payment_method,
         vo.status,
         vo.ccv_status,
         vo.drop_reason,
@@ -437,12 +448,15 @@ unified_offers AS (
     SELECT
         g.id AS id_offer,
         g.id_sale_flow AS id_sales_flow,
-        g.id_sale_flow,
+        g.id_sale_flow,        
         g.id_house,
+        CAST(NULL AS BIGINT) AS id_region,
+        CAST(NULL AS BIGINT) AS id_hub,
         g.id_buyer,
         g.id_owner,
         g.id_agent,
         g.current_payment_method AS current_payment_method,
+        CAST(NULL AS STRING) AS planned_payment_method,
         CAST(NULL AS STRING) AS status,
         CAST(NULL AS STRING) AS ccv_status,
         CAST(NULL AS STRING) AS drop_reason,
