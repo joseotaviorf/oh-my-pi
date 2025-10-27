@@ -11,8 +11,8 @@ SELECT
    NULLIF(l1, '') AS owner_l1_email,
    NULLIF(l2, '') AS owner_l2_email,
    NULLIF(l3, '') AS owner_l3_email,
-   ts_load
-   YEAR(CURRENT_DATE()) AS year,
-   MONTH(CURRENT_DATE()) AS month
+   ts_load,
+   YEAR(ts_load) AS year,
+   MONTH(ts_load) AS month
 FROM
    datalake_gsheets_people_raw.codex_cost_centers

@@ -20,8 +20,8 @@ columns:
   year:
     description: Year (YYYY) partition column of when the record was loaded.
     lineage:
-    - CURRENT_DATE()
+    - datalake_gsheets_people_raw.codex_cost_centers.ts_load
   month:
     description: Month (MM) partition column of when the record was loaded.
     lineage:
-    - CURRENT_DATE()
+    - datalake_gsheets_people_raw.codex_cost_centers.ts_load
