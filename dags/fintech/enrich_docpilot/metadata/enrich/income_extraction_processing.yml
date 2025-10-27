@@ -90,15 +90,27 @@ columns:
   net_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The net income extracted from a document in a reference month."
+    description: "The raw net income extracted from a document in a reference month."
   gross_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The gross income extracted from a document in a reference month."
+    description: "The raw gross income extracted from a document in a reference month."
+  processed_net_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The net income for a reference month after DocPilot processing, applying established rules. For payslips, this includes the original document’s net income plus the highest advance value ('advance') to estimate the total monthly amount. If more than one payslip exists for the same month, all incomes for that month will be replaced with the highest value found among them."
+  processed_gross_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The gross income for a reference month after DocPilot processing, applying established rules. If more than one payslip exists for the same month, all incomes for that month will be replaced with the highest value found among them."
   committed_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "The commited income extracted from a document in a reference month."
+  advance:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The maximum advance value from a payslip"
   avg_net_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
