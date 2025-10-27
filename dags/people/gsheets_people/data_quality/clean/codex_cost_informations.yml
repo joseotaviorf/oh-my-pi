@@ -2,9 +2,17 @@ table_name: datalake_gsheets_people_clean.codex_cost_informations
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 1
+    greater_than: 22976
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
     severity_level: Error
 column_level_validations:
-  id_cost_center:
+  cost_center_code:
     is_complete:
+      severity_level: Warning
+    custom: # The same cost_center_code should NOT have more than one value in the cost_center_detail field. It should be either 'Capacity', 'Overhead' or null. If it has both 'Capacity' AND 'Overhead' values, it is an error and should be investigated.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM (SELECT DISTINCT cost_center_code FROM datalake_gsheets_people_clean.codex_cost_informations WHERE cost_center_detail IN ('Capacity', 'Overhead')) GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning

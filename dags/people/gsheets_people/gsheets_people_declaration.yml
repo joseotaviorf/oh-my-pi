@@ -25,6 +25,13 @@ workflow:
   has_hive_sync: false
   credentials_scope: people
   bucket_config_name: people_bucket
+  tables_customization:
+    codex_cost_centers:
+      extraction_type: incremental
+      merge_on: ["cost_center_code", "year", "month"]
+    codex_cost_informations:
+      extraction_type: incremental
+      merge_on: ["cost_center_code", "year", "month"]
   custom_schema: gsheets_people
   default_table_privileges:
     people-team:

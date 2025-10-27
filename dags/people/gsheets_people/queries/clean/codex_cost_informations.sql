@@ -1,8 +1,8 @@
 SELECT
-   cc_code AS id_cost_center,
+   cc_code AS cost_center_code,
    pl_line_type AS cost_center_detail,
-   ts_load
+   ts_load,
+   YEAR(CURRENT_DATE()) AS year,
+   MONTH(CURRENT_DATE()) AS month
 FROM
    datalake_gsheets_people_raw.codex_cost_informations
-WHERE
-   pl_line_type IS NOT NULL

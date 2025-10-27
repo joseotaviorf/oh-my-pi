@@ -3,10 +3,15 @@ table_name: datalake_gsheets_people_clean.codex_cost_centers
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 1
+    greater_than: 13947
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
     severity_level: Error
 column_level_validations:
-  id_cost_center:
+  cost_center_code:
     is_complete:
       severity_level: Warning
     is_unique:

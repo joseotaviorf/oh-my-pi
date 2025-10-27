@@ -1,12 +1,14 @@
 WITH
 cost_center_headcount_type AS (
   SELECT DISTINCT
-    id_cost_center,
+    cost_center_code,
     cost_center_detail AS headcount_type
   FROM
     datalake_gsheets_people_clean.codex_cost_informations
   WHERE
     cost_center_detail IN ('Capacity', 'Overhead')
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY cost_center_code ORDER BY year DESC, month DESC) = 1
 ),
 employee_ids AS (
   SELECT
@@ -61,10 +63,9 @@ employee_ids_enrich AS (
   FROM
     new_emails_from_mapping
 ),
-codex_unified AS (
+codex_enrich AS (
   SELECT
-    codex_cc.id_cost_center AS id_cost_center,
-    codex_cc.cost_center_name,
+    codex_cc.cost_center_code AS cost_center_code,
     codex_cc.cost_center_full_name,
     codex_cc.business,
     codex_cc.product,
@@ -81,40 +82,32 @@ codex_unified AS (
     codex_cc.owner_l1_email,
     codex_cc.owner_l2_email,
     codex_cc.owner_l3_email,
-    codex_cc.owner_finance_email,
-    codex_hctp.headcount_type,
-    codex_cc.team_code,
-    codex_cc.sort_number,
-    CASE
-      WHEN codex_cc.cost_center_status = 'Active' THEN TRUE
-      WHEN codex_cc.cost_center_status = 'End' THEN FALSE
-    END AS is_active
+    codex_hctp.headcount_type
   FROM
     datalake_gsheets_people_clean.codex_cost_centers AS codex_cc
   LEFT JOIN
     cost_center_headcount_type AS codex_hctp
-      ON codex_cc.id_cost_center = codex_hctp.id_cost_center
+      ON codex_cc.cost_center_code = codex_hctp.cost_center_code
   QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY
-        codex_cc.id_cost_center
+        codex_cc.cost_center_code
       ORDER BY
+        codex_cc.year DESC,
+        codex_cc.month DESC,
         (
-          CAST((codex_cc.cost_center_status = 'Active') AS INT) * 10
           + CAST((codex_cc.chapter IS NOT NULL) AS INT)
           + CAST((codex_cc.line IS NOT NULL) AS INT)
           + CAST((codex_cc.owner_l1_email IS NOT NULL) AS INT)
           + CAST((codex_cc.owner_l2_email IS NOT NULL) AS INT)
           + CAST((codex_cc.owner_l3_email IS NOT NULL) AS INT)
           + CAST((codex_hctp.headcount_type IS NOT NULL) AS INT)
-        ) DESC,
-        codex_cc.sort_number
+        ) DESC
       ) = 1
     )
 
 SELECT
-  codex.id_cost_center,
-  codex.cost_center_name,
+  codex.cost_center_code,
   codex.cost_center_full_name,
   codex.business,
   codex.product,
@@ -133,11 +126,7 @@ SELECT
   codex.owner_l1_email,
   codex.owner_l2_email,
   codex.owner_l3_email,
-  codex.owner_finance_email,
-  codex.headcount_type,
-  codex.team_code,
-  codex.sort_number,
-  codex.is_active,
+  codex.headcount_type
   CASE
     WHEN org.codigo_dff IS NULL THEN NULL
     ELSE (
@@ -157,7 +146,7 @@ SELECT
   END AS is_outdated_in_system,
   NOW() AS ts_load
 FROM
-  codex_unified AS codex
+  codex_enrich AS codex
 LEFT JOIN
   employee_ids_enrich AS emp_id1
     ON codex.owner_l1_email = emp_id1.work_email
@@ -169,4 +158,4 @@ LEFT JOIN
     ON codex.owner_l3_email = emp_id3.work_email
 LEFT JOIN
   datalake_hr_system_clean.organizations AS org
-    ON codex.id_cost_center = org.codigo_dff
+    ON codex.cost_center_code = org.codigo_dff

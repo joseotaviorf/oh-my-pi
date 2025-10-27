@@ -5,12 +5,11 @@ domain: People
 description: |-
   Table containing consolidated information from the CODEX database about cost centers.
 columns:
-  id_cost_center:
+  cost_center_code:
     description: |-
-      Unique identifier of the cost center. This can be either the current ID (id_cost_center_current) or the legacy ID (id_cost_center_legacy) from the codex_cost_centers table. The is_legacy_code flag indicates which type of ID is present in this row.
+      Unique identifier of the cost center.
     lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.id_cost_center_current
-    - datalake_gsheets_people_clean.codex_cost_centers.id_cost_center_legacy
+    - datalake_gsheets_people_clean.codex_cost_centers.cost_center_code
   cost_center_name:
     description: Name of the cost center without its ID at the beginning.
     lineage:
