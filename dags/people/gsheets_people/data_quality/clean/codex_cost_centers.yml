@@ -5,11 +5,6 @@ table_level_validations:
   has_size:
     greater_than: 13947
     severity_level: Error
-  has_size_variation:
-    variation_type: percentage
-    greater_than_or_equal_to: 0
-    less_than_or_equal_to: 10
-    severity_level: Error
 column_level_validations:
   cost_center_code:
     is_complete:

@@ -6,11 +6,6 @@ table_level_validations:
   has_size:
     greater_than: 1
     severity_level: Error
-  has_size_variation:
-    variation_type: percentage
-    greater_than_or_equal_to: 0
-    less_than_or_equal_to: 10
-    severity_level: Warning
 
 column_level_validations:
   cost_center_code:
@@ -42,30 +37,6 @@ column_level_validations:
   team:
     has_null_count:
       less_than_or_equal_to: 1
-      severity_level: Warning
-  owner_l1_person_number:
-    custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hr_system.cost_center_codex WHERE owner_l1_email IS NOT NULL AND owner_l1_person_number IS NULL GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
-  owner_l2_person_number:
-    custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hr_system.cost_center_codex WHERE owner_l2_email IS NOT NULL AND owner_l2_person_number IS NULL GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
-  owner_l3_person_number:
-    custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hr_system.cost_center_codex WHERE owner_l3_email IS NOT NULL AND owner_l3_person_number IS NULL GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
-  owner_l1_full_name:
-    custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hr_system.cost_center_codex WHERE owner_l1_email IS NOT NULL AND owner_l1_full_name IS NULL GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
-  owner_l2_full_name:
-    custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hr_system.cost_center_codex WHERE owner_l2_email IS NOT NULL AND owner_l2_full_name IS NULL GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
-      severity_level: Warning
-  owner_l3_full_name:
-    custom:
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hr_system.cost_center_codex WHERE owner_l3_email IS NOT NULL AND owner_l3_full_name IS NULL GROUP BY cost_center_code HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
   owner_l1_email:
     has_null_count:

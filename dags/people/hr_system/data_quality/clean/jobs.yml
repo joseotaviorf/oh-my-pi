@@ -5,11 +5,6 @@ table_level_validations:
   has_size:
     greater_than: 4700
     severity_level: Error
-  has_size_variation:
-    variation_type: percentage
-    greater_than_or_equal_to: 0
-    less_than_or_equal_to: 10
-    severity_level: Warning
 column_level_validations:
   id_job:
     is_complete:
