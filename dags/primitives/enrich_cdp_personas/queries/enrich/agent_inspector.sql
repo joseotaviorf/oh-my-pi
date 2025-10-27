@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   u.id AS id_user,
   u.uuid_person,
   ad.is_active,
