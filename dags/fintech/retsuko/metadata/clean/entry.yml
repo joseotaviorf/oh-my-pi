@@ -2,24 +2,31 @@
 database_name: datalake_retsuko_clean
 table_name: entry
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
+description: Data from the entry table containing invoice entry information and status details
 columns:
   id:
+    description: "Unique identifier of the entry in Retsuko"
     lineage:
       - datalake_retsuko_raw.entry.id
   id_external:
+    description: "External identifier of the entry in the source system"
     lineage:
       - datalake_retsuko_raw.entry.external_id
   id_invoice:
+    description: "Identifier of the invoice associated to this entry"
     lineage:
       - datalake_retsuko_raw.entry.invoice_id
   id_contract:
+    description: "Identifier of the contract related to this entry"
     lineage:
       - datalake_retsuko_raw.entry.contract_id
   id_from_account:
+    description: "Source account identifier debited in the transaction"
     lineage:
       - datalake_retsuko_raw.entry.from_account_id
   id_to_account:
+    description: "Destination account identifier credited in the transaction"
     lineage:
       - datalake_retsuko_raw.entry.to_account_id
   id_external_reversed_entry:
@@ -27,6 +34,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.entry.reversed_entry_external_id
   id_audit:
+    description: "Audit event identifier associated to this entry"
     lineage:
       - datalake_retsuko_raw.entry.audit_id
   accounting_transaction_identifier:
@@ -34,12 +42,15 @@ columns:
     lineage:
       - datalake_retsuko_raw.entry.accounting_transaction_identifier
   amount:
+    description: "Monetary amount of the entry"
     lineage:
       - datalake_retsuko_raw.entry.amount
   bill_item:
+    description: "Billing item associated with the entry"
     lineage:
       - datalake_retsuko_raw.entry.bill_item
   description:
+    description: "Free-text description of the entry"
     lineage:
       - datalake_retsuko_raw.entry.description
   status:
@@ -47,15 +58,23 @@ columns:
     lineage:
       - datalake_retsuko_raw.entry.status
   producer:
+    description: "System or service that produced the entry"
     lineage:
       - datalake_retsuko_raw.entry.producer
+  is_not_invoicable:
+    description: "Indicates if a entry is not-invoiceable"
+    lineage:
+      - datalake_retsuko_raw.entry.not_invoicable
   accrual_year_month:
+    description: "Accrual period in year-month (YYYYMM)"
     lineage:
       - datalake_retsuko_raw.entry.accrual_year_month
   due_year_month:
+    description: "Due period in year-month (YYYYMM)"
     lineage:
       - datalake_retsuko_raw.entry.due_year_month
   ts_created:
+    description: "Creation timestamp in the source system"
     lineage:
       - datalake_retsuko_raw.entry.created_at
   ts_synced:
@@ -63,9 +82,11 @@ columns:
     lineage:
       - datalake_retsuko_raw.entry.synced_at
   ts_retsuko_created:
+    description: "Creation timestamp of the entry in Retsuko"
     lineage:
       - datalake_retsuko_raw.entry.retsuko_created_at
   ts_retsuko_updated:
+    description: "Last update timestamp of the entry in Retsuko"
     lineage:
       - datalake_retsuko_raw.entry.retsuko_updated_at
   year:
