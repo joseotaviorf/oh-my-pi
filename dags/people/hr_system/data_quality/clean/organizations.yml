@@ -3,8 +3,13 @@ table_name: datalake_hr_system_clean.organizations
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 1
+    greater_than: 2490
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
+    severity_level: Warning
 column_level_validations:
   id_organization:
     is_complete:

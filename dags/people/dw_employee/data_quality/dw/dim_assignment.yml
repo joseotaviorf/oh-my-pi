@@ -4,12 +4,12 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 1
+    greater_than: 10050
     severity_level: Error
   has_size_variation:
     variation_type: percentage
     greater_than_or_equal_to: 0
-    less_than_or_equal_to: 25
+    less_than_or_equal_to: 10
     severity_level: Warning
 
 column_level_validations:
