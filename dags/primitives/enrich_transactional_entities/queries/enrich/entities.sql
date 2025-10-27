@@ -754,7 +754,6 @@ base AS (
         ts_updated
     FROM
         visit
-    /***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
@@ -787,6 +786,7 @@ base AS (
         ts_updated
     FROM
         contract
+    /***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
