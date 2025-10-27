@@ -563,7 +563,7 @@ LEFT JOIN
     ON dm.partner_3p_demand = p_3p_demand.extracted_3p_tag
 LEFT JOIN
   datalake_company.company_sks AS cs_company
-    ON hl.uuid_company = cs_company.id_hubspot
+    ON hl.uuid_company = cs_company.uuid_company
 LEFT JOIN
   datalake_company.company_sks AS cs_hubspot
     ON hl.id_company_hubspot = cs_hubspot.id_hubspot
