@@ -1,5 +1,5 @@
 ---
-table_name: datalake_ebdb_test_raw.usuariorevisionentity
+table_name: datalake_ebdb_raw.usuariorevisionentity
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:

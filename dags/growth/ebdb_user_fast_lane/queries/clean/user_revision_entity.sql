@@ -11,4 +11,4 @@ SELECT
     usuario_id AS id_user,
     motivo AS reason
 FROM
-    datalake_ebdb_test_raw.`UsuarioRevisionEntity`
+    datalake_ebdb_raw.`UsuarioRevisionEntity`
