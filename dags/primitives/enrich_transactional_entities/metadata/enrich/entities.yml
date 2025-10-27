@@ -14,8 +14,8 @@ columns:
     lineage:
       - core_contract.contract.id_owner
       - core_contract.contract.id_tenant
-      - core_visit.visit.id_visit
       - core_offer.offer.id_offer
+      - core_visit.visit.code
       - core_visit.visit.id_agent
       - core_visit.visit.id_visitor
       - core_visit.visit.id_owner

@@ -14,7 +14,7 @@ WITH visit AS (
     ),
     visit_base AS (
         SELECT
-            v.id_visit AS id_entity,
+            v.code AS id_entity,
             v.id_house,
             CAST(NULL AS BIGINT) AS id_contract,
             v.id_owner,
@@ -754,6 +754,7 @@ base AS (
         ts_updated
     FROM
         visit
+    /***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
@@ -898,13 +899,14 @@ base AS (
         ts_updated
     FROM
         repair
+    ***/
 )
 SELECT
     b.sk_entity,
-    b.id_entity,
-    b.id_house,
-    b.id_contract,
-    b.id_user,
+    CAST(b.id_entity AS STRING) AS id_entity,
+    CAST(b.id_house AS STRING) AS id_house,
+    CAST(b.id_contract AS STRING) AS id_contract,
+    CAST(b.id_user AS STRING) AS id_user,
     u.uuid_person,
     b.entity,
     b.persona,
