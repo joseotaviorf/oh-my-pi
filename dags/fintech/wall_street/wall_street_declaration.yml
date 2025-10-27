@@ -52,6 +52,9 @@ workflow:
     Store:
       clean_table_name: store
       primary_keys: ["id"]
+    UserBlocklist:
+      clean_table_name: user_blocklist
+      primary_keys: ["id_user"]
 cluster:
   type: custom_cluster
   custom_libraries:
