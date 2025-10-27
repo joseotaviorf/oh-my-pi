@@ -52,3 +52,5 @@ data-people:
   - "**/dags/people/**"
 data-agents:
   - "**/dags/agents/**"
+data-planning-and-performance:
+  - "**/dags/planning_and_performance/**"

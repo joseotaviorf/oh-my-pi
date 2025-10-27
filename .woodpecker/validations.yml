@@ -92,3 +92,35 @@ steps:
       - make validate-core-model-schema-content
     when:
       event: push
+
+  transpile-and-commit-sql:
+    image: public.ecr.aws/docker/library/python:3.9.5
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    commands:
+      # Install dependencies and run transpilation
+      - make requirements-scripts
+      - make transcript-sql-files
+      
+      # Configure git identity
+      - git config user.name "Homes"
+      - git config user.email "homesbot@quintoandar.com.br"
+      
+      # Commit and push if there are changes
+      - |
+        if ! git diff --quiet || ! git diff --cached --quiet; then
+          echo "📝 Changes detected, committing and pushing..."
+          git add -A
+          git commit -m "chore: transpile SQL files to Databricks syntax [skip ci]"
+          git push origin HEAD:$${CI_COMMIT_BRANCH}
+          echo "✅ Changes pushed successfully"
+        else
+          echo "ℹ️ No changes to commit"
+        fi
+    when:
+      event: push
+      path:
+        include:
+          - 'dags/planning_and_performance/**/*.sql'
+    depends_on: []

@@ -272,6 +272,16 @@ core-model-tests:
 ###############################################################################
 ###################### Validations commands ###################################
 ###############################################################################
+.PHONY: transcript-sql-files
+## transcript new/modified SQL files from Trino to Databricks syntax
+transcript-sql-files:
+	@echo ""
+	@echo "Transcripting SQL files from Trino to Databricks syntax"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/ci_cd/sql_transcript.py --mode git-diff --from-branch origin/master --to-branch HEAD
+
 .PHONY: validate-dags-dependencies
 validate-dags-dependencies:
 	@echo ""
