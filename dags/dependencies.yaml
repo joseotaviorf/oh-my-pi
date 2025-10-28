@@ -232,9 +232,9 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis:first-run-of-day
-  - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-analysis-request:first-run-of-day
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine-checklist:first-run-of-day
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine:first-run-of-day
   - bietlejuice.enrich_docpilot:load-enrich-income-extraction-processing:first-run-of-day
   - bietlejuice.enrich_docx:load-enrich-income-documentation:first-run-of-day
   - bietlejuice.enrich_docx:load-enrich-personal-documentation:first-run-of-day
@@ -395,9 +395,9 @@ bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
@@ -1290,8 +1290,8 @@ bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
@@ -1393,8 +1393,8 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-affiliate-data:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-appointment-change-reason-category:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-aud:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
@@ -1915,8 +1915,8 @@ bietlejuice.enrich_docpilot_audit:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-analysis-request:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-checklist-group:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-checklist-item:first-run-of-day
@@ -1948,8 +1948,8 @@ bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_lead:load-clean-lead:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-affiliate-data-aud:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-affiliate-data:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud:first-run-of-day
@@ -1962,8 +1962,8 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user-merge:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
@@ -1987,8 +1987,8 @@ bietlejuice.enrich_ebdb_amenities:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
 bietlejuice.enrich_ebdb_condo:
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-enrichment-aud:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity:first-run-of-day
@@ -2009,8 +2009,8 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
@@ -2055,9 +2055,9 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_contract:load-clean-full-contract:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-portability:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-registration-status:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-special-condition:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_house_properties:load-clean-key-type:first-run-of-day
   - bietlejuice.ebdb_house_properties:load-clean-occupant-type:first-run-of-day
@@ -2065,11 +2065,11 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_house_properties:load-clean-special-condition-aud:first-run-of-day
   - bietlejuice.ebdb_house_properties:load-clean-special-condition:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-dynamic-pricing-house:first-run-of-day
-  - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
-  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-rent-model:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-local:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-map-region:first-run-of-day
@@ -2100,8 +2100,8 @@ bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_ebdb_pricing:
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-dynamic-pricing-house-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
@@ -2156,8 +2156,8 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb_user:load-clean-device:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-sales-rep:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user-merge:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
@@ -2206,6 +2206,8 @@ bietlejuice.enrich_facebook_insights:
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-832880310585080-region:first-run-of-day
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994644903935458-region:first-run-of-day
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994734287259853-region:first-run-of-day
+bietlejuice.enrich_find_health_metrics:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all:first-run-of-day
@@ -2761,8 +2763,8 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
   - bietlejuice.ebdb_offer:load-clean-offer-aud:first-run-of-day
   - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
@@ -2907,8 +2909,8 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user-pro-owner-aud:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user-pro-owner:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
@@ -2969,10 +2971,10 @@ bietlejuice.enrich_rede_house_history:
   - bietlejuice.company:load-clean-company-product:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
+  - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
-  - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
@@ -3028,8 +3030,8 @@ bietlejuice.enrich_rent_flows:
   - bietlejuice.enrich_proposal:load-enrich-proposal:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
 bietlejuice.enrich_rent_listings_lenses:
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity:first-run-of-day
@@ -3249,12 +3251,12 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_sale_listings_lenses:
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-predicted-price:first-run-of-day
-  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-suspected-unavailability-listings-aud:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-suspected-unavailability-listings:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation:first-run-of-day
@@ -3271,6 +3273,7 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
 bietlejuice.enrich_sale_offer:
+  - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
@@ -3279,6 +3282,7 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   - bietlejuice.sales_flow:load-clean-brokerage:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-ccv-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow:load-clean-offer-aud:first-run-of-day
   - bietlejuice.sales_flow:load-clean-offer:first-run-of-day
@@ -3288,8 +3292,6 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.sales_flow:load-clean-sales-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-specialist:first-run-of-day
   - bietlejuice.sales_flow:load-clean-users:first-run-of-day
-  - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-ccv-flow:first-run-of-day
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder-reference:first-run-of-day
   - bietlejuice.docx:load-clean-folder:first-run-of-day
@@ -3569,8 +3571,8 @@ bietlejuice.enrich_supply_conversion:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-job-aud:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_bob:load-enrich-house-draft-business-context:first-run-of-day
   - bietlejuice.enrich_bob:load-enrich-house-draft:first-run-of-day
   - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-events:first-run-of-day
@@ -3855,8 +3857,9 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
+  - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-user-visit-preferences:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visit-aud:first-run-of-day
@@ -4434,5 +4437,3 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
-bietlejuice.enrich_find_health_metrics:
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day

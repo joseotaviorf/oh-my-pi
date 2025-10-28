@@ -1,47 +1,156 @@
 WITH
     visit_log AS (
+        WITH vsl AS (
+            SELECT
+                vsl.id_visit,
+                MAX_BY(vsl.id_schedule, vsl.ts_created) AS last_id_schedule,
+                SUM(1) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
+                MIN(vsl.on_behalf_of) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS visit_request_on_behalf_of,
+                MIN(vsl.author_user_role) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS visit_request_user_role,
+                MIN(vsl.id_author_user) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS id_user_visit_request,
+                MAX(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS ts_visit_rescheduled,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS ts_visit_first_rescheduled,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_DONE') AS ts_visit_done,
+                MIN(vsl.ts_created) FILTER (WHERE event_type = 'VISIT_UNSUCCESSFUL') AS ts_visit_unsuccessful,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_REGISTERED') AS ts_visit_registered,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_FITTED') AS ts_visit_fitted,
+                MIN(vsl.author_user_role) FILTER (WHERE vsl.event_type = 'VISIT_REGISTERED') AS author_role_visit_registered,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'FOLLOW_UP_COLLECTED') AS ts_visit_fup_collected,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_STALLED') AS ts_visit_stalled,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
+                MAX(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
+                MIN_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_channel,
+                MIN_BY(vsl.author_user_role, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_user_role,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'SUPPLY') AS ts_visit_supply_answer,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'DEMAND') AS ts_visit_demand_answer,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'AGENT') AS ts_visit_agent_answer,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_answer,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'SUPPLY') AS ts_visit_supply_confirmed,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'DEMAND') AS ts_visit_demand_confirmed,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'AGENT') AS ts_visit_agent_confirmed,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_confirmed,
+                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_BOOKED' OR vsl.event_type = 'VISIT_CONFIRMED') AS ts_visit_confirmed,
+                MAX(vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_PENDING' AND vsl.on_behalf_of = 'TENANT_LIVING') AS ts_visit_pending_tenant_answer,
+                MIN(vsl.ts_created) AS ts_first_event,
+                MAX(vsl.ts_created) AS ts_last_event,
+                MIN_BY(vsl.event_type, vsl.ts_created) AS first_event,
+                MAX_BY(vsl.event_type, vsl.ts_created) AS last_event,
+                MIN_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'SUPPLY') AS first_supply_answer,
+                MIN_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'SUPPLY') AS first_supply_answer_channel,
+                MIN_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer,
+                MIN_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel
+            FROM
+                datalake_ebdb_clean.visit_status_log AS vsl
+            JOIN
+                datalake_ebdb_clean.visit AS v
+                    ON vsl.id_visit = v.id
+            WHERE
+                v.ts_created::DATE >= '2024-11-01'
+            GROUP BY 1
+        ),
+        bsc AS (
+            SELECT
+                b.id_visit,
+                MAX_BY(bsc.id_booking, bsc.ts_created) AS last_id_schedule,
+                MIN_BY(bsc.id_user, bsc.ts_created) AS id_user_visit_request,
+                MIN(bsc.ts_created) FILTER (WHERE bsc.reason = 'Visita extra de encaixe') AS ts_visit_fitted,
+                MIN(bsc.ts_created) FILTER (WHERE bsc.reason = 'AGENT_SCHEDULE_REALIZED') AS ts_visit_registered,
+                MIN(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_visit_first_confirmed,
+                MAX(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_visit_last_confirmed,
+                MIN(bsc.ts_created) AS ts_first_event,
+                MAX(bsc.ts_created) AS ts_last_event
+            FROM
+                datalake_ebdb_clean.booking_status_change AS bsc
+            LEFT JOIN datalake_ebdb_clean.booking AS b
+                ON bsc.id_booking = b.id
+            LEFT JOIN datalake_ebdb_clean.visit AS v
+                ON b.id_visit = v.id
+            WHERE
+                b.type = 'Visita'
+                AND v.ts_created::DATE < '2024-11-01'
+            GROUP BY 1
+        )
         SELECT
             id_visit,
-            MAX_BY(id_schedule, ts_created) AS last_id_schedule,
-            SUM(1) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
-            MIN(on_behalf_of) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_on_behalf_of,
-            MIN(author_user_role) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_user_role,
-            MIN(id_author_user) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS id_user_visit_request,
-            MAX(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_rescheduled,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_first_rescheduled,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_DONE') AS ts_visit_done,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_UNSUCCESSFUL') AS ts_visit_unsuccessful,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REGISTERED') AS ts_visit_registered,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_FITTED') AS ts_visit_fitted,
-            MIN(author_user_role) FILTER (WHERE event_type = 'VISIT_REGISTERED') AS author_role_visit_registered,
-            MIN(ts_created) FILTER (WHERE event_type = 'FOLLOW_UP_COLLECTED') AS ts_visit_fup_collected,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_STALLED') AS ts_visit_stalled,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
-            MAX(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
-            MIN_BY(channel, ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_channel,
-            MIN_BY(author_user_role, ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_user_role,
-            MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_answer,
-            MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'DEMAND') AS ts_visit_demand_answer,
-            MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'AGENT') AS ts_visit_agent_answer,
-            MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_answer,
-            MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_confirmed,
-            MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'DEMAND') AS ts_visit_demand_confirmed,
-            MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'AGENT') AS ts_visit_agent_confirmed,
-            MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_confirmed,
-            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_BOOKED' OR event_type = 'VISIT_CONFIRMED') AS ts_visit_confirmed,
-            MAX(ts_created) FILTER (WHERE event_type = 'ANSWER_PENDING' AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_pending_tenant_answer,
-            MIN(ts_created) AS ts_first_event,
-            MAX(ts_created) AS ts_last_event,
-            MIN_BY(event_type, ts_created) AS first_event,
-            MAX_BY(event_type, ts_created) AS last_event,
-            MIN_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS first_supply_answer,
-            MIN_BY(channel, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS first_supply_answer_channel,
-            MIN_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer,
-            MIN_BY(channel, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel
+            last_id_schedule,
+            nbr_reschedule,
+            visit_request_on_behalf_of,
+            visit_request_user_role,
+            id_user_visit_request,
+            ts_visit_rescheduled,
+            ts_visit_first_rescheduled,
+            ts_visit_done,
+            ts_visit_unsuccessful,
+            ts_visit_registered,
+            ts_visit_fitted,
+            author_role_visit_registered,
+            ts_visit_fup_collected,
+            ts_visit_stalled,
+            ts_visit_first_confirmed,
+            ts_visit_last_confirmed,
+            visit_first_confirmed_channel,
+            visit_first_confirmed_user_role,
+            ts_visit_supply_answer,
+            ts_visit_demand_answer,
+            ts_visit_agent_answer,
+            ts_visit_tenant_answer,
+            ts_visit_supply_confirmed,
+            ts_visit_demand_confirmed,
+            ts_visit_agent_confirmed,
+            ts_visit_tenant_confirmed,
+            ts_visit_confirmed,
+            ts_visit_pending_tenant_answer,
+            ts_first_event,
+            ts_last_event,
+            first_event,
+            last_event,
+            first_supply_answer,
+            first_supply_answer_channel,
+            first_tenant_living_answer,
+            first_tenant_living_answer_channel
         FROM
-            datalake_ebdb_clean.visit_status_log
-        GROUP BY
-            id_visit
+            vsl
+        UNION ALL
+        SELECT
+            id_visit,
+            last_id_schedule,
+            NULL AS nbr_reschedule,
+            NULL AS visit_request_on_behalf_of,
+            NULL AS visit_request_user_role,
+            id_user_visit_request,
+            NULL AS ts_visit_rescheduled,
+            NULL AS ts_visit_first_rescheduled,
+            NULL AS ts_visit_done,
+            NULL AS ts_visit_unsuccessful,
+            ts_visit_registered,
+            ts_visit_fitted,
+            NULL AS author_role_visit_registered,
+            NULL AS ts_visit_fup_collected,
+            NULL AS ts_visit_stalled,
+            ts_visit_first_confirmed,
+            ts_visit_last_confirmed,
+            NULL AS visit_first_confirmed_channel,
+            NULL AS visit_first_confirmed_user_role,
+            NULL AS ts_visit_supply_answer,
+            NULL AS ts_visit_demand_answer,
+            NULL AS ts_visit_agent_answer,
+            NULL AS ts_visit_tenant_answer,
+            NULL AS ts_visit_supply_confirmed,
+            NULL AS ts_visit_demand_confirmed,
+            NULL AS ts_visit_agent_confirmed,
+            NULL AS ts_visit_tenant_confirmed,
+            NULL AS ts_visit_confirmed,
+            NULL AS ts_visit_pending_tenant_answer,
+            ts_first_event,
+            ts_last_event,
+            NULL AS first_event,
+            NULL AS last_event,
+            NULL AS first_supply_answer,
+            NULL AS first_supply_answer_channel,
+            NULL AS first_tenant_living_answer,
+            NULL AS first_tenant_living_answer_channel
+        FROM
+            bsc
     ),
     visit_3p_demand_agent AS (
         SELECT
