@@ -1,0 +1,21 @@
+---
+database_name: datalake_cyber_clean
+table_name: bureau_policy_bureau
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Table that contains data about the negativation/rehabilitation queues and indicates in which Bureau (e.g., SERASA or CYB - Internal Bureau)
+  the record will be negatived/rehabilitated. Links the bureau policy queue to a specific Bureau. This table is parameterized via screen in CyberEngine.
+columns:
+  id_policy:
+    description: "Policy ID - references the negativation/rehabilitation queue"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr_bureau.CD_POLITICA
+  ts_validity_start:
+    description: "Validity start date for the policy-bureau relationship"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr_bureau.DT_INI_VIG
+  id_bureau:
+    description: "Bureau ID where the negativation/rehabilitation will be sent (e.g., SERASA or CYB)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr_bureau.CD_BUREAU

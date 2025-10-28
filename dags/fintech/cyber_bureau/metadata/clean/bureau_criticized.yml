@@ -1,0 +1,85 @@
+---
+database_name: datalake_cyber_clean
+table_name: bureau_criticized
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Table that contains information about contracts that were criticized by the CyberBureau process.
+  Stores contracts that did not pass the CyberBureau criticism rules during negativation/rehabilitation processing.
+columns:
+  ts_billing_cycle:
+    description: "Billing cycle date"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.DT_CICLO_COBRANCA
+  cpf_cnpj:
+    description: "Client CPF/CNPJ"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_CPFCNPJ_CLI
+  ts_request:
+    description: "Request timestamp"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.DT_SOLICITACAO
+  contract_group:
+    description: "Contract group: 1 for QuintoAndar, 2 for QuintoCred"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_GRUPO
+  creditor:
+    description: "Creditor name: QuintoAndar or QuintoCred"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_GRUPO
+  id_contract:
+    description: "Contract number that was criticized"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_CONTRATO
+  id_policy:
+    description: "Policy ID (negativation/rehabilitation queue)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_POLITICA
+  bureau_action_description:
+    description: "Description of the bureau action (NEGATIVAR, REABILITAR, etc.)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.DS_ACAO_BUREAU
+  id_bureau:
+    description: "Unique identifier for the Bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_BUREAU
+  id_company:
+    description: "Company ID"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_EMPRESA
+  installment_number:
+    description: "Installment number"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.NR_PARCELA
+  installment_amount:
+    description: "Installment amount value"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.VL_PARCELA
+  ts_processing:
+    description: "Processing timestamp"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.DT_PROCESSAMENTO
+  reason_type:
+    description: "Type of reason (E for Error, etc.)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.TP_MOTIVO
+  reason_code:
+    description: "Reason code that identifies the criticism"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_MOTIVO
+  reason_description:
+    description: "Detailed description of the criticism reason"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.DS_MOTIVO
+  origin_indicator:
+    description: "Origin indicator of the criticism (CTR for Contract, etc.)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.IN_ORIGEM_CRIT
+  remittance_number:
+    description: "Remittance number"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.NR_REMESSA
+  contract_bureau_code:
+    description: "Contract code as registered in the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_CTR_BUREAU

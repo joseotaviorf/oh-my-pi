@@ -1,0 +1,65 @@
+---
+database_name: datalake_cyber_clean
+table_name: agency_specific_bureau
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Contains company data that will be used specifically in the negativation and rehabilitation processes of a specific Bureau.
+  This table is parameterized via screen in CyberEngine and links companies to specific bureaus.
+columns:
+  id_company:
+    description: "Company ID"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.CD_EMPRESA
+  id_bureau:
+    description: "Bureau ID (e.g., SERASA or CYB - Internal Bureau)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.CD_BUREAU
+  company_code_bureau:
+    description: "Company code as registered in the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.CD_EMPRESA_BUREAU
+  company_name_bureau:
+    description: "Company name as registered in the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.NM_EMPRESA_BUREAU
+  ddd_company_bureau:
+    description: "Area code (DDD) for company contact in the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.NR_DDD_EMPRESA_BUREAU
+  phone_company_bureau:
+    description: "Phone number for company contact in the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.NR_TEL_EMPRESA_BUREAU
+  extension_company_bureau:
+    description: "Phone extension for company contact in the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.NR_RAMAL_EMPRESA_BUREAU
+  contact_name_company_bureau:
+    description: "Contact person name at the bureau"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.NM_CONTATO_EMPRESA_BUREAU
+  limit_lower_negativation:
+    description: "Lower limit for negativation quantity"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.QT_LIM_INF_NEG
+  limit_upper_negativation:
+    description: "Upper limit for negativation quantity"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.QT_LIM_SUP_NEG
+  limit_lower_rehabilitation:
+    description: "Lower limit for rehabilitation quantity"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.QT_LIM_INF_REA
+  limit_upper_rehabilitation:
+    description: "Upper limit for rehabilitation quantity"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.QT_LIM_SUP_REA
+  client_code:
+    description: "Client code for bureau identification"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.COD_CLI
+  operator:
+    description: "Operator identifier"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa_bureau.OPERADOR

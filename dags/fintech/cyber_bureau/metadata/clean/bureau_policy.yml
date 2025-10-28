@@ -1,0 +1,29 @@
+---
+database_name: datalake_cyber_clean
+table_name: bureau_policy
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Stores data about the negativation/rehabilitation queues and their validity.
+  Defines the bureau reporting policy. This table is parameterized via screen in CyberEngine.
+columns:
+  id_policy:
+    description: "Policy ID - unique identifier for the negativation/rehabilitation queue"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr.CD_POLITICA
+  ts_validity_start:
+    description: "Policy validity start date"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr.DT_INI_VIG
+  ts_validity_end:
+    description: "Policy validity end date"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr.DT_FIM_VIG
+  bureau_action_description:
+    description: "Description of the bureau action (NEGATIVAR, REABILITAR, etc.)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr.DS_ACAO_BUREAU
+  debtor_client_type:
+    description: "Debtor client type (1 for debtor, 0 for co-obligor)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_politica_mnr.TP_CLI_DEVEDOR

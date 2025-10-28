@@ -1,0 +1,21 @@
+---
+database_name: datalake_cyber_clean
+table_name: bureau_agency
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Stores company data (QuintoAndar/QuintoCred) that will be used in the negativation and rehabilitation processes.
+  This table is parameterized via screen in CyberEngine.
+columns:
+  id_company:
+    description: "Company ID"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa.CD_EMPRESA
+  company_name:
+    description: "Company name"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa.NM_EMPRESA
+  company_cnpj:
+    description: "Company CNPJ (tax identification number)"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_empresa.CD_EMP_CNPJ

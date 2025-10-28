@@ -62,4 +62,4 @@ SELECT
     DT_RET_BUREAU AS ts_bureau_return,
     DT_MOVIMENTO AS ts_movement,
     NOW() AS ts_load
-FROM datalake_cyber_raw.tb_historico_bureau
+FROM datalake_cyber_bureau_raw.tb_historico_bureau

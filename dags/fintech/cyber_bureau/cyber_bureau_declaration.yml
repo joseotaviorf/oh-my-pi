@@ -1,0 +1,113 @@
+dag:
+  name: cyber_bureau
+  schedule_start_date: 2025, 10, 20
+  schedule_interval: 30 7 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestion of CyberBureau tables about debts and collections.
+      cyber folder that contains all details about the system: https://drive.google.com/drive/folders/1qkegwyyddsnj37hdoa2yh8fz52cftfhx?usp=drive_link
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_cyber_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 2), 'load_end_date') }}"
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
+  tables_customization:
+    tb_historico_bureau:
+      clean_table_name: bureau_history
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_processo_bureau:
+      clean_table_name: bureau_process
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_empresa:
+      clean_table_name: bureau_agency
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_empresa_bureau:
+      clean_table_name: agency_specific_bureau
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_rejeicoes_bureau:
+      clean_table_name: bureau_rejections
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_criticados_mnr:
+      clean_table_name: bureau_criticized
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_politica_mnr:
+      clean_table_name: bureau_policy
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_politica_mnr_bureau:
+      clean_table_name: bureau_policy_bureau
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_motivos_rejeicoes_mnr:
+      clean_table_name: bureau_rejection_reasons
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  databricks_conn_id: databricks_new

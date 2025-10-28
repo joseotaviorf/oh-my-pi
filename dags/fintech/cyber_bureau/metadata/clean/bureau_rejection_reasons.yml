@@ -1,0 +1,21 @@
+---
+database_name: datalake_cyber_clean
+table_name: bureau_rejection_reasons
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: |
+  Table that contains the codes and descriptions of the criticisms (rejection reasons) performed by the Bureau.
+  Used so that the user area can consult and identify the reasons for rejection.
+columns:
+  reason_code:
+    description: "Reason code - unique identifier for the rejection reason"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_motivos_rejeicoes_mnr.CD_MOTIVO
+  reason_description:
+    description: "Description of the rejection reason"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_motivos_rejeicoes_mnr.DS_MOTIVO
+  id_bureau:
+    description: "Bureau ID that defines this rejection reason"
+    lineage:
+      - datalake_cyber_bureau_raw.tb_motivos_rejeicoes_mnr.CD_BUREAU
