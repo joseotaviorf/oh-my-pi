@@ -1,19 +1,4 @@
 WITH
-contract_info AS (
-    SELECT
-      c.sk_contract,
-      ROUND(SUM(p.monthly_income), 2) AS monthly_income
-    FROM dw_rent.dim_contract c
-    LEFT JOIN dw_rent.fact_listing_rent_flows f
-      ON c.sk_contract = f.sk_contract
-      AND f.sk_contract <> -1
-    LEFT JOIN datalake_sorting_hat_clean.proponent p
-      ON p.id_proposal = f.sk_proposal
-    GROUP BY
-      c.sk_contract, f.sk_proposal, f.sk_proposal_approved_date,
-      c.ts_canceled, c.guarantee
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY c.sk_contract ORDER BY f.sk_proposal DESC) = 1
-),
 essential_features AS (
     SELECT
         sk_contract,
@@ -67,6 +52,8 @@ essential_features AS (
         qt_aco_desconto,
         n_invoices_in_wallet,
         wallet_overdue_t2,
+        debts_in_income_share_t1,
+        debts_in_income_share_t2,
         overdue_recovered_amount_t2,
         dt_contract_start
     FROM dw_collections_segmentation.fact_contract_wallet_timeline
@@ -223,12 +210,12 @@ calculate_monthly_payment_ratios AS (
             ELSE ROUND(acc_n_invoices_paid_ontime_t1_l12m / (acc_n_invoices_paid_ontime_t1_l12m + acc_n_overdue_invoices_paid_t1_l12m), 4)
         END AS pct_invoices_paid_ontime_t1_l12m
     FROM calculate_avg_days_overdue_invoice_paid_t1
-
 ),
 prob_payment_calculation AS (
     SELECT
         f.*,
-        c.monthly_income,
+        f.debts_in_income_share_t1,
+        f.debts_in_income_share_t2,
         CASE
             WHEN f.max_delay_contaminated_contract_t1 <= 0 THEN 'a. Current'
             WHEN f.max_delay_contaminated_contract_t1 <= 30 THEN 'b. 1-30'
@@ -300,11 +287,26 @@ prob_payment_calculation AS (
                 AND f.max_delay_contaminated_contract_t2 <= 3 THEN 'VERY_HIGH'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 <= 5 THEN 'HIGH'
+                AND f.avg_days_overdue_invoices_paid_t1 <= 5
+                AND debts_in_income_share_t1 <= 0.4
+                THEN 'HIGH'
+            WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 <= 30
+                AND f.avg_days_overdue_invoices_paid_t1 <= 5
+                AND debts_in_income_share_t1 > 0.4
+                THEN 'LOW'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
-                AND f.acc_broken_promessas_lifetime <= 1.5 THEN 'MEDIUM'
+                AND f.acc_broken_promessas_lifetime <= 1.5
+                AND debts_in_income_share_t1 <= 0.4
+                THEN 'MEDIUM'
+            WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 <= 30
+                AND f.avg_days_overdue_invoices_paid_t1 <= 20
+                AND f.acc_broken_promessas_lifetime <= 1.5
+                AND debts_in_income_share_t1 > 0.4
+                THEN 'LOW'
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30
                 AND f.avg_days_overdue_invoices_paid_t1 <= 20
@@ -318,37 +320,45 @@ prob_payment_calculation AS (
                 AND f.max_delay_contaminated_contract_t2 > 30 THEN 'NULL PROB ACTIVE [31+]'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 <= 11
-                AND f.days_since_ending <= 30 THEN 'HIGH'
+                AND acc_n_overdue_invoices_paid_t2_l12m > 1
+                AND acc_broken_promessas_lifetime <= 0.50
+                AND avg_days_overdue_invoices_paid_t1 <= 5
+                THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 <= 11
-                AND f.days_since_ending > 30
-                AND (c.monthly_income <= 8100 OR c.monthly_income IS NULL) THEN 'LOW'
+                AND acc_n_overdue_invoices_paid_t2_l12m > 1
+                AND acc_broken_promessas_lifetime <= 0.50
+                AND avg_days_overdue_invoices_paid_t1 > 5
+                AND debts_in_income_share_t1 <= 0.2
+                THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 <= 11
-                AND f.days_since_ending > 30
-                AND c.monthly_income > 8100 THEN 'HIGH'
+                AND acc_n_overdue_invoices_paid_t2_l12m > 1
+                AND acc_broken_promessas_lifetime <= 0.50
+                AND avg_days_overdue_invoices_paid_t1 > 5
+                AND debts_in_income_share_t1 > 0.2
+                THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 > 11
-                AND f.acc_max_n_repairs = 0
-                AND f.acc_broken_multiple_deals_lifetime = 0 THEN 'HIGH'
-            WHEN f.reference_contract_status = 'Finalizado'
+                AND acc_n_overdue_invoices_paid_t2_l12m > 1
+                AND acc_broken_promessas_lifetime > 0.50
+                THEN 'LOW'
+            WHEN  f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 > 11
-                AND f.acc_max_n_repairs = 0
-                AND f.acc_broken_multiple_deals_lifetime > 0 THEN 'LOW'
+                AND acc_n_overdue_invoices_paid_t2_l12m <= 1
+                THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 <= 30
-                AND f.avg_days_overdue_invoices_paid_t1 > 11
-                AND f.acc_max_n_repairs > 0 THEN 'LOW'
-            WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'NULL PROB ENDED [1-30]'
+                AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
-                AND f.max_delay_contaminated_contract_t2 <= 90
+                AND f.n_reparos_invoices = f.n_invoices_in_wallet
+                THEN 'VERY_LOW'
+            WHEN f.reference_contract_status = 'Finalizado'
+                AND f.max_delay_contaminated_contract_t2 > 30
+                AND debts_in_income_share_t1 <= 0.2
+                THEN 'HIGH'
+            WHEN f.reference_contract_status = 'Finalizado'
+                AND f.max_delay_contaminated_contract_t2 > 30
                 AND (
                     (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices > 0) OR
                     (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices = 0 AND f.acc_cpc_l90 > 0) OR
@@ -356,26 +366,10 @@ prob_payment_calculation AS (
                 ) THEN 'HIGH'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
-                AND f.max_delay_contaminated_contract_t2 <= 90
                 AND (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices > 0) THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
-                AND f.max_delay_contaminated_contract_t2 <= 90 THEN 'LOW'
-            WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 > 90
-                AND f.n_reparos_invoices = f.n_invoices_in_wallet THEN 'VERY_LOW'
-            WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 > 90
-                AND (
-                    (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices > 0) OR
-                    (f.n_rental_core_invoices = 0 AND f.n_acordo_invoices = 0 AND f.acc_cpc_l90 > 0) OR
-                    (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices = 0 AND f.share_monthly_paid_ontime_t1 > 0.68)
-                ) THEN 'HIGH'
-            WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 > 90
-                AND (f.n_rental_core_invoices > 0 AND f.n_reparos_invoices > 0) THEN 'LOW'
-            WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 > 90 THEN 'LOW'
+                THEN 'LOW'
             ELSE 'NULL UNDEFINED'
         END AS prob_payment_at_dt_reference,
         CASE
@@ -388,17 +382,13 @@ prob_payment_calculation AS (
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'TREE 2'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 >=31
-                AND f.max_delay_contaminated_contract_t2 <= 90 THEN 'TREE 3'
-            WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 > 90 THEN 'TREE 4'
+                THEN 'TREE 3'
             ELSE 'NO_TREE'
         END AS tree_class,
         DATE(DATE_TRUNC('MONTH', dt_reference)) AS dt_month_start
     FROM
         calculate_monthly_payment_ratios AS f
-    LEFT JOIN
-        contract_info AS c
-            ON c.sk_contract = f.sk_contract
+
 ),
 calculate_tree_aux AS (
     SELECT

@@ -525,9 +525,27 @@ negotiations AS (
     FROM
         base_negotiations
 ),
+contract_info AS (
+    SELECT
+      c.sk_contract,
+      ROUND(SUM(p.monthly_income), 2) AS monthly_income
+    FROM dw_rent.dim_contract c
+    LEFT JOIN dw_rent.fact_listing_rent_flows f
+      ON c.sk_contract = f.sk_contract
+      AND f.sk_contract <> -1
+    LEFT JOIN datalake_sorting_hat_clean.proponent p
+      ON p.id_proposal = f.sk_proposal
+    GROUP BY
+      c.sk_contract, f.sk_proposal, f.sk_proposal_approved_date,
+      c.ts_canceled, c.guarantee
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY c.sk_contract ORDER BY f.sk_proposal DESC) = 1
+),
 contract_enhanced AS (
     SELECT /*+ RANGE_JOIN(e, 1), RANGE_JOIN(be, 1), RANGE_JOIN(app, 1), RANGE_JOIN(bl, 1), RANGE_JOIN(d, 1) */
         m.*,
+        c.monthly_income,
+        COALESCE(m.wallet_overdue_t1/c.monthly_income, 0) AS debts_in_income_share_t1,
+        COALESCE(m.wallet_overdue_t2/c.monthly_income, 0) AS debts_in_income_share_t2,
         COALESCE(e.is_evictions, FALSE) AS is_evictions,
         COALESCE(e.id_process, NULL) AS id_process_evictions,
         COALESCE(be.esforco, 0) AS esforco,
@@ -563,6 +581,9 @@ contract_enhanced AS (
         negotiations AS d
             ON d.sk_contract = m.sk_contract
             AND d.dt_reference = m.dt_reference
+    LEFT JOIN
+        contract_info AS c
+            ON c.sk_contract = m.sk_contract
 )
 SELECT
     MD5(CONCAT(sk_contract, DATE_FORMAT(dt_reference, 'yyyyMMdd'))) AS sk_contract_wallet_timeline,
@@ -687,16 +708,19 @@ SELECT
     CAST(n_monthly_overdue_invoices_paid_t1 AS BIGINT) AS n_monthly_overdue_invoices_paid_t1,
     CAST(n_monthly_invoices_created AS BIGINT) AS n_monthly_invoices_created,
     CAST(n_invoices_in_wallet_total AS BIGINT) AS n_invoices_in_wallet,
+    monthly_income,
     open_wallet_overdue_t1,
     open_wallet_overdue_t2,
     open_wallet_overdue_t3,
     wallet_overdue_t2,
+    debts_in_income_share_t2,
     overdue_recovered_amount_t2,
     open_wallet,
     wallet,
     recovered_amount,
     wallet_on_time_t1,
     wallet_overdue_t1,
+    debts_in_income_share_t1,
     open_wallet_on_time_t1,
     overdue_recovered_amount_t1,
     on_time_paid_amount_t1,
@@ -712,6 +736,7 @@ SELECT
     CAST(max_open_delay_contaminated_contract_t2 AS BIGINT) AS max_open_delay_contaminated_contract_t2,
     dt_contract_end,
     dt_contract_start,
+    dt_pipe,
     YEAR(dt_reference) AS year,
     MONTH(dt_reference) AS month,
     DAY(dt_reference) AS day,
