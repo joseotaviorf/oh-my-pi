@@ -13,6 +13,7 @@ SELECT
     description,
     status,
     producer,
+    not_invoicable AS is_not_invoicable,
     accrual_year_month,
     due_year_month,
     timestamp(created_at) AS ts_created,
