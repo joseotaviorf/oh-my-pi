@@ -3,7 +3,12 @@ table_name: salary
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Stores the historical and current salary records for each persons assignment. Each record represents a specific salary amount for a defined period.
+  Stores the historical and current salary records for each persons assignment. 
+  Each record represents a specific salary amount for a defined period.
+  Salary holds details of salary proposals for Employee or Contingent worker assignments. 
+  A salary proposal may have one or more components.
+  There can be one/multiple unapproved salary proposal(s) at any time. 
+  When a salary proposal is approved, an element entry of type 'SP' (Salary Proposal) is created or updated.
 columns:
   id_person:
     description: Unique identifier for the person.
@@ -33,32 +38,108 @@ columns:
     description: Identifier for the business unit associated with the assignment.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.business_unit_id
+  id_action:
+    description: Identifier for the action associated with the salary change.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.action_id
+  id_action_occurrence:
+    description: Foreign key to PER_ACTION_OCCURRENCES. Identifies the specific occurrence of an action.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.action_occurrence_id
+  id_action_reason:
+    description: Identifier for the reason of the action associated with the salary change.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.action_reason_id
+  id_salary_basis:
+    description: Foreign key to Salary Basis. Defines the frequency and type of salary calculation.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_basis_id
+  id_element_entry:
+    description: Foreign key to payroll's PAY_ELEMENT_ENTRIES_F. Links to the payroll element entry.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.element_entry_id
+  id_element_type:
+    description: Identifier for the element type used in payroll calculations.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.element_type_id
+  id_input_value:
+    description: Identifier for the input value associated with the payroll element.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.input_value_id
+  id_legislative_data_group:
+    description: Identifier for the legislative data group, used for compliance and legal requirements.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.legislative_data_group_id
+  id_business_group:
+    description: Enterprise id. Foreign key to HR_ALL_ORGANIZATION_UNITS.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.business_group_id
+  id_assignment_grade_ladder:
+    description: Identifier for the assignment grade ladder, used in career progression tracking.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.assig_grade_ladder_id
+  id_rate:
+    description: Identifier for the salary rate definition used in calculations.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.rate_id
   currency_code:
     description: The currency code for the salary amount (e.g., BRL, USD).
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.currency_code
   salary_basis_code:
-    description: Code indicating the frequency or basis of the salary (e.g., MONTHLY).
+    description: Code indicating the frequency or basis of the salary (e.g., MONTHLY, HOURLY).
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.salary_basis_code
+  salary_basis_type:
+    description: Type classification of the salary basis (e.g., U for Unit-based).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_basis_type
+  assignment_type:
+    description: Type of assignment (E for Employee, C for Contingent worker, P for Pending worker).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.assignment_type
+  element_usage_level:
+    description: Level at which the payroll element is used (e.g., A for Assignment level).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.element_usage_level
+  component_usage:
+    description: Indicates how salary components are used (e.g., NO_COMPONENT when multiple components are not used).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.component_usage
+  quartile:
+    description: Salary quartile position relative to the pay range (1-4, or categorical values like ABV/BLW for Above/Below range).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.quartile
+  quintile:
+    description: Salary quintile position relative to the pay range (1-5, or categorical values like ABV/BLW for Above/Below range).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.quintile
+  multiple_components:
+    description: Flag indicating if salary has multiple components (Y/N).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.multiple_components
+  salary_transaction_status:
+    description: Current status of the salary transaction in the workflow.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_transaction_status
   created_by:
-    description: Identifier of the user who created the record.
+    description: User who created the salary record.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.created_by
   updated_by:
-    description: Identifier of the user who made the last update to the record.
+    description: User who made the last update to the salary record.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.last_updated_by
   object_version_number:
-    description: Version number of the record, used for concurrency control and change auditing.
+    description: Version number used for optimistic locking. Incremented on each update to detect concurrent modifications.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.object_version_number
   salary_amount:
-    description: The bases salary amount for the specified frequency (e.g., monthly salary).
+    description: Salary amount entered based on the salary basis frequency (e.g., monthly salary amount).
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.salary_amount
   annual_salary:
-    description: The calculated total annual salary.
+    description: Calculated total annual salary based on the salary amount and frequency.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.annual_salary
   adjustment_amount:
@@ -69,6 +150,90 @@ columns:
     description: The percentage of the last salary adjustment.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.adjustment_percent
+  adjustment_amount_scale:
+    description: Scale/precision metadata for the adjustment amount field (typically 2 for currency).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.adjustment_amount_scale
+  adjustment_percent_scale:
+    description: Scale/precision metadata for the adjustment percent field (typically 2 for percentages).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.adjustment_percent_scale
+  annual_ft_salary:
+    description: Adjusted annual full-time salary based on adjusted FTE value.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.annual_ft_salary
+  compa_ratio_scale:
+    description: Scale/precision metadata for the compa ratio field.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.compa_ratio_scale
+  fte_value:
+    description: Full-time equivalent value for the assignment (1.0 for full-time, <1.0 for part-time).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.fte_value
+  payroll_factor:
+    description: Multiplier factor used in payroll calculations for this salary.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.payroll_factor
+  range_position_scale:
+    description: Scale/precision metadata for the range position field.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.range_position_scale
+  salary_amount_scale:
+    description: Scale/precision metadata for the salary amount field.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_amount_scale
+  salary_factor:
+    description: Multiplier factor used in salary calculations (e.g., for annualization).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_factor
+  salary_range_scale:
+    description: Scale/precision metadata for the salary range field.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_range_scale
+  compa_ratio:
+    description: Compensation ratio comparing actual salary to the midpoint of the pay range (expressed as percentage).
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.compa_ratio
+  range_position:
+    description: Position of salary within the pay range as a percentage. Can be negative if below minimum or >100 if above maximum.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.range_position
+  rate_default_amount:
+    description: Default amount for the salary rate.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.rate_default_amount
+  rate_factor:
+    description: Factor used in rate calculations for salary conversion.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.rate_factor
+  rate_max_amount:
+    description: Maximum amount defined in the salary rate or pay range.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.rate_max_amount
+  rate_mid_amount:
+    description: Midpoint amount defined in the salary rate or pay range.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.rate_mid_amount
+  rate_min_amount:
+    description: Minimum amount defined in the salary rate or pay range.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.rate_min_amount
+  adjusted_fte_value:
+    description: Adjusted full-time equivalent value when adjustments are applied to the standard FTE.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.adjusted_fte_value
+  is_adjusted_fte:
+    description: Boolean flag indicating if adjusted FTE is used for this salary record.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.adjusted_fte_flag
+  is_salary_approved:
+    description: Boolean flag indicating if the salary proposal has been approved.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.salary_approved
+  is_working_at_home:
+    description: Boolean flag indicating if the employee works from home.
+    lineage:
+    - datalake_pin_compensation_raw.cmp_salary.work_at_home
   dt_started:
     description: The start date for which this salary record is effective.
     lineage:
@@ -85,21 +250,17 @@ columns:
     description: Timestamp of the last update to the record in the source system.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.last_update_date
-  is_salary_approved:
-    description: A boolean flag indicating if the salary has been approved.
-    lineage:
-    - datalake_pin_compensation_clean.salary.approval_status
   ts_load:
     description: Timestamp that indicates when the data was loaded into the clean table, logging the ETL process execution.
   year:
-    description: Partitioning column representing the year of the salary record.
+    description: Partitioning column representing the year of the last update.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.year
   month:
-    description: Partitioning column representing the month of the salary record.
+    description: Partitioning column representing the month of the last update.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.month
   day:
-    description: Partitioning column representing the day of the salary record.
+    description: Partitioning column representing the day of the last update.
     lineage:
     - datalake_pin_compensation_raw.cmp_salary.day
