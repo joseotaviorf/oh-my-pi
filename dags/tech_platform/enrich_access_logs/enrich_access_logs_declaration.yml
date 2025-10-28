@@ -10,7 +10,7 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
-  execution_timeout_hours: 3
+  execution_timeout_hours: 4
   default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
@@ -21,8 +21,9 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5a.2xlarge
-    node_type_id: m5a.2xlarge
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    runtime_engine: PHOTON
     num_workers: 2
     spark_version: 12.2.x-scala2.12
     spark_conf:
