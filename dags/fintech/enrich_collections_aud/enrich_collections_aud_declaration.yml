@@ -13,32 +13,15 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
-  inner_dependencies:
-    invoice_aud_daily:
-      - invoice_aud
-    contract_aud_daily:
-      - contract_aud
-    invoice_aud_at_closing:
-      - invoice_aud_daily
-    contract_aud_at_closing:
-      - contract_aud_daily
   tables_customization:
     invoice_aud:
       extraction_type: incremental
       partitions: [year, month, day]
       z_order_by: [id_invoice]
-    invoice_aud_daily:
-      z_order_by: [dt_reference, id_invoice]
-    invoice_aud_at_closing:
-      z_order_by: [dt_closing, id_invoice]
     contract_aud:
       extraction_type: incremental
       partitions: [year, month, day]
       z_order_by: [id_contract]
-    contract_aud_daily:
-      z_order_by: [dt_reference, id_contract]
-    contract_aud_at_closing:
-      z_order_by: [dt_closing, id_contract]
 cluster:
   type: custom_cluster
   custom_configurations:
