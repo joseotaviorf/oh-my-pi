@@ -4,7 +4,8 @@ owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
   Keyword-level regional enrichment for Google Search Console (GSC) data for Brazilian portals (Imovelweb, wimoveis and CasaMineira).
-  Adds inferred matches for IBGE city, while preserving keyword performance metrics.
+  Adds inferred matches for IBGE city and regional classification (cidade_sigla) based on page URL analysis,
+  while preserving keyword performance metrics for regional SEO analysis.
 columns:
   keyword:
     description: "Original search query from GSC."
@@ -19,6 +20,20 @@ columns:
     lineage:
       - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
       - datalake_google_search_console_classified.gsc_keywords.keyword_clean
+  city_abbreviation:
+    description: "Brazilian city/region abbreviation derived from page URL analysis."
+    lineage:
+      - datalake_google_search_console_classified.gsc_keywords.page
+    categories:
+      RJ: "Rio de Janeiro"
+      POA: "Porto Alegre"
+      BH: "Belo Horizonte"
+      BSB: "Brasília"
+      CWB: "Curitiba"
+      SP INTERIOR+LITORAL: "São Paulo interior and coast"
+      RMSP: "Some cities in the Região Metropolitana de São Paulo (São Paulo, Guarulhos, Santo André, São Bernardo do Campo and São Caetano do Sul)"
+      RMSP OUTROS: "Other regions in the Região Metropolitana de São Paulo"
+      OUTROS: "Other regions"
   page:
     description: "Full page URL."
     lineage:
@@ -74,7 +89,7 @@ columns:
   has_mention_to_city:
     description: Flag indicating whether the keyword mentions or implies a city.
     lineage:
-      - datalake_google_search_console.gsc_keywords.keyword_clean
+      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
       - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
   dt_created:
     description: "Month reference date (first day of month) derived from the original search date."
