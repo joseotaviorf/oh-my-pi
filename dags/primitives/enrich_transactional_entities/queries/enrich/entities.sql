@@ -786,7 +786,6 @@ base AS (
         ts_updated
     FROM
         contract
-    /***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
@@ -804,6 +803,7 @@ base AS (
     FROM
         termination
     UNION ALL
+    /***
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
@@ -868,6 +868,7 @@ base AS (
     FROM
         onboarding
     UNION ALL
+    ***/
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
@@ -883,6 +884,7 @@ base AS (
         ts_updated
     FROM
         reservation
+    /***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
