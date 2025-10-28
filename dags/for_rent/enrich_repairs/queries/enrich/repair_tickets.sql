@@ -334,7 +334,8 @@ WHERE
     'ReparAção Comum [BACK]',
     'Reembolso de Reparos [Back]',
     'Triagem [Porto]',
-    'Atendimento [Porto]'
+    'Atendimento [Porto]',
+    'ReparAção Emergencial [BACK]'
 )
   AND (
     tc.ts_created >= DATE('{load_start_date}') - INTERVAL 6 MONTH
