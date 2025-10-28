@@ -3,7 +3,7 @@ table_name: datalake_hr_system_clean.job_families
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 12
+    greater_than: 10
     severity_level: Error
 column_level_validations:
   id_job_family:

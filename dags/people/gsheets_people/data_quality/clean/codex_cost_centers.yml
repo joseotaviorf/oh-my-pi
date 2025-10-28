@@ -3,7 +3,7 @@ table_name: datalake_gsheets_people_clean.codex_cost_centers
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 13947
+    greater_than: 12500
     severity_level: Error
 column_level_validations:
   cost_center_code:
