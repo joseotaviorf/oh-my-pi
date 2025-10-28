@@ -820,6 +820,7 @@ base AS (
     FROM
         listing
     UNION ALL
+    ***/
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
@@ -852,6 +853,7 @@ base AS (
     FROM
         credit_evaluation
     UNION ALL
+    /***
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
