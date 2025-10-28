@@ -2,7 +2,9 @@ import json
 import logging
 import requests
 from argparse import ArgumentParser
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -46,7 +48,7 @@ def api_request(api_url, table_name, start_date, end_date, cursor=None):
     }
 
     url = f"{api_url}/{table_name.lstrip('/')}"
-    
+
     params = {
         'start': start_date,
         'end': end_date
@@ -54,7 +56,7 @@ def api_request(api_url, table_name, start_date, end_date, cursor=None):
 
     if cursor:
         params['cursor'] = cursor
-    
+
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()  # Raise exception for HTTP error status
@@ -67,29 +69,29 @@ def api_request(api_url, table_name, start_date, end_date, cursor=None):
 def get_all_data(api_url, table_name, start_date, end_date):
     """
     Returns all data from the period by performing cursor-based pagination
-    
+
     Args:
         api_url: Base API URL
         table_name: API endpoint (access, activations, properties)
         start_date: Start date in YYYY-MM-DD format
         end_date: End date in YYYY-MM-DD format
-        
+
     Returns:
         List with data from all pages
     """
     all_data = []
-    cursor = None 
-    
+    cursor = None
+
     while True:
         response = api_request(api_url, table_name, start_date, end_date, cursor)
-        
+
         page_data = response.get('data', [])
         all_data.extend(page_data)
-        
+
         cursor = response.get('cursor')
         if cursor is None:
             break
-    
+
     return all_data
 
 
@@ -122,7 +124,7 @@ if __name__ == "__main__":
     )
 
     client_response = get_all_data(api_url, table_name, load_start_date, load_end_date)
-    
+
     if client_response:
 
         spark_client = SparkClient()
@@ -186,6 +188,15 @@ if __name__ == "__main__":
             df=df,
             partition_cols=raw_partition_cols,
         )
+
+        full_raw_table_name = f"datalake_{source}_raw.{table_name}"
+        table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
+        if (
+                table_privileges
+                and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+        ):
+            table_privileges.apply()
+
         spark_metastore_service.refresh_table(database_name, table_name)
 
     else:
