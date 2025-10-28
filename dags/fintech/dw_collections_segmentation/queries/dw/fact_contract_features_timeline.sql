@@ -30,6 +30,7 @@ essential_features AS (
         array_open_invoices,
         array_paid_invoices,
         array_negotiated_invoices,
+        monthly_income,
         n_monthly_invoices,
         n_invoices_paid,
         n_invoices_paid_ontime_t2,
@@ -214,8 +215,6 @@ calculate_monthly_payment_ratios AS (
 prob_payment_calculation AS (
     SELECT
         f.*,
-        f.debts_in_income_share_t1,
-        f.debts_in_income_share_t2,
         CASE
             WHEN f.max_delay_contaminated_contract_t1 <= 0 THEN 'a. Current'
             WHEN f.max_delay_contaminated_contract_t1 <= 30 THEN 'b. 1-30'
