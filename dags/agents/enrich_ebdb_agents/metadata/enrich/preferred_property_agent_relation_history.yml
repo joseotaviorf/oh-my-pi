@@ -32,7 +32,10 @@ columns:
   ts_relation_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: relation creation date
+    description: For relationships with a creation date of 2025-06-03, the rule works as follows
+      It first checks whether the property was published between 2025-02-12 (program launch) and 2025-06-03 (table creation date).If true, the first listing date becomes the relationship start date.
+      If false, and the relationship creation date is still 2025-06-03, the rule then checks whether the publication date is before 2025-02-12.If so, it sets 2025-02-12 as the relationship start date.
+      Otherwise, it keeps the start date already recorded in the table.
   ts_relation_ended:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision

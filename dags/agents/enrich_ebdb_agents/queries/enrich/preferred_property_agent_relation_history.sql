@@ -6,6 +6,7 @@ WITH property_prefered_agent AS (
     hlra.id_related,
     u.id AS id_user_agent,
     u.id_agent,
+    XXHASH64(hlra.id_house, u.id_agent, hlra.id_listing_business_context, DATE(r.ts_revision)) AS id_house_listing_relation_group,
     CASE
       WHEN lbc.is_rent_context = TRUE THEN 'RENT'
       WHEN lbc.is_sale_context = TRUE THEN 'SALE'
@@ -38,27 +39,60 @@ WITH property_prefered_agent AS (
     )
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY hlra.id_house_listing_relation ORDER BY hlra.rev) = 1
+),
+duplicates_listing_relation AS (
+    SELECT
+        id_house_listing_relation_group,
+        COUNT(*) AS total_duplicates
+    FROM
+        property_prefered_agent
+    GROUP BY ALL
+    HAVING total_duplicates > 1
+),
+deduplication_house_listing_relation AS (
+    SELECT
+        ppa.id_house_listing_relation,
+        ppa.id_house,
+        ppa.id_agent,
+        ppa.id_listing_business_context,
+        ppa.ts_relation_started,
+        ppa.ts_relation_ended
+    FROM
+        property_prefered_agent AS ppa
+    JOIN
+        duplicates_listing_relation AS di
+            ON ppa.id_house_listing_relation_group = di.id_house_listing_relation_group
+    QUALIFY
+        LEAD(ppa.ts_relation_started) OVER(
+            PARTITION BY ppa.id_house_listing_relation_group
+            ORDER BY ppa.id_house_listing_relation
+        ) < IFNULL(ppa.ts_relation_ended, NOW())
 )
 SELECT
-    id_house_listing_relation,
-    id_house,
-    id_user_agent AS id_user_related_agent,
-    id_agent AS id_related_agent,
-    id_listing_business_context,
-    business_context,
+    ppa.id_house_listing_relation,
+    ppa.id_house,
+    ppa.id_user_agent AS id_user_related_agent,
+    ppa.id_agent AS id_related_agent,
+    ppa.id_listing_business_context,
+    ppa.business_context,
     CASE
       WHEN
-        ROW_NUMBER() OVER(PARTITION BY id_house, id_related ORDER BY id_house_listing_relation) = 1
-            AND ts_relation_started = DATE('2025-06-03')
-            AND ts_business_context_house_first_listing BETWEEN DATE('2025-02-12') AND DATE('2025-06-03')
-        THEN ts_business_context_house_first_listing
+        ROW_NUMBER() OVER(PARTITION BY ppa.id_house, ppa.id_related ORDER BY ppa.id_house_listing_relation) = 1
+          AND DATE(ppa.ts_relation_started) = DATE('2025-06-03')
+          AND ppa.ts_business_context_house_first_listing BETWEEN DATE('2025-02-12') AND DATE('2025-06-03')
+        THEN ppa.ts_business_context_house_first_listing
       WHEN
-        ROW_NUMBER() OVER(PARTITION BY id_house, id_related ORDER BY id_house_listing_relation) = 1
-            AND ts_relation_started = DATE('2025-06-03')
-            AND ts_business_context_house_first_listing < DATE('2025-02-12')
+        ROW_NUMBER() OVER(PARTITION BY ppa.id_house, ppa.id_related ORDER BY ppa.id_house_listing_relation) = 1
+          AND DATE(ppa.ts_relation_started) = DATE('2025-06-03')
+          AND ppa.ts_business_context_house_first_listing < DATE('2025-02-12')
         THEN DATE('2025-02-12')
-      ELSE ts_relation_started
+      ELSE ppa.ts_relation_started
     END AS ts_relation_started,
-    ts_relation_ended
+    ppa.ts_relation_ended
 FROM
-    property_prefered_agent
+  property_prefered_agent AS ppa
+LEFT JOIN
+  deduplication_house_listing_relation AS dups
+    ON dups.id_house_listing_relation = ppa.id_house_listing_relation
+WHERE
+  dups.id_house_listing_relation IS NULL
