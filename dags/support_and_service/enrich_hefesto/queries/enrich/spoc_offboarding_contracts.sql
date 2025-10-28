@@ -1,11 +1,11 @@
 WITH queue_cte AS (
-  SELECT DISTINCT 
+  SELECT DISTINCT
     id_queue,
     queue_friendly_name
-  FROM 
+  FROM
     datalake_hefesto_clean.queue
   )
-SELECT 
+SELECT
   wp.id_portfolio,
   INT(COALESCE(wpu.origin_identifier, CAST(wp.id_contract AS string))) AS id_contract,
   INT(COALESCE(CAST(get_json_object(wpu.metadata, '$.termination_id') AS string), wp.id_entity_origin)) AS id_termination,
@@ -19,20 +19,20 @@ SELECT
   a.organization AS analyst_organization,
   wp.entity_origin,
   wpu.ts_updated
-FROM 
+FROM
   datalake_hefesto_clean.worker_portfolio_unit wpu
 LEFT JOIN
-  datalake_hefesto_clean.worker_portfolio AS wp 
+  datalake_hefesto_clean.worker_portfolio AS wp
     ON wpu.worker_portfolio_id = wp.id_portfolio
 LEFT JOIN
-  (queue_cte) AS q 
+  (queue_cte) AS q
     ON wp.id_queue = q.id_queue
 LEFT JOIN
-  datalake_hefesto_clean.worker AS w 
+  datalake_hefesto_clean.worker AS w
     ON wp.id_worker = w.id_worker
 LEFT JOIN
-  datalake_support_users.analysts AS a 
+  datalake_support_users.analysts AS a
     ON a.email = w.email
-WHERE 
-  wp.entity_origin = 'OFFBOARDING'
+WHERE
+  wp.entity_origin IN ('OFFBOARDING', 'OFFBOARDING_PHONE')
   AND queue_friendly_name = 'CX Off Manager'
