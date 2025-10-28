@@ -851,7 +851,6 @@ base AS (
     FROM
         credit_evaluation
     UNION ALL
-    /***
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
@@ -868,7 +867,6 @@ base AS (
     FROM
         onboarding
     UNION ALL
-    ***/
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
