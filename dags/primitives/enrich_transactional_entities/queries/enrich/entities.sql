@@ -882,7 +882,6 @@ base AS (
         ts_updated
     FROM
         reservation
-    /***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
@@ -899,7 +898,6 @@ base AS (
         ts_updated
     FROM
         repair
-    ***/
 )
 SELECT
     b.sk_entity,
