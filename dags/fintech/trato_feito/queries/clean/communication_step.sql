@@ -5,7 +5,6 @@ SELECT
     CAST(action_id AS BIGINT) AS id_action,
     day_offset,
     version,
-    minimum_start_hour_utc,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load

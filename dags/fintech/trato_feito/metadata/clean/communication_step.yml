@@ -29,10 +29,6 @@ columns:
     description: "Version number for optimistic locking"
     lineage:
       - datalake_trato_feito_raw.communication_step.version
-  minimum_start_hour_utc:
-    description: "Minimum hour in UTC when the step can start"
-    lineage:
-      - datalake_trato_feito_raw.communication_step.minimum_start_hour_utc
   ts_created:
     description: "Timestamp when the step was created"
     lineage:
