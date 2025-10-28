@@ -485,6 +485,31 @@ columns:
       - datalake_semrush_clean.loft_organic_search_kw.keyword_difficulty
       - datalake_semrush_clean.olximoveis_organic_search_kw.keyword_difficulty
       - datalake_semrush_clean.dfimoveis_organic_search_kw.keyword_difficulty
+  city_abbreviation:
+    description: "Brazilian city/region abbreviation derived from page URL analysis. Values include: RJ (Rio de Janeiro), POA (Porto Alegre), BH (Belo Horizonte), BSB (Brasília), CWB (Curitiba), SP INTERIOR+LITORAL (São Paulo interior and coast), RMSP (São Paulo metropolitan region), RMSP OUTROS (Other São Paulo metropolitan areas), OUTROS (Other regions)"
+    lineage:
+      - datalake_semrush_clean.quintoandar_organic_search_kw.url
+      - datalake_semrush_clean.imovelweb_organic_search_kw.url
+      - datalake_semrush_clean.zapimoveis_organic_search_kw.url
+      - datalake_semrush_clean.vivareal_organic_search_kw.url
+      - datalake_semrush_clean.casamineira_organic_search_kw.url
+      - datalake_semrush_clean.lopes_organic_search_kw.url
+      - datalake_semrush_clean.emcasa_organic_search_kw.url
+      - datalake_semrush_clean.chavesnamao_organic_search_kw.url
+      - datalake_semrush_clean.imoveisestadao_organic_search_kw.url
+      - datalake_semrush_clean.imoveismercadolivre_organic_search_kw.url
+      - datalake_semrush_clean.wimoveis_organic_search_kw.url
+      - datalake_semrush_clean.123i_organic_search_kw.url
+      - datalake_semrush_clean.trisul_organic_search_kw.url
+      - datalake_semrush_clean.ape11_organic_search_kw.url
+      - datalake_semrush_clean.arboimoveis_organic_search_kw.url
+      - datalake_semrush_clean.imovelguide_organic_search_kw.url
+      - datalake_semrush_clean.direcional_organic_search_kw.url
+      - datalake_semrush_clean.auxiliadorapredial_organic_search_kw.url
+      - datalake_semrush_clean.secovi_organic_search_kw.url
+      - datalake_semrush_clean.loft_organic_search_kw.url
+      - datalake_semrush_clean.olximoveis_organic_search_kw.url
+      - datalake_semrush_clean.dfimoveis_organic_search_kw.url
   is_goldenset:
     description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
     lineage:

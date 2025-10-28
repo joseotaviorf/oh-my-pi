@@ -121,6 +121,10 @@ columns:
     description: "SEMrush keyword difficulty score (0–100)."
     lineage:
       - datalake_semrush.keyword_region_attributes.keyword_difficulty
+  city_abbreviation:
+    description: "Brazilian city/region abbreviation derived from page URL analysis. Values include: RJ (Rio de Janeiro), POA (Porto Alegre), BH (Belo Horizonte), BSB (Brasília), CWB (Curitiba), SP INTERIOR+LITORAL (São Paulo interior and coast), RMSP (São Paulo metropolitan region), RMSP OUTROS (Other São Paulo metropolitan areas), OUTROS (Other regions)"
+    lineage:
+      - datalake_semrush.keyword_region_attributes.city_abbreviation
   is_goldenset:
     description: "Boolean flag indicating whether the keyword is part of the strategic SEO golden set (true = golden set keyword, false = regular keyword)"
     lineage:

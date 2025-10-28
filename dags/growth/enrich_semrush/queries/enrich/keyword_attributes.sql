@@ -229,6 +229,7 @@ SELECT
   competition,
   number_of_results,
   keyword_difficulty,
+  city_abbreviation,
   is_goldenset,
   has_mention_to_location,
   

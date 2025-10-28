@@ -52,6 +52,7 @@ general_city_level_enrichment AS (
     competition,
     number_of_results,
     keyword_difficulty,
+    city_abbreviation,
     is_goldenset,
     dt_display,
     dt_display AS dt_report,
@@ -150,6 +151,7 @@ operation_city_level_enrichment AS (
     competition,
     number_of_results,
     keyword_difficulty,
+    city_abbreviation,
     is_goldenset,
     CASE
       WHEN match_igbe_city != '' THEN 1
@@ -239,7 +241,8 @@ operation_neighborhood_level_enrichment AS (
     competition,
     number_of_results,
     keyword_difficulty,
-    is_goldenset,
+    city_abbreviation,
+    is_goldenset, 
     COALESCE(
       gcle.has_mention_to_location,
       CASE
@@ -302,6 +305,7 @@ SELECT
   competition,
   number_of_results,
   keyword_difficulty,
+  city_abbreviation,
   is_goldenset,
   COALESCE(
     has_mention_to_location,

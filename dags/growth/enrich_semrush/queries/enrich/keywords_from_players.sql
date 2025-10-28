@@ -19,6 +19,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -51,6 +64,32 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE 
+      WHEN regexp_like(url,'rio-de-janeiro|freguesia-jacarepagua|jacarepagua|meier|pechincha|guaratiba|cachambi|vila-valqueire|engenho-de-dentro|jardim-oceanico|curicica|praca-seca|cosmos|vila-da-penha|braz-de-pina|lins-de-vasconcelos|penha-circular|del-castilho|inhoaiba|cascadura|bento-ribeiro|cosme-velho|jardim-sulacap|pilares|quintino-bocaiuva|cordovil|parada-de-lucas|freguesia-ilha-do-governador|colegio|vila-kosmos|honorio-gurgel|estacio|vaz-lobo|marechal-hermes|pedra-de-guaratiba|rocha-miranda|maria-da-graca|cocota|praia-da-bandeira|senador-vasconcelos|cavalcanti|monero|senador-camara|gardenia-azul|engenho-da-rainha|catumbi|engenheiro-leal|ricardo-de-albuquerque|vigario-geral|barra-de-guaratiba|magalhaes-bastos|ilha-de-guaratiba|sepetiba|ilha-do-governador|campo-dos-afonsos|costa-barros|barros-filho')
+        THEN 'RJ'
+
+      WHEN regexp_like(url,'porto-alegre|tristeza|hipica|partenon|cavalhada|central-parque|jardim-itu-sabara|praia-de-belas|chacara-das-pedras|azenha|tres-figueiras|belem-novo|rubem-berta|parque-santa-fe|campo-novo|mario-quintana|jardim-isabel|pedra-redonda|agronomia|alto-petropolis|lami|belem-velho|costa-e-silva|ecoville|coronel-aparicio-borges|vila-joao-pessoa|parque-dos-maias|arquipelago|nova-ipanema|jardim-itati')
+        THEN 'POA'
+
+      WHEN regexp_like(url,'belo-horizonte|nova-suissa|manacos|colegio-batista|carlos-prates|alto-barroca|alipio-de-melo|bandeirantes-pampulha|alto-caicaras|vila-cloris|diamante|vila-sao-joao-batista|vila-piratininga|caicara-adelaide|juliana|comiteco|esplanada|leticia|alvaro-camargos|novo-gloria|diamante-barreiro|tirol-barreiro|estrela-do-oriente|vila-nova-gameleira-i|dom-cabral|etelvina-carneiro|ana-lucia-venda-nova|vila-engenho-nogueira|miramar-barreiro|maria-virginia|minascaixa|conjunto-california-i|santa-helena-barreiro|caicara|milionarios-barreiro|serra-verde-venda-nova|antonio-ribeiro-de-abreu|conjunto-celso-machado|frei-leopoldo|tupi-a|cenaculo|ermelinda|vila-minaslandia|eymard|ouro-minas|vila-madre-gertrudes-i|cardoso-barreiro|sao-jose-pampulha|tupi-b|parque-copacabana|teixeira-dias-barreiro|brasil-industrial-barreiro|jardim-dos-comerciarios-venda-nova|lindeia-barreiro|pousada-santo-antonio|granja-de-freitas|parque-sao-pedro-venda-nova|solar-do-barreiro-barreiro|conjunto-bonsucesso|vila-oeste|solimoes|aarao-reis|xodo-marize|nova-cintra|taquaril|conjunto-tunel-ibirite|sao-tomaz|novo-sao-lucas|olaria-barreiro|leblon-venda-nova|mangueiras-barreiro|vila-magnesita|vila-santa-rita-vale-do-jatoba-barreiro|conjunto-lagoa|parque-pedro-ii|jardim-pirineus|flavio-de-oliveira|industrias-i-barreiro|jardim-europa|jonas-veiga|maria-tereza|flavio-de-oliveira-barreiro|santa-cruz-barreiro|vila-independencia-i|cidade-jardim-taquaril|conjunto-minascaixa|conjunto-taquaril|glalija|indians|itaipu-barreiro|mineirao|pongelupe-barreiro|madri|novo-santa-cecilia-barreiro|novo-tupi|parque-sao-joao-batista|santa-margarida-barreiro|ventosa|capitao-eduardo|conjunto-ademar-maldonado-barreiro|distrito-industrial|flavio-marques-lisboa-barreiro|mariano-de-abreu|santa-cecilia-vale-do-jatoba-barreiro|vale-do-jatoba-barreiro|adelaide|cabana|castanheira-i-vale-do-jatoba-barreiro|conjunto-helena-antipoff|conjunto-santa-maria|conjunto-tunel-ibirite-barreiro|leonina|marilandia-jatoba-barreiro|marcola|vila-barragem-santa-lucia|vila-petropolis|vila-pinho-vale-do-jatoba-barreiro|vila-atila-de-paiva')
+        THEN 'BH'
+
+      WHEN regexp_like(url,'brasilia|distrito-federal|setor-de-mansoes-dom-bosco|superquadra-noroeste|samambaia|setor-de-mansoes-lago-norte|setor-de-hoteis-e-turismo-norte|setor-de-armazenagem-e-abastecimento-norte|mansoes-do-lago|setor-de-multiplas-atividades-sul|centro-comercial-noroeste|centro-de-atividades|quadra-mista-sudoeste|setor-de-garagens-e-concessionarias-de-veiculos|setor-de-grandes-areas-norte')
+        THEN 'BSB'
+
+      WHEN regexp_like(url,'curitiba|bigorrilho|campo-comprido|bacacheri|juveve|cic|mossungue|ahu|capao-raso|pilarzinho|hauer|alto-boqueirao|campina-do-siqueira|hugo-lange|umbara|abranches|tatuquara|butiatuvinha|capao-da-imbuia|fanny|parolin|ganchinho|neoville|parque-tangua|jardim-schaffer')
+        THEN 'CWB'
+
+      WHEN regexp_like(url,'campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja|jardim-proenca|vila-itapura|mansoes-santo-antonio|parque-prado|chacara-da-barra|parque-jambeiro|parque-imperador|jardim-novo-campos-eliseos|sitios-de-recreio-gramado|parque-sao-quirino|barao-geraldo|loteamento-parque-sao-martinho|loteamento-caminhos-de-san-conrado-sousas|vila-brandina|jardim-eulina|cidade-satelite-iris|parque-xangrila|parque-residencial-vila-uniao|jardim-campos-eliseos|parque-alto-taquaral|parque-via-norte|vila-marieta|jardim-santa-genebra|residencial-parque-da-fazenda|bairro-das-palmeiras|vila-joao-jorge|vila-proost-de-souza|jardim-antonio-von-zuben|jardim-do-lago-continuacao|jardim-garcia|parque-italia|vila-mimosa|residencial-jatibela|parque-das-universidades|chacara-santa-margarida|jardim-myrian-moreira-da-costa|loteamento-mont-blanc-residence|recanto-dos-dourados|parque-jatibaia-sousas|colinas-do-ermitage-sousas|ville-sainte-helene|parque-da-hipica|parque-fazendinha|jardim-botanico-sousas|jardim-carlos-lourenco|vila-joaquim-inacio|swift|tijuco-das-telhas|jardim-paranapanema|fazenda-sao-quirino|jardim-conceicao-sousas|jardim-ipaussurama|vila-padre-manoel-de-nobrega|residencial-cosmos|loteamento-residencial-barao-do-cafe|loteamento-residencial-vila-bella|parque-dos-alecrins|vila-saturnia|chacara-sao-rafael|bosque-de-barao-geraldo|parque-das-quaresmeiras|fazenda-santa-candida|fundacao-da-casa-popular|parque-universitario-de-viracopos|parque-dos-pomares|residencial-terras-do-barao|loteamento-center-santa-genebra|loteamento-arboreto-dos-jequitibas-sousas|jardim-novo-maracana|jardim-londres|loteamento-chacaras-vale-das-garcas|jardim-capivari|notre-dame|parque-valenca-i|vila-rossi-borghi-e-siqueira|jardim-florence|vila-hollandia|conjunto-habitacional-padre-anchieta|bosque-das-palmeiras|vila-sonia-sousas|jardim-proenca-i|jardim-paraiso-de-viracopos|jardim-martinelli-sousas|chacaras-campos-dos-amarais|vila-miguel-vicente-cury|conjunto-residencial-parque-bandeirantes|jardim-esmeraldina|jardim-santa-eudoxia|jardim-yeda|chacaras-campos-eliseos|vila-aurocan|jardim-andorinhas|chacaras-sao-martinho|conjunto-residencial-souza-queiroz|jardim-atibaia-sousas|residencial-parque-rio-das-pedras|recanto-do-sol-i|jardim-santa-genebra-ii-barao-geraldo|jardim-sorirama-sousas|jardim-nilopolis|vila-maria-eugenia|fazenda-pau-d-alho|loteamento-chacaras-gargantilhas|parque-camelias|fazenda-santana-sousas|vila-orozimbo-maia|jardim-alto-da-barra|chacaras-cruzeiro-do-sul|jardim-dom-vieira|jardim-do-lago-ii|vila-nova-teixeira|loteamento-residencial-jaguari-sousas|vila-trinta-e-um-de-marco|conjunto-habitacional-parque-itajai|jardim-planalto-de-viracopos|jardim-do-vovo|vila-san-martin|loteamento-chacara-prado|galleria|vila-nova-sao-jose|vila-perseu-leite-de-barros|loteamento-residencial-novo-mundo|dic-vi-conjunto-habitacional-santo-dias-silva|residencial-vila-verde|vila-manoel-ferreira|jardim-lumen-christi|parque-beatriz|jardim-nova-mercedes|loteamento-country-ville|castelo|dic-v-conjunto-habitacional-chico-mendes|loteamento-residencial-campina-verde|loteamento-parque-das-hortencias-sousas|conjunto-habitacional-vila-santana-sousas|conjunto-habitacional-vila-reggio|residencial-nova-bandeirante|chacara-cneo|novo-taquaral|jardim-sao-pedro-de-viracopos|dic-i-conjunto-habitacional-monsenhor-luiz-fernando-abreu|jardim-lisa|jardim-santa-judith|jardim-aero-continental|residencial-parque-das-araucarias|parque-valenca-ii|jardim-rossin|vila-aeroporto-i|conjunto-residencial-parque-sao-bento|jardim-itatinga|jardim-new-york|loteamento-residencial-porto-seguro|vila-jequitibas|morada-das-nascentes-joaquim-egidio|parque-luciamar|dic-iv-conjunto-habitacional-lech-walesa|dae|vila-saltinho|chacara-de-recreio-santa-fe|jardim-cura-dars|jardim-dom-nery|conjunto-habitacional-parque-da-floresta|grupo-residencial-do-iapc|residencial-estancia-eudoxia|chacara-de-recreio-barao|vila-modesto-fernandes|nova-sousas-sousas|vila-palacios|conjunto-mauro-marcondes|jardim-alto-da-cidade-universitaria|terminal-intermodal-de-cargas-tic|vila-estanislau|parque-residencial-carvalho-de-moura|jardim-fernanda|techno-park|jardim-adhemar-de-barros|chacara-nova-boa-vista|chacaras-bocaiuva-nova|chacara-sao-domingos|dic-ii-conj-habitacional-doutor-antonio-mendonca-de-barros|jardim-sao-francisco-sousas|residencial-campo-florido|conjunto-habitacional-vida-nova|parque-dos-jacarandas|residencial-vitoria-ropole-barao-geraldo|condominio-residencial-colinas|jardim-itayu|residencial-burato|residencial-candido-ferreira-sousas|parque-dos-cisnes|chacaras-recanto-da-colina-verde|jardim-uruguai|parque-camboriu|vila-bourbon-sousas|vila-31-de-marco|jardim-liliza|jardim-melina-i|nucleo-residencial-vila-vitoria|parque-anhumas|vila-palmeiras-ii|vila-santa-rita-sousas|condominio-colinas-do-atibaia|dic-iii-conjunto-habitacional-ruy-novaes|recreio-tsuriba|vila-antonio-lourenco|cidade-singer|vila-andrade-neves|conjunto-habitacional-residencial-olimpia|jardim-aires-da-costa|jardim-presidente-wenceslau|vila-lunardi|chacara-santa-leticia|jardim-irmaos-sigrist|conjunto-habitacional-edivaldo-antonio-orsi|vila-aeroporto-iii|vila-carlito|vila-palmeiras-i|fazenda-monte-deste|imperial-parque-sousas|jardim-aeroporto-de-viracopos|jardim-professora-tarcilia|loteamento-campos-dos-amarais|loteamento-parque-centenario|vila-alberto-simoes|vila-angela-marta|arruamento-fain-jose-feres|chacara-formosa|jardim-novo-barao-geraldo|parque-uniao-da-vitoria|vila-horacio-tulli|condominio-vila-dos-platanos|jardim-campineiro|vila-jose-iorio-sousas|jardim-santa-vitoria|loteamento-vila-lafayette-alvaro|jardim-novo-sao-jose|vila-mingone|chacara-santos-dumont|jardim-arua|jardim-belmonte-sousas|jardim-novo-flamboyant|jardim-jose-martins|jardim-novo-botafogo|jardim-okita|jardim-sul-america|nucleo-residencial-padre-josimo|parque-viracopos|chacara-mendonca|jardim-conceicao-i|recanto-do-sol-ii|vila-santa-odila|chacaras-sao-quirino|loteamento-e-arruamento-telesp|nucleo-residencial-princesa-oeste|nucleo-residencial-nossa-senhora-aparecida|vila-ferreira-jorge|arruamento-luiz-vicentin|condominio-riviera-barao|jardim-novo-sol|parque-residencial-campina-grande|residencial-bougainville|condominio-residencial-espaco-verde-i|jardim-fernanda-continuacao|jardim-rosana-sousas|loteamento-vila-esperanca|regiao-do-aeroporto-de-viracopos|vila-tofanello|zona-rural|chacaras-sao-francisco-do-aeroporto|jardim-aeronave-de-viracopos|jardim-pita|nucleo-habitacional-boa-vista-nova-aparecida|vila-lovato|alphaville---extra-muro|condominio-residencial-espaco-verde-ii|friburgo|jardim-campina-grande|jardim-monte-cristo/parque-oziel|jardim-sao-domingos-savio|parque-industrial-lisboa|parque-campolim|wanel-ville|condominio-ibiti-reserva|alem-ponte|jardim-simus|cajuru-do-sul|parque-reserva-fazenda-imperial|vila-trujillo|caguassu|residencial-reserva-ipanema|condominio-chacara-ondina|vila-barao|parque-residencial-villa-dos-inglezes|vila-jardini|ibiti-royal-park|condominio-villagio-milano|jardim-pagliato|brigadeiro-tobias|jardim-ibiti-do-paco|jardim-wanel-ville-v|vila-fiori|jardim-vergueiro|jardim-prestes-de-barros|jardim-sao-guilherme|jardim-do-paco|chacaras-reunidas-sao-jorge|condominio-golden-park-residence|jardim-saira|conjunto-habitacional-julio-de-mesquita-filho|lopes-de-oliveira|vila-mineirao|vivendas-do-lago|jardim-residencial-villa-amato|jardim-wanel-ville-iv|parque-vitoria-regia|jardim-piazza-di-roma-ii|parque-tres-meninos|jardim-leocadia|granja-olga-i|condominio-ibiti-do-paco|loteamento-dinora-rosa|condominio-villa-verona|granja-olga-ii|jardim-piazza-di-roma|jardim-gutierres|condominio-fazenda-imperial|condominio-lago-da-boa-vista|jardim-maria-antonia-prado|condominio-residencial-renaissance|condominio-fazenda-jequitiba|jardim-itangua|jardim-refugio|jardim-vila-sao-domingos|vila-odim-antao|jardim-das-magnolias|condominio-horto-florestal-i|jardim-rosalia-alcolea|vila-leao|bairro-da-vossoroca|jardim-zulmira|condominio-solar-do-bosque|jardim-astro|jardim-eltonville|jardim-tulipas|parque-manchester|parque-ouro-fino|quintais-do-imperador|jardim-residencial-tivoli-park|jardim-nova-manchester|condominio-vale-do-lago|condominio-villa-do-bosque|ipanema-ville|granja-olga-iii|jardim-judith|jardim-golden-park-residencial|jardim-dois-coracoes|jardim-josane|condominio-terras-de-sao-lucas|jardim-residencial-mont-blanc|condominio-horto-florestal-ii|condominio-residencial-village-vert|jardim-sao-lourenzo|retiro-sao-joao|jardim-residencial-martinez|ipanema-das-pedras|vila-colorau|condominio-dacha|jardim-residencial-imperatriz|jardim-residencial-deolinda-guerra|condominio-village-saint-claire|condominio-village-colina-do-sol|jardim-altos-do-itavuvu|jardim-santa-madre-paulina|jardim-bertanha|jardim-nova-aparecidinha|condominio-horto-florestal-iii|condominio-tivoli-park|condominio-angelo-vial|jardim-nilton-torres|terras-de-arieta|ipanema-do-meio|jardim-guaiba|jardim-novo-eldorado|jardim-luciana-maria|condominio-portal-da-primavera|jardim-maria-elvira|rancho-dirce|condominio-golden-park-alfa|jardim-residencial-colinas-do-sol|condominio-vila-azul|vila-artura|jardim-abatia|condominio-granja-deolinda|jardim-marcelo-augusto|jardim-parada-do-alto|jardim-santa-claudia|itavuvu|condominio-golden-park-sigma|condominio-residencial-castanheira|jardim-moncayo|wanel-ville-ii|jardim-j-s-carvalho|jardim-residencial-vicente-de-moraes|vila-carol|condominio-spazio-splendido|altos-do-trujillo|jardim-botucatu|jardim-helena-cristina|recreio-marajoara|jardim-capitao|residencial-villazul|jardim-eden-ville|jardim-pires-de-mello|jardim-atilio-silvano|condominio-via-reggio|condominio-constantino-matucci|jardim-portal-do-itavuvu|condominio-portal-da-raposo|condominio-morada-das-artes|conjunto-residencial-jardim-villagio-torino|jardim-village-saint-claire|alem-linha|condominio-vizzon-ville|inhayba|condominio-villagio-di-lucca|jardim-residencial-dos-reis|jardim-vila-inglesa|condominio-bosque-sao-bento-ii|vila-dalmatas|condominio-reserva-olga|jardim-millenium|condominio-terra-nova|condominio-jardim-portugal|fazenda-alta-vista|jardim-hungares|condominio-isaura|condominio-residencial-village-salermo|jardim-residencial-vivenda-do-itavuvu|vila-odin|conjunto-habitacional-herbert-de-souza|condominio-vila-inglesa|jardim-portobello|vila-joao-romao|jardim-copaiba|vila-louzada|conjunto-habitacional-professor-benedicto-cleto|jardim-rodrigo|vila-fleury|jardim-residencial-morada-das-flores|vila-santa-francisca|condominio-chacara-santa-maria|jardim-germiniani|jardim-turmalina|condominio-ibirapuera|condominio-mirante-de-ipanema|condominio-san-paolo|vila-terron|vila-tortelli|vila-da-fonte|condominio-portal-do-morumbi|condominio-real-villas-europa|genebra-morros|jardim-francini|condominio-portobello|condominio-bela-vista|condominio-residencial-dalias|condominio-residencial-gramados|jardim-ipatinga|vila-nicanor-marques|condominio-bosque-ipanema|conjunto-habitacional-doutor-ulisses-guimaraes|jardim-constantino-matucci|residencial-jardim-villagio-sola|vila-cassia-maria|condominio-parque-das-arvores|condominio-villa-grimaldi|condominio-green-garden|jardim-residencial-villa-olympia|vila-netinho|condominio-horto-florestal-iv|condominio-residencial-valenca|condominio-villagio-vita-bella|jardim-cardoso|jardim-montevideo|santa-marina-ii|vila-zacarias|condominio-di-parma|condominio-olga-ville|condominio-vila-olympia|jardim-humberto-de-campos|recanto-dos-juritis|vila-casanova|vila-florinda|vila-sabia|condominio-morada-das-americas|condominio-portal-do-saira-ii|condominio-residencial-village-splendore|sao-guilherme-ii|condominio-la-fontana|condominio-moradas-de-sao-guilherme|condominio-chacara-sonia-maria|condominio-san-lorenzo|condominio-verde-vale|condominio-dos-passaros|habiteto-ana-paula-eleuterio|jardim-avore-pilungo|jardim-santa-lucinda|engordadouro|anhangabau|recanto-quarto-centenario|jardim-ermida-i|ponte-de-sao-joao|ivoturucaia|chacara-malota|corrupira|parque-residencial-eloy-chaves|vila-vianelo|chacara-terra-nova|portal-do-paraiso-ii|agapeama|residencial-santa-giovana|jardim-tereza-cristina|vila-arens-ii|jardim-messina|vila-nambi|loteamento-capital-ville|vila-das-hortencias|chacara-morada-mediterranea|chacara-urbana|jardim-quintas-das-videiras|vila-boaventura|fazenda-grande|poste|jardim-torres-sao-jose|loteamento-portal-da-colina|parque-cidade-jardim-ii|parque-almerinda-pereira-chaves|horto-santo-antonio|vila-joana|eloy-chaves|parque-residencial-nove-de-julho|cidade-luiza|portal-do-paraiso-i|vila-nova-esperia|terras-de-sao-carlos|jardim-ermida-ii|vila-rami|vila-lacerda|vila-hortolandia|cidade-santos-dumont|chacaras-saudaveis-e-encantadoras|malota|vila-isabel-eber|nova-cidade-jardim|morada-das-vinhas|jardim-tannus|jardim-sarapiranga|residencial-terra-da-uva|chacara-recreio-lagoa-dos-patos|traviu|ponte-de-campinas|currupira|jardim-merci-ii|chacara-segre|vila-m-genoveva|jardim-pitangueiras-i|jardim-das-carpas|vila-rafael-de-oliveira|jardim-bizarro|castanho|jardim-danubio|quinta-das-paineiras|vila-arens-i|vila-della-piazza|champirra|parque-quinta-da-boa-vista|vila-graff|vivenda|jardim-rosaura|vila-santana-ii|vila-didi|vale-azul-ii|jardim-dona-donata|jardim-pitangueiras-ii|vila-agricola|jardim-cica|condominio-terras-de-genova|vila-manfredi|jardim-marco-leite|vila-nova-medeiros|vila-japi-ii|jardim-bufalo|fazenda-campo-verde|jardim-tarantela|bairro-dos-fernandes|jardim-merci-i|vila-bela-i|vale-dos-cebrantes|vila-de-vecchi|chacara-aeroporto|condominio-bosque-dos-jatobas|recanto-da-prata|chacara-pai-jaco|vila-santana-i|vila-de-vito|mirante-da-colonia|vila-argos-nova|vila-inhamupe|jardim-marabambaia-ii-jardim-santa-gertrudes|jardim-scala|chacara-recreio-santa-camila|sitio-paecara-vicente-de-carvalho|jardim-pernambuco-ii|jardim-santa-genoveva|jardim-das-conchas|jardim-boa-esperanca-vicente-de-carvalho|vila-alice-vicente-de-carvalho|praia-sao-pedro|tortugas|jardim-albamar|vila-aurea-vicente-de-carvalho|parque-estuario-vicente-de-carvalho|jardim-pernambuco-i|vila-ligya|taguaiba|vila-nova-perequê|jardim-cunhambebe-vicente-de-carvalho|sitio-tijucopava|jardim-mar-e-ceu|jardim-conceicaozinha-vicente-de-carvalho|cing|jardim-conceicaozinha|park-lane|jardim-monteiro-da-cruz-vicente-de-carvalho|costao-do-pernambuco|sitio-sao-pedro|balneario-mar-casado|jardim-brasil-i|jardim-esplanada-do-castelo-vicente-de-carvalho|santa-cruz-dos-navegantes|jardim-alvorada-vicente-de-carvalho|jardim-brasil-ii|jardim-santana-vicente-de-carvalho|jardim-santense-vicente-de-carvalho|mare-mansa|paecara')
+        THEN 'SP INTERIOR+LITORAL'
+
+      WHEN regexp_like(url,'sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul|itaim-bibi|parelheiros|brooklin|tatuape|mooca|butanta|tucuruvi|vila-clementino|mandaqui|panamby|itaquera|vila-carrao|planalto-paulista|freguesia-do-o|vila-nova-cachoeirinha|brooklin-paulista|jardim-aricanduva|sacoma|alto-da-lapa|vila-mascote|artur-alvim|analia-franco|brooklin-novo|ermelino-matarazzo|sapopemba|cidade-ademar|guaianazes|sao-miguel-paulista|vila-suzana|bosque-da-saude|chacara-klabin|jardim-das-acacias|chacara-inglesa|parada-inglesa|agua-rasa|parque-bristol|sao-joao-climaco|pari|lauzane-paulista|imirim|vila-regente-feijo|vila-mazzei|vila-buarque|perus|sumarezinho|vila-pompeia|vila-gumercindo|santa-teresinha|campos-eliseos|granja-julieta|belenzinho|vila-ema|cidade-tiradentes|penha-de-franca|jardim-guedala|vila-gustavo|vila-gomes-cardim|vila-da-saude|jardim-analia-franco|jardim-paulistano|parque-mandaqui|vila-guarani-zona-sul|vila-monumento|cupece|alto-da-mooca|vila-dom-pedro-ivila-maria-alta|vila-anastacio|vila-ipojuca|jardim-da-gloria|vila-esperanca|vila-alpina|jardim-vila-mariana|cursino|parque-da-mooca|cidade-patriarca|jardim-da-saude|horto-florestal|vila-cordeiro|vila-constanca|parque-edu-chaves|cidade-lider|jardim-ampliacao|city-america|vila-nova-mazzei|cidade-dutra|vila-santa-clara|vila-isolina-mazzei|jardim-franca|jardim-vila-formosa|vila-dom-pedro-iiitaim-paulista|vila-bertioga|vila-cruzeiro|chacara-belenzinho|vila-albertina|chacara-california|parque-dos-principes|jardim-leonor|ponte-rasa|vila-moraes|vila-guilhermina|vila-nivi|vila-congonhas|jardim-monte-kemel|jardim-das-vertentes|vila-carmosina|jardim-brasil-zona-norte|paraiso-do-morumbi|jardim-peri|vila-moinho-velho|cidade-sao-francisco|vila-antonieta|vila-aricanduva|parque-sao-lucas|jardim-cordeiro|varzea-da-barra-funda|jardim-petropolis|jardim-avelino|vila-irmaos-arnoni|vila-progredior|vila-parque-jabaquara|vila-pauliceia|parque-sao-jorge|parque-jabaquara|chora-menino|chacara-santo-antonio-zona-leste|parque-da-vila-prudente|cidade-mae-do-ceu|vila-gertrudes|itaim|vila-gomes|vila-bela|jardim-iris|chacara-monte-alegre|vila-alexandria|vila-butanta|parque-vitoria|jardim-londrina|quarta-parada|jardim-leonor-mendes-de-barros|vila-mangalot|vila-invernada|vila-santo-estefano|jardim-fonte-do-morumbi|vila-pirituba|parque-boturussu|vila-ester-zona-norte|jardim-caravelas|vila-sofia|colonia-zona-leste|fazenda-morumbi|jardim-cabore|piqueri|jardim-independencia|parque-reboucas|santa-efigenia|jardim-santa-terezinha-zona-leste|jardim-nossa-senhora-do-carmo|vila-brasílio-machado|parque-peruche|jardim-consorcio|carandiru|instituto-de-previdencia|quinta-da-paineira|jardim-umuarama|vila-buenos-aires|vila-nair|jardim-arpoador|vila-amalia-zona-norte|vila-aurora-zona-norte|jardim-paraiso|jardim-esmeralda|jardim-virginia-bianca|vila-nhocune|vila-primavera|vila-campestre|jurubatuba|jardim-textil|jardim-oriental|jardim-japao|casa-verde-alta|cidade-antonio-estevao-de-carvalho|jardim-cidade-pirituba|jardim-das-bandeiras|vila-morumbi|vila-paiva|vila-jacui|jardim-sabara|barro-branco-zona-norte|jardim-olympia|bela-alianca|jardim-boa-vista-zona-oeste|jardim-sao-bento|parque-imperial|vila-pereira-barreto|vila-california|vila-amelia|parque-colonial|vila-lageado|vila-polopoli|vila-palmeiras|alto-do-ipiranga|jardim-parque-morumbi|vila-paulista|vila-zelina|lapa-de-baixo|jardim-peri-peri|vila-indiana|vila-santana|vila-isa|jardim-morumbi|vila-lucia|vila-do-encontro|americanopolis|parque-palmas-do-tremembe|vila-ede|chacara-mafalda|conjunto-residencial-jose-bonifacio|jardim-ester-yolanda|jardim-dom-bosco|jardim-floresta|vila-oratorio|marsilac|vila-romero|morro-dos-ingleses|parque-munhoz|jardim-brasil-zona-sul|paraisopolis|vila-das-belezas|vila-vera|vila-morse|vila-sao-geraldo|chacara-seis-de-outubro|jardim-taquaral|parque-maria-domitila|vila-silvia|caxingui|nossa-senhora-do-o|jardim-sao-saverio|sitio-do-mandaqui|jardim-vazani|sitio-da-figueira|parque-industrial-tomas-edson|vila-jaguara|cidade-vargas|jardim-nordeste|vila-ivone|boacava|jardim-trussardi|jardim-regina|vila-talarico|parque-ipe|vila-pirajussara|caninde|jardim-guapira|vila-nova-curuca|parque-casa-de-pedra|jardim-popular|jardim-vera-cruz|vila-hamburguesa|jardim-maringa|jardim-vergueiro-sacoma|vila-sao-jose-ipiranga|vila-liviero|catumbi|parque-continental|vila-moreira|luz|vila-vermelha|jardim-das-laranjeiras|vila-brasilina|vila-campo-grande|vila-ida|vila-roque|vila-sao-francisco-zona-sul|jardim-luzitania|super-quadra-morumbi|vila-rio-branco|jardim-umarizal|parque-fongaro|usina-piratininga|vila-santa-maria|aricanduva|vila-caraguata|ferreira|parque-residencial-da-lapa|vila-azevedo|jardim-penha|vila-progresso-zona-leste|conjunto-residencial-butanta|vila-sao-silvestre|vila-antonina|jardim-maristela|jardim-colombo|vila-tolstoi|jardim-santo-amaro|jardim-america-da-penha|casa-verde-media|vila-sabrina|vila-siqueira-zona-norte|vila-aurora|vila-sao-jose|vila-mafra|vila-do-bosque|vila-diva-zona-leste|vila-inah|jardim-jussara|jardim-santo-elias|vila-pereira-cerca|conjunto-residencial-vista-verde|vila-santo-estevao|jardim-panorama|vila-penteado|jardim-brasilia-zona-leste|vila-dos-remedios|jardim-aurelia|vila-celeste|vila-maria-baixa|jardim-matarazzo|vila-tramontano|vila-guaca|vila-do-castelo|vila-paranagua|nova-piraju|vila-lais|vila-santa-terezinha-zona-norte|vila-nova-manchester|vila-santa-teresa-zona-leste|parque-cisper|vila-libanesa|vila-canero|vila-zilda|loteamento-city-jaragua|jardim-campo-grande|vila-basileia|vila-guedes|engenheiro-goulart|itaberaba|jardim-maria-estela|jardim-do-lago|vila-deodoro|bortolandia|cidade-sao-mateus|jardim-guanca|vila-clarice|jardim-libano|veleiros|vila-salete|jardim-santa-cruz-sacoma|vila-graciosa|jardim-do-colegio-zona-norte|vila-taquari|jardim-sarah|jardim-previdencia|vila-cruz-das-almas|jardim-santa-maria|jardim-taboao|jardim-angela-zona-leste|vila-dalila|vila-inglesa|vila-beatriz|vila-nilo|paineiras-do-morumbi|jardim-belem|vila-industrial|vila-antonio|jardim-colonial|jardim-rosa-maria|vila-cosmopolita|vila-nova-savoia|vila-zat|carrao|cidade-satelite-santa-barbara|vila-bela-vista-zona-norte|vila-campanela|vila-vitorio-mazzei|jardim-patente-novo|jardim-pedro-jose-nunes|jardim-santa-monica|jardim-jabaquara|jardim-cidalia|jardim-santa-cruz-campo-grande|agua-funda|jardim-tremembe|jardim-d-abril|vila-nova-caledonia|jardim-ubirajara-zona-sul|vila-universitaria|limoeiro|cachoeirinha|jardim-piqueroby|vila-araguaia|vila-castelo|vila-carbone|jardim-guairaca|vila-emir|jardim-mangalot|vila-pierina|jardim-jau-zona-leste|jardim-miriam|jardim-ivana|jardim-catanduva|vila-tiradentes|jardim-mitsutani|retiro-morumbi|jardim-raposo-tavares|vila-nova-carolina|guaiauna|vila-barreto|vila-santa-teresa-zona-sul|jardim-danfer|jardim-palmares-zona-sul|vila-baruel|jardim-tres-marias|jardim-fernandes|parque-savoy-city|jardim-jaragua|vila-bonilha|vila-rui-barbosa|parque-do-morumbi|rolinopolis|vila-mariza-mazzei|jardim-satelite|jardim-vista-linda|vila-marina|jardim-sao-jose-zona-norte|fazenda-aricanduva|vila-rosaria|chacara-itaim|jardim-belgica|vila-costa-melo|jardim-rizzo|vila-euthalia|vila-pedra-branca|vila-sao-francisco-zona-leste|jardim-nove-de-julho|jardim-patente|jardim-pirituba|vila-paulo-silas|vila-souza|jardim-centenario|jardim-pereira-leite|parque-maria-luiza|vila-arapua|jardim-felicidade-zona-oeste|jardim-novo-mundo|vila-brasilandia|jardim-ibitirama|vila-macedopolis|jardim-sapopemba|jardim-sao-joao-jaragua|vila-carioca|jardim-sao-carlos-zona-leste|vila-anhanguera|vila-paulistana|vila-dionisia|vila-gea|jardim-andaraí|jardim-ponte-rasa|jardim-primavera-zona-norte|pirajussara|vila-mira|jardim-norma|vila-bancaria-munhoz|jardim-alvorada-zona-oeste|jardim-marisa|parque-sao-lourenco|vila-ester|vila-mendes|vila-arriete|conjunto-residencial-jardim-canaa|vila-arcadia|vila-fachini|vila-fernandes|vila-nova-parada|vila-ponte-rasa|vila-uniao-zona-leste|jardim-gloria|jardim-sao-francisco-zona-leste|jardim-adutora|chacara-tatuape|jardim-sao-nicolau|vila-agua-funda|jardim-everest|jardim-ibiratiba|jardim-tiete|parque-independencia|sitio-pinheirinho|vila-dalva|jardim-imperador-zona-leste|jardim-lallo|parque-nacoes-unidas|guapira|parque-panamericano|vila-londrina|campininha|jardim-carlu|jardim-helena|parque-esmeralda|vila-pita|colonia-zona-sul|parque-artur-alvim|vila-nova-alba|conjunto-habitacional-padre-manoel-da-nobrega|jardim-imperador-zona-sul|fazenda-da-juta|jardim-adhemar-de-barros|jardim-teresa|jardim-jaqueline|vila-prel|chacara-nossa-senhora-do-bom-conselho|conjunto-habitacional-teotonio-vilela|jardim-marilu|jardim-arize|jardim-casablanca|vila-claudia|conjunto-residencial-santa-terezinha|vila-bancaria|chacara-sao-joao|jardim-eliane|jardim-das-imbuias|siciliano|vila-nova-york|varzea-de-baixo|vila-barbosa|vila-boacava|vila-domitila|vila-babilonia|vila-marte|jardim-helga|parque-monteiro-soares|recanto-campo-belo|jardim-claudia|jardim-germania|parque-fernanda|jardim-do-tiro|rio-bonito|terceira-divisao-de-interlagos|vila-imperio|jardim-santa-cruz-zona-norte|vila-robertina|jardim-viana|vila-carolina|parque-paineiras|cidade-dos-bandeirantes|parque-santa-cecilia|vila-adalgisa|vila-siria|jardim-novo-parelheiros|alto-do-pari|vila-germinal|vila-praia|vila-prado|conjunto-habitacional-santa-etelvina-ii|sitio-morro-grande|jardim-itacolomi|jardim-itatinga|jardim-monjolo|jordanopolis|lajeado|vila-mesquita|vila-princesa-isabel|jardim-helian|cidade-domitila|jardim-da-laranjeira-zona-leste|parque-do-terceiro-lago|vila-olinda|vila-rosa|parque-tomas-saraiva|parque-america|parque-residencial-oratorio|jardim-ernestina|cidade-nova-sao-miguel|jardim-regis|vila-francos|vila-iorio|vila-nova-galvao|conjunto-habitacional-castro-alves|parque-guaianazes|vila-nina|jardim-cotinha|jardim-lajeado|jardim-santo-antoninho|parque-bairro-morumbi|sitio-do-morro|jardim-da-pedreira|vila-bruna|jardim-luisa|jardim-dom-jose|jardim-gilda-maria|vila-cunha-bueno|vila-nova-pauliceia|jardim-brasilia-zona-norte|jardim-ipanema-zona-oeste|jardim-paris|jardim-piratininga|jardim-vila-carrao|jardim-das-flores|parque-alves-de-lima|parque-da-lapa|vila-cleonice|jardim-maria-duarte|jardim-botucatu|jardim-itapeva|vila-nova-das-belezas|cidade-centenario|jardim-dracena|vila-chabilandia|vila-piaui|vila-mirante|parque-paulistano|vila-sao-luis-zona-oeste|jardim-antartica|jardim-sao-jorge-raposo-tavares|vila-comercial|vila-divina-pastora|vila-nossa-senhora-do-retiro|jardim-represa|jardim-sao-jorge|vila-natalia|riviera-paulista|vila-nova|jardim-iracema|conjunto-habitacional-brigadeiro-faria-lima|jardim-novo-taboao|jardim-sao-bernardo|jardim-vergueiro|vila-miriam|vila-plana|vila-socorro|jardim-guarau|vila-espanhola|cidade-continental|jardim-guanhembu|vila-bandeirantes|vila-regina-zona-leste|conjunto-habitacional-fazenda-do-carmo|jardim-casa-pintada|jardim-rodolfo-pirani|jardim-artur-alvim|vila-ivg|vila-sao-jose-cidade-dutra|parque-sevilha|parque-dos-bancarios|jardim-francisco-mendes|vila-cavaton|vila-constancia|vila-diva-zona-norte|conjunto-residencial-sitio-oratorio|parque-ramos-freitas|protendit|vila-carlos-de-campos|cidade-nova-heliopolis|jardim-triana|vila-monte-santo|conjunto-habitacional-inacio-monteiro|jardim-egle|jardim-ipe|jardim-vivan|jardim-das-esmeraldas|vila-darli|vila-lourdes|jardim-novo-santo-amaro|jardim-sao-ricardo|conjunto-habitacional-santa-etelvina-iii|jardim-climax|jardim-joao-xxiii|jardim-maraba|jardim-santa-lucrecia|conjunto-habitacional-padre-manoel-de-paiva|jardim-amaralina|jardim-portal-i-e-ii|jardim-sao-miguel|parque-brasil|parque-sonia|jardim-lideranca|jardim-lisboa|jardim-ubirajara-zona-leste|altos-de-vila-prudente|jardim-hipico|jardim-iva|parque-penha|vila-continental|vila-erna|jardim-cliper|jardim-monte-alegre-zona-norte|jardim-monte-azul|jardim-das-camelias|vila-cardoso-franco|jardim-sao-judas-tadeu|vila-fiat-lux|jardim-guaruja|jardim-sonia-zona-sul|vila-cachoeira|vila-santa-edwiges|chacara-do-encosto|vila-santa-eulalia|jardim-ipanema-zona-sul|jardim-mutinga|jardim-da-campina|parque-arariba|balneario-sao-jose|jardim-macedonia|vila-maria-luisa|vila-santa-virginia|chacara-nossa-senhora-aparecida|chacara-santa-maria|cidade-nitro-operaria|jardim-gonzaga|parque-santa-madalena|parque-santa-rita|jardim-adelfiore|jardim-amalia|jardim-eledy|vila-conde-do-pinhal|conjunto-habitacional-padre-jose-de-anchieta|jardim-santa-fe-zona-sul|parque-anhanguera|vila-romano|vila-serralheiro|capao-do-embira|jardim-das-palmas|parque-regina|vila-franci|vila-natal|chacara-gaivotas|conjunto-promorar-raposo-tavares|jardim-catarina|jardim-icarai|jardim-saude|vila-picinin|conjunto-residencial-pinheirinho|jardim-maraba-zona-sul|jardim-marilia|jardim-guarapiranga|parque-boa-esperanca|vila-santa-delfina|vila-zulmira|jardim-alzira|jardim-bibi|jose-bonifacio|sete-praias|jardim-cachoeira|jardim-cotiana|jardim-cupece|jardim-dona-sinha|jardim-jaragua-sao-domingos|vila-baby|vila-itaim|vila-joaniza|balneario-mar-paulista|jardim-campo-limpo|jardim-sao-vicente|parque-alto-do-rio-bonito|vila-santa-teresinha|conjunto-habitacional-instituto-adventista|jardim-nelia|jardim-de-lorenzo|vila-friburgo|conjunto-habitacional-juscelino-kubitschek|jardim-camargo-novo|jardim-marquesa|vila-conceicao|conjunto-residencial-elisio-teixeira-leite|jardim-bom-refugio|jardim-luanda|nucleo-do-engordador|parque-belem|parque-residencial-cocaia|vila-silva-teles|vila-virginia|conjunto-habitacional-barreira-grande|embura|jardim-bela-vista-zona-sul|jardim-noronha|jardim-paulistano-zona-norte|jardim-das-palmeiras-zona-sul|vila-clara|vila-genioli|vila-roseira-ii|vila-sapopemba|jardim-aurora-zona-leste|jardim-boa-vista-zona-sul|jardim-itapema|jardim-neila|jardim-piracuama|umarizal|vila-ribeiro-de-barros|vila-dos-andradas|cidade-popular|jardim-hercilia|jardim-kioto|jardim-lider|jardim-mariliza|jardim-vaz-de-lima|vila-albano|vila-santa-ines|jardim-britania|jardim-leme|jardim-santa-fe-zona-oeste|jardim-dos-alamos|recanto-paraiso|vila-bonilha-nova|jardim-anhanguera|jardim-eliana|jardim-martins-silva|jardim-vera-cruz-zona-leste|parque-dom-joao-neri|vila-frugoli|vila-santista|cantinho-do-ceu|jardim-belaura|jardim-nice|nucleo-lajeado|vila-jaguari|conjunto-residencial-novo-pacaembu|jardim-laone|jardim-silva-teles|vila-corberi|vila-doutor-eiras|vila-paulistania|chacara-santa-etelvina|cidade-kemel|jardim-guanabara|jardim-joamar|parque-grajau|parque-itaberaba|parque-rodrigues-alves|vila-caiuba|vila-fanton|casa-verde-baixa|chacara-japonesa|chacara-santana|cidade-d-abril|jardim-jua|jardim-maria-rita|jardim-nova-germania|jardim-rincao|jardim-riviera|jardim-tango|jardim-vilas-boas|parque-cocaia|praias-paulistanas|vila-bauab|vila-dona-augusta|vila-hebe|vila-perus|vila-progresso-zona-norte|chacara-santo-amaro|conjunto-habitacional-marechal-mascarenhas-de-morais|jardim-ataliba-leonel|jardim-redil|jardim-santos-dumont|jardim-vale-das-virtudes|jardim-das-camelias-zona-sul|parque-do-castelo|vila-elze|vila-vasconcelos|chacara-jaragua|conjunto-habitacional-sitio-conceicao|conjunto-promorar-sapopemba|jardim-cruzeiro|jardim-edith|jardim-guaianazes|jardim-inga|jardim-morro-verde|jardim-novo-horizonte|santa-etelvina|vila-carmem|vila-margarida|vila-missionaria|balneario-sao-francisco|chacara-meyer|conjunto-habitacional-turistica|jardim-alfredo|jardim-melo|jardim-myrna|jardim-panorama-zona-leste|jardim-picolo|jardim-shangrila-zona-sul|vila-ernesto|vila-herminia|chacara-sao-silvestre|conjunto-habitacional-barro-branco-ii|jardim-bartira|jardim-beatriz|jardim-bela-vista-zona-norte|jardim-caguassu|jardim-maria-virginia|jardim-sertaozinho|jardim-sao-rafael|jardim-varginha|parque-florestal|vila-california-zona-sul|vila-itaberaba|vila-sao-silvestre-zona-leste|jardim-comercial|jardim-felicidade-zona-norte|jardim-iae|jardim-itapura|jardim-silvia-zona-oeste|jardim-universidade-pinheiros|vila-fazzeoni|vila-lisboa|vila-renato-zona-norte|conjunto-residencial-prestes-maia|jardim-alto-alegre-sao-rafael|jardim-gianetti|jardim-hebrom|jardim-lucinda|jardim-sao-roberto|jardim-das-pedras|parque-do-lago|vila-americana|vila-joao-batista|cidade-julia|conjunto-habitacional-jova-rural|conjunto-residencial-ingai|jardim-cecy|jardim-elizabeth|jardim-faria-lima|jardim-iporanga|jardim-ipora|jardim-novo-carrao|jardim-paraguacu|jardim-primavera-zona-sul|jardim-soares|jardim-sao-jose-sao-mateus|parque-planalto|parque-das-flores|vila-amalia-zona-leste|vila-bianca|vila-renato-zona-leste|vila-uniao-zona-norte|conjunto-city-jaragua|engenheiro-marsilac|jardim-belcito|jardim-campinas|jardim-papai-noel|jardim-seckler|jardim-sao-bento-novo|parque-santa-amelia|valo-velho|vila-lucia-elvira|vila-santa-cruz|chacara-vista-alegre|jardim-almeida-prado|jardim-alto-pedroso|jardim-grimaldi|jardim-ipanema-cidade-lider|jardim-sydney|jardim-tua|vila-raquel|vila-reis|chacara-maria-trindade|jardim-almanara|jardim-alpino|jardim-alviverde|jardim-fontalis|jardim-ivone|jardim-martini|jardim-mimar|vila-cisper|vila-cristalia|vila-giordano|vila-yara|vila-dos-andrades|cidade-sao-miguel|conjunto-residencial-morada-do-sol|gleba-do-pessego|jardim-quarto-centenario|jardim-sao-luiz|jardim-do-divino|vila-represa|jardim-angelina|jardim-elisa-maria|jardim-etelvina|jardim-laura|jardim-reimberg|jardim-sao-francisco|parque-taipas|vila-iolanda-ii|vila-zefira|cidade-luz|jardim-campos|jardim-castro-alves|jardim-fanganiello|jardim-filhos-da-terra|jardim-maria-amalia|parque-maria-fernandes|ponte-pequena|praia-da-lagoa|vila-maria-zelia|cantareira|jardim-apura|jardim-avenida|jardim-cristal|jardim-luso|jardim-malia-ii|jardim-niteroi|jardim-porteira-grande|jardim-suzana|jardim-dos-prados|vila-maracana|alto-da-riviera|conjunto-habitacional-a-e-carvalho|jardim-cris|jardim-edi|jardim-flor-de-maio|jardim-perola-ii|jardim-robru|jardim-santa-margarida|jardim-vera-cruz-zona-sul|jardim-yara|morro-grande|vila-homero|flor-da-cantareira|jardim-almeida|jardim-bandeirantes-zona-norte|jardim-capao-redondo|jardim-daysy|jardim-lucelia|jardim-meliunas|jardim-rossin|jardim-samara|parque-residencial-julia|recanto-verde-do-sol|vila-catupia|vila-dona-sara|vila-remo|vila-santo-henrique|vila-teresinha|jardim-alvorada-zona-sul|jardim-aurelio|jardim-maraca|jardim-presidente|jardim-rio-pequeno|jardim-rubilene|jardim-santa-josefina|jardim-sao-joao-zona-norte|jardim-tenani|parque-anhembi|parque-ligia|vila-leme|vila-miami|vila-paulista-i|vila-sao-domingos|borore|casa-grande|conjunto-habitacional-aguia-de-haia|conjunto-residencial-sabara-campo-grande|jardim-aladim|jardim-cambara|jardim-cibele|jardim-figueira-grande|jardim-internacional|jardim-itapolis|jardim-labitary|jardim-mariane|jardim-nadir|jardim-samambaia|jardim-taipas|parque-anhanguera-sao-domingos|parque-tiete|tres-cruzes|vila-chica-luisa|vila-roschel|chacara-cocaia|cidade-ipava|conjunto-habitacional-jardim-sao-bento|conjunto-residencial-alpes-do-jaragua|jardim-capelinha|jardim-carombe|jardim-esmeralda-zona-sul|jardim-fraternidade|jardim-italia|jardim-ondina|jardim-rosana|jardim-selma|jardim-valparaiso|jardim-do-colegio|vila-sao-nicolau|chacara-inglesa-pirituba|iguatemi|itupu|jardim-lucia|jardim-martinica|jardim-monte-belo-raposo-tavares|jardim-santa-etelvina|sitio-represa|sitio-do-piqueri|vila-nelson|conjunto-habitacional-brigadeiro-eduardo-gomes|copacabana|jardim-batalha|jardim-edilene|jardim-haia-do-carrao|jardim-lourdes-zona-sul|jardim-lidia|jardim-rubio|jardim-russo|jardim-santa-terezinha-pedreira|jardim-shangrila-zona-norte|parque-vila-maria|vila-alzira|vila-ayrosa|vila-danubio-azul|vila-dorna|vila-inacio|vila-marcelo|vila-noca|vila-vessoni|chacara-figueira-grande|conjunto-habitacional-parque-valo-velho-ii|conjunto-habitacional-vila-nova-cachoeirinha|jardim-alto-paulistano|jardim-campo-limpo-zona-norte|jardim-damasceno|jardim-imbe|jardim-ipanema-sao-miguel|jardim-irapiranga|jardim-kika|jardim-maia|jardim-marilda|jardim-namba|jardim-remo|jardim-sao-francisco-zona-sul|jardim-da-conquista-zona-leste|jardim-das-rosas-iguatemi|jardim-dos-francos|parque-bologne|vila-anadir|vila-bela-vista-zona-sul|vila-calu|vila-santa-cruz-zona-leste|cipo-do-meio|jardim-alvina|jardim-arizona|jardim-cabucu|jardim-monica|jardim-novo-jau|jardim-oriental-parelheiros|jardim-quisisana-vila-nova-curuca|jardim-roschel|jardim-senice|jardim-tiro-ao-pombo|parque-ibirapuera|parque-lagoa-rica|sitio-barrocada|vila-aparecida|vila-damaceno|vila-heliopolis|vila-iolanda-lajeado|vila-maria-eugenia|vila-marilena|vila-solange|associacao-sobradinho|chacara-do-sol|conjunto-residencial-paraiso|educandario|jardim-bonito|jardim-nakamura|jardim-veronia|jardim-zaira|jardim-das-rosas-zona-sul|parque-amazonas|parque-doroteia|parque-novo-lar|parque-primavera|parque-santo-amaro|vila-alabama|vila-arruda|vila-borges|vila-graziela|vila-nova-jaguare|vila-rubi|conjunto-residencial-salvador-tolezani|fazenda-caguacu|jardim-adalgisa|jardim-cotching|jardim-denise|jardim-herplin|jardim-nelia-iv|jardim-peri-novo|jardim-real|jardim-sabia-ii|jardim-santa-francisca-cabrini|jardim-sonia-inga|jardim-tres-coracoes|jardim-zilda|jardim-das-fontes|jardim-do-centro|jardim-dos-bichinhos|parque-cruzeiro-do-sul-vila-formosa|parque-sao-jose|parque-sao-miguel|parque-do-estado|vila-ana-rosa|vila-guacuri|vila-sampaio|chacara-santo-hubertus|jardim-bandeirante-sao-rafael|jardim-herculano|jardim-marcel|jardim-prainha|jardim-sao-carlos-zona-sul|jardim-sao-joao-guaianazes|jardim-sao-luis-zona-norte|jardim-toca|jardim-da-conquista-zona-oeste|jardim-das-carmelitas|jardim-das-rosas-zona-leste-i|jardim-dos-cataldis|morro-doce|recanto-ana-maria|santa-amelia|sitio-areiao|vila-bela-alianca|vila-caju|vila-gilda|vila-mara|vila-maria-trindade|vila-nova-jaragua|vila-nova-teresa|vila-patrimonial|vila-progresso-zona-sul|vila-quintana|chacara-das-corujas|cidade-nova-america|conjunto-promorar-vila-maria-iii|conjunto-residencial-morumbi|guacuri|jardim-aimore|jardim-capela|jardim-clarice|jardim-florida-paulista|jardim-itatiaia|jardim-jaragua-itaim-paulista|jardim-joana-d-arc|jardim-morais-prado|jardim-premiano|jardim-represa-parelheiros|jardim-vitoria-regia-zona-norte|jardim-wilma-flor|parque-do-otero|praia-azul|uniao-de-vila-nova|vila-alba|vila-minerva|chacara-da-enseada|conjunto-promorar-estrada-da-parada|conjunto-dos-bancarios|jardim-apuana|jardim-arantes|jardim-cruz-do-corisco|jardim-celia-zona-sul|jardim-estrela-d-alva|jardim-heliomar|jardim-heloisa|jardim-moreno|jardim-malia-i|jardim-recanto-do-sol|jardim-s-kemel|jardim-souza|jardim-sao-joao-zona-leste|jardim-sao-luis-zona-leste|jardim-das-pedras-zona-sul|jardim-do-campo|morro-do-indio|parque-deizy|parque-novo-santo-amaro|sitio-botuquara|vila-aimore|vila-augusto|vila-guarani-zona-leste|vila-sirene|vila-dos-palmares|chacara-nani|jardim-beatriz-zona-leste|jardim-cinco-de-julho|jardim-cleide|jardim-edda|jardim-elisio|jardim-guacuri|jardim-irene|jardim-monte-belo|jardim-neide|jardim-nova-vitoria-ii|jardim-pouso-alegre|jardim-perola-i|jardim-rosalina|jardim-santa-edwiges-capela-do-socorro|jardim-santa-edwiges-grajau|jardim-santa-terezinha-parelheiros|jardim-sao-jose-artur-alvim|jardim-sao-joao|jardim-turquesa|parque-malagoli|parque-mandi|parque-residencial-dos-lagos|parque-vila-prudente|parque-das-cerejeiras|praia-do-leblon|residencial-taipas|residencial-vilela|vila-bom-jardim|vila-dinorah|vila-fidalgo|vila-julio-cesar|vila-morro-grande|vila-nilva|vila-seabra|vila-simone|chacara-dona-olivia|condominio-jequitiruba|granja-nossa-senhora-aparecida|jardim-alvorada-zona-norte|jardim-atibaia|jardim-borba-gato|jardim-dinorah|jardim-domitila|jardim-itajai|jardim-kagohara|jardim-leila|jardim-marcelo|jardim-ninho-verde-ii|jardim-nova-vitoria-i|jardim-ramala|jardim-santa-zelia|jardim-somara|jardim-sao-januario|jardim-sao-joao-sao-rafael|jardim-tapera|jardim-thealia|jardim-tupi|jardim-das-oliveiras-zona-sul|vila-gouveia|vila-guaraciaba|vila-malvina|vila-piracicaba|vila-sulina|vila-sao-judas|vila-rosalia|jardim-flor-da-montanha|gopouva|picanco|jardim-santa-mena|jardim-vila-galvao|vila-nova-bonsucesso|agua-chata|parque-continental-ii|parque-renato-maia|jardim-rosa-de-franca|vila-milton|parque-continental-i|vila-endres|vila-das-bandeiras|jardim-cumbica|vila-rio-de-janeiro|jardim-paraventi|portal-dos-gramados|jardim-albertina|jardim-tranquilidade|cidade-parque-alvorada|jardim-aida|cidade-soberana|jardim-guilhermino|jardim-barbosa|vila-bremen|jardim-city|jardim-cocaia|jardim-do-triunfo|jardim-sao-paulo|cidade-industrial-satelite-de-sao-paulo|vila-camargos|cidade-jardim-cumbica|vila-venditti|jardim-iporanga|jardim-ansalca|jardim-terezopolis|jardim-novo-portugal|jardim-dos-pimentas|recreio-sao-jorge|jardim-santa-francisca|cidade-aracilia|vila-itapegica|vila-carmela-i|cidade-tupinamba|cidade-parque-brasilia|residencial-parque-cumbica|vila-pedro-moreira|parque-jurema|cidade-maia|jardim-testae|jardim-ponte-alta-i|vila-tijuco|vila-itapoan|vila-zamataro|jardim-ottawa|parque-industrial-cumbica|jardim-almeida-prado|torres-tibagy|cidade-brasil|jardim-maria-dirce|bosque-maia|cidade-serodio|jardim-nova-taboao|vila-zanardi|vila-hulda|vila-renata|jardim-sao-ricardo|cumbica|jardim-iv-centenario|parque-uirapuru|vila-maranduba|jardim-jovaia|jardim-lenize|jardim-gopouva|jardim-gumercindo|vila-lanzara|jardim-da-mamae|vila-capitao-rabelo|jardim-divinolandia|vila-carmela-ii|jardim-gracinda|vila-imaculada|vila-nova-cumbica|vila-sao-ricardo|jardim-bebedouro|vila-carioca|vila-maricy|parque-mikail|cidade-martins|jardim-eusonia|vila-trabalhista|vila-herminia|chacara-cabucu|jardim-flor-do-campo|jardim-tabatinga|jardim-diogo|jardim-rizzo|jardim-dona-meri|parque-residencial-bambi|vila-melliani|cidade-parque-sao-luiz|vila-tibagi|jardim-acacio|jardim-bananal|jardim-izildinha|conjunto-marcos-freire|mikail-ii|jardim-aerodromo|vila-miriam|vila-sirena|vila-sadokim|itapegica|vila-rachid|parque-continental-iii|jardim-ema|jardim-alamo|conjunto-residencial-paes-de-barros|jardim-guaracy|nova-ponte-alta|chacara-das-lavras|jardim-frizzo|jardim-santa-vicencia|vila-maria-tereza|cidade-nova-bonsucesso|jardim-vermelhao|vila-yaya|jardim-anny|jardim-leda|jardim-marilena|jardim-castanha|jardim-betel|jardim-munira|jardim-scyntila|vila-adelaide-perella|jardim-bondanca|jardim-santa-beatriz|jardim-capri|vila-bom-lar|jardim-giovana|jardim-dos-olivas|jardim-oliveira-ii|residencial-cerconi|chacara-do-vovo|cidade-soimco|jardim-nazaret|vila-francisco-mineiro|vila-monteiro-lobato|jardim-doraly|vila-clotilde|vila-sitio-dos-morros|jardim-hanna|jardim-jade|jardim-vera|vila-cocaia|vila-leda|vila-gopouva|jardim-luciara|jardim-santo-afonso|parque-santo-agostinho|vila-sabatino|conjunto-residencial-haroldo-veloso|jardim-madeirense|jardim-okuyama|vila-bananal|jardim-cristin-alice|jardim-katia|vila-lidio-santana|vila-ristori|conjunto-inocoop-bonsucesso|jardim-oliveira-i|jardim-ponte-alta-ii|parque-continental-iv|varzea-do-palacio|jardim-kawamoto|jardim-tamassia|jardim-das-andorinhas|sitios-de-recreio-rober|jardim-artidoro|jardim-baruch|jardim-sueli|vale-dos-machados|parque-jandaia-ii|vila-cavadas|vila-nova-uniao|jardim-dos-cardoso|parque-industrial-do-jardim-sao-geraldo|residencial-mazzei|jardim-beirute|jardim-dos-afonsos|sitio-dos-britos|jardim-zimbardi|parque-goncalves-junior|vila-saiago|rudge-ramos|baeta-neves|demarchi|dos-casa|alves-dias|ferrazopolis|vila-caminho-do-mar|vila-lusitania|parque-terra-nova-ii|cooperativa|jardim-chacara-inglesa|vila-vivaldi|batistini|jardim-hollywood|parque-terra-nova|parque-selecta-montanhao|vila-dayse|vila-mussolini|parque-espacial|vila-dusi|dos-finco|vila-jerusalem|parque-botujuru|parque-sao-diogo|vila-jordanopolis|jardim-nova-petropolis|vila-marchi|jardim-borborema|vila-euro|jardim-santo-ignacio|jardim-maria-adelaide|jardim-valdibia|vila-alvinopolis|jardim-orlandina|vila-joao-basso|jardim-andrea-demarchi|vila-alvaro-marques|chacara-sergipe|jardim-calux|jardim-paramount|jardim-petroni|vila-damasio|balnearia|jardim-thelma|vila-das-valsas|zanzala|cidade-miramar|jardim-silvina|jardim-das-quatro-marias|vila-mussoline|alto-industrial|vila-santa-angelina|tatetos|jardim-fada|jardim-lauro-gomes|conjunto-residencial-pombeva|jardim-via-anchieta|parque-residencial-tiradentes|vila-quirino-de-lima|jardim-wallace-simonsen|jardim-cantareira|vila-luiz-casa|jardim-da-represa|vila-jupiter|vila-saracatan|jardim-gagliardi|vila-santa-cassia|curucutu|jardim-belita|jardim-joao-de-barro|conjunto-habitacional-franchini|taquacetuba|golden-park|jardim-farina|nova-baeta|vila-dourados|vila-normandia|vila-uras|parque-riacho-grande|vila-claraval|vila-sao-leopoldo|conjunto-residencial-nova-roma|vila-vianas|conjunto-habitacional-sao-fernando|conjunto-habitacional-trevo|conjunto-residencial-brasilia|jardim-nascimento|vila-afonsina|vila-alcantara|vila-danubio|conjunto-residencial-jussara|jardim-detroit|jardim-fei-mizuho|jardim-trieste|vila-suzi|vila-sao-silverio|conjunto-planalto|conjunto-residencial-das-hortencias|jardim-bartira|jardim-saracantan|vila-armando-bondioli|vila-artuelia|vila-duzzi|vila-marininha|vila-netuno|vila-village|chacara-rialto|parque-silvaplana|sitio-jandaia|vila-delmira|vila-esther|vila-sacilotto|vila-curuca|vila-valparaiso|vila-camilopolis|vila-bastos|parque-oratorio|vila-scarpelli|parque-novo-oratorio|vila-gilda|vila-eldizia|vila-homero-thon|vila-principe-de-gales|vila-metalurgica|parque-erasmo-assuncao|jardim-utinga|vila-linda|jardim-santo-alberto|vila-francisco-matarazzo|vila-tibirica|parque-capuava|parque-jacatuba|parque-joao-ramalho|jardim-das-maravilhas|vila-luzita|cidade-sao-jorge|jardim-ocara|vila-lutecia|vila-apiai|vila-guaraciaba|vila-sacadura-cabral|vila-cecilia-maria|parque-gerassi|condominio-maracana|jardim-guarara|vila-aquilino|jardim-alzira-franco|vila-clarice|jardim-marek|jardim-rina|parque-industriario|vila-lea|vila-guarara|jardim-milena|jardim-stetel|cidade-recreio-da-borda-do-campo|jardim-jacatuba|jardim-teles-de-menezes|vila-claudio|vila-amabile-pezzolo|acampamento-anchieta-blocos-c-e-d|vila-vilma|vila-dora|sitio-dos-vianas|jardim-clube-de-campo|sacadura-cabral|parque-miami|parque-andreense|vila-santo-alberto|conjunto-residencial-planeta|sitio-taquaral|jardim-cipreste|vila-lilica|cata-preta|chacara-engenho-da-serra|jardim-santo-antonio-de-padua|jardim-joaquim-eugenio-de-lima|vila-javri|nova-gerty|fundacao') 
+        THEN 'RMSP'
+
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -83,6 +122,19 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -115,6 +167,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -147,6 +212,19 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -179,6 +257,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -211,6 +302,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -243,6 +347,19 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -302,6 +419,19 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -334,6 +464,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -366,6 +509,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -398,6 +554,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -430,6 +599,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -462,6 +644,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -494,6 +689,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -526,6 +734,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -558,6 +779,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -590,6 +824,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -622,6 +869,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -654,6 +914,19 @@ SELECT
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -686,6 +959,19 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -718,6 +1004,19 @@ SELECT DISTINCT -- There are duplicates in the source table
     competition,
     number_of_results,
     keyword_difficulty,
+
+    CASE  
+      WHEN regexp_like(url, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(url, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(url, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(url, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(url, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(url, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(url, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(url, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
+
     dt_display,
     dt_report,
     ts_report,
@@ -907,6 +1206,7 @@ SELECT
   pds.competition,
   pds.number_of_results,
   pds.keyword_difficulty,
+  city_abbreviation,
   CASE WHEN sg.keyword IS NOT NULL 
     THEN TRUE
     ELSE FALSE
