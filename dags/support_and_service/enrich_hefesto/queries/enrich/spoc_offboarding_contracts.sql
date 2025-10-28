@@ -35,4 +35,4 @@ LEFT JOIN
     ON a.email = w.email
 WHERE
   wp.entity_origin IN ('OFFBOARDING', 'OFFBOARDING_PHONE')
-  AND queue_friendly_name = 'CX Off Manager'
+  AND queue_friendly_name IN ('CX Off Manager', 'CX Off Manager WhatsApp')
