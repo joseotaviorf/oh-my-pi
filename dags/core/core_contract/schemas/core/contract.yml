@@ -45,7 +45,7 @@ columns:
 
   # Condominium responsibility
   paying_condo:
-    type: boolean
+    type: string
     required: false
 
   responsible_for_condo:
@@ -54,14 +54,13 @@ columns:
 
   # IPTU responsibility  
   paying_iptu:
-    type: boolean
+    type: string
     required: false
 
   responsible_for_iptu:
     type: string
     required: false
 
-  # Contract details
   signature_type:
     type: string
     required: false
@@ -76,39 +75,39 @@ columns:
 
   # Financial information
   rent:
-    type: decimal
+    type: double
     required: false
 
   iptu:
-    type: decimal
+    type: double
     required: false
 
   rental_guarantee_installment:
-    type: decimal
+    type: int
     required: false
 
   rental_guarantee_value:
-    type: decimal
+    type: double
     required: false
 
   home_insurance_installment:
-    type: decimal
+    type: int
     required: false
 
   home_insurance_value:
-    type: decimal
+    type: double
     required: false
 
   first_rent_comission_fee:
-    type: decimal
+    type: double
     required: false
 
   tenant_service_fee:
-    type: decimal
+    type: double
     required: false
 
   agent_brokerage_share:
-    type: decimal
+    type: double
     required: false
 
   # Contract dates
@@ -126,7 +125,7 @@ columns:
 
   # Contract timestamps
   ts_contract_expected_end:
-    type: timestamp
+    type: date
     required: false
 
   ts_signed:
@@ -134,7 +133,7 @@ columns:
     required: false
 
   ts_expected_termination:
-    type: timestamp
+    type: date
     required: false
 
   ts_minuta_approved:
@@ -147,6 +146,11 @@ columns:
     required: true
 
   ts_updated:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
     type: timestamp
     required: true
 
@@ -164,6 +168,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 36
-max_columns: 36
+min_columns: 37
+max_columns: 37
 strict: true

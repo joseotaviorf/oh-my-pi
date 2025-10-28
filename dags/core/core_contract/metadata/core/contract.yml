@@ -155,18 +155,18 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.dt_termination
     description: Date of the contract's termination.
-  dt_contract_expected_end:
-    lineage:
-      - datalake_ebdb_clean.contract.ts_contract_expected_end
-    description: Date of when the contract is expected to end.
   ts_signed:
     lineage:
       - datalake_ebdb_clean.contract.ts_signed
     description: Timestamp of when the contract was signed.
+  ts_contract_expected_end:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_contract_expected_end
+    description: Date of when the contract is expected to end.
   ts_expected_termination:
     lineage:
       - datalake_ebdb_clean.contract.ts_expected_termination
-    description: Timestamp of when the contract termination is expected.
+    description: Date of when the contract termination is expected.
   ts_minuta_approved:
     lineage:
       - datalake_ebdb_clean.contract.ts_minuta_approved
@@ -179,3 +179,19 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.ts_updated
     description: Timestamp of when the contract was updated.
+  ts_load:
+    lineage:
+      - current_timestamp()
+    description: Timestamp of when the record was loaded into the core model.
+  year:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_created
+    description: Year extracted from ts_created for partitioning.
+  month:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_created
+    description: Month extracted from ts_created for partitioning.
+  day:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_created
+    description: Day extracted from ts_created for partitioning.

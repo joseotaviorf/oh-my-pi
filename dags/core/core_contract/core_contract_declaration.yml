@@ -6,12 +6,22 @@ dag:
     dag_purpose: |
       This is a DAG responsible to create Contract's Core Model
 workflow:
-  type: query_delta
+  type: core_model
   layer: core
-  default_extraction_type: full
+  default_extraction_type: incremental
+  load_spark_job: load_core_contract
   execution_timeout_hours: 1
   tables_customization:
     contract:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
       z_order_by: [id_house]
       table_properties:
         "delta.enableChangeDataFeed": "true"
