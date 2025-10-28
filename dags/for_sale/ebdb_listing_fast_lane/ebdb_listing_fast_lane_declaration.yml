@@ -17,12 +17,10 @@ workflow:
   execution_timeout_hours: 0.5
   tables_customization:
     ImovelListingRelation:
-      custom_schema: ebdb_test
       clean_primary_keys: [id]
       clean_table_name: house_listing_relation
       clean_z_order_by: [id_house]
     ImovelListingRelation_AUD:
-      custom_schema: ebdb_test
       clean_primary_keys: [id_house_listing_relation, rev]
       clean_table_name: house_listing_relation_aud
       clean_z_order_by: [id_house]
@@ -31,7 +29,6 @@ workflow:
       clean_table_name: listing_business_context
       clean_z_order_by: [id_house, status]
     ListingBusinessContext_AUD:
-      custom_schema: ebdb_test
       clean_primary_keys: [id_listing_business_context, rev]
       clean_table_name: listing_business_context_aud
       clean_z_order_by: [id_house, status]

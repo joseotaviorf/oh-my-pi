@@ -17,4 +17,4 @@ SELECT
     criadoEm AS ts_created,
     atualizadoEm AS ts_updated
 FROM
-    datalake_ebdb_test_raw.ImovelListingRelation_AUD
+    datalake_ebdb_raw.ImovelListingRelation_AUD

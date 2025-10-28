@@ -21,12 +21,6 @@ workflow:
       clean_table_name: dynamic_pricing_parameters
     DynamicPricingParameters_AUD:
       clean_table_name: dynamic_pricing_parameters_aud
-    ImovelListingRelation:
-      clean_table_name: house_listing_relation
-    ImovelListingRelation_AUD:
-      clean_table_name: house_listing_relation_aud
-    ListingBusinessContext_AUD:
-      clean_table_name: listing_business_context_aud
     ListingInfo:
       clean_table_name: listing_info
     ListingPerformance:

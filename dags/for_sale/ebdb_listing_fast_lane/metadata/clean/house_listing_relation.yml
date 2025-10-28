@@ -1,4 +1,4 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: house_listing_relation
 description:
   This table manages the relationship between physical properties (houses) and their business configurations (listings),
@@ -8,23 +8,23 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.id
+      - datalake_ebdb_raw.imovellistingrelation.id
     description: Unique identifier for the house-listing relationship record, serving as the primary key for tracking specific relationship instances.
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.imovelid
+      - datalake_ebdb_raw.imovellistingrelation.imovelid
     description: Foreign key reference to the house (Imovel) entity. Links this relationship record to a specific physical property in the system.
   id_listing_business_context:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.listingbusinesscontextid
+      - datalake_ebdb_raw.imovellistingrelation.listingbusinesscontextid
     description: Foreign key reference to the listing business context. Connects the house to a specific listing configuration that defines how the property is presented and managed in the marketplace.
   id_related:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.relatedid
+      - datalake_ebdb_raw.imovellistingrelation.relatedid
     description: Identifier of the related external entity or system. Used to track connections between the house-listing relationship and other systems, integrations or external references. Can be a user ID, a company UUID or a person UUID depending on source_type.
   related_as:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.relatedas
+      - datalake_ebdb_raw.imovellistingrelation.relatedas
     description: Type or nature of the relationship with the external entity. Defines how the property relates to the external system identified by id_related, such as source system role or integration type.
     categories:
       OWNER_AGENT: The entity is an agent representing the property owner.
@@ -35,7 +35,7 @@ columns:
       PROPERTY_OWNER: The entity is the owner of the property listed (house).
   source_type:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.sourcetype
+      - datalake_ebdb_raw.imovellistingrelation.sourcetype
     description: Type or origin of the source system that created or manages this relationship. Indicates whether the entity is a person, user or company.
     categories:
       PERSON_REF: Signals that the entity is from Person system (so id_related is a Person UUID).
@@ -43,16 +43,16 @@ columns:
       COMPANY_REF: Signals that the entity is from Company system (so id_related is a Company UUID).
   house_origin:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.imoveloriginated
+      - datalake_ebdb_raw.imovellistingrelation.imoveloriginated
     description: Indicates the origin of the property (house). Used to track if the property record was created as a result of this relationship or existed independently.
     categories:
       IMOVEL_TABLE: Property originated from the Imovel Table.
       LISTING_RELATION_TABLE: Property originated from the Listing Relation Table.
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.criadoem
+      - datalake_ebdb_raw.imovellistingrelation.criadoem
     description: Timestamp when the house-listing relationship was initially created in the system. Essential for tracking when properties were connected to listing contexts.
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.imovellistingrelation.atualizadoem
+      - datalake_ebdb_raw.imovellistingrelation.atualizadoem
     description: Timestamp of the most recent update to the house-listing relationship, used for tracking data freshness and relationship changes over time.
