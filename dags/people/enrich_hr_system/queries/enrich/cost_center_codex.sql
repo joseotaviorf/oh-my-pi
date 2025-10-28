@@ -147,6 +147,10 @@ SELECT
   NOW() AS ts_load
 FROM
   codex_enrich AS codex
+INNER JOIN
+  datalake_hr_system_clean.organizations AS org
+    ON codex.cost_center_code = org.codigo_dff
+    AND org.classification_code = 'DEPARTMENT'
 LEFT JOIN
   employee_ids_enrich AS emp_id1
     ON codex.owner_l1_email = emp_id1.work_email
@@ -156,6 +160,5 @@ LEFT JOIN
 LEFT JOIN
   employee_ids_enrich AS emp_id3
     ON codex.owner_l3_email = emp_id3.work_email
-LEFT JOIN
-  datalake_hr_system_clean.organizations AS org
-    ON codex.cost_center_code = org.codigo_dff
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY org.codigo_dff ORDER BY org.status, org.ts_last_update DESC) = 1
