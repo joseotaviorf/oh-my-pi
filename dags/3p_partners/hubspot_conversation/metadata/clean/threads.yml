@@ -1,0 +1,82 @@
+---
+database_name: datalake_hubspot_clean
+table_name: threads
+description: |
+  HubSpot conversation threads with inbox, channel and lifecycle information,
+  including latest message timestamps and partition/load fields.
+domain: 3P Partners
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_thread:
+    lineage:
+      - datalake_hubspot_raw.threads.id
+    description: Unique identifier of the thread.
+  id_inbox:
+    lineage:
+      - datalake_hubspot_raw.threads.inboxId
+    description: Associated inbox identifier.
+  id_original_channel:
+    lineage:
+      - datalake_hubspot_raw.threads.originalChannelId
+    description: Original channel identifier.
+  id_original_channel_account:
+    lineage:
+      - datalake_hubspot_raw.threads.originalChannelAccountId
+    description: Original channel account identifier.
+  id_associated_contact:
+    lineage:
+      - datalake_hubspot_raw.threads.associatedContactId
+    description: Associated HubSpot contact identifier, when present.
+  status:
+    lineage:
+      - datalake_hubspot_raw.threads.status
+    description: Current status of the thread.
+  assigned_to:
+    lineage:
+      - datalake_hubspot_raw.threads.assignedTo
+    description: User assigned to the thread.
+  is_spam:
+    lineage:
+      - datalake_hubspot_raw.threads.spam
+    description: Indicates if the thread was flagged as spam.
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.threads.archived
+    description: Indicates if the thread is archived.
+  ts_latest_message_timestamp:
+    lineage:
+      - datalake_hubspot_raw.threads.latestMessageTimestamp
+    description: Timestamp of the latest message in the thread.
+  ts_latest_message_sent_timestamp:
+    lineage:
+      - datalake_hubspot_raw.threads.latestMessageSentTimestamp
+    description: Timestamp when the latest message was sent.
+  ts_latest_message_received_timestamp:
+    lineage:
+      - datalake_hubspot_raw.threads.latestMessageReceivedTimestamp
+    description: Timestamp when the latest message was received.
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.threads.createdAt
+    description: Thread creation timestamp.
+  ts_load:
+    lineage:
+      - datalake_hubspot_raw.threads.ts_load
+    description: Load timestamp captured at ingestion time.
+  year:
+    lineage:
+      - datalake_hubspot_raw.threads.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_hubspot_raw.threads.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_hubspot_raw.threads.day
+    description: Partition day.
+  hour:
+    lineage:
+      - datalake_hubspot_raw.threads.hour
+    description: Partition hour.
+

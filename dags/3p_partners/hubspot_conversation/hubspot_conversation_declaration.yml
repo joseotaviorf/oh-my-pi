@@ -1,0 +1,97 @@
+dag:
+  name: hubspot_conversation
+  schedule_start_date: 2025, 10, 21
+  schedule_interval: 0 21,7,12 * * *
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: |
+      This DAG imports conversation data from HubSpot, including inboxes, threads, and thread messages.
+
+      **Imported Objects:**
+      - **Inboxes**: HubSpot inboxes and their details (name, description, etc.)
+      - **Threads**: HubSpot threads and their details (name, description, etc.)
+      - **Thread Messages**: HubSpot thread messages and their details (content, sender, etc.)
+
+      **Data Strategy:**
+      - Incremental loads using updated_at timestamps for efficient data extraction
+  
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: hubspot
+  load_spark_job: load_hubspot_conversation_raw
+  spark_job_arguments:
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - "hubspot" # custom schema name
+  - "{{ data_interval_start | ts }}"
+  - "{{ data_interval_end | ts }}"
+  - "{table_name}"
+  - "{partitions}"
+  raw_inner_dependencies:
+    threads:
+      - inboxes
+    thread_messages:
+      - threads
+  default_extraction_type: incremental
+  default_partitions: [year, month, day, hour]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_end_date') }}"
+  tables_customization:
+    # table_name: (is the same as the endpoint enum name)
+    #   extra_spark_job_arguments:  
+    #   (dictionary of request config)
+    #   - is_interval_data_filtered: boolean (if true, the data will be filtered by the interval)
+    #     executor_type: str (optional. the type of executor to use. sequential or parallel)
+    #   (dictionary of feedback config)
+    #     feedback_config: (dictionary of feedback config)
+    #       table: str (the table to get the feedback from)
+    #       selected_column: str (the column to get the feedback from)
+    #       feedback_key: str (the key to use for the feedback)
+    #       date_column_filter: str (the column to filter by)
+    #   (dictionary of endpoint params)
+    #   - sort: str (optional. the field to sort by)
+    #     limit: int (optional. the limit of the request)
+    inboxes:
+      extra_spark_job_arguments:
+      - is_interval_data_filtered: false
+        executor_type: thread
+      - limit: 500
+    threads:
+      extra_spark_job_arguments:
+      - is_interval_data_filtered: true
+        executor_type: thread
+        feedback_config:
+          table: datalake_hubspot_raw.inboxes
+          selected_column: id
+          feedback_key: inboxId
+          date_column_filter: ts_load
+          is_only_thread_executor_param: true
+      - sort: latestMessageTimestamp
+        limit: 500
+    thread_messages:
+      extra_spark_job_arguments:
+      - is_interval_data_filtered: false
+        executor_type: thread
+        feedback_config:
+          table: datalake_hubspot_raw.threads
+          selected_column: id
+          feedback_key: threadId
+          date_column_filter: ts_load
+      - limit: 500
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+  - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.3.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new
