@@ -25,5 +25,5 @@ workflow:
       clean_table_name: house_aud
       clean_z_order_by: [id_house]
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster_4_workers
+  type: databricks_16_4_rfleet_instance_cluster_7_workers
   databricks_conn_id: databricks_new
