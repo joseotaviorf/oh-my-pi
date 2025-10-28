@@ -126,7 +126,7 @@ SELECT
   codex.owner_l1_email,
   codex.owner_l2_email,
   codex.owner_l3_email,
-  codex.headcount_type
+  codex.headcount_type,
   CASE
     WHEN org.codigo_dff IS NULL THEN NULL
     ELSE (
