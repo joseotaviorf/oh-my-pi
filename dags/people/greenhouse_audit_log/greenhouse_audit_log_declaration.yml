@@ -1,0 +1,68 @@
+dag:
+  name: greenhouse_audit_log
+  owner: Data People
+  documentation:
+    dag_purpose: |
+      This DAG ingests audit log events from the Greenhouse Audit Log API.
+      Audit log provides a record of important events from the prior thirty days,
+      offering insights into who accessed or edited information in Greenhouse Recruiting.
+  schedule_interval: 0 3 * * *
+
+cluster:
+  type: custom_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+      first_on_demand: 1
+      availability: SPOT_WITH_FALLBACK
+
+workflow:
+  layer: raw
+  has_hive_sync: false
+  type: custom_ingestion
+  default_extraction_type: "incremental"
+  default_partitions: [year, month, day]
+  bucket_config_name: people_bucket
+  load_spark_job: load_greenhouse_audit_log_raw
+  default_table_privileges:
+    people-analytics:
+      - ALL PRIVILEGES
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ data_interval_start | ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+
+  tables_customization:
+
+    events:
+      merge_schema: true
+      extra_spark_job_arguments:
+        - endpoint: "events"
+          date_column_to_partition: "event_time"
+          base_filters:
+            "after_time": "load_start_date"
+            "before_time": "load_end_date"
+            "paging": true
+

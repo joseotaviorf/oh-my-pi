@@ -1,0 +1,76 @@
+database_name: datalake_greenhouse_audit_log_clean
+table_name: events
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Audit log events from Greenhouse Recruiting, providing a record of important events from the prior thirty days.
+  This includes information about who accessed or edited data, what changes were made, and when they occurred.
+  Data sourced from the Greenhouse Audit Log API.
+columns:
+  id_organization:
+    description: The organization's unique Greenhouse Recruiting ID.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.organization_id
+  id_request:
+    description: The ID of the request. A single event may return multiple results that can be linked by this request ID.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.request.id
+  id_performer:
+    description: The Greenhouse Recruiting user ID of the person who performed the change, or the API key if performed via Greenhouse API.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.performer.id
+  id_event_target:
+    description: The ID of the element that was edited or accessed. May be null if the action does not target one particular ID.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.event.target_id
+  request_type:
+    description: The name of the action taken in Greenhouse Recruiting, or the request URL if performed via Harvest API.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.request.type
+  performer_type:
+    description: The type of performer. One of - user, api_key, or greenhouse_internal.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.performer.type
+  performer_ip_address:
+    description: The IP address of the person or integration that performed the change.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.performer.ip_address
+  performer_name:
+    description: The name of the Greenhouse Recruiting user who performed the change.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.performer.meta.name
+  performer_username:
+    description: The email address (username) of the Greenhouse Recruiting user who performed the change, or the exact type of API key that performed the change.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.performer.meta.username
+  event_type:
+    description: The type of event. One of - data_change_update, data_change_create, data_change_destroy, harvest_access, or action.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.event.type
+  event_target_type:
+    description: The resource name for data changes, Harvest access, or the event action type for other actions.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.event.target_type
+  event_meta:
+    description: Event metadata as JSON string. The schema varies by event type and may contain fields such as action, application_id, candidate_id, job_id, and many others depending on the specific action performed. Use JSON parsing functions to extract specific fields as needed.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.event.meta
+  ts_event:
+    description: The exact time of the event in ISO-8601 format.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.event_time
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year extracted from the 'event_time' timestamp, used for partitioning.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.year
+  month:
+    description: The month extracted from the 'event_time' timestamp, used for partitioning.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.month
+  day:
+    description: The day extracted from the 'event_time' timestamp, used for partitioning.
+    lineage:
+      - datalake_greenhouse_audit_log_raw.events.day
+

@@ -1,0 +1,31 @@
+---
+table_name: datalake_greenhouse_audit_log_clean.events
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_organization:
+    is_complete:
+      severity_level: Warning
+  id_request:
+    is_complete:
+      severity_level: Warning
+  id_performer:
+    is_complete:
+      severity_level: Warning
+  event_type:
+    is_complete:
+      severity_level: Warning
+  ts_event:
+    is_complete:
+      severity_level: Warning
+

@@ -167,7 +167,7 @@ class RawLayerLoader:
     def _apply_privileges_to_people_team(self) -> None:
         """Applies specific table privileges for the 'people-analytics' role.
 
-        This method grants `SELECT`, `APPLY TAG`, and `MODIFY` permissions
+        This method grants ALL PRIVILEGES
         on the current table to the 'people-analytics' role."""
 
         table_privileges_dict = {"people-analytics": ["ALL PRIVILEGES"]}
