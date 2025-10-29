@@ -1,6 +1,6 @@
 dag:
   name: knowledge_base
-  schedule_start_date: 2024, 01, 01
+  schedule_start_date: 2025, 10, 01
   schedule_interval: 30 0,3-20 * * *
   owner: Data Conversational XP
   documentation:
@@ -11,15 +11,19 @@ workflow:
   layer: raw
   database_type: postgres
   source_database: knowledge_base
-  lineage_product_database_name: knowledge_base
   custom_schema: knowledge_base
   source_schema: public
   tables_customization:
-    bot_content: {}
-    bot_content_deep_link: {}
-    deep_link: {}
-    meta_information: {}
-    meta_information_bot_content: {}
+    bot_content:
+      clean_primary_keys: [id]
+    bot_content_deep_link:
+      clean_primary_keys: [id_bot_content, id_deep_link]
+    deep_link:
+      clean_primary_keys: [id]
+    meta_information:
+      clean_primary_keys: [id]
+    meta_information_bot_content:
+      clean_primary_keys: [id_meta_information, id_bot_content]
 
 cluster:
   type: custom_cluster
@@ -27,7 +31,7 @@ cluster:
     driver_node_type_id: r7a.xlarge
     node_type_id: r7a.xlarge
     num_workers: 1
-    spark_version: 16.4.x-scala2.12
+    spark_version: 15.4.x-scala2.12
     aws_attributes:
       availability: ON_DEMAND
     spark_conf:
