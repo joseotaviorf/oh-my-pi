@@ -1,5 +1,5 @@
 WITH orchestrator_sessions AS (
-  SELECT DISTINCT
+  SELECT
     cs.id AS id_session,
     cs.id_external AS id_langfuse_session,
     s.id AS id_sauron_session,
@@ -29,6 +29,8 @@ WITH orchestrator_sessions AS (
       ON m.id_session = cs.id
   WHERE
     s.ts_updated >= '{load_start_date}'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY cs.id ORDER BY s.ts_updated DESC) = 1
 ),
 old_bot_sessions AS (
   SELECT
@@ -43,14 +45,21 @@ old_bot_sessions AS (
     ss.ts_updated
   FROM
     datalake_greenseer_clean.session AS gs
-  LEFT JOIN
+  INNER JOIN
     datalake_sauron_clean.session AS ss
       ON ss.id = gs.id_session
+  LEFT JOIN
+    datalake_copilot_service_clean.session AS cs
+      ON cs.id_sauron_session = ss.id
   WHERE
     ss.ts_updated >= '{load_start_date}'
+    AND cs.id_sauron_session IS NULL
     AND ss.source IN ('whatsapp', 'internal_chat')
+    AND gs.id_pipeline IN (
+      'whatsapp', 'whatsapp_main', 'whatsapp_main_legacy', 'mx_whatsapp_main'
+    )
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_started DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY ss.ts_updated DESC) = 1
 ),
 sessions AS (
   SELECT
