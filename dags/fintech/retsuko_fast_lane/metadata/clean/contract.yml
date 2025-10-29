@@ -1,0 +1,92 @@
+---
+database_name: datalake_retsuko_test_clean
+table_name: contract
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Clean layer table containing contract information from SeuBarriga for rental agreements.
+  This table stores contract details including terms, dates, fees, and status information."
+columns:
+  id:
+    description: "Unique contract identifier"
+    lineage:
+      - datalake_retsuko_test_raw.contract.id
+  id_external:
+    description: "External contract identifier from SeuBarriga"
+    lineage:
+      - datalake_retsuko_test_raw.contract.external_id
+  country_code:
+    description: "Country code where the contract is located"
+    lineage:
+      - datalake_retsuko_test_raw.contract.country
+  city:
+    description: "City where the contract is located"
+    lineage:
+      - datalake_retsuko_test_raw.contract.locale
+  version:
+    description: "Contract version"
+    lineage:
+      - datalake_retsuko_test_raw.contract.version
+  guarantee:
+    description: "Guarantee amount for the contract"
+    lineage:
+      - datalake_retsuko_test_raw.contract.guarantee
+  is_b2b:
+    description: "Boolean field indicating if this is a B2B contract"
+    lineage:
+      - datalake_retsuko_test_raw.contract.is_b2b
+  is_rental_paid_in_advance:
+    description: "Boolean field indicating if rental is paid in advance"
+    lineage:
+      - datalake_retsuko_test_raw.contract.is_rental_paid_in_advance
+  status:
+    description: "Contract status"
+    lineage:
+      - datalake_retsuko_test_raw.contract.status
+  blocked:
+    description: "Boolean field that indicates if a contract is blocked to invoice creation"
+    lineage:
+      - datalake_retsuko_test_raw.contract.blocked
+  landlord_transfer_funds_day:
+    description: "Landlord payment day"
+    lineage:
+      - datalake_retsuko_test_raw.contract.landlord_transfer_funds_day
+  landlord_legal_person:
+    description: "Indicates if landlord legal person is physical (PF) or juridical (PJ)"
+    lineage:
+      - datalake_retsuko_test_raw.contract.landlord_legal_person
+  rental_administrator:
+    description: "Rental administrator type"
+    lineage:
+      - datalake_retsuko_test_raw.contract.rental_administrator
+  adm_fee_minimum_amount:
+    description: "The minimum amount for administration fee"
+    lineage:
+      - datalake_retsuko_test_raw.contract.adm_fee_minimum_amount
+  administration_fee:
+    description: "Administratio fee percentage"
+    lineage:
+      - datalake_retsuko_test_raw.contract.administration_fee
+  ts_signature:
+    description: "Timestamp when the contract was signed"
+    lineage:
+      - datalake_retsuko_test_raw.contract.signature_date
+  ts_guarantee_started:
+    description: "Timestamp when the guarantee period started"
+    lineage:
+      - datalake_retsuko_test_raw.contract.guarantee_start_date
+  ts_period_started:
+    description: "Timestamp when the rental period started"
+    lineage:
+      - datalake_retsuko_test_raw.contract.start_period
+  ts_charge_started:
+    description: "Timestamp when charges started"
+    lineage:
+      - datalake_retsuko_test_raw.contract.start_charge
+  ts_charge_ended:
+    description: "Timestamp when charges ended"
+    lineage:
+      - datalake_retsuko_test_raw.contract.end_charge
+  ts_expected_end_charge:
+    description: "Expected contract ended date. It's used to calculate proportional rent charge"
+    lineage:
+      - datalake_retsuko_test_raw.contract.expected_end_charge
