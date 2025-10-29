@@ -4,17 +4,18 @@ dag:
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose: 'Enrich user context events in Amplitude and load into data lake.
-      This DAG enriches amplitude events that come from user login, user created, 
-      and home page visited. Thus, we can track the users initial journey in the app.'
+    dag_purpose:
+      "Enrich user context events in Amplitude and load into data lake.
+      This DAG enriches amplitude events that come from user login, user created,
+      and home page visited. Thus, we can track the users initial journey in the app."
 workflow:
   type: query_delta
   layer: enrich
 cluster:
-  type: databricks_12_2_xmed_io-memory_photon_cluster
+  type: databricks_16_4_xmed_io-memory_photon_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
