@@ -62,12 +62,12 @@ columns:
   frt:
     description: Full Repair Time, calculated as the difference in days between the ticket creation date (ts_created_local) and the ticket solved date (ts_solved_local).
     lineage:
-      - datalake_repairs.repair_tickets.ts_created_local
-      - datalake_repairs.repair_tickets.ts_solved_local
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.ts_solved
   days_to_first_reply:
     description: Number of days it took for the ticket to receive its first reply after creation.
     lineage:
-      - datalake_repairs.repair_tickets.ts_created_local
+      - datalake_zendesk.tickets_current.ts_created
       - datalake_repairs.repair_tickets.custom_fields
   ldt_fr_minutes:
     description: Amount of calendar minutes the ticket took to be replied
@@ -84,7 +84,8 @@ columns:
   is_ongoing:
     description: Indicates whether the repair request is still open (ongoing) or has been closed.
     lineage:
-      - datalake_repairs.repair_tickets.ts_created_local
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.ts_solved
   is_other_responsability:
     description: Binary flag indicating whether the repair responsibility lies with a third-party company.
     lineage:
@@ -164,7 +165,8 @@ columns:
   ts_first_public_comment:
     description: Timestamp of the first public comment.
     lineage:
-      - datalake_zendesk.tickets_current.ts_first_public_comment
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_zendesk.tickets_current.reply_time_min_calendar
   ts_reflux:
     description: Timestamp of the reflux.
     lineage:
@@ -229,15 +231,15 @@ columns:
   ts_created_local:
     description: Timestamp of the ticket creation.
     lineage:
-      - datalake_repairs.repair_tickets.ts_created_local
+      - datalake_zendesk.tickets_current.ts_created
   ts_solved_local:
     description: Timestamp of the ticket solved.
     lineage:
-      - datalake_repairs.repair_tickets.ts_solved_local
+      - datalake_zendesk.tickets_current.ts_solved
   ts_closed_local:
     description: Timestamp of the ticket closed.
     lineage:
-      - datalake_repairs.repair_tickets.ts_closed_local
+      - datalake_zendesk.tickets_current.ts_closed
   ts_updated:
     description: Timestamp of the ticket updated.
     lineage:
