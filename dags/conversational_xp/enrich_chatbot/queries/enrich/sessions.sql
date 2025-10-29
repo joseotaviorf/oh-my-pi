@@ -16,7 +16,7 @@ WITH orchestrator_sessions AS (
     s.department AS first_queue,
     s.source,
     s.source_environment,
-    COALESCE(s.user_data:["user_phone"], cs.user_phone_number) AS user_phone_number,
+    COALESCE(s.user_phone, cs.user_phone_number, s.user_data:["user_phone"]) AS user_phone_number,
     cs.ts_created,
     s.ts_updated
   FROM
@@ -38,7 +38,7 @@ old_bot_sessions AS (
     ss.department AS first_queue,
     ss.source,
     ss.source_environment,
-    ss.user_data:["user_phone"] AS user_phone_number,
+    COALESCE(ss.user_phone, ss.user_data:["user_phone"]) AS user_phone_number,
     ss.ts_created,
     ss.ts_updated
   FROM
@@ -113,8 +113,8 @@ SELECT
     ELSE 'unknown'
   END AS channel,
   CASE
-    WHEN s.source = 'whatsapp' AND s.source_environment = 'default' THEN 'main'
-    WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'other'
+    WHEN s.source = 'whatsapp' AND s.source_environment = 'default' THEN 'main number'
+    WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'others'
     ELSE NULL
   END AS whatsapp_number,
   es.first_queue,

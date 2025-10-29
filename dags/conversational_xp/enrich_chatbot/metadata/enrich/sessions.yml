@@ -12,6 +12,7 @@ columns:
   id_sauron_session:
     description: 'Sauron session ID'
     lineage:
+    - datalake_greenseer_clean.session.id_session
     - datalake_sauron_clean.session.id
   id_langfuse_session:
     description: 'Langfuse session ID (external session ID in Copilot)'
@@ -25,10 +26,12 @@ columns:
     description: 'User ID for the session'
     lineage:
     - datalake_copilot_service_clean.session.id_user
+    - datalake_sauron_clean.session.user_data
   user_phone_number:
     description: 'User phone number associated with the session'
     lineage:
     - datalake_copilot_service_clean.session.user_phone_number
+    - datalake_sauron_clean.session.user_phone
     - datalake_sauron_clean.session.user_data
   bot:
     description: 'Bot persona handling the session'
@@ -54,13 +57,15 @@ columns:
   whatsapp_number:
     description: 'WhatsApp number type (main or other)'
     categories:
-      main: 'Main WhatsApp number'
-      other: 'Other numbers'
+      main number: 'Main WhatsApp number'
+      others: 'Other numbers'
     lineage:
+    - datalake_sauron_clean.session.source
     - datalake_sauron_clean.session.source_environment
   first_queue:
     description: 'First support queue (department)'
     lineage:
+    - datalake_customer_support.tickets.first_queue
     - datalake_sauron_clean.session.department
   last_queue:
     description: 'Last support queue'
@@ -69,7 +74,7 @@ columns:
   is_escalated:
     description: 'True if escalated to support'
     lineage:
-    - datalake_sauron_clean.session.department
+    - datalake_customer_support.tickets.id_ticket
   ts_created:
     description: 'Session creation timestamp'
     lineage:
