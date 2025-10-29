@@ -1,0 +1,31 @@
+---
+database_name: datalake_fintech_order_clean
+table_name: event_info
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: The table EventInfo will be used to ensure idempotency from events on the consumer side and stores events to reprocess without external dependencies.
+columns:
+  id:
+    description: Unique identifier for each event info record
+    lineage:
+      - datalake_fintech_order_raw.event_info.id
+  id_external:
+    description: External identifier for the event info, used for integration with external systems
+    lineage:
+      - datalake_fintech_order_raw.event_info.external_id
+  source:
+    description: Source system or origin of the event info
+    lineage:
+      - datalake_fintech_order_raw.event_info.source
+  event:
+    description: Event type or category associated with the event info
+    lineage:
+      - datalake_fintech_order_raw.event_info.event
+  ts_generated:
+    description: Timestamp when the event info was generated or created in the source system
+    lineage:
+      - datalake_fintech_order_raw.event_info.generated_at
+  ts_created:
+    description: Timestamp when the event info record was created in the database
+    lineage:
+      - datalake_fintech_order_raw.event_info.created_at

@@ -1,0 +1,32 @@
+dag:
+  name: fintech_order
+  schedule_start_date: 2025,10,23
+  schedule_interval: 0 3,8,12 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Data ingestion fintech order into raw layer
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: FINTECH_ORDER_DB
+  lineage_product_database_name: fintech_order
+  tables_customization:
+    order:
+      clean_table_name: order
+    order_item:
+      clean_table_name: order_item
+      transactional_datatype_overrides:
+        amount: decimal(40,20)
+    event_info:
+      clean_table_name: event_info
+cluster:
+  type: databricks_16_4_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

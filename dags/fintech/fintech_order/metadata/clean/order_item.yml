@@ -1,0 +1,43 @@
+---
+database_name: datalake_fintech_order_clean
+table_name: order_item
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Order_item table stores items and information related to financial movement.
+columns:
+  id:
+    description: Unique identifier for each order item record
+    lineage:
+      - datalake_fintech_order_raw.order_item.id
+  id_order:
+    description: Foreign key reference to the order table, linking events to their associated orders
+    lineage:
+      - datalake_fintech_order_raw.order_item.order_id
+  amount:
+    description: Monetary amount associated with the order item
+    lineage:
+      - datalake_fintech_order_raw.order_item.amount
+  metadata:
+    description: Additional metadata and context information for the order item in JSON format
+    lineage:
+      - datalake_fintech_order_raw.order_item.metadata
+  from_actor_account_name:
+    description: Account name of the actor who initiated the order item
+    lineage:
+      - datalake_fintech_order_raw.order_item.from_actor_account_name
+  to_actor_account_name:
+    description: Account name of the actor who is the recipient of the order item
+    lineage:
+      - datalake_fintech_order_raw.order_item.to_actor_account_name
+  dt_accrual:
+    description: Accrual date for the order item, indicating when the order item should be recognized for accounting purposes
+    lineage:
+      - datalake_fintech_order_raw.order_item.accrual_date
+  ts_created:
+    description: Timestamp when the order item record was created
+    lineage:
+      - datalake_fintech_order_raw.order_item.created_at
+  ts_updated:
+    description: Timestamp when the order item record was last updated
+    lineage:
+      - datalake_fintech_order_raw.order_item.updated_at

@@ -1,0 +1,71 @@
+---
+database_name: datalake_fintech_order_clean
+table_name: order
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Order table stores the order's owner and the control dates (important to provide data necessary to group orders and generate the bill).
+columns:
+  id:
+    description: Unique identifier for each order record
+    lineage:
+      - datalake_fintech_order_raw.order.id
+  id_event_info:
+    description: Foreign key reference to the event_info table, linking orders to their associated events
+    lineage:
+      - datalake_fintech_order_raw.order.event_info_id
+  id_ledger_transaction:
+    description: Foreign key reference to the ledger transaction associated with this order
+    lineage:
+      - datalake_fintech_order_raw.order.ledger_transaction_id
+  id_from_actor:
+    description: Identifier of the actor (user, system, etc.) who initiated the order
+    lineage:
+      - datalake_fintech_order_raw.order.from_actor_id
+  id_to_actor:
+    description: Identifier of the actor (user, system, etc.) who is the recipient of the order
+    lineage:
+      - datalake_fintech_order_raw.order.to_actor_id
+  type:
+    description: Type classification of the order (e.g., payment, refund, adjustment)
+    lineage:
+      - datalake_fintech_order_raw.order.type
+  status:
+    description: Current status of the order (e.g., pending, completed, failed, cancelled)
+    lineage:
+      - datalake_fintech_order_raw.order.status
+  currency:
+    description: Currency code for the order amount (e.g., BRL, USD)
+    lineage:
+      - datalake_fintech_order_raw.order.currency
+  metadata:
+    description: Additional metadata and context information for the order in JSON format
+    lineage:
+      - datalake_fintech_order_raw.order.metadata
+  from_actor_role:
+    description: Role or type of the actor who initiated the order
+    lineage:
+      - datalake_fintech_order_raw.order.from_actor_role
+  from_actor_account_name:
+    description: Account name associated with the actor who initiated the order
+    lineage:
+      - datalake_fintech_order_raw.order.from_actor_account_name
+  to_actor_role:
+    description: Role or type of the actor who is the recipient of the order
+    lineage:
+      - datalake_fintech_order_raw.order.to_actor_role
+  to_actor_account_name:
+    description: Account name associated with the actor who is the recipient of the order
+    lineage:
+      - datalake_fintech_order_raw.order.to_actor_account_name
+  dt_due:
+    description: Due date for the order completion or fulfillment
+    lineage:
+      - datalake_fintech_order_raw.order.due_date
+  ts_created:
+    description: Timestamp when the order was created
+    lineage:
+      - datalake_fintech_order_raw.order.created_at
+  ts_updated:
+    description: Timestamp when the order was last updated
+    lineage:
+      - datalake_fintech_order_raw.order.updated_at
