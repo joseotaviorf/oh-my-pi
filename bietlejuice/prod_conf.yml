@@ -745,6 +745,14 @@ databricks_13_3_med_mem_driver_min_memory_2_nodes_photon_cluster:
     num_workers: 2
     spark_version: 13.3.x-scala2.12
 
+databricks_16_4_med_mem_driver_min_memory_2_nodes_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
 databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5d.2xlarge
