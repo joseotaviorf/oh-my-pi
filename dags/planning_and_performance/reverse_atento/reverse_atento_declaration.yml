@@ -9,6 +9,7 @@ workflow:
   type: load
   layer: reverse
   custom_schema: atento
+  bucket_config_name: 5a-dataops-prod
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
   execution_timeout_hours: 4
