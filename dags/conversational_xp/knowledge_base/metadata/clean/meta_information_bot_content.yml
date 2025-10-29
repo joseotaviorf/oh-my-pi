@@ -1,0 +1,20 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: meta_information_bot_content
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores the relationship between meta information and bot content"
+columns:
+  id_meta_information:
+    description: "The meta information identifier (foreign key to meta_information)"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information_bot_content.meta_information_id
+  id_bot_content:
+    description: "The bot content identifier (foreign key to bot_content)"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information_bot_content.bot_content_id
+  bot_content_order:
+    description: "The order of the bot content for the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information_bot_content.bot_content_order
+  

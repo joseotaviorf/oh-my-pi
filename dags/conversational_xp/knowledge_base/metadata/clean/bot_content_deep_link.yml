@@ -1,0 +1,20 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: bot_content_deep_link
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores the relationship between bot content and deep links"
+columns:
+  id_bot_content:
+    description: "The bot content identifier (foreign key to bot_content)"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content_deep_link.bot_content_id
+  id_deep_link:
+    description: "The deep link identifier (foreign key to deep_link)"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content_deep_link.deep_link_id
+  deep_link_order:
+    description: "The order of the deep link for the bot content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content_deep_link.deep_link_order
+  

@@ -1,0 +1,44 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: deep_link
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores deep link information from the knowledge-base service"
+columns:
+  id:
+    description: "The deep link identifier"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.id
+  id_content:
+    description: "The content identifier"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.content_id
+  title:
+    description: "The title of the deep link"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.title
+  label:
+    description: "The label of the deep link"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.label
+  link:
+    description: "The URL or link content"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.link
+  description:
+    description: "The description of the deep link"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.description
+  status:
+    description: "The status of the deep link"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.status
+  ts_updated:
+    description: "The timestamp when the deep link was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.updated_at
+  ts_created:
+    description: "The timestamp when the deep link was created"
+    lineage:
+    - datalake_knowledge_base_raw.deep_link.created_at
+  

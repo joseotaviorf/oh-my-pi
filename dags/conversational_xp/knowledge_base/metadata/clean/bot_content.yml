@@ -1,0 +1,64 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: bot_content
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores bot content information from the knowledge-base service"
+columns:
+  id:
+    description: "The bot content identifier"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.id
+  id_content:
+    description: "The content identifier"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.content_id
+  title:
+    description: "The title of the bot content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.title
+  country:
+    description: "JSON field containing country information"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.country
+  customer_type:
+    description: "JSON field containing customer type information"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.customer_type
+  bot_tags:
+    description: "JSON field containing bot tags"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.bot_tags
+  web_content:
+    description: "JSON field containing web content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.web_content
+  app_content:
+    description: "JSON field containing app content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.app_content
+  questions:
+    description: "Questions associated with the bot content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.questions
+  status:
+    description: "The status of the bot content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.status
+  department_front:
+    description: "Front department associated with the content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.department_front
+  department_back:
+    description: "Back department associated with the content"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.department_back
+  ts_updated:
+    description: "The timestamp when the content was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.updated_at
+  ts_created:
+    description: "The timestamp when the content was created"
+    lineage:
+    - datalake_knowledge_base_raw.bot_content.created_at
+  

@@ -1,0 +1,52 @@
+---
+database_name: datalake_knowledge_base_clean
+table_name: meta_information
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores meta information from the knowledge-base service"
+columns:
+  id:
+    description: "The meta information identifier"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.id
+  id_content:
+    description: "The content identifier"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.content_id
+  theme:
+    description: "The theme of the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.theme
+  product:
+    description: "The product associated with the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.product
+  journey:
+    description: "The journey associated with the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.journey
+  tags:
+    description: "JSON field containing tags"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.tags
+  status:
+    description: "The status of the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.status
+  department_front:
+    description: "Front department associated with the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.department_front
+  department_back:
+    description: "Back department associated with the meta information"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.department_back
+  ts_updated:
+    description: "The timestamp when the meta information was last updated"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.updated_at
+  ts_created:
+    description: "The timestamp when the meta information was created"
+    lineage:
+    - datalake_knowledge_base_raw.meta_information.created_at
+  
