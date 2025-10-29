@@ -73,12 +73,15 @@ workflow:
             "filter[added_before]": "load_end_date"
             "limit": "1000"
     content:
-      extraction_type: full
+      extraction_type: incremental
+      merge_on: ["id"]
       extra_spark_job_arguments:
         - scope: "content:read"
           base_filters:
             "filter[include_restricted]": "true"
             "limit": "100"
+            "filter[modified_before]": "load_start_date"
+            "filter[modified_after]": "load_end_date"
     custom_attributes:
       extraction_type: full
       extra_spark_job_arguments:

@@ -24,3 +24,5 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_degreed_raw.content
+WHERE 
+    DATE(attributes.modified_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
