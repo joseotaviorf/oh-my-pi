@@ -42,6 +42,33 @@ def _normalize_schema(schema: StructType) -> StructType:
         fields.append(StructField(name, dtype, field.nullable))
     return StructType(fields)
 
+def _normalize_nested_structs(df):
+    """
+    Converts complex columns:
+    - STRUCT → STRING (JSON)
+    - ARRAY<STRUCT> → ARRAY<STRING> (JSON by element)
+    Keeps other types unchanged.
+    """
+    for field in df.schema.fields:
+        dtype = field.dataType
+        
+        # STRUCT to STRING
+        if isinstance(dtype, StructType):
+            df = df.withColumn(field.name, F.to_json(F.col(field.name)))
+        
+        # ARRAY<STRUCT> to ARRAY<STRING>
+        elif isinstance(dtype, ArrayType) and isinstance(dtype.elementType, StructType):
+            df = df.withColumn(
+                field.name,
+                F.expr(f"transform({field.name}, x -> to_json(x))")
+            )
+        
+        # MAP to STRING (optional)
+        elif hasattr(dtype, "keyType"):
+            df = df.withColumn(field.name, F.to_json(F.col(field.name)))
+            
+    return df
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
@@ -160,6 +187,7 @@ if __name__ == "__main__":
 
         new_schema = _normalize_schema(df.schema)
         df = spark_client.create_dataframe(df.rdd, schema=new_schema)
+        df = _normalize_nested_structs(df)
 
         df = (
             df.withColumn("ts_load", F.lit(ts_interval_start))
