@@ -1,7 +1,9 @@
 SELECT
   id,
+  CAST(installerId AS BIGINT) AS id_installer,
   installer,
   installerName AS installer_name,
+  installerRc AS installer_rc,
   plate,
   property,
   transactionType AS transaction_type,

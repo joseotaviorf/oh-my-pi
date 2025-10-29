@@ -8,6 +8,10 @@ columns:
     description: Unique identifier for the activation record
     lineage:
       - datalake_quires_raw.activations.id
+  id_installer:
+    description: Installer ID
+    lineage:
+      - datalake_quires_raw.activations.installerId
   installer:
     description: Installer identifier
     lineage:
@@ -16,6 +20,10 @@ columns:
     description: Name of the installer
     lineage:
       - datalake_quires_raw.activations.installerName
+  installer_rc:
+    description: Installer RC identifier
+    lineage:
+      - datalake_quires_raw.activations.installerRc
   plate:
     description: Plate information associated with the activation record
     lineage:
