@@ -10,4 +10,5 @@ SELECT
   department_back,
   updated_at AS ts_updated,
   created_at AS ts_created
-FROM datalake_knowledge_base_raw.meta_information
+FROM
+  datalake_knowledge_base_raw.meta_information
