@@ -19,7 +19,7 @@ workflow:
     order_item:
       clean_table_name: order_item
       transactional_datatype_overrides:
-        amount: decimal(40,20)
+        amount: decimal(38,20)
     event_info:
       clean_table_name: event_info
 cluster:
