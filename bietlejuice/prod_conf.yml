@@ -72,6 +72,7 @@ datalake_bucket: 5a-datalake-prod
 incoming_bucket: 5a-datalake-incoming-prod
 doc_md_chart_url: https://n2065e18540524a1cp-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
 dw_bucket: 5a-dw-prod
+planning_and_performance_bucket: 5a-dataops-prod
 people_bucket: people-s3-data-quintoandar-com-br
 union_bucket: ingestao-dados-union/union
 analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
