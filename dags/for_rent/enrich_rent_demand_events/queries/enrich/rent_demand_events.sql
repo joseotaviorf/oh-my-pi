@@ -762,6 +762,7 @@ SELECT DISTINCT
   rde.id_visit,
   rde.id_offer,
   rde.id_proposal,
+  rde.id_advance_payment,
   rde.id_contract,
   rde.id_event_type,
   rde.id_client AS id_tenant_prospect,
