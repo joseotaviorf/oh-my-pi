@@ -6,7 +6,7 @@ WITH orchestrator_sessions AS (
     cs.id_user,
     CASE
       WHEN m.channel = 'WHATSAPP_SONIA_CHAT' THEN 'sonia'
-      WHEN m.channel = 'IN_APP_SUPPORT_CHAT' THEN 'wall-e'
+      WHEN m.channel IN ('IN_APP_SUPPORT_CHAT', 'WHATSAPP_SUPPORT_CHAT') THEN 'wall-e'
       WHEN m.channel IN ('WHATSAPP_ISAIAS_CHAT', 'WHATSAPP_ISAIAS_MAIN_CHAT') THEN 'isaias'
       WHEN m.channel = 'WHATSAPP_MATTHEW_CHAT' THEN 'matthew'
       WHEN m.channel = 'WHATSAPP_CONCIERGE_CHAT' THEN 'concierge'
