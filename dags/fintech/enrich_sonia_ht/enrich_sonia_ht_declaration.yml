@@ -2,11 +2,11 @@
 dag:
   name: enrich_sonia_ht
   owner: Data Fintech
-  schedule_interval: "30 11,20 * * *"
+  schedule_interval: "30 10,14,16,19 * * *"
   documentation:
     dag_purpose: |
       This DAG creates the enriched tables for the HighTouch data source.
-      It runs twice a day to keep the dataset up to date for downstream processes.
+      It runs many times a day to keep the dataset up to date for downstream processes.
 workflow:
   type: query_delta
   layer: enrich
