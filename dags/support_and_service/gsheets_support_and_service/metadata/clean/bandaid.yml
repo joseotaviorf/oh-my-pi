@@ -1,91 +1,127 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: bandaid
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+description: Table with information about Bandaid tickets.
 columns:
   key:
     lineage:
       - datalake_gsheets_raw.bandaid.chave
+    description: Key of the Bandaid process.
   id_contract:
     lineage:
       - datalake_gsheets_raw.bandaid.contrato
+    description: ID of the contract.
   id_house:
     lineage:
       - datalake_gsheets_raw.bandaid.id_imovel
+    description: ID of the house.
   id_jira_analysis:
     lineage:
       - datalake_gsheets_raw.bandaid.id_analise_jira
+    description: ID of the Jira analysis.
   value:
     lineage:
       - datalake_gsheets_raw.bandaid.valor
+    description: Value of the Bandaid process.
   status:
     lineage:
       - datalake_gsheets_raw.bandaid.status
+    description: Status of the Bandaid process.
   type:
     lineage:
       - datalake_gsheets_raw.bandaid.tipo
+    description: Type of the Bandaid process.
   department:
     lineage:
       - datalake_gsheets_raw.bandaid.departamento
+    description: Department of the Bandaid process.
   requester:
     lineage:
       - datalake_gsheets_raw.bandaid.solicitante
+    description: Requester of the Bandaid process.
   requester_email:
     lineage:
       - datalake_gsheets_raw.bandaid.email_solicitante
+    description: Email of the requester.
   client_email:
     lineage:
       - datalake_gsheets_raw.bandaid.email_cliente
+    description: Email of the client.
   beneficiary:
     lineage:
       - datalake_gsheets_raw.bandaid.beneficiario
+    description: Beneficiary of the Bandaid process.
   case_summary:
     lineage:
       - datalake_gsheets_raw.bandaid.resumo_do_caso
+    description: Summary of the Bandaid process.
   jira_responsible:
     lineage:
-      - datalake_gsheets_raw.bandaid.responsavel_jira
+      - datalake_gsheets_raw.bandaid.responsavel_jira 
+    description: Responsible for the process in Jira.
   jira_analysis_date:
     lineage:
       - datalake_gsheets_raw.bandaid.data_analise_jira
+    description: Date of the Jira analysis.
   approver:
     lineage:
       - datalake_gsheets_raw.bandaid.aprovador
+    description: Approver of the Bandaid process.
   request_type:
     lineage:
       - datalake_gsheets_raw.bandaid.tipo_solicitacao
+    description: Type of the request.
   category:
     lineage:
       - datalake_gsheets_raw.bandaid.categoria
+    description: Category of the Bandaid process.
   classification:
     lineage:
       - datalake_gsheets_raw.bandaid.classificacao
+    description: Classification of the Bandaid process.
   reason:
     lineage:
       - datalake_gsheets_raw.bandaid.motivo
+    description: Reason of the Bandaid process.
   comment:
     lineage:
       - datalake_gsheets_raw.bandaid.comentario
+    description: Comment of the Bandaid process.
   specific_action_tag:
     lineage:
       - datalake_gsheets_raw.bandaid.tag_acao_especifica
+    description: Specific action tag of the Bandaid process.
   error_analyst_email:
     lineage:
       - datalake_gsheets_raw.bandaid.email_analista_erro
+    description: Email of the error analyst.
   bpo:
     lineage:
       - datalake_gsheets_raw.bandaid.bpo
+    description: BPO of the Bandaid process.
   rejection_reason:
     lineage:
       - datalake_gsheets_raw.bandaid.motivo_reprovacao
+    description: Reason of the rejection.
   system_process_name:
     lineage:
       - datalake_gsheets_raw.bandaid.nome_do_processo_sistema
+    description: Process name in the bandaid system.
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.bandaid.tkt_zendesk
+    description: ID of the ticket in Zendesk.
   created_at:
     lineage:
       - datalake_gsheets_raw.bandaid.criado
+    description: Date of the creation of the Bandaid process.
   updated_at:
     lineage:
       - datalake_gsheets_raw.bandaid.atualizadoa
+    description: Date of the update of the Bandaid process.
   ts_load:
     lineage:
       - datalake_gsheets_raw.bandaid.ts_load
+    description: Timestamp load.

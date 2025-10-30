@@ -27,6 +27,7 @@ SELECT
     data_analise_jira AS jira_analysis_date,
     criado AS created_at,
     atualizadoa AS updated_at,
+    IF(tkt_zendesk = '', NULL, tkt_zendesk) AS id_ticket,
     ts_load
 FROM
     datalake_gsheets_raw.bandaid
