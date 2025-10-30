@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class QueryViewCreatorPipeline(AbstractPipeline):
     """
-    Pipeline responsible for creating views on both Databricks and Trino.
+    Pipeline responsible for creating views on Databricks and optionally on Trino.
     This pipeline creates non-materialized views that are automatically overwritten on every execution.
     """
 
@@ -34,6 +34,7 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         env: str = None,
         spark=None,
         table_privileges: TablePrivileges = None,
+        has_hive_sync: bool = False,
     ):
         """
         :param database_name: database name to create the view
@@ -45,6 +46,7 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         :param env: environment (forno/prod)
         :param spark: Spark session object
         :param table_privileges: TablePrivileges object to apply view privileges after creation
+        :param has_hive_sync: whether to create the view on Trino (default: False)
         """
         self.database_name = database_name
         self.view_name = view_name
@@ -55,10 +57,11 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         self.env = env
         self.spark = spark
         self.table_privileges = table_privileges
+        self.has_hive_sync = has_hive_sync
 
     def run(self):
         """
-        Creates views on both Databricks and Trino based on the provided SQL query.
+        Creates views on Databricks and optionally on Trino based on the provided SQL query.
         The views are automatically overwritten if they already exist.
         """
         spark_client = SparkClient()
@@ -66,7 +69,8 @@ class QueryViewCreatorPipeline(AbstractPipeline):
 
         self._create_databricks_view(spark_client, formatted_query)
 
-        self._create_trino_view(formatted_query)
+        if self.has_hive_sync:
+            self._create_trino_view(formatted_query)
 
         if (
             self.table_privileges
@@ -74,9 +78,13 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         ):
             self.table_privileges.apply()
 
+        views_created = ["Databricks"]
+        if self.has_hive_sync:
+            views_created.append("Trino")
+
         logger.info(
             f"Successfully created view {self.database_name}.{self.view_name} "
-            f"on both Databricks and Trino"
+            f"on {', '.join(views_created)}"
         )
 
     def _create_databricks_database(self, spark_client: SparkClient):

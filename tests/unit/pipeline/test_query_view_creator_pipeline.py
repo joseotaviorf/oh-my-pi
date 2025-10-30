@@ -40,6 +40,7 @@ class TestQueryViewCreatorPipeline:
             env="test",
             spark=None,
             table_privileges=None,
+            has_hive_sync=False,  # Explicitly set to False for testing
         )
 
     def test_init_with_defaults(self):
@@ -77,6 +78,37 @@ class TestQueryViewCreatorPipeline:
                 mock_spark_client_instance,
                 "SELECT * FROM source_table WHERE param = 'value1'",
             )
+            # With has_hive_sync=False, the Trino view should not be created
+            mock_create_trino.assert_not_called()
+
+    def test_run_creates_trino_view_when_enabled(self, mock_spark_client):
+        # Arrange
+        pipeline = QueryViewCreatorPipeline(
+            database_name="test_db",
+            view_name="test_view",
+            layer="enrich",
+            query="SELECT * FROM source_table WHERE param = '{param1}'",
+            query_template_params={"param1": "value1"},
+            has_hive_sync=True,  # Enable Trino view creation
+        )
+        mock_spark_client_instance = mock.MagicMock()
+        mock_spark_client.return_value = mock_spark_client_instance
+
+        with mock.patch.object(
+            pipeline, "_create_databricks_view"
+        ) as mock_create_databricks, mock.patch.object(
+            pipeline, "_create_trino_view"
+        ) as mock_create_trino:
+
+            # Act
+            pipeline.run()
+
+            # Assert
+            mock_create_databricks.assert_called_once_with(
+                mock_spark_client_instance,
+                "SELECT * FROM source_table WHERE param = 'value1'",
+            )
+            # With has_hive_sync=True, the Trino view should be created
             mock_create_trino.assert_called_once_with(
                 "SELECT * FROM source_table WHERE param = 'value1'"
             )
@@ -213,9 +245,7 @@ class TestQueryViewCreatorPipeline:
         mock_spark_client_instance = mock.MagicMock()
         mock_spark_client.return_value = mock_spark_client_instance
 
-        with mock.patch.object(pipeline, "_create_databricks_view"), mock.patch.object(
-            pipeline, "_create_trino_view"
-        ):
+        with mock.patch.object(pipeline, "_create_databricks_view"):
 
             # Act
             pipeline.run()

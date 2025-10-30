@@ -8,7 +8,6 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.pipeline.query_view_creator_pipeline import QueryViewCreatorPipeline
 
 JOB_NAME = "create_query_view"
@@ -20,12 +19,10 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket", type=str, help="datalake bucket")
-    parser.add_argument("layer", type=str, help="layer where the view will be created (dw/enrich)")
     parser.add_argument(
-        "schema",
-        type=str,
-        help="schema name for the view",
+        "layer", type=str, help="layer where the view will be created (dw/enrich)"
     )
+    parser.add_argument("schema", type=str, help="schema name for the view")
     parser.add_argument(
         "relative_query_path",
         type=str,
@@ -39,9 +36,7 @@ if __name__ == "__main__":
         help="custom config parameters to be set in spark session",
     )
     parser.add_argument(
-        "extra_query_template_params",
-        type=str,
-        help="extra query template parameters",
+        "extra_query_template_params", type=str, help="extra query template parameters"
     )
     parser.add_argument("execution_date_2", help="second execution date parameter")
     parser.add_argument(
@@ -49,7 +44,15 @@ if __name__ == "__main__":
         type=str,
         help="json string mapping each principal to a list of permissions for the view",
         required=False,
-        dest="table_privileges"
+        dest="table_privileges",
+    )
+    parser.add_argument(
+        "--has-hive-sync",
+        type=str,
+        default="false",
+        help="whether to create the view on Trino (default: false)",
+        required=False,
+        dest="has_hive_sync",
     )
 
     args = parser.parse_args()
@@ -58,6 +61,11 @@ if __name__ == "__main__":
         table_privileges_dict = json.loads(args.table_privileges)
     else:
         table_privileges_dict = None
+
+    # Parse create_trino_view flag
+    has_hive_sync = (
+        args.has_hive_sync.lower() == "true" if args.has_hive_sync else False
+    )
 
     env = args.env
     datalake_bucket = args.datalake_bucket
@@ -75,10 +83,14 @@ if __name__ == "__main__":
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
         + f"schema={schema}, table_name={table_name}, "
         + f"relative_query_path={relative_query_path}, "
+        + f"execution_date={execution_date}, "
+        + f"has_hive_sync={has_hive_sync}, "
         + f"msg=Job execution started"
     )
 
-    metastore_mapping = MetastoreMappingFactory.get_mapper_by_layer(LayerEnum(layer), schema, datalake_bucket)
+    metastore_mapping = MetastoreMappingFactory.get_mapper_by_layer(
+        LayerEnum(layer), schema, datalake_bucket
+    )
     database_name = metastore_mapping.get_full_database_name(LayerEnum(layer))
 
     if table_privileges_dict is not None:
@@ -86,7 +98,9 @@ if __name__ == "__main__":
             table_privileges_dict, f"{database_name}.{table_name}"
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default_for_view(f"{database_name}.{table_name}")
+        table_privileges = TablePrivileges.from_environment_default_for_view(
+            f"{database_name}.{table_name}"
+        )
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=relative_query_path,
@@ -103,8 +117,9 @@ if __name__ == "__main__":
         query_template_params=query_template_params,
         spark_session_configs=spark_session_configs,
         env=env,
-        spark=spark,
+        spark=None,  # spark parameter is not used in the pipeline
         table_privileges=table_privileges,
+        has_hive_sync=has_hive_sync,
     )
 
     query_view_creator_pipeline.run()

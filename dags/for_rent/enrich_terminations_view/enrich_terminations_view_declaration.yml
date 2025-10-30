@@ -5,6 +5,7 @@ dag:
 workflow:
   type: query_view
   layer: enrich
+  has_hive_sync: true
 cluster:
   type: databricks_16_4_min_general_cluster
   access_control_list:
