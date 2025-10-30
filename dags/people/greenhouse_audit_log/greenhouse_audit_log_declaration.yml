@@ -37,6 +37,7 @@ workflow:
   default_partitions: [year, month, day]
   bucket_config_name: people_bucket
   load_spark_job: load_greenhouse_audit_log_raw
+  execution_timeout_hours: 3
   default_table_privileges:
     people-analytics:
       - ALL PRIVILEGES

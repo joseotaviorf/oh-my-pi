@@ -26,6 +26,7 @@ class BaseAPIClient:
         common_headers: Optional[dict] = None,
         timeout: int = 30,
         max_retries: int = 3,
+        min_remaining_threshold: int = 5,
     ):
         self.base_url = base_url
         self.session = requests.Session()
@@ -38,7 +39,9 @@ class BaseAPIClient:
             allowed_methods=["HEAD", "GET", "OPTIONS"],
             backoff_factor=1,
         )
-        adapter = HeaderRateLimitAdapter(max_retries=retry_strategy)
+        adapter = HeaderRateLimitAdapter(
+            max_retries=retry_strategy, min_remaining_threshold=min_remaining_threshold
+        )
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
 

@@ -60,7 +60,7 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                 - load_start_date (str): Start date for filtering (YYYY-MM-DD)
                 - load_end_date (str): End date for filtering (YYYY-MM-DD)
         """
-        super().__init__(base_url=API_BASE_URL)
+        super().__init__(base_url=API_BASE_URL, min_remaining_threshold=1)
 
         self.endpoint = job_args.get("endpoint")
         base_filters = job_args.get("base_filters", {})
