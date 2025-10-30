@@ -19,9 +19,6 @@ column_level_validations:
   id_request:
     is_complete:
       severity_level: Warning
-  id_performer:
-    is_complete:
-      severity_level: Warning
   event_type:
     is_complete:
       severity_level: Warning
