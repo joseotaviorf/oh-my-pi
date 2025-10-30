@@ -138,6 +138,10 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
             else:
                 self.params[key] = value
         
+        if "paging" not in self.params:
+            LOGGER.warning("Parameter 'paging' not found in filters. Adding 'paging=true' to enable pagination.")
+            self.params["paging"] = "true"
+        
         LOGGER.info("Filters processed. Final params to be sent to API: %s", self.params)
 
     def get_all_paginated_results(self) -> List[Dict[str, Any]]:

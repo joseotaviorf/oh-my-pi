@@ -1,0 +1,680 @@
+import json
+import sys
+import unittest
+from unittest.mock import MagicMock, patch
+
+# Mock PySpark and all its submodules before any imports
+mock_pyspark = MagicMock()
+sys.modules["pyspark"] = mock_pyspark
+sys.modules["pyspark.conf"] = MagicMock()
+sys.modules["pyspark.sql"] = MagicMock()
+sys.modules["pyspark.sql.functions"] = MagicMock()
+sys.modules["pyspark.sql.types"] = MagicMock()
+sys.modules["pyspark.sql.dataframe"] = MagicMock()
+sys.modules["pyspark.context"] = MagicMock()
+
+# Mock other dependencies that require Spark
+sys.modules["bietlejuice.jobs.common.helpers"] = MagicMock()
+sys.modules["bietlejuice.jobs.common.raw_layer_loader"] = MagicMock()
+sys.modules["quintoandar_logger"] = MagicMock()
+
+from dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw import (  # noqa: E402
+    GreenhouseAuditLogAPI,
+    main,
+    JWT_TOKEN_URL,
+    DATABRICKS_SCOPE,
+    API_KEY_FIELD,
+    TOKEN_EXPIRATION_SECONDS,
+    TOKEN_EXPIRES_FIELD,
+    PAGE_SIZE,
+    PAGINATION_RATE_LIMIT_DELAY,
+    DEFAULT_PARTITION_COLUMN,
+    FILTER_PLACEHOLDER_START_DATE,
+    FILTER_PLACEHOLDER_END_DATE,
+)
+
+
+class TestGreenhouseAuditLogAPIInit(unittest.TestCase):
+    """Tests for the GreenhouseAuditLogAPI.__init__ method."""
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_init_with_dict_filters(self, mock_process_filters, mock_auth):
+        """Test initialization with filters as dictionary."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {"actor.user_id": "123", "paging": "true"},
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertEqual(api_client.endpoint, "events")
+        self.assertEqual(
+            api_client.base_filters, {"actor.user_id": "123", "paging": "true"}
+        )
+        self.assertEqual(api_client.load_start_date, "2025-01-01")
+        self.assertEqual(api_client.load_end_date, "2025-01-31")
+        mock_auth.assert_called_once()
+        mock_process_filters.assert_called_once()
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_init_with_json_string_filters(self, mock_process_filters, mock_auth):
+        """Test initialization with filters as JSON string."""
+        filters_dict = {"actor.user_id": "123", "paging": "true"}
+        job_args = {
+            "endpoint": "events",
+            "base_filters": json.dumps(filters_dict),
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertEqual(api_client.base_filters, filters_dict)
+        mock_auth.assert_called_once()
+        mock_process_filters.assert_called_once()
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_init_with_invalid_json_string(self, mock_process_filters, mock_auth):
+        """Test initialization with invalid JSON string raises error."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": "invalid{json",
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        with self.assertRaises(json.JSONDecodeError):
+            GreenhouseAuditLogAPI(job_args)
+
+        mock_auth.assert_not_called()
+        mock_process_filters.assert_not_called()
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_init_with_empty_filters(self, mock_process_filters, mock_auth):
+        """Test initialization with no filters provided."""
+        job_args = {
+            "endpoint": "events",
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertEqual(api_client.base_filters, {})
+        mock_auth.assert_called_once()
+        mock_process_filters.assert_called_once()
+
+
+class TestGreenhouseAuditLogAPIAuthentication(unittest.TestCase):
+    """Tests for the GreenhouseAuditLogAPI._apply_authentication method."""
+
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BasicAuthOAuth2ClientCredentials"
+    )
+    def test_apply_authentication(self, mock_auth_class, mock_process_filters):
+        """Test that authentication handler is correctly applied."""
+        mock_auth_handler = MagicMock()
+        mock_auth_class.return_value = mock_auth_handler
+
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {},
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify auth handler was created with correct params
+        mock_auth_class.assert_called_once_with(
+            databricks_scope=DATABRICKS_SCOPE,
+            secret_key=unittest.mock.ANY,  # APIEnum.GREENHOUSE
+            token_url=JWT_TOKEN_URL,
+            client_id_field=API_KEY_FIELD,
+            client_secret_field=API_KEY_FIELD,
+            expires_at_field=TOKEN_EXPIRES_FIELD,
+            fallback_token_expiration_seconds=TOKEN_EXPIRATION_SECONDS,
+        )
+
+        # Verify auth was applied to session
+        mock_auth_handler.apply_auth.assert_called_once_with(api_client.session)
+
+        # Verify Accept header was set
+        self.assertEqual(api_client.session.headers.get("Accept"), "application/json")
+
+
+class TestGreenhouseAuditLogAPIProcessFilters(unittest.TestCase):
+    """Tests for the GreenhouseAuditLogAPI._process_filters method."""
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_with_date_placeholders(self, mock_auth):
+        """Test filter processing with start and end date placeholders."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {
+                "occurred_at[gte]": FILTER_PLACEHOLDER_START_DATE,
+                "occurred_at[lte]": FILTER_PLACEHOLDER_END_DATE,
+                "actor.user_id": "123",
+                "paging": "true",
+            },
+            "load_start_date": "2025-01-15",
+            "load_end_date": "2025-01-20",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify start date placeholder was replaced
+        self.assertEqual(
+            api_client.params["occurred_at[gte]"], "2025-01-15T00:00:00.000Z"
+        )
+        # Verify end date placeholder was replaced
+        self.assertEqual(
+            api_client.params["occurred_at[lte]"], "2025-01-20T00:00:00.000Z"
+        )
+        # Verify other params remain unchanged
+        self.assertEqual(api_client.params["actor.user_id"], "123")
+        self.assertEqual(api_client.params["paging"], "true")
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_without_placeholders(self, mock_auth):
+        """Test filter processing without date placeholders."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {"actor.user_id": "123", "paging": "true"},
+            "load_start_date": "2025-01-15",
+            "load_end_date": "2025-01-20",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify params are unchanged when no placeholders
+        self.assertEqual(api_client.params["actor.user_id"], "123")
+        self.assertEqual(api_client.params["paging"], "true")
+        self.assertNotIn("occurred_at[gte]", api_client.params)
+        self.assertNotIn("occurred_at[lte]", api_client.params)
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_adds_paging_if_missing(self, mock_auth):
+        """Test that paging=true is added if not present in filters."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {"actor.user_id": "123"},
+            "load_start_date": "2025-01-15",
+            "load_end_date": "2025-01-20",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify paging was added
+        self.assertEqual(api_client.params["paging"], "true")
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_keeps_existing_paging(self, mock_auth):
+        """Test that existing paging parameter is not overwritten."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {"actor.user_id": "123", "paging": "false"},
+            "load_start_date": "2025-01-15",
+            "load_end_date": "2025-01-20",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify paging was not changed
+        self.assertEqual(api_client.params["paging"], "false")
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_with_missing_dates(self, mock_auth):
+        """Test filter processing when load dates are not provided."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {
+                "occurred_at[gte]": FILTER_PLACEHOLDER_START_DATE,
+                "occurred_at[lte]": FILTER_PLACEHOLDER_END_DATE,
+                "paging": "true",
+            },
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Placeholders should remain as-is when dates are not provided
+        self.assertEqual(
+            api_client.params["occurred_at[gte]"], FILTER_PLACEHOLDER_START_DATE
+        )
+        self.assertEqual(
+            api_client.params["occurred_at[lte]"], FILTER_PLACEHOLDER_END_DATE
+        )
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_with_only_start_date(self, mock_auth):
+        """Test filter processing when only start date is provided but both placeholders exist."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {
+                "occurred_at[gte]": FILTER_PLACEHOLDER_START_DATE,
+                "occurred_at[lte]": FILTER_PLACEHOLDER_END_DATE,
+                "paging": "true",
+            },
+            "load_start_date": "2025-01-15",
+            # "load_end_date" is missing
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify start date was replaced
+        self.assertEqual(
+            api_client.params["occurred_at[gte]"], "2025-01-15T00:00:00.000Z"
+        )
+        # Verify end date placeholder remained unchanged
+        self.assertEqual(
+            api_client.params["occurred_at[lte]"], FILTER_PLACEHOLDER_END_DATE
+        )
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    def test_process_filters_with_only_end_date(self, mock_auth):
+        """Test filter processing when only end date is provided but both placeholders exist."""
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {
+                "occurred_at[gte]": FILTER_PLACEHOLDER_START_DATE,
+                "occurred_at[lte]": FILTER_PLACEHOLDER_END_DATE,
+                "paging": "true",
+            },
+            "load_end_date": "2025-01-31",
+            # "load_start_date" is missing
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        # Verify start date placeholder remained unchanged
+        self.assertEqual(
+            api_client.params["occurred_at[gte]"], FILTER_PLACEHOLDER_START_DATE
+        )
+        # Verify end date was replaced
+        self.assertEqual(
+            api_client.params["occurred_at[lte]"], "2025-01-31T00:00:00.000Z"
+        )
+
+
+class TestGreenhouseAuditLogAPIGetAllPaginatedResults(unittest.TestCase):
+    """Tests for the GreenhouseAuditLogAPI.get_all_paginated_results method."""
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.CursorPaginator"
+    )
+    def test_get_all_paginated_results_success(
+        self, mock_paginator_class, mock_process_filters, mock_auth
+    ):
+        """Test successful paginated data fetching."""
+        # Setup mock paginator
+        mock_paginator = MagicMock()
+        mock_paginator.fetch_all.return_value = iter(
+            [[{"id": 1, "action": "create"}], [{"id": 2, "action": "update"}]]
+        )
+        mock_paginator_class.return_value = mock_paginator
+
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {"paging": "true"},
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+        # Manually set params since _process_filters is mocked
+        api_client.params = {"paging": "true"}
+        results = api_client.get_all_paginated_results()
+
+        # Verify results were aggregated correctly
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], {"id": 1, "action": "create"})
+        self.assertEqual(results[1], {"id": 2, "action": "update"})
+
+        # Verify paginator was created with correct parameters
+        mock_paginator_class.assert_called_once()
+        call_kwargs = mock_paginator_class.call_args[1]
+        self.assertEqual(call_kwargs["client"], api_client)
+        self.assertEqual(call_kwargs["endpoint"], "events")
+        self.assertEqual(call_kwargs["cursor_param"], "Search-After")
+        self.assertEqual(call_kwargs["cursor_location"], "header")
+        self.assertEqual(call_kwargs["context_param"], "Pit-Id")
+        self.assertEqual(call_kwargs["page_size"], PAGE_SIZE)
+        self.assertEqual(call_kwargs["page_delay"], PAGINATION_RATE_LIMIT_DELAY)
+        self.assertTrue(call_kwargs["retry_on_context_expiration"])
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_get_all_paginated_results_no_endpoint(
+        self, mock_process_filters, mock_auth
+    ):
+        """Test that ValueError is raised when endpoint is not defined."""
+        job_args = {
+            "base_filters": {"paging": "true"},
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+        api_client.endpoint = None
+
+        with self.assertRaises(ValueError) as context:
+            api_client.get_all_paginated_results()
+
+        self.assertIn("endpoint", str(context.exception).lower())
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.CursorPaginator"
+    )
+    def test_get_all_paginated_results_empty(
+        self, mock_paginator_class, mock_process_filters, mock_auth
+    ):
+        """Test paginated fetch when API returns no data."""
+        mock_paginator = MagicMock()
+        mock_paginator.fetch_all.return_value = iter([])
+        mock_paginator_class.return_value = mock_paginator
+
+        job_args = {
+            "endpoint": "events",
+            "base_filters": {"paging": "true"},
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+        }
+
+        api_client = GreenhouseAuditLogAPI(job_args)
+        # Manually set params since _process_filters is mocked
+        api_client.params = {"paging": "true"}
+        results = api_client.get_all_paginated_results()
+
+        self.assertEqual(results, [])
+
+
+class TestMainFunction(unittest.TestCase):
+    """Tests for the main function."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        self.job_args = {
+            "table_name": "greenhouse_audit_events",
+            "endpoint": "events",
+            "base_filters": {"paging": "true"},
+            "load_start_date": "2025-01-01",
+            "load_end_date": "2025-01-31",
+            "environment": "forno",
+            "dag_name": "greenhouse_audit_log",
+            "datalake_bucket": "test-bucket",
+            "partition_cols": ["year", "month", "day"],
+            "extraction_type": "full",
+            "date_column_to_partition": "event_time",
+        }
+
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkClient"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkSession"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.GreenhouseAuditLogAPI"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.json_to_dataframe"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.insert_partitions"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.RawLayerLoader"
+    )
+    def test_main_success_with_data(
+        self,
+        mock_raw_loader_class,
+        mock_insert_partitions,
+        mock_json_to_df,
+        mock_api_class,
+        mock_spark_session,
+        mock_spark_client_class,
+        mock_parser,
+    ):
+        """Test main function successfully loads data when API returns records."""
+        # Setup mocks
+        mock_parser.parse_args.return_value = self.job_args
+        mock_spark_client = MagicMock()
+        mock_spark_client_class.return_value = mock_spark_client
+        mock_spark = MagicMock()
+        mock_spark_session.builder.getOrCreate.return_value = mock_spark
+
+        # Mock API response
+        mock_api_client = MagicMock()
+        api_data = [
+            {"id": "evt_1", "action": "create", "event_time": "2025-01-15T10:00:00Z"},
+            {"id": "evt_2", "action": "update", "event_time": "2025-01-16T11:00:00Z"},
+        ]
+        mock_api_client.get_all_paginated_results.return_value = api_data
+        mock_api_class.return_value = mock_api_client
+
+        # Mock DataFrame operations
+        mock_df = MagicMock()
+        mock_json_to_df.return_value = mock_df
+        mock_df_with_partitions = MagicMock()
+        mock_insert_partitions.return_value = mock_df_with_partitions
+
+        # Mock RawLayerLoader
+        mock_raw_loader = MagicMock()
+        mock_raw_loader_class.return_value = mock_raw_loader
+
+        # Execute
+        main()
+
+        # Verify API client was created correctly
+        mock_api_class.assert_called_once_with(self.job_args)
+        mock_api_client.get_all_paginated_results.assert_called_once()
+
+        # Verify DataFrame creation
+        mock_json_to_df.assert_called_once_with(mock_spark, api_data)
+
+        # Verify partitions were added
+        mock_insert_partitions.assert_called_once_with(mock_df, "event_time")
+
+        # Verify RawLayerLoader was instantiated correctly
+        mock_raw_loader_class.assert_called_once_with(
+            spark_client=mock_spark_client,
+            environment="forno",
+            source="greenhouse_audit_log",
+            datalake_bucket="test-bucket",
+            table_name="greenhouse_audit_events",
+            partition_cols=["year", "month", "day"],
+            extraction_type="full",
+        )
+
+        # Verify data was loaded to raw layer
+        mock_raw_loader.load_to_raw.assert_called_once_with(mock_df_with_partitions)
+
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkClient"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkSession"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.GreenhouseAuditLogAPI"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.RawLayerLoader"
+    )
+    def test_main_no_data_returned(
+        self,
+        mock_raw_loader_class,
+        mock_api_class,
+        mock_spark_session,
+        mock_spark_client_class,
+        mock_parser,
+    ):
+        """Test main function handles empty API response gracefully."""
+        # Setup mocks
+        mock_parser.parse_args.return_value = self.job_args
+
+        # Mock API response with no data
+        mock_api_client = MagicMock()
+        mock_api_client.get_all_paginated_results.return_value = []
+        mock_api_class.return_value = mock_api_client
+
+        # Execute
+        main()
+
+        # Verify API was called
+        mock_api_client.get_all_paginated_results.assert_called_once()
+
+        # Verify RawLayerLoader was NOT instantiated
+        mock_raw_loader_class.assert_not_called()
+
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkClient"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkSession"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.GreenhouseAuditLogAPI"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.json_to_dataframe"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.insert_partitions"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.RawLayerLoader"
+    )
+    def test_main_uses_default_partition_column(
+        self,
+        mock_raw_loader_class,
+        mock_insert_partitions,
+        mock_json_to_df,
+        mock_api_class,
+        mock_spark_session,
+        mock_spark_client_class,
+        mock_parser,
+    ):
+        """Test main function uses default partition column when not specified."""
+        # Remove date_column_to_partition from job_args
+        job_args = self.job_args.copy()
+        del job_args["date_column_to_partition"]
+
+        mock_parser.parse_args.return_value = job_args
+        mock_spark_client = MagicMock()
+        mock_spark_client_class.return_value = mock_spark_client
+        mock_spark = MagicMock()
+        mock_spark_session.builder.getOrCreate.return_value = mock_spark
+
+        # Mock API response
+        mock_api_client = MagicMock()
+        api_data = [{"id": "evt_1", "action": "create"}]
+        mock_api_client.get_all_paginated_results.return_value = api_data
+        mock_api_class.return_value = mock_api_client
+
+        # Mock DataFrame operations
+        mock_df = MagicMock()
+        mock_json_to_df.return_value = mock_df
+        mock_df_with_partitions = MagicMock()
+        mock_insert_partitions.return_value = mock_df_with_partitions
+
+        # Mock RawLayerLoader
+        mock_raw_loader = MagicMock()
+        mock_raw_loader_class.return_value = mock_raw_loader
+
+        # Execute
+        main()
+
+        # Verify default partition column was used
+        mock_insert_partitions.assert_called_once_with(
+            mock_df, DEFAULT_PARTITION_COLUMN
+        )
+
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.GreenhouseAuditLogAPI"
+    )
+    def test_main_handles_exception(self, mock_api_class, mock_parser):
+        """Test main function raises exception on error."""
+        mock_parser.parse_args.return_value = self.job_args
+
+        # Mock API to raise an exception
+        mock_api_class.side_effect = Exception("API connection failed")
+
+        # Execute and verify exception is raised
+        with self.assertRaises(Exception) as context:
+            main()
+
+        self.assertIn("API connection failed", str(context.exception))
+
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkClient"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkSession"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.GreenhouseAuditLogAPI"
+    )
+    @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.RawLayerLoader"
+    )
+    def test_main_handles_exception_during_fetch(
+        self,
+        mock_raw_loader_class,
+        mock_api_class,
+        mock_spark_session,
+        mock_spark_client_class,
+        mock_parser,
+    ):
+        """Test main function raises exception if API fetch fails (not init)."""
+        # Setup mocks
+        mock_parser.parse_args.return_value = self.job_args
+        mock_spark_client_class.return_value = MagicMock()
+        mock_spark_session.builder.getOrCreate.return_value = MagicMock()
+
+        # Mock API client to fail on 'get_all_paginated_results'
+        mock_api_client = MagicMock()
+        mock_api_client.get_all_paginated_results.side_effect = Exception(
+            "API fetch failed"
+        )
+        mock_api_class.return_value = mock_api_client  # Init works
+
+        # Execute and verify exception was raised
+        with self.assertRaises(Exception) as context:
+            main()
+
+        self.assertIn("API fetch failed", str(context.exception))
+        # Verify API was called
+        mock_api_client.get_all_paginated_results.assert_called_once()
+        # Ensure loader was not called
+        mock_raw_loader_class.assert_not_called()
+
+
+if __name__ == "__main__":
+    unittest.main()

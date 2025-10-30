@@ -64,5 +64,5 @@ workflow:
           base_filters:
             "after_time": "load_start_date"
             "before_time": "load_end_date"
-            "paging": true
+            "paging": "true"
 
