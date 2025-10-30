@@ -41,6 +41,10 @@ columns:
     description: The percentage of crawled URLs that are affected by the issue.
     lineage:
       - datalake_ada_crawls_raw.issues_overview_report.`% of Total`
+  dt_report:
+    description: The crawl date.
+    lineage:
+      - datalake_ada_crawls_raw.issues_overview_report.date
   device: 
     description: |
       The device type of the crawl (desktop or mobile).

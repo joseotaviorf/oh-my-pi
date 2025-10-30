@@ -18,6 +18,10 @@ columns:
       Internal Outlinks", "Response Codes Internal Client Error (4Xx)", etc.).
     lineage:
       - datalake_ada_crawls_raw.issues.issue
+  dt_report:
+    description: The crawl date.
+    lineage:
+      - datalake_ada_crawls_raw.issues.date
   device:
     description: |
       The device type of the crawl (desktop or mobile).

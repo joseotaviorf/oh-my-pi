@@ -1170,6 +1170,9 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.vans:load-clean-payment-boleto:first-run-of-day
   - bietlejuice.vans:load-clean-payment:first-run-of-day
   - bietlejuice.wall_street:load-clean-charge:first-run-of-day
+bietlejuice.enrich_ada_crawls:
+  - bietlejuice.ada_crawls:load-clean-internal-all:first-run-of-day
+  - bietlejuice.ada_crawls:load-clean-issues:first-run-of-day
 bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day

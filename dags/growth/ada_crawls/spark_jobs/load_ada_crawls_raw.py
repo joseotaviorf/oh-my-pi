@@ -1,5 +1,5 @@
 import logging
-import re
+import re, os
 from datetime import datetime
 from pyspark.sql.functions import lit
 from functools import reduce
@@ -65,10 +65,15 @@ def get_internal_all_or_issues_overview_dataframe(most_recent_crawl_file_path: s
       Returns:
         df (DataFrame): The DataFrame with the data from the CSV file.
     """
-    df = spark.read.option("header", "true").csv(most_recent_crawl_file_path)
+    df = spark.read \
+        .option("header", "true") \
+        .option("multiline", "true") \
+        .option("escape", "\"") \
+        .option("quote", "\"") \
+        .csv(most_recent_crawl_file_path)
     df = df.withColumn("device", lit(crawl_device)).withColumn("date", lit(crawl_date))
     if most_recent_crawl_file_path.endswith("internal_all.csv") and "Supply 1" not in df.columns:
-        df = df.withColumn("Supply 1", lit(None))
+        df = df.withColumn("Supply 1", lit(None).cast("string"))
     if df.count() == 0:
         raise FileNotFoundError(f"m=get_internal_all_or_issues_overview_dataframe, msg=”{most_recent_crawl_file_path}” file not found.")
 
@@ -93,7 +98,12 @@ def get_issues_dataframe(most_recent_crawl_issues_path: str, crawl_device: str, 
 
     rows = []
     for report_file in report_file_list:        
-        df = spark.read.option("header", "true").csv(report_file.path)
+        df = spark.read \
+            .option("header", "true") \
+            .option("multiline", "true") \
+            .option("escape", "\"") \
+            .option("quote", "\"") \
+            .csv(report_file.path)
         if "Address" in df.columns:
             issue_name = report_file.name.replace(".csv", "").replace("_", " ").title()
             df_sel = df.select("Address") \
@@ -175,7 +185,9 @@ def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date:
     
     device_folders = [
         item for item in dbutils.fs.ls(most_recent_crawl.path)
-        if item.isDir and (item.name.lower() == "mobile/" or item.name.lower() == "desktop/")
+        if item.isDir and not item.name.startswith('.')
+                      and dbutils.fs.ls(os.path.join(item.path, "issues_reports/")) 
+                      and dbutils.fs.ls(os.path.join(item.path, "internal_all.csv"))
     ]
     if not device_folders:
         raise FileNotFoundError(f"""

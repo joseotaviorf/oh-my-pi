@@ -7,6 +7,7 @@ SELECT
   `Help URL` AS help_url,
   URLs AS url_count,
   `% of Total` AS percentage_of_total,
+  date AS dt_report,
   device,
   YEAR(date) AS year,
   MONTH(date) AS month,

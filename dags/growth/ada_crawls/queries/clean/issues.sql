@@ -1,6 +1,7 @@
 SELECT
   Address AS address, 
   issue, 
+  date AS dt_report,
   device, 
   YEAR(date) AS year,
   MONTH(date) AS month,
