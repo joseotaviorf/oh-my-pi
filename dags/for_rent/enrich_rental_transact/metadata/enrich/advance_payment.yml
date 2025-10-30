@@ -1,0 +1,137 @@
+database_name: datalake_rental_transact
+table_name: advance_payment
+description: Enrich table for advance payments with historical audit data.
+  This table contains all revision history for advance payments including modification flags and associated offer information.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.id
+    description: Unique ID of the advance payment.
+  uuid_advance_payment:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.uuid_advance_payment
+    description: UUID of the advance payment.
+  id_house_external:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.id_house_external
+    description: External house ID - joins with EBDB's house ID.
+  id_tenant_external:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.id_tenant_external
+    description: External tenant ID - joins with Person's user ID.
+  id_owner_external:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.id_owner_external
+    description: External owner ID - joins with Person's user ID.
+  uuid_offer:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.uuid_offer
+    description: UUID of the rent flow/offer.
+  id_offer:
+    lineage:
+      - datalake_rental_transact_clean.offer.id
+    description: Offer ID from the rental transact database (current version).
+  rev:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.rev
+    description: Revision number for the advance payment audit entry.
+  ts_rev:
+    lineage:
+      - datalake_rental_transact_clean.rev_info.ts_rev
+    description: Timestamp when this advance payment revision occurred.
+  revend:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.revend
+    description: End revision number for the advance payment audit entry.
+  ts_revend:
+    lineage:
+      - datalake_rental_transact_clean.rev_info.ts_rev
+    description: Timestamp when this advance payment revision ended.
+  revtype:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.revtype
+    description: Type of revision for advance payment (0=ADD, 1=MOD, 2=DEL).
+  status:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.status
+    description: Current status of the advance payment.
+    categories:
+      CREATED: Payment has been created but not yet initiated.
+      PENDING: Payment is waiting for processing.
+      PROCESSING: Payment is currently being processed by the payment provider.
+      PAID: Payment has been successfully completed and confirmed.
+      CANCELED: Payment has been canceled before completion.
+      PROCESSING_REFUND: Refund has been requested and is being processed.
+      REFUNDED: Payment has been successfully refunded to the payer.
+      CHARGEBACK: Payment has been charged back by the payer or their bank.
+      FINISHED: Payment has finished processing with success and the advance payment is settled.
+      RETAINED: Payment has been canceled and QuintoAndar keeps the payment amount.
+  rejection_reason:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.rejection_reason
+    description: Rejection reason of the advance payment, if any.
+  payment_percentage:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.payment_percentage
+    description: Percentage of the payment amount.
+  payment_amount:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.payment_amount
+    description: Amount of the advance payment.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.ts_created
+    description: Timestamp when the advance payment was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.ts_updated
+    description: Timestamp when the advance payment was last updated.
+  ts_expires:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.ts_expires
+    description: Timestamp when the advance payment expires.
+  ts_cancelled:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.ts_cancelled
+    description: Timestamp when the advance payment was cancelled.
+  mod_status:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_status
+    description: Flag indicating if status was modified in this revision.
+  mod_ts_expires:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_ts_expires
+    description: Flag indicating if expiration timestamp was modified in this revision.
+  mod_payment_percentage:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_payment_percentage
+    description: Flag indicating if payment percentage was modified in this revision.
+  mod_payment_amount:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_payment_amount
+    description: Flag indicating if payment amount was modified in this revision.
+  mod_rejection_reason:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_rejection_reason
+    description: Flag indicating if rejection reason was modified in this revision.
+  mod_id_tenant_external:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_id_tenant_external
+    description: Flag indicating if tenant external ID was modified in this revision.
+  mod_id_owner_external:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_id_owner_external
+    description: Flag indicating if owner external ID was modified in this revision.
+  mod_ts_cancelled:
+    lineage:
+      - datalake_rental_transact_clean.advance_payment_aud.mod_ts_cancelled
+    description: Flag indicating if cancellation timestamp was modified in this revision.
+  year:
+    description: Year of the advance payment revision. It's also a table partition.
+  month:
+    description: Month of the advance payment revision. It's also a table partition.
+  day:
+    description: Day of the advance payment revision. It's also a table partition.
+

@@ -95,3 +95,73 @@ SELECT
       'VD' AS abbreviation,
       'VISIT' AS stage,
       NOW() AS ts_load
+  UNION ALL
+  SELECT
+    15 AS sk_event_type,
+    'ADVANCE_PAYMENT_CREATED' AS event_name,
+    'APC' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    16 AS sk_event_type,
+    'ADVANCE_PAYMENT_PENDING' AS event_name,
+    'APP' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    17 AS sk_event_type,
+    'ADVANCE_PAYMENT_PROCESSING' AS event_name,
+    'APPR' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    18 AS sk_event_type,
+    'ADVANCE_PAYMENT_PAID' AS event_name,
+    'APPD' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    19 AS sk_event_type,
+    'ADVANCE_PAYMENT_CANCELED' AS event_name,
+    'APCL' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    20 AS sk_event_type,
+    'ADVANCE_PAYMENT_PROCESSING_REFUND' AS event_name,
+    'APPRF' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    21 AS sk_event_type,
+    'ADVANCE_PAYMENT_REFUNDED' AS event_name,
+    'APRF' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    22 AS sk_event_type,
+    'ADVANCE_PAYMENT_CHARGEBACK' AS event_name,
+    'APCB' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    23 AS sk_event_type,
+    'ADVANCE_PAYMENT_FINISHED' AS event_name,
+    'APF' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load
+  UNION ALL
+  SELECT
+    24 AS sk_event_type,
+    'ADVANCE_PAYMENT_RETAINED' AS event_name,
+    'APRT' AS abbreviation,
+    'ADVANCE_PAYMENT' AS stage,
+    NOW() AS ts_load

@@ -122,6 +122,7 @@ rent_demand_events AS (
     rf.id_offer,
     rf.id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     1 AS id_event_type,
     bk.id_visitor AS id_client,
     bk.id_house,
@@ -161,6 +162,7 @@ rent_demand_events AS (
     rf.id_offer,
     rf.id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     2 AS id_event_type,
     bk.id_visitor AS id_client,
     bk.id_house,
@@ -205,6 +207,7 @@ rent_demand_events AS (
     off.id_offer_context AS id_offer,
     rf.id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     3 AS id_event_type,
     off.id_client,
     off.id_house,
@@ -247,6 +250,7 @@ rent_demand_events AS (
     off.id_offer_context AS id_offer,
     rf.id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     4 AS id_event_type,
     off.id_client,
     off.id_house,
@@ -286,6 +290,7 @@ rent_demand_events AS (
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     5 AS id_event_type,
     off.id_client,
     off.id_house,
@@ -327,6 +332,7 @@ rent_demand_events AS (
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     6 AS id_event_type,
     off.id_client,
     off.id_house,
@@ -368,6 +374,7 @@ rent_demand_events AS (
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     7 AS id_event_type,
     COALESCE(off.id_client, rf.id_client) AS id_client,
     COALESCE(off.id_house, rf.id_house) AS id_house,
@@ -414,6 +421,7 @@ rent_demand_events AS (
     rf.id_offer,
     pp.id AS id_proposal,
     rf.id_contract,
+    NULL AS id_advance_payment,
     8 AS id_event_type,
     COALESCE(off.id_client, rf.id_client) AS id_client,
     COALESCE(off.id_house, rf.id_house) AS id_house,
@@ -455,6 +463,7 @@ rent_demand_events AS (
     rf.id_offer,
     rf.id_proposal,
     ct.id AS id_contract,
+    NULL AS id_advance_payment,
     9 AS id_event_type,
     COALESCE(off.id_client, rf.id_client) AS id_client,
     ct.id_house,
@@ -500,6 +509,7 @@ rent_demand_events AS (
     rf.id_offer,
     rf.id_proposal,
     ct.id AS id_contract,
+    NULL AS id_advance_payment,
     10 AS id_event_type,
     COALESCE(off.id_client, rf.id_client) AS id_client,
     ct.id_house,
@@ -544,6 +554,7 @@ rent_demand_events AS (
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
+    NULL AS id_advance_payment,
     11 AS id_event_type,
     v.id_visitor AS id_client,
     v.id_house,
@@ -577,6 +588,7 @@ rent_demand_events AS (
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
+    NULL AS id_advance_payment,
     12 AS id_event_type,
     v.id_visitor AS id_client,
     v.id_house,
@@ -610,6 +622,7 @@ rent_demand_events AS (
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
+    NULL AS id_advance_payment,
     13 AS id_event_type,
     v.id_visitor AS id_client,
     v.id_house,
@@ -643,6 +656,7 @@ rent_demand_events AS (
     NULL AS id_offer,
     NULL AS id_proposal,
     NULL AS id_contract,
+    NULL AS id_advance_payment,
     14 AS id_event_type,
     v.id_visitor AS id_client,
     v.id_house,
@@ -668,6 +682,60 @@ rent_demand_events AS (
       ON v.id = vsl.id_visit
   WHERE
     vsl.event_type = 'VISIT_DONE'
+  UNION ALL
+  SELECT --advance_payment
+    ap.id AS id_event,
+    NULL AS id_booking,
+    NULL AS id_visit,
+    off.id_offer_context AS id_offer,
+    NULL AS id_proposal,
+    NULL AS id_contract,
+    ap.id AS id_advance_payment,
+    CASE
+      WHEN ap.status = 'CREATED' THEN 15
+      WHEN ap.status = 'PENDING' THEN 16
+      WHEN ap.status = 'PROCESSING' THEN 17
+      WHEN ap.status = 'PAID' THEN 18
+      WHEN ap.status = 'CANCELED' THEN 19
+      WHEN ap.status = 'PROCESSING_REFUND' THEN 20
+      WHEN ap.status = 'REFUNDED' THEN 21
+      WHEN ap.status = 'CHARGEBACK' THEN 22
+      WHEN ap.status = 'FINISHED' THEN 23
+      WHEN ap.status = 'RETAINED' THEN 24
+    END AS id_event_type,
+    COALESCE(off.id_client, rf.id_client) AS id_client,
+    COALESCE(off.id_house, rf.id_house) AS id_house,
+    rf.id_agent,
+    COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    NULL AS id_schedule,
+    ap.ts_rev AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    hbh.id_user AS id_owner_on_event,
+    rf.uuid_company,
+    rf.id_company_hubspot,
+    rf.partner_3p_supply,
+    rf.country_code,
+    YEAR(ap.ts_rev) AS year,
+    MONTH(ap.ts_rev) AS month,
+    DAY(ap.ts_rev) AS day
+  FROM
+    datalake_rental_transact.advance_payment AS ap
+  LEFT JOIN
+    datalake_rental_transact_clean.offer AS rto
+      ON rto.uuid_offer = ap.uuid_offer
+  LEFT JOIN
+    datalake_offer.offer AS off
+      ON off.id_firestore = rto.id_firestore_offer
+  LEFT JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_offer = off.id_offer_context
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON COALESCE(off.id_house, rf.id_house) = hbh.id_house
+      AND DATE(ap.ts_rev) >= DATE(hbh.ts_started)
+      AND DATE(ap.ts_rev) < COALESCE(DATE(hbh.ts_ended), NOW())
 ),
 termination_period AS (
   /** We need to understand if a demand event happened during a contract termination process.

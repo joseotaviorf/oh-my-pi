@@ -3022,6 +3022,8 @@ bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history:first-run-of-day
   - bietlejuice.enrich_pro_owners:load-enrich-owner-category:first-run-of-day
   - bietlejuice.enrich_proposal:load-enrich-proposal:first-run-of-day
+  - bietlejuice.enrich_rental_transact:load-enrich-advance-payment:first-run-of-day
+  - bietlejuice.rental_transact_fast_lane:load-clean-offer:first-run-of-day
 bietlejuice.enrich_rent_flows:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow:first-run-of-day
@@ -3090,6 +3092,7 @@ bietlejuice.enrich_rental_management:
   - bietlejuice.rental_management:load-clean-invoice:first-run-of-day
 bietlejuice.enrich_rental_transact:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.rental_transact:load-clean-advance-payment-aud:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-aud:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic-aud:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic-message-aud:first-run-of-day
