@@ -21,6 +21,10 @@ SELECT
     IF(salary = '', NULL, salary) AS salary,
     IF(status = '', NULL, status) AS status,
     IF(transportation_type = '', NULL, transportation_type) AS transportation_type,
+    IF(responsible = '', NULL, responsible) AS responsible,
+    IF(portfolio = '', NULL, portfolio) AS portfolio,
+    IF(appointed_representative = '', NULL, appointed_representative) AS appointed_representative,
+    DATE(handover_date) AS dt_handover,
     DATE(dt_start) AS dt_start,
     DATE(dt_end) AS dt_end,
     NOW() AS ts_load

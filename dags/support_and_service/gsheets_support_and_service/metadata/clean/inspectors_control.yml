@@ -1,5 +1,8 @@
 database_name: datalake_gsheets_clean
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
 table_name: inspectors_control
+description: Table with information about inspectors control.
 columns:
   sk_inspector:
     description: Inspector's unique identifier
@@ -96,6 +99,22 @@ columns:
     description: Inspector's transportation type
     lineage:
       - datalake_gsheets_raw.inspectors_control.transportation_type
+  responsible:
+    description: Superior responsible for the inspector
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.responsible
+  portfolio:
+    description: If nesting or IM (nesting until 90 days)
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.portfolio
+  appointed_representative:
+    description: If is there an appointed representative for the inspector
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.appointed_representative
+  dt_handover:
+    description: Handover date
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.handover_date
   dt_start:
     description: Contract start date
     lineage:
