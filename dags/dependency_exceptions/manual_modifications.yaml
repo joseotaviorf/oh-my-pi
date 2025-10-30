@@ -814,14 +814,17 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
     - bietlejuice.enrich_entities_views:load-enrich-onboarding:first-run-of-day
-    - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
-    - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
     - bietlejuice.inspection_services_fast_lane:load-clean-assessment:first-run-of-day
     - bietlejuice.inspection_services_fast_lane:load-clean-inspection:first-run-of-day
     - bietlejuice.inspection_services_fast_lane:load-clean-item-group:first-run-of-day
     - bietlejuice.inspection_services_fast_lane:load-clean-repair-request:first-run-of-day
     - bietlejuice.inspection_services_fast_lane:load-clean-room:first-run-of-day
+    - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
     - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
+    - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
+    - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
+    - bietlejuice.retsuko_fast_lane:load-clean-invoice:first-run-of-day
+    - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.dw_quintocred_ifrs:
   remove:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows:first-run-of-day
