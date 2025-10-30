@@ -146,9 +146,21 @@ columns:
     lineage:
       - datalake_crawler_loft_clean.loft.house_info
     description: |
-      The usege type of the housing unit (e.g., RESIDENTIAL, etc.).
+      The usage type of the housing unit (e.g., RESIDENTIAL, etc.).
       It is provided by the original struct field "house_info", and it can
       assume null values.  
+  amenities:
+    lineage:
+      - datalake_crawler_loft_clean.loft.house_info
+    description: |
+      The amenities of the housing unit (e.g., GREEN_AREA, GOURMET_AREA, PARTY_ROOM, PLAYGROUND, etc.).
+      It is provided by the original struct field "house_info", and it can assume null values.    
+  infrastructure:
+    lineage:
+      - datalake_crawler_loft_clean.loft.house_info
+    description: |
+      The infrastructure of the housing unit (e.g., AIR_CONDITIONER_ALLOWED, GARAGE, POWER GENERATOR, etc.).
+      It is provided by the original struct field "house_info", and it can assume null values.  
   property_type:
     lineage:
       - datalake_crawler_loft_clean.loft.property_type

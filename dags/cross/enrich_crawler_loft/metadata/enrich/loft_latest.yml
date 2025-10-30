@@ -126,6 +126,16 @@ columns:
       - datalake_crawler_loft.loft.usage_type
     description: |
       The usege type of the housing unit (e.g., RESIDENTIAL, etc.).
+  amenities:
+    lineage:
+      - datalake_crawler_loft.loft.amenities
+    description: |
+      The amenities of the housing unit (e.g., GREEN_AREA, GOURMET_AREA, PARTY_ROOM, PLAYGROUND, etc.).
+  infrastructure:
+    lineage:
+      - datalake_crawler_loft.loft.infrastructure
+    description: |
+       The infrastructure of the housing unit (e.g., AIR_CONDITIONER_ALLOWED, GARAGE, POWER GENERATOR, etc.).
   property_type:
     lineage:
       - datalake_crawler_loft.loft.property_type

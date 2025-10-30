@@ -19,6 +19,8 @@ SELECT
   parking_spaces,
   unit_type,
   usage_type,
+  amenities,
+  infrastructure,
   property_type,
   contract_type,
   advertiser_name,

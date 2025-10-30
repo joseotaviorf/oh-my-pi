@@ -52,6 +52,8 @@ SELECT
   CAST(GET_JSON_OBJECT(house_info,'$.parking_spaces') AS INTEGER) AS parking_spaces,
   CAST(GET_JSON_OBJECT(house_info,'$.unit_type') AS STRING) AS unit_type,
   CAST(GET_JSON_OBJECT(house_info,'$.usage_type[0]') AS STRING) AS usage_type,
+  GET_JSON_OBJECT(house_info,'$.amenities') AS amenities, 
+  GET_JSON_OBJECT(house_info,'$.infrastructure') AS infrastructure, 
   property_type,
   contract_type,
   advertiser_name,
