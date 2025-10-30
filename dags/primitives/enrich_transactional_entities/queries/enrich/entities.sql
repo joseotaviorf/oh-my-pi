@@ -777,7 +777,7 @@ invoice AS (
     JOIN
         core_contract.contract AS cc
             ON c.id_external = cc.id_contract
-)
+),
 base AS (
     SELECT
         {sk_entity} AS sk_entity,
