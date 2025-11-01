@@ -1,9 +1,9 @@
 SELECT
   -- ids
-  organization_id AS id_organization,
-  request.id AS id_request,
-  performer.id AS id_performer,
-  event.target_id AS id_event_target,
+  CAST(organization_id AS STRING) AS id_organization,
+  CAST(request.id AS STRING) AS id_request,
+  CAST(performer.id AS STRING) AS id_performer,
+  CAST(event.target_id AS STRING) AS id_event_target,
   -- non-metrics
   request.type AS request_type,
   performer.type AS performer_type,
