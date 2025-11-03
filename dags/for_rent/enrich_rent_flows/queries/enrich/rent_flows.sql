@@ -9,6 +9,7 @@ WITH rent_flow_base AS (
     rde.id_offer,
     rde.id_proposal,
     rde.id_contract,
+    rde.id_advance_payment,
     rde.id_region,
     rde.id_event_type,
     rde.uuid_company,
@@ -37,6 +38,8 @@ WITH rent_flow_base AS (
     p.ts_guarantee_paid,
     c.ts_created AS ts_contract_created,
     IF(id_event_type = 9, ts_event, NULL) AS ts_contract_signed,
+    IF(id_event_type = 15, ts_event, NULL) AS ts_advance_payment_created,
+    IF(id_event_type = 18, ts_event, NULL) AS ts_advance_payment_paid,
     c.dt_termination AS dt_contract_terminated,
     rde.ts_event AS ts_rent_flow_event
   FROM
@@ -98,6 +101,7 @@ valid_rent_flows AS (
       rf.id_offer,
       rf.id_proposal,
       rf.id_contract,
+      rf.id_advance_payment,
       rf.id_region,
       rf.id_event_type,
       rf.uuid_company,
@@ -138,6 +142,8 @@ valid_rent_flows AS (
       rf.ts_guarantee_paid,
       rf.ts_contract_created,
       rf.ts_contract_signed,
+      rf.ts_advance_payment_created,
+      rf.ts_advance_payment_paid,
       rf.dt_contract_terminated,
       rf.ts_rent_flow_event
   FROM
@@ -170,6 +176,7 @@ invalid_rent_flows AS (
       of.id_offer_context AS id_offer,
       pp.id AS id_proposal,
       c.id AS id_contract,
+      NULL AS id_advance_payment,
       h.id_region,
       NULL AS id_event_type,
       IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
@@ -199,6 +206,8 @@ invalid_rent_flows AS (
       pp.ts_guarantee_paid,
       c.ts_created AS ts_contract_created,
       c.ts_signed AS ts_contract_signed,
+      NULL AS ts_advance_payment_created,
+      NULL AS ts_advance_payment_paid,
       c.dt_termination AS dt_contract_terminated,
       NULL AS ts_rent_flow_event
     FROM
@@ -262,6 +271,7 @@ invalid_rent_flows AS (
       rf.id_offer,
       rf.id_proposal,
       rf.id_contract,
+      rf.id_advance_payment,
       rf.id_region,
       rf.id_event_type,
       rf.uuid_company,
@@ -302,6 +312,8 @@ invalid_rent_flows AS (
       rf.ts_guarantee_paid,
       rf.ts_contract_created,
       rf.ts_contract_signed,
+      rf.ts_advance_payment_created,
+      rf.ts_advance_payment_paid,
       rf.dt_contract_terminated,
       rf.ts_rent_flow_event
     FROM

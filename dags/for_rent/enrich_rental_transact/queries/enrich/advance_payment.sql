@@ -30,10 +30,10 @@ WITH advance_payment_with_offer AS (
         ap_aud.mod_ts_cancelled        
     FROM
         datalake_rental_transact_clean.advance_payment_aud AS ap_aud
-    JOIN
+    LEFT JOIN
         datalake_rental_transact_clean.rev_info AS rev_info
             ON ap_aud.rev = rev_info.rev
-    JOIN
+    LEFT JOIN
         datalake_rental_transact_clean.rev_info AS revend_info
             ON ap_aud.revend = revend_info.rev
     LEFT JOIN

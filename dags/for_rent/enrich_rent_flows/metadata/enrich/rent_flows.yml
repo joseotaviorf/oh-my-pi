@@ -57,6 +57,10 @@ columns:
       - datalake_ebdb_contract.contract.id
       - datalake_rent_demand_events.rent_demand_events.id_contract
     description: "Id of the contract related to the rent flow."
+  id_advance_payment:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_advance_payment
+    description: "Id of the advance payment related to the rent flow."
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
@@ -76,6 +80,8 @@ columns:
       '7': "Id of the documentation sent (DS) event."
       '8': "Id of the credit approved (CA) event."
       '9': "Id of the contract signed (CS) event."
+      '15': "Id of the advance payment created event."
+      '18': "Id of the advance payment paid event."
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
@@ -217,6 +223,14 @@ columns:
       - datalake_ebdb_contract.contract.ts_signed
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: "Timestamp of when the contract related to the rent flow was signed."
+  ts_advance_payment_created:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: "Timestamp of when the advance payment related to the rent flow was created (event type 15)."
+  ts_advance_payment_paid:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: "Timestamp of when the advance payment related to the rent flow was paid (event type 18)."
   dt_contract_terminated:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
