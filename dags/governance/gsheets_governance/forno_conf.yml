@@ -40,3 +40,9 @@ sheets_info:
     sheet_name: Validated
     clean_table_name: anonymization_manual_validation
     sheet_context: governance
+
+  anonymization_pii_rae:
+    sheet_id: 16G1XRsGEUdGmGe0nUiDHYt74FK0i2O3SWz6CP4aOdNw
+    sheet_name: RAE
+    clean_table_name: anonymization_pii_rae
+    sheet_context: governance

@@ -1,0 +1,70 @@
+database_name: datalake_gsheets_clean
+table_name: anonymization_pii_rae
+owner: augusto.torres@quintoandar.com.br
+domain: Data Ops & Governance
+description: Information about PII columns exception.
+columns:
+  id_rae:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.rae_id
+    description: Id exceptions case.
+  full_columns_name:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.full_columns_name
+    description: Id entity, field composed by database_name, table_name and column_name.
+  exception_type:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.exception_type
+    description: Type/Cause this use case is an exceptions to PII anonymization.
+  has_pii:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.contains_pii
+    description: In case a false positive, Indicatess there`s no pii data.
+  data_subject_type:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.data_subject_type
+    description: Indicates correctly PII classification.
+  requester:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.requester
+    description: Person requesting the use of case as a RAE.
+  justification:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.justification
+    description: Justificaton why is a exception.
+  comments:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.comments
+    description: RAE requester comment to justify the exception use case.
+  status:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.status
+    description: Indicates the RAE status.
+  lgpd_impact:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.lgpd_impact
+    description: Indicates if the exceptions was removed from anonymization.
+  focal_points:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.focal_points
+    description: Responsible to the RAE use case.
+  approved_by:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.approved_by
+    description: RAE uses case aproover.
+  dt_activation:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.date_of_activation
+    description: RAE removal from anonymization date.
+  dt_approval:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.approval_date
+    description: RAE approval from anonymization date
+  dt_last_reviewed:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.last_review
+    description: Last time the RAE was reviewed.
+  pull_request:
+    lineage:
+      - datalake_gsheets_raw.anonymization_pii_rae.pull_request
+    description: Pull request link.
