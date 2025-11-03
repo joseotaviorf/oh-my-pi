@@ -221,7 +221,8 @@ offers_date_rescue_history AS (
         id_firestore AS id_offer,
         MAX(ts_accepted) AS ts_last_offer_accepted,
         MAX(ts_discarded) AS ts_last_offer_discarded,
-        IF(MAX(ts_accepted) > MAX(ts_discarded), TRUE, FALSE) AS is_a_rescued_offer
+        IF(MAX(ts_accepted) > MAX(ts_discarded), TRUE, FALSE) AS is_a_rescued_offer,
+        IF(MAX(ts_accepted) > MAX(ts_discarded), MAX(ts_accepted), CAST(NULL AS TIMESTAMP)) AS ts_rescued_offer
     FROM
         datalake_sales_flow_clean.offer_aud
     GROUP BY
@@ -238,7 +239,11 @@ offers_date_rescue_history AS (
         CASE
             WHEN SF.is_canceled = FALSE AND SF.ts_canceled IS NOT NULL THEN TRUE
             ELSE FALSE
-        END AS is_a_rescued_offer
+        END AS is_a_rescued_offer,
+        CASE
+            WHEN SF.is_canceled = FALSE AND SF.ts_canceled IS NOT NULL THEN O.ts_accepted
+            ELSE CAST(NULL AS TIMESTAMP)
+        END AS ts_rescued_offer
     FROM
         datalake_sales_flow_clean.sales_flow AS SF
     LEFT JOIN
@@ -366,7 +371,8 @@ sale_offer AS (
         ccv_flow.ts_sale_agreement_signed,
         off_drh.ts_last_offer_accepted AS ts_offer_accepted,
         off_drh.ts_last_offer_discarded AS ts_offer_discarded,
-        off_drh.is_a_rescued_offer
+        off_drh.is_a_rescued_offer,
+        off_drh.ts_rescued_offer AS ts_offer_rescued
     FROM
         offers AS off
     LEFT JOIN
@@ -437,6 +443,7 @@ unified_offers AS (
         vo.ts_canceled AS ts_offer_canceled,
         vo.ts_offer_accepted,
         vo.ts_offer_discarded,
+        vo.ts_offer_rescued,
         vo.ts_offer_updated AS ts_updated,
         vo.ts_sale_agreement_created,
         vo.ts_sale_agreement_signed
@@ -483,6 +490,7 @@ unified_offers AS (
         CAST(NULL AS TIMESTAMP) AS ts_offer_canceled,
         CAST(NULL AS TIMESTAMP) AS ts_offer_accepted,
         CAST(NULL AS TIMESTAMP) AS ts_offer_discarded,
+        CAST(NULL AS TIMESTAMP) AS ts_offer_rescued,
         g.ts_updated AS ts_updated,
         CAST(NULL AS TIMESTAMP) AS ts_sale_agreement_created,
         CAST(NULL AS TIMESTAMP) AS ts_sale_agreement_signed
