@@ -1,0 +1,47 @@
+---
+database_name: datalake_hightouch
+table_name: sync_changelog
+owner: eduardo.soares@quintoandar.com.br
+domain: Primitives
+description: Detailed changelog tracking individual row-level operations executed during Hightouch reverse ETL sync runs, including operation type, status, and failure reasons for each record
+columns:
+  id_sync:
+    description: Unique identifier for the sync configuration that executed this operation
+    lineage:
+      - datalake_hightouch.sync_runs.id_sync
+  id_sync_run:
+    description: Unique identifier for the specific sync run execution that processed this row-level change
+    lineage:
+      - datalake_hightouch.sync_runs.id_sync_run
+  ts_started:
+    description: Timestamp when the parent sync run was initiated, inherited from the sync run execution
+    lineage:
+      - datalake_hightouch.sync_runs.ts_started
+  year:
+    description: Partition column representing the year of the sync run start date
+    lineage:
+      - datalake_hightouch.sync_runs.year
+  month:
+    description: Partition column representing the month of the sync run start date
+    lineage:
+      - datalake_hightouch.sync_runs.month
+  day:
+    description: Partition column representing the day of the sync run start date
+    lineage:
+      - datalake_hightouch.sync_runs.day
+  row_id:
+    description: Unique identifier for the individual record that was processed in the destination system
+    lineage:
+      - hightouch_audit.sync_changelog.row_id
+  op_type:
+    description: Type of operation performed on the row (added, changed, removed) during the sync execution
+    lineage:
+      - hightouch_audit.sync_changelog.op_type
+  status:
+    description: Execution status of the row-level operation (success, failed)
+    lineage:
+      - hightouch_audit.sync_changelog.status
+  failure_reason:
+    description: Detailed error message or reason explaining why the row operation failed, null if successful
+    lineage:
+      - hightouch_audit.sync_changelog.failure_reason

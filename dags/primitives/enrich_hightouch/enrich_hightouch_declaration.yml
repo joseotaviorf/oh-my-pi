@@ -13,6 +13,9 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    sync_changelog:
+      - sync_runs
   tables_customization:
     sync_runs: {}
     audience_membership: {}
@@ -20,6 +23,7 @@ workflow:
       extraction_type: full
       partitions: []
     journey_log: {}
+    sync_changelog: {}
 
 cluster:
   type: databricks_16_4_medium_memory_cluster
