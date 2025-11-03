@@ -1114,3 +1114,6 @@ bietlejuice.search_metrics_service:
 bietlejuice.enrich_sale_salesforce:
   add:
     - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day
+bietlejuice.enrich_atlas_db_quality_metrics:
+  add:
+    - bietlejuice.amplitude_subpartitioned:load-clean-183047-atlas-db-house-characteristics-events:first-run-of-day

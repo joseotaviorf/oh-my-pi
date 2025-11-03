@@ -1280,6 +1280,8 @@ bietlejuice.enrich_app_installed:
 bietlejuice.enrich_arquivo_confidencial:
   - bietlejuice.arquivo_confidencial:load-clean-rev-info:first-run-of-day
   - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud:first-run-of-day
+bietlejuice.enrich_atlas_db_quality_metrics:
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-atlas-db-house-characteristics-events:first-run-of-day
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
