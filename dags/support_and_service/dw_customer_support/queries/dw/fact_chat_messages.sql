@@ -6,11 +6,11 @@ WITH messages AS (
     CASE
       WHEN from_phone_number = 'system' THEN 'Bot'
       WHEN from_phone_number LIKE '%whatsapp%' THEN 'User'
+      WHEN REPLACE(REPLACE(from_phone_number,'_2E', '.'), '_40', '@')  LIKE '%@%' THEN 'Analyst'
       WHEN from_phone_number LIKE '%@%' THEN 'Analyst'
       ELSE NULL
     END AS user_type,
     message_body AS message,
-    'whatsapp' AS origin,
     ts_created
   FROM
     datalake_quinto_messenger_clean.channel_event
@@ -38,7 +38,6 @@ WITH messages AS (
       ELSE NULL
     END AS user_type,
     message,
-    'in_app' AS origin,
     ts_created
   FROM
     datalake_internal_chat_clean.internal_chat_messages
@@ -62,7 +61,6 @@ twilio_data AS (
     COALESCE(t1.id_task, t2.id_task) AS id_task,
     m.id_message,
     REPLACE(m.user_sender, '+', '') AS user_sender,
-    m.origin,
     m.user_type,
     m.message,
     m.ts_created
@@ -101,7 +99,6 @@ messages_with_users AS (
         ELSE COALESCE(u1.id, u2.id, TRY_CAST(td.user_sender AS BIGINT), -1)
       END
     ) AS sk_user_sender,
-    td.origin,
     td.user_type,
     td.message,
     td.ts_created
@@ -123,19 +120,22 @@ messages_with_users AS (
   GROUP BY ALL
 )
 SELECT
-  sk_channel,
-  sk_session,
-  sk_message,
-  sk_user_sender,
-  origin,
-  user_type,
-  message,
+  mwu.sk_channel,
+  mwu.sk_session,
+  mwu.sk_message,
+  mwu.sk_user_sender,
+  t.origin,
+  mwu.user_type,
+  mwu.message,
   CASE
-    WHEN LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created) IS NOT NULL
-      THEN DATEDIFF(SECOND, LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created), ts_created)
+    WHEN LAG(mwu.ts_created) OVER (PARTITION BY mwu.sk_channel ORDER BY mwu.ts_created) IS NOT NULL
+      THEN DATEDIFF(SECOND, LAG(mwu.ts_created) OVER (PARTITION BY mwu.sk_channel ORDER BY mwu.ts_created), mwu.ts_created)
     ELSE NULL
   END AS reply_time,
-  ts_created,
+  mwu.ts_created,
   NOW() AS ts_load
 FROM
-  messages_with_users
+  messages_with_users AS mwu
+LEFT JOIN 
+  datalake_customer_support.chats AS t
+    ON sk_session = t.id_session
