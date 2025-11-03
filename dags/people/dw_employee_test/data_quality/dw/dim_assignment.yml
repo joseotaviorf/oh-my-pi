@@ -1,0 +1,74 @@
+---
+table_name: dw_employee_test.dim_assignment
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1000
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -5
+    less_than_or_equal_to: 15
+    severity_level: Warning
+
+column_level_validations:
+  sk_assignment_version:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  assignment_number:
+    is_complete:
+      severity_level: Warning
+  person_number:
+    is_complete:
+      severity_level: Warning
+  legacy_registration:
+    is_complete:
+      severity_level: Warning
+  legislation_code:
+    is_complete:
+      severity_level: Warning
+  worker_type:
+    is_complete:
+      severity_level: Warning
+  assignment_status_type:
+    is_complete:
+      severity_level: Warning
+  union_name:
+    is_complete:
+      severity_level: Warning
+  dismissal_type:
+    is_complete:
+      severity_level: Warning
+  dismissal_reason:
+    is_complete:
+      severity_level: Warning
+  dt_projected_started:
+    is_complete:
+      severity_level: Warning
+  dt_started:
+    is_complete:
+      severity_level: Warning
+  dt_termination:
+    is_complete:
+      severity_level: Warning
+  dt_notified_termination:
+    is_complete:
+      severity_level: Warning
+  version:
+    is_complete:
+      severity_level: Warning
+  dt_valid_from:
+    is_complete:
+      severity_level: Warning
+  dt_valid_to:
+    is_complete:
+      severity_level: Warning
+  is_current:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning

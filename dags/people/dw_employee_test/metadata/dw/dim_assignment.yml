@@ -1,0 +1,107 @@
+database_name: dw_employee_test
+table_name: dim_assignment
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Dimension table that stores employee assignment data with historical tracking (SCD Type 2).
+  An "assignment" represents a specific employment contract/matricula, not a work relationship.
+  This allows tracking when employees have multiple assignments (e.g., Pending Worker converted to Employee).
+  Grain: One record per assignment per version.
+  A single person can have multiple assignments over time (P→E transfers, rehires, etc.).
+  Star schema design: Uses person_number business key instead of snowflake foreign keys.
+columns:
+  sk_assignment_version:
+    description: Unique surrogate key for each version of the assignment (MD5 hash of id_assignment and dt_valid_from).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.id_assignment
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+  assignment_number:
+    description: Unique identifier for the assignment (matricula) used in source HR systems. Business key.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.assignment_number
+  person_number:
+    description: Unique identifier for the person in source HR systems. Business key linking to dim_employee.
+    lineage:
+    - datalake_pin_core_clean.all_people.person_number
+  legacy_registration:
+    description: Registration number from a previous (legacy) HR system.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.legacy_registration
+  legislation_code:
+    description: |
+      Code indicating the labor legislation/country to which the contract is subject.
+      Examples: 'BR' (Brazil/CLT), 'US' (United States), 'PT' (Portugal), 'MX' (Mexico).
+      This determines which labor laws apply to the employment contract.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.legislation_code
+  worker_type:
+    description: Classification of the worker's employment type.
+    categories:
+      E: Employee
+      P: Pending Worker
+      C: Contingent Worker
+      N: Nonworker
+    lineage:
+    - datalake_pin_core_clean.all_assignments.assignment_type
+  assignment_status_type:
+    description: Current status of the assignment (e.g., 'Active', 'Inactive', 'Suspended', 'Terminated').
+    lineage:
+    - datalake_pin_core_clean.all_assignments.assignment_status_type
+  union_name:
+    description: Name of the union with which the employee is associated. Returns '-1' if no union affiliation.
+    lineage:
+    - datalake_hr_system_clean.workers.work_relationships.assignments.UnionName
+  dismissal_type:
+    description: Categorizes the official reason for the employee's dismissal. Returns '-1' if no dismissal.
+    lineage:
+    - datalake_hr_system_clean.actions_lov.description
+  dismissal_reason:
+    description: Detailed reason for the employee's dismissal. Returns '-1' if no dismissal.
+    lineage:
+    - datalake_pin_core_clean.action_reason_translation.action_reason
+  dt_projected_started:
+    description: |
+      Projected start date for pending workers (worker_type = 'P').
+      This represents the expected hire date before the worker officially becomes an employee.
+      NULL for regular employees (E) and contractors (C).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.dt_projected_started
+  dt_started:
+    description: Actual start date of the period of service (work relationship).
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_termination:
+    description: Actual termination date of the work relationship. NULL if still active.
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  dt_notified_termination:
+    description: Date when termination was notified. NULL if no termination or not yet notified.
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_notified_termination
+  version:
+    description: |
+      Sequential version number for this assignment, starting at 1. Increments with each attribute change.
+      Used to identify how many times an assignment's tracked attributes have changed over time.
+  dt_valid_from:
+    description: |
+      The date from which this version of the assignment becomes effective (SCD Type 2).
+      Represents when a tracked attribute changed (worker_type, status, union, dismissal info, or service dates).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+  dt_valid_to:
+    description: |
+      The date until which this version of the assignment remains valid (exclusive, SCD Type 2).
+      Set to '9999-12-31' for the current version.
+      For historical versions, equals (next version's dt_valid_from - 1 day).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+  is_current:
+    description: |
+      Boolean flag indicating if this is the current active version of the assignment (TRUE) or a historical version (FALSE).
+      Important: Only ONE assignment per person can be marked as current at any given time.
+      When a person has multiple active assignments simultaneously (e.g., P and E types), the prioritization logic is:
+      1. Employee (E) > Contractor (C) > Pending (P)
+      2. If same worker_type, the most recent dt_valid_from wins
+      This ensures queries filtering on is_current = TRUE return exactly one assignment per person.
+  ts_load:
+    description: Timestamp when the record was loaded into the table.

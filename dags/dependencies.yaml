@@ -512,6 +512,15 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_core:load-clean-rates:first-run-of-day
   - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
+bietlejuice.dw_employee_test:
+  - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.hr_system:load-clean-actions-lov:first-run-of-day
+  - bietlejuice.hr_system:load-clean-workers:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
