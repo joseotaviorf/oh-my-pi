@@ -9,6 +9,8 @@ SELECT
   country_of_birth,
   region_of_birth,
   town_of_birth,
+  UPPER(attribute1) AS mother_name,
+  UPPER(attribute2) AS father_name,
   CAST(object_version_number AS INT) AS object_version_number,
   TO_DATE(date_of_birth) AS dt_of_birth,
   TO_DATE(date_of_death) AS date_of_death,

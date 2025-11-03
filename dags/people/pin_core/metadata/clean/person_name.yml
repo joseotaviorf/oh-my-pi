@@ -58,6 +58,14 @@ columns:
       PT: Portugal.
       BR: Brazil.
       AR: Argentine.
+  first_social_name:
+    description: The person's preferred given name (social name). From Name DFF field NAM_INFORMATION15.
+    lineage:
+    - datalake_pin_core_raw.per_person_names_f.nam_information15
+  last_social_name:
+    description: The person's preferred surname (social name). From Name DFF field NAM_INFORMATION16.
+    lineage:
+    - datalake_pin_core_raw.per_person_names_f.nam_information16
   legislation_code:
     description: Legal code associated with this name data.
     lineage:

@@ -11,6 +11,8 @@ SELECT
   UPPER(last_name) AS last_name,
   UPPER(list_name) AS list_name,
   UPPER(name_type) AS name_type,
+  UPPER(nam_information15) AS first_social_name,
+  UPPER(nam_information16) AS last_social_name,
   legislation_code,
   CAST(object_version_number AS INT) AS object_version_number,
   TO_DATE(effective_end_date) AS dt_effective_ended,

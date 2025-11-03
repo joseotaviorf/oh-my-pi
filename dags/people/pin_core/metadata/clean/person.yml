@@ -45,6 +45,14 @@ columns:
     description: City or town within the birth region.
     lineage:
     - datalake_pin_core_raw.per_persons.town_of_birth
+  mother_name:
+    description: Name of the person's mother. From Person DFF field ATTRIBUTE1.
+    lineage:
+    - datalake_pin_core_raw.per_persons.attribute1
+  father_name:
+    description: Name of the person's father. From Person DFF field ATTRIBUTE2.
+    lineage:
+    - datalake_pin_core_raw.per_persons.attribute2
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:
