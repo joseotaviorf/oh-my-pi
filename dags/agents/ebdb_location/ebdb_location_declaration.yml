@@ -46,7 +46,7 @@ cluster:
     driver_node_type_id: m5a.xlarge
     node_type_id: m5a.xlarge
     num_workers: 3
-    spark_version: 12.2.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.serializer: "org.apache.spark.serializer.KryoSerializer"
       spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
