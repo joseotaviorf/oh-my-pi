@@ -1,0 +1,112 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: operation_payments
+description: |
+  This table contains the payment information to be made to the agent.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.id
+    description: ID of the table, it’s the primary key.
+  id_user:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.user_id
+    description: ID of the user.
+  id_operation_event:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.operation_event_id
+    description: ID of the event.
+  uuid_person:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.person_uuid
+    description: UUID of the person.
+  id_operation:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.operation_id
+    description: ID of the operation.
+  id_house:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.house_id
+    description: ID of the house.
+  id_operating_city:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.operating_city_id
+    description: ID of the city where the agent works.
+  id_agent:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.agent_id
+    description: ID of the agent.
+  id_agent_payment:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.agent_payment_id
+    description: ID of the agent payment.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.version
+    description: Operation Payment Version.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.agent_type
+    description: Type of the agent.
+  agent_status:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.agent_status
+    description: Status of the agent.
+  agent_contract_type:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.agent_contract_type
+    description: Type of the contract of the agent.
+  operation_agent_type:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.operation_agent_type
+    description: Type of operation performed by the agent.
+  operation_agent_status:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.operation_agent_status
+    description: Status of operation performed by the agent
+  house_area:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.house_area
+    description: Area of the house.
+  house_reference:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.house_reference
+    description: Information about the house.
+  base_meter_value:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.base_meter_value
+    description: Amount to be paid in relation to the base area considered for a house.
+  additional_meter_value:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.additional_meter_value
+    description: Percentage to be paid related to the area that exceeds the base area of the house.
+  total_meter_value:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.total_meter_value
+    description: The total amount to be paid for the house total area.
+  total_add_ons:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.total_add_ons
+    description: The total amount to be paid for additional charges.
+  fixed_value:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.fixed_value
+    description: Additional fixed amount considered to the calculate of the payment.
+  operation_business:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.operation_business
+    description: Reference to the business source of the operation.
+  dt_schedule:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.schedule_date
+    description: Date when the operation was scheduled.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.created_at
+    description: Timestamp of the creation of the operation payment.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.updated_at
+    description: Timestamp of the update of the operation payment.

@@ -1,0 +1,56 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: error_records
+description: |
+  This table contains the errors that need manual attention.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.error_records.id
+    description: ID of the table, it’s the primary key.
+  id_operation_event:
+    lineage:
+      - datalake_partner_payment_raw.error_records.operation_event_id
+    description: ID of the operation event.
+  id_operation_payment:
+    lineage:
+      - datalake_partner_payment_raw.error_records.operation_payment_id
+    description: ID of the operation payment.
+  id_agent_payment:
+    lineage:
+      - datalake_partner_payment_raw.error_records.agent_payment_id
+    description: ID of the agent payment.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.error_records.version
+    description: Error records version.
+  error_date:
+    lineage:
+      - datalake_partner_payment_raw.error_records.error_date
+    description: Date when the error occurred.
+  status:
+    lineage:
+      - datalake_partner_payment_raw.error_records.status
+    description: Status of the error.
+  message_error:
+    lineage:
+      - datalake_partner_payment_raw.error_records.message_error
+    description: Message of the error.
+  error_category:
+    lineage:
+      - datalake_partner_payment_raw.error_records.error_category
+    description: Category of the error.
+  source_reference:
+    lineage:
+      - datalake_partner_payment_raw.error_records.source_reference
+    description: Reference to the source where the error is addressed.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.error_records.created_at
+    description: Timestamp of the creation of the error.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.error_records.updated_at
+    description: Timestamp of the update of the error.

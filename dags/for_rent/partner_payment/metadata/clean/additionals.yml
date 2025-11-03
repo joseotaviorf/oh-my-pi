@@ -1,0 +1,40 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: additionals
+description: |
+  This table contains the additional charges that are paid for an inspection or a photo session.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.additionals.id
+    description: ID of the table, it’s the primary key.
+  id_operation_payment:
+    lineage:
+      - datalake_partner_payment_raw.additionals.operation_payment_id
+    description: ID of the operation payment.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.additionals.version
+    description: Additional version.
+  additional_type:
+    lineage:
+      - datalake_partner_payment_raw.additionals.additional_type
+    description: Type of the additional charges.
+  quantity:
+    lineage:
+      - datalake_partner_payment_raw.additionals.quantity
+    description: Threshold for considering whether to pay for the charge.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.additionals.amount
+    description: Amount to pay for the charge.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.additionals.created_at
+    description: Timestamp of the creation of the additional.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.additionals.updated_at
+    description: Timestamp of the update of the additional.
