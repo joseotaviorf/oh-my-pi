@@ -1,7 +1,7 @@
 database_name: datalake_visit
-table_name: visit_unsuccessful_unified
-description: The visit unsuccessful details is collected through an agent's follow up. This model
-  This model contains information on visits unsuccessful from the old model. We will soon have this information in the new modeling and this model will unify them.
+table_name: post_visit_agent_unified
+description: The post visit details is collected through an agent's follow up.
+  This model contains the post visit by agent from current model (fup agent models). We will soon have this information in the new modeling and this model will unify them.
   Each row is an unique visit.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
@@ -18,10 +18,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
     description: Reason of visit unsuccessful.
-  comment:
+  event_type:
     lineage:
-      - datalake_ebdb_clean.booking.visit_fup_comment
-    description: Comment about reason of visit unsuccessful.
+      - datalake_ebdb_clean.booking.visit_fup
+    description: If the visit was done or unsuccessful.
+    categories:
+      VISIT_DONE: The visit was done by agent.
+      VISIT_UNSUCCESSFUL: The visit was unsuccessful by agent.
+      ERROR: Not mapped case.
   has_demand_attended:
     lineage:
       - datalake_ebdb_clean.visitor.has_attended
@@ -38,7 +42,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.visitor.has_attended
     description: True if supply (owner) attended the visit.
-  ts_visit_unsuccessful:
+  ts_post_visit_agent:
     lineage:
       - datalake_ebdb_clean.booking.ts_visit_fup
     description: Timestamp when the follow up was collected.

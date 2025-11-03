@@ -1,5 +1,5 @@
 ---
-table_name: datalake_visit.visit_unsuccessful_unified
+table_name: datalake_visit.post_visit_agent_unified
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id_visit:
