@@ -2183,6 +2183,8 @@ bietlejuice.enrich_edwiges:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs:first-run-of-day
+bietlejuice.enrich_employee:
+  - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
 bietlejuice.enrich_employee_registration:
   - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
