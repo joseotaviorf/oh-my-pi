@@ -24,7 +24,7 @@ salaries AS (
   FROM 
     datalake_pin_compensation_clean.salary AS s
   WHERE 
-    s.dt_started <= CURRENT_DATE
+    s.dt_started <= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) = 1
 ),
@@ -54,15 +54,15 @@ current_assignments AS (
   WHERE
     (
       (
-        dt_effective_started <= CURRENT_DATE
+        dt_effective_started <= DATE('{load_start_date}')
         AND assignment_type IN ('E', 'C')
       )
       OR (
-        dt_projected_started > CURRENT_DATE
+        dt_projected_started > DATE('{load_start_date}')
         AND assignment_type = 'P'
       )
     )
-    AND dt_effective_ended >= CURRENT_DATE
+    AND dt_effective_ended >= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (
       PARTITION BY id_period_of_service 
@@ -78,7 +78,7 @@ managers AS (
   FROM
     datalake_pin.managers_history
   WHERE
-    dt_effective_started <= CURRENT_DATE
+    dt_effective_started <= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY dt_effective_started DESC) = 1
 ),
@@ -155,7 +155,7 @@ SELECT
   COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
   CASE 
     WHEN ed.assignment_type = 'P' THEN 0
-    ELSE FLOOR(MONTHS_BETWEEN(COALESCE(ps.dt_actual_termination, CURRENT_DATE), ps.dt_started)) 
+    ELSE FLOOR(MONTHS_BETWEEN(COALESCE(ps.dt_actual_termination, DATE('{load_start_date}')), ps.dt_started)) 
   END AS assignment_age_months,
   COALESCE(sub.qnt_directly_led, 0) AS qnt_directly_led,
   COALESCE(sub.qnt_undirectly_led, 0) AS qnt_undirectly_led,
