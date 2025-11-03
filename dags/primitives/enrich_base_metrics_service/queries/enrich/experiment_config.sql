@@ -177,7 +177,7 @@ FROM VALUES
     (
         "ab_beakman_native_home_feed_recommendations_experiment",
         named_struct(
-            'begin_date', DATE('2025-10-18'),
+            'begin_date', DATE('2025-10-30'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
