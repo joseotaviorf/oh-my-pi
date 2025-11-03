@@ -63,7 +63,7 @@ cluster:
     driver_node_type_id: m5a.xlarge
     node_type_id: m5a.large
     num_workers: 2
-    spark_version: 16.4.x-scala2.12
+    spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
