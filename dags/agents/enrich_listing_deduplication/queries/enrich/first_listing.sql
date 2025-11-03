@@ -15,7 +15,13 @@ WITH house_listing_consultant AS (
         hrlc.consultant_type,
         "RENT" AS business_context,
         hrlc.is_last_ciq_on_listing,
-        hrlc.ts_enrollment_started
+        COALESCE(
+            hrlc.ts_enrollment_started, 
+            FIRST(hrlc.ts_listing_version_start) OVER (
+                PARTITION BY hrlc.id_house, COALESCE(hrlc.id_user, -1), hrlc.consultant_type 
+                ORDER BY hrlc.ts_listing_version_start ASC
+            )
+        ) AS ts_enrollment_started
     FROM
         datalake_big_agent.house_rent_listing_consultant AS hrlc
 ),

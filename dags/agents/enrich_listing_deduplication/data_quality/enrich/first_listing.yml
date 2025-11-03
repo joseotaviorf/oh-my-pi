@@ -6,13 +6,13 @@ table_level_validations:
     greater_than: 145000
     severity_level: Error
 column_level_validations:
-  id_user:
+  id_house:
     is_complete:
       severity_level: Error
-  id_partner:
+  consultant_type:
     is_complete:
-      severity_level: Warning
-  id_house:
+      severity_level: Error
+  business_context:
     is_complete:
       severity_level: Error
   year:
