@@ -348,8 +348,15 @@ prob_payment_calculation AS (
                 THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'LOW'
+
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
+                AND f.max_delay_contaminated_contract_t2 <= 90
+                AND f.n_reparos_invoices = f.n_invoices_in_wallet
+                THEN 'LOW'
+    
+            WHEN f.reference_contract_status = 'Finalizado'
+                AND f.max_delay_contaminated_contract_t2 > 90
                 AND f.n_reparos_invoices = f.n_invoices_in_wallet
                 THEN 'VERY_LOW'
             WHEN f.reference_contract_status = 'Finalizado'
