@@ -8,7 +8,7 @@ clean_partition_cols:
   - year
   - month
   - day
-kafka_brokers: kb0.forno.quintoandar.com.br:9092,kb1.forno.quintoandar.com.br:9092,kb2.forno.quintoandar.com.br:9092
+kafka_brokers: kafka-01.svc.core-frn.habitat.zone:9092,kafka-02.svc.core-frn.habitat.zone:9092,kafka-03.svc.core-frn.habitat.zone:9092
 kafka_topic: emlio-logs
 load_format: json
 path_prefix: s3://

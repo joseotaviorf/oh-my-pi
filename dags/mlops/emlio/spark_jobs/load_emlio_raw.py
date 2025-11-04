@@ -54,6 +54,7 @@ value_schema = StructType(
         StructField("inputs", StringType(), nullable=False),
         StructField("outputs", StringType(), nullable=True),
         StructField("keys", StringType(), nullable=True),
+        StructField("deployment_info", StringType(), nullable=True),
     ]
 )
 
@@ -100,7 +101,14 @@ if __name__ == "__main__":
     kafka_columns = config_service.get_config("kafka_columns")
     max_records_per_file = config_service.get_config("max_records_per_file")
 
-    spark_client = SparkClient()
+    session_params = {
+        "spark.sql.adaptive.enabled": "true",
+        "spark.databricks.delta.retentionDurationCheck.enabled": "false",
+        "spark.sql.streaming.schemaInference": "true",
+        "spark.sql.streaming.adaptiveQueryExecution.enabled": "true"
+    }
+
+    spark_client = SparkClient(session_params=session_params)
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     datalake_info = DatalakeMetastoreService.get_db_info(
@@ -147,6 +155,7 @@ if __name__ == "__main__":
         .trigger(availableNow=True)
         .option("maxRecordsPerFile", max_records_per_file)
         .option("checkpointLocation", checkpoints_path)
+        .option("mergeSchema", "true")
         .outputMode("append")
         .option("path", load_path)
         .toTable(database_name + "." + table_name)

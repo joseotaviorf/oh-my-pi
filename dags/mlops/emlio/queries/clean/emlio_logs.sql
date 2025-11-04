@@ -8,6 +8,7 @@ select
   inputs,
   outputs,
   keys as service_keys,
+  deployment_info,
   year,
   month,
   day
