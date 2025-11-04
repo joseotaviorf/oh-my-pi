@@ -66,7 +66,6 @@ employee_ids_enrich AS (
 codex_enrich AS (
   SELECT
     codex_cc.cost_center_code AS cost_center_code,
-    codex_cc.cost_center_full_name,
     codex_cc.business,
     codex_cc.product,
     codex_cc.brand,
@@ -108,7 +107,6 @@ codex_enrich AS (
 
 SELECT
   codex.cost_center_code,
-  codex.cost_center_full_name,
   codex.business,
   codex.product,
   codex.brand,

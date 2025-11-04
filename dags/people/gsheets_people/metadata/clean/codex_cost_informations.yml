@@ -8,20 +8,24 @@ columns:
   cost_center_code:
     description: Current unique identifier of the cost center.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.cc_code
+    - datalake_gsheets_people_raw.codex_cost_informations.cc_code
   cost_center_detail:
     description: Type of P&L cost, further used to infer the type of headcount allocated in the cost center, being either Capacity or Overhead.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.pl_line_type
+    - datalake_gsheets_people_raw.codex_cost_informations.pl_line_type
+  dt_updated:
+    description: Date representing the offical monthly version of the data. Is used in the partition columns.
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_informations.dt_updated
   ts_load:
     description: Timestamp of when the record was loaded.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.ts_load
-  year:
-    description: Year (YYYY) partition column of when the record was loaded.
-    lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.ts_load
+    - datalake_gsheets_people_raw.codex_cost_informations.ts_load
   month:
-    description: Month (MM) partition column of when the record was loaded.
+    description: Month (MM) partition column of the offical monthly version date.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.ts_load
+    - datalake_gsheets_people_raw.codex_cost_informations.dt_updated
+  year:
+    description: Year (YYYY) partition column of the offical monthly version date.
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_informations.dt_updated

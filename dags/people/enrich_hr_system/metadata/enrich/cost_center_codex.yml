@@ -14,10 +14,6 @@ columns:
     description: Name of the cost center without its ID at the beginning.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.cc_name
-  cost_center_full_name:
-    description: Full name of the cost center (includes its ID at the beggining)
-    lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.cc_full_name
   business:
     description: Business unit to which the cost center belongs.
     lineage:

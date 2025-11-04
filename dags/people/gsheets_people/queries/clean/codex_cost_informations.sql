@@ -1,8 +1,9 @@
 SELECT
    cc_code AS cost_center_code,
    pl_line_type AS cost_center_detail,
+   dt_updated,
    ts_load,
-   YEAR(ts_load) AS year,
-   MONTH(ts_load) AS month
+   MONTH(dt_updated) AS month,
+   YEAR(dt_updated) AS year
 FROM
    datalake_gsheets_people_raw.codex_cost_informations
