@@ -2239,6 +2239,9 @@ bietlejuice.enrich_google_search_console:
 bietlejuice.enrich_google_search_console_classified:
   - bietlejuice.google_search_console_classified:load-clean-report-by-page-and-query:first-run-of-day
 bietlejuice.enrich_greenhouse:
+  - bietlejuice.greenhouse:load-clean-demographics-answer-options:first-run-of-day
+  - bietlejuice.greenhouse:load-clean-demographics-answers:first-run-of-day
+  - bietlejuice.greenhouse:load-clean-demographics-questions:first-run-of-day
   - bietlejuice.greenhouse:load-clean-jobs:first-run-of-day
 bietlejuice.enrich_greenseer:
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day

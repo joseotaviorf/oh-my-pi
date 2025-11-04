@@ -21,6 +21,10 @@ columns:
     description: The type of answer expected for the question.
     lineage:
     - datalake_greenhouse_raw.demographics_questions.answer_type
+  language:
+    description: The language of the question.
+    lineage:
+    - datalake_greenhouse_raw.demographics_questions.translations.language
   is_active:
     description: A boolean flag indicating if the question is active.
     lineage:

@@ -13,6 +13,14 @@ columns:
     description: The unique identifier for the demographic question to which this answer option belongs.
     lineage:
     - datalake_greenhouse_raw.demographics_answer_options.demographic_question_id
+  name:
+    description: The name of the answer option.
+    lineage:
+    - datalake_greenhouse_raw.demographics_answer_options.translations.language
+  language:
+    description: The language of the answer option.
+    lineage:
+    - datalake_greenhouse_raw.demographics_answer_options.translations.language
   free_form:
     description: Indicates whether the answer option allows for free-form text input.
     lineage:

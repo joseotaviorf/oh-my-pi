@@ -5,6 +5,7 @@ SELECT
     -- text fields
     name,
     answer_type,
+    translations[0].language AS language,
     -- boolean
     CAST(active AS BOOLEAN) AS is_active,
     CAST(required AS BOOLEAN) AS is_required,
