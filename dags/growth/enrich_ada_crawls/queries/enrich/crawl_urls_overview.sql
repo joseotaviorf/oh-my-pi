@@ -18,7 +18,7 @@ internal_all AS (
     CASE
       WHEN address LIKE '%www.quintoandar.com.br/' OR address LIKE '%www.quintoandar.com.br' THEN 'HOME'
       WHEN CONTAINS(address, 'br/alugar/imovel') THEN 'SEARCH RENT'
-      WHEN CONTAINS(address, 'br/venda/imovel') THEN 'SEARCH SALE'
+      WHEN CONTAINS(address, 'br/comprar/imovel') THEN 'SEARCH SALE'
       WHEN CONTAINS(address,'br/imovel/') THEN 'LISTING'
       WHEN CONTAINS(address, 'br/classificados/') THEN 'LISTING CLASSIFIEDS'
       WHEN CONTAINS(address, 'br/condominio/') THEN 'CONDO'
