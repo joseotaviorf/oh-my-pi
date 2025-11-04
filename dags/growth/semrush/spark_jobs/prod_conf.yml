@@ -103,7 +103,7 @@ report_list:
     display_limit: 300000 # expected number of results * 1,25
   dfimoveis_organic_search_kw:
     configs:
-      subfolder: dfimoveis.com.br
+      subdomain: dfimoveis.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
