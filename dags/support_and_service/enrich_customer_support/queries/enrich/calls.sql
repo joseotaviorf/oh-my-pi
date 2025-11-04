@@ -1,14 +1,32 @@
-WITH call_sessions AS (
-  SELECT
+WITH sss_and_sauron_call_sessions AS (
+  SELECT 
     id AS id_session,
     user_data:["user_id"] AS id_user,
     source_identity
-  FROM
+  FROM 
     datalake_sauron_clean.session
-  WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
+  WHERE 
+    source in ('call_in_app', 'call')
+    AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
+  UNION 
+  SELECT 
+    id AS id_session,
+    user_data:["user_id"] AS id_user,
+    source_identity
+  FROM 
+    datalake_support_session_service_clean.support_session
+  WHERE 
+    source in ('call_in_app', 'call')
+    AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
+), call_sessions AS ( 
+  SELECT
+    source_identity,
+    id_session,
+    id_user
+  FROM
+    sss_and_sauron_call_sessions
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY source_identity ORDER BY ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY source_identity ORDER BY id_session) = 1
 ),
 call_events AS (
   SELECT

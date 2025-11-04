@@ -13,7 +13,8 @@ columns:
   id_session:
     lineage:
       - datalake_sauron_clean.session.id
-    description: Session ID from Sauron
+      - datalake_support_session_service_clean.support_session.id_session
+    description: Session ID from Sauron or Support Session Service
   id_task:
     lineage:
       - datalake_bigfone_clean.event.id_task
@@ -33,7 +34,8 @@ columns:
   id_user:
     lineage:
       - datalake_sauron_clean.session.user_data
-    description: Unique identifier for the user associated with the session
+      - datalake_support_session_service_clean.support_session.user_data
+    description: Unique identifier for the user associated with the session from Sauron or Support Session Service
   id_worker:
     lineage:
       - datalake_bigfone_clean.event.id_worker
