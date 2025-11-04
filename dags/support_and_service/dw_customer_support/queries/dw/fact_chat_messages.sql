@@ -77,12 +77,10 @@ twilio_data AS (
   LEFT JOIN
     datalake_quinto_messenger_clean.task AS t1
       ON t1.id_channel = ch.id_channel
-      AND m.origin = 'whatsapp'
       AND t1.ts_created >= '{load_start_date}' - INTERVAL 60 DAY
   LEFT JOIN
     datalake_quinto_messenger_clean.task AS t2
       ON t2.id_chat = cht.id_chat
-      AND m.origin = 'in app'
       AND t2.ts_created >= '{load_start_date}' - INTERVAL 60 DAY
 ),
 messages_with_users AS (
@@ -138,4 +136,4 @@ FROM
   messages_with_users AS mwu
 LEFT JOIN 
   datalake_customer_support.chats AS t
-    ON sk_session = t.id_session
+    ON mwu.sk_session = t.id_session
