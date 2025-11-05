@@ -1,0 +1,67 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: discounts
+description: This table contains the discounts to be applied to the agents (inspector or photographer).
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.discounts.id
+    description: ID of the table, it’s the primary key.
+  id_agent_payment:
+    lineage:
+      - datalake_partner_payment_raw.discounts.agent_payment_id
+    description: ID of the agent payment where the discount is consolidated.
+  id_operation_agent:
+    lineage:
+      - datalake_partner_payment_raw.discounts.operation_agent_id
+    description: ID of the operation payment related with the discount. It is set only when the discount is related to an operation payment (inspection or a photo session).
+  id_agent:
+    lineage:
+      - datalake_partner_payment_raw.discounts.agent_id
+    description: ID of the agent related with the discount.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.discounts.version
+    description: Discount version.
+  discount_type:
+    lineage:
+      - datalake_partner_payment_raw.discounts.discount_type
+    description: Type of the discount (D0, D-1, No Show, etc.).
+  agent_contract_type:
+    lineage:
+      - datalake_partner_payment_raw.discounts.agent_contract_type
+    description: Type of the contract of the agent to related to the policy values of the discounts.
+  base_amount:
+    lineage:
+      - datalake_partner_payment_raw.discounts.base_amount
+    description: Base amount where a percentage is applied to get the value of the discount.
+  discount_amount:
+    lineage:
+      - datalake_partner_payment_raw.discounts.discount_amount
+    description: Amount of the discount to be applied to the payment.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.discounts.agent_type
+    description: Type of the agent related to the discount (inspection or photo session).
+  business_source:
+    lineage:
+      - datalake_partner_payment_raw.discounts.business_source
+    description: Source of the business, related with the cost center, where this discount will be applied.
+  dt_schedule:
+    lineage:
+      - datalake_partner_payment_raw.discounts.schedule_date
+    description: Schedule date of the operation related with the discount. It is set only when the discount is related to an operation (inspection or a photo session).
+  dt_cancelation:
+    lineage:
+      - datalake_partner_payment_raw.discounts.cancelation_date
+    description: The cancellation date is the date when the agent send the notification that he is not attend to an operation.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.discounts.created_at
+    description: Timestamp of the creation of the discount.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.discounts.updated_at
+    description: Timestamp of the update of the discount.
