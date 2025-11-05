@@ -14,8 +14,6 @@ workflow:
         - visit_business_model
         - post_visit_agent_unified
         - visit_origin_unified
-      visit_business_model:
-        - preferred_fixed_agent_history
       visit_schedules:
         - visit_business_model
     execution_timeout_hours: 3

@@ -1,50 +1,50 @@
 database_name: datalake_visit
 table_name: visit_business_model
-description: This table contains the business model of the visit.
+description: This table contains the business model of the visit with 3P access control indicators.
 domain: For Sale
 owner: vitor.musachio@quintoandar.com.br
 columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.visit_business_model.id
+    description: The unique identifier of the visit business model record.
+  id_booking:
+    lineage:
+      - datalake_ebdb_clean.visitor.id_booking
+    description: The booking id associated with the agent visitor.
   id_visit:
     lineage:
-      - datalake_ebdb_clean.visit.id
+      - datalake_ebdb_clean.visit_business_model.id_visit
     description: The id of the visit.
-  id_agent:
+  uuid_company:
     lineage:
-      - datalake_ebdb_clean.visit.id_agent
-    description: The id of the agent.
-  id_pfa_history:
-    lineage:
-      - datalake_ebdb_clean.visit.id_pfa_history
-    description: The id of the related preferred fixed agent in the visit.
-  id_visitor:
-    lineage:
-      - datalake_ebdb_clean.visit.id_visitor
-    description: The id of the visitor.
+      - datalake_ebdb_clean.visitor.uuid_company
+    description: The company UUID associated with the agent visitor.
   business_model:
     lineage:
-      - datalake_ebdb_clean.visit.business_model
+      - datalake_ebdb_clean.visit_business_model.business_model
     description: The business model of the visit.
-  is_pfa_tqc_3p_agent:
+  is_3p_supply:
     lineage:
-      - datalake_ebdb_clean.visit.is_pfa_tqc_3p_agent
-    description: Whether the preferred fixed agent is in TQC 3P and its the same agent that the visit.
-  is_visit_scheduled_pfa_origin:
+      - datalake_ebdb_clean.visit_business_model.business_model
+    description: Boolean flag indicating whether the business model includes 3P_SUPPLY. Derived from business_model LIKE '%3P_SUPPLY%'.
+  is_3p_demand:
     lineage:
-      - datalake_ebdb_clean.visit.is_visit_scheduled_pfa_origin
-    description: Whether the visit is scheduled by the preferred fixed agent. This is used to identify if the visit is scheduled by the preferred fixed agent.
-  is_visit_tqc_3p_agent:
+      - datalake_ebdb_clean.visit_business_model.business_model
+    description: Boolean flag indicating whether the business model includes 3P_DEMAND. Derived from business_model LIKE '%3P_DEMAND%'.
+  is_3p_lead_gen:
     lineage:
-      - datalake_ebdb_clean.visit.is_visit_tqc_3p_agent
-    description: Whether the visit is in TQC 3P PoC. This is used to identify if the visit is in TQC 3P.
-  has_pfa:
+      - datalake_ebdb_clean.visit_business_model.business_model
+    description: Boolean flag indicating whether the business model includes 3P_LEAD_GEN. Derived from business_model LIKE '%3P_LEAD_GEN%'.
+  has_3p_access_control:
     lineage:
-      - datalake_ebdb_clean.visit.has_pfa
-    description: Whether the visit has a preferred fixed agent. This is used to identify if the visit has a preferred fixed agent.
+      - datalake_ebdb_clean.visit_business_model.business_model
+    description: Boolean flag indicating whether the business model has any 3P access control. Derived from business_model LIKE '%3P%'.
   ts_created:
     lineage:
-      - datalake_ebdb_clean.visit.ts_created
-    description: The timestamp of the visit creation.
+      - datalake_ebdb_clean.visit_business_model.ts_created
+    description: The timestamp of the visit business model creation.
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.visit.ts_updated
-    description: The timestamp of the visit update.
+      - datalake_ebdb_clean.visit_business_model.ts_updated
+    description: The timestamp of the visit business model update.
