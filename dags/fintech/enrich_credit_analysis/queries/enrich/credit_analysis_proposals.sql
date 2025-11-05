@@ -60,15 +60,15 @@ dti AS (
     p.id AS id_proposal,
     NULLIF(SUM(p2.monthly_income),0) AS income,
     MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0)) AS package,
-    CASE 
+    CASE
       WHEN SUM(p2.monthly_income) != 0 THEN CAST(MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0))/SUM(p2.monthly_income) AS DECIMAL(9,2))
-      ELSE NULL 
+      ELSE NULL
     END AS dti
   FROM
-    datalake_sorting_hat_clean.proposal p 
-  LEFT JOIN 
-    datalake_sorting_hat_clean.proponent p2 
-      ON p.id = p2.id_proposal 
+    datalake_sorting_hat_clean.proposal p
+  LEFT JOIN
+    datalake_sorting_hat_clean.proponent p2
+      ON p.id = p2.id_proposal
   GROUP BY 1
 ),
 
@@ -98,6 +98,17 @@ sorting_hat_proposals AS (
     sorting_hat_proposals_prev
   WHERE
     rn = 1
+),
+
+latest_screening_result AS (
+  SELECT
+    id_proposal,
+    liquidity,
+    risk_category,
+    score
+  FROM
+    datalake_sorting_hat_clean.screening_result
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_database_transaction DESC) = 1
 )
 
 SELECT
@@ -143,7 +154,7 @@ LEFT JOIN
   dti
     ON shp.id_proposal = dti.id_proposal
 LEFT JOIN
-  datalake_sorting_hat_clean.screening_result AS cr
+  latest_screening_result AS cr
     ON shp.id_proposal = cr.id_proposal
 LEFT JOIN
   datalake_rental_guarantee.guarantee AS rg
