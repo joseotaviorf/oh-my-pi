@@ -3,7 +3,7 @@ SELECT
    business AS business,
    product AS product,
    brand AS brand,
-   team_name AS team,
+   cc_name AS team,
    structure_name AS structure,
    NULLIF(pt_chapter, '-') AS chapter,
    NULLIF(pt_line, '-') AS line,

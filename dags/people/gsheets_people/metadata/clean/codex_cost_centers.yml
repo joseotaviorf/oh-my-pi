@@ -24,7 +24,7 @@ columns:
   team:
     description: Team to which the cost center belongs.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.team_name
+    - datalake_gsheets_people_raw.codex_cost_centers.cc_name
   structure:
     description: Structure to which the cost center belongs.
     lineage:
