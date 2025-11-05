@@ -48,4 +48,5 @@ workflow:
     tier_partner: {}
     supply_acquisition_share: {}
 cluster:
-  type: databricks_16_4_med_general_cluster
+  type: databricks_16_4_med_2xlarge_general_cluster
+  
