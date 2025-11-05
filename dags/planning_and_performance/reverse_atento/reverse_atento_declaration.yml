@@ -9,6 +9,7 @@ workflow:
   type: load
   layer: reverse
   custom_schema: atento
+  bucket_config_name: planning_and_performance_bucket
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
   execution_timeout_hours: 4

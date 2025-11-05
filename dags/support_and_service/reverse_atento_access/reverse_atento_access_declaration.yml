@@ -12,7 +12,7 @@ workflow:
   spark_job_arguments:
   - "{dag_name}"   # dag_name
   - "{environment}"
-  - "{bucket}"
+  - "5a-dataops-prod"
   - "atento"   #source
   tables_customization:
     external_bucket: {} #dummy task
