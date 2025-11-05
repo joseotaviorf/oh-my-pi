@@ -11,7 +11,7 @@ keywords AS (
   SELECT
     *
   FROM 
-    datalake_google_search_console_classified.gsc_keywords_region_url_match_bra
+    datalake_google_search_console_classified.gsc_keyword_region_url_match_bra
   WHERE
     dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
