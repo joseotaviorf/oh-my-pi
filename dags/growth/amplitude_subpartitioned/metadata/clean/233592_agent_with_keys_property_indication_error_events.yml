@@ -1,0 +1,34 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_agent_with_keys_property_indication_error_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Tracks error events that occur when agents with keys encounter issues during property indication processes.
+columns:
+  id_user:
+    description: Unique identifier of the agent user who encountered the error.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    description: Identifier of the property where the error occurred during the indication process.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.house_id
+  feedback_type:
+    description: Type of feedback of error that was encountered during the property indication process.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.feedback_type
+  ts_event:
+    description: Timestamp when the error event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day
