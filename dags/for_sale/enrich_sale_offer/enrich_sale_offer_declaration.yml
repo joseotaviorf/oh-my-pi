@@ -8,6 +8,9 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    sale_offers:
+    - core_sale_offer
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   databricks_conn_id: databricks_new

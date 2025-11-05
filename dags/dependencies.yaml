@@ -3315,7 +3315,11 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.sales_flow:load-clean-reject-reason:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-specialist:first-run-of-day
-  - bietlejuice.sales_flow:load-clean-users:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-users:first-run-of-day  
+  - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-sales-flow-details:first-run-of-day
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder-reference:first-run-of-day
   - bietlejuice.docx:load-clean-folder:first-run-of-day

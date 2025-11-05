@@ -1,0 +1,175 @@
+database_name: datalake_sale_offer
+table_name: sale_offers
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: Enriched table that consolidates sale offer information with visit and booking data, providing comprehensive metrics and flags for offer analysis including business unit attribution, partner identification, and conversion funnel timing metrics.
+columns:
+  id_offer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_offer
+    description: Offer unique identifier.
+  id_sales_flow:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_sales_flow
+    description: SalesFlow identification key linked to an offer.
+  id_sale_flow:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_sale_flow
+    description: Concatenated identification key for the sales flow (buyer_id + house_id).
+  id_buyer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_buyer
+    description: Identification key of the user who sent the offer.
+  id_house:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_house
+    description: Identification key of the house linked to the offer.
+  id_owner:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_owner
+    description: House owner identification key to whom an offer has been sent.
+  id_region:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_region
+    description: Region identification key where the property is located.
+  id_agent:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_agent
+      - datalake_visit.visits.id_agent
+    description: Agent identification key linked to the offer or visit.
+  id_booking:
+    lineage:
+      - datalake_visit.visits.id_visit
+    description: Booking identification key linked to the visit before the offer.
+  id_business_unit:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_hub
+      - datalake_hub_services_clean.business_unit.id
+    description: Business unit identification key responsible for the offer. Populated from id_hub field in core_sale_offer.
+  id_company_supply:
+    lineage:
+      - datalake_visit.visits.id_company_supply
+    description: Identification key of the supply partner company in HubSpot.
+  id_company_demand:
+    lineage:
+      - datalake_visit.visits.id_company_demand
+    description: Identification key of the demand partner company.
+  current_payment_method:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.current_payment_method
+    description: Current payment method chosen for the offer (Cash, financed, etc).
+  planned_payment_method:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.planned_payment_method
+    description: Initial payment method planned by the buyer at the moment of offer creation.
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.has_used_fgts_in_payment
+    description: Boolean flag indicating if FGTS (Employment Compensation Fund) was used in the payment method.
+  brokerage_fee:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.brokerage_fee
+    description: Brokerage fee percentage paid on this offer transaction.
+  sale_price:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.sale_price
+    description: Sale listing price set by the seller.
+  first_price_offered_by_buyer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.first_price_offered_by_buyer
+    description: First value offered by the buyer for the property.
+  last_price_offered_by_buyer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.last_price_offered_by_buyer
+    description: Last value offered by the buyer for the property.
+  sale_price_agreed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.sale_price_agreed
+    description: Final price agreed between buyer and seller for the property.
+  first_discount_proposed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.first_discount_proposed
+    description: First discount percentage proposed by the buyer calculated as (sale_price - first_offer_price) / sale_price.
+  last_discount_proposed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.last_discount_proposed
+    description: Last discount percentage proposed by the buyer calculated as (sale_price - last_offer_price) / sale_price.
+  price_segment:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.price_segment
+    description: Price segment classification of the property at the time the offer was created.
+  id_buyer_prospect_type:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect_type.id_buyer_prospect_type
+    description: Buyer prospect type identification key based on buyer behavior and city group at the time of offer.
+  flg_booking_before_offer:
+    description: Boolean flag indicating if a booking was created before the offer was submitted.
+  flg_visit_completed_before_offer:
+    description: Boolean flag indicating if a visit was completed before the offer was submitted.
+  is_buyer_first_offer:
+    description: Boolean flag indicating if this is the first offer submitted by this buyer.
+  is_house_first_offer:
+    description: Boolean flag indicating if this is the first offer received by this house.
+  ts_booking_created:
+    lineage:
+      - datalake_visit.visits.ts_created
+    description: Timestamp when the booking associated with this offer was created.
+  hours_booking_to_offer:
+    description: Number of hours between the booking creation and the offer submission.
+  hours_visit_to_offer:
+    description: Number of hours between the visit completion and the offer submission.
+  days_offer_submitted_to_offer_accepted:
+    description: Number of days between offer submission and offer acceptance by seller.
+  days_offer_submitted_to_sale_agreement_created:
+    description: Number of days between offer submission and sale agreement (CCV) creation.
+  days_offer_submitted_to_offer_dismissed:
+    description: Number of days between offer submission and offer dismissal/rejection.
+  days_offer_submitted_to_sale_agreement_signed:
+    description: Number of days between offer submission and sale agreement signing.
+  days_offer_accepted_to_sale_agreement_created:
+    description: Number of days between offer acceptance and sale agreement (CCV) creation.
+  days_offer_accepted_to_sale_agreement_signed:
+    description: Number of days between offer acceptance and sale agreement signing.
+  days_offer_accepted_to_offer_dismissed:
+    description: Number of days between offer acceptance and offer dismissal (for rescued offers).
+  days_sale_agreement_created_to_sale_agreement_signed:
+    description: Number of days between sale agreement creation and sale agreement signing.
+  ts_offer_submitted:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_created
+    description: Timestamp when the offer was submitted by the buyer.
+  ts_offer_accepted:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_accepted
+    description: Timestamp when the offer was accepted by the seller.
+  ts_offer_dismissed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_discarded
+    description: Timestamp when the offer was dismissed or rejected.
+  ts_offer_canceled:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_canceled
+    description: Timestamp when the offer was canceled.
+  ts_offer_rescued:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_rescued
+    description: Timestamp when a previously discarded or canceled offer was rescued and accepted again.
+  ts_sale_agreement_created:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_sale_agreement_created
+    description: Timestamp when the sale agreement (CCV - Contrato de Compra e Venda) confection was started.
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_sale_agreement_signed
+    description: Timestamp when the sale agreement (CCV) was signed by both parties.
+  ts_seller_fup:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.ts_seller_fup
+    description: Timestamp of seller follow-up interaction.
+  ts_buyer_fup:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.ts_buyer_fup
+    description: Timestamp of buyer follow-up interaction.
+  ts_load:
+    description: Timestamp when the data was loaded into the datalake.
+
