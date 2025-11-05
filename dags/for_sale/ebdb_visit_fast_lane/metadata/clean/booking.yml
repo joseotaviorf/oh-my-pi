@@ -1,0 +1,166 @@
+database_name: datalake_ebdb_test_clean
+table_name: booking
+domain: For Sale
+description: >
+  Comprehensive booking and appointment management table for real estate property visits.
+  This table stores all booking-related information including visitor details, agent assignments,
+  property information, scheduling data, and visit outcomes. It tracks the complete lifecycle
+  of property visit appointments from initial booking through completion, including rescheduling,
+  follow-ups, and status updates.
+columns:
+  id:
+    description: Unique identifier for the booking record. Primary key that uniquely identifies each property visit appointment in the system.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.id
+  id_visitor:
+    description: Foreign key reference to the visitor who scheduled the property visit.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.visitante_id
+  id_agent:
+    description: Foreign key reference to the real estate agent assigned to conduct the property visit.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.agente_id
+  id_coordinate:
+    description: Reference to geographical coordinates or location data associated with the property visit.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.coordinateid
+  is_closed:
+    description: Boolean flag indicating whether the booking has been closed or finalized.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.encerrado
+  id_house:
+    description: Foreign key reference to the property/house being visited. Links to detailed property information including address, specifications, and listing details.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.imovel_id
+  is_first_time:
+    description: Boolean flag indicating whether this is the visitor's first time viewing this specific property.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.primeiravez
+  id_visit:
+    description: Foreign key reference to the visit record containing detailed information about the actual property visit event and outcomes.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.visita_id
+  id_rent_flow:
+    description: Reference to the rental process workflow when the booking is part of a rental transaction. Tracks the rental application and approval process.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.fluxolocacao_id
+  id_rescheduled_booking:
+    description: Self-referencing foreign key pointing to the original booking that was rescheduled.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.reagendadode_id
+  id_fup_details:
+    description: Foreign key reference to follow-up details record containing information about post-visit actions, feedback, and next steps in the sales process.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.followupdetails_id
+  id_photo_job:
+    description: Reference to photographer job assignment when professional photography is scheduled as part of the property visit or listing process.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.jobfotografo_id
+  id_attendant:
+    description: Foreign key reference to the customer service attendant who handled the booking request and provided customer support during the process.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.atendente_id
+  id_last_update_origin:
+    description: Reference to the system or source that performed the most recent update to this booking record.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.origemultimaatualizacao_id
+  id_schedule:
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.external_id
+    description: Identification key of appointment in schedule source.
+  structured:
+    description: Boolean flag indicating whether the booking data is in a structured format compliant with system standards.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.structured
+  code:
+    description: Human-readable booking code or reference number used for customer communication and internal tracking.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.codigo
+  slots_duration:
+    description: Duration of the booking appointment measured in time slots (typically 15 or 30-minute intervals). Determines how long the visit is expected to take.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.durationinslots
+  business_context:
+    description: Classification of the business scenario or context for this booking (e.g., first visit, follow-up visit, negotiation meeting, documentation signing).
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.businesscontext
+  buyer_intention:
+    description: Visitor's stated intention or purpose for the property visit (e.g., serious buyer, just browsing, investment consideration, rental interest).
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.intention
+  checkin_status:
+    description: Current check-in status of the visitor for their appointment (e.g., pending, checked-in, no-show, completed).
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.checkinstatus
+  visitor_id_date_slot:
+    description: Combined identifier linking visitor with specific date and time slot. Used to prevent double-bookings and manage visitor schedules efficiently.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.visitordatetime
+  status:
+    description: Current overall status of the booking appointment (e.g., scheduled, confirmed, in-progress, completed, cancelled, rescheduled). Primary field for workflow management.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.status
+  contact_preference:
+    description: Visitor's preferred method of communication (e.g., phone, email, SMS, WhatsApp). Used to personalize outreach and follow-up communications.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.preferecontato
+  hash:
+    description: Cryptographic hash value generated for the booking record. Used for data integrity verification, duplicate detection, and security purposes.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.hash
+  slot_day:
+    description: Specific day component of the appointment slot. Used in conjunction with time slots for comprehensive schedule management and availability tracking.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.slotdia
+  visit_fup:
+    description: Visit follow-up classification or type indicating the nature of post-visit actions required (e.g., call back, send documents, schedule second visit).
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.fupvisita
+  type:
+    description: Classification of the booking type (e.g., individual visit, group tour, virtual tour, documentation meeting, key handover). Determines visit procedures.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.tipo
+  is_agent_fixed:
+    description: Boolean flag indicating whether a specific agent is permanently assigned to this booking. True when visitor specifically requested an agent or ongoing relationship exists.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.agentefixo
+  visit_fup_comment:
+    description: Free-text comments and notes from agents regarding follow-up actions after the visit. Contains valuable insights for sales process optimization.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.comentariofupvisita
+  is_tenant_notification_pending:
+    description: Boolean flag indicating whether current tenants still need to be notified about the upcoming visit. Critical for properties with existing tenants.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.informeinquilinopendente
+  is_confirmed:
+    description: Boolean flag indicating whether the booking has been confirmed by both the visitor and the property owner/agent. Essential for finalizing appointments.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.confirmado
+  is_conflict_allowed:
+    description: Boolean flag indicating whether this booking can be scheduled even if it conflicts with other appointments. Used for emergency or priority bookings.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.permitirconflito
+  dt_booking:
+    description: Date when the property visit appointment is scheduled to occur. Core field for calendar management and scheduling operations.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.data
+  ts_next_not_fup:
+    description: Timestamp indicating when the next non-follow-up action should occur. Used for scheduling future activities that aren't direct follow-ups.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.proxnotfup
+  ts_visit_fup:
+    description: Timestamp for when follow-up actions related to this visit should be executed. Critical for sales pipeline management and customer relationship maintenance.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.datafupvisita
+  ts_negotiation_start_notified:
+    description: Timestamp when parties were notified that formal negotiations have begun following the property visit. Marks transition from visit to active sales process.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.avisadoentrouemnegociacao
+  ts_created:
+    description: Timestamp when the booking record was initially created in the system. Used for audit trails and performance analytics on booking response times.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.criadoem
+  ts_updated:
+    description: Timestamp of the most recent modification to any field in this booking record. Essential for change tracking and data synchronization processes.
+    lineage:
+      - datalake_ebdb_test_raw.agendamento.atualizadoem

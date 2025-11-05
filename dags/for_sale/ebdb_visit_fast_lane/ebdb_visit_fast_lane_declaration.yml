@@ -16,6 +16,10 @@ workflow:
   custom_schema: ebdb
   execution_timeout_hours: 0.5
   tables_customization:
+    Agendamento:
+      clean_table_name: booking
+      clean_primary_keys: [id]
+      custom_schema: ebdb_test
     Visita:
       clean_table_name: visit
       clean_primary_keys: [id]

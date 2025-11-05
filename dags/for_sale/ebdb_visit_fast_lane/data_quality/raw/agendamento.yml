@@ -1,0 +1,8 @@
+table_name: datalake_ebdb_test_raw.agendamento
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
