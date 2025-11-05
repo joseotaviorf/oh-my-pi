@@ -16,6 +16,7 @@ SELECT
   es.id_user_agent AS sk_user_agent,
   es.id_user_en AS sk_user_en,
   es.id_fixed_agent AS sk_fixed_agent,
+  ppa.id_house_listing_relation AS sk_ppa_relation,
   es.id_user_creation AS sk_author_creator,
   es.id_user_cancelation AS sk_author_cancelation,
   es.visit_code,
@@ -72,3 +73,8 @@ LEFT JOIN
         ON es.id_house = dim_heh.sk_house
         AND es.ts_schedule_created >= dim_heh.ts_entrance_started
         AND es.ts_schedule_created < COALESCE(dim_heh.ts_entrance_ended, NOW())
+LEFT JOIN
+    datalake_ebdb_agents.preferred_property_agent_relation_history AS ppa
+        ON ppa.id_house = es.id_house
+        AND es.business_context = ppa.business_context
+        AND ts_schedule_created BETWEEN ppa.ts_relation_started AND COALESCE(ppa.ts_relation_ended, NOW())

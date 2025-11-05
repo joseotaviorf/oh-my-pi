@@ -81,6 +81,11 @@ columns:
       - datalake_visit.visit_schedules.id_fixed_agent
     description:
       ID of the fixed agent associated with the buyer when the schedule was created.
+  sk_ppa_relation:
+    lineage:
+      - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
+    description:
+      ID of the preferred property agent relation.
   sk_author_creator:
     lineage:
       - datalake_visit.visit_schedules.id_user_creation

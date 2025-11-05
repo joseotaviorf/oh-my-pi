@@ -1118,6 +1118,7 @@ bietlejuice.dw_visit:
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
+  - bietlejuice.enrich_ebdb_agents:load-enrich-preferred-property-agent-relation-history:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified:first-run-of-day

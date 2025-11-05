@@ -44,6 +44,11 @@ columns:
     lineage:
       - dw_house.dim_house_entrance_history.sk_house_entrance
     description: Foreign key from dw_house.dim_house_entrance_history. Last event before the visit.
+  sk_ppa_relation:
+    lineage:
+      - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
+    description:
+      ID of the preferred property agent relation.
   sk_business_context:
     description: Context type Id.
     lineage:

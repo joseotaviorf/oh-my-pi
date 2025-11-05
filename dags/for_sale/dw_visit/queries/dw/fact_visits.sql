@@ -26,6 +26,7 @@ SELECT
   v.id_house_listing AS sk_house_listing,
   v.id_company_demand AS sk_company_demand,
   v.id_company_supply AS sk_company_supply,
+  ppa.id_house_listing_relation AS sk_ppa_relation,
   bc.sk_business_context,
   dim_heh.sk_house_entrance,
   db.sk_behavior_type,
@@ -109,3 +110,8 @@ LEFT JOIN
     ON v.id_visit = funnel_cs.sk_visit
     AND v.business_context = funnel_cs.business_context
     AND funnel_cs.event_code = 'cs'
+LEFT JOIN
+  datalake_ebdb_agents.preferred_property_agent_relation_history AS ppa
+    ON ppa.id_house = v.id_house
+    AND v.business_context = ppa.business_context
+    AND v.ts_created BETWEEN ppa.ts_relation_started AND COALESCE(ppa.ts_relation_ended, NOW())
