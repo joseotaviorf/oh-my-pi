@@ -685,11 +685,11 @@ rent_demand_events AS (
   UNION ALL
   SELECT --advance_payment
     ap.id AS id_event,
-    NULL AS id_booking,
-    NULL AS id_visit,
+    rf.id_booking AS id_booking,
+    rf.id_visit AS id_visit,
     off.id_offer_context AS id_offer,
-    NULL AS id_proposal,
-    NULL AS id_contract,
+    rf.id_proposal AS id_proposal,
+    rf.id_contract AS id_contract,
     ap.id AS id_advance_payment,
     CASE
       WHEN ap.status = 'CREATED' THEN 15

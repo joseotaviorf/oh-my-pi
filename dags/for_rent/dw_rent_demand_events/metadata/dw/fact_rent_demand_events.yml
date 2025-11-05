@@ -33,6 +33,10 @@ columns:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_offer
     description: Id of the offer.
+  sk_advance_payment:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_advance_payment
+    description: Id of the advance payment.
   sk_proposal:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_proposal

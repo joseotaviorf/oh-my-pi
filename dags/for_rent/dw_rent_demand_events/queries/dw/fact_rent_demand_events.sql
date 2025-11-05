@@ -27,6 +27,7 @@ SELECT
     COALESCE(rde.id_booking, -1) AS sk_booking,
     COALESCE(rde.id_visit, -1) AS sk_visit,
     COALESCE(rde.id_offer, -1) AS sk_offer,
+    COALESCE(rde.id_advance_payment, -1) AS sk_advance_payment,
     COALESCE(rde.id_proposal, -1) AS sk_proposal,
     COALESCE(rde.id_contract, -1) AS sk_contract,
     rde.id_event_type AS sk_event_type,
