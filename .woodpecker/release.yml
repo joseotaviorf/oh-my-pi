@@ -93,7 +93,7 @@ steps:
   create-dag-files:
     image: public.ecr.aws/docker/library/python:3.9.5
     commands:
-      - pip install "apache-airflow==2.10.4"
+      - pip install "google-re2==1.1.20250805" "apache-airflow==2.10.4"
       - make requirements-scripts
       - make create-dag-files
     when:
