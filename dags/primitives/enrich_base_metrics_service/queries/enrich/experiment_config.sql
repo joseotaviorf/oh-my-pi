@@ -194,6 +194,29 @@ FROM VALUES
                                 ),
            'running', True
         )
+    ),
+
+    -- Talk to Concierge button test
+    (
+        "ab_beakman_talk_to_concierge",
+        named_struct(
+            'begin_date', DATE('2025-11-07'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 AS experiment_config(experiment_name, config)
