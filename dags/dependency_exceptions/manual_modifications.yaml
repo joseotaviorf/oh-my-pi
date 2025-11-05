@@ -300,6 +300,7 @@ bietlejuice.enrich_content_funnel:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
 bietlejuice.enrich_google_search_console_classified:
   remove:
+    - bietlejuice.gsheets_growth:done-clean-brazilian-regions-url:first-run-of-day
     - bietlejuice.gsheets_growth:done-clean-mexico-regions:first-run-of-day
 bietlejuice.enrich_neurotech_quintocred:
   remove:

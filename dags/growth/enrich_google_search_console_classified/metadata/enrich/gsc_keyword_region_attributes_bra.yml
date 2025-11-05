@@ -5,25 +5,25 @@ domain: Growth
 description: |
   Keyword-level regional enrichment for Google Search Console (GSC) data for Brazilian portals (Imovelweb, wimoveis and CasaMineira).
   Adds inferred matches for IBGE city and regional classification (cidade_sigla) based on page URL analysis,
-  while preserving keyword performance metrics for regional SEO analysis.
+  while preserving keyword performance metrics for regional SEO analysis and region match by URL.
 columns:
   keyword:
     description: "Original search query from GSC."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.keyword
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword
   keyword_clean:
     description: "Keyword normalized to lowercase with accents removed and non-alphanumeric characters stripped (spaces kept)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword_clean
   match_igbe_city:
     description: IBGE city name inferred from the cleaned keyword using Brazilian cities reference.
     lineage:
       - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
-      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword_clean
   city_abbreviation:
     description: "Brazilian city/region abbreviation derived from page URL analysis."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.page
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.page
     categories:
       RJ: "Rio de Janeiro"
       POA: "Porto Alegre"
@@ -37,74 +37,90 @@ columns:
   page:
     description: "Full page URL."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.page
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.page
   structure:
     description: "Page structure according to business rules."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.structure
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.structure
   business_context:
     description: "Business context category classification according to business rules."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.business_context
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.business_context
   site_url:
     description: "Main property URL measured by GSC."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.site_url
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.site_url
   device:
     description: "Device type where the search was made (desktop, mobile, tablet)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.device
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.device
   domain:
     description: "Generic referring domain grouping (Supply, Content, Help, QuintoAndar)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.domain
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.domain
   country:
     description: "Country from GSC"
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.country
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.country
+  state:
+    description: "State match by URL"
+    lineage:
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.state
+  city:
+    description: "City match by URL"
+    lineage:
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.city
+  neighborhood:
+    description: "Neighborhood match by URL"
+    lineage:
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.neighborhood
   position:
     description: "Aggregated average position computed as SUM(posimp) / SUM(impressions)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.position
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.position
   impressions:
     description: "Total impressions in the month for the group (SUM of impressions)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.impressions
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.impressions
   clicks:
     description: "Total clicks in the month for the group (SUM of clicks)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.clicks
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.clicks
   ctr:
     description: "Aggregated click-through rate computed as SUM(clicks) / SUM(impressions)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.ctr
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.ctr
   posimp:
     description: "Total position-impressions product in the month for the group (SUM of posimp)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.posimp
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.posimp
   is_branded:
     description: "Flag indicating whether the search query is branded."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.is_branded
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.is_branded
+  has_region:
+    description: Flag indicating whether the pages identifies a region.
+    lineage:
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.has_region
   has_mention_to_city:
     description: Flag indicating whether the keyword mentions or implies a city.
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.keyword_clean
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.keyword_clean
       - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
   dt_created:
     description: "Month reference date (first day of month) derived from the original search date."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.dt_created
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.dt_created
   year:
     description: "Partition year."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.year
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.year
   month:
     description: "Partition month."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.month
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.month
   day:
     description: "Partition day (set to 01 for monthly aggregation)."
     lineage:
-      - datalake_google_search_console_classified.gsc_keywords.day
+      - datalake_google_search_console_classified.gsc_keyword_region_url_match_bra.day
 

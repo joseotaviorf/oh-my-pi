@@ -11,10 +11,9 @@ keywords AS (
   SELECT
     *
   FROM 
-    datalake_google_search_console_classified.gsc_keywords
+    datalake_google_search_console_classified.gsc_keywords_region_url_match_bra
   WHERE
-    domain IN ("imovelweb", "wimoveis", "casamineira")
-    AND dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 general_city_level_enrichment AS (
   SELECT
@@ -73,6 +72,9 @@ general_city_level_enrichment AS (
     structure,
     business_context,
     country,
+    state,
+    city,
+    neighborhood,
     position,
     impressions,
     clicks,
@@ -82,6 +84,7 @@ general_city_level_enrichment AS (
     device,
     domain,
     is_branded,
+    has_region,
     dt_created,
     year,
     month,
@@ -109,12 +112,16 @@ SELECT
   device,
   domain,
   country,
+  state,
+  city,
+  neighborhood,
   position,
   impressions,
   clicks,
   ctr,
   posimp,
   is_branded,
+  has_region,
   CASE
     WHEN match_ibge_city != '' THEN 1
     ELSE 0
