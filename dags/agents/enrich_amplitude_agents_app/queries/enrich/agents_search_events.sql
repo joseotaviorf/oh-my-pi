@@ -26,7 +26,18 @@ WITH events AS (
             'search_page_viewed',
             'listing_page_viewed',
             'share_listing',
-            'favorites_list_page_viewed'
+            'favorites_list_page_viewed',
+            'shopwindow_onboarding_viewed',
+            'shopwindow_onboarding_step_completed',
+            'shopwindow_share_listing_onboarding_viewed',
+            'shopwindow_share_listing_onboarding_action_button_clicked',
+            'shopwindow_add_to_list_onboarding_viewed',
+            'shopwindow_add_to_list_onboarding_action_button_clicked',
+            'shopwindow_listing_shared',
+            'add_to_shopwindow_intent_page_view',
+            'add_to_shopwindow_success_page_view',
+            'create_new_shopwindow_button_clicked',
+            'key_holder_lock_drawer_viewed'
         )
 )
 SELECT
@@ -44,7 +55,7 @@ SELECT
     e.year,
     e.month,
     e.day
-FROM  
+FROM
     events AS e
 JOIN
     datalake_ebdb_agents.business_context AS adbcs
