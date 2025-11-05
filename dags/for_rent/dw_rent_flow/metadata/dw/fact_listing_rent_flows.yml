@@ -68,6 +68,10 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.id
     description: Key of the contract related to the rent flow. A rent flow can have none, one or more contracts related.
+  sk_advance_payment:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_advance_payment
+    description: Key of the advance payment related to the rent flow. A rent flow can have none, one or more advance payments related.
   sk_rent_flow_taxonomy:
     lineage:
       - dw_public.dim_booking.sk_rent_flow_taxonomy
@@ -173,6 +177,14 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.ts_canceled
     description: Key of the date when the contract related to the rent flow was canceled. It's the contract's cancelation date transformed into a number. A rent flow can have none, one or more contract's canceled dates.
+  sk_advance_payment_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_created
+    description: Key of the date when the advance payment related to the rent flow was created. It's the advance payment's creation date transformed into a number. A rent flow can have none, one or more advance payment's created dates.
+  sk_advance_payment_paid_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_paid
+    description: Key of the date when the advance payment related to the rent flow was paid. It's the advance payment's paid date transformed into a number. A rent flow can have none, one or more advance payment's paid dates.
   sk_credit_analysis_first_init_date:
     lineage:
       - datalake_proposal.proposal.ts_credit_analysis_first_init

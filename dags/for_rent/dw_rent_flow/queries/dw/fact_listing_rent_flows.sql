@@ -10,6 +10,21 @@ WITH listing_rent_flows AS (
         FROM
             datalake_kill_queue.reservation
     ),
+    advance_payment AS (
+        SELECT
+            rf1.id_offer,
+            rf1.id_rent_flow,
+            rf1.id_advance_payment,
+            rf1.ts_advance_payment_created,
+            rf2.ts_advance_payment_paid
+        FROM
+            datalake_rent_flows.rent_flows AS rf1
+        LEFT JOIN
+            datalake_rent_flows.rent_flows AS rf2
+                ON rf1.id_advance_payment = rf2.id_advance_payment
+                AND rf2.id_event_type = 18 
+        WHERE rf1.id_event_type = 15
+    ),
     rent_flows_base AS (
         SELECT
             rent_flow.id_house_rent_flow,
@@ -26,6 +41,7 @@ WITH listing_rent_flows AS (
             COALESCE(dim_offer.sk_offer, -1) AS sk_offer,
             COALESCE(rent_flow.id_proposal, -1) AS sk_proposal,
             COALESCE(rent_flow.id_contract, -1) AS sk_contract,
+            COALESCE(advance_payment.id_advance_payment, -1) AS sk_advance_payment,
             COALESCE(reservation.id_reservation, -1) AS sk_reservation,
             COALESCE(dim_booking.sk_rent_flow_taxonomy, -1) AS sk_rent_flow_taxonomy,
             COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
@@ -110,10 +126,14 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(DATE_FORMAT(proposal.ts_guarantee_paid, "yyyyMMdd") AS BIGINT), -1) AS sk_guarantee_paid_date,
             COALESCE(CAST(DATE_FORMAT(proposal.ts_processed, "yyyyMMdd") AS BIGINT), -1) AS sk_proposal_processed_date,
             COALESCE(CAST(DATE_FORMAT(reservation.ts_created, "yyyyMMdd") AS BIGINT), -1) AS sk_reservation_created_date,
+            COALESCE(CAST(DATE_FORMAT(advance_payment.ts_advance_payment_created, "yyyyMMdd") AS BIGINT), -1) AS sk_advance_payment_created_date,
+            COALESCE(CAST(DATE_FORMAT(advance_payment.ts_advance_payment_paid, "yyyyMMdd") AS BIGINT), -1) AS sk_advance_payment_paid_date,
             CAST(reservation.reservation_attempts AS SMALLINT) AS reservation_attempts,
             COALESCE(CAST(proposal.ts_credit_approved_last AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_credit_last_approved,
             COALESCE(CAST(contract.ts_signed AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_signed,
             COALESCE(CAST(contract.ts_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_created,
+            COALESCE(CAST(advance_payment.ts_advance_payment_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_advance_payment_created,
+            COALESCE(CAST(advance_payment.ts_advance_payment_paid AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_advance_payment_paid,
             CAST(NOW() AS TIMESTAMP) AS ts_load
         FROM
             datalake_ebdb_rent_flow.rent_flow
@@ -181,6 +201,10 @@ WITH listing_rent_flows AS (
             datalake_company.company_sks AS cs_tag
                 ON h.is_rent_3p_supply
                 AND h.partner_3p_supply = cs_tag.extracted_3p_tag
+        LEFT JOIN
+            advance_payment
+                ON rent_flow.id_rent_flow = advance_payment.id_rent_flow
+                AND rent_flow.id_offer_context = advance_payment.id_offer
         WHERE
             house_listing.is_for_rent
             AND (
@@ -360,6 +384,7 @@ SELECT
     sk_reservation,
     sk_proposal,
     sk_contract,
+    sk_advance_payment,
     sk_rent_flow_taxonomy,
     sk_company_supply,
     sk_house_first_listing_date,
@@ -386,6 +411,8 @@ SELECT
     sk_contract_signed_date,
     sk_contract_annulment_date,
     sk_contract_canceled_date,
+    sk_advance_payment_created_date,
+    sk_advance_payment_paid_date,
     sk_credit_analysis_first_init_date,
     sk_credit_analysis_last_init_date,
     sk_credit_analysis_init_date,

@@ -17,6 +17,8 @@ WITH counts AS (
     COUNT(DISTINCT id_contract) FILTER (WHERE ts_contract_created IS NOT NULL) AS nbr_contracts_created,
     COUNT(DISTINCT id_contract) FILTER (WHERE ts_contract_signed IS NOT NULL) AS nbr_contracts_signed,
     COUNT(DISTINCT id_contract) FILTER (WHERE dt_contract_terminated IS NOT NULL) AS nbr_contracts_terminated,
+    COUNT(DISTINCT id_advance_payment) FILTER (WHERE ts_advance_payment_created IS NOT NULL) AS nbr_advance_payments_created,
+    COUNT(DISTINCT id_advance_payment) FILTER (WHERE ts_advance_payment_paid IS NOT NULL) AS nbr_advance_payments_paid,
     SUM(tta_messages) AS nbr_tta_messages
   FROM
     datalake_rent_flows.rent_flows
@@ -38,6 +40,8 @@ min_max_events AS (
     MAX(id_offer) AS id_last_offer,
     MAX(id_proposal) AS id_last_proposal,
     MAX(id_contract) AS id_last_contract,
+    MIN(id_advance_payment) AS id_first_advance_payment,
+    MAX(id_advance_payment) AS id_last_advance_payment,
     MIN(ts_rent_flow_event) AS ts_first_event,
     MIN(ts_booking_created) AS ts_first_booking_created,
     MIN(ts_visit_completed) AS ts_first_visit_completed,
@@ -47,6 +51,8 @@ min_max_events AS (
     MIN(ts_offer_approved) AS ts_first_offer_approved,
     MIN(ts_contract_created) AS ts_first_contract_created,
     MIN(ts_contract_signed) AS ts_first_contract_signed,
+    MIN(ts_advance_payment_created) AS ts_first_advance_payment_created,
+    MIN(ts_advance_payment_paid) AS ts_first_advance_payment_paid,
     MAX(ts_rent_flow_event) AS ts_last_event,
     MAX(ts_booking_created) AS ts_last_booking_created,
     MAX(ts_visit_completed) AS ts_last_visit_completed,
@@ -54,7 +60,9 @@ min_max_events AS (
     MAX(ts_offer_submitted) AS ts_last_offer_submitted,
     MAX(ts_offer_approved) AS ts_last_offer_approved,
     MAX(ts_contract_created) AS ts_last_contract_created,
-    MAX(ts_contract_signed) AS ts_last_contract_signed
+    MAX(ts_contract_signed) AS ts_last_contract_signed,
+    MAX(ts_advance_payment_created) AS ts_last_advance_payment_created,
+    MAX(ts_advance_payment_paid) AS ts_last_advance_payment_paid
   FROM
     datalake_rent_flows.rent_flows
   GROUP BY 1, 2, 3, 4
@@ -104,6 +112,8 @@ SELECT
   COALESCE(m.id_last_proposal, -1) AS sk_last_proposal,
   COALESCE(m.id_first_contract, -1) AS sk_first_contract,
   COALESCE(m.id_last_contract, -1) AS sk_last_contract,
+  COALESCE(m.id_first_advance_payment, -1) AS sk_first_advance_payment,
+  COALESCE(m.id_last_advance_payment, -1) AS sk_last_advance_payment,
   COALESCE(rf.id_region, -1) AS sk_region,
   COALESCE(cs.sk_company, -1) AS sk_company_supply,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_event_date,
@@ -114,6 +124,8 @@ SELECT
   COALESCE(CAST(DATE_FORMAT(m.ts_first_offer_approved, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_offer_approved_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_contract_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_contract_created_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_contract_signed, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_contract_signed_date,
+  COALESCE(CAST(DATE_FORMAT(m.ts_first_advance_payment_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_advance_payment_created_date,
+  COALESCE(CAST(DATE_FORMAT(m.ts_first_advance_payment_paid, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_advance_payment_paid_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_last_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_event_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_last_booking_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_booking_created_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_last_visit_completed, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_visit_completed_date,
@@ -122,6 +134,8 @@ SELECT
   COALESCE(CAST(DATE_FORMAT(m.ts_last_offer_approved, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_offer_approved_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_last_contract_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_contract_created_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_last_contract_signed, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_contract_signed_date,
+  COALESCE(CAST(DATE_FORMAT(m.ts_last_advance_payment_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_advance_payment_created_date,
+  COALESCE(CAST(DATE_FORMAT(m.ts_last_advance_payment_paid, 'yyyyMMdd') AS BIGINT), -1) AS sk_last_advance_payment_paid_date,
   rf.country_code,
   DATEDIFF(ts_last_event, ts_first_event) AS days_first_touchpoint_to_last,
   DATEDIFF(NOW(), ts_last_event) AS days_since_last_event,
@@ -138,6 +152,8 @@ SELECT
   nbr_contracts_created,
   nbr_contracts_signed,
   nbr_contracts_terminated,
+  nbr_advance_payments_created,
+  nbr_advance_payments_paid,
   nbr_tta_messages,
   rf.ts_created,
   rf.ts_updated,
@@ -150,6 +166,8 @@ SELECT
   ts_first_offer_approved,
   ts_first_contract_created,
   ts_first_contract_signed,
+  ts_first_advance_payment_created,
+  ts_first_advance_payment_paid,
   ts_last_event,
   ts_last_booking_created,
   ts_last_visit_completed,
@@ -158,6 +176,8 @@ SELECT
   ts_last_offer_approved,
   ts_last_contract_created,
   ts_last_contract_signed,
+  ts_last_advance_payment_created,
+  ts_last_advance_payment_paid,
   NOW() AS ts_load
 FROM
     last_rent_flow_event AS rf

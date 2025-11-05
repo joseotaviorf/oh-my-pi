@@ -76,6 +76,14 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.id_contract
     description: Id of the most recent contract. Joins with dw_rent.dim_contract.
+  sk_first_advance_payment:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_advance_payment
+    description: Id of the first advance payment. Joins with dw_rent.dim_advance_payment.
+  sk_last_advance_payment:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_advance_payment
+    description: Id of the most recent advance payment. Joins with dw_rent.dim_advance_payment.
   sk_region:
     lineage:
       - datalake_rent_flows.rent_flows.id_region
@@ -116,6 +124,14 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.ts_contract_signed
     description: Date of when the first contract of the rent flow was signed, transformed into an id.
+  sk_first_advance_payment_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_created
+    description: Date of when happened the first advance payment creation of the rent flow, transformed into an id.
+  sk_first_advance_payment_paid_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_paid
+    description: Date of when happened the first advance payment paid of the rent flow, transformed into an id.
   sk_last_event_date:
     lineage:
       - datalake_rent_flows.rent_flows.ts_rent_flow_event
@@ -148,6 +164,14 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.ts_contract_signed
     description: Date of when the last contract of the rent flow was signed, transformed into an id.
+  sk_last_advance_payment_created_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_created
+    description: Date of when happened the last advance payment creation of the rent flow, transformed into an id.
+  sk_last_advance_payment_paid_date:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_paid
+    description: Date of when happened the last advance payment paid of the rent flow, transformed into an id.
   country_code:
     lineage:
       - datalake_rent_flows.rent_flows.country_code
@@ -185,6 +209,10 @@ columns:
     description: Number of contracts signed in the rent flow.
   nbr_contracts_terminated:
     description: Number of contracts terminated in the rent flow.
+  nbr_advance_payments_created:
+    description: Number of advance payments created in the rent flow.
+  nbr_advance_payments_paid:
+    description: Number of advance payments paid in the rent flow.
   nbr_tta_messages:
     description: Number of messages sent during the Talk to Agent program, from the Covid-19 pandemic.
   ts_created:
@@ -231,6 +259,14 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.ts_contract_signed
     description: Timestamp of when happened the first contract of the rent flow was signed.
+  ts_first_advance_payment_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_created
+    description: Timestamp of when happened the first advance payment creation of the rent flow.
+  ts_first_advance_payment_paid:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_paid
+    description: Timestamp of when happened the first advance payment paid of the rent flow.
   ts_last_event:
     lineage:
       - datalake_rent_flows.rent_flows.ts_rent_flow_event
@@ -263,5 +299,13 @@ columns:
     lineage:
       - datalake_rent_flows.rent_flows.ts_contract_signed
     description: Timestamp of when happened the last contract of the rent flow was signed.
+  ts_last_advance_payment_created:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_created
+    description: Timestamp of when happened the last advance payment creation of the rent flow.
+  ts_last_advance_payment_paid:
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_advance_payment_paid
+    description: Timestamp of when happened the last advance payment paid of the rent flow.
   ts_load:
     description: Timestamp of the data load.
