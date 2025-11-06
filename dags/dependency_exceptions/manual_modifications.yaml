@@ -78,7 +78,7 @@ bietlejuice.dw_datamarts_cross:
     - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
     - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep:first-run-of-day
-    - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+    - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
 bietlejuice.dw_datamarts_for_sale:
   add:
@@ -174,7 +174,7 @@ bietlejuice.dw_operator_performance:
     - bietlejuice.webhelp:load-clean-login:first-run-of-day
 bietlejuice.dw_photo_jobs:
   remove:
-    - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+    - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
     - bietlejuice.ebdb:load-clean-inspection:first-run-of-day
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
 bietlejuice.dw_revenue_lines:
@@ -783,7 +783,7 @@ bietlejuice.enrich_tracked_events:
     - bietlejuice.greenseer:load-clean-session:first-run-of-day
 bietlejuice.enrich_tracksale:
   remove:
-    - bietlejuice.ebdb_visit:load-clean-booking:first-run-of-day
+    - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
     - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_offer:load-clean-offer:first-run-of-day

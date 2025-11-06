@@ -39,4 +39,4 @@ SELECT
   criadoem AS ts_created,
   atualizadoem AS ts_updated
 FROM
-  datalake_ebdb_test_raw.Agendamento
+  datalake_ebdb_raw.Agendamento

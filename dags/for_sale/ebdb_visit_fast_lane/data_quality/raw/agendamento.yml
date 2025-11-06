@@ -1,4 +1,4 @@
-table_name: datalake_ebdb_test_raw.agendamento
+table_name: datalake_ebdb_raw.agendamento
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id:
