@@ -1,0 +1,103 @@
+database_name: datalake_sap_accounting_process
+table_name: kill_queue_reverse
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: 
+  Reverse straw failure monitoring for Kill Queue reservation fee invoices.
+  Compares source (Kill Queue) against SAP ledger for account 420006 and flags
+  reverse cases where the source record is missing. Includes basic process
+  status and reference dates for investigation.
+columns:
+  id_accounting_process:
+    description: Unique identifier combining transaction ID and account number.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_transaction
+      - datalake_accounting_funnel.ledger.account_number
+  id_business_entity:
+    description: Tenant/business entity identifier from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_business_entity
+  id_finance_entity:
+    description: Finance entity identifier from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: Finance entity entry identifier from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity_entry
+  version:
+    description: Version identifier from source system (not available in reverse).
+    lineage:
+      - "NULL value"
+  business_unit:
+    description: Business unit label.
+    lineage:
+      - "'for rent' constant"
+  source_name:
+    description: Source system for accounting record.
+    lineage:
+      - "'S4' constant"
+  accounting_type:
+    description: Accounting record type.
+    lineage:
+      - "'invoice' constant"
+  account_number:
+    description: SAP account number (420006 for reservation fee).
+    lineage:
+      - datalake_accounting_funnel.ledger.account_number
+  accounting_name:
+    description: Human readable name for the SAP account (reservation fee).
+    lineage:
+      - "'reservation fee' constant"
+  accrual_year_month:
+    description: Accrual period in format YYYYMM from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.accrual_year_month
+  accounting_process_status:
+    description: Process classification for reverse cases (reverse straw failure).
+    lineage:
+      - "'reverse straw failure' constant"
+  error_description:
+    description: Reason for failure based on presence across SAP and source.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity
+      - datalake_sap_gateway_clean.feature.id_source
+      - datalake_kill_queue_clean.reservation.id
+  is_completeness:
+    description: Indicates whether there is a corresponding source and SAP record (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  is_correctness:
+    description: Indicates whether source and SAP amounts match within tolerance (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  is_temporality:
+    description: Indicates whether SAP reference date is within tolerance from source trigger (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  is_compliance:
+    description: TRUE when completeness, correctness, and temporality are all TRUE (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  source_amount:
+    description: Amount from the Kill Queue reservation source system.
+    lineage:
+      - datalake_kill_queue_clean.reservation.value
+  sap_amount:
+    description: Amount recorded in SAP accounting system.
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+  dt_source_trigger:
+    description: Date when the source record was created/triggered.
+    lineage:
+      - datalake_kill_queue_clean.reservation.ts_created
+  dt_sap_created:
+    description: Date when the record was created in SAP.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_created
+  dt_sap_reference:
+    description: Reference date in SAP accounting system.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
+
+

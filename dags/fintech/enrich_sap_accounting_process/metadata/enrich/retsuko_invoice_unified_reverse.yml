@@ -1,0 +1,105 @@
+database_name: datalake_sap_accounting_process
+table_name: retsuko_invoice_unified_reverse
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description:
+  Reverse straw failure monitoring for unified invoices generated from Retsuko
+  (Seu Barriga) to SAP S/4. Tracks cases where ledger entries exist without a
+  corresponding source-side record, including process status and key dates for
+  investigation.
+columns:
+  id_accounting_process:
+    description: Unique identifier combining transaction ID and account number.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_transaction
+      - datalake_accounting_funnel.ledger.account_number
+  id_business_entity:
+    description: Contract/business entity identifier from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_business_entity
+  id_finance_entity:
+    description: Finance entity identifier from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: Finance entity entry identifier from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity_entry
+  version:
+    description: Version identifier from Retsuko/SAP entity integration.
+    lineage:
+      - datalake_retsuko_clean.sap_entity.version
+  business_unit:
+    description: Business unit label.
+    lineage:
+      - "'for rent' constant"
+  source_name:
+    description: Source system for accounting record.
+    lineage:
+      - "'S4' constant"
+  accounting_type:
+    description: Accounting record type (unified invoice).
+    lineage:
+      - "'unified invoice' constant"
+  account_number:
+    description: SAP account number for the unified invoice mapping.
+    lineage:
+      - datalake_accounting_funnel.ledger.account_number
+  accounting_name:
+    description: Human readable name for the SAP account derived from bill-item.
+    lineage:
+      - datalake_retsuko.entry.bill_item
+  accrual_year_month:
+    description: Accrual period in format YYYYMM from SAP ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.accrual_year_month
+  accounting_process_status:
+    description: Process classification for reverse cases (reverse straw failure).
+    lineage:
+      - "'reverse straw failure' constant"
+  error_description:
+    description: Reason for failure based on presence across SAP entity and gateway.
+    lineage:
+      - datalake_retsuko_clean.sap_entity.id_sap_gateway_feature
+      - datalake_sap_gateway_clean.invoice.id_feature
+      - datalake_sap_gateway_clean.consolidated_invoice.doc_entry
+  is_completeness:
+    description: Indicates whether there is a corresponding source and SAP record (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  is_correctness:
+    description: Indicates whether source and SAP amounts match within tolerance (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  is_temporality:
+    description: Indicates whether SAP reference date is within tolerance from source trigger (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  is_compliance:
+    description: TRUE when completeness, correctness, and temporality are all TRUE (reverse cases set to FALSE).
+    lineage:
+      - "FALSE constant"
+  source_amount:
+    description: Amount from the Retsuko source system.
+    lineage:
+      - datalake_retsuko.entry.amount
+  sap_amount:
+    description: Amount recorded in SAP accounting system.
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+  dt_source_trigger:
+    description: Trigger date based on Retsuko accrual rules for the bill-item.
+    lineage:
+      - datalake_retsuko.entry.accrual_year_month
+      - datalake_retsuko.entry.producer
+      - datalake_retsuko_clean.contract.is_rental_paid_in_advance
+  dt_sap_created:
+    description: Date when the record was created in SAP.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_created
+  dt_sap_reference:
+    description: Reference date in SAP accounting system.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
+
+
