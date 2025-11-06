@@ -682,5 +682,183 @@ class TestSchemaValidationError:
         assert "Schema validation failed" in str(error)
 
 
+class TestSchemaValidatorEdgeCases:
+    """Test cases for edge cases and error conditions."""
+
+    def test_validate_basic_structure_with_exception(self):
+        """Test _validate_basic_structure handles DataFrame access exceptions."""
+        # Arrange
+        validator = SchemaValidator()
+        mock_df = Mock()
+        # Make accessing columns or schema raise an exception
+        type(mock_df).columns = property(Mock(side_effect=Exception("Access error")))
+        type(mock_df).schema = property(
+            Mock(side_effect=Exception("Schema access error"))
+        )
+
+        # Act
+        errors = validator._validate_basic_structure(mock_df, {})
+
+        # Assert
+        assert len(errors) > 0
+        assert "Failed to access DataFrame schema" in errors[0]
+
+    def test_validate_columns_with_none_dataframe(self):
+        """Test _validate_columns handles None DataFrame."""
+        # Arrange
+        validator = SchemaValidator()
+        column_schema = {"id": {"type": "string"}}
+
+        # Act
+        errors = validator._validate_columns(None, column_schema)
+
+        # Assert
+        assert errors == []
+
+    def test_validate_columns_optional_column_not_required(self, spark_session):
+        """Test _validate_columns skips validation for optional columns that don't exist."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = StructType([StructField("id", StringType(), True)])
+        df = spark_session.createDataFrame([("1",)], schema)
+        column_schema = {
+            "id": {"type": "string", "required": True},
+            "optional": {"type": "string", "required": False},
+        }
+
+        # Act
+        errors = validator._validate_columns(df, column_schema)
+
+        # Assert
+        assert errors == []
+
+    def test_validate_column_type_with_datatype_object(self, spark_session):
+        """Test _validate_column_type with DataType object."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = StructType([StructField("id", StringType(), True)])
+        df = spark_session.createDataFrame([("1",)], schema)
+        field = df.schema.fields[0]
+
+        # Act - Pass DataType object instead of string
+        errors = validator._validate_column_type("id", field, StringType())
+
+        # Assert
+        assert errors == []
+
+    def test_validate_column_type_with_datatype_mismatch(self, spark_session):
+        """Test _validate_column_type with DataType object mismatch."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = StructType([StructField("id", StringType(), True)])
+        df = spark_session.createDataFrame([("1",)], schema)
+        field = df.schema.fields[0]
+
+        # Act - Pass different DataType object
+        errors = validator._validate_column_type("id", field, IntegerType())
+
+        # Assert
+        assert len(errors) > 0
+        assert "type mismatch" in errors[0].lower()
+
+    def test_validate_column_type_custom_type_not_in_mapping(self, spark_session):
+        """Test _validate_column_type with custom type not in mapping."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = StructType([StructField("id", StringType(), True)])
+        df = spark_session.createDataFrame([("1",)], schema)
+        field = df.schema.fields[0]
+
+        # Act - Use custom type not in mapping
+        errors = validator._validate_column_type("id", field, "customtype")
+
+        # Assert
+        assert len(errors) > 0
+        assert "type mismatch" in errors[0].lower()
+
+    def test_is_compatible_numeric_type_integer_compatibility(self):
+        """Test _is_compatible_numeric_type for integer types."""
+        # Arrange
+        validator = SchemaValidator()
+
+        # Act & Assert
+        assert validator._is_compatible_numeric_type("int", "integertype") is True
+        assert validator._is_compatible_numeric_type("integer", "longtype") is True
+        assert validator._is_compatible_numeric_type("long", "bigint") is True
+        assert validator._is_compatible_numeric_type("bigint", "int") is True
+        assert validator._is_compatible_numeric_type("int", "stringtype") is False
+
+    def test_is_compatible_numeric_type_float_compatibility(self):
+        """Test _is_compatible_numeric_type for float types."""
+        # Arrange
+        validator = SchemaValidator()
+
+        # Act & Assert
+        assert validator._is_compatible_numeric_type("float", "doubletype") is True
+        assert validator._is_compatible_numeric_type("double", "floattype") is True
+        assert validator._is_compatible_numeric_type("float", "integertype") is False
+
+    def test_validate_column_count_with_none_dataframe(self):
+        """Test _validate_column_count handles None DataFrame."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = {"min_columns": 5}
+
+        # Act
+        errors = validator._validate_column_count(None, schema)
+
+        # Assert
+        assert errors == []
+
+    def test_validate_strict_mode_with_none_dataframe(self):
+        """Test _validate_strict_mode handles None DataFrame."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = {"columns": {"id": {"type": "string"}}, "strict": True}
+
+        # Act
+        errors = validator._validate_strict_mode(None, schema)
+
+        # Assert
+        assert errors == []
+
+    def test_validate_strict_mode_without_columns_in_schema(self, spark_session):
+        """Test _validate_strict_mode when columns not in schema."""
+        # Arrange
+        validator = SchemaValidator()
+        schema = StructType([StructField("id", StringType(), True)])
+        df = spark_session.createDataFrame([("1",)], schema)
+        schema_def = {"strict": True}  # No columns key
+
+        # Act
+        errors = validator._validate_strict_mode(df, schema_def)
+
+        # Assert
+        assert errors == []
+
+    def test_spark_type_to_simple_unmapped_type(self):
+        """Test _spark_type_to_simple with unmapped type."""
+        # Arrange
+        validator = SchemaValidator()
+
+        # Act
+        result = validator._spark_type_to_simple("UnknownComplexType")
+
+        # Assert
+        assert result == "UnknownComplexType"
+
+    def test_spark_type_to_simple_with_complex_type_name(self):
+        """Test _spark_type_to_simple with complex type name."""
+        # Arrange
+        validator = SchemaValidator()
+
+        # Act - Use a type that doesn't match any mapping
+        result = validator._spark_type_to_simple("MapType")
+
+        # Assert
+        # Should return original if no mapping found
+        assert result == "MapType"
+
+
 # Pytest markers for conditional test execution
 pytestmark = [pytest.mark.unit, pytest.mark.core_models, pytest.mark.schema_validation]

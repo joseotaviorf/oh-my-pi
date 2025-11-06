@@ -31,7 +31,7 @@ steps:
       event: push
     depends_on: [] # This is for the steps to run in parallel
 
-  core-model-tests:
+  core-model-tests-and-coverage:
     image: octoenergy/pyspark:3.3.2
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
@@ -39,6 +39,6 @@ steps:
       - pip install --upgrade pip
       - make requirements-test
       - make requirements
-      - make core-model-tests
+      - make core-model-coverage
     when:
       event: push
