@@ -7,6 +7,17 @@ WITH credit_analysis_versions AS (
   GROUP BY 1
 ),
 
+latest_screening_result AS (
+  SELECT
+    id_proposal,
+    liquidity,
+    risk_category_canon,
+    score
+  FROM
+    datalake_sorting_hat_clean.screening_result
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_proposal ORDER BY ts_database_transaction DESC) = 1
+),
+
 credit_analysis AS (
 SELECT
   ca.id_credit_analysis,
@@ -47,7 +58,7 @@ FROM
     credit_analysis_versions AS cav
       ON ca.id_credit_analysis = cav.id_credit_analysis
   LEFT JOIN
-    datalake_sorting_hat_clean.screening_result AS sr
+    latest_screening_result AS sr
       ON sr.id_proposal = ca.id_proposal
 )
 
