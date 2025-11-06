@@ -67,7 +67,7 @@ SELECT
     'S4' AS source_name,
     'invoice' AS accounting_type,
     sl.account_number,
-    r.accounting_type,
+    r.accounting_name,
     sl.accrual_year_month,
     'reverse straw failure' AS accounting_process_status,
     CASE
