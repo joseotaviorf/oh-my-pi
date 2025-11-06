@@ -54,6 +54,30 @@ columns:
     lineage:
       - datalake_visit.visits.id_company_demand
     description: Identification key of the demand partner company.
+  id_user_secretariat_booking_creator:
+    lineage:
+      - datalake_visit.visits.id_user_visit_request
+    description: User identification key of the secretariat member who created the booking when different from the assigned agent.
+  id_user_agent:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent
+    description: Agent user identification key on main tables (EBDB) responsible for the offer.
+  id_user_team_lead:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_team_lead
+    description: Team lead user identification key on main tables (EBDB).
+  id_user_consultant:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_consultant
+    description: Deal Maker/consultant user identification key on main tables (EBDB).
+  id_consultant:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_consultant
+    description: Deal Maker/consultant identification key on SalesFlow tables.
+  id_closing_specialist:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_consultant
+    description: User identification key of the specialist who participated in the CCV (sale agreement) step on main tables (EBDB).
   current_payment_method:
     lineage:
       - datalake_sale_offer.core_sale_offer.current_payment_method

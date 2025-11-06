@@ -1,5 +1,4 @@
-WITH 
-business_unit_by_hub_id AS (
+WITH business_unit_by_hub_id AS (
   SELECT
     bu.id AS id_hub,
     bu.hub_name,
@@ -113,97 +112,103 @@ sales_flow_details AS (
 )
 
 SELECT    
-    o.id_offer,
-    o.id_sales_flow,
-    o.id_sale_flow,
-    o.id_buyer,
-    o.id_house,
-    o.id_owner,
-    o.id_region,
-    o.id_agent,    
-    vo.id_booking,
-    o.id_hub AS id_business_unit,
-    vo.id_company_supply,
-    vo.id_company_demand,
-    o.current_payment_method,
-    o.planned_payment_method,
-    o.has_used_fgts_in_payment,
-    o.brokerage_fee,
-    o.sale_price,
-    o.first_price_offered_by_buyer,
-    o.last_price_offered_by_buyer,
-    o.sale_price_agreed,
-    o.first_discount_proposed,
-    o.last_discount_proposed,
-    slpc.price_segment,
-    bpt.id_buyer_prospect_type,
-    vo.flg_booking_before_offer,
-    vo.flg_visit_completed_before_offer,
-    CASE
-      WHEN rk.buyer_rank_offers = 1
-        THEN TRUE
-      ELSE FALSE
-    END AS is_buyer_first_offer,
-    CASE
-      WHEN rk.house_rank_offers = 1
-        THEN TRUE
-      ELSE FALSE
-    END AS is_house_first_offer,
-    vo.ts_booking_created,
-    vo.hours_booking_to_offer,
-    vo.hours_visit_to_offer,
-    CASE
-        WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_accepted)
-        THEN DATEDIFF(DATE(o.ts_offer_accepted), DATE(o.ts_offer_created))
-    END AS days_offer_submitted_to_offer_accepted,
+  o.id_offer,
+  o.id_sales_flow,
+  o.id_sale_flow,
+  o.id_buyer,
+  o.id_house,
+  o.id_owner,
+  o.id_region,
+  o.id_agent,    
+  vo.id_booking,
+  o.id_hub AS id_business_unit,
+  vo.id_company_supply,
+  vo.id_company_demand,
+  vo.id_user_secretariat_booking_creator,
+  o.current_payment_method,
+  o.planned_payment_method,
+  o.has_used_fgts_in_payment,
+  o.brokerage_fee,
+  o.sale_price,
+  o.first_price_offered_by_buyer,
+  o.last_price_offered_by_buyer,
+  o.sale_price_agreed,
+  o.first_discount_proposed,
+  o.last_discount_proposed,
+  slpc.price_segment,
+  bpt.id_buyer_prospect_type,  
+  sp.id_user_agent,
+  sp.id_user_team_lead,
+  sp.id_user_consultant,
+  sp.id_consultant,
+  sp.id_user_consultant AS id_closing_specialist,
+  vo.flg_booking_before_offer,
+  vo.flg_visit_completed_before_offer,
+  CASE
+    WHEN rk.buyer_rank_offers = 1
+      THEN TRUE
+    ELSE FALSE
+  END AS is_buyer_first_offer,
+  CASE
+    WHEN rk.house_rank_offers = 1
+      THEN TRUE
+    ELSE FALSE
+  END AS is_house_first_offer,
+  vo.ts_booking_created,
+  vo.hours_booking_to_offer,
+  vo.hours_visit_to_offer,
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_accepted)
+      THEN DATEDIFF(DATE(o.ts_offer_accepted), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_offer_accepted,
 
-    CASE
-        WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_created)
-        THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
-    END AS days_offer_submitted_to_sale_agreement_created,
-    
-    CASE
-        WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_discarded)
-        THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
-    END AS days_offer_submitted_to_offer_dismissed,
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_created)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_sale_agreement_created,
+  
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_discarded)
+      THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_offer_dismissed,
 
-    CASE
-        WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_signed)
-        THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
-    END AS days_offer_submitted_to_sale_agreement_signed,
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_signed)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_sale_agreement_signed,
 
-    CASE
-        WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_created)
-        THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
-    END AS days_offer_accepted_to_sale_agreement_created,
+  CASE
+      WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_created)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
+  END AS days_offer_accepted_to_sale_agreement_created,
 
-    CASE
-        WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_signed)
-        THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
-    END AS days_offer_accepted_to_sale_agreement_signed,
+  CASE
+      WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_signed)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
+  END AS days_offer_accepted_to_sale_agreement_signed,
 
-    CASE
-        WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_offer_discarded)
-        THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
-    END AS days_offer_accepted_to_offer_dismissed,
-    
-    CASE
-        WHEN DATE(o.ts_sale_agreement_created) <= DATE(o.ts_sale_agreement_signed)
-        THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_sale_agreement_created))
-    END AS days_sale_agreement_created_to_sale_agreement_signed,
-    o.ts_offer_created AS ts_offer_submitted,
-    o.ts_offer_accepted,
-    o.ts_offer_discarded AS ts_offer_dismissed,
-    o.ts_offer_canceled,
-    o.ts_offer_rescued,
-    o.ts_sale_agreement_created,
-    o.ts_sale_agreement_signed,
-    sfd.ts_seller_fup,
-    sfd.ts_buyer_fup, 
-    now() as ts_load
+  CASE
+      WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_offer_discarded)
+      THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
+  END AS days_offer_accepted_to_offer_dismissed,
+  
+  CASE
+      WHEN DATE(o.ts_sale_agreement_created) <= DATE(o.ts_sale_agreement_signed)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_sale_agreement_created))
+  END AS days_sale_agreement_created_to_sale_agreement_signed,
+  o.ts_offer_created AS ts_offer_submitted,
+  o.ts_offer_accepted,
+  o.ts_offer_discarded AS ts_offer_dismissed,
+  o.ts_offer_canceled,
+  o.ts_offer_rescued,
+  o.ts_sale_agreement_created,
+  o.ts_sale_agreement_signed,
+  sfd.ts_seller_fup,
+  sfd.ts_buyer_fup, 
+  now() as ts_load
 FROM
   datalake_sale_offer.core_sale_offer AS o
-INNER JOIN
+LEFT JOIN
   visit_offer AS vo
   ON o.id_offer = vo.id_offer
 LEFT JOIN
@@ -216,7 +221,7 @@ LEFT JOIN
   sales_flow_details AS sfd
   ON sfd.id_sales_flow = o.id_sales_flow
 LEFT JOIN datalake_region.region AS r
-        ON o.id_region = r.id
+  ON o.id_region = r.id
 LEFT JOIN
   datalake_sale_listings.sale_listing_price_changes AS slpc
   ON o.id_house = slpc.id_house
@@ -228,3 +233,6 @@ LEFT JOIN
   AND r.city_group = bpt.city_group
   AND o.ts_offer_created >= bpt.ts_activation 
   AND o.ts_offer_created < COALESCE(bpt.ts_activation_end, NOW())
+LEFT JOIN
+  datalake_sale_offer_flows.offer_specialists AS sp
+  ON o.id_offer = sp.id_offer
