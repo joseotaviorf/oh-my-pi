@@ -35,3 +35,4 @@ workflow:
       - dag_run
 cluster:
   type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new_env
