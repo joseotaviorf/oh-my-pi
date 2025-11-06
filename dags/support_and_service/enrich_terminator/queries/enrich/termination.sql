@@ -141,7 +141,12 @@ repair_metrics AS (
         datalake_inspections.inspection_booking AS ib
             ON rr.id_inspection = ib.id_inspection
     WHERE
-        rr.comment IS NOT NULL
+        (
+        (rr.has_automatically_identified IS NULL AND rr.comment IS NOT NULL) -- proxy legacy rule
+        OR NOT rr.has_automatically_identified 
+        OR (rr.has_automatically_identified AND rr.has_automatic_identification_accepted) 
+        OR rr.has_automatic_identification_accepted IS NULL
+        )
         AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
     GROUP BY
           1
