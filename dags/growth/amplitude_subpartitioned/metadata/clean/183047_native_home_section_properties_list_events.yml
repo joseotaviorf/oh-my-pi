@@ -61,10 +61,22 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.amplitude_event_type
     description: Column amplitude_event_type from Amplitude events
-  ab_beakman_native_owner_home_toggle:
+  ab_beakman_native_home_bff_supply_visits_tile:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-    description: Column ab_beakman_native_owner_home_toggle from Amplitude events
+    description: Column ab_beakman_native_home_bff_supply_visits_tile from Amplitude events
+  rc_beakman_native_home_bff_supply_visits_tile:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column rc_beakman_native_home_bff_supply_visits_tile from Amplitude events
+  ab_beakman_native_home_bff_supply_rental_transact_tile:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column ab_beakman_native_home_bff_supply_rental_transact_tile from Amplitude events
+  rc_beakman_native_home_bff_supply_rental_transact_tile:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column rc_beakman_native_home_bff_supply_rental_transact_tile from Amplitude events
   up_platform:
     lineage:
       - datalake_amplitude_clean.events.user_properties
