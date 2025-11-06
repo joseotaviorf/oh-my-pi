@@ -156,57 +156,57 @@ overdue_invoices_events AS (
 
   UNION ALL
 
-  SELECT
-    id_amplitude,
-    id_session,
-    id_user,
-    ARRAY(ep_id_contract) AS id_contract,
-    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
-    device_family,
-    "contract_payment_summary_viewed" AS event_name,
-    event_properties,
-    GET_JSON_OBJECT(event_properties, '$.summary_state') AS summary_state,
-    "Overdue Self Service Action" AS funnel_step,
-    5 AS level,
-    "Triggers when user views the 'Payment Summary' page" AS event_description,
-    "lpf" AS feature,
-    TRUE AS is_active,
-    year,
-    month,
-    day,
-    ts_event
-  FROM
-    datalake_amplitude_clean.170698_contract_payment_summary_viewed_events
-  WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  -- SELECT
+  --   id_amplitude,
+  --   id_session,
+  --   id_user,
+  --   ARRAY(ep_id_contract) AS id_contract,
+  --   FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
+  --   device_family,
+  --   "contract_payment_summary_viewed" AS event_name,
+  --   event_properties,
+  --   GET_JSON_OBJECT(event_properties, '$.summary_state') AS summary_state,
+  --   "Overdue Self Service Action" AS funnel_step,
+  --   5 AS level,
+  --   "Triggers when user views the 'Payment Summary' page" AS event_description,
+  --   "lpf" AS feature,
+  --   TRUE AS is_active,
+  --   year,
+  --   month,
+  --   day,
+  --   ts_event
+  -- FROM
+  --   datalake_amplitude_clean.170698_contract_payment_summary_viewed_events
+  -- WHERE
+  --   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
-  UNION ALL
+  -- UNION ALL
 
-  SELECT
-    id_amplitude,
-    id_session,
-    id_user,
-    ARRAY(ep_id_contract) AS id_contract,
-    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
-    device_family,
-    "contract_payment_summary_clicked" AS event_name,
-    event_properties,
-    GET_JSON_OBJECT(event_properties, '$.summary_state') AS summary_state,
-    "Overdue Self Service Action" AS funnel_step,
-    6 AS level,
-    "Triggers when user clicks the 'Payment Summary' page" AS event_description,
-    "lpf" AS feature,
-    TRUE AS is_active,
-    year,
-    month,
-    day,
-    ts_event
-  FROM
-    datalake_amplitude_clean.170698_contract_payment_summary_clicked_events
-  WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  -- SELECT
+  --   id_amplitude,
+  --   id_session,
+  --   id_user,
+  --   ARRAY(ep_id_contract) AS id_contract,
+  --   FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
+  --   device_family,
+  --   "contract_payment_summary_clicked" AS event_name,
+  --   event_properties,
+  --   GET_JSON_OBJECT(event_properties, '$.summary_state') AS summary_state,
+  --   "Overdue Self Service Action" AS funnel_step,
+  --   6 AS level,
+  --   "Triggers when user clicks the 'Payment Summary' page" AS event_description,
+  --   "lpf" AS feature,
+  --   TRUE AS is_active,
+  --   year,
+  --   month,
+  --   day,
+  --   ts_event
+  -- FROM
+  --   datalake_amplitude_clean.170698_contract_payment_summary_clicked_events
+  -- WHERE
+  --   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
-  UNION ALL
+  -- UNION ALL
 
   SELECT
     id_amplitude,

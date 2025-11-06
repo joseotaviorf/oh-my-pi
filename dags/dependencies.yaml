@@ -1551,8 +1551,6 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-review-check-negotiation-cta-onclick-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-coll-review-check-negotiation-page-onload-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-contract-page-viewed-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-contract-payment-summary-clicked-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-170698-contract-payment-summary-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-my-rent-pending-invoices-card-view-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-invoice-pay-button-clicked-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-invoice-pay-total-button-clicked-events:first-run-of-day

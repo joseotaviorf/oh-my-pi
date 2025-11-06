@@ -831,12 +831,6 @@ workflow:
     233592_agent_with_keys_property_indication_error_events:
       run_optimize: false
       run_vacuum: false
-    170698_contract_payment_summary_viewed_events:
-      run_optimize: false
-      run_vacuum: false
-    170698_contract_payment_summary_clicked_events:
-      run_optimize: false
-      run_vacuum: false
     170698_pending_invoices_overdue_card_viewed_events:
       run_optimize: false
       run_vacuum: false
