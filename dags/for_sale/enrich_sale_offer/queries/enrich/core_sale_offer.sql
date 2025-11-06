@@ -250,6 +250,20 @@ offers_date_rescue_history AS (
         datalake_sales_flow_clean.offer AS O
             ON SF.id = O.id_sales_flow
 ),
+offers_date_rescue AS (
+    SELECT 
+        odrh.id_sales_flow,
+        odrh.id_offer,
+        odrh.ts_last_offer_accepted,
+        odrh.ts_last_offer_discarded,
+        odrh.is_a_rescued_offer,
+        odrh.ts_rescued_offer
+    FROM
+        offers_date_rescue_history as odrh
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_sales_flow ORDER BY ts_last_offer_accepted DESC) = 1
+
+),
 sales_flow AS (
     SELECT
         sf.id,
@@ -379,7 +393,7 @@ sale_offer AS (
         sales_flow AS sf
             ON sf.id = off.id_sales_flow
     LEFT JOIN
-        offers_date_rescue_history AS off_drh
+        offers_date_rescue AS off_drh
             ON sf.id = off_drh.id_sales_flow
     LEFT JOIN
         flow_type AS ft
