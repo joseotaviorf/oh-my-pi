@@ -1,0 +1,26 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_keys_management_page_viewed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Tracks when users view the keys management page interface.
+columns:
+  id_user:
+    description: Unique identifier of the agent who viewed the keys management page.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  ts_event:
+    description: Timestamp when the keys management page view event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day

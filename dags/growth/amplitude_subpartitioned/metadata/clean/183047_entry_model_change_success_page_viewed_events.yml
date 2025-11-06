@@ -1,0 +1,42 @@
+database_name: datalake_amplitude_clean
+table_name: 183047_entry_model_change_success_page_viewed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Tracks when users view the success page after successfully changing entry model settings for a property.
+columns:
+  id_user:
+    description: Unique identifier of the owner who viewed the entry model change success page.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    description: Identifier of the property for which the entry model change was successfully completed.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.house_id
+  key_location:
+    description: Location where the property keys are stored.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.key_location
+  source:
+    description: Source from which the entry model change process was initiated.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.source
+  business_context:
+    description: Business context which the entry model change was performed.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.business_context
+  ts_event:
+    description: Timestamp when the entry model change success page view event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day

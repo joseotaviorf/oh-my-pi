@@ -1,0 +1,42 @@
+database_name: datalake_amplitude_clean
+table_name: 183047_entry_model_form_page_viewed_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Tracks when users view the entry model form page to configure or change property entry settings.
+columns:
+  id_user:
+    description: Unique identifier of the owner who viewed the entry model form page.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    description: Identifier of the property for which the entry model form is being viewed or configured.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.house_id
+  key_location:
+    description: Current location where the property keys are stored.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.key_location
+  source:
+    description: Source from which the owner accessed the entry model form page.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.source
+  business_context:
+    description: Business context which the entry model form is being accessed.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.business_context
+  ts_event:
+    description: Timestamp when the entry model form page view event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day

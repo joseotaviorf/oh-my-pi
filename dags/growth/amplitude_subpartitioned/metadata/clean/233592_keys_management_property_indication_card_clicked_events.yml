@@ -1,0 +1,26 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_keys_management_property_indication_card_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Tracks when users click on property indication cards within the keys management interface.
+columns:
+  id_user:
+    description: Unique identifier of the agent who clicked the property indication card in keys management.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  ts_event:
+    description: Timestamp when the property indication card click event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day

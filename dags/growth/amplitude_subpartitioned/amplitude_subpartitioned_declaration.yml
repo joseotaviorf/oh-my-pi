@@ -834,6 +834,24 @@ workflow:
     170698_pending_invoices_overdue_card_viewed_events:
       run_optimize: false
       run_vacuum: false
+    183047_entry_model_details_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_entry_model_form_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_entry_model_change_confirmed_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_entry_model_change_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_keys_management_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_keys_management_property_indication_card_clicked_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new
