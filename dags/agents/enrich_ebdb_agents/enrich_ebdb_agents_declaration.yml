@@ -24,6 +24,8 @@ workflow:
       - year
       - month
       - day
+    preferred_property_agent_program_eligibility:
+      extraction_type: incremental
 cluster:
   type: custom_cluster
   custom_configurations:

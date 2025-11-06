@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_agents
+table_name: preferred_property_agent_program_eligibility
+description: This table registers agents eligibility status to the PPA program
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.agent_data_programs_aud.id
+    description: Primary key - id agent eligibility
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_programs_aud.id_agent_data
+    description: identification of an 5A agent
+  program:
+    lineage:
+      - datalake_ebdb_clean.agent_data_programs_aud.program
+    description: program name
+  is_eligible:
+    lineage:
+      - datalake_ebdb_clean.agent_data_programs_aud.is_eligible
+    description: program eligibility status
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: timestamp to eligibility status start
+  ts_status_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: timestamp to eligibility status end

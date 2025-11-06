@@ -1969,6 +1969,7 @@ bietlejuice.enrich_ebdb_affiliates_cost:
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-data-programs-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-region-data-aud:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
