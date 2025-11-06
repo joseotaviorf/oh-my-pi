@@ -12,7 +12,8 @@ WITH explode_parse_url AS (
     (
       'a514a5d6fe646931',
       '01176589bb5ad239',
-      'f28163ea321f7cab'
+      'f28163ea321f7cab',
+      '4140063f0c1e5a1c'
     )
     AND sr.dt_load BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
@@ -50,7 +51,9 @@ SELECT
             1852448,
             1852462,
             2864548,
-            2864549
+            2864549,
+            3230546,
+            3230547
           )
         THEN rc.answer_content
       END
@@ -62,7 +65,8 @@ SELECT
         (
           1852449,
           1852463,
-          2864550
+          2864550,
+          3230548
         )
       THEN rc.answer_content
     END
@@ -71,11 +75,11 @@ SELECT
     MAX(
       CASE
         WHEN rc.id_question IN (1852451, 1852461) THEN rc.answer_content
-        WHEN rc.id_question = '2864547' AND rc.answer_content = 'Extremely happy' THEN  5
-        WHEN rc.id_question = '2864547' AND rc.answer_content = 'Happy' THEN  4
-        WHEN rc.id_question = '2864547' AND rc.answer_content = 'Neutral' THEN  3
-        WHEN rc.id_question = '2864547' AND rc.answer_content = 'Unsatisfied' THEN  2
-        WHEN rc.id_question = '2864547' AND rc.answer_content = 'Extremely unsatisfied' THEN  1
+        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Extremely happy' THEN  5
+        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Happy' THEN  4
+        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Neutral' THEN  3
+        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Unsatisfied' THEN  2
+        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Extremely unsatisfied' THEN  1
       END
     ) AS INT
   ) AS satisfaction_score,
