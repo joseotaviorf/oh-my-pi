@@ -9,6 +9,7 @@ SELECT
     reason,
     channel,
     event_type,
+    application_source,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

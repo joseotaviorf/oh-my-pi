@@ -43,6 +43,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.visitstatuslog.event_type
     description: "The type of status change event."
+  application_source:
+    lineage:
+      - datalake_ebdb_raw.visitstatuslog.application_source
+    description: "The application source for the visit status change."
   ts_created:
     lineage:
       - datalake_ebdb_raw.visitstatuslog.created_at
