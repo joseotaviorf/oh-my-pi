@@ -1,3 +1,9 @@
+clone:
+  - name: clone
+    image: woodpeckerci/plugin-git
+    settings:
+      partial: false # We need to clone the entire history to find the changed files
+
 steps:
   unit-tests-python:
     image: octoenergy/pyspark:3.3.2
@@ -35,10 +41,4 @@ steps:
       - make requirements
       - make core-model-tests
     when:
-      path:
-        [
-          "dags/core/**",
-          "tests/core_model_dags/**",
-          "bietlejuice/base/core_models/**",
-        ]
       event: push

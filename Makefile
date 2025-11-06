@@ -261,13 +261,19 @@ files-validation:
 	@python -m pytest tests/files_validation/
 
 .PHONY: core-model-tests
-## run core model DAG tests
+## run core model DAG tests (CI/CD only - only runs if core model changes detected)
 core-model-tests:
 	@echo ""
-	@echo "Core Model DAG Tests"
+	@echo "Checking for core model changes"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning tests/core_model_dags/
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/ci_cd/core_models/check_core_model_changes.py -b "$(CI_COMMIT_BRANCH)" -v && exit 0 || \
+		(echo "" && \
+		 echo "Core Model DAG Tests" && \
+		 echo "==========" && \
+		 echo "" && \
+		 python -m pytest -W ignore::DeprecationWarning tests/core_model_dags/)
 
 ###############################################################################
 ###################### Validations commands ###################################
