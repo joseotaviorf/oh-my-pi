@@ -1,4 +1,4 @@
-database_name: datalake_product_tech
+database_name: datalake_gsheets_people
 table_name: team_formation_product_tech
 owner: isabella.araujo@quintoandar.com.br
 domain: People

@@ -1,9 +1,9 @@
 dag:
-  name: enrich_product_tech
+  name: enrich_gsheets_people
   schedule_start_date: 2024, 7, 15
   owner: Data People
   documentation:
-    dag_purpose: Enrich Product and Tech data.
+    dag_purpose: Enrich data from Gsheets for the People team.
 workflow:
   type: query_delta
   layer: enrich
