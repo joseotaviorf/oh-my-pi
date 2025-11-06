@@ -25,15 +25,21 @@ base_data AS (
     domain IN ("inmuebles24", "vivanuncios")
     AND dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+unique_keywords AS (
+  SELECT
+    DISTINCT(keyword_clean) AS keyword_clean
+  FROM
+    base_data
+),
 general_state_level_enrichment AS (
   SELECT 
-    bd.*,
+    uk.keyword_clean,
     CASE
       WHEN CONTAINS(keyword_clean, 'ciudad de mexico') THEN 'ciudad de mexico'
       WHEN RLIKE(keyword_clean, r'.*(\bcdmx\b).*') THEN 'ciudad de mexico'
       ELSE NULL
     END AS match_state
-  FROM base_data bd
+  FROM unique_keywords uk
 ),
 general_city_level_enrichment AS (
   SELECT 
@@ -53,12 +59,12 @@ general_city_level_enrichment AS (
     gsle.*
   FROM general_state_level_enrichment gsle
     LEFT JOIN cities c
-    ON CHARINDEX(LOWER(c.city_clean), LOWER(gsle.keyword_clean)) > 0
-      QUALIFY ROW_NUMBER() OVER(
-        PARTITION BY dt_created, keyword_clean, page, device
-        ORDER BY LENGTH(match_city) DESC, CHARINDEX(match_city, keyword_clean)
-        DESC
-      ) = 1
+      ON CHARINDEX(LOWER(c.city_clean), LOWER(gsle.keyword_clean)) > 0
+  QUALIFY ROW_NUMBER() OVER(
+    PARTITION BY keyword_clean
+    ORDER BY LENGTH(match_city) DESC, CHARINDEX(match_city, keyword_clean)
+    DESC
+  ) = 1
 ),
 general_zone_level_enrichment AS (
   SELECT 
@@ -77,43 +83,45 @@ general_zone_level_enrichment AS (
     gcle.*
   FROM general_city_level_enrichment gcle
     LEFT JOIN zones z
-    ON CHARINDEX(LOWER(z.zone_clean), LOWER(gcle.keyword_clean)) > 0
-      QUALIFY ROW_NUMBER() OVER(
-        PARTITION BY dt_created, keyword_clean, page, device
-        ORDER BY LENGTH(match_zone) DESC, CHARINDEX(match_zone, keyword_clean)
-        DESC
-      ) = 1
+      ON CHARINDEX(LOWER(z.zone_clean), LOWER(gcle.keyword_clean)) > 0
+  QUALIFY ROW_NUMBER() OVER(
+    PARTITION BY keyword_clean
+    ORDER BY LENGTH(match_zone) DESC, CHARINDEX(match_zone, keyword_clean)
+    DESC
+  ) = 1
 )
 SELECT
-  keyword,
-  keyword_clean,
-  COALESCE(match_city, match_state, '') AS match_city,
-  match_zone,
-  page,
-  structure,
-  business_context,
-  site_url,
-  device,
-  domain,
-  country,
-  position,
-  impressions,
-  clicks,
-  ctr,
-  posimp,
-  is_branded,
+  bd.keyword,
+  gzle.keyword_clean,
+  COALESCE(gzle.match_city, gzle.match_state, '') AS match_city,
+  gzle.match_zone,
+  bd.page,
+  bd.structure,
+  bd.business_context,
+  bd.site_url,
+  bd.device,
+  bd.domain,
+  bd.country,
+  bd.position,
+  bd.impressions,
+  bd.clicks,
+  bd.ctr,
+  bd.posimp,
+  bd.is_branded,
   CASE
-    WHEN COALESCE(match_city, match_state, '') != '' THEN 1
+    WHEN COALESCE(gzle.match_city, gzle.match_state, '') != '' THEN 1
     ELSE 0
   END AS has_mention_to_city,
   CASE
-    WHEN match_zone != '' THEN 1
+    WHEN gzle.match_zone != '' THEN 1
     ELSE 0
   END AS has_mention_to_zone,
-  dt_created,
-  year,
-  month,
-  day
+  bd.dt_created,
+  bd.year,
+  bd.month,
+  bd.day
 FROM
-  general_zone_level_enrichment
-
+  base_data bd
+LEFT JOIN
+  general_zone_level_enrichment gzle
+    ON bd.keyword_clean = gzle.keyword_clean
