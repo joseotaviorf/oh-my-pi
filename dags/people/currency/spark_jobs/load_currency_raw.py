@@ -2,7 +2,7 @@ import json
 import requests
 import argparse
 from datetime import datetime
-from tenacity import retry, stop_after_attempt
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
@@ -19,7 +19,26 @@ DATABRICKS_SCOPE = "people"
 API_URL = "https://economia.awesomeapi.com.br/json/daily"
 WEEKEND_DAYS = ["Saturday", "Sunday", "Monday"]
 
-@retry(stop=stop_after_attempt(1))
+
+def _is_retryable_exception(exception):
+    if isinstance(exception, requests.exceptions.HTTPError):
+        status_code = exception.response.status_code if exception.response else None
+        return status_code == 429 or (status_code is not None and status_code >= 500)
+    return isinstance(
+        exception,
+        (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.Timeout,
+        ),
+    )
+
+
+@retry(
+    reraise=True,
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=2, min=1, max=60),
+    retry=retry_if_exception(_is_retryable_exception),
+)
 def get_exchange_rates(currency, start_date, end_date):
     formatted_start_date = start_date.replace("-", "")
     formatted_end_date = end_date.replace("-", "")
@@ -27,7 +46,15 @@ def get_exchange_rates(currency, start_date, end_date):
     logger.info(f"m={JOB_NAME}, msg=Fetching exchange rates from {url}")
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
+        if response.status_code == 429:
+            retry_after = response.headers.get("Retry-After")
+            logger.warning(
+                "m=%s, msg=Rate limited with status 429 for %s. Retry-After=%s",
+                JOB_NAME,
+                currency,
+                retry_after,
+            )
         response.raise_for_status()
         data = response.json()
         if not data:
@@ -35,8 +62,8 @@ def get_exchange_rates(currency, start_date, end_date):
 
         logger.info(f"m={JOB_NAME}, msg=Fetched {len(data)} records for {currency}")
         return data
-    except Exception as e:
-        logger.exception(f"m={JOB_NAME}, msg=Error fetching exchange rates: {e}")
+    except requests.exceptions.RequestException as e:
+        logger.warning(f"m={JOB_NAME}, msg=Error fetching exchange rates: {e}")
         raise
 
 def load_raw(spark_client, df, environment, source, datalake_bucket, table_name):
