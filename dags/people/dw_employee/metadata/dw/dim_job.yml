@@ -2,8 +2,7 @@ database_name: dw_employee
 table_name: dim_job
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: |-
-  Dimension table that stores information about job roles, including their structure, career path, and operational attributes within the QuintoAndar Group.
+description: Dimension table that stores information about job roles, including their structure, career path, and operational attributes within the QuintoAndar Group.
 columns:
   sk_job:
     description: Surrogate key for the job, serving as the unique identifier for this dimension.
@@ -33,6 +32,10 @@ columns:
     description: The name of the compensation ladder, or salary table, which defines the compensation details for a set of jobs.
     lineage:
     - datalake_pin_core_clean.grade_ladder_translation.name
+  country:
+    description: The country where the job is registered. Can be used to infer the country of the employees associated with this job.
+    lineage:
+    - datalake_pin_core_clean.grade_ladder_translation.name
   comp_ladder_business_unit:
     description: Business unit linked to the compensation ladder and job, based on the set identifier.
     lineage:
@@ -41,6 +44,10 @@ columns:
     description: The work arrangement or legal working hours regime for the job.
     lineage:
     - datalake_pin_core_clean.job.work_arrangement
+  currency_code:
+    description: The currency for all currency-related (target and salary_range) fields except for target_sop and target_bonus_tech_usd.
+    lineage:
+    - datalake_pin_core_clean.rates.currency_code
   target_sop_currency:
     description: The currency for the Target SOP (Stock Options Program).
     lineage:
@@ -88,6 +95,10 @@ columns:
   salary_range_max:
     description: The maximum value of the salary range for the job's grade.
     lineage:
+    - datalake_pin_core_clean.grade_ladder_translation.name
+  annual_salary_multiplier:
+    description: The factor used to calculate the total annual gross salary from the monthly salary, accounting for all fixed payments (e.g., 12 months + 13th salary + vacation bonus).
+    lineage:
     - datalake_pin_core_clean.rate_values.maximum_value
   is_active:
     description: 'Flag indicating if the job role is currently active. Possible values: TRUE, FALSE.'
@@ -98,14 +109,14 @@ columns:
     lineage:
     - datalake_pin_core_clean.job.is_time_clocking_required
   dt_effective_started:
-    description: Column description to be added.
+    description: Date in which the job was created/started.
     lineage:
     - datalake_pin_core_clean.job.dt_effective_started
   dt_effective_ended:
-    description: Column description to be added.
+    description: Date in which the job was terminated/ended.
     lineage:
     - datalake_pin_core_clean.job.dt_effective_ended
   ts_updated:
-    description: Column description to be added.
+    description: Timestamp of the last change made to the job.
     lineage:
     - datalake_pin_core_clean.job.ts_updated

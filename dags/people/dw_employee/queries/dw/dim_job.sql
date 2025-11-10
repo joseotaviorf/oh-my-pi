@@ -161,6 +161,7 @@ rates_latest AS (
     SELECT
         id_grade_ladder,
         id_rate,
+        currency_code,
         dt_effective_started,
         object_version_number
     FROM
@@ -197,8 +198,20 @@ SELECT
     grade_tl.name AS band,
     job_latest.contribution_level AS career_track,
     grade_ladder_tl.name AS comp_ladder_directorate,
+    CASE
+        WHEN grade_ladder_tl.name = 'Deel' THEN 'Estados Unidos'
+        WHEN grade_ladder_tl.name = 'Classifieds Geral' THEN 'Uruguai'
+        WHEN RIGHT(grade_ladder_tl.name, 2) = 'PT' THEN 'Portugal'
+        WHEN RIGHT(grade_ladder_tl.name, 2) = 'MX' THEN 'Mexico'
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ARG' THEN 'Argentina'
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PER' THEN 'Peru'
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ECU' THEN 'Ecuador'
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PAN' THEN 'Panama'
+        ELSE 'Brasil'
+    END AS country,
     set_id.set_name AS comp_ladder_business_unit,
     job_latest.work_arrangement AS working_hours_regime,
+    rate.currency_code,
     job_latest.target_sop_currency,
     job_leg.brazilian_occupation_code,
     job_latest.weekly_hours AS workload,
@@ -211,6 +224,17 @@ SELECT
     rate_val.mid_value AS salary_range_midpoint,
     rate_val.minimum_value AS salary_range_min,
     rate_val.maximum_value AS salary_range_max,
+    CASE
+        WHEN grade_ladder_tl.name = 'Deel' THEN 12
+        WHEN grade_ladder_tl.name = 'Classifieds Geral' THEN 13
+        WHEN RIGHT(grade_ladder_tl.name, 2) = 'PT' THEN 14
+        WHEN RIGHT(grade_ladder_tl.name, 2) = 'MX' THEN 13
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ARG' THEN 13
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PER' THEN 14
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'ECU' THEN 14
+        WHEN RIGHT(grade_ladder_tl.name, 3) = 'PAN' THEN 13
+        ELSE 13.33
+    END AS annual_salary_multiplier,
     job_latest.is_active,
     job_latest.is_time_clocking_required AS has_clock_in,
     job_latest.dt_effective_started AS dt_effective_started,
