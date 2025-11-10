@@ -38,4 +38,4 @@ cluster:
     runtime_engine: PHOTON
     num_workers: 2
     spark_version: 13.3.x-scala2.12
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
