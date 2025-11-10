@@ -94,6 +94,15 @@ terminations_finished AS (
     GROUP BY
         1
 ),
+contestation_analysis AS (
+  SELECT 
+    DISTINCT
+    ra.id_inspection
+  FROM
+    datalake_inspections.reviewer AS ra
+  WHERE
+    ra.approval_type = 'CONTESTATION_ANALYSIS'
+),
 repair_metrics AS (
     SELECT
         rr.id_contract,
@@ -124,13 +133,14 @@ repair_metrics AS (
           CASE
             WHEN rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false THEN 1
         END) AS repairs_absorbed_ac,
-        CASE
-            WHEN MAX(ra.is_early_both_agree) = TRUE OR MAX(ib.has_early_mediation) = TRUE THEN 0
-            ELSE COUNT_IF(
-                    (rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE')) OR (rr.requester_type = 'OWNER')
-                ) - COUNT_IF(
-                    (rr.is_exempted_by_owner = true) OR (rr.is_finished = true AND rr.is_exempted = true) OR (rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false)
-                )
+        CASE 
+          WHEN COUNT(ca.id_inspection) > 0 THEN 
+            COUNT_IF( 
+              (rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE')) OR (rr.requester_type = 'OWNER') 
+            ) - COUNT_IF( 
+              (rr.is_exempted_by_owner = true) OR (rr.is_finished = true AND rr.is_exempted = true) OR (rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false) 
+            ) 
+          ELSE 0 
         END AS total_tentant_repair_ac
     FROM
         datalake_inspections.repair_request AS rr
@@ -140,6 +150,9 @@ repair_metrics AS (
     LEFT JOIN
         datalake_inspections.inspection_booking AS ib
             ON rr.id_inspection = ib.id_inspection
+    LEFT JOIN
+        contestation_analysis AS ca
+            ON rr.id_inspection = ca.id_inspection
     WHERE
         (
         (rr.has_automatically_identified IS NULL AND rr.comment IS NOT NULL) -- proxy legacy rule
