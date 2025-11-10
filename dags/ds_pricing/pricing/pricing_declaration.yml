@@ -80,7 +80,7 @@ workflow:
     price_prediction:
       raw_primary_keys: [entity_id]
 cluster:
-  type: databricks_16_4_med_general_cluster
+  type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: data-products
