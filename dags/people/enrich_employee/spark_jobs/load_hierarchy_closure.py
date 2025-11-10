@@ -10,6 +10,7 @@ from pyspark.sql.functions import (
 from pyspark.sql.types import StringType
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -314,6 +315,18 @@ if __name__ == "__main__":
     )
     
     spark_metastore_service.refresh_table(database_name, table_name)
-    
+
+    # Apply table privileges
+    table_privileges_dict = {"people-analytics": ["ALL PRIVILEGES"]}
+
+    table_privileges = TablePrivileges.from_input_dict(
+        table_privileges_dict,
+        full_table_name,
+    )
+    table_privileges.apply()
+    logger.info(
+        f"Applied privileges on {full_table_name} for: {list(table_privileges_dict.keys())}"
+    )
+
     logger.info(f"Successfully loaded {df_hierarchy.count():,} records to {full_table_name}")
 
