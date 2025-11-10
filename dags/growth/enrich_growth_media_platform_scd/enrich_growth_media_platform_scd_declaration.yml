@@ -26,7 +26,7 @@ workflow:
       when_matched_operation: {"is_current": 'False', "dt_end": "source.dt_start"}
       when_not_matched_operation: {"merge_key": "source.id_campaign", "id_campaign": "source.id_campaign", "campaign_name": "source.campaign_name", "origin": "source.origin", "is_current": "source.is_current", "dt_start": "source.dt_start", "dt_end": "source.dt_end"}
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
