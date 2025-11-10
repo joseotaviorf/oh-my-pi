@@ -1,5 +1,5 @@
 ---
-table_name: datalake_hr_system.cost_center_codex
+table_name: datalake_gsheets_people.codex_history_base
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -8,9 +8,27 @@ table_level_validations:
     severity_level: Error
 
 column_level_validations:
-  cost_center_code:
+  id:
     is_unique:
+      severity_level: Error
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  codex_history_code:
+    is_unique:
+      severity_level: Error
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  cost_center_code:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
+  cost_center_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  cost_center_status_latest:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
@@ -42,3 +60,11 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  is_latest_month:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_closing_month:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error

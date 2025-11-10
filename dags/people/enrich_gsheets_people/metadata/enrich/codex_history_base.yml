@@ -1,19 +1,18 @@
-database_name: datalake_hr_system
-table_name: cost_center_codex
+database_name: datalake_gsheets_people
+table_name: codex_history_base
 owner: gabriel.berger@quintoandar.com.br
 domain: People
-description: |-
-  Table containing consolidated information from the CODEX database about cost centers.
+description: Table containing consolidated information from the CODEX database about cost centers. Responsible for retrieving the latest information from Gsheets and incrementally building a historical version.
 columns:
-  cost_center_code:
-    description: |-
-      Unique identifier of the cost center.
+  id:
+    description: Unique identifier of the cost center in a particular date.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.cost_center_code
-  cost_center_name:
-    description: Name of the cost center without its ID at the beginning.
+    - datalake_gsheets_people_clean.codex_cost_centers.dt_updated
+  cost_center_code:
+    description: Unique identifier of the cost center.
     lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.cc_name
+    - datalake_gsheets_people_clean.codex_cost_centers.cost_center_code
   business:
     description: Business unit to which the cost center belongs.
     lineage:
@@ -27,8 +26,7 @@ columns:
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.brand
   vertical:
-    description: |-
-      Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product).
+    description: Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product).
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.structure
   structure:
@@ -89,54 +87,15 @@ columns:
     description: Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_centers.l3
-  owner_finance_email:
-    description: Email of the FP&A (Financial Planning and Analysis team) member responsible for the cost center.
-    lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.fp_owner
   headcount_type:
     description: Inferred type of headcount allocated in the cost center, being either 'Capacity' or 'Overhead'.
     lineage:
     - datalake_gsheets_people_clean.codex_cost_informations.cost_center_detail
-  team_code:
-    description: Unique identifier of the cost centers team
+  dt_closing_month:
+    description: Date representing the offical monthly version of the data.
     lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.team_code
-  sort_number:
-    description: Number used to sort the cost centers in a specific order defined by the FP&A team.
+    - datalake_gsheets_people_clean.codex_cost_centers.dt_updated
+  ts_load:
+    description: Timestamp of when the data was ingested into the datalake.
     lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.sort
-  is_active:
-    description: Boolean flag indicating the status of the cost center. TRUE if cost_center_status is 'Active', FALSE if 'End'.
-    lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.status
-  is_outdated_in_system:
-    description: |-
-      Flag indicating if a cost center's attributes are synchronized between the source of truth (cost_center_codex) and the PIN system (organizations). Derived from comparing multiple attributes between the cost_center_codex and organizations tables.
-    categories:
-      'TRUE': At least one attribute in the PIN system (organizations table) differs from the source of truth (cost_center_codex). The record is outdated and requires an update.
-      'FALSE': All compared attributes are perfectly synchronized between the source of truth (cost_center_codex) and the PIN system (organizations).
-      'NULL': The cost center exists in the source of truth (cost_center_codex) but was not found in the PIN system (organizations), so its synchronization status is unknown.
-    lineage:
-    - datalake_gsheets_people_clean.codex_cost_centers.business
-    - datalake_gsheets_people_clean.codex_cost_centers.product
-    - datalake_gsheets_people_clean.codex_cost_centers.vertical
-    - datalake_gsheets_people_clean.codex_cost_centers.brand
-    - datalake_gsheets_people_clean.codex_cost_centers.structure
-    - datalake_gsheets_people_clean.codex_cost_centers.team
-    - datalake_gsheets_people_clean.codex_cost_centers.chapter
-    - datalake_gsheets_people_clean.codex_cost_centers.line
-    - datalake_gsheets_people_clean.codex_cost_informations.headcount_type
-    - datalake_hr_system_clean.organizations.codigo_dff
-    - datalake_hr_system_clean.organizations.business
-    - datalake_hr_system_clean.organizations.product
-    - datalake_hr_system_clean.organizations.vertical
-    - datalake_hr_system_clean.organizations.brand
-    - datalake_hr_system_clean.organizations.structure
-    - datalake_hr_system_clean.organizations.team
-    - datalake_hr_system_clean.organizations.chapter
-    - datalake_hr_system_clean.organizations.line
-    - datalake_hr_system_clean.organizations.owner_leadership_layer_1_name
-    - datalake_hr_system_clean.organizations.owner_leadership_layer_2_name
-    - datalake_hr_system_clean.organizations.owner_leadership_layer_3_name
-    - datalake_hr_system_clean.organizations.headcount_type
-    - datalake_employee_registration.identifier_mapping.full_name
+    - datalake_gsheets_people_clean.codex_cost_centers.ts_load

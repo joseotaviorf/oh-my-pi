@@ -14,6 +14,14 @@ workflow:
     team_formation_product_tech:
       extraction_type: incremental
       merge_on: ["id"]
+    codex_history_base:
+      extraction_type: incremental
+      merge_on: ["id"]
+    codex:
+      extraction_type: full
+  inner_dependencies:
+    codex:
+      - codex_history_base
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
 cluster:

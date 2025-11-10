@@ -2,13 +2,12 @@ WITH
 cost_center_headcount_type AS (
   SELECT DISTINCT
     cost_center_code,
-    cost_center_detail AS headcount_type
+    cost_center_detail AS headcount_type,
+    dt_updated
   FROM
     datalake_gsheets_people_clean.codex_cost_informations
   WHERE
     cost_center_detail IN ('Capacity', 'Overhead')
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY cost_center_code ORDER BY year DESC, month DESC) = 1
 ),
 employee_ids AS (
   SELECT
@@ -65,7 +64,13 @@ employee_ids_enrich AS (
 ),
 codex_enrich AS (
   SELECT
-    codex_cc.cost_center_code AS cost_center_code,
+    MD5(
+      CONCAT(
+        codex_cc.cost_center_code,
+        DATE_FORMAT(codex_cc.dt_updated, 'yyyyMM')
+      )
+    ) AS id,
+    codex_cc.cost_center_code,
     codex_cc.business,
     codex_cc.product,
     codex_cc.brand,
@@ -81,19 +86,22 @@ codex_enrich AS (
     codex_cc.owner_l1_email,
     codex_cc.owner_l2_email,
     codex_cc.owner_l3_email,
-    codex_hctp.headcount_type
+    codex_hctp.headcount_type,
+    codex_cc.dt_updated AS dt_closing_month,
+    codex_cc.ts_load
   FROM
     datalake_gsheets_people_clean.codex_cost_centers AS codex_cc
   LEFT JOIN
     cost_center_headcount_type AS codex_hctp
       ON codex_cc.cost_center_code = codex_hctp.cost_center_code
+      AND codex_cc.dt_updated = codex_hctp.dt_updated
   QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY
-        codex_cc.cost_center_code
+        codex_cc.cost_center_code,
+        DATE_FORMAT(codex_cc.dt_updated, 'yyyyMM')
       ORDER BY
-        codex_cc.year DESC,
-        codex_cc.month DESC,
+        codex_cc.ts_load DESC,
         (
           + CAST((codex_cc.chapter IS NOT NULL) AS INT)
           + CAST((codex_cc.line IS NOT NULL) AS INT)
@@ -106,6 +114,7 @@ codex_enrich AS (
     )
 
 SELECT
+  codex.id,
   codex.cost_center_code,
   codex.business,
   codex.product,
@@ -113,36 +122,20 @@ SELECT
   codex.vertical,
   codex.structure,
   codex.team,
-  codex.chapter,
-  codex.line,
+  COALESCE(codex.chapter, '-') AS chapter,
+  COALESCE(codex.line, '-') AS line,
   emp_id1.person_number AS owner_l1_person_number,
   emp_id2.person_number AS owner_l2_person_number,
   emp_id3.person_number AS owner_l3_person_number,
-  emp_id1.full_name AS owner_l1_full_name,
-  emp_id2.full_name AS owner_l2_full_name,
-  emp_id3.full_name AS owner_l3_full_name,
+  COALESCE(emp_id1.full_name, '-') AS owner_l1_full_name,
+  COALESCE(emp_id2.full_name, '-') AS owner_l2_full_name,
+  COALESCE(emp_id3.full_name, '-') AS owner_l3_full_name,
   codex.owner_l1_email,
   codex.owner_l2_email,
   codex.owner_l3_email,
-  codex.headcount_type,
-  CASE
-    WHEN org.codigo_dff IS NULL THEN NULL
-    ELSE (
-      (codex.business IS DISTINCT FROM org.business)
-      OR (codex.product IS DISTINCT FROM org.product)
-      OR (codex.vertical IS DISTINCT FROM org.vertical)
-      OR (codex.brand IS DISTINCT FROM org.brand)
-      OR (codex.structure IS DISTINCT FROM org.structure)
-      OR (codex.team IS DISTINCT FROM org.team)
-      OR (codex.chapter IS DISTINCT FROM org.chapter)
-      OR (codex.line IS DISTINCT FROM org.line)
-      OR (emp_id1.full_name IS DISTINCT FROM org.owner_leadership_layer_1_name)
-      OR (emp_id2.full_name IS DISTINCT FROM org.owner_leadership_layer_2_name)
-      OR (emp_id3.full_name IS DISTINCT FROM org.owner_leadership_layer_3_name)
-      OR (codex.headcount_type IS DISTINCT FROM org.headcount_type)
-    )
-  END AS is_outdated_in_system,
-  NOW() AS ts_load
+  COALESCE(codex.headcount_type, '-') AS headcount_type,
+  codex.dt_closing_month,
+  codex.ts_load
 FROM
   codex_enrich AS codex
 INNER JOIN
@@ -158,5 +151,3 @@ LEFT JOIN
 LEFT JOIN
   employee_ids_enrich AS emp_id3
     ON codex.owner_l3_email = emp_id3.work_email
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY org.codigo_dff ORDER BY org.status, org.ts_last_update DESC) = 1
