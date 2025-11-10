@@ -14,12 +14,6 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
-  codex_history_code:
-    is_unique:
-      severity_level: Error
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Error
   cost_center_code:
     has_null_count:
       less_than_or_equal_to: 1
