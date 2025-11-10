@@ -27,8 +27,6 @@ workflow:
       clean_table_name: house_predicted_price
     HousePredictedPrice_AUD:
       clean_table_name: house_predicted_price_aud
-    HousePriceSuggestion:
-      clean_table_name: house_price_suggestion
     HouseRating:
       clean_table_name: house_rating
     HouseRating_RatingLabel:
