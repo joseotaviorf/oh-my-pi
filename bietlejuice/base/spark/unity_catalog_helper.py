@@ -92,3 +92,46 @@ class UnityCatalogHelper:
         UnityCatalogHelper.logger.info(
             f"Granted {privilege_type.value} on {catalog}.{table_name} to {principal}"
         )
+
+    @staticmethod
+    def table_or_schema_has_data_contract_tag(table_name: str, catalog: str = None):
+        """Checks if a table or the table schema has the data contract tag"""
+        if not catalog:
+            catalog = UnityCatalogHelper.get_environment_unity_catalog()
+
+        schema = table_name.split(".")[0]
+
+        tags = BaseSparkContext.spark.sql(
+            f"""
+        SELECT
+            tt.tag_name,
+            tt.tag_value
+        FROM system.information_schema.table_tags tt
+        WHERE tt.catalog_name = '{catalog}' AND (tt.schema_name || "." || tt.table_name) = '{table_name}'
+        UNION ALL
+        SELECT
+            st.tag_name,
+            st.tag_value
+        FROM system.information_schema.schema_tags st
+        WHERE st.catalog_name = '{catalog}' AND st.schema_name = '{schema}'"""
+        ).collect()
+
+        is_data_contract_managed = False
+        data_contract_id = None
+
+        for tag_name, tag_value in tags:
+            if tag_name == "data_contract_managed":
+                is_data_contract_managed = True
+            elif tag_name == "data_contract_id":
+                data_contract_id = tag_value
+
+        if is_data_contract_managed:
+            UnityCatalogHelper.logger.info(
+                f"Table {catalog}.{table_name} has a Data Contract managing the permissions data_contract_id={data_contract_id}"
+            )
+            return True
+
+        UnityCatalogHelper.logger.info(
+            f"Table {catalog}.{table_name} does not have a Data Contract."
+        )
+        return False

@@ -16,6 +16,11 @@ class TablePrivileges:
         self.catalog = catalog
 
     def apply(self) -> None:
+        if UnityCatalogHelper.table_or_schema_has_data_contract_tag(
+            self.table_name, self.catalog
+        ):
+            return
+
         for principal, privileges in self.permissions_by_principal.items():
             for privilege in privileges:
                 UnityCatalogHelper.grant_table_permission(
