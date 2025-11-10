@@ -1,0 +1,224 @@
+database_name: datalake_customer_support
+table_name: tickets_perspective
+description: Enriched view of support data from tickets perspective.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Unique identifier for each ticket.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+    description: Unique identifier for the user associated with the ticket.
+  sk_user_contract:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.fact_tickets.sk_contract
+    description: Unique identifier for the user or contract associated with the ticket.
+  sk_contract:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_contract
+    description: Unique identifier for the contract associated with the ticket.
+  sk_session:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_session
+    description: Unique identifier for the session associated with the ticket.
+  channel:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+    description: Channel associated with the ticket.
+  status:
+    lineage:
+      - dw_customer_support.dim_ticket.status
+    description: Status associated with the ticket.
+  last_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.last_csat_score
+    description: Last CSAT score associated with the ticket.
+  last_csat_comment:
+    lineage:  
+      - dw_satisfaction_rating.fact_ticket_csat.last_csat_comment
+    description: Last CSAT comment associated with the ticket.
+  last_csat_ts_response:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.ts_last_response
+    description: Timestamp of the last CSAT response associated with the ticket.
+  first_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: First CSAT score associated with the ticket.
+  first_csat_comment:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_comment
+    description: First CSAT comment associated with the ticket.
+  first_csat_ts_response:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.ts_first_response
+    description: Timestamp of the first CSAT response associated with the ticket.
+  replies:
+    lineage:
+      - dw_customer_support.fact_tickets.replies
+    description: Number of replies associated with the ticket.
+  reopens:
+    lineage:
+      - dw_customer_support.fact_tickets.reopens
+    description: Number of reopens associated with the ticket.
+  front_or_back:
+    lineage:
+      - dw_customer_support.fact_tickets.front_or_back
+    description: Whether the ticket is from the front or back office.
+  has_answered_csat:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.sk_ticket
+    description: Whether the ticket has a CSAT response.
+  is_ticket_rate:
+    lineage:
+      - dw_customer_support.fact_tickets.is_ticket_rate
+    description: Whether the ticket is part of the ticket rate calculation.
+  ticket_rate_weight:
+    lineage:
+      - dw_customer_support.fact_tickets.ticket_rate_weight
+    description: Weight of the ticket in the ticket rate calculation.
+  ticket_age:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+      - dw_customer_support.fact_tickets.ts_created
+    description: Age of the ticket in days.
+  ticket_type:
+    lineage:
+      - dw_customer_support.dim_ticket.type
+    description: Type of the ticket.
+  first_department:
+    lineage:
+      - dw_customer_support.dim_ticket.department
+    description: First department associated with the ticket.
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Last department associated with the ticket.
+  pre_pos_front:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Whether the ticket is from the pré or pós front office.
+    categories:
+      Pré: When the ticket last department is any of the following departments
+        - CX Mudança [FRONT] [POS]
+        - CX Parceiros Compra e Venda [FRONT]
+        - CX Parceiros [FRONT] [PRE]
+        - CX Parceiros da Portaria [FRONT] [PRE]
+        - CX Propostas [FRONT] [PRE]
+        - CX Visitas [FRONT] [PRE]
+        - Consultores imobiliários 5A 
+      Pós: When the ticket last department is any of the following departments
+        - CX Pagamentos [FRONT] [POS]
+        - CX Reparos [FRONT] [POS]
+        - CX Rescisão [FRONT] [POS]
+      "NULL": When the ticket last department is not any of the above departments.
+  first_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the first agent associated with the ticket.
+  first_agent_manager:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_manager
+    description: Manager of the first agent associated with the ticket.
+  first_analyst_organization:
+    lineage: 
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the first agent associated with the ticket.
+  last_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the last agent associated with the ticket.
+  last_agent_manager:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_manager
+    description: Manager of the last agent associated with the ticket.
+  last_agent_organization:
+    lineage: 
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the last agent associated with the ticket.
+  days_since_last_update:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_updated
+    description: Number of days since the last update of the ticket, calculated
+      as the difference between the last update timestamp and the current date, in days.
+  minutes_first_reply_time_business:
+    lineage:
+      - dw_customer_support.fact_tickets.reply_time_min_business
+    description: Number of minutes it took to reply to the ticket in business days.
+  minutes_first_reply_time_calendar:
+    lineage:
+      - dw_customer_support.fact_tickets.reply_time_min_calendar
+    description: Number of minutes it took to reply to the ticket in calendar days.
+  is_ticket_solved_within_sla:
+    lineage:
+      - dw_customer_support.fact_tickets.is_backlog_in_time
+    description: Whether the ticket was solved within the SLA target.
+  days_worked:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Number of business days worked on the ticket.
+  days_worked_with_days_off:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_calendar
+    description: Number of calendar days worked on the ticket, including days off.
+  sla_target:
+    lineage:
+      - dw_customer_support.fact_tickets.sla_target
+    description: SLA target for resolving the ticket.
+  ticket_origin:
+    lineage:
+      - dw_customer_support.fact_tickets.ticket_origin
+    description: Origin of the ticket.
+  total_talk_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.total_talk_time
+    description: Total talk time associated with the ticket.
+  bot:
+    lineage:
+      - dw_customer_support.segments.bot
+    description: Bot name associated with the ticket.
+  ts_latest_customer_comment:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_latest_customer_comment
+    description: Timestamp of the latest customer comment associated with the ticket, in America/Sao_Paulo timezone.
+  ts_latest_analyst_comment:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_latest_analyst_comment
+    description: Timestamp of the latest analyst comment associated with the ticket, in America/Sao_Paulo timezone.
+  ts_task_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp of the task creation associated with the ticket.
+  ts_created:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Timestamp of the ticket creation, in UTC timezone.
+  ts_updated:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_updated
+    description: Timestamp of the ticket last update, in UTC timezone.
+  ts_started_new:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp of the ticket start, in UTC timezone.
+  ts_started_week:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Week of the year of the ticket creation.
+  ts_solved:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Timestamp of the ticket solved, in UTC timezone.
+  ts_closed:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_closed
+    description: Timestamp of the ticket closed, in UTC timezone.
+  ts_last_move_to_final_group:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_last_move_to_final_group
+    description: Timestamp of the last move to the final group of the ticket, in UTC timezone.
