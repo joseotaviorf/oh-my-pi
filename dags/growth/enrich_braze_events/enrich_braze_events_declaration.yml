@@ -11,20 +11,20 @@ workflow:
   custom_schema: braze
   default_extraction_type: incremental
   default_partitions:
-  - event_type
-  - event_channel
-  - year
-  - month
-  - day
+    - event_type
+    - event_channel
+    - year
+    - month
+    - day
 cluster:
   type: custom_cluster
   custom_configurations:
-    spark_version: 12.2.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     driver_node_type_id: m5d.xlarge
     node_type_id: m5d.xlarge
     runtime_engine: PHOTON
     num_workers: 3
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
