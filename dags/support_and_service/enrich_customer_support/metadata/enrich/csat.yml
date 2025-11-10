@@ -48,10 +48,7 @@ columns:
     description: Indicates whether the ticket has been answered based on satisfaction data.
   is_solved:
     lineage:
-      - datalake_zendesk_clean.tickets.satisfaction_rating.score
-      - datalake_survicate.zendesk_email_surveys.is_solved
-      - datalake_bigfone_clean.event.csat_1
-      - datalake_chat_fup_clean.surveys_answer.is_solved
+      - datalake_customer_support.tickets.ts_solved
     description: Indicates whether the ticket has been resolved or solved.
   ts_first_response:
     lineage:

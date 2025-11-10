@@ -99,15 +99,21 @@ csat AS (
     AND sa.rating IS NOT NULL
 )
 SELECT DISTINCT
-  id_ticket,
-  ARRAY_AGG(source) OVER(PARTITION BY id_ticket) AS sources,
-  FIRST(csat_score) OVER(PARTITION BY id_ticket ORDER BY ts_response) AS first_csat_score,
-  FIRST(csat_score) OVER(PARTITION BY id_ticket ORDER BY ts_response DESC) AS last_csat_score,
-  FIRST(csat_comment) OVER(PARTITION BY id_ticket ORDER BY ts_response) AS first_csat_comment,
-  FIRST(csat_comment) OVER(PARTITION BY id_ticket ORDER BY ts_response DESC) AS last_csat_comment,
-  MAX(is_answered) OVER(PARTITION BY id_ticket) AS is_answered,
-  MAX(is_solved) OVER(PARTITION BY id_ticket) AS is_solved,
-  MIN(ts_response) OVER(PARTITION BY id_ticket) AS ts_first_response,
-  MAX(ts_response) OVER(PARTITION BY id_ticket) AS ts_last_response
+  c.id_ticket,
+  ARRAY_AGG(c.source) OVER(PARTITION BY c.id_ticket) AS sources,
+  FIRST(c.csat_score) OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response) AS first_csat_score,
+  FIRST(c.csat_score) OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response DESC) AS last_csat_score,
+  FIRST(c.csat_comment) OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response) AS first_csat_comment,
+  FIRST(c.csat_comment) OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response DESC) AS last_csat_comment,
+  MAX(c.is_answered) OVER(PARTITION BY c.id_ticket) AS is_answered,
+  CASE WHEN 
+    t.ts_solved IS NULL 
+    THEN is_solved = FALSE
+    ELSE TRUE 
+  END AS is_solved,
+  MIN(c.ts_response) OVER(PARTITION BY c.id_ticket) AS ts_first_response,
+  MAX(c.ts_response) OVER(PARTITION BY c.id_ticket) AS ts_last_response
 FROM
-  csat
+  csat AS c
+LEFT JOIN datalake_customer_support.tickets AS t
+  ON t.id_ticket = c.id_ticket
