@@ -696,11 +696,6 @@ bietlejuice.dw_offer:
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic-message:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic:first-run-of-day
-bietlejuice.dw_operator_performance:
-  - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation-installment:first-run-of-day
-  - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation:first-run-of-day
-  - bietlejuice.iaf:load-clean-employee:first-run-of-day
-  - bietlejuice.recupera:load-clean-operators:first-run-of-day
 bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline:first-run-of-day
   - bietlejuice.enrich_payments_platform:load-enrich-payment:first-run-of-day

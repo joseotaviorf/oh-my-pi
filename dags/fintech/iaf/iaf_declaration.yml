@@ -1,6 +1,6 @@
 dag:
   name: iaf
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 9 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: This DAG imports the tables from IAF, one of QuintoCred's payment consultings.

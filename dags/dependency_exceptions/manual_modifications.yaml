@@ -168,10 +168,6 @@ bietlejuice.dw_offboarding:
 bietlejuice.dw_offer:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
-bietlejuice.dw_operator_performance:
-  remove:
-    - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
-    - bietlejuice.webhelp:load-clean-login:first-run-of-day
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
