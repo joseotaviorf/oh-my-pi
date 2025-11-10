@@ -834,6 +834,12 @@ workflow:
     170698_pending_invoices_overdue_card_viewed_events:
       run_optimize: false
       run_vacuum: false
+    170698_contract_payment_summary_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_contract_payment_summary_clicked_events:
+      run_optimize: false
+      run_vacuum: false
     183047_entry_model_details_page_viewed_events:
       run_optimize: false
       run_vacuum: false
