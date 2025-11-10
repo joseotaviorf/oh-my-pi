@@ -54,7 +54,7 @@ def main():
                 .format("text")
                 .option("wholetext", True)
                 .option("recursiveFileLookup", "true")
-                .option("pathGlobFilter", "results.json")
+                .option("pathGlobFilter", "{results,report}.json")
                 .load(source_path)
                 .selectExpr(
                     "_metadata.file_path AS file_path",
@@ -70,11 +70,11 @@ def main():
 
     # Pattern for e2e: includes service after ci_build_id
     # s3://bucket/e2e/repository/deploy_group/YYYY-MM-DD/ci_build_id/service/artifacts/results.json
-    pattern_e2e = r"^s3[an]?://[^/]+/([^/]+)/([^/]+)/([^/]+)/([0-9]{4}-[0-9]{2}-[0-9]{2})/([^/]+)/([^/]+)/.*/results\.json$"
+    pattern_e2e = r"^s3[an]?://[^/]+/([^/]+)/([^/]+)/([^/]+)/([0-9]{4}-[0-9]{2}-[0-9]{2})/([^/]+)/([^/]+)/.*/(?:results|report)\.json$"
 
     # Pattern for hermetic: no service after ci_build_id
     # s3://bucket/hermetic/repository/deploy_group/YYYY-MM-DD/ci_build_id/artifacts/results.json
-    pattern_hermetic = r"^s3[an]?://[^/]+/([^/]+)/([^/]+)/([^/]+)/([0-9]{4}-[0-9]{2}-[0-9]{2})/([^/]+)/artifacts/results\.json$"
+    pattern_hermetic = r"^s3[an]?://[^/]+/([^/]+)/([^/]+)/([^/]+)/([0-9]{4}-[0-9]{2}-[0-9]{2})/([^/]+)/artifacts/(?:results|report)\.json$"
 
     df_parsed = df_raw.selectExpr(
         "file_path",

@@ -1,0 +1,204 @@
+---
+database_name: datalake_release_validations_tests_clean
+table_name: maestro_tests
+domain: Tech Platform
+description: Granular Maestro test executions with test case metadata expanded to one row per test case.
+columns:
+  file_path:
+    description: Full storage path for the Maestro JSON artifact used as source.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.file_path
+  test_type:
+    description: Logical test classification derived from the artifact location (e.g. hermetic, e2e).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.test_type
+  repository:
+    description: Git repository name inferred from the artifact path.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.repository
+  deploy_group:
+    description: Deploy group or product area inferred from the artifact path.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.deploy_group
+  service:
+    description: Service or app name associated with the run, when available in the path.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.service
+  id_ci_build:
+    description: CI build identifier that produced the Maestro run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.ci_build_id
+  dt_run:
+    description: Execution date provided by the ingestion pipeline in YYYY-MM-DD.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.run_date
+  year:
+    description: Year partition extracted from run_date.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.year
+  month:
+    description: Month partition extracted from run_date.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.month
+  day:
+    description: Day partition extracted from run_date.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.day
+  id_test_case:
+    description: Unique identifier for the test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  id_unique_test_result:
+    description: Concatenated identifier for the test result combining build, test case id, and test case index.
+  suite_name:
+    description: Name of the test suite reported by Maestro.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  suite_total_time_seconds:
+    description: Total execution time in seconds for the entire suite.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  suite_timestamp:
+    description: Timestamp of the suite execution in ISO-8601 format.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  performance_avg_execution_time_seconds:
+    description: Average execution time in seconds across all test cases.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  performance_total_execution_time_seconds:
+    description: Total execution time in seconds for all test cases combined.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  maestro_url:
+    description: URL to the Maestro dashboard for this test run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  report_name:
+    description: Name of the report, typically includes branch or PR information.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  platform:
+    description: Platform where tests were executed (e.g., android, ios).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  environment:
+    description: Environment where tests were executed (e.g., hermetic, staging, production).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_id:
+    description: Unique identifier for the individual test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_name:
+    description: Human-readable name of the test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_classname:
+    description: Class name or category associated with the test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_time_seconds:
+    description: Execution time in seconds for this specific test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_status:
+    description: Status outcome for the test case (SUCCESS, FAILED, etc.).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_failure_message:
+    description: Error message if the test case failed.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_timestamp:
+    description: Timestamp when the test case executed in ISO-8601 format.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_failed:
+    description: Boolean flag indicating if the test case failed.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  ownership_team_name:
+    description: Name of the team responsible for this test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  ownership_team_alias:
+    description: Alias or short identifier for the team.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  ownership_owner_email:
+    description: Email of the primary owner for this test case.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  ownership_tags:
+    description: Array of tags associated with the test case (e.g., tier-0, hermetic, flow-offers).
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  test_case_failed_endpoints:
+    description: Array of endpoints that failed during the test case execution.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_total_flows:
+    description: Total number of flows executed in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_failed_flows:
+    description: Number of flows that failed in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_successful_flows:
+    description: Number of flows that succeeded in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  is_failures_run:
+    description: Boolean indicating if any failures occurred in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  run_failed_flow_names:
+    description: Array of names of flows that failed in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  metadata_total_test_cases:
+    description: Total number of test cases in the run according to metadata.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  metadata_failed_test_cases_count:
+    description: Count of failed test cases according to metadata.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  metadata_successful_test_cases_count:
+    description: Count of successful test cases according to metadata.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  metadata_teams_with_failures:
+    description: Array of team names that had failures in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  metadata_all_teams_involved:
+    description: Array of all team names involved in the run.
+    lineage:
+      - datalake_release_validations_tests_raw.playwright_results.content
+  failed_endpoints_count:
+    description: Number of endpoints that failed for this test case.
+  ownership_tags_count:
+    description: Number of tags associated with the test case.
+  is_passed:
+    description: Boolean flag when the test case status is SUCCESS.
+  is_failed:
+    description: Boolean flag when the test case failed flag is true.
+  is_status_failed:
+    description: Boolean flag when the test case status is FAILED.
+  test_case_index:
+    description: Index position of the test case within the testCases array.
+  ts_suite:
+    description: Suite timestamp converted to Spark timestamp type.
+  ts_test_case:
+    description: Test case timestamp converted to Spark timestamp type.
+  ts_report_generated:
+    description: Report generation timestamp converted to Spark timestamp type.
+  dt_suite:
+    description: Date derived from ts_suite for easier partitioning.
+  dt_test_case:
+    description: Date derived from ts_test_case for easier partitioning.
+  dt_report_generated:
+    description: Date derived from ts_report_generated for easier partitioning.

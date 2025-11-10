@@ -19,6 +19,8 @@ WITH base AS (
       'ARRAY<STRING>'
     ) AS root_suites
   FROM datalake_release_validations_tests_raw.playwright_results
+  WHERE MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+  AND file_path LIKE '%results.json%'
 ),
 rooted AS (
   SELECT

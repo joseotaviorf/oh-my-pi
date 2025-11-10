@@ -33,6 +33,9 @@ workflow:
       clean_table_name: playwright_specs_tests
       partitions: [year, month, day]
       clean_partitions: [year, month, day]
+    maestro_tests:
+      partitions: [year, month, day]
+      clean_partitions: [year, month, day]
 
 cluster:
   type: databricks_16_4_med_memory_cluster
