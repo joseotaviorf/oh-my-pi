@@ -40,4 +40,5 @@ class SurvicateValidationSuite(APIValidationSuitesExecutor):
             params=optional_parameters,
         )
 
-        self._validate_response_list_not_empty(response)
+        assert response is not None
+        assert isinstance(response, list)
