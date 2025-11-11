@@ -21,11 +21,23 @@ column_level_validations:
   id_job:
     is_complete:
       severity_level: Warning
+    custom:
+      # Validate that each id_job has exactly one current version
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_job, COUNT(*) as current_count
+           FROM dw_employee_test.dim_job
+           WHERE is_current = TRUE
+           GROUP BY id_job
+           HAVING current_count > 1
+         )) = 0
+      severity_level: Warning
   version:
     is_complete:
       severity_level: Warning
-    has_min:
-      min_value: 1
+    has_min_value:
+      greater_than_or_equal_to: 1
       severity_level: Warning
   job_code:
     is_complete:
@@ -57,15 +69,3 @@ column_level_validations:
   ts_load:
     is_complete:
       severity_level: Warning
-  custom:
-    # Validate that each id_job has exactly one current version
-    constraint: |-
-      (SELECT COUNT(*) 
-       FROM (
-         SELECT id_job, COUNT(*) as current_count
-         FROM dw_employee_test.dim_job
-         WHERE is_current = TRUE
-         GROUP BY id_job
-         HAVING current_count > 1
-       )) = 0
-    severity_level: Warning
