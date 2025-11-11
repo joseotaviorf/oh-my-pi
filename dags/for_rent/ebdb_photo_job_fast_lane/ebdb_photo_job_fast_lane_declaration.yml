@@ -5,9 +5,8 @@ dag:
   owner: Data ForRent
   documentation:
     dag_purpose: |
-      <<TEST>> Fast lane DAG for high-frequency extraction of photographer_job table into data lake.
+      Fast lane DAG for high-frequency extraction of photographer_job table into data lake.
       This DAG runs every 30 minutes to provide near real-time updates for photo job data.
-      Deployed in test environment with ebdb_test schema before moving to production.
       EBDB is the main database for QuintoAndar.
 workflow:
   type: cdc
@@ -16,7 +15,7 @@ workflow:
   dbutils_secret_key: EBDB_DB
   source_database: ebdb
   source_schema: ebdb
-  custom_schema: ebdb_test
+  custom_schema: ebdb
   tables_customization:
     JobFotografo:
       clean_table_name: photographer_job

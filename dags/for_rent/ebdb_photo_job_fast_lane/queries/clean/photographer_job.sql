@@ -38,5 +38,5 @@ SELECT
   dataagendamento AS ts_scheduled,
   datacriacao AS ts_created,
   atualizadoem AS ts_updated
-FROM datalake_ebdb_test_raw.jobfotografo
+FROM datalake_ebdb_raw.jobfotografo
 

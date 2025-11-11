@@ -1334,7 +1334,7 @@ bietlejuice.enrich_b2b:
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
-  - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
+  - bietlejuice.ebdb_photo_job_fast_lane:load-clean-photographer-job:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_lead:load-enrich-lead:first-run-of-day
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead:first-run-of-day
@@ -2034,7 +2034,7 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
-  - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
+  - bietlejuice.ebdb_photo_job_fast_lane:load-clean-photographer-job:first-run-of-day
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
@@ -2122,7 +2122,7 @@ bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-data:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-job-aud:first-run-of-day
-  - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
+  - bietlejuice.ebdb_photo_job_fast_lane:load-clean-photographer-job:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
@@ -2612,7 +2612,7 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-job-aud:first-run-of-day
-  - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
+  - bietlejuice.ebdb_photo_job_fast_lane:load-clean-photographer-job:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
@@ -2640,7 +2640,7 @@ bietlejuice.enrich_listing_temp:
   - bietlejuice.ebdb_lead:load-clean-lead:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
-  - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
+  - bietlejuice.ebdb_photo_job_fast_lane:load-clean-photographer-job:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-fees:first-run-of-day

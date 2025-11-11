@@ -1,4 +1,4 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: photographer_job
 domain: For Rent
 owner: data-ae-for-rent@quintoandar.com.br
@@ -10,51 +10,51 @@ description: |
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.id
+      - datalake_ebdb_raw.jobfotografo.id
     description: Unique identifier for the photographer job record. Primary key of the table. Always populated.
   id_photographer_data:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.dadosfotografo_id
+      - datalake_ebdb_raw.jobfotografo.dadosfotografo_id
     description: Foreign key reference to the photographer's data record assigned to this job. May be null for newly created jobs that have not yet been assigned to a photographer.
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.imovel_id
+      - datalake_ebdb_raw.jobfotografo.imovel_id
     description: Foreign key reference to the property (house) that requires photography services. Essential field that links the photo job to the specific property. Always populated as a photo job cannot exist without a property.
   id_origin_creation:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.origincreation_id
+      - datalake_ebdb_raw.jobfotografo.origincreation_id
     description: Foreign key reference to the origin or source that created this photo job (e.g., Inside Sales, Owner, Admin). Indicates the system or user type that initiated the photo job creation. Helps track the source of photo job requests for analytics and workflow optimization.
   id_reserved_for:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.reservadopara_id
+      - datalake_ebdb_raw.jobfotografo.reservadopara_id
     description: Foreign key reference to the user or entity for whom this photo job is reserved. Used when photo jobs are pre-assigned or reserved for specific users. May be null if job is available for general assignment.
   id_last_update_origin:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.originlastupdate_id
+      - datalake_ebdb_raw.jobfotografo.originlastupdate_id
     description: Foreign key reference to the origin that last updated this photo job record. Tracks which system or user type made the most recent modification. Useful for auditing changes and understanding update patterns.
   photo_session_phone:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.telefonesessaofotos
+      - datalake_ebdb_raw.jobfotografo.telefonesessaofotos
     description: Primary phone number for the photo session contact, used for scheduling coordination. Typically formatted as Brazilian phone number format (e.g., (11) 98765-4321). One of the most frequently updated fields during the scheduling process as contact information gets refined. May be null if property owner prefers email contact, contact information is incomplete, or when using lockbox access that doesn't require contact.
   photo_session_email:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.emailsessaofotos
+      - datalake_ebdb_raw.jobfotografo.emailsessaofotos
     description: Email address for the photo session contact, used for scheduling and communication with the property owner/tenant. Essential for coordinating photo session timing when email is the preferred communication method. May be null if contact prefers phone communication, contact information is incomplete, or when using lockbox access that doesn't require contact coordination.
   photo_session_secondary_phone:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.telefonesessaofotossecundario
+      - datalake_ebdb_raw.jobfotografo.telefonesessaofotossecundario
     description: Secondary phone number for the photo session contact, used as an alternate contact method. Often null as many contacts only provide a primary phone number. Most commonly populated when property has multiple contact persons, backup contact is required for reliability, or primary contact is frequently unavailable. Typically has lower population rate than primary phone.
   photo_session_contact_name:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.nomecontatosessaofotos
+      - datalake_ebdb_raw.jobfotografo.nomecontatosessaofotos
     description: Name of the contact person for the photo session, typically the property owner, tenant, or property manager. Used for personalized communication and scheduling coordination. May be null when contact information is incomplete or when property access doesn't require contact (e.g., lockbox access).
   photo_sender_user_type:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.photosender
+      - datalake_ebdb_raw.jobfotografo.photosender
     description: Type of user who initiated or sent the photo job request. Common values include owner, admin, inside sales, or photographer. Indicates the role of the person or system that created the photo job. May be null for jobs created through automated processes, system integrations, or when origin tracking is not available.
   status:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.status
+      - datalake_ebdb_raw.jobfotografo.status
     description: Current status of the photo job. Tracks the lifecycle state of the job from creation to completion or cancellation.
     categories:
       Novo: Initial state when a new photo job is created and awaiting assignment.
@@ -70,23 +70,23 @@ columns:
       Publicado: Photos from this job have been published for the listing.
   reason_of_change:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.motivoalteracao
+      - datalake_ebdb_raw.jobfotografo.motivoalteracao
     description: Reason code or description for why the photo job was changed or updated. Used for tracking modifications and understanding the context behind updates. May be null for routine updates where no specific reason is recorded or for automated system changes.
   cancellation_reason:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.motivocancelamentojob
+      - datalake_ebdb_raw.jobfotografo.motivocancelamentojob
     description: Coded reason for photo job cancellation, if applicable. Only populated when status is 'Cancelado'. Provides standardized categorization of cancellation reasons for analytics and process improvement. Common categories may include property already rented, owner cancelled, scheduling conflicts, or property issues.
   cancellation_reason_text:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.textomotivocancelamento
+      - datalake_ebdb_raw.jobfotografo.textomotivocancelamento
     description: Text describing the reason for photo job cancellation, if applicable. Provides detailed explanation when cancellation_reason code is not sufficient or when free-form explanation is needed. Often contains specific context about why the cancellation occurred. Only populated when status is 'Cancelado' and detailed explanation is available.
   correctness_score:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.scorecorretude
+      - datalake_ebdb_raw.jobfotografo.scorecorretude
     description: Score indicating the correctness or quality of the photo job information. Higher scores indicate better data quality and reliability of the information. Typically ranges from 0 to 100, though exact scale may vary by system version. Often null for recently created jobs that haven't been validated yet, cancelled jobs, or when scoring algorithm is not applicable. Used for data quality monitoring and identifying jobs that may need manual review or correction.
   key_pick_up:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.retirarchave
+      - datalake_ebdb_raw.jobfotografo.retirarchave
     description: Instructions or location for picking up keys for property access during the photo session. Common values include 'Portaria' (reception/concierge), 'Proprietario' (owner), or 'Outros' (other location). May be null if property uses lockbox or owner will be present during session.
     categories:
       Portaria: Keys are available at the building reception or concierge desk.
@@ -94,11 +94,11 @@ columns:
       Outros: Keys are available at another location not specified in standard categories.
   key_others:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.outroschave
+      - datalake_ebdb_raw.jobfotografo.outroschave
     description: Additional key access information or alternative access methods for the property. May contain free-form text describing alternative key pickup locations or methods.
   problem:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.problema
+      - datalake_ebdb_raw.jobfotografo.problema
     description: Coded identifier for problems encountered during the photo job execution or scheduling. Only populated when status is 'ComProblema'. Common values include issues like property already rented, unsafe conditions, photographer no-show, address problems, or photo upload issues. See related problem categories for complete list.
     categories:
       Alugado: Property was already rented when photographer arrived.
@@ -115,86 +115,86 @@ columns:
       PROBLEMA_COM_ENDERECO: Address-related problems (wrong address, inaccessible, etc).
   booking_instructions:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.instrucoesagendamento
+      - datalake_ebdb_raw.jobfotografo.instrucoesagendamento
     description: Special instructions for scheduling the photo session, including preferred times, access requirements, or other notes. Often contains scheduling preferences or special access instructions.
   house_revision:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.revisionimovel
+      - datalake_ebdb_raw.jobfotografo.revisionimovel
     description: Reference to the house revision number, linking this photo job to a specific version of the property data. Used to track which version of property information was current when the photo job was created.
   contract_type:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.tipocontrato
+      - datalake_ebdb_raw.jobfotografo.tipocontrato
     description: Type of contract associated with the photographer's engagement. Indicates the employment relationship type for the photographer assigned to this job.
     categories:
       CLT: Consolidated Labor Laws contract - formal employment relationship.
       Freelancer: Freelance/independent contractor arrangement.
   completeness_score:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.scorecompletude
+      - datalake_ebdb_raw.jobfotografo.scorecompletude
     description: Score indicating the completeness of the photo job information and required details. Higher scores indicate more complete data. Typically ranges from 0 to 100. Often null for recently created jobs or when scoring is not applicable. Measures how many required fields are populated with valid data.
   has_tried_contact:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.naotentoucontato
+      - datalake_ebdb_raw.jobfotografo.naotentoucontato
     description: |
       Boolean flag indicating whether an attempt has been made to contact the property owner/tenant. Note: field name suggests inverse logic (naotentoucontato = has not tried contact), so false values may indicate contact attempts were made. Used to track contact efforts and identify jobs that may need follow-up. May be null if contact status is unknown or not yet determined.
   has_lockbox:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.lockbox
+      - datalake_ebdb_raw.jobfotografo.lockbox
     description: Boolean flag indicating whether a lockbox is available for key access to the property. When true, photographer can access keys via lockbox without needing to coordinate with property owner.
   has_written_authorization:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.autorizacaoporescrito
+      - datalake_ebdb_raw.jobfotografo.autorizacaoporescrito
     description: Boolean flag indicating whether written authorization has been obtained for property access and photography. Required for legal compliance when photographing private properties.
   has_no_landlord_contact:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.semcontatoproprietario
+      - datalake_ebdb_raw.jobfotografo.semcontatoproprietario
     description: Boolean flag indicating whether there is no landlord contact information available. When true, indicates challenges in scheduling coordination due to missing contact details. Jobs with this flag set to true may rely on lockbox access, alternative contact methods, or may require additional efforts to obtain contact information. Used to identify jobs that may need special handling or additional support.
   is_fixed:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.fixed
+      - datalake_ebdb_raw.jobfotografo.fixed
     description: Boolean flag indicating whether the photo job has been fixed or resolved after encountering issues. Typically set to true when problems reported in the 'problem' field have been addressed.
   is_photo_session_email_preferred:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.prefereemailsessaofotos
+      - datalake_ebdb_raw.jobfotografo.prefereemailsessaofotos
     description: Boolean flag indicating whether the contact person prefers email communication over phone for photo session scheduling. When true, email should be used as primary communication method.
   is_approved:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.aprovado
+      - datalake_ebdb_raw.jobfotografo.aprovado
     description: Boolean flag indicating whether the photo job or resulting photos have been approved. Approval typically happens after photos are uploaded and reviewed for quality.
   is_confirmed:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.confirmado
+      - datalake_ebdb_raw.jobfotografo.confirmado
     description: Boolean flag indicating whether the photo session has been confirmed with all parties. Confirmation typically occurs after scheduling when owner, photographer, and QuintoAndar have all agreed to the session details.
   ts_photographer_accepted:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.dataaceitofotografo
+      - datalake_ebdb_raw.jobfotografo.dataaceitofotografo
     description: Timestamp when the assigned photographer accepted the photo job assignment. Critical milestone indicating photographer commitment to execute the job. Only populated when status is 'Aceito' or later. Null for jobs that haven't been accepted yet, cancelled before acceptance, or when assignment workflow doesn't require explicit acceptance. Used to measure time from assignment to acceptance for SLA tracking.
   ts_payment:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.datapagamento
+      - datalake_ebdb_raw.jobfotografo.datapagamento
     description: Timestamp when payment for the photo job was processed or completed. Typically only populated for completed jobs where photographer compensation is processed successfully. Often null for jobs in early stages, cancelled jobs, jobs with problems, or when payment processing hasn't occurred yet. Used for financial tracking and photographer payment reconciliation.
   ts_session_started:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.datainiciosessao
+      - datalake_ebdb_raw.jobfotografo.datainiciosessao
     description: Timestamp when the photo session actually started at the property location. Represents when photographer physically arrived and began taking photos at the property. Only populated when status is 'Iniciado' or later in the workflow. Null for jobs that haven't reached the property yet, were cancelled before session start, or encountered issues preventing session start. Used to measure actual execution time and identify delays.
   ts_photos_uploaded:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.datauploadfotos
+      - datalake_ebdb_raw.jobfotografo.datauploadfotos
     description: Timestamp when the photographer uploaded the photos from the session to the system. Critical milestone for job completion tracking. Only populated for jobs where photos were successfully taken and uploaded to the system. Often null for jobs that were cancelled, had problems preventing photo upload, or are still in progress. Used to measure time from session start to upload completion and track photo processing pipeline efficiency.
   ts_photo_job_requested:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.datajobpedido
+      - datalake_ebdb_raw.jobfotografo.datajobpedido
     description: Timestamp when the photo job was initially requested or created in the business system. Represents the creation time of the photo job request from a business process perspective. Always populated as this is the initial trigger for creating a photo job. Used as baseline for measuring end-to-end job completion time.
   ts_scheduled:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.dataagendamento
+      - datalake_ebdb_raw.jobfotografo.dataagendamento
     description: Timestamp when the photo session was scheduled for a specific date and time. Critical for tracking scheduling efficiency and coordinating photographer and property availability. Only populated when status is 'Agendado' or later. Null for jobs that haven't been scheduled yet or were cancelled before scheduling. Used to measure scheduling turnaround time and identify bottlenecks in the scheduling process.
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.datacriacao
+      - datalake_ebdb_raw.jobfotografo.datacriacao
     description: Timestamp when the photo job record was created in the database. Represents the system-level creation time, which may differ from ts_photo_job_requested depending on system processing timing, batch processing delays, or data synchronization patterns. Always populated. Used for system-level audit trails and data pipeline tracking.
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.jobfotografo.atualizadoem
+      - datalake_ebdb_raw.jobfotografo.atualizadoem
     description: Timestamp when the photo job record was last updated in the database. Useful for tracking recent changes and identifying stale records that may need attention. Updates whenever any field in the photo job is modified, making it a key indicator of record activity. Always populated and typically equals ts_created for new records. Used for change detection, data freshness monitoring, and identifying jobs that may need follow-up based on update patterns.
 
