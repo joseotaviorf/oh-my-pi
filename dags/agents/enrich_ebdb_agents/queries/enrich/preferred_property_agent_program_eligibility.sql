@@ -18,6 +18,7 @@ WITH revised_agent_data_programs_aud AS (
       AND DATE(r.ts_revision) <= DATE('{load_end_date}')
 )
 SELECT
+  XXHASH64(id_agent_data, ts_revision) AS id_snapshot,
   id,
   id_agent_data AS id_agent,
   program,

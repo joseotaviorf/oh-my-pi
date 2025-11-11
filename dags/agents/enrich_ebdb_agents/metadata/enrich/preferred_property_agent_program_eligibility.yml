@@ -4,10 +4,15 @@ description: This table registers agents eligibility status to the PPA program
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
+  id_snapshot:
+    lineage:
+      - datalake_ebdb_clean.agent_data_programs_aud.id_agent_data
+      - datalake_ebdb_clean.agent_data_programs_aud.ts_revision
+    description: Primary key - id snapshot for agent id and ts revision
   id:
     lineage:
       - datalake_ebdb_clean.agent_data_programs_aud.id
-    description: Primary key - id agent eligibility
+    description: id agent eligibility for ppa program
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent_data_programs_aud.id_agent_data
