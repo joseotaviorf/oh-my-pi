@@ -9,18 +9,19 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
-  default_partitions: ['year', 'month', 'day']
+  default_partitions: ["year", "month", "day"]
   tables_customization:
     criteo_campaigns:
-      z_order_by: ["id_advertiser", "id_ad_set", "advertiser_name", "ad_set", "dt_report"]
+      z_order_by:
+        ["id_advertiser", "id_ad_set", "advertiser_name", "ad_set", "dt_report"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
-  type: databricks_13_3_min_io-general_cluster
+  type: databricks_16_4_min_io-general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
