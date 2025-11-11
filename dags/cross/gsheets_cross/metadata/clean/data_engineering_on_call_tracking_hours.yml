@@ -1,0 +1,65 @@
+---
+database_name: datalake_gsheets_clean
+table_name: data_engineering_on_call_tracking_hours
+owner: isabella.santos@quintoandar.com.br
+domain: Cross
+description: Tracking hours for Data Engineering on-call activities. Contains employee information, allowance details, and monthly reference hours from March 2025 to December 2025.
+columns:
+  id_employee:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Matrícula"
+    description: Employee ID/registration number.
+  employee_name:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Nome Funcionário"
+    description: Employee full name.
+  allowance:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Verba"
+    description: Allowance type code.
+  allowance_description:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Descrição de verba"
+    description: Description of the allowance type.
+  reference_0325:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0325"
+    description: Reference hours for March 2025.
+  reference_0425:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0425"
+    description: Reference hours for April 2025.
+  reference_0525:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0525"
+    description: Reference hours for May 2025.
+  reference_0625:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0625"
+    description: Reference hours for June 2025.
+  reference_0725:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0725"
+    description: Reference hours for July 2025.
+  reference_0825:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0825"
+    description: Reference hours for August 2025.
+  reference_0925:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_0925"
+    description: Reference hours for September 2025.
+  reference_1025:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_1025"
+    description: Reference hours for October 2025.
+  reference_1125:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_1125"
+    description: Reference hours for November 2025.
+  reference_1225:
+    lineage:
+      - datalake_gsheets_raw.data_engineering_on_call_tracking_hours."Referência_1225"
+    description: Reference hours for December 2025.
+  ts_load:
+    description: Timestamp of when the data was loaded into our systems.

@@ -17,6 +17,18 @@ sheets_info:
     clean_table_name: dags_sla_exclusion_list
     sheet_context: cross
 
+  data_engineering_on_call_tracking_hours:
+    sheet_id: 1t9QsbCRj3-TCflzMb2L0is4HgC0LbEjZve4PTYQ_mXM
+    sheet_name: de_tracking_hours
+    clean_table_name: data_engineering_on_call_tracking_hours
+    sheet_context: cross
+
+  data_platform_engineering_on_call_tracking_hours:
+    sheet_id: 1t9QsbCRj3-TCflzMb2L0is4HgC0LbEjZve4PTYQ_mXM
+    sheet_name: dpe_tracking_hours
+    clean_table_name: data_platform_engineering_on_call_tracking_hours
+    sheet_context: cross
+
   documentation_campaign_datasets:
     sheet_id: 1-dUVLZ00CI2bPUJ2fDssJTsd1mg4jsbiJ5AKIqBY1fM
     sheet_name: datasets

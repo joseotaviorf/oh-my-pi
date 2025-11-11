@@ -1,0 +1,4 @@
+---
+database_name: datalake_gsheets_raw
+table_name: data_platform_engineering_on_call_tracking_hours
+domain: Cross
