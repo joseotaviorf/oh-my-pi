@@ -1810,14 +1810,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.sauron:load-clean-session:first-run-of-day
   - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
   - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
-bietlejuice.enrich_customer_support_view:
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts:first-run-of-day
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
-  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
-  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
 bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-agency-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-agency-group:first-run-of-day

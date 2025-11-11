@@ -8,7 +8,8 @@ dag:
       Creates views for customer support datasets.
 workflow:
   type: query_view
-  layer: enrich
+  layer: dw
+  custom_schema: customer_support
   has_hive_sync: true
 cluster:
   type: databricks_16_4_min_memory_cluster
