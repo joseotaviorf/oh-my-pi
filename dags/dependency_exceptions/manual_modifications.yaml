@@ -502,6 +502,10 @@ bietlejuice.enrich_entities_views:
   remove:
     - bietlejuice.core_contract:load-core-contract:first-run-of-day
     - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding:first-run-of-day
+    - bietlejuice.ebdb_photo_job:load-clean-photographer-job:first-run-of-day
+    - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
 bietlejuice.enrich_pipeline:
   remove:
     - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
