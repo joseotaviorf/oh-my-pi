@@ -4,6 +4,8 @@ SELECT
     previous_assessment_id AS id_previous_assessment,
     key_location,
     key_location_details,
+    GET_JSON_OBJECT(key_information, '$.locationChange.locationChangeReason') AS location_change_reason,
+    GET_JSON_OBJECT(key_information, '$.locationChange.locationChangeReasonDetails') AS location_change_reason_details,
     source,
     house_supplies,
     scheduling_key_recovery,

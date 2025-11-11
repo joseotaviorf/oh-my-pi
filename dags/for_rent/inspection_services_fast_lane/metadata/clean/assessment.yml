@@ -37,6 +37,16 @@ columns:
     description:
       If the key_location column is filled in as 'other', the inspector
       must describe the location and this information is saved in this column.
+  location_change_reason:
+    lineage:
+      - datalake_inspection_services_raw.key_information.locationChange.locationChangeReason
+    description:
+      Reason given by the inspector to not follow the landlord's preference regarding where to return the keys.
+  location_change_reason_details:
+    lineage:
+      - datalake_inspection_services_raw.key_information.locationChange.locationChangeReasonDetails
+    description:
+      Details on the reason given by the inspector to not follow the landlord's preference regarding where to return the keys.
   source:
     lineage:
       - datalake_inspection_services_raw.assessment.source
