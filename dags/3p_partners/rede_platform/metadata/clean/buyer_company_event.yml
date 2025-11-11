@@ -21,6 +21,10 @@ columns:
     description: The unique identifier for the person in Person service.
     lineage:
       - datalake_rede_platform_raw.buyer_company_event.person_uuid
+  application_source:
+    description: The application that triggered the event.
+    lineage:
+      - datalake_rede_platform_raw.buyer_company_event.application_source
   event_entity_name:
     description: The name of the event entity.
     lineage:
