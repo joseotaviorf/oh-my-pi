@@ -18,14 +18,6 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  cost_center_name:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
-  cost_center_status_latest:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
   business:
     has_null_count:
       less_than_or_equal_to: 1
