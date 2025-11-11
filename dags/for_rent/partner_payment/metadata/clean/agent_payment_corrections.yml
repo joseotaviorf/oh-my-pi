@@ -1,0 +1,68 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: agent_payment_corrections
+description: |
+  This table contains the corrections related to previous payments.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.id
+    description: ID of the table, it’s the primary key.
+  id_operation_payment:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.operation_payment_id
+    description: ID of the operation payment related with the correction. It is set only when the correction is related to an operation payment (inspection or a photo session).
+  id_agent_payment:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.agent_payment_id
+    description: ID of the agent payment where the corrections are consolidated.
+  id_agent:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.agent_id
+    description: ID of the agent related with the correction.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.version
+    description: Agent Payments Corrections version.
+  request_type:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.request_type
+    description: Type of the request of the correction. It can be to include or discount values.
+  request_category:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.request_category
+    description: Category related to the correction.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.amount
+    description: Amount of the correction.
+  approving_user:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.approving_user
+    description: Email of the user that approved the amount of the correction to be applied to the agent.
+  source_reference:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.source_reference
+    description: Reference of a source where the correction is detailed.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.agent_type
+    description: Type of the agent related to the correction (inspection or photo session).
+  business_source:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.business_source
+    description: Source of the business, related with the cost center, where this change will be applied.
+  dt_request:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.request_date
+    description: Date when request of the correction is registered.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.created_at
+    description: Timestamp of the creation of the corrections.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.agent_payment_corrections.updated_at
+    description: Timestamp of the update of the corrections.

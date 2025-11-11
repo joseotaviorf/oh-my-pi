@@ -1,0 +1,64 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: agenda_availability
+description: |
+  This table contains extra charges related to the available agenda of an agent when they have a fixed contract type.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.id
+    description: ID of the table, it’s the primary key.
+  id_agent:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.agent_id
+    description: ID of the agent related with the agenda availability.
+  id_agent_payment:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.agent_payment_id
+    description: ID of the agent payment where this charge is consolidated.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.version
+    description: Agenda availability record version.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.amount
+    description: Amount related with the available agenda of the agent. This amount is an extra charge that an agent receives to have your agenda available.
+  weakly_hours_response:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.weakly_hours_response
+    description: Response of the endpoint with the available weekly hours information, registered for the agent in Main.
+  specific_hours_response:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.specific_hours_response
+    description: Response of the endpoint with the available specif hours information, registered for the agent in Main.
+  holidays_response:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.holidays_response
+    description: Response of the endpoint with the available holidays information, registered for the agent in Main.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.agent_type
+    description: Type of the agent related to the available agenda (inspection or photo session).
+  business_source:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.business_source
+    description: Source of the business, related with the cost center, where this change will be applied.
+  dt_start:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.start_date
+    description: Started reference date when the agent is available in a period.
+  dt_end:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.end_date
+    description: Ended reference date when the agent is available in a period.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.created_at
+    description: Timestamp of the creation of the agenda availability record.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.agenda_availability.updated_at
+    description: Timestamp of the update of the agenda availability record. 

@@ -21,6 +21,14 @@ workflow:
       clean_table_name: additionals
     error_records:
       clean_table_name: error_records
+    agenda_availability:
+      clean_table_name: agenda_availability
+    campaigns:
+      clean_table_name: campaigns
+    agent_payments:
+      clean_table_name: agent_payments
+    agent_payment_corrections:
+      clean_table_name: agent_payment_corrections
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
