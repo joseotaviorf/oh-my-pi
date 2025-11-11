@@ -56,6 +56,10 @@ custom_libraries = [
         "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
         f"quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
     },
+    {
+        "whl": f"{artifacts_bucket}/survicate-api-client-python/"
+        f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
+    },
 ]
 jiraops_callback = JiraOpsCallback()
 dag = DAG(
