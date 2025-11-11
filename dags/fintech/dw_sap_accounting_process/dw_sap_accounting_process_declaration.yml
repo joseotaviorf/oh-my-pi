@@ -6,6 +6,13 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: sap_accounting_process
+  default_table_privileges:
+    de-fintech-sap-owners:
+      - SELECT
+      - APPLY TAG
+      - MODIFY
+    prod-read-write:
+      - SELECT
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
