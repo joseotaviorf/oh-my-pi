@@ -106,10 +106,10 @@ SELECT DISTINCT
   FIRST(c.csat_comment) OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response) AS first_csat_comment,
   FIRST(c.csat_comment) OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response DESC) AS last_csat_comment,
   MAX(c.is_answered) OVER(PARTITION BY c.id_ticket) AS is_answered,
-  CASE WHEN 
-    t.ts_solved IS NULL 
+  CASE WHEN
+    t.ts_solved IS NULL
     THEN is_solved = FALSE
-    ELSE TRUE 
+    ELSE TRUE
   END AS is_solved,
   MIN(c.ts_response) OVER(PARTITION BY c.id_ticket) AS ts_first_response,
   MAX(c.ts_response) OVER(PARTITION BY c.id_ticket) AS ts_last_response
@@ -117,3 +117,4 @@ FROM
   csat AS c
 LEFT JOIN datalake_customer_support.tickets AS t
   ON t.id_ticket = c.id_ticket
+QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_ticket ORDER BY c.ts_response DESC) = 1
