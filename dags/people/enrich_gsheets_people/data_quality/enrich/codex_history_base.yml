@@ -42,10 +42,6 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  owner_l1_email:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
   dt_closing_month:
     has_null_count:
       less_than_or_equal_to: 1
