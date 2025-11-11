@@ -61,65 +61,24 @@ employee_ids_enrich AS (
     full_name
   FROM
     new_emails_from_mapping
-),
-codex_enrich AS (
-  SELECT
-    MD5(
-      CONCAT(
-        codex_cc.cost_center_code,
-        DATE_FORMAT(codex_cc.dt_updated, 'yyyyMM')
-      )
-    ) AS id,
-    codex_cc.cost_center_code,
-    codex_cc.business,
-    codex_cc.product,
-    codex_cc.brand,
-    CASE
-      WHEN codex_cc.structure IN ('Sales','Operations','Marketing','Guarantees') THEN 'Ops'
-      WHEN codex_cc.structure IN ('Finance','People','Legal','Administrative') THEN 'Corp'
-      WHEN codex_cc.structure = 'Product' THEN 'Tech'
-    END AS vertical,
-    codex_cc.structure,
-    codex_cc.team,
-    codex_cc.chapter,
-    codex_cc.line,
-    codex_cc.owner_l1_email,
-    codex_cc.owner_l2_email,
-    codex_cc.owner_l3_email,
-    codex_hctp.headcount_type,
-    codex_cc.dt_updated AS dt_closing_month,
-    codex_cc.ts_load
-  FROM
-    datalake_gsheets_people_clean.codex_cost_centers AS codex_cc
-  LEFT JOIN
-    cost_center_headcount_type AS codex_hctp
-      ON codex_cc.cost_center_code = codex_hctp.cost_center_code
-      AND codex_cc.dt_updated = codex_hctp.dt_updated
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY
-        codex_cc.cost_center_code,
-        DATE_FORMAT(codex_cc.dt_updated, 'yyyyMM')
-      ORDER BY
-        codex_cc.ts_load DESC,
-        (
-          + CAST((codex_cc.chapter IS NOT NULL) AS INT)
-          + CAST((codex_cc.line IS NOT NULL) AS INT)
-          + CAST((codex_cc.owner_l1_email IS NOT NULL) AS INT)
-          + CAST((codex_cc.owner_l2_email IS NOT NULL) AS INT)
-          + CAST((codex_cc.owner_l3_email IS NOT NULL) AS INT)
-          + CAST((codex_hctp.headcount_type IS NOT NULL) AS INT)
-        ) DESC
-      ) = 1
-    )
+)
 
 SELECT
-  codex.id,
+  MD5(
+    CONCAT(
+      codex.cost_center_code,
+      DATE_FORMAT(codex.dt_updated, 'yyyyMM')
+    )
+  ) AS id,
   codex.cost_center_code,
   codex.business,
   codex.product,
   codex.brand,
-  codex.vertical,
+  CASE
+    WHEN codex.structure IN ('Sales','Operations','Marketing','Guarantees') THEN 'Ops'
+    WHEN codex.structure IN ('Finance','People','Legal','Administrative') THEN 'Corp'
+    WHEN codex.structure = 'Product' THEN 'Tech'
+  END AS vertical,
   codex.structure,
   codex.team,
   COALESCE(codex.chapter, '-') AS chapter,
@@ -133,15 +92,19 @@ SELECT
   codex.owner_l1_email,
   codex.owner_l2_email,
   codex.owner_l3_email,
-  COALESCE(codex.headcount_type, '-') AS headcount_type,
-  codex.dt_closing_month,
+  COALESCE(cc_hctype.headcount_type, '-') AS headcount_type,
+  codex.dt_updated AS dt_closing_month,
   codex.ts_load
 FROM
-  codex_enrich AS codex
-INNER JOIN
-  datalake_hr_system_clean.organizations AS org
-    ON codex.cost_center_code = org.codigo_dff
-    AND org.classification_code = 'DEPARTMENT'
+  datalake_gsheets_people_clean.codex_cost_centers AS codex
+LEFT JOIN
+  cost_center_headcount_type AS cc_hctype
+    ON codex.cost_center_code = cc_hctype.cost_center_code
+    AND codex.dt_updated = cc_hctype.dt_updated
+LEFT JOIN
+  cost_center_headcount_type AS codex_hctp
+    ON codex.cost_center_code = codex_hctp.cost_center_code
+    AND codex.dt_updated = codex_hctp.dt_updated
 LEFT JOIN
   employee_ids_enrich AS emp_id1
     ON codex.owner_l1_email = emp_id1.work_email
@@ -151,3 +114,19 @@ LEFT JOIN
 LEFT JOIN
   employee_ids_enrich AS emp_id3
     ON codex.owner_l3_email = emp_id3.work_email
+QUALIFY
+  ROW_NUMBER() OVER(
+    PARTITION BY
+      codex.cost_center_code,
+      DATE_FORMAT(codex.dt_updated, 'yyyyMM')
+    ORDER BY
+      codex.ts_load DESC,
+      (
+        + CAST((codex.chapter IS NOT NULL) AS INT)
+        + CAST((codex.line IS NOT NULL) AS INT)
+        + CAST((codex.owner_l1_email IS NOT NULL) AS INT)
+        + CAST((codex.owner_l2_email IS NOT NULL) AS INT)
+        + CAST((codex.owner_l3_email IS NOT NULL) AS INT)
+        + CAST((cc_hctype.headcount_type IS NOT NULL) AS INT)
+      ) DESC
+    ) = 1
