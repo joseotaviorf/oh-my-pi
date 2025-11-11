@@ -1,6 +1,8 @@
 SELECT
   id,
+  duplicated_id AS id_duplicate,
   externaldomainid AS id_external_domain,
+  hash AS deduplication_hash,
   externaldomain AS external_domain,
   status,
   bathrooms,
@@ -29,5 +31,3 @@ SELECT
   day
 FROM
   datalake_kodak_raw.image_inspection_group
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1

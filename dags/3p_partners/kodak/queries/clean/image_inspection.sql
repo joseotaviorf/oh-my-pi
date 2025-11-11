@@ -38,5 +38,3 @@ SELECT
   day
 FROM
   datalake_kodak_raw.image_inspection
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1

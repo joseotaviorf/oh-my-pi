@@ -10,10 +10,18 @@ columns:
     lineage:
       - datalake_kodak_raw.image_inspection_group.id
     description: 'Unique identifier for each property-level image inspection group. Primary key used for linking with individual image inspections and business context results.'
+  id_duplicate:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.duplicate_id
+    description: 'Reference to another image inspection group if this group is identified as a duplicate. Used for deduplication workflows and preventing duplicate content.'
   id_external_domain:
     lineage:
       - datalake_kodak_raw.image_inspection_group.externaldomainid
     description: 'External identifier linking the image group to records in other systems (property ID, lead ID, building ID, etc.). The interpretation depends on the external_domain value.'
+  deduplication_hash:
+    lineage:
+      - datalake_kodak_raw.image_inspection_group.hash
+    description: 'Perceptual hash (dHash) used for image group deduplication. Enables identification of visually similar or identical image groups across different properties and partners.'
   external_domain:
     lineage:
       - datalake_kodak_raw.image_inspection_group.externaldomain

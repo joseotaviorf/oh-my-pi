@@ -22,5 +22,3 @@ SELECT
   day
 FROM
   datalake_kodak_raw.image_inspection_group_result
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) = 1
