@@ -1,0 +1,28 @@
+SELECT 
+    id,
+    deal_id AS id_deal,
+    operation_net_amount,
+    installments_number,
+    installment_amount,
+    installments_sum,
+    interest_monthly_rate,
+    interest_annual_rate,
+    gross_costs_monthly_rate,
+    gross_costs_annual_rate,
+    operation_total_taxes,
+    operation_total_costs,
+    operation_gross_amount,
+    first_installment_date AS dt_first_installment,
+    last_installment_date AS dt_last_installment,
+    tax_iof_fixed_rate,
+    tax_iof_daily_rate,
+    tax_iof_total_rate,
+    tax_iof_total_value,
+    costs_fixed_share,
+    costs_rate_share,
+    interest_total_value,
+    gross_costs_total_value,
+    created_at AS ts_created,
+    updated_at AS ts_updated
+FROM 
+    datalake_lending_raw.deal_financial_info

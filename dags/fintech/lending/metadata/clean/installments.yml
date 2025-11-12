@@ -1,0 +1,95 @@
+---
+database_name: datalake_lending_clean
+table_name: installments
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains information about the installments.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.installments.id
+    description: Primary key of the installments.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.installments.deal_id
+    description: ID of the deal.
+  id_installment:
+    lineage:
+      - datalake_lending_raw.installments.installment_id
+    description: ID of the installment.
+  dt_due:
+    lineage:
+      - datalake_lending_raw.installments.installment_due_date
+    description: Installment due date of the installment.
+  installment_principal_amount:
+    lineage:
+      - datalake_lending_raw.installments.installment_principal_amount
+    description: Installment principal amount of the installment.
+  installment_interest_amount:
+    lineage:
+      - datalake_lending_raw.installments.installment_interest_amount
+    description: Installment interest amount of the installment.
+  installment_amount:
+    lineage:
+      - datalake_lending_raw.installments.installment_amount
+    description: Installment amount of the installment.
+  additional_late_fine:
+    lineage:
+      - datalake_lending_raw.installments.additional_late_fine
+    description: Additional late fine of the installment.
+  additional_late_penalty_interest:
+    lineage:
+      - datalake_lending_raw.installments.additional_late_penalty_interest
+    description: Additional late penalty interest of the installment.
+  additional_late_contract_interest:
+    lineage:
+      - datalake_lending_raw.installments.additional_late_contract_interest
+    description: Additional late contract interest of the installment.
+  additional_other_items:
+    lineage:
+      - datalake_lending_raw.installments.additional_other_items
+    description: Additional other items of the installment.
+  discount_pre_payment:
+    lineage:
+      - datalake_lending_raw.installments.discount_pre_payment
+    description: Discount pre payment of the installment.
+  discount_other_items:
+    lineage:
+      - datalake_lending_raw.installments.discount_other_items
+    description: Discount other items of the installment.
+  installment_negotiated_amount:
+    lineage:
+      - datalake_lending_raw.installments.installment_negotiated_amount
+    description: Installment negotiated amount of the installment.
+  installment_paid_amount:
+    lineage:
+      - datalake_lending_raw.installments.installment_paid_amount
+    description: Installment paid amount of the installment.
+  installment_payment_date:
+    lineage:
+      - datalake_lending_raw.installments.installment_payment_date
+    description: Installment payment date of the installment.
+  installment_number:
+    lineage:
+      - datalake_lending_raw.installments.installment_number
+    description: Installment number of the installment.
+  id_original_installment:
+    lineage:
+      - datalake_lending_raw.installments.original_installment_id
+    description: Original installment ID of the installment.
+  dt_original_due:
+    lineage:
+      - datalake_lending_raw.installments.installment_original_due_date
+    description: Original installment due date of the installment.
+  installment_original_principal_amount:
+    lineage:
+      - datalake_lending_raw.installments.installment_original_principal_amount
+    description: Original installment principal amount of the installment.
+  ts_created: 
+    lineage:
+      - datalake_lending_raw.installments.created_at
+    description: Timestamp when the installments was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.installments.updated_at
+    description: Timestamp when the installments was updated.

@@ -1,0 +1,23 @@
+---
+database_name: datalake_lending_clean
+table_name: deal_status
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains information about the deal status.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.deal_status.id
+    description: Primary key of the deal status.
+  status:
+    lineage:
+      - datalake_lending_raw.deal_status.status
+    description: Status of the deal.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.deal_status.deal_id
+    description: ID of the deal.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.deal_status.created_at
+    description: Timestamp when the deal status was created.

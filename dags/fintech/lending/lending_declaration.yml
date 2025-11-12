@@ -1,0 +1,35 @@
+dag:
+  name: lending
+  owner: Data Fintech
+  schedule_interval: 0 21 * * *
+  documentation:
+    dag_purpose: |
+      Ingest the S3 data from lending and clean them for the datalake
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  tables_customization:
+    deal:
+      clean_table_name: deal
+    deal_collateral:
+      clean_table_name: deal_collateral
+    deal_financial_info:
+      clean_table_name: deal_financial_info
+    deal_status:
+      clean_table_name: deal_status
+    installment_status:
+      clean_table_name: installment_status
+    installments:
+      clean_table_name: installments
+    offer_cohort:
+      clean_table_name: offer_cohort
+    offer_cohort_member:
+      clean_table_name: offer_cohort_member
+    product:
+      clean_table_name: product
+    user_consent:
+      clean_table_name: user_consent
+cluster:
+  type: databricks_16_4_min_general_cluster

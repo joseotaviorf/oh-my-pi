@@ -1,0 +1,43 @@
+---
+database_name: datalake_lending_clean
+table_name: deal
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains information about the deal.
+columns:
+  id:
+    lineage:
+    - datalake_lending_raw.deal.id
+    description: Primary key of the deal.
+  uuid:
+    lineage:
+      - datalake_lending_raw.deal.uuid
+    description: UUID of the deal.
+  uuid_person:
+    lineage:
+      - datalake_lending_raw.deal.person_uuid
+    description: UUID of the person.
+  value:
+    lineage:
+      - datalake_lending_raw.deal.value
+    description: Value of the deal.
+  id_product:
+    lineage:
+      - datalake_lending_raw.deal.product_id
+    description: ID of the product.
+  id_external:
+    lineage:
+      - datalake_lending_raw.deal.external_id
+    description: External ID of the deal.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.deal.created_at
+    description: Timestamp when the deal was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.deal.updated_at
+    description: Timestamp when the deal was updated.
+  id_offer_cohort:
+    lineage:
+      - datalake_lending_raw.deal.offer_cohort_id
+    description: ID of the offer cohort.

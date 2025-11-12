@@ -1,0 +1,25 @@
+SELECT
+    id,
+    deal_id AS id_deal,
+    installment_id AS id_installment,
+    installment_due_date AS dt_due,
+    installment_principal_amount,
+    installment_interest_amount,
+    installment_amount,
+    additional_late_fine,
+    additional_late_penalty_interest,
+    additional_late_contract_interest,
+    additional_other_items,
+    discount_pre_payment,
+    discount_other_items,
+    installment_negotiated_amount,
+    installment_paid_amount,
+    installment_payment_date AS dt_payment,
+    installment_number,
+    original_installment_id AS id_original_installment,
+    installment_original_due_date AS dt_original_due,
+    installment_original_principal_amount,
+    created_at AS ts_created,
+    updated_at AS ts_updated
+FROM 
+    datalake_lending_raw.installments

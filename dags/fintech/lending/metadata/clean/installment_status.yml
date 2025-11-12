@@ -1,0 +1,23 @@
+---
+database_name: datalake_lending_clean
+table_name: installment_status
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains information about the installment status.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.installment_status.id
+    description: Primary key of the installment status.
+  id_installment:
+    lineage:
+      - datalake_lending_raw.installment_status.installment_id
+    description: ID of the installment.
+  status:
+    lineage:
+      - datalake_lending_raw.installment_status.status
+    description: Status of the installment.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.installment_status.created_at
+    description: Timestamp when the installment status was created.

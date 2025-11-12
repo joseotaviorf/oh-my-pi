@@ -1,0 +1,107 @@
+---
+database_name: datalake_lending_clean
+table_name: deal_financial_info
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains information about the deal financial info.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.id
+    description: Primary key of the deal financial info.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.deal_id
+    description: ID of the deal.
+  operation_net_amount:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.operation_net_amount
+    description: Operation net amount of the deal financial info.
+  installments_number:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.installments_number
+    description: Installments number of the deal financial info.
+  installment_amount:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.installment_amount
+    description: Installment amount of the deal financial info.
+  installments_sum:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.installments_sum
+    description: Installments sum of the deal financial info.
+  interest_monthly_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.interest_monthly_rate
+    description: Interest monthly rate of the deal financial info.
+  interest_annual_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.interest_annual_rate
+    description: Interest annual rate of the deal financial info.
+  gross_costs_monthly_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.gross_costs_monthly_rate
+    description: Gross costs monthly rate of the deal financial info.
+  gross_costs_annual_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.gross_costs_annual_rate
+    description: Gross costs annual rate of the deal financial info.
+  operation_total_taxes:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.operation_total_taxes
+    description: Operation total taxes of the deal financial info.
+  operation_total_costs:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.operation_total_costs
+    description: Operation total costs of the deal financial info.
+  operation_gross_amount:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.operation_gross_amount
+    description: Operation gross amount of the deal financial info.
+  dt_first_installment:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.first_installment_date
+    description: First installment date of the deal financial info.
+  dt_last_installment:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.last_installment_date
+    description: Last installment date of the deal financial info.
+  tax_iof_fixed_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.tax_iof_fixed_rate
+    description: Tax IOF fixed rate of the deal financial info.
+  tax_iof_daily_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.tax_iof_daily_rate
+    description: Tax IOF daily rate of the deal financial info.
+  tax_iof_total_rate:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.tax_iof_total_rate
+    description: Tax IOF total rate of the deal financial info.
+  tax_iof_total_value:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.tax_iof_total_value
+    description: Tax IOF total value of the deal financial info.
+  costs_fixed_share:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.costs_fixed_share
+    description: Costs fixed share of the deal financial info.
+  costs_rate_share:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.costs_rate_share
+    description: Costs rate share of the deal financial info.
+  interest_total_value:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.interest_total_value
+    description: Interest total value of the deal financial info.
+  gross_costs_total_value:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.gross_costs_total_value
+    description: Gross costs total value of the deal financial info.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.created_at
+    description: Timestamp when the deal financial info was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.updated_at
+    description: Timestamp when the deal financial info was updated.
