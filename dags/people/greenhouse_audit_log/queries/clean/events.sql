@@ -4,6 +4,8 @@ SELECT
   CAST(request.id AS STRING) AS id_request,
   CAST(performer.id AS STRING) AS id_performer,
   CAST(event.target_id AS STRING) AS id_event_target,
+  CAST(event.meta.close_reason_id[0] AS STRING) AS id_close_reason_before_event,
+  CAST(event.meta.close_reason_id[1] AS STRING) AS id_close_reason_after_event,
   -- non-metrics
   request.type AS request_type,
   performer.type AS performer_type,
@@ -13,7 +15,10 @@ SELECT
   event.type AS event_type,
   event.target_type AS event_target_type,
   -- event.meta as JSON string (schema varies by event type)
-  CAST(event.meta AS STRING) AS event_meta,
+  TO_JSON(event.meta) AS event_meta,
+  -- dates
+  CAST(event.meta.close_date[0] AS DATE) AS dt_closed_before_event,
+  CAST(event.meta.close_date[1] AS DATE) AS dt_closed_after_event,
   -- timestamp
   CAST(event_time AS TIMESTAMP) AS ts_event,
   NOW() AS ts_load,
