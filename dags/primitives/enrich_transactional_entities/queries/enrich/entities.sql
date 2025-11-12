@@ -520,25 +520,6 @@ onboarding AS (
     FROM
         onboarding_base
 ),
-photo_session AS (
-    SELECT
-        id_entity,
-        id_house,
-        id_contract,
-        id_user,
-        entity,
-        persona,
-        business_context,
-        properties,
-        is_active,
-        ts_created,
-        ts_updated
-    FROM
-        datalake_entities_views.photo_session
-    WHERE
-        id_user IS NOT NULL
-        AND YEAR(ts_created) >= 2025
-),
 reservation AS (
     WITH reservation_base AS (
         SELECT
@@ -925,22 +906,6 @@ base AS (
         ts_updated
     FROM
         onboarding
-    UNION ALL
-    SELECT
-        {sk_entity} AS sk_entity,
-        id_entity,
-        id_house,
-        id_contract,
-        id_user,
-        entity,
-        persona,
-        business_context,
-        properties,
-        is_active,
-        ts_created,
-        ts_updated
-    FROM
-        photo_session
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
