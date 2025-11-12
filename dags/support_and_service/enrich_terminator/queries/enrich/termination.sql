@@ -163,15 +163,7 @@ repair_metrics AS (
         AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
     GROUP BY
           1
-),
-unset_repairs AS (
-    SELECT
-        rr.id_contract,
-        COUNT_IF(rr.responsibility IN ('UNSET', 'UNDEFINED') AND rr.comment IS NOT NULL) AS total_unset_repairs
-    FROM
-        datalake_inspections.repair_request AS rr
-    GROUP BY ALL)
-
+)
 SELECT
     t.id AS id_termination,
     t.id_contract,
@@ -219,7 +211,6 @@ SELECT
     CASE
         WHEN rm.total_tentant_repair_ac > 0
             OR (rm.total_tentant_repair_ac = 0 AND rm.total_tentant_repair_review > 0 AND (rm.has_early_mediation OR rm.is_early_both_agree))
-            OR ur.total_unset_repairs > 0
         THEN TRUE
         ELSE FALSE
     END AS has_repairs,
@@ -235,7 +226,6 @@ SELECT
     rm.repairs_exempted_ac,
     rm.repairs_absorbed_ac,
     rm.total_tentant_repair_ac,
-    ur.total_unset_repairs,
     neg.repair_cost,
     t.spoc_wave,
     t.dt_vacancy AS dt_termination,
@@ -288,9 +278,6 @@ LEFT JOIN
         ON t.id = neg.id_termination
 LEFT JOIN
     repair_metrics AS rm
-        ON t.id_contract = rm.id_contract
-LEFT JOIN
-    unset_repairs AS ur
         ON t.id_contract = rm.id_contract
 LEFT JOIN
     datalake_terminator_clean.inspection_opted_out AS ioo

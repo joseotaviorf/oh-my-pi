@@ -181,9 +181,8 @@ columns:
   has_repairs:
     description: Indicates whether the termination had repairs.
       It will be true if
-      (1) it is not an eviction,
-      (2) has repairs and
-      (3) is not early both agree, nor had "Both Agreed" on budget approval or required band-aid.
+      (1) the count of tenant repairs in AC is greater than 0
+      or (2) if the count of tenant repairs in AC is 0 but there were tenant repairs in AR AND the termination had early mediation or early both agree.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -221,9 +220,6 @@ columns:
     description:
       Total repairs are the tenant's responsibility in the contestation analysis.
       If the inspection has early mediation or early both agree, the value will be 0, because there's no AC step when one of them happens.
-  total_unset_repairs:
-    description:
-      Total repairs for which the responsibility was undefined. 
   repair_cost:
     description: Cost of Repair to be performed in the Offboarding process
     lineage:
