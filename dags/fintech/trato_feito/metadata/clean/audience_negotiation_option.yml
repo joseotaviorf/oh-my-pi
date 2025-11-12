@@ -1,0 +1,41 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: audience_negotiation_option
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Associates an audience with a negotiation option, defining priority and type."
+columns:
+  id:
+    description: "Unique identifier of the audience-negotiation option relation."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.id
+  id_audience:
+    description: "Identifier of the audience."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.audience_id
+  ts_created:
+    description: "Timestamp when the record was created."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.created_at
+  ts_updated:
+    description: "Timestamp when the record was last updated."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.updated_at
+  version:
+    description: "Version for optimistic locking."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.version
+  negotiation_option_id:
+    description: "Identifier of the negotiation option (INTERNAL id or CYBER key)."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.negotiation_option_id
+  negotiation_option_priority:
+    description: "Priority order of the negotiation option for the audience."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.negotiation_option_priority
+  is_active:
+    description: "Indicates if this mapping is active."
+    lineage:
+      - datalake_trato_feito_raw.audience_negotiation_option.active
+  ts_load:
+    description: "Load timestamp of the table."

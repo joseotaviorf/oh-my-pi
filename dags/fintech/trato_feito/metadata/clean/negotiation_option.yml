@@ -1,0 +1,69 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: negotiation_option
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Catalog of available negotiation options and their financial conditions."
+columns:
+  id:
+    description: "Unique identifier of the negotiation option."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.id
+  ts_created:
+    description: "Timestamp when the option was created."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.created_at
+  ts_updated:
+    description: "Timestamp when the option was last updated."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.updated_at
+  version:
+    description: "Version for optimistic locking."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.version
+  internal_key:
+    description: "Internal unique key for the option."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.internal_key
+  payment_method:
+    description: "Payment method (e.g., PIXLETO, CREDIT_CARD)."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.payment_method
+  down_payment_percentage:
+    description: "Percentage of down payment required."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.down_payment_percentage
+  business_days_until_down_payment:
+    description: "Business days to settle the down payment."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.business_days_until_down_payment
+  installments_quantity:
+    description: "Number of installments."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.installments_quantity
+  credit_card_fee_percentage:
+    description: "Fee percentage charged on credit card payments."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.credit_card_fee_percentage
+  discount_on_fee_percent:
+    description: "Discount percentage on fees."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.discount_on_fee_percent
+  discount_on_additional_charges_percentage:
+    description: "Discount percentage on additional charges."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.discount_on_additional_charges_percentage
+  discount_on_principal_amount_percentage:
+    description: "Discount percentage on principal amount."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.discount_on_principal_amount_percentage
+  discount_on_fine_percent:
+    description: "Discount percentage on fines."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.discount_on_fine_percent
+  external_key:
+    description: "External key identifier (e.g., from portals)."
+    lineage:
+      - datalake_trato_feito_raw.negotiation_option.external_key
+  ts_load:
+    description: "Load timestamp of the table."
