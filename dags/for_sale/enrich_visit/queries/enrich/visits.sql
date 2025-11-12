@@ -10,12 +10,8 @@ WITH
                 MIN(vsl.id_author_user) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS id_user_visit_request,
                 MAX(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS ts_visit_rescheduled,
                 MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS ts_visit_first_rescheduled,
-                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_DONE') AS ts_visit_done,
-                MIN(vsl.ts_created) FILTER (WHERE event_type = 'VISIT_UNSUCCESSFUL') AS ts_visit_unsuccessful,
                 MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_REGISTERED') AS ts_visit_registered,
                 MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_FITTED') AS ts_visit_fitted,
-                MIN(vsl.author_user_role) FILTER (WHERE vsl.event_type = 'VISIT_REGISTERED') AS author_role_visit_registered,
-                MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'FOLLOW_UP_COLLECTED') AS ts_visit_fup_collected,
                 MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_STALLED') AS ts_visit_stalled,
                 MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
                 MAX(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
@@ -53,18 +49,30 @@ WITH
                 b.id_visit,
                 MAX_BY(bsc.id_booking, bsc.ts_created) AS last_id_schedule,
                 MIN_BY(bsc.id_user, bsc.ts_created) AS id_user_visit_request,
+                SUM(1) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS nbr_reschedule,
+                MAX(bsc.ts_created) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS ts_visit_rescheduled,
+                MIN(bsc.ts_created) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS ts_visit_first_rescheduled,
                 MIN(bsc.ts_created) FILTER (WHERE bsc.reason = 'Visita extra de encaixe') AS ts_visit_fitted,
                 MIN(bsc.ts_created) FILTER (WHERE bsc.reason = 'AGENT_SCHEDULE_REALIZED') AS ts_visit_registered,
                 MIN(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_visit_first_confirmed,
                 MAX(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_visit_last_confirmed,
+                IF(MIN(fup.id_visit) IS NULL AND MIN(vcu.id_visit) IS NULL AND DATEDIFF(DAY, MIN(v.ts_visit), NOW()) >= 3, DATEADD(DAY, 2, MIN(v.ts_visit)), NULL) AS ts_visit_stalled,
                 MIN(bsc.ts_created) AS ts_first_event,
                 MAX(bsc.ts_created) AS ts_last_event
             FROM
                 datalake_ebdb_clean.booking_status_change AS bsc
-            LEFT JOIN datalake_ebdb_clean.booking AS b
-                ON bsc.id_booking = b.id
-            LEFT JOIN datalake_ebdb_clean.visit AS v
-                ON b.id_visit = v.id
+            LEFT JOIN
+                datalake_ebdb_clean.booking AS b
+                    ON bsc.id_booking = b.id
+            LEFT JOIN
+                datalake_ebdb_clean.visit AS v
+                    ON b.id_visit = v.id
+            LEFT JOIN
+                datalake_visit.post_visit_agent_unified AS fup
+                    ON fup.id_visit = v.id
+            LEFT JOIN
+                datalake_visit.visit_cancellation_unified AS vcu
+                    ON vcu.id_visit = v.id
             WHERE
                 b.type = 'Visita'
                 AND v.ts_created::DATE < '2024-11-01'
@@ -79,12 +87,8 @@ WITH
             id_user_visit_request,
             ts_visit_rescheduled,
             ts_visit_first_rescheduled,
-            ts_visit_done,
-            ts_visit_unsuccessful,
             ts_visit_registered,
             ts_visit_fitted,
-            author_role_visit_registered,
-            ts_visit_fup_collected,
             ts_visit_stalled,
             ts_visit_first_confirmed,
             ts_visit_last_confirmed,
@@ -114,19 +118,15 @@ WITH
         SELECT
             id_visit,
             last_id_schedule,
-            NULL AS nbr_reschedule,
+            nbr_reschedule,
             NULL AS visit_request_on_behalf_of,
             NULL AS visit_request_user_role,
             id_user_visit_request,
-            NULL AS ts_visit_rescheduled,
-            NULL AS ts_visit_first_rescheduled,
-            NULL AS ts_visit_done,
-            NULL AS ts_visit_unsuccessful,
+            ts_visit_rescheduled,
+            ts_visit_first_rescheduled,
             ts_visit_registered,
             ts_visit_fitted,
-            NULL AS author_role_visit_registered,
-            NULL AS ts_visit_fup_collected,
-            NULL AS ts_visit_stalled,
+            ts_visit_stalled,
             ts_visit_first_confirmed,
             ts_visit_last_confirmed,
             NULL AS visit_first_confirmed_channel,
@@ -181,6 +181,20 @@ WITH
         FROM
             datalake_ebdb_clean.visit_aud
         GROUP BY 1
+    ),
+    last_booking_status AS (
+        SELECT
+            b.id_visit,
+            MAX_BY(b.status, b.ts_created) AS last_status
+        FROM
+            datalake_ebdb_clean.booking AS b
+        LEFT JOIN
+            datalake_ebdb_clean.visit AS v
+                ON v.id = b.id_visit
+        WHERE
+            v.ts_created::DATE < '2024-11-01'
+            AND b.type = 'Visita'
+        GROUP BY 1
     )
 SELECT
     visit.id AS id_visit,
@@ -205,7 +219,16 @@ SELECT
     lh.partner_3p_supply,
     visit_demand.partner_3p_demand,
     visit.status,
-    visit.computed_status,
+    CASE
+        WHEN visit.ts_created::DATE >= '2024-11-01' THEN visit.computed_status
+        WHEN visit.ts_created::DATE < '2024-11-01' AND pva.event_type = 'VISIT_DONE' THEN 'DONE'
+        WHEN visit.ts_created::DATE < '2024-11-01' AND pva.event_type = 'VISIT_UNSUCCESSFUL' THEN 'UNSUCCESSFUL'
+        WHEN visit.ts_created::DATE < '2024-11-01' AND visit_cancellation.id_visit IS NOT NULL THEN 'CANCELED'
+        WHEN visit.ts_created::DATE < '2024-11-01' AND visit_log.ts_visit_stalled IS NOT NULL THEN 'STALLED'
+        WHEN visit.ts_created::DATE < '2024-11-01' AND lbs.last_status = 'AguardandoConfirmacao' THEN 'REQUESTED'
+        WHEN visit.ts_created::DATE < '2024-11-01' AND lbs.last_status = 'Marcado' THEN 'CONFIRMED'
+    END AS computed_status_unified,
+    computed_status_unified AS computed_status,
     visit.behavior,
     visit.booking_type,
     vbm.business_model,
@@ -221,8 +244,8 @@ SELECT
     END AS business_model_demand,
     visit_log.first_event,
     CASE
-        WHEN visit_log.ts_visit_fup_collected IS NOT NULL THEN 'FOLLOW_UP_COLLECTED'
-        WHEN visit_log.ts_visit_fup_collected IS NULL
+        WHEN pva.id_visit IS NOT NULL THEN 'FOLLOW_UP_COLLECTED'
+        WHEN pva.id_visit IS NULL
              AND visit_log.ts_visit_registered IS NOT NULL THEN 'VISIT_REGISTERED'
         ELSE visit_log.last_event
     END AS last_event,
@@ -233,6 +256,7 @@ SELECT
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
     visit_cancellation.channel AS cancellation_channel,
+    visit_cancellation.type AS cancellation_type,
     visit_cancellation.author_user_role AS cancellation_author_role,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.reason, NULL) AS unsuccessful_reason,
     CASE
@@ -268,12 +292,11 @@ SELECT
     END AS has_more_one_agent,
     IF(visit_log.ts_visit_confirmed IS NOT NULL, TRUE, FALSE) AS is_confirmed,
     visit_log.ts_visit_registered IS NOT NULL AS is_registered,
-    IF(visit_log.ts_visit_done IS NOT NULL, TRUE, FALSE) AS is_completed,
+    IF(pva.event_type = 'VISIT_DONE', TRUE, FALSE) AS is_completed,
     IF(nbr_reschedule >= 1, TRUE, FALSE) AS is_reschedule,
     IF(visit_cancellation.ts_created IS NOT NULL, TRUE, FALSE) AS is_canceled,
-    IF(visit_log.ts_visit_unsuccessful IS NOT NULL, TRUE, FALSE) AS is_unsuccessful,
-    IF(visit_log.author_role_visit_registered = 'AGENT', TRUE, FALSE) AS is_registered_by_agent,
-    IF(visit_log.ts_visit_fup_collected IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
+    IF(pva.event_type = 'VISIT_UNSUCCESSFUL', TRUE, FALSE) AS is_unsuccessful,
+    IF(pva.id_visit IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
     IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
     CASE
         WHEN business_model_demand = '3P' THEN TRUE
@@ -284,7 +307,7 @@ SELECT
         WHEN business_model_supply = '1P' THEN FALSE
     END AS is_3p_supply,
     IF(pfa.id_pfa_history IS NOT NULL, TRUE, FALSE) AS is_fixed_agent,
-    IF(computed_status IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
+    IF(computed_status_unified IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
     CASE
         WHEN visit_log.ts_visit_tenant_answer IS NOT NULL
              OR visit_log.ts_visit_pending_tenant_answer IS NOT NULL THEN TRUE
@@ -329,10 +352,10 @@ SELECT
     visit_log.ts_visit_confirmed,
     visit_log.ts_visit_first_confirmed,
     visit_log.ts_visit_last_confirmed,
-    visit_log.ts_visit_fup_collected,
+    pva.ts_post_visit_agent AS ts_visit_fup_collected,
     visit_cancellation.ts_created AS ts_visit_canceled,
-    visit_log.ts_visit_done,
-    visit_log.ts_visit_unsuccessful,
+    IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL) AS ts_visit_done,
+    IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.ts_post_visit_agent, NULL) AS ts_visit_unsuccessful,
     visit_log.ts_visit_stalled,
     vbh.ts_first_visit
 FROM
@@ -343,6 +366,9 @@ LEFT JOIN
 LEFT JOIN
     visit_log
         ON visit.id = visit_log.id_visit
+LEFT JOIN
+    last_booking_status AS lbs
+        ON visit.id = lbs.id_visit
 LEFT JOIN
     datalake_ebdb_listing.house AS lh
         ON lh.id = visit.id_house
@@ -377,4 +403,4 @@ LEFT JOIN
         AND visit.ts_created < COALESCE(pfa.ts_ended, NOW())
         AND pfa.is_enabled
 WHERE
-    DATE(visit.ts_created) >= '2024-11-01'
+    DATE(visit.ts_created) >= '2020-01-01'

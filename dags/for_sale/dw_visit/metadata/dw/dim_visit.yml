@@ -1,6 +1,7 @@
 database_name: dw_public
 table_name: dim_visit
-description: Information about Rent and Sale visits, which is a subset of bookings.
+description:
+  Information about Rent and Sale visits, which is a subset of bookings.
   A visit is when a tenant prospect/buyer prospect visits a property because it's interested in it.
   Each line is an unique visit.
 domain: For Rent
@@ -43,24 +44,24 @@ columns:
       - datalake_visit.visits.status
     description: Visit status
     categories:
-      Canceled: ''
-      Done: ''
-      Scheduled: ''
+      Canceled: ""
+      Done: ""
+      Scheduled: ""
   computed_status:
     lineage:
       - datalake_visit.visits.computed_status
-    description: Last computed status from Visit, has to be almost the same of status
+    description: Last computed status unified from Visit. Data since 2020.
   behavior:
     lineage:
       - datalake_visit.visits.behavior
-    description: What the step of behavior is this visit
+    description: What the step of behavior is this visit. Data since 2024-04.
   booking_type:
     lineage:
       - datalake_visit.visits.booking_type
     description: Type of the booking
     categories:
-      Booked: ''
-      Realized: ''
+      Booked: ""
+      Realized: ""
   business_context:
     lineage:
       - datalake_visit.visits.business_context
@@ -80,23 +81,27 @@ columns:
   cancellation_reason:
     lineage:
       - datalake_visit.visits.cancellation_reason
-    description: What the reason for the cancellation of this visit
+    description: What the reason for the cancellation of this visit. Data since 2024-05.
   cancellation_on_behalf_of:
     lineage:
       - datalake_visit.visits.cancellation_on_behalf_of
-    description: In whose name that cancellation status
+    description: In whose name that cancellation status. Data since 2024-05.
   cancellatin_channel:
     lineage:
       - datalake_visit.visits.cancellatin_channel
-    description: What the channel for the cancellation of this visit
+    description: What the channel for the cancellation of this visit. Data since 2024-05.
+  cancellation_type:
+    lineage:
+      - datalake_visit.visits.cancellation_type
+    description: Type of cancellation. It can be before or after the confirmation. Data since 2024-11.
   cancellation_author_role:
     lineage:
       - datalake_visit.visits.cancellation_author_role
-    description: Role of user who cancelled the visit
+    description: Role of user who cancelled the visit. Data since 2024-11.
   unsuccessful_reason:
     lineage:
       - datalake_visit.visits.unsuccessful_reason
-    description: Reason of visit unsuccessful.
+    description: Reason of visit unsuccessful. Data since 2020.
     categories:
       ASSISTED_ENTRANCE: When a third person is needed to enter.
       EASY_ENTRANCE: When no third person is needed to enter.
@@ -166,35 +171,31 @@ columns:
   is_visit_confirmed:
     lineage:
       - datalake_visit.visits.is_confirmed
-    description: If the visit was confirmed by all
+    description: If the visit was confirmed by all. Data since 2020.
   is_visit_completed:
     lineage:
       - datalake_visit.visits.is_completed
-    description: If the visit is completed
+    description: If the visit is completed. Data since 2020.
   is_visit_canceled:
     lineage:
       - datalake_visit.visits.is_canceled
-    description: If this visit is canceled
+    description: If this visit is canceled. Data since 2020.
   is_visit_unsuccessful:
     lineage:
       - datalake_visit.visits.is_unsuccessful
-    description: If this visit return unsuccessful
+    description: If this visit return unsuccessful. Data since 2020.
   is_visit_reschedule:
     lineage:
       - datalake_visit.visits.is_reschedule
-    description: If this visit is a reschedule
-  is_visit_registered_by_agent:
-    lineage:
-      - datalake_visit.visits.is_visit_registered_by_agent
-    description: If the visit was registered by agent
+    description: If this visit is a reschedule. Data since 2020.
   is_visit_cancelled_by_expiration:
     lineage:
       - datalake_visit.visits.is_cancelled_by_expiration
-    description: True if the visit was cancelled due to expired time
+    description: True if the visit was cancelled due to expired time. Data since 2024-05.
   is_visit_stalled:
     lineage:
       - datalake_visit.visits.is_stalled
-    description: If the visit is stalled.
+    description: If the visit is stalled. Data since 2020.
   has_visit_tenant_living:
     lineage:
       - datalake_visit.visits.has_tenant_living
@@ -206,11 +207,11 @@ columns:
   has_visit_fup_collected:
     lineage:
       - datalake_visit.visits.has_fup_collected
-    description: True when the visit has a follow up collected
+    description: True when the visit has a follow up collected. Data since 2020.
   has_visit_more_one_agent:
     lineage:
       - datalake_visit.visits.has_more_one_agent
-    description: True when the visit has more than one associated agent.
+    description: True when the visit has more than one associated agent. Data since 2020.
   has_unsuccessful_demand_attended:
     lineage:
       - datalake_visit.visits.has_demand_attended
@@ -242,7 +243,7 @@ columns:
   ts_visit_first_confirmed:
     lineage:
       - datalake_visit.visits.ts_visit_first_confirmed
-    description: Timestamp with the first confirmation of this visit.
+    description: Timestamp with the first confirmation of this visit. Data since 2020.
   ts_visit_supply_answer:
     lineage:
       - datalake_visit.visits.ts_visit_supply_answer
@@ -262,38 +263,38 @@ columns:
   ts_visit_last_confirmed:
     lineage:
       - datalake_visit.visits.ts_visit_last_confirmed
-    description: Timestamp with the last confirmation of this visit
+    description: Timestamp with the last confirmation of this visit. Data since 2020.
   ts_visit_first_rescheduled:
     lineage:
       - datalake_visit.visits.ts_visit_first_rescheduled
-    description: Timestamp with the first reschedule date of this visit
+    description: Timestamp with the first reschedule date of this visit. Data since 2020.
   ts_visit_last_rescheduled:
     lineage:
       - datalake_visit.visits.ts_visit_rescheduled
-    description: Timestamp with the last rescheduled date of this visit.
+    description: Timestamp with the last rescheduled date of this visit. Data since 2020.
   ts_visit_canceled:
     lineage:
       - datalake_visit.visits.ts_visit_canceled
-    description: Timestamp with the canceled date of this visit.
+    description: Timestamp with the canceled date of this visit. Data since 2020.
   ts_visit_unsuccessful:
     lineage:
       - datalake_visit.visits.ts_visit_unsuccessful
-    description: Timestamp with the unsuccessful date of this visit.
+    description: Timestamp with the unsuccessful date of this visit. Data since 2020.
   ts_visit_done:
     lineage:
       - datalake_visit.visits.ts_visit_done
-    description: Timestamp with the done date of this visit.
+    description: Timestamp with the done date of this visit. Data since 2020.
   ts_visit_fup_collected:
     lineage:
       - datalake_visit.visits.ts_visit_fup_collected
-    description: Timestamp with the follow up collected date of this visit.
+    description: Timestamp with the follow up collected date of this visit. Data since 2020.
   ts_visit_stalled:
     lineage:
       - datalake_visit.visits.ts_visit_stalled
-    description: Timestamp when the visit was stalled.
+    description: Timestamp when the visit was stalled. Data since 2020.
   ts_first_visit:
     lineage:
       - datalake_visit.visits.ts_first_visit
-    description: Timestamp when the visit was first scheduled.
+    description: Timestamp when the visit was first scheduled. Data since 2020.
   ts_load:
     description: Timestamp of the ingestion data.

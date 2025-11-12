@@ -1,39 +1,60 @@
-WITH
-new_model AS (
+WITH new_model AS (
   SELECT
-    id_visit,
-    channel,
-    on_behalf_of,
-    reason,
-    author_user_role,
-    IF(reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
-    ts_created,
-    ts_updated
+    vsl.id_visit,
+    vsl.channel,
+    vsl.on_behalf_of,
+    vsl.reason,
+    vsl.author_user_role,
+    vsl.event_type AS type,
+    IF(vsl.reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
+    vsl.ts_created,
+    vsl.ts_updated
   FROM
-    datalake_ebdb_clean.visit_status_log
+    datalake_ebdb_clean.visit_status_log AS vsl
+  JOIN
+    datalake_ebdb_clean.visit AS v
+      ON vsl.id_visit = v.id
   WHERE
-    event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
-    AND DATE(ts_created) >= '2025-01-01'
+    vsl.event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
+    AND DATE(v.ts_created) >= '2024-11-01'
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY vsl.id_visit ORDER BY vsl.ts_created DESC) = 1
 ),
 old_model AS (
+  WITH last_booking_status AS (
+    SELECT
+      b.id_visit,
+      MAX_BY(b.status, b.ts_created) AS last_status,
+      MAX(b.ts_updated) AS ts_created
+    FROM
+      datalake_ebdb_clean.booking AS b
+    LEFT JOIN
+      datalake_ebdb_clean.visit AS v
+        ON b.id_visit = v.id
+    WHERE
+      b.type = 'Visita'
+      AND DATE(v.ts_created) < '2024-11-01'
+    GROUP BY 1
+  )
   SELECT
-    vcd.id_visit,
+    lbs.id_visit,
     vcd.channel,
     vcd.on_behalf_of,
     vcd.reason,
     vsl.author_user_role,
     IF(vcd.reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
-    vcd.ts_created,
-    vcd.ts_updated
+    lbs.ts_created,
+    lbs.ts_created AS ts_updated
   FROM
+    last_booking_status AS lbs
+  LEFT JOIN
     datalake_ebdb_clean.visit_cancellation_details AS vcd
+      ON lbs.id_visit = vcd.id_visit
   LEFT JOIN
     datalake_ebdb_clean.visit_status_log AS vsl
       ON vcd.id_visit_status_log = vsl.id_visit_status_log
   WHERE
-    DATE(vcd.ts_created) < '2025-01-01'
+    lbs.last_status = 'Cancelado'
 )
 SELECT
   id_visit,
@@ -41,6 +62,7 @@ SELECT
   on_behalf_of,
   reason,
   author_user_role,
+  type,
   is_cancelled_by_expiration,
   ts_created,
   ts_updated
@@ -52,6 +74,7 @@ SELECT
   on_behalf_of,
   reason,
   author_user_role,
+  NULL AS type,
   is_cancelled_by_expiration,
   ts_created,
   ts_updated

@@ -20,6 +20,7 @@ SELECT
   v.id_visit AS sk_visit,
   v.id_visitor AS sk_visitor,
   v.id_owner AS sk_owner,
+  v.id_user_visit_request AS sk_user_visit_request,
   vse.sk_first_associated_agent,
   vse.sk_last_associated_agent,
   v.id_house AS sk_house,
@@ -78,10 +79,10 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_visit.visits AS v
-INNER JOIN
+LEFT JOIN
   visit_status_events AS vse
     ON v.id_visit = vse.id_visit
-INNER JOIN
+LEFT JOIN
   dw_visit.dim_behavior AS db
     ON v.behavior = db.behavior_type
 LEFT JOIN

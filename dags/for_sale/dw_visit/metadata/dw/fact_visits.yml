@@ -16,6 +16,10 @@ columns:
     description: Owner's id. (Connect with dim_user)
     lineage:
         - datalake_visit.visits.id_owner
+  sk_user_visit_request:
+    description: User's id who requested the visit.
+    lineage:
+        - datalake_visit.visits.id_user_visit_request
   sk_first_associated_agent:
     description: Is the Id of the first agent who was associated with the visit.
     lineage:

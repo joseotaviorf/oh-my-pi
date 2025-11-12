@@ -1,6 +1,6 @@
 database_name: datalake_visit
 table_name: visit_cancellation_unified
-description: This data model unifies visit cancellation data. Until 2024 coming from visit_cancellation_details and after 2024 coming from visit_status_log.
+description: This data model unifies visit cancellation data. Until 2024 coming from booking (last status by visit) and visit_cancellation_details and after 2024 coming from visit_status_log.
   Each row is an unique visit.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
@@ -9,17 +9,17 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_visit
       - datalake_ebdb_clean.visit_cancellation_details.id_visit
-    description: Primary key of this table. The cancellation information is at visit granularity.
+    description: Primary key of this table. The cancellation information is at visit granularity. Data since 2015.
   channel:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
       - datalake_ebdb_clean.visit_cancellation_details.channel
-    description: The channel through which the visit was cancelled.
+    description: The channel through which the visit was cancelled. Data since 2024-05.
   on_behalf_of:
     lineage:
       - datalake_ebdb_clean.visit_status_log.on_behalf_of
       - datalake_ebdb_clean.visit_cancellation_details.on_behalf_of
-    description: On whose behalf the visit was cancelled.
+    description: On whose behalf the visit was cancelled. Data since 2024-05.
     categories:
       SUPPLY: Visit canceled on behalf of the owner.
       TENANT_LIVING: Visit canceled on behalf of the tenant who is living in the house.
@@ -29,20 +29,27 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.reason
       - datalake_ebdb_clean.visit_cancellation_details.reason
-    description: Reason why the visit was cancelled.
+    description: Reason why the visit was cancelled. Data since 2024-05.
   author_user_role:
     lineage:
       - datalake_ebdb_clean.visit_status_log.author_user_role
-    description: Role of user who cancelled the visit.
+    description: Role of user who cancelled the visit. Data since 2024-11.
+  type:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.event_type
+    description: Type of cancellation. It can be before or after the confirmation. Data since 2024-11.
+    categories:
+      VISIT_REQUEST_CANCELED: Visit cancelled before the confirmation.
+      VISIT_CANCELED: Visit cancelled after the confirmation.
   is_cancelled_by_expiration:
-    description: True if the visit was cancelled due to expired time.
+    description: True if the visit was cancelled due to expired time. Data since 2024-05.
   ts_created:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.visit_cancellation_details.ts_created
-    description: Timestamp of when the cancelled visits were created.
+    description: Timestamp of when the cancelled visits were created. Data since 2015.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_updated
       - datalake_ebdb_clean.visit_cancellation_details.ts_updated
-    description: Timestamp of when the cancelled visits were updated.
+    description: Timestamp of when the cancelled visits were updated. Data since 2015.
