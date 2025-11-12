@@ -183,8 +183,6 @@ columns:
       It will be true if
       (1) the count of tenant repairs in AC is greater than 0
       or (2) if the count of tenant repairs in AC is 0 but there were tenant repairs in AR AND the termination had early mediation or early both agree.
-  has_termination_date_rescheduling:
-    description: Flag indicating whether the termination request included rescheduling of the termination date.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -233,11 +231,6 @@ columns:
   dt_termination:
     description: Date when the property became or will become vacant.
     lineage:
-      - datalake_terminator_clean.termination.dt_vacancy
-  original_dt_termination:
-    description: Original date of when the property should become vacant.
-    lineage:
-      - datalake_terminator_clean.termination.rescheduling_history
       - datalake_terminator_clean.termination.dt_vacancy
   dt_last_rescheduled:
     description: Date of last rescheduling of termination.
