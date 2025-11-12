@@ -33,16 +33,6 @@ columns:
       - datalake_terminator.termination.ts_termination_finished
       - datalake_terminator.termination.total_tentant_repair_ac
     description: Flag indicating if the tenant had repairs in AC.
-  has_unset_repairs:
-    lineage:
-      - datalake_inspections.repair_request
-    description:
-      Flag indicating if there were repairs with undetermined responsibility.
-  has_bandaid:
-    lineage:
-      - datalake_inspection_services_clean.automatic_invoice
-    description:
-      Flag indicating if band-aid was required.
   has_mediation:
     lineage:
       - datalake_inspections.inspection_status_change.ts_budget_approval_sent_to_owner
@@ -55,9 +45,9 @@ columns:
     description: |
       Flag indicating if a mediation occurred.
       This flag is true if the following scenarios are true:
-      (1) There were repairs,
-      (2) It is not an eviction and
-      (3) It has neither early both agree or “Both Agreed” on budget approval, nor required band-aid.
+        - If the tenant has repairs and the type of BA is not Both Agreed
+        - If the tenant has early mediation
+        - If the tenant has unset repairs
   is_ticket_opened_via_terminator:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket
