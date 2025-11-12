@@ -170,8 +170,7 @@ unset_repairs AS (
         COUNT_IF(rr.responsibility IN ('UNSET', 'UNDEFINED') AND rr.comment IS NOT NULL) AS total_unset_repairs
     FROM
         datalake_inspections.repair_request AS rr
-    GROUP BY ALL)
-
+    GROUP BY ALL
 )
 SELECT
     t.id AS id_termination,
