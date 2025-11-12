@@ -1,0 +1,34 @@
+database_name: datalake_chat_fup_clean
+table_name: surveys_answer
+description: "Clean version of the surveys_answer table"
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.id
+    description: "Unique identifier for each survey answer"
+  is_solved:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.solved
+    description: "Whether the survey answer is solved"
+  rating:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.rating
+    description: "Rating of the survey answer"
+  comment:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.comment
+    description: "Comment of the survey answer"
+  ts_created:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.created_at
+    description: "Timestamp of the creation of the survey answer"
+  ts_updated:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.updated_at
+    description: "Timestamp of the last update of the survey answer"
+  id_survey:
+    lineage:
+      - datalake_chat_fup_raw.surveys_answer.survey_id
+    description: "Unique identifier for each survey"

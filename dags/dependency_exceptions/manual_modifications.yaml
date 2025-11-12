@@ -695,9 +695,13 @@ bietlejuice.enrich_satisfaction_rating:
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
     - bietlejuice.dag_test_alert:load-clean-chats-chat:first-run-of-day
+    - bietlejuice.dag_test_alert:load-clean-surveys-answer:first-run-of-day
+    - bietlejuice.dag_test_alert:load-clean-surveys-survey:first-run-of-day
 bietlejuice.enrich_customer_support:
   remove:
     - bietlejuice.dag_test_alert:load-clean-chats-chat:first-run-of-day
+    - bietlejuice.dag_test_alert:load-clean-surveys-answer:first-run-of-day
+    - bietlejuice.dag_test_alert:load-clean-surveys-survey:first-run-of-day
 bietlejuice.enrich_seo_funnel:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
