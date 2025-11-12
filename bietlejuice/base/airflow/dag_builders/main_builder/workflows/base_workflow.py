@@ -64,6 +64,7 @@ class BaseWorkflow(BuilderInterface):
         user_defined_macros = {"get_date_param": self.get_date_param}
         user_defined_macros.update(kwargs.get("user_defined_macros", {}))
         jiraops_callback = JiraOpsCallback()
+        callback_by_task = self.dag_args.get("callback_by_task", True)
 
         dag = DAG(
             dag_id=self.dag_id,
@@ -72,13 +73,18 @@ class BaseWorkflow(BuilderInterface):
                 "owner": self.dag_args["owner"],
                 "wait_for_downstream": False,
                 "depends_on_past": False,
-                "on_failure_callback": jiraops_callback.task_failure_alert,
+                "on_failure_callback": (
+                    jiraops_callback.task_failure_alert if callback_by_task else None
+                ),
             },
             start_date=schedule_start_date,
             schedule=self.dag_args.get("schedule_interval", self.dataset_dependencies),
             doc_md=doc_md,
             user_defined_macros=user_defined_macros,
             params=BaseDAG.get_default_trigger_form_params(),
+            on_failure_callback=(
+                jiraops_callback.dag_failure_alert if not callback_by_task else None
+            ),
             **kwargs,
         )
 

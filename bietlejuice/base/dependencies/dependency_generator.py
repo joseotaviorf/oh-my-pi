@@ -204,7 +204,7 @@ class DependencyGenerator:
         return dependencies
 
     def _find_all_tables_in_query_file(self, query_path: str) -> set:
-        """"
+        """ "
         Returns a set of tables inside the given query path
         :param query_path: The path to the query
         :type query_path: str

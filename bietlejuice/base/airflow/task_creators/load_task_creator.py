@@ -42,9 +42,9 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
                     "table_name": table_attributes.table_name,
                     "layer": table_attributes.layer.value,
                     "bucket": self.dag_execution_context.bucket,
-                    "storage_format": self.storage_format.value
-                    if self.storage_format
-                    else None,
+                    "storage_format": (
+                        self.storage_format.value if self.storage_format else None
+                    ),
                 }
             )
         return task

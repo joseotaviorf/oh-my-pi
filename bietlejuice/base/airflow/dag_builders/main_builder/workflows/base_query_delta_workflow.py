@@ -116,9 +116,11 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
 
         optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
             cluster_tables,
-            optimize_delta_table_local_id=execute_job_cluster_local_id
-            if execute_job_cluster_local_id > 1
-            else None,
+            optimize_delta_table_local_id=(
+                execute_job_cluster_local_id
+                if execute_job_cluster_local_id > 1
+                else None
+            ),
         )
 
         table_first_tasks = {}

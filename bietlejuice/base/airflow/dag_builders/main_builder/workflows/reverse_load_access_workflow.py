@@ -45,7 +45,12 @@ class ReverseLoadAccessWorkflow(BaseWorkflow):
                 optimize_delta_table_task = self.optimize_delta_table_task_creator.create_task(
                     [table]
                 )
-                execute_job_cluster_task >> load_reverse_task >> optimize_delta_table_task >> dummy_terminate_job_cluster_task
+                (
+                    execute_job_cluster_task
+                    >> load_reverse_task
+                    >> optimize_delta_table_task
+                    >> dummy_terminate_job_cluster_task
+                )
                 load_reverse_task >> export_reverse_task
             else:
                 execute_job_cluster_task >> export_reverse_task

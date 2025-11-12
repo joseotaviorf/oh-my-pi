@@ -8,9 +8,9 @@ from dags import DAG_PACKAGES_ROOT
 def get_dict_from_yaml_file_side_effect(path: str) -> dict:
     path_tree = path.split("/")
     return {
-        "database_name": "datalake_sale_dag"
-        if "enrich" in path_tree
-        else "datalake_sale_dag_clean",
+        "database_name": (
+            "datalake_sale_dag" if "enrich" in path_tree else "datalake_sale_dag_clean"
+        ),
         "table_name": path_tree[-1].split(".")[0],
     }
 

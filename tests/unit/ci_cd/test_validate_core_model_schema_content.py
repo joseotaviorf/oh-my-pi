@@ -192,7 +192,7 @@ class TestValidateSchemaStructure:
         # Arrange
         invalid_schema = {
             "min_columns": 1,
-            "max_columns": 1
+            "max_columns": 1,
             # Missing columns
         }
 
@@ -408,7 +408,7 @@ class TestValidateSchemaStructure:
             "columns": {
                 "id": {
                     "type": "string",
-                    "required": True
+                    "required": True,
                     # No nullable field
                 }
             },

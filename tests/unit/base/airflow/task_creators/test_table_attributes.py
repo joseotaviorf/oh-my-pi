@@ -64,7 +64,7 @@ class TestTableAttributes:
         assert table_attributes.schema == "dag_name"
 
     def test_should_infer_schema_from_dag_name_removing_enrich_prefix_if_not_informed(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "enrich_dag_name"}
@@ -199,7 +199,7 @@ class TestTableAttributes:
         assert table_attributes.extraction_type == "<default_clean_extraction_type>"
 
     def test_should_use_table_specific_extraction_type_instead_of_default_for_layer(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}
@@ -344,7 +344,7 @@ class TestTableAttributes:
         assert not table_attributes.has_custom_spark_job
 
     def test_has_custom_spark_job_should_return_true_if_load_spark_job_is_set_in_workflow_args(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}
@@ -364,7 +364,7 @@ class TestTableAttributes:
         assert table_attributes.has_custom_spark_job
 
     def test_has_custom_spark_job_should_return_true_if_load_spark_job_is_set_in_table_customization(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}
@@ -386,7 +386,7 @@ class TestTableAttributes:
         assert table_attributes.has_custom_spark_job
 
     def test_get_has_soft_delete_should_return_true_if_set_to_true_in_table_customization(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}
@@ -408,7 +408,7 @@ class TestTableAttributes:
         assert table_attributes.get_has_soft_delete() is True
 
     def test_get_has_soft_delete_should_return_false_if_set_to_false_in_table_customization(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}
@@ -430,7 +430,7 @@ class TestTableAttributes:
         assert table_attributes.get_has_soft_delete() is False
 
     def test_get_has_soft_delete_should_return_true_if_set_to_true_in_workflow_args(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}
@@ -450,7 +450,7 @@ class TestTableAttributes:
         assert table_attributes.get_has_soft_delete() is True
 
     def test_get_has_soft_delete_should_return_false_if_set_to_false_in_workflow_args(
-        self
+        self,
     ):
         # arrange
         dag_args = {"name": "dag_name"}

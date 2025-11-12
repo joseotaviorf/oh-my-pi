@@ -37,7 +37,11 @@ class ReverseAccessWorkflow(BaseWorkflow):
         tables = self._get_tables()
         for table in tables:
             export_reverse_task = self.export_task_creator.create_task(table)
-            execute_job_cluster_task >> export_reverse_task >> dummy_terminate_job_cluster_task
+            (
+                execute_job_cluster_task
+                >> export_reverse_task
+                >> dummy_terminate_job_cluster_task
+            )
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()

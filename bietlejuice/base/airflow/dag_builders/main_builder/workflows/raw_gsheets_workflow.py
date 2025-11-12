@@ -255,13 +255,17 @@ class RawGsheetsWorkflow(BaseWorkflow):
         )
         default_libraries = self.config_service.get_config("default_libraries")
         custom_libraries = [
-            {
-                lib_type: lib_name.format(
-                    artifacts_bucket=self.config_service.get_config("artifacts_bucket")
-                )
-            }
-            if isinstance(lib_name, str)
-            else {lib_type: lib_name}
+            (
+                {
+                    lib_type: lib_name.format(
+                        artifacts_bucket=self.config_service.get_config(
+                            "artifacts_bucket"
+                        )
+                    )
+                }
+                if isinstance(lib_name, str)
+                else {lib_type: lib_name}
+            )
             for custom_libraries in self.cluster_args["custom_libraries"]
             for lib_type, lib_name in custom_libraries.items()
         ]

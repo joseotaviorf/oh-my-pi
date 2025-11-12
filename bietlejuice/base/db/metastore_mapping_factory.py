@@ -9,7 +9,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class MetastoreMappingFactory:
-    """"Returns the correct Metastore Mapper according to the desired layer"""
+    """ "Returns the correct Metastore Mapper according to the desired layer"""
 
     @staticmethod
     def get_mapper_by_layer(

@@ -95,9 +95,11 @@ class CdcSchemaTreatment(ABC):
         """Applies the column alias to the transactional dataframe, if they exist."""
 
         latest_table_change["primaryKeyColumnNames"] = [
-            self.database_column_alias[column_name]
-            if column_name in self.database_column_alias.keys()
-            else column_name
+            (
+                self.database_column_alias[column_name]
+                if column_name in self.database_column_alias.keys()
+                else column_name
+            )
             for column_name in latest_table_change["primaryKeyColumnNames"]
         ]
 

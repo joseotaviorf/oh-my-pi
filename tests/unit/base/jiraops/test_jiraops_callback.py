@@ -123,9 +123,7 @@ def test_task_failure_alert_prod_environment(
     mock_client_class.assert_called_once_with(expected_credentials)
 
     expected_message = "DAG: test_dag - Task: test_task"
-    expected_description = (
-        "DAG: test_dag - Task: test_task Failed at: 2025-05-05 12:00:00"
-    )
+    expected_description = "DAG: test_dag - Task: test_task at: 2025-05-05 12:00:00"
     expected_tags = ["test_dag", "test_task", "task failed"]
 
     expected_extra_properties = {

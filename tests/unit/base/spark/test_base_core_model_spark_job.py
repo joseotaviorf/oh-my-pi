@@ -639,8 +639,8 @@ class TestBaseCoreModelSparkJob:
         mock_args.schema = "test_schema"
         mock_args.table_name = "test_table"
         mock_args.partitions = (
-            "['year', 'month', 'day']"
-        )  # Multiple partitions as string
+            "['year', 'month', 'day']"  # Multiple partitions as string
+        )
 
         # Create source DataFrame
         source_data = [{"col1": "val1", "year": "2023", "month": "01", "day": "15"}]

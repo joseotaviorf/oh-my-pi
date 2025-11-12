@@ -20,7 +20,7 @@ class TestDatasetService:
             yield
 
     def test_get_dag_datasets_from_dependencies_should_return_none_if_no_dependencies(
-        self
+        self,
     ):
         dependencies = []
 
@@ -29,7 +29,7 @@ class TestDatasetService:
         assert result is None
 
     def test_get_dag_datasets_from_dependencies_should_structure_dataset_object_correctly(
-        self
+        self,
     ):
         dependencies = ["dag1:task1", "dag1:task2", "dag2:task1"]
 
@@ -49,7 +49,7 @@ class TestDatasetService:
         )
 
     def test_get_dag_datasets_from_dependencies_should_accept_custom_dict_expressions(
-        self
+        self,
     ):
         dependencies = {"any": [{"all": ["dag1:task1", "dag2:task1"]}, "dag1:task2"]}
         result = DatasetService.get_dag_datasets_from_dependencies(dependencies)
@@ -68,7 +68,7 @@ class TestDatasetService:
         )
 
     def test_get_dag_datasets_from_dependencies_should_remove_redundant_dependencies_from_reprocessing(
-        self
+        self,
     ):
         dependencies = {"any": [{"all": ["dag1:task1", "dag2:task1"]}, "dag1:task2"]}
         redundant_dependencies = ["dag1:task1"]
@@ -88,7 +88,7 @@ class TestDatasetService:
         )
 
     def test_get_dag_datasets_from_dependencies_should_treat_first_run_of_day_suffix_correctly(
-        self
+        self,
     ):
         dependencies = {
             "any": [

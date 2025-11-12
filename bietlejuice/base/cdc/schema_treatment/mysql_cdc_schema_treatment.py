@@ -182,8 +182,8 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
 
         for column in unix_columns:
             """
-                If the unix timestamp is lower than 100000000000000, it is a unix timestamp with miliseconds
-                If not, it is a timestamp with microseconds.
+            If the unix timestamp is lower than 100000000000000, it is a unix timestamp with miliseconds
+            If not, it is a timestamp with microseconds.
             """
             transactional_dataframe = transactional_dataframe.withColumn(
                 column,

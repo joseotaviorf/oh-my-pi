@@ -1,4 +1,5 @@
 """Slack service helper."""
+
 import copy
 import logging
 from typing import Dict, Any, Tuple, List
@@ -33,7 +34,7 @@ class SlackService:
 
     @staticmethod
     def build_slack_payload(
-        error_messages: List[Tuple[str, str]]
+        error_messages: List[Tuple[str, str]],
     ) -> Dict[str, Dict[str, Any]]:
         """Builds the message payload from the error messages."""
         error_dict = {}  # type: ignore
