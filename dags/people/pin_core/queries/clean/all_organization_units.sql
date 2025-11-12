@@ -1,6 +1,9 @@
 SELECT
   business_group_id AS id_business_group,
   organization_id AS id_organization,
+  attribute4 AS id_salu,
+  attribute20 AS id_greenhouse,
+  action_occurrence_id AS id_action_occurrence,
   organization_code,
   attribute1 AS cost_center_code,
   name,
@@ -11,15 +14,24 @@ SELECT
   attribute6 AS product,
   attribute8 AS vertical,
   attribute9 AS vice_presidency,
-  attribute10 AS sub_directorate,
+  attribute10 AS chapter,
+  attribute11 AS brand,
+  attribute12 AS structure,
+  attribute13 AS team,
+  attribute15 AS line,
+  attribute16 AS name_owner_l1,
+  attribute17 AS name_owner_l2,
+  attribute18 AS name_owner_l3,
+  attribute19 AS headcount_type,
   internal_external_flag AS organization_scope,
+  CAST(object_version_number AS INT) AS object_version_number,
   TO_TIMESTAMP(creation_date) AS ts_created,
   TO_TIMESTAMP(last_update_date) AS ts_updated,
-  TO_TIMESTAMP(effective_start_date) AS ts_effective_started,
-  TO_TIMESTAMP(effective_end_date) AS ts_effective_ended,
+  TO_DATE(effective_start_date) AS dt_effective_started,
+  TO_DATE(effective_end_date) AS dt_effective_ended,
   NOW() AS ts_load,
   year,
   month,
   day
 FROM
-  datalake_pin_core_raw.hr_all_organization_units_vl
+  datalake_pin_core_raw.hr_all_organization_units_f
