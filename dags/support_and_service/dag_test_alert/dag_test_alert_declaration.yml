@@ -1,7 +1,7 @@
 dag:
   name: dag_test_alert
   schedule_start_date: 2019, 5, 31
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 21 * * *
   owner: Data SS
   callback_by_task: False
   documentation:
