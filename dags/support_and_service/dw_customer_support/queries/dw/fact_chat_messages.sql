@@ -116,24 +116,47 @@ messages_with_users AS (
       ON REPLACE(u2.main_phone, '+', '') = td.user_sender
       AND u2.country_code = 'BR'
   GROUP BY ALL
-)
-SELECT
+),
+origin_infos AS (
+  SELECT 
+    id_session, 
+    origin
+  FROM 
+    datalake_customer_support.chats
+  WHERE 
+    ts_created >= DATE('{load_start_date}') - INTERVAL 1 YEAR
+    AND id_session IS NOT NULL
+),
+messages_with_origins AS (
+  SELECT DISTINCT
   mwu.sk_channel,
   mwu.sk_session,
   mwu.sk_message,
   mwu.sk_user_sender,
-  t.origin,
+  oi.origin,
   mwu.user_type,
   mwu.message,
-  CASE
-    WHEN LAG(mwu.ts_created) OVER (PARTITION BY mwu.sk_channel ORDER BY mwu.ts_created) IS NOT NULL
-      THEN DATEDIFF(SECOND, LAG(mwu.ts_created) OVER (PARTITION BY mwu.sk_channel ORDER BY mwu.ts_created), mwu.ts_created)
-    ELSE NULL
-  END AS reply_time,
-  mwu.ts_created,
-  NOW() AS ts_load
+  mwu.ts_created
 FROM
   messages_with_users AS mwu
 LEFT JOIN 
-  datalake_customer_support.chats AS t
-    ON mwu.sk_session = t.id_session
+  origin_infos AS oi
+  ON mwu.sk_session = oi.id_session
+)
+SELECT DISTINCT
+  sk_channel,
+  sk_session,
+  sk_message,
+  sk_user_sender,
+  origin,
+  user_type,
+  message,
+  CASE
+    WHEN LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created) IS NOT NULL
+      THEN DATEDIFF(SECOND, LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created), ts_created)
+    ELSE NULL
+  END AS reply_time,
+  ts_created,
+  NOW() AS ts_load
+FROM
+ messages_with_origins
