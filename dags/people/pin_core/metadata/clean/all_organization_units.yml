@@ -31,10 +31,6 @@ columns:
     description: Code for the Cost Center.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.attribute1
-  name:
-    description: Translated name for the Organization Unit.
-    lineage:
-      - datalake_pin_core_raw.hr_all_organization_units_vl.name
   created_by:
     description: User who created the row.
     lineage:

@@ -6,7 +6,6 @@ SELECT
   action_occurrence_id AS id_action_occurrence,
   organization_code,
   attribute1 AS cost_center_code,
-  name,
   created_by,
   last_updated_by AS updated_by,
   attribute3 AS directorate,
