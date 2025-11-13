@@ -1,0 +1,47 @@
+dag:
+  name: reverse_atento_test
+  schedule_start_date: 2022,7,12
+  owner: Data Planning and Performance
+  documentation:
+    dag_purpose: |
+      This dag aims to load a copy of the databases that will be sent to Atento to our datalake and then, sending them.
+workflow:
+  type: load_access
+  layer: reverse
+  load_spark_job: load_reverse_atento
+  spark_job_arguments:
+    - "{dag_name}"
+    - "{table_name}"
+    - "{schema}"
+    - "{{ data_interval_start | ds }}"
+    - "5a-dataops-prod" # destination bucket name
+  custom_schema: atento
+  tables_customization:
+    backlog_metric: {}
+    csat_front: {}
+    demand_metric: {}
+    fcr_metric: {}
+    general_metric: {}
+    recontact_mx: {}
+    recontact: {}
+    speech_call: {}
+    speech_chat: {}
+    taxonomy: {}
+    tmr: {}
+    tickets_transferred: {}
+    twilio_chat_aht: {}
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r6g.8xlarge
+    node_type_id: r6g.4xlarge
+    spark_version: 16.4.x-scala2.12
+    num_workers: 5
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
