@@ -10,6 +10,10 @@ columns:
     description: ID of the third party bill.
     lineage:
       - datalake_rental_management_raw.third_party_bills.id
+  uuid_third_party_bills:
+    description: UUID of the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.third_party_bills_uuid
   id_contract:
     description: ID of the contract.
     lineage:

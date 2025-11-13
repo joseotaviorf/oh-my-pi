@@ -1,5 +1,6 @@
 SELECT
     id,
+    third_party_bills_uuid AS uuid_third_party_bills,
     contract_id AS id_contract,
     bar_code,
     beneficiary_name,
