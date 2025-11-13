@@ -1,6 +1,7 @@
 dag:
   name: greenhouse_audit_log
   owner: Data People
+  callback_by_task: False
   documentation:
     dag_purpose: |
       This DAG ingests audit log events from the Greenhouse Audit Log API.

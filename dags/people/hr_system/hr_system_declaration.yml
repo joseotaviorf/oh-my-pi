@@ -2,6 +2,7 @@ dag:
   name: hr_system
   schedule_interval: 0 3 * * *
   owner: Data People
+  callback_by_task: False
   dag_documentation:
     dag_purpose: |
       Retrieve data from Oracle HR System API, a sub product of Oracle Human Capital Resources (Oracle HCM).

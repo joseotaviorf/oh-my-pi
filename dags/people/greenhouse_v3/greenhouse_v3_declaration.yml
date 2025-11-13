@@ -1,6 +1,7 @@
 dag:
   name: greenhouse_v3
   owner: Data People
+  callback_by_task: False
   documentation:
     dag_purpose: |
       This DAG aims to ingest data from the Greenhouse API v3 (Recruitment).

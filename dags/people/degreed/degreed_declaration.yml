@@ -1,6 +1,7 @@
 dag:
   name: degreed
   owner: Data People
+  callback_by_task: False
   documentation:
     dag_purpose: |
       This DAG aims to ingest data from the Degreed API (Learning Hub).

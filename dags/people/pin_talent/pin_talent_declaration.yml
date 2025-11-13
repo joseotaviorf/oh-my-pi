@@ -2,6 +2,7 @@ dag:
   name: pin_talent
   schedule_interval: 30 3 * * *
   owner: Data People
+  callback_by_task: False
   dag_documentation:
     dag_purpose: |
       This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
