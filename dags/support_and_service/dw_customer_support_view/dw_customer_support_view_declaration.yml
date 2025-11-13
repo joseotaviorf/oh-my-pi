@@ -13,4 +13,4 @@ workflow:
   has_hive_sync: true
 cluster:
   type: databricks_16_4_min_memory_cluster
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
