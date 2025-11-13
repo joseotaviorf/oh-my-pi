@@ -5,6 +5,10 @@ domain: For Sale
 description: This table contains visit_schedule_clicked events from app 170698.
   It tracks user interactions and includes relevant metadata and user properties.
 columns:
+  uuid_event:
+    lineage:
+      - datalake_amplitude_clean.events.uuid
+    description: Unique identifier for the triggered event.
   id_user:
     lineage:
       - datalake_amplitude_clean.events.id_user
@@ -17,6 +21,14 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.event_properties
     description: Business context information extracted from event_properties JSON field using get_json_object function.
+  agent_assignment_type_options:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Information regarding the agents types available to accompany the visit, extracted from event_properties JSON field using get_json_object function.
+  agent_assignment_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Information regarding the chosen agent type to accompany the visit, extracted from event_properties JSON field using get_json_object function.
   nbr_days_available:
     lineage:
       - datalake_amplitude_clean.events.event_properties
@@ -25,6 +37,10 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.event_properties
     description: Number of hours available extracted from event_properties JSON field using get_json_object function.
+  login_status:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: user login status extracted from user_properties JSON field using get_json_object function.
   dt_schedule:
     lineage:
       - datalake_amplitude_clean.events.event_properties
