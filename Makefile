@@ -268,12 +268,7 @@ core-model-tests:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/core_models/check_core_model_changes.py -b "$(CI_COMMIT_BRANCH)" -v && exit 0 || \
-		(echo "" && \
-		 echo "Core Model DAG Tests and Coverage Check" && \
-		 echo "==========" && \
-		 echo "" && \
-		 PYTHONPATH=. python3 scripts/ci_cd/core_models/check_core_model_coverage.py -v)
+	@PYTHONPATH=. python3 -m pytest -W ignore::DeprecationWarning tests/core_model_dags/ bietlejuice/base/core_models/
 
 .PHONY: core-model-coverage
 ## check test coverage for core model source code (CI/CD only - only runs if core model changes detected)
@@ -281,7 +276,7 @@ core-model-coverage:
 	@echo ""
 	@echo "Checking for core model changes"
 	@echo "=========="
-	@echo ""
+	# @echo ""
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/ci_cd/core_models/check_core_model_changes.py -b "$(CI_COMMIT_BRANCH)" -v && exit 0 || \
 		(echo "" && \

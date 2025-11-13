@@ -160,9 +160,19 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
 
         # Check if pytest ran successfully
         if result.returncode != 0:
-            print(f"Warning: pytest exited with code {result.returncode} (tests may have failed)")
-            print("Attempting to parse coverage anyway...")
+            print(f"❌ Tests failed: pytest exited with code {result.returncode}")
             print("")
+            print("Test failures must be fixed before coverage can be checked.")
+            print("")
+            if not verbose:
+                print("Test output:")
+                print(output)
+            # Clean up temp file
+            try:
+                os.unlink(json_report_path)
+            except OSError:
+                pass
+            return 1, output
 
         # Parse coverage percentage from JSON report
         coverage_percent = None
