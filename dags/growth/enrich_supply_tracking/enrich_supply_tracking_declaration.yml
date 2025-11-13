@@ -14,17 +14,18 @@ workflow:
     udfs: [SF_NORMALIZE_STRING]
   tables_customization:
     conversion_tracking:
-      z_order_by: ['id_lead_ebdb', 'id_house', 'business_context']
+      z_order_by: ["id_lead_ebdb", "id_house", "business_context"]
     supply_events_tracking:
-      z_order_by: ['sk_supply_lead', 'id_lead_ebdb', 'id_house', 'business_context']
+      z_order_by:
+        ["sk_supply_lead", "id_lead_ebdb", "id_house", "business_context"]
   inner_dependencies:
     supply_events_tracking:
-    - conversion_tracking
+      - conversion_tracking
 cluster:
-  type: databricks_12_2_xmin-io-memory_photon_cluster
+  type: databricks_16_4_xmin-io-memory_photon_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

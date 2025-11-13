@@ -27,28 +27,28 @@ workflow:
       z_order_by: ["id_user"]
   inner_dependencies:
     conversion_staging:
-    - prospects_events
+      - prospects_events
     last_pj_attribution:
-    - conversion_staging
-    - operations_agents
+      - conversion_staging
+      - operations_agents
     conversion_attributed_events:
-    - conversion_staging
-    - conversion_events_3p
+      - conversion_staging
+      - conversion_events_3p
     conversion_events:
-    - conversion_attributed_events
+      - conversion_attributed_events
     manual_reprocessing_events:
-    - conversion_events
-    - conversion_staging
+      - conversion_events
+      - conversion_staging
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_4xlarge_general_photon_cluster
+  type: databricks_16_4_med_4xlarge_general_photon_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
