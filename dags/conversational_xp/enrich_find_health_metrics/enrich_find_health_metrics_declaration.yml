@@ -15,13 +15,9 @@ workflow:
     "days_past_30": 30
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
-    
   tables_customization:
     metric_listing_page_viewed:
-      default_partitions:
-        - year
-        - month
-        - day
+      partitions: [year, month, day]
 
 cluster:
     type: databricks_16_4_med_general_2_workers_cluster
