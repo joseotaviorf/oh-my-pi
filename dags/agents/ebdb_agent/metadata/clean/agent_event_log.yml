@@ -1,0 +1,61 @@
+---
+database_name: datalake_ebdb_clean
+table_name: agent_event_log
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Event log of agent capability changes and actions, including actor, channel and timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.id
+    description: Unique identifier for the event record.
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.agent_id
+    description: Agent identifier associated with the event.
+  id_capability:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.capability_id
+    description: Capability identifier related to the event.
+  author_type:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.author_type
+    description: Type of actor who triggered the event (e.g., agent, system).
+  author_identifier:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.author_identifier
+    description: Unique identifier of the actor who triggered the event.
+  author_role:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.author_role
+    description: Role of the actor who triggered the event.
+  channel:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.channel
+    description: Channel where the action occurred (e.g., app, API, internal).
+  reason:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.reason
+    description: Reason provided for the action or change.
+  on_behalf_of_role:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.on_behalf_of_role
+    description: Role on whose behalf the action was performed, if applicable.
+  event_type:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.event_type
+    description: Type of event that occurred.
+  ts_occurred:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.occurred_at
+    description: Timestamp when the event occurred in the source system.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.created_at
+    description: Timestamp when the record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.agenteventlog.updated_at
+    description: Timestamp when the record was last updated.
+
+

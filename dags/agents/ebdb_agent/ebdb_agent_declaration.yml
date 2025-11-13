@@ -13,6 +13,10 @@ workflow:
   source_database: ebdb
   source_schema: ebdb
   tables_customization:
+    Agent:
+      clean_table_name: agent
+    AgentEventLog:
+      clean_table_name: agent_event_log
     AgentLeadReferral:
       clean_table_name: agent_lead_referral
     AgentLeadReferral_AUD:
@@ -21,6 +25,8 @@ workflow:
       clean_table_name: agent_with_keys_allocation_parameters
     AgentWithKeysAllocationParameters_AUD:
       clean_table_name: agent_with_keys_allocation_parameters_aud
+    Capability:
+      clean_table_name: capability
     DadosAgente:
       clean_table_name: agent_data
     DadosAgente_AUD:
@@ -43,6 +49,8 @@ workflow:
       clean_table_name: agent_region_data
     DadosAgente_Regiao_AUD:
       clean_table_name: agent_region_data_aud
+    # DemandVisitManagementCapabilitySettings:
+    #   clean_table_name: demand_visit_management_capability_settings
     HouseAgent:
       clean_table_name: house_agent
     HouseAgent_AUD:

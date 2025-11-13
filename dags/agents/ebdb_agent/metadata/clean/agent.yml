@@ -1,0 +1,45 @@
+---
+database_name: datalake_ebdb_clean
+table_name: agent
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Core agent entity with identifiers, affiliation and status information.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agent.id
+    description: Unique identifier for the agent.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.agent.agent_uuid
+    description: Agent UUID in the source system.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_raw.agent.person_uuid
+    description: Person UUID linked to the agent.
+  id_partnership_representative:
+    lineage:
+      - datalake_ebdb_raw.agent.partnership_representative_id
+    description: Identifier of the partnership representative.
+  partnership_representative_type:
+    lineage:
+      - datalake_ebdb_raw.agent.partnership_representative_type
+    description: Type of the partnership representative.
+  affiliation_type:
+    lineage:
+      - datalake_ebdb_raw.agent.affiliation_type
+    description: Agent affiliation type.
+  status:
+    lineage:
+      - datalake_ebdb_raw.agent.status
+    description: Current status of the agent.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.agent.created_at
+    description: Timestamp when the agent record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.agent.updated_at
+    description: Timestamp when the agent record was last updated.
+
+

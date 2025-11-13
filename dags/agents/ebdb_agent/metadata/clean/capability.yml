@@ -1,0 +1,33 @@
+---
+database_name: datalake_ebdb_clean
+table_name: capability
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Capabilities associated with agents and their current status.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.capability.id
+    description: Unique identifier for the capability record.
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.capability.agent_id
+    description: Agent identifier that owns the capability.
+  type:
+    lineage:
+      - datalake_ebdb_raw.capability.type
+    description: Capability type.
+  status:
+    lineage:
+      - datalake_ebdb_raw.capability.status
+    description: Capability status.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.capability.created_at
+    description: Timestamp when the capability record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.capability.updated_at
+    description: Timestamp when the capability record was last updated.
+
+

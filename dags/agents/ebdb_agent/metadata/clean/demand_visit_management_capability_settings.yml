@@ -1,0 +1,29 @@
+---
+database_name: datalake_ebdb_clean
+table_name: demand_visit_management_capability_settings
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Settings for the Demand Visit Management capability, including business context.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.id
+    description: Unique identifier for the capability settings record.
+  id_capability:
+    lineage:
+      - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.capability_id
+    description: Capability identifier to which these settings apply.
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.business_context
+    description: Business context in which the capability is applied.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.created_at
+    description: Timestamp when the settings record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.updated_at
+    description: Timestamp when the settings record was last updated.
+
+
