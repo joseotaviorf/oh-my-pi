@@ -153,7 +153,7 @@ base AS (
             WHEN dsupc.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsof.nm_agent IS NOT NULL THEN 'operations'
             WHEN dsupc.tp_origin IN ('full_self_service', 'referral', 'ios') THEN 'ownerpwa'
-            WHEN dsupc.tp_origin IN ('prime','owner_conversion') THEN 'operations'
+            WHEN dsupc.tp_origin IN ('prime', 'owner_conversion', 'isaias') THEN 'operations'
             ELSE concat('notmapped-',dsupc.tp_origin)
         END AS conversion_origin,
         CASE
@@ -167,14 +167,14 @@ base AS (
             WHEN dsupa.tp_origin = 'humancrawler' THEN 'crawler'
             WHEN dsupa.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsupa.tp_origin = 'consultantpwa' THEN 'ciq'
-            WHEN dsupa.tp_origin IN ('inbound', 'ownerconversionpwa') THEN 'operations'
+            WHEN dsupa.tp_origin IN ('inbound', 'ownerconversionpwa', 'isaias') THEN 'operations'
             WHEN dsupa.tp_origin IN ('pricesuggestionsale', 'pricesuggestion', 'pricesuggestionhome') THEN dsupa.tp_origin
             WHEN dsupa.tp_origin IN ('ownerpropertyregistration', 'ownerhomeloggedin') THEN 'ownerpropertyregistration'
             ELSE concat('notmapped-',dsupa.tp_origin)
         END AS acquisition_origin,
         CASE
-            WHEN dsupc.tp_origin = 'inbound' THEN 'is_inbound'
-            WHEN dsupa.tp_origin = 'inbound' THEN 'is_inbound'
+            WHEN dsupc.tp_origin IN ('inbound', 'isaias') THEN 'is_inbound'
+            WHEN dsupa.tp_origin IN ('inbound', 'isaias') THEN 'is_inbound'
             WHEN dsupc.tp_origin = 'admin_confirmation' THEN 'ciq'
             WHEN dsupc.tp_origin = 'portfolio_manager' THEN 'ciq'
             WHEN dsof.nm_agent IS NULL AND dsupc.tp_origin = 'prime' THEN 'account_manager_pp_multi'
