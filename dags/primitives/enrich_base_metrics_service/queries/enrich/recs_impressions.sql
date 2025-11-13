@@ -112,5 +112,5 @@ SELECT
     year,
     month,
     day
-FROM recs_impressions_final_1
+FROM recs_impressions_final
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16
