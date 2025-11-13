@@ -66,12 +66,14 @@ unset_repairs AS (
 terminations AS (
   SELECT
     t.id_termination,
+    t.category,
     t.id_contract,
     i.type_ba,
     c.rent,
     t.repairs_absorbed_ac,
     t.total_tentant_repair_ac,
     ur.total_unset_repairs,
+    t.has_repairs,
     tc.is_pro_owner,
     CASE
       WHEN DATE(ib.ts_synced - INTERVAL 3 HOUR) > DATE(t.ts_termination_request) THEN DATE(ib.ts_synced - INTERVAL 3 HOUR)
@@ -179,6 +181,22 @@ mediation_via_zendesk AS (
     AND tc.custom_fields['Tipo de Demanda'] = 'demanda_pos_saida'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY tc.id_contract ORDER BY tc.ts_created DESC) = 1
+),
+
+bandaid AS (
+    SELECT
+      id_contract,
+      ts_created,
+      tenant_cost,
+      owner_cost,
+      (owner_cost - tenant_cost) AS bandaid_value
+    FROM
+      datalake_inspection_services_clean.automatic_invoice
+    WHERE
+      tag = 'AUTOMATIC_BANDAID'
+      AND (owner_cost - tenant_cost) > 0
+    QUALIFY
+      ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created) = 1
 )
 
 SELECT
@@ -191,15 +209,18 @@ SELECT
     WHEN t.total_tentant_repair_ac > 0 THEN TRUE
     ELSE FALSE
   END has_ac_repairs,
-  t.total_unset_repairs > 0 AS has_unset_repairs,
+  COALESCE(t.total_unset_repairs > 0, FALSE) AS has_unset_repairs,
+  COALESCE(b.bandaid_value > 0, FALSE) AS has_bandaid,
   i.has_early_mediation,
   i.is_early_both_agree,
   COALESCE(mtr.id_ticket, STRING(mtk.id_ticket)) IS NOT NULL AS has_mediation_ticket,
   IF(
-    (t.total_tentant_repair_ac > 0 AND i.type_ba != 'Both Agreed')
-    OR i.has_early_mediation
-    OR t.total_unset_repairs > 0
-    , TRUE, FALSE
+    (
+	  t.has_repairs = TRUE
+	  AND NOT COALESCE((i.is_early_both_agree OR i.type_ba = 'Both Agreed' OR b.bandaid_value > 0), FALSE)
+	  AND t.category <> 'EVICTION' 
+		)
+		, TRUE, FALSE
   ) AS has_mediation,
   mtr.id_ticket IS NOT NULL AS is_ticket_opened_via_terminator,
   t.dt_inspection,
@@ -216,3 +237,6 @@ LEFT JOIN
 LEFT JOIN
   inspection AS i
     ON t.id_contract = i.id_contract
+LEFT JOIN
+  bandaid AS b
+    ON t.id_contract = b.id_contract
