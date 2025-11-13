@@ -1,5 +1,5 @@
 dag:
-  name: enrich_customer_support_view
+  name: dw_customer_support_view
   schedule_start_date: 2025, 11, 5
   owner: Data SS
   domain: Data SS
