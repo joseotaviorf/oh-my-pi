@@ -1,0 +1,19 @@
+---
+table_name: datalake_pin_core_clean.organization_unit_classification
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_organization_unit_classification:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Warning
+  dt_effective_started:
+    custom:
+      # Ensure the effective period is valid (start date not after end date).
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.organization_unit_classification WHERE dt_effective_started > dt_effective_ended)) = 0"
+      severity_level: Warning
+

@@ -1,0 +1,20 @@
+---
+table_name: datalake_pin_core_clean.people_extra_info
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_person_extra_info:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Warning
+  dt_effective_started:
+    custom:
+      # Validate that the effective period is not open with an inverted date range.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.people_extra_info WHERE dt_effective_started > dt_effective_ended)) = 0"
+      severity_level: Warning
+
+

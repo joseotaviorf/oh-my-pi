@@ -1,0 +1,93 @@
+---
+database_name: datalake_pin_core_clean
+table_name: organization_unit_classification
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Holds the assignment of Oracle HCM classifications to organization units.
+columns:
+  id_organization_unit_classification:
+    description: Primary identifier for the classification assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.org_unit_classification_id
+  id_business_group:
+    description: Business group identifier associated with the classification assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.business_group_id
+  id_action_occurrence:
+    description: Action occurrence reference that triggered the assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.action_occurrence_id
+  id_organization:
+    description: Identifier of the organization unit receiving the classification.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.organization_id
+  id_set:
+    description: Identifier of the set where the classification is registered, when applicable.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.set_id
+  id_module:
+    description: Oracle module identifier that owns the classification assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.module_id
+  classification_code:
+    description: Code of the classification applied to the organization unit.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.classification_code
+  status:
+    description: Status of the classification assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.status
+    categories:
+      A: Classification is active.
+      I: Classification is inactive.
+  category_code:
+    description: Oracle category grouping for the classification assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.category_code
+  legislation_code:
+    description: Legislation code applicable to the classification assignment.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.legislation_code
+  created_by:
+    description: User who created the assignment record.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.created_by
+  updated_by:
+    description: User who last updated the assignment record.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.last_updated_by
+  object_version_number:
+    description: Version counter used to manage concurrent updates.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.object_version_number
+  dt_effective_started:
+    description: Start date from which the classification assignment is valid.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.effective_start_date
+  dt_effective_ended:
+    description: End date until which the classification assignment remains valid.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.effective_end_date
+  ts_created:
+    description: Timestamp of when the assignment record was created.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.creation_date
+  ts_updated:
+    description: Timestamp of when the assignment record was last updated.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.last_update_date
+  ts_load:
+    description: Timestamp indicating the ingestion time into the clean layer.
+  year:
+    description: Partition year from the ingestion metadata.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.year
+  month:
+    description: Partition month from the ingestion metadata.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.month
+  day:
+    description: Partition day from the ingestion metadata.
+    lineage:
+      - datalake_pin_core_raw.hr_org_unit_classifications_f.day
+

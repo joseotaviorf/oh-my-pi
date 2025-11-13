@@ -84,6 +84,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    hr_org_unit_classifications_f:
+      clean_table_name: organization_unit_classification
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     hr_organization_v:
       clean_table_name: hr_organization
       extra_spark_job_arguments:
@@ -226,6 +231,11 @@ workflow:
           date_column_to_partition: last_update_date
     per_people_legislative_f:
       clean_table_name: people_legislative
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_people_extra_info_f:
+      clean_table_name: people_extra_info
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
