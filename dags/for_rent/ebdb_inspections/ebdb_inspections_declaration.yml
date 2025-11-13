@@ -29,7 +29,7 @@ workflow:
       raw_primary_keys: ["id"]
       clean_table_name: conservation_item
 cluster:
-  type: databricks_12_2_max_io-general_cluster
+  type: databricks_16_4_max_io-general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
