@@ -780,8 +780,6 @@ bietlejuice.enrich_supply_outbound_flows:
 bietlejuice.enrich_survicate:
   remove:
     - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
-bietlejuice.enrich_talk_to_agent:
-  override: []
 bietlejuice.enrich_top_of_funnel_demand:
   remove:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
