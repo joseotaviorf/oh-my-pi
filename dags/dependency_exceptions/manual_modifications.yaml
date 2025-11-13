@@ -632,12 +632,7 @@ bietlejuice.enrich_sale_closing_flows:
     - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day
     - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
 bietlejuice.enrich_sale_crawlers_listings:
-  remove:
-    - bietlejuice.ebdb_location:load-clean-map-region:first-run-of-day
-    - bietlejuice.ebdb_location:load-clean-polygon-region:first-run-of-day
-    - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-    - bietlejuice.listings.em_casa:load-clean-em-casa:first-run-of-day
-    - bietlejuice.listings.loft:load-clean-loft:first-run-of-day
+  override: []
 bietlejuice.enrich_sale_firestore:
   remove:
     - bietlejuice.firestore:load-clean-monday:first-run-of-day
