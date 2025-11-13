@@ -1,0 +1,87 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: task_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for task containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the task record.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.task_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.revend
+  label:
+    description: Label/name of the task.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.label
+  mod_label:
+    description: Flag indicating if the column label has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.label_mod
+  subject:
+    description: Subject/topic of the task.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.subject
+  mod_subject:
+    description: Flag indicating if the column subject has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.subject_mod
+  source:
+    description: Source system or origin of the task.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.source
+  mod_source:
+    description: Flag indicating if the column source has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.source_mod
+  id_source_related:
+    description: Related ID from the source system.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.source_related_id
+  mod_id_source_related:
+    description: Flag indicating if the column id_source_related has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.source_related_id_mod
+  task_trigger:
+    description: Trigger that creates this task.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.task_trigger
+  mod_task_trigger:
+    description: Flag indicating if the column task_trigger has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.task_trigger_mod
+  ts_created:
+    description: Timestamp when the task was created.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the task.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.updated_at
+  year:
+    description: Year partition for the task record.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.year
+  month:
+    description: Month partition for the task record.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.month
+  day:
+    description: Day partition for the task record.
+    lineage:
+      - datalake_sales_flow_raw.task_aud.day

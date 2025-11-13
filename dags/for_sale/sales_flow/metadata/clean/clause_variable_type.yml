@@ -1,0 +1,43 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: clause_variable_type
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Contains definitions of variable types used in contract clauses.
+columns:
+  id:
+    description: Unique ID for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.id
+  input_type:
+    description: Type of input for the variable.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.input_type
+  element:
+    description: Element identifier for the variable.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.element
+  options:
+    description: JSONB field containing available options for the variable.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.options
+  ts_created:
+    description: Timestamp when the clause variable type was created.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.created_at
+  ts_updated:
+    description: Timestamp of the last update to the clause variable type.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.updated_at
+  year:
+    description: Year partition for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.year
+  month:
+    description: Month partition for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.month
+  day:
+    description: Day partition for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type.day

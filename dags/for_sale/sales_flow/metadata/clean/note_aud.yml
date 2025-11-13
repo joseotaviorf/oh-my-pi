@@ -1,0 +1,71 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: note_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for note containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.note_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.revend
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.sales_flow_id
+  mod_id_sales_flow:
+    description: Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.sales_flow_id_mod
+  message:
+    description: Content of the note message.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.message
+  mod_message:
+    description: Flag indicating if the column message has changed.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.message_mod
+  type:
+    description: Type/category of the note.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.type
+  mod_type:
+    description: Flag indicating if the column type has changed.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.type_mod
+  ts_created:
+    description: Timestamp when the note was created.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the note.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.updated_at
+  year:
+    description: Year partition for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.year
+  month:
+    description: Month partition for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.month
+  day:
+    description: Day partition for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note_aud.day

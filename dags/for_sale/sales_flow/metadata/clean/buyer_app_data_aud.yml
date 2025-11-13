@@ -1,0 +1,55 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: buyer_app_data_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for buyer_app_data containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the buyer app data record.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.revend
+  investor:
+    description: Flag indicating if the buyer is an investor.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.investor
+  mod_investor:
+    description: Flag indicating if the column investor has changed.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.investor_mod
+  ts_created:
+    description: Timestamp when the buyer app data was created.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the buyer app data.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.updated_at
+  year:
+    description: Year partition for the buyer app data record.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.year
+  month:
+    description: Month partition for the buyer app data record.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.month
+  day:
+    description: Day partition for the buyer app data record.
+    lineage:
+      - datalake_sales_flow_raw.buyer_app_data_aud.day

@@ -1,0 +1,103 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: clause_message_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for clause_message containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the clause message record.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.revend
+  id_subject:
+    description: Foreign key to the clause_subject table.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.subject_id
+  mod_id_subject:
+    description: Flag indicating if the column id_subject has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.subject_id_mod
+  description:
+    description: Description of the clause message.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.description
+  mod_description:
+    description: Flag indicating if the column description has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.description_mod
+  payment_method:
+    description: Payment method associated with the clause.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.payment_method
+  mod_payment_method:
+    description: Flag indicating if the column payment_method has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.payment_method_mod
+  title:
+    description: Title of the clause message.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.title
+  mod_title:
+    description: Flag indicating if the column title has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.title_mod
+  id_parent:
+    description: Foreign key to the parent clause_message record.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.parent_id
+  mod_id_parent:
+    description: Flag indicating if the column id_parent has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.parent_id_mod
+  order_clause:
+    description: Order/position of the clause.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.order_clause
+  mod_order_clause:
+    description: Flag indicating if the column order_clause has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.order_clause_mod
+  variables:
+    description: JSONB field containing clause variables.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.variables
+  mod_variables:
+    description: Flag indicating if the column variables has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.variables_mod
+  ts_created:
+    description: Timestamp when the clause message was created.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the clause message.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.updated_at
+  year:
+    description: Year partition for the clause message record.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.year
+  month:
+    description: Month partition for the clause message record.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.month
+  day:
+    description: Day partition for the clause message record.
+    lineage:
+      - datalake_sales_flow_raw.clause_message_aud.day

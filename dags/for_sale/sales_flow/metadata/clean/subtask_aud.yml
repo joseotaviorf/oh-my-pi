@@ -1,0 +1,95 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: subtask_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for subtask containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the subtask record.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.revend
+  id_task:
+    description: Foreign key to the task table.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.task_id
+  mod_id_task:
+    description: Flag indicating if the column id_task has changed.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.task_id_mod
+  label:
+    description: Label/name of the subtask.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.label
+  mod_label:
+    description: Flag indicating if the column label has changed.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.label_mod
+  type:
+    description: Type of the subtask.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.type
+  mod_type:
+    description: Flag indicating if the column type has changed.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.type_mod
+  target:
+    description: Target for the subtask.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.target
+  mod_target:
+    description: Flag indicating if the column target has changed.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.target_mod
+  deadline:
+    description: Deadline specification for the subtask.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.deadline
+  mod_deadline:
+    description: Flag indicating if the column deadline has changed.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.deadline_mod
+  activation_trigger:
+    description: Trigger that activates this subtask.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.activation_trigger
+  mod_activation_trigger:
+    description: Flag indicating if the column activation_trigger has changed.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.activation_trigger_mod
+  ts_created:
+    description: Timestamp when the subtask was created.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the subtask.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.updated_at
+  year:
+    description: Year partition for the subtask record.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.year
+  month:
+    description: Month partition for the subtask record.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.month
+  day:
+    description: Day partition for the subtask record.
+    lineage:
+      - datalake_sales_flow_raw.subtask_aud.day

@@ -1,0 +1,26 @@
+SELECT
+    id,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    subject_id AS id_subject,
+    subject_id_mod AS mod_id_subject,
+    description,
+    description_mod AS mod_description,
+    payment_method,
+    payment_method_mod AS mod_payment_method,
+    title,
+    title_mod AS mod_title,
+    parent_id AS id_parent,
+    parent_id_mod AS mod_id_parent,
+    order_clause,
+    order_clause_mod AS mod_order_clause,
+    variables,
+    variables_mod AS mod_variables,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.clause_message_aud

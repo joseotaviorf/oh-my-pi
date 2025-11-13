@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: ccv_additional_file_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for ccv_additional_file containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the CCV additional file record.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.revend
+  id_ccv_flow:
+    description: Foreign key to the ccv_flow table.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.ccv_flow_id
+  mod_id_ccv_flow:
+    description: Flag indicating if the column id_ccv_flow has changed.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.ccv_flow_id_mod
+  name:
+    description: Name of the additional file.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.name
+  mod_name:
+    description: Flag indicating if the column name has changed.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.name_mod
+  storage_hash_token:
+    description: Hash token for file storage reference.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.storage_hash_token
+  mod_storage_hash_token:
+    description: Flag indicating if the column storage_hash_token has changed.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.storage_hash_token_mod
+  ts_deleted:
+    description: Timestamp when the file was deleted (soft delete).
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.deleted_at
+  mod_ts_deleted:
+    description: Flag indicating if the column ts_deleted has changed.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.deleted_at_mod
+  ts_created:
+    description: Timestamp when the additional file record was created.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the additional file record.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.updated_at
+  year:
+    description: Year partition for the additional file record.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.year
+  month:
+    description: Month partition for the additional file record.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.month
+  day:
+    description: Day partition for the additional file record.
+    lineage:
+      - datalake_sales_flow_raw.ccv_additional_file_aud.day

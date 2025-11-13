@@ -1,0 +1,43 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: note
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Contains notes and annotations added to sales flows.
+columns:
+  id:
+    description: Unique ID for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note.id
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.note.sales_flow_id
+  message:
+    description: Content of the note message.
+    lineage:
+      - datalake_sales_flow_raw.note.message
+  type:
+    description: Type/category of the note.
+    lineage:
+      - datalake_sales_flow_raw.note.type
+  ts_created:
+    description: Timestamp when the note was created.
+    lineage:
+      - datalake_sales_flow_raw.note.created_at
+  ts_updated:
+    description: Timestamp of the last update to the note.
+    lineage:
+      - datalake_sales_flow_raw.note.updated_at
+  year:
+    description: Year partition for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note.year
+  month:
+    description: Month partition for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note.month
+  day:
+    description: Day partition for the note record.
+    lineage:
+      - datalake_sales_flow_raw.note.day

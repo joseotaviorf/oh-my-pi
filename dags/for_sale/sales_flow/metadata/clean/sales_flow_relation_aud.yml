@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: sales_flow_relation_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for sales_flow_relation containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the sales flow relation record.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.revend
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.sales_flow_id
+  mod_id_sales_flow:
+    description: Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.sales_flow_id_mod
+  id_related:
+    description: ID of the related external entity.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.related_id
+  mod_id_related:
+    description: Flag indicating if the column id_related has changed.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.related_id_mod
+  source_type:
+    description: Type of the external source system.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.source_type
+  mod_source_type:
+    description: Flag indicating if the column source_type has changed.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.source_type_mod
+  related_as:
+    description: Type of relationship between sales flow and related entity.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.related_as
+  mod_related_as:
+    description: Flag indicating if the column related_as has changed.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.related_as_mod
+  ts_created:
+    description: Timestamp when the relation was created.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the relation.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.updated_at
+  year:
+    description: Year partition for the relation record.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.year
+  month:
+    description: Month partition for the relation record.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.month
+  day:
+    description: Day partition for the relation record.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation_aud.day

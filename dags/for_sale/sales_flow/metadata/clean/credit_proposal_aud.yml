@@ -1,0 +1,103 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: credit_proposal_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for credit_proposal containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the credit proposal record.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.revend
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.sales_flow_id
+  mod_id_sales_flow:
+    description: Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.sales_flow_id_mod
+  id_external_proposal:
+    description: External system ID for the credit proposal.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.external_proposal_id
+  mod_external_proposal_id:
+    description: Flag indicating if the column external_proposal_id has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.external_proposal_id_mod
+  bank:
+    description: Bank providing the credit proposal.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.bank
+  mod_bank:
+    description: Flag indicating if the column bank has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.bank_mod
+  macro_status:
+    description: High-level status of the credit proposal.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.macro_status
+  mod_macro_status:
+    description: Flag indicating if the column macro_status has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.macro_status_mod
+  micro_status:
+    description: Detailed status of the credit proposal.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.micro_status
+  mod_micro_status:
+    description: Flag indicating if the column micro_status has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.micro_status_mod
+  is_chosen:
+    description: Flag indicating if this proposal was chosen by the buyer.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.is_chosen
+  mod_is_chosen:
+    description: Flag indicating if the column is_chosen has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.is_chosen_mod
+  ts_last_macro_status_updated:
+    description: Timestamp of the last macro status update.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.last_macro_status_updated_at
+  mod_ts_last_macro_status_updated:
+    description: Flag indicating if the column ts_last_macro_status_updated has changed.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.last_macro_status_updated_at_mod
+  ts_created:
+    description: Timestamp when the credit proposal was created.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the credit proposal.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.updated_at
+  year:
+    description: Year partition for the credit proposal record.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.year
+  month:
+    description: Month partition for the credit proposal record.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.month
+  day:
+    description: Day partition for the credit proposal record.
+    lineage:
+      - datalake_sales_flow_raw.credit_proposal_aud.day

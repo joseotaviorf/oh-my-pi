@@ -1,0 +1,39 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: screening_house
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Contains house screening information within the screening process.
+columns:
+  id:
+    description: Unique ID for the screening house record.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.id
+  id_screening:
+    description: Foreign key to the screening table.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.screening_id
+  status:
+    description: Status of the house screening.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.status
+  ts_created:
+    description: Timestamp when the screening house record was created.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.created_at
+  ts_updated:
+    description: Timestamp of the last update to the screening house record.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.updated_at
+  year:
+    description: Year partition for the screening house record.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.year
+  month:
+    description: Month partition for the screening house record.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.month
+  day:
+    description: Day partition for the screening house record.
+    lineage:
+      - datalake_sales_flow_raw.screening_house.day

@@ -1,0 +1,71 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: clause_variable_type_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for clause_variable_type containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.revend
+  input_type:
+    description: Type of input for the variable.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.input_type
+  mod_input_type:
+    description: Flag indicating if the column input_type has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.input_type_mod
+  element:
+    description: Element identifier for the variable.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.element
+  mod_element:
+    description: Flag indicating if the column element has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.element_mod
+  options:
+    description: JSONB field containing available options for the variable.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.options
+  mod_options:
+    description: Flag indicating if the column options has changed.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.options_mod
+  ts_created:
+    description: Timestamp when the clause variable type was created.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the clause variable type.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.updated_at
+  year:
+    description: Year partition for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.year
+  month:
+    description: Month partition for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.month
+  day:
+    description: Day partition for the clause variable type record.
+    lineage:
+      - datalake_sales_flow_raw.clause_variable_type_aud.day

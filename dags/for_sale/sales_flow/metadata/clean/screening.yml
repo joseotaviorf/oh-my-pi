@@ -1,0 +1,39 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: screening
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Contains screening process information for sales flows.
+columns:
+  id:
+    description: Unique ID for the screening record.
+    lineage:
+      - datalake_sales_flow_raw.screening.id
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.screening.sales_flow_id
+  legal_pendency_status:
+    description: Status of legal pendencies identified during screening.
+    lineage:
+      - datalake_sales_flow_raw.screening.legal_pendency_status
+  ts_created:
+    description: Timestamp when the screening was created.
+    lineage:
+      - datalake_sales_flow_raw.screening.created_at
+  ts_updated:
+    description: Timestamp of the last update to the screening.
+    lineage:
+      - datalake_sales_flow_raw.screening.updated_at
+  year:
+    description: Year partition for the screening record.
+    lineage:
+      - datalake_sales_flow_raw.screening.year
+  month:
+    description: Month partition for the screening record.
+    lineage:
+      - datalake_sales_flow_raw.screening.month
+  day:
+    description: Day partition for the screening record.
+    lineage:
+      - datalake_sales_flow_raw.screening.day

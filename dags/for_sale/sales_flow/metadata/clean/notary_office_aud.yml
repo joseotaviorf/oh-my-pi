@@ -1,0 +1,151 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: notary_office_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for notary_office containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the notary office record.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.revend
+  name:
+    description: Name of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.name
+  mod_name:
+    description: Flag indicating if the column name has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.name_mod
+  mobile_phone:
+    description: Mobile phone number of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.mobile_phone
+  mod_mobile_phone:
+    description: Flag indicating if the column mobile_phone has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.mobile_phone_mod
+  phone:
+    description: Phone number of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.phone
+  mod_phone:
+    description: Flag indicating if the column phone has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.phone_mod
+  email:
+    description: Email address of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.email
+  mod_email:
+    description: Flag indicating if the column email has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.email_mod
+  address:
+    description: Physical address of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.address
+  mod_address:
+    description: Flag indicating if the column address has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.address_mod
+  city:
+    description: City where the notary office is located.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.city
+  mod_city:
+    description: Flag indicating if the column city has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.city_mod
+  state:
+    description: State where the notary office is located.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.state
+  mod_state:
+    description: Flag indicating if the column state has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.state_mod
+  hubs_id:
+    description: Array of hub IDs associated with this notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.hubs_id
+  mod_hubs_id:
+    description: Flag indicating if the column hubs_id has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.hubs_id_mod
+  label:
+    description: Label or identifier for the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.label
+  mod_label:
+    description: Flag indicating if the column label has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.label_mod
+  type:
+    description: Type or classification of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.type
+  mod_type:
+    description: Flag indicating if the column type has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.type_mod
+  latitude:
+    description: Geographic latitude coordinate of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.latitude
+  mod_latitude:
+    description: Flag indicating if the column latitude has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.latitude_mod
+  longitude:
+    description: Geographic longitude coordinate of the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.longitude
+  mod_longitude:
+    description: Flag indicating if the column longitude has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.longitude_mod
+  ts_created:
+    description: Timestamp when the notary office was created.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.created_at
+  mod_ts_created:
+    description: Flag indicating if the column ts_created has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.created_at_mod
+  ts_updated:
+    description: Timestamp of the last update to the notary office.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.updated_at
+  mod_ts_updated:
+    description: Flag indicating if the column ts_updated has changed.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.updated_at_mod
+  year:
+    description: Year partition for the notary office record.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.year
+  month:
+    description: Month partition for the notary office record.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.month
+  day:
+    description: Day partition for the notary office record.
+    lineage:
+      - datalake_sales_flow_raw.notary_office_aud.day

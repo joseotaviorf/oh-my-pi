@@ -1,0 +1,71 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: screening_note_aud
+domain: For Sale
+owner: igor.firmo@quintoandar.com.br
+description: Audit table for screening_note containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the screening note record.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.revend
+  id_screening:
+    description: Foreign key to the screening table.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.screening_id
+  mod_id_screening:
+    description: Flag indicating if the column id_screening has changed.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.screening_id_mod
+  id_note:
+    description: Foreign key to the note table.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.note_id
+  mod_id_note:
+    description: Flag indicating if the column id_note has changed.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.note_id_mod
+  status:
+    description: Status of the screening note.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.status
+  mod_status:
+    description: Flag indicating if the column status has changed.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.status_mod
+  ts_created:
+    description: Timestamp when the screening note record was created.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the screening note record.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.updated_at
+  year:
+    description: Year partition for the screening note record.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.year
+  month:
+    description: Month partition for the screening note record.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.month
+  day:
+    description: Day partition for the screening note record.
+    lineage:
+      - datalake_sales_flow_raw.screening_note_aud.day
