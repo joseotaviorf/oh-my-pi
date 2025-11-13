@@ -240,14 +240,16 @@ columns:
     description: The type of the lead, that could be related with application.
   detailed_route:
     lineage:
-      - datalake_supply_flows.acquisition_backfill.detailed_route
       - datalake_supply_flows.lead_origin.detailed_route
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
   id_task:
     lineage:
-      - datalake_supply_flows.acquisition_backfill.id_task
       - datalake_supply_flows.lead_origin.id_task
     description: The ID for the lead creation task.
+  id_chat_session:
+    lineage:
+      - datalake_supply_flows.lead_origin.id_chat_session
+    description: The ID for the lead creation session in Sauron.
   quinto_andar_phone_number:
     lineage:
       - datalake_supply_flows.acquisition_backfill.quinto_andar_phone_number

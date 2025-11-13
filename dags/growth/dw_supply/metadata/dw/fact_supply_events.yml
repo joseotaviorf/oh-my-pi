@@ -118,6 +118,10 @@ columns:
     description: The ID for the lead creation task.
     lineage:
       - datalake_supply_flows.supply_events_tracking.id_task
+  sk_chat_session:
+    description: The ID for the lead creation session in Sauron.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_chat_session
   quinto_andar_phone_number:
     description: QuintoAndar phone number the client used to get in touch and have their lead created.
     lineage:

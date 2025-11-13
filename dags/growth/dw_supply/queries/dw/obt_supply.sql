@@ -108,6 +108,7 @@ base AS (
         fse.utm_term AS nm_term,
         fse.nm_detailed_route,
         fse.sk_task,
+        fse.sk_chat_session,
         fse.quinto_andar_phone_number,
         dal.tp_lead,
         dfs.cd_funnel_step,

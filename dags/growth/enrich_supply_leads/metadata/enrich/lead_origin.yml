@@ -114,6 +114,14 @@ columns:
     description: The ID for the lead creation task.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  id_chat_session: 
+    description: The ID for the chat session in Sauron.
+    lineage:
+      - datalake_sauron_clean.session.id
+  id_ai_core_session: 
+    description: The ID for the chat in the Orchestrator/Copilot.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   quinto_andar_phone_number:
     description: The QuintoAndar phone number the client used to get in touch and have their lead created.
     lineage:

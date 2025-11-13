@@ -3633,6 +3633,7 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.bob:load-clean-house-draft:first-run-of-day
   - bietlejuice.bob:load-clean-submission-progress:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.ebdb_lead:load-clean-lead:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-polygon-region:first-run-of-day
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin:first-run-of-day

@@ -24,6 +24,7 @@ WITH lead_origin_rene_descartes AS (
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.gclid') AS STRING) AS gclid,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.fbclid') AS STRING) AS fbclid,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.ctwaClid') AS STRING) AS ctwa_clid,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.aiCoreSessionId') AS STRING) AS id_ai_core_session,
     amd.ts_created AS ts_event
   FROM
     datalake_rene_descartes_clean.house_lead AS hl
@@ -103,6 +104,28 @@ phone_number AS (
       AND GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') IS NOT NULL
   QUALIFY ROW_NUMBER() OVER (PARTITION BY ca.id_task ORDER BY s.ts_created DESC) = 1
 ),
+sauron_sessions AS (
+  SELECT DISTINCT
+    s.id as id_chat_session,
+    cs.id_external AS id_ai_core_session,
+    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.ctwa_clid')) AS ctwa_clid,
+    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.referral_source_id')) AS id_source_ctwa ,
+    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.referral_source_url')) AS url_source_ctwa,
+    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.referral_source_url')) AS type_source_ctwa
+  FROM 
+    datalake_sauron_clean.session AS s
+  INNER JOIN 
+      datalake_copilot_service_clean.session AS cs
+        ON s.id = cs.id_sauron_session
+  LEFT JOIN 
+      datalake_sauron_clean.session AS s2
+        ON  REGEXP_EXTRACT(s.user_phone, '[0-9]+', 0) =  REGEXP_EXTRACT(s2.user_phone, '[0-9]+', 0) 
+            AND GET_JSON_OBJECT(s2.metadata, '$.extra_params.ctwa_clid') IS NOT NULL
+  WHERE 
+      s.year >= 2025
+  QUALIFY 
+      ROW_NUMBER() OVER (PARTITION BY s.id ORDER BY s2.ts_created DESC) = 1
+),
 click_to_whatsapp_campaigns AS (
   SELECT 
     id_ad,
@@ -138,6 +161,8 @@ mid_table AS (
     r.detailed_route,
     r.original_lead,
     r.id_task,
+    r.id_ai_core_session,
+    ss.id_chat_session,
     r.gclid,
     r.fbclid,
     COALESCE(r.ctwa_clid, pn.ctwa_clid) AS ctwa_clid,
@@ -168,8 +193,15 @@ mid_table AS (
     phone_number AS pn
       ON (pn.id_task = r.id_task)
   LEFT JOIN
+    sauron_sessions AS ss
+      ON (ss.id_ai_core_session = r.id_ai_core_session)
+  LEFT JOIN
     click_to_whatsapp_campaigns AS ctwac
-      ON ctwac.id_ad = pn.id_source_ctwa
+      ON (
+          (pn.id_source_ctwa IS NOT NULL AND ctwac.id_ad = pn.id_source_ctwa)
+          OR 
+          (ss.id_source_ctwa IS NOT NULL AND ctwac.id_ad = ss.id_source_ctwa)
+         )
 )
 -- Hard rules
 SELECT DISTINCT
@@ -202,6 +234,8 @@ SELECT DISTINCT
   fbclid,
   ctwa_clid,
   id_task,
+  id_chat_session,
+  id_ai_core_session,
   REGEXP_EXTRACT(quinto_andar_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
   id_source_ctwa,
   url_source_ctwa,
