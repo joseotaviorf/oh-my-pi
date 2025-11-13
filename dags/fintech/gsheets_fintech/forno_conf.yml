@@ -59,6 +59,18 @@ sheets_info:
     clean_table_name: cod_locale
     sheet_context: fintech
 
+  collections_for_sale_journey_history:
+    sheet_id: 1Jrwut4ued51kNWnAQrnTS-5bo71usg0rI69VeddHlAI
+    sheet_name: historico_datalake
+    clean_table_name: collections_for_sale_journey_history
+    sheet_context: fintech
+
+  collections_for_sale_journey_routine:
+    sheet_id: 1Jrwut4ued51kNWnAQrnTS-5bo71usg0rI69VeddHlAI
+    sheet_name: rotina_datalake
+    clean_table_name: collections_for_sale_journey_routine
+    sheet_context: fintech
+
   expected_evers:
     sheet_id: 1-YXy2nUEvhwCkTAsWeWxzw7KF6clkmGFUtdz6ZRkI5I
     sheet_name: expected_evers
