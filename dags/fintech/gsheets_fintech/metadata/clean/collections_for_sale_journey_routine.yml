@@ -24,19 +24,23 @@ columns:
   is_3p_leads:
     description: Indicates if the lead comes from a third-party partner
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.É_3p_leads_
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.É 3p leads?
   is_primary_market:
     description: Indicates if the property is in the primary market
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.É_mercado_primário_
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.É mercado primário?
   is_my_house_my_life:
     description: Indicates if the property is part of the "Minha Casa Minha Vida" program
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.É_minha_casa_minha_vida_
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.É minha casa minha vida?
   is_recognized_loss:
     description: Indicates if the loss has been recognized
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.É_perda_reconhecida_
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.É perda reconhecida?
+  is_ccv_from_2025_01_06:
+    description: Indicates if CCV is from 06/01/2025 onwards
+    lineage:
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.CCV é apartir de 06/01/2025?
   recommends_wo:
     description: Indicates if write-off is recommended
     lineage:
