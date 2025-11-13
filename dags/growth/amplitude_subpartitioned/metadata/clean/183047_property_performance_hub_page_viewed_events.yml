@@ -78,6 +78,14 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.user_properties
     description: A/B test feature flag for listing performance experiment (Wave 0) in sale flow. Controls performance dashboard features for sale properties.
+  up_rc_beakman_owners_listing_performance_show_score_hybrid_toggle:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: A/B test feature flag indicating whether the session is active for the new performance score test in performance hub for hybrid listings.
+  up_rc_beakman_owners_listing_performance_show_score_sale_toggle:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: A/B test feature flag indicating whether the session is active for the new performance score test.
   up_rc_beakman_owners_listing_performance_wave_one_rent_toggle:
     lineage:
     - datalake_amplitude_clean.events.user_properties
@@ -253,7 +261,7 @@ columns:
   version_name:
     lineage:
     - datalake_amplitude_clean.events.version_name
-    description: Current app version name (e.g., '5.2.1', '6.0.0'). Tracks feature adoption and performance across different app versions. 
+    description: Current app version name (e.g., '5.2.1', '6.0.0'). Tracks feature adoption and performance across different app versions.
   sample_rate:
     lineage:
     - datalake_amplitude_clean.events.sample_rate

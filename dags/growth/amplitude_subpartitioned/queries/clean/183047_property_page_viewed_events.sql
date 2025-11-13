@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id_amplitude,
     ids_amplitude_attributed,
     CAST((GET_JSON_OBJECT(event_properties, '$.house_id')) AS BIGINT) AS id_house,
@@ -17,6 +17,8 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.ab_beakman_owner_house_setup') AS up_ab_beakman_owner_house_setup,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_rent_toggle') AS up_rc_beakman_owners_listing_performance_rent_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_sale_toggle') AS up_rc_beakman_owners_listing_performance_sale_toggle,
+    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_show_score_hybrid_toggle') AS up_rc_beakman_owners_listing_performance_show_score_hybrid_toggle,
+    GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_show_score_sale_toggle') AS up_rc_beakman_owners_listing_performance_show_score_sale_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_rent_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_rent_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_sale_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_sale_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_wave_one_hybrid_toggle') AS up_rc_beakman_owners_listing_performance_wave_one_hybrid_toggle,
@@ -64,6 +66,6 @@ SELECT
 FROM
     datalake_amplitude_clean.events
 WHERE
-    id_app = '183047' 
+    id_app = '183047'
     AND event_type = 'property_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
