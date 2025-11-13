@@ -81,6 +81,7 @@ workflow:
     reviewer:
       partitions: [year, month, day]
       extraction_type: incremental
+      merge_on: [id_reviewer]
 
 cluster:
   type: custom_cluster
