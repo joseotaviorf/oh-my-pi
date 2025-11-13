@@ -5,7 +5,7 @@ owner: bianca.martins@quintoandar.com.br
 domain: Fintech
 description: "Associates an audience with a negotiation option, defining priority and type."
 columns:
-  id:
+  id_audience_negotiation_option:
     description: "Unique identifier of the audience-negotiation option relation."
     lineage:
       - datalake_trato_feito_raw.audience_negotiation_option.id
@@ -25,7 +25,7 @@ columns:
     description: "Version for optimistic locking."
     lineage:
       - datalake_trato_feito_raw.audience_negotiation_option.version
-  negotiation_option_id:
+  id_negotiation_option:
     description: "Identifier of the negotiation option (INTERNAL id or CYBER key)."
     lineage:
       - datalake_trato_feito_raw.audience_negotiation_option.negotiation_option_id

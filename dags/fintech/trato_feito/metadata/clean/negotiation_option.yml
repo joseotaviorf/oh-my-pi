@@ -5,7 +5,7 @@ owner: bianca.martins@quintoandar.com.br
 domain: Fintech
 description: "Catalog of available negotiation options and their financial conditions."
 columns:
-  id:
+  id_negotiation_option:
     description: "Unique identifier of the negotiation option."
     lineage:
       - datalake_trato_feito_raw.negotiation_option.id
