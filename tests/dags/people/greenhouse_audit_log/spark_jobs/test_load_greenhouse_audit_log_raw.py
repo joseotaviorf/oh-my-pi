@@ -484,7 +484,7 @@ class TestMainFunction(unittest.TestCase):
         mock_api_client.get_all_paginated_results.assert_called_once()
 
         # Verify DataFrame creation
-        mock_json_to_df.assert_called_once_with(mock_spark, api_data)
+        mock_json_to_df.assert_called_once_with(mock_spark, api_data, "raw_payload")
 
         # Verify partitions were added
         mock_insert_partitions.assert_called_once_with(mock_df, "event_time")

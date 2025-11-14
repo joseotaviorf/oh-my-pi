@@ -27,18 +27,32 @@ def clean_keys_recursive(obj):
         return obj
 
 
-def json_to_dataframe(spark: SparkSession, api_data_list: list) -> DataFrame:
+def json_to_dataframe(
+    spark: SparkSession, api_data_list: list, raw_column_name: str = None
+) -> DataFrame:
     """
     Converts a list of dictionaries into a Spark DataFrame dynamically.
 
     This approach first cleans the keys in the raw data, then uses Spark's
     native inference engine on an RDD of JSON strings, making it robust against
     inconsistent schemas and invalid characters in field names.
+
+    If ``raw_column_name`` is provided, the original JSON payload of each
+    record (before key normalization) is stored as a string in that column.
     """
     if not api_data_list:
         return spark.createDataFrame([], schema=StructType([]))
 
-    cleaned_api_data_list = [clean_keys_recursive(record) for record in api_data_list]
+    cleaned_api_data_list = []
+    if raw_column_name:
+        for record in api_data_list:
+            cleaned_record = clean_keys_recursive(record)
+            cleaned_record[raw_column_name] = json.dumps(record)
+            cleaned_api_data_list.append(cleaned_record)
+    else:
+        cleaned_api_data_list = [
+            clean_keys_recursive(record) for record in api_data_list
+        ]
 
     rdd_json_strings = spark.sparkContext.parallelize(
         [json.dumps(record) for record in cleaned_api_data_list]

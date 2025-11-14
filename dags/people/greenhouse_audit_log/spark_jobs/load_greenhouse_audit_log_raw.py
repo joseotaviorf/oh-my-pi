@@ -250,7 +250,7 @@ def main():
                 "Successfully fetched %d records from API. Converting to DataFrame...",
                 len(api_data_list),
             )
-            df = json_to_dataframe(spark, api_data_list)
+            df = json_to_dataframe(spark, api_data_list, raw_column_name="raw_payload")
 
             date_column_to_partition = job_args.get(
                 "date_column_to_partition", DEFAULT_PARTITION_COLUMN
