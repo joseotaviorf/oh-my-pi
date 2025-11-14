@@ -8,19 +8,19 @@ columns:
   id_offer:
     description: Unique identifier for the offer
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.ID_offer
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.ID offer
   id_house:
     description: Unique identifier for the house/property
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.ID_house
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.ID house
   is_offer_canceled:
     description: Indicates if the offer was canceled
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Offer_cancelada
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Offer cancelada
   is_cancellation_with_brokerage:
     description: Indicates if the cancellation includes brokerage fees
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Distrato_c_corretagem
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Distrato c/ corretagem
   is_3p_leads:
     description: Indicates if the lead comes from a third-party partner
     lineage:
@@ -37,14 +37,10 @@ columns:
     description: Indicates if the loss has been recognized
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.É perda reconhecida?
-  is_ccv_from_2025_01_06:
-    description: Indicates if CCV is from 06/01/2025 onwards
-    lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.CCV é apartir de 06/01/2025?
   recommends_wo:
     description: Indicates if write-off is recommended
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Recomenda_WO
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Recomenda WO
   is_settled:
     description: Indicates if the debt has been settled
     lineage:
@@ -52,31 +48,31 @@ columns:
   has_extrajudicial_notification:
     description: Indicates if there was an extrajudicial notification
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Notificação_Extrajudicial
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Notificação Extrajudicial
   offer_status:
     description: Current status of the offer
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status_da_offer
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status da offer1
   collection_status:
     description: Current status of the collection process
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status_cobrança
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status cobrança
   time_in_base:
     description: Time the record has been in the base
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tempo_na_base
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tempo na base
   time_since_last_interaction:
     description: Time elapsed since the last interaction
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tempo_desde_a_última_interação
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tempo desde a última interação
   aging_since_last_interaction:
     description: Aging period since the last interaction
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Aging_desde_a_última_interação
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Aging desde a última interação
   possible_wo_h1_2025:
     description: Possible write-off indicator for H1 2025
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Possível_WO__H1_2025_
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Possível WO (H1/2025)
   status:
     description: General status of the record
     lineage:
@@ -84,11 +80,11 @@ columns:
   offer_status_2:
     description: Secondary offer status field
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status_da_offer_2
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status da offer10
   payment_type:
     description: Type of payment method
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tipo_pagamento
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tipo pagamento
   product:
     description: Product type or category
     lineage:
@@ -96,11 +92,11 @@ columns:
   partner_network:
     description: Partner network identifier
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Partner___Rede
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Partner - Rede
   sales_tag:
     description: Sales tag or label
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tag_Vendas
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Tag Vendas
   seller:
     description: Name of the seller
     lineage:
@@ -112,7 +108,7 @@ columns:
   email:
     description: Contact email address
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.E_mail
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.E-mail
   address:
     description: Property or contact address
     lineage:
@@ -124,15 +120,15 @@ columns:
   detailed_status:
     description: Detailed status description
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status_Detalhado
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status Detalhado
   collection_status_2:
     description: Secondary collection status field
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status_da_cobrança_2
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Status da cobrança
   collection_reason:
     description: Reason for the collection action
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Motivo_da_cobrança
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Motivo da cobrança
   call_record:
     description: Record of phone calls made
     lineage:
@@ -140,7 +136,7 @@ columns:
   zendesk_ticket:
     description: Zendesk ticket identifier
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Ticket_Zendesk
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Ticket Zendesk
   condition:
     description: Condition or requirement
     lineage:
@@ -148,75 +144,75 @@ columns:
   other_contacts:
     description: Additional contact information
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Demais_contatos
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Demais contatos
   brokerage_amount:
     description: Amount of brokerage fee
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Valor_de_corretagem
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Valor de corretagem
   balance_received:
     description: Amount already received
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Saldo_recebido
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Saldo recebido
   balance_to_receive:
     description: Amount still to be received
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Saldo_a_receber
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Saldo a receber
   contact_attempts_count:
     description: Number of contact attempts made
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Nº_de_tentativas_de_contato
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Nº de tentativas de contato
   dt_entry:
     description: Date when the record entered the system
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_entrada
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data entrada
   dt_ccv_signed:
     description: Date when the CCV (purchase and sale agreement) was signed
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_CCV_assinado
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data CCV assinado
   dt_cri:
     description: Date of CRI (Real Estate Receivables Certificate)
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_CRI
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data CRI
   dt_diligence:
     description: Date of due diligence
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_diligência
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data diligência
   dt_cancellation:
     description: Date of cancellation
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_do_cancelamento
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data do cancelamento
   dt_offer_rescue:
     description: Date when the offer was rescued
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_resgate_da_offer
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data resgate da offer
   dt_financing:
     description: Date of financing
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_financiamento
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data financiamento
   dt_collection_start:
     description: Date when collection started
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_início_cobrança
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data início cobrança
   dt_settlement:
     description: Date of settlement/quittance
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_da_quitação
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data da quitação
   dt_extrajudicial_notification:
     description: Date of extrajudicial notification
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_Notificação_EJ
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data Notificação EJ
   dt_condition:
     description: Date of condition
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_Condicionante
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data Condicionante
   dt_first_contact:
     description: Date of first contact
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_primeiro_contato
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data primeiro contato
   dt_expected_contact:
     description: Expected date for next contact
     lineage:
-      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data_Prevista_de_Contato
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.Data Prevista de Contato
   ts_load:
     description: Timestamp when the record was loaded
     lineage:
