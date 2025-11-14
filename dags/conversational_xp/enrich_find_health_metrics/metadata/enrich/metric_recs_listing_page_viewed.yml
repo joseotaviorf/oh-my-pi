@@ -1,5 +1,5 @@
 database_name: datalake_search
-table_name: metric_listing_page_viewed
+table_name: metric_recs_listing_page_viewed
 owner: yiyi.ji@quintoandar.com
 domain: Conversational XP
 description: Table containing listing page viewed (LPV) events data for calculating recommendation health metrics related to LPV. 
