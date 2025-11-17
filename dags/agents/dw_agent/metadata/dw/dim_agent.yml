@@ -1,227 +1,112 @@
 database_name: dw_public
 table_name: dim_agent
-description: Shrunken dimension of dim_user, containing only agents (users with dados_agente_id
-  not null).
+description: Dimension table containing agent data with foreign keys to person, user, and company dimensions. Contains only agents (users with agent_data_id not null).
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-    - dw_public.dim_user.dados_agente_id
-    description: Key of agent (dados_agente_id).
+    - datalake_ebdb_clean.agent_data.id
+    description: Surrogate key of agent from agent_data table.
+  sk_person:
+    lineage:
+    - datalake_person.person_sks.sk_person
+    description: Foreign key to person dimension. Returns -1 when no person is associated.
+  sk_user:
+    lineage:
+    - datalake_ebdb_user.user.id
+    description: Foreign key to user table. Returns -1 when no user is associated.
+  sk_company:
+    lineage:
+    - datalake_company.company_sks.sk_company
+    description: Foreign key to company dimension. Returns -1 when no company is associated.
   id_user:
     lineage:
-    - dw_public.dim_user.id
-    description: Key of user.
-  name:
+    - datalake_ebdb_user.user.id
+    description: User ID associated with the agent.
+  agent_code:
     lineage:
-    - dw_public.dim_user.nome
-    description: Full name of user.
-  cpf:
+    - datalake_ebdb_clean.agent_data.code
+    description: Agent code identifier.
+  agent_profile:
     lineage:
-    - dw_public.dim_user.cpf
-    description: CPF (Tax Identification Number) of user, with dot and hyphen formatting
-  rg:
-    lineage:
-    - dw_public.dim_user.rg
-    description: RG (Brazilian national lD) of user.
-  sex:
-    lineage:
-    - dw_public.dim_user.sexo
-    description: Sex of user.
-    categories:
-      Feminino: ''
-      Masculino: ''
-  email:
-    lineage:
-    - dw_public.dim_user.email
-    description: Email of user.
-  alternative_email:
-    lineage:
-    - dw_public.dim_user.email_alternativo
-    description: Alternative email of user.
-  main_phone_number:
-    lineage:
-    - dw_public.dim_user.telefone_principal
-    description: Main contact phone of user.
-  address:
-    lineage:
-    - dw_public.dim_user.endereco
-    description: Street name of user's address.
-  number:
-    lineage:
-    - dw_public.dim_user.numero
-    description: Property number of user's address.
-  complement:
-    lineage:
-    - dw_public.dim_user.complemento
-    description: Complement of user's address.
-  neighborhood:
-    lineage:
-    - dw_public.dim_user.bairro
-    description: Neighborhood of user's address.
-  cep:
-    lineage:
-    - dw_public.dim_user.cep
-    description: Zip code of user's address.
-  city:
-    lineage:
-    - dw_public.dim_user.cidade
-    description: City of user's address.
-  state_name:
-    lineage:
-    - dw_public.dim_user.estado_nome
-    description: Full state name of user's address.
-    categories:
-      Acre: ''
-      Alagoas: ''
-      Amapá: ''
-      Amazonas: ''
-      Bahia: ''
-      Ceará: ''
-      Distrito Federal: ''
-      Espírito Santo: ''
-      Goiás: ''
-      Maranhão: ''
-      Mato Grosso: ''
-      Mato Grosso do Sul: ''
-      Minas Gerais: ''
-      Paraná: ''
-      Paraíba: ''
-      Pará: ''
-      Pernambuco: ''
-      Rio Grande do Norte: ''
-      Rio Grande do Sul: ''
-      Rio de Janeiro: ''
-      Rondônia: ''
-      Roraima: ''
-      Santa Catarina: ''
-      Sergipe: ''
-      São Paulo: ''
-      Tocantins: ''
-  state_abbreviation:
-    lineage:
-    - dw_public.dim_user.estado_abreviacao
-    description: State acronym of user's address.
-    categories:
-      AC: ''
-      AL: ''
-      AM: ''
-      AP: ''
-      BA: ''
-      CE: ''
-      DF: ''
-      ES: ''
-      GO: ''
-      MA: ''
-      MG: ''
-      MS: ''
-      MT: ''
-      PA: ''
-      PB: ''
-      PE: ''
-      PR: ''
-      RJ: ''
-      RN: ''
-      RO: ''
-      RR: ''
-      RS: ''
-      SC: ''
-      SE: ''
-      SP: ''
-      TO: ''
-  country_code:
-    lineage:
-    - dw_public.dim_user.country_code
-    description: Country code of the user.
-    categories:
-      BR: Brazil's country code
-      MX: Mexico's country code
-  work_contract_name:
-    lineage:
-    - datalake_ebdb_work_contract.work_contract.contract_name
-    description: Name of the agent's current work contract.
-  rede_partner:
-    lineage:
-    - datalake_ebdb_work_contract.work_contract.3p_partner
-    description: Name of the agent's current Rede QuintoAndar partner, if it is one.
+    - datalake_ebdb_clean.agent_data.profile
+    description: Agent profile, such as CAR_LONG_DISTANCE or BUS_LONG_DISTANCE.
   agent_type:
     lineage:
     - datalake_ebdb_clean.agent_data_types.types
-    description: Type of the agent.
-    categories:
-      CheckUpLar: ''
-      SessaoFotos: ''
-      Visita: ''
-      Vistoria: ''
-      VistoriaQuarteirizada: ''
-  agent_profile:
+    description: Concatenated types of the agent (e.g., visit, inspection, photo session). Can contain multiple types.
+  agent_type_main:
     lineage:
-    - dw_public.dim_user.dadosagente_perfil
-    description: Agent profile, such as CAR_LONG_DISTANCE or BUS_LONG_DISTANCE.
-    categories:
-      BUS_LONG_DISTANCE: ''
-      CARRO: ''
-      CAR_LONG_DISTANCE: ''
-      CAR_TEMP_COVID: ''
-      CAR_USING_HIGHWAYS: ''
-      ONIBUS: ''
-  agent_creci:
+    - datalake_ebdb_clean.agent_data.agent_type
+    description: Agent type from agent_data Main's table. Primary classification of agent role.
+  contract_name:
     lineage:
-    - dw_public.dim_user.dadosagente_numero_creci
-    description: Creci number (Regional Council for Real Estate Brokers) of user.
-  is_user_active:
+    - datalake_ebdb_clean.work_contract.contract_name
+    description: Name of the agent's current work contract with brackets removed.
+  creci_number:
     lineage:
-    - dw_public.dim_user.active
-    description: If the user is active or not.
-  is_blocked:
-    lineage:
-    - dw_public.dim_user.bloqueado
-    description: If the user is blocked or not.
-  is_affiliate_active:
-    lineage:
-    - dw_public.dim_user.dadosafiliado_ativo
-    description: If user is affiliate, flag indicates whether user is still registered
-      in the affiliates program (same field as dim_user_affiliate.is_active)
+    - datalake_ebdb_clean.agent_data.creci_number
+    description: CRECI number (Regional Council for Real Estate Brokers) of the agent.
   is_agent_active:
     lineage:
-    - dw_public.dim_user.dadosagente_ativo
-    description: If the user is still registered as an agent or not.
-  is_photographer_active:
+    - datalake_ebdb_clean.agent_data.is_active
+    description: If the agent is still registered as an agent (same as is_active).
+  is_user_active:
     lineage:
-    - dw_public.dim_user.dadosfotografo_ativo
-    description: Active or not, if user is photographer.
-  is_tenant:
+    - datalake_ebdb_user.user.is_active
+    description: If the associated user is active.
+  is_blocked:
     lineage:
-    - dw_public.dim_user.inquilino
-    description: Is user is a tenant with QuintoAndar.
-  is_sale_agent:
+    - datalake_ebdb_user.user.is_blocked
+    description: If the associated user is blocked.
+  is_3p_agent:
     lineage:
-    - dw_public.dim_user.is_sale_agent
-    description: If user is an Agent with QuintoAndar working with Sales.
+    - datalake_ebdb_clean.agent_data.agent_type
+    description: Flag indicating if agent is a third-party agent (agent_type = 'CORRETOR_REDE').
   is_rent_agent:
     lineage:
-    - dw_public.dim_user.is_rent_agent
-    description: If user is an Agent with QuintoAndar working with Rentals.
-  is_tqc_3p_agent:
+    - datalake_ebdb_user.agent_data.is_rent_agent
+    description: If the agent works with rental properties.
+  is_sale_agent:
     lineage:
-    - datalake_gsheets_clean.agents_3p_tqc.id_agent
-    description: If user is an Agent with in TQC 3P PoC.
-  is_rede_agent:
+    - datalake_ebdb_user.agent_data.is_sale_agent
+    description: If the agent works with property sales.
+  is_affiliate_active:
     lineage:
-    - datalake_ebdb_work_contract.work_contract.is_3p_contract
-    description: If user is an Agent with Rede QuintoAndar.
-  dt_birth:
+    - datalake_ebdb_user.affiliate_data.is_active
+    description: If user is an affiliate, indicates whether they are still registered in the affiliates program.
+  is_photographer_active:
     lineage:
-    - dw_public.dim_user.data_nascimento
-    description: User's date of birth.
+    - datalake_ebdb_clean.photographer_data.is_active
+    description: If user is a photographer, indicates whether they are still active as photographer.
+  is_tenant:
+    lineage:
+    - datalake_ebdb_user.user.is_tenant
+    description: If the user is a tenant with QuintoAndar.
+  is_passive_lead_receiver:
+    lineage:
+    - datalake_ebdb_clean.agent_data.is_passive_lead_receiver
+    description: If the agent is configured to receive passive leads.
+  is_service_link_active:
+    lineage:
+    - datalake_ebdb_clean.agent_data.is_service_link_active
+    description: If the agent's service link is currently active.
+  has_3p_member_profile_active:
+    lineage:
+    - datalake_company_clean.member_profile.status
+    description: If the agent has an active 3P member profile in company service (status = 'ACTIVE', profile = 17, product = 27).
+  has_3p_member_profile_pending:
+    lineage:
+    - datalake_company_clean.member_profile.status
+    description: If the agent has a pending 3P member profile in company service (status IN 'PENDING CONFIRMATION' or 'PENDING INVITATION', profile = 17, product = 27).
   ts_created:
     lineage:
-    - dw_public.dim_user.criado_em
-    description: Timestamp of when the user was created in QuintoAndar.
+    - datalake_ebdb_clean.agent_data.ts_created
+    description: Timestamp of when the agent record was created.
   ts_updated:
     lineage:
-    - dw_public.dim_user.atualizado_em
-    description: Timestamp of when the user was last updated.
+    - datalake_ebdb_clean.agent_data.ts_updated
+    description: Timestamp of when the agent record was last updated.
   ts_load:
     description: Timestamp of when the table was last processed.
