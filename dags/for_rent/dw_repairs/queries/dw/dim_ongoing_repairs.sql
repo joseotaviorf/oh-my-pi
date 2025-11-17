@@ -91,10 +91,11 @@ SELECT
   tc.year,
   tc.month,
   tc.day,
+  tc.ts_updated,
   NOW() AS ts_load
 FROM
   datalake_zendesk.tickets_current AS tc
-LEFT JOIN
+INNER JOIN
   datalake_repairs.ongoing_repair_tickets AS rt
     ON tc.id_ticket = rt.id_ticket
 LEFT JOIN
@@ -115,4 +116,4 @@ LEFT JOIN
 WHERE
   tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY tc.ts_updated DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) = 1

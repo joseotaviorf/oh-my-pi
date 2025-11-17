@@ -115,5 +115,9 @@ columns:
     description: Day when the ticket was created.
     lineage:
       - datalake_zendesk.tickets_current.day
+  ts_updated:
+    description: Timestamp of the ticket updated.
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
   ts_load:
     description: Date and time when the data was loaded.

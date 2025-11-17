@@ -325,7 +325,7 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_zendesk.tickets_current AS tc
-LEFT JOIN
+INNER JOIN
   datalake_repairs.ongoing_repair_tickets AS rt
     ON rt.id_ticket = tc.id_ticket
 LEFT JOIN
@@ -347,4 +347,4 @@ LEFT JOIN
   tickets_whatsapp AS wpp
     ON wpp.id_contact_ticket = tc.id_ticket
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY tc.ts_updated DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) = 1
