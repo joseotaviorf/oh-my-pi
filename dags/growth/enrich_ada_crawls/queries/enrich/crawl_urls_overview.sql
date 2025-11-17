@@ -1,8 +1,8 @@
 WITH 
-issues AS (
+issues_aggregated AS (
   SELECT 
     address, 
-    ARRAY_AGG(issue) AS issues,
+    ARRAY_AGG(issue_name) AS aggregated_issues,
     device,
     dt_report
   FROM
@@ -12,9 +12,20 @@ issues AS (
   GROUP BY
     address, device, dt_report
 ),
+issues AS (
+  SELECT 
+    address,
+    issue_name,
+    device,
+    dt_report
+  FROM
+    datalake_ada_crawls_clean.issues
+  WHERE
+    dt_report BETWEEN '{load_start_date}' AND '{load_end_date}'
+),
 internal_all AS (
   SELECT 
-    *, 
+    *,
     CASE
       WHEN address LIKE '%www.quintoandar.com.br/' OR address LIKE '%www.quintoandar.com.br' THEN 'HOME'
       WHEN CONTAINS(address, 'br/alugar/imovel') THEN 'SEARCH RENT'
@@ -38,7 +49,8 @@ internal_all AS (
 )
 SELECT 
   ia.address, 
-  is.issues,
+  is.issue_name,
+  is_agg.aggregated_issues,
   ia.structure,
   ia.content_type,
   ia.status_code,
@@ -81,11 +93,11 @@ SELECT
   ia.percentage_of_total,
   ia.outlink_count,
   ia.unique_outlink_count,
-  ia.response_time AS response_time,
+  ia.response_time,
   ia.ts_last_modified,
-  ia.ts_crawl AS ts_crawl,
-  ia.dt_report AS dt_report,
-  ia.device AS device,
+  ia.ts_crawl,
+  ia.dt_report,
+  ia.device,
   ia.year,
   ia.month,
   ia.day
@@ -93,4 +105,7 @@ FROM
   internal_all AS ia
 LEFT JOIN 
   issues AS is
-    ON ia.address = is.address
+    ON ia.address = is.address AND ia.device = is.device AND ia.dt_report = is.dt_report
+LEFT JOIN
+  issues_aggregated AS is_agg
+    ON ia.address = is_agg.address AND ia.device = is_agg.device AND ia.dt_report = is_agg.dt_report

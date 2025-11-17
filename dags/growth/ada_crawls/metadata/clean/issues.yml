@@ -12,12 +12,12 @@ columns:
     description: The URL in which the issue was detected.
     lineage:
       - datalake_ada_crawls_raw.issues.Address
-  issue:
+  issue_name:
     description: | 
       The name of the issue (e.g., "Content Readability Difficult", "H1 Missing", "Links Pages With High 
       Internal Outlinks", "Response Codes Internal Client Error (4Xx)", etc.).
     lineage:
-      - datalake_ada_crawls_raw.issues.issue
+      - datalake_ada_crawls_raw.issues.issue_name
   dt_report:
     description: The crawl date.
     lineage:

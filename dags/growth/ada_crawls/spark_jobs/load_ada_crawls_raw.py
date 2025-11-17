@@ -72,8 +72,7 @@ def get_internal_all_or_issues_overview_dataframe(most_recent_crawl_file_path: s
         .option("quote", "\"") \
         .csv(most_recent_crawl_file_path)
     df = df.withColumn("device", lit(crawl_device)).withColumn("date", lit(crawl_date))
-    if most_recent_crawl_file_path.endswith("internal_all.csv") and "Supply 1" not in df.columns:
-        df = df.withColumn("Supply 1", lit(None).cast("string"))
+
     if df.count() == 0:
         raise FileNotFoundError(f"m=get_internal_all_or_issues_overview_dataframe, msg=”{most_recent_crawl_file_path}” file not found.")
 
@@ -107,7 +106,7 @@ def get_issues_dataframe(most_recent_crawl_issues_path: str, crawl_device: str, 
         if "Address" in df.columns:
             issue_name = report_file.name.replace(".csv", "").replace("_", " ").title()
             df_sel = df.select("Address") \
-                .withColumn("issue", lit(issue_name)) \
+                .withColumn("issue_name", lit(issue_name)) \
                 .withColumn("device", lit(crawl_device)) \
                 .withColumn("date", lit(crawl_date))
             rows.append(df_sel)
@@ -163,6 +162,22 @@ def reduce_dataframes(dfs: list[DataFrame]) -> DataFrame:
 
     return reduce(lambda df1, df2: df1.unionByName(df2), common_schema_dfs)
 
+def has_required_items(path: str) -> bool:
+    """
+    Checks if the S3 bucket path has the required items.
+
+      Args:
+        path (str): The S3 bucket path to check.
+
+      Returns:
+        bool: True if the path has the required items, False otherwise.
+    """
+    try:
+        contents = [content.name for content in dbutils.fs.ls(path)]
+        return "issues_reports/" in contents and "internal_all.csv" in contents
+    except:
+        return False
+
 def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date: str, load_end_date: str, folder_or_file_name: str) -> DataFrame:
     """
     Gets the issues, internal_all or issues_overview_report DataFrame for the most recent crawl based on the folder_or_file_name.
@@ -185,9 +200,7 @@ def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date:
     
     device_folders = [
         item for item in dbutils.fs.ls(most_recent_crawl.path)
-        if item.isDir and not item.name.startswith('.')
-                      and dbutils.fs.ls(os.path.join(item.path, "issues_reports/")) 
-                      and dbutils.fs.ls(os.path.join(item.path, "internal_all.csv"))
+        if item.isDir and not item.name.startswith('.') and has_required_items(item.path)
     ]
     if not device_folders:
         raise FileNotFoundError(f"""
@@ -209,6 +222,32 @@ def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date:
         
     dfs = reduce_dataframes(dfs)
     return dfs
+
+def update_df_with_missing_columns(df: DataFrame, database_name: str, table_name: str, spark_metastore_service: SparkMetastoreService) -> DataFrame:
+    """
+    Updates the DataFrame with the missing columns compared to the table in the database.
+
+      Args:
+        df (DataFrame): The DataFrame being loaded to the Datalake.
+        database_name (str): The name of the Datalake.
+        table_name (str): The name of the table.
+        spark_metastore_service (SparkMetastoreService): The Spark Metastore Service.
+
+      Returns:
+        DataFrame: The DataFrame with the missing columns.
+    """
+    schema_df = df.schema
+    table_schema = spark_metastore_service.get_table_schema(
+      database_name = database_name,
+      table_name = table_name,
+      ignore_partition_keys = True
+    )
+    df_cols = set(df.columns)
+    datalake_cols = set([field for field in table_schema])
+    missing_cols = datalake_cols - df_cols
+    for field in missing_cols:
+      df = df.withColumn(field, lit(None).cast("string"))
+    return df
 
 def load_dataframe_into_datalake(datalake_bucket: str, df: DataFrame, environment: str, table_name: str, source: str) -> None:
     """
@@ -242,9 +281,10 @@ def load_dataframe_into_datalake(datalake_bucket: str, df: DataFrame, environmen
 
     spark_metastore_service.create_database(database_name=database_name)
     partition_cols = ['date', 'device']
+    updated_df = update_df_with_missing_columns(df, database_name, table_name, spark_metastore_service)
 
     s3_loader.load_df(
-        df=df,
+        df=updated_df,
         s3_path=f"{database_location}{table_name}",
         format_options=format_options,
         partitions=partition_cols,
@@ -252,7 +292,7 @@ def load_dataframe_into_datalake(datalake_bucket: str, df: DataFrame, environmen
     )
 
     spark_metastore_loader.update_metastore(
-        df=df,
+        df=updated_df,
         database_name=database_name,
         table_name=table_name,
         format_options=format_options,
@@ -261,7 +301,7 @@ def load_dataframe_into_datalake(datalake_bucket: str, df: DataFrame, environmen
     )
 
     spark_metastore_service.create_new_partitions_from_df(
-        df=df,
+        df=updated_df,
         database_name=database_name,
         table_name=table_name,
         partition_cols=partition_cols,

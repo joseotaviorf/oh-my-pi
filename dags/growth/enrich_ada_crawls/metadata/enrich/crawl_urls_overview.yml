@@ -11,10 +11,14 @@ columns:
     description: The URL of the page.
     lineage:
       - datalake_ada_crawls_clean.internal_all.address
-  issues:
-    description: The array of issues found in the URL.
+  issue_name:
+    description: The specific issue detected for the given URL. Each row represents a single issue associated with the address.
     lineage:
-      - datalake_ada_crawls_clean.issues.issue
+      - datalake_ada_crawls_clean.issues.issue_name
+  aggregated_issues:
+    description: An array containing all issues identified for the given URL, aggregating multiple issue names into a single list.
+    lineage:
+      - datalake_ada_crawls_clean.issues.issue_name
   structure:
     description: The URL cluster based on URL patterns (e.g., SEARCH RENT,SEARCH SALE, HOME, LISTING).
     lineage:
