@@ -59,6 +59,10 @@ columns:
     lineage:
       - datalake_quinturk_clean.task_completion.result
     description: "The commited income extracted from a document in a reference month by the analyst."
+  advance_salary:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The advance salary extracted from a document in a reference month by the analyst."
   payslip_reference_period:
     lineage:
       - datalake_quinturk_clean.task_completion.result

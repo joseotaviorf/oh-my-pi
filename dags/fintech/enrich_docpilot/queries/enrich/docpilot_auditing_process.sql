@@ -142,6 +142,9 @@ get_input_value AS (
       WHEN field_type = 'commited' THEN input_value
     END AS committed_income,
     CASE
+      WHEN field_type = 'advance_salary' THEN input_value
+    END AS advance_salary,
+    CASE
       WHEN field_type = 'month' THEN input_value
     END AS reference_month,
     CASE
@@ -189,6 +192,7 @@ get_documents_annotation AS (
     SPLIT(MAX(net_income), ';') AS net_income,
     SPLIT(MAX(gross_income), ';') AS gross_income,
     SPLIT(MAX(committed_income), ';') AS committed_income,
+    SPLIT(MAX(advance_salary), ';') AS advance_salary,
     TO_DATE(MAX(date_start) , 'dd/MM/yyyy') AS bank_statement_start_date,
     MAX(date_end) AS bank_statement_end_date,
     MAX(date_start_partial) AS bank_statement_date_start_partial,
@@ -238,6 +242,14 @@ get_documents_annotation AS (
     posexplode(committed_income) AS (position, committed_income)
   FROM
     get_documents_annotation
+), advance_salary_view AS (
+  SELECT
+    id_proposal,
+    document_path,
+    ts_updated,
+    posexplode(advance_salary) AS (position, advance_salary)
+  FROM
+    get_documents_annotation
 ), payslip_reference_period__view AS (
   SELECT
     id_proposal,
@@ -262,6 +274,7 @@ SELECT
     n.net_income,
     gr.gross_income,
     c.committed_income,
+    a.advance_salary,
     n.position,
     g.bank_statement_start_date,
     g.bank_statement_end_date,
@@ -288,6 +301,11 @@ SELECT
       AND g.document_path = c.document_path
       AND c.position = n.position
       and c.ts_updated = g.ts_updated
+  LEFT JOIN advance_salary_view a
+      ON g.id_proposal = a.id_proposal
+      AND g.document_path = a.document_path
+      AND a.position = n.position
+      and a.ts_updated = g.ts_updated
   LEFT JOIN payslip_reference_period__view pr
       ON g.id_proposal = pr.id_proposal
       AND g.document_path = pr.document_path
@@ -310,6 +328,7 @@ SELECT
     n.net_income,
     gr.gross_income,
     c.committed_income,
+    a.advance_salary,
     n.position,
     g.bank_statement_start_date,
     g.bank_statement_end_date,
@@ -336,11 +355,16 @@ SELECT
       AND g.document_path = c.document_path
       AND c.position = n.position
       and c.ts_updated = g.ts_updated
-    LEFT JOIN payslip_reference_period__view pr
-      ON g.id_proposal = pr.id_proposal
-      AND g.document_path = pr.document_path
-      AND pr.position = n.position
-      and pr.ts_updated = g.ts_updated
+  LEFT JOIN advance_salary_view a
+      ON g.id_proposal = a.id_proposal
+      AND g.document_path = a.document_path
+      AND a.position = n.position
+      and a.ts_updated = g.ts_updated
+  LEFT JOIN payslip_reference_period__view pr
+    ON g.id_proposal = pr.id_proposal
+    AND g.document_path = pr.document_path
+    AND pr.position = n.position
+    and pr.ts_updated = g.ts_updated
   WHERE
     document_type = 'BANK_STATEMENT'
     ), union_documents AS (
@@ -381,6 +405,14 @@ SELECT
       )
       ELSE committed_income
     END AS committed_income,
+    CASE
+      WHEN advance_salary LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(advance_salary, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE advance_salary
+    END AS advance_salary,
     payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
@@ -429,6 +461,14 @@ SELECT
       )
       ELSE committed_income
     END AS committed_income,
+    CASE
+      WHEN advance_salary LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(advance_salary, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE advance_salary
+    END AS advance_salary,
     payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
@@ -454,6 +494,7 @@ SELECT
   CAST(net_income AS DECIMAL(10, 2)) AS net_income,
   CAST(gross_income AS DECIMAL(10, 2)) AS gross_income,
   CAST(committed_income AS DECIMAL(10, 2)) AS committed_income,
+  CAST(advance_salary AS DECIMAL(10, 2)) AS advance_salary,
   TO_DATE(payslip_reference_period, 'MM/yyyy') AS payslip_reference_period,
   TO_DATE(bank_statement_start_date, 'dd/MM/yyyy') AS bank_statement_start_date,
   TO_DATE(bank_statement_end_date, 'dd/MM/yyyy') AS bank_statement_end_date,
