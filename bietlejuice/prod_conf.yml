@@ -1255,6 +1255,16 @@ databricks_13_3_high_mem_driver_high_mem_nodes:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_16_4_high_mem_driver_high_mem_nodes:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 5
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_16_4_high_mem_driver_high_mem_nodes_3_workers:
     <<: *cluster_anchor
     driver_node_type_id: r5a.4xlarge
@@ -1264,6 +1274,7 @@ databricks_16_4_high_mem_driver_high_mem_nodes_3_workers:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
 databricks_16_4_medium_memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.xlarge

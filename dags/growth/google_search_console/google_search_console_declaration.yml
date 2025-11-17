@@ -43,7 +43,7 @@ workflow:
       extra_spark_job_arguments:
       - by_query   # report_type                      
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_16_4_med_general_cluster
   custom_libraries:
   - pypi:
       package: "google-api-python-client"

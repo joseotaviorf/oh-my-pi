@@ -51,7 +51,7 @@ workflow:
       - tenants   # app group
       - canvas   # identifier
 cluster:
-  type: databricks_13_3_med_memory_2_workers_general_cluster
+  type: databricks_16_4_med_memory_2_workers_general_cluster
   custom_libraries:
   - whl: "{artifacts_bucket}/braze-api-client-python/quintoandar_braze_api_client-0.1.0-py2.py3-none-any.whl"
   databricks_conn_id: databricks_new
