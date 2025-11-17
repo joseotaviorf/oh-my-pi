@@ -1,50 +1,59 @@
 database_name: datalake_visit
 table_name: visit_business_model
-description: This table contains the business model of the visit with 3P access control indicators.
+description: This table contains the business model of the visit with 3P access control indicators, consolidated from visit and visit_business_model tables with agent visitor company information.
 domain: For Sale
 owner: vitor.musachio@quintoandar.com.br
 columns:
-  id:
-    lineage:
-      - datalake_ebdb_clean.visit_business_model.id
-    description: The unique identifier of the visit business model record.
-  id_booking:
-    lineage:
-      - datalake_ebdb_clean.visitor.id_booking
-    description: The booking id associated with the agent visitor.
   id_visit:
     lineage:
-      - datalake_ebdb_clean.visit_business_model.id_visit
-    description: The id of the visit.
+      - datalake_ebdb_clean.visit.id
+    description: The unique identifier of the visit.
+  id_visit_business_model:
+    lineage:
+      - datalake_ebdb_clean.visit_business_model.id
+    description: The unique identifier of the visit business model record. Null if no separate business model record exists.
   uuid_company:
     lineage:
       - datalake_ebdb_clean.visitor.uuid_company
-    description: The company UUID associated with the agent visitor.
+    description: The company UUID associated with the agent visitor. Retrieved from visitor where type = 'Agent', using the most recent record per visit.
   business_model:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model
-    description: The business model of the visit.
+      - datalake_ebdb_clean.visit.business_model
+    description: The business model of the visit. Coalesces from visit_business_model.business_model first, then visit.business_model if null.
   is_3p_supply:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model
+      - datalake_ebdb_clean.visit.business_model
     description: Boolean flag indicating whether the business model includes 3P_SUPPLY. Derived from business_model LIKE '%3P_SUPPLY%'.
   is_3p_demand:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model
+      - datalake_ebdb_clean.visit.business_model
     description: Boolean flag indicating whether the business model includes 3P_DEMAND. Derived from business_model LIKE '%3P_DEMAND%'.
   is_3p_lead_gen:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model
+      - datalake_ebdb_clean.visit.business_model
     description: Boolean flag indicating whether the business model includes 3P_LEAD_GEN. Derived from business_model LIKE '%3P_LEAD_GEN%'.
   has_3p_access_control:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model
+      - datalake_ebdb_clean.visit.business_model
     description: Boolean flag indicating whether the business model has any 3P access control. Derived from business_model LIKE '%3P%'.
-  ts_created:
+  ts_business_model_created:
     lineage:
       - datalake_ebdb_clean.visit_business_model.ts_created
-    description: The timestamp of the visit business model creation.
-  ts_updated:
+    description: The timestamp when the visit_business_model record was created. Null if no separate business model record exists.
+  ts_visit_created:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+    description: The timestamp when the visit record was created.
+  ts_business_model_updated:
     lineage:
       - datalake_ebdb_clean.visit_business_model.ts_updated
-    description: The timestamp of the visit business model update.
+    description: The timestamp when the visit_business_model record was last updated. Null if no separate business model record exists.
+  ts_visit_updated:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_updated
+    description: The timestamp when the visit record was last updated.
