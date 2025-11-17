@@ -27,9 +27,6 @@ workflow:
       dim_origin_type:
         extraction_type: incremental
         merge_on: [ "origin_name" ]
-      dim_visit_fup:
-        extraction_type: incremental
-        merge_on: [ "visit_fup" ]
       dim_visit_model:
         extraction_type: incremental
         merge_on: [ "visit_model" ]
@@ -46,7 +43,6 @@ workflow:
         - dim_business_context
         - dim_visit_model
         - dim_behavior
-        - dim_visit_fup
       fact_visits:
         - dim_behavior
         - dim_visit_status

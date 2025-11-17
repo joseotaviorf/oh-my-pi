@@ -119,11 +119,6 @@ columns:
       - dw_visit.dim_origin_type
     description:
       Is the key of origin of the event.
-  sk_visit_fup:
-    lineage:
-      - dw_visit.dim_visit_fup
-    description:
-      Is the key of the follow of of the visit.
   days_visit_cancelled_to_visit:
     lineage:
       - datalake_visit.visit_schedules.days_visit_cancelled_to_visit

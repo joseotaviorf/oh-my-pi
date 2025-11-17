@@ -8,7 +8,6 @@ SELECT
   bc.sk_business_context,
   vm.sk_visit_model,
   db.sk_behavior_type,
-  fup.sk_visit_fup,
   es.id_business_unit AS sk_business_unit,
   es.id_company_supply AS sk_company_supply,
   es.id_company_demand AS sk_company_demand,
@@ -34,47 +33,37 @@ SELECT
   CASE WHEN es.is_house_rented IS TRUE THEN 1 ELSE 0 END AS is_house_rented,
   CASE WHEN es.has_tenant_living IS TRUE THEN 1 ELSE 0 END AS has_tenant_living,
   1 AS is_booking,
-  CASE WHEN es.ts_schedule_rescheduled IS NOT NULL THEN 1 ELSE 0 END AS is_reschedule,
-  CASE WHEN es.ts_schedule_confirmed IS NOT NULL THEN 1 ELSE 0 END AS is_confirmed,
-  CASE WHEN es.ts_schedule_completed IS NOT NULL THEN 1 ELSE 0 END AS is_completed,
-  CASE WHEN es.ts_schedule_canceled IS NOT NULL THEN 1 ELSE 0 END AS is_canceled,
-  CASE WHEN es.ts_schedule_unsuccessful IS NOT NULL THEN 1 ELSE 0 END AS is_unsuccessful,
-  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_created,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_created,
-  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_confirmed,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_confirmed,
-  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_completed,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_completed,
-  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_canceled,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_canceled,
-  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_unsuccessful,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_unsuccessful,
+  CASE WHEN NOT es.ts_schedule_rescheduled IS NULL THEN 1 ELSE 0 END AS is_reschedule,
+  CASE WHEN NOT es.ts_schedule_confirmed IS NULL THEN 1 ELSE 0 END AS is_confirmed,
+  CASE WHEN NOT es.ts_schedule_completed IS NULL THEN 1 ELSE 0 END AS is_completed,
+  CASE WHEN NOT es.ts_schedule_canceled IS NULL THEN 1 ELSE 0 END AS is_canceled,
+  CASE WHEN NOT es.ts_schedule_unsuccessful IS NULL THEN 1 ELSE 0 END AS is_unsuccessful,
+  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_created, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_created,
+  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_confirmed, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_confirmed,
+  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_completed, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_completed,
+  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_canceled, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_canceled,
+  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_unsuccessful, 1, 10), '-', '') AS BIGINT), -1) AS sk_schedule_unsuccessful,
   ts_schedule_created,
   ts_schedule_confirmed,
   ts_schedule_completed,
   ts_schedule_canceled,
   ts_schedule_unsuccessful,
   ts_schedule_rescheduled,
-  NOW() AS ts_load
-FROM
-  datalake_visit.visit_schedules AS es
-LEFT JOIN
-   dw_visit.dim_origin_type AS dot
-    ON es.schedule_origin = dot.origin_name
-LEFT JOIN
-   dw_visit.dim_business_context AS bc
-    ON es.business_context = bc.business_context
-LEFT JOIN
-    dw_visit.dim_visit_model AS vm
-     ON  es.visit_model = vm.visit_model
-LEFT JOIN
-    dw_visit.dim_behavior AS db
-        ON es.behavior = db.behavior_type
-LEFT JOIN
-    dw_visit.dim_visit_fup AS fup
-        ON es.visit_fup = fup.visit_fup
-LEFT JOIN
-    dw_house.dim_house_entrance_history AS dim_heh
-        ON es.id_house = dim_heh.sk_house
-        AND es.ts_schedule_created >= dim_heh.ts_entrance_started
-        AND es.ts_schedule_created < COALESCE(dim_heh.ts_entrance_ended, NOW())
-LEFT JOIN
-    datalake_ebdb_agents.preferred_property_agent_relation_history AS ppa
-        ON ppa.id_house = es.id_house
-        AND es.business_context = ppa.business_context
-        AND ts_schedule_created BETWEEN ppa.ts_relation_started AND COALESCE(ppa.ts_relation_ended, NOW())
+  CURRENT_TIMESTAMP() AS ts_load
+FROM datalake_visit.visit_schedules AS es
+LEFT JOIN dw_visit.dim_origin_type AS dot
+  ON es.schedule_origin = dot.origin_name
+LEFT JOIN dw_visit.dim_business_context AS bc
+  ON es.business_context = bc.business_context
+LEFT JOIN dw_visit.dim_visit_model AS vm
+  ON es.visit_model = vm.visit_model
+LEFT JOIN dw_visit.dim_behavior AS db
+  ON es.behavior = db.behavior_type
+LEFT JOIN dw_house.dim_house_entrance_history AS dim_heh
+  ON es.id_house = dim_heh.sk_house
+  AND es.ts_schedule_created >= dim_heh.ts_entrance_started
+  AND es.ts_schedule_created < COALESCE(dim_heh.ts_entrance_ended, CURRENT_TIMESTAMP())
+LEFT JOIN datalake_ebdb_agents.preferred_property_agent_relation_history AS ppa
+  ON ppa.id_house = es.id_house
+  AND es.business_context = ppa.business_context
+  AND ts_schedule_created BETWEEN ppa.ts_relation_started AND COALESCE(ppa.ts_relation_ended, CURRENT_TIMESTAMP())
