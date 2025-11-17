@@ -23,6 +23,24 @@ sheets_info:
     clean_table_name: agent_tiers_rounds
     sheet_context: for_sale
 
+  asp_for_sale_alocated:
+    sheet_id: 10l9Ot2Z54I-dtzL179hqTH_oPfRi0gjo9EwoOd8ZZMw
+    sheet_name: data
+    clean_table_name: asp_for_sale_alocated
+    sheet_context: for_sale
+
+  asp_opportunities_distribution:
+    sheet_id: 1P24ubMhjkn0SDsinaCET4QSmJ_O0HLk6Ly3V5Uf8z8s
+    sheet_name: data
+    clean_table_name: asp_opportunities_distribution
+    sheet_context: for_sale
+
+  asp_relisting_opportunities_distribution:
+    sheet_id: 1TlGMYfuYVrLg1ZVRDPa7URdlPLWAs-s5bXGFaJ6vpQo
+    sheet_name: data
+    clean_table_name: asp_relisting_opportunities_distribution
+    sheet_context: for_sale
+
   aux_agents_sale_hub:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_HUB
@@ -94,7 +112,7 @@ sheets_info:
     sheet_name: sale_demand_budget_2024
     clean_table_name: sale_demand_budget_2024
     sheet_context: for_sale
-  
+
   sale_demand_buyer_budget_2025:
     sheet_id: 1Q3RfHCbFPX7Qohu7lbg4V1Qp3YzMkn92tGWTDQbMEds
     sheet_name: sale_demand_buyer_targets_budget_2025
@@ -166,13 +184,13 @@ sheets_info:
     sheet_name: sale_supply_targets_2024
     clean_table_name: sale_supply_budget_2024
     sheet_context: for_sale
-  
+
   sale_supply_budget_2025:
     sheet_id: 1iyLvYShE0520O0DrU4rhxiJkGwrL3s4TPdhVqafuVHA
     sheet_name: sale_supply_targets_2025
     clean_table_name: sale_supply_budget_2025
     sheet_context: for_sale
-  
+
   sale_supply_budget_ticket_2025:
     sheet_id: 17-HrwpAQsNehcFASPXp4wYXhFxrTGfIMCjRwkkJzA5U
     sheet_name: sale_supply_budget_ticket_2025
@@ -282,7 +300,7 @@ sheets_info:
     sheet_name: ipo_roadmap
     clean_table_name: ipo_roadmap
     sheet_context: for_sale
-  
+
   notary_office_nps:
     sheet_id: 1YqjKLgf17qRNVdoJbI_-KGMIY7uHGF4cbmYLKaBhn14
     sheet_name: q_nps
