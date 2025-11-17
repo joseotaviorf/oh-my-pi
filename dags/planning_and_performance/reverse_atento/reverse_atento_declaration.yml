@@ -10,6 +10,7 @@ workflow:
   layer: reverse
   custom_schema: atento
   default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
   execution_timeout_hours: 4
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
