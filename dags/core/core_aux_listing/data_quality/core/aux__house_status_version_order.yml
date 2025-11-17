@@ -1,0 +1,22 @@
+---
+table_name: core_listing.aux__house_status_version_order
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM core_listing.aux__house_status_version_order GROUP BY id_house, rev HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  order_status:
+    is_complete:
+      severity_level: Error
+  order_version:
+    is_complete:
+      severity_level: Error
+  rev:
+    is_complete:
+      severity_level: Error
+  ts_status_changed:
+    is_complete:
+      severity_level: Error

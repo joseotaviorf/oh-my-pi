@@ -1,0 +1,53 @@
+database_name: core_listing
+table_name: aux__house_status_version_order
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description:
+  Auxiliary table for Listing Core model that tracks house status changes and versions over time. This table provides a chronological
+  view of house status transitions, calculating version numbers based on significant status changes (rented or unpublished for 84+ days)
+  and tracks publication history for each house listing version.
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
+  order_status:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+    description: Sequential order number of status changes for this house. ROW_NUMBER() ordered by revision number, providing chronological sequence of changes.
+  order_version:
+    lineage:
+      - datalake_ebdb_clean.house_aud.dt_first_publication
+    description: Version number for this house listing. Dense rank based on publication_version_date, representing the chronological order of house listing versions. 0 indicates houses that were never published.
+  rev:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+    description: Revision number from the house audit table. Represents the specific version/change record for this house.
+  status_history:
+    lineage:
+      - datalake_ebdb_clean.house_aud.status
+    description: Historical status of the house at this specific revision. Captures the status value before any transformations or filtering.
+  reason:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+    description: Reason for the status change as recorded in the user revision entity. Provides context for why the house status was modified.
+  events_change_status:
+    lineage:
+      - datalake_ebdb_clean.house_aud.status
+    description: Status value that triggers a version change. Only populated when the status change qualifies as a version-changing event (rented or unpublished for 84+ days).
+  publication_version_date:
+    lineage:
+      - datalake_ebdb_clean.house_aud.dt_first_publication
+    description: First publication date for the current version of the house. Tracks when each version was first published, used for version ordering.
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.house_aud.dt_first_publication
+    description: Timestamp of the very first publication of this house across all versions. Represents when the house was initially made available on the platform.
+  ts_status_changed:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when the status change occurred. Derived from the revision timestamp in user_revision_entity table.
+  ts_status_changed_next:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of the next status change for this house. Used to calculate duration between status changes, particularly for unpublished periods.

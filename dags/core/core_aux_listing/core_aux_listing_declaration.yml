@@ -1,0 +1,22 @@
+dag:
+  name: core_aux_listing
+  schedule_start_date: 2025, 9, 1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This is a DAG responsible to create auxiliary tables for Listing Core Model
+workflow:
+  type: query_delta
+  layer: core
+  custom_schema: core_listing
+  default_extraction_type: full
+  execution_timeout_hours: 1
+  has_hive_sync: false
+  tables_customization:
+    aux__house_status_version_order:
+      table_privileges:
+        owner-xp:
+          - ALL PRIVILEGES
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

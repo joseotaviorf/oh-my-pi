@@ -1,0 +1,53 @@
+# Schema validation file for core aux__house_status_version_order table
+# This file defines the expected schema for the core_listing.aux__house_status_version_order table
+# Path: dags/core/core_aux_listing/schemas/core/aux__house_status_version_order.yml
+
+columns:
+  id_house:
+    type: bigint
+    required: true
+
+  order_status:
+    type: int
+    required: true
+
+  order_version:
+    type: int
+    required: true
+
+  rev:
+    type: int
+    required: true
+
+  status_history:
+    type: string
+    required: false
+
+  reason:
+    type: string
+    required: false
+
+  events_change_status:
+    type: string
+    required: false
+
+  publication_version_date:
+    type: timestamp
+    required: false
+
+  ts_first_publication:
+    type: timestamp
+    required: false
+
+  ts_status_changed:
+    type: timestamp
+    required: true
+
+  ts_status_changed_next:
+    type: timestamp
+    required: false
+
+# Schema constraints
+min_columns: 11
+max_columns: 11
+strict: true

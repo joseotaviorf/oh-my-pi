@@ -147,4 +147,3 @@ local/astro/scripts/*
 
 # Airflow DAG Builder Python tfiles
 dags/**/*_dag.py
-
