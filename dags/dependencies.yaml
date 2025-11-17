@@ -2418,6 +2418,11 @@ bietlejuice.enrich_hub_services_agents:
   - bietlejuice.hub_services:load-clean-member-profile-aud:first-run-of-day
   - bietlejuice.hub_services:load-clean-rev-info:first-run-of-day
   - bietlejuice.hub_services:load-clean-users:first-run-of-day
+bietlejuice.enrich_hubspot_claude_analyses:
+  - bietlejuice.hubspot:load-clean-contact:first-run-of-day
+  - bietlejuice.hubspot:load-clean-owner:first-run-of-day
+  - bietlejuice.hubspot_conversation:load-clean-thread-messages:first-run-of-day
+  - bietlejuice.hubspot_conversation:load-clean-threads:first-run-of-day
 bietlejuice.enrich_hubspot_crm:
   - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company-document:first-run-of-day

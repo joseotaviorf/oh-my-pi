@@ -1,0 +1,56 @@
+dag:
+  name: enrich_hubspot_claude_analyses
+  schedule_start_date: 2020, 7, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: This DAG enriches the HubSpot conversation data with Claude analyses.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: hubspot
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    conversation_sentiment_analysis:
+      - thread_conversation
+  tables_customization:
+    conversation_sentiment_analysis:
+      load_spark_job: conversation_sentiment_analysis
+      spark_job_arguments:
+      - "{environment}"   # environment
+      - "{bucket}"   # datalake_bucket
+      - "{dag_name}"   # dag_name
+      - "hubspot" # custom schema name
+      - "{table_name}"   # table_name
+      - "{load_start_date}"   # data_interval_start
+      - "{load_end_date}"   # data_interval_end
+      - "{partitions}"   # partitions
+      - table_name_base: datalake_hubspot.thread_conversation
+        date_column_filter: ts_thread_updated
+        selected_columns: [id_inbox, id_thread, id_associated_contact, sender_type, message_text, ts_message_created]
+      - base_url: 
+          prod: https://litellm.apps.shared-prd.habitat.zone
+          forno: https://litellm.apps.core-frn.habitat.zone
+        endpoint: v1/chat/completions
+        model: vertex_ai/claude-sonnet-4
+        headers:
+          Authorization: Bearer
+          Content-Type: application/json
+        prompt: |
+          Você é um analista de satisfação de atendimento ao cliente especializado em avaliar interações de bots.
+          Leia o histórico do usuário e do bot e responda em português.
+          Siga as regras abaixo:\n
+          - Se o bot respondeu que não sabe ou não encontrou dados, o sentimento é 'Negativo' e informe quais temas ou perguntas o bot falhou.\n
+          - Se o usuário ficou satisfeito com a resposta, o sentimento é 'Satisfatório' e liste quais temas foram abordados corretamente.\n
+          - Sempre forneça a resposta no formato: 'Sentimento: [Satisfatório/Negativo]. Motivo: [detalhamento específico dos temas].'
+cluster:
+  type: databricks_16_4_med_general_cluster
+  custom_configurations:
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

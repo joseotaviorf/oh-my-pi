@@ -1,0 +1,55 @@
+database_name: datalake_hubspot
+table_name: conversation_sentiment_analysis
+description: |
+  Conversation-level sentiment summaries for HubSpot contacts, generated from the
+  enriched thread messages using Claude. Each row aggregates the ordered message
+  history for a contact and the corresponding sentiment evaluation outputs.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_inbox:
+    lineage:
+      - datalake_hubspot.thread_conversation.id_inbox
+    description: Inbox ID that the conversation belongs to.
+  id_thread:
+    lineage:
+      - datalake_hubspot.thread_conversation.id_thread
+    description: Conversation thread ID.
+  id_associated_contact:
+    lineage:
+      - datalake_hubspot.thread_conversation.id_associated_contact
+    description: Contact ID associated with the conversation history.
+  message_history:
+    lineage:
+      - datalake_hubspot.thread_conversation.message_text
+    description: Concatenated, chronologically ordered message texts for the contact.
+  ts_message_history:
+    lineage:
+      - datalake_hubspot.thread_conversation.ts_message_created
+    description: Concatenated, chronologically ordered timestamps aligned to message_history.
+  detailed_sentiment:
+    lineage:
+      - datalake_hubspot.thread_conversation.message_text
+    description: List of Claude model outputs per evaluated batch of the conversation.
+  satisfactory_sentiment:
+    lineage:
+      - datalake_hubspot.thread_conversation.message_text
+    description: Subset of outputs flagged as satisfactory according to the prompt rules.
+  negative_sentiment:
+    lineage:
+      - datalake_hubspot.thread_conversation.message_text
+    description: Subset of outputs flagged as negative according to the prompt rules.
+  raw_response:
+    lineage:
+      - datalake_hubspot.thread_conversation.message_text
+    description: Raw JSON responses returned by the Claude API for traceability.
+  ts_load:
+    description: Load timestamp for the generated evaluation record.
+  year:
+    description: Partition year for the evaluation record.
+  month:
+    description: Partition month for the evaluation record.
+  day:
+    description: Partition day for the evaluation record.
+
+
