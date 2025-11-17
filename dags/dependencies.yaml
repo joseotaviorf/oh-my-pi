@@ -3640,6 +3640,7 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_growth_media_platform_metrics:load-enrich-facebook-metrics:first-run-of-day
+  - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-address:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-house-lead-conversion:first-run-of-day

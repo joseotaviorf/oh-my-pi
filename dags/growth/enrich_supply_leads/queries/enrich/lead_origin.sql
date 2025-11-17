@@ -165,11 +165,11 @@ mid_table AS (
     ss.id_chat_session,
     r.gclid,
     r.fbclid,
-    COALESCE(r.ctwa_clid, pn.ctwa_clid) AS ctwa_clid,
-    pn.quinto_andar_phone_number,
-    pn.id_source_ctwa,
-    pn.url_source_ctwa,
-    pn.type_source_ctwa,
+    COALESCE(r.ctwa_clid, pn.ctwa_clid, ss.ctwa_clid) AS ctwa_clid,
+    COALESCE(REPLACE(wpp_channel.twilio_phone_number, "whatsapp:+", ""), pn.quinto_andar_phone_number) AS quinto_andar_phone_number,
+    COALESCE(pn.id_source_ctwa, ss.id_source_ctwa) AS id_source_ctwa,
+    COALESCE(pn.url_source_ctwa, ss.url_source_ctwa) AS url_source_ctwa,
+    COALESCE(pn.type_source_ctwa, ss.type_source_ctwa) AS type_source_ctwa,
     -- We're tracking how database is the source of our UTMs
     NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', NVL2(ctwac.utm_campaign, 'facebook_api', 'lost_tracking')))) AS database_tracking_campaign,
     NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(a2.medium, 'amplitude', NVL2(ctwac.utm_medium, 'facebook_api', 'lost_tracking')))) AS database_tracking_medium,
@@ -195,6 +195,10 @@ mid_table AS (
   LEFT JOIN
     sauron_sessions AS ss
       ON (ss.id_ai_core_session = r.id_ai_core_session)
+  LEFT JOIN
+    datalake_quinto_messenger_clean.channel AS wpp_channel
+      ON wpp_channel.id_session = ss.id_chat_session
+        AND MAKE_DATE(wpp_channel.year, wpp_channel.month, wpp_channel.day) BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAY AND DATE('{load_end_date}')
   LEFT JOIN
     click_to_whatsapp_campaigns AS ctwac
       ON (
