@@ -413,11 +413,6 @@ bietlejuice.enrich_growth_costs_sharing_rules:
     - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead:first-run-of-day
     - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking:first-run-of-day
     - bietlejuice.dw_supply:load-dw-growth-fact-supply-events:first-run-of-day
-bietlejuice.enrich_growth_costs_sharing_rules_test:
-  remove:
-    - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead:first-run-of-day
-    - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking:first-run-of-day
-    - bietlejuice.dw_supply:load-dw-growth-fact-supply-events:first-run-of-day
 bietlejuice.enrich_growth_media_platform_metrics:
   remove:
     - bietlejuice.criteo_temp:load-clean-criteo-region-lookup:first-run-of-day

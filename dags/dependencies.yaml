@@ -2303,18 +2303,6 @@ bietlejuice.enrich_growth_costs_sharing_rules:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
-bietlejuice.enrich_growth_costs_sharing_rules_test:
-  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
-  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows:first-run-of-day
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status:first-run-of-day
-  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
-  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate:first-run-of-day
-  - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
-  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status:first-run-of-day
-  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
-  - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
 bietlejuice.enrich_growth_manual_daily_costs:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-marketing-manual-costs-name-convetion:first-run-of-day
