@@ -3,82 +3,79 @@ table_name: fact_performance_evaluations
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Fact table that consolidates performance evaluations.  It includes surrogate keys for initial (manager) and calibrated ratings,  as well as composite keys for tracking changes during calibration and between evaluation periods.  It is populated from the datalake_pin.performance_evaluation table.
+  Fact table that consolidates performance evaluations at the cycle and assignment level. It links to the dim_performance_evaluation dimension for both SELF and MANAGER evaluation types, providing the current version of each evaluation type. The table includes descriptive and numeric ratings for Behavior, Impact, and Leadership from both evaluation perspectives.
 columns:
-  sk_evaluation:
-    description: Surrogate key uniquely identifying a single performance evaluation. Serves as the table's grain.
+  sk_performance_evaluation_manager_version:
+    description: Surrogate key for the current version of the MANAGER evaluation in the dim_performance_evaluation dimension. This key includes the version number (dt_valid_from) to uniquely identify a specific SCD Type 2 version.
     lineage:
-    - datalake_pin.performance_evaluation.id_evaluation
-  sk_assignment:
-    description: Surrogate key for the employee's period of service (assignment).
+    - dw_performance.dim_performance_evaluation.sk_performance_evaluation_version
+  sk_performance_evaluation_self_version:
+    description: Surrogate key for the current version of the SELF evaluation in the dim_performance_evaluation dimension. This key includes the version number (dt_valid_from) to uniquely identify a specific SCD Type 2 version.
     lineage:
-    - datalake_pin.performance_evaluation.id_period_of_service
-  sk_employee:
-    description: Surrogate key for the employee.
+    - dw_performance.dim_performance_evaluation.sk_performance_evaluation_version
+  sk_performance_evaluation_manager:
+    description: Surrogate key for the MANAGER evaluation in the dim_performance_evaluation dimension. This key represents the evaluation type regardless of version, linking to the current version when used with is_current = TRUE.
     lineage:
-    - datalake_pin.performance_evaluation.id_person
-  sk_evaluation_date:
-    description: Surrogate key for the date when the evaluation occurred, in 'yyyyMMdd' format. Links to a date dimension.
+    - dw_performance.dim_performance_evaluation.sk_performance_evaluation
+  sk_performance_evaluation_self:
+    description: Surrogate key for the SELF evaluation in the dim_performance_evaluation dimension. This key represents the evaluation type regardless of version, linking to the current version when used with is_current = TRUE.
     lineage:
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
-  sk_performance_rating_from_manager:
-    description: Surrogate key representing the combination of initial ratings (Behavior, Impact, Leadership) from the manager. Links to dim_performance_rating.
-    lineage:
-    - dw_performance.dim_performance_rating.sk_performance_rating
-  sk_performance_rating_from_calibration:
-    description: Surrogate key representing the combination of final, calibrated ratings (Behavior, Impact, Leadership). Links to dim_performance_rating.
-    lineage:
-    - dw_performance.dim_performance_rating.sk_performance_rating
-  sk_performance_variation_period:
-    description: Surrogate key indicating the trend (Increased, Decreased, Maintained) of calibrated ratings compared to the previous evaluation period. Links to dim_performance_variation.
-    lineage:
-    - datalake_pin.performance_evaluation.dt_evaluation_occurred
-    - datalake_pin.performance_evaluation.id_period_of_service
-    - datalake_pin.performance_evaluation.numeric_behavior_from_calibration
-    - datalake_pin.performance_evaluation.numeric_impact_from_calibration
-    - datalake_pin.performance_evaluation.numeric_leadership_from_calibration
-  sk_performance_variation_calibration:
-    description: |-
-      Surrogate key indicating the trend (Increased, Decreased, Maintained) of ratings from the manager's initial assessment to the final calibrated assessment within the same cycle. Links to dim_performance_variation.
-    lineage:
-    - datalake_pin.performance_evaluation.numeric_behavior_from_calibration
-    - datalake_pin.performance_evaluation.numeric_behavior_from_manager
-    - datalake_pin.performance_evaluation.numeric_impact_from_calibration
-    - datalake_pin.performance_evaluation.numeric_impact_from_manager
-    - datalake_pin.performance_evaluation.numeric_leadership_from_calibration
-    - datalake_pin.performance_evaluation.numeric_leadership_from_manager
+    - dw_performance.dim_performance_evaluation.sk_performance_evaluation
   assignment_number:
-    description: The business identifier for the employee's assignment.
+    description: The business identifier for the employee's assignment. Part of the grain of the fact table along with cycle_name.
     lineage:
     - datalake_pin.performance_evaluation.assignment_number
-  numeric_behavior_from_manager:
-    description: Numeric value of the Behavior assessment from the manager, before calibration.
+  cycle_name:
+    description: Name of the performance review cycle. Part of the grain of the fact table along with assignment_number.
     lineage:
-    - datalake_pin.performance_evaluation.numeric_behavior_from_manager
-  numeric_behavior_from_calibration:
-    description: Final numeric value of the Behavior assessment after calibration.
+    - datalake_pin.performance_evaluation.cycle_name
+  behavior_self:
+    description: Textual description of the Behavior rating from the employee's self-assessment (SELF evaluation type).
     lineage:
-    - datalake_pin.performance_evaluation.numeric_behavior_from_calibration
-  numeric_impact_from_manager:
-    description: Numeric value of the Impact assessment from the manager, before calibration.
+    - dw_performance.dim_performance_evaluation.description_behavior
+  impact_self:
+    description: Textual description of the Impact rating from the employee's self-assessment (SELF evaluation type).
     lineage:
-    - datalake_pin.performance_evaluation.numeric_impact_from_manager
-  numeric_impact_from_calibration:
-    description: Final numeric value of the Impact assessment after calibration.
+    - dw_performance.dim_performance_evaluation.description_impact
+  leadership_self:
+    description: Textual description of the Leadership rating from the employee's self-assessment (SELF evaluation type).
     lineage:
-    - datalake_pin.performance_evaluation.numeric_impact_from_calibration
-  numeric_leadership_from_manager:
-    description: Numeric value of the Leadership assessment from the manager, before calibration.
+    - dw_performance.dim_performance_evaluation.description_leadership
+  numeric_behavior_self:
+    description: Numeric value of the Behavior rating from the employee's self-assessment (SELF evaluation type).
     lineage:
-    - datalake_pin.performance_evaluation.numeric_leadership_from_manager
-  numeric_leadership_from_calibration:
-    description: Final numeric value of the Leadership assessment after calibration.
+    - dw_performance.dim_performance_evaluation.numeric_behavior
+  numeric_impact_self:
+    description: Numeric value of the Impact rating from the employee's self-assessment (SELF evaluation type).
     lineage:
-    - datalake_pin.performance_evaluation.numeric_leadership_from_calibration
-  is_last_cycle:
-    description: Boolean flag (TRUE/FALSE) indicating if this is the most recent evaluation cycle for the employee's period of service.
+    - dw_performance.dim_performance_evaluation.numeric_impact
+  numeric_leadership_self:
+    description: Numeric value of the Leadership rating from the employee's self-assessment (SELF evaluation type).
     lineage:
-    - datalake_pin.performance_evaluation.dt_performance_document_started
-    - datalake_pin.performance_evaluation.id_period_of_service
+    - dw_performance.dim_performance_evaluation.numeric_leadership
+  behavior_manager:
+    description: Textual description of the Behavior rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.description_behavior
+  impact_manager:
+    description: Textual description of the Impact rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.description_impact
+  leadership_manager:
+    description: Textual description of the Leadership rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.description_leadership
+  numeric_behavior_manager:
+    description: Numeric value of the Behavior rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.numeric_behavior
+  numeric_impact_manager:
+    description: Numeric value of the Impact rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.numeric_impact
+  numeric_leadership_manager:
+    description: Numeric value of the Leadership rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.numeric_leadership
   ts_load:
     description: Timestamp of when the record was loaded into this fact table.

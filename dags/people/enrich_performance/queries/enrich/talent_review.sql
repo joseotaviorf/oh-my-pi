@@ -28,9 +28,9 @@ SELECT
   COALESCE(i_rol.id_rating_level, -1) AS id_risk_loss_rating_level_initial,
   COALESCE(c_rol.id_rating_level, -1) AS id_risk_loss_rating_level_calibrated,
   COALESCE(i_cri.id_rating_level, -1) AS id_criticality_rating_level_initial, 
-  COALESCE(c_cri.id_rating_level, -1) AS id_criticality_rating_level_calibrated,
+  COALESCE(c_cri.id_rating_level, -1) AS id_metric_calibrated_value_4,
   COALESCE(i_rea.id_rating_level, -1) AS id_readiness_rating_level_initial,
-  COALESCE(c_rea.id_rating_level, -1) AS id_readiness_rating_level_calibrated,
+  COALESCE(c_rea.id_rating_level, -1) AS id_metric_calibrated_value_3,
   COALESCE(i_pot.id_rating_level, -1) AS id_potential_rating_level_initial,
   COALESCE(c_pot.id_rating_level, -1) AS id_potential_rating_level_calibrated,
   -- descriptions
@@ -79,10 +79,10 @@ LEFT JOIN
     ON i_rol.id_rating_level = hrd.id_risk_loss_rating_level
 LEFT JOIN
   talent_rating_descriptions AS i_cri
-    ON i_cri.id_rating_level = hrd.id_criticality_rating_level
+    ON i_cri.id_rating_level = hrd.id_metric_value_4
 LEFT JOIN
   talent_rating_descriptions AS i_rea
-    ON i_rea.id_rating_level = hrd.id_readiness_rating_level
+    ON i_rea.id_rating_level = hrd.id_metric_value_3
 LEFT JOIN
   talent_rating_descriptions AS i_pot
     ON i_pot.id_rating_level = hrd.id_potential_rating_level
@@ -92,10 +92,10 @@ LEFT JOIN
     ON c_rol.id_rating_level = hrd.id_risk_loss_rating_level_calibrated
 LEFT JOIN
   talent_rating_descriptions AS c_cri
-    ON c_cri.id_rating_level = hrd.id_criticality_rating_level_calibrated
+    ON c_cri.id_rating_level = hrd.id_metric_calibrated_value_4
 LEFT JOIN
   talent_rating_descriptions AS c_rea
-    ON c_rea.id_rating_level = hrd.id_readiness_rating_level_calibrated
+    ON c_rea.id_rating_level = hrd.id_metric_calibrated_value_3
 LEFT JOIN
   talent_rating_descriptions AS c_pot
     ON c_pot.id_rating_level = hrd.id_potential_rating_level_calibrated

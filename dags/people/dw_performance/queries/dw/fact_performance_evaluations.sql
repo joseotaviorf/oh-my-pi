@@ -1,75 +1,44 @@
 WITH
-change_calculations AS (
-  SELECT
-    id_evaluation,
-    id_period_of_service,
-    dt_evaluation_occurred,
-    CASE
-        WHEN numeric_behavior_from_calibration IS NULL OR numeric_behavior_from_manager IS NULL THEN '-1'
-        WHEN numeric_behavior_from_calibration > numeric_behavior_from_manager THEN 'Increased'
-        WHEN numeric_behavior_from_calibration < numeric_behavior_from_manager THEN 'Decreased'
-        ELSE 'Maintained'
-    END AS behavior_calibration_adjustment,
-    CASE
-        WHEN numeric_impact_from_calibration IS NULL OR numeric_impact_from_manager IS NULL THEN '-1'
-        WHEN numeric_impact_from_calibration > numeric_impact_from_manager THEN 'Increased'
-        WHEN numeric_impact_from_calibration < numeric_impact_from_manager THEN 'Decreased'
-        ELSE 'Maintained'
-    END AS impact_calibration_adjustment,
-    CASE
-        WHEN numeric_leadership_from_calibration IS NULL OR numeric_leadership_from_manager IS NULL THEN '-1'
-        WHEN numeric_leadership_from_calibration > numeric_leadership_from_manager THEN 'Increased'
-        WHEN numeric_leadership_from_calibration < numeric_leadership_from_manager THEN 'Decreased'
-        ELSE 'Maintained'
-    END AS leadership_calibration_adjustment,
-    numeric_behavior_from_calibration - LAG(numeric_behavior_from_calibration, 1, 0) OVER (PARTITION BY id_period_of_service ORDER BY dt_evaluation_occurred) AS behavior_rating_diff_from_previous,
-    numeric_impact_from_calibration - LAG(numeric_impact_from_calibration, 1, 0) OVER (PARTITION BY id_period_of_service ORDER BY dt_evaluation_occurred) AS impact_rating_diff_from_previous,
-    numeric_leadership_from_calibration - LAG(numeric_leadership_from_calibration, 1, 0) OVER (PARTITION BY id_period_of_service ORDER BY dt_evaluation_occurred) AS leadership_rating_diff_from_previous
-    
+distinct_cycles AS (
+  SELECT DISTINCT
+    cycle_name,
+    assignment_number
   FROM
     datalake_pin.performance_evaluation
+  WHERE
+    cycle_name IS NOT NULL
 )
-
 SELECT
-    pc.id_evaluation AS sk_evaluation,
-    pc.id_period_of_service AS sk_assignment,
-    pc.id_person AS sk_employee,
-    COALESCE(CAST(DATE_FORMAT(pc.dt_evaluation_occurred, 'yyyyMMdd') AS INT), -1) AS sk_evaluation_date,
-    id_performance_rating_from_manager AS sk_performance_rating_from_manager,
-    id_performance_rating_from_calibration AS sk_performance_rating_from_calibration,
-    MD5(CONCAT(
-        CASE 
-            WHEN cc.behavior_rating_diff_from_previous > 0 THEN 'Increased' 
-            WHEN cc.behavior_rating_diff_from_previous < 0 THEN 'Decreased' 
-            ELSE 'Maintained' 
-        END,
-        CASE 
-            WHEN cc.impact_rating_diff_from_previous > 0 THEN 'Increased' 
-            WHEN cc.impact_rating_diff_from_previous < 0 THEN 'Decreased' 
-            ELSE 'Maintained' 
-        END,
-        CASE 
-            WHEN cc.leadership_rating_diff_from_previous > 0 THEN 'Increased' 
-            WHEN cc.leadership_rating_diff_from_previous < 0 THEN 'Decreased' 
-            ELSE 'Maintained' 
-        END
-    )) AS sk_performance_variation_period,
-    MD5(CONCAT(
-        cc.behavior_calibration_adjustment,
-        cc.impact_calibration_adjustment,
-        cc.leadership_calibration_adjustment
-    )) AS sk_performance_variation_calibration,
-    pc.assignment_number,
-    pc.numeric_behavior_from_manager,
-    pc.numeric_behavior_from_calibration,
-    pc.numeric_impact_from_manager,
-    pc.numeric_impact_from_calibration,
-    pc.numeric_leadership_from_manager,
-    pc.numeric_leadership_from_calibration,
-    YEAR(pc.dt_performance_document_started) = MAX(YEAR(pc.dt_performance_document_started)) OVER (PARTITION BY pc.id_period_of_service) AS is_last_cycle,
-    NOW() AS ts_load
-FROM 
-    datalake_pin.performance_evaluation AS pc
-LEFT JOIN 
-    change_calculations AS cc 
-        ON pc.id_evaluation = cc.id_evaluation
+  dpe_manager.sk_performance_evaluation_version AS sk_performance_evaluation_manager_version,
+  dpe_self.sk_performance_evaluation_version AS sk_performance_evaluation_self_version,
+  dpe_manager.sk_performance_evaluation AS sk_performance_evaluation_manager,
+  dpe_self.sk_performance_evaluation AS sk_performance_evaluation_self,
+  dc.assignment_number,
+  dc.cycle_name,
+  dpe_self.description_behavior AS behavior_self,
+  dpe_self.description_impact AS impact_self,
+  dpe_self.description_leadership AS leadership_self,
+  dpe_self.numeric_behavior AS numeric_behavior_self,
+  dpe_self.numeric_impact AS numeric_impact_self,
+  dpe_self.numeric_leadership AS numeric_leadership_self,
+  dpe_manager.description_behavior AS behavior_manager,
+  dpe_manager.description_impact AS impact_manager,
+  dpe_manager.description_leadership AS leadership_manager,
+  dpe_manager.numeric_behavior AS numeric_behavior_manager,
+  dpe_manager.numeric_impact AS numeric_impact_manager,
+  dpe_manager.numeric_leadership AS numeric_leadership_manager,
+  NOW() AS ts_load
+FROM
+  distinct_cycles AS dc
+LEFT JOIN
+  dw_performance.dim_performance_evaluation AS dpe_manager
+    ON dc.cycle_name = dpe_manager.cycle_name
+    AND dc.assignment_number = dpe_manager.assignment_number
+    AND dpe_manager.evaluation_type = 'MANAGER'
+    AND dpe_manager.is_current = TRUE
+LEFT JOIN
+  dw_performance.dim_performance_evaluation AS dpe_self
+    ON dc.cycle_name = dpe_self.cycle_name
+    AND dc.assignment_number = dpe_self.assignment_number
+    AND dpe_self.evaluation_type = 'SELF'
+    AND dpe_self.is_current = TRUE

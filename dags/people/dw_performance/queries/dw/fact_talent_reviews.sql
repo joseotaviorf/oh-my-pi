@@ -141,8 +141,8 @@ INNER JOIN
 WHERE 
   COALESCE(
     tr.id_risk_loss_rating_level_calibrated,
-    tr.id_criticality_rating_level_calibrated,
-    tr.id_readiness_rating_level_calibrated,
+    tr.id_metric_calibrated_value_4,
+    tr.id_metric_calibrated_value_3,
     tr.id_potential_rating_level_calibrated,
     tr.id_risk_loss_rating_level_initial,
     tr.id_criticality_rating_level_initial,

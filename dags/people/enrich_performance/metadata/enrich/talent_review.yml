@@ -33,7 +33,7 @@ columns:
     description: Identifier for the initial criticality rating level.
     lineage:
     - datalake_pin_talent_clean.rating_level_base.id_rating_level
-  id_criticality_rating_level_calibrated:
+  id_metric_calibrated_value_4:
     description: Identifier for the calibrated criticality rating level.
     lineage:
     - datalake_pin_talent_clean.rating_level_base.id_rating_level
@@ -41,7 +41,7 @@ columns:
     description: Identifier for the initial readiness rating level.
     lineage:
     - datalake_pin_talent_clean.rating_level_base.id_rating_level
-  id_readiness_rating_level_calibrated:
+  id_metric_calibrated_value_3:
     description: Identifier for the calibrated readiness rating level.
     lineage:
     - datalake_pin_talent_clean.rating_level_base.id_rating_level

@@ -3,20 +3,10 @@ table_name: performance_evaluation
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Table that consolidates the results of the performance evaluation process. It contains evaluations from different perspectives (self-assessment, manager, calibration) for each section of an employee's performance review (Impact, Leadership, Behavior), with each section pivoted into its own set of columns.
+  Table that consolidates the results of the performance evaluation process. It contains evaluations from different perspectives (self-assessment and manager) for each section of an employee's performance review (Impact, Leadership, Behavior). Each evaluation type (SELF or MANAGER) is represented as a separate row, with each section pivoted into its own set of columns.
 columns:
-  id_performance_rating_from_manager:
-    description: MD5 hash that represents a unique identifier for the set of manager's evaluation descriptions (Behavior, Impact, Leadership).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  id_performance_rating_from_calibration:
-    description: MD5 hash that represents a unique identifier for the set of calibration evaluation descriptions (Behavior, Impact, Leadership).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  id_performance_rating_from_self:
-    description: MD5 hash that represents a unique identifier for the set of self-assessment descriptions (Behavior, Impact, Leadership).
+  id_performance_rating:
+    description: MD5 hash that represents a unique identifier for the set of evaluation descriptions (Behavior, Impact, Leadership) for the specific evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.rating_description
@@ -40,48 +30,23 @@ columns:
     description: The assignment number associated with the employee.
     lineage:
     - datalake_employee_registration.identifier_mapping.assignment_number
-  id_impact_rating_level_from_self:
-    description: Identifier of the rating level for the Impact section, assigned by the employee (self-assessment).
+  manager_assignment_number:
+    description: The assignment number associated with the manager registered at evaluation.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_pin_performance_clean.evaluation.id_manager_assignment
+  id_impact_rating_level:
+    description: Identifier of the rating level for the Impact section, assigned by the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_impact_rating_level_from_manager:
-    description: Identifier of the rating level for the Impact section, assigned by the manager.
+  id_leadership_rating_level:
+    description: Identifier of the rating level for the Leadership section, assigned by the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_impact_rating_level_from_calibration:
-    description: Identifier of the final rating level for the Impact section, defined during the calibration process.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_leadership_rating_level_from_self:
-    description: Identifier of the rating level for the Leadership section, assigned by the employee (self-assessment).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_leadership_rating_level_from_manager:
-    description: Identifier of the rating level for the Leadership section, assigned by the manager.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_leadership_rating_level_from_calibration:
-    description: Identifier of the final rating level for the Leadership section, defined during the calibration process.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_behavior_rating_level_from_self:
-    description: Identifier of the rating level for the Behavior section, assigned by the employee (self-assessment).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_behavior_rating_level_from_manager:
-    description: Identifier of the rating level for the Behavior section, assigned by the manager.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.id_rating_level
-  id_behavior_rating_level_from_calibration:
-    description: Identifier of the final rating level for the Behavior section, defined during the calibration process.
+  id_behavior_rating_level:
+    description: Identifier of the rating level for the Behavior section, assigned by the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.id_rating_level
@@ -89,93 +54,37 @@ columns:
     description: Name of the performance review cycle.
     lineage:
     - datalake_pin_talent_clean.review_period_translation.review_period_name
-  description_impact_from_self:
-    description: Textual description of the rating for the Impact section, from the employee (self-assessment).
+  evaluation_type:
+    description: Type of evaluation perspective. Can be 'SELF' (self-assessment by the employee) or 'MANAGER' (evaluation by the manager).
+    lineage:
+    - datalake_pin_performance_clean.evaluation_rating.role_type
+  description_impact:
+    description: Textual description of the rating for the Impact section, from the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_impact_from_manager:
-    description: Textual description of the rating for the Impact section, from the manager.
+  description_leadership:
+    description: Textual description of the rating for the Leadership section, from the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_impact_from_calibration:
-    description: Textual description of the final rating for the Impact section, from the calibration process.
+  description_behavior:
+    description: Textual description of the rating for the Behavior section, from the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_leadership_from_self:
-    description: Textual description of the rating for the Leadership section, from the employee (self-assessment).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_leadership_from_manager:
-    description: Textual description of the rating for the Leadership section, from the manager.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_leadership_from_calibration:
-    description: Textual description of the final rating for the Leadership section, from the calibration process.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_behavior_from_self:
-    description: Textual description of the rating for the Behavior section, from the employee (self-assessment).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_behavior_from_manager:
-    description: Textual description of the rating for the Behavior section, from the manager.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  description_behavior_from_calibration:
-    description: Textual description of the final rating for the Behavior section, from the calibration process.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
-  numeric_impact_from_self:
-    description: Numeric value of the rating for the Impact section, from the employee (self-assessment).
+  numeric_impact:
+    description: Numeric value of the rating for the Impact section, from the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_impact_from_manager:
-    description: Numeric value of the rating for the Impact section, from the manager.
+  numeric_leadership:
+    description: Numeric value of the rating for the Leadership section, from the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_impact_from_calibration:
-    description: Numeric value of the final rating for the Impact section, from the calibration process.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_leadership_from_self:
-    description: Numeric value of the rating for the Leadership section, from the employee (self-assessment).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_leadership_from_manager:
-    description: Numeric value of the rating for the Leadership section, from the manager.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_leadership_from_calibration:
-    description: Numeric value of the final rating for the Leadership section, from the calibration process.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_behavior_from_self:
-    description: Numeric value of the rating for the Behavior section, from the employee (self-assessment).
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_behavior_from_manager:
-    description: Numeric value of the rating for the Behavior section, from the manager.
-    lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_base.numeric_rating
-  numeric_behavior_from_calibration:
-    description: Numeric value of the final rating for the Behavior section, from the calibration process.
+  numeric_behavior:
+    description: Numeric value of the rating for the Behavior section, from the evaluation type (SELF or MANAGER).
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_base.numeric_rating
