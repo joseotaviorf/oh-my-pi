@@ -18,14 +18,17 @@ from pyspark.sql.types import (
 )
 
 from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
 )
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "conversation_sentiment_analysis"
@@ -319,6 +322,13 @@ if __name__ == "__main__":
 
         df_base.unpersist()
 
+        logger.info(
+            f"""
+                m={JOB_NAME}, url={bc_url.value}, model={bc_model.value}, prompt={bc_prompt.value}
+                msg=ended conversation sentiment analysis, starting to load data with delta loader..."
+            """
+        )
+
         df_result = (
             df_result.withColumn("ts_load", F.lit(dt_interval_start.date()))
             .withColumn("year", F.lit(dt_interval_start.year))
@@ -339,6 +349,18 @@ if __name__ == "__main__":
             source_df=df_result,
             partition_by=partitions,
         )
+
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service.refresh_table(
+            database_name, table_name
+        )
+
+        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
+        if (
+            table_privileges
+            and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+        ):
+            table_privileges.apply()
 
         logger.info(
             f"""
