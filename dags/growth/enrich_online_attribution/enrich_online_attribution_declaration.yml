@@ -16,7 +16,7 @@ workflow:
     udfs: [SF_ALPHANUMERIC_SNAKE_CASE]
   inner_dependencies:
     online_attribution:
-    - events_exploded
+      - events_exploded
   tables_customization:
     online_attribution:
       z_order_by: [ts_event, event_type_sanitized]
@@ -27,8 +27,8 @@ cluster:
     node_type_id: m5d.4xlarge
     runtime_engine: PHOTON
     num_workers: 3
-    spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
