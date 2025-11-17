@@ -10,7 +10,7 @@ SELECT
   syc.sync_run_id,
   CASE
     WHEN meta.node_name = 'FORA DOS FILTROS' THEN 'Out of Experiment'
-    WHEN meta.node_name = 'EXPERIMENTO JAIMINHO FAKE' THEN 'Test'
+    WHEN meta.node_name = 'D+1 Jaiminho' THEN 'Test'
     WHEN meta.node_name = 'CONTROLE AUDIT' THEN 'Control'
    END AS group_name,
   get_json_object(syc.fields, '$.id_proposal') AS proposal_id,
@@ -29,7 +29,7 @@ INNER JOIN hightouch_audit.sync_changelog AS syc
 INNER JOIN hightouch_audit.sync_runs AS runs
   ON syc.sync_run_id = runs.sync_run_id
 WHERE log.timestamp >= '2025-09-24'
-  AND meta.node_name IN ('FORA DOS FILTROS', 'EXPERIMENTO JAIMINHO FAKE', 'CONTROLE AUDIT')
+  AND meta.node_name IN ('FORA DOS FILTROS', 'D+1 Jaiminho', 'CONTROLE AUDIT')
   AND syc.op_type = 'added'
   AND syc.status = 'succeeded'
   AND syc.sync_id IN (2593283, 2593312, 2594586)
