@@ -34,3 +34,4 @@ cluster:
     node_type_id: m5d.8xlarge
     spark_version: 16.4.x-scala2.12
     num_workers: 4
+  databricks_conn_id: databricks_new_env

@@ -51,4 +51,4 @@ cluster:
       zone_id: us-east-1d
       ebs_volume_size: 200
       availability: SPOT_WITH_FALLBACK
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env

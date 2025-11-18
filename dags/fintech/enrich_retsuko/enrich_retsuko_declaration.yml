@@ -24,6 +24,7 @@ workflow:
       - entry
 cluster:
   type: custom_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.8xlarge
