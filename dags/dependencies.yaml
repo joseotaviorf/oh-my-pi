@@ -531,6 +531,7 @@ bietlejuice.dw_employee_test:
   - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-assignment-supervisor:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
@@ -538,6 +539,7 @@ bietlejuice.dw_employee_test:
   - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-job:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
   - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
   - bietlejuice.pin_core:load-clean-rates:first-run-of-day
   - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
