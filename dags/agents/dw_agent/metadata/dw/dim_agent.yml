@@ -48,6 +48,10 @@ columns:
     lineage:
     - datalake_ebdb_clean.agent_data.creci_number
     description: CRECI number (Regional Council for Real Estate Brokers) of the agent.
+  rede_partner:
+    lineage:
+    - datalake_company.company_sks.extracted_3p_tag
+    description: Name of the partner if this is a Rede contract. DEPRECATED, use sk_company to get the partner name in dw_company.dim_company_3p_partners.
   is_agent_active:
     lineage:
     - datalake_ebdb_clean.agent_data.is_active
