@@ -9,11 +9,14 @@ column_level_validations:
   id_evaluation:
     is_complete:
       severity_level: Warning
-    is_unique:
-      severity_level: Warning
   assignment_number:
     is_complete:
       severity_level: Warning
   id_period_of_service:
     is_complete:
+      severity_level: Warning
+  id_performance_evaluation:
+    is_complete:
+      severity_level: Warning
+    is_unique:
       severity_level: Warning

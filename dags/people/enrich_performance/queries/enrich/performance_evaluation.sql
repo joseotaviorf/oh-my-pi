@@ -124,10 +124,11 @@ evaluations AS (
 )
 SELECT
   MD5(CONCAT(
-    COALESCE(description_behavior, '-1'),
-    COALESCE(description_impact, '-1'),
-    COALESCE(description_leadership, '-1')
-  )) AS id_performance_rating,
+    COALESCE(id_person, '-1'),
+    COALESCE(evaluation_type, '-1'),
+    COALESCE(cycle_name, '-1'),
+    COALESCE(dt_evaluation_occurred, '-1')
+  )) AS id_performance_evaluation,
   id_assignment,
   id_period_of_service,
   id_evaluation,

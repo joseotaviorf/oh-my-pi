@@ -26,6 +26,9 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    fact_performance_evaluations:
+      - dim_performance_evaluation
   tables_customization:
     dim_committee_meeting:
       vacuum_retention_hours: 168
