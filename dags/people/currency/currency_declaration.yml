@@ -50,3 +50,5 @@ workflow:
             - "EUR-BRL"
             - "ARS-BRL"
             - "MXN-BRL"
+      vacuum_retention_hours: 168
+      vacuum_lite: true

@@ -60,6 +60,8 @@ workflow:
 
     events:
       merge_schema: true
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "events"
           date_column_to_partition: "event_time"
@@ -67,4 +69,3 @@ workflow:
             "after_time": "load_start_date"
             "before_time": "load_end_date"
             "paging": "true"
-

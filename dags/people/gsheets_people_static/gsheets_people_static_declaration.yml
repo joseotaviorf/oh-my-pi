@@ -28,3 +28,13 @@ workflow:
   default_table_privileges:
     people-team:
     - ALL PRIVILEGES
+  tables_customization:
+    edc_roles:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    email_employee_mapping:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    layoffs:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

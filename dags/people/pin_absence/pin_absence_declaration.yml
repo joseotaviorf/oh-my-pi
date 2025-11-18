@@ -47,31 +47,43 @@ workflow:
   tables_customization:
     anc_absence_reasons_f:
       clean_table_name: reason
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_absence
           date_column_to_partition: last_update_date
     anc_absence_reasons_f_tl:
       clean_table_name: reason_translation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_absence
           date_column_to_partition: last_update_date
     anc_absence_types_f:
       clean_table_name: type
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_absence
           date_column_to_partition: last_update_date
     anc_absence_types_f_tl:
       clean_table_name: type_translation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_absence
           date_column_to_partition: last_update_date
     anc_per_abs_entries:
       clean_table_name: person_entry
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_absence
           date_column_to_partition: last_update_date
     anc_per_abs_type_entries:
       clean_table_name: person_type_entry
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_absence
           date_column_to_partition: last_update_date

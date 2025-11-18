@@ -52,6 +52,8 @@ workflow:
   tables_customization:
 
     application_stages:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "application_stages"
           date_column_to_partition: "updated_at"
@@ -59,6 +61,8 @@ workflow:
             per_page: 500
 
     job_interview_stages:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "job_interview_stages"
           date_column_to_partition: "updated_at"
@@ -66,6 +70,8 @@ workflow:
             per_page: 500
 
     job_notes:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "job_notes"
           date_column_to_partition: "updated_at"

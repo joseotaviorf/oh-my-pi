@@ -47,36 +47,50 @@ workflow:
   tables_customization:
     hrr_dashboards:
       clean_table_name: dashboard
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date
     hrr_dashboard_tmpls_b:
       clean_table_name: dashboard_template_base
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date
     hrr_dashboard_tmpls_tl:
       clean_table_name: dashboard_template_translation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date
     hrr_meetings:
       clean_table_name: meeting
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date
     hrr_meeting_facilitators:
       clean_table_name: meeting_facilitator
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date
     hrr_meeting_participants:
       clean_table_name: meeting_participant
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date
     hrr_meeting_talentpools:
       clean_table_name: meeting_talent_pool
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date

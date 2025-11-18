@@ -47,16 +47,22 @@ workflow:
   tables_customization:
     cmp_salary:
       clean_table_name: salary
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_compensation
           date_column_to_partition: last_update_date
     cmp_salary_bases:
       clean_table_name: salary_bases
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_compensation
           date_column_to_partition: last_update_date
     cmp_salary_bases_tl:
       clean_table_name: salary_bases_translation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - raw_custom_schema: pin_compensation
           date_column_to_partition: last_update_date

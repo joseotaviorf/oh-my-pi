@@ -36,3 +36,61 @@ workflow:
   inner_dependencies:
     fact_employees:
     - fact_assignments
+  tables_customization:
+    dim_absence_request_status:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_absence_type:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_assignment:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_business_unit:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_cost_center:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_demographic_information:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_disability:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_employee:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_employee_contact:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_employee_documentation:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_hierarchy:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_job:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_product_tech:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_vacation_status:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_absence_requests:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_assignment_events:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_assignments:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_employees:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_vacation_balances:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

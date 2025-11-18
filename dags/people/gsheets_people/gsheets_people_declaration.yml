@@ -29,9 +29,25 @@ workflow:
     codex_cost_centers:
       extraction_type: incremental
       merge_on: ["cost_center_code", "year", "month"]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     codex_cost_informations:
       extraction_type: incremental
       merge_on: ["cost_center_code", "year", "month"]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    navent_convenia_like:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    performance_review:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    talent_review:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    team_formation_product_tech:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
   custom_schema: gsheets_people
   default_table_privileges:
     people-team:

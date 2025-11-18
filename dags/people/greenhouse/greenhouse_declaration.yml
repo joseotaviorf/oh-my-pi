@@ -51,104 +51,140 @@ workflow:
   
   tables_customization:
     applications:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       z_order_by: ["status"]
       extra_spark_job_arguments:
         - endpoint: "applications"
           date_column_to_partition: "last_activity_at"
 
     candidates:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "candidates"
           date_column_to_partition: "last_activity"
 
     close_reasons:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "close_reasons"
 
     custom_fields:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "custom_fields"
 
-    demographics_answers:
-      extra_spark_job_arguments:
-        - endpoint: "demographics/answers"
-
     demographics_answer_options:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["is_active"]
       extra_spark_job_arguments:
-        - endpoint: "demographics/answer_options"   
+        - endpoint: "demographics/answer_options"
+
+    demographics_answers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "demographics/answers"
 
     demographics_questions:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "demographics/questions"
 
     departments:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "departments"
 
     email_templates:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "email_templates"
           date_column_to_partition: "updated_at"
 
-    jobs:
-      z_order_by: ["name"]
-      extra_spark_job_arguments:
-        - endpoint: "jobs"
-          date_column_to_partition: "updated_at"
-
     job_posts:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       z_order_by: ["title"]
       extra_spark_job_arguments:
         - endpoint: "job_posts"
           date_column_to_partition: "updated_at"
 
+    jobs:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "jobs"
+          date_column_to_partition: "updated_at"
+
     offers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       z_order_by: ["ts_updated", "id_application", "id_job"]
       extra_spark_job_arguments:
         - endpoint: "offers"
           date_column_to_partition: "updated_at"
 
     offices:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "offices"
 
     rejection_reasons:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       z_order_by: ["name"]
       extra_spark_job_arguments:
         - endpoint: "rejection_reasons"
 
     scheduled_interviews:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       z_order_by: ["ts_updated", "id_application"]
       extra_spark_job_arguments:
         - endpoint: "scheduled_interviews"
           date_column_to_partition: "updated_at"
 
     scorecards:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       z_order_by: ["ts_updated", "id_application", "id_candidate"]
       extra_spark_job_arguments:
         - endpoint: "scorecards"
           date_column_to_partition: "updated_at"
 
     tags_candidate:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       partitions: []
       extra_spark_job_arguments:
         - endpoint: "tags/candidate"
 
     users:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "users"
           date_column_to_partition: "updated_at"

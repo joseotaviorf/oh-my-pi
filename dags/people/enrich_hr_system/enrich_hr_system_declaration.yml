@@ -29,3 +29,16 @@ workflow:
   inner_dependencies:
     disability:
       - demographic_attributes
+  tables_customization:
+    demographic_attributes:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    disability:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    employee_info:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    hierarchy_ids:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

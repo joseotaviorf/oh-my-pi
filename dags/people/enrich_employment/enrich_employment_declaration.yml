@@ -30,3 +30,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  tables_customization:
+    employee_details:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

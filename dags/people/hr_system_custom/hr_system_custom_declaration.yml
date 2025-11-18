@@ -31,6 +31,8 @@ workflow:
   tables_customization:
     workers_registration:
       merge_on: ["assignment_number"]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
   default_table_privileges:
     people-team:
     - ALL PRIVILEGES
