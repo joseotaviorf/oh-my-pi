@@ -1,0 +1,58 @@
+database_name: datalake_search
+table_name: metric_recs_click_through_rate
+owner: yiyi.ji@quintoandar.com
+domain: Conversational XP
+description: Table containing information about recommendation sets (caroussels) generated and which listing within the recommendation set were clicked to calculate recommendation health metrics related to click though rate (CTR). 
+columns:
+  id_recset_fix:
+    lineage:
+    - datalake_search.recs_impressions_processed.recset_id_fix
+    description: A concatenation of recset_id + id_user + id_session (session of amplitude) to identify a unique recommendation set (carousel) per user and session. This concatenation is needed as a recset can be same for different users and repeat between sessions for a same user.
+  id_house:
+    lineage:
+    - datalake_search.recs_impressions_processed.id_house
+    description: ID of the house (property).
+  business_context:
+    lineage:
+    - datalake_search.recs_impressions_processed.business_context
+    description: The business context of the house. Can be SALE or RENT.
+  house_city:
+    lineage:
+    - datalake_search.recs_impressions_processed.house_city
+    description: The city of the house.
+  platform:
+    lineage:
+    - datalake_search.recs_impressions_processed.platform
+    description: Platform from which the user is accessing. Can be WEB or APP.
+  listing_position_in_recset:
+    lineage:
+    - datalake_search.recs_impressions_processed.listing_position_in_recset
+    description: The position of the house in the recommendation set (carousel).
+  showcase:
+    lineage:
+    - datalake_search.recs_impressions_processed.showcase
+    description: Showcase of the recommendation set, e.g., "LISTING_SIMILAR_USER", "LISTING_SIMILAR_NEARBY" "FEED_RECENTLY_VIEWED_SIMILAR"
+  listing_age:
+    lineage:
+    - datalake_search.recs_impressions_processed.listing_age
+    description: The age of the house in days from when it was published to the time of the recommendation event.
+  listing_clicked:
+    lineage:
+    - datalake_search.recs_impressions_processed.listing_clicked
+    description: Whether the house listing was clicked.
+  ts_recommendation_event:
+    lineage:
+    - datalake_search.recs_impressions_processed.ts_recommendation_event
+    description: The timestamp of the recommendation event.
+  year:
+    lineage:
+    - datalake_search.recs_impressions_processed.year
+    description: The year when the recommendation event was processed on the server. Might differ from ts_recommendation_event.
+  month:
+    lineage:
+    - datalake_search.recs_impressions_processed.month
+    description: The month when the recommendation event was processed on the server. Might differ from ts_recommendation_event.
+  day:
+    lineage:
+    - datalake_search.recs_impressions_processed.day
+    description: The day when the recommendation event was processed on the server. Might differ from ts_recommendation_event.

@@ -2250,6 +2250,7 @@ bietlejuice.enrich_facebook_insights:
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994734287259853-region:first-run-of-day
 bietlejuice.enrich_find_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
+  - bietlejuice.enrich_base_metrics_service:load-enrich-recs-impressions-processed:first-run-of-day
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all:first-run-of-day
