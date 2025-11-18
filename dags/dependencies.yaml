@@ -1,13 +1,13 @@
 ---
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.core_aux_listing:
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity
 bietlejuice.core_contract:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract
 bietlejuice.core_credit_evaluation:
   - bietlejuice.docx_fast_lane:load-clean-credit-evaluation
-bietlejuice.core_aux_listing:
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity
 bietlejuice.core_offer:
   - bietlejuice.rental_transact_fast_lane:load-clean-offer
 bietlejuice.core_visit:
@@ -205,11 +205,14 @@ bietlejuice.dw_collections_segmentation:
 bietlejuice.dw_company:
   - bietlejuice.company:load-clean-address:first-run-of-day
   - bietlejuice.company:load-clean-company:first-run-of-day
+  - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members:first-run-of-day
   - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates:first-run-of-day
   - bietlejuice.enrich_hubspot_management:load-enrich-owner:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+  - bietlejuice.rede_platform:load-clean-buyer-company-event:first-run-of-day
+  - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day
 bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-communication:first-run-of-day
   - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events:first-run-of-day

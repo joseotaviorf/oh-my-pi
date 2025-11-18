@@ -1,0 +1,74 @@
+database_name: dw_public
+table_name: dim_buyer_company_relation
+description: Dimension table containing relationships between buyers (persons/users) and companies in the 3P partner ecosystem. Tracks how buyers are associated with companies through various events (agent referrals, visits) and classifies the demand type (3P_LEAD_GEN vs 3P_DEMAND).
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_buyer_company_relation:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company.id
+    description: Surrogate key for the buyer-company relation record. Primary key of the table.
+  sk_company:
+    lineage:
+      - datalake_company.company_sks.sk_company
+    description: Foreign key to company dimension. Returns -1 when no company is associated with the buyer relation.
+  sk_person:
+    lineage:
+      - datalake_person.person_sks.sk_person
+    description: Foreign key to person dimension. Returns -1 when no person is associated with the buyer relation.
+  sk_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+    description: Foreign key to user table. Returns -1 when no user is associated with the buyer relation.
+  sk_preferred_fixed_agent:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company_event.id_event_entity
+    description: Foreign key to the preferred fixed agent. Populated only when event_entity_name is 'AGENT_REFERRAL', otherwise -1.
+  sk_visit:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company_event.id_event_entity
+    description: Foreign key to visit. Populated only when event_entity_name is 'VISIT', otherwise -1.
+  buyer_company_relation_type:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company.type
+    description: Type of the buyer-company relationship. Can be '1P' (first party) or '3P' (third party).
+    categories:
+      1P: First party relationship - buyer came through QuintoAndar channels
+      3P: Third party relationship - buyer came through 3P Partners channels
+  application_source:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company_event.application_source
+    description: The application or platform source that triggered the buyer-company relationship event.
+  demand_type:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company.type
+    description: Classification of demand type based on relation type. '3P_LEAD_GEN' for type '1P', '3P_DEMAND' for type '3P'.
+    categories:
+      3P_LEAD_GEN: Lead generation model - 1P buyers referred to 3P companies
+      3P_DEMAND: Full demand model - 3P buyers working with 3P companies
+  event_entity_name:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company_event.event_entity_name
+    description: Name of the entity associated with the event that created the buyer-company relationship (e.g., 'AGENT_REFERRAL', 'VISIT').
+  event_type:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company_event.event_type
+    description: Type of event that triggered the buyer-company relationship.
+  trigger_actor:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company_event.trigger_actor
+    description: Actor who triggered the event that created the buyer-company relationship.
+  is_active:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company.is_active
+    description: Flag indicating if the buyer-company relationship is currently active.
+  ts_start:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company.ts_started
+    description: Timestamp when the buyer-company relationship started.
+  ts_end:
+    lineage:
+      - datalake_rede_platform_clean.buyer_company.ts_finished
+    description: Timestamp when the buyer-company relationship ended. Null if the relationship is still active.
+  ts_load:
+    description: Timestamp of when the table was last processed.
