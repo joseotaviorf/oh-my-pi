@@ -1,21 +1,14 @@
 WITH photo_session_exploded AS (
-  SELECT
+  SELECT DISTINCT
     pj.id AS id_entity,
     pj.id_house,
     pj.id AS id_photographer,
-    COALESCE(u.id, h.id_user) AS id_owner,
     'PHOTO_SESSION' AS entity,
-    EXPLODE(
-      CASE
-          WHEN h.is_for_rent AND h.is_for_sale THEN ARRAY('RENT','SALE')
-          WHEN h.is_for_rent THEN ARRAY('RENT')
-          WHEN h.is_for_sale THEN ARRAY('SALE')
-          ELSE ARRAY(NULL)
-      END
-    ) AS business_context,
+    COALESCE(u.id, h.id_user) AS id_owner,
+    NULL AS business_context,
     pj.status AS status,
     CASE
-      WHEN upper(trim(pj.status)) IN ('PUBLICADO', 'CANCELADO', 'COMPLETADO', 'FOTOSTIRADAS') THEN FALSE
+      WHEN UPPER(TRIM(pj.status)) IN ('PUBLICADO', 'CANCELADO', 'COMPLETADO', 'FOTOSTIRADAS') THEN FALSE
       ELSE TRUE
     END AS is_active,
     pj.ts_created,
