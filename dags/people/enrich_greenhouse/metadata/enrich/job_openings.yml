@@ -214,7 +214,7 @@ columns:
     lineage:
     - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.updated_at_oic.value
   ts_load:
-    description: The timestamp when the record was loaded into the clean layer.
+    description: The timestamp when the record was loaded into the enrich layer.
   year:
     description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'updated_at' column in the raw layer.
     lineage:
