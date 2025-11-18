@@ -1,0 +1,47 @@
+---
+table_name: datalake_pin_core_clean.assignment_responsibility
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Warning
+column_level_validations:
+  id_assignment_responsibility:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
+  id_assignment:
+    is_complete:
+      severity_level: Warning
+  id_person:
+    is_complete:
+      severity_level: Warning
+  responsibility_name:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.assignment_responsibility GROUP BY responsibility_name, id_person HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
+  responsibility_type:
+    is_complete:
+      severity_level: Warning
+  dt_started:
+    is_complete:
+      severity_level: Warning
+  id_enterprise:
+    is_complete:
+      severity_level: Warning
+  status:
+    is_complete:
+      severity_level: Warning
+  created_by:
+    is_complete:
+      severity_level: Warning
+  ts_created:
+    is_complete:
+      severity_level: Warning
+  ts_updated:
+    is_complete:
+      severity_level: Warning
+  updated_by:
+    is_complete:
+      severity_level: Warning

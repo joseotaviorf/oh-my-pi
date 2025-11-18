@@ -1,0 +1,106 @@
+database_name: datalake_pin_core_clean
+table_name: assignment_responsibility
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Stores the details of a person's areas of responsibility, defined by reference to existing workforce structures and other criteria.
+columns:
+  id_assignment_responsibility:
+    description: Unique identifier for the assignment responsibility record. Primary key.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.asg_responsibility_id
+  id_legal_entity:
+    description: Identifier of the legal employer for which this responsibility applies.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.legal_entity_id
+  id_assignment:
+    description: Identifier of the parent assignment to which this responsibility belongs.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.assignment_id
+  id_person:
+    description: Identifier of the person for whom this responsibility is recorded.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.person_id
+  id_enterprise:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.enterprise_id
+  id_organization:
+    description: Identifier of the department for which this responsibility applies.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.organization_id
+  id_template:
+    description: Identifier of the template used to create this responsibility.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.template_id
+  created_by:
+    description: Username of the user who created the record.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.created_by
+  updated_by:
+    description: Username of the user who last updated the record.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.last_updated_by
+  responsibility_name:
+    description: Name of the responsibility.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.responsibility_name
+  responsibility_type:
+    description: Type of responsibility that defines the criteria for this record.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.responsibility_type
+  status:
+    description: Status of the responsibility. Used to identify when responsibilities should be reassigned before end-dating.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.status
+  usage:
+    description: Purpose or use case for which this responsibility is applied.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.usage
+  is_work_contacts:
+    description: Boolean flag indicating whether this record should be included in work contacts evaluation.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.work_contacts_flag
+  is_auto_provision:
+    description: Boolean flag indicating whether this Area of Responsibility (AOR) record was created automatically or manually.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.auto_provision_flag
+  is_include_top_hier_node:
+    description: Boolean flag indicating whether the top node of the selected hierarchy is included in the responsibility scope.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.include_top_hier_node
+  object_version_number:
+    description: Version number used for optimistic locking. Incremented on each update to detect concurrent modifications.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.object_version_number
+  dt_started:
+    description: Start date when the responsibility becomes effective.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.start_date
+  dt_ended:
+    description: End date when the responsibility expires. NULL if the responsibility is currently active.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.end_date
+  ts_created:
+    description: Timestamp when the record was created in the source system.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.creation_date
+  ts_updated:
+    description: Timestamp when the record was last updated in the source system.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this clean table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column. Used for data partitioning and filtering.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.year
+  month:
+    description: Month extracted from the 'ts_updated' column. Used for data partitioning and filtering.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.month
+  day:
+    description: Day extracted from the 'ts_updated' column. Used for data partitioning and filtering.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.day
+

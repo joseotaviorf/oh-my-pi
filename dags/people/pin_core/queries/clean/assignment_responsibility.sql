@@ -1,0 +1,28 @@
+SELECT 
+    asg_responsibility_id AS id_assignment_responsibility,
+    legal_entity_id AS id_legal_entity,
+    assignment_id AS id_assignment,
+    person_id AS id_person,
+    enterprise_id AS id_enterprise,
+    organization_id AS id_organization,
+    template_id AS id_template,
+    created_by,
+    last_updated_by AS updated_by,
+    responsibility_name,
+    responsibility_type,
+    status,
+    usage,
+    work_contacts_flag = 'Y' AS is_work_contacts,
+    auto_provision_flag = 'Y' AS is_auto_provision,
+    include_top_hier_node = 'Y' AS is_include_top_hier_node,
+    CAST(object_version_number AS INT) AS object_version_number,
+    TO_DATE(start_date) AS dt_started,
+    TO_DATE(end_date) AS dt_ended,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM 
+    datalake_pin_core_raw.per_asg_responsibilities
