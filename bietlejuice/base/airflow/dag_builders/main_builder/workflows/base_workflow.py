@@ -19,6 +19,8 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from airflow.timetables.datasets import DatasetOrTimeSchedule
+from airflow.timetables.trigger import CronTriggerTimetable
 
 
 class BaseWorkflow(BuilderInterface):
@@ -66,6 +68,20 @@ class BaseWorkflow(BuilderInterface):
         jiraops_callback = JiraOpsCallback()
         callback_by_task = self.dag_args.get("callback_by_task", True)
 
+        if "schedule_interval" in self.dag_args and self.dataset_dependencies:
+            schedule = DatasetOrTimeSchedule(
+                timetable=CronTriggerTimetable(
+                    cron=self.dag_args["schedule_interval"], timezone=self.local_tz
+                ),
+                datasets=self.dataset_dependencies,
+            )
+        elif "schedule_interval" in self.dag_args:
+            schedule = self.dag_args["schedule_interval"]
+        elif self.dataset_dependencies:
+            schedule = self.dataset_dependencies
+        else:
+            schedule = None
+
         dag = DAG(
             dag_id=self.dag_id,
             catchup=self.dag_args.get("catchup", False),
@@ -78,7 +94,7 @@ class BaseWorkflow(BuilderInterface):
                 ),
             },
             start_date=schedule_start_date,
-            schedule=self.dag_args.get("schedule_interval", self.dataset_dependencies),
+            schedule=schedule,
             doc_md=doc_md,
             user_defined_macros=user_defined_macros,
             params=BaseDAG.get_default_trigger_form_params(),
