@@ -18,6 +18,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on enrich layer: 
 
 - `metric_recs_listing_page_viewed`
+- `metric_recs_conversion`
 - `metric_recs_click_through_rate`
 
 </details>

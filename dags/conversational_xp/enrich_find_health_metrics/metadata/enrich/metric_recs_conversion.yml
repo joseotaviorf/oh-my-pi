@@ -1,0 +1,114 @@
+database_name: datalake_search
+table_name: metric_recs_conversion
+owner: yiyi.ji@quintoandar.com
+domain: Conversational XP
+description: Table containing information about visits books, direct offer, offers and contract signed related to recommendation sets (caroussels) to calculate recommendation health metrics related to conversion. A flow action described above (excluding contract signed) is related to a recommendation if it happened within 14 days of the recommendation click.
+columns:
+  id_user:
+    lineage:
+    - datalake_rent_flows.rent_flows.id_tenant_prospect
+    - datalake_sale_flows.sale_flow.id_buyer
+    description: The id of the user who booked a visit, or submitted a direct offer, or submitted an offer, or signed a contract.
+  id_house: 
+    lineage:
+    - datalake_rent_flows.rent_flows.id_house
+    - datalake_sale_flows.sale_flow.id_house
+    description: The id of the house that got a visit booked, or a direct offer, or an offer, or a contract signed.
+  id_user_house:
+    lineage:
+    - datalake_rent_flows.rent_flows.id_house
+    - datalake_sale_flows.sale_flow.id_house
+    description: A concatenation of the id of the user and the id of the house.
+  business_context:
+    lineage:
+    - datalake_rent_flows.rent_flows.business_context
+    - datalake_sale_flows.sale_flow.business_context
+    description: The business context of the house. Can be SALE or RENT.
+  user_house_first_contact:
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: The first contact between the user and the house whether it was a visit booked or a direct offer.
+  is_rec_click:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(metrics, '$.click')
+    description: Whether the user clicked on a recommendation prior to booking a visit or submitting a direct offer.
+  has_visit_booked:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(metrics, '$.visit_booked')
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: Whether the user booked a visit or not(independently of whether it was following a recommendation click or not). TRUE/FALSE.
+  has_direct_offer:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(metrics, '$.direct_offer')
+    - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+    description: Whether the user submitted a direct offer or not (independently of whether it was following a recommendation click or not). TRUE/FALSE.
+  has_offer:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(metrics, '$.offer')
+    - datalake_rent_flows.rent_flows.ts_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+    description: Whether the user submitted an offer or not (independently of whether it was following a recommendation click or not). TRUE/FALSE.
+  has_contract_signed:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(metrics, '$.contract_signed')
+    - datalake_rent_flows.rent_flows.ts_contract_signed
+    - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    description: Whether the user signed a contract or not (independently of whether it was following a recommendation click or not). TRUE/FALSE.
+  days_from_rec_click_to_visit_booked:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_visit_booked')
+    description: The number of days between the recommendation click and the visit booked.
+  is_rec_click_and_visit_booked_within_14_days:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_visit_booked')
+    description: Whether the user booked a visit within 14 days of the recommendation click. TRUE/FALSE.
+  days_from_rec_click_to_direct_offer:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_direct_offer')
+    description: The number of days between the recommendation click and the direct offer submitted.
+  is_rec_click_and_direct_offer_within_14_days:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_direct_offer')
+    description: Whether the user submitted a direct offer within 14 days of the recommendation click. TRUE/FALSE.
+  is_rec_click_and_vb_or_do_within_14_days:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - COALESCE(datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_visit_booked'), datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_direct_offer'))
+    description: Whether the user booked a visit or submitted a direct offer within 14 days of the recommendation click. TRUE/FALSE.
+  days_from_rec_click_to_offer:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_offer')
+    description: The number of days between the recommendation click and the offer submitted.
+  is_rec_click_and_offer_within_14_days:
+    lineage:
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
+    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_offer')
+    description: Whether the user submitted an offer within 14 days of the recommendation click. TRUE/FALSE.  
+  ts_first_flow_action:
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: The timestamp of the first contact between the user and the house whether it was a visit booked or a direct offer.
+  year:
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: The year of the first contact between the user and the house whether it was a visit booked or a direct offer. For database partition purposes.
+  month:
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    description: The month of the first contact between the user and the house whether it was a visit booked or a direct offer. For database partition purposes.
+  day:
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    description: The day of the first contact between the user and the house whether it was a visit booked or a direct offer. For database partition purposes.

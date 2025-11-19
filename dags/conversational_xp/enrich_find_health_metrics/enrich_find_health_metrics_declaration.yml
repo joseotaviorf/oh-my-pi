@@ -18,6 +18,8 @@ workflow:
   tables_customization:
     metric_recs_listing_page_viewed:
       partitions: [year, month, day]
+    metric_recs_conversion: 
+      partitions: [year, month, day]
     metric_recs_click_through_rate:
       partitions: [year, month, day]
 
