@@ -1,6 +1,7 @@
 dag:
   name: cyber_complement
   owner: Data Fintech
+  callback_by_task: False
   documentation:
     dag_purpose: |
       ingestion of cyber system tables about debts and collections.

@@ -1,8 +1,9 @@
 dag:
   name: cyber_bureau
   schedule_start_date: 2025, 10, 20
-  schedule_interval: 30 7 * * *
+  schedule_interval: 0 8 * * *
   owner: Data Fintech
+  callback_by_task: False
   documentation:
     dag_purpose: |
       Ingestion of CyberBureau tables about debts and collections.

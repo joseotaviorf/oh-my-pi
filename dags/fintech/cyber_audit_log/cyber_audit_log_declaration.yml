@@ -3,6 +3,7 @@ dag:
   schedule_start_date: 2025, 9, 1
   schedule_interval: 0 10 * * *
   owner: Data Fintech
+  callback_by_task: False
   documentation:
     dag_purpose: |
       Ingestão específica da tabela AUDIT_LOG do sistema CyberFinancial para auditoria e segurança.
