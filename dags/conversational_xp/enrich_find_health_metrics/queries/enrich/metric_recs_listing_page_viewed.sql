@@ -2,7 +2,7 @@ SELECT
     get_json_object(event_properties, '$.house_id') AS id_house,
     id_user,
     get_json_object(event_properties, '$.recset_id') AS id_recset,
-    business_context,
+    UPPER(business_context) AS business_context,
     up_platform AS platform,
     CASE
         WHEN up_platform IN ("android", "ios") THEN "app"
