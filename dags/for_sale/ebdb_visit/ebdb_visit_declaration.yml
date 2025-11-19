@@ -64,6 +64,8 @@ workflow:
       clean_table_name: visitor
     Visitor_AUD:
       clean_table_name: visitor_aud
+  extra_query_template_params:
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
 cluster:
   type: databricks_13_3_med_memory_general_cluster
   databricks_conn_id: databricks_new

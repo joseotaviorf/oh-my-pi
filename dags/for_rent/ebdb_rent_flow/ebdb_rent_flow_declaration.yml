@@ -19,6 +19,8 @@ workflow:
       clean_table_name: rent_flow_aud
     FluxoLocacao_DadosAgente:
       clean_table_name: agent_rent_flow
+  extra_query_template_params:
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
