@@ -13,14 +13,6 @@ columns:
     description: "Unique identifier for the sequence"
     lineage:
       - datalake_trato_feito_raw.communication_step.sequence_id
-  id_internal_comms:
-    description: "Identification of the comms rule in comms manager"
-    lineage:
-      - datalake_trato_feito_raw.communication_step.internal_comms_id
-  id_action:
-    description: "On the comms platform, the internal_comms_id represents a file that can have multiple actions. The action_id represents one of these actions."
-    lineage:
-      - datalake_trato_feito_raw.communication_step.action_id
   day_offset:
     description: "Day offset for the step, starting from 1"
     lineage:

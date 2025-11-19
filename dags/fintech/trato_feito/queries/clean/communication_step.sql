@@ -1,8 +1,6 @@
 SELECT
     CAST(id AS BIGINT) AS id_communication_step,
     CAST(sequence_id AS BIGINT) AS id_sequence,
-    internal_comms_id AS id_internal_comms,
-    CAST(action_id AS BIGINT) AS id_action,
     day_offset,
     version,
     created_at AS ts_created,
