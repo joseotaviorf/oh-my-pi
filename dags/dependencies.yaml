@@ -1467,6 +1467,9 @@ bietlejuice.enrich_bigfone_events:
   - bietlejuice.bigfone:load-clean-event:first-run-of-day
 bietlejuice.enrich_bigfone_twilio:
   - bietlejuice.enrich_bigfone_events:load-enrich-events:first-run-of-day
+bietlejuice.enrich_billing:
+  - bietlejuice.billing:load-clean-contract-revision:first-run-of-day
+  - bietlejuice.billing:load-clean-contract:first-run-of-day
 bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft-aud:first-run-of-day
   - bietlejuice.bob:load-clean-house-draft:first-run-of-day

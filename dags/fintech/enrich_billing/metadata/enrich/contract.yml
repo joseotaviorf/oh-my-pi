@@ -1,0 +1,37 @@
+---
+database_name: datalake_billing
+table_name: contract
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Contract data enriched with the latest signature date extracted from contract revisions."
+columns:
+  id:
+    description: "Unique identifier of the contract record"
+    lineage:
+      - datalake_billing_clean.contract.id
+  uuid_recurrence:
+    description: "UUID identifier of the related recurrence"
+    lineage:
+      - datalake_billing_clean.contract.uuid_recurrence
+  status:
+    description: "Current status of the contract"
+    lineage:
+      - datalake_billing_clean.contract.status
+  current_revision:
+    description: "Current revision number of the contract"
+    lineage:
+      - datalake_billing_clean.contract.current_revision
+  ts_signature:
+    description: "Signature timestamp extracted from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  ts_created:
+    description: "Record creation timestamp"
+    lineage:
+      - datalake_billing_clean.contract.ts_created
+  ts_updated:
+    description: "Record last update timestamp"
+    lineage:
+      - datalake_billing_clean.contract.ts_updated
+
+
