@@ -23,6 +23,7 @@ class DAGOwnerEnum:
     DATA_SS = "Data SS"
     DATA_PP = "Data Planning and Performance"
     MLOPS = "MLOps"
+    OPS_POC = "Ops POC"
     QCX = "QCX"
     TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"
     TECH_PLATAFORM_DEV_FOUNDATION = "Tech Platform Dev Foundation"
