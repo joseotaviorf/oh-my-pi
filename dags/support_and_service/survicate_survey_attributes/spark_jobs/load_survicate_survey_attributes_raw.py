@@ -84,8 +84,7 @@ def table_configs(table_name: str):
     elif table_name == 'survey_questions':
         endpoint_enum = 'SURVEY_QUESTIONS'
         feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE workspace_name = '{workspace}'"
-        optional_parameters = {"items_per_page": 100,
-                               "start": start}
+        optional_parameters = {"items_per_page": 100}
   
     elif table_name == 'survey_responses':
         endpoint_enum = 'SURVEY_RESPONSES'
