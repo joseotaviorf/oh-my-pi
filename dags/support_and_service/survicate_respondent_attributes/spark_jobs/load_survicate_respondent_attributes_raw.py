@@ -138,10 +138,11 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
 
         endpoint_enum, feedback_parameters_query, optional_parameters = table_configs(table_name)
 
-        logger.info("m=__main__, msg=Format start date...")
-        optional_parameters["start"] = optional_parameters.get("start").format(
-            execution_date=execution_date
-        )
+        if optional_parameters.get("start"):
+            logger.info("m=__main__, msg=Format start date...")
+            optional_parameters["start"] = optional_parameters.get("start").format(
+                execution_date=execution_date
+            )
 
         if optional_parameters.get("end"):
             logger.info("m=__main__, msg=Format end date...")
