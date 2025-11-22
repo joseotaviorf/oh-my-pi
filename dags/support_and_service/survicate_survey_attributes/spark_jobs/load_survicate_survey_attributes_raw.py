@@ -96,8 +96,7 @@ def table_configs(table_name: str):
     elif table_name == "respondent_attributes":
         endpoint_enum = 'RESPONDENT_ATTRIBUTES'
         feedback_parameters_query = "SELECT DISTINCT GET_JSON_OBJECT(respondent, '$.uuid') AS respondent_uuid FROM datalake_survicate_raw.survey_responses WHERE DATE(dt_load) = DATE('{execution_date}') and workspace_name = '{workspace}'"
-        optional_parameters = {"items_per_page": 100,
-                               "start": start} 
+        optional_parameters = {"items_per_page": 100} 
            
     return endpoint_enum, feedback_parameters_query, optional_parameters
 
