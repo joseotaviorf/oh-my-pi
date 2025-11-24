@@ -22,6 +22,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.clean_factory 
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.core_factory import (
     CoreFactory,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.factories.wonka_factory import (
+    WonkaFactory,
+)
 from bietlejuice.base.pipeline import LayerEnum
 from airflow.datasets import BaseDataset
 
@@ -40,6 +43,7 @@ class FactoryDispatcher:
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,
         LayerEnum.REVERSE: ReverseFactory,
+        LayerEnum.WONKA: WonkaFactory,
     }
 
     def __init__(self, layer: LayerEnum) -> None:

@@ -135,6 +135,28 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "wonka_config": {
+                    "type": "dict",
+                    "empty": False,
+                    "required": False,
+                    "schema": {
+                        "name": {"type": "string", "required": True, "empty": False},
+                        "pipeline": {
+                            "type": "string",
+                            "required": True,
+                            "empty": False,
+                        },
+                    },
+                },
+                "datazord_config": {
+                    "type": "dict",
+                    "empty": False,
+                    "required": False,
+                    "schema": {
+                        "entity": {"type": "string", "required": True, "empty": False},
+                        "table": {"type": "string", "required": True, "empty": False},
+                    },
+                },
             },
         },
         "cluster": {

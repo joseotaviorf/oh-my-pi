@@ -19,6 +19,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "core": f"{self.source}",
             "clean_staging": f"datalake_{self.source}_clean_staging",
             "enrich": f"datalake_{self.source}",
+            "wonka": "wonka",
         }[layer.value]
 
     def get_full_database_path(self, layer: LayerEnum = None):
@@ -30,6 +31,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "core": f"s3a://{self.bucket}/core/{self.source}/",
             "clean_staging": f"s3a://{self.bucket}/clean_staging/{self.source}/",
             "enrich": f"s3a://{self.bucket}/enrich/{self.source}/",
+            "wonka": f"s3a://{self.bucket}/wonka/historical/{self.source}/",
         }[layer.value]
 
     def get_all_datalake_info(self):
@@ -47,6 +49,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 LayerEnum.CLEAN_STAGING,
                 LayerEnum.CORE,
                 LayerEnum.ENRICH,
+                LayerEnum.WONKA,
             )
         }
         s3_files_path = {
@@ -58,6 +61,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
                 LayerEnum.CLEAN_STAGING,
                 LayerEnum.CORE,
                 LayerEnum.ENRICH,
+                LayerEnum.WONKA,
             )
         }
 

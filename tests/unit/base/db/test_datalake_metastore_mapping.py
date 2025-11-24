@@ -26,6 +26,8 @@ class TestDatalakeMetastoreMapping:
             "db_enrich_path": "s3a://bucket-forno/enrich/_my_src_/",
             "db_transactional_name": "datalake__my_src__transactional",
             "db_transactional_path": "s3a://bucket-forno/transactional/_my_src_/",
+            "db_wonka_name": "wonka",
+            "db_wonka_path": "s3a://bucket-forno/wonka/historical/_my_src_/",
         }
 
     def test_get_all_datalake_info_for_prod(self):
@@ -52,6 +54,8 @@ class TestDatalakeMetastoreMapping:
             "db_enrich_path": "s3a://5a-datalake-prod/enrich/_my_src_/",
             "db_transactional_name": "datalake__my_src__transactional",
             "db_transactional_path": "s3a://5a-datalake-prod/transactional/_my_src_/",
+            "db_wonka_name": "wonka",
+            "db_wonka_path": "s3a://5a-datalake-prod/wonka/historical/_my_src_/",
         }
         assert db_info_dict == expected
 

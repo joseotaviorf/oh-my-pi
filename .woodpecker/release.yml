@@ -77,6 +77,32 @@ steps:
       event: [push, tag]
       branch: forno
 
+  export-install-pex-init-script-forno:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: scripts/wonka/install_pex_generic.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/wonka/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
+  export-vault-secrets-init-script-forno:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: scripts/wonka/get_credentials_from_vault.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/wonka/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
   export-init-script-to-s3-prod:
     image: plugins/s3:1.4.0
     settings:
@@ -84,6 +110,32 @@ steps:
       source: scripts/init_script.sh
       target: bi-etl-ejuice/
       strip_prefix: scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+ 
+  export-install-pex-init-script-prod:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: scripts/wonka/install_pex_generic.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/wonka/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
+  export-vault-secrets-init-script-prod:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: scripts/wonka/get_credentials_from_vault.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:

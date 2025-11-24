@@ -68,6 +68,7 @@ dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
 data_documentation_bucket: data-documentation.s3.forno.data.quintoandar.com.br
 datalake_bucket: 5a-datalake-forno
 incoming_bucket: 5a-datalake-incoming-forno
+wonka_bucket: wonka.s3.forno.data.quintoandar.com.br
 planning_and_performance_bucket: 5a-dataops-forno
 people_bucket: people-s3-forno-data-quintoandar-com-br
 union_bucket: ingestao-dados-union/union
@@ -260,6 +261,60 @@ custom_cluster_with_sedona:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
               region: ""
+
+wonka_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
+    spark_env_vars:
+      PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"
+      PREV_DATA_INTERVAL_END_SUCCESS: "{{ prev_data_interval_end_success }}"
+      PREV_START_DATE_SUCCESS: "{{ prev_start_date_success }}"
+      PREV_END_DATE_SUCCESS: "{{ prev_end_date_success }}"
+      DATA_INTERVAL_START: "{{ data_interval_start | ds }}"
+      DATA_INTERVAL_START_JUST_FOR_DEBUG: "{{ data_interval_start }}"
+      DATA_INTERVAL_END: "{{ data_interval_end }}"
+      LOGICAL_DATE: "{{ logical_date }}"
+      VAULT_SECRET: "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
+      CASSANDRA_HOST: "node1.cassandra-wonka.forno.data.quintoandar.com.br,node2.cassandra-wonka.forno.data.quintoandar.com.br,node3.cassandra-wonka.forno.data.quintoandar.com.br"
+      CASSANDRA_KEYSPACE: "wonka"
+      CASSANDRA_LOCAL_DC: "us-east-1"
+      CASSANDRA_READ_CONSISTENCY_LEVEL: "LOCAL_QUORUM"
+      ENVIRONMENT: "{{ var.value.environment }}"
+      FEATURE_STORE_HISTORICAL_DATABASE: "wonka"
+      FEATURE_STORE_S3_BUCKET: "wonka.s3.forno.data.quintoandar.com.br/wonka"
+      INMETRO_VERSION: "{{ var.value.environment }}"
+      INMETRO_DATA_ALARMS_SLACK_WEBHOOK: "https://notification-hub-internal-api.quintoandar.com.br/webhook/inmetro?space=data-alarms"
+      INMETRO_S3_BUCKET_LOADER: "inmetro-s3-forno-quintoandar-com-br"
+      KAFKA_CONNECTION_STRING: "kafka-01.svc.core-frn.habitat.zone:9092,kafka-02.svc.core-frn.habitat.zone:9092,kafka-03.svc.core-frn.habitat.zone:9092"
+      PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+      SPARK_VERSION: "3.5.0"
+      STREAM_CHECKPOINT_PATH: "s3://wonka.s3.forno.data.quintoandar.com.br/checkpoints/online_feature_store"
+      STREAM_PROCESSING_TIME: "0 seconds"
+      ARTIFACTS_BUCKET: *artifacts_bucket
+      AIRFLOW_EXECUTION_PARAMS: "{{ dag_run.conf }}"
+      AIRFLOW_EXECUTION_DATE: "{{ ds }}"
+      AIRFLOW_PREVIOUS_EXECUTION_DATE: "{{ prev_ds }}"
+      AIRFLOW_NEXT_EXECUTION_DATE: "{{ next_ds }}"
+      WONKA_START_DATE: "{{ dag_run.conf.get('start_date', '') }}"
+      WONKA_END_DATE: "{{ dag_run.conf.get('end_date', '') }}"
+      WONKA_DISABLE_ONLINE_WRITER: "{{ dag_run.conf.get('disable_online_writer', 'false')}}"
+      WONKA_FORCE_FULL_LOAD: "{{ dag_run.conf.get('force_full_load', 'false')}}"
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
+    init_scripts:
+        - s3:
+            destination: "{{ var.value.artifacts_bucket }}/openlineage/init_script_openlineage.sh"
+            region: ""
+        - s3:
+            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
+            region: ""
+        - s3:
+            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
+            region: ""
 
 databricks_10_4_min_general_cluster:
     <<: *cluster_anchor
@@ -1495,3 +1550,7 @@ notification_webhooks_keys:
 
 vespucio_pipeline_version: "forno-latest"
 vespucio_output_path: "s3://5a-vespucio-forno"
+
+### Datazord Configs
+datazord_kafka_bootstrap_servers: "lkc-2yo85o-j29g53.us-east-1.aws.glb.confluent.cloud:9092"
+datazord_base_checkpoint_location: "s3://wonka.s3.forno.data.quintoandar.com.br/checkpoints/cdf-to-kafka"

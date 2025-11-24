@@ -12,6 +12,7 @@ class LayerEnum(Enum):
     DW = "dw"
     METRIC = "metric"
     REVERSE = "reverse"
+    WONKA = "wonka"
 
     @classmethod
     def get_available_enum_values(cls):

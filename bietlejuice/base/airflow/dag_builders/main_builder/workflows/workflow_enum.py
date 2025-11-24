@@ -19,6 +19,7 @@ class WorkflowEnum(Enum):
     QUERY_DELTA_WORKFLOW = "query_delta"
     QUERY_WORKFLOW = "query"
     QUERY_VIEW_WORKFLOW = "query_view"
+    WONKA_WORKFLOW = "wonka"
 
     @classmethod
     def get_available_enum_values(cls):

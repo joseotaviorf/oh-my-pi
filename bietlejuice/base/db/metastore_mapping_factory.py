@@ -26,4 +26,5 @@ class MetastoreMappingFactory:
             LayerEnum.DW_STAGING: DwMetastoreMapping,
             LayerEnum.METRIC: MetricMetastoreMapping,
             LayerEnum.REVERSE: ReverseMetastoreMapping,
+            LayerEnum.WONKA: DatalakeMetastoreMapping,
         }[layer](source, bucket)

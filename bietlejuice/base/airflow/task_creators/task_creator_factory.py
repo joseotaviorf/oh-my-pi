@@ -66,6 +66,12 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
 from bietlejuice.base.airflow.enums.task_enum import TaskEnum
+from bietlejuice.base.airflow.task_creators.load_wonka_task_creator import (
+    LoadWonkaTaskCreator,
+)
+from bietlejuice.base.airflow.task_creators.load_cdf_to_datazord_task_creator import (
+    LoadCDFtoDatazordTaskCreator,
+)
 
 
 class TaskCreatorFactory:
@@ -88,12 +94,14 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_QUERY: LoadQueryTaskCreator,
         TaskEnum.LOAD_DELTA: LoadDeltaTableTaskCreator,
         TaskEnum.LOAD_CORE_MODEL: LoadCustomTaskCreator,
+        TaskEnum.LOAD_WONKA: LoadWonkaTaskCreator,
         TaskEnum.OPTIMIZE_DELTA_TABLE: OptimizeDeltaTableTaskCreator,
         TaskEnum.REGISTER_DELTA_TABLE: RegisterDeltaTableTaskCreator,
         TaskEnum.REPROCESSING_GUARD: ReprocessingGuardTaskCreator,
         TaskEnum.SKIP_RUN: SkipRunTaskCreator,
         TaskEnum.SYNC_METADATA: SyncMetadataTaskCreator,
         TaskEnum.CREATE_QUERY_VIEW: CreateQueryViewTaskCreator,
+        TaskEnum.LOAD_CDF_TO_DATAZORD: LoadCDFtoDatazordTaskCreator,
     }
 
     def __init__(self, dag_execution_context: DagExecutionContext) -> None:

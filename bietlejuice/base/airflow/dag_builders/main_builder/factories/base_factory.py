@@ -67,7 +67,7 @@ class BaseFactory(ABC):
         available_enums = self._WORKFLOW_ENUM_TO_CLASS_MAPPING.keys()
         if workflow_enum not in available_enums:
             raise ValueError(
-                f"m=__validate_workflow_class, msg=DAG Workflow does not exist, "
+                f"m=__validate_workflow_class, msg=DAG Workflow {workflow_enum} does not exist, "
                 "available_workflows={}".format(
                     [enum.value for enum in available_enums]
                 )

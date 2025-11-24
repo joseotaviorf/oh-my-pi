@@ -125,7 +125,7 @@ class TestBaseFactory:
         # act & assert
         with pytest.raises(
             ValueError,
-            match=f"m=__validate_workflow_class, msg=DAG Workflow does not exist, available_workflows=\['{return_value}'\]",
+            match=f"m=__validate_workflow_class, msg=DAG Workflow {workflow_enum} does not exist, available_workflows=\['{return_value}'\]",
         ):
             _ = base_factory._BaseFactory__validate_workflow_enum(workflow_enum)
             mocked_enum_value.assert_called()

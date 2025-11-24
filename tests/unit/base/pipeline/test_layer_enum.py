@@ -18,4 +18,5 @@ class TestLayerEnum:
             LayerEnum.DW.value,
             LayerEnum.METRIC.value,
             LayerEnum.REVERSE.value,
+            LayerEnum.WONKA.value,
         ]
