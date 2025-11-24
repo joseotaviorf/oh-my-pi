@@ -2,7 +2,6 @@ import ast
 import json
 import logging
 import pyspark.sql.functions as F
-import sys
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -70,6 +69,35 @@ def _normalize_nested_structs(df):
             
     return df
 
+def _get_consumer_data(
+    consumer: HubspotConversationsConsumer, 
+    endpoint_params: dict, 
+    feedback_parameters: list, 
+    executor_type: str, 
+    is_only_thread_executor_param: bool,
+    ts_interval_start: datetime
+):
+
+    logger.info(
+        f"""
+            m={JOB_NAME}, table_name={table_name}, params={endpoint_params}, 
+            feedback_parameters={feedback_parameters},
+            executor_type={executor_type}, endpoint_enum={endpoint_enum},
+            ts_interval_start={ts_interval_start},
+            is_only_thread_executor_param={is_only_thread_executor_param},
+            msg=starting sync request to hubspot api..."
+        """
+    )
+
+    response = consumer.sync(
+        params=endpoint_params,
+        thread_executor_params=feedback_parameters if is_only_thread_executor_param == True else None,
+        feedback_list=feedback_parameters if is_only_thread_executor_param == False else None,
+        executor_type=executor_type,
+    )
+
+    return response
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
@@ -111,6 +139,18 @@ if __name__ == "__main__":
 
     ts_interval_start = datetime.fromisoformat(data_interval_start)
 
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    api_token = json.loads(
+        dbutils.secrets.get(scope="quintoandar", key=APIEnum.HUBSPOT)
+    )['token']
+
+    hubspot_client = HubspotClient(api_token)
+    endpoint_enum = EndpointEnum[table_name.upper()].value
+    consumer = HubspotConversationsConsumer(client=hubspot_client, endpoint_enum=endpoint_enum)
+
     if is_interval_data_filtered:
         endpoint_params["interval_start_timestamp"] = data_interval_start
         endpoint_params["interval_end_timestamp"] = data_interval_end
@@ -128,7 +168,7 @@ if __name__ == "__main__":
             BaseSparkContext.spark.table(table)
             .filter(
                 f"""
-                DATE({date_column_filter}) BETWEEN DATE("{data_interval_start}") AND DATE("{data_interval_end}")
+                {date_column_filter} BETWEEN TIMESTAMP("{data_interval_start}") AND TIMESTAMP("{data_interval_end}")
             """
             )
             .select(selected_column)
@@ -147,40 +187,25 @@ if __name__ == "__main__":
                     msg=no rows found in the {table} table for the given date interval"
                 """
             )
-            sys.exit(0)
+            response = None
+        else:
+            response = _get_consumer_data(
+                consumer=consumer, 
+                endpoint_params=endpoint_params, 
+                feedback_parameters=feedback_parameters, 
+                executor_type=executor_type, 
+                is_only_thread_executor_param=is_only_thread_executor_param, 
+                ts_interval_start=ts_interval_start
+            )
     else:
-        feedback_parameters = None
-        is_only_thread_executor_param = None
-
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-
-    api_token = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.HUBSPOT)
-    )['token']
-
-    hubspot_client = HubspotClient(api_token)
-    endpoint_enum = EndpointEnum[table_name.upper()].value
-    consumer = HubspotConversationsConsumer(client=hubspot_client, endpoint_enum=endpoint_enum)
-
-    logger.info(
-        f"""
-            m={JOB_NAME}, table_name={table_name}, params={endpoint_params}, 
-            feedback_parameters={feedback_parameters},
-            executor_type={executor_type}, endpoint_enum={endpoint_enum},
-            ts_interval_start={ts_interval_start},
-            is_only_thread_executor_param={is_only_thread_executor_param},
-            msg=starting sync request to hubspot api..."
-        """
-    )
-
-    response = consumer.sync(
-        params=endpoint_params,
-        thread_executor_params=feedback_parameters if is_only_thread_executor_param == True else None,
-        feedback_list=feedback_parameters if is_only_thread_executor_param == False else None,
-        executor_type=executor_type,
-    )
+        response = _get_consumer_data(
+            consumer=consumer, 
+            endpoint_params=endpoint_params, 
+            feedback_parameters=None, 
+            executor_type=executor_type, 
+            is_only_thread_executor_param=None, 
+            ts_interval_start=ts_interval_start
+        )
 
     if response:
         spark_client = SparkClient()
