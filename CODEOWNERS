@@ -20,3 +20,4 @@ dags/primitives/                                                        @quintoa
 dags/mlops/                                                             @quintoandar/mlcops
 dags/growth/enrich_vespucio_pipeline/**                                 @quintoandar/atlas-db-code-owners
 dags/planning_and_performance/**                                        @quintoandar/data-bpo-ops-code-owners
+dags/conversational_xp/**                                               @quintoandar/personalization
