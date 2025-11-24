@@ -24,7 +24,7 @@ workflow:
       z_order_by: [id_issue, id_attachment, ts_updated]
     bug_issues:
       merge_on: [id_issue]
-      z_order_by: [id_issue, ts_updated]
+      z_order_by: [id_issue, id_line]
     comments:
       merge_on: [id_issue, id_comment]
       z_order_by: [id_issue, id_comment, ts_updated]
