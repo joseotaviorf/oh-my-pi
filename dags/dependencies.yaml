@@ -359,6 +359,14 @@ bietlejuice.dw_customer_support:
   - bietlejuice.twilio_flex_insights:load-clean-analyst-activity-time:first-run-of-day
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics:first-run-of-day
   - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
+bietlejuice.dw_customer_support_views:
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
 bietlejuice.dw_data_quality:
   - bietlejuice.enrich_data_quality:load-enrich-validations:first-run-of-day
 bietlejuice.dw_datamarts_cross:

@@ -1,6 +1,6 @@
-database_name: datalake_customer_support
-table_name: tickets_perspective
-description: Enriched view of support data from tickets perspective.
+database_name: dw_customer_support
+table_name: fact_tickets_perspective
+description: Enriched table of support data from tickets perspective.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
