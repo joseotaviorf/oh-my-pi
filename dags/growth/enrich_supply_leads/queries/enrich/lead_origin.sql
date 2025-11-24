@@ -67,88 +67,39 @@ lead_origin_amplitude AS (
     DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(formfield_lead_uuid, id_firestore, id_lead) ORDER BY ts_event) = 1 -- Works if formfield_lead_uuid is a NULL
 ),
-phone_number AS (
-  SELECT DISTINCT
-    c.id_task,
-    c.twilio_phone_number as quinto_andar_phone_number,
-    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') as ctwa_clid,
-    COALESCE(c.id_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id')) AS id_source_ctwa,
-    COALESCE(c.url_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url')) AS url_source_ctwa,
-    COALESCE(c.type_source_ctwa,GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type')) AS type_source_ctwa
-  FROM
-    datalake_customer_support.chats AS c 
-  LEFT JOIN 
-    datalake_sauron_clean.session AS s
-      ON REGEXP_EXTRACT(s.user_phone, '[0-9]+', 0) = REGEXP_EXTRACT(c.customer_phone_number, '[0-9]+', 0) 
-      AND GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY c.id_task ORDER BY s.ts_created DESC) = 1
-  UNION ALL
-  SELECT DISTINCT
-    ca.id_task,
-    CASE
-      WHEN ca.direction = 'inbound' THEN to_phone_number
-      WHEN ca.direction = 'outbound' THEN from_phone_number
-    END AS quinto_andar_phone_number,
-    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
-    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa ,
-    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
-    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type') AS type_source_ctwa
-  FROM
-    datalake_customer_support.calls AS ca 
-  LEFT JOIN 
-    datalake_sauron_clean.session AS s
-      ON REGEXP_EXTRACT(s.user_phone, '[0-9]+', 0) = 
-      CASE
-        WHEN ca.direction = 'outbound' THEN REGEXP_EXTRACT(ca.to_phone_number, '[0-9]+', 0)
-        WHEN ca.direction = 'inbound' THEN REGEXP_EXTRACT(ca.from_phone_number , '[0-9]+', 0) END
-      AND GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY ca.id_task ORDER BY s.ts_created DESC) = 1
-),
-sauron_sessions AS (
-  SELECT DISTINCT
-    s.id as id_chat_session,
-    cs.id_external AS id_ai_core_session,
-    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.ctwa_clid')) AS ctwa_clid,
-    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.referral_source_id')) AS id_source_ctwa ,
-    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.referral_source_url')) AS url_source_ctwa,
-    COALESCE(GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type'), GET_JSON_OBJECT(s2.metadata, '$.extra_params.referral_source_url')) AS type_source_ctwa
-  FROM 
-    datalake_sauron_clean.session AS s
-  INNER JOIN 
-      datalake_copilot_service_clean.session AS cs
-        ON s.id = cs.id_sauron_session
-  LEFT JOIN 
-      datalake_sauron_clean.session AS s2
-        ON  REGEXP_EXTRACT(s.user_phone, '[0-9]+', 0) =  REGEXP_EXTRACT(s2.user_phone, '[0-9]+', 0) 
-            AND GET_JSON_OBJECT(s2.metadata, '$.extra_params.ctwa_clid') IS NOT NULL
-  WHERE 
-      s.year >= 2025
-  QUALIFY 
-      ROW_NUMBER() OVER (PARTITION BY s.id ORDER BY s2.ts_created DESC) = 1
-),
-click_to_whatsapp_campaigns AS (
+inbound_leads AS (
   SELECT 
-    id_ad,
-    utm_campaign,
-    utm_term,
-    utm_content,
-    origin AS utm_source,
+    ia.id_lead_ebdb,
+    ia.id_session,
+    ia.id_task,
+    ia.id_source_ctwa,
+    ia.quinto_andar_phone_number,
+    ia.ctwa_clid,
+    ia.url_source_ctwa,
+    ia.type_source_ctwa,
+    fm.utm_campaign,
+    fm.utm_term,
+    fm.utm_content,
+    fm.origin AS utm_source,
     'whatsapp' AS utm_medium
   FROM 
-    datalake_growth_media_platform.facebook_metrics
+    datalake_supply_flows.inbound_attribution AS ia
+  LEFT JOIN
+    datalake_growth_media_platform.facebook_metrics AS fm
+      ON ia.id_source_ctwa = fm.id_ad
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_ad ORDER BY dt_cost DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY ia.id_lead_ebdb ORDER BY fm.dt_cost DESC) = 1
 ),
 mid_table AS (
   SELECT
     r.id_lead AS id_lead,
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
-    COALESCE(IF(r.campaign == '', NULL, r.campaign), a.campaign, a2.campaign, ctwac.utm_campaign) AS campaign,
-    COALESCE(IF(r.medium == '', NULL, r.medium), a.medium, a2.medium, ctwac.utm_medium) AS medium,
-    COALESCE(IF(r.source == '', NULL, r.source), a.source, a2.source, ctwac.utm_source) AS source,
-    COALESCE(IF(r.content == '', NULL, r.content), a.content, a2.content, ctwac.utm_content) AS content,
-    COALESCE(IF(r.term == '', NULL, r.term), a.term, a2.term, ctwac.utm_term) AS term,
+    COALESCE(IF(r.campaign == '', NULL, r.campaign), a.campaign, a2.campaign, inbound_leads.utm_campaign) AS campaign,
+    COALESCE(IF(r.medium == '', NULL, r.medium), a.medium, a2.medium, inbound_leads.utm_medium) AS medium,
+    COALESCE(IF(r.source == '', NULL, r.source), a.source, a2.source, inbound_leads.utm_source) AS source,
+    COALESCE(IF(r.content == '', NULL, r.content), a.content, a2.content, inbound_leads.utm_content) AS content,
+    COALESCE(IF(r.term == '', NULL, r.term), a.term, a2.term, inbound_leads.utm_term) AS term,
     r.ops_agent,
     r.ops_partner,
     r.application,
@@ -160,23 +111,23 @@ mid_table AS (
     r.lead_type,
     r.detailed_route,
     r.original_lead,
-    r.id_task,
+    inbound_leads.id_task,
     r.id_ai_core_session,
-    ss.id_chat_session,
+    inbound_leads.id_session AS id_chat_session,
     r.gclid,
     r.fbclid,
-    COALESCE(r.ctwa_clid, pn.ctwa_clid, ss.ctwa_clid) AS ctwa_clid,
-    COALESCE(REPLACE(wpp_channel.twilio_phone_number, "whatsapp:+", ""), pn.quinto_andar_phone_number) AS quinto_andar_phone_number,
-    COALESCE(pn.id_source_ctwa, ss.id_source_ctwa) AS id_source_ctwa,
-    COALESCE(pn.url_source_ctwa, ss.url_source_ctwa) AS url_source_ctwa,
-    COALESCE(pn.type_source_ctwa, ss.type_source_ctwa) AS type_source_ctwa,
+    inbound_leads.ctwa_clid,
+    inbound_leads.quinto_andar_phone_number,
+    inbound_leads.id_source_ctwa,
+    inbound_leads.url_source_ctwa,
+    inbound_leads.type_source_ctwa,
     -- We're tracking how database is the source of our UTMs
-    NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', NVL2(ctwac.utm_campaign, 'facebook_api', 'lost_tracking')))) AS database_tracking_campaign,
-    NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(a2.medium, 'amplitude', NVL2(ctwac.utm_medium, 'facebook_api', 'lost_tracking')))) AS database_tracking_medium,
-    NVL2(r.source, 'rene_descartes', NVL2(a.source, 'amplitude', NVL2(a2.source, 'amplitude', NVL2(ctwac.utm_source, 'facebook_api', 'lost_tracking')))) AS database_tracking_source,
-    NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(a2.content, 'amplitude', NVL2(ctwac.utm_content, 'facebook_api', 'lost_tracking')))) AS database_tracking_content,
-    NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(a2.term, 'amplitude', NVL2(ctwac.utm_term, 'facebook_api', 'lost_tracking')))) AS database_tracking_term,
-    NVL2(r.ctwa_clid, 'rene_descartes', NVL2(pn.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
+    NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', NVL2(inbound_leads.utm_campaign, 'facebook_api', 'lost_tracking')))) AS database_tracking_campaign,
+    NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(a2.medium, 'amplitude', NVL2(inbound_leads.utm_medium, 'facebook_api', 'lost_tracking')))) AS database_tracking_medium,
+    NVL2(r.source, 'rene_descartes', NVL2(a.source, 'amplitude', NVL2(a2.source, 'amplitude', NVL2(inbound_leads.utm_source, 'facebook_api', 'lost_tracking')))) AS database_tracking_source,
+    NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(a2.content, 'amplitude', NVL2(inbound_leads.utm_content, 'facebook_api', 'lost_tracking')))) AS database_tracking_content,
+    NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(a2.term, 'amplitude', NVL2(inbound_leads.utm_term, 'facebook_api', 'lost_tracking')))) AS database_tracking_term,
+    NVL2(r.ctwa_clid, 'rene_descartes', NVL2(inbound_leads.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
     COALESCE(r.ts_event, a.ts_event) AS ts_event
   FROM
     lead_origin_rene_descartes AS r
@@ -190,22 +141,8 @@ mid_table AS (
     affiliate_type_fix AS atf
       ON (r.id_lead = atf.id_lead)
   LEFT JOIN
-    phone_number AS pn
-      ON (pn.id_task = r.id_task)
-  LEFT JOIN
-    sauron_sessions AS ss
-      ON (ss.id_ai_core_session = r.id_ai_core_session)
-  LEFT JOIN
-    datalake_quinto_messenger_clean.channel AS wpp_channel
-      ON wpp_channel.id_session = ss.id_chat_session
-        AND MAKE_DATE(wpp_channel.year, wpp_channel.month, wpp_channel.day) BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAY AND DATE('{load_end_date}')
-  LEFT JOIN
-    click_to_whatsapp_campaigns AS ctwac
-      ON (
-          (pn.id_source_ctwa IS NOT NULL AND ctwac.id_ad = pn.id_source_ctwa)
-          OR 
-          (ss.id_source_ctwa IS NOT NULL AND ctwac.id_ad = ss.id_source_ctwa)
-         )
+    inbound_leads
+      ON inbound_leads.id_lead_ebdb = r.id_lead_ebdb
 )
 -- Hard rules
 SELECT DISTINCT

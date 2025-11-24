@@ -21,8 +21,7 @@ columns:
   id_source_ctwa:
     description: The Id for the campaign related to the click to whatsapp identifier.
     lineage:
-      - datalake_customer_support.chats.id_source_ctwa
-      - datalake_sauron_clean.session.metadata
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   affiliate_type:
     description: The type of affiliate associated with the lead's acquisition campaign.
     lineage: 
@@ -110,16 +109,15 @@ columns:
   ctwa_clid:
     description: The whatsapp click identifier of the the lead.
     lineage:
-      - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
-      - datalake_sauron_clean.session.metadata
+      - datalake_supply_flows.inbound_attribution.ctwa_clid
   id_task: 
     description: The ID for the lead creation task.
     lineage:
-      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_supply_flows.inbound_attribution.id_task
   id_chat_session: 
     description: The ID for the chat session in Sauron.
     lineage:
-      - datalake_sauron_clean.session.id
+      - datalake_supply_flows.inbound_attribution.id_session
   id_ai_core_session: 
     description: The ID for the chat in the Orchestrator/Copilot.
     lineage:
@@ -127,19 +125,15 @@ columns:
   quinto_andar_phone_number:
     description: The QuintoAndar phone number the client used to get in touch and have their lead created.
     lineage:
-      - datalake_customer_support.chats
-      - datalake_customer_support.calls
-      - datalake_quinto_messenger_clean.channel
+      - datalake_supply_flows.inbound_attribution.quinto_andar_phone_number
   url_source_ctwa:
     description: The url for the campaign related to the click to whatsapp identifier.
     lineage:
-      - datalake_customer_support.chats.url_source_ctwa
-      - datalake_sauron_clean.session.metadata
+      - datalake_supply_flows.inbound_attribution.url_source_ctwa
   type_source_ctwa:
     description: The type of the campaign related to the click to whatsapp identifier.
     lineage:
-      - datalake_customer_support.chats.type_source_ctwa
-      - datalake_sauron_clean.session.metadata
+      - datalake_supply_flows.inbound_attribution.type_source_ctwa
   original_lead:
     description: The identifier of the original lead if the current lead is a result of reprocessing process.
     lineage: 
