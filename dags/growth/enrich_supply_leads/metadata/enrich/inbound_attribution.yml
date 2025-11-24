@@ -1,0 +1,53 @@
+database_name: datalake_supply_flows
+table_name: inbound_attribution
+domain: Growth
+owner: vinicius.araujo@quintoandar.com.br
+description: This table contains attribution data that combines information extracted from the René Descartes service with information from messaging services for a specific case of leads coming from inbound processes with the Inside Sales team.
+columns:
+  id_lead_ebdb:
+    description: The unique identifier for each lead in the dataset.
+    lineage: 
+      - datalake_rene_descartes_clean.house_lead.id
+  id_session:
+    description: The ID for the chat session in Sauron.
+    lineage:
+      - datalake_sauron_clean.session.id
+      - datalake_copilot_service_clean.session.id_sauron_session
+  id_task:
+    description: The ID for the lead creation task.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_customer_support.chats.id_task
+      - datalake_customer_support.calls.id_task
+  id_source_ctwa:
+    description: The Id for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_sauron_clean.session.metadata
+  phone_number:
+    description: The customer phone number associated with their lead creation.
+    lineage:
+      - datalake_rene_descartes_clean.phone.phone_number
+  quinto_andar_phone_number:
+    description: The QuintoAndar phone number the client used to get in touch and have their lead created.
+    lineage:
+      - datalake_customer_support.calls
+      - datalake_customer_support.chats.twilio_phone_number
+      - datalake_quinto_messenger_clean.channel.twilio_phone_number
+  ctwa_clid:
+    description: The whatsapp click identifier of the the lead.
+    lineage:
+      - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_sauron_clean.session.metadata
+  url_source_ctwa:
+    description: The url for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_sauron_clean.session.metadata
+  type_source_ctwa:
+    description: The type of the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_sauron_clean.session.metadata
+  ts_created:
+    description: The timestamp of the lead creation event.
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
+  

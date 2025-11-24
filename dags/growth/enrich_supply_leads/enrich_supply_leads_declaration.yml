@@ -19,6 +19,9 @@ workflow:
     lead_origin:
       merge_on: ["id_lead"]
       z_order_by: ["id_lead"]
+    inbound_attribution:
+      merge_on: ["id_lead_ebdb"]
+      z_order_by: ["id_lead_ebdb"]
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:

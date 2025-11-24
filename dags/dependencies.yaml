@@ -3663,6 +3663,7 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.rene_descartes:load-clean-address:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-house-lead-conversion:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
+  - bietlejuice.rene_descartes:load-clean-phone:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details:first-run-of-day
