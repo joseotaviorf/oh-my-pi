@@ -14,6 +14,7 @@ SELECT
 	sender,
 	payload,
 	COALESCE(templateName, payload:bodyTemplate) AS template,
+	lower(metaCategory) as template_meta_category,
 	payload:country AS country_code,
 	payload:metadata AS metadata,
 	ccost AS cost_center,

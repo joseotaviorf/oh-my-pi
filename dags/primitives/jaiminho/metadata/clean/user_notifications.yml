@@ -69,6 +69,10 @@ columns:
     lineage:
       - datalake_jaiminho_raw.user_notifications.payload:bodyTemplate
       - datalake_jaiminho_raw.user_notifications.templateName
+  template_meta_category:
+    description: Category of the template at meta at the time the notification was sent. Only for whatsapp
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.metaCategory
   country_code:
     description: Country code where the notification was sent or targeted.
     lineage:
