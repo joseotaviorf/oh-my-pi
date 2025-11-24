@@ -60,6 +60,9 @@ custom_libraries = [
         "whl": f"{artifacts_bucket}/survicate-api-client-python/"
         f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
     },
+    {
+        "jar": f"{artifacts_bucket}/jars/ojdbc8.jar"
+    },
 ]
 jiraops_callback = JiraOpsCallback()
 dag = DAG(

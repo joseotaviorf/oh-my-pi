@@ -91,23 +91,21 @@ class OracleConsumer(DBConsumer):
         )
 
     @logger
-    def get_table_names_and_sizes(self, table_name: str):
+    def get_table_names_and_sizes(self):
         """
         Retrieves the names and sizes of tables in the Oracle database.
-
-        :param table_name: Name of the table to retrieve.
-        :type table_name: str
         :return: A Spark DataFrame with columns: table_name and size (estimated size in MB).
         """
 
         query = f"""
-            SELECT
-                TABLE_NAME,
-                ROUND(NUM_ROWS*(AVG_ROW_LEN/1024/1024),2) size
-            FROM all_tables
-            WHERE OWNER = '{self.schema}'
-            AND TABLE_NAME = '{table_name}'
-        """
+                  SELECT
+                      TABLE_NAME,
+                      ROUND((NUM_ROWS * AVG_ROW_LEN) / 1024 / 1024, 2) AS ESTIMATED_SIZE_MB
+                  FROM
+                      ALL_TABLES
+                  WHERE
+                      OWNER = UPPER('{self.schema}')
+            """
 
         return self.get_data_from_query(query)
 
