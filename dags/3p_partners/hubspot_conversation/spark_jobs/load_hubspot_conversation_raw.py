@@ -142,9 +142,11 @@ if __name__ == "__main__":
                     m={JOB_NAME}, feedback_config={feedback_config}, seleted_table={table}, 
                     selected_column={selected_column}, feedback_key={feedback_key}, 
                     date_column_filter={date_column_filter}, table_name={table_name}, 
-                    msg=feedback_parameters is empty"
+                    data_interval_start={data_interval_start}, data_interval_end={data_interval_end},
+                    msg=no rows found in the {table} table for the given date interval"
                 """
             )
+            exit(0)
     else:
         feedback_parameters = None
         is_only_thread_executor_param = None
