@@ -2,6 +2,7 @@ import ast
 import json
 import logging
 import pyspark.sql.functions as F
+import sys
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -146,7 +147,7 @@ if __name__ == "__main__":
                     msg=no rows found in the {table} table for the given date interval"
                 """
             )
-            exit(0)
+            sys.exit(0)
     else:
         feedback_parameters = None
         is_only_thread_executor_param = None

@@ -4,6 +4,7 @@ import logging
 import random
 import requests
 import time
+import sys
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -261,7 +262,7 @@ if __name__ == "__main__":
                 msg=no rows found in the {table_name_base} table for the given date interval"
             """
         )
-        exit(0)
+        sys.exit(0)
         
     else:
         logger.info(
