@@ -72,6 +72,38 @@ columns:
       "Error - Assigned Test and Out of Experiment, Really Out": User was correctly Out of Experiment but also incorrectly assigned to Test due to HighTouch reactivation.
       "Error - Assigned Control and Out of Experiment, Really Out": User was correctly Out of Experiment but also incorrectly assigned to Control due to HighTouch reactivation.
       "Error - Assigned Control and Test": User was incorrectly assigned to both Control and Test groups due to inconsistent segmentation or reactivation logic in HighTouch.
+  is_fup_d3:
+    lineage:
+      - hightouch_all_data.is_fup_d3
+    description: |
+      Boolean flag indicating whether the proposal received a follow-up message
+      at D+3 (FUP D+3) in the HighTouch journey.
+  started_at_fup_d3:
+    lineage:
+      - hightouch_all_data.started_at_fup_d3
+    description: |
+      Timestamp indicating when the D+3 follow-up message sync started execution.
+  finished_at_fup_d3:
+    lineage:
+      - hightouch_all_data.finished_at_fup_d3
+    description: |
+      Timestamp indicating when the D+3 follow-up message sync completed execution.
+  is_fup_d5:
+    lineage:
+      - hightouch_all_data.is_fup_d5
+    description: |
+      Boolean flag indicating whether the proposal received a follow-up message
+      at D+5 (FUP D+5) in the HighTouch journey.
+  started_at_fup_d5:
+    lineage:
+      - hightouch_all_data.started_at_fup_d5
+    description: |
+      Timestamp indicating when the D+5 follow-up message sync started execution.
+  finished_at_fup_d5:
+    lineage:
+      - hightouch_all_data.finished_at_fup_d5
+    description: |
+      Timestamp indicating when the D+5 follow-up message sync completed execution.
   is_bypass:
     lineage:
       - hightouch_audit.sync_changelog.fields.is_bypass
