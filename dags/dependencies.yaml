@@ -2547,6 +2547,8 @@ bietlejuice.enrich_iptu:
   - bietlejuice.iptu_poa:load-clean-iptu-poa:first-run-of-day
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues:first-run-of-day
+bietlejuice.enrich_jira_bugs:
+  - bietlejuice.jira:load-clean-issues:first-run-of-day
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-documentation:first-run-of-day
   - bietlejuice.kill_queue:load-clean-house:first-run-of-day

@@ -1,0 +1,61 @@
+---
+database_name: datalake_jira_bugs
+table_name: attachments
+description: Attachments extracted from Jira Bugs project issues
+domain: Cross
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+    description: Issue identifier in Jira
+  id_attachment:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.id
+    description: Attachment identifier in Jira
+  id_author_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.author.accountId
+    description: Author account ID of the attachment
+  file_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.filename
+    description: Attached file name
+  file_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.mimeType
+    description: Attachment MIME type
+  file_content_url:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.content
+    description: URL to the file content in Jira
+  file_thumbnail:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.thumbnail
+    description: Attachment thumbnail URL (when available)
+  file_size:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.size
+    description: File size in bytes
+  ts_created:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.created
+    description: Attachment creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.year
+      - datalake_jira_clean.issues.month
+      - datalake_jira_clean.issues.day
+    description: Issue snapshot date used in extraction (derived from year/month/day)
+  year:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.created
+    description: Attachment creation year
+  month:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.created
+    description: Attachment creation month
+  day:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment.created
+    description: Attachment creation day

@@ -1,0 +1,67 @@
+---
+database_name: datalake_jira_bugs
+table_name: user_account
+description: Dimension of Jira user accounts observed in Bugs project issues
+domain: Cross
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.accountId
+      - datalake_jira_clean.issues.fields.reporter.accountId
+      - datalake_jira_clean.issues.fields.creator.accountId
+      - datalake_jira_clean.issues.fields.comment.comments.author.accountId
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.accountId
+      - datalake_jira_clean.issues.fields.attachment.author.accountId
+    description: Jira user account identifier
+  name:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.displayName
+      - datalake_jira_clean.issues.fields.reporter.displayName
+      - datalake_jira_clean.issues.fields.creator.displayName
+      - datalake_jira_clean.issues.fields.comment.comments.author.displayName
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.displayName
+      - datalake_jira_clean.issues.fields.attachment.author.displayName
+    description: Displayed user name
+  email:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.emailAddress
+      - datalake_jira_clean.issues.fields.reporter.emailAddress
+      - datalake_jira_clean.issues.fields.creator.emailAddress
+      - datalake_jira_clean.issues.fields.comment.comments.author.emailAddress
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.emailAddress
+      - datalake_jira_clean.issues.fields.attachment.author.emailAddress
+    description: User email
+  time_zone:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.timeZone
+      - datalake_jira_clean.issues.fields.reporter.timeZone
+      - datalake_jira_clean.issues.fields.creator.timeZone
+      - datalake_jira_clean.issues.fields.comment.comments.author.timeZone
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.timeZone
+      - datalake_jira_clean.issues.fields.attachment.author.timeZone
+    description: User time zone
+  account_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.accountType
+      - datalake_jira_clean.issues.fields.reporter.accountType
+      - datalake_jira_clean.issues.fields.creator.accountType
+      - datalake_jira_clean.issues.fields.comment.comments.author.accountType
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.accountType
+      - datalake_jira_clean.issues.fields.attachment.author.accountType
+    description: Jira account type (e.g., atlassian, app, etc.)
+  is_active:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.active
+      - datalake_jira_clean.issues.fields.reporter.active
+      - datalake_jira_clean.issues.fields.creator.active
+      - datalake_jira_clean.issues.fields.comment.comments.author.active
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.active
+      - datalake_jira_clean.issues.fields.attachment.author.active
+    description: Active account indicator
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.year
+      - datalake_jira_clean.issues.month
+      - datalake_jira_clean.issues.day
+    description: Issue snapshot date on which the account was most recently observed

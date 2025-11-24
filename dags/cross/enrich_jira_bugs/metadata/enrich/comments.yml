@@ -1,0 +1,53 @@
+---
+database_name: datalake_jira_bugs
+table_name: comments
+description: Comments extracted from Jira Bugs project issues (normalized text)
+domain: Cross
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+    description: Issue identifier in Jira
+  id_comment:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.id
+    description: Comment identifier in Jira
+  id_author_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.author.accountId
+    description: Author account ID of the comment
+  id_last_modified_by_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.updateAuthor.accountId
+    description: Account ID of the last modifier of the comment
+  comment:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.body
+    description: Consolidated comment text extracted from Atlassian Document format
+  ts_created:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.created
+    description: Comment creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.updated
+    description: Comment last update timestamp
+  ts_load:
+    lineage:
+      - datalake_jira_clean.issues.year
+      - datalake_jira_clean.issues.month
+      - datalake_jira_clean.issues.day
+    description: Issue snapshot date from which the comment was read
+  year:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.created
+    description: Comment creation year
+  month:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.created
+    description: Comment creation month
+  day:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.comments.created
+    description: Comment creation day

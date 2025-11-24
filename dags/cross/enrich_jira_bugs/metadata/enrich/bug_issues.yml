@@ -1,0 +1,381 @@
+---
+database_name: datalake_jira_bugs
+table_name: bug_issues
+description: Enriched Jira issues table (Bugs project) with context, SLAs, and comments/attachments summaries
+domain: Cross
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+    description: Issue identifier in Jira
+  id_project:
+    lineage:
+      - datalake_jira_clean.issues.fields.project.id
+    description: Internal Jira project identifier
+  id_workspace:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25330.objectId
+      - datalake_jira_clean.issues.fields.customfield_25330.workspaceId
+    description: Associated workspace identifier (custom field)
+  id_request_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10200.requestType.id
+    description: Jira Service Management request type identifier
+  id_issue_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10200.requestType.issueTypeId
+    description: Issue type identifier associated with the request type
+  id_assignee_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.accountId
+    description: Account ID of the current assignee
+  id_reporter_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.reporter.accountId
+    description: Account ID of the reporter
+  id_creator_account:
+    lineage:
+      - datalake_jira_clean.issues.fields.creator.accountId
+    description: Account ID of the issue creator
+  id_dag:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25330.objectId
+    description: DAG identifier (custom field)
+  id_line:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25331.objectId
+    description: Line identifier (custom field)
+  project_key:
+    lineage:
+      - datalake_jira_clean.issues.fields.project.key
+    description: Project key in Jira
+  project_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.project.name
+    description: Project name in Jira
+  summary:
+    lineage:
+      - datalake_jira_clean.issues.fields.summary
+    description: Issue title/summary
+  issue_type_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.issuetype.name
+    description: Issue type name (e.g., Bug, Task)
+  issue_description:
+    lineage:
+      - datalake_jira_clean.issues.fields.description
+    description: Issue description
+  priority:
+    lineage:
+      - datalake_jira_clean.issues.fields.priority.name
+    description: Issue priority
+  request_type_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10200.requestType.name
+    description: Jira Service Management request type name
+  assignee_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.displayName
+    description: Assignee name
+  assignee_email:
+    lineage:
+      - datalake_jira_clean.issues.fields.assignee.emailAddress
+    description: Assignee email
+  reporter_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.reporter.displayName
+    description: Reporter name
+  reporter_email:
+    lineage:
+      - datalake_jira_clean.issues.fields.reporter.emailAddress
+    description: Reporter email
+  creator_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.creator.displayName
+    description: Issue creator name
+  creator_email:
+    lineage:
+      - datalake_jira_clean.issues.fields.creator.emailAddress
+    description: Issue creator email
+  line_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_12221.value
+    description: Line name (custom field)
+  squad_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_11356.value
+    description: Current squad name (custom field)
+  initial_squad_name:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_11681
+    description: Initial squads list (custom field)
+  form_response_issue_module:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22689.value
+    description: |
+      Form answer - which module has the issue. 
+      Field: [Form S&S Dados] Módulo
+      Question: Em que módulo está o problema?
+  form_response_issue_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25836.value
+    description: |
+      Form answer - issue type. 
+      Field: [Form S&S Dados] Qual o tipo de problema?
+      Question: Qual o tipo de problema?
+  form_response_integration_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22600.value
+    description: |
+      Form answer - integration/update flow. 
+      Field: [Form S&S Dados] Integração/Atualização Dados > Jornada
+  form_response_data_model_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22602.value
+    description: |
+      Form answer - data modeling issue. 
+      Field: [Form S&S Dados] Problemas na modelagem dos dados > Jornada
+  form_response_dag:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22692.value
+    description: |
+      Form answer - impacted DAG. 
+      Field: [Form S&S Dados] Em qual dag está o problema?
+  form_response_data_integration:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25333.value
+    description: |
+      Form answer - data integration. 
+      Field: [Form S&S Dados] Integração de dados
+  form_response_atento_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22605.value
+    description: |
+      Form answer - Atento problem. 
+      Field: [Form S&S Dados] Atento > Problema
+  form_response_birdie_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22604.value
+    description: |
+      Form answer - Birdie problem. 
+      Field: [Form S&S Dados] Birdie > Problema
+  dag:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22692.value
+    description: Impacted DAG from the form (alias of form_response_dag)
+  problem_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22689.value
+    description: Which module has the issue (alias of form_response_issue_module)
+  problem_description:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25836.value
+    description: Issue type from the form (alias of form_response_issue_type)
+  integration_type:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22600.value
+    description: Integration/update flow from the form (alias of form_response_integration_type)
+  data_model_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22602.value
+    description: Data modeling issue from the form (alias of form_response_data_model_issue)
+  data_integration:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25333.value
+    description: Data integration from the form (alias of form_response_data_integration)
+  atento_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22605.value
+    description: Atento problem from the form (alias of form_response_atento_issue)
+  birdie_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_22604.value
+    description: Birdie problem from the form (alias of form_response_birdie_issue)
+  final_resolution:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_19688.value
+    description: Final resolution from B custom field (alias of b_final_resolution)
+  request_participants:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10201
+    description: List of request participants (array of objects with accountId, emailAddress and displayName)
+  previous_status:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_19925
+    description: Previously recorded status (custom field)
+  issue_sub_categorization:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10727
+    description: Issue sub-categorization list (custom field)
+  labels:
+    lineage:
+      - datalake_jira_clean.issues.fields.labels
+    description: Issue labels list
+  b_labels:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_19832
+    description: B labels list (custom field)
+  b_final_resolution:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_19688.value
+    description: Final B resolution (custom field)
+  aura_invalid_agent_rule_applied:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25199
+    description: Invalid agent rule applied (custom field)
+  aura_invalid_agent_status:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_25244
+    description: Invalid agent status (custom field)
+  total_comments:
+    lineage:
+      - datalake_jira_clean.issues.fields.comment.total
+    description: Total number of issue comments (in the snapshot)
+  comments:
+    lineage:
+      - datalake_jira_bugs.comments.comment
+    description: Concatenated comment texts per issue (ordered by date)
+  total_attachments:
+    lineage:
+      - datalake_jira_clean.issues.fields.attachment
+    description: Total number of issue attachments (in the snapshot)
+  attachments:
+    lineage:
+      - datalake_jira_bugs.attachments.file_name
+    description: Concatenated list of attached file names per issue (ordered by date)
+  sla_first_response_status:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222
+    description: Consolidated first response SLA status
+  sla_resolution_status:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221
+    description: Consolidated resolution SLA status
+  first_response_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222.goalDuration.millis
+      - datalake_jira_clean.issues.fields.customfield_10222.elapsedTime.millis
+    description: Elapsed hours until first response (or NULL if not completed)
+  first_response_delay_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222.goalDuration.millis
+      - datalake_jira_clean.issues.fields.customfield_10222.elapsedTime.millis
+    description: Delay hours relative to the first response SLA goal
+  sla_resolution_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221.elapsedTime.millis
+    description: Elapsed hours until resolution (or NULL if not completed)
+  resolution_delay_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221.goalDuration.millis
+      - datalake_jira_clean.issues.fields.customfield_10221.elapsedTime.millis
+    description: Delay hours relative to the resolution SLA goal
+  is_sla_first_response_agreed:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222.breached
+      - datalake_jira_clean.issues.fields.customfield_10222.stopTime.iso8601
+    description: Indicator that first response SLA was met
+  is_sla_resolution_agreed:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221.breached
+      - datalake_jira_clean.issues.fields.customfield_10221.stopTime.iso8601
+    description: Indicator that resolution SLA was met
+  is_invalid_bug:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: True if current status equals "Invalid"
+  is_in_triage:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: True if current status equals "Triage"
+  is_need_more_info:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: True if current status equals "NEED MORE INFO"
+  is_under_investigation:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: True if current status equals "Under investigation"
+  is_resolved:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: True if current status equals "Close - Resolved"
+  is_closed:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: True if current status is in ("Close - Not Resolved", "Close - Resolved")
+  ts_sla_first_response_started:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222.startTime.iso8601
+    description: Start timestamp of first response SLA
+  ts_sla_first_response_completed:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222.stopTime.iso8601
+    description: Completion timestamp of first response SLA
+  ts_sla_first_response_breach_limit:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10222.breachTime.iso8601
+    description: Breach deadline of first response SLA
+  ts_sla_resolution_started:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221.startTime.iso8601
+    description: Start timestamp of resolution SLA
+  ts_sla_resolution_completed:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221.stopTime.iso8601
+    description: Completion timestamp of resolution SLA
+  ts_sla_resolution_breach_limit:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10221.breachTime.iso8601
+    description: Breach deadline of resolution SLA
+  status:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.name
+    description: Current issue status
+  status_category:
+    lineage:
+      - datalake_jira_clean.issues.fields.status.statusCategory.name
+    description: Current issue status category
+  is_data_ai_team_bug:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10200.requestType.id
+    description: Indicator whether the ticket belongs to the Data & AI team request type
+  ts_status:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10200.currentStatus.statusDate.iso8601
+    description: Timestamp of the current status
+  ts_status_category_changed:
+    lineage:
+      - datalake_jira_clean.issues.fields.statuscategorychangedate
+    description: Timestamp of the last status category change
+  ts_resolved:
+    lineage:
+      - datalake_jira_clean.issues.fields.resolutiondate
+    description: Issue resolution timestamp
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.updated
+    description: Issue last update timestamp
+  ts_created:
+    lineage:
+      - datalake_jira_clean.issues.created
+    description: Issue creation timestamp
+  ts_load:
+    lineage:
+      - datalake_jira_clean.issues.year
+      - datalake_jira_clean.issues.month
+      - datalake_jira_clean.issues.day
+    description: Issue snapshot date in the datalake
+  year:
+    lineage:
+      - datalake_jira_clean.issues.created
+    description: Issue creation year
+  month:
+    lineage:
+      - datalake_jira_clean.issues.created
+    description: Issue creation month
+  day:
+    lineage:
+      - datalake_jira_clean.issues.created
+    description: Issue creation day

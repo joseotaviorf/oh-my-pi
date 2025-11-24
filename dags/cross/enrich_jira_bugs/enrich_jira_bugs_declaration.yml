@@ -1,0 +1,42 @@
+dag:
+  name: enrich_jira_bugs
+  schedule_start_date: 2025, 11, 17
+  owner: Data Engineering
+  documentation:
+    dag_purpose: |
+      This DAG creates the full table for Jira Bugs workflow.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    bug_issues:
+      - user_account
+      - attachments
+      - comments
+  tables_customization:    
+    attachments:
+      merge_on: [id_issue, id_attachment]
+      z_order_by: [id_issue, id_attachment, ts_updated]
+    bug_issues:
+      merge_on: [id_issue]
+      z_order_by: [id_issue, ts_updated]
+    comments:
+      merge_on: [id_issue, id_comment]
+      z_order_by: [id_issue, id_comment, ts_updated]
+    user_account:
+      merge_on: [id_account]
+      z_order_by: [id_account, ts_updated]
+      partitions: []
+cluster:
+  type: databricks_16_4_med_general_2_workers_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
