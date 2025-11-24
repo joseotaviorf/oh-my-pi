@@ -4,8 +4,7 @@ from argparse import ArgumentParser
 import pyspark.sql.functions as F
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
-    spark
+    SparkTableStorageFormat
 )
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.s3_loader import S3Loader

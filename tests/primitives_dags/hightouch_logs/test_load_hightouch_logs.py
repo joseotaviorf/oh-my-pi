@@ -29,6 +29,10 @@ class TestLoadHightouchLogs(unittest.TestCase):
         self.mock_df.selectExpr.return_value = self.mock_df
         self.mock_df.withColumn.return_value = self.mock_df
 
+        # Set spark as a global variable in the module (simulating Databricks environment)
+        import load_hightouch_logs
+        load_hightouch_logs.spark = self.mock_spark
+
         # Sample arguments for incremental loading
         self.sample_args = Namespace(
             environment='prod',
