@@ -1339,6 +1339,7 @@ databricks_16_4_medium_memory_cluster:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
 databricks_16_4_rfleet_instance_cluster:
     <<: *cluster_anchor_base
     driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
