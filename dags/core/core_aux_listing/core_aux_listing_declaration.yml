@@ -17,6 +17,13 @@ workflow:
       table_privileges:
         owner-xp:
           - ALL PRIVILEGES
+    aux__lbc_status_version_order:
+      table_privileges:
+        owner-xp:
+          - ALL PRIVILEGES
+  inner_dependencies:
+    aux__lbc_status_version_order:
+      - aux__house_status_version_order
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: databricks_16_4_rfleet_instance_cluster_3_workers
   databricks_conn_id: databricks_new

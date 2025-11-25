@@ -1,0 +1,86 @@
+database_name: core_listing
+table_name: aux__lbc_status_version_order
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description: |
+  Auxiliary table for Listing Core model that tracks listing status changes and versions over time for RENT business context.
+  This table provides a chronological view of listing status transitions, calculating version numbers based on significant status changes
+  (first listing, recovered after 84+ days unpublished, relisting after rented, etc.). It merges data from aux__house_status_version_order
+  (for historical data before listing_business_context was created) with listing_business_context_aud.
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+      - core_listing.aux__house_status_version_order.id_house
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
+  lbc_state_order:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+    description: Sequential order number of states in the listing_business_context history for this house. NULL for states from house_status_version_order (historical data).
+  state_order:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+      - core_listing.aux__house_status_version_order.order_status
+    description: Sequential order number of status changes across the entire history (both house and LBC states) for this house. Combines order_status from house_status_version_order with lbc_state_order, providing a unified chronological sequence of all state changes.
+  days_in_status:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - core_listing.aux__house_status_version_order.ts_status_changed
+      - core_listing.aux__house_status_version_order.ts_status_changed_next
+    description: Number of days the listing remained in this specific status. Calculated as the difference between ts_state_ended and ts_state_started. NULL if the state is still active (ts_state_ended is NULL).
+  trigger_new_version:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status_reason
+    description: Binary flag (0 or 1) indicating whether this state change should trigger a new listing version in the next status. Used to calculate listing_version.
+  listing_version:
+    lineage:
+      - core_listing.aux__house_status_version_order.order_version
+      - datalake_ebdb_clean.listing_business_context_aud.status
+    description: Version number for this listing, representing the chronological order of listing versions.
+  rev:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+      - core_listing.aux__house_status_version_order.rev
+    description: Revision number that represents the specific version/change record for this house.
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - core_listing.aux__house_status_version_order.status_history
+    description: Status of the listing at this specific state.
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.status_reason
+      - core_listing.aux__house_status_version_order.reason
+    description: Reason for the status change, providing context for why the listing status was modified.
+  revision_reason:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+    description: Reason for the revision as recorded in the user revision entity. Provides additional context about the change.
+  is_extended_rental:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+    description: Boolean flag indicating if the contract termination was canceled after relisting as early demand or if the owner asked to unpublish the listing after relisting as early demand while the contract was active.
+  has_termination_canceled:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+    description: Boolean flag indicating if the contract termination was canceled after relisting as early demand.
+  is_last_state_of_day:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+    description: Boolean flag indicating if this is the last state change that occurred on this specific day for this house.
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+      - core_listing.aux__house_status_version_order.ts_first_publication
+    description: Timestamp of the very first publication of this listing across all versions. Represents when the listing was initially made available on the platform.
+  ts_state_started:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - core_listing.aux__house_status_version_order.ts_status_changed
+    description: Timestamp when this state started.
+  ts_state_ended:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - core_listing.aux__house_status_version_order.ts_status_changed_next
+    description: Timestamp when this state ended (when the next state started). NULL if this is the current/last state for the listing.

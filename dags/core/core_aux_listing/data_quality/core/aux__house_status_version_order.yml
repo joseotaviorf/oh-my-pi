@@ -1,6 +1,6 @@
 ---
 table_name: core_listing.aux__house_status_version_order
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
 column_level_validations:
   id_house:
     is_complete:

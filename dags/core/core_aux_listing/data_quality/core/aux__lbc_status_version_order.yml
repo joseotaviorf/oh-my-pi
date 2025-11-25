@@ -1,0 +1,34 @@
+---
+table_name: core_listing.aux__lbc_status_version_order
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM core_listing.aux__lbc_status_version_order GROUP BY id_house, rev HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  state_order:
+    is_complete:
+      severity_level: Error
+  trigger_new_version:
+    is_complete:
+      severity_level: Error
+  listing_version:
+    is_complete:
+      severity_level: Error
+  rev:
+    is_complete:
+      severity_level: Error
+  is_extended_rental:
+    is_complete:
+      severity_level: Error
+  has_termination_canceled:
+    is_complete:
+      severity_level: Error
+  is_last_state_of_day:
+    is_complete:
+      severity_level: Error
+  ts_state_started:
+    is_complete:
+      severity_level: Error

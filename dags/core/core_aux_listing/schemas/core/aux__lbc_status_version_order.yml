@@ -1,0 +1,73 @@
+# Schema validation file for core aux__lbc_status_version_order table
+# This file defines the expected schema for the core_listing.aux__lbc_status_version_order table
+# Path: dags/core/core_aux_listing/schemas/core/aux__lbc_status_version_order.yml
+
+columns:
+  id_house:
+    type: bigint
+    required: true
+
+  lbc_state_order:
+    type: int
+    required: false
+
+  state_order:
+    type: int
+    required: true
+
+  days_in_status:
+    type: int
+    required: false
+
+  trigger_new_version:
+    type: int
+    required: true
+
+  listing_version:
+    type: bigint
+    required: true
+
+  rev:
+    type: int
+    required: true
+
+  status:
+    type: string
+    required: false
+
+  status_reason:
+    type: string
+    required: false
+
+  revision_reason:
+    type: string
+    required: false
+
+  is_extended_rental:
+    type: boolean
+    required: true
+
+  has_termination_canceled:
+    type: boolean
+    required: true
+
+  is_last_state_of_day:
+    type: boolean
+    required: true
+
+  ts_first_publication:
+    type: timestamp
+    required: false
+
+  ts_state_started:
+    type: timestamp
+    required: true
+
+  ts_state_ended:
+    type: timestamp
+    required: false
+
+# Schema constraints
+min_columns: 16
+max_columns: 16
+strict: true
