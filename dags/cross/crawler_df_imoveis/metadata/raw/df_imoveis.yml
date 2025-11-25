@@ -1,0 +1,10 @@
+---
+database_name: datalake_crawler_df_imoveis_raw
+table_name: df_imoveis
+description: |
+  This table contains the data from the DF Imóveis crawler.
+  It is updated weekly, every Friday at 00:00 BRT, to update the data from the current week, 
+  which is provided every Thursday by the crawler provider.
+  It only contains the listings that have the city available.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br

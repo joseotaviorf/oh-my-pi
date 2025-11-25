@@ -1,0 +1,111 @@
+---
+database_name: datalake_crawler_df_imoveis_clean
+table_name: df_imoveis
+description: |
+  This table contains the data from the DF Imóveis crawler.
+  Only the listings that have the city available are included in the table,
+  following the same logic of the raw table.
+  It is updated weekly, every Friday at 00:00 BRT, to update the data from the current week,
+  which is provided every Thursday by the crawler provider.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.id
+    description: |
+      The ID of the listing.
+  origin:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.origin
+    description: |
+      The origin of the listing, in this case, it is always "dfimoveis".
+  address:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.address
+    description: |
+      The address of the listing.
+      It has the following address values: city, country, neighborhood,
+      state, street and zip_code.
+  city:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.city
+    description: |
+      The city of the listing.
+      It is obtained from the address field, which contains the city.
+      All the listings where the city is not available are removed from the table.
+  geolocation:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.region
+    description: |
+      The geolocation of the listing, containing latitude and longitude.
+  listing_name:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.name
+    description: |
+      The name of the listing.
+  listing_description:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.description
+    description: |
+      The description of the listing.
+  crawl_metadata:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.crawl_metadata
+    description: |
+      The metadata of the crawl, with the listing url.
+  house_info:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.house_info
+    description: |
+      The house info of the listing.
+      It has all the main information about the house, such as area,
+      amenities, bedrooms, parking_spaces, etc.
+  type:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.type
+    description: |
+      The type of the listing, contains information about the operation_type, 
+      tags, unit_type and usage_type.
+  image_urls:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.image_urls
+    description: |
+      The list of image urls of the listing.
+  advertiser:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.advertiser
+    description: |
+      The advertiser information from the listing.
+      It has the advertiser name, email, phone, country and creci.
+  price:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.price
+    description: |
+      The price of the listing.
+      It has the fields rent and sale.
+      Each one provides information about the price of the listing.
+  date_info:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.date_info
+    description: |
+      It has information about the crawler date, when the listing
+      was created and when it was last updated.
+  year:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.year
+    description: |
+      The year of the crawler date.
+      It is a partition column.
+  month:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.month
+    description: |
+      The month of the crawler date.
+      It is a partition column.
+  day:
+    lineage:
+      - datalake_crawler_df_imoveis_raw.df_imoveis.day
+    description: |
+      The day of the crawler date.
+      It is a partition column.
