@@ -1,0 +1,72 @@
+database_name: core_listing
+table_name: aux__house_listing_category
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description: |
+  Auxiliary table for Listing Core model that categorizes listing versions based on their lifecycle events.
+  This table provides a simplified view of listing versions with their categorization, status information and timestamps.
+columns:
+  id_house:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.id_house
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
+  id_house_listing:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.id_house
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version). Uniquely identifies a specific listing version.
+  version:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: Version number for this listing, representing the chronological order of listing versions.
+  status:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.status
+    description: Last status of the listing for this version or the last one that led the next version.
+  status_history:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.status
+    description: Previous status before the status change that triggered the next version. Provides context about the status transition.
+  status_reason:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.status_reason
+    description: Reason for the last status change for this version or the last one that led to the next version. Provides context for why the listing status was modified.
+  revision_reason:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.revision_reason
+    description: Reason for the for the last status change for this version or the last one that led the next version. Provides additional context about the change.
+  listing_category:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.listing_version
+      - core_listing.aux__lbc_status_version_order.status
+      - core_listing.aux__lbc_status_version_order.days_in_status
+    description: Categorization of the listing version based on lifecycle events.
+    categories:
+      "NULL": Version 0 or other cases that don't match the below categories.
+      "First Listing": Version 1. The first time the listing was published.
+      "Re-Listing": Version > 1. Listing published after it has already been rented. This category is prioritized over Recovered, in case the listing fits into both scenarios.
+      "Recovered": Version > 1. Listing that has already been published, but has remained unpublished for 84 days (12 weeks) or more.
+  is_extended_rental:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.is_extended_rental
+    description: Boolean flag indicating if the contract termination was canceled after relisting as early demand or if the owner asked to unpublish the listing after relisting as early demand while the contract was active.
+  has_termination_canceled:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.has_termination_canceled
+    description: Boolean flag indicating if the contract termination was canceled after relisting as early demand.
+  ts_status_changed:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Timestamp when the status change that triggered the next version occurred.
+  ts_listing_version_start:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Timestamp when this listing version started. Represents the earliest state change timestamp for this version.
+  ts_listing_version_end:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.ts_state_ended
+    description: Timestamp when this listing version ended (when the next version started). NULL if this is the current/last version for the listing.
+  ts_last_unpublished:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Timestamp of the last time the listing was unpublished within this version. NULL if the listing was never unpublished in this version.

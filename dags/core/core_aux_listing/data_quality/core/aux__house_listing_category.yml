@@ -1,0 +1,27 @@
+---
+table_name: core_listing.aux__house_listing_category
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_house_listing:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  is_extended_rental:
+    is_complete:
+      severity_level: Error
+  has_termination_canceled:
+    is_complete:
+      severity_level: Error
+  ts_status_changed:
+    is_complete:
+      severity_level: Error
+  ts_listing_version_start:
+    is_complete:
+      severity_level: Error

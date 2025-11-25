@@ -1,0 +1,65 @@
+# Schema validation file for core aux__house_listing_category table
+# This file defines the expected schema for the core_listing.aux__house_listing_category table
+# Path: dags/core/core_aux_listing/schemas/core/aux__house_listing_category.yml
+
+columns:
+  id_house:
+    type: bigint
+    required: true
+
+  id_house_listing:
+    type: bigint
+    required: true
+
+  version:
+    type: bigint
+    required: true
+
+  status:
+    type: string
+    required: false
+
+  status_history:
+    type: string
+    required: false
+
+  status_reason:
+    type: string
+    required: false
+
+  revision_reason:
+    type: string
+    required: false
+
+  listing_category:
+    type: string
+    required: false
+
+  is_extended_rental:
+    type: boolean
+    required: true
+
+  has_termination_canceled:
+    type: boolean
+    required: true
+
+  ts_status_changed:
+    type: timestamp
+    required: true
+
+  ts_listing_version_start:
+    type: timestamp
+    required: true
+
+  ts_listing_version_end:
+    type: timestamp
+    required: false
+
+  ts_last_unpublished:
+    type: timestamp
+    required: false
+
+# Schema constraints
+min_columns: 14
+max_columns: 14
+strict: true
