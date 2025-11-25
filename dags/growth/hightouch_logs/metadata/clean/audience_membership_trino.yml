@@ -1,0 +1,38 @@
+---
+database_name: datalake_hightouch_logs_clean
+table_name: audience_membership_trino
+domain: Growth
+description: Clean Hightouch audience membership from Trino source tracking marketing campaign audience events
+columns:
+  id_audience:
+    description: Unique identifier for the Hightouch audience
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.ht_audience_id
+  id_row:
+    description: Unique identifier for the row in the audience membership
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.ht_row_id
+  ht_event_type:
+    description: Type of audience membership event (enter, exit, update)
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.ht_event_type
+  ht_split_group:
+    description: Split group identifier for A/B testing or segmentation
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.ht_split_group
+  ts_ht:
+    description: Timestamp when the audience membership event occurred
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.ht_timestamp
+  year:
+    description: Partition column representing the year of the data
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.year
+  month:
+    description: Partition column representing the month of the data
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.month
+  day:
+    description: Partition column representing the day of the data
+    lineage:
+      - datalake_hightouch_logs_raw.audience_membership_trino.day

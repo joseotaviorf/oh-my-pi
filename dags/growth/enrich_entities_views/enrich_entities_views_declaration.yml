@@ -1,0 +1,15 @@
+dag:
+  name: enrich_entities_views
+  schedule_start_date: 2025, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Creates enriched views for data consolidation later used in the enrich_transactional_entities DAG.
+      This view provides a unified view of several process with all related entities.
+workflow:
+  type: query_view
+  layer: enrich
+  has_hive_sync: false
+cluster:
+  type: databricks_16_4_min_general_cluster
+  databricks_conn_id: databricks_new

@@ -1,0 +1,22 @@
+---
+database_name: datalake_hightouch_logs_raw
+table_name: sync_audience_membership_databricks
+domain: Growth
+description: Hightouch audience membership tracking for marketing campaigns and customer segmentation from Databricks source
+columns:
+  ht_audience_id:
+    description: Unique identifier for the Hightouch audience
+  ht_row_id:
+    description: Unique identifier for the row in the audience membership
+  ht_timestamp:
+    description: Timestamp when the audience membership event occurred
+  ht_event_type:
+    description: Type of audience membership event (enter, exit, update)
+  ht_split_group:
+    description: Split group identifier for A/B testing or segmentation
+  year:
+    description: Partition column representing the year of the data
+  month:
+    description: Partition column representing the month of the data
+  day:
+    description: Partition column representing the day of the data

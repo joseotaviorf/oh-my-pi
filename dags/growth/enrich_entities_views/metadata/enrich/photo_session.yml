@@ -1,0 +1,76 @@
+database_name: datalake_entities_views
+table_name: photo_session
+description: |
+  Enriched view of photo session data that consolidates photographer, house, and job information for photo session processes.
+  This table creates multiple rows per photo session - one row per persona (OWNER and AGENT_PHOTOGRAPHER).
+  Each photo session generates exactly 2 rows (one for OWNER persona and one for AGENT_PHOTOGRAPHER persona).
+  Only includes photo sessions created in 2025 or later (YEAR(ts_created) >= 2025).
+domain: Growth
+owner: marcio.gomes@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id
+    description: Primary key of the photo session entity, directly from the photographer_job table.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id_house
+    description: Foreign key referencing the house entity where the photo session takes place.
+  id_contract:
+    lineage:
+      - .id_contract
+    description: Contract id related to the photo session. Always NULL for photo sessions as they are not directly linked to contracts.
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.photographer_job.id
+    description: |
+      The unique identifier for a user associated with the photo session entity.
+      This field contains either the property owner (COALESCE of user.id from photographer relationship or house.id_user as fallback) when persona is 'OWNER', 
+      or the photographer job ID (photographer_job.id) when persona is 'AGENT_PHOTOGRAPHER'.
+      Each photo session entity generates two rows with different id_user values based on persona.
+  entity:
+    lineage:
+      - .entity
+    description: |
+      Entity type indicating the photo session type. Set to 'PHOTO_SESSION' for all photo session entities.
+      The value is currently the same for all photo sessions regardless of business context (RENT/SALE).
+  business_context:
+    lineage:
+      - .business_context
+    description: |
+      Business context of the photo session. Currently always NULL in the query implementation.
+      The field is reserved for future use to indicate 'RENT', 'SALE', or both when business context explosion is implemented.
+  persona:
+    description: |
+      A persona describes the primary role of a user (id_user) in relation to the photo session entity.
+      Each photo session generates exactly 2 rows - one for OWNER and one for AGENT_PHOTOGRAPHER persona.
+    categories:
+      OWNER: The property owner associated with the photo session. id_user comes from COALESCE(user.id, house.id_user) where user is matched via photographer relationship.
+      AGENT_PHOTOGRAPHER: The photographer assigned to the photo session job. id_user is set to photographer_job.id.
+  properties:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+      - datalake_ebdb_clean.photographer_job.ts_created
+    description: |
+      JSON structure containing photo session properties including status and creation timestamp (when).
+      Used to provide detailed contextual information about the current state of each photo session entity.
+      Structure: {"status": "<status_value>", "when": "<timestamp>"}
+      Note: The status field is only available within this JSON structure, not as a separate column.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+    description: |
+      Boolean flag indicating if the photo session is currently active.
+      Set to FALSE when status is 'PUBLICADO', 'CANCELADO', 'COMPLETADO', or 'FOTOSTIRADAS' (case-insensitive, after UPPER and TRIM), TRUE for all other statuses.
+      Active photo sessions are those that can still receive interactions.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_created
+    description: Timestamp when the photo session record was created. Only includes records from 2025 onwards (YEAR(ts_created) >= 2025).
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_updated
+    description: Timestamp when the photo session record was last updated.
+
