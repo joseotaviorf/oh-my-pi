@@ -485,6 +485,7 @@ join_and_predict_task = [
             f"--input_linked={Tables.link_step}",
             f"--input_joined_houses={Tables.join_step_houses}",
             f"--input_source_predicted_houses={Tables.source_predict_step_houses}",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_house_compounds={Tables.house_compounds}",
         ],
     ),
