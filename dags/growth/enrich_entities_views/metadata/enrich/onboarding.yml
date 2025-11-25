@@ -42,12 +42,6 @@ columns:
       InformationCheck: When the onboarding process is in information check.
       KillBill: When the onboarding process is in kill bill.
       WelcomingAutomatedEmails: When the onboarding process is in welcoming automated emails.
-  properties:
-    lineage:
-      - datalake_ebdb_clean.onboarding.status
-      - datalake_ebdb_clean.onboarding.ts_created
-    description: JSON structure containing onboarding properties including status and creation timestamp.
-      Used to provide detailed contextual information about the current state of each onboarding entity.
   is_active:
     lineage:
       - datalake_ebdb_clean.onboarding.status

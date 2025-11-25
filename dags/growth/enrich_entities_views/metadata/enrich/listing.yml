@@ -6,8 +6,11 @@ owner: bruno.sbrito@quintoandar.com.br
 columns:
   id_entity:
     lineage:
-      - datalake_ebdb_clean.listing_business_context.id
-    description: Primary key of the listing entity.
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: |
+      Primary key of the listing entity, created by concatenating the house id and business context (CONCAT(id_house, '_', business_context)).
+      This ensures uniqueness per business context (RENT/SALE) for the same house, allowing the same property to have separate listing entities for rental and sale contexts. 
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
@@ -19,6 +22,7 @@ columns:
   id_user:
     lineage:
       - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
     description: Foreign key referencing the property owner (user) associated with the listing.
   entity:
     description: Fixed value 'LISTING' indicating the type of entity.
@@ -40,11 +44,10 @@ columns:
   is_active:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status
-      - datalake_ebdb_clean.listing_business_context.status_reason
     description: |
       Boolean flag indicating if the listing is currently active.
-      Set to TRUE when status is 'PUBLISHED' or 'EDITING', or when status is 'SUSPENDED' with status_reason NOT IN ('OWNER_GAVE_UP_RENTING', 'OwnerConsequencesManagement', 'OwnerReforming', 'OwnerTemporarilySuspended', 'OwnerTraveling').
-      Set to FALSE when status is 'OPTED_OUT' or 'UNPUBLISHED', or when status is 'SUSPENDED' with status_reason IN ('OWNER_GAVE_UP_RENTING', 'OwnerConsequencesManagement', 'OwnerReforming', 'OwnerTemporarilySuspended', 'OwnerTraveling').
+      Set to TRUE when status is 'PUBLISHED' or 'EDITING'.
+      Set to FALSE when status is 'OPTED_OUT', 'UNPUBLISHED' or 'SUSPENDED'.
       Set to NULL for any other status values.
       Active listings are those that can still receive interactions and demand.
   ts_created:

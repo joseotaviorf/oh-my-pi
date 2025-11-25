@@ -25,7 +25,8 @@ columns:
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
-      - datalake_ebdb_clean.listing_business_context.id
+      - datalake_entities_views.listing.id_entity
+      - datalake_entities_views.listing.id_user
       - datalake_ebdb_clean.inspection.id
       - datalake_entities_views.onboarding.id_entity
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
@@ -44,7 +45,7 @@ columns:
       - core_offer.offer.id_offer
       - core_contract.contract.id_contract
       - datalake_terminator_clean.termination.id
-      - datalake_ebdb_clean.listing_business_context.id
+      - datalake_entities_views.listing.id_entity
       - datalake_ebdb_clean.inspection.id
       - datalake_entities_views.onboarding.id_entity
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
@@ -60,7 +61,7 @@ columns:
       - core_offer.offer.id_house
       - core_contract.contract.id_house
       - datalake_ebdb_clean.inspection.id_house
-      - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_entities_views.listing.id_house
       - datalake_entities_views.onboarding.id_house
       - core_credit_evaluation.credit_evaluation.id_house
       - datalake_kill_queue_clean.reservation.id_house
@@ -70,6 +71,7 @@ columns:
     lineage:
       - core_contract.contract.id_contract
       - datalake_ebdb_clean.inspection.id_contract
+      - datalake_entities_views.listing.id_contract
       - datalake_entities_views.onboarding.id_contract
       - datalake_inspection_services_clean.inspection.id_contract
       - datalake_repairs_clean.repair_request.id_contract
@@ -89,6 +91,7 @@ columns:
       - datalake_ebdb_clean.house.id_user
       - datalake_ebdb_clean.inspection.id_user_inspector
       - datalake_ebdb_clean.user.id
+      - datalake_entities_views.listing.id_user
       - datalake_entities_views.onboarding.id_owner
       - datalake_entities_views.onboarding.id_tenant
       - datalake_inspection_services_clean.inspection.id_inspector
@@ -111,7 +114,7 @@ columns:
       FR_OFFER: The entity is a ForRent offer, with its id_entity mapping directly to the id_offer from the Rental Transact system.
       FR_CONTRACT: The entity is a contract, with its id_entity mapping directly to the id_contract from the Contract table in the core model.
       FR_TERMINATION: The entity is a termination, with its id_entity mapping directly to the id from the Termination table in the terminator system.
-      LISTING: The entity is a property listing, with its id_entity mapping directly to the id from the Listing Business Context table, representing property listings.
+      LISTING: The entity is a property listing, with its id_entity mapping to the id_house + business_context from the Listing Business Context table via the datalake_entities_views.listing view, representing property listings across Rent and Sale business contexts.
       FR_INSPECTION: The entity is an inspection, with its id_entity mapping directly to the id from the Inspection table in EBDB database.
       FR_ONBOARDING: The entity is an onboarding process, with its id_entity mapping directly to the id from the Onboarding table in EBDB database.
       FR_CREDIT_EVALUATION: The entity is a credit evaluation, with its id_entity mapping directly to the id_credit_evaluation from the Credit Evaluation core model.
@@ -119,6 +122,10 @@ columns:
       FR_INVOICE: The entity is an invoice, with its id_entity mapping directly to the id from the Invoice table in the Retsuko system.
       PHOTO_SESSION: The entity is a photo session, with its id_entity mapping directly to the id from the Photographer Job table in EBDB database.
   persona:
+    lineage:
+      - datalake_entities_views.listing.persona
+      - datalake_entities_views.onboarding.persona
+      - datalake_entities_views.photo_session.persona
     description:
       A persona describes the primary role of a user (id_user) in relation to a specific
       entity within our platform's business context.
@@ -133,7 +140,7 @@ columns:
   business_context:
     lineage:
       - core_visit.visit.business_context
-      - datalake_ebdb_clean.listing_business_context.business_context
+      - datalake_entities_views.listing.business_context
     description: |
       Business context that categorizes the type of transaction or interaction.
       This field indicates whether the entity is related to rental (RENT) or sale (SALE) operations,
@@ -155,8 +162,7 @@ columns:
       - datalake_terminator_clean.termination.ts_created
       - datalake_ebdb_clean.inspection.status
       - datalake_ebdb_clean.inspection.dt_inspected
-      - datalake_ebdb_clean.listing_business_context.status
-      - datalake_ebdb_clean.listing_business_context.ts_created
+      - datalake_entities_views.listing.properties
       - datalake_ebdb_clean.visit_status_log.event_type
       - datalake_entities_views.onboarding.status
       - datalake_entities_views.onboarding.ts_created
@@ -206,7 +212,7 @@ columns:
       An offer entity will be considered as active for status proposed, and inactive for statuses accepted, dismissed or rejected.
       A contract entity will be considered as active for statuses ativo, minuta or PreAssinaturas, and inactive for statuses cancelado or finalizado.
       A termination entity will be considered as active for statuses requested, inspection_under_review, inspection_scheduled, inspection_opted_out, inspection_executed, or inspection_canceled, and inactive for statuses done or canceled.
-      A listing entity will be considered as active for statuses published, editing, or suspended (except when suspended for specific owner-related reasons like giving up renting, consequences management, reforming, temporarily suspended, or traveling), and inactive for statuses opted_out, unpublished, or suspended with owner-related reasons.
+      A listing entity will be considered as active for statuses 'PUBLISHED' or 'EDITING', and inactive for statuses 'OPTED_OUT', 'UNPUBLISHED', or 'SUSPENDED'.
       An inspection entity will be considered as active for statuses Agendada, Comentada, EmAcordo, EmRevisao, Nova, or Revisada, and inactive for statuses Finalizada, Cancelada, or ContratoCancelado.
       An onboarding entity will be considered as active for all statuses except "Finished" and "Aborted", which are considered inactive.
       A credit evaluation entity will be considered as active for statuses NOT_SENT, ON_HOLD or PROCESSING, and inactive for statuses CANCELLED, FAILED or FINISHED.
@@ -221,7 +227,7 @@ columns:
       - core_offer.offer.ts_updated
       - core_contract.contract.ts_updated
       - datalake_terminator_clean.termination.ts_updated
-      - datalake_ebdb_clean.listing_business_context.ts_updated
+      - datalake_entities_views.listing.ts_updated
       - datalake_ebdb_clean.inspection.ts_updated
       - datalake_entities_views.onboarding.ts_updated
       - core_credit_evaluation.credit_evaluation.ts_updated
@@ -241,6 +247,7 @@ columns:
       - core_contract.contract.ts_created
       - datalake_terminator_clean.termination.ts_created
       - datalake_ebdb_clean.inspection.ts_created
+      - datalake_entities_views.listing.ts_created
       - datalake_entities_views.onboarding.ts_created
       - core_credit_evaluation.credit_evaluation.ts_created
       - datalake_kill_queue_clean.reservation.ts_created
