@@ -1,92 +1,94 @@
 ---
-database_name: datalake_retsuko_test_clean
+database_name: datalake_retsuko_clean
 table_name: contract
-owner: ae-finance-fintech@quintoandar.com.br
+owner: bianca.martins@quintoandar.com.br
 domain: Fintech
-description: "Clean layer table containing contract information from SeuBarriga for rental agreements.
-  This table stores contract details including terms, dates, fees, and status information."
+description: |
+  Retsuko rental contracts table, containing information about contracts between landlords and tenants.
+  Includes data about guarantees, administrative fees, validity periods and contract status.
+  This table is updated every 1 hour, between 7h30 AM to 22h30 AM BRT.
 columns:
   id:
-    description: "Unique contract identifier"
+    description: "Unique identifier of the contract in the Retsuko system"
     lineage:
-      - datalake_retsuko_test_raw.contract.id
+      - datalake_retsuko_raw.contract.id
   id_external:
-    description: "External contract identifier from SeuBarriga"
+    description: "External identifier of the contract, used for integration with external systems. It's the EBDB's contract ID."
     lineage:
-      - datalake_retsuko_test_raw.contract.external_id
+      - datalake_retsuko_raw.contract.external_id
   country_code:
-    description: "Country code where the contract is located"
+    description: "Country code where the contract is located (e.g.: BR, US)"
     lineage:
-      - datalake_retsuko_test_raw.contract.country
+      - datalake_retsuko_raw.contract.country
   city:
     description: "City where the contract is located"
     lineage:
-      - datalake_retsuko_test_raw.contract.locale
+      - datalake_retsuko_raw.contract.locale
   version:
-    description: "Contract version"
+    description: "Contract version, indicating updates or modifications"
     lineage:
-      - datalake_retsuko_test_raw.contract.version
+      - datalake_retsuko_raw.contract.version
   guarantee:
-    description: "Guarantee amount for the contract"
+    description: "Contract guarantee value in cents"
     lineage:
-      - datalake_retsuko_test_raw.contract.guarantee
+      - datalake_retsuko_raw.contract.guarantee
   is_b2b:
-    description: "Boolean field indicating if this is a B2B contract"
+    description: "Indicates if the contract is B2B (Business to Business) or B2C (Business to Consumer)"
     lineage:
-      - datalake_retsuko_test_raw.contract.is_b2b
+      - datalake_retsuko_raw.contract.is_b2b
   is_rental_paid_in_advance:
-    description: "Boolean field indicating if rental is paid in advance"
+    description: "Indicates if the rent is paid in advance"
     lineage:
-      - datalake_retsuko_test_raw.contract.is_rental_paid_in_advance
+      - datalake_retsuko_raw.contract.is_rental_paid_in_advance
   status:
-    description: "Contract status"
+    description: "Current contract status (active, inactive, cancelled, etc.)"
     lineage:
-      - datalake_retsuko_test_raw.contract.status
+      - datalake_retsuko_raw.contract.status
   blocked:
-    description: "Boolean field that indicates if a contract is blocked to invoice creation"
+    description: "Indicates if the contract is blocked for invoice creation"
     lineage:
-      - datalake_retsuko_test_raw.contract.blocked
+      - datalake_retsuko_raw.contract.blocked
   landlord_transfer_funds_day:
-    description: "Landlord payment day"
+    description: "Day of the month when funds are transferred to the landlord (usually day 12, but in old contracts it's day 10)"
     lineage:
-      - datalake_retsuko_test_raw.contract.landlord_transfer_funds_day
+      - datalake_retsuko_raw.contract.landlord_transfer_funds_day
   landlord_legal_person:
-    description: "Indicates if landlord legal person is physical (PF) or juridical (PJ)"
+    description: "Indicates if the landlord is a physical person (PF) or legal entity (PJ)"
     lineage:
-      - datalake_retsuko_test_raw.contract.landlord_legal_person
+      - datalake_retsuko_raw.contract.landlord_legal_person
   rental_administrator:
-    description: "Rental administrator type"
+    description: "Type of rental administrator (Retsuko, third party, etc.)"
     lineage:
-      - datalake_retsuko_test_raw.contract.rental_administrator
+      - datalake_retsuko_raw.contract.rental_administrator
   adm_fee_minimum_amount:
-    description: "The minimum amount for administration fee"
+    description: "Minimum administrative fee amount in cents. Used in contracts with low average ticket, where the minimum amount is greater than the fee percentage"
     lineage:
-      - datalake_retsuko_test_raw.contract.adm_fee_minimum_amount
+      - datalake_retsuko_raw.contract.adm_fee_minimum_amount
   administration_fee:
-    description: "Administratio fee percentage"
+    description: "Administrative fee percentage (e.g.: 0.08 for 8%)"
     lineage:
-      - datalake_retsuko_test_raw.contract.administration_fee
+      - datalake_retsuko_raw.contract.administration_fee
   ts_signature:
-    description: "Timestamp when the contract was signed"
+    description: "Date and time of contract signature"
     lineage:
-      - datalake_retsuko_test_raw.contract.signature_date
+      - datalake_retsuko_raw.contract.signature_date
   ts_guarantee_started:
-    description: "Timestamp when the guarantee period started"
+    description: "Date and time of contract guarantee start"
     lineage:
-      - datalake_retsuko_test_raw.contract.guarantee_start_date
+      - datalake_retsuko_raw.contract.guarantee_start_date
   ts_period_started:
-    description: "Timestamp when the rental period started"
+    description: "Date and time of contract validity period start"
     lineage:
-      - datalake_retsuko_test_raw.contract.start_period
+      - datalake_retsuko_raw.contract.start_period
   ts_charge_started:
-    description: "Timestamp when charges started"
+    description: "Date and time of contract charge start"
     lineage:
-      - datalake_retsuko_test_raw.contract.start_charge
+      - datalake_retsuko_raw.contract.start_charge
   ts_charge_ended:
-    description: "Timestamp when charges ended"
+    description: "Date and time of contract charge end"
     lineage:
-      - datalake_retsuko_test_raw.contract.end_charge
+      - datalake_retsuko_raw.contract.end_charge
   ts_expected_end_charge:
-    description: "Expected contract ended date. It's used to calculate proportional rent charge"
+    description: "Expected date and time of contract charge end. Used to calculate proportional rent charge"
     lineage:
-      - datalake_retsuko_test_raw.contract.expected_end_charge
+      - datalake_retsuko_raw.contract.expected_end_charge

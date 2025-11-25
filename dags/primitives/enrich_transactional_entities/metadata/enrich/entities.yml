@@ -32,7 +32,7 @@ columns:
       - core_credit_evaluation.credit_evaluation.id_user
       - core_credit_evaluation.credit_evaluation.id_owner
       - datalake_kill_queue_clean.reservation.id
-      - datalake_retsuko_test_clean.invoice.id
+      - datalake_retsuko_clean.invoice.id
       - datalake_entities_views.photo_session.id_entity
       - datalake_entities_views.photo_session.id_user
     description: Surrogate key of all transactional entities.
@@ -49,7 +49,7 @@ columns:
       - datalake_entities_views.onboarding.id_entity
       - core_credit_evaluation.credit_evaluation.id_credit_evaluation
       - datalake_kill_queue_clean.reservation.id
-      - datalake_retsuko_test_clean.invoice.id
+      - datalake_retsuko_clean.invoice.id
       - datalake_entities_views.photo_session.id_entity
     description:
       The primary identifier for an entity, directly from our production systems.
@@ -93,7 +93,7 @@ columns:
       - datalake_entities_views.onboarding.id_tenant
       - datalake_inspection_services_clean.inspection.id_inspector
       - datalake_kill_queue_clean.reservation.id_tenant
-      - datalake_retsuko_test_clean.account.id_main_user
+      - datalake_retsuko_clean.account.id_main_user
       - datalake_entities_views.photo_session.id_user
     description: The unique identifier for a user associated with the entity.
       This id corresponds to the id from the User table in our Main database (EBDB).
@@ -167,8 +167,8 @@ columns:
       - datalake_repairs_clean.repair_request.status
       - datalake_repairs_clean.repair_request.ts_created
       - datalake_inspection_services_clean.repair_request.ts_created
-      - datalake_retsuko_test_clean.invoice.status
-      - datalake_retsuko_test_clean.invoice.ts_created
+      - datalake_retsuko_clean.invoice.status
+      - datalake_retsuko_clean.invoice.ts_created
       - datalake_entities_views.photo_session.properties
       - datalake_entities_views.photo_session.ts_created
     description:
@@ -228,7 +228,7 @@ columns:
       - datalake_kill_queue_clean.reservation.ts_updated
       - datalake_repairs_clean.repair_request.ts_updated
       - datalake_inspection_services_clean.repair_request.ts_updated
-      - datalake_retsuko_test_clean.invoice.ts_retsuko_updated
+      - datalake_retsuko_clean.invoice.ts_retsuko_updated
       - datalake_entities_views.photo_session.ts_updated
     description: Timestamp when the entity became inactive (is_active = FALSE).
       This field captures the ts_updated timestamp for entities that are currently inactive.
@@ -246,7 +246,7 @@ columns:
       - datalake_kill_queue_clean.reservation.ts_created
       - datalake_repairs_clean.repair_request.ts_created
       - datalake_inspection_services_clean.repair_request.ts_created
-      - datalake_retsuko_test_clean.invoice.ts_created
+      - datalake_retsuko_clean.invoice.ts_created
       - datalake_entities_views.photo_session.ts_created
     description: Timestamp of when the entity was created in our product.
   ts_updated:
@@ -262,7 +262,7 @@ columns:
       - datalake_kill_queue_clean.reservation.ts_updated
       - datalake_repairs_clean.repair_request.ts_updated
       - datalake_inspection_services_clean.repair_request.ts_updated
-      - datalake_retsuko_test_clean.invoice.ts_retsuko_updated
+      - datalake_retsuko_clean.invoice.ts_retsuko_updated
       - datalake_entities_views.photo_session.ts_updated
     description: Last timestamp of when the entity was updated in our product.
       This field is used as the filtering criterion for inactive entities - only inactive entities

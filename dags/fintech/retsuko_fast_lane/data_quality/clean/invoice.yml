@@ -1,5 +1,5 @@
 ---
-table_name: datalake_retsuko_test_clean.invoice
+table_name: datalake_retsuko_clean.invoice
 alert_channel: FINTECH_INMETRO_ALERTS
 table_level_validations:
   has_size:

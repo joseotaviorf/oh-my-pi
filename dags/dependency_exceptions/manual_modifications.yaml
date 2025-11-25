@@ -628,7 +628,7 @@ bietlejuice.enrich_revenue_lines:
     - bietlejuice.owner_fees:load-clean-contract:first-run-of-day
     - bietlejuice.rental_guarantee:load-clean-charge:first-run-of-day
     - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
-    - bietlejuice.retsuko:load-clean-contract:first-run-of-day
+    - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
 
 bietlejuice.enrich_robin_hood:
   add:

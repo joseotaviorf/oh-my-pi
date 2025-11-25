@@ -273,7 +273,7 @@ bietlejuice.dw_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-fraud:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-debt-forgiveness:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
-  - bietlejuice.retsuko:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
 bietlejuice.dw_credit_passport:
   - bietlejuice.docx:load-clean-credit-evaluation-aud:first-run-of-day
   - bietlejuice.docx:load-clean-group-member:first-run-of-day
@@ -1191,7 +1191,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
-  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
   - bietlejuice.robin_hood:load-clean-payment-request:first-run-of-day
@@ -1564,8 +1564,8 @@ bietlejuice.enrich_collections_aud:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
-  - bietlejuice.retsuko:load-clean-account:first-run-of-day
-  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-checkout-order-credit-card-payment-button-tapped-events:first-run-of-day
@@ -2549,8 +2549,8 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-entry:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
-  - bietlejuice.retsuko:load-clean-account:first-run-of-day
-  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.enrich_iptu:
   - bietlejuice.iptu_bh:load-clean-iptu-bh:first-run-of-day
   - bietlejuice.iptu_poa:load-clean-iptu-poa:first-run-of-day
@@ -2684,7 +2684,7 @@ bietlejuice.enrich_losses:
   - bietlejuice.dw_fintech_snapshot:load-dw-public-snapshot-dim-contract-snapshot:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-entry:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
-  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.trato_feito:load-clean-accounting-installment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-debt:first-run-of-day
   - bietlejuice.trato_feito:load-clean-installment:first-run-of-day
@@ -3174,13 +3174,13 @@ bietlejuice.enrich_repairs:
   - bietlejuice.repairs:load-clean-service-request:first-run-of-day
   - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
 bietlejuice.enrich_retsuko:
-  - bietlejuice.retsuko:load-clean-account:first-run-of-day
   - bietlejuice.retsuko:load-clean-boleto:first-run-of-day
-  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
   - bietlejuice.retsuko:load-clean-entry:first-run-of-day
-  - bietlejuice.retsuko:load-clean-invoice:first-run-of-day
   - bietlejuice.retsuko:load-clean-monthly-closing-checks:first-run-of-day
   - bietlejuice.retsuko:load-clean-sap-entity:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-invoice:first-run-of-day
 bietlejuice.enrich_revenue_lines:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data:first-run-of-day
@@ -3199,8 +3199,8 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners:first-run-of-day
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud:first-run-of-day
-  - bietlejuice.retsuko:load-clean-account:first-run-of-day
   - bietlejuice.retsuko:load-clean-credit-card-payment:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
 bietlejuice.enrich_reverses_monitoring:
   - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
   - bietlejuice.reverse_atento:load-reverse-csat-front:first-run-of-day
@@ -3468,9 +3468,9 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
-  - bietlejuice.retsuko:load-clean-account:first-run-of-day
-  - bietlejuice.retsuko:load-clean-contract:first-run-of-day
   - bietlejuice.retsuko:load-clean-sap-entity:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-consolidated-invoice:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-feature:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-invoice:first-run-of-day

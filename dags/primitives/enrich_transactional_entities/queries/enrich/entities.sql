@@ -743,12 +743,12 @@ invoice AS (
         i.ts_created,
         i.ts_retsuko_updated AS ts_updated
     FROM
-        datalake_retsuko_test_clean.invoice AS i
+        datalake_retsuko_clean.invoice AS i
     LEFT JOIN
-      datalake_retsuko_test_clean.account AS ai
+      datalake_retsuko_clean.account AS ai
         ON i.id_account = ai.id
     LEFT JOIN
-        datalake_retsuko_test_clean.contract AS c
+        datalake_retsuko_clean.contract AS c
             ON c.id = i.id_contract
     JOIN
         core_contract.contract AS cc

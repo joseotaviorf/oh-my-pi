@@ -21,9 +21,6 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
-    account:
-      get_table_metrics:
-        count: external_id
     audit:
       get_table_metrics:
         count: id
@@ -31,9 +28,6 @@ workflow:
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
-    contract:
-      get_table_metrics:
-        count: external_id
     credit_card_payment:
       get_table_metrics:
         count: external_id
@@ -46,10 +40,6 @@ workflow:
         count: external_id
         max: retsuko_updated_at
     file: {}
-    invoice:
-      get_table_metrics:
-        count: external_id
-        max: retsuko_updated_at
     invoice_partitioned:
       get_table_metrics:
         count: external_id
