@@ -1,0 +1,111 @@
+---
+database_name: datalake_crawler_chaves_na_mao_clean
+table_name: chaves_na_mao
+description: |
+  This table contains the data from the Chaves Na Mão crawler.
+  Only the listings that have the city available are included in the table,
+  following the same logic of the raw table.
+  It is updated weekly, every Thursday at 00:00 BRT, to update the data from the current week,
+  which is provided every Wednesday by the crawler provider.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.id
+    description: |
+      The ID of the listing.
+  origin:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.origin
+    description: |
+      The origin of the listing, in this case, it is always "chaves-na-mao".
+  address:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.address
+    description: |
+      The address of the listing.
+      It has the following address values: city, country, neighborhood, number,
+      state, street and zip_code.
+  city:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.city
+    description: |
+      The city of the listing.
+      It is obtained from the address field, which contains the city.
+      All the listings where the city is not available are removed from the table.
+  geolocation:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.region
+    description: |
+      The geolocation of the listing, containing latitude and longitude.
+  listing_name:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.name
+    description: |
+      The name of the listing.
+  listing_description:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.description
+    description: |
+      The description of the listing.
+  crawl_metadata:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.crawl_metadata
+    description: |
+      The metadata of the crawl, with the listing url.
+  house_info:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.house_info
+    description: |
+      The house info of the listing.
+      It has all the main information about the house, such as area,
+      bathrooms, bedrooms, parking_spaces, etc.
+  type:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.type
+    description: |
+      The type of the listing, contains information about the operation_type, 
+      publication_type, unit_type and usage_type.
+  image_urls:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.image_urls
+    description: |
+      The list of image urls of the listing.
+  advertiser:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.advertiser
+    description: |
+      The advertiser information from the listing.
+      It has the advertiser name, url, phone, address, etc.
+  price:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.price
+    description: |
+      The price of the listing.
+      It has the fields rent and sale.
+      Each one provides information about the price of the listing.
+  date_info:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.date_info
+    description: |
+      It has information about the crawler date, when the listing
+      was created and when it was last updated.
+  year:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.year
+    description: |
+      The year of the crawler date.
+      It is a partition column.
+  month:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.month
+    description: |
+      The month of the crawler date.
+      It is a partition column.
+  day:
+    lineage:
+      - datalake_crawler_chaves_na_mao_raw.chaves_na_mao.day
+    description: |
+      The day of the crawler date.
+      It is a partition column.

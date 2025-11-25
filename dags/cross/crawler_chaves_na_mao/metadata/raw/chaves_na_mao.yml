@@ -1,0 +1,10 @@
+---
+database_name: datalake_crawler_chaves_na_mao_raw
+table_name: chaves_na_mao
+description: |
+  This table contains the data from the Chaves Na Mão crawler.
+  It is updated weekly, every Thursday at 00:00 BRT, to update the data from the current week, 
+  which is provided every Wednesday by the crawler provider.
+  It only contains the listings that have the city available.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
