@@ -7,6 +7,7 @@ SELECT
     photo,
     version,
     blocked AS is_blocked,
+    block_reason,
     birth_date AS dt_birth,
     created_at AS ts_created,
     updated_at AS ts_updated,

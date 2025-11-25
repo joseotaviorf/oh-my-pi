@@ -1,6 +1,9 @@
 SELECT
     id,
     person_id AS id_person,
+    hash_id AS id_anonymization,
+    explained_feedback,
+    feedback,
     version,
     created_at AS ts_created,
     updated_at AS ts_updated,
