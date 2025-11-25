@@ -197,10 +197,10 @@ if __name__ == "__main__":
             for path in filtered_files:
                 df = spark.read.text(path)
                 df = df.select(
-                    df.value.SUBSTR(1,3).alias('id_bank'),
-                    df.value.SUBSTR(4,4).alias('id_service_batch'),
-                    df.value.SUBSTR(8,1).alias('record_type'),
-                    df.value.SUBSTR(9,240).alias('metadata'),
+                    df.value.substr(1,3).alias('id_bank'),
+                    df.value.substr(4,4).alias('id_service_batch'),
+                    df.value.substr(8,1).alias('record_type'),
+                    df.value.substr(9,240).alias('metadata'),
                     )
                 if any(account in path for account in ['97477', '52081']):
                     date_str = re.search(r'_(\d{6})\d+\.ret$', path).group(1)
@@ -225,12 +225,12 @@ if __name__ == "__main__":
             for path in filtered_files:
                 df = spark.read.text(path)
                 df = df.select(
-                    df.value.SUBSTR(1,3).alias('id_bank'),
-                    df.value.SUBSTR(4,4).alias('id_service_batch'),
-                    df.value.SUBSTR(8,1).alias('record_type'),
-                    df.value.SUBSTR(9, 5).alias('record_sequence_number'),
-                    df.value.SUBSTR(14, 1).alias('segment_type'),
-                    df.value.SUBSTR(15,225).alias('metadata'),
+                    df.value.substr(1,3).alias('id_bank'),
+                    df.value.substr(4,4).alias('id_service_batch'),
+                    df.value.substr(8,1).alias('record_type'),
+                    df.value.substr(9, 5).alias('record_sequence_number'),
+                    df.value.substr(14, 1).alias('segment_type'),
+                    df.value.substr(15,225).alias('metadata'),
                     )
                 if any(account in path for account in ['426879']):
                     date_str = re.search(r'_(\d{6})_\d+\.ret$', path).group(1)
@@ -252,8 +252,8 @@ if __name__ == "__main__":
             for path in filtered_files:
                 df = spark.read.text(path)
                 df = df.select(
-                    df.value.SUBSTR(1,1).alias('record_type'),
-                    df.value.SUBSTR(2,399).alias('metadata'),
+                    df.value.substr(1,1).alias('record_type'),
+                    df.value.substr(2,399).alias('metadata'),
                 )
                 if any(account in path for account in ['063180', '148643', '099036', '469916']):
                     date_str = re.search(r'_(\d{8})_', path).group(1)
