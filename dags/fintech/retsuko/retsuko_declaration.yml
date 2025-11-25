@@ -63,6 +63,7 @@ workflow:
     monthly_closing_checks:
       get_table_metrics:
         count: id
+    payment_block: {}
     recurrent_credit_card: {}
     sap_entity:
       get_table_metrics:
