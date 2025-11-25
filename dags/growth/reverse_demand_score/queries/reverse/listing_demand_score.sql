@@ -378,7 +378,13 @@ results AS (
       WHEN quality_score >= 1 AND quality_score < 2 THEN 'B'
       WHEN quality_score >= 2 AND quality_score < 3 THEN 'C'
       WHEN quality_score >= 3 AND quality_score < 4 THEN 'D'
-      WHEN quality_score >= 4 THEN 'E'
+      WHEN quality_score >= 4 AND quality_score < 5 THEN 'E'
+      WHEN quality_score >= 5 AND quality_score < 6 THEN 'F'
+      WHEN quality_score >= 6 AND quality_score < 7 THEN 'G'
+      WHEN quality_score >= 7 AND quality_score < 8 THEN 'H'
+      WHEN quality_score >= 8 AND quality_score < 9 THEN 'I'
+      WHEN quality_score >= 9 AND quality_score < 10 THEN 'J'
+      WHEN quality_score >= 10 THEN 'K'
       ELSE 'X'
     END AS quality_score_result,
   -- 21 days
