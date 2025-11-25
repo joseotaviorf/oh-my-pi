@@ -49,14 +49,6 @@ workflow:
     load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
     load_end_date: "{{ data_interval_start | ds }}"
   tables_customization:
-    certifiable_skills:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "user_skills:read"
-          base_filters:
-            "limit": "1000"
     certificates:
       extraction_type: incremental
       merge_on: ["id"]
