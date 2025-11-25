@@ -77,7 +77,7 @@ attribution AS (
     support_sessions.id_source_ctwa,
     support_sessions.url_source_ctwa,
     support_sessions.type_source_ctwa,
-    inbound_leads.ts_created
+    support_sessions.ts_created
   FROM 
     inbound_leads
   INNER JOIN
@@ -103,7 +103,7 @@ attribution AS (
     support_sessions.id_source_ctwa,
     support_sessions.url_source_ctwa,
     support_sessions.type_source_ctwa,
-    il.ts_created
+    support_sessions.ts_created
   FROM
     inbound_leads AS il
   INNER JOIN 
@@ -129,7 +129,7 @@ indirect_attribution AS ( -- when we don't have the identifier coming from sourc
     st.department,
     il.phone_number,
     st.quinto_andar_phone_number,
-    il.ts_created
+    ss.ts_created
   FROM 
     inbound_leads AS il
   INNER JOIN 

@@ -57,7 +57,7 @@ columns:
     lineage:
       - datalake_sauron_clean.session.metadata
   ts_created:
-    description: The timestamp of the lead creation event.
+    description: The timestamp of the session when was the lead creation.
     lineage: 
-      - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
+      - datalake_sauron_clean.session.ts_created
   
