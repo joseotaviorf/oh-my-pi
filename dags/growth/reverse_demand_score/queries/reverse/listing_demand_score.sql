@@ -296,9 +296,7 @@ lpv_14_days_for_sale_base AS (
 ),
 last_lpv_14_days_for_sale AS (
 SELECT
-  id_house,
-  MAX(CASE WHEN qt_lpv_14d_for_sale < 3 THEN dt_event END) AS dt_last_lpv_14_below_3,
-  MAX(CASE WHEN qt_lpv_14d_for_sale > 8 THEN dt_event END) AS dt_last_lpv_14_above_8
+  id_house
 FROM lpv_14_days_for_sale_base
 GROUP BY ALL
 ),
@@ -309,8 +307,6 @@ for_sale_score AS (
     dr.city_group,
     dr.city_name,
     dr.region_code,
-    dt_last_lpv_14_below_3,
-    dt_last_lpv_14_above_8,
     if(date(dhl.ts_last_publication) is null,date(dhl.ts_first_publication),date(dhl.ts_first_publication)) as dt_publication,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-1,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_1d_for_sale,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-3,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_3d_for_sale,
@@ -339,7 +335,7 @@ for_sale_score AS (
       ON lpv_14.id_house = ol.sk_house
   WHERE
     d.date >= DATE_ADD(DAY,-21,CURRENT_DATE)
-  GROUP BY 1,2,3,4,5,6,7,8
+  GROUP BY 1,2,3,4,5,6
 ),
 results AS (
   SELECT
@@ -363,9 +359,6 @@ results AS (
     fs.qt_lpv_14d_for_sale,
     fs.qt_lpv_21d_for_sale,
     fs.dt_publication AS dt_publication_for_sale,
-    DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), dt_last_lpv_14_below_3) AS days_last_lpv_14_below_3,
-    DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), dt_last_lpv_14_above_8) AS days_last_lpv_14_above_8,
-    DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), DATE('2025-03-26')) AS days_since_test_started,
     CASE
       WHEN liquidity_score >= 0 AND liquidity_score < 10 THEN 'A'
       WHEN liquidity_score >= 10 AND liquidity_score < 20 THEN 'B'
@@ -593,14 +586,11 @@ results AS (
       COALESCE(lpv_7d_for_rent, 'X'), -- Adding at the request of SH on 2025-01-06
       COALESCE(lpv_7d_for_sale, 'X'), -- Adding at the request of SH on 2025-01-06
       COALESCE(lpv_14d_for_rent, 'X'), -- Adding at the request of SH on 2025-02-20
-      COALESCE(lpv_14d_for_sale, 'X'),-- Adding at the request of SH on 2025-02-20
+      COALESCE(lpv_14d_for_sale, 'X')-- Adding at the request of SH on 2025-02-20
       -- COALESCE(lpv_21d_for_rent, 'X'), -- Removed at the request of SH on 2025-03-18
       -- COALESCE(lpv_21d_for_sale, 'X'),-- Removed at the request of SH on 2025-03-18
-      COALESCE(days_last_lpv_14_below_3, 'X'), -- Adding at the request of SH on 2025-03-18
-      COALESCE(days_last_lpv_14_above_8, 'X'), -- Adding at the request of SH on 2025-03-18
       -- COALESCE(lpv_1d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
       -- COALESCE(lpv_1d_for_sale, 'X') -- Removed at the request of SH on 2024-11-05
-      CASE WHEN days_since_test_started < 0 THEN 0 ELSE days_since_test_started END -- Added at the request of SH on 2025-03-24
     ) AS demand_score,
     CURRENT_DATE AS dt_snapshot
   FROM for_rent_score AS fr
@@ -608,12 +598,12 @@ results AS (
     ON (fr.id_house = fs.id_house)
 )
 SELECT
-  r.*, 
-  CASE 
+  r.*,
+  CASE
     WHEN fhlt.sk_ended_rental_confirmed_date = -1 AND dt_publication_for_rent IS NOT NULL THEN 'Ocupado' -- imoveis de rent ou hibridos
     ELSE 'Desocupado'
   END AS occupation_status
 FROM results AS r
-LEFT JOIN dw_offboarding.fact_house_listing_terminations  AS fhlt 
+LEFT JOIN dw_offboarding.fact_house_listing_terminations  AS fhlt
   ON fhlt.sk_next_house_listing_consolidated = r.id_house_listing
 GROUP BY ALL
