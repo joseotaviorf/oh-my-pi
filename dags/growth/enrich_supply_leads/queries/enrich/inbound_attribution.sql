@@ -22,6 +22,8 @@ WITH inbound_leads AS ( -- all leads that could bring task ids or sessions ids
 support_sessions AS (
   SELECT
     s.id AS id_session,
+    s.source_environment,
+    s.department,
     REGEXP_EXTRACT(COALESCE(s.user_phone, s.user_data:["user_phone"]), '[0-9]+', 0) AS phone_number,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
     GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa,
@@ -40,6 +42,7 @@ support_tasks AS (
     ch.id_task,
     ch.id_session,
     1 AS task_priority,
+    ch.queue_name AS department,
     REGEXP_EXTRACT(ch.twilio_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
     ch.ts_created AS ts_task_created
   FROM
@@ -52,6 +55,7 @@ support_tasks AS (
       WHEN ca.direction = 'inbound' THEN 2
       WHEN ca.direction = 'outbound' THEN 3
     END task_priority,
+    ca.queue_name AS department,
     CASE
       WHEN ca.direction = 'inbound' THEN REGEXP_EXTRACT(ca.to_phone_number, '[0-9]+', 0)
       WHEN ca.direction = 'outbound' THEN REGEXP_EXTRACT(ca.from_phone_number, '[0-9]+', 0)
@@ -65,6 +69,8 @@ attribution AS (
     inbound_leads.id_lead_ebdb,
     support_sessions.id_session,
     inbound_leads.id_task,
+    support_sessions.source_environment,
+    support_tasks.department,
     COALESCE(inbound_leads.phone_number, support_sessions.phone_number) AS phone_number,
     support_tasks.quinto_andar_phone_number,
     COALESCE(inbound_leads.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
@@ -89,6 +95,8 @@ attribution AS (
     il.id_lead_ebdb,
     cs.id_sauron_session AS id_session,
     '-1' AS id_task,
+    support_sessions.source_environment,
+    support_sessions.department,
     COALESCE(il.phone_number, support_sessions.phone_number) AS phone_number,
     REGEXP_EXTRACT(wpp_channel.twilio_phone_number, '[0-9]+', 0) AS quinto_andar_phone_number,
     COALESCE(il.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,
@@ -117,6 +125,8 @@ indirect_attribution AS ( -- when we don't have the identifier coming from sourc
     il.id_lead_ebdb,
     ss.id_session,
     st.id_task,
+    ss.source_environment,
+    st.department,
     il.phone_number,
     st.quinto_andar_phone_number,
     il.ts_created
@@ -145,6 +155,8 @@ final_attribution AS (
     id_lead_ebdb,
     id_session,
     id_task,
+    source_environment,
+    department,
     phone_number,
     quinto_andar_phone_number,
     NULL AS ctwa_clid,
@@ -161,6 +173,8 @@ final_attribution AS (
     att.id_lead_ebdb,
     att.id_session,
     att.id_task,
+    att.source_environment,
+    att.department,
     att.phone_number,
     att.quinto_andar_phone_number,
     att.ctwa_clid,
@@ -181,6 +195,8 @@ SELECT
   final_attribution.id_session,
   final_attribution.id_task,
   COALESCE(final_attribution.id_source_ctwa, support_sessions.id_source_ctwa) AS id_source_ctwa,
+  final_attribution.source_environment,
+  final_attribution.department,
   final_attribution.phone_number,
   final_attribution.quinto_andar_phone_number,
   COALESCE(final_attribution.ctwa_clid, support_sessions.ctwa_clid) AS ctwa_clid,

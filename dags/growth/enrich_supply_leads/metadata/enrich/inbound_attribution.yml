@@ -23,6 +23,16 @@ columns:
     description: The Id for the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_sauron_clean.session.metadata
+  source_environment:
+    description: The source environment associated with the support session when the lead was created.
+    lineage:
+      - datalake_sauron_clean.session.source_environment
+  department:
+    description: The department associated with the support session when the lead was created.
+    lineage:
+      - datalake_customer_support.chats.queue_name
+      - datalake_customer_support.calls.queue_name
+      - datalake_sauron_clean.session.department
   phone_number:
     description: The customer phone number associated with their lead creation.
     lineage:
