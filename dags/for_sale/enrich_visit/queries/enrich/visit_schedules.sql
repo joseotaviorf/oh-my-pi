@@ -1,98 +1,154 @@
-WITH
-filtered_schedule AS (
-  SELECT DISTINCT
-    id_schedule,
-    id_visit
-  FROM
-    datalake_ebdb_clean.visit_status_log
-  WHERE
-    DATE(ts_created) >= DATE('2024-11-01')
-),
-schedule AS (
+WITH schedule AS (
+  WITH new AS (
+    SELECT
+      vsl.id_visit,
+      vsl.id_schedule,
+      MAX(
+        CASE
+          WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.id_author_user
+        END
+      ) AS id_user_creator,
+      MAX(
+        CASE
+          WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.author_user_role
+        END
+      ) AS user_role_creator,
+      MAX(
+        CASE
+          WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.channel
+        END
+      ) AS channel_creation,
+      MAX(
+        CASE
+          WHEN vsl.on_behalf_of = 'TENANT_LIVING' THEN vsl.ts_created
+        END
+      ) AS ts_event_tenant,
+      MIN(
+        CASE
+          WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.ts_created
+        END
+      ) AS ts_schedule_created,
+      MIN(
+        CASE
+          WHEN vsl.event_type = 'VISIT_REQUESTED' THEN vsl.ts_created
+        END
+      ) AS ts_schedule_requested,
+      MIN(
+        CASE
+          WHEN vsl.event_type = 'VISIT_RESCHEDULED' THEN vsl.ts_created
+        END
+      ) AS ts_schedule_rescheduled,
+      MIN(
+        CASE
+          WHEN vsl.event_type = 'VISIT_CONFIRMED' THEN vsl.ts_created
+        END
+      ) AS ts_schedule_confirmed,
+      CASE
+        WHEN MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
+        ELSE 'REQUEST'
+      END AS schedule_origin,
+      LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule,
+      MIN_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS first_confirmed_channel,
+      MIN_BY(vsl.author_user_role, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS first_confirmed_user_role,
+      MAX_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'SUPPLY') AS last_confirm_answer_supply,
+      MAX_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'DEMAND') AS last_confirm_answer_demand,
+      MAX_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'AGENT') AS last_confirm_answer_agent,
+      MAX_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'TENANT_LIVING') AS last_confirm_answer_tenant_living,
+      MAX_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'SUPPLY') AS channel_confirmed_supply,
+      MAX_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'DEMAND') AS channel_confirmed_demand,
+      MAX_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'AGENT') AS channel_confirmed_agent,
+      MAX_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'ANSWER_CONFIRMED' AND vsl.on_behalf_of = 'TENANT_LIVING') AS channel_confirmed_tenant_living
+    FROM
+      datalake_ebdb_clean.visit_status_log AS vsl
+    JOIN
+      datalake_ebdb_clean.visit AS v
+        ON vsl.id_visit = v.id
+    WHERE
+      v.ts_created::DATE >= '2024-11-01'
+    GROUP BY 1, 2
+  ),
+  old AS (
+    SELECT
+      b.id_visit,
+      b.id AS id_schedule,
+      MAX_BY(b.slot_day, b.ts_created) AS slot_schedule,
+      MIN_BY(bsc.id_user, bsc.id) AS id_user_creator,
+      LEAD(b.id) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS id_succeed_schedule,
+      LAG(b.id) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS id_last_schedule,
+      MAX(b.dt_booking) AS dt_schedule_visit,
+      MIN(b.ts_created) AS ts_schedule_created,
+      MIN(bsc.ts_created) FILTER (WHERE bsc.status = 'Marcado') AS ts_schedule_confirmed
+    FROM
+      datalake_ebdb_clean.booking_status_change AS bsc
+    LEFT JOIN
+      datalake_ebdb_clean.booking AS b
+        ON bsc.id_booking = b.id
+    LEFT JOIN
+      datalake_ebdb_clean.visit AS v
+        ON b.id_visit = v.id
+    WHERE
+      b.type = 'Visita'
+      AND v.ts_created::DATE >= '2020-01-01'
+      AND v.ts_created::DATE < '2024-11-01'
+    GROUP BY 1,2
+  )
   SELECT
-    vsl.id_visit,
-    vsl.id_schedule,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.id_author_user
-      END
-    ) AS id_user_creator,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.author_user_role
-      END
-    ) AS user_role_creator,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_CANCELED', 'VISIT_REQUEST_CANCELED') THEN vsl.id_author_user
-      END
-    ) AS id_user_cancelation,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.channel
-      END
-    ) AS channel_creation,
-    MAX(
-      CASE
-        WHEN vsl.on_behalf_of = 'TENANT_LIVING' THEN vsl.ts_created
-      END
-    ) AS ts_event_tenant,
-    MIN(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.ts_created
-      END
-    ) AS ts_schedule_created,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_REQUESTED' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_requested,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_RESCHEDULED' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_rescheduled,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_CONFIRMED' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_confirmed,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_DONE' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_completed,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_UNSUCCESSFUL' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_unsuccessful,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') THEN vsl.ts_created
-      END
-    ) AS ts_schedule_canceled,
-    CASE
-      WHEN MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
-      ELSE 'REQUEST'
-    END AS schedule_origin,
-    LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule,
-    MIN_BY(channel, ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS first_confirmed_channel,
-    MIN_BY(author_user_role, ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS first_confirmed_user_role,
-    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS last_confirm_answer_supply,
-    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'DEMAND') AS last_confirm_answer_demand,
-    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'AGENT') AS last_confirm_answer_agent,
-    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS last_confirm_answer_tenant_living,
-    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'SUPPLY') AS channel_confirmed_supply,
-    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'DEMAND') AS channel_confirmed_demand,
-    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'AGENT') AS channel_confirmed_agent,
-    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'TENANT_LIVING') AS channel_confirmed_tenant_living
+    id_visit,
+    id_schedule,
+    id_user_creator,
+    'NEW' AS source_schedule,
+    NULL AS slot_schedule,
+    user_role_creator,
+    first_confirmed_channel,
+    first_confirmed_user_role,
+    channel_creation,
+    NULL AS dt_schedule_visit,
+    ts_event_tenant,
+    ts_schedule_created,
+    ts_schedule_requested,
+    ts_schedule_rescheduled,
+    ts_schedule_confirmed,
+    schedule_origin,
+    id_succeed_schedule,
+    last_confirm_answer_supply,
+    last_confirm_answer_demand,
+    last_confirm_answer_agent,
+    last_confirm_answer_tenant_living,
+    channel_confirmed_supply,
+    channel_confirmed_demand,
+    channel_confirmed_agent,
+    channel_confirmed_tenant_living
   FROM
-    datalake_ebdb_clean.visit_status_log AS vsl
-  JOIN
-    filtered_schedule AS fs
-      ON vsl.id_schedule = fs.id_schedule AND vsl.id_visit = fs.id_visit
-  GROUP BY 1, 2
+    new
+  UNION ALL
+  SELECT
+    id_visit,
+    id_schedule,
+    id_user_creator,
+    'OLD' AS source_schedule,
+    slot_schedule,
+    NULL AS user_role_creator,
+    NULL AS first_confirmed_channel,
+    NULL AS first_confirmed_user_role,
+    NULL AS channel_creation,
+    dt_schedule_visit,
+    NULL AS ts_event_tenant,
+    ts_schedule_created,
+    IF(id_last_schedule IS NULL, ts_schedule_created, NULL) AS ts_schedule_requested,
+    IF(id_last_schedule IS NOT NULL, ts_schedule_created, NULL) AS ts_schedule_rescheduled,
+    ts_schedule_confirmed,
+    IF(id_last_schedule IS NULL, 'REQUEST', 'RESCHEDULE') AS schedule_origin,
+    id_succeed_schedule,
+    NULL AS last_confirm_answer_supply,
+    NULL AS last_confirm_answer_demand,
+    NULL AS last_confirm_answer_agent,
+    NULL AS last_confirm_answer_tenant_living,
+    NULL AS channel_confirmed_supply,
+    NULL AS channel_confirmed_demand,
+    NULL AS channel_confirmed_agent,
+    NULL AS channel_confirmed_tenant_living
+  FROM
+    old
 ),
 visit_aud AS (
   SELECT
@@ -111,7 +167,6 @@ schedule_enriched AS (
     schedule.id_schedule,
     schedule.id_user_creator,
     schedule.user_role_creator,
-    schedule.id_user_cancelation,
     schedule.first_confirmed_channel,
     schedule.first_confirmed_user_role,
     schedule.channel_creation,
@@ -120,9 +175,6 @@ schedule_enriched AS (
     schedule.ts_schedule_requested,
     schedule.ts_schedule_rescheduled,
     schedule.ts_schedule_confirmed,
-    schedule.ts_schedule_completed,
-    schedule.ts_schedule_unsuccessful,
-    schedule.ts_schedule_canceled,
     schedule.schedule_origin,
     schedule.id_succeed_schedule,
     schedule.last_confirm_answer_supply,
@@ -133,7 +185,10 @@ schedule_enriched AS (
     schedule.channel_confirmed_demand,
     schedule.channel_confirmed_agent,
     schedule.channel_confirmed_tenant_living,
-    va.ts_visit AS ts_schedule_visit
+    CASE
+      WHEN schedule.source_schedule = 'NEW' THEN va.ts_visit
+      WHEN schedule.source_schedule = 'OLD' THEN MAKE_TIMESTAMP(EXTRACT(YEAR FROM schedule.dt_schedule_visit), EXTRACT(MONTH FROM schedule.dt_schedule_visit), EXTRACT(DAY FROM schedule.dt_schedule_visit), (schedule.slot_schedule/4) + 11, (schedule.slot_schedule%4)*15, 0)
+    END AS ts_schedule_visit
   FROM
     schedule
   LEFT JOIN
@@ -218,23 +273,6 @@ schedule_aux AS (
   LEFT JOIN
     datalake_ebdb_clean.user AS u
       ON u.id = v.id_agent
-),
-booking_3p_demand_agent AS (
-  SELECT
-    b.id_schedule,
-    wc.id_company_hubspot AS id_company_demand,
-    wc.3p_partner AS partner_3p_demand
-  FROM
-    agent_contract AS ac
-  INNER JOIN
-    schedule_aux AS b
-      ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
-      AND ac.id_agent = b.id_agent
-  INNER JOIN
-    datalake_ebdb_work_contract.work_contract AS wc
-      ON wc.id = ac.id_work_contract
-  WHERE
-    is_3p_contract = TRUE
 ),
 booking_hub_agent AS (
   SELECT
@@ -386,10 +424,12 @@ filtered_visit AS (
     v.id_visitor,
     v.id_house,
     v.id_agent,
+    vbm.id_company_demand,
     v.code,
     v.business_context,
     v.behavior,
     vbm.business_model,
+    vbm.is_3p_demand,
     v.dt_visit,
     v.id_real_estate_agent_rating,
     v.ts_visit,
@@ -416,7 +456,7 @@ SELECT DISTINCT
   v.id_house,
   s.id_user_creator AS id_user_creation,
   s.user_role_creator AS user_role_creation,
-  s.id_user_cancelation,
+  vcu.id_user AS id_user_cancelation,
   v.id_agent AS id_user_agent,
   ua.id_agent,
   so.id_offer,
@@ -425,7 +465,7 @@ SELECT DISTINCT
   sovd.id_user_secretariat_on_visit_date,
   ls.id_user_last_secretariat,
   COALESCE(cs_company.sk_company, cs_hubspot.sk_company, p_3p_supply.sk_company) AS id_company_supply,
-  COALESCE(NULLIF(COALESCE(cs_demand.sk_company, p_3p_demand.sk_company), -1), dm.id_company_demand) AS id_company_demand,
+  v.id_company_demand,
   s.id_succeed_schedule,
   CONCAT(v.id_visitor, '_', v.id_house) AS id_sale_flow,
   h.id_region,
@@ -474,18 +514,18 @@ SELECT DISTINCT
     ELSE NULL
   END AS is_confirmed_by_tenant_living,
   IF(s.ts_schedule_confirmed IS NOT NULL, TRUE, FALSE) AS is_confirmed,
-  IF(s.ts_schedule_completed IS NOT NULL, TRUE, FALSE) AS is_completed,
-  IF(s.ts_schedule_unsuccessful IS NOT NULL, TRUE, FALSE) AS is_unsuccessful,
-  IF(s.ts_schedule_canceled IS NOT NULL, TRUE, FALSE) AS is_canceled,
+  IF(pva.event_type = 'VISIT_DONE', TRUE, FALSE) AS is_completed,
+  IF(pva.event_type = 'VISIT_UNSUCCESSFUL', TRUE, FALSE) AS is_unsuccessful,
+  IF(vcu.ts_created IS NOT NULL, TRUE, FALSE) AS is_canceled,
   IF(s.ts_schedule_rescheduled IS NOT NULL, TRUE, FALSE) AS is_rescheduled,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
-  IF(dm.id_schedule IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
+  v.is_3p_demand,
   IF(v.behavior IN ('CONFIRMATION_TENANT_LIVING','CONFIRMATION_TENANT_LIVING_ASSURED','CONFIRMATION_TENANT_LIVING_REQUIRED'), TRUE, FALSE) AS has_tenant_living,
-  DATEDIFF(v.dt_visit, ts_schedule_canceled) AS days_visit_cancelled_to_visit,
+  DATEDIFF(v.dt_visit, vcu.ts_created) AS days_visit_cancelled_to_visit,
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
-  DATEDIFF(ts_schedule_canceled, ts_schedule_created) AS days_visit_booked_to_cancelled,
-  DATEDIFF(ts_schedule_completed, ts_schedule_created) AS days_visit_booked_to_visit_completed,
+  DATEDIFF(vcu.ts_created, ts_schedule_created) AS days_visit_booked_to_cancelled,
+  DATEDIFF(IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL), ts_schedule_created) AS days_visit_booked_to_visit_completed,
   so.hours_booking_to_offer,
   so.hours_visit_to_offer,
   v.ts_visit,
@@ -493,9 +533,9 @@ SELECT DISTINCT
   s.ts_schedule_requested,
   s.ts_schedule_rescheduled,
   s.ts_schedule_confirmed,
-  s.ts_schedule_completed,
-  s.ts_schedule_unsuccessful,
-  s.ts_schedule_canceled,
+  IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL) AS ts_schedule_completed,
+  IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.ts_post_visit_agent, NULL) AS ts_schedule_unsuccessful,
+  vcu.ts_created AS ts_schedule_canceled,
   s.ts_schedule_visit,
   v_cin.ts_checkin AS ts_visit_checkin,
   br.dt_creation AS ts_buyer_review_rating,
@@ -528,9 +568,6 @@ LEFT JOIN
   datalake_hub_services.secretariat_hierarchy AS su
     ON su.id_user_5a = s.id_user_creator
 LEFT JOIN
-  booking_3p_demand_agent AS dm
-    ON s.id_schedule = dm.id_schedule
-LEFT JOIN
   fixed_agent AS fa
     ON s.id_schedule = fa.id_schedule
 LEFT JOIN
@@ -556,12 +593,6 @@ LEFT JOIN
     ON v.code = br.id_reviewed
     AND v.id_visitor = br.id_reviewer
 LEFT JOIN
-  datalake_company.company_sks AS cs_demand
-    ON dm.id_company_demand = cs_demand.id_hubspot
-LEFT JOIN
-  datalake_company.company_sks AS p_3p_demand
-    ON dm.partner_3p_demand = p_3p_demand.extracted_3p_tag
-LEFT JOIN
   datalake_company.company_sks AS cs_company
     ON hl.uuid_company = cs_company.uuid_company
 LEFT JOIN
@@ -570,5 +601,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_company.company_sks AS p_3p_supply
     ON hl.partner_3p_supply = p_3p_supply.extracted_3p_tag
-WHERE
-  s.id_user_creator IS NOT NULL
+LEFT JOIN
+  datalake_visit.post_visit_agent_unified AS pva
+    ON s.id_schedule = pva.id_schedule
+LEFT JOIN
+  datalake_visit.visit_cancellation_unified AS vcu
+    ON s.id_schedule = vcu.id_schedule

@@ -10,6 +10,16 @@ columns:
       - datalake_ebdb_clean.visit_status_log.id_visit
       - datalake_ebdb_clean.visit_cancellation_details.id_visit
     description: Primary key of this table. The cancellation information is at visit granularity. Data since 2015.
+  id_schedule:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_schedule
+      - datalake_ebdb_clean.booking.id
+    description: ID of schedule (booking) that was cancelled. Data since 2015.
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_author_user
+      - datalake_ebdb_clean.booking_status_change.id_user
+    description: ID of user who cancelled the visit. Data since 2015.
   channel:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
