@@ -1,5 +1,5 @@
 dag:
-  name: cyber_historical_queue
+  name: cyber_historical_tree
   schedule_start_date: 2025, 11, 1
   schedule_interval: 30 8 * * *
   owner: Data Fintech
@@ -37,7 +37,7 @@ workflow:
     - "{partitions}"
   tables_customization:
     tb_historico_arvore:
-      clean_table_name: cyber_historical_queue
+      clean_table_name: cyber_historical_tree
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
