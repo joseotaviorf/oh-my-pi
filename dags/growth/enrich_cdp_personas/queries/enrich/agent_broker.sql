@@ -18,3 +18,4 @@ LEFT JOIN
         ON u.id_agent = ad.id
 WHERE
     b.types = 'Visita'
+    AND u.id IS NOT NULL -- Some users found on agent_data table but not on user table, so we're filtering them out
