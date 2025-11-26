@@ -116,4 +116,4 @@ cluster:
     spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: USER_ISOLATION
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
