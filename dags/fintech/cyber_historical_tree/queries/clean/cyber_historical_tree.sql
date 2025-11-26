@@ -32,5 +32,8 @@ SELECT
   DATE(HILCHGDT5) AS dt_evictions_label_change,
   DATE(HILCHGDT6) AS dt_label_change_6,
   HIREGISTRO AS ts_record_insertion,
-  CURRENT_TIMESTAMP() AS ts_load
+  year,
+  month,
+  day,
+  NOW() AS ts_load
 FROM datalake_cyber_raw.tb_historico_arvore
