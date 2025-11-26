@@ -16,8 +16,10 @@ WITH consolidated_visits AS (
 SELECT
   cv.id_visit,
   cv.id_visit_business_model,
+  c.sk_company AS id_company_demand,
   vt.uuid_company,
   cv.business_model,
+  c.company_name AS partner_3p_demand,
   cv.business_model LIKE '%3P_SUPPLY%' AS is_3p_supply,
   cv.business_model LIKE '%3P_DEMAND%' AS is_3p_demand,
   cv.business_model LIKE '%3P_LEAD_GEN%' AS is_3p_lead_gen,
@@ -32,5 +34,8 @@ LEFT JOIN
   datalake_ebdb_clean.visitor AS vt
     ON cv.id_visit = vt.id_visit
       AND vt.type = 'Agent'
+LEFT JOIN
+  datalake_company.company_sks AS c
+    ON vt.uuid_company = c.uuid_company
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY vt.id_visit ORDER BY vt.ts_updated DESC) = 1

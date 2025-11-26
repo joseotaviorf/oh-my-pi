@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_business_model.id
     description: The unique identifier of the visit business model record. Null if no separate business model record exists.
+  id_company_demand:
+    lineage:
+      - datalake_company.company_sks.sk_company
+    description: The surrogate key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company.
   uuid_company:
     lineage:
       - datalake_ebdb_clean.visitor.uuid_company
@@ -21,6 +25,10 @@ columns:
       - datalake_ebdb_clean.visit_business_model.business_model
       - datalake_ebdb_clean.visit.business_model
     description: The business model of the visit. Coalesces from visit_business_model.business_model first, then visit.business_model if null.
+  partner_3p_demand:
+    lineage:
+      - datalake_company.company_sks.company_name
+    description: The name of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company.
   is_3p_supply:
     lineage:
       - datalake_ebdb_clean.visit_business_model.business_model
