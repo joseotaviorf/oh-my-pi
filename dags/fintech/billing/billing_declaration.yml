@@ -1,7 +1,7 @@
 dag:
   name: billing
   schedule_start_date: 2025, 9, 1
-  schedule_interval: 30 7,12 * * *
+  schedule_interval: 0 8,13 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |

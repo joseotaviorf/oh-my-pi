@@ -1133,3 +1133,6 @@ bietlejuice.enrich_sale_salesforce:
 bietlejuice.enrich_atlas_db_quality_metrics:
   add:
     - bietlejuice.amplitude_subpartitioned:load-clean-183047-atlas-db-house-characteristics-events:first-run-of-day
+bietlejuice.enrich_billing:
+  - bietlejuice.billing:load-clean-contract-revision
+  - bietlejuice.billing:load-clean-contract
