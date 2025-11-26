@@ -1,4 +1,17 @@
-SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+-- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+WITH amplitude_partner_taxonomy AS (
+  SELECT
+    id_device,
+    utm_campaign,
+    utm_medium,
+    utm_source,
+    year,
+    month,
+    day
+  FROM 
+    datalake_amplitude_clean.283048_register_form_completed_events
+)
+SELECT DISTINCT
   p.id as sk_partner,
   p.id as id_partner,
   p.id_amplitude_device,
@@ -37,15 +50,15 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
 FROM
   datalake_ebdb_clean.partner AS p
 LEFT JOIN
-  datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy AS apt
+  amplitude_partner_taxonomy AS apt
     ON p.id_amplitude_device = apt.id_device
 LEFT JOIN
   datalake_ebdb_clean.partner_agent AS pa
     ON pa.id_partner = p.id
 LEFT JOIN 
-    datalake_ebdb_country.user AS u
-        ON pa.id_user = u.id_user
+  datalake_ebdb_country.user AS u
+    ON pa.id_user = u.id_user
 LEFT JOIN
-    datalake_ebdb_clean.state AS st
-       ON p.id_state = st.id
+  datalake_ebdb_clean.state AS st
+    ON p.id_state = st.id
 WINDOW w AS (PARTITION BY apt.id_device ORDER BY apt.year, apt.month, apt.DAY ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)

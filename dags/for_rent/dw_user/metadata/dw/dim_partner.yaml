@@ -72,15 +72,15 @@ columns:
     description: 'Internal locality code, calculated based on the partner city and state. Ex: (L001, L002, L003).'
   utm_campaign:
     lineage:
-    - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
+    - datalake_amplitude_clean.283048_register_form_completed_events.utm_campaign
     description: 'Identifies the promotion of an specific campaign.'
   utm_medium:
     lineage:
-    - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_medium
+    - datalake_amplitude_clean.283048_register_form_completed_events.utm_medium
     description: 'Identifies the type of strategy used on the campaign.'
   utm_source:
     lineage:
-    - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_source
+    - datalake_amplitude_clean.283048_register_form_completed_events.utm_source
     description: 'Identifies which url sent the traffic.'
   ts_joined_partnership:
     lineage:

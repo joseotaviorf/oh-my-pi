@@ -477,6 +477,9 @@ workflow:
     250821_photo_session_detail_viewed_events:
       run_optimize: false
       run_vacuum: false
+    283048_register_form_completed_events:
+      run_optimize: false
+      run_vacuum: false
     440441_home_page_viewed_events:
       run_optimize: false
       run_vacuum: false

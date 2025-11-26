@@ -1084,6 +1084,7 @@ bietlejuice.dw_table_snapshot:
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
 bietlejuice.dw_user:
+  - bietlejuice.amplitude_subpartitioned:load-clean-283048-register-form-completed-events:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_finance:load-clean-bank:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
@@ -1095,7 +1096,6 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-sales-rep:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
-  - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-agent-current-program:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-user:first-run-of-day
@@ -1298,8 +1298,6 @@ bietlejuice.enrich_amplitude_page_viewed_events:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-schedule-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events:first-run-of-day
-bietlejuice.enrich_amplitude_partner_taxonomy:
-  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.enrich_amplitude_sale_visit_intent:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-schedule-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-intent-clicked-events:first-run-of-day

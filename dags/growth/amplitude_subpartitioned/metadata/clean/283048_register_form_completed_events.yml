@@ -1,0 +1,58 @@
+database_name: datalake_amplitude_clean
+table_name: 283048_register_form_completed_events
+description: This table contains register_form_completed events from app 283048.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.events.id_amplitude
+    description: Column id_amplitude from Amplitude events
+  id_event:
+    lineage:
+    - datalake_amplitude_clean.events.id_event
+    description: Column id_event from Amplitude events
+  id_device:
+    lineage:
+    - datalake_amplitude_clean.events.id_device
+    description: Column id_device from Amplitude events
+  user_country:
+    lineage:
+    - datalake_amplitude_clean.events.country
+    description: Column country from Amplitude events
+  country_code:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Country code from user_properties.country
+  utm_campaign:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: UTM campaign from user_properties.utm_campaign
+  utm_medium:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: UTM medium from user_properties.utm_medium
+  utm_source:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: UTM source from user_properties.utm_source
+  user_properties:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Column user_properties from Amplitude events
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
+    description: Column ts_event from Amplitude events
+  year:
+    lineage:
+    - datalake_amplitude_clean.events.year
+    description: Column year from Amplitude events
+  month:
+    lineage:
+    - datalake_amplitude_clean.events.month
+    description: Column month from Amplitude events
+  day:
+    lineage:
+    - datalake_amplitude_clean.events.day
+    description: Column day from Amplitude events
