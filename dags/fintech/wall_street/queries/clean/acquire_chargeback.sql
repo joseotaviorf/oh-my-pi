@@ -1,0 +1,26 @@
+SELECT
+    id,
+    businessEntityId AS id_business_entity,
+    financeEntityId AS id_finance_entity,
+    chargeId AS id_charge,
+    internalId AS id_internal,
+    chargebackReasonCode AS chargeback_reason_code,
+    chargebackReason AS chargeback_reason,
+    status,
+    transactionAmount AS transaction_amount,
+    installment,
+    totalInstallments AS total_installments,
+    cardBrand AS card_brand,
+    acquireAuthCode AS acquire_auth_code,
+    acquireCode AS acquire_code,
+    acquireNsu AS acquire_nsu,
+    acquireTid AS acquire_tid,
+    hashId AS hash,
+    pdvTef AS pdv_tef,
+    timestamp(chargebackDebitDate) AS chargeback_debit_date,
+    timestamp(chargebackNotificationDate) AS chargeback_notification_date,
+    timestamp(transactionDate) AS transaction_date,
+    timestamp(createdAt) AS ts_created,
+    timestamp(updatedAt) AS ts_updated
+FROM
+    datalake_wall_street_raw.acquirechargeback

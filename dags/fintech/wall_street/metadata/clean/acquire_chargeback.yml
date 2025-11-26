@@ -1,0 +1,98 @@
+database_name: datalake_wall_street_clean
+table_name: acquire_chargeback
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: This table centralizes chargeback information processed by Simetrik, including transaction details and reason codes.
+columns:
+  id:
+    description: "Primary key for the chargeback record."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.id
+  id_business_entity:
+    description: "Identifier for the business entity involved in the chargeback."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.businessEntityId
+  id_finance_entity:
+    description: "Identifier for the finance entity involved in the chargeback."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.financeEntityId
+  id_charge:
+    description: "Identifier for the original charge/transaction."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.chargeId
+  id_internal:
+    description: "Internal system identifier."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.internalId
+  chargeback_reason_code:
+    description: "Code specifying the reason for the chargeback (e.g., fraud, service not received)."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.chargebackReasonCode
+  chargeback_reason:
+    description: "Detailed description of the chargeback reason."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.chargebackReason
+  status:
+    description: "Current status of the chargeback process."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.status
+  transaction_amount:
+    description: "The monetary value of the transaction."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.transactionAmount
+  installment:
+    description: "The current installment number of the transaction."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.installment
+  total_installments:
+    description: "The total number of installments for the transaction."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.totalInstallments
+  card_brand:
+    description: "The brand of the card used (e.g., Visa, Mastercard)."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.cardBrand
+  acquire_auth_code:
+    description: "Acquirer authorization code."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.acquireAuthCode
+  acquire_code:
+    description: "Acquirer specific code."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.acquireCode
+  acquire_nsu:
+    description: "Acquirer NSU (Número Sequencial Único)."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.acquireNsu
+  acquire_tid:
+    description: "Acquirer Terminal ID."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.acquireTid
+  hash:
+    description: "Hashed identifier for privacy/security."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.hashId
+  pdv_tef:
+    description: "Point of Sale (PDV) or TEF (Transferência Eletrônica de Fundos) flag/identifier."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.pdvTef
+  chargeback_debit_date:
+    description: "Timestamp when the chargeback was debited."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.chargebackDebitDate
+  chargeback_notification_date:
+    description: "Timestamp when the chargeback was officially notified."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.chargebackNotificationDate
+  transaction_date:
+    description: "Timestamp of the original transaction."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.transactionDate
+  ts_created:
+    description: "Timestamp when the record was created in the raw system."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.createdAt
+  ts_updated:
+    description: "Timestamp when the record was last updated in the raw system."
+    lineage:
+      - datalake_wall_street_raw.acquirechargeback.updatedAt

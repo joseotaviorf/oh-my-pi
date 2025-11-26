@@ -16,6 +16,9 @@ workflow:
   lineage_product_database_name: wallstreet
   dbutils_secret_key: WALL_STREET_DB
   tables_customization:
+    AcquireChargeback:
+      clean_table_name: acquire_chargeback
+      primary_keys: ["id"]
     Blocklist:
       clean_table_name: blocklist
       primary_keys: ["id"]
