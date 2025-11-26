@@ -1,0 +1,141 @@
+---
+database_name: datalake_cyber_historical_tree_clean
+table_name: cyber_historical_tree
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Tabela de histórico da árvore de contratos do sistema Cyber. Armazena snapshots dos dados no momento da alteração de Filas ou Labels, permitindo rastreamento completo das mudanças nos contratos de cobrança. Tabela particionada por ano (HIANO) com política de não exclusão para suportar crescimento ilimitado."
+columns:
+  id:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hissnum
+    description: "CPF/CNPJ do cliente"
+  id_contract:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiacct
+    description: "Número do Contrato"
+  contract_group:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiacctg
+    description: "Grupo do Contrato"
+  segmentation_queue:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hique
+    description: "Fila de Segmentação - Código da primeira fila de cobrança"
+  commission_queue:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hique2
+    description: "Fila de Comissão - Código da segunda fila de cobrança"
+  agreement_queue:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hique3
+    description: "Fila de Acordo - Código da terceira fila de cobrança"
+  digital_channel_queue:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hique4
+    description: "Fila de Canal Digital - Código da quarta fila de cobrança"
+  eviction_queue:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hique5
+    description: "Fila de Despejo - Código da quinta fila de cobrança"
+  credit_denial_queue:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hique6
+    description: "Fila de Negativa de Crédito - Código da sexta fila de cobrança"
+  olos_dialer_label:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilabel1
+    description: "Label OLOS Dialer - Primeira etiqueta/marcador do contrato"
+  evictions_reason:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilabel2
+    description: "Razão de Despejos - Segunda etiqueta/marcador do contrato"
+  campaign_label:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilabel3
+    description: "Label de Campanha - Terceira etiqueta/marcador do contrato"
+  serasa_limpa_nome_label:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilabel4
+    description: "Label Serasa Limpa Nome - Quarta etiqueta/marcador do contrato"
+  evictions_label:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilabel5
+    description: "Label de Despejos - Quinta etiqueta/marcador do contrato"
+  label_6:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilabel6
+    description: "Label 6 - Sexta etiqueta/marcador do contrato"
+  days_delayed:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hidays
+    description: "Dias de Atraso do contrato"
+  outstanding_balance:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hicurbal
+    description: "Saldo Devedor atual do contrato"
+  total_delayed_amount:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiamtdlq
+    description: "Valor Total em Atraso"
+  partition_year:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiano
+    description: "Ano da gravação do registro - utilizado para particionamento da tabela"
+  dt_due_date:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hidlqdt
+    description: "Data de Vencimento"
+  dt_segmentation_queue_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiqchgdt
+    description: "Data de alteração da Fila de Segmentação"
+  dt_commission_queue_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiqchgdt2
+    description: "Data de alteração da Fila de Comissão"
+  dt_agreement_queue_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiqchgdt3
+    description: "Data de alteração da Fila de Acordo"
+  dt_digital_channel_queue_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiqchgdt4
+    description: "Data de alteração da Fila de Canal Digital"
+  dt_eviction_queue_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiqchgdt5
+    description: "Data de alteração da Fila de Despejo"
+  dt_credit_denial_queue_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiqchgdt6
+    description: "Data de alteração da Fila de Negativa de Crédito"
+  dt_olos_dialer_label_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilchgdt1
+    description: "Data de alteração da Label OLOS Dialer"
+  dt_evictions_reason_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilchgdt2
+    description: "Data de alteração da Razão de Despejos"
+  dt_campaign_label_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilchgdt3
+    description: "Data de alteração da Label de Campanha"
+  dt_serasa_limpa_nome_label_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilchgdt4
+    description: "Data de alteração da Label Serasa Limpa Nome"
+  dt_evictions_label_change:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilchgdt5
+    description: "Data de alteração da Label de Despejos"
+  dt_label_change_6:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hilchgdt6
+    description: "Data de alteração da Label 6"
+  ts_record_insertion:
+    lineage:
+      - datalake_cyber_raw.tb_historico_arvore.hiregistro
+    description: "Data e hora (SYSDATE) que o registro foi inserido na tabela - timestamp de criação do snapshot"
+  ts_load:
+    description: "Timestamp de carregamento dos dados no datalake"

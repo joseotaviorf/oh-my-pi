@@ -1,0 +1,60 @@
+dag:
+  name: cyber_historical_queue
+  schedule_start_date: 2025, 11, 1
+  schedule_interval: 30 8 * * *
+  owner: Data Fintech
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      Ingestão da tabela TB_HISTORICO_ARVORE do sistema Cyber, que armazena o histórico completo da árvore de contratos.
+
+      Esta tabela captura snapshots dos dados no momento da alteração de Filas ou Labels, permitindo rastreamento
+      completo das mudanças nos contratos de cobrança ao longo do tempo.
+
+      Características principais:
+      - Armazena até 6 filas (HIQUE) e 6 labels (HILABEL) por contrato com suas respectivas datas de alteração
+      - Particionada por ano (HIANO) para suportar crescimento ilimitado
+      - Política de não exclusão de dados para manter histórico completo
+      - Inclui informações de contrato, cliente (CPF/CNPJ), saldo devedor e dias de atraso
+
+      Link para documentação completa do sistema Cyber: https://drive.google.com/drive/folders/1qkegwyyddsnj37hdoa2yh8fz52cftfhx?usp=drive_link
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_cyber_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 2), 'load_end_date') }}"
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
+  tables_customization:
+    tb_historico_arvore:
+      clean_table_name: cyber_historical_queue
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['HIREGISTRO']"
+        - False
+        - "[]"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  databricks_conn_id: databricks_new
