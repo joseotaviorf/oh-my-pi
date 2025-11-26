@@ -310,6 +310,9 @@ wonka_cluster:
             destination: "{{ var.value.artifacts_bucket }}/openlineage/init_script_openlineage.sh"
             region: ""
         - s3:
+            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_spark_metrics_plugin.sh"
+            region: ""
+        - s3:
             destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
             region: ""
         - s3:

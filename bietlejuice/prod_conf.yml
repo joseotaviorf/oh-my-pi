@@ -269,6 +269,9 @@ wonka_cluster:
         availability: SPOT_WITH_FALLBACK
     init_scripts:
         - s3:
+            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_spark_metrics_plugin.sh"
+            region: ""
+        - s3:
             destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
             region: ""
         - s3:

@@ -103,6 +103,19 @@ steps:
       event: [push, tag]
       branch: forno
 
+  export-install-spark-metrics-plugin-forno:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: scripts/wonka/install_spark_metrics_plugin.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/wonka/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
   export-init-script-to-s3-prod:
     image: plugins/s3:1.4.0
     settings:
@@ -134,6 +147,19 @@ steps:
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: scripts/wonka/get_credentials_from_vault.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/wonka/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
+  export-install-spark-metrics-plugin-prod:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: scripts/wonka/install_spark_metrics_plugin.sh
       target: bi-etl-ejuice/
       strip_prefix: scripts/wonka/
       acl: bucket-owner-full-control
