@@ -41,11 +41,6 @@ columns:
       - dw_visit.dim_business_context.sk_business_context
     description:
       Is the key of the visit model.
-  sk_behavior_type:
-    lineage:
-      - datalake_visit.visit_schedules.behavior
-    description:
-      What is the behavior of the visit.
   sk_business_unit:
     lineage:
       - datalake_visit.visit_schedules.id_business_unit
@@ -114,11 +109,6 @@ columns:
   sk_succeed_schedule:
     description:
       The next schedule case when this schedule have a reschedule.
-  sk_origin_type:
-    lineage:
-      - dw_visit.dim_origin_type
-    description:
-      Is the key of origin of the event.
   days_visit_cancelled_to_visit:
     lineage:
       - datalake_visit.visit_schedules.days_visit_cancelled_to_visit

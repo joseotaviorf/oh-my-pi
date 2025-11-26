@@ -203,10 +203,6 @@ columns:
     description: Journey days since the first created event.
     lineage:
         - datalake_visit.visits.journey_days
-  has_tenant_living:
-    description: If have a tenant living in the house.
-    lineage:
-        - datalake_visit.visits.ts_event_tenant
   hours_between_created_and_visit_day:
     description: Hours between the creation of visit and visit day.
   hours_between_request_and_cancellation:

@@ -7,7 +7,6 @@ SELECT
     es.id_house AS sk_house,
     bc.sk_business_context,
     vm.sk_visit_model,
-    db.sk_behavior_type,
     es.id_business_unit AS sk_business_unit,
     es.id_company_supply AS sk_company_supply,
     es.id_company_demand AS sk_company_demand,
@@ -22,7 +21,6 @@ SELECT
     es.id_offer AS sk_offer,
     dim_heh.sk_house_entrance,
     es.id_succeed_schedule AS sk_succeed_schedule,
-    sk_origin_type,
     es.days_visit_cancelled_to_visit,
     es.days_visit_booked_to_visit,
     es.days_visit_booked_to_cancelled,
@@ -53,17 +51,11 @@ SELECT
 FROM
     datalake_visit.visit_schedules AS es
 LEFT JOIN
-    dw_visit.dim_origin_type AS dot
-        ON es.schedule_origin = dot.origin_name
-LEFT JOIN
     dw_visit.dim_business_context AS bc
         ON es.business_context = bc.business_context
 LEFT JOIN
     dw_visit.dim_visit_model AS vm
         ON es.visit_model = vm.visit_model
-LEFT JOIN
-    dw_visit.dim_behavior AS db
-        ON es.behavior = db.behavior_type
 LEFT JOIN
     dw_house.dim_house_entrance_history AS dim_heh
         ON es.id_house = dim_heh.sk_house

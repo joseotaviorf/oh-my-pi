@@ -30,7 +30,6 @@ SELECT
   ppa.id_house_listing_relation AS sk_ppa_relation,
   bc.sk_business_context,
   dim_heh.sk_house_entrance,
-  db.sk_behavior_type,
   dvs.sk_visit_status,
   funnel_os.sk_visit_funnel AS sk_funnel_offer_submitted,
   funnel_oa.sk_visit_funnel AS sk_funnel_offer_accepted,
@@ -69,7 +68,6 @@ SELECT
   v.is_canceled,
   v.is_unsuccessful,
   v.journey_days,
-  IF(sk_behavior_type IN (2,6,7), 1, 0) AS has_tenant_living,
   DATEDIFF(HOUR, v.ts_created, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_created_and_visit_day,
   DATEDIFF(HOUR, v.ts_created, v.ts_visit_canceled) AS hours_between_request_and_cancellation,
   DATEDIFF(HOUR, vse.ts_first_booked, v.ts_visit_canceled) AS hours_between_first_booked_and_visit_day,
@@ -82,9 +80,6 @@ FROM
 LEFT JOIN
   visit_status_events AS vse
     ON v.id_visit = vse.id_visit
-LEFT JOIN
-  dw_visit.dim_behavior AS db
-    ON v.behavior = db.behavior_type
 LEFT JOIN
   dw_visit.dim_visit_status AS dvs
     ON v.computed_status = dvs.status_name
