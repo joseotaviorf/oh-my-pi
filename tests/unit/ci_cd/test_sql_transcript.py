@@ -401,10 +401,10 @@ class TestSQLTranspilerRunnerGitDiff:
         mock_git_instance = Mock()
         mock_git_service.return_value = mock_git_instance
         mock_git_instance.get_modified_files_from_diff.return_value = {
-            "dags/fintech/query1.sql": "A",
-            "dags/fintech/query2.sql": "M",
-            "dags/fintech/README.md": "A",
-            "dags/fintech/query3.sql": "D",
+            "dags/planning_and_performance/query1.sql": "A",
+            "dags/planning_and_performance/query2.sql": "M",
+            "dags/planning_and_performance/README.md": "A",
+            "dags/planning_and_performance/query3.sql": "D",
         }
         mock_git_instance.NEW_OR_MODIFIED_FILE_STATUS = ["A", "M"]
 
@@ -415,10 +415,10 @@ class TestSQLTranspilerRunnerGitDiff:
 
         # Assert
         assert len(sql_files) == 2
-        assert "dags/fintech/query1.sql" in sql_files
-        assert "dags/fintech/query2.sql" in sql_files
-        assert "dags/fintech/README.md" not in sql_files
-        assert "dags/fintech/query3.sql" not in sql_files
+        assert "dags/planning_and_performance/query1.sql" in sql_files
+        assert "dags/planning_and_performance/query2.sql" in sql_files
+        assert "dags/planning_and_performance/README.md" not in sql_files
+        assert "dags/planning_and_performance/query3.sql" not in sql_files
 
     @patch("scripts.ci_cd.sql_transcript.GitService")
     def test_get_sql_files_with_fetch(self, mock_git_service):
@@ -443,6 +443,65 @@ class TestSQLTranspilerRunnerGitDiff:
         # Assert
         mock_git_instance.fetch.assert_called_once_with("master")
         assert sql_files == []
+
+    @patch("scripts.ci_cd.sql_transcript.GitService")
+    def test_get_sql_files_not_in_planning_and_performance(self, mock_git_service):
+        """Test that files NOT in planning_and_performance folder are filtered out."""
+        # Arrange
+        args = Mock()
+        args.dry_run = False
+        args.from_branch = "origin/master"
+        args.to_branch = "HEAD"
+        args.fetch = False
+
+        mock_git_instance = Mock()
+        mock_git_service.return_value = mock_git_instance
+        mock_git_instance.get_modified_files_from_diff.return_value = {
+            "dags/fintech/query1.sql": "A",
+            "dags/support_and_service/query2.sql": "M",
+            "dags/other_folder/query3.sql": "A",
+        }
+        mock_git_instance.NEW_OR_MODIFIED_FILE_STATUS = ["A", "M"]
+
+        runner = SQLTranspilerRunner(args)
+
+        # Act
+        sql_files = runner.get_sql_files_from_git_diff()
+
+        # Assert
+        assert sql_files == []
+
+    @patch("scripts.ci_cd.sql_transcript.GitService")
+    def test_get_sql_files_mixed_folders(self, mock_git_service):
+        """Test that only planning_and_performance files are returned when mixed with other folders."""
+        # Arrange
+        args = Mock()
+        args.dry_run = False
+        args.from_branch = "origin/master"
+        args.to_branch = "HEAD"
+        args.fetch = False
+
+        mock_git_instance = Mock()
+        mock_git_service.return_value = mock_git_instance
+        mock_git_instance.get_modified_files_from_diff.return_value = {
+            "dags/fintech/query1.sql": "A",
+            "dags/planning_and_performance/query2.sql": "M",
+            "dags/planning_and_performance/query3.sql": "A",
+            "dags/other_folder/query4.sql": "M",
+        }
+        mock_git_instance.NEW_OR_MODIFIED_FILE_STATUS = ["A", "M"]
+
+        runner = SQLTranspilerRunner(args)
+
+        # Act
+        sql_files = runner.get_sql_files_from_git_diff()
+
+        # Assert
+        assert len(sql_files) == 2
+        assert "dags/planning_and_performance/query2.sql" in sql_files
+        assert "dags/planning_and_performance/query3.sql" in sql_files
+        assert "dags/fintech/query1.sql" not in sql_files
+        assert "dags/other_folder/query4.sql" not in sql_files
 
 
 class TestSQLTranspilerRunnerDirectory:
@@ -500,7 +559,9 @@ class TestSQLTranspilerRunnerRun:
 
         mock_git_instance = Mock()
         mock_git_service.return_value = mock_git_instance
-        mock_git_instance.get_modified_files_from_diff.return_value = {"test.sql": "A"}
+        mock_git_instance.get_modified_files_from_diff.return_value = {
+            "dags/planning_and_performance/test.sql": "A"
+        }
         mock_git_instance.NEW_OR_MODIFIED_FILE_STATUS = ["A", "M"]
 
         mock_transpile_file.return_value = True
@@ -513,7 +574,9 @@ class TestSQLTranspilerRunnerRun:
 
         # Assert
         assert exit_code == 0
-        mock_transpile_file.assert_called_once_with("test.sql")
+        mock_transpile_file.assert_called_once_with(
+            "dags/planning_and_performance/test.sql"
+        )
 
     @patch("scripts.ci_cd.sql_transcript.GitService")
     def test_run_git_diff_mode_no_files(self, mock_git_service):
@@ -538,6 +601,34 @@ class TestSQLTranspilerRunnerRun:
 
         # Assert
         assert exit_code == 0
+
+    @patch("scripts.ci_cd.sql_transcript.GitService")
+    def test_run_git_diff_mode_filtered_out(self, mock_git_service):
+        """Test run in git-diff mode when files are filtered out (not in planning_and_performance)."""
+        # Arrange
+        args = Mock()
+        args.mode = "git-diff"
+        args.from_branch = "origin/master"
+        args.to_branch = "HEAD"
+        args.fetch = False
+        args.dry_run = False
+
+        mock_git_instance = Mock()
+        mock_git_service.return_value = mock_git_instance
+        # Files exist but NOT in planning_and_performance folder
+        mock_git_instance.get_modified_files_from_diff.return_value = {
+            "dags/fintech/query1.sql": "A",
+            "dags/other/query2.sql": "M",
+        }
+        mock_git_instance.NEW_OR_MODIFIED_FILE_STATUS = ["A", "M"]
+
+        runner = SQLTranspilerRunner(args)
+
+        # Act
+        exit_code = runner.run()
+
+        # Assert
+        assert exit_code == 0  # Should exit successfully when filtered out
 
     def test_run_single_file_mode_not_found(self):
         """Test run in single-file mode with non-existent file."""

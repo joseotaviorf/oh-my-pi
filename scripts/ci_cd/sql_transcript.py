@@ -240,10 +240,25 @@ class SQLTranspilerRunner:
             self.args.to_branch
         )
         
-        # Filter for SQL files that are new or modified
+        # Check if any modified files are in dags/planning_and_performance folder
+        has_planning_and_performance_changes = any(
+            "dags/planning_and_performance" in file_path 
+            for file_path in modified_files.keys()
+        )
+        
+        if not has_planning_and_performance_changes:
+            logger.info("ℹ️  No modified files found in dags/planning_and_performance folder.")
+            logger.info("ℹ️  Skipping SQL transpilation.")
+            return []
+        
+        logger.info("✓ Found changes in dags/planning_and_performance folder.")
+        
+        # Filter for SQL files that are new or modified AND in planning_and_performance folder
         sql_files = [
             file_path for file_path, status in modified_files.items()
-            if file_path.endswith('.sql') and status in self.git_service.NEW_OR_MODIFIED_FILE_STATUS
+            if file_path.endswith('.sql') 
+            and status in self.git_service.NEW_OR_MODIFIED_FILE_STATUS
+            and "dags/planning_and_performance" in file_path
         ]
         
         return sql_files
@@ -272,7 +287,8 @@ class SQLTranspilerRunner:
         if self.args.mode == 'git-diff':
             sql_files = self.get_sql_files_from_git_diff()
             if not sql_files:
-                logger.info("No new or modified SQL files found in git diff.")
+                logger.info("No new or modified SQL files found to transpile.")
+                logger.info("✓ Transpilation skipped successfully.")
                 return 0
             logger.info(f"Found {len(sql_files)} SQL file(s) to transpile from git diff.")
             
