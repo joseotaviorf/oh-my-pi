@@ -507,6 +507,110 @@ SELECT
   id_amplitude,
   id_session,
   id_user,
+  CAST(NULL AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "native_home_section_tiles_list" AS event_name,
+  event_properties,
+  CAST(NULL AS STRING) AS summary_state,
+  "Home Page" AS funnel_step,
+  0 AS level,
+  "Triggers when the user views the Super Critical Tile" AS event_description,
+  "home_entry_points" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_native_home_section_tiles_list_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(NULL AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "tile_perform_action" AS event_name,
+  event_properties,
+  CAST(NULL AS STRING) AS summary_state,
+  "Home Page" AS funnel_step,
+  0 AS level,
+  "Triggers when the user clicks the Super Critical Tile" AS event_description,
+  "home_entry_points" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_tile_perform_action_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(NULL AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "native_home_section_banner" AS event_name,
+  event_properties,
+  CAST(NULL AS STRING) AS summary_state,
+  "Home Page" AS funnel_step,
+  0 AS level,
+  "Triggers when the user views the Home Banner" AS event_description,
+  "home_entry_points" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_native_home_section_banner_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(NULL AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "banner_perform_action" AS event_name,
+  event_properties,
+  CAST(NULL AS STRING) AS summary_state,
+  "Home Page" AS funnel_step,
+  0 AS level,
+  "Triggers when the user clicks the Home Banner" AS event_description,
+  "home_entry_points" AS feature,
+  TRUE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_banner_perform_action_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
   CAST(ep_id_contract AS BIGINT) AS id_contract,
   CAST(NULL AS BIGINT) AS id_invoice,
   device_family,
