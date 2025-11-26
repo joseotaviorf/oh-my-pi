@@ -53,8 +53,6 @@ WITH issues AS (
         GET_JSON_OBJECT(fields, '$.customfield_19688.value') AS b_final_resolution,
         GET_JSON_OBJECT(fields, '$.customfield_25199') AS aura_invalid_agent_rule_applied,
         GET_JSON_OBJECT(fields, '$.customfield_25244') AS aura_invalid_agent_status,
-        -- custom cols
-        CAST(GET_JSON_OBJECT(fields, '$.customfield_10200.requestType.id') AS BIGINT) = 9228 AS is_data_ai_team_bug,
         -- comments and attachments
         INT(GET_JSON_OBJECT(fields,'$.comment.total')) AS total_comments,
         SIZE(FROM_JSON(GET_JSON_OBJECT(fields, '$.attachment'), "ARRAY<STRING>")) AS total_attachments,
@@ -250,7 +248,8 @@ SELECT
     END, 2) AS resolution_delay_hours,
     i.ts_sla_first_response_completed IS NOT NULL AND i.is_sla_first_response_breached IS FALSE AS is_sla_first_response_agreed,
     i.ts_sla_resolution_completed IS NOT NULL AND i.is_sla_resolution_breached IS FALSE AS is_sla_resolution_agreed,
-    i.is_data_ai_team_bug,
+    COALESCE(i.id_request_type = 9228 AND i.squad = "Data", FALSE) AS is_data_ai_team_bug,
+    COALESCE(i.id_request_type = 9228 AND i.squad <> "Data" AND ARRAY_CONTAINS(i.initial_squad, "Data"), FALSE) AS is_data_ai_team_redirected,
     i.current_status = "Invalid" AS is_invalid_bug,
     i.current_status = "Triage" AS is_in_triage,
     i.current_status = "NEED MORE INFO" AS is_need_more_info,

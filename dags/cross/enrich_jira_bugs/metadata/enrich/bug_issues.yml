@@ -340,7 +340,17 @@ columns:
   is_data_ai_team_bug:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_10200.requestType.id
-    description: Indicator whether the ticket belongs to the Data & AI team request type
+    description: |
+      Indicates whether the issue currently belongs to the Data & AI team. 
+      “True” means the bug is owned and handled by the Data & AI team.
+  is_data_ai_team_redirected:
+    lineage:
+      - datalake_jira_clean.issues.fields.customfield_10200.requestType.id
+      - datalake_jira_clean.issues.fields.customfield_11356.value
+      - datalake_jira_clean.issues.fields.customfield_11681
+    description: |
+      Indicates whether the issue was originally created by the Data & AI team but later reassigned to another team.
+      “True” means the bug started in the Data & AI team but has since been redirected elsewhere.
   ts_status:
     lineage:
       - datalake_jira_clean.issues.fields.customfield_10200.currentStatus.statusDate.iso8601
