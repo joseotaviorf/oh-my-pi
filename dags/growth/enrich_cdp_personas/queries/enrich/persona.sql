@@ -69,3 +69,15 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_cdp_personas.agent_inspector
+UNION ALL
+SELECT
+    id_user,
+    uuid_person,
+    'AGENT_BROKER' AS persona,
+    NULL AS journey_step,
+    is_active,
+    ts_first_event,
+    ts_last_event,
+    NOW() AS ts_load
+FROM
+    datalake_cdp_personas.agent_broker

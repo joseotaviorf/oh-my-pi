@@ -1,0 +1,35 @@
+---
+database_name: datalake_cdp_personas
+table_name: agent_broker
+description:
+  This table consolidates all broker agents from QuintoAndar in a historical view.
+  Broker agents are identified by having the 'Visita' (Visit) type in the Main's agent_data_types table.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: The user id of the broker agent.
+    lineage:
+      - datalake_ebdb_clean.user.id
+  uuid_person:
+    description: The UUID Person of the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  is_active:
+    description: Boolean flag indicating if the user is active or not as a broker agent.
+    lineage:
+      - datalake_ebdb_clean.agent_data.is_active
+  ts_first_event:
+    description: Timestamp of the first user event while as a broker.
+      Some old users don't have a creation date, so we're assuming the update date for these cases.
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_created
+      - datalake_ebdb_clean.agent_data.ts_updated
+  ts_last_event:
+    description: Timestamp of the last user event while as a broker.
+      For active agents (is_active = TRUE), this field is NULL. For inactive agents, it represents when they became inactive.
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_updated
+  ts_load:
+    description: Timestamp indicating when the data was loaded in the data lake.
+
