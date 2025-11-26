@@ -144,19 +144,28 @@ LEFT JOIN
   ON mwu.sk_session = oi.id_session
 )
 SELECT DISTINCT
-  sk_channel,
-  sk_session,
-  sk_message,
-  sk_user_sender,
-  origin,
-  user_type,
-  message,
+  mwo.sk_channel,
+  mwo.sk_session,
+  mwo.sk_message,
+  FIRST(fcc.sk_task) OVER (PARTITION BY mwo.sk_message ORDER BY fcc.ts_task_created DESC) AS sk_task,
+  mwo.sk_user_sender,
+  mwo.origin,
+  mwo.user_type,
+  mwo.message,
   CASE
-    WHEN LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created) IS NOT NULL
-      THEN DATEDIFF(SECOND, LAG(ts_created) OVER (PARTITION BY sk_channel ORDER BY ts_created), ts_created)
+    WHEN LAG(mwo.ts_created) OVER (PARTITION BY mwo.sk_channel ORDER BY mwo.ts_created) IS NOT NULL
+      THEN DATEDIFF(SECOND, LAG(mwo.ts_created) OVER (PARTITION BY mwo.sk_channel ORDER BY mwo.ts_created), ts_created)
     ELSE NULL
   END AS reply_time,
-  ts_created,
+  mwo.ts_created,
+  FIRST(fcc.ts_task_created) OVER (PARTITION BY mwo.sk_message ORDER BY fcc.ts_task_created DESC) AS ts_task_created,
   NOW() AS ts_load
 FROM
- messages_with_origins
+ messages_with_origins AS mwo
+ LEFT JOIN dw_customer_support.fact_customer_contacts AS fcc
+  ON mwo.sk_session = fcc.sk_session
+  AND mwo.ts_created >= fcc.ts_task_created
+WHERE
+  mwo.ts_created >= DATE('{load_start_date}') - INTERVAL 1 YEAR
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY mwo.sk_message ORDER BY fcc.ts_task_created DESC) = 1

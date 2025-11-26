@@ -20,6 +20,10 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.event_payload
       - datalake_internal_chat_clean.internal_chat_messages.id_message
     description: Message identifier.
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Twilio task identifier.
   sk_user_sender:
     lineage:
       - datalake_ebdb_user.user.id
@@ -44,5 +48,9 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.ts_created
       - datalake_internal_chat_clean.internal_chat_messages.ts_created
     description: Timestamp indicating when the message was created.
+  ts_task_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp indicating when the Twilio task the message belongs to was created.
   ts_load:
     description: Timestamp of when data was loaded to the table.
