@@ -27,6 +27,7 @@ workflow:
     offline_attribution:
       - plaquinhas_offline_touchpoints
       - secretaria_offline_touchpoints
+      - concierge_attribution
     cross_channel_full:
       - offline_attribution
     attribution_cross_channel:

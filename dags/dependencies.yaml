@@ -3806,6 +3806,8 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-contact:first-run-of-day
   - bietlejuice.casa_mineira_crm:load-clean-media-contact:first-run-of-day
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions:first-run-of-day

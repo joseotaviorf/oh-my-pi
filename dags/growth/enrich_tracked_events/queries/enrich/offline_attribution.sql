@@ -77,3 +77,17 @@ WHERE
   AND COALESCE(bqr.phone_number, bqr.id_business) is not null
   AND bqr.id_channel = 1
   AND bqr.id_campaign = 62
+UNION ALL
+SELECT 
+  id_user,
+  id_contact,
+  event_name,
+  origin,
+  channel,
+  agent,
+  ts_event,
+  year,
+  month,
+  day
+FROM
+    datalake_tracked_events.concierge_attribution

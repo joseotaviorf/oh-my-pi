@@ -1,0 +1,53 @@
+---
+database_name: datalake_tracked_events
+table_name: concierge_attribution
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: Table utilized by the Growth team to describe concierge attribution events from WhatsApp Concierge Chat interactions, including Facebook, Online Classifieds, and Placas.
+columns:
+  id_user:
+    description: Unique identifier for the user associated with the concierge event. Derived from session id_user or user id matched by phone number.
+    lineage:
+      - datalake_copilot_service_clean.session.id_user
+      - datalake_ebdb_clean.user.id
+  id_contact:
+    description: Unique identifier for the contact related to the concierge attribution event. Corresponds to the session ID.
+    lineage:
+      - datalake_copilot_service_clean.message.id_session
+      - datalake_copilot_service_clean.session.id
+  event_name:
+    description: Name of the concierge event. Always 'Contact' for these events.
+  origin:
+    description: Origin source of the event, indicating where the initial interaction occurred (Facebook, Online Classifieds, or Placas). Derived from message content patterns.
+    lineage:
+      - datalake_copilot_service_clean.message.content
+  channel:
+    description: Communication channel through which the event was recorded (Facebook, Online Classifieds, or Placas). Derived from message content patterns.
+    lineage:
+      - datalake_copilot_service_clean.message.content
+  agent:
+    description: Agent or representative handling the contact or event. Always 'Concierge' for these events.
+  business_context:
+    description: Business context of the event, indicating whether it relates to Rent, Sale, or Hybrid (both Rent and Sale). Facebook events are always Hybrid. Online Classifieds and Placas events are determined by analyzing message content for keywords related to rent and/or sale.
+    lineage:
+      - datalake_copilot_service_clean.message.content
+  content:
+    description: Content of the message sent by the user in the WhatsApp Concierge Chat.
+    lineage:
+      - datalake_copilot_service_clean.message.content
+  ts_event:
+    description: Timestamp of when the concierge event occurred.
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
+  year:
+    description: Year when the event was recorded.
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
+  month:
+    description: Month when the event was recorded.
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
+  day:
+    description: Day when the event was recorded.
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
