@@ -20,7 +20,7 @@ workflow:
       - experiment_config
     recs_impressions:
       - experiment_config
-      - global_metrics
+      # - global_metrics
     recs_impressions_processed:
       - experiment_config_processed
       - recs_impressions
@@ -29,17 +29,17 @@ workflow:
       - sale_flow_past_30_days
       - rent_outlier_users_past_30_days
       - sale_outlier_users_past_30_days
-    search_impressions:
-      - experiment_config_processed
-      - house_publication_dates
-      - rent_flow_past_30_days
-      - sale_flow_past_30_days
-      - rent_outlier_users_past_30_days
-      - sale_outlier_users_past_30_days
+    # search_impressions:
+    #   - experiment_config_processed
+    #   - house_publication_dates
+    #   - rent_flow_past_30_days
+    #   - sale_flow_past_30_days
+    #   - rent_outlier_users_past_30_days
+    #   - sale_outlier_users_past_30_days
     recs_global_metrics:
       - recs_impressions_processed
-    global_metrics:
-      - search_impressions
+    # global_metrics:
+    #   - search_impressions
     experiment_config_processed:
       - experiment_config
   tables_customization:
