@@ -8,10 +8,11 @@ dag:
 workflow:
   layer: reverse
   type: access
+  bucket_config_name: planning_and_performance_bucket
   load_spark_job: load_reverse_atento
   spark_job_arguments:
     - "{environment}"
-    - "{planning_and_performance_bucket}"
+    - "{bucket}"
     - "{dag_name}"
     - "{schema}"
     - "{table_name}"
