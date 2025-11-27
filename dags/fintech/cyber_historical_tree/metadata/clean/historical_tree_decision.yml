@@ -1,6 +1,6 @@
 ---
 database_name: datalake_cyber_clean
-table_name: cyber_historical_tree
+table_name: historical_tree_decision
 owner: bianca.martins@quintoandar.com.br
 domain: Fintech
 description: "Tabela de histórico da árvore de contratos do sistema Cyber. Armazena snapshots dos dados no momento da alteração de Filas ou Labels, permitindo rastreamento completo das mudanças nos contratos de cobrança. Tabela particionada por ano (HIANO) com política de não exclusão para suportar crescimento ilimitado."

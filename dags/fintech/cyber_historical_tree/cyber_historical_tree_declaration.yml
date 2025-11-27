@@ -38,7 +38,7 @@ workflow:
     - "{partitions}"
   tables_customization:
     tb_historico_arvore:
-      clean_table_name: cyber_historical_tree
+      clean_table_name: historical_tree_decision
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
