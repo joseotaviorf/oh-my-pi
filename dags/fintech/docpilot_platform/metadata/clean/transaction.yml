@@ -1,0 +1,18 @@
+database_name: datalake_docpilot_platform_clean
+table_name: transaction
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Transaction records from the DocPilot Platform service, tracking transaction identifiers and remote addresses."
+columns:
+  id:
+    lineage:
+      - datalake_docpilot_platform_raw.transaction.id
+    description: "Unique identifier of the transaction."
+  remote_address:
+    lineage:
+      - datalake_docpilot_platform_raw.transaction.remote_addr
+    description: "Remote address associated with the transaction."
+  ts_issued:
+    lineage:
+      - datalake_docpilot_platform_raw.transaction.issued_at
+    description: "Timestamp when the transaction was issued."

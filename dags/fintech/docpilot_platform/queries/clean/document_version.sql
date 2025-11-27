@@ -1,0 +1,22 @@
+SELECT
+	id,
+	document_external_id AS id_document_external,
+	transaction_id AS id_transaction,
+	end_transaction_id AS id_end_transaction,
+	context,
+	application_name,
+	original_document_uri,
+	internal_document_uri,
+	document_metadata,
+	checksum,
+	created_at AS ts_created,
+	operation_type,
+	document_external_id_mod AS mod_id_document_external,
+	context_mod AS mod_context,
+	application_name_mod AS mod_application_name,
+	original_document_uri_mod AS mod_original_document_uri,
+	internal_document_uri_mod AS mod_internal_document_uri,
+	document_metadata_mod AS mod_document_metadata,
+	checksum_mod AS mod_checksum,
+	created_at_mod AS mod_ts_created
+FROM datalake_docpilot_platform_raw.document_version

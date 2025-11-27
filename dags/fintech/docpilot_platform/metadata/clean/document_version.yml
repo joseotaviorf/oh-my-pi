@@ -1,0 +1,86 @@
+database_name: datalake_docpilot_platform_clean
+table_name: document_version
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Version history of document records from the DocPilot Platform, including audit tracking with modification flags (mod_* columns) for field-level change detection."
+columns:
+  id:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.id
+    description: "Unique identifier of the document version record."
+  id_document_external:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.document_external_id
+    description: "External identifier of the document."
+  id_transaction:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.transaction_id
+    description: "Identifier of the transaction associated with this document version."
+  id_end_transaction:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.end_transaction_id
+    description: "Identifier of the end transaction associated with this document version."
+  context:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.context
+    description: "Context information associated with the document version."
+  application_name:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.application_name
+    description: "Name of the application that processed or submitted the document."
+  original_document_uri:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.original_document_uri
+    description: "URI of the original document file."
+  internal_document_uri:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.internal_document_uri
+    description: "Internal URI of the processed document file."
+  document_metadata:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.document_metadata
+    description: "Metadata associated with the document version in JSON format."
+  checksum:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.checksum
+    description: "Checksum value for document integrity verification."
+  operation_type:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.operation_type
+    description: "Type of operation performed on this document version (e.g., insert, update, delete)."
+  mod_id_document_external:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.document_external_id_mod
+    description: "Flag indicating modification of document_external_id on this revision."
+  mod_context:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.context_mod
+    description: "Flag indicating modification of context on this revision."
+  mod_application_name:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.application_name_mod
+    description: "Flag indicating modification of application_name on this revision."
+  mod_original_document_uri:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.original_document_uri_mod
+    description: "Flag indicating modification of original_document_uri on this revision."
+  mod_internal_document_uri:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.internal_document_uri_mod
+    description: "Flag indicating modification of internal_document_uri on this revision."
+  mod_document_metadata:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.document_metadata_mod
+    description: "Flag indicating modification of document_metadata on this revision."
+  mod_checksum:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.checksum_mod
+    description: "Flag indicating modification of checksum on this revision."
+  mod_ts_created:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.created_at_mod
+    description: "Flag indicating modification of created_at on this revision."
+  ts_created:
+    lineage:
+      - datalake_docpilot_platform_raw.document_version.created_at
+    description: "Creation timestamp recorded on this document version."

@@ -1,0 +1,50 @@
+database_name: datalake_docpilot_platform_clean
+table_name: extraction
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Extraction records from the DocPilot Platform, storing data extracted from documents including extractor metadata and processing results."
+columns:
+  id:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.id
+    description: "Unique identifier of the extraction record."
+  id_document:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.document_id
+    description: "Identifier of the document from which data was extracted."
+  extractor_name:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.extractor_name
+    description: "Name of the extractor used to process the document."
+  document_extractor_type:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.document_extractor_type
+    description: "Type of document extractor used for processing."
+  extracted_data:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.extracted_data
+    description: "Data extracted from the document, typically in JSON format."
+  extractor_metadata:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.extractor_metadata
+    description: "Metadata associated with the extraction process and extractor configuration."
+  error:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.error
+    description: "Error message or details if extraction processing failed."
+  ts_created:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.created_at
+    description: "Creation timestamp of the extraction record."
+  status:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.status
+    description: "Current processing status of the extraction."
+  ts_processed:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.processed_at
+    description: "Timestamp when the extraction was processed."
+  retry_count:
+    lineage:
+      - datalake_docpilot_platform_raw.extraction.retry_count
+    description: "Number of retry attempts made for processing this extraction."

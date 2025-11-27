@@ -1,0 +1,31 @@
+dag:
+  name: docpilot_platform
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG extracts and process data from DocPilot Platform. DocPilot Platform is a company-wide platform for document processing and data extraction.
+  schedule_interval: 0 3 * * *
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  custom_schema: docpilot_platform
+  dbutils_secret_key: DOCPILOT_PLATFORM_DB
+  lineage_product_database_name: docpilot_platform
+  tables_customization:
+    Document:
+      clean_table_name: document
+    Document_version:
+      clean_table_name: document_version
+    Extraction:
+      clean_table_name: extraction
+    transaction: {}
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,42 @@
+database_name: datalake_docpilot_platform_clean
+table_name: document
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Document records from the DocPilot Platform, including document URIs, metadata, and processing information."
+columns:
+  id:
+    lineage:
+      - datalake_docpilot_platform_raw.document.id
+    description: "Unique identifier of the document."
+  id_document_external:
+    lineage:
+      - datalake_docpilot_platform_raw.document.document_external_id
+    description: "External identifier of the document."
+  context:
+    lineage:
+      - datalake_docpilot_platform_raw.document.context
+    description: "Context information associated with the document."
+  application_name:
+    lineage:
+      - datalake_docpilot_platform_raw.document.application_name
+    description: "Name of the application that processed or submitted the document."
+  original_document_uri:
+    lineage:
+      - datalake_docpilot_platform_raw.document.original_document_uri
+    description: "URI of the original document file."
+  internal_document_uri:
+    lineage:
+      - datalake_docpilot_platform_raw.document.internal_document_uri
+    description: "Internal URI of the processed document file."
+  document_metadata:
+    lineage:
+      - datalake_docpilot_platform_raw.document.document_metadata
+    description: "Metadata associated with the document in JSON format."
+  checksum:
+    lineage:
+      - datalake_docpilot_platform_raw.document.checksum
+    description: "Checksum value for document integrity verification."
+  ts_created:
+    lineage:
+      - datalake_docpilot_platform_raw.document.created_at
+    description: "Creation timestamp of the document record."
