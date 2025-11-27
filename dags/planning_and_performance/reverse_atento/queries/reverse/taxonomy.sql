@@ -32,6 +32,7 @@ WITH base AS (
 )
 SELECT DISTINCT
   sk_ticket,
+  agent_organization AS organization,
   channel,
   department AS queue,
   journey AS step,

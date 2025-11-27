@@ -2,6 +2,7 @@ SELECT DISTINCT
   ft.sk_ticket,
   da.email,
   dd.team,
+  da.agent_organization AS organization,
   CASE
     WHEN ft.channel = 'email' THEN  'email'
     ELSE ft.channel

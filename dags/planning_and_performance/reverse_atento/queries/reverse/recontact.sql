@@ -186,6 +186,7 @@ SELECT
   rc.department,
   rc.team,
   rc.email,
+  rc.agent_organization as organization,
   rc.theme_detail,
   rc.previous_contact_taxonomy AS macrotaxo_first_contact,
   rc.theme AS macrotaxo_last_contact,
@@ -223,6 +224,6 @@ LEFT JOIN
 WHERE
   department NOT LIKE '%[WH]%' --caixas da WebHelp agora são identificadas assim
   AND department NOT LIKE '%[CNX]%'
-  AND agent_organization IN ('atn', 'atento')
+  AND rc.agent_organization IN ('atn', 'atento')
   AND rn = 1
 GROUP BY ALL

@@ -1,5 +1,6 @@
 SELECT DISTINCT
   COALESCE(c.id_call, c.id_task) AS id_source_unique,
+  a.organization,
   c.from_phone_number AS caller_phone_number,
   c.to_phone_number AS destination_phone_number,
   c.direction,

@@ -1,6 +1,7 @@
 SELECT
   ca.dt_task_created_local,
   ca.agent_email,
+  ca.agent_organization,
   ca.department_name,
   ca.ts_start_first_task,
   ca.ts_end_last_task,

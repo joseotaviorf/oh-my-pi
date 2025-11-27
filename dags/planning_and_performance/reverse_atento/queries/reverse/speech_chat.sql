@@ -1,6 +1,7 @@
 WITH message_summary AS (
   SELECT DISTINCT
     t.id_ticket,
+    a.organization,
     'BR' AS country_code,
     CAST(GET_JSON_OBJECT(evt.event_payload, '$.DateCreated') AS TIMESTAMP) AS ts_created_message,
     cht.ts_created AS ts_ticket_started,
@@ -59,6 +60,7 @@ WITH message_summary AS (
 )
 SELECT
   id_ticket,
+  organization,
   ts_ticket_started,
   ts_ticket_ended,
   ts_created_message,

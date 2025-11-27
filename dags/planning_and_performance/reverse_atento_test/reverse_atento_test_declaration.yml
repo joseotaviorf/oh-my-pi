@@ -1,21 +1,23 @@
 dag:
   name: reverse_atento_test
-  schedule_start_date: 2022,7,12
+  schedule_start_date: 2023,8,23
   owner: Data Planning and Performance
   documentation:
     dag_purpose: |
-      This dag aims to load a copy of the databases that will be sent to Atento to our datalake and then, sending them.
+      This dag has the purpose of sending operation follow-up data, related to Atento services.
 workflow:
-  type: load_access
   layer: reverse
+  type: access
   load_spark_job: load_reverse_atento
   spark_job_arguments:
+    - "{environment}"
+    - "{planning_and_performance_bucket}"
     - "{dag_name}"
-    - "{table_name}"
     - "{schema}"
-    - "{{ data_interval_start | ds }}"
-    - "5a-dataops-prod" # destination bucket name
-  custom_schema: atento
+    - "{table_name}"
+    - "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
+    
   tables_customization:
     backlog_metric: {}
     csat_front: {}
@@ -31,8 +33,8 @@ workflow:
     tickets_transferred: {}
     twilio_chat_aht: {}
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_start_date') }}"
+    partner_name: "atento"
+    organization_filters: "(atento', 'atn')"
 cluster:
   type: custom_cluster
   custom_configurations:
