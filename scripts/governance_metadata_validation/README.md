@@ -32,7 +32,7 @@ python validate_lineage_consistency.py -b <BRANCH>
 ### Supported Layers
 This validation works for: `raw`, `clean`, `enrich`, `dw`, and `metric` layers.
 
-**Note:** The `core` layer is not supported because Core Models use Spark jobs (Python) instead of SQL queries. Core Models have their own validation: `validate-core-model-schemas`.
+**Note:** The `core` and `reverse` layers are not supported. Core Models use Spark jobs (Python) instead of SQL queries and have their own validation: `validate-core-model-schemas`. Reverse layer queries are excluded from this validation as this layer does not require metadata file.
 
 ### Skip Lists
 All validation scripts use a centralized `skip_list.yml` file with three different skip lists:

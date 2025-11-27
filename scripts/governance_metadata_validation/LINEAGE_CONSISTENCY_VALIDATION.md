@@ -107,7 +107,7 @@ Mode: file
 VALIDATION RESULTS
 ================================================================================
 
-✓ PASSED: 1 file(s)
+✅ PASSED: 1 file(s)
 
 ================================================================================
 
@@ -123,12 +123,12 @@ Mode: file
 VALIDATION RESULTS
 ================================================================================
 
-✗ FAILED: 1 file(s)
+❌ FAILED: 1 file(s)
 
   File: dags/domain/dag_name/metadata/layer/table.yml
   SQL:  dags/domain/dag_name/queries/layer/table.sql
-    ✗ Columns in SQL query but missing in metadata: ['new_column', 'extra_field']
-    ✗ Columns in metadata but missing in SQL query: ['old_column_removed']
+    ❌ Columns in SQL query but missing in metadata: ['new_column', 'extra_field']
+    ❌ Columns in metadata but missing in SQL query: ['old_column_removed']
 
 ================================================================================
 
@@ -196,7 +196,7 @@ Validation works for the following layers:
 - `dw`
 - `metric`
 
-**Note:** The `core` layer is **not supported** because Core Models use Spark jobs (Python) instead of SQL queries. Core Models have their own validation system (`validate-core-model-schemas`).
+**Note:** The `core` and `reverse` layers are **not supported**. Core Models use Spark jobs (Python) instead of SQL queries and have their own validation system (`validate-core-model-schemas`). Reverse layer queries are excluded from this validation as this layer does not require metadata file.
 
 ## Known limitations
 

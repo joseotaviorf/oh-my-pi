@@ -137,7 +137,7 @@ def normalize_sql(sql: str) -> str:
     return sql
 
 
-def extract_columns_from_sql(sql_file_path: str) -> Set[str]:
+def extract_columns_from_sql(sql_file_path: str) -> Tuple[Set[str], bool]:
     """
     Parses a SQL file and extracts the column names from the final SELECT statement.
     
@@ -145,7 +145,8 @@ def extract_columns_from_sql(sql_file_path: str) -> Set[str]:
         sql_file_path: Path to the SQL file
         
     Returns:
-        Set of column names (lowercase for comparison)
+        Tuple of (Set of column names (lowercase for comparison), has_select_star)
+        has_select_star is True if the final SELECT uses SELECT *
         
     Raises:
         Exception: If SQL cannot be parsed
@@ -164,12 +165,19 @@ def extract_columns_from_sql(sql_file_path: str) -> Set[str]:
             raise Exception("No SELECT statement found in SQL")
 
         columns = set()
+        has_select_star = False
         for column in final_select.expressions:
-            col_name = column.alias_or_name
-            if col_name and col_name != "*":
-                columns.add(col_name.lower())
+            # Check if this is a SELECT * (Star expression)
+            if isinstance(column, exp.Star):
+                has_select_star = True
+            else:
+                col_name = column.alias_or_name
+                if col_name == "*":
+                    has_select_star = True
+                elif col_name:
+                    columns.add(col_name.lower())
 
-        return columns
+        return columns, has_select_star
 
     except Exception as e:
         raise Exception(f"Error parsing SQL file {sql_file_path}: {str(e)}")
@@ -245,7 +253,8 @@ def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
             'errors': List[str],
             'error_type': str ('parsing', 'consistency', 'metadata', or None),
             'sql_columns': Set[str],
-            'metadata_columns': Set[str]
+            'metadata_columns': Set[str],
+            'has_select_star': bool
         }
     """
     result = {
@@ -254,15 +263,27 @@ def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
         "error_type": None,
         "sql_columns": set(),
         "metadata_columns": set(),
+        "has_select_star": False,
     }
 
     try:
         # Extract columns from both sources
-        sql_columns = extract_columns_from_sql(sql_path)
+        sql_columns, has_select_star = extract_columns_from_sql(sql_path)
         metadata_columns = extract_columns_from_metadata(metadata_path)
 
         result["sql_columns"] = sql_columns
         result["metadata_columns"] = metadata_columns
+        result["has_select_star"] = has_select_star
+
+        # Special handling for SELECT * case
+        if has_select_star:
+            result["valid"] = False
+            result["error_type"] = "consistency"
+            result["errors"].append(
+                "SQL query uses SELECT * which prevents column validation. "
+                "Please explicitly list all columns in the SELECT statement to enable metadata validation."
+            )
+            return result
 
         # Check for columns in SQL but not in metadata
         missing_in_metadata = sql_columns - metadata_columns
@@ -332,14 +353,14 @@ def get_files_to_validate(mode: str, input_value) -> List[Tuple[str, str, str]]:
             sql_path = file_path
             metadata_path = get_metadata_path_from_sql(file_path)
         else:
-            print(f"Warning: File {file_path} is not in queries/ or metadata/ folder")
+            print(f"⚠️ Warning: File {file_path} is not in queries/ or metadata/ folder")
             return files
 
         if os.path.exists(sql_path) and os.path.exists(metadata_path):
             files.append((sql_path, metadata_path, "M"))
         else:
             print(
-                f"Warning: Could not find both SQL and metadata files for {file_path}"
+                f"⚠️ Warning: Could not find both SQL and metadata files for {file_path}"
             )
 
     elif mode == "branch":
@@ -380,8 +401,8 @@ def get_files_to_validate(mode: str, input_value) -> List[Tuple[str, str, str]]:
             ):
                 continue
 
-            # Explicitly skip core layer files
-            if "/core/" in file_path:
+            # Explicitly skip core and reverse layer files
+            if "/core/" in file_path or "/reverse/" in file_path:
                 continue
 
             if "/metadata/" in file_path and (
@@ -413,7 +434,7 @@ def get_files_to_validate(mode: str, input_value) -> List[Tuple[str, str, str]]:
         for sql_path in dags_dir.rglob("queries/**/*.sql"):
             sql_path_str = str(sql_path)
 
-            # Check if in relevant layer (excluding core)
+            # Check if in relevant layer (excluding core and reverse)
             # Note: Core models use Spark jobs (Python) instead of SQL queries
             if not any(
                 layer in sql_path_str
@@ -421,8 +442,8 @@ def get_files_to_validate(mode: str, input_value) -> List[Tuple[str, str, str]]:
             ):
                 continue
 
-            # Explicitly skip core layer files
-            if "/core/" in sql_path_str:
+            # Explicitly skip core and reverse layer files
+            if "/core/" in sql_path_str or "/reverse/" in sql_path_str:
                 continue
 
             metadata_path = get_metadata_path_from_sql(sql_path_str)
@@ -440,7 +461,7 @@ def output_results(results: Dict, verbose: bool):
 
     # Show passed files
     if results["passed"]:
-        print(f"✓ PASSED: {len(results['passed'])} file(s)")
+        print(f"✅ PASSED: {len(results['passed'])} file(s)")
         if verbose:
             for sql_path, metadata_path in results["passed"]:
                 print(f"  - {metadata_path}")
@@ -467,14 +488,19 @@ def output_results(results: Dict, verbose: bool):
     # Categorize failures by type
     if results["failed"]:
         parsing_errors = []
+        select_star_errors = []
         consistency_errors = []
         metadata_errors = []
         other_errors = []
 
         for sql_path, metadata_path, validation_result in results["failed"]:
             error_type = validation_result.get("error_type", "unknown")
+            has_select_star = validation_result.get("has_select_star", False)
+            
             if error_type == "parsing":
                 parsing_errors.append((sql_path, metadata_path, validation_result))
+            elif error_type == "consistency" and has_select_star:
+                select_star_errors.append((sql_path, metadata_path, validation_result))
             elif error_type == "consistency":
                 consistency_errors.append((sql_path, metadata_path, validation_result))
             elif error_type == "metadata":
@@ -504,6 +530,17 @@ def output_results(results: Dict, verbose: bool):
                         error_msg = error_msg[:150] + "..."
                     print(f"      ❌ {error_msg}")
 
+        # Show SELECT * errors (special case)
+        if select_star_errors:
+            print(f"\n⚠️  SELECT * ERRORS: {len(select_star_errors)} file(s)")
+            print("    ⚠️  SQL queries use SELECT * which prevents column validation.")
+            print("    📝 ACTION: Replace SELECT * with explicit column names to enable metadata validation.")
+            for sql_path, metadata_path, validation_result in select_star_errors:
+                print(f"\n    File: {metadata_path}")
+                print(f"    SQL:  {sql_path}")
+                for error in validation_result["errors"]:
+                    print(f"      ❌ {error}")
+
         # Show consistency errors (expected - need metadata update)
         if consistency_errors:
             print(f"\n⚠️  CONSISTENCY ERRORS: {len(consistency_errors)} file(s)")
@@ -513,7 +550,7 @@ def output_results(results: Dict, verbose: bool):
                 print(f"\n    File: {metadata_path}")
                 print(f"    SQL:  {sql_path}")
                 for error in validation_result["errors"]:
-                    print(f"      ✗ {error}")
+                    print(f"      ❌ {error}")
 
         # Show metadata reading errors
         if metadata_errors:
@@ -575,7 +612,7 @@ def main():
         print("Please update the metadata files to match the query columns.\n")
         exit(1)
     else:
-        print("\nResult: All metadata files are consistent with their SQL queries! ✓\n")
+        print("\nResult: All metadata files are consistent with their SQL queries! ✅\n")
         exit(0)
 
 
