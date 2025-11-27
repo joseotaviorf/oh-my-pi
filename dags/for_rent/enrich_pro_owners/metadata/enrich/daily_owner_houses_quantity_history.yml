@@ -19,10 +19,6 @@ columns:
     lineage:
     - datalake_ebdb_country.user.country_code
     description: Country code of the user.
-  rental_administrator:
-    lineage:
-    - datalake_ebdb_listing.rent_listing.rental_administrator
-    description: The rental administrator of the house.
   houses_published:
     description: Quantity of distincts houses that the owner has on a respective day with status 'publicado' or 'PUBLISHED'.
   houses_suspended:

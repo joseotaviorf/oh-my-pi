@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.rev
     description: Foreign key of the RevInfo table, which indicates when the record was changed
-  revtype:
+  rev_type:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.revtype
     description: Indicates whether the line refers to an inclusion, alteration or deletion.
@@ -23,7 +23,7 @@ columns:
       "0": Inclusion operation.
       "1": Alteration operation.
       "2": Deletion operation.
-  revend:
+  rev_end:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.revend
     description: Number of the next revision of this id.
@@ -142,7 +142,7 @@ columns:
   ts_created:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.created_at
-    description:
+    description:  Date and time when the rule was created.
   ts_updated:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.updated_at

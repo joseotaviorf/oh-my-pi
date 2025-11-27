@@ -1,3 +1,20 @@
+# ==============================================================================
+# GOVERNANCE METADATA VALIDATION - SKIP LISTS
+# ==============================================================================
+# This file contains skip lists used by different metadata validation scripts.
+# Each list serves a specific purpose and is used by a different validation script.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. METADATA FILES OUT OF PATTERN
+# ------------------------------------------------------------------------------
+# Used by: validate_metadata_files_content.py
+# Purpose: Skip metadata files that don't follow the standard schema
+# 
+# Add files here when:
+#   - Metadata file has custom structure for special cases
+#   - File is being migrated and temporarily doesn't meet schema requirements
+#
 metadata_files_out_of_pattern:
   - cross/gsheets_by_context/metadata/clean/for_rent/proj_agent_manager.yml
   - growth/enrich_lost_listings/metadata/enrich/lost_listings.yml
@@ -41,6 +58,55 @@ metadata_files_out_of_pattern:
   - growth/dw_datamarts_growth_cross/metadata/dw/unique_supply_events_funnel.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/user_funnel.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/unique_performance_marketing_metrics_supply_coincident.yml
+
+# ------------------------------------------------------------------------------
+# 2. QUERIES WITHOUT METADATA FILES
+# ------------------------------------------------------------------------------
+# Used by: validate_metadata_files_exist.py
+# Purpose: Skip SQL queries that intentionally don't have metadata files
+#
+# Add files here when:
+#   - Query is temporary/experimental
+#   - Query is part of a special pipeline that doesn't require metadata
+#   - Query is being deprecated
+#
 queries_without_metadata_files:
   - for_rent/regions_polygon/queries/enrich_for_looker/regions_polygon.sql
   - for_rent/property_tax/queries/raw/tax_report.sql
+
+# ------------------------------------------------------------------------------
+# 3. PARSING SKIP LIST
+# ------------------------------------------------------------------------------
+# Used by: validate_lineage_consistency.py
+# Purpose: Skip SQL files that use advanced Spark SQL features not fully 
+#          supported by sqlglot parser (databricks dialect)
+#
+# Add files here when:
+#   - PIVOT clause (not fully supported by sqlglot)
+#   - Extremely complex queries (1000+ lines with multiple UNION ALL)
+#   - Non-standard SQL syntax or edge cases
+#
+# NOTE: Files in this list will show a WARNING in CI/CD but won't fail the pipeline
+#       Manual validation is recommended when modifying these files
+# IMPORTANT:
+#       Always use FULL PATHS relative to repo root (e.g., 'dags/domain/dag_name/queries/layer/file.sql')
+#
+parsing_skip_list:
+  # PIVOT clause - not fully supported by sqlglot
+  - dags/for_sale/enrich_sale_available_booking_hours/queries/enrich/weekly_available_booking_hours.sql
+  
+  # GET_JSON_OBJECT() - Spark SQL specific function with complex syntax
+  - dags/for_sale/enrich_atta/queries/enrich/proposal_situation_changes.sql
+  
+  # Complex syntax / token parsing issues
+  - dags/governance/enrich_trino/queries/enrich/trino_detractor_queries.sql
+  - dags/for_rent/dw_datamarts_for_rent/queries/dw/repressed_demand.sql
+  
+  # 1223 lines with multiple UNION ALL - too complex for parser
+  - dags/growth/enrich_semrush/queries/enrich/keywords_from_players.sql
+  
+  # String/syntax edge cases
+  - dags/growth/iptu_bh/queries/clean/iptu_bh.sql
+  - dags/growth/enrich_google_search_console_classified/queries/enrich/gsc_keyword_region_attributes_bra.sql
+  - dags/platform/enrich_databricks_table_usage/queries/enrich/daily_table_usage_per_user.sql
+  - dags/fintech/payable_accounts_transactions/queries/clean/accounts_payable.sql

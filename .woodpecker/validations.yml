@@ -77,6 +77,14 @@ steps:
       branch:
         exclude: [forno, hotfix/*]
 
+  validate-lineage-consistency:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - make requirements-scripts
+      - make validate-lineage-consistency
+    when:
+      event: push
+
   validate-core-model-schemas:
     image: public.ecr.aws/docker/library/python:3.7.16
     commands:

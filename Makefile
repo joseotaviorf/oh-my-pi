@@ -352,6 +352,24 @@ validate-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v
 
+.PHONY: validate-lineage-consistency
+validate-lineage-consistency:
+	@echo ""
+	@echo "Validating if metadata files are consistent with their SQL queries"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_lineage_consistency.py -b "$(CI_COMMIT_BRANCH)" -v
+
+.PHONY: validate-lineage-consistency-all
+## validates that all metadata files are consistent with SQL queries (local development)
+validate-lineage-consistency-all:
+	@echo ""
+	@echo "Validating all metadata files for consistency with SQL queries"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_lineage_consistency.py -a
+
 .PHONY: validate-core-model-schemas
 ## validates that all core model tables have corresponding schema files (CI/CD only)
 validate-core-model-schemas:

@@ -1,7 +1,7 @@
 SELECT
     id,
     income_id AS id_income,
-    from AS income_from,
+    `from` AS income_from,
     amount,
     income_date AS dt_income,
     created_at AS ts_created,
