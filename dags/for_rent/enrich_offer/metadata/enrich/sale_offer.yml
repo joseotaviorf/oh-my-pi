@@ -510,10 +510,6 @@ columns:
       - datalake_firestore.monday.is_ccv_canceled
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
     description: If the CCV is canceled
-  is_3p_supply:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply
-    description: If the house is 3P supply
   is_3p_supply_5a:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_5a
@@ -522,10 +518,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_bh
     description: If the house is 3P supply BH
-  is_3p_demand:
-    lineage:
-      - datalake_ebdb_work_contract.work_contract.id
-    description: If the booking is 3P demand
   is_a_rescued_ccv:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_ccv
