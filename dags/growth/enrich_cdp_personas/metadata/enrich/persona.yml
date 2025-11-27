@@ -18,6 +18,7 @@ columns:
     lineage:
       - datalake_cdp_personas.agent_broker.id_user
       - datalake_cdp_personas.agent_inspector.id_user
+      - datalake_cdp_personas.agent_photographer.id_user
       - datalake_cdp_personas.buyer_prospect.id_user
       - datalake_cdp_personas.partner_ciq.id_user
       - datalake_cdp_personas.tenant.id_user
@@ -28,6 +29,7 @@ columns:
     lineage:
       - datalake_cdp_personas.agent_broker.uuid_person
       - datalake_cdp_personas.agent_inspector.uuid_person
+      - datalake_cdp_personas.agent_photographer.uuid_person
       - datalake_cdp_personas.buyer_prospect.uuid_person
       - datalake_cdp_personas.partner_ciq.uuid_person
       - datalake_cdp_personas.tenant.uuid_person
@@ -38,6 +40,7 @@ columns:
     categories:
       AGENT_BROKER: User is a broker agent who attends visits to properties and help clients during the rent/sale journey.
       AGENT_INSPECTOR: User is an agent inspector.
+      AGENT_PHOTOGRAPHER: User is a photographer agent assigned to conduct photo sessions for property listings.
       BUYER_PROSPECT: User is a buyer prospect.
       PARTNER_CIQ: User is a CIQ.
       TENANT: User is a tenant.
@@ -54,6 +57,7 @@ columns:
     lineage:
       - datalake_cdp_personas.agent_broker.is_active
       - datalake_cdp_personas.agent_inspector.is_active
+      - datalake_cdp_personas.agent_photographer.is_active
       - datalake_cdp_personas.buyer_prospect.is_active
       - datalake_cdp_personas.partner_ciq.is_active
       - datalake_cdp_personas.tenant.is_active
@@ -64,6 +68,7 @@ columns:
     lineage:
       - datalake_cdp_personas.agent_broker.ts_first_event
       - datalake_cdp_personas.agent_inspector.ts_first_event
+      - datalake_cdp_personas.agent_photographer.ts_first_event
       - datalake_cdp_personas.buyer_prospect.ts_first_event
       - datalake_cdp_personas.partner_ciq.ts_first_event
       - datalake_cdp_personas.tenant.ts_first_event
@@ -74,6 +79,7 @@ columns:
     lineage:
       - datalake_cdp_personas.agent_broker.ts_last_event
       - datalake_cdp_personas.agent_inspector.ts_last_event
+      - datalake_cdp_personas.agent_photographer.ts_last_event
       - datalake_cdp_personas.buyer_prospect.ts_last_event
       - datalake_cdp_personas.partner_ciq.ts_last_event
       - datalake_cdp_personas.tenant.ts_last_event

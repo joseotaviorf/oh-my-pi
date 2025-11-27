@@ -14,6 +14,7 @@ workflow:
     persona:
       - agent_broker
       - agent_inspector
+      - agent_photographer
       - buyer_prospect
       - partner_ciq
       - tenant
@@ -23,6 +24,8 @@ workflow:
     agent_broker:
       z_order_by: [id_user]
     agent_inspector:
+      z_order_by: [id_user]
+    agent_photographer:
       z_order_by: [id_user]
     buyer_prospect:
       z_order_by: [id_user]
