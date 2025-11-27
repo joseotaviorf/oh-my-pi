@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     charge_id AS id_charge,
     requester_id AS id_requester,
@@ -55,7 +55,7 @@ SELECT
     last_date_to_pay AS dt_last_date_to_pay,
     created_at AS ts_created,
     canceled_at AS ts_canceled,
-    paid_at AS ts_paid,
+    convert_timezone('UTC', 'America/Sao_Paulo', paid_at) AS ts_paid,
     updated_at AS ts_updated
-FROM 
+FROM
     datalake_checkout_raw.credit_card_status_log

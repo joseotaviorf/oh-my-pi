@@ -15,7 +15,7 @@ SELECT
     fixed_cost_of_transaction AS transaction_fixed_cost,
     installment_fee_amount,
     convenience_fee_amount,
-    TIMESTAMP(paid_at) AS ts_paid,
+    convert_timezone('UTC', 'America/Sao_Paulo', paid_at) AS ts_paid,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
 FROM

@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     charge_id AS id_charge,
     order_id AS id_order,
@@ -20,9 +20,9 @@ SELECT
     user_zipcode,
     TIMESTAMP(started_processing_at) AS ts_started_processing,
     TIMESTAMP(created_at) AS ts_created,
-    TIMESTAMP(paid_at) AS ts_paid,
+    convert_timezone('UTC', 'America/Sao_Paulo', paid_at) AS ts_paid,
     TIMESTAMP(canceled_at) AS ts_canceled,
     TIMESTAMP(deleted_at) AS ts_deleted,
     TIMESTAMP(updated_at) AS ts_updated
-FROM 
+FROM
     datalake_checkout_raw.charge_status_log

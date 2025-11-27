@@ -52,7 +52,7 @@ SELECT
     fine_start_at AS ts_fine_start,
     updated_at AS ts_updated,
     interest_start_at AS ts_interest_start,
-    paid_at AS ts_paid,
+    convert_timezone('UTC', 'America/Sao_Paulo', paid_at) AS ts_paid,
     canceled_at AS ts_canceled
 FROM
     datalake_checkout_raw.credit_card

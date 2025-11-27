@@ -1,7 +1,7 @@
-SELECT 
+SELECT
     id,
-    charge_id AS id_charge, 
-    requester_id AS id_requester, 
+    charge_id AS id_charge,
+    requester_id AS id_requester,
     transaction_id AS id_transaction,
     CAST(due_amount AS DOUBLE) AS due_amount,
     CAST(interest_amount AS DOUBLE) AS interest_amount,
@@ -47,16 +47,16 @@ SELECT
     written_down_by,
     write_down_reason,
     raw_response,
-    DATE(due_date) AS dt_due, 
-    DATE(emission_date) AS dt_emission, 
-    TIMESTAMP(paid_at) AS ts_paid, 
+    DATE(due_date) AS dt_due,
+    DATE(emission_date) AS dt_emission,
+    convert_timezone('UTC', 'America/Sao_Paulo', paid_at) AS ts_paid,
     DATE(credit_date) AS dt_credit,
-    DATE(interest_start_at) AS dt_interest_start, 
-    DATE(fine_start_at) AS dt_fine_start, 
-    DATE(last_date_to_pay) AS dt_last_to_pay, 
+    DATE(interest_start_at) AS dt_interest_start,
+    DATE(fine_start_at) AS dt_fine_start,
+    DATE(last_date_to_pay) AS dt_last_to_pay,
     TIMESTAMP(written_down_at) AS ts_written_down,
     TIMESTAMP(started_processing_at) AS ts_started_processing,
-    TIMESTAMP(created_at) AS ts_created, 
+    TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
-FROM 
+FROM
     datalake_checkout_raw.bolecode

@@ -24,7 +24,7 @@ SELECT
     additional_info,
     TIMESTAMP(registered_at) AS ts_registered,
     TIMESTAMP(started_processing_at) AS ts_started_processing,
-    TIMESTAMP(paid_at) AS ts_paid,
+    convert_timezone('UTC', 'America/Sao_Paulo', paid_at) AS ts_paid,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
 FROM
