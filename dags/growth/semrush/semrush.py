@@ -32,7 +32,7 @@ SOURCE = "semrush"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
-CLUSTER_DESCRIPTION = "databricks_12_2_max_io-memory_cluster"
+CLUSTER_DESCRIPTION = "databricks_16_4_max_io-memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
 partition_cols = config_service.get_config("clean_partition_cols")

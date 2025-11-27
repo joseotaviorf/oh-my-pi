@@ -26,12 +26,18 @@ workflow:
       analytics-engineers:
         - ALL PRIVILEGES
 cluster:
-  type: databricks_13_3_high_mem_driver_high_mem_nodes
+  type: custom_cluster
+  databricks_conn_id: databricks_new
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
   custom_configurations:
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 5
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:

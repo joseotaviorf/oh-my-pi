@@ -750,6 +750,16 @@ databricks_12_2_max_io-memory_cluster:
         availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
+databricks_16_4_max_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_12_2_min_io-general_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.large
@@ -1049,6 +1059,17 @@ databricks_12_2_min_io-general_photon_cluster:
     runtime_engine: PHOTON
     num_workers: 3
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
