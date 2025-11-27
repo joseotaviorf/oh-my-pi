@@ -1163,9 +1163,9 @@ bietlejuice.enrich_3p_demand_views:
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
+  - bietlejuice.enrich_business_model:load-enrich-visit-business-model:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
-  - bietlejuice.enrich_visit:load-enrich-visit-business-model:first-run-of-day
 bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
@@ -1515,6 +1515,11 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
+bietlejuice.enrich_business_model:
+  - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
 bietlejuice.enrich_buyer_prospect:
   - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
@@ -3946,6 +3951,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+  - bietlejuice.enrich_business_model:load-enrich-visit-business-model:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day

@@ -11,11 +11,9 @@ workflow:
       visits:
         - visit_cancellation_unified
         - preferred_fixed_agent_history
-        - visit_business_model
         - post_visit_agent_unified
         - visit_origin_unified
       visit_schedules:
-        - visit_business_model
         - visit_cancellation_unified
         - post_visit_agent_unified
     execution_timeout_hours: 3

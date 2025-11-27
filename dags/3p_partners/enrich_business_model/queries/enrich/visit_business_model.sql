@@ -2,6 +2,7 @@ WITH consolidated_visits AS (
   SELECT
     v.id AS id_visit,
     bm.id AS id_visit_business_model,
+    v.id_house,
     COALESCE(bm.business_model, v.business_model) AS business_model,
     bm.ts_created AS ts_business_model_created,
     v.ts_created AS ts_visit_created,
@@ -16,10 +17,12 @@ WITH consolidated_visits AS (
 SELECT
   cv.id_visit,
   cv.id_visit_business_model,
-  c.sk_company AS id_company_demand,
-  vt.uuid_company,
+  cv.id_house,
+  IF(cv.business_model LIKE '%3P_SUPPLY%', cs.sk_company, NULL) AS id_company_supply,
+  IF(cv.business_model LIKE '%3P_DEMAND%' OR cv.business_model LIKE '%3P_LEAD_GEN%', cd.sk_company, NULL) AS id_company_demand,
+  IF(cv.business_model LIKE '%3P_SUPPLY%', cs.company_name, NULL) AS partner_3p_supply,
+  IF(cv.business_model LIKE '%3P_DEMAND%' OR cv.business_model LIKE '%3P_LEAD_GEN%', cd.company_name, NULL) AS partner_3p_demand,
   cv.business_model,
-  c.company_name AS partner_3p_demand,
   cv.business_model LIKE '%3P_SUPPLY%' AS is_3p_supply,
   cv.business_model LIKE '%3P_DEMAND%' AS is_3p_demand,
   cv.business_model LIKE '%3P_LEAD_GEN%' AS is_3p_lead_gen,
@@ -35,7 +38,13 @@ LEFT JOIN
     ON cv.id_visit = vt.id_visit
       AND vt.type = 'Agent'
 LEFT JOIN
-  datalake_company.company_sks AS c
-    ON vt.uuid_company = c.uuid_company
+  datalake_ebdb_listing.house AS h
+    ON cv.id_house = h.id
+LEFT JOIN
+  datalake_company.company_sks AS cs
+    ON h.uuid_company = cs.uuid_company
+LEFT JOIN
+  datalake_company.company_sks AS cd
+    ON vt.uuid_company = cd.uuid_company
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY vt.id_visit ORDER BY vt.ts_updated DESC) = 1

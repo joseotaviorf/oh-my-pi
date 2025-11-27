@@ -1,0 +1,24 @@
+---
+table_name: datalake_visit.visit_business_model
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_visit:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_visit_business_model:
+    is_unique:
+      severity_level: Error
+  id_company_supply:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM datalake_visit.visit_business_model WHERE is_3p_supply = true AND id_company_supply IS NULL) = 0"
+      severity_level: Error
+  id_company_demand:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM datalake_visit.visit_business_model WHERE (is_3p_demand = true OR is_3p_lead_gen = true) AND id_company_demand IS NULL) = 0"
+      severity_level: Error
