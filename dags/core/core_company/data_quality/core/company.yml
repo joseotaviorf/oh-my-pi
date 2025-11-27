@@ -1,0 +1,35 @@
+---
+table_name: core_company.company
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: ts_company_updated
+  incremental_date_mask: yyyy-MM-dd
+column_level_validations:
+  sk_company:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_company:
+    is_complete:
+      severity_level: Error
+  uuid_company:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning
+  company_name:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning
+  company_status:
+    is_complete:
+      severity_level: Error
+  ts_company_created:
+    is_complete:
+      severity_level: Error
+  ts_company_updated:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

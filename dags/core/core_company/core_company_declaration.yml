@@ -1,0 +1,31 @@
+dag:
+  name: core_company
+  schedule_start_date: 2020, 1, 1
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: |
+      This is a DAG related to the Company Core Model
+workflow:
+  type: core_model
+  layer: core
+  default_extraction_type: incremental
+  load_spark_job: load_core_company
+  execution_timeout_hours: 1
+  tables_customization:
+    company:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [year, month, day]
+      z_order_by: [id_company, id_product]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

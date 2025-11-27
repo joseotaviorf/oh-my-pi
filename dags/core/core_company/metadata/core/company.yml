@@ -1,0 +1,181 @@
+database_name: core_company
+table_name: company
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+description: Company Core Model containing information about companies, their products, addresses, documents, and related entities. This table consolidates company data from multiple sources to provide a comprehensive view of each company in the system.
+columns:
+  sk_company:
+    lineage:
+      - datalake_company_clean.company.id
+      - datalake_company_clean.product.id
+    description: Surrogate key related to the Company Core Model. It's made by concatenating id_company with id_product (or 0 if no product). This key must always be unique and represents a company-product combination.
+  id_company:
+    lineage:
+      - datalake_company_clean.company.id
+    description: Identifier of the company. It's the id of the Company table from the Company database. This identifier is used internally in our systems and products.
+  id_parent:
+    lineage:
+      - datalake_company_clean.company.id_parent
+    description: Parent company identifier, used to represent company hierarchies. References another company id when this company is a subsidiary or child company.
+  id_product:
+    lineage:
+      - datalake_company_clean.product.id
+    description: Product identifier associated with the company. Represents which product or service the company is using or providing.
+  uuid_company:
+    lineage:
+      - datalake_company_clean.company.uuid_company
+    description: Universal unique identifier (UUID) for the company. This is the globally unique identifier used across systems.
+  company_name:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: Official legal name of the company as registered in official documents.
+  trade_name:
+    lineage:
+      - datalake_company_clean.company.trade_name
+    description: Commercial or trade name of the company, which may differ from the legal name. This is the name used in business operations.
+  company_type:
+    lineage:
+      - datalake_company_clean.company.company_type
+    description: Type or category of the company, indicating its business classification or organizational structure.
+  company_status:
+    lineage:
+      - datalake_company_clean.company.status
+    description: Current status of the company in the system (e.g., ACTIVE, INACTIVE). Indicates whether the company is currently operational.
+  company_version:
+    lineage:
+      - datalake_company_clean.company.version
+    description: Version number of the company record, used for tracking changes and updates to company information.
+  address:
+    lineage:
+      - datalake_company_clean.address.public_area
+    description: Street address or public area name where the company is located.
+  address_number:
+    lineage:
+      - datalake_company_clean.address.number
+    description: Street number of the company's address.
+  address_complement:
+    lineage:
+      - datalake_company_clean.address.complement
+    description: Additional address information such as apartment number, suite, floor, or building name.
+  neighborhood:
+    lineage:
+      - datalake_company_clean.address.neighborhood
+    description: Neighborhood or district where the company is located.
+  city:
+    lineage:
+      - datalake_company_clean.address.city
+    description: City where the company is located.
+  state:
+    lineage:
+      - datalake_company_clean.address.state
+    description: State or province where the company is located.
+  country:
+    lineage:
+      - datalake_company_clean.address.country
+    description: Country where the company is located.
+  zip_code:
+    lineage:
+      - datalake_company_clean.address.zip_code
+    description: Postal code (zip code) of the company's address, normalized to contain only numeric characters.
+  creci:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: CRECI (Conselho Regional de Corretores de Imóveis) registration number. This is the professional license number for real estate brokers in Brazil, containing only numeric characters.
+  cnpj:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: CNPJ (Cadastro Nacional da Pessoa Jurídica) number. This is the Brazilian federal tax ID for companies, containing only numeric characters.
+  rfc:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: RFC (Registro Federal de Contribuyentes) number. This is the Mexican federal tax ID for companies, containing only numeric characters.
+  product_name:
+    lineage:
+      - datalake_company_clean.product.name
+    description: Name of the product associated with the company.
+  business_segment:
+    lineage:
+      - datalake_company_clean.product.business_segment
+    description: Business segment or industry category of the product.
+  integrator_partner:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: Name of the integrator partner company, if this company is working with an integration partner. This references another company in the system.
+  integrator_partner_status:
+    lineage:
+      - datalake_company_clean.company.status
+    description: Current status of the integrator partner company (e.g., ACTIVE, INACTIVE).
+  commission:
+    lineage:
+      - datalake_company_clean.revenue_share.commission
+    description: Commission percentage or amount defined in the revenue share agreement.
+  demand_fee:
+    lineage:
+      - datalake_company_clean.revenue_share.demand_fee
+    description: Fee charged on the demand side of transactions in the revenue share agreement.
+  supply_fee:
+    lineage:
+      - datalake_company_clean.revenue_share.supply_fee
+    description: Fee charged on the supply side of transactions in the revenue share agreement.
+  platform_fee:
+    lineage:
+      - datalake_company_clean.revenue_share.platform_fee
+    description: Platform usage fee defined in the revenue share agreement.
+  account_bank:
+    lineage:
+      - datalake_company_clean.banking_information.bank
+    description: Bank name or code where the company maintains its account for transactions.
+  agency_number:
+    lineage:
+      - datalake_company_clean.banking_information.agency_number
+    description: Bank agency or branch number for the company's account.
+  account_number:
+    lineage:
+      - datalake_company_clean.banking_information.account_number
+    description: Bank account number for the company.
+  account_type:
+    lineage:
+      - datalake_company_clean.banking_information.type
+    description: Type of bank account (e.g., checking, savings).
+  tier_name:
+    lineage:
+      - datalake_company_clean.tier.tier_name
+    description: Tier or level classification of the company, which may indicate service level, pricing tier, or customer segment.
+  id_region_list:
+    lineage:
+      - datalake_company_clean.company_product_region.id_region
+    description: Comma-separated list of region identifiers where the company-product combination operates or provides services. Multiple regions can be associated with a single company-product pair. Values are separated by commas (e.g., "1,5,10").
+  is_active_company:
+    lineage:
+      - datalake_company_clean.company.status
+    description: Boolean flag indicating if the company status is ACTIVE. True when company_status equals 'ACTIVE', false otherwise.
+  has_3p_access_control:
+    lineage:
+      - datalake_company_clean.product.id
+    description: Boolean flag indicating if the company has third-party access control enabled. True when id_product is 27 or 30.
+  has_opt_in_navent:
+    lineage:
+      - datalake_company_clean.company_product.product_settings
+    description: Boolean flag indicating if the company has opted in to Navent integration. Extracted from product_settings JSON field.
+  ts_company_created:
+    lineage:
+      - datalake_company_clean.company.ts_created
+    description: Timestamp when the company record was initially created in the system.
+  ts_company_updated:
+    lineage:
+      - datalake_company_clean.company.ts_updated
+    description: Timestamp when the company record was last updated in the system. Used for incremental loading and change tracking.
+  ts_load:
+    description: Timestamp when the Company Core Model was updated and loaded for the last time by the ETL process. This is the processing timestamp, not the data timestamp.
+  year:
+    lineage:
+      - datalake_company_clean.company.year
+    description: Year of the company record, also a table partition. Based on ts_company_updated.
+  month:
+    lineage:
+      - datalake_company_clean.company.month
+    description: Month of the company record, also a table partition. Based on ts_company_updated.
+  day:
+    lineage:
+      - datalake_company_clean.company.day
+    description: Day of the company record, also a table partition. Based on ts_company_updated.

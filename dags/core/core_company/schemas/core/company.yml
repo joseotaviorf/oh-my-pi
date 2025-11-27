@@ -1,0 +1,200 @@
+# Schema validation file for core company table
+# This file defines the expected schema for the core.company table
+# Path: dags/core/core_company/schemas/core/company.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_company:
+    type: string
+    required: true
+
+  # Company identifiers
+  id_company:
+    type: bigint
+    required: true
+
+  id_parent:
+    type: bigint
+    required: false
+
+  id_product:
+    type: bigint
+    required: false
+
+  uuid_company:
+    type: string
+    required: false
+
+  # Company information
+  company_name:
+    type: string
+    required: false
+
+  trade_name:
+    type: string
+    required: false
+
+  company_type:
+    type: string
+    required: false
+
+  company_status:
+    type: string
+    required: false
+
+  company_version:
+    type: bigint
+    required: false
+
+  # Address information
+  address:
+    type: string
+    required: false
+
+  address_number:
+    type: string
+    required: false
+
+  address_complement:
+    type: string
+    required: false
+
+  neighborhood:
+    type: string
+    required: false
+
+  city:
+    type: string
+    required: false
+
+  state:
+    type: string
+    required: false
+
+  country:
+    type: string
+    required: false
+
+  zip_code:
+    type: string
+    required: false
+
+  # Document information
+  creci:
+    type: string
+    required: false
+
+  cnpj:
+    type: string
+    required: false
+
+  rfc:
+    type: string
+    required: false
+
+  # Product information
+  product_name:
+    type: string
+    required: false
+
+  business_segment:
+    type: string
+    required: false
+
+  # Integrator partner information
+  integrator_partner:
+    type: string
+    required: false
+
+  integrator_partner_status:
+    type: string
+    required: false
+
+  # Revenue share information
+  commission:
+    type: decimal
+    required: false
+
+  demand_fee:
+    type: decimal
+    required: false
+
+  supply_fee:
+    type: decimal
+    required: false
+
+  platform_fee:
+    type: decimal
+    required: false
+
+  # Banking information
+  account_bank:
+    type: string
+    required: false
+
+  agency_number:
+    type: string
+    required: false
+
+  account_number:
+    type: string
+    required: false
+
+  account_type:
+    type: string
+    required: false
+
+  # Tier information
+  tier_name:
+    type: string
+    required: false
+
+  # Region information
+  id_region_list:
+    type: string
+    required: false
+
+  # Boolean flags
+  is_active_company:
+    type: boolean
+    required: false
+
+  has_3p_access_control:
+    type: boolean
+    required: false
+
+  has_opt_in_navent:
+    type: string
+    required: false
+
+  # Audit timestamps
+  ts_company_created:
+    type: timestamp
+    required: false
+
+  ts_company_updated:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 44
+max_columns: 44
+strict: true
