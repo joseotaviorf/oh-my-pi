@@ -45,8 +45,14 @@ visit AS(
     vsl.channel,
     vsl.ts_event_created,
     vbm.id_company_supply,
+    vbm.id_company_demand,
     lh.uuid_company AS uuid_company_supply,
     vbm.partner_3p_supply,
+    vbm.partner_3p_demand,
+    vbm.is_3p_supply,
+    vbm.is_3p_demand,
+    vbm.is_3p_lead_gen,
+    vbm.has_3p_access_control,
     lh.id_user AS id_owner,
     COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     hl.country_code
@@ -63,6 +69,9 @@ visit AS(
       ON v.id_house = hl.id_house
       AND DATE(v.ts_created) >= DATE(hl.ts_listing_version_start)
       AND (DATE(v.ts_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
+  LEFT JOIN
+    datalake_visit.visit_business_model AS vbm
+      ON v.id = vbm.id_visit
 )
 SELECT
   CONCAT(v.id_visit_status_log,'R',ranking) AS id_visit_status_events,
@@ -79,14 +88,14 @@ SELECT
   v.id_sale_flow,
   v.id_fup_details,
   v.id_company_supply,
+  v.id_company_demand,
   v.uuid_company_supply,
-  vbm.id_company_demand,
   v.partner_3p_supply,
-  vbm.partner_3p_demand,
-  vbm.is_3p_supply,
-  vbm.is_3p_demand,
-  vbm.is_3p_lead_gen,
-  vbm.has_3p_access_control,
+  v.partner_3p_demand,
+  v.is_3p_supply,
+  v.is_3p_demand,
+  v.is_3p_lead_gen,
+  v.has_3p_access_control,
   v.business_context,
   v.event_type,
   v.ranking,
@@ -99,8 +108,5 @@ SELECT
   v.ts_event_created
 FROM
    visit AS v
-LEFT JOIN
-  datalake_visit.visit_business_model AS vbm
-    ON v.id_visit = vbm.id_visit
 WHERE
     DATE(v.ts_event_created) >= '2024-11-01'

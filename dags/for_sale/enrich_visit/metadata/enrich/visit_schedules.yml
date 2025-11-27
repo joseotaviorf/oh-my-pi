@@ -202,10 +202,6 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.status
     description: True if the house booked had an active rental contract at 5A at the booking date
-  is_3p_demand:
-    lineage:
-      - datalake_ebdb_clean.visit_business_model.is_3p_demand
-    description: Boolean column that identifies if the visitor came from a QuintoAndar demand partner.
   is_confirmed:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created

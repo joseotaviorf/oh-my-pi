@@ -74,6 +74,8 @@
         b.visit_fup,
         vbm.is_3p_supply,
         vbm.is_3p_demand,
+        vbm.is_3p_lead_gen,
+        vbm.has_3p_access_control,
         (b.status = 'Cancelado') AS is_canceled,
         CAST(b.dt_booking AS TIMESTAMP)
           + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS

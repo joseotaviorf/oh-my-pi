@@ -528,7 +528,6 @@ SELECT DISTINCT
   IF(s.ts_schedule_rescheduled IS NOT NULL, TRUE, FALSE) AS is_rescheduled,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
-  v.is_3p_demand,
   IF(v.behavior IN ('CONFIRMATION_TENANT_LIVING','CONFIRMATION_TENANT_LIVING_ASSURED','CONFIRMATION_TENANT_LIVING_REQUIRED'), TRUE, FALSE) AS has_tenant_living,
   DATEDIFF(v.dt_visit, vcu.ts_created) AS days_visit_cancelled_to_visit,
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
