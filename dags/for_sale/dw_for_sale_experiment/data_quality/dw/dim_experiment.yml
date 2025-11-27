@@ -1,0 +1,30 @@
+---
+table_name: dw_for_sale_experiment.dim_experiment
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_neotribe_exp:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_neotribe:
+    is_complete:
+      severity_level: Error
+  sk_experiment:
+    is_complete:
+      severity_level: Error
+  name_neotribe:
+    is_complete:
+      severity_level: Error
+  name_experiment:
+    is_complete:
+      severity_level: Error
+  identifier_type:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  dt_started:
+    is_complete:
+      severity_level: Error
