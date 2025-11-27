@@ -80,8 +80,8 @@ columns:
     description: Identification key of the business unit where the buyer was served.
   id_company_supply:
     lineage:
-      - datalake_ebdb_listing.house.id_company_hubspot
-    description: Id of the supply partner in HubSpot
+      - datalake_booking.booking.id_company_supply
+    description: ID of the supply partner from the company domain. Obtained from booking table which gets it from visit_business_model.
   uuid_company_supply:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
@@ -89,7 +89,7 @@ columns:
   id_company_demand:
     lineage:
       - datalake_booking.booking.id_company_demand
-    description: Id of the demand partner
+    description: ID of the demand partner from Hubspot. Obtained from booking table which gets it from visit_business_model.
   vendas_offer_flow:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.vendas_offer_flow
@@ -101,12 +101,28 @@ columns:
     description: Name of the business unit where the buyer was served.
   partner_3p_supply:
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
-    description: 'Name of the supply partner '
+      - datalake_booking.booking.partner_3p_supply
+    description: Name of the supply partner. Obtained from booking table which gets it from visit_business_model.
   partner_3p_demand:
     lineage:
       - datalake_booking.booking.partner_3p_demand
-    description: Name of the demand partner
+    description: Name of the demand partner. Obtained from booking table which gets it from visit_business_model.
+  is_3p_supply:
+    lineage:
+      - datalake_booking.booking.is_3p_supply
+    description: Boolean flag indicating if the offer has 3P supply partner. Obtained from booking table which gets it from visit_business_model.
+  is_3p_demand:
+    lineage:
+      - datalake_booking.booking.is_3p_demand
+    description: Boolean flag indicating if the offer has 3P demand partner. Obtained from booking table which gets it from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_booking.booking.is_3p_lead_gen
+    description: Boolean flag indicating if the offer has 3P lead generation partner. Obtained from booking table which gets it from visit_business_model.
+  has_3p_access_control:
+    lineage:
+      - datalake_booking.booking.has_3p_access_control
+    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). Obtained from booking table which gets it from visit_business_model.
   drop_reason:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.drop_reason

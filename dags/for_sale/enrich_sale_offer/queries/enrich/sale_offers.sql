@@ -28,6 +28,8 @@ base_visits AS (
     b.visit_request_channel AS visit_channel, 
     b.is_3p_supply,
     b.is_3p_demand,
+    b.is_3p_lead_gen,
+    b.has_3p_access_control,
     b.is_canceled,  
     b.ts_visit,
     b.ts_created AS ts_booking_created             
@@ -49,6 +51,8 @@ visit_offer AS (
     bs.partner_3p_demand,
     bs.is_3p_supply,
     bs.is_3p_demand,
+    bs.is_3p_lead_gen,
+    bs.has_3p_access_control,
     CASE
       WHEN bs.ts_booking_created < eso.ts_offer_created THEN TRUE
       ELSE FALSE
@@ -124,6 +128,10 @@ SELECT
   o.id_hub AS id_business_unit,
   vo.id_company_supply,
   vo.id_company_demand,
+  vo.is_3p_supply,
+  vo.is_3p_demand,
+  vo.is_3p_lead_gen,
+  vo.has_3p_access_control,
   vo.id_user_secretariat_booking_creator,
   o.current_payment_method,
   o.planned_payment_method,

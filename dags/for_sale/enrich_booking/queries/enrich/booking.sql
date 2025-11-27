@@ -344,23 +344,6 @@ booking_hub_agent AS (
         -- Date that the visits in HUB flow started
         AND CAST(b.ts_created AS DATE) >= '2021-07-19'
 ),
-booking_3p_demand_agent AS (
-    SELECT
-        b.id,
-        wc.id_company_hubspot AS id_company_demand,
-        wc.3p_partner AS partner_3p_demand
-    FROM
-        agent_contract AS ac
-    JOIN
-        datalake_ebdb_clean.booking AS b
-            ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
-            AND ac.id_agent = b.id_agent
-    JOIN
-        datalake_ebdb_work_contract.work_contract AS wc
-            ON wc.id = ac.id_work_contract
-    WHERE
-        is_3p_contract
-),
 secretariat_on_visit_date AS (
     SELECT
         b.id,
@@ -408,9 +391,13 @@ base_booking AS (
         ) AS id_sale_flow,
         vou.id_real_estate_agent_rating,
         IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
-        hl.id_company_hubspot AS id_company_supply,
+        vbm.id_company_supply,
         hl.uuid_company AS uuid_company_supply,
-        b3pa.id_company_demand,
+        vbm.id_company_demand,
+        vbm.is_3p_supply,
+        vbm.is_3p_demand,
+        vbm.is_3p_lead_gen,
+        vbm.has_3p_access_control,
         b.id_schedule,
         COALESCE(hl.country_code, 'Undefined') AS country_code,
         COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
@@ -525,14 +512,8 @@ base_booking AS (
             NULL
         ) AS user_sale_booking_creator,
         bha.contract_name AS hub_agent_region,
-        b3pa.partner_3p_demand,
-        CASE
-          WHEN COALESCE(
-            (hl.is_sale_3p_supply AND b.business_context = 'SALE')
-            OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
-            FALSE
-          ) THEN hl.partner_3p_supply
-        END AS partner_3p_supply,
+        vbm.partner_3p_demand,
+        vbm.partner_3p_supply,
         b.ts_visit_fup,
         b.ts_created,
         b.ts_updated,
@@ -551,12 +532,6 @@ base_booking AS (
         b.is_closed,
         b.is_agent_fixed,
         IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
-        IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
-        COALESCE(
-          (hl.is_sale_3p_supply AND b.business_context = 'SALE')
-          OR (hl.is_rent_3p_supply AND b.business_context = 'RENT'),
-          FALSE
-        ) AS is_3p_supply,
         CASE
           WHEN COALESCE(
             (hl.is_sale_3p_supply AND b.business_context = 'SALE')
@@ -646,8 +621,8 @@ base_booking AS (
         booking_hub_agent AS bha
             ON bha.id = b.id
     LEFT JOIN
-        booking_3p_demand_agent AS b3pa
-            ON b3pa.id = b.id
+        datalake_visit.visit_business_model AS vbm
+            ON b.id_visit = vbm.id_visit
     LEFT JOIN
         datalake_ebdb_clean.user AS ua
             ON ua.id_agent = b.id_agent
@@ -695,7 +670,96 @@ cross_channel AS (
 )
 -- custom columns that need pre-calculated ones
 SELECT
-    bb.*,
+    bb.id,
+    bb.id_country,
+    bb.id_rescheduled_booking,
+    bb.id_visitor,
+    bb.id_visit,
+    bb.id_user_creation,
+    bb.id_user_cancelation,
+    bb.id_house,
+    bb.id_agent,
+    bb.id_user_sale_agent,
+    bb.id_attendant,
+    bb.id_user_sale_attendence_5a,
+    bb.id_user_secretariat_on_visit_date,
+    bb.id_user_last_secretariat,
+    bb.id_rent_flow,
+    bb.id_sale_flow,
+    bb.id_real_estate_agent_rating,
+    bb.id_sale_fixed_agent,
+    bb.id_company_supply,
+    bb.uuid_company_supply,
+    bb.id_company_demand,
+    bb.is_3p_supply,
+    bb.is_3p_demand,
+    bb.is_3p_lead_gen,
+    bb.has_3p_access_control,
+    bb.id_schedule,
+    bb.country_code,
+    bb.default_timezone,
+    bb.dt_booking,
+    bb.status,
+    bb.visit_intent,
+    bb.buyer_intention,
+    bb.type,
+    bb.visit_fup,
+    bb.checkin_code,
+    bb.visit_checkin_status,
+    bb.checkin_fail_reason,
+    bb.checkin_fail_commentary,
+    bb.slot_day,
+    bb.checkin_status,
+    bb.user_creation_email,
+    bb.first_update_source,
+    bb.code,
+    bb.last_status_change_reason,
+    bb.last_status_change_reason_enum,
+    bb.last_status_change_reason_category,
+    bb.tenant_absence_reason,
+    bb.agent_absence_reason,
+    bb.landlord_absence_reason,
+    bb.troublesome_entrance_problem,
+    bb.cancellation_reason,
+    bb.cancellation_reason_category,
+    bb.owner_missing_reason,
+    bb.reason_category,
+    bb.user_sale_booking_creator,
+    bb.hub_agent_region,
+    bb.partner_3p_demand,
+    bb.partner_3p_supply,
+    bb.ts_visit_fup,
+    bb.ts_created,
+    bb.ts_updated,
+    bb.ts_first_canceled,
+    bb.ts_first_canceled_unevaluated,
+    bb.ts_booking_local_tz,
+    bb.ts_created_local_tz,
+    bb.ts_visit_follow_up_local_tz,
+    bb.is_confirmed,
+    bb.is_closed,
+    bb.is_agent_fixed,
+    bb.is_hub_flow,
+    bb.is_3p_supply_5a,
+    bb.is_3p_supply_bh,
+    bb.is_virtual_visit,
+    bb.is_entrance_successful,
+    bb.is_canceled,
+    bb.is_sale_visit,
+    bb.is_inspection,
+    bb.is_visit,
+    bb.is_photo_session,
+    bb.is_visit_completed,
+    bb.is_visit_performed,
+    bb.is_via_reschedule,
+    bb.has_reschedule,
+    bb.has_tenant_attended,
+    bb.has_agent_attended,
+    bb.has_landlord_attended,
+    bb.has_owner_arrived,
+    bb.is_first_booking_auto,
+    bb.is_house_rented,
+    bb.ts_checkin,
     TO_UTC_TIMESTAMP(bb.ts_booking_local_tz, default_timezone) AS ts_booking_utc,
     FROM_UTC_TIMESTAMP(bb.ts_first_canceled, default_timezone) AS ts_first_canceled_local_tz,
     FROM_UTC_TIMESTAMP(bb.ts_first_canceled_unevaluated, default_timezone) AS ts_first_canceled_unevaluated_local_tz,

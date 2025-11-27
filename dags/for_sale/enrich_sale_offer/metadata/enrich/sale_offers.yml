@@ -54,6 +54,22 @@ columns:
     lineage:
       - datalake_visit.visits.id_company_demand
     description: Identification key of the demand partner company.
+  is_3p_supply:
+    lineage:
+      - datalake_visit.visits.is_3p_supply
+    description: Boolean flag indicating if the offer has 3P supply partner. Obtained from visits table which gets it from visit_business_model.
+  is_3p_demand:
+    lineage:
+      - datalake_visit.visits.is_3p_demand
+    description: Boolean flag indicating if the offer has 3P demand partner. Obtained from visits table which gets it from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_visit.visits.is_3p_lead_gen
+    description: Boolean flag indicating if the offer has 3P lead generation partner. Obtained from visits table which gets it from visit_business_model.
+  has_3p_access_control:
+    lineage:
+      - datalake_visit.visits.has_3p_access_control
+    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). Obtained from visits table which gets it from visit_business_model.
   id_user_secretariat_booking_creator:
     lineage:
       - datalake_visit.visits.id_user_visit_request

@@ -424,12 +424,16 @@ filtered_visit AS (
     v.id_visitor,
     v.id_house,
     v.id_agent,
+    vbm.id_company_supply,
     vbm.id_company_demand,
     v.code,
     v.business_context,
     v.behavior,
     vbm.business_model,
+    vbm.is_3p_supply,
     vbm.is_3p_demand,
+    vbm.is_3p_lead_gen,
+    vbm.has_3p_access_control,
     v.dt_visit,
     v.id_real_estate_agent_rating,
     v.ts_visit,
@@ -464,8 +468,12 @@ SELECT DISTINCT
   su.id_user_5a AS id_user_sale_attendence_5a,
   sovd.id_user_secretariat_on_visit_date,
   ls.id_user_last_secretariat,
-  COALESCE(cs_company.sk_company, cs_hubspot.sk_company, p_3p_supply.sk_company) AS id_company_supply,
+  v.id_company_supply,
   v.id_company_demand,
+  v.is_3p_supply,
+  v.is_3p_demand,
+  v.is_3p_lead_gen,
+  v.has_3p_access_control,
   s.id_succeed_schedule,
   CONCAT(v.id_visitor, '_', v.id_house) AS id_sale_flow,
   h.id_region,
@@ -592,15 +600,6 @@ LEFT JOIN
   buyer_review AS br
     ON v.code = br.id_reviewed
     AND v.id_visitor = br.id_reviewer
-LEFT JOIN
-  datalake_company.company_sks AS cs_company
-    ON hl.uuid_company = cs_company.uuid_company
-LEFT JOIN
-  datalake_company.company_sks AS cs_hubspot
-    ON hl.id_company_hubspot = cs_hubspot.id_hubspot
-LEFT JOIN
-  datalake_company.company_sks AS p_3p_supply
-    ON hl.partner_3p_supply = p_3p_supply.extracted_3p_tag
 LEFT JOIN
   datalake_visit.post_visit_agent_unified AS pva
     ON s.id_schedule = pva.id_schedule

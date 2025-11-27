@@ -60,23 +60,6 @@
             previous_id_work_contract <> id_work_contract
             OR previous_id_work_contract IS NULL
     ),
-    booking_3p_demand_agent AS (
-        SELECT
-            b.id,
-            wc.id_company_hubspot AS id_company_demand,
-            wc.3p_partner AS partner_3p_demand
-        FROM
-            agent_contract AS ac
-        JOIN
-            datalake_ebdb_clean.booking AS b
-                ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
-                AND ac.id_agent = b.id_agent
-        JOIN
-            datalake_ebdb_work_contract.work_contract AS wc
-                ON wc.id = ac.id_work_contract
-        WHERE
-            is_3p_contract
-    ),
     base_booking AS (
       SELECT
         b.id,
@@ -84,10 +67,13 @@
         b.id_visitor,
         b.id_agent,
         su.id_user_5a AS id_user_sale_attendence_5a,
-        b3pa.id_company_demand,
-        b3pa.partner_3p_demand,
+        vbm.id_company_supply,
+        vbm.id_company_demand,
+        vbm.partner_3p_supply,
+        vbm.partner_3p_demand,
         b.visit_fup,
-        IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
+        vbm.is_3p_supply,
+        vbm.is_3p_demand,
         (b.status = 'Cancelado') AS is_canceled,
         CAST(b.dt_booking AS TIMESTAMP)
           + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
@@ -106,8 +92,8 @@
           datalake_hub_services.secretariat_hierarchy AS su
               ON su.id_user_5a = fba.id_user_creation
       LEFT JOIN
-          booking_3p_demand_agent AS b3pa
-              ON b3pa.id = b.id
+          datalake_visit.visit_business_model AS vbm
+              ON b.id_visit = vbm.id_visit
       LEFT JOIN
         datalake_ebdb_listing.house AS hl
             ON b.id_house = hl.id
@@ -126,10 +112,15 @@
             bs.id_agent,
             bs.id_user_sale_attendence_5a AS id_user_secretariat_booking_creator,
             du.id AS id_user_agent,
+            bs.id_company_supply,
             bs.id_company_demand,
             du.name AS agent_name,
+            bs.partner_3p_supply,
             bs.partner_3p_demand,
+            bs.is_3p_supply,
             bs.is_3p_demand,
+            bs.is_3p_lead_gen,
+            bs.has_3p_access_control,
             TRUE AS flg_visit_completed_before_offer,
             (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
             (unix_timestamp(COALESCE(g.ts_created, vo.ts_offer_created))-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
@@ -171,10 +162,15 @@ booking_before_offer AS (
             bs.id_agent,
             bs.id_user_sale_attendence_5a AS id_user_secretariat_booking_creator,
             du.id AS id_user_agent,
+            bs.id_company_supply,
             bs.id_company_demand,
             du.name AS agent_name,
+            bs.partner_3p_supply,
             bs.partner_3p_demand,
+            bs.is_3p_supply,
             bs.is_3p_demand,
+            bs.is_3p_lead_gen,
+            bs.has_3p_access_control,
             TRUE AS flg_booking_before_offer,
             (unix_timestamp(COALESCE(vo.ts_offer_created, g.ts_created))-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
             (unix_timestamp(COALESCE(vo.ts_offer_created, g.ts_created))-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
@@ -218,18 +214,17 @@ relation_booking_offer AS (
             ELSE bo.id_user_secretariat_booking_creator
         END AS id_user_secretariat_booking_creator,
         COALESCE(vo.id_user_agent, bo.id_user_agent) AS id_user_agent,
-        CASE
-            WHEN vo.is_3p_demand IS NOT NULL THEN vo.id_company_demand
-            ELSE bo.id_company_demand
-        END AS id_company_demand,
+        COALESCE(vo.id_company_supply, bo.id_company_supply) AS id_company_supply,
+        COALESCE(vo.id_company_demand, bo.id_company_demand) AS id_company_demand,
         COALESCE(vo.agent_name, bo.agent_name) AS agent_name,
-        CASE
-            WHEN vo.is_3p_demand IS NOT NULL THEN vo.partner_3p_demand
-            ELSE bo.partner_3p_demand
-        END AS partner_3p_demand,
+        COALESCE(vo.partner_3p_supply, bo.partner_3p_supply) AS partner_3p_supply,
+        COALESCE(vo.partner_3p_demand, bo.partner_3p_demand) AS partner_3p_demand,
         COALESCE(vo.hours_booking_to_offer, bo.hours_booking_to_offer) AS hours_booking_to_offer,
         COALESCE(vo.hours_visit_to_offer, bo.hours_visit_to_offer) AS hours_visit_to_offer,
+        COALESCE(vo.is_3p_supply, bo.is_3p_supply) AS is_3p_supply,
         COALESCE(vo.is_3p_demand, bo.is_3p_demand) AS is_3p_demand,
+        COALESCE(vo.is_3p_lead_gen, bo.is_3p_lead_gen) AS is_3p_lead_gen,
+        COALESCE(vo.has_3p_access_control, bo.has_3p_access_control) AS has_3p_access_control,
         COALESCE(bo.flg_booking_before_offer,vo.flg_visit_completed_before_offer) AS flg_booking_before_offer,
         vo.flg_visit_completed_before_offer,
         COALESCE(vo.ts_booking_created, bo.ts_booking_created) AS ts_booking_created
@@ -368,11 +363,16 @@ data_sources AS (
         -- data from relation_booking_offer
         rbo.id_user_agent AS rbo_id_user_agent,
         rbo.id_booking,
+        rbo.id_company_supply,
         rbo.id_company_demand,
         rbo.id_user_secretariat_booking_creator,
         UPPER(rbo.agent_name) AS rbo_agent_name,
+        rbo.partner_3p_supply,
         rbo.partner_3p_demand,
+        COALESCE(rbo.is_3p_supply, FALSE) AS is_3p_supply,
         COALESCE(rbo.is_3p_demand, FALSE) AS is_3p_demand,
+        COALESCE(rbo.is_3p_lead_gen, FALSE) AS is_3p_lead_gen,
+        COALESCE(rbo.has_3p_access_control, FALSE) AS has_3p_access_control,
         COALESCE(rbo.flg_booking_before_offer,FALSE) AS flg_booking_before_offer,
         COALESCE(rbo.flg_visit_completed_before_offer,FALSE) AS flg_visit_completed_before_offer,
         rbo.hours_booking_to_offer,
@@ -696,9 +696,9 @@ business_rules AS (
         ds.id_pendency,
         ds.vo_id_user_team_lead AS id_user_team_lead,
         COALESCE(busf.id_hub, bu.id_business_unit) AS id_business_unit,
-        h.id_company_hubspot AS id_company_supply,
+        ds.id_company_supply,
         h.uuid_company AS uuid_company_supply,
-        ds.id_company_demand AS id_company_demand,
+        ds.id_company_demand,
         CASE
             WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
                 THEN ds.vo_agent_name
@@ -904,11 +904,9 @@ business_rules AS (
         COALESCE(vo_days_offer_accepted_to_offer_dismissed, mo_days_offer_accepted_to_offer_dismissed) AS days_offer_accepted_to_offer_dismissed,
         ds.ts_updated,
         vo_ts_last_updated_pendency AS ts_last_updated_pendency,
-        CASE
-            WHEN h.is_sale_3p_supply THEN h.partner_3p_supply
-        END AS partner_3p_supply,
+        ds.partner_3p_supply,
         ds.partner_3p_demand,
-        COALESCE(h.is_sale_3p_supply, FALSE) AS is_3p_supply,
+        ds.is_3p_supply,
         COALESCE(h.is_3p_supply_5a AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_5a,
         COALESCE(h.is_3p_supply_bh AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_bh,
         ds.is_3p_demand,
@@ -1094,9 +1092,9 @@ SELECT DISTINCT
     id_business_unit,
     id_company_supply,
     uuid_company_supply,
-    COALESCE(supply_company.sk_company, supply_hubspot.sk_company, supply_tag.sk_company) AS sk_company_supply,
+    id_company_supply AS sk_company_supply,
     id_company_demand,
-    COALESCE(demand_hubspot.sk_company, demand_tag.sk_company) AS sk_company_demand,
+    id_company_demand AS sk_company_demand,
     pendency,
     CASE
         WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (
@@ -1149,6 +1147,10 @@ SELECT DISTINCT
     diligence_appointment_reason,
     partner_3p_supply,
     partner_3p_demand,
+    is_3p_supply,
+    is_3p_demand,
+    is_3p_lead_gen,
+    has_3p_access_control,
     registry_price,
     itbi_price,
     payment_entry_amount,
@@ -1209,6 +1211,8 @@ SELECT DISTINCT
     is_3p_supply_5a,
     is_3p_supply_bh,
     is_3p_demand,
+    is_3p_lead_gen,
+    has_3p_access_control,
     is_a_rescued_ccv,
     is_a_rescued_offer,
     is_ccv_5a_model,
@@ -1251,18 +1255,3 @@ LEFT JOIN
 LEFT JOIN
     last_secretariat AS ls
         ON ls.id_offer = br.id_offer
-LEFT JOIN
-    datalake_company.company_sks AS demand_hubspot
-        ON br.id_company_demand = demand_hubspot.id_hubspot
-LEFT JOIN
-    datalake_company.company_sks AS demand_tag
-        ON br.partner_3p_demand = demand_tag.extracted_3p_tag
-LEFT JOIN
-    datalake_company.company_sks AS supply_company
-        ON br.uuid_company_supply = supply_company.uuid_company
-LEFT JOIN
-    datalake_company.company_sks AS supply_hubspot
-        ON br.id_company_supply = supply_hubspot.id_hubspot
-LEFT JOIN
-    datalake_company.company_sks AS supply_tag
-        ON br.partner_3p_supply = supply_tag.extracted_3p_tag

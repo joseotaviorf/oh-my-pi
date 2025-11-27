@@ -38,8 +38,14 @@ SELECT DISTINCT
     b.id_house,
     h.id_region,
     svh.id_business_unit,
-    COALESCE(cs_company.sk_company, cs_hubspot.sk_company, p_3p_supply.sk_company) AS sk_company_supply,
-    COALESCE(NULLIF(COALESCE(cs_demand.sk_company, p_3p_demand.sk_company), -1), b.id_company_demand) AS sk_company_demand,
+    COALESCE(b.id_company_supply, -1) AS sk_company_supply,
+    COALESCE(b.id_company_demand, -1) AS sk_company_demand,
+    b.partner_3p_supply,
+    b.partner_3p_demand,
+    b.is_3p_supply,
+    b.is_3p_demand,
+    b.is_3p_lead_gen,
+    b.has_3p_access_control,
     b.id_agent,
     ua.id AS id_user_agent,
     svh.id_user_en AS id_user_en,
@@ -91,21 +97,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.user AS ua
         ON ua.id_agent = b.id_agent
-LEFT JOIN
-  datalake_company.company_sks AS cs_demand
-    ON b.id_company_demand = cs_demand.id_hubspot
-LEFT JOIN
-  datalake_company.company_sks AS p_3p_demand
-    ON b.partner_3p_demand = p_3p_demand.extracted_3p_tag
-LEFT JOIN
-  datalake_company.company_sks AS cs_company
-    ON b.uuid_company_supply = cs_company.uuid_company
-LEFT JOIN
-  datalake_company.company_sks AS cs_hubspot
-    ON b.id_company_supply = cs_hubspot.id_hubspot
-LEFT JOIN
-  datalake_company.company_sks AS p_3p_supply
-    ON b.partner_3p_supply = p_3p_supply.extracted_3p_tag
 LEFT JOIN
   status_log AS vsl
     ON b.id = vsl.id_schedule

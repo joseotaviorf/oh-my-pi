@@ -35,16 +35,16 @@ columns:
     description: Id for Sale Flow connection, junction of visitor with house
   id_company_supply:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_company_hubspot
-    description: Id of the supply partner in HubSpot
+      - datalake_visit.visit_business_model.id_company_supply
+    description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data.
   uuid_company_supply:
     lineage:
       - datalake_ebdb_listing.house_listing.uuid_company
     description: UUID of the supply partner in the company domain
   id_company_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
-    description: ID of the demand partner from Hubspot.
+      - datalake_visit.visit_business_model.id_company_demand
+    description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data.
   id_follow_up:
     description: ID for visit's follow up
   id_entrance_type:
@@ -77,12 +77,28 @@ columns:
     description: Country code.
   partner_3p_supply:
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
-    description: Supply partner name
+      - datalake_visit.visit_business_model.partner_3p_supply
+    description: Supply partner name. Obtained from visit_business_model which consolidates supply partner data.
   partner_3p_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.3p_partner
-    description: Demand partner name
+      - datalake_visit.visit_business_model.partner_3p_demand
+    description: Demand partner name. Obtained from visit_business_model which consolidates demand partner data.
+  is_3p_supply:
+    lineage:
+      - datalake_visit.visit_business_model.is_3p_supply
+    description: Boolean flag indicating if the visit has 3P supply partner. Obtained from visit_business_model.
+  is_3p_demand:
+    lineage:
+      - datalake_visit.visit_business_model.is_3p_demand
+    description: Boolean flag indicating if the visit has 3P demand partner. Obtained from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_visit.visit_business_model.is_3p_lead_gen
+    description: Boolean flag indicating if the visit has 3P lead generation partner. Obtained from visit_business_model.
+  has_3p_access_control:
+    lineage:
+      - datalake_visit.visit_business_model.has_3p_access_control
+    description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). Obtained from visit_business_model.
   status:
     lineage:
       - datalake_ebdb_clean.visit.status
@@ -216,7 +232,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
     description: Role of user who is related to the first visit confirmation.
-  first_tenant_livign_answer:
+  first_tenant_living_answer:
     lineage:
       - datalake_ebdb_clean.visit_status_log.event_type
     description: First confirmation response from tenant living.

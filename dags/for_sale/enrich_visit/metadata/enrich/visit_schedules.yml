@@ -70,12 +70,28 @@ columns:
     description: User id of the last Sales secretary responsible for the buyer.
   id_company_supply:
     lineage:
-      - datalake_company.company_sks.sk_company
-    description: Id of the company in Rede QuintoAndar associated with the house.
+      - datalake_visit.visit_business_model.id_company_supply
+    description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data.
   id_company_demand:
     lineage:
-      - datalake_ebdb_clean.visit_business_model.id_company_demand
-    description: Id of the company in Rede QuintoAndar associated with the agent.
+      - datalake_visit.visit_business_model.id_company_demand
+    description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data.
+  is_3p_supply:
+    lineage:
+      - datalake_visit.visit_business_model.is_3p_supply
+    description: Boolean flag indicating if the visit has 3P supply partner. Obtained from visit_business_model.
+  is_3p_demand:
+    lineage:
+      - datalake_visit.visit_business_model.is_3p_demand
+    description: Boolean flag indicating if the visit has 3P demand partner. Obtained from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_visit.visit_business_model.is_3p_lead_gen
+    description: Boolean flag indicating if the visit has 3P lead generation partner. Obtained from visit_business_model.
+  has_3p_access_control:
+    lineage:
+      - datalake_visit.visit_business_model.has_3p_access_control
+    description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). Obtained from visit_business_model.
   id_succeed_schedule:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_schedule

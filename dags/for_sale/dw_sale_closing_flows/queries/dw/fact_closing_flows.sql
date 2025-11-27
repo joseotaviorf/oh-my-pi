@@ -4,7 +4,7 @@ SELECT
   id_owner AS sk_owner,
   id_house AS sk_house,
   COALESCE(cs_supply.sk_company, -1) AS sk_company_supply,
-  COALESCE(cs_demand.sk_company, -1) AS sk_company_demand,
+  COALESCE(cf.id_company_demand, -1) AS sk_company_demand,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_created,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_created_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_onboarding_ended,1, 10),'-','') AS BIGINT), -1) AS sk_onboarding_ended_date,
@@ -85,12 +85,6 @@ SELECT
   NOW() AS ts_load
 FROM
     datalake_sale_closing_flows.closing_flow AS cf
-LEFT JOIN
-  datalake_company.company_sks AS cs_demand
-    ON (cf.id_company_demand IS NOT NULL
-    AND cf.id_company_demand = cs_demand.id_hubspot)
-    OR (cf.id_company_demand IS NULL
-    AND cf.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
   datalake_company.company_sks AS cs_supply
     ON (

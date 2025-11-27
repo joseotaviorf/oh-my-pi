@@ -87,16 +87,16 @@ columns:
     description: Id of the fixed agent if the business context = sale
   id_company_supply:
     lineage:
-    - datalake_ebdb_listing.house.id_company_hubspot
-    description: Id of the supply partner in HubSpot
+    - datalake_visit.visit_business_model.id_company_supply
+    description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data.
   uuid_company_supply:
     lineage:
     - datalake_ebdb_listing.house.uuid_company
     description: UUID of the supply partner in the company domain
   id_company_demand:
     lineage:
-    - datalake_ebdb_work_contract.work_contract.id_company_hubspot
-    description: Id of the demand partner
+    - datalake_visit.visit_business_model.id_company_demand
+    description: Id of the demand partner. Obtained from visit_business_model which consolidates demand partner data.
   id_schedule:
     lineage:
       - datalake_ebdb_clean.booking.id_schedule
@@ -431,12 +431,28 @@ columns:
       Unlisted apartment: ''
   partner_3p_demand:
     lineage:
-    - datalake_ebdb_work_contract.work_contract.3p_partner
-    description: Column with the name of partner who brought the visitor, if the listing has the is_3p_demand flag.
+    - datalake_visit.visit_business_model.partner_3p_demand
+    description: Column with the name of partner who brought the visitor, if the listing has the is_3p_demand flag. Obtained from visit_business_model which consolidates demand partner data.
   partner_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.partner_3p_supply
-    description: Column with the name of QuintoAndar real estate partner, if the listing has the is_3p_supply flag.
+    - datalake_visit.visit_business_model.partner_3p_supply
+    description: Supply partner name. Obtained from visit_business_model which consolidates supply partner data.
+  is_3p_supply:
+    lineage:
+    - datalake_visit.visit_business_model.is_3p_supply
+    description: Boolean flag indicating if the booking has 3P supply partner. Obtained from visit_business_model.
+  is_3p_demand:
+    lineage:
+    - datalake_visit.visit_business_model.is_3p_demand
+    description: Boolean flag indicating if the booking has 3P demand partner. Obtained from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+    - datalake_visit.visit_business_model.is_3p_lead_gen
+    description: Boolean flag indicating if the booking has 3P lead generation partner. Obtained from visit_business_model.
+  has_3p_access_control:
+    lineage:
+    - datalake_visit.visit_business_model.has_3p_access_control
+    description: Boolean flag indicating if the booking has any 3P access control (supply, demand, or lead gen). Obtained from visit_business_model.
   ts_visit_fup:
     lineage:
     - datalake_ebdb_clean.booking.ts_visit_fup
@@ -643,6 +659,12 @@ columns:
       - datalake_tracked_events.attribution_cross_channel.final_attribution_term
     description: >
       Identifies search terms that brought the lead.
+  branded:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.branded
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
+    description: >
+      Identifies if the visit was branded or not. Obtained from attribution data.
   final_attribution_origin:
     lineage:
       - datalake_tracked_events.attribution_cross_channel.final_attribution_origin

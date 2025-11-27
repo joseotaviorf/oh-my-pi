@@ -44,9 +44,9 @@ visit AS(
     vsl.on_behalf_of,
     vsl.channel,
     vsl.ts_event_created,
-    lh.id_company_hubspot AS id_company_supply,
+    vbm.id_company_supply,
     lh.uuid_company AS uuid_company_supply,
-    lh.partner_3p_supply,
+    vbm.partner_3p_supply,
     lh.id_user AS id_owner,
     COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     hl.country_code
@@ -63,24 +63,6 @@ visit AS(
       ON v.id_house = hl.id_house
       AND DATE(v.ts_created) >= DATE(hl.ts_listing_version_start)
       AND (DATE(v.ts_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
-),
-booking_3p_demand_agent AS (
-    SELECT
-        v.id_visit,
-        wc.id_company_hubspot AS id_company_demand,
-        wc.3p_partner AS partner_3p_demand
-    FROM
-         datalake_ebdb_agents.agent_contract AS ac
-    JOIN
-        visit AS v
-            ON v.ts_created BETWEEN ac.ts_work_contract_started AND COALESCE(ac.ts_work_contract_ended, CURRENT_TIMESTAMP)
-            AND ac.id_agent = v.id_agent
-    JOIN
-        datalake_ebdb_work_contract.work_contract AS wc
-            ON wc.id = ac.id_work_contract
-    WHERE
-        is_3p_contract
-    GROUP BY 1, 2, 3
 )
 SELECT
   CONCAT(v.id_visit_status_log,'R',ranking) AS id_visit_status_events,
@@ -98,9 +80,13 @@ SELECT
   v.id_fup_details,
   v.id_company_supply,
   v.uuid_company_supply,
-  b3da.id_company_demand,
+  vbm.id_company_demand,
   v.partner_3p_supply,
-  b3da.partner_3p_demand,
+  vbm.partner_3p_demand,
+  vbm.is_3p_supply,
+  vbm.is_3p_demand,
+  vbm.is_3p_lead_gen,
+  vbm.has_3p_access_control,
   v.business_context,
   v.event_type,
   v.ranking,
@@ -114,7 +100,7 @@ SELECT
 FROM
    visit AS v
 LEFT JOIN
-  booking_3p_demand_agent AS b3da
-    ON v.id_visit = b3da.id_visit
+  datalake_visit.visit_business_model AS vbm
+    ON v.id_visit = vbm.id_visit
 WHERE
     DATE(v.ts_event_created) >= '2024-11-01'

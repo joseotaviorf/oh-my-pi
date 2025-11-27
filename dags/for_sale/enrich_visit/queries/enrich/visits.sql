@@ -152,25 +152,6 @@ WITH
         FROM
             bsc
     ),
-    visit_3p_demand_agent AS (
-        SELECT
-            v.id AS id_visit,
-            wc.id_company_hubspot AS id_company_demand,
-            wc.3p_partner AS partner_3p_demand
-        FROM
-            datalake_ebdb_agents.agent_contract AS ac
-        JOIN
-            datalake_ebdb_clean.visit AS v
-                ON v.ts_created BETWEEN ac.ts_work_contract_started
-                AND COALESCE(ac.ts_work_contract_ended, CURRENT_TIMESTAMP)
-                AND ac.id_agent = v.id_agent
-        JOIN
-            datalake_ebdb_work_contract.work_contract AS wc
-                ON wc.id = ac.id_work_contract
-        WHERE
-            is_3p_contract
-        GROUP BY 1,2,3
-    ),
     visit_by_history AS (
         SELECT
             id_visit,
@@ -205,9 +186,9 @@ SELECT
     COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     -1 AS id_rent_flow,
     -1 AS id_sale_flow,
-    lh.id_company_hubspot AS id_company_supply,
+    vbm.id_company_supply,
     lh.uuid_company AS uuid_company_supply,
-    visit_demand.id_company_demand,
+    vbm.id_company_demand,
     -1 AS id_follow_up,
     -1 AS id_entrance_type,
     vbh.id_first_associated_agent,
@@ -216,8 +197,12 @@ SELECT
     visit.code,
     visit.type,
     hl.country_code,
-    lh.partner_3p_supply,
-    visit_demand.partner_3p_demand,
+    vbm.partner_3p_supply,
+    vbm.partner_3p_demand,
+    vbm.is_3p_supply,
+    vbm.is_3p_demand,
+    vbm.is_3p_lead_gen,
+    vbm.has_3p_access_control,
     visit.status,
     CASE
         WHEN visit.ts_created::DATE >= '2024-11-01' THEN visit.computed_status
@@ -298,14 +283,6 @@ SELECT
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', TRUE, FALSE) AS is_unsuccessful,
     IF(pva.id_visit IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
     IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
-    CASE
-        WHEN business_model_demand = '3P' THEN TRUE
-        WHEN business_model_demand = '1P' THEN FALSE
-    END AS is_3p_demand,
-    CASE
-        WHEN business_model_supply = '3P' THEN TRUE
-        WHEN business_model_supply = '1P' THEN FALSE
-    END AS is_3p_supply,
     IF(pfa.id_pfa_history IS NOT NULL, TRUE, FALSE) AS is_fixed_agent,
     IF(computed_status_unified IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
     CASE
@@ -378,8 +355,8 @@ LEFT JOIN
       AND DATE(visit.ts_created) >= DATE(hl.ts_listing_version_start)
       AND (DATE(visit.ts_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
 LEFT JOIN
-    visit_3p_demand_agent AS visit_demand
-        ON visit.id = visit_demand.id_visit
+    datalake_visit.visit_business_model AS vbm
+        ON visit.id = vbm.id_visit
 LEFT JOIN
     datalake_visit.visit_cancellation_unified AS visit_cancellation
         ON visit.id = visit_cancellation.id_visit
@@ -392,9 +369,6 @@ LEFT JOIN
 LEFT JOIN
     visit_by_history AS vbh
         ON visit.id = vbh.id_visit
-LEFT JOIN
-    datalake_visit.visit_business_model AS vbm
-        ON visit.id = vbm.id_visit
 LEFT JOIN
     datalake_visit.preferred_fixed_agent_history AS pfa
         ON visit.id_agent = pfa.id_user_agent

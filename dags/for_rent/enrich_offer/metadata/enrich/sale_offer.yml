@@ -116,28 +116,28 @@ columns:
     description: Identification key of the business unit where the buyer was served.
   id_company_supply:
     lineage:
-      - datalake_ebdb_listing.house.id_company_hubspot
-    description: Id of the supply partner in HubSpot
+      - datalake_booking.booking.id_company_supply
+    description: ID of the supply partner from the company domain. Obtained from booking table which gets it from visit_business_model.
   uuid_company_supply:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
     description: UUID of the supply partner in the company domain
   sk_company_supply:
     lineage:
-      - datalake_company.company_sks.sk_company
+      - datalake_booking.booking.id_company_supply
     description:
       Surrogate Key of the company in Rede QuintoAndar associated with
-      the house. Can be joined with dw_rede.dim_company.
+      the house. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   sk_company_demand:
     lineage:
-      - datalake_company.company_sks.sk_company
+      - datalake_booking.booking.id_company_demand
     description:
       Surrogate Key of the company in Rede QuintoAndar associated with
-      the agent. Can be joined with dw_rede.dim_company.
+      the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   id_company_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.id_company_hubspot
-    description: Id of the demand partner
+      - datalake_visit.visit_business_model.id_company_demand
+    description: Id of the demand partner. Obtained from visit_business_model which consolidates demand partner data.
   pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency
@@ -304,12 +304,28 @@ columns:
     description: Reason why a diligence appointment was scheduled.
   partner_3p_supply:
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
-    description: Name of the Rede partner that supplied the property.
+      - datalake_booking.booking.partner_3p_supply
+    description: Name of the Rede partner that supplied the property. Obtained from booking table which gets it from visit_business_model.
   partner_3p_demand:
     lineage:
-      - datalake_ebdb_work_contract.work_contract.3p_partner
-    description: Name of the Rede partner that demanded the property.
+      - datalake_booking.booking.partner_3p_demand
+    description: Name of the Rede partner that demanded the property. Obtained from booking table which gets it from visit_business_model.
+  is_3p_supply:
+    lineage:
+      - datalake_booking.booking.is_3p_supply
+    description: Boolean flag indicating if the offer has 3P supply partner. Obtained from booking table which gets it from visit_business_model.
+  is_3p_demand:
+    lineage:
+      - datalake_booking.booking.is_3p_demand
+    description: Boolean flag indicating if the offer has 3P demand partner. Obtained from booking table which gets it from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_booking.booking.is_3p_lead_gen
+    description: Boolean flag indicating if the offer has 3P lead generation partner. Obtained from booking table which gets it from visit_business_model.
+  has_3p_access_control:
+    lineage:
+      - datalake_booking.booking.has_3p_access_control
+    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). Obtained from booking table which gets it from visit_business_model.
   current_payment_method:
     lineage:
       - datalake_firestore.sale_offer.current_payment_method
