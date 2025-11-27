@@ -5,6 +5,7 @@ SELECT
   origin,
   channel,
   agent,
+  NULL AS business_context,
   ts_event,
   year,
   month,
@@ -19,6 +20,7 @@ SELECT
   origin,
   channel,
   agent,
+  NULL AS business_context,
   ts_event,
   year,
   month,
@@ -33,13 +35,14 @@ SELECT
   cs.origin AS origin,
   'demand-contact-submission' AS channel,
   'Secretaria' AS agent,
+  NULL AS business_context,
   cs.ts_created_at as ts_event,
   year,
   month,
   day
 FROM
   datalake_demand_contact_submission_clean.contact_submissions AS cs
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY ALL
 UNION ALL 
 SELECT
   COALESCE(id_user_lead,lead_phone) AS id_user,
@@ -48,6 +51,7 @@ SELECT
   LOWER(origin) AS origin,
   'TQC' AS channel,
   'TQC' AS agent,
+  NULL AS business_context,
   ts_created AS ts_event,
   YEAR(ts_created) AS year,
   MONTH(ts_created) AS month,
@@ -63,6 +67,7 @@ SELECT
   'Placas' AS origin,
   'plaquinhas_ada_whatsapp' AS channel,
   'Secretaria' AS agent,
+  NULL AS business_context,
   ts_contact_start AS ts_event,
   YEAR(ts_contact_start) AS year,
   MONTH(ts_contact_start) AS month,
@@ -85,6 +90,7 @@ SELECT
   origin,
   channel,
   agent,
+  business_context,
   ts_event,
   year,
   month,

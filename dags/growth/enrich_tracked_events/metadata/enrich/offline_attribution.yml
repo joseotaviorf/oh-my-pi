@@ -2,7 +2,7 @@
 database_name: datalake_tracked_events
 table_name: offline_attribution
 domain: Growth
-owner: '@data-growth'
+owner: "@data-growth"
 description: This table contains data from offline interactions events and contacts.
 columns:
   id_user:
@@ -16,23 +16,26 @@ columns:
       - datalake_hmb_ada_clean.backoffices.phone_number
       - datalake_hmb_ada_clean.backoffices.id_business
       - datalake_ebdb_clean.user.id
+      - datalake_tracked_events.concierge_attribution.id_user
   id_contact:
     description: Unique identifier for the contact related to the offline attribution event.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.id_contact
       - datalake_tracked_events.secretaria_offline_touchpoints.id_contact
       - datalake_demand_contact_submission_clean.contact_submissions.id_user
-      - datalake_demand_contact_submission_clean.contact_submissions.user_email  
-      - datalake_demand_contact_submission_clean.contact_submissions.id_contact_submission  
+      - datalake_demand_contact_submission_clean.contact_submissions.user_email
+      - datalake_demand_contact_submission_clean.contact_submissions.id_contact_submission
       - datalake_tqc_referral.unified_lead_referral_flow.id_user_lead
       - datalake_tqc_referral.unified_lead_referral_flow.lead_phone
       - datalake_tqc_referral.unified_lead_referral_flow.id_referral_flow
       - datalake_hmb_ada_clean.backoffices.id_contact
+      - datalake_tracked_events.concierge_attribution.id_contact
   event_name:
     description: Name of the event.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.event_name
       - datalake_tracked_events.secretaria_offline_touchpoints.event_name
+      - datalake_tracked_events.concierge_attribution.event_name
   origin:
     description: Origin source of the event, indicating where the initial interaction occurred.
     lineage:
@@ -40,45 +43,56 @@ columns:
       - datalake_tracked_events.secretaria_offline_touchpoints.origin
       - datalake_demand_contact_submission_clean.contact_submissions.origin
       - datalake_tqc_referral.unified_lead_referral_flow.origin
+      - datalake_tracked_events.concierge_attribution.origin
   channel:
     description: Communication channel through which the event was recorded.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.channel
       - datalake_tracked_events.secretaria_offline_touchpoints.channel
+      - datalake_tracked_events.concierge_attribution.channel
   agent:
     description: Agent or representative handling the contact or event.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.agent
       - datalake_tracked_events.secretaria_offline_touchpoints.agent
+      - datalake_tracked_events.concierge_attribution.agent
+  business_context:
+    description: Business context associated with the offline attribution event.
+    lineage:
+      - datalake_tracked_events.concierge_attribution.business_context
   ts_event:
     description: Timestamp of when the event occurred.
     lineage:
       - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
       - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
-      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
+      - datalake_demand_contact_submission_clean.contact_submissions.ts_created_at
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
       - datalake_hmb_ada_clean.backoffices.ts_contact_start
+      - datalake_tracked_events.concierge_attribution.ts_event
   year:
     description: Year when the event was recorded.
     lineage:
-      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
-      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
-      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.year
+      - datalake_tracked_events.secretaria_offline_touchpoints.year
+      - datalake_demand_contact_submission_clean.contact_submissions.year
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
       - datalake_hmb_ada_clean.backoffices.ts_contact_start
+      - datalake_tracked_events.concierge_attribution.year
   month:
     description: Month when the event was recorded.
     lineage:
-      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
-      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
-      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.month
+      - datalake_tracked_events.secretaria_offline_touchpoints.month
+      - datalake_demand_contact_submission_clean.contact_submissions.month
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
       - datalake_hmb_ada_clean.backoffices.ts_contact_start
+      - datalake_tracked_events.concierge_attribution.month
   day:
     description: Day when the event was recorded.
     lineage:
-      - datalake_tracked_events.plaquinhas_offline_touchpoints.ts_event
-      - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
-      - datalake_demand_contact_submission_clean.contact_submissions.ts_event
+      - datalake_tracked_events.plaquinhas_offline_touchpoints.day
+      - datalake_tracked_events.secretaria_offline_touchpoints.day
+      - datalake_demand_contact_submission_clean.contact_submissions.day
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
       - datalake_hmb_ada_clean.backoffices.ts_contact_start
+      - datalake_tracked_events.concierge_attribution.day

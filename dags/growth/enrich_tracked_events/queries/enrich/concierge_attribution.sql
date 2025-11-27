@@ -24,7 +24,6 @@ WITH concierge_events AS (
     AND COALESCE(css.id_user, ebdb_user.id) IS NOT NULL
     AND message_index = 0
     AND role = 'HUMAN'
-    AND DATE(csm.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND (
       csm.content LIKE '%Olá! Gostaria de ver alguns imóveis no QuintoAndar%'
       OR csm.content LIKE '%QuintoAndar no portal%'
