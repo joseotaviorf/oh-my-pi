@@ -12,7 +12,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
     fact_house_listing_daily_infos:
-    - fact_house_listing_daily_available_hours
+      - fact_house_listing_daily_available_hours
   tables_customization:
     dim_condo:
       partitions: []
@@ -36,13 +36,13 @@ cluster:
   databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: m5d.2xlarge
-    node_type_id: c7i.2xlarge
+    node_type_id: m5d.4xlarge
     num_workers: 3
     runtime_engine: PHOTON
     spark_version: 16.4.x-scala2.12
     aws_attributes:
       ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
