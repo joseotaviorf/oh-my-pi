@@ -912,6 +912,8 @@ business_rules AS (
         COALESCE(h.is_3p_supply_5a AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_5a,
         COALESCE(h.is_3p_supply_bh AND h.is_sale_3p_supply, FALSE) AS is_3p_supply_bh,
         ds.is_3p_demand,
+        ds.is_3p_lead_gen,
+        ds.has_3p_access_control,
         ds.flg_booking_before_offer,
         ds.flg_visit_completed_before_offer,
         ds.hours_booking_to_offer,
