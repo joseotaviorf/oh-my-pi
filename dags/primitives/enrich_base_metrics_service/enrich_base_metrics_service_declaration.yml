@@ -53,16 +53,16 @@ workflow:
         - year
         - month
         - day
-    search_impressions:
-      partitions:
-        - year
-        - month
-        - day
-    global_metrics:
-      partitions:
-        - year
-        - month
-        - day
+    # search_impressions:
+    #   partitions:
+    #     - year
+    #     - month
+    #     - day
+    # global_metrics:
+    #   partitions:
+    #     - year
+    #     - month
+    #     - day
     recs_global_metrics:
       partitions:
         - year
