@@ -36,6 +36,17 @@ general_city_level_enrichment AS (
       WHEN CONTAINS(keyword_clean, ' sao bernardo do campo') THEN COALESCE(c.city_name, 'sao bernardo do campo')
       ELSE COALESCE(c.city_name, '')
     END AS match_igbe_city,
+    CASE  
+      WHEN regexp_like(page, 'belo-horizonte') THEN 'BH'
+      WHEN regexp_like(page, 'curitiba') THEN 'CWB'
+      WHEN regexp_like(page, 'porto-alegre') THEN 'POA' 
+      WHEN regexp_like(page, 'rio-de-janeiro')  THEN 'RJ' 
+      WHEN regexp_like(page, 'df-brasil|brasilia-df|distrito-federal|/df/')  THEN 'BSB' 
+      WHEN regexp_like(page, '(sao-paulo|guarulhos|santo-andre|sao-bernardo-do-campo|sao-caetano-do-sul)') THEN 'RMSP'
+      WHEN regexp_like(page, '(campinas|sorocaba|jundiai|santos|praia-grande|sao-jose-dos-campos|guaruja)') THEN 'SP INTERIOR+LITORAL'
+      WHEN regexp_like(page, '(aruja|barueri|biritiba-mirim|caieiras|cajamar|carapicuiba|cotia|diadema|embu|embu-guacu|ferraz-de-vasconcelos|francisco-morato|franco-da-rocha|guararema|itapecerica-da-serra|itapevi|itaquaquecetuba|jandira|juquitiba|mairipora|maua|mogi-das-cruzes|osasco|pirapora-do-bom-jesus|poa|ribeirao-pires|rio-grande-da-serra|salesopolis|santa-isabel|santana-de-parnaiba|sao-lourenco-da-serra|suzano|taboao-da-serra|vargem-grande-paulista)') THEN 'RMSP Outros'
+      ELSE 'OUTROS'
+    END AS city_abbreviation,
     page,
     google_property,
     branded,
@@ -109,6 +120,7 @@ operation_city_level_enrichment AS (
     keyword,
     keyword_clean,
     match_igbe_city,
+    city_abbreviation,
     CASE
       WHEN CONTAINS(keyword_clean, r.name) THEN r.name
       WHEN CONTAINS(r.name, ' ') THEN r.name
@@ -211,6 +223,7 @@ operation_neighborhood_level_enrichment AS (
     keyword,
     keyword_clean,
     match_igbe_city,
+    city_abbreviation,
     match_operation_city,
     CASE
       WHEN CONTAINS(r.name, ' ') THEN r.name
@@ -278,6 +291,7 @@ SELECT
   keyword,
   keyword_clean,
   match_igbe_city,
+  city_abbreviation,
   match_operation_city,
   match_operation_neighborhood,
   page,

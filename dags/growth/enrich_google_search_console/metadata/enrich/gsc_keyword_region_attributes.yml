@@ -32,6 +32,20 @@ columns:
       lineage:
         - datalake_seo_keywords_clusters.ibge_cities.municipio_clean
         - datalake_google_search_console.gsc_keywords.keyword_clean
+    city_abbreviation:
+      description: "Brazilian city/region abbreviation derived from page URL analysis."
+      lineage:
+        - datalake_google_search_console.gsc_keywords.page
+      categories:
+        RJ: "Rio de Janeiro"
+        POA: "Porto Alegre"
+        BH: "Belo Horizonte"
+        BSB: "Brasília"
+        CWB: "Curitiba"
+        SP INTERIOR+LITORAL: "São Paulo interior and coast"
+        RMSP: "Some cities in the Região Metropolitana de São Paulo (São Paulo, Guarulhos, Santo André, São Bernardo do Campo and São Caetano do Sul)"
+        RMSP OUTROS: "Other regions in the Região Metropolitana de São Paulo"
+        OUTROS: "Other regions"
     match_operation_city:
       description: Operation city matched using internal regions dataset and the cleaned keyword.
       lineage:

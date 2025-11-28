@@ -32,6 +32,10 @@ columns:
         lineage:
             - datalake_google_search_console.gsc_keyword_region_attributes.match_igbe_city
             - datalake_google_search_console.gsc_keyword_region_attributes.keyword_clean
+    city_abbreviation:
+        description: "Brazilian city/region abbreviation derived from page URL analysis."
+        lineage:
+            - datalake_google_search_console.gsc_keyword_region_attributes.city_abbreviation
     match_operation_city:
         description: Operation city match refined using contextual rules over the cleaned keyword.
         lineage:

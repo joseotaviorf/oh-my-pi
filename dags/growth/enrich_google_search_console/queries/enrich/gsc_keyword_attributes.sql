@@ -15,6 +15,7 @@ SELECT
     WHEN keyword_clean like match_igbe_city THEN match_igbe_city
     ELSE ''
   END as match_igbe_city,
+  city_abbreviation,
 
   CASE WHEN match_operation_city = '' THEN ''
     WHEN keyword_clean REGEXP 'bh|carapicuiba|goiania|nova iguacu|santo andre|sao bernardo do campo|sao caetano|sao goncalo|sao paulo|sbc|sjc|visconde de maua| sbo| vcp| vix| rj| sp|rj |sp ' THEN match_operation_city
