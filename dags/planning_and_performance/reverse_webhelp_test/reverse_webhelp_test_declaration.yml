@@ -46,7 +46,7 @@ cluster:
     spark_version: 16.4.x-scala2.12
     num_workers: 5
     single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
+    data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   databricks_conn_id: databricks_new
