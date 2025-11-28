@@ -8,11 +8,15 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  tables_customization:
+    closing_flow:
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
