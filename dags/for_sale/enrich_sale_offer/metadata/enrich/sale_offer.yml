@@ -111,10 +111,6 @@ columns:
     lineage:
       - datalake_booking.booking.is_3p_supply
     description: Boolean flag indicating if the offer has 3P supply partner. Obtained from booking table which gets it from visit_business_model.
-  is_3p_demand:
-    lineage:
-      - datalake_booking.booking.is_3p_demand
-    description: Boolean flag indicating if the offer has 3P demand partner. Obtained from booking table which gets it from visit_business_model.
   is_3p_lead_gen:
     lineage:
       - datalake_booking.booking.is_3p_lead_gen
@@ -141,10 +137,6 @@ columns:
   is_house_first_offer:
     description: Validation done to understand if it is the first offer that a house
       has received.
-  is_3p_supply:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply
-    description: Flag indicating if this offer has an 3p supply partner.
   is_3p_supply_5a:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_5a

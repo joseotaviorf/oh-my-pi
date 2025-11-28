@@ -354,10 +354,6 @@ SELECT
         TRUE,
         FALSE
     ) AS is_house_first_offer,
-    COALESCE(rbo.is_3p_supply, FALSE) AS is_3p_supply,
-    COALESCE(rbo.is_3p_demand, FALSE) AS is_3p_demand,
-    COALESCE(rbo.is_3p_lead_gen, FALSE) AS is_3p_lead_gen,
-    COALESCE(rbo.has_3p_access_control, FALSE) AS has_3p_access_control,
     COALESCE(h.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
     COALESCE(h.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
     v.is_ccv_canceled AS is_ccv_canceled,
