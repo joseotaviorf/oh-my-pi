@@ -8,10 +8,6 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  tables_customization:
-    sale_visit:
-      row_filter_column_key: has_3p_access_control
-      row_filter: has_3p_access
 cluster:
   type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new

@@ -8,10 +8,6 @@ workflow:
   type: query_delta
   layer: enrich
   custom_schema: visit
-  tables_customization:
-    visit_business_model:
-      row_filter_column_key: has_3p_access_control
-      row_filter: has_3p_access
 cluster:
   type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new_env

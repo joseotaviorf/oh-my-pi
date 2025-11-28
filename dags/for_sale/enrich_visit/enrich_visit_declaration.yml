@@ -23,15 +23,7 @@ workflow:
             partitions: [year, month, day]
             z_order_by: [id, status]
             merge_on: [id]
-        visit_schedules:
-            row_filter_column_key: has_3p_access_control
-            row_filter: has_3p_access
-        visits:
-            row_filter_column_key: has_3p_access_control
-            row_filter: has_3p_access
-        visit_status_events:
-            row_filter_column_key: has_3p_access_control
-            row_filter: has_3p_access
+
 cluster:
     type: custom_cluster
     custom_configurations:

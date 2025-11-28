@@ -11,13 +11,6 @@ workflow:
   inner_dependencies:
     sale_offers:
     - core_sale_offer
-  tables_customization:
-    sale_offers:
-      row_filter_column_key: has_3p_access_control
-      row_filter: has_3p_access
-    sale_offer:
-      row_filter_column_key: has_3p_access_control
-      row_filter: has_3p_access
 cluster:
   type: databricks_16_4_med_general_photon_cluster
   databricks_conn_id: databricks_new
