@@ -31,8 +31,16 @@ if __name__ == "__main__":
 
     logger = QuintoAndarLogger(f"{dag_name}")
 
-    load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
-    load_end_date = datetime.strptime(load_end_date, "%Y-%m-%d")
+    # Parse ISO format datetime (supports both date-only and full datetime formats) removing the timezone information
+    if 'T' in load_start_date:
+        load_start_date = datetime.fromisoformat(load_start_date.replace('+00:00', ''))
+    else:
+        load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
+    
+    if 'T' in load_end_date:
+        load_end_date = datetime.fromisoformat(load_end_date.replace('+00:00', ''))
+    else:
+        load_end_date = datetime.strptime(load_end_date, "%Y-%m-%d")
     
     # Generate date range
     current_date = load_start_date
