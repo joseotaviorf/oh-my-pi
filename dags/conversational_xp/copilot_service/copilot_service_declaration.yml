@@ -16,6 +16,7 @@ workflow:
     session: {}
     state: {}
     message_flow: {}
+    voice_call_attempt: {}
 
 cluster:
   type: custom_cluster
@@ -29,6 +30,6 @@ cluster:
     spark_conf:
       spark.driver.maxResultSize: "0"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new 
+  databricks_conn_id: databricks_new
