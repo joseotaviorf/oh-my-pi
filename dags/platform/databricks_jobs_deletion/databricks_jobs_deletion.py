@@ -65,7 +65,7 @@ for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
         op_kwargs={
             "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
             "job_name_regex": job_name_regex,
-            "databricks_conn_id": "databricks_job_cluster",
+            "databricks_conn_id": "databricks_new",
         },
     )
     # We're making them all sequential instead of parallel due to the Databricks API rate limit
@@ -83,7 +83,7 @@ for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
         op_kwargs={
             "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
             "job_name_regex": job_name_regex,
-            "databricks_conn_id": "databricks_new",
+            "databricks_conn_id": "databricks_new_env",
         },
     )
     # We're making them all sequential instead of parallel due to the Databricks API rate limit
