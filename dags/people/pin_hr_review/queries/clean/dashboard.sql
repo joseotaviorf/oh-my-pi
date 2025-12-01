@@ -13,6 +13,7 @@ SELECT
   extn_metric_calib_value3 AS id_metric_calibrated_value_3,
   extn_metric_value4 AS id_metric_value_4,
   extn_metric_calib_value4 AS id_metric_calibrated_value_4,
+  extn_metric_value5 AS id_metric_value_5,
   extn_metric_calib_value5 AS id_metric_calibrated_value_5,
   created_by,
   last_updated_by AS updated_by,

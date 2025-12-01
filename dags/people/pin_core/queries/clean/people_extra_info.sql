@@ -12,6 +12,7 @@ SELECT
   created_by,
   last_updated_by AS updated_by,
   CAST(object_version_number AS INT) AS object_version_number,
+  TO_DATE(pei_information2) AS dt_evaluation,
   TO_DATE(effective_start_date) AS dt_effective_started,
   TO_DATE(effective_end_date) AS dt_effective_ended,
   TO_TIMESTAMP(creation_date) AS ts_created,

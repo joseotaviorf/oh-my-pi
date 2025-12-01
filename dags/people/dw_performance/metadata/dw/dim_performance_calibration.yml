@@ -1,0 +1,127 @@
+database_name: dw_performance
+table_name: dim_performance_calibration
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Dimension table that stores calibration evaluation results from the Performa cycle with versioning. Combines data from both calibration_evaluation and extra_info sources, with calibration_evaluation taking precedence. Contains both pre-calibration (initial) and post-calibration (calibrated) ratings for three performance dimensions: Behavior, Impact, and Leadership. Each row represents a specific version of a calibration evaluation for an employee during a calibration meeting year, with versions created when multiple evaluations exist for the same person and year, ordered by source priority and evaluation timestamp.
+columns:
+  sk_performance_calibration_version:
+    description: Surrogate key that uniquely identifies a specific version of a calibration evaluation. Includes the calibration_version to distinguish between different versions of the same person and meeting year.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.person_number
+    - datalake_pin.performa_calibration_evaluation.meeting_year
+    - datalake_pin.performa_calibration_extra_info.person_number
+    - datalake_pin.performa_calibration_extra_info.meeting_year
+  sk_performance_calibration:
+    description: Surrogate key that identifies a calibration evaluation for a given person and meeting year, regardless of version. Used to link to the current version when combined with is_current = TRUE.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.person_number
+    - datalake_pin.performa_calibration_evaluation.meeting_year
+    - datalake_pin.performa_calibration_extra_info.person_number
+    - datalake_pin.performa_calibration_extra_info.meeting_year
+  id_source_record:
+    description: Identifier of the source record from the original table (id_calibration_evaluation from calibration_evaluation or id_person_extra_info from extra_info).
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.id_calibration_evaluation
+    - datalake_pin.performa_calibration_extra_info.id_person_extra_info
+  id_meeting:
+    description: Unique identifier for the calibration meeting where the evaluation was performed.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.id_meeting
+    - datalake_pin.performa_calibration_extra_info.id_meeting
+  person_number:
+    description: Unique identifier for the person (employee) who was evaluated.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.person_number
+    - datalake_pin.performa_calibration_extra_info.person_number
+  meeting_status_code:
+    description: Status code of the calibration meeting.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.meeting_status_code
+    - datalake_pin.performa_calibration_extra_info.meeting_status_code
+  meeting_year:
+    description: Year when the calibration meeting occurred.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.meeting_year
+    - datalake_pin.performa_calibration_extra_info.meeting_year
+  calibration_version:
+    description: Sequential version number for this calibration evaluation, starting at 1. Increments when multiple evaluations exist for the same person and meeting year, ordered by source priority (calibration_evaluation takes precedence over extra_info) and then by evaluation timestamp (most recent first).
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.ts_meeting
+    - datalake_pin.performa_calibration_extra_info.dt_evaluation
+  source_type:
+    description: Indicates the source of the calibration data. Can be 'calibration_evaluation' (from dashboard) or 'extra_info' (from people_extra_info/Notas Talent). Calibration_evaluation takes precedence when both sources exist for the same person and meeting year.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation
+    - datalake_pin.performa_calibration_extra_info
+  meeting_title:
+    description: Title or name of the calibration meeting.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.meeting_title
+    - datalake_pin.performa_calibration_extra_info.meeting_title
+  calibrated_behavior_description:
+    description: Textual description of the calibrated (post-meeting) Behavior rating.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.calibrated_behavior_description
+    - datalake_pin.performa_calibration_extra_info.behavior_description
+  pre_calibration_behavior_description:
+    description: Textual description of the pre-calibration (initial) Behavior rating before the meeting. NULL for records from extra_info source.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.pre_calibration_behavior_description
+  calibrated_behavior_numeric:
+    description: Numeric value of the calibrated (post-meeting) Behavior rating.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.calibrated_behavior_numeric
+    - datalake_pin.performa_calibration_extra_info.behavior_numeric
+  pre_calibration_behavior_numeric:
+    description: Numeric value of the pre-calibration (initial) Behavior rating before the meeting. NULL for records from extra_info source.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.pre_calibration_behavior_numeric
+  calibrated_impact_description:
+    description: Textual description of the calibrated (post-meeting) Impact rating.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.calibrated_impact_description
+    - datalake_pin.performa_calibration_extra_info.impact_description
+  pre_calibration_impact_description:
+    description: Textual description of the pre-calibration (initial) Impact rating before the meeting. NULL for records from extra_info source.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.pre_calibration_impact_description
+  calibrated_impact_numeric:
+    description: Numeric value of the calibrated (post-meeting) Impact rating.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.calibrated_impact_numeric
+    - datalake_pin.performa_calibration_extra_info.impact_numeric
+  pre_calibration_impact_numeric:
+    description: Numeric value of the pre-calibration (initial) Impact rating before the meeting. NULL for records from extra_info source.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.pre_calibration_impact_numeric
+  calibrated_leadership_description:
+    description: Textual description of the calibrated (post-meeting) Leadership rating.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.calibrated_leadership_description
+    - datalake_pin.performa_calibration_extra_info.leadership_description
+  pre_calibration_leadership_description:
+    description: Textual description of the pre-calibration (initial) Leadership rating before the meeting. NULL for records from extra_info source.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.pre_calibration_leadership_description
+  calibrated_leadership_numeric:
+    description: Numeric value of the calibrated (post-meeting) Leadership rating.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.calibrated_leadership_numeric
+    - datalake_pin.performa_calibration_extra_info.leadership_numeric
+  pre_calibration_leadership_numeric:
+    description: Numeric value of the pre-calibration (initial) Leadership rating before the meeting. NULL for records from extra_info source.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.pre_calibration_leadership_numeric
+  is_current:
+    description: Boolean flag indicating if this is the current active version of the calibration evaluation (TRUE) or a historical version (FALSE). The current version has calibration_version = 1.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.ts_meeting
+    - datalake_pin.performa_calibration_extra_info.dt_evaluation
+  dt_evaluation:
+    description: Date/timestamp of when the calibration evaluation occurred. For calibration_evaluation source, this is the meeting timestamp (ts_meeting). For extra_info source, this is the evaluation date (dt_evaluation).
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.ts_meeting
+    - datalake_pin.performa_calibration_extra_info.dt_evaluation
+  ts_load:
+    description: Timestamp when the record was loaded into the table.

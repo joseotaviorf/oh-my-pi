@@ -44,10 +44,6 @@ columns:
     description: Unique identifier of the person who performed the last action on the evaluation.
     lineage:
     - datalake_pin_performance_raw.hra_evaluations.action_performed_by
-  id_person_locked_performance:
-    description: Unique identifier of the person who locked the document for changes.
-    lineage:
-    - datalake_pin_performance_raw.hra_evaluations.locked_by_user_id
   template_type_code:
     description: Code defining the type of performance document template used.
     lineage:

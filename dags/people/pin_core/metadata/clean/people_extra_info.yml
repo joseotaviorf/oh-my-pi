@@ -62,6 +62,10 @@ columns:
     description: Version counter used for optimistic locking in Oracle HCM.
     lineage:
       - datalake_pin_core_raw.per_people_extra_info_f.object_version_number
+  dt_evaluation:
+    description: Date of when the calibration evaluation occurred. This comes from pei_information2 field.
+    lineage:
+      - datalake_pin_core_raw.per_people_extra_info_f.pei_information2
   dt_effective_started:
     description: Start date from which the extra information record is effective.
     lineage:

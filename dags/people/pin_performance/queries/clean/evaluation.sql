@@ -6,7 +6,6 @@ SELECT
     worker_id AS id_person,
     manager_id AS id_manager,
     assignment_id AS id_assignment,
-    locked_by_user_id AS id_person_locked_performance,
     manager_assignment_id AS id_manager_assignment,
     review_period_id AS id_review_period,
     action_performed_by AS id_person_action_performed_by,

@@ -1,0 +1,116 @@
+database_name: dw_performance
+table_name: fact_performance_calibrations
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Fact table that consolidates calibration evaluation results at the person and meeting year level. It links to the dim_performance_calibration dimension and dim_performance_variation dimension, providing the current version of calibration evaluations. The table includes both pre-calibration and calibrated ratings for Behavior, Impact, and Leadership, along with calculated performance scores and calibration variation indicators.
+columns:
+  sk_performance_calibration_version:
+    description: Surrogate key for the current version of the calibration evaluation in the dim_performance_calibration dimension. This key includes the calibration_version to uniquely identify a specific version.
+    lineage:
+    - dw_performance.dim_performance_calibration.sk_performance_calibration_version
+  sk_performance_calibration:
+    description: Surrogate key for the calibration evaluation in the dim_performance_calibration dimension. This key represents the calibration regardless of version, linking to the current version when used with is_current = TRUE.
+    lineage:
+    - dw_performance.dim_performance_calibration.sk_performance_calibration
+  sk_performance_variation:
+    description: Composite surrogate key representing the combination of calibration variation trends (Increased, Decreased, Maintained) for Behavior, Impact, and Leadership dimensions. Links to dim_performance_variation.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_behavior_numeric
+    - dw_performance.dim_performance_calibration.calibrated_behavior_numeric
+    - dw_performance.dim_performance_calibration.pre_calibration_impact_numeric
+    - dw_performance.dim_performance_calibration.calibrated_impact_numeric
+    - dw_performance.dim_performance_calibration.pre_calibration_leadership_numeric
+    - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
+  id_meeting:
+    description: Unique identifier for the calibration meeting where the evaluation was performed.
+    lineage:
+    - dw_performance.dim_performance_calibration.id_meeting
+  person_number:
+    description: Unique identifier for the person (employee) who was evaluated. Part of the grain of the fact table along with meeting_year.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.person_number
+    - datalake_pin.performa_calibration_extra_info.person_number
+  meeting_status_code:
+    description: Status code of the calibration meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.meeting_status_code
+  meeting_year:
+    description: Year when the calibration meeting occurred. Part of the grain of the fact table along with person_number.
+    lineage:
+    - datalake_pin.performa_calibration_evaluation.meeting_year
+    - datalake_pin.performa_calibration_extra_info.meeting_year
+  meeting_title:
+    description: Title or name of the calibration meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.meeting_title
+  calibrated_behavior_description:
+    description: Textual description of the calibrated (post-meeting) Behavior rating.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_behavior_description
+  pre_calibration_behavior_description:
+    description: Textual description of the pre-calibration (initial) Behavior rating before the meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_behavior_description
+  calibrated_impact_description:
+    description: Textual description of the calibrated (post-meeting) Impact rating.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_impact_description
+  pre_calibration_impact_description:
+    description: Textual description of the pre-calibration (initial) Impact rating before the meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_impact_description
+  calibrated_leadership_description:
+    description: Textual description of the calibrated (post-meeting) Leadership rating.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_leadership_description
+  pre_calibration_leadership_description:
+    description: Textual description of the pre-calibration (initial) Leadership rating before the meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_leadership_description
+  calibrated_behavior_numeric:
+    description: Numeric value of the calibrated (post-meeting) Behavior rating.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_behavior_numeric
+  pre_calibration_behavior_numeric:
+    description: Numeric value of the pre-calibration (initial) Behavior rating before the meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_behavior_numeric
+  calibrated_impact_numeric:
+    description: Numeric value of the calibrated (post-meeting) Impact rating.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_impact_numeric
+  pre_calibration_impact_numeric:
+    description: Numeric value of the pre-calibration (initial) Impact rating before the meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_impact_numeric
+  calibrated_leadership_numeric:
+    description: Numeric value of the calibrated (post-meeting) Leadership rating.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
+  pre_calibration_leadership_numeric:
+    description: Numeric value of the pre-calibration (initial) Leadership rating before the meeting.
+    lineage:
+    - dw_performance.dim_performance_calibration.pre_calibration_leadership_numeric
+  performa_score_numeric:
+    description: |-
+      Calculated numeric performance score based on weighted average of calibrated ratings. Formula: If leadership rating exists, then (0.6 * impact_numeric) + (0.2 * behavior_numeric) + (0.2 * leadership_numeric), otherwise (0.6 * impact_numeric) + (0.4 * behavior_numeric).
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_impact_numeric
+    - dw_performance.dim_performance_calibration.calibrated_behavior_numeric
+    - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
+  performa_score:
+    description: Categorical classification of the performance score based on numeric ranges.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_impact_numeric
+    - dw_performance.dim_performance_calibration.calibrated_behavior_numeric
+    - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
+    categories:
+      Insufficient: Performance score is less than 70.
+      'Partially misses expecatations': Performance score is between 70 and 89.
+      'Meets expectations': Performance score is between 90 and 109.
+      'Above expectations': Performance score is between 110 and 137.
+      Outstanding: Performance score is between 138 and 150.
+  ts_load:
+    description: Timestamp of when the record was loaded into this fact table.
+

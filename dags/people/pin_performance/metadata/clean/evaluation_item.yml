@@ -66,10 +66,6 @@ columns:
     categories:
       "true": Item is not rated.
       "false": Item is rated.
-  is_added_in_task:
-    description: Identifier of the specific task during which this item was added to the evaluation.
-    lineage:
-      - datalake_pin_performance_raw.hra_eval_items.added_in_task
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:

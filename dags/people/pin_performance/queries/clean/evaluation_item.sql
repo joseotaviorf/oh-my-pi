@@ -12,7 +12,6 @@ SELECT
     mandatory_flag = 'Y' AS is_mandatory,
     critical_flag = 'Y' AS is_critical,
     not_rated_flag = 'Y' AS is_not_rated,
-    added_in_task = 'Y' AS is_added_in_task,
     CAST(object_version_number AS INT) AS object_version_number,
     CAST(creation_date AS TIMESTAMP) AS ts_created,
     CAST(last_update_date AS TIMESTAMP) AS ts_updated,

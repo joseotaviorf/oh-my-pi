@@ -1,0 +1,67 @@
+database_name: datalake_performance
+table_name: performa_calibration_extra_info
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Consolidates calibration ratings from the Performa cycle stored in people_extra_info (Notas Talent). Contains ratings for three performance dimensions: Behavior, Impact, and Leadership.
+columns:
+  id_person_extra_info:
+    description: Unique identifier for the person extra information record containing the calibration ratings.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_person_extra_info
+  person_number:
+    description: Unique identifier for the person (employee) who was evaluated.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.person_number
+  id_meeting:
+    description: Unique identifier for the calibration meeting where the evaluation was performed.
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.id_meeting
+  meeting_year:
+    description: Year when the calibration meeting occurred. Extracted from the meeting timestamp (ts_meeting) or meeting creation timestamp (ts_created) as fallback.
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.ts_meeting
+    - datalake_pin_hr_review_clean.meeting.ts_created
+  meeting_title:
+    description: Title or name of the calibration meeting.
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.meeting_title
+  meeting_status_code:
+    description: Status code of the calibration meeting.
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.meeting_status_code
+  impact_description:
+    description: Textual description of the Impact rating from the calibration.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_rating_impact
+    - datalake_pin_talent_clean.rating_level_translation.rating_description
+  impact_numeric:
+    description: Numeric value of the Impact rating from the calibration.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_rating_impact
+    - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  behavior_description:
+    description: Textual description of the Behavior rating from the calibration.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_rating_behavior
+    - datalake_pin_talent_clean.rating_level_translation.rating_description
+  behavior_numeric:
+    description: Numeric value of the Behavior rating from the calibration.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_rating_behavior
+    - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  leadership_description:
+    description: Textual description of the Leadership rating from the calibration.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_rating_leadership
+    - datalake_pin_talent_clean.rating_level_translation.rating_description
+  leadership_numeric:
+    description: Numeric value of the Leadership rating from the calibration.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.id_rating_leadership
+    - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  dt_evaluation:
+    description: Date of when the calibration evaluation occurred. This comes from the people_extra_info record.
+    lineage:
+    - datalake_pin_core_clean.people_extra_info.dt_evaluation
+

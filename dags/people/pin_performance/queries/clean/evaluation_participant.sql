@@ -5,7 +5,6 @@ SELECT
     person_id AS id_person,
     eval_role_id AS id_eval_role,
     questionnaire_id AS id_questionnaire,
-    added_by_person_id AS id_added_by_person,
     notified_by_person_id AS id_notified_by_person,
     action_performed_by,
     role_type_code,

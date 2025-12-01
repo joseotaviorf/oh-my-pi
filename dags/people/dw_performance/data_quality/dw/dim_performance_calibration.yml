@@ -1,0 +1,49 @@
+---
+table_name: dw_performance.dim_performance_calibration
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 7000
+    severity_level: Error
+column_level_validations:
+  sk_performance_calibration_version:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
+  sk_performance_calibration:
+    is_complete:
+      severity_level: Warning
+  person_number:
+    custom:
+      # Every person_number and meeting_year should have only one is_current = TRUE
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_performance.dim_performance_calibration WHERE is_current = TRUE GROUP BY person_number, meeting_year HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
+  calibrated_impact_numeric:
+    has_max_value:
+      less_than_or_equal_to: 150
+      severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+  calibrated_behavior_numeric:
+    has_max_value:
+      less_than_or_equal_to: 150
+      severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+  pre_calibration_behavior_numeric:
+    has_max_value:
+      less_than_or_equal_to: 150
+      severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+  pre_calibration_impact_numeric:
+    has_max_value:
+      less_than_or_equal_to: 150
+      severity_level: Warning
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning

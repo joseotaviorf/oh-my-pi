@@ -108,16 +108,27 @@ columns:
     description: Goal Approval State included for Mass Goal Approval.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.goal_approval_state
-  description_of_minimum_achievement:
-    description: Description of minimum achievement of the goal.
+  attribute1_text:
+    description: |
+      Text attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category:
+      - For "KPI" goals: Measurement unit for the KPI
+      - For "Project or Critical Process" goals: Description of minimum achievement value
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute1
-  description_of_target_achievement:
-    description: Description of target achievement of the goal.
+  attribute2_text:
+    description: |
+      Text attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category:
+      - For "KPI" goals: Goal orientation
+      - For "Project or Critical Process" goals: Description of target achievement value
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute2
-  description_of_maximum_achievement:
-    description: Description of maximum achievement of the goal.
+  attribute3_text:
+    description: |
+      Text attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category.
+      - For "Project or Critical Process" goals: Description of maximum achievement value
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute3
   expected_completion_period:
@@ -131,20 +142,33 @@ columns:
     categories:
       Project or Critical Process: Goal related to a specific project or process.
       KPI: Key Performance Indicator.
-  mininum_value:
-    description: Minimum value of the goal.
+  attribute_number1_value:
+    description: |
+      Numeric attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category:
+      - For "KPI" goals: Minimum value of the goal
+      - For "Project or Critical Process" goals: Result value of the goal
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute_number1
-  target_value:
-    description: Target value of the goal.
+  attribute_number2_value:
+    description: |
+      Numeric attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category.
+      - For "KPI" goals: Target value of the goal
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute_number2
-  maximum_value:
-    description: Maximum value of the goal.
+  attribute_number3_value:
+    description: |
+      Numeric attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category.
+      - For "KPI" goals: Maximum value of the goal
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute_number3
-  result_value:
-    description: Result value of the goal.
+  attribute_number4_value:
+    description: |
+      Numeric attribute from the source system. The semantic meaning depends on the HCM configuration and goal_category.
+      - For "KPI" goals: Maximum value of the goal
+      Always check goal_category to interpret this field correctly.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.attribute_number4
   object_version_number:

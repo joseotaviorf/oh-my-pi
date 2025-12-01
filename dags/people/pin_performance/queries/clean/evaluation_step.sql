@@ -10,7 +10,6 @@ SELECT
     step_code,
     step_status,
     step_sub_status,
-    action_reason,
     step_upd_action_code AS update_action_code,
     created_by,
     last_updated_by AS updated_by,

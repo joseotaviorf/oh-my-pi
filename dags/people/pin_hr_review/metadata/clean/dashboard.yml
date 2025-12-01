@@ -42,21 +42,29 @@ columns:
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_calib_rt_lvl_id
   id_metric_value_3:
-    description: Identifier for readiness rating level.
+    description: Identifier for responses on different evaluations.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value3
   id_metric_calibrated_value_3:
-    description: Identifier of the calibrated readiness rating level.
+    description: Identifier for calibrated responses on different evaluations.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value3
   id_metric_value_4:
-    description: Identifier for criticality rating level.
+    description: Identifier for responses on different evaluations.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value4
   id_metric_calibrated_value_4:
-    description: Identifier of the calibrated criticality rating level.
+    description: Identifier for calibrated responses on different evaluations.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value4
+  id_metric_value_5:
+    description: Identifier for responses on different evaluations.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value5
+  id_metric_calibrated_value_5:
+    description: Identifier for calibrated responses on different evaluations.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value5
   created_by:
     description: User who created the row.
     lineage:

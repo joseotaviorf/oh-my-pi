@@ -41,18 +41,6 @@ columns:
     description: Textual description of the Leadership rating from the employee's self-assessment (SELF evaluation type).
     lineage:
     - dw_performance.dim_performance_evaluation.description_leadership
-  numeric_behavior_self:
-    description: Numeric value of the Behavior rating from the employee's self-assessment (SELF evaluation type).
-    lineage:
-    - dw_performance.dim_performance_evaluation.numeric_behavior
-  numeric_impact_self:
-    description: Numeric value of the Impact rating from the employee's self-assessment (SELF evaluation type).
-    lineage:
-    - dw_performance.dim_performance_evaluation.numeric_impact
-  numeric_leadership_self:
-    description: Numeric value of the Leadership rating from the employee's self-assessment (SELF evaluation type).
-    lineage:
-    - dw_performance.dim_performance_evaluation.numeric_leadership
   behavior_manager:
     description: Textual description of the Behavior rating from the manager's evaluation (MANAGER evaluation type).
     lineage:
@@ -75,6 +63,18 @@ columns:
     - dw_performance.dim_performance_evaluation.numeric_impact
   numeric_leadership_manager:
     description: Numeric value of the Leadership rating from the manager's evaluation (MANAGER evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.numeric_leadership
+  numeric_behavior_self:
+    description: Numeric value of the Behavior rating from the employee's self-assessment (SELF evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.numeric_behavior
+  numeric_impact_self:
+    description: Numeric value of the Impact rating from the employee's self-assessment (SELF evaluation type).
+    lineage:
+    - dw_performance.dim_performance_evaluation.numeric_impact
+  numeric_leadership_self:
+    description: Numeric value of the Leadership rating from the employee's self-assessment (SELF evaluation type).
     lineage:
     - dw_performance.dim_performance_evaluation.numeric_leadership
   ts_load:

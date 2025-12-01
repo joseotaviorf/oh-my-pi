@@ -725,6 +725,7 @@ bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment:first-run-of-day
 bietlejuice.dw_performance:
   - bietlejuice.enrich_performance:load-enrich-performance-evaluation:first-run-of-day
+  - bietlejuice.enrich_performance:load-enrich-talent-review:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
 bietlejuice.dw_person:
@@ -2282,6 +2283,13 @@ bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_for_sale_experiment:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+bietlejuice.enrich_goal:
+  - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
+  - bietlejuice.pin_goal:load-clean-goal-plan-to-goal:first-run-of-day
+  - bietlejuice.pin_goal:load-clean-goal-plan-translation:first-run-of-day
+  - bietlejuice.pin_goal:load-clean-goal:first-run-of-day
+  - bietlejuice.pin_talent:load-clean-review-period-translation:first-run-of-day
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set:first-run-of-day
 bietlejuice.enrich_google_analytics_classified:
@@ -2928,6 +2936,8 @@ bietlejuice.enrich_people_public:
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
 bietlejuice.enrich_performance:
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
+  - bietlejuice.pin_core:load-clean-people-extra-info:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-item:first-run-of-day

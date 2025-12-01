@@ -1,0 +1,29 @@
+---
+table_name: datalake_pin.goal
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 60000
+    severity_level: Warning
+column_level_validations:
+  id_goal:
+    is_complete:
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
+  category:
+    is_contained_in:
+      values: ["kpi", "project"]
+      severity_level: Warning
+  goal_orientation:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin.goal WHERE category = 'kpi' AND goal_orientation IS NOT NULL AND goal_orientation NOT IN ('maximize', 'minimize'))) = 0"
+      severity_level: Warning
+  goal_weight:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    has_max_value:
+      less_than_or_equal_to: 100
+      severity_level: Warning
+

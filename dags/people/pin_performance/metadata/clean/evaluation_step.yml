@@ -49,10 +49,6 @@ columns:
     description: More detailed status information for the step.
     lineage:
       - datalake_pin_performance_raw.hra_eval_steps.step_sub_status
-  action_reason:
-    description: Reason for the last action performed on this step.
-    lineage:
-      - datalake_pin_performance_raw.hra_eval_steps.action_reason
   update_action_code:
     description: Code for the last update action performed on this evaluation step.
     lineage:

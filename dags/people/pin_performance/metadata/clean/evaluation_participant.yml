@@ -29,10 +29,6 @@ columns:
     description: Identifier of the questionnaire assigned to the participant.
     lineage:
     - datalake_pin_performance_raw.hra_eval_participants.questionnaire_id
-  id_added_by_person:
-    description: Identifier of the person who added this participant to the evaluation.
-    lineage:
-    - datalake_pin_performance_raw.hra_eval_participants.added_by_person_id
   id_notified_by_person:
     description: Identifier of the person who sent the notification request to the participant.
     lineage:
