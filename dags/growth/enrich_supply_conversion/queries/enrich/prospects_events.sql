@@ -66,7 +66,13 @@ SELECT
   'PROSPECT' AS step,
   4 AS weight,
   cd.reason,
-  sds.drop_step,
+  --Starting on 2025-11-30, we will be correcting a structural problem in the OBT 
+  --that did not consider discards made via WOLOLO that had the drop_step of LEAD in the supply_discards_settings.
+  CASE
+    WHEN cd.ts_created < CAST('2025-11-30' AS DATE) THEN sds.drop_step
+    WHEN cd.ts_created >= CAST('2025-11-30' AS DATE) AND sds.drop_step = 'L2P' THEN 'P2Q'
+    ELSE sds.drop_step 
+  END AS drop_step,
   cd.ts_created AS ts_event
 FROM
   extract_wololo AS p

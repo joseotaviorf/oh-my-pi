@@ -51,15 +51,3 @@ columns:
     description: Timestamp indicating the time of the event.
     lineage:
       - datalake_wololo_clean.prospect.ts_created
-  year:
-    description: Year indicating the time of the event.
-    lineage:
-      - datalake_wololo_clean.prospect.ts_created
-  month:
-    description: Month indicating the time of the event.
-    lineage:
-      - datalake_wololo_clean.prospect.ts_created
-  day:
-    description: Day indicating the time of the event.
-    lineage:
-      - datalake_wololo_clean.prospect.ts_created
