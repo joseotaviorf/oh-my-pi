@@ -1,6 +1,12 @@
 SELECT
+    NULLIF(sk_company, '') AS sk_company,
     NULLIF(partner, '') AS partner,
     NULLIF(partner_short_name, '') AS partner_short_name,
+    NULLIF(partner_short_name_backup, '') AS partner_short_name_backup,
+    NULLIF(extracted_3p_tag, '') AS extracted_3p_tag,
+    NULLIF(company_name, '') AS company_name,
+    NULLIF(trade_name, '') AS trade_name,
+    NULLIF(hubspot_company_name, '') AS hubspot_company_name,
     NULLIF(category, '') AS category,
     NULLIF(state, '') AS state,
     NULLIF(city_group, '') AS city_group,

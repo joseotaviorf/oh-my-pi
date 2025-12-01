@@ -5,6 +5,10 @@ domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 description: This table contains the conditions for the 3P Partners program.
 columns:
+  sk_company:
+    description: Surrogate key or identifier for the company
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.sk_company
   partner:
     description: Name of the third-party partner in the program
     lineage:
@@ -13,6 +17,26 @@ columns:
     description: Abbreviated or short name identifier for the partner
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.partner_short_name
+  partner_short_name_backup:
+    description: Backup or alternative short name identifier for the partner
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.partner_short_name_backup
+  extracted_3p_tag:
+    description: Tag extracted from 3P partner data for categorization or identification
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.extracted_3p_tag
+  company_name:
+    description: Legal or registered name of the company
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.company_name
+  trade_name:
+    description: Trading name or commercial name used by the company
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.trade_name
+  hubspot_company_name:
+    description: Company name as registered in HubSpot CRM system
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.hubspot_company_name
   category:
     description: Category or type of partnership arrangement
     lineage:
@@ -101,6 +125,14 @@ columns:
     description: Revenue share percentage for supply-side partners
     lineage:
       - datalake_gsheets_raw.forbrokers_3p_partner_conditions.supply_partner_revenue_share
+  lead_gen_revenue_share:
+    description: Revenue share percentage for lead generation partners
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.lead_gen_revenue_share
+  is_valid:
+    description: Boolean flag indicating if the partnership record is currently valid and active. Derived from the 'valido' column where 'Sim' (Yes) equals TRUE.
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.valido
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.
