@@ -11,9 +11,6 @@ column_level_validations:
       severity_level: Warning
     is_unique:
       severity_level: Warning
-  sk_performance_calibration:
-    is_complete:
-      severity_level: Warning
   person_number:
     custom:
       # Every person_number and meeting_year should have only one is_current = TRUE
