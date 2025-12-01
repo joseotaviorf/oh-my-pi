@@ -49,6 +49,10 @@ columns:
     description: Indicates if there was an extrajudicial notification
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.notificacao_extrajudicial
+  has_idactum_return:
+    description: Indicates if there is a return from Idactum
+    lineage:
+      - datalake_gsheets_raw.collections_for_sale_journey_routine.retorno_idactum
   offer_model:
     description: Current status of the offer
     lineage:

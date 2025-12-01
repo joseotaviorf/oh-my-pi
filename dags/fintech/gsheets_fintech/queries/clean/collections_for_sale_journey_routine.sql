@@ -46,6 +46,10 @@ SELECT
         WHEN LOWER(NULLIF(notificacao_extrajudicial, '')) = 'não' THEN FALSE
         ELSE NULL
     END AS has_extrajudicial_notification,
+    CASE
+        WHEN LOWER(NULLIF(retorno_idactum, '')) = 'sim' THEN TRUE
+        ELSE NULL
+    END AS has_idactum_return,
     NULLIF(modelo_da_offer, '') AS offer_model,
     NULLIF(status_cobranca, '') AS collection_status,
     CAST(NULLIF(tempo_na_base, '') AS INT) AS time_in_base,
@@ -70,9 +74,9 @@ SELECT
     NULLIF(ticket_zendesk, '') AS zendesk_ticket,
     NULLIF(condicionante, '') AS condition,
     NULLIF(demais_contatos, '') AS other_contacts,
-    CAST(NULLIF(valor_de_corretagem, '') AS DOUBLE) AS brokerage_amount,
-    CAST(NULLIF(saldo_recebido, '') AS DOUBLE) AS balance_received,
-    CAST(NULLIF(saldo_a_receber, '') AS DOUBLE) AS balance_to_receive,
+    CAST(NULLIF(REPLACE(REGEXP_REPLACE(NULLIF(valor_de_corretagem, ''), '[^0-9,-]', ''), ',', '.'), '') AS DOUBLE) AS brokerage_amount,
+    CAST(NULLIF(REPLACE(REGEXP_REPLACE(NULLIF(saldo_recebido, ''), '[^0-9,-]', ''), ',', '.'), '') AS DOUBLE) AS balance_received,
+    CAST(NULLIF(REPLACE(REGEXP_REPLACE(NULLIF(saldo_a_receber, ''), '[^0-9,-]', ''), ',', '.'), '') AS DOUBLE) AS balance_to_receive,
     CAST(NULLIF(no_de_tentativas_de_contato, '') AS INT) AS contact_attempts_count,
     TO_DATE(NULLIF(data_entrada, ''), 'd/M/y') AS dt_entry,
     TO_DATE(NULLIF(data_ccv_assinado, ''), 'd/M/y') AS dt_ccv_signed,

@@ -213,6 +213,10 @@ columns:
     description: Date of first contact
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_history.data_primeiro_contato
+  dt_expected_contact:
+    description: Expected date for next contact
+    lineage:
+      - datalake_gsheets_raw.collections_for_sale_journey_history.data_prevista_de_contato
   ts_load:
     description: Timestamp when the record was loaded
     lineage:
