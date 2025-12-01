@@ -1,0 +1,26 @@
+database_name: datalake_ebdb_clean
+table_name: agent_rent_flow_aud
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+description: Audit table for agent rent flow containing historical changes and modifications.
+columns:
+  id_agent:
+    description: ID of the agent related to the rent flow.
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_dadosagente_aud.agentes_id
+  id_rent_flow:
+    description: ID of the rent flow.
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_dadosagente_aud.fluxolocacao_id
+  rev:
+    description: Revision number.
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_dadosagente_aud.rev
+  rev_type:
+    description: Revision type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_ebdb_raw.fluxolocacao_dadosagente_aud.revtype
