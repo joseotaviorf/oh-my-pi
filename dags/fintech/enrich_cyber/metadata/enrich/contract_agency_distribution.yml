@@ -2,31 +2,49 @@
 database_name: datalake_cyber
 table_name: contract_agency_distribution
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Get the changes in contract distribution between agencies/advisories
 columns:
-  id_contract_external:
-    description: ""
+  id_contract:
+    description: "Unique identifier for the contract."
     lineage:
-      - datalake_cyber_clean.contracts.id_contract_external
-  contract_group:
-    description: ""
+      - datalake_cyber_clean.history_contract_distribution.id_contract
+  creditor:
+    description: "Creditor associated with the contract."
     lineage:
-      - datalake_cyber_clean.history_contract_distribution.contract_group
-  agency_group:
-    description: ""
+      - datalake_cyber_clean.history_contract_distribution.creditor
+  id_agency:
+    description: "Identifier for the agency."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.agency
-  agency_name:
-    description: ""
+  id_main_agency:
+    description: "Identifier for the main agency."
     lineage:
-      - datalake_cyber_clean.agency.agency_name
+      - datalake_cyber.agencies.id_main_agency
+  id_agencies_group:
+    description: "Identifier for the agency group."
+    lineage:
+      - datalake_cyber.agencies.id_agencies_group
+  main_agency_name:
+    description: "Name of the main agency."
+    lineage:
+      - datalake_cyber.agencies.main_agency_name
+  main_agency_type:
+    description: "Type of the main agency."
+    lineage:
+      - datalake_cyber.agencies.main_agency_type
+  agencies_name_group:
+    description: "Group name of agencies."
+    lineage:
+      - datalake_cyber.agencies.agencies_name_group
   dt_start_interval:
-    description: ""
+    description: "Start date of the interval during which the agency was responsible for the contract."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.ts_distribution
       - datalake_cyber_clean.history_contract_distribution.ts_redistribution
   dt_end_interval:
-    description: ""
+    description: "End date of the interval during which the agency was responsible for the contract."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.ts_redistribution
+  ts_load:
+    description: "Timestamp when the data was loaded."

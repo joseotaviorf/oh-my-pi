@@ -8,7 +8,7 @@ get_last_agency_contract_distribution AS (
     ts_distribution,
     ts_redistribution
   FROM datalake_cyber_clean.history_contract_distribution
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract_external, ts_distribution ORDER BY ts_redistribution DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract_external, ts_distribution ORDER BY ts_redistribution, id_contract DESC) = 1
 ),
 agency_distribution AS (
   SELECT
