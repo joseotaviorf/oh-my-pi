@@ -7,7 +7,7 @@ columns:
   id_offer:
     lineage:
       - datalake_rental_transact_clean.offer.id
-    description: Offer ID.
+    description: Offer identifier from Rental Transact database.
   id_offer_topic:
     lineage:
       - datalake_rental_transact_clean.offer_topic.id
@@ -27,7 +27,7 @@ columns:
   id_house:
     lineage:
       - datalake_rental_transact_clean.offer.id_house_external
-    description: House ID.
+    description: House identifier from Rental Transact database.
   original_condo:
     lineage:
       - datalake_ebdb_clean.house.condo
@@ -44,6 +44,29 @@ columns:
     lineage:
       - datalake_rental_transact_clean.offer.original_rent_value
     description: Original rent value.
+  payment_flow_type:
+    lineage:
+      - datalake_rental_transact_clean.offer.payment_flow_type
+    description: Payment flow type for the offer.
+    categories:
+      NONE: No payment flow type specified.
+      ADVANCE_PAYMENT: Payment flow uses advance payment.
+  original_iptu_value:
+    lineage:
+      - datalake_rental_transact_clean.offer.original_iptu_value
+    description: Original IPTU (property tax) value from the offer.
+  original_condominium_value:
+    lineage:
+      - datalake_rental_transact_clean.offer.original_condominium_value
+    description: Original condominium value from the offer.
+  original_home_insurance_value:
+    lineage:
+      - datalake_rental_transact_clean.offer.original_home_insurance_value
+    description: Original home insurance value from the offer.
+  original_tenant_service_fee_value:
+    lineage:
+      - datalake_rental_transact_clean.offer.original_tenant_service_fee_value
+    description: Original tenant service fee value from the offer.
   rent:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message.proposed_rent_value

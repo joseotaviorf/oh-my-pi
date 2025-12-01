@@ -58,6 +58,29 @@ columns:
     lineage:
     - datalake_rental_transact_raw.offer.original_rent_value
     description: Original rent value asked by the owner.
+  payment_flow_type:
+    lineage:
+    - datalake_rental_transact_raw.offer.payment_flow_type
+    description: Payment flow type for the offer.
+    categories:
+      NONE: No payment flow type specified.
+      ADVANCE_PAYMENT: Payment flow uses advance payment.
+  original_iptu_value:
+    lineage:
+    - datalake_rental_transact_raw.offer.original_iptu_value
+    description: Original IPTU (property tax) value.
+  original_condominium_value:
+    lineage:
+    - datalake_rental_transact_raw.offer.original_condominium_value
+    description: Original condominium value.
+  original_home_insurance_value:
+    lineage:
+    - datalake_rental_transact_raw.offer.original_home_insurance_value
+    description: Original home insurance value.
+  original_tenant_service_fee_value:
+    lineage:
+    - datalake_rental_transact_raw.offer.original_tenant_service_fee_value
+    description: Original tenant service fee value.
   ts_created:
     lineage:
     - datalake_rental_transact_raw.offer.created_at

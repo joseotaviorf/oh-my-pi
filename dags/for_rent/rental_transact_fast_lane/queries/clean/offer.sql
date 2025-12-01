@@ -12,6 +12,11 @@ SELECT
     turn,
     rejection_reason,
     original_rent_value,
+    payment_flow_type,
+    original_iptu_value,
+    original_condominium_value,
+    original_home_insurance_value,
+    original_tenant_service_fee_value,
     created_at AS ts_created,
     updated_at AS ts_updated,
     expires_at AS ts_expiration
