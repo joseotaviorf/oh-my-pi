@@ -85,7 +85,10 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
                     if date.strftime('_%d%m%y') in f:
                         filtered_files.append(f)
                 elif any(account in f for account in ['063180', '148643', '099036', '469916', '984646']):
-                    if date.strftime('_%d%m%Y_') in f:
+                    if re.search(r'_\d{6}00\.ret$', f):
+                        print(f"Ignoring file with invalid date: {f}")
+                        continue
+                    elif date.strftime('_%d%m%Y_') in f:
                         filtered_files.append(f)
                 else:
                     if date.strftime('_%d%m%y_') in f:
@@ -202,7 +205,7 @@ if __name__ == "__main__":
                     df.value.substr(8,1).alias('record_type'),
                     df.value.substr(9,240).alias('metadata'),
                     )
-                if any(account in path for account in ['97477', '52081']):
+                if any(account in path for account in ['97477', '52081', '98464']):
                     date_str = re.search(r'_(\d{6})\d+\.ret$', path).group(1)
                     date_obj = datetime.strptime(date_str, '%d%m%y')
                 elif any(account in path for account in ['5514', '130067134']):
@@ -255,7 +258,7 @@ if __name__ == "__main__":
                     df.value.substr(1,1).alias('record_type'),
                     df.value.substr(2,399).alias('metadata'),
                 )
-                if any(account in path for account in ['063180', '148643', '099036', '469916']):
+                if any(account in path for account in ['063180', '148643', '099036', '469916', '984646']):
                     date_str = re.search(r'_(\d{8})_', path).group(1)
                     date_obj = datetime.strptime(date_str, '%d%m%Y')
                 else:
