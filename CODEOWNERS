@@ -19,4 +19,4 @@ CODEOWNERS                                                              @quintoa
 dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives
 dags/mlops/                                                             @quintoandar/mlcops
 dags/growth/enrich_vespucio_pipeline/**                                 @quintoandar/atlas-db-code-owners
-dags/conversational_xp/**                                               @quintoandar/personalization
+dags/conversational_xp/**                                               @quintoandar/personalization @quintoandar/bi-etl-ejuice-code-owners
