@@ -14,7 +14,7 @@
 # Bi-etl-ejuice
 Repository with implementation of Airflow DAGs and Spark Jobs.
 
-<img src="https://cdn.apps.joltteam.com/brikbuild/beetlejuice-pixel-art-8bit-beetlejuice-ghost-pixel-pixel-art-warner-bros-5a24f9adf6c96a8d29720595.brickImg.jpg" width="300" height="300">
+<img src="bietlejuice.jpg" width="200">
 
 ---
 
