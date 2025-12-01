@@ -52,7 +52,7 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
         files = S3Service(boto3.resource("s3")).list_objects(s3_files_path)
         for f in files:
             for date in datetime_to_ingest:
-                if any(account in f for account in ['97477', '52081']):
+                if any(account in f for account in ['97477', '52081', '98464']):
                     if date.strftime('_%d%m%y') in f:
                         filtered_files.append(f)
                 elif any(account in f for account in ['5514', '130067134']):
@@ -84,7 +84,7 @@ def list_files(table_name, source_root_path, format, datetime_to_ingest):
                 if any(account in f for account in ['velo']):
                     if date.strftime('_%d%m%y') in f:
                         filtered_files.append(f)
-                elif any(account in f for account in ['063180', '148643', '099036', '469916']):
+                elif any(account in f for account in ['063180', '148643', '099036', '469916', '984646']):
                     if date.strftime('_%d%m%Y_') in f:
                         filtered_files.append(f)
                 else:
