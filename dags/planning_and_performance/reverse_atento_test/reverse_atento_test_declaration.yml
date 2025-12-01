@@ -18,6 +18,8 @@ workflow:
     - "{table_name}"
     - "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
     - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
+    - "atento"
+    - "(atento', 'atn')"
     
   tables_customization:
     backlog_metric: {}
@@ -33,9 +35,7 @@ workflow:
     tmr: {}
     tickets_transferred: {}
     twilio_chat_aht: {}
-  extra_query_template_params:
-    partner_name: "atento"
-    organization_filters: "(atento', 'atn')"
+
 cluster:
   type: custom_cluster
   custom_configurations:
