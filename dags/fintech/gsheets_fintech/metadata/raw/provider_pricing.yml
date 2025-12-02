@@ -1,0 +1,5 @@
+---
+database_name: datalake_gsheets_raw
+table_name: provider_pricing
+domain: Fintech
+description: Raw provider pricing data imported from Google Sheets, containing product pricing information from external providers

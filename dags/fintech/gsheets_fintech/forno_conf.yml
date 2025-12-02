@@ -225,6 +225,12 @@ sheets_info:
     clean_table_name: process_eviction
     sheet_context: fintech
 
+  provider_pricing:
+    sheet_id: 1s2eBVCT8_qMp3Zq-Yq05Cf0BqkLreRd0qQRf2HFaffM
+    sheet_name: pricing
+    clean_table_name: provider_pricing
+    sheet_context: fintech
+
   target_nps_weekly:
     sheet_id: 17hx0dsLK4CJ-sivMf7w1L54LMpZgkHboKpuI0S1Di3o
     sheet_name: target_nps_weekly
