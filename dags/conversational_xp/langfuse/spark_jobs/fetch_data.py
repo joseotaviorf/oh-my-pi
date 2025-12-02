@@ -258,16 +258,40 @@ def enrich_scores_from_api(df, langfuse):
         enriched_df = df.join(api_df, df.id == api_df.id, "left") \
                         .drop(api_df.id)
         
-        enriched_df = enriched_df.withColumn(
-            "session_id",
-            coalesce(col("api_session_id"), col("session_id"))
-        ).withColumn(
-            "metadata",
-            coalesce(col("api_metadata"), col("metadata"))
-        ).withColumn(
-            "value",
-            coalesce(col("api_value"), col("value"))
-        ).drop("api_session_id", "api_metadata", "api_value")
+        if "session_id" in df.columns:
+            enriched_df = enriched_df.withColumn(
+                "session_id",
+                coalesce(col("api_session_id"), col("session_id"))
+            )
+        else:
+            enriched_df = enriched_df.withColumn(
+                "session_id",
+                col("api_session_id")
+            )
+        
+        if "metadata" in df.columns:
+            enriched_df = enriched_df.withColumn(
+                "metadata",
+                coalesce(col("api_metadata"), col("metadata"))
+            )
+        else:
+            enriched_df = enriched_df.withColumn(
+                "metadata",
+                col("api_metadata")
+            )
+        
+        if "value" in df.columns:
+            enriched_df = enriched_df.withColumn(
+                "value",
+                coalesce(col("api_value"), col("value"))
+            )
+        else:
+            enriched_df = enriched_df.withColumn(
+                "value",
+                col("api_value")
+            )
+        
+        enriched_df = enriched_df.drop("api_session_id", "api_metadata", "api_value")
         
         logger.info("Successfully enriched dataframe with API data")
         return enriched_df
