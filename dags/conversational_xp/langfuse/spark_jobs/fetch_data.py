@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import boto3
 from langfuse import Langfuse
-from pyspark.sql.functions import lit, col
+from pyspark.sql.functions import lit, col, coalesce
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -77,7 +77,7 @@ def fetch_page_with_retry(langfuse, score_ids_str, page, max_retries=MAX_RETRIES
 
 
 def extract_score_data(score):
-    """Extract id, session_id and metadata from a score object."""
+    """Extract id, session_id, metadata and value from a score object."""
     metadata = None
     if hasattr(score, 'metadata') and score.metadata:
         try:
@@ -94,7 +94,8 @@ def extract_score_data(score):
     return {
         'id': getattr(score, 'id', None),
         'session_id': getattr(score, 'session_id', None),
-        'metadata': metadata
+        'metadata': metadata,
+        'value': getattr(score, 'value', None)
     }
 
 
@@ -250,18 +251,23 @@ def enrich_scores_from_api(df, langfuse):
         api_df = spark.createDataFrame(api_data)
         
         api_df = api_df.withColumnRenamed("session_id", "api_session_id") \
-                       .withColumnRenamed("metadata", "api_metadata")
+                       .withColumnRenamed("metadata", "api_metadata") \
+                       .withColumnRenamed("value", "api_value") \
+                       .select("id", "api_session_id", "api_metadata", "api_value")
         
         enriched_df = df.join(api_df, df.id == api_df.id, "left") \
                         .drop(api_df.id)
         
         enriched_df = enriched_df.withColumn(
             "session_id",
-            col("api_session_id")
+            coalesce(col("api_session_id"), col("session_id"))
         ).withColumn(
             "metadata",
-            col("api_metadata")
-        ).drop("api_session_id", "api_metadata")
+            coalesce(col("api_metadata"), col("metadata"))
+        ).withColumn(
+            "value",
+            coalesce(col("api_value"), col("value"))
+        ).drop("api_session_id", "api_metadata", "api_value")
         
         logger.info("Successfully enriched dataframe with API data")
         return enriched_df
