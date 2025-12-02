@@ -542,9 +542,6 @@ bietlejuice.enrich_recupera:
     - bietlejuice.recupera:load-clean-installment:first-run-of-day
     - bietlejuice.recupera:load-clean-installments-indicators:first-run-of-day
     - bietlejuice.recupera:load-clean-records-distributed-channels:first-run-of-day
-bietlejuice.enrich_rede_lead_crawler:
-  remove:
-    - bietlejuice.growth_lab:load-clean-supply-recurrence:first-run-of-day
 bietlejuice.enrich_rede_supply:
   remove:
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day

@@ -840,7 +840,6 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
   - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition:first-run-of-day
-  - bietlejuice.enrich_rede_lead_crawler:load-enrich-lead-3p-freshness:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-file-sks:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reasons:first-run-of-day
@@ -1171,17 +1170,6 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-status-events:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
-bietlejuice.enrich_3p_demand_views:
-  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
-  - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
-  - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
-  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
-  - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-  - bietlejuice.enrich_business_model:load-enrich-visit-business-model:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
-  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
@@ -3078,9 +3066,6 @@ bietlejuice.enrich_rede_house_history:
 bietlejuice.enrich_rede_lead_acquisition:
   - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes:first-run-of-day
-bietlejuice.enrich_rede_lead_crawler:
-  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud:first-run-of-day
