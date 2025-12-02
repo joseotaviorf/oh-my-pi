@@ -3970,6 +3970,8 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs:first-run-of-day
+  - bietlejuice.insider:load-clean-feature:first-run-of-day
+  - bietlejuice.insider:load-clean-review-feature:first-run-of-day
   - bietlejuice.insider:load-clean-review:first-run-of-day
 bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-contact:first-run-of-day

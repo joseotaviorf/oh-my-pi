@@ -1,0 +1,55 @@
+---
+database_name: datalake_visit
+table_name: post_visit_demand
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Post-visit evaluation data from the demand perspective, consolidating both agent and house
+  ratings provided by visitors after completing property visits. This table combines feedback
+  about agent performance (ratings, improvements, good points) and house evaluation (like/dislike,
+  positive/negative points).
+  Each record represents a unique visit evaluation.
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+    description: Unique identifier of the visit being evaluated.
+  code_visit:
+    lineage:
+      - datalake_insider_clean.review.id_reviewed
+    description: Visit code extracted from review identifiers.
+  agent_rating:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Numerical rating given by the visitor to evaluate the agent's performance during the visit.
+  house_like:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Visitor's overall satisfaction rating for the house visited (yes, partially, no).
+  agent_improvements:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Array of improvement areas identified by the visitor regarding the agent's performance.
+  agent_good_points:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Array of positive aspects highlighted by the visitor about the agent's performance.
+  house_negative_points:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Array of negative aspects or issues identified by the visitor about the house.
+  house_positive_points:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+    description: Array of positive aspects or features appreciated by the visitor about the house.
+  evaluation_domain:
+    lineage:
+      - datalake_insider_clean.review.id_reviewed
+    description: Classification of the evaluation scope based on the available feedback.
+    categories:
+      AGENT_HOUSE: Both agent and house were evaluated.
+      HOUSE: Only house was evaluated.
+      AGENT: Only agent was evaluated.
+  ts_creation:
+    lineage:
+      - datalake_insider_clean.review.dt_creation
+    description: Timestamp when visitor evaluated the agent or house.
