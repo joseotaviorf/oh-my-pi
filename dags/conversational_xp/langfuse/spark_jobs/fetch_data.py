@@ -31,7 +31,6 @@ DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "fetch_data"
 SOURCE = "langfuse"
 
-# retry and performance constants for API fetching
 MAX_WORKERS = 5 # maximum number of workers to use for API fetching
 MAX_RETRIES = 5 # maximum number of times to retry a failed request
 EXPONENTIAL_BACKOFF_BASE = 2 # base for exponential backoff, e.g. 2^0 = 1s, 2^1 = 2s, 2^2 = 4s, etc.
@@ -119,13 +118,11 @@ def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches,
         
         elapsed = time.time() - start_time
 
-        # count how many scores have actual data vs null placeholders
         valid_count = sum(1 for r in results if r.get('session_id') or r.get('metadata'))
         
         if valid_count < len(results):
             logger.warning(f"Batch {batch_num}: {len(results) - valid_count} scores with no data")
 
-        # log based on time interval or if it's the last batch
         current_time = time.time()
         should_log = False
         batches_completed = 0
@@ -146,7 +143,6 @@ def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches,
                 f"Progress ({progress_pct:.1f}%): {batches_completed}/{total_batches} batches completed. "
             )
         
-        # reset consecutive failures on success
         with log_state['lock']:
             log_state['consecutive_failures'] = 0
         
@@ -155,7 +151,6 @@ def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches,
     except Exception as e:
         elapsed = time.time() - start_time
         
-        # track consecutive failures and halt job if threshold exceeded
         with log_state['lock']:
             log_state['consecutive_failures'] += 1
             consecutive_failures = log_state['consecutive_failures']
@@ -166,7 +161,6 @@ def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches,
             f"(consecutive failures: {consecutive_failures})"
         )
         
-        # halt the entire job if too many consecutive failures
         if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
             error_msg = (
                 f"Job halted after {consecutive_failures} consecutive batch failures. "
@@ -185,13 +179,22 @@ def enrich_scores_from_api(df, langfuse):
     logger.info("Starting API enrichment for scores table")
     logger.info(f"Config: {MAX_WORKERS} workers, batch size {BATCH_SIZE}")
 
+    total_rows = df.count()
+    df = df.dropDuplicates(subset=["id"])
+    deduplicated_rows = df.count()
+    
+    if total_rows > deduplicated_rows:
+        logger.warning(
+            f"Removed {total_rows - deduplicated_rows} duplicate IDs from S3 data. "
+            f"Original rows: {total_rows}, After deduplication: {deduplicated_rows}"
+        )
+
     score_ids = [row.id for row in df.select("id").distinct().collect()]
     
     if not score_ids:
         logger.warning("No score IDs found, skipping enrichment")
         return df
 
-    # split score IDs into batches
     batches = [score_ids[i:i + BATCH_SIZE] for i in range(0, len(score_ids), BATCH_SIZE)]
     logger.info(f"Processing {len(batches)} batches of {BATCH_SIZE} scores")
 
@@ -218,7 +221,6 @@ def enrich_scores_from_api(df, langfuse):
             try:
                 results = future.result()
                 if results:
-                    # Check if batch returned valid data or null placeholders
                     valid_results = [r for r in results if r.get('session_id') is not None or r.get('metadata') is not None]
                     if valid_results:
                         successful_batches += 1
@@ -250,11 +252,9 @@ def enrich_scores_from_api(df, langfuse):
         api_df = api_df.withColumnRenamed("session_id", "api_session_id") \
                        .withColumnRenamed("metadata", "api_metadata")
         
-        # join with original dataframe on score_id
         enriched_df = df.join(api_df, df.id == api_df.id, "left") \
                         .drop(api_df.id)
         
-        # coalesce to prefer API values, fall back to S3
         enriched_df = enriched_df.withColumn(
             "session_id",
             col("api_session_id")
@@ -327,19 +327,16 @@ if __name__ == "__main__":
     logger.info(f"table_name={table_name}")
     logger.info(f"start_timestamp={start_timestamp_str}, end_timestamp={end_timestamp_str}")
 
-    # Parse timestamps
     end_timestamp = datetime.fromisoformat(end_timestamp_str).replace(tzinfo=None)
     start_timestamp = datetime.fromisoformat(start_timestamp_str).replace(tzinfo=None) - timedelta(hours=2)
     partition_cols = ["year", "month", "day", "hour"]
 
-    # Initialize services
     config_service = ConfigurationService(dag_name)
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     s3_loader = S3Loader()
 
-    # Setup database
     datalake_info = DatalakeMetastoreService.get_db_info(
         environment, SOURCE, datalake_bucket
     )
