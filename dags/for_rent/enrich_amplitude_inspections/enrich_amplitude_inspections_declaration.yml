@@ -20,7 +20,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 
 cluster:
-  type: databricks_13_3_min_io-memory_cluster
+  type: databricks_16_4_min_io-memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
