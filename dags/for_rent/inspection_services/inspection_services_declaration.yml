@@ -37,6 +37,10 @@ workflow:
       raw_primary_keys: [id, rev]
     automatic_invoice: {}
     automatic_invoice_aud: {}
+    invoice_discount:
+      clean_table_name: invoice_discount
+      clean_primary_keys: [uuid_discount]
+      raw_primary_keys: [discount_uuid]
     budget_approval_payment_preference_aud:
       clean_table_name: budget_approval_payment_preference_aud
       clean_primary_keys: [id_budget_approval_payment_preference, rev]

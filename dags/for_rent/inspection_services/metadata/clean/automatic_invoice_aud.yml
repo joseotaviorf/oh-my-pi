@@ -6,7 +6,7 @@ domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
   id_automatic_invoice:
-    description: ID of the table.
+    description: ID of the table. It's the primary key.
     lineage:
       - datalake_inspection_services_raw.automatic_invoice_aud.id
   uuid_inspection:

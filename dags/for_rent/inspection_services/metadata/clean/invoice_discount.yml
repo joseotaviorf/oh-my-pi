@@ -1,0 +1,109 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: invoice_discount
+description: |
+  This table contains the discount evaluation details.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  uuid_discount:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_uuid
+    description: The discount uuid. It's the primary key.
+  id_contract:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.contract_id
+    description: The contract id.
+  uuid_inspection:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.inspection_uuid
+    description: The inspection uuid.
+  id_checkpoint:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.checkpoint_id
+    description: The checkpoint id identifies the customer journey step where the discount was informed/adopted.
+  id_user:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.user_id
+    description: The user ids from MAIN (monolith) legacy system.
+  uuid_person:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.person_uuid
+    description: The person uuid of all tenants involved in the inspection.
+  discount_type:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_type
+    description: Classification of the discount type.
+  inspection_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.inspection_cost
+    description: The inspection total cost.
+  disputed_inspection_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.disputed_inspection_cost
+    description: The inspection cost disputed by the tenant.
+  discount_value:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_value
+    description: The discount value.
+  discount_hash:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_hash
+    description: The hash of the discount request – Bandaid ML Service request hash.
+  discount_value_type:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_value_type
+    description: The type of the discount value informed by Bandaid ML (total, partial etc.).
+  has_tenant_approval:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.tenant_approval
+    description: Indicates if the tenant approved the inspection billed amount.
+  has_landlord_approval:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.landlord_approval
+    description: Indicates if the landlord approved the inspection billed amount.
+  has_landlord_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.landlord_repair_request
+    description: Indicates if the landlord requested a repair.
+  is_eviction:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.is_eviction
+    description: Indicates if the inspection is an eviction.
+  is_spoc:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.is_spoc
+    description: Indicates if the context is SPOC.
+  person_blocked:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.person_blocked
+    description: Indicates if each person is blocked.
+  person_blocked_reason:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.person_blocked_reason
+    description: The reason for each person block.
+  is_discount_accepted:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_accepted
+    description: Indicates if the discount was accepted or refused.
+  discount_reviewed_value:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_reviewed_value
+    description: The discount value after restriction evaluations calculated at persist/update time.
+  discount_acceptance_by:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_acceptance_by
+    description: Indicates the source of the acceptance decision.
+  dt_discount_accepted:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_accepted_at
+    description: The date when the discount was accepted or refused.
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.created_at
+    description: The creation timestamp.
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.updated_at
+    description: The last update timestamp.
+
