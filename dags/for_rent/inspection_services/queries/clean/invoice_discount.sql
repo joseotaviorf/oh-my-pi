@@ -20,7 +20,6 @@ SELECT
     person_blocked_reason,
     discount_accepted AS is_discount_accepted,
     discount_reviewed_value,
-    discount_acceptance_by,
     discount_accepted_at AS dt_discount_accepted,
     created_at AS ts_created,
     updated_at AS ts_updated

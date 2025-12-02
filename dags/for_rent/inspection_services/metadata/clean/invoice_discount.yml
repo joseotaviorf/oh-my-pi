@@ -90,10 +90,6 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_reviewed_value
     description: The discount value after restriction evaluations calculated at persist/update time.
-  discount_acceptance_by:
-    lineage:
-      - datalake_inspection_services_raw.invoice_discount.discount_acceptance_by
-    description: Indicates the source of the acceptance decision.
   dt_discount_accepted:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_accepted_at
