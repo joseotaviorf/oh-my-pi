@@ -19,9 +19,6 @@ column_level_validations:
   assignment_age_months:
     is_complete:
       severity_level: Warning
-  has_self_declared_disability:
-    is_complete:
-      severity_level: Warning
   is_active:
     is_complete:
       severity_level: Warning
