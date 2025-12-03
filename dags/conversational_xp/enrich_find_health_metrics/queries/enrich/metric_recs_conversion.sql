@@ -63,7 +63,7 @@ recs_impressions_actions AS (
     GET_JSON_OBJECT(timestamps, '$.ts_contract_signed') AS ts_contract_signed
   FROM datalake_search.recs_impressions_processed
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     AND GET_JSON_OBJECT(metrics, '$.click') = '1'
     AND (
       GET_JSON_OBJECT(metrics, '$.direct_offer') = '1'
