@@ -1,0 +1,25 @@
+dag:
+  name: enrich_open_external_data
+  owner: Data Atlas DB
+  schedule_start_date: 2020, 8, 29
+  schedule_interval: 0 13 15,30 * *
+  documentation:
+    dag_purpose: |
+      This DAG is intended to handle tables retrieved from public data
+      (eg. taxes, interest rate, inflation rate etc).
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    itbi_all_residential_transactions:
+      - itbi_sp_residential_transactions
+      - itbi_bh_residential_transactions
+  default_extraction_type: full
+cluster:
+  type: databricks_16_4_med_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

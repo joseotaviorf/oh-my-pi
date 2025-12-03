@@ -1,0 +1,12 @@
+---
+database_name: datalake_iptu_raw
+table_name: iptu_sp
+description: |
+  This table contains IPTU data from São Paulo, featuring details on urban properties such as location, venal value, and property usage.
+  Extracted from the GeoSampa website, the table is periodically updated by the City Hall.
+  It's a valuable resource for urban analysis and real estate market studies.
+
+  Source: https://geosampa.prefeitura.sp.gov.br/PaginasPublicas/_SBC.aspx
+  Metadata: (https://metadados.geosampa.prefeitura.sp.gov.br/geonetwork/srv/por/catalog.search#/metadata/b971efa1-aad5-42f3-ad28-18f1f4efe270).
+domain: Atlas DB
+owner: data-atlas-db@quintoandar.com.br

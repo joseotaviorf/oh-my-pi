@@ -1,0 +1,183 @@
+---
+database_name: datalake_open_external_data
+table_name: iptu_sp_residential_properties
+description: |
+  Table enriched with IPTU data from SP.
+domain: Atlas DB
+owner: data-atlas-db@quintoandar.com.br
+columns:
+  taxpayer_number:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.taxpayer_number
+    description: |
+      Each property will correspond to a registration number in the Tax Real Estate Registry,
+      with the following being understood as a property: I - the area of land, built or not,
+      defined in the registration of the competent Real Estate Registry Service or in transcripts
+      that are still in force.
+  condo_number:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.condo_number
+    description: |
+      Condominium number (if any).
+  release_notification_number:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.release_notification_number
+    description: |
+      Release Notification Number.
+  taxpayer_phase:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.taxpayer_phase
+    description: |
+      Taxpayer phase.
+  street_code:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.street_code
+    description: |
+      Street code of the property according to the "Cadastro de Logradouro".
+  address_street_name:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.address
+    description: |
+      Most likely address for that listing.
+  address_number:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.number
+    description: |
+      Unit number of the property.
+  address_zipcode:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.zipcode
+    description: |
+      Zip code of the property address.
+  address_complement:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.complement
+    description: |
+      Property complement. Composes the property's address.
+  address_reference:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.reference
+    description: |
+      Property reference. Composes the property's address.
+  address_neighborhood:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.neighborhood
+    description: |
+      Most likely neighborhood for that listing.
+  address_state:
+    description: |
+      State of the property.
+  address_city:
+    description: |
+      IPTU city.
+  address_country:
+    description: |
+      IPTU country.
+  property_use_type:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.property_use_type
+    description: |
+      The IPTU use code is the code that represents the type of use of the property.
+  building_standard_type:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.building_standard_type
+    description: |
+      The IPTU standard code is the code that represents the type of property.
+  building_standard_type_tier:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.building_standard_type
+    description: |
+      The tier of the building standard type.
+  land_type:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.land_type
+    description: |
+      Land position.
+    categories:
+      "De duas ou mais frentes": "Two or more fronts"
+      "De esquina": "Corner"
+      "Lote de esquina em zero": "Corner land in zero"
+      "Lote de fundos": "Back land"
+      "Lote encravado": "Embedded land"
+      "Normal": "Normal"
+      "Terreno interno": "Internal land"
+  land_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.land_area_m2
+    description: |
+      The land area is the area of the property in square meters.
+  built_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.built_area_m2
+    description: |
+      The built area is This is the area that has buildings on the land in square meters.
+  occupied_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.occupied_area_m2
+    description: |
+      The occupied area is the area of the property that is occupied in square meters.
+  land_price_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.land_price_m2
+    description: |
+      The land price per square meter is the value of the property divided by the land area in R$.
+  building_price_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.building_price_m2
+    description: |
+      The building price per square meter is the value of the property divided by the built area in R$.
+  frontage:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.frontage
+    description: |
+      The frontage is the width of the property (including the side walls, if there are any). If your property is on a corner, you should add up the front (main) and side (secondary) frontages.
+  ideal_fraction:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.ideal_fraction
+    description: |
+      Incidence of the acquisition percentage over the ideal fraction original.
+  depreciation_factor:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.depreciation_factor
+    description: |
+      Depreciation coefficients for the value of buildings, by age.
+  qty_street_corners_or_fronts:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.qty_street_corners_or_fronts
+    description: |
+      Number of corners or fronts of the property.
+  qty_floors:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.qty_floors
+    description: |
+      Number of floors of the property.
+  built_year:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.built_year
+    description: |
+      Year that the construction of the property was finished.
+  iptu_year:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.iptu_year
+    description: |
+      Year of the IPTU exercise.
+  first_year_of_taxpayer_life:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.first_year_of_taxpayer_life
+    description: |
+      Year of the first IPTU of the taxpayer.
+  first_month_of_taxpayer_life:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.first_month_of_taxpayer_life
+    description: |
+      Month of the first IPTU of the taxpayer.
+  ts_registration:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.dt_registration
+    description: |
+      Timestamp of registration of the property.
+  ts_load:
+    lineage:
+      - datalake_iptu_clean.iptu_sp.dt_load
+    description: |
+      Timestamp of when the table was loaded.

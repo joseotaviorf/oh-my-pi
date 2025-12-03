@@ -1,0 +1,29 @@
+---
+dag:
+  name: enrich_atlas_db_quality_metrics
+  schedule_start_date: 2025, 10, 29
+  owner: Data Atlas DB
+  documentation:
+    dag_purpose: |
+      This DAG enriches the Atlas DB quality metrics by comparing the original auto-completed values with the customer-edited values.
+      It tracks auto-complete events and customer edition events to measure data quality by comparing
+      original auto-completed values with customer-edited values. The table includes metrics such as
+      absolute differences and percentage differences between original and edited values for various
+      house characteristics (area, condo, bedrooms, parking lots, etc.). This data helps identify
+      patterns in user corrections and assess the accuracy of auto-complete predictions.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_16_4_med_io-memory_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

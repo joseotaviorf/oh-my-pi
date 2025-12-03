@@ -2,7 +2,7 @@
 .woodpecker/**                                                          @quintoandar/data-ingestion-code-owners
 .drone.yml                                                              @quintoandar/data-ingestion-code-owners
 Makefile                                                                @quintoandar/data-ingestion-code-owners
-scripts/init_script.sh                                                  @quintoandar/data-ingestion-code-owners   
+scripts/init_script.sh                                                  @quintoandar/data-ingestion-code-owners
 bietlejuice/base/airflow/**                                             @quintoandar/data-ingestion-code-owners
 bietlejuice/base/athena/**                                              @quintoandar/data-ingestion-code-owners
 bietlejuice/base/hive/**                                                @quintoandar/data-ingestion-code-owners
@@ -18,5 +18,5 @@ scripts/ci_cd/**                                                        @quintoa
 CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
 dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives
 dags/mlops/                                                             @quintoandar/mlcops
-dags/growth/enrich_vespucio_pipeline/**                                 @quintoandar/atlas-db-code-owners
+dags/atlas_db/enrich_vespucio_pipeline/**                               @quintoandar/atlas-db-code-owners
 dags/conversational_xp/**                                               @quintoandar/personalization @quintoandar/bi-etl-ejuice-code-owners

@@ -25,7 +25,7 @@ dags_not_using_builder:
   - growth/amplitude/amplitude.py
   - growth/enrich_growth_costs_sharing_rules/enrich_growth_costs_sharing_rules.py
   - growth/enrich_marketing_costs_sharing_rules/enrich_marketing_costs_sharing_rules.py
-  - growth/enrich_vespucio_pipeline/enrich_vespucio_pipeline.py
+  - atlas_db/enrich_vespucio_pipeline/enrich_vespucio_pipeline.py
   - growth/lifull_campaigns/lifull_campaigns.py
   - growth/olos_dialer/olos_dialer.py
   - growth/semrush/semrush.py

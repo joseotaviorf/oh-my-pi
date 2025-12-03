@@ -1,0 +1,1475 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: company
+owner: data-atlas-db@quintoandar.com.br
+domain: Atlas DB
+description: |
+  This table contains real estate company and broker information from UnionDB, including both real estate
+  agencies and individual brokers/agents. It stores comprehensive details such as company identification.
+  This is a key dimension table for understanding the business
+  relationships and partnerships in the real estate marketplace.
+columns:
+  id_company:
+    description: Company primary key.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pkempresa
+  id_onboarding:
+    description: Foreign key referencing onboarding process or stage.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fkonboarding
+  nome:
+    description: Company or broker name.
+    lineage:
+      - datalake_union_cdc_raw.empresa.nome
+  creci:
+    description: CRECI registration number (Regional Real Estate Council).
+    lineage:
+      - datalake_union_cdc_raw.empresa.creci
+  endereco:
+    description: Company street address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.endereco
+  numero:
+    description: Company address street number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.numero
+  complemento:
+    description: Company address complement (suite, floor, etc).
+    lineage:
+      - datalake_union_cdc_raw.empresa.complemento
+  bairro:
+    description: Company neighborhood/district.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bairro
+  cidade:
+    description: Company city name.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cidade
+  uf:
+    description: Company state abbreviation (UF).
+    lineage:
+      - datalake_union_cdc_raw.empresa.uf
+  cep:
+    description: Company postal code (CEP).
+    lineage:
+      - datalake_union_cdc_raw.empresa.cep
+  dddtelefone:
+    description: Area code (DDD) for company telephone.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dddtelefone
+  telefone:
+    description: Company telephone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.telefone
+  dddfax:
+    description: Area code (DDD) for company fax.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dddfax
+  fax:
+    description: Company fax number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fax
+  email:
+    description: Company email address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.email
+  site:
+    description: Company website URL.
+    lineage:
+      - datalake_union_cdc_raw.empresa.site
+  cnpj:
+    description: Company CNPJ registration number (Brazilian federal tax ID).
+    lineage:
+      - datalake_union_cdc_raw.empresa.cnpj
+  ie:
+    description: State tax registration number (Inscrição Estadual).
+    lineage:
+      - datalake_union_cdc_raw.empresa.ie
+  im:
+    description: Municipal tax registration number (Inscrição Municipal).
+    lineage:
+      - datalake_union_cdc_raw.empresa.im
+  responsavel:
+    description: Name of the person responsible for the company.
+    lineage:
+      - datalake_union_cdc_raw.empresa.responsavel
+  cpfresp:
+    description: CPF (personal tax ID) of the company responsible person.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cpfresp
+  rgresp:
+    description: RG (identity document) of the company responsible person.
+    lineage:
+      - datalake_union_cdc_raw.empresa.rgresp
+  moeda:
+    description: Currency type used by the company.
+    lineage:
+      - datalake_union_cdc_raw.empresa.moeda
+  intmoedasing:
+    description: Integer part of currency singular form name.
+    lineage:
+      - datalake_union_cdc_raw.empresa.intmoedasing
+  fracmoedasing:
+    description: Fractional part of currency singular form name.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fracmoedasing
+  intmoedaplu:
+    description: Integer part of currency plural form name.
+    lineage:
+      - datalake_union_cdc_raw.empresa.intmoedaplu
+  fracmoedaplu:
+    description: Fractional part of currency plural form name.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fracmoedaplu
+  reserva:
+    description: Reserved field or reservation information.
+    lineage:
+      - datalake_union_cdc_raw.empresa.reserva
+  logorpt:
+    description: Logo file path for reports.
+    lineage:
+      - datalake_union_cdc_raw.empresa.logorpt
+  logofigura:
+    description: Logo image file name or path.
+    lineage:
+      - datalake_union_cdc_raw.empresa.logofigura
+  simbolo:
+    description: Company symbol or brand icon.
+    lineage:
+      - datalake_union_cdc_raw.empresa.simbolo
+  path_foto:
+    description: File path for company photos/images.
+    lineage:
+      - datalake_union_cdc_raw.empresa.path_foto
+  path_foto360:
+    description: File path for 360-degree photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.path_foto360
+  path_video:
+    description: File path for company videos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.path_video
+  fotolarg:
+    description: Photo width dimension in pixels.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fotolarg
+  fotoalt:
+    description: Photo height dimension in pixels.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fotoalt
+  textofoto:
+    description: Primary text or caption overlay for photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.textofoto
+  textofoto2:
+    description: Secondary text or caption overlay for photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.textofoto2
+  textname:
+    description: Font name for text overlay on photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.textname
+  textosize:
+    description: Font size for text overlay on photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.textosize
+  textstilo:
+    description: Font style for text overlay (bold, italic, etc).
+    lineage:
+      - datalake_union_cdc_raw.empresa.textstilo
+  textocor:
+    description: Font color for text overlay on photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.textocor
+  posicao:
+    description: Text position or alignment on photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.posicao
+  lingua:
+    description: Language configuration for the company system.
+    lineage:
+      - datalake_union_cdc_raw.empresa.lingua
+  autoref:
+    description: Automatic reference numbering configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.autoref
+  dominio:
+    description: Company domain name for website.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dominio
+  dfc:
+    description: DFC (Declaração de Conta Fiscal) configuration or flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dfc
+  nomeu:
+    description: Username for system access.
+    lineage:
+      - datalake_union_cdc_raw.empresa.nomeu
+  senha:
+    description: Password for system access (encrypted).
+    lineage:
+      - datalake_union_cdc_raw.empresa.senha
+  indicador:
+    description: Indicator or flag for company classification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.indicador
+  tipoftp:
+    description: FTP type configuration for file transfers.
+    lineage:
+      - datalake_union_cdc_raw.empresa.tipoftp
+  forcacep:
+    description: Flag to force CEP (postal code) validation.
+    lineage:
+      - datalake_union_cdc_raw.empresa.forcacep
+  inidt_importa:
+    description: Start date/time for data import process.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inidt_importa
+  jumbo:
+    description: Jumbo or large format configuration flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.jumbo
+  latitude:
+    description: Company geographical latitude coordinate.
+    lineage:
+      - datalake_union_cdc_raw.empresa.latitude
+  codigo_rdstation:
+    description: RD Station (marketing automation) integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_rdstation
+  setup:
+    description: System setup or configuration status.
+    lineage:
+      - datalake_union_cdc_raw.empresa.setup
+  email_inicial_enviado:
+    description: Flag indicating whether initial welcome email was sent.
+    lineage:
+      - datalake_union_cdc_raw.empresa.email_inicial_enviado
+  chave_admin_web:
+    description: Web admin access key or token.
+    lineage:
+      - datalake_union_cdc_raw.empresa.chave_admin_web
+  email_rede_dono_site:
+    description: Network website owner email address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.email_rede_dono_site
+  uniloc_segundavia_codigo:
+    description: Uniloc second-way code for payment slip access.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_segundavia_codigo
+  fkwebdesign:
+    description: Foreign key referencing web design template or theme.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fkwebdesign
+  fimdt_importa:
+    description: End date/time for data import process.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fimdt_importa
+  situacao:
+    description: Company status or situation (active, inactive, suspended).
+    lineage:
+      - datalake_union_cdc_raw.empresa.situacao
+  tipoipmac:
+    description: Type of IP/MAC address configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.tipoipmac
+  ipmac:
+    description: IP address or MAC address for system access control.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ipmac
+  urlfoto:
+    description: URL base path for company photos/images.
+    lineage:
+      - datalake_union_cdc_raw.empresa.urlfoto
+  iniftp_importa:
+    description: Start time for FTP import process.
+    lineage:
+      - datalake_union_cdc_raw.empresa.iniftp_importa
+  fimftp_importa:
+    description: End time for FTP import process.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fimftp_importa
+  wssenha:
+    description: Web service password for API integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wssenha
+  identimo:
+    description: Property identification format or pattern.
+    lineage:
+      - datalake_union_cdc_raw.empresa.identimo
+  idcontrole:
+    description: Control identifier for system management.
+    lineage:
+      - datalake_union_cdc_raw.empresa.idcontrole
+  idpartner:
+    description: Partner identifier for business relationships.
+    lineage:
+      - datalake_union_cdc_raw.empresa.idpartner
+  previsite:
+    description: Pre-visit or virtual tour configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.previsite
+  razao:
+    description: Company legal name (razão social).
+    lineage:
+      - datalake_union_cdc_raw.empresa.razao
+  numtour:
+    description: Number of virtual tours or tour identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.numtour
+  pathlogo:
+    description: File path for company logo.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pathlogo
+  servsmtp:
+    description: SMTP server address for email sending.
+    lineage:
+      - datalake_union_cdc_raw.empresa.servsmtp
+  usersmtp:
+    description: SMTP username for email authentication.
+    lineage:
+      - datalake_union_cdc_raw.empresa.usersmtp
+  senhasmtp:
+    description: SMTP password for email authentication.
+    lineage:
+      - datalake_union_cdc_raw.empresa.senhasmtp
+  flagdesk:
+    description: Desktop flag or configuration setting.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flagdesk
+  paratime:
+    description: Parameter timestamp for data processing.
+    lineage:
+      - datalake_union_cdc_raw.empresa.paratime
+  busca_miniatura:
+    description: Thumbnail search or display configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.busca_miniatura
+  id_imobiliaria:
+    description: Real estate agency identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.id_imobiliaria
+  licensas:
+    description: Software licenses or module licenses enabled for the company.
+    lineage:
+      - datalake_union_cdc_raw.empresa.licensas
+  sincCount:
+    description: Synchronization count or number of syncs performed.
+    lineage:
+      - datalake_union_cdc_raw.empresa.sincCount
+  sincData:
+    description: Last synchronization date/timestamp.
+    lineage:
+      - datalake_union_cdc_raw.empresa.sincData
+  sincDiaria:
+    description: Daily synchronization flag or schedule.
+    lineage:
+      - datalake_union_cdc_raw.empresa.sincDiaria
+  ftp_redemorar:
+    description: FTP configuration for RedeMorar network integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_redemorar
+  idt_redemorar:
+    description: RedeMorar network identifier or timestamp.
+    lineage:
+      - datalake_union_cdc_raw.empresa.idt_redemorar
+  redemorar_dir:
+    description: RedeMorar FTP directory path.
+    lineage:
+      - datalake_union_cdc_raw.empresa.redemorar_dir
+  redemorar_user:
+    description: RedeMorar FTP username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.redemorar_user
+  redemorar_password:
+    description: RedeMorar FTP password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.redemorar_password
+  eptvanuncios:
+    description: Number of advertisements on EPTV channel.
+    lineage:
+      - datalake_union_cdc_raw.empresa.eptvanuncios
+  eptvdestaques:
+    description: Number of featured advertisements on EPTV channel.
+    lineage:
+      - datalake_union_cdc_raw.empresa.eptvdestaques
+  subdominio_corretor:
+    description: Subdomain for individual broker/agent websites.
+    lineage:
+      - datalake_union_cdc_raw.empresa.subdominio_corretor
+  path_logo:
+    description: File path for company logo.
+    lineage:
+      - datalake_union_cdc_raw.empresa.path_logo
+  site_union:
+    description: Union/network website URL or identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.site_union
+  segmento:
+    description: Business segment or market sector classification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.segmento
+  end_datasul:
+    description: Datasul ERP system address endpoint.
+    lineage:
+      - datalake_union_cdc_raw.empresa.end_datasul
+  investigador_venda:
+    description: Background check/investigator service for sales transactions.
+    lineage:
+      - datalake_union_cdc_raw.empresa.investigador_venda
+  investigador_locacao:
+    description: Background check/investigator service for rental transactions.
+    lineage:
+      - datalake_union_cdc_raw.empresa.investigador_locacao
+  pub_webcasas:
+    description: Publication flag for WebCasas portal integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pub_webcasas
+  tipo_site:
+    description: Website type or template classification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.tipo_site
+  flag_live_externo:
+    description: Flag for external live chat integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_live_externo
+  cad_life:
+    description: Life/lifetime value calculation or cadastre configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cad_life
+  wslimite:
+    description: Web service API call limit or quota.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wslimite
+  wssinc:
+    description: Web service synchronization counter.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wssinc
+  wssincdata:
+    description: Web service last synchronization date.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wssincdata
+  wsjanelainicio:
+    description: Web service time window start time.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wsjanelainicio
+  wsjanelafim:
+    description: Web service time window end time.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wsjanelafim
+  fksecovi:
+    description: Foreign key referencing SECOVI association registration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fksecovi
+  flag_departamento:
+    description: Flag indicating whether company has departments enabled.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_departamento
+  legenda_equipe:
+    description: Team legend or label for organizational structure.
+    lineage:
+      - datalake_union_cdc_raw.empresa.legenda_equipe
+  codigo_rac:
+    description: RAC (Regional Administrative Council) code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_rac
+  secovi_corretor:
+    description: SECOVI broker/agent registration identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.secovi_corretor
+  secovi_gerente:
+    description: SECOVI manager registration identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.secovi_gerente
+  ativar_atendimento:
+    description: Flag to activate customer service/support module.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ativar_atendimento
+  inad_univen_cliente:
+    description: Univen (sales system) client default/delinquency code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inad_univen_cliente
+  inad_univen_data:
+    description: Date when Univen client default status was recorded.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inad_univen_data
+  inad_univen_user:
+    description: User who recorded Univen client default status.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inad_univen_user
+  noti_univen_cliente:
+    description: Univen client notification code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.noti_univen_cliente
+  noti_univen_data:
+    description: Date when Univen client was notified.
+    lineage:
+      - datalake_union_cdc_raw.empresa.noti_univen_data
+  noti_univen_user:
+    description: User who sent Univen client notification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.noti_univen_user
+  bloq_univen_cliente:
+    description: Univen client block/suspension code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bloq_univen_cliente
+  bloq_univen_data:
+    description: Date when Univen client was blocked.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bloq_univen_data
+  bloq_univen_user:
+    description: User who blocked Univen client.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bloq_univen_user
+  inad_uniloc_cliente:
+    description: Uniloc (rental system) client default/delinquency code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inad_uniloc_cliente
+  inad_uniloc_data:
+    description: Date when Uniloc client default status was recorded.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inad_uniloc_data
+  inad_uniloc_user:
+    description: User who recorded Uniloc client default status.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inad_uniloc_user
+  noti_uniloc_cliente:
+    description: Uniloc client notification code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.noti_uniloc_cliente
+  noti_uniloc_data:
+    description: Date when Uniloc client was notified.
+    lineage:
+      - datalake_union_cdc_raw.empresa.noti_uniloc_data
+  noti_uniloc_user:
+    description: User who sent Uniloc client notification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.noti_uniloc_user
+  bloq_uniloc_cliente:
+    description: Uniloc client block/suspension code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bloq_uniloc_cliente
+  bloq_uniloc_data:
+    description: Date when Uniloc client was blocked.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bloq_uniloc_data
+  bloq_uniloc_user:
+    description: User who blocked Uniloc client.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bloq_uniloc_user
+  user_cadastro:
+    description: User who registered/created the company record.
+    lineage:
+      - datalake_union_cdc_raw.empresa.user_cadastro
+  data_cadastro:
+    description: Date when company was registered/created.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_cadastro
+  user_altera:
+    description: User who last modified the company record.
+    lineage:
+      - datalake_union_cdc_raw.empresa.user_altera
+  data_altera:
+    description: Date when company record was last modified.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_altera
+  lider_rede:
+    description: Network leader or coordinator identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.lider_rede
+  flag_pi:
+    description: PI (Personal Information) flag or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_pi
+  servicos:
+    description: Services or modules enabled for the company.
+    lineage:
+      - datalake_union_cdc_raw.empresa.servicos
+  data_extensao:
+    description: Extension date for contract or service agreement.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_extensao
+  possui_uniloc:
+    description: Flag indicating whether company has Uniloc (rental) system.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_uniloc
+  possui_univen:
+    description: Flag indicating whether company has Univen (sales) system.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_univen
+  possui_univen_web:
+    description: Flag indicating whether company has Univen web version.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_univen_web
+  flag_mascara_telefone:
+    description: Flag to enable telephone number formatting/masking.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_mascara_telefone
+  flag_mascara_rg:
+    description: Flag to enable RG (identity document) formatting/masking.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_mascara_rg
+  situacao_uniloc:
+    description: Uniloc system status (active, inactive, suspended).
+    lineage:
+      - datalake_union_cdc_raw.empresa.situacao_uniloc
+  flag_foto_life:
+    description: Flag for photo life/expiration configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_foto_life
+  hotsites_rede:
+    description: Network hotsites configuration or count.
+    lineage:
+      - datalake_union_cdc_raw.empresa.hotsites_rede
+  situacao_univen_web:
+    description: Univen web version status (active, inactive, suspended).
+    lineage:
+      - datalake_union_cdc_raw.empresa.situacao_univen_web
+  publicado:
+    description: Publication status flag for company profile.
+    lineage:
+      - datalake_union_cdc_raw.empresa.publicado
+  google_verificador:
+    description: Google verification code for website ownership.
+    lineage:
+      - datalake_union_cdc_raw.empresa.google_verificador
+  exibir_boleto_vencido:
+    description: Flag to show expired payment slips/invoices.
+    lineage:
+      - datalake_union_cdc_raw.empresa.exibir_boleto_vencido
+  data_uniloc_web_inativo:
+    description: Date when Uniloc web version became inactive.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_uniloc_web_inativo
+  wschave:
+    description: Web service API key for integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.wschave
+  cnabReader:
+    description: CNAB (banking file format) reader configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cnabReader
+  cnabCobranca:
+    description: CNAB billing/collection file configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cnabCobranca
+  versao_univen:
+    description: Univen system version number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.versao_univen
+  log_sincronizacao:
+    description: Synchronization log or audit trail.
+    lineage:
+      - datalake_union_cdc_raw.empresa.log_sincronizacao
+  monitor_online:
+    description: Online monitoring status or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.monitor_online
+  versao_monitor:
+    description: System monitor version number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.versao_monitor
+  caminho_banco:
+    description: Database file path or connection string.
+    lineage:
+      - datalake_union_cdc_raw.empresa.caminho_banco
+  espaco_disco:
+    description: Disk space usage or available space.
+    lineage:
+      - datalake_union_cdc_raw.empresa.espaco_disco
+  data_ultima_sincronizacao:
+    description: Date of last synchronization.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_ultima_sincronizacao
+  ultimo_backup:
+    description: Date of last database backup.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ultimo_backup
+  site_estatisticas:
+    description: Website statistics or analytics code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.site_estatisticas
+  pref_clientes_sobrenome:
+    description: Preference for displaying client surnames first.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pref_clientes_sobrenome
+  qtde_email:
+    description: Quantity of email accounts or email limit.
+    lineage:
+      - datalake_union_cdc_raw.empresa.qtde_email
+  hotsites_personalizado:
+    description: Personalized hotsites configuration or count.
+    lineage:
+      - datalake_union_cdc_raw.empresa.hotsites_personalizado
+  codigoEmailMarketing:
+    description: Email marketing platform integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigoEmailMarketing
+  enviadoEmailMarketing:
+    description: Flag indicating whether email marketing was sent.
+    lineage:
+      - datalake_union_cdc_raw.empresa.enviadoEmailMarketing
+  hostEmailMarketing:
+    description: Email marketing platform host/server.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pkemhostEmailMarketingpresa
+  loginEmailMarketing:
+    description: Email marketing platform login username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.loginEmailMarketing
+  chaveEmailMarketing:
+    description: Email marketing platform API key.
+    lineage:
+      - datalake_union_cdc_raw.empresa.chaveEmailMarketing
+  flagEmailMarketing:
+    description: Email marketing integration enabled flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flagEmailMarketing
+  cod_webcasas:
+    description: WebCasas portal integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cod_webcasas
+  chat_externo:
+    description: External chat integration code or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.chat_externo
+  chave_redemorar:
+    description: RedeMorar network API key.
+    lineage:
+      - datalake_union_cdc_raw.empresa.chave_redemorar
+  flag_condordo:
+    description: Flag indicating agreement to terms of service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_condordo
+  flag_condordo_web:
+    description: Flag indicating agreement to web terms of service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_condordo_web
+  flag_condordo_uniloc:
+    description: Flag indicating agreement to Uniloc terms of service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_condordo_uniloc
+  concordo_date:
+    description: Date when terms of service were accepted.
+    lineage:
+      - datalake_union_cdc_raw.empresa.concordo_date
+  condordo_user:
+    description: User who accepted terms of service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_user
+  concordo_ip:
+    description: IP address from which terms of service were accepted.
+    lineage:
+      - datalake_union_cdc_raw.empresa.concordo_ip
+  condordo_web_date:
+    description: Date when web terms of service were accepted.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_web_date
+  condordo_web_user:
+    description: User who accepted web terms of service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_web_user
+  condordo_web_ip:
+    description: IP address from which web terms were accepted.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_web_ip
+  condordo_uniloc_date:
+    description: Date when Uniloc terms of service were accepted.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_uniloc_date
+  condordo_uniloc_user:
+    description: User who accepted Uniloc terms of service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_uniloc_user
+  condordo_uniloc_ip:
+    description: IP address from which Uniloc terms were accepted.
+    lineage:
+      - datalake_union_cdc_raw.empresa.condordo_uniloc_ip
+  possui_tag:
+    description: Flag indicating whether company has tagging feature enabled.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_tag
+  uniloc_planos_codigo:
+    description: Uniloc subscription plan code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_planos_codigo
+  uniloc_planos_ate:
+    description: Uniloc subscription plan expiration date.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_planos_ate
+  sen_webcasas:
+    description: WebCasas portal password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.sen_webcasas
+  usu_webcasas:
+    description: WebCasas portal username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.usu_webcasas
+  uniloc_mudou_plano:
+    description: Flag indicating whether Uniloc plan was changed.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_mudou_plano
+  uniloc_u_codinq:
+    description: Uniloc inquiry code or identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_u_codinq
+  renovar_senha:
+    description: Flag to force password renewal/reset.
+    lineage:
+      - datalake_union_cdc_raw.empresa.renovar_senha
+  flagCargaWebservice:
+    description: Flag for web service data loading/import.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flagCargaWebservice
+  flag_verificar_iptu:
+    description: Flag to enable IPTU (property tax) verification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_verificar_iptu
+  flag_univen_totem:
+    description: Flag indicating whether Univen totem module is enabled.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_univen_totem
+  flag_univen_indoor:
+    description: Flag indicating whether Univen indoor module is enabled.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_univen_indoor
+  flag_perfil_marketing:
+    description: Flag indicating whether marketing profile module is enabled.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_perfil_marketing
+  perfil_marketing_qtd:
+    description: Quantity of marketing profiles or licenses.
+    lineage:
+      - datalake_union_cdc_raw.empresa.perfil_marketing_qtd
+  flag_possui_app:
+    description: Flag indicating whether company has iOS mobile app.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_possui_app
+  app_date_final:
+    description: iOS mobile app subscription expiration date.
+    lineage:
+      - datalake_union_cdc_raw.empresa.app_date_final
+  flag_possui_android:
+    description: Flag indicating whether company has Android mobile app.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_possui_android
+  android_date_final:
+    description: Android mobile app subscription expiration date.
+    lineage:
+      - datalake_union_cdc_raw.empresa.android_date_final
+  ftp_servidor:
+    description: FTP server address for file transfers.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_servidor
+  ftp_senha:
+    description: FTP password for authentication.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_senha
+  ftp_usuario:
+    description: FTP username for authentication.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_usuario
+  olx:
+    description: OLX portal integration code or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.olx
+  trovit:
+    description: Trovit portal integration code or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.trovit
+  mapafixo:
+    description: Fixed map configuration or default map setting.
+    lineage:
+      - datalake_union_cdc_raw.empresa.mapafixo
+  flag_univen_docs:
+    description: Flag indicating whether Univen documents module is enabled.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_univen_docs
+  portalapp:
+    description: Portal app integration code or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.portalapp
+  appgps:
+    description: GPS mobile app integration code or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.appgps
+  pub_vivareal:
+    description: Publication flag for VivaReal portal integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pub_vivareal
+  codigo_vivareal:
+    description: VivaReal portal integration code or account ID.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_vivareal
+  contato_vivareal:
+    description: VivaReal contact email or phone for integration support.
+    lineage:
+      - datalake_union_cdc_raw.empresa.contato_vivareal
+  pub_pronto:
+    description: Publication flag for ProntoImóvel portal integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pub_pronto
+  id_pronto:
+    description: ProntoImóvel portal account identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.id_pronto
+  ftp_pronto:
+    description: ProntoImóvel FTP server address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_pronto
+  usuario_pronto:
+    description: ProntoImóvel FTP username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.usuario_pronto
+  senha_pronto:
+    description: ProntoImóvel FTP password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.senha_pronto
+  pub_zlimovel:
+    description: Publication flag for ZLImóvel portal integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pub_zlimovel
+  user_zlimovel:
+    description: ZLImóvel portal username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.user_zlimovel
+  pass_zlimovel:
+    description: ZLImóvel portal password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pass_zlimovel
+  flag_mud:
+    description: Flag for MUD (mobile update) configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_mud
+  flag_facebook:
+    description: Flag for Facebook integration or advertising.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_facebook
+  pagina_depoimento:
+    description: Testimonials page configuration or URL.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pagina_depoimento
+  possui_imovelweb:
+    description: Flag indicating whether company has ImóvelWeb integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_imovelweb
+  codigo_imovelweb:
+    description: ImóvelWeb portal integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_imovelweb
+  possui_123i:
+    description: Flag indicating whether company has 123i portal integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_123i
+  codigo_123i:
+    description: 123i portal integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_123i
+  cub_mensal:
+    description: Monthly CUB (Basic Unit Cost) construction index value.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cub_mensal
+  url_download_app:
+    description: iOS mobile app download URL.
+    lineage:
+      - datalake_union_cdc_raw.empresa.url_download_app
+  url_download_android:
+    description: Android mobile app download URL.
+    lineage:
+      - datalake_union_cdc_raw.empresa.url_download_android
+  ftp_imovelweb:
+    description: ImóvelWeb FTP server address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_imovelweb
+  usuario_imovelweb:
+    description: ImóvelWeb FTP username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.usuario_imovelweb
+  senha_imovelweb:
+    description: ImóvelWeb FTP password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.senha_imovelweb
+  previste_internacional:
+    description: International pre-visit or virtual tour configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.previste_internacional
+  possui_i123:
+    description: Flag indicating whether company has i123 integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_i123
+  codigo_i123:
+    description: i123 portal integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_i123
+  mercadolivre:
+    description: MercadoLivre (Mercado Libre) integration flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.mercadolivre
+  secret_key_mercadolivre:
+    description: MercadoLivre API secret key.
+    lineage:
+      - datalake_union_cdc_raw.empresa.secret_key_mercadolivre
+  id_mercadolivre:
+    description: MercadoLivre account identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.id_mercadolivre
+  univen30hs:
+    description: Univen 30-hour trial or test configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen30hs
+  possui_imoveissc:
+    description: Flag indicating whether company has ImóveisSC portal integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.possui_imoveissc
+  token_mercadolivre:
+    description: MercadoLivre API access token.
+    lineage:
+      - datalake_union_cdc_raw.empresa.token_mercadolivre
+  refresh_token_mercadolivre:
+    description: MercadoLivre API refresh token for authentication renewal.
+    lineage:
+      - datalake_union_cdc_raw.empresa.refresh_token_mercadolivre
+  univen_guardiao:
+    description: Univen guardian/monitoring service configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen_guardiao
+  imobox:
+    description: ImoBox platform integration flag or code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.imobox
+  plugimoveis:
+    description: PlugImóveis portal integration flag or code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.plugimoveis
+  guiadeimoveis:
+    description: GuiaDeImóveis portal integration flag or code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.guiadeimoveis
+  imoveis_triangulo:
+    description: ImóveisTriângulo portal integration flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.imoveis_triangulo
+  imoveis_triangulo_chave:
+    description: ImóveisTriângulo API key.
+    lineage:
+      - datalake_union_cdc_raw.empresa.imoveis_triangulo_chave
+  imoveis_triangulo_chave_senha:
+    description: ImóveisTriângulo API password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.imoveis_triangulo_chave_senha
+  posicao_imagem:
+    description: Image position or layout configuration for photos.
+    lineage:
+      - datalake_union_cdc_raw.empresa.posicao_imagem
+  flag_atua_empre:
+    description: Flag indicating whether company operates as enterprise/business.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_atua_empre
+  uniloc_qtde_contrato:
+    description: Number of active Uniloc contracts.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_qtde_contrato
+  uniloc_total_contrato:
+    description: Total value of Uniloc contracts.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_total_contrato
+  zap_usuario:
+    description: ZAP Imóveis portal username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.zap_usuario
+  zap_senha:
+    description: ZAP Imóveis portal password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.zap_senha
+  flag_4:
+    description: Generic flag for feature configuration (purpose 4).
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_4
+  redeimob:
+    description: RedeImob network integration flag or code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.redeimob
+  abcimovel:
+    description: ABCImóvel portal integration flag or code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.abcimovel
+  amazon_fotos:
+    description: Amazon S3 photo storage configuration or flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.amazon_fotos
+  guardiao_ip:
+    description: Guardian service IP address for monitoring.
+    lineage:
+      - datalake_union_cdc_raw.empresa.guardiao_ip
+  guardiao_horario1:
+    description: Guardian service first monitoring time window.
+    lineage:
+      - datalake_union_cdc_raw.empresa.guardiao_horario1
+  guardiao_horario2:
+    description: Guardian service second monitoring time window.
+    lineage:
+      - datalake_union_cdc_raw.empresa.guardiao_horario2
+  ftp_canaldoimovel:
+    description: CanalDoImóvel FTP server address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_canaldoimovel
+  usuario_canaldoimovel:
+    description: CanalDoImóvel FTP username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.usuario_canaldoimovel
+  senha_canaldoimovel:
+    description: CanalDoImóvel FTP password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.senha_canaldoimovel
+  codigo_canaldoimovel:
+    description: CanalDoImóvel portal integration code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.codigo_canaldoimovel
+  email_capacidade:
+    description: Email storage capacity or quota limit.
+    lineage:
+      - datalake_union_cdc_raw.empresa.email_capacidade
+  tiqueimoveis_usuario:
+    description: TiqueImóveis portal username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.tiqueimoveis_usuario
+  tiqueimoveis_senha:
+    description: TiqueImóveis portal password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.tiqueimoveis_senha
+  flag_clientes_proprietario:
+    description: Flag to enable client-as-owner functionality.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_clientes_proprietario
+  flag_imoveis_sem_atua:
+    description: Flag to show properties without updates.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_imoveis_sem_atua
+  flag_clientes_sem_atua:
+    description: Flag to show clients without updates.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_clientes_sem_atua
+  penseimoveis:
+    description: PenseImóveis portal integration flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.penseimoveis
+  penseimoveis_ftp:
+    description: PenseImóveis FTP server address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.penseimoveis_ftp
+  penseimoveis_usuario:
+    description: PenseImóveis FTP username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.penseimoveis_usuario
+  penseimoveis_senha:
+    description: PenseImóveis FTP password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.penseimoveis_senha
+  univen_docs_qtd:
+    description: Quantity of Univen documents licenses or quota.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen_docs_qtd
+  penseimoveis_diretorio:
+    description: PenseImóveis FTP directory path.
+    lineage:
+      - datalake_union_cdc_raw.empresa.penseimoveis_diretorio
+  viaprincipal:
+    description: ViaPrincipal portal integration flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.viaprincipal
+  ftp_viaprincipal:
+    description: ViaPrincipal FTP server address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.ftp_viaprincipal
+  usuario_viaprincipal:
+    description: ViaPrincipal FTP username.
+    lineage:
+      - datalake_union_cdc_raw.empresa.usuario_viaprincipal
+  senha_viaprincipal:
+    description: ViaPrincipal FTP password.
+    lineage:
+      - datalake_union_cdc_raw.empresa.senha_viaprincipal
+  flag_no_universidade:
+    description: Flag for university/training module configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_no_universidade
+  flag_licencas:
+    description: Flag for license management module.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_licencas
+  flag_block_consulta_net:
+    description: Flag to block online queries or lookups.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_block_consulta_net
+  dddcelular:
+    description: Area code (DDD) for mobile phone.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dddcelular
+  celular:
+    description: Mobile phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.celular
+  email_leads_portais:
+    description: Email address to receive leads from portals.
+    lineage:
+      - datalake_union_cdc_raw.empresa.email_leads_portais
+  temporada_pernoite:
+    description: Seasonal rental per-night pricing configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.temporada_pernoite
+  uniloc_versao:
+    description: Uniloc system version number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_versao
+  fkgerenteconta:
+    description: Foreign key referencing account manager.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fkgerenteconta
+  univen_participa_rodada:
+    description: Flag indicating whether company participates in Univen rounds.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen_participa_rodada
+  data_univen_web_inativo:
+    description: Date when Univen web became inactive.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_univen_web_inativo
+  cargassites:
+    description: Site loading or batch processing configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.cargassites
+  univen_web_tipo:
+    description: Univen web version type or plan category.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen_web_tipo
+  data_univen_web_ativo:
+    description: Date when Univen web became active.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_univen_web_ativo
+  verifica_financeiro:
+    description: Flag to enable financial verification checks.
+    lineage:
+      - datalake_union_cdc_raw.empresa.verifica_financeiro
+  corretor_em_rede:
+    description: Flag indicating whether broker is part of network.
+    lineage:
+      - datalake_union_cdc_raw.empresa.corretor_em_rede
+  bing_verificador:
+    description: Bing verification code for website ownership.
+    lineage:
+      - datalake_union_cdc_raw.empresa.bing_verificador
+  fkimplantacao:
+    description: Foreign key referencing implementation/deployment record.
+    lineage:
+      - datalake_union_cdc_raw.empresa.fkimplantacao
+  uniloc_segundavia_chave:
+    description: Uniloc second-way access key for payment slips.
+    lineage:
+      - datalake_union_cdc_raw.empresa.uniloc_segundavia_chave
+  email_inicial_enviado_date:
+    description: Date when initial welcome email was sent.
+    lineage:
+      - datalake_union_cdc_raw.empresa.email_inicial_enviado_date
+  longitude:
+    description: Company geographical longitude coordinate.
+    lineage:
+      - datalake_union_cdc_raw.empresa.longitude
+  situacao_app:
+    description: Mobile app status (active, inactive, suspended).
+    lineage:
+      - datalake_union_cdc_raw.empresa.situacao_app
+  user_univen_altera:
+    description: User who last modified Univen configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.user_univen_altera
+  data_univen_altera:
+    description: Date when Univen configuration was last modified.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_univen_altera
+  flag_permite_pesq_cliente:
+    description: Flag to allow client search functionality.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_permite_pesq_cliente
+  flag_permite_pesq_imovel:
+    description: Flag to allow property search functionality.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_permite_pesq_imovel
+  flag_verificar_dup_imovel:
+    description: Flag to enable duplicate property detection/verification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_verificar_dup_imovel
+  flag_verificar_dup_cliente:
+    description: Flag to enable duplicate client detection/verification.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_verificar_dup_cliente
+  chave_unilocweb:
+    description: Uniloc web API key for authentication.
+    lineage:
+      - datalake_union_cdc_raw.empresa.chave_unilocweb
+  secret_unilocweb:
+    description: Uniloc web API secret for authentication.
+    lineage:
+      - datalake_union_cdc_raw.empresa.secret_unilocweb
+  promessa_pagamento_data:
+    description: Date of payment promise or commitment.
+    lineage:
+      - datalake_union_cdc_raw.empresa.promessa_pagamento_data
+  sistema_origem:
+    description: Source system for data migration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.sistema_origem
+  sistema_destino:
+    description: Destination system for data migration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.sistema_destino
+  motivo_rescisao:
+    description: Primary reason for contract termination/cancellation.
+    lineage:
+      - datalake_union_cdc_raw.empresa.motivo_rescisao
+  data_importacao:
+    description: Date when data was imported into the system.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_importacao
+  financeiro_email:
+    description: Financial department email address.
+    lineage:
+      - datalake_union_cdc_raw.empresa.financeiro_email
+  financeiro_dddtelefone:
+    description: Financial department phone area code.
+    lineage:
+      - datalake_union_cdc_raw.empresa.financeiro_dddtelefone
+  financeiro_telefone:
+    description: Financial department phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.financeiro_telefone
+  pref_bloquear_atd:
+    description: Preference to block customer service/support.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pref_bloquear_atd
+  motivo_rescisao2:
+    description: Secondary reason for contract termination/cancellation.
+    lineage:
+      - datalake_union_cdc_raw.empresa.motivo_rescisao2
+  promessa_pagamento_contador:
+    description: Payment promise counter or number of promises made.
+    lineage:
+      - datalake_union_cdc_raw.empresa.promessa_pagamento_contador
+  idsap:
+    description: SAP ERP system identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.idsap
+  vendido_brasilia:
+    description: Flag for Brasília sales region configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.vendido_brasilia
+  univen_not_acesso:
+    description: Univen access notification flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen_not_acesso
+  univen_not_novo_imovel:
+    description: Univen new property notification flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.univen_not_novo_imovel
+  pref_imovel_prop:
+    description: Property-proprietor preference or configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.pref_imovel_prop
+  inicio_contrato:
+    description: Contract start date.
+    lineage:
+      - datalake_union_cdc_raw.empresa.inicio_contrato
+  oportunidades_app:
+    description: Opportunities/leads mobile app configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.oportunidades_app
+  data_uniloc_web_ativo:
+    description: Date when Uniloc web became active.
+    lineage:
+      - datalake_union_cdc_raw.empresa.data_uniloc_web_ativo
+  flag_controle_chaveiro:
+    description: Flag to enable key management control module.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_controle_chaveiro
+  situacao_univen_chat:
+    description: Univen chat service status (active, inactive).
+    lineage:
+      - datalake_union_cdc_raw.empresa.situacao_univen_chat
+  flag_email_prop:
+    description: Flag to enable email notifications for property owners.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_email_prop
+  flag_verificar_dup_imovel_ed:
+    description: Flag to verify duplicate properties during editing.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_verificar_dup_imovel_ed
+  flag_verificar_dup_cliente_ed:
+    description: Flag to verify duplicate clients during editing.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_verificar_dup_cliente_ed
+  robots:
+    description: Robots.txt file configuration for search engine crawlers.
+    lineage:
+      - datalake_union_cdc_raw.empresa.robots
+  dddtelefone4:
+    description: Area code for fourth phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dddtelefone4
+  telefone4:
+    description: Fourth phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.telefone4
+  dddtelefone5:
+    description: Area code for fifth phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dddtelefone5
+  telefone5:
+    description: Fifth phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.telefone5
+  dddtelefone6:
+    description: Area code for sixth phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.dddtelefone6
+  telefone6:
+    description: Sixth phone number.
+    lineage:
+      - datalake_union_cdc_raw.empresa.telefone6
+  admin_web_frase:
+    description: Web admin custom phrase or slogan.
+    lineage:
+      - datalake_union_cdc_raw.empresa.admin_web_frase
+  orulo_block:
+    description: Orulo integration block or restriction flag.
+    lineage:
+      - datalake_union_cdc_raw.empresa.orulo_block
+  orulo_client_id:
+    description: Orulo API client identifier.
+    lineage:
+      - datalake_union_cdc_raw.empresa.orulo_client_id
+  orulo_client_secret:
+    description: Orulo API client secret key.
+    lineage:
+      - datalake_union_cdc_raw.empresa.orulo_client_secret
+  flag_perfil_aviso:
+    description: Flag for profile notification/alert configuration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_perfil_aviso
+  situacao_uniloc_web:
+    description: Uniloc web status (active, inactive, suspended).
+    lineage:
+      - datalake_union_cdc_raw.empresa.situacao_uniloc_web
+  licencas_uniloc_web:
+    description: Number of Uniloc web licenses.
+    lineage:
+      - datalake_union_cdc_raw.empresa.licencas_uniloc_web
+  limite_contratos_uniloc_web:
+    description: Uniloc web contract limit or maximum allowed contracts.
+    lineage:
+      - datalake_union_cdc_raw.empresa.limite_contratos_uniloc_web
+  quality_score:
+    description: Quality score or rating for company performance/service.
+    lineage:
+      - datalake_union_cdc_raw.empresa.quality_score
+  flag_atta_seguros:
+    description: Flag for Atta insurance integration.
+    lineage:
+      - datalake_union_cdc_raw.empresa.flag_atta_seguros

@@ -1,0 +1,195 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: house_2
+owner: data-atlas-db@quintoandar.com.br
+domain: Atlas DB
+description: |
+  This table contains supplementary property information from UnionDB (imovel2 table), providing additional
+  details that extend the main house table. It includes secondary attributes such as building specifications
+  (block, apartment number, floor), guarantee/security information (insurance, guarantor, deposit),
+  negotiation details, and property reservation data. This table has a one-to-one relationship with the house table.
+columns:
+  id_house_2:
+    description: House 2 primary key.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.pkimovel2
+  id_house:
+    description: Foreign key referencing the main house table.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.fkimovel
+  inf_bloco:
+    description: Building block identifier for properties in multi-building complexes.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_bloco
+  inf_apartamento:
+    description: Apartment or unit number within the building.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_apartamento
+  inf_andar:
+    description: Floor number where the property is located.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_andar
+  inf_segurofianca:
+    description: Indicator whether rental insurance (seguro fiança) is required or accepted.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_segurofianca
+  inf_fiador:
+    description: Indicator whether a guarantor (fiador) is required or accepted for rental.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_fiador
+  inf_depgarantia:
+    description: Indicator whether security deposit is required or accepted for rental.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_depgarantia
+  inf_caucao:
+    description: Indicator whether bond/caution deposit is required or accepted.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_caucao
+  codigo_importacao:
+    description: Import code used for data migration or integration tracking.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.codigo_importacao
+  cap_tipolocalchaves:
+    description: Type of location where property keys are stored or available.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_tipolocalchaves
+  cap_fkcorretorchaves:
+    description: Foreign key to the broker/agent who holds the property keys.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_fkcorretorchaves
+  int_pubtv:
+    description: Indicator whether property is advertised on TV.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.int_pubtv
+  inf_valnegociavel:
+    description: Indicator whether the property price is negotiable.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valnegociavel
+  inf_aceitaveiculo:
+    description: Indicator whether vehicle is accepted as part of payment or negotiation.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_aceitaveiculo
+  inf_valveiculo:
+    description: Value of the vehicle accepted in the transaction, if applicable.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valveiculo
+  inf_reserva_fkcliente:
+    description: Foreign key to the client who has reserved the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_reserva_fkcliente
+  inf_reserva_fkcorretor:
+    description: Foreign key to the broker/agent handling the property reservation.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_reserva_fkcorretor
+  det_distanciamar:
+    description: Distance from the property to the sea/ocean in meters.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_distanciamar
+  det_demisuite:
+    description: Indicator whether the property has a demi-suite (half-suite bedroom).
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_demisuite
+  inf_tipoiptu:
+    description: Type of property tax (IPTU) payment arrangement.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_tipoiptu
+  inf_titulocap:
+    description: Title or ownership document type for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_titulocap
+  inf_cartaocredito:
+    description: Indicator whether credit card payment is accepted for transactions.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_cartaocredito
+  cap_capcomissao_valor:
+    description: Commission value for property capture/acquisition.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_capcomissao_valor
+  cap_indcomissao_valor:
+    description: Individual commission value for the transaction.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_indcomissao_valor
+  cap_parcomissao_valor:
+    description: Partner commission value for the transaction.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_parcomissao_valor
+  cap_viscomissao_valor:
+    description: Visit commission value for property showings.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_viscomissao_valor
+  cap_corcomissao_valor:
+    description: Broker commission value for the transaction.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_corcomissao_valor
+  cnf_gas:
+    description: Indicator whether the property has gas connection or piped gas.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_gas
+  cnf_gas_emp:
+    description: Gas utility company responsible for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_gas_emp
+  cnf_eletricidade_emp:
+    description: Electricity utility company responsible for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_eletricidade_emp
+  cnf_agua_emp:
+    description: Water utility company responsible for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cnf_agua_emp
+  cap_iptu_pag:
+    description: IPTU (property tax) payment arrangement or responsibility indicator.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.cap_iptu_pag
+  inf_condo_adm:
+    description: Condominium administration fee amount or arrangement.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_condo_adm
+  inf_leilao:
+    description: Indicator whether the property is available through auction.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_leilao
+  inf_valleilao:
+    description: Auction starting value or reserve price for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valleilao
+  inf_leilaodata1:
+    description: First auction date scheduled for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_leilaodata1
+  inf_leilaodata2:
+    description: Second auction date scheduled for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_leilaodata2
+  inf_valvendapromo:
+    description: Promotional sale price or discounted value for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valvendapromo
+  inf_valsegincendio:
+    description: Fire insurance value or premium for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valsegincendio
+  det_armlavanderia:
+    description: Indicator whether the property has laundry room cabinets.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_armlavanderia
+  inf_segurofianca_parc:
+    description: Rental insurance installment or partial payment option indicator.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_segurofianca_parc
+  inf_cartafianca:
+    description: Indicator whether bank letter of guarantee is accepted for rental.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_cartafianca
+  inf_valleilao2:
+    description: Second auction value or alternative auction price for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.inf_valleilao2
+  det_solmanha:
+    description: Indicator whether the property receives morning sun exposure.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_solmanha
+  det_aceitapet:
+    description: Indicator whether pets are accepted in the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel2.det_aceitapet

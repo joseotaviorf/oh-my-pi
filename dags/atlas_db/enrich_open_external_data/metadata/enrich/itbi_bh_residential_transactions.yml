@@ -1,0 +1,172 @@
+database_name: datalake_open_external_data
+table_name: itbi_bh_residential_transactions
+description: |
+  Table enriched with ITBI data from BH.
+  Only Residencial transactions, starting from 2019 are considered.
+  This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
+domain: Atlas DB
+owner: data-atlas-db@quintoandar.com.br
+columns:
+  id_itbi_transaction_source:
+    description: |
+      Unique table key, created from the transaction extract file and the IPTU number.
+  id_address_transaction:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.dt_load
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Unique identifier for each transaction.
+      The way the ID is created changes from each address and transaction date.
+      Since some transactions may appear on more than one extraction file, this id can be
+      duplicated for these cases.
+      It applies a MD5 hash in the fields ts_transaction, address_contry, address_state,
+      address_city, address_neighborhood, address_street_name, address_number, address_complement,
+      and address_zipcode.
+  itbi_region:
+    description: |
+      ITBI identification column. Represents which municipality the data comes from.
+    categories:
+      ITBI_BH: transaction that come from the BH source.
+  address_country:
+    description: |
+      Address Country regarding the transaction record.
+    categories:
+      BR: currently, assumes only the BR value, standing for Brazil.
+  address_state:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address State regarding the transaction record.
+    categories:
+      MG: regarding all the transactions from the BH source.
+  address_city:
+    description: |
+      Address City regarding the transaction record.
+    categories:
+      Belo Horizonte: regarding all the transactions from the BH source.
+  address_neighborhood:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Neighborhood regarding the transaction record.
+  address_street_name:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Street Name regarding the transaction record.
+  address_number:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Number regarding the transaction record.
+  address_complement:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Address Complement regarding the transaction record.
+  address_zipcode:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.address
+    description: |
+      Addess Zipcode regarding the transaction record.
+      It assumes the pattern XXXXX-XXX.
+  occupation_description:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.occupation_description
+    description: |
+      Whether the occupancy type is residential, non-residential or territorial.
+    categories:
+      RESIDENCIAL: If the occupation is residential (used for living).
+      NAO RESIDENCIAL: If the occupation is non-residential (not used for living).
+      TERRITORIAL: It's only a piece of land, it doesn't have the property built.
+      VALOR NULO: No information.
+  standard_finish:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.standard_finish
+    description: |
+      Finishing Standard of the unit according to the score received from the constructive characteristics.
+  urban_zoning_code:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.urban_zoning_code
+    description: |
+      Urban zoning coding for the property, assigned by the Use and Occupancy Law in effect at the time of
+      the transaction.
+  property_type:
+    description: |
+      Type of property ownership, which can be residential or commercial.
+    categories:
+      Residencial Vertical: If the propoerty is a residential apartment.
+      Residencial Horizontal: If it's a residential house.
+  raw_source_address:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.source_file
+    description: |
+      Address as it was in the source file.
+  source_file:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.source_file
+    description: |
+      URL of the CSV downloaded for ingesting the data from the BH municipality.
+  land_area_m2:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.land_area_m2
+    description: |
+      Land area in square meters.
+  built_area_m2:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.built_area_m2
+    description: |
+      Result of the application of the percentage acquired by the unit construction area.
+  all_units_area_m2:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.all_units_area_m2
+    description: |
+      Sum of the units in cases where we have severam building types.
+      It occurs when the units represent distinct blocks because they aren't contiguous or because they
+      constitute different savings.
+  ideal_fraction:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.ideal_fraction
+    description: |
+      Incidence of the acquisition percentage over the ideal fraction original.
+  adopted_calculation_basis:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.adopted_calculation_basis
+    description: |
+      Value determined by the tax administration through an appraisal based on the elements contained
+      in the Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher.
+  declared_transaction_value:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.declared_transaction_value
+    description: |
+      Value declared by the taxpayer.
+  amount_tax_paid_summarized:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.amount_tax_paid_summarized
+    description: |
+      Total amount of tax collected and summarized (only available for the year 2021).
+  year_built:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.year_built
+    description: |
+      Year that the construction of the property was finished.
+  month:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.month
+    description: |
+      Month referring to the date when the data was extracted.
+  year:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.year
+    description: |
+      Year referring to the date when the data was extracted.
+  ts_transaction:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.dt_transaction
+    description: |
+      Timestamp when the transaction was created.
+  ts_load:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.dt_load
+    description: |
+      Timestamp when the ITBI BH was updated for the last time.

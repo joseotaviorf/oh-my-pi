@@ -1,0 +1,6 @@
+---
+database_name: datalake_itbi_raw
+table_name: itbi_sp
+description: ITBI - São Paulo
+domain: Atlas DB
+owner: data-atlas-db@quintoandar.com.br

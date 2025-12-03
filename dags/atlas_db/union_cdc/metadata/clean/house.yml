@@ -1,0 +1,1342 @@
+---
+database_name: datalake_union_cdc_clean
+table_name: house
+owner: data-atlas-db@quintoandar.com.br
+domain: Atlas DB
+description: |
+  This table contains comprehensive property listings data from UnionDB, a real estate management system.
+  It includes detailed information about residential and commercial properties such as location, characteristics,
+  pricing, amenities, and operational details. This is the main fact table for property information in the Union CDC pipeline.
+columns:
+  id_house:
+    description: House Primary Key.
+    lineage:
+      - datalake_union_cdc_raw.imovel.pkImovel
+  id_company:
+    description: Company Foreign Key.
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkEmpresa
+  id_codcli:
+    description: Foreign key referencing the client code.
+    lineage:
+      - datalake_union_cdc_raw.imovel.fk_codcli
+  id_captador:
+    description: Foreign key referencing the property capturer/acquirer agent.
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkcaptador
+  id_increase_group:
+    description: Foreign key referencing the price increase group or adjustment category.
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkgrupo_aumento
+  id_currency:
+    description: Foreign key referencing the currency type for property pricing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.fkmoeda
+  bloquear_pubrede:
+    description: Flag to block property publication on network/portal websites.
+    lineage:
+      - datalake_union_cdc_raw.imovel.bloquear_pubrede
+  Cap_AnoConstru:
+    description: Year of property construction.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_AnoConstru
+  Cap_AtuaPor:
+    description: User or agent who last updated the property record.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_AtuaPor
+  Cap_CadPor:
+    description: User or agent who registered/captured the property initially.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CadPor
+  Cap_CapComissao:
+    description: Commission percentage or value for property capture/acquisition.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CapComissao
+  Cap_Captador:
+    description: Name or identifier of the property capturer/acquirer.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Captador
+  Cap_CondComercial:
+    description: Commercial conditions or terms for the property transaction.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CondComercial
+  Cap_ContExclu:
+    description: Indicator whether there is an exclusive contract for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ContExclu
+  Cap_CorComissao:
+    description: Broker commission percentage or value for property transactions.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CorComissao
+  Cap_Corretor:
+    description: Name or identifier of the broker handling the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Corretor
+  Cap_Dias:
+    description: Number of days since a specific property event or registration.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Dias
+  Cap_IndComissao:
+    description: Individual commission percentage or value for property referral.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_IndComissao
+  Cap_Indicador:
+    description: Name or identifier of the person who referred/indicated the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Indicador
+  Cap_LocalChaves:
+    description: Location where property keys are stored or available for pickup.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_LocalChaves
+  Cap_NumOcupantes:
+    description: Number of current occupants in the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_NumOcupantes
+  Cap_Parceria:
+    description: Partnership type or arrangement for property management/sale.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Parceria
+  Cap_ParComissao:
+    description: Partner commission percentage or value for property transactions.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ParComissao
+  Cap_UltimaReforma:
+    description: Year of the last renovation or remodeling of the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_UltimaReforma
+  Cap_ValCondominio:
+    description: Monthly condominium fee value for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ValCondominio
+  Cap_ValIptu:
+    description: Annual property tax (IPTU) value.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_ValIptu
+  cap_valtlu:
+    description: TLU (Taxa de Lixo Urbana) value or urban waste collection fee.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cap_valtlu
+  Cap_VisComissao:
+    description: Visit commission percentage or value for property showings.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_VisComissao
+  Cap_Vistoria:
+    description: Inspection or survey status/notes for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_Vistoria
+  cnf_Agua:
+    description: Water utility information or service provider for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Agua
+  cnf_CadPref:
+    description: Municipal registration or prefecture cadastre code for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_CadPref
+  cnf_CartorioImoveis:
+    description: Real estate registry office information for property documentation.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_CartorioImoveis
+  cnf_Documentacao:
+    description: Documentation status or notes for property legal papers.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Documentacao
+  cnf_Eletricidade:
+    description: Electricity utility information or service provider for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Eletricidade
+  cnf_Saneamento:
+    description: Sanitation or sewage service information for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.cnf_Saneamento
+  codempre:
+    description: Company or enterprise code associated with the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.codempre
+  codigo_importacao:
+    description: Import code used for data migration or integration tracking.
+    lineage:
+      - datalake_union_cdc_raw.imovel.codigo_importacao
+  Conf_aut_dias:
+    description: Number of days for automatic publication configuration.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_aut_dias
+  Conf_Aut_Pub:
+    description: Automatic publication configuration flag or settings.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_Aut_Pub
+  dest_eptv:
+    description: Featured or highlighted status for EPTV channel advertising.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_eptv
+  dest_imo1:
+    description: Featured status level 1 for property advertisement.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo1
+  dest_imo2:
+    description: Featured status level 2 for property advertisement.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo2
+  dest_imo3:
+    description: Featured status level 3 for property advertisement.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo3
+  dest_imo4:
+    description: Featured status level 4 for property advertisement.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imo4
+  dest_imvweb:
+    description: Featured status for ImóvelWeb portal advertising.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_imvweb
+  dest_portal:
+    description: Featured status for general portal advertising.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_portal
+  dest_vivareal:
+    description: Featured status for VivaReal portal advertising.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dest_vivareal
+  det_Acesso:
+    description: Property access type or access road description.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Acesso
+  det_adega:
+    description: Indicator whether the property has a wine cellar.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_adega
+  det_Agua:
+    description: Water availability or water system details for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Agua
+  det_aguaquente:
+    description: Indicator whether the property has hot water system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_aguaquente
+  det_alarme:
+    description: Indicator whether the property has alarm/security system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_alarme
+  det_altatensao:
+    description: Indicator whether the property has high voltage electrical installation.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_altatensao
+  det_Andares:
+    description: Total number of floors in the building.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Andares
+  det_AptoAndar:
+    description: Number of apartments per floor in the building.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AptoAndar
+  det_aquececentral:
+    description: Indicator whether the property has central heating system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_aquececentral
+  det_aquesolar:
+    description: Indicator whether the property has solar water heating system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_aquesolar
+  det_arcondicionado:
+    description: Indicator whether the property has air conditioning system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_arcondicionado
+  det_AreaComum:
+    description: Common area size in square meters.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaComum
+  det_AreaConst:
+    description: Total constructed area in square meters.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaConst
+  det_arealazer:
+    description: Indicator whether the property has leisure/recreation area.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_arealazer
+  det_areaprivativa:
+    description: Private area size in square meters (excluding common areas).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_areaprivativa
+  det_AreaServ:
+    description: Service area size in square meters.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaServ
+  det_AreaTerreno:
+    description: Land/lot area size in square meters.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaTerreno
+  det_AreaTotal:
+    description: Total property area in square meters (land plus construction).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaTotal
+  det_AreaUtil:
+    description: Usable area in square meters (area that can be effectively utilized).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_AreaUtil
+  det_armariosala:
+    description: Indicator whether the property has living room cabinets/closets.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_armariosala
+  det_ArmBanheiro:
+    description: Indicator whether the property has bathroom cabinets.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmBanheiro
+  det_ArmCloset:
+    description: Indicator whether the property has closet cabinets/built-ins.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmCloset
+  det_ArmCozinha:
+    description: Indicator whether the property has kitchen cabinets.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmCozinha
+  det_ArmDormitorio:
+    description: Indicator whether the property has bedroom cabinets/closets.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ArmDormitorio
+  det_assoalho:
+    description: Indicator whether the property has hardwood flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_assoalho
+  det_automatizado:
+    description: Indicator whether the property has home automation/smart home features.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_automatizado
+  det_banauxiliar:
+    description: Indicator whether the property has auxiliary/guest bathroom.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_banauxiliar
+  det_BanEmp:
+    description: Indicator whether the property has maid's bathroom.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_BanEmp
+  det_banheiro:
+    description: Indicator whether the property has bathroom facilities.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_banheiro
+  det_Banheiros:
+    description: Total number of bathrooms in the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Banheiros
+  det_bar:
+    description: Indicator whether the property has a bar area.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_bar
+  det_beiralago:
+    description: Indicator whether the property is located by a lake/waterfront.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_beiralago
+  det_bicicletario:
+    description: Indicator whether the building/property has bicycle storage/rack.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_bicicletario
+  det_boxgaragemcob:
+    description: Indicator whether the property has covered garage box/space.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_boxgaragemcob
+  det_boxgaragemdesc:
+    description: Indicator whether the property has uncovered garage box/space.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_boxgaragemdesc
+  det_brinquedoteca:
+    description: Indicator whether the building has toy library/playroom facility.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_brinquedoteca
+  det_cachoeira:
+    description: Indicator whether the property has waterfall feature or nearby waterfall access.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cachoeira
+  det_calefacao:
+    description: Indicator whether the property has heating system (calefação).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_calefacao
+  det_camarafria:
+    description: Indicator whether the property has cold storage room/refrigerated chamber.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_camarafria
+  det_camfria:
+    description: Indicator whether the property has cold room/refrigeration facility.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_camfria
+  det_campfutebol:
+    description: Indicator whether the property/building has soccer field.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_campfutebol
+  det_Carpete:
+    description: Indicator whether the property has carpeted flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Carpete
+  det_CarpMadeira:
+    description: Indicator whether the property has wood carpentry/woodwork features.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CarpMadeira
+  det_CasaCaseiro:
+    description: Indicator whether the property has caretaker's house.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CasaCaseiro
+  det_celeiro:
+    description: Indicator whether the property has barn/granary.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CasaCaseiro
+  det_cerca:
+    description: Indicator whether the property has fence/enclosure.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cerca
+  det_Churrasqueira:
+    description: Indicator whether the property has barbecue grill area.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Churrasqueira
+  det_circuitotv:
+    description: Indicator whether the property has closed-circuit TV security system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_circuitotv
+  det_closet:
+    description: Indicator whether the property has walk-in closet.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_closet
+  det_cobcoletiva:
+    description: Indicator whether the property has collective/shared roofing structure.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cobcoletiva
+  det_contra_piso:
+    description: Indicator whether the property has sub-flooring/underlayment.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_contra_piso
+  det_copa:
+    description: Indicator whether the property has pantry/breakfast room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_copa
+  det_cozamericana:
+    description: Indicator whether the property has American-style open kitchen.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cozamericana
+  det_cozindependente:
+    description: Indicator whether the property has independent/separate closed kitchen.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_cozindependente
+  det_Cozinha:
+    description: Indicator whether the property has kitchen facilities.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Cozinha
+  det_CozPlan:
+    description: Indicator whether the property has planned/fitted kitchen.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_CozPlan
+  det_curral:
+    description: Indicator whether the property has corral/livestock enclosure.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_curral
+  det_deck:
+    description: Indicator whether the property has deck area.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_deck
+  det_decorado:
+    description: Indicator whether the property is decorated/furnished for showing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_decorado
+  det_deposito:
+    description: Indicator whether the property has storage room/deposit.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_deposito
+  det_depprivsubsolo:
+    description: Indicator whether the property has private basement storage.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_depprivsubsolo
+  det_Despensa:
+    description: Indicator whether the property has pantry/larder.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Despensa
+  det_DimTerreno:
+    description: Land dimensions or lot measurements.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_DimTerreno
+  det_divisoria:
+    description: Indicator whether the property has partitions/dividers.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_divisoria
+  det_docpen:
+    description: Indicator whether property documentation is pending.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_docpen
+  det_dormemp:
+    description: Indicator whether the property has maid's quarters/servant's bedroom.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_dormemp
+  det_Dormitorios:
+    description: Total number of bedrooms in the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Dormitorios
+  det_edicula:
+    description: Indicator whether the property has guest house/edicula.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_edicula
+  det_Elevador:
+    description: Indicator whether the building has elevator.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Elevador
+  det_elevadorcarga:
+    description: Indicator whether the building has cargo/freight elevator.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_elevadorcarga
+  det_elevadorservico:
+    description: Indicator whether the building has service elevator.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_elevadorservico
+  det_Energia:
+    description: Electricity/energy availability or type for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Energia
+  det_EntCaminhoes:
+    description: Indicator whether the property has truck entrance/access.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_EntCaminhoes
+  det_entlateral:
+    description: Indicator whether the property has side entrance.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_entlateral
+  det_entradaservico:
+    description: Indicator whether the property has service entrance.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_entradaservico
+  det_entservico:
+    description: Indicator whether the building has service entrance.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_entservico
+  det_Escritorio:
+    description: Indicator whether the property has office/study room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Escritorio
+  det_Esgoto:
+    description: Sewage/drainage system availability or type for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Esgoto
+  det_espauto:
+    description: Indicator whether the property has automated parking space.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_espauto
+  det_esperasplit:
+    description: Indicator whether the property has split AC pre-installation/hookup.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_esperasplit
+  det_Estacionamento:
+    description: Indicator whether the property has parking space.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Estacionamento
+  det_estarintimo:
+    description: Indicator whether the property has intimate living room/private lounge.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estarintimo
+  det_estcoberto:
+    description: Indicator whether the property has covered parking.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estcoberto
+  det_estrebaria:
+    description: Indicator whether the property has stable for horses.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estrebaria
+  det_estrutparede:
+    description: Wall structure type or construction material.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estrutparede
+  det_estvisitante:
+    description: Indicator whether the building has visitor parking.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_estvisitante
+  det_face:
+    description: Property facing direction or orientation.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_face
+  det_fornopp:
+    description: Indicator whether the property has pizza/bread oven.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_fornopp
+  det_frenteclube:
+    description: Indicator whether the property faces a club.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_frenteclube
+  det_FrenteMar:
+    description: Indicator whether the property has oceanfront/beachfront location.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_FrenteMar
+  det_frentepraca:
+    description: Indicator whether the property faces a plaza/square.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_frentepraca
+  det_gabinete:
+    description: Indicator whether the property has private office/study cabinet.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gabinete
+  det_garagembarco:
+    description: Indicator whether the property has boat garage/dock.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagembarco
+  det_Garagens:
+    description: Total number of garage spaces/parking spots.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Garagens
+  det_garagenscob:
+    description: Number of covered garage spaces.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagenscob
+  det_garagenscond:
+    description: Number of condominium garage spaces.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagenscond
+  det_garagensdescob:
+    description: Number of uncovered garage spaces.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagensdescob
+  det_garagensfechada:
+    description: Number of enclosed/closed garage spaces.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagensfechada
+  det_garagenstipo:
+    description: Garage type or configuration.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_garagenstipo
+  det_gas:
+    description: Indicator whether the property has gas connection.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gas
+  det_GasNatural:
+    description: Indicator whether the property has natural gas piped connection.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_GasNatural
+  det_gerador:
+    description: Indicator whether the property has electrical generator.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gerador
+  det_gourmet:
+    description: Indicator whether the property has gourmet area/kitchen.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gourmet
+  det_gradeado:
+    description: Indicator whether the property has security bars/grilles on windows.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_gradeado
+  det_granito:
+    description: Indicator whether the property has granite countertops/finishes.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_granito
+  det_guarita:
+    description: Indicator whether the building/property has security guard booth.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_guarita
+  det_hall:
+    description: Indicator whether the property has entrance hall/foyer.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_hall
+  det_hidro:
+    description: Indicator whether the property has hot tub/jacuzzi/hydromassage.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_hidro
+  det_hidrometro:
+    description: Indicator whether the property has individual water meter.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_hidrometro
+  det_interfone:
+    description: Indicator whether the property has intercom system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_interfone
+  det_isolamento:
+    description: Indicator whether the property has acoustic/thermal insulation.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_isolamento
+  det_jardim:
+    description: Indicator whether the property has garden/landscaping.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_jardim
+  det_juntomuro:
+    description: Indicator whether the property is adjacent to a wall/boundary.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_juntomuro
+  det_lago:
+    description: Indicator whether the property has lake/pond feature.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_lago
+  det_laminado:
+    description: Indicator whether the property has laminate flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_laminado
+  det_lareira:
+    description: Indicator whether the property has fireplace.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_lareira
+  det_Lavabo:
+    description: Indicator whether the property has powder room/guest bathroom.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Lavabo
+  det_Lavanderia:
+    description: Indicator whether the property has laundry room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Lavanderia
+  det_living:
+    description: Indicator whether the property has living room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_living
+  det_luminaria:
+    description: Indicator whether the property has built-in lighting fixtures.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_luminaria
+  det_Mais1:
+    description: Additional room or flexible space (plus one room).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Mais1
+  det_marina:
+    description: Indicator whether the property has marina access or is in a marina.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_marina
+  det_marmore:
+    description: Indicator whether the property has marble finishes/flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_marmore
+  det_medida:
+    description: Measurement or dimensions specification for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_medida
+  det_mezanino:
+    description: Indicator whether the property has mezzanine level.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_mezanino
+  det_mobiliado:
+    description: Indicator whether the property is furnished/comes with furniture.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_mobiliado
+  det_moveisplanej:
+    description: Indicator whether the property has custom/built-in planned furniture.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_moveisplanej
+  det_murado:
+    description: Indicator whether the property has perimeter wall/is walled.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_murado
+  det_ofuro:
+    description: Indicator whether the property has Japanese soaking tub (ofuro).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ofuro
+  det_pasto:
+    description: Indicator whether the property has pasture/grazing land.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_pasto
+  det_Patio:
+    description: Indicator whether the property has patio/courtyard.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Patio
+  det_Pavimentacao:
+    description: Type of street/road paving in front of the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Pavimentacao
+  det_PeDireito:
+    description: Ceiling height measurement (pé direito) in meters.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_PeDireito
+  det_persianaelet:
+    description: Indicator whether the property has electric blinds/shutters.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_persianaelet
+  det_pilotis:
+    description: Indicator whether the building has pilotis (ground floor on stilts).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_pilotis
+  det_piscaquecida:
+    description: Indicator whether the property has heated swimming pool.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piscaquecida
+  det_Piscina:
+    description: Indicator whether the property has swimming pool.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Piscina
+  det_piscinapriv:
+    description: Indicator whether the property has private swimming pool.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piscinapriv
+  det_piscinfantil:
+    description: Indicator whether the property/building has children's pool.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piscinfantil
+  det_piso_ceramica:
+    description: Indicator whether the property has ceramic tile flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_piso_ceramica
+  det_pisoelevado:
+    description: Indicator whether the property has raised/elevated flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_pisoelevado
+  det_PisoFrio:
+    description: Indicator whether the property has cold/cool flooring (tile/stone).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_PisoFrio
+  det_playground:
+    description: Indicator whether the building/property has playground.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_playground
+  det_poco:
+    description: Indicator whether the property has well/water well.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_poco
+  det_ponterolante:
+    description: Indicator whether the property has overhead crane/bridge crane.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ponterolante
+  det_porcelanato:
+    description: Indicator whether the property has porcelain tile flooring.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_porcelanato
+  det_PortaoEletronico:
+    description: Indicator whether the property has automatic/electronic gate.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_PortaoEletronico
+  det_Portaria24h:
+    description: Indicator whether the building has 24-hour concierge/reception.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Portaria24h
+  det_posicao:
+    description: Property position or location within the building/lot.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_posicao
+  det_QuadraPoli:
+    description: Indicator whether the building has multi-sport court.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_QuadraPoli
+  det_quadrasquash:
+    description: Indicator whether the building has squash court.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_quadrasquash
+  det_quintal:
+    description: Indicator whether the property has backyard.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_quintal
+  det_Recepcao:
+    description: Indicator whether the building has reception area/lobby.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Recepcao
+  det_RedeTensao:
+    description: Electrical voltage network type available at the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_RedeTensao
+  det_refeitorio:
+    description: Indicator whether the property has cafeteria/dining hall.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_refeitorio
+  det_reformado:
+    description: Indicator whether the property has been renovated/remodeled.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_reformado
+  det_resagua:
+    description: Indicator whether the property has water reservoir/tank.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_resagua
+  det_rio:
+    description: Indicator whether the property is near a river or has river access.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_rio
+  det_roupeiro:
+    description: Indicator whether the property has linen closet/wardrobe.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_roupeiro
+  det_Sacada:
+    description: Indicator whether the property has balcony.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Sacada
+  det_sacadafundo:
+    description: Indicator whether the property has rear/back balcony.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sacadafundo
+  det_sacadalat:
+    description: Indicator whether the property has side balcony.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sacadalat
+  det_Sala:
+    description: Indicator whether the property has living room/hall.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Sala
+  det_salacinema:
+    description: Indicator whether the building has cinema/movie theater room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salacinema
+  det_SalaEstar:
+    description: Indicator whether the property has family room/living room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SalaEstar
+  det_salafesta:
+    description: Indicator whether the building has party room/event hall.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salafesta
+  det_salaginastica:
+    description: Indicator whether the building has gym/fitness room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salaginastica
+  det_SalaJantar:
+    description: Indicator whether the property has dining room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SalaJantar
+  det_salajogo:
+    description: Indicator whether the building has game room/recreation room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_salajogo
+  det_SalaTV:
+    description: Indicator whether the property has TV room/media room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SalaTV
+  det_sauna:
+    description: Indicator whether the property/building has sauna.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sauna
+  det_saunaprivat:
+    description: Indicator whether the property has private sauna.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_saunaprivat
+  det_semimobiliado:
+    description: Indicator whether the property is semi-furnished/partially furnished.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_semimobiliado
+  det_sisincendio:
+    description: Indicator whether the property has fire protection/sprinkler system.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_sisincendio
+  det_skate:
+    description: Indicator whether the building has skate park area.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_skate
+  det_spa:
+    description: Indicator whether the building has spa facilities.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_spa
+  det_split:
+    description: Indicator whether the property has split air conditioning units.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_split
+  det_Suite:
+    description: Total number of suite bedrooms (bedrooms with private bathroom).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Suite
+  det_SuiteClo:
+    description: Number of suites with walk-in closet.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_SuiteClo
+  det_suitemaster:
+    description: Indicator whether the property has master suite.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_suitemaster
+  det_taco:
+    description: Indicator whether the property has parquet flooring (taco).
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_taco
+  det_telefone:
+    description: Indicator whether the property has telephone line/connection.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_telefone
+  det_terraco:
+    description: Indicator whether the property has terrace/rooftop terrace.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_terraco
+  det_transformador:
+    description: Indicator whether the property has electrical transformer.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_transformador
+  det_tvacabo:
+    description: Indicator whether the property has cable TV connection.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_tvacabo
+  det_ValorMetro:
+    description: Price per square meter value for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_ValorMetro
+  det_Varanda:
+    description: Indicator whether the property has veranda/porch.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_Varanda
+  det_varanda_gourmet:
+    description: Indicator whether the property has gourmet balcony/veranda.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_varanda_gourmet
+  det_vent_teto:
+    description: Indicator whether the property has ceiling fans.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vent_teto
+  det_vestiario:
+    description: Indicator whether the building has locker room/changing room.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vestiario
+  det_vistacidade:
+    description: Indicator whether the property has city view.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistacidade
+  det_vistalagoa:
+    description: Indicator whether the property has lagoon/lake view.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistalagoa
+  det_vistamar:
+    description: Indicator whether the property has ocean/sea view.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistamar
+  det_vistapano:
+    description: Indicator whether the property has panoramic view.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistapano
+  det_vistaserra:
+    description: Indicator whether the property has mountain/hill view.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_vistaserra
+  det_wireless:
+    description: Indicator whether the property has wireless/WiFi internet.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_wireless
+  det_zelador:
+    description: Indicator whether the building has caretaker/janitor.
+    lineage:
+      - datalake_union_cdc_raw.imovel.det_zelador
+  flagdesk:
+    description: Flag indicating desktop/featured display status.
+    lineage:
+      - datalake_union_cdc_raw.imovel.flagdesk
+  idprevisite:
+    description: Identifier for property pre-visit or showing appointment.
+    lineage:
+      - datalake_union_cdc_raw.imovel.idprevisite
+  inf_aceitaf:
+    description: Indicator whether FGTS (government housing fund) is accepted as payment.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_aceitaf
+  inf_aut_pub:
+    description: Authorization flag for automatic publication of the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_aut_pub
+  inf_Bairro:
+    description: Property neighborhood/district name.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Bairro
+  inf_bairrores:
+    description: Residential neighborhood or area classification.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_bairrores
+  inf_Categoria:
+    description: Property category or classification type.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Categoria
+  inf_Cep:
+    description: Property postal code (CEP).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Cep
+  inf_Cidade:
+    description: Property city name.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Cidade
+  inf_Complemento:
+    description: Address complement (apartment number, unit, etc).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Complemento
+  inf_Condominio:
+    description: Condominium identifier or name where property is located.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Condominio
+  inf_CondoNome:
+    description: Condominium name.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_CondoNome
+  inf_Construtora:
+    description: Construction company or developer name.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Construtora
+  inf_cubtipo:
+    description: Cubicle or office type classification.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_cubtipo
+  inf_Descricao:
+    description: Property description text.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Descricao
+  inf_Edificio:
+    description: Building name where the property is located.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Edificio
+  inf_Empreendimento:
+    description: Development or real estate project name.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Empreendimento
+  inf_Endereco:
+    description: Property street address.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Endereco
+  inf_Estado:
+    description: Property state/province abbreviation.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Estado
+  inf_financiado:
+    description: Indicator whether the property can be financed through bank loans.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_financiado
+  inf_Gleba:
+    description: Land parcel or plot number within a larger development.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Gleba
+  inf_Locacao:
+    description: Indicator whether the property is available for rent/lease.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Locacao
+  inf_locacao_estu:
+    description: Indicator whether the property is available for student rentals.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_locacao_estu
+  inf_Localizacao:
+    description: Property location description or classification.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Localizacao
+  inf_Lote:
+    description: Lot number within the development or cadastral block.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Lote
+  inf_Numero:
+    description: Property street number.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Numero
+  inf_Ocupacao:
+    description: Property occupancy status (vacant, occupied, etc).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Ocupacao
+  inf_Padra:
+    description: Property standard or quality classification.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Padra
+  inf_Permuta:
+    description: Indicator whether property exchange/barter is accepted.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Permuta
+  inf_pontoref:
+    description: Reference point or landmark near the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_pontoref
+  inf_Quadra:
+    description: Block number within the cadastral district.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Quadra
+  inf_referencia:
+    description: Property reference code or identifier.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_referencia
+  inf_referencia_antiga:
+    description: Old/previous property reference code.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_referencia_antiga
+  inf_Regiao:
+    description: Property region or geographical area.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Regiao
+  inf_reserva:
+    description: Property reservation status or identifier.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_reserva
+  inf_Situacao:
+    description: Property status (available, rented, sold, etc).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Situacao
+  inf_SubTipo:
+    description: Property subtype classification (apartment, house, etc).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_SubTipo
+  inf_Temporada:
+    description: Indicator whether the property is available for seasonal/vacation rental.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Temporada
+  inf_Tipo:
+    description: Property type classification (residential, commercial, etc).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Tipo
+  inf_Uf:
+    description: State abbreviation (UF - Unidade Federativa).
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Uf
+  inf_valcub:
+    description: Property value based on CUB (Basic Unit Cost) construction index.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_valcub
+  inf_ValLocacao:
+    description: Monthly rental/lease value for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_ValLocacao
+  inf_vallocacao_estu:
+    description: Monthly rental value for student housing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_vallocacao_estu
+  inf_valsobconsulta:
+    description: Indicator whether price is available upon request only.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_valsobconsulta
+  inf_ValTemporada:
+    description: Seasonal/vacation rental value for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_ValTemporada
+  inf_ValVenda:
+    description: Sale price value for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_ValVenda
+  inf_Venda:
+    description: Indicator whether the property is available for sale.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Venda
+  int_AnuncioInternet:
+    description: Internet advertisement text or content for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_AnuncioInternet
+  int_AnuncioJornal:
+    description: Newspaper advertisement text or content for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_AnuncioJornal
+  int_IncRelAnuncio:
+    description: Flag to include property in advertisement reports.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_IncRelAnuncio
+  int_metadescription:
+    description: SEO meta description for property web listing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_metadescription
+  int_metatag:
+    description: SEO meta tags for property web listing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_metatag
+  int_OptNegocio:
+    description: Business operation type (rent, sale, both).
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_OptNegocio
+  int_PubDestaque:
+    description: Featured publication status flag for highlighted advertising.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_PubDestaque
+  int_PubSite:
+    description: Website publication status flag.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_PubSite
+  int_pubsite_rede:
+    description: Network/portal website publication status flag.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_pubsite_rede
+  int_title:
+    description: SEO title for property web listing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.int_title
+  lkprevisite:
+    description: Link to property pre-visit or virtual tour.
+    lineage:
+      - datalake_union_cdc_raw.imovel.lkprevisite
+  loc_Classificacao:
+    description: Property signage/advertising sign classification.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Classificacao
+  loc_Latitude:
+    description: Property geographical latitude coordinate.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Latitude
+  loc_Longitude:
+    description: Property geographical longitude coordinate.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Longitude
+  loc_NumeroPlacas:
+    description: Number of advertising signs/placards placed for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_NumeroPlacas
+  loc_placa_qrcode:
+    description: QR code for property sign/placard.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_placa_qrcode
+  loc_PlacaLocal:
+    description: Location where property sign/placard is placed.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_PlacaLocal
+  loc_Tipo:
+    description: Type of property sign/advertising placard.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_Tipo
+  minia:
+    description: Thumbnail image filename or path for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.minia
+  minia_amazon:
+    description: Amazon S3 thumbnail image path for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.minia_amazon
+  moeda:
+    description: Currency type used for property pricing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.moeda
+  pais:
+    description: Country where the property is located.
+    lineage:
+      - datalake_union_cdc_raw.imovel.pais
+  perc_adiantamento:
+    description: Down payment percentage required for property purchase.
+    lineage:
+      - datalake_union_cdc_raw.imovel.perc_adiantamento
+  site_visitas:
+    description: Number of website visits/views for the property listing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.site_visitas
+  tour:
+    description: Virtual tour link or identifier for the property.
+    lineage:
+      - datalake_union_cdc_raw.imovel.tour
+  userExclu:
+    description: User who excluded/deactivated the property listing.
+    lineage:
+      - datalake_union_cdc_raw.imovel.userExclu
+  video_flag:
+    description: Flag indicating whether property has video content.
+    lineage:
+      - datalake_union_cdc_raw.imovel.video_flag
+  dt_inf_state:
+    description: Date when property status was last changed.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_DtEstado
+  dt_loc_order_placed:
+    description: Date when sign placement order was requested.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_PedidoColocacao
+  dt_loc_placed:
+    description: Date when property sign was actually placed.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_DataColocacao
+  dt_order_withdraw:
+    description: Date when sign removal order was requested.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_PedidoRetirada
+  dt_loc_withdraw:
+    description: Date when property sign was removed.
+    lineage:
+      - datalake_union_cdc_raw.imovel.loc_DataRetirada
+  dt_cap_registered:
+    description: Date when property was initially registered/captured.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_CadEm
+  dt_cap_updated:
+    description: Date when property information was last updated.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_AtuaEm
+  dt_cap_start:
+    description: Start date of property capture contract/agreement.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_DtInicio
+  dt_cap_end:
+    description: End date of property capture contract/agreement.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Cap_DtFim
+  dt_exclusion:
+    description: Date when property was excluded/deactivated from listings.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dataExclu
+  dt_inf_aut_published:
+    description: Date when property was automatically published.
+    lineage:
+      - datalake_union_cdc_raw.imovel.inf_Dtaut_pub
+  dt_conf_aut_start:
+    description: Start date for automatic publication configuration.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_Aut_DtInicio
+  dt_conf_aut_end:
+    description: End date for automatic publication configuration.
+    lineage:
+      - datalake_union_cdc_raw.imovel.Conf_Aut_DtFim
+  dt_paratime:
+    description: Timestamp parameter for data processing or updates.
+    lineage:
+      - datalake_union_cdc_raw.imovel.paratime
+  dt_active:
+    description: Date when property listing became active.
+    lineage:
+      - datalake_union_cdc_raw.imovel.dataativa

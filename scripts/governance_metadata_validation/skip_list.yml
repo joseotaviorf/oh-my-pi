@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 # Used by: validate_metadata_files_content.py
 # Purpose: Skip metadata files that don't follow the standard schema
-# 
+#
 # Add files here when:
 #   - Metadata file has custom structure for special cases
 #   - File is being migrated and temporarily doesn't meet schema requirements
@@ -78,7 +78,7 @@ queries_without_metadata_files:
 # 3. PARSING SKIP LIST
 # ------------------------------------------------------------------------------
 # Used by: validate_lineage_consistency.py
-# Purpose: Skip SQL files that use advanced Spark SQL features not fully 
+# Purpose: Skip SQL files that use advanced Spark SQL features not fully
 #          supported by sqlglot parser (databricks dialect)
 #
 # Add files here when:
@@ -94,19 +94,19 @@ queries_without_metadata_files:
 parsing_skip_list:
   # PIVOT clause - not fully supported by sqlglot
   - dags/for_sale/enrich_sale_available_booking_hours/queries/enrich/weekly_available_booking_hours.sql
-  
+
   # GET_JSON_OBJECT() - Spark SQL specific function with complex syntax
   - dags/for_sale/enrich_atta/queries/enrich/proposal_situation_changes.sql
-  
+
   # Complex syntax / token parsing issues
   - dags/governance/enrich_trino/queries/enrich/trino_detractor_queries.sql
   - dags/for_rent/dw_datamarts_for_rent/queries/dw/repressed_demand.sql
-  
+
   # 1223 lines with multiple UNION ALL - too complex for parser
   - dags/growth/enrich_semrush/queries/enrich/keywords_from_players.sql
-  
+
   # String/syntax edge cases
-  - dags/growth/iptu_bh/queries/clean/iptu_bh.sql
+  - dags/atlas_db/iptu_bh/queries/clean/iptu_bh.sql
   - dags/growth/enrich_google_search_console_classified/queries/enrich/gsc_keyword_region_attributes_bra.sql
   - dags/platform/enrich_databricks_table_usage/queries/enrich/daily_table_usage_per_user.sql
   - dags/fintech/payable_accounts_transactions/queries/clean/accounts_payable.sql
