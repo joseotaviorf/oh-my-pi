@@ -1,0 +1,246 @@
+---
+database_name: datalake_crawler_chaves_na_mao
+table_name: chaves_na_mao_latest
+description: |
+  This table contains the most recent update for each listing regarding the chaves_na_mao crawler data.
+  It provides a deduplicated view of the datalake_crawler_chaves_na_mao.chaves_na_mao table, showing only
+  the most recent record per listing (id_house) based on the partition (year, month, day).
+
+  **Deduplication Logic:**
+  - Returns the latest update per listing using ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY make_date(year, month, day) DESC) = 1
+  - Filters data within the specified load date range
+
+  **Use Case:**
+  This table is ideal for analytics requiring the current state of each property without duplicates,
+  providing a clean, point-in-time view of the latest available information for each listing.
+
+  **Update Schedule:**
+  The table is updated weekly, every Thursday, after the datalake_crawler_chaves_na_mao.chaves_na_mao
+  table is refreshed. This ensures data consistency and maintains the dependency chain.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns: 
+  id_house_platform:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.id
+    description: |
+      The id of the listing in the chaves_na_mao platform.
+  id_house:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.id_house
+    description: |
+      It concatenates the id of the listing in the chaves_na_mao platform with the
+      string "chaves-na-mao".
+  platform:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.platform
+    description: |
+      The origin of the listing, which is always "chaves-na-mao" for this table.
+  country:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.country
+    description: |
+      The country of the listing.
+  state:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.state
+    description: |
+      The state of the listing.
+  address_city:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.address_city
+    description: |
+      The city of the listing.
+      If the original value is null, then it assumes the clean table partition,
+      which is the "city" field.
+      It doens't assume null values, and it is used as a z_order field for the
+      delta table.
+  neighborhood:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.neighborhood
+    description: |
+      The neighborhood of the listing.
+  street:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.street
+    description: |
+      The street of the listing.
+  number:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.number
+    description: |
+      The number of the listing.
+  zip_code:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.zip_code
+    description: |
+      The zip_code of the listing.
+  latitude:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.latitude
+    description: |
+      The latitude associated with the listing location.
+  longitude:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.longitude
+    description: |
+      The longitude associated with the listing location.
+  listing_name:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.listing_name
+    description: |
+      The name of the listing.
+      It is the listing description provided in the origin platform.
+  listing_url:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.listing_url
+    description: |
+      The url of the listing.
+  total_area:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.total_area
+    description: |
+      The total area of the listing in square meters.
+  area:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.area
+    description: |
+      The area of the listing in square meters.
+  common_items:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.common_items
+    description: |
+      The listing common itens, such as "Bicicletário", "Interfone", "Jardim", etc.
+  privative_items:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.privative_items
+    description: |
+      The listing privative itens, such as "Alarme", "Área de serviço", "Churrasqueira", etc.
+  bathrooms:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.bathrooms
+    description: |
+      The number of bathrooms in the listing.
+  bedrooms:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.bedrooms
+    description: |
+      The number of bedrooms in the listing.
+  suites:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.suites
+    description: |
+      The number of suites in the listing.
+  parking_spaces:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.parking_spaces
+    description: |
+      The number of parking spaces available in the listing.
+  publication_type:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.publication_type
+    description: |
+      The type of the publication (e.g., normal, featured, etc.).
+  unit_type:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.unit_type
+    description: |
+      The type of the housing unit (e.g., apartamento, casa / sobrado, etc.).
+  usage_type:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.usage_type
+    description: |
+      The usage type of the housing unit (e.g., residential, commercial, etc.).
+  is_for_rent:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.is_for_rent
+    description: |
+      Boolean flag indicating if the property is available for rent.
+  is_for_sale:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.is_for_sale
+    description: |
+      Boolean flag indicating if the property is available for sale.
+  is_hybrid:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.is_hybrid
+    description: |
+      Boolean flag indicating if the property is available for both rent and sale.
+      It is true when both type.rentable and type.buyable are true, false otherwise.
+  advertiser_name:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_name
+    description: |
+      The name of the advertiser responsible for the listing.
+  advertiser_phone:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_phone
+    description: |
+      The phone number of the advertiser responsible for the listing.
+  advertiser_creci:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_creci
+    description: |
+      The creci of the advertiser responsible for the listing.
+  condo_fee:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.condo_fee
+    description: |
+      The condominium fee of the property.
+  iptu:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.iptu
+    description: |
+      The yearly IPTU (property tax) of the listing.
+  rent_price:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.rent_price
+    description: |
+      The rent price of the property.
+  sale_price:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.sale_price
+    description: |
+      The sale price of the property.
+  price_m2_rental:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.price_m2_rental
+    description: |
+      The rent price per square meter.
+      It is calculated by dividing the rental price by the total area,
+      rounded to 2 decimal places.
+  price_m2_sale:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.price_m2_sale
+    description: |
+      The sale price per square meter.
+      It is calculated by dividing the sale price by the total area,
+      rounded to 2 decimal places.  
+  ts_created:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.ts_created
+    description: |
+      The timestamp when the listing was created.
+  ts_updated:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.ts_updated
+    description: |
+      The timestamp when the listing was updated.
+  year:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.year
+    description: |
+      The year of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  month:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.month
+    description: |
+      The month of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  day:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.day
+    description: |
+      The day of the crawler date.
+      It is used for data partitioning and filtering purposes.

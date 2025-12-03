@@ -1709,6 +1709,8 @@ bietlejuice.enrich_copilot_service:
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
 bietlejuice.enrich_cozy_metrics:
   - bietlejuice.cozy_metrics:load-clean-library-versions:first-run-of-day
+bietlejuice.enrich_crawler_chaves_na_mao:
+  - bietlejuice.crawler_chaves_na_mao:load-clean-chaves-na-mao:first-run-of-day
 bietlejuice.enrich_crawler_loft:
   - bietlejuice.crawler_loft:load-clean-loft:first-run-of-day
 bietlejuice.enrich_crawler_olx:
