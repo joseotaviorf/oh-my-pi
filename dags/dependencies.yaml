@@ -96,6 +96,48 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_booking:load-enrich-booking-review:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
+bietlejuice.dw_bpo_performance_views:
+  - bietlejuice.bigfone:load-clean-call:first-run-of-day
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer:first-run-of-day
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign:first-run-of-day
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-dispatches:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-zendesk-user:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-chat-messages:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
+  - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
+  - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
+  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
+  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day
+  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks:first-run-of-day
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination:first-run-of-day
+  - bietlejuice.enrich_repairs:load-enrich-repair-tickets:first-run-of-day
+  - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
+  - bietlejuice.enrich_terminator:load-enrich-termination:first-run-of-day
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
+  - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
+  - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
+  - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
+  - bietlejuice.salesforce:load-clean-cases:first-run-of-day
+  - bietlejuice.salesforce:load-clean-relisting-context:first-run-of-day
+  - bietlejuice.salesforce:load-clean-task:first-run-of-day
+  - bietlejuice.salesforce:load-clean-terminations:first-run-of-day
+  - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
 bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-1w-before:first-run-of-day
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-2w-before:first-run-of-day

@@ -1,0 +1,182 @@
+database_name: dw_bpo_performance
+table_name: general_metric
+description: Table that contains the general metrics for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+    description: Surrogate key for the user, cast from id_user.
+  sk_agent:
+    lineage:
+      - dw_customer_support.dim_analyst.sk_last_analyst
+    description: Surrogate key for the ticket last analyst, cast from analyst email.
+  channel:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+    description: Channel of the ticket.
+  csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: First CSAT score of the ticket.
+  status:
+    lineage:
+      - dw_customer_support.dim_ticket.status
+    description: Status of the ticket.
+  csat_type:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.last_csat_score
+    description: Type of the CSAT score. 
+  csat_comment:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.first_csat_comment
+    description: First CSAT comment of the ticket.    
+  main_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Main department of the ticket.  
+  direction:
+    lineage:
+      - dw_customer_support.fact_tickets.direction
+    description: Direction of the ticket.
+  area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Area of the ticket.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department of the ticket.
+  journey_step:
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+    description: Department journey step of the ticket.
+  front_or_back:
+    lineage:
+      - dw_customer_support.fact_tickets.front_or_back
+    description: Whether the ticket is from front or back.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Department team of the ticket.
+  contact_motivation_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Contact motivation tag of the ticket.
+  contact_theme_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Contact theme tag of the ticket.
+  contact_theme_detail_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Contact theme detail tag of the ticket.
+  customer_type_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type tag of the ticket.
+  tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.tags
+    description: Tags of the ticket.
+  step_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.step_tag
+    description: Step tag of the ticket.
+  external_url:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Zendesk external URL of the ticket.
+  hours_to_solve_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.full_resolution_time_min_business
+    description: Business hours to solve the ticket, rounded to 2 decimal places.
+  agent_full_name:
+    lineage:
+      - dw_customer_support.dim_analyst.full_name
+    description: Full name of the agent.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the agent.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Agent organization of the ticket.
+  reopens:
+    lineage:
+      - dw_customer_support.fact_tickets.reopens
+    description: Number of times the ticket was reopened.
+  replies:
+    lineage:
+      - dw_customer_support.fact_tickets.replies
+    description: Number of replies to the ticket.
+  is_active:
+    lineage:
+      - dw_customer_support.dim_department.is_active
+    description: Whether the department is active or not.
+  has_answered_csat:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.sk_ticket
+    description: Boolean indicating whether the ticket has answered the CSAT survey or not.
+  has_transfers:
+    lineage:
+      - "null"
+    description: Not applicable for this metric.
+  is_resolution:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.is_solved
+    description: Boolean indicating whether the ticket has been resolved or not.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Timestamp of the ticket creation.
+  ts_survey:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.ts_last_response
+    description: Timestamp of the last CSAT survey response.
+  ts_csat_response:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.ts_first_response
+    description: Timestamp of the first CSAT survey response.
+  ts_solved:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Timestamp of the ticket solution.
+  ts_closed:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_closed
+    description: Timestamp of the ticket closure.
+  minutes_requester_wait_time_business:
+    lineage:
+      - dw_customer_support.fact_tickets.requester_wait_time_min_business
+    description: Minutes of requester wait time during business hours.
+  minutes_first_reply_time_business:
+    lineage:
+      - dw_customer_support.fact_tickets.reply_time_min_business
+    description: Minutes of first reply time during business hours.
+  minutes_full_resolution_time_business:
+    lineage:
+      - dw_customer_support.fact_tickets.full_resolution_time_min_business
+    description: Minutes of full resolution time during business hours.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.

@@ -1,0 +1,100 @@
+database_name: dw_bpo_performance
+table_name: twilio_spoc
+description: Table that contains the Twilio SPOC data for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  spoc_direction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.direction
+    description: Direction of the SPOC interaction.
+  ts_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp of the creation of the SPOC interaction.
+  first_response_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.first_reply_time
+    description: First response time of the SPOC interaction.
+  queue_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.total_queue_time
+    description: Queue time of the SPOC interaction.
+  talk_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.total_talk_time
+    description: Talk time of the SPOC interaction.
+  spoc_agent_email:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.agent_email
+    description: Email of the analyst who answered the SPOC interaction.
+  status:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Status of the SPOC interaction.
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Zendesk ticket ID of the SPOC interaction.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_user
+    description: User ID of the SPOC interaction.
+  transferred_to:
+    lineage:
+      - dw_customer_support.dim_department.sk_department
+    description: Department ID to which the SPOC interaction was transferred.
+  transferred_from:
+    lineage:
+      - dw_customer_support.dim_department.sk_department
+    description: Department ID from which the SPOC interaction was transferred.
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Twilio task ID of the SPOC interaction.
+  sk_session:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_session
+    description: Session ID of the SPOC interaction.
+  sk_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_interaction
+    description: Interaction ID of the SPOC interaction.
+  chat_started_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_reservation_created
+    description: Timestamp of the start of the chat.
+  chat_ended_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_reservation_ended
+    description: Timestamp of the end of the chat.
+  avg_reply_time:
+    lineage:
+      - dw_customer_support.fact_chat_messages.reply_time
+    description: Average reply time of the SPOC interaction.
+  customer_type:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type of the SPOC interaction.
+  workday_chat:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_reservation_created
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Whether the SPOC interaction was on a workday.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.
+    

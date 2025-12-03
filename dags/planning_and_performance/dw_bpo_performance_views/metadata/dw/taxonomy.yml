@@ -1,0 +1,70 @@
+database_name: dw_bpo_performance
+table_name: taxonomy
+description: Table that contains the taxonomy data for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  channel:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Channel of the ticket.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the agent who answered the chat.
+  queue:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Queue of the ticket.
+  step:
+    lineage:
+      - dw_customer_support.dim_taxonomy.journey
+    description: Journey of the ticket.
+  client:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type of the ticket.
+  motivation:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Motivation of the ticket.
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Theme of the ticket.
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail of the ticket.
+  area:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: Area of the ticket.
+  email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the agent who answered the chat.
+  ts_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp of the creation of the ticket.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.

@@ -1,0 +1,138 @@
+database_name: dw_bpo_performance
+table_name: tarefas_salesforce
+description: Table that contains the Salesforce tasks data.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  id_task:
+    lineage:
+      - datalake_salesforce_clean.task.id_task
+    description: Unique identification key for task in Salesforce.
+  id_contract:
+    lineage:
+      - datalake_salesforce_clean.task.id_contract
+    description: Unique identification key for contract in Salesforce.
+  id_termination:
+    lineage:
+      - datalake_salesforce_clean.terminations.id_external
+    description: Unique identification key for termination in Salesforce.
+  spoc_class:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_request
+      - dw_offboarding.fact_terminations.is_spoc_contract
+      - dw_offboarding.fact_terminations.is_spoc_control_group
+      - dw_offboarding.fact_terminations.team
+    description: SPOC class of the termination.
+  spoc_agent_email:
+    lineage:
+      - datalake_hefesto.spoc_offboarding_contracts.worker_email
+    description: Email of the SPOC agent of the termination.
+  high_value_contract:
+    lineage:
+      - datalake_salesforce_clean.terminations.high_value_contract
+    description: Whether the contract is a high value contract.
+  dt_termination:
+    lineage:
+      - dw_offboarding.fact_terminations.dt_termination
+    description: Date of the termination.
+  dt_termination_request:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_request
+    description: Date of the termination request.
+  dt_termination_finished:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_finished
+    description: Date of the termination finished.
+  termination_status:
+    lineage:
+      - dw_offboarding.dim_termination.status
+    description: Status of the termination.
+  case_status:
+    lineage:
+      - datalake_salesforce_clean.cases.case_status
+    description: Status of the case.
+  is_case_closed:
+    lineage:
+      - datalake_salesforce_clean.cases.is_closed
+    description: Whether the case is closed.
+  subject:
+    lineage:
+      - datalake_salesforce_clean.task.subject
+    description: Subject of the task.
+  status:
+    lineage:
+      - datalake_salesforce_clean.task.status
+    description: Status of the task.
+  task_subtype:
+    lineage:
+      - datalake_salesforce_clean.task.task_subtype
+    description: Subtype of the task.
+  has_relisting_flow:
+    lineage:
+      - datalake_salesforce_clean.relisting_context.has_relisting_flow
+    description: Whether the termination has a re-listing flow.
+  is_high_priority:
+    lineage:
+      - datalake_salesforce_clean.task.is_high_priority
+    description: Whether the task is a high priority task.
+  is_deleted:
+    lineage:
+    description: Whether the task is deleted.
+  is_closed:
+    lineage:
+      - datalake_salesforce_clean.task.is_closed
+    description: Whether the task is closed.
+  dt_task_created:
+    lineage:
+      - datalake_salesforce_clean.task.ts_created
+    description: Date of the task creation.
+  dt_task_expiration:
+    lineage:
+      - datalake_salesforce_clean.task.ts_activity
+    description: Date of the task expiration.
+  dt_task_first_interaction_needed:
+    lineage:
+      - datalake_salesforce_clean.task.ts_first_interaction
+    description: Date of the first interaction needed for the task.
+  dt_task_completed:
+    lineage:
+      - datalake_salesforce_clean.task.ts_task_completed
+    description: Date of the task completion.
+  is_task_expired:
+    lineage:
+      - datalake_salesforce_clean.task.ts_completed
+      - datalake_salesforce_clean.task.ts_activity
+    description: Whether the task is expired.
+  task_leadtime:
+    lineage:
+      - datalake_salesforce_clean.task.ts_created
+      - datalake_salesforce_clean.task.ts_completed
+    description: Leadtime of the task.
+  sla_task:
+    lineage:
+      - datalake_salesforce_clean.task.status
+      - datalake_salesforce_clean.task.ts_task_completed
+      - datalake_salesforce_clean.task.ts_task_expiration
+    description: Boolean indicating whether the task is completed within the SLA.
+  overdue_task:
+    lineage:
+      - datalake_salesforce_clean.task.status
+      - datalake_salesforce_clean.task.ts_task_completed
+      - datalake_salesforce_clean.task.ts_task_expiration
+    description: Boolean indicating whether the task is overdue.
+  year:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Year of the task.
+  month:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Month of the task.
+  day:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Day of the task.
+  ts_load:
+    lineage:
+      - NOW()
+    description: Timestamp of the load.

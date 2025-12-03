@@ -1,0 +1,67 @@
+database_name: dw_bpo_performance
+table_name: speech_call
+description: Table that contains the speech call metrics for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  id_source_unique:
+    lineage:
+      - datalake_customer_support.calls.id_call
+      - datalake_customer_support.calls.id_task
+    description: The unique identifier of the source call or task.
+  caller_phone_number:
+    lineage:
+      - datalake_customer_support.calls.from_phone_number
+    description: The phone number of the caller.
+  destination_phone_number:
+    lineage:
+      - datalake_customer_support.calls.to_phone_number
+    description: The phone number of the destination.
+  direction:
+    lineage:
+      - datalake_customer_support.calls.direction
+    description: The direction of the call.
+  provider:
+    lineage:
+      - 'Twilio'
+    description: Provider of the call.
+  agent_email:
+    lineage:
+      - datalake_customer_support.calls.worker_email
+    description: Email of the agent who answered the call.
+  organization:
+    lineage:
+      - datalake_support_users.analysts.organization
+    description: Organization of the agent who answered the call.
+  country_code:
+    lineage:
+      - 'BR'
+    description: Country code of the agent who answered the call.
+  recording_url:
+    lineage:
+      - datalake_bigfone_clean.call.recording_url
+    description: URL of the recording of the call.
+  ts_started:
+    lineage:
+      - datalake_bigfone_clean.call.ts_started
+    description: Timestamp of the start of the call.
+  ts_ended:
+    lineage:
+      - datalake_bigfone_clean.call.ts_ended
+    description: Timestamp of the end of the call.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.

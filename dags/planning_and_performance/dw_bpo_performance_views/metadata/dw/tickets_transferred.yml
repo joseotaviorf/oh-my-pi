@@ -1,0 +1,107 @@
+database_name: dw_bpo_performance
+table_name: tickets_transferred
+description: Table that contains the tickets transferred data for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  sk_segment:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Surrogate key for the segment, cast from Twilio id_task.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department name.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Department team.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Agent organization.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Agent email.
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Theme taxonomy of a ticket.
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail taxonomy of a ticket.
+  first_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: First department of a ticket.
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Last department of a ticket.
+  transferred_to:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department to which the ticket was transferred.
+  is_last_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_last_interaction
+    description: Whether the last interaction of the ticket was with a human agent.
+  ticket_origin:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.origin
+    description: Origin of the ticket.
+  task_transferred:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+      - dw_customer_support.fact_customer_contacts.is_first_department_interaction
+      - dw_customer_support.dim_department.team
+    description: Whether the task was transferred to a non-Inside Sales department.
+  task_idled:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Whether the task was idled by the agent.
+  session_expired:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Whether the task was expired by the agent.
+  status:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Status of the task.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp when the task was started.
+  transfer_reason:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Reason for the transfer, either human error or bot error.
+  transfer_reason_detailed:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+      - dw_customer_support.fact_customer_contacts.is_last_interaction
+      - dw_customer_support.fact_customer_contacts.transferred_to
+      - dw_customer_support.fact_customer_contacts.status
+    description: Detailed reason for the transfer, either bot error, human error, or department correction.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.

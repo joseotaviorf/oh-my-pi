@@ -1,0 +1,115 @@
+database_name: dw_bpo_performance
+table_name: nps_offboarding
+description: Table that contains the NPS Offboarding data for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns: 
+  sk_nps_answer:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_answer.sk_nps_answer
+    description: Key of the NPS answer.
+  ts_answered:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_answer.ts_answered
+    description: Timestamp of when the NPS answer was answered.
+  name:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_campaign.name
+    description: Name of the NPS campaign.
+  metric_group:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_campaign.metric_group
+    description: Metric group of the NPS campaign.
+  sk_contract:
+    lineage:
+      - dw_customer_satisfaction.fact_nps_dispatches.sk_contract
+    description: Key of the contract.
+  tr_dt:
+    lineage:
+      - datalake_terminator.termination.termination_request
+    description: Timestamp of when the contract termination request was made.
+  td_dt:
+    lineage:
+      - datalake_terminator.termination.dt_termination
+    description: Date of the termination.
+  tf_dt:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_termination_finished
+    description: Date of the termination finished.
+  score:
+    lineage:
+      - dw_customer_satisfaction.fact_nps_dispatches.score
+    description: Score of the NPS answer.
+  score_category:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_answer.score_category
+    description: Category of the NPS answer.
+  customer_type:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_campaign.customer_type
+    description: Type of customer.
+  opted_out:
+    lineage:
+      - dw_rent.dim_contract.is_exit_inspection_opted_out
+    description: Whether the customer opted out of the exit inspection.
+  with_AC_repairs:
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_absorbed_ac
+      - dw_offboarding.fact_terminations.total_tentant_repair_ac
+    description: Whether the tenant has AC repairs.
+  reg_state:
+    lineage:
+      - dw_public.dim_region.short_region_name
+    description: State of the registration.
+  rent:
+    lineage:
+      - dw_rent.dim_contract.rent
+    description: Rent of the contract.
+  high_value:
+    lineage:
+      - dw_rent.dim_contract.rent
+    description: Whether the contract is above R$2500,00.
+  sk_user:
+    lineage:
+      - dw_customer_satisfaction.fact_nps_dispatches.sk_user
+    description: Key of the user.
+  spoc_wave:
+    lineage:
+      - dw_offboarding.fact_terminations.spoc_wave
+    description: Wave of the SPOC contract.
+  spoc_class:
+    lineage:
+      - dw_offboarding.fact_terminations.is_spoc_control_group
+      - dw_offboarding.fact_terminations.is_spoc_contract
+      - datalake_terminator.termination.dt_termination
+    description: Class of the SPOC contract.
+  med_created_dt:
+    lineage:
+      - datalake_terminator.termination.ts_termination_request
+    description: Timestamp of when the MED was created.
+  med_sk_ticket:  
+    lineage:
+      - datalake_terminator.termination.id_zendesk_task
+    description: Zendesk id ticket of the mediation.
+  spoc_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the SPOC agent.
+  comment:
+    lineage:
+      - dw_customer_satisfaction.dim_nps_answer.comment
+    description: Comment of the NPS answer. 
+  year:
+    lineage: 
+      - CURRENT_DATE - 1
+    description: Current year.
+  month:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Current month.
+  day:
+    description: Current day.
+  ts_load:
+    lineage:
+      - NOW()
+    description: Timestamp of the data load.

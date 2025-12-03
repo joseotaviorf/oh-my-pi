@@ -1,0 +1,260 @@
+database_name: dw_bpo_performance
+table_name: repair_tickets
+description: Table that contains the repair tickets data for bpo performance.
+domain: Cross
+owner: data-pp@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_repairs.repair_tickets.id_ticket
+    description: Unique identifier for the repair ticket.
+  id_request:
+    lineage:
+      - datalake_repairs.repair_tickets.id_request
+    description: Unique identifier for the repair request.
+  id_contract:
+    lineage:
+      - datalake_repairs.repair_tickets.id_contract
+    description: Unique identifier for the contract.
+  group_name:
+    lineage:
+      - datalake_repairs.repair_tickets.group_name
+    description: Name of the group handling the ticket.
+  client_type:
+    lineage:
+      - datalake_repairs.repair_tickets.client_type
+    description: Type of client associated with the ticket.
+  status:
+    lineage:
+      - datalake_repairs.repair_tickets.status
+    description: Current status of the ticket.
+  custom_fields:
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+    description: JSON object containing custom fields related to the ticket.
+  tags:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+    description: Tags associated with the ticket for categorization and tracking.
+  ticket_via:
+    lineage:
+      - datalake_repairs.repair_tickets.ticket_via
+    description: Channel through which the ticket was received.
+  channel:
+    lineage:
+      - datalake_repairs.repair_tickets.channel
+    description: Communication channel of the ticket.
+  agent_email:
+    lineage:
+      - datalake_repairs.repair_tickets.agent_email
+    description: Email of the analyst who answered the ticket.
+  organization:
+    lineage:
+      - datalake_repairs.repair_tickets.agent_organization
+    description: Organization of the analyst who answered the ticket.
+  contestation_task_origin:
+    lineage:
+      - datalake_repairs.repair_tickets.contestation_task_origin
+    description: Origin of the contestation task.
+  service_provider:
+    lineage:
+      - datalake_repairs.repair_tickets.service_provider
+    description: Service provider of the ticket.
+  theme:
+    lineage:
+      - datalake_repairs.repair_tickets.theme
+    description: Theme of the ticket.
+  theme_detail:
+    lineage:
+      - datalake_repairs.repair_tickets.theme_detail
+    description: Detail of the theme of the ticket.
+  request_type:
+    lineage:
+      - datalake_repairs.repair_tickets.request_type
+    description: Type of the request of the ticket.
+  customer_type_tag:
+    lineage:
+      - datalake_repairs.repair_tickets.customer_type_tag
+    description: Type of the customer of the ticket.
+  motivation:
+    lineage:
+      - datalake_repairs.repair_tickets.motivation
+    description: Motivation of the ticket.
+  front_or_back:
+    lineage:
+      - datalake_repairs.repair_tickets.front_or_back
+    description: Indicates if the interaction was front or back.
+  comment_csat:
+    lineage:
+      - datalake_repairs.repair_tickets.comment_csat
+    description: Comment of the CSAT of the ticket.
+  csat_tags:
+    lineage:
+      - datalake_repairs.repair_tickets.csat_tags
+    description: Tags of the CSAT of the ticket.
+  csat_score:
+    lineage:
+      - datalake_repairs.repair_tickets.csat_score
+    description: Score of the CSAT of the ticket.
+  csat_partes:
+    lineage:
+      - datalake_repairs.repair_tickets.csat_partes
+    description: Partes of the CSAT of the ticket.
+  is_closed_by_merge:
+    lineage:
+      - datalake_repairs.repair_tickets.is_closed_by_merge
+    description: Indicates if the ticket was closed by a merge operation.
+  is_contestation_backlog:
+    lineage:
+      - datalake_repairs.repair_tickets.is_contestation_backlog
+    description: Indicates if the contestation is in the backlog.
+  is_ticket_followup:
+    lineage:
+      - datalake_repairs.repair_tickets.is_ticket_followup
+    description: Indicates if the ticket is a follow-up.
+  has_chat_negociation:
+    lineage:
+      - datalake_repairs.repair_tickets.has_chat_negociation
+    description: Indicates if the ticket has a chat negotiation.
+  reopens:
+    lineage:
+      - datalake_repairs.repair_tickets.reopens
+    description: Number of times the ticket was reopened.
+  replies:
+    lineage:
+      - datalake_repairs.repair_tickets.replies
+    description: Number of replies to the ticket.
+  relisting:
+    lineage:
+      - datalake_repairs.repair_tickets.relisting
+    description: Indicates if the ticket is a relisting.
+  minutes_first_reply_time_calendar:
+    lineage:
+      - datalake_repairs.repair_tickets.minutes_first_reply_time_calendar
+    description: Minutes of the first reply time calendar.
+  entrance_date:
+    lineage:
+      - datalake_repairs.repair_tickets.entrance_date
+    description: Date of the entrance of the ticket.
+  ts_contestation:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_contestation
+    description: Timestamp of the contestation.
+  ts_resolution_contestation:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_resolution_contestation
+    description: Timestamp of the resolution contestation.
+  ts_first_interaction:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_first_interaction
+    description: Timestamp of the first interaction. 
+  ts_created_local:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_local
+    description: Local timestamp of the creation of the ticket.
+  ts_updated_local:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_updated_local
+    description: Local timestamp of the last update of the ticket.
+  ts_closed_local:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_closed_local
+    description: Local timestamp of the closing of the ticket.
+  ts_solved_local:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_solved_local
+    description: Local timestamp of the solving of the ticket.
+  ts_request_created:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_request_created
+    description: Timestamp of the creation of the request.
+  ts_csat_response_submitted:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_csat_response_submitted
+    description: Timestamp of the submission of the CSAT response.
+  ts_initially_assigned_local:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_initially_assigned_local
+    description: Local timestamp of the initially assigned of the ticket.
+  ts_last_assigned_local:
+    lineage:
+      - datalake_repairs.repair_tickets.ts_last_assigned_local
+    description: Local timestamp of the last assigned of the ticket.
+  ts_reflux:
+    lineage:
+      - dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+    description: Local timestamp of the reflux of the ticket, whether tags are
+                 - macro_ro_acao_backlog_full_prestador_interno
+                 - acao_backlog_full_prestador_interno
+                 - macro_ro_refluxo_tarefa_acionar_parceiro
+  ts_first_open:
+    lineage:
+      - dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+    description: Local timestamp of the first open of the ticket, when sk_group is not 18592339863437.
+  ts_ps_iq:
+    lineage:
+      - dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+    description: Local timestamp of the PS IQ of the ticket, whether tags are one of the following
+                 - macro_ro_iq_ps_iq_manual
+                 - macro_ro_pp_ps_iq_manual
+                 - testes_ro_especializacao_ps_iq
+                 - pp_escolheu_prestador_iq_aprovar_orcamento
+                 - iq_pp_escolheu_prestador_iq_aprovar_orcamento
+                 - macro_ro_triagem_pp_definido_psiq
+                 - macro_ro_triagem_iq_definido_psiq
+                 - tag_Squad_reparos_reparacao_piloto_ps_iq
+  ts_ps_pp:
+    lineage:
+      - dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+    description: Local timestamp of the PS PP of the ticket, whether tags are one of the following
+                 - macro_ro_definicao_prestador_proprio
+                 - definição_prestador_proprio
+                 - macro_ro_definicao_prestador_proprio
+                 - testes_ro_especializacao_ps_pp
+                 - pp_autosserviço_prestadorpp
+                 - iq_pp_autosserviço_prestadorpp
+                 - macro_ro_triagem_iq_definido_pspp
+  ts_compulsory:
+    lineage:
+      - dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+    description: Timestamp of the compulsory of the ticket, whether tags are one of the following
+                 - comum_iniciar_compulsoria
+                 - mediação_início_compulsória
+                 - macro_ro_inicio_compulsoria
+                 - macro_ro_compulsoria_iq_inicio_compulsoria
+                 - macro_ro_compulsoria_pp_inicio_compulsoria
+                 - execução_compulsória
+                 - macro_ro_aprovado_compulsória
+  ts_help_request:
+    lineage:
+      - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.ts_updated
+    description: Timestamp of the help request of the ticket, when status is HELP_NEEDED.
+  ts_latest_customer_comment:
+    lineage:
+      - datalake_repairs_clean.repair_tickets.ts_latest_customer_comment
+    description: Timestamp of the latest customer comment of the ticket.
+  ts_latest_analyst_comment:
+    lineage:
+      - datalake_repairs_clean.repair_tickets.ts_latest_analyst_comment
+    description: Timestamp of the latest analyst comment of the ticket.
+  year:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Year of the ticket.
+  month:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Month of the ticket.
+  day:
+    lineage:
+      - CURRENT_DATE - 1
+    description: Day of the ticket.
+  ts_load:
+    lineage:
+      - CURRENT_TIMESTAMP
+    description: Timestamp of the load.
