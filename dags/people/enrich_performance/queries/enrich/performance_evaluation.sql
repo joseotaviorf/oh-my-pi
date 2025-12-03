@@ -132,6 +132,33 @@ evaluations AS (
     base.dt_performance_document_ended,
     base.ts_created,
     base.ts_updated
+),
+open_evaluations AS (
+  SELECT
+    e.id_evaluation,
+    e.id_evaluator,
+    qr.free_text_answer_unlimited AS open_evaluation
+  FROM
+    evaluations AS e
+  LEFT JOIN
+    datalake_pin_performance_clean.evaluation_participant AS ep
+      ON ep.id_person = e.id_evaluator
+      AND ep.id_evaluation = e.id_evaluation
+  LEFT JOIN
+    datalake_pin_questionnaires_clean.questionnaire_participant AS p
+      ON p.id_subject = e.id_evaluation
+      AND p.id_participant = ep.id_eval_participant
+  LEFT JOIN
+    datalake_pin_questionnaires_clean.questionnaire_response AS r
+      ON r.id_questionnaire_participant = p.id_questionnaire_participant
+  LEFT JOIN
+    datalake_pin_questionnaires_clean.question_response AS qr
+      ON qr.id_questionnaire_response = r.id_questionnaire_response
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY e.id_evaluation, e.id_evaluator
+      ORDER BY qr.ts_created DESC NULLS LAST
+    ) = 1
 )
 SELECT
   MD5(CONCAT(
@@ -155,7 +182,7 @@ SELECT
   e.description_impact,
   e.description_leadership,
   e.description_behavior,
-  qr.free_text_answer_unlimited AS open_evaluation,
+  oe.open_evaluation,
   e.numeric_impact,
   e.numeric_leadership,
   e.numeric_behavior,
@@ -171,16 +198,6 @@ SELECT
 FROM
   evaluations AS e
 LEFT JOIN
-  datalake_pin_performance_clean.evaluation_participant AS ep
-    ON ep.id_person = e.id_evaluator
-        AND ep.id_evaluation = e.id_evaluation
-LEFT JOIN
-  datalake_pin_questionnaires_clean.questionnaire_participant AS p
-    ON p.id_subject = e.id_evaluation
-        AND p.id_participant = ep.id_eval_participant
-LEFT JOIN
-  datalake_pin_questionnaires_clean.questionnaire_response AS r
-    ON r.id_questionnaire_participant = p.id_questionnaire_participant
-LEFT JOIN
-  datalake_pin_questionnaires_clean.question_response AS qr
-    ON qr.id_questionnaire_response = r.id_questionnaire_response
+  open_evaluations AS oe
+    ON oe.id_evaluation = e.id_evaluation
+    AND oe.id_evaluator = e.id_evaluator
