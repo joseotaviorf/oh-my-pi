@@ -1,0 +1,283 @@
+---
+database_name: datalake_crawler_df_imoveis
+table_name: df_imoveis
+description: |
+  This table contains enriched fields regarding the df_imoveis crawler data.
+  It transforms and flattens the original struct fields from the clean table into
+  individual columns for easier analysis and consumption.
+
+  **Key Transformations:**
+  - Extracts and flattens JSON struct fields (address, price, house_info, etc.) into individual columns
+  - Applies data type casting (integers for numeric fields, booleans for flags, doubles for prices and price_m2)
+  - Calculates derived fields like price_m2_rental and price_m2_sale
+  - Handles complex city name parsing with regex cleaning
+  - Creates composite fields like id_house (id + 'dfimoveis') and is_hybrid flag
+
+  **Data Source:**
+  - **2025 onwards:** Sources data from datalake_crawler_df_imoveis_clean.df_imoveis
+
+  **Update Schedule:**
+  The table is updated weekly, every Friday, after the datalake_crawler_df_imoveis_clean.df_imoveis
+  table is refreshed. This ensures data consistency and maintains the dependency chain.
+domain: Cross
+owner: mateus.aferreira@quintoandar.com.br
+columns: 
+  id_house_platform:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.id
+    description: |
+      The id of the listing in the df_imoveis platform.
+  id_house:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.id
+    description: |
+      It concatenates the id of the listing in the df_imoveis platform with the
+      string "dfimoveis".
+  platform:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.origin
+    description: |
+      The origin of the listing, which is always "dfimoveis" for this table.
+  country:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.address
+    description: |
+      The country of the listing.
+      It is provided by the original struct field "address".
+  state:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.address
+    description: |
+      The state of the listing.
+      It is provided by the original struct field "address".
+  address_city:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.address
+    description: |
+      The city of the listing.
+      It is provided by the original struct field "address".
+      If the original value is null, then it assumes the clean table partition,
+      which is the "city" field.
+      It doens't assume null values, and it is used as a z_order field for the
+      delta table.
+  neighborhood:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.address
+    description: |
+      The neighborhood of the listing.
+      It is provided by the original struct field "address".
+  street:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.address
+    description: |
+      The street of the listing.
+      It is provided by the original struct field "address".
+  zip_code:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.address
+    description: |
+      The zip_code of the listing.
+      It is provided by the original struct field "address".
+  latitude:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.geolocation
+    description: |
+      The latitude associated with the listing location.
+      It is provided by the original struct field "geolocation".
+  longitude:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.geolocation
+    description: |
+      The longitude associated with the listing location.
+      It is provided by the original struct field "geolocation".
+  listing_name:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.listing_name
+    description: |
+      The name of the listing.
+      It is the listing description provided in the origin platform.
+  listing_url:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.crawl_metadata
+    description: |
+      The url of the listing.
+      It is provided by the original struct field "crawl_metadata".
+  total_area:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The total area of the listing in square meters.
+      It is extracted from the "house_info" struct field and cast as integer.
+  area:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The area of the listing in square meters.
+      It is extracted from the "house_info" struct field and cast as integer.
+  amenities:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The listing amenities, such as "Área de Serviço", "Quadra Esportiva", "Salão de Festas", "Aceita Pets", etc.
+      It is extracted from the "house_info" struct field.
+  bedrooms:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The number of bedrooms in the listing.
+      It is extracted from the "house_info" struct field and cast as integer.
+  suites:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The number of suites in the listing.
+      It is extracted from the "house_info" struct field and cast as integer.
+  floor:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The floor number of the listing.
+      It is extracted from the "house_info" struct field and cast as integer.
+  parking_spaces:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The number of parking spaces available in the listing.
+      It is extracted from the "house_info" struct field and cast as integer.
+  tags:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+    description: |
+      The tags associated with the publication (e.g., "super_destaque", "imovel_assinado", etc.).
+      It is provided by the original struct field "type", and it can
+      assume null values.
+  unit_type:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+    description: |
+      The type of the housing unit (e.g., apartamento, casa, etc.).
+      It is provided by the original struct field "type", and it can assume null values.
+  usage_type:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+    description: |
+      The usage type of the housing unit (e.g., residencial, commercial, etc.).
+      It is provided by the original struct field "type", and it can assume null values.  
+  is_for_rent:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+    description: |
+      Boolean flag indicating if the property is available for rent.
+      It is extracted from the "type.operation_type" struct field and cast as boolean.
+  is_for_sale:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+    description: |
+      Boolean flag indicating if the property is available for sale.
+      It is extracted from the "type.operation_type" struct field and cast as boolean.
+  is_hybrid:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+    description: |
+      Boolean flag indicating if the property is available for both rent and sale.
+      It is true when both type.rentable and type.buyable are true, false otherwise.
+  advertiser_name:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.advertiser
+    description: |
+      The name of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser", and it can
+      assume null values.
+  advertiser_phone:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.advertiser
+    description: |
+      The phone number of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser", and it can
+      assume null values.
+  advertiser_email:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.advertiser
+    description: |
+      The email of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser", and it can
+      assume null values.
+  advertiser_creci:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.advertiser
+    description: |
+      The creci of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser", and it can
+      assume null values.
+  condo_fee:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+      - datalake_crawler_df_imoveis_clean.df_imoveis.price
+    description: |
+      The condominium fee of the property.
+      It is extracted from the "price" struct field and cast as double.
+  iptu:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.type
+      - datalake_crawler_df_imoveis_clean.df_imoveis.price
+    description: |
+      The yearly IPTU (property tax) of the listing.
+      It is extracted from the "price" struct field and cast as double.
+  rent_price:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.price
+    description: |
+      The rent price of the property.
+      It is extracted from the "price" struct field and cast as double.
+  sale_price:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.price
+    description: |
+      The sale price of the property.
+      It is extracted from the "price" struct field and cast as double.
+  price_m2_rental:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.price
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The rent price per square meter.
+      It is calculated by dividing the rental price by the total area,
+      rounded to 2 decimal places.
+  price_m2_sale:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.price
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The sale price per square meter.
+      It is calculated by dividing the sale price by the total area,
+      rounded to 2 decimal places.  
+  ts_created:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.date_info
+    description: |
+      The timestamp when the listing was created.
+      It is provided by the original struct field "date_info".  
+  ts_updated:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.date_info
+    description: |
+      The timestamp when the listing was updated.
+      It is provided by the original struct field "date_info".
+  year:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.year
+    description: |
+      The year of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  month:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.month
+    description: |
+      The month of the crawler date.
+      It is used for data partitioning and filtering purposes.
+  day:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.day
+    description: |
+      The day of the crawler date.
+      It is used for data partitioning and filtering purposes.

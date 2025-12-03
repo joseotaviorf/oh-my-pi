@@ -1,0 +1,48 @@
+SELECT 
+    id_house_platform,
+    id_house,
+    platform,
+    country,
+    state,
+    address_city,
+    neighborhood,
+    street,
+    zip_code,
+    latitude,
+    longitude,
+    listing_name,
+    listing_url,
+    total_area,
+    area,      
+    amenities,
+    bedrooms,
+    suites,
+    floor,
+    parking_spaces,
+    tags,
+    unit_type,
+    usage_type,      
+    is_for_rent,       
+    is_for_sale,             
+    is_hybrid, 
+    advertiser_name,   
+    advertiser_phone,
+    advertiser_email,
+    advertiser_creci,      
+    condo_fee,
+    iptu,
+    rent_price,
+    sale_price,         
+    price_m2_rental,
+    price_m2_sale,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
+FROM 
+    datalake_crawler_df_imoveis.df_imoveis
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY 
+    ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY make_date(year, month, day) DESC) = 1
