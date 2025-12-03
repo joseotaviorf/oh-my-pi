@@ -1134,6 +1134,15 @@ bietlejuice.enrich_atlas_db_quality_metrics:
 bietlejuice.enrich_billing:
   - bietlejuice.billing:load-clean-contract-revision
   - bietlejuice.billing:load-clean-contract
+bietlejuice.enrich_business_model:
+  add:
+    - bietlejuice.ebdb_visit:load-clean-visitor
+    - bietlejuice.ebdb_visit_fast_lane:load-clean-visit
+  remove:
+    - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
+    - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
+    - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+    - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
 bietlejuice.core_company:
   add:
     - bietlejuice.company:load-clean-company
