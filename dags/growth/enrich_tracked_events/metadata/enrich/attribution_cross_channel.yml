@@ -1,7 +1,7 @@
 ---
 database_name: datalake_tracked_events
 table_name: attribution_cross_channel
-owner: cristina.cardoso@quintoandar.com.br
+owner: "@data-growth"
 domain: Growth
 description: Table utilized by the Growth team to describe the attribution cross channel of the amplitude events.
 columns:
@@ -37,16 +37,18 @@ columns:
     description: Code of the visit when the event is related to a visit.
     lineage:
       - datalake_tracked_events.cross_channel_full.visit_code
-  app_type:
-    description: Type of the app used by the user when he did the event.
+  final_attribution_app_type:
+    description: Final app type attributed to the event.
     lineage:
-      - datalake_tracked_events.cross_channel_full.platform
+      - datalake_tracked_events.cross_channel_full.final_attribution_app_type
   final_attribution_branded:
     description: If in the final attribution the user came through a branded campaign.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_branded
   final_attribution_origin:
-    description: Final origin attributed to the event.
+    description: |
+      Final origin attributed to the event.
+      If the origin is NULL, it defaults to 'cross_channel_attribution'.
     lineage:
       - datalake_tracked_events.cross_channel_full.final_attribution_origin
   final_attribution_source:
@@ -76,7 +78,7 @@ columns:
   final_attribution_entrance_uri:
     description: The URL of the first page a user visits in a session
     lineage:
-      - datalake_tracked_events.cross_channel_full.final_attribution_entrance_uri  
+      - datalake_tracked_events.cross_channel_full.final_attribution_entrance_uri
   ts_event:
     description: Date of the event.
     lineage:

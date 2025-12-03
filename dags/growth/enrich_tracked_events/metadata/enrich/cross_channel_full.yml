@@ -1,12 +1,12 @@
 ---
 database_name: datalake_tracked_events
 table_name: cross_channel_full
-owner: cristina.cardoso@quintoandar.com.br
+owner: "@data-growth"
 domain: Growth
 description: Table utilized by the Growth team to describe the attribution cross channel of online and offline events.
 columns:
   id_user:
-    description: sk_user of the user that did the event.  
+    description: sk_user of the user that did the event.
     lineage:
       - datalake_online_attribution.online_attribution.id_user
       - datalake_tracked_events.offline_attribution.id_user
@@ -39,10 +39,13 @@ columns:
     description: Code of the visit when the event is related to a visit.
     lineage:
       - datalake_online_attribution.online_attribution.visit_code
-  app_type:
-    description: Type of the app used by the user when he did the event.
+  final_attribution_app_type:
+    description: |
+      Final app type attributed to the event, derived from the platform or amplitude_platform fields.
+      Uses attribution logic to determine the app type from the last touchpoint before conversion, with fallback to conversion event attribution when needed.
     lineage:
       - datalake_online_attribution.online_attribution.platform
+      - datalake_online_attribution.online_attribution.amplitude_platform
   final_attribution_branded:
     description: If in the final attribution, the user came through a branded campaign.
     lineage:
@@ -82,7 +85,7 @@ columns:
   final_attribution_entrance_uri:
     description: The URL of the first page a user visits in a session
     lineage:
-      - datalake_online_attribution.online_attribution.entrance_uri    
+      - datalake_online_attribution.online_attribution.entrance_uri
   ts_event:
     description: Date of the event.
     lineage:

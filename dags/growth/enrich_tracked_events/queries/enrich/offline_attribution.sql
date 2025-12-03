@@ -83,12 +83,25 @@ WHERE
   AND bqr.id_channel = 1
   AND bqr.id_campaign = 62
 UNION ALL
-SELECT 
+SELECT
   id_user,
   id_contact,
   event_name,
   origin,
-  channel,
+  CASE 
+    WHEN channel = 'Facebook' THEN 'ZEBRA.hybr.acq.nonorg.na.d.webdisplay.facebook'
+    WHEN channel = 'Placas' THEN CONCAT('ZEBRA.', LOWER(business_context), '.acq.nonorg.na.d.placas.na')
+    WHEN channel = 'Online Classifieds' THEN CONCAT(
+      'ZEBRA.', 
+      LOWER(business_context), 
+      '.acq.nonorg.na.d.onlineclassifieds.', 
+      CASE 
+        WHEN source IN ('Imovelweb', 'Chaves na Mão') THEN LOWER(REPLACE(source, ' ', ''))
+        ELSE 'na'
+      END
+    )
+    ELSE channel
+  END AS channel,
   agent,
   business_context,
   ts_event,

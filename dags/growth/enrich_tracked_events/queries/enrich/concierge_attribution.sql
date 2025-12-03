@@ -10,7 +10,8 @@ WITH concierge_events AS (
       WHEN csm.content LIKE '%Olá! Gostaria de ver alguns imóveis no QuintoAndar%' THEN 'Facebook'
       WHEN csm.content LIKE '%QuintoAndar no portal%' THEN 'Online Classifieds'
       WHEN csm.content LIKE '%placa%' THEN 'Placas'
-    END AS event_type
+    END AS event_type,
+    NULLIF(TRIM(REGEXP_EXTRACT(content,'portal\\s+(.*?)(?:\\s+e\\s+|\\.|,|$|\\n)',1)),'') AS source
   FROM
     datalake_copilot_service_clean.message AS csm
   LEFT JOIN
@@ -54,6 +55,12 @@ SELECT
     ELSE 'Hybrid'
   END AS business_context,
   content,
+  CASE
+    WHEN event_type = 'Facebook' THEN 'Facebook'
+    WHEN event_type = 'Placas' THEN 'NA'
+    WHEN event_type = 'Online Classifieds' AND source RLIKE 'Chaves\\s*n\\s*[aA]?\\s*[mM][aAãA]o' THEN 'Chaves na Mão'
+    ELSE source
+  END AS source,
   ts_created AS ts_event,
   YEAR(ts_created) AS year,
   MONTH(ts_created) AS month,

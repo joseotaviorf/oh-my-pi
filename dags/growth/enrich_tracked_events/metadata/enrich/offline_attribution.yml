@@ -57,7 +57,9 @@ columns:
       - datalake_tracked_events.secretaria_offline_touchpoints.agent
       - datalake_tracked_events.concierge_attribution.agent
   business_context:
-    description: Business context associated with the offline attribution event.
+    description: |
+      Business context of the event, indicating whether it relates to Rent, Sale, or Hybrid (both Rent and Sale). For most offline attribution sources, this is NULL.
+      For concierge attribution events, this value is derived from the concierge_attribution table.
     lineage:
       - datalake_tracked_events.concierge_attribution.business_context
   ts_event:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_tracked_events
 table_name: concierge_attribution
-owner: henrique.paulo@quintoandar.com.br
+owner: "@data-growth"
 domain: Growth
 description: Table utilized by the Growth team to describe concierge attribution events from WhatsApp Concierge Chat interactions, including Facebook, Online Classifieds, and Placas.
 columns:
@@ -29,6 +29,10 @@ columns:
     description: Agent or representative handling the contact or event. Always 'Concierge' for these events.
   business_context:
     description: Business context of the event, indicating whether it relates to Rent, Sale, or Hybrid (both Rent and Sale). Facebook events are always Hybrid. Online Classifieds and Placas events are determined by analyzing message content for keywords related to rent and/or sale.
+    lineage:
+      - datalake_copilot_service_clean.message.content
+  source:
+    description: Source of the event, indicating the specific portal or platform for Online Classifieds events (e.g., 'Imovelweb', 'Chaves na Mão'). For Facebook events, returns 'Facebook'. For Placas events, returns 'NA'. Extracted from message content using regex pattern matching.
     lineage:
       - datalake_copilot_service_clean.message.content
   content:

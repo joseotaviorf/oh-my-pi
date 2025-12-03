@@ -295,7 +295,9 @@ cross_channel AS (
             'SIGN', 
             'INBOUND',
             'service_link',
-            'referral'
+            'referral',
+            'Facebook',
+            'Online Classifieds'
             )
 ),
 apply_attribution_rule AS (
