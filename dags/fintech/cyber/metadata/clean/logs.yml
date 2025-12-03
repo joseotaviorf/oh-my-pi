@@ -2,7 +2,7 @@
 database_name: datalake_cyber_clean
 table_name: logs
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: |
   Table that stores all activities, actions taken, results obtained and comments from managers in the
   system. Contains a record for each activity carried out.
@@ -18,15 +18,15 @@ columns:
     lineage:
       - datalake_cyber_raw.actfil.ACCIDNAM
   contract_group:
-    description: ""
+    description: "Group identifier for the contract (1=QuintoAndar, 2=QuintoCred)"
     lineage:
       - datalake_cyber_raw.actfil.ACACCTG
-  letter_code:
-    description: ""
+  creditor:
+    description: "Creditor name derived from contract group (1=QuintoAndar, 2=QuintoCred)"
     lineage:
-      - datalake_cyber_raw.actfil.ACLCCODE
+      - datalake_cyber_raw.actfil.ACACCTG
   region_code:
-    description: ""
+    description: "Region code associated with the contract activity"
     lineage:
       - datalake_cyber_raw.actfil.ACARCOD
   action:
@@ -37,12 +37,16 @@ columns:
     description: "Result realized in the contract"
     lineage:
       - datalake_cyber_raw.actfil.ACRCCODE
+  complement:
+    description: "Complement code or letter code for the action"
+    lineage:
+      - datalake_cyber_raw.actfil.ACLCCODE
   sequence_number:
-    description: ""
+    description: "Sequence number of the activity record"
     lineage:
       - datalake_cyber_raw.actfil.ACSEQNUM
   comment:
-    description: ""
+    description: "Comments or notes added by the manager regarding the activity"
     lineage:
       - datalake_cyber_raw.actfil.ACCOMM
   phone_number:
@@ -54,22 +58,34 @@ columns:
     lineage:
       - datalake_cyber_raw.actfil.ACEXT
   latitude:
-    description: ""
+    description: "Latitude coordinate of where the activity took place"
     lineage:
       - datalake_cyber_raw.actfil.ACLAT
   longitude:
-    description: ""
+    description: "Longitude coordinate of where the activity took place"
     lineage:
       - datalake_cyber_raw.actfil.ACLNG
   ts_activity:
-    description: ""
+    description: "Timestamp when the activity occurred"
     lineage:
       - datalake_cyber_raw.actfil.ACACTDTE
   ts_load_cyber:
     description: "This field is used for batch loads. For inserted records, the correct field is ts_activity (original name: ACACTDTE)."
     lineage:
       - datalake_cyber_raw.actfil.ACENTDTE
+  year:
+    description: "Partition column year"
+    lineage:
+      - datalake_cyber_raw.actfil.year
+  month:
+    description: "Partition column month"
+    lineage:
+      - datalake_cyber_raw.actfil.month
+  day:
+    description: "Partition column day"
+    lineage:
+      - datalake_cyber_raw.actfil.day
   ts_load:
-    description: ""
+    description: "Timestamp when the record was loaded into the table"
     lineage:
       - datalake_cyber_raw.actfil.NOW()

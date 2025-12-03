@@ -12,7 +12,7 @@ SELECT
     ACRCCODE AS result,
     ACLCCODE AS complement,
     ACSEQNUM AS sequence_number,
-    ACCOMM AS comment,
+    DECODE(ENCODE(ACCOMM, 'ISO-8859-1'), 'UTF-8') AS comment,
     ACPHONE AS phone_number,
     ACEXT AS phone_extension,
     ACLAT AS latitude,
