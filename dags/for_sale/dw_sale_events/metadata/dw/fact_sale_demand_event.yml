@@ -128,6 +128,26 @@ columns:
     - dw_sale.fact_visits.sk_listing_price_segment
     - dw_sale.fact_offers.sk_listing_price_segment
     description: Surrogate key of the listing price segment. Can be joined with dw_sale.dim_sale_price_segment.
+  is_3p_supply:
+    lineage:
+    - dw_sale.fact_visits.is_3p_supply
+    - dw_sale.fact_offers.is_3p_supply
+    description: Boolean flag indicating if the event has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
+  is_3p_demand:
+    lineage:
+    - dw_sale.fact_visits.is_3p_demand
+    - dw_sale.fact_offers.is_3p_demand
+    description: Boolean flag indicating if the event has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
+  is_3p_lead_gen:
+    lineage:
+    - dw_sale.fact_visits.is_3p_lead_gen
+    - dw_sale.fact_offers.is_3p_lead_gen
+    description: Boolean flag indicating if the event has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
+  has_3p_access_control:
+    lineage:
+    - dw_sale.fact_visits.has_3p_access_control
+    - dw_sale.fact_offers.has_3p_access_control
+    description: Boolean flag indicating if the event has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   year:
     lineage:
     - dw_public.dim_date.year

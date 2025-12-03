@@ -48,6 +48,10 @@ columns:
     lineage:
       - dw_house.dim_house_entrance_history.sk_house_entrance
     description: Foreign key from dw_house.dim_house_entrance_history. Last event before the visit.
+  sk_visit_status:
+    lineage:
+      - dw_visit.dim_visit_status.sk_visit_status
+    description: Foreign key from dw_visit.dim_visit_status. Current computed status of the visit.
   sk_ppa_relation:
     lineage:
       - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
@@ -129,7 +133,7 @@ columns:
     description: Timestamp of the first visit rescheduled.
     lineage:
         - datalake_visit.visit_status_events.ts_event_created
-  ts_last_visit_reschedule:
+  ts_last_visit_rescheduled:
     description: Timestamp of the last visit rescheduled.
     lineage:
         - datalake_visit.visit_status_events.ts_event_created
@@ -199,6 +203,22 @@ columns:
     description: If the visit is unsuccessful.
     lineage:
       - datalake_visit.visits.is_unsuccessful
+  is_3p_supply:
+    lineage:
+      - datalake_visit.visits.is_3p_supply
+    description: Boolean flag indicating if the visit has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
+  is_3p_demand:
+    lineage:
+      - datalake_visit.visits.is_3p_demand
+    description: Boolean flag indicating if the visit has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_visit.visits.is_3p_lead_gen
+    description: Boolean flag indicating if the visit has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
+  has_3p_access_control:
+    lineage:
+      - datalake_visit.visits.has_3p_access_control
+    description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   journey_days:
     description: Journey days since the first created event.
     lineage:

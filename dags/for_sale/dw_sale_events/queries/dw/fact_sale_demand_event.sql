@@ -19,6 +19,10 @@ WITH bookings AS (
         fv.sk_last_secretariat,
         fv.sk_buyer_prospect_type,
         fv.sk_listing_price_segment,
+        fv.is_3p_supply,
+        fv.is_3p_demand,
+        fv.is_3p_lead_gen,
+        fv.has_3p_access_control,
         fv.ts_booking_created,
         fv.ts_visit_completed,
         fv.ts_visit_canceled
@@ -60,6 +64,10 @@ offers AS (
         fo.sk_last_secretariat,
         fo.sk_buyer_prospect_type,
         fo.sk_listing_price_segment,
+        fo.is_3p_supply,
+        fo.is_3p_demand,
+        fo.is_3p_lead_gen,
+        fo.has_3p_access_control,
         fo.ts_offer_submitted,
         fo.ts_offer_accepted,
         fo.ts_sale_agreement_created,
@@ -96,6 +104,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_booking_created AS ts_event
     FROM
         bookings
@@ -122,6 +134,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_visit_completed AS ts_event
     FROM
         bookings
@@ -148,6 +164,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_offer_submitted AS ts_event
     FROM
         offers
@@ -174,6 +194,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_offer_accepted AS ts_event
     FROM
         offers
@@ -200,6 +224,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_sale_agreement_created AS ts_event
     FROM
         offers
@@ -226,6 +254,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_sale_agreement_signed AS ts_event
     FROM
         offers
@@ -252,6 +284,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_visit_canceled AS ts_event
     FROM
         bookings
@@ -278,6 +314,10 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
+        is_3p_supply,
+        is_3p_demand,
+        is_3p_lead_gen,
+        has_3p_access_control,
         ts_offer_dismissed AS ts_event
     FROM
         offers
@@ -306,6 +346,10 @@ SELECT
     COALESCE(e.sk_last_secretariat, -1) AS sk_last_secretariat,
     COALESCE(e.sk_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(e.sk_listing_price_segment, -1) AS sk_listing_price_segment,
+    COALESCE(e.is_3p_supply, FALSE) AS is_3p_supply,
+    COALESCE(e.is_3p_demand, FALSE) AS is_3p_demand,
+    COALESCE(e.is_3p_lead_gen, FALSE) AS is_3p_lead_gen,
+    COALESCE(e.has_3p_access_control, FALSE) AS has_3p_access_control,
     YEAR(e.ts_event) AS year,
     MONTH(e.ts_event) AS month,
     DAY(e.ts_event) AS day,
@@ -336,6 +380,10 @@ SELECT
     sk_last_secretariat,
     sk_buyer_prospect_type,
     sk_listing_price_segment,
+    is_3p_supply,
+    is_3p_demand,
+    is_3p_lead_gen,
+    has_3p_access_control,
     year,
     month,
     day,

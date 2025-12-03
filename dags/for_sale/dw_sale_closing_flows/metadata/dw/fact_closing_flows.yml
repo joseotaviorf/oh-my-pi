@@ -174,6 +174,22 @@ columns:
     lineage:
       - datalake_sale_closing_flows.closing_flow.id_real_estate_register_specialist
     description: ID Real Estate Register Specialist
+  is_3p_supply:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.is_3p_supply
+    description: Boolean flag indicating if the closing flow has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
+  is_3p_demand:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.is_3p_demand
+    description: Boolean flag indicating if the closing flow has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.is_3p_lead_gen
+    description: Boolean flag indicating if the closing flow has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
+  has_3p_access_control:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.has_3p_access_control
+    description: Boolean flag indicating if the closing flow has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   days_sale_agreement_created_to_legaut_analysis_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_created_to_legaut_analysis_started

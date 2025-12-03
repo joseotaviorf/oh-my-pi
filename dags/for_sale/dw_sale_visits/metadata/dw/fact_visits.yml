@@ -156,6 +156,22 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.is_virtual_visit
     description: True if the visit is a virtual visit.
+  is_3p_supply:
+    lineage:
+    - datalake_sale_visit.sale_visit.is_3p_supply
+    description: Boolean flag indicating if the visit has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
+  is_3p_demand:
+    lineage:
+    - datalake_sale_visit.sale_visit.is_3p_demand
+    description: Boolean flag indicating if the visit has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
+  is_3p_lead_gen:
+    lineage:
+    - datalake_sale_visit.sale_visit.is_3p_lead_gen
+    description: Boolean flag indicating if the visit has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
+  has_3p_access_control:
+    lineage:
+    - datalake_sale_visit.sale_visit.has_3p_access_control
+    description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   days_visit_cancelled_to_visit:
     lineage:
     - datalake_sale_visit.sale_visit.days_visit_cancelled_to_visit

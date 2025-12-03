@@ -234,6 +234,22 @@ columns:
     lineage:
     - datalake_offer.sale_offer.hours_visit_to_offer
     description: Hours between the visit completion and the offer submission
+  is_3p_supply:
+    lineage:
+    - datalake_offer.sale_offer.is_3p_supply
+    description: Boolean flag indicating if the offer has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
+  is_3p_demand:
+    lineage:
+    - datalake_offer.sale_offer.is_3p_demand
+    description: Boolean flag indicating if the offer has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
+  is_3p_lead_gen:
+    lineage:
+    - datalake_offer.sale_offer.is_3p_lead_gen
+    description: Boolean flag indicating if the offer has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
+  has_3p_access_control:
+    lineage:
+    - datalake_offer.sale_offer.has_3p_access_control
+    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   ts_offer_submitted:
     lineage:
     - datalake_offer.sale_offer.ts_offer_submitted

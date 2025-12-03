@@ -42,6 +42,11 @@ SELECT
   id_notes_registry_specialist,
   id_real_estate_register_specialist,
   --
+  COALESCE(cf.is_3p_supply, FALSE) AS is_3p_supply,
+  COALESCE(cf.is_3p_demand, FALSE) AS is_3p_demand,
+  COALESCE(cf.is_3p_lead_gen, FALSE) AS is_3p_lead_gen,
+  COALESCE(cf.has_3p_access_control, FALSE) AS has_3p_access_control,
+  --
   days_sale_agreement_created_to_legaut_analysis_started,
   days_sale_agreement_signed_to_house_registry_started,
   days_sale_agreement_signed_to_house_registry_ended,

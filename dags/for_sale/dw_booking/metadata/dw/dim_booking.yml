@@ -725,6 +725,16 @@ columns:
       - datalake_booking.booking.is_3p_demand
     description: >
       Boolean column that identifies if the visitor came from a QuintoAndar demand partner.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_booking.booking.is_3p_lead_gen
+    description: >
+      Boolean flag indicating if the booking has 3P lead generation partner.
+  has_3p_access_control:
+    lineage:
+      - datalake_booking.booking.has_3p_access_control
+    description: >
+      Boolean flag indicating if the booking has any 3P access control (supply, demand, or lead gen).
   dt_visit_follow_up:
     lineage:
       - datalake_booking.booking.ts_visit_fup
