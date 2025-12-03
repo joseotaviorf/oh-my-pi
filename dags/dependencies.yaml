@@ -2434,6 +2434,7 @@ bietlejuice.enrich_hr_system:
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
   - bietlejuice.hr_system:load-clean-workers:first-run-of-day
+  - bietlejuice.pin_core:load-clean-lookup:first-run-of-day
 bietlejuice.enrich_hr_system_custom:
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
 bietlejuice.enrich_hub_services:

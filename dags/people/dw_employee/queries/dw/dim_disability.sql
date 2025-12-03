@@ -1,9 +1,10 @@
 SELECT DISTINCT
   sk_disability,
-  disability_category_code_wdoc,
-  disability_category_wdoc,
-  disability_status_wdoc,
-  disability_self_declaration_code,
-  disability_self_declaration_description,
+  documented_name_active AS documented_name,
+  self_declared_name,
+  has_documented_active_disability AS has_documented_disability,
+  has_self_declared_disability,
+  has_documented_pending_disability AS has_pending_documented_disability,
   NOW() AS ts_load
-FROM datalake_hr_system.disability
+FROM
+  datalake_hr_system.disability

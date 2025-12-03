@@ -1,36 +1,33 @@
 ---
 database_name: dw_employee
 table_name: dim_disability
-owner: isabella.araujo@quintoandar.com.br
+owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: Dimension table that stores employee disability information.
 columns:
   sk_disability:
-    description: Surrogate key for the dimension table employee_disability.
+    description: Surrogate key for the disability dimension, created with MD5 of documented name, self-declared name, and disability flags for active disabilities.
     lineage:
       - datalake_hr_system.disability.sk_disability
-  disability_category_code_wdoc:
-    description: Disability category code.
+  documented_name:
+    description: Disability category name for active documented disabilities only.
     lineage:
-      - datalake_hr_system.disability.disability_category_code_wdoc
-  disability_category_wdoc:
-    description: Disability category description.
+      - datalake_hr_system.disability.documented_name_active
+  self_declared_name:
+    description: Self-declared disability description from lookup table.
     lineage:
-      - datalake_hr_system.disability.disability_category_wdoc
-  disability_status_wdoc:
-    description: Disability status.
-    categories:
-      A: Active
-      I: Inactive
+      - datalake_hr_system.disability.self_declared_name
+  has_documented_disability:
+    description: Boolean flag indicating if the employee has an active documented disability.
     lineage:
-      - datalake_hr_system.disability.disability_status_wdoc
-  disability_self_declaration_code:
-    description: Self-declared disability code.
+      - datalake_hr_system.disability.has_documented_active_disability
+  has_self_declared_disability:
+    description: Boolean flag indicating if the employee has a self-declared disability.
     lineage:
-      - datalake_hr_system.disability.disability_self_declaration_code
-  disability_self_declaration_description:
-    description: Self-declared disability description.
+      - datalake_hr_system.disability.has_self_declared_disability
+  has_pending_documented_disability:
+    description: Boolean flag indicating if the employee has a pending documented disability.
     lineage:
-      - datalake_hr_system.disability.disability_self_declaration_description
+      - datalake_hr_system.disability.has_documented_pending_disability
   ts_load:
     description: Timestamp of when the record was loaded into the table.

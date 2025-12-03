@@ -28,16 +28,6 @@ salaries AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) = 1
 ),
-disability AS (
-  SELECT DISTINCT
-    sk_disability,
-    id_person,
-    has_self_declared_disability
-  FROM 
-    datalake_hr_system.disability
-  QUALIFY
-    ts_last_updated = MAX(ts_last_updated) OVER (PARTITION BY id_person)
-),
 current_assignments AS (
   SELECT 
     id_period_of_service, 
@@ -152,7 +142,6 @@ SELECT
     THEN TRUE
     ELSE FALSE
   END AS is_manager,
-  COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
   CASE 
     WHEN ed.assignment_type = 'P' THEN 0
     ELSE FLOOR(MONTHS_BETWEEN(COALESCE(ps.dt_actual_termination, DATE('{load_start_date}')), ps.dt_started)) 
@@ -181,7 +170,7 @@ LEFT JOIN
   salaries AS s
     ON s.id_assignment = im.id_assignment
 LEFT JOIN
-  disability AS d
+  datalake_hr_system.disability AS d
     ON d.id_person = im.id_person
 LEFT JOIN
   datalake_hr_system.demographic_attributes AS da

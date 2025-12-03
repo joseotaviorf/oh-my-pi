@@ -85,10 +85,6 @@ columns:
     - datalake_employment.employee_details.assignment_status_type
     - datalake_hr_system.management_hierarchy.is_direct_manager
     - datalake_pin_core_clean.all_assignments.career_track
-  has_self_declared_disability:
-    description: Flag (TRUE/FALSE) indicating if the employee has a self-declared disability.
-    lineage:
-    - datalake_hr_system.disability.has_self_declared_disability
   assignment_age_months:
     description: Tenure in months, calculated from the start date to the end date (or current date if active).
     lineage:

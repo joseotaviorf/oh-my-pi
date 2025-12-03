@@ -16,3 +16,11 @@ column_level_validations:
   sk_disability:
     is_unique:
       severity_level: Warning
+  documented_name:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM dw_employee.dim_disability WHERE documented_name LIKE '%*') = 0"
+      severity_level: Warning
+  self_declared_name:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM dw_employee.dim_disability WHERE self_declared_name LIKE '%*') = 0"
+      severity_level: Warning

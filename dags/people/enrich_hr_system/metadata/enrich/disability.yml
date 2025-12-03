@@ -1,47 +1,95 @@
+---
 database_name: datalake_hr_system
 table_name: disability
-owner: isabella.araujo@quintoandar.com.br
+owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: Table storing information about employees' disabilities.
 columns:
   id_person:
     description: Identifier for the person.
     lineage:
-    - .workers.id_person
+      - datalake_hr_system_clean.workers.id_person
+  id_disability:
+    description: Identifier for the disability from the HR system.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.DisabilityId
   sk_disability:
-    description: Surrogate key for the dimension table dim_disability.
+    description: Surrogate key for active disability combinations, created with
+      MD5 of documented name, self-declared name, and disability flags.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_description
-  disability_category_code_wdoc:
-    description: Disability category code with documentation
+      - datalake_hr_system_clean.workers.disabilities.Category
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.deficienciaAutodeclaracao
+      - datalake_pin_core_clean.lookup.meaning
+      - datalake_hr_system_clean.workers.disabilities.Status
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.possuiAlgumaDeficiencia
+  sk_disability_all_status:
+    description: Surrogate key for all disability status combinations, created with
+      MD5 of documented name, self-declared name, status, and self-declared flag.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
-  disability_category_wdoc:
-    description: Disability category with documentation
+      - datalake_hr_system_clean.workers.disabilities.Category
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.deficienciaAutodeclaracao
+      - datalake_pin_core_clean.lookup.meaning
+      - datalake_hr_system_clean.workers.disabilities.Status
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.possuiAlgumaDeficiencia
+  person_number:
+    description: Person number from the HR system.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
-  disability_status_wdoc:
-    description: Disability status with documentation
+      - datalake_hr_system_clean.workers.person_number
+  documented_code:
+    description: Disability category code from documented source in the HR system.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
-  disability_self_declaration_code:
-    description: Self-declared disability code
+      - datalake_hr_system_clean.workers.disabilities.Category
+  self_declared_code:
+    description: Self-declared disability code from legislative information.
     lineage:
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_code
-  disability_self_declaration_description:
-    description: Self-declared disability description
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.deficienciaAutodeclaracao
+  documented_name:
+    description: Disability category name mapped from documented code.
     lineage:
-    - datalake_hr_system.demographic_attributes.disability_self_declaration_description
+      - datalake_hr_system_clean.workers.disabilities.Category
+  documented_name_active:
+    description: Disability category name for active documented disabilities only.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.Category
+      - datalake_hr_system_clean.workers.disabilities.Status
+  status_documented:
+    description: Status of the documented disability in the HR system.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.Status
+  self_declared_name:
+    description: Self-declared disability description from lookup table.
+    lineage:
+      - datalake_pin_core_clean.lookup.meaning
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.deficienciaAutodeclaracao
+  created_by_documented:
+    description: User who created the documented disability record.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.CreatedBy
+  updated_by_documented:
+    description: User who last updated the documented disability record.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.LastUpdatedBy
+  has_documented_active_disability:
+    description: Boolean flag indicating if the employee has an active documented
+      disability.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.Status
+  has_documented_pending_disability:
+    description: Boolean flag indicating if the employee has a pending documented
+      disability.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.Status
   has_self_declared_disability:
     description: Self-declared disability
     lineage:
-    - datalake_hr_system.demographic_attributes.has_disability
-  dt_effective_start:
-    description: Last update date
+      - datalake_hr_system_clean.workers.legislative_info.legislativeInfoDFF.possuiAlgumaDeficiencia
+  ts_documented_created:
+    description: Timestamp when the documented disability record was created.
     lineage:
-    - datalake_hr_system_clean.workers.disabilities
-    - datalake_hr_system.demographic_attributes.dt_effective_start
+      - datalake_hr_system_clean.workers.disabilities.CreationDate
+  ts_documented_updated:
+    description: Timestamp when the documented disability record was last updated.
+    lineage:
+      - datalake_hr_system_clean.workers.disabilities.LastUpdateDate
   ts_load:
     description: Timestamp when the data was loaded into the table
