@@ -7,7 +7,7 @@ WITH goal_category AS (
       ELSE g.goal_category
     END AS category
   FROM
-    datalake_pin_goal_clean.goal g
+    datalake_pin_goal_clean.goal AS g
   WHERE
     g.goal_version_type_code = 'ACTIVE'
 ),
@@ -63,159 +63,183 @@ goal_base AS (
     g.ts_updated,
     g.ts_load
   FROM
-    datalake_pin_goal_clean.goal g
+    datalake_pin_goal_clean.goal AS g
   INNER JOIN
-    goal_category gc
-    ON gc.id_goal = g.id_goal
+    goal_category AS gc
+      ON gc.id_goal = g.id_goal
   INNER JOIN
-    datalake_pin_goal_clean.goal_plan_to_goal gpg
-    ON gpg.id_goal = g.id_goal
+    datalake_pin_goal_clean.goal_plan_to_goal AS gpg
+      ON gpg.id_goal = g.id_goal
   INNER JOIN
-    datalake_pin_goal_clean.goal_plan_translation gpt
-    ON gpt.id_goal_plan = gpg.id_goal_plan
-      AND gpt.language = 'PTB'
+    datalake_pin_goal_clean.goal_plan_translation AS gpt
+      ON gpt.id_goal_plan = gpg.id_goal_plan
+        AND gpt.language = 'PTB'
   INNER JOIN
-    datalake_pin_talent_clean.review_period_translation rpt
-    ON rpt.id_review_period = gpg.id_review_period
-      AND rpt.language = 'PTB'
+    datalake_pin_talent_clean.review_period_translation AS rpt
+      ON rpt.id_review_period = gpg.id_review_period
+        AND rpt.language = 'PTB'
   INNER JOIN
-    datalake_pin_core_clean.person_name pn
-    ON pn.id_person = g.id_person
-      AND pn.name_type = 'GLOBAL'
-      AND pn.dt_effective_ended >= '4712-12-31'
+    datalake_pin_core_clean.person_name AS pn
+      ON pn.id_person = g.id_person
+        AND pn.name_type = 'GLOBAL'
+        AND pn.dt_effective_ended >= '4712-12-31'
   INNER JOIN
-    datalake_pin_core_clean.all_people ap
-    ON ap.id_person = g.id_person
-      AND ap.dt_effective_ended >= '4712-12-31'
+    datalake_pin_core_clean.all_people AS ap
+      ON ap.id_person = g.id_person
+        AND ap.dt_effective_ended >= '4712-12-31'
   INNER JOIN
-    datalake_pin_core_clean.all_people ab
-    ON ab.id_person = g.id_assigned_by_person
-      AND ab.dt_effective_ended >= '4712-12-31'
+    datalake_pin_core_clean.all_people AS ab
+      ON ab.id_person = g.id_assigned_by_person
+        AND ab.dt_effective_ended >= '4712-12-31'
   WHERE
     gc.category IN ('kpi', 'project')
 ),
-goal_with_achievement AS (
+goal_values AS (
   SELECT
-    id_goal,
-    person_number,
-    assigned_by_person_number,
-    display_name,
-    review_period_name,
-    goal_plan_name,
-    goal_name,
-    expected_completion_period,
-    category,
-    measurement_unit,
-    goal_orientation,
-    goal_weight,
-    minimum_value,
-    target_value,
-    maximum_value,
-    result_value,
+    g.id_goal,
     CASE
-      WHEN result_value IS NULL
-      THEN NULL
-      WHEN category = 'project'
-      THEN CAST(result_value AS DOUBLE) * 0.01
-      WHEN id_goal IS NULL
-        OR goal_name IS NULL
-        OR goal_orientation IS NULL
-        OR result_value IS NULL
-      THEN NULL
-      WHEN category = 'kpi'
-        AND minimum_value IS NOT NULL
-        AND maximum_value IS NOT NULL
-        AND goal_orientation = 'maximize'
-        AND target_value IS NOT NULL
-        AND CAST(result_value AS DOUBLE) >= CAST(minimum_value AS DOUBLE)
-        AND CAST(result_value AS DOUBLE) <= CAST(target_value AS DOUBLE)
-      THEN (((CAST(result_value AS DOUBLE) - CAST(minimum_value AS DOUBLE)) / (CAST(target_value AS DOUBLE) - CAST(minimum_value AS DOUBLE))) * (1.0 - 0.7)) + 0.7
-      WHEN category = 'kpi'
-        AND minimum_value IS NOT NULL
-        AND maximum_value IS NOT NULL
-        AND goal_orientation = 'maximize'
-        AND target_value IS NOT NULL
-        AND CAST(result_value AS DOUBLE) >= CAST(target_value AS DOUBLE)
-        AND CAST(result_value AS DOUBLE) <= CAST(maximum_value AS DOUBLE)
-      THEN (((CAST(result_value AS DOUBLE) - CAST(target_value AS DOUBLE)) / (CAST(maximum_value AS DOUBLE) - CAST(target_value AS DOUBLE))) * (1.2 - 1.0)) + 1.0
-      WHEN category = 'kpi'
-        AND minimum_value IS NOT NULL
-        AND maximum_value IS NOT NULL
-        AND goal_orientation = 'maximize'
-        AND CAST(result_value AS DOUBLE) > CAST(maximum_value AS DOUBLE)
-      THEN 1.2
-      WHEN category = 'kpi'
-        AND minimum_value IS NOT NULL
-        AND maximum_value IS NOT NULL
-        AND goal_orientation = 'minimize'
-        AND target_value IS NOT NULL
-        AND CAST(result_value AS DOUBLE) <= CAST(minimum_value AS DOUBLE)
-        AND CAST(result_value AS DOUBLE) >= CAST(target_value AS DOUBLE)
-      THEN (((CAST(minimum_value AS DOUBLE) - CAST(result_value AS DOUBLE)) / (CAST(minimum_value AS DOUBLE) - CAST(target_value AS DOUBLE))) * (1.0 - 0.7)) + 0.7
-      WHEN category = 'kpi'
-        AND minimum_value IS NOT NULL
-        AND maximum_value IS NOT NULL
-        AND goal_orientation = 'minimize'
-        AND target_value IS NOT NULL
-        AND CAST(result_value AS DOUBLE) <= CAST(target_value AS DOUBLE)
-        AND CAST(result_value AS DOUBLE) >= CAST(maximum_value AS DOUBLE)
-      THEN (((CAST(target_value AS DOUBLE) - CAST(result_value AS DOUBLE)) / (CAST(target_value AS DOUBLE) - CAST(maximum_value AS DOUBLE))) * (1.2 - 1.0)) + 1.0
-      WHEN category = 'kpi'
-        AND minimum_value IS NOT NULL
-        AND maximum_value IS NOT NULL
-        AND goal_orientation = 'minimize'
-        AND CAST(result_value AS DOUBLE) < CAST(maximum_value AS DOUBLE)
-      THEN 1.2
-      WHEN category = 'kpi'
-        AND (minimum_value IS NULL OR maximum_value IS NULL)
-        AND goal_orientation = 'maximize'
-        AND target_value IS NOT NULL
-        AND CAST(target_value AS DOUBLE) > 0
-      THEN CAST(result_value AS DOUBLE) / CAST(target_value AS DOUBLE)
-      WHEN category = 'kpi'
-        AND (minimum_value IS NULL OR maximum_value IS NULL)
-        AND goal_orientation = 'minimize'
-        AND result_value IS NOT NULL
-        AND CAST(result_value AS DOUBLE) > 0
-      THEN CAST(target_value AS DOUBLE) / CAST(result_value AS DOUBLE)
+      WHEN b.minimum_value IS NULL THEN NULL
+      WHEN b.goal_orientation = 'minimize' THEN GREATEST(CAST(b.maximum_value AS DOUBLE), CAST(b.minimum_value AS DOUBLE))
+      WHEN b.goal_orientation = 'maximize' THEN LEAST(CAST(b.maximum_value AS DOUBLE), CAST(b.minimum_value AS DOUBLE))
       ELSE NULL
-    END AS achievement_percentage_raw,
-    dt_started,
-    dt_target_completion,
-    ts_modified,
-    ts_created,
-    ts_updated,
-    ts_load
+    END AS minimum_value,
+    b.target_value,
+    CASE
+      WHEN b.maximum_value IS NULL THEN NULL
+      WHEN b.goal_orientation = 'minimize' THEN LEAST(CAST(b.maximum_value AS DOUBLE), CAST(b.minimum_value AS DOUBLE))
+      WHEN b.goal_orientation = 'maximize' THEN GREATEST(CAST(b.maximum_value AS DOUBLE), CAST(b.minimum_value AS DOUBLE))
+      ELSE NULL
+    END AS maximum_value
+  FROM 
+    datalake_pin_goal_clean.goal AS g
+  LEFT JOIN
+    goal_base AS b 
+      ON b.id_goal = g.id_goal
+  WHERE
+    b.category = 'kpi'
+  UNION ALL
+  SELECT
+    g.id_goal,
+    b.minimum_value,
+    b.target_value,
+    b.maximum_value
+  FROM 
+    datalake_pin_goal_clean.goal AS g
+  LEFT JOIN
+    goal_base AS b
+      ON b.id_goal = g.id_goal
+  WHERE
+    b.category = 'project'
+),
+project_achievements AS (
+  SELECT
+    b.id_goal,
+    CASE
+      WHEN b.result_value IS NULL THEN NULL
+      ELSE CAST(b.result_value AS DOUBLE) * 0.01
+    END AS achievement_percentage_raw
   FROM
-    goal_base
+    goal_base AS b
+  WHERE
+    b.category = 'project'
+),
+kpi_full_achievements AS (
+  SELECT
+    b.id_goal,
+    CASE
+      WHEN b.result_value IS NULL THEN NULL
+      WHEN CAST(b.result_value AS DOUBLE) <= v.target_value THEN (TRY_DIVIDE((CAST(b.result_value AS DOUBLE) - v.minimum_value), (v.target_value - v.minimum_value)) * (1 - 0.7)) + 0.7
+      WHEN CAST(b.result_value AS DOUBLE) > v.target_value THEN (TRY_DIVIDE((CAST(b.result_value AS DOUBLE) - v.target_value), (v.maximum_value - v.target_value)) * (1.2 - 1)) + 1
+      ELSE NULL
+    END AS achievement_percentage_raw
+  FROM
+    goal_base AS b
+  LEFT JOIN
+    goal_values AS v 
+      ON v.id_goal = b.id_goal
+  WHERE
+    b.category = 'kpi'
+    AND v.minimum_value IS NOT NULL
+    AND v.target_value IS NOT NULL
+    AND v.maximum_value IS NOT NULL
+),
+kpi_partial_achievements AS (
+  SELECT
+    b.id_goal,
+    CASE
+      WHEN b.result_value IS NULL THEN NULL
+      WHEN b.goal_orientation = 'maximize' THEN TRY_DIVIDE(CAST(b.result_value AS DOUBLE) - v.target_value, ABS(v.target_value)) + 1
+      WHEN b.goal_orientation = 'minimize' THEN TRY_DIVIDE(v.target_value - CAST(b.result_value AS DOUBLE), ABS(v.target_value)) + 1
+      ELSE NULL
+    END AS achievement_percentage_raw
+  FROM
+    goal_base AS b
+  LEFT JOIN
+    goal_values AS v
+      ON v.id_goal = b.id_goal
+  WHERE
+    b.category = 'kpi'
+    AND (v.minimum_value IS NULL OR v.maximum_value IS NULL)
+),
+goal_achievements AS (
+  SELECT
+    pa.id_goal,
+    CASE
+      WHEN pa.achievement_percentage_raw IS NULL THEN NULL
+      ELSE LEAST(GREATEST(pa.achievement_percentage_raw, 0.0), 1.2)
+    END AS achievement_percentage
+  FROM
+    project_achievements AS pa
+  UNION ALL
+  SELECT
+    kfa.id_goal,
+    CASE
+      WHEN kfa.achievement_percentage_raw IS NULL THEN NULL
+      ELSE LEAST(GREATEST(kfa.achievement_percentage_raw, 0.0), 1.2)
+    END AS achievement_percentage
+  FROM
+    kpi_full_achievements AS kfa
+  UNION ALL
+    SELECT
+    kpa.id_goal,
+    CASE
+      WHEN kpa.achievement_percentage_raw IS NULL THEN NULL
+      ELSE LEAST(GREATEST(kpa.achievement_percentage_raw, 0.0), 1.2)
+    END AS achievement_percentage
+  FROM
+    kpi_partial_achievements AS kpa
 )
 SELECT
-  id_goal,
-  person_number,
-  assigned_by_person_number,
-  display_name,
-  review_period_name,
-  goal_plan_name,
-  goal_name,
-  expected_completion_period,
-  category,
-  measurement_unit,
-  goal_orientation,
-  goal_weight,
-  minimum_value,
-  target_value,
-  maximum_value,
-  result_value,
-  CASE
-    WHEN achievement_percentage_raw IS NULL
-    THEN NULL
-    ELSE LEAST(GREATEST(achievement_percentage_raw, 0.0), 1.2)
-  END AS achievement_percentage,
-  dt_started,
-  dt_target_completion,
-  ts_modified,
-  ts_created,
-  ts_updated,
-  ts_load
-FROM
-  goal_with_achievement
+  b.id_goal,
+  b.person_number,
+  b.assigned_by_person_number,
+  b.display_name,
+  b.review_period_name,
+  b.goal_plan_name,
+  b.goal_name,
+  b.expected_completion_period,
+  b.category,
+  b.measurement_unit,
+  b.goal_orientation,
+  b.goal_weight,
+  v.minimum_value,
+  v.target_value,
+  v.maximum_value,
+  b.result_value,
+  ga.achievement_percentage,
+  b.dt_started,
+  b.dt_target_completion,
+  b.ts_modified,
+  b.ts_created,
+  b.ts_updated,
+  b.ts_load
+FROM 
+  goal_base AS b
+LEFT JOIN
+  goal_values AS v 
+    ON v.id_goal = b.id_goal
+LEFT JOIN
+  goal_achievements AS ga 
+    ON ga.id_goal = b.id_goal
+WHERE
+    b.category IN ('kpi', 'project')

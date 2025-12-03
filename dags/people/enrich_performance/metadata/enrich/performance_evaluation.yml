@@ -1,15 +1,17 @@
 database_name: datalake_performance
 table_name: performance_evaluation
-owner: isabella.araujo@quintoandar.com.br
+owner: pedro.prates@quintoandar.com.br
 domain: People
 description: |-
   Table that consolidates the results of the performance evaluation process. It contains evaluations from different perspectives (self-assessment and manager) for each section of an employee's performance review (Impact, Leadership, Behavior). Each evaluation type (SELF or MANAGER) is represented as a separate row, with each section pivoted into its own set of columns.
 columns:
-  id_performance_rating:
-    description: MD5 hash that represents a unique identifier for the set of evaluation descriptions (Behavior, Impact, Leadership) for the specific evaluation type (SELF or MANAGER).
+  id_performance_evaluation:
+    description: MD5 hash that uniquely identifies a performance evaluation. Generated from id_person, evaluation_type, cycle_name, and dt_evaluation_occurred.
     lineage:
-    - datalake_pin_performance_clean.section_definition_translation.name
-    - datalake_pin_talent_clean.rating_level_translation.rating_description
+    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_pin_performance_clean.evaluation_rating.role_type
+    - datalake_pin_talent_clean.review_period_translation.review_period_name
+    - datalake_pin_performance_clean.evaluation.dt_evaluation_occurred
   id_assignment:
     description: Unique identifier for an employee's assignment.
     lineage:
@@ -25,6 +27,11 @@ columns:
   id_person:
     description: Unique identifier for the person (employee).
     lineage:
+    - datalake_employee_registration.identifier_mapping.id_person
+  id_evaluator:
+    description: Unique identifier for the person who performed the evaluation. For SELF evaluations, this is the employee's id_person. For MANAGER evaluations, this is the manager's id_person.
+    lineage:
+    - datalake_pin_performance_clean.evaluation.id_manager
     - datalake_employee_registration.identifier_mapping.id_person
   assignment_number:
     description: The assignment number associated with the employee.
@@ -73,6 +80,10 @@ columns:
     lineage:
     - datalake_pin_performance_clean.section_definition_translation.name
     - datalake_pin_talent_clean.rating_level_translation.rating_description
+  open_evaluation:
+    description: Free text answer from the open evaluation question, providing additional context or comments about the performance evaluation.
+    lineage:
+    - datalake_pin_questionnaires_clean.question_response.free_text_answer_unlimited
   numeric_impact:
     description: Numeric value of the rating for the Impact section, from the evaluation type (SELF or MANAGER).
     lineage:

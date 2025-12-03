@@ -23,6 +23,7 @@ base_evaluations AS (
   SELECT
     e.id_assignment,
     e.id_manager_assignment,
+    e.id_manager,
     e.id_evaluation,
     e.dt_performance_document_started,
     e.dt_performance_document_ended,
@@ -64,6 +65,11 @@ evaluations AS (
     employees.id_period_of_service,
     base.id_evaluation,
     employees.id_person,
+    CASE
+      WHEN et.evaluation_type = 'MANAGER' THEN base.id_manager
+      WHEN et.evaluation_type = 'SELF' THEN employees.id_person
+      ELSE NULL
+    END AS id_evaluator,
     employees.assignment_number,
     managers.assignment_number AS manager_assignment_number,
     et.evaluation_type,
@@ -113,6 +119,11 @@ evaluations AS (
     employees.id_period_of_service,
     base.id_evaluation,
     employees.id_person,
+    CASE
+      WHEN et.evaluation_type = 'MANAGER' THEN base.id_manager
+      WHEN et.evaluation_type = 'SELF' THEN employees.id_person
+      ELSE NULL
+    END,
     employees.assignment_number,
     managers.assignment_number,
     et.evaluation_type,
@@ -124,36 +135,52 @@ evaluations AS (
 )
 SELECT
   MD5(CONCAT(
-    COALESCE(id_person, '-1'),
-    COALESCE(evaluation_type, '-1'),
-    COALESCE(cycle_name, '-1'),
-    COALESCE(dt_evaluation_occurred, '-1')
+    COALESCE(e.id_person, '-1'),
+    COALESCE(e.evaluation_type, '-1'),
+    COALESCE(e.cycle_name, '-1'),
+    COALESCE(e.dt_evaluation_occurred, '-1')
   )) AS id_performance_evaluation,
-  id_assignment,
-  id_period_of_service,
-  id_evaluation,
-  id_person,
-  assignment_number,
-  manager_assignment_number,
-  id_impact_rating_level,
-  id_leadership_rating_level,
-  id_behavior_rating_level,
-  cycle_name,
-  evaluation_type,
-  description_impact,
-  description_leadership,
-  description_behavior,
-  numeric_impact,
-  numeric_leadership,
-  numeric_behavior,
-  dt_evaluation_occurred,
-  dt_performance_document_started,
-  dt_performance_document_ended,
-  ts_created,
-  ts_updated,
+  e.id_assignment,
+  e.id_period_of_service,
+  e.id_evaluation,
+  e.id_person,
+  e.id_evaluator,
+  e.assignment_number,
+  e.manager_assignment_number,
+  e.id_impact_rating_level,
+  e.id_leadership_rating_level,
+  e.id_behavior_rating_level,
+  e.cycle_name,
+  e.evaluation_type,
+  e.description_impact,
+  e.description_leadership,
+  e.description_behavior,
+  qr.free_text_answer_unlimited AS open_evaluation,
+  e.numeric_impact,
+  e.numeric_leadership,
+  e.numeric_behavior,
+  e.dt_evaluation_occurred,
+  e.dt_performance_document_started,
+  e.dt_performance_document_ended,
+  e.ts_created,
+  e.ts_updated,
   NOW() AS ts_load,
-  year,
-  month,
-  day
+  e.year,
+  e.month,
+  e.day
 FROM
-  evaluations
+  evaluations AS e
+LEFT JOIN
+  datalake_pin_performance_clean.evaluation_participant AS ep
+    ON ep.id_person = e.id_evaluator
+        AND ep.id_evaluation = e.id_evaluation
+LEFT JOIN
+  datalake_pin_questionnaires_clean.questionnaire_participant AS p
+    ON p.id_subject = e.id_evaluation
+        AND p.id_participant = ep.id_eval_participant
+LEFT JOIN
+  datalake_pin_questionnaires_clean.questionnaire_response AS r
+    ON r.id_questionnaire_participant = p.id_questionnaire_participant
+LEFT JOIN
+  datalake_pin_questionnaires_clean.question_response AS qr
+    ON qr.id_questionnaire_response = r.id_questionnaire_response

@@ -2946,12 +2946,16 @@ bietlejuice.enrich_performance:
   - bietlejuice.pin_core:load-clean-people-extra-info:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
+  - bietlejuice.pin_performance:load-clean-evaluation:first-run-of-day
+  - bietlejuice.pin_performance:load-clean-evaluation-participant:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-item:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-rating:first-run-of-day
   - bietlejuice.pin_performance:load-clean-evaluation-section:first-run-of-day
-  - bietlejuice.pin_performance:load-clean-evaluation:first-run-of-day
   - bietlejuice.pin_performance:load-clean-section-definition-translation:first-run-of-day
   - bietlejuice.pin_performance:load-clean-template-section:first-run-of-day
+  - bietlejuice.pin_questionnaires:load-clean-question-response:first-run-of-day
+  - bietlejuice.pin_questionnaires:load-clean-questionnaire-participant:first-run-of-day
+  - bietlejuice.pin_questionnaires:load-clean-questionnaire-response:first-run-of-day
   - bietlejuice.pin_talent:load-clean-profile-base:first-run-of-day
   - bietlejuice.pin_talent:load-clean-rating-level-base:first-run-of-day
   - bietlejuice.pin_talent:load-clean-rating-level-translation:first-run-of-day

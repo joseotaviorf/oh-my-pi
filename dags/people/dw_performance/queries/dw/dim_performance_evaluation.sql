@@ -6,12 +6,13 @@ evaluations_with_version AS (
     cycle_name,
     dt_evaluation_occurred,
     evaluation_type,
-    numeric_behavior,
-    numeric_impact,
-    numeric_leadership,
     description_behavior,
     description_impact,
     description_leadership,
+    open_evaluation,
+    numeric_behavior,
+    numeric_impact,
+    numeric_leadership,
     ROW_NUMBER() OVER (
       PARTITION BY cycle_name, assignment_number, evaluation_type
       ORDER BY dt_evaluation_occurred
@@ -49,6 +50,7 @@ SELECT
   description_behavior,
   description_impact,
   description_leadership,
+  open_evaluation,
   numeric_behavior,
   numeric_impact,
   numeric_leadership,
