@@ -97,8 +97,8 @@ class TestTablePrivileges(unittest.TestCase):
         self.assertEqual(
             table_privileges.permissions_by_principal,
             {
-                f"forno-read-only": [TablePrivilegeTypeEnum.SELECT],
-                f"forno-read-write": [
+                "forno-read-only": [TablePrivilegeTypeEnum.SELECT],
+                "forno-read-write": [
                     TablePrivilegeTypeEnum.SELECT,
                     TablePrivilegeTypeEnum.MODIFY,
                     TablePrivilegeTypeEnum.APPLY_TAG,
@@ -123,7 +123,7 @@ class TestTablePrivileges(unittest.TestCase):
         self.assertEqual(
             table_privileges.permissions_by_principal,
             {
-                f"forno-read-only": [TablePrivilegeTypeEnum.SELECT],
-                f"forno-read-write": [TablePrivilegeTypeEnum.SELECT],
+                "forno-read-only": [TablePrivilegeTypeEnum.SELECT],
+                "forno-read-write": [TablePrivilegeTypeEnum.SELECT],
             },
         )

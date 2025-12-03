@@ -74,8 +74,8 @@ class DatasetAdder:
         if dag_execution_context.dag.timetable.dataset_condition is None:
             return
 
-        reprocessing_guard_task_creator = task_creator_module.ReprocessingGuardTaskCreator(
-            dag_execution_context
+        reprocessing_guard_task_creator = (
+            task_creator_module.ReprocessingGuardTaskCreator(dag_execution_context)
         )
         reprocessing_guard_task = reprocessing_guard_task_creator.create_task()
         reprocessing_guard_task >> first_tasks_of_dag

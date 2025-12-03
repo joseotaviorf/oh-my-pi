@@ -30,9 +30,9 @@ class GenerateDatabaseTableMetricsTaskCreator(BaseTaskCreator):
                 table_metrics[raw_table_name]["metrics"] = table_information[
                     "get_table_metrics"
                 ]
-                table_metrics[raw_table_name][
-                    "clean_table_name"
-                ] = table_information.get("clean_table_name", raw_table_name)
+                table_metrics[raw_table_name]["clean_table_name"] = (
+                    table_information.get("clean_table_name", raw_table_name)
+                )
 
         return table_metrics
 

@@ -32,7 +32,7 @@ class DatasetService:
                     "cardId": "dataset_service_alert",
                     "card": {
                         "header": {
-                            "title": f"🚨 Dataset Alerts 🚨",
+                            "title": "🚨 Dataset Alerts 🚨",
                             "subtitle": f"{context['task_instance'].dag_id}:{context['task_instance'].task_id}",
                             "imageUrl": "https://media.licdn.com/dms/image/v2/D560BAQGNzZcOWa-Afw/company-logo_200_200/B56ZXuOuLWGoAM-/0/1743458591974/astronomer_logo?e=2147483647&v=beta&t=ubbCJrPu9UU_FD1IR4IND8n7C98VulEVuInTFpEgR_s",
                             "imageType": "CIRCLE",
@@ -74,8 +74,8 @@ class DatasetService:
         if dag_id not in dependencies:
             return None
         redundant_dependency_finder = BietlejuiceRedundantDependencyFinder(dependencies)
-        redundant_dependencies = redundant_dependency_finder.find_redundant_dependencies(
-            dag_id
+        redundant_dependencies = (
+            redundant_dependency_finder.find_redundant_dependencies(dag_id)
         )
         return DatasetService.get_dag_datasets_from_dependencies(
             dependencies[dag_id], redundant_dependencies
@@ -97,8 +97,10 @@ class DatasetService:
         # We're creating all the logic as a dictionary and then parsing the dictionary into a Dataset object
         # That's because we later want to allow custom logic to be defined in the dependencies file
         # So it will be easier to treat everything as a dictionary and then parse it into a Dataset object
-        dict_dataset_expression = DatasetService.get_dataset_as_dict_expression_from_dependencies(
-            dependencies, redundant_dependencies
+        dict_dataset_expression = (
+            DatasetService.get_dataset_as_dict_expression_from_dependencies(
+                dependencies, redundant_dependencies
+            )
         )
         return DatasetParser.parse_dict_expression_as_dataset(dict_dataset_expression)
 
@@ -174,8 +176,10 @@ class DatasetService:
         # Or when any of the dependencies was reprocessed (i.e., a dataset with the ":reprocessing" suffix was updated)
         dag_datasets_reprocessing = {"any": []}
 
-        unique_dependencies_without_redundancies = cls._find_unique_dependencies_without_redundancies(
-            dependencies, redundant_dependencies
+        unique_dependencies_without_redundancies = (
+            cls._find_unique_dependencies_without_redundancies(
+                dependencies, redundant_dependencies
+            )
         )
         dag_datasets_reprocessing["any"].extend(
             [
@@ -196,8 +200,10 @@ class DatasetService:
 
         Optionally, you can provide a list of dependencies that were identified as redundant. These will be removed.
         """
-        unique_dependencies = BietlejuiceDependencyHelper.find_unique_dependencies_in_dependency_object(
-            dependencies
+        unique_dependencies = (
+            BietlejuiceDependencyHelper.find_unique_dependencies_in_dependency_object(
+                dependencies
+            )
         )
         redundant_dependencies = redundant_dependencies or []
         return set(unique_dependencies) - set(redundant_dependencies)

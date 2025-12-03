@@ -13,7 +13,7 @@ class S3Loader:
 
     # todo:  check this value and argue the choice
     MAX_RECORDS_PER_FILE = 250000
-    RECORDS_COLS_PER_FILE_RELATION = 43.48 * (10 ** 6)  # For a 128 MB file
+    RECORDS_COLS_PER_FILE_RELATION = 43.48 * (10**6)  # For a 128 MB file
 
     @logger(exclude="df")
     def load_full_table(

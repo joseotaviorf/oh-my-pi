@@ -29,8 +29,8 @@ class SchemaChangesNotifier:
             )
             added_columns = set(new_df.columns) - set(existing_df.columns)
             # We store the previously identified removed columns in the table properties. This is to avoid sending the same message multiple times.
-            previously_removed_columns = SchemaChangesNotifier._retrieve_previously_removed_columns(
-                table_name
+            previously_removed_columns = (
+                SchemaChangesNotifier._retrieve_previously_removed_columns(table_name)
             )
             all_removed_columns = set(existing_df.columns) - set(new_df.columns)
             newly_removed_columns = all_removed_columns - previously_removed_columns

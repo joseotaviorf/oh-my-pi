@@ -60,8 +60,8 @@ class DataFrameHandler:
 
             if xml_content is None:
                 self.logger.warning(
-                    f"Could not decode file with standard encodings. "
-                    f"Attempting with errors='replace'."
+                    "Could not decode file with standard encodings. "
+                    "Attempting with errors='replace'."
                 )
                 with open(file_path, "r", encoding="utf-8", errors="replace") as f:
                     xml_content = f.read()

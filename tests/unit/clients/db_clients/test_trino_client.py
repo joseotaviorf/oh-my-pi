@@ -150,7 +150,7 @@ class TestTrinoClient:
         # assert
         assert not returned_value
         mocked_trino_client.get_records.assert_called_once_with(
-            f"SHOW TABLES FROM schema LIKE 'table'"
+            "SHOW TABLES FROM schema LIKE 'table'"
         )
 
     def test_table_exists_if_show_tables_returns_something(self, mocked_trino_client):
@@ -166,7 +166,7 @@ class TestTrinoClient:
         # assert
         assert returned_value
         mocked_trino_client.get_records.assert_called_once_with(
-            f"SHOW TABLES FROM schema LIKE 'table'"
+            "SHOW TABLES FROM schema LIKE 'table'"
         )
 
     def test_get_table_ddl(self, mocked_trino_client):
@@ -184,5 +184,5 @@ class TestTrinoClient:
         # assert
         assert returned_value == expected_return
         mocked_trino_client.get_records.assert_called_once_with(
-            f'SHOW CREATE TABLE "schema"."table"'
+            'SHOW CREATE TABLE "schema"."table"'
         )

@@ -210,7 +210,7 @@ def aux__house_status_version_order_result_df(
 
 @pytest.fixture
 def aux__house_status_version_order_result_data(
-    aux__house_status_version_order_result_df
+    aux__house_status_version_order_result_df,
 ):
     """Return collected result data from the core_aux_listing query."""
     return aux__house_status_version_order_result_df.collect()

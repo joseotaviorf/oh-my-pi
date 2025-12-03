@@ -62,8 +62,8 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             self.config_service,
             minimum_databricks_version="12.2",
         )
-        self.load_custom_ingestion_raw_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CUSTOM
+        self.load_custom_ingestion_raw_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.LOAD_CUSTOM)
         )
         self.load_query_clean_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_DELTA
@@ -71,8 +71,8 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.register_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.REGISTER_DELTA_TABLE
@@ -153,9 +153,11 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                 )
 
         if cluster_clean_tables:
-            optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
-                cluster_clean_tables,
-                optimize_delta_table_local_id=execute_job_cluster_local_id,
+            optimize_delta_tables_task = (
+                self.optimize_delta_table_task_creator.create_task(
+                    cluster_clean_tables,
+                    optimize_delta_table_local_id=execute_job_cluster_local_id,
+                )
             )
             optimize_delta_tables_task >> dummy_terminate_job_cluster_task
         else:
@@ -334,9 +336,9 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                         "Make sure this table is named correctly and its table declaration exists."
                     )
 
-                tables_customization_with_raw_dependency[
-                    table_name
-                ] = tables_customization.get(table_name)
+                tables_customization_with_raw_dependency[table_name] = (
+                    tables_customization.get(table_name)
+                )
                 del tables_customization_without_raw_dependency[table_name]
 
         return (

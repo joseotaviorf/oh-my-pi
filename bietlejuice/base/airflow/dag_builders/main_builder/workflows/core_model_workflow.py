@@ -64,8 +64,8 @@ class CoreModelWorkflow(BaseWorkflow):
         self.skip_run_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SKIP_RUN
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.register_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.REGISTER_DELTA_TABLE
@@ -99,8 +99,10 @@ class CoreModelWorkflow(BaseWorkflow):
         for table_name, table_parameters in self.workflow_args[
             "tables_customization"
         ].items():
-            core_model_initial_task, core_model_final_task = self._create_core_model_tasks(
-                table_name=table_name, last_task=optimize_delta_tables_task
+            core_model_initial_task, core_model_final_task = (
+                self._create_core_model_tasks(
+                    table_name=table_name, last_task=optimize_delta_tables_task
+                )
             )
 
             core_model_first_tasks[table_name.lower()] = core_model_initial_task

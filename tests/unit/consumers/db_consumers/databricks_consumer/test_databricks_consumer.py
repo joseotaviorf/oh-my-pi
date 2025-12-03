@@ -57,8 +57,8 @@ class TestDatabricksConsumer:
         )
 
         # act
-        partition_values_df_result = databricks_consumer.get_partition_values_from_table(
-            "<table_name>"
+        partition_values_df_result = (
+            databricks_consumer.get_partition_values_from_table("<table_name>")
         )
 
         # assert

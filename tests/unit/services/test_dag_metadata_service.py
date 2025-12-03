@@ -51,7 +51,7 @@ class TestDAGMetadataService:
         "source, context, expected_intermediate_path",
         [
             ("dag_source", "dag_source", None),
-            ("dag_source", "dag_context", f"dag_source/dag_context"),
+            ("dag_source", "dag_context", "dag_source/dag_context"),
         ],
     )
     def test__get_intermediate_path(self, source, context, expected_intermediate_path):

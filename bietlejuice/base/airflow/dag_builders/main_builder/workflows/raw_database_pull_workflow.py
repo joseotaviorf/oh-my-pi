@@ -36,8 +36,10 @@ class RawDatabasePullWorkflow(BaseWorkflow):
 
         for raw_table_name, table_parameters in tables_customization.items():
             if n_tables_so_far % tables_per_cluster == 0:
-                execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
-                    execute_job_cluster_local_id=execute_job_cluster_local_id
+                execute_job_cluster_task = (
+                    self.execute_job_cluster_task_creator.create_task(
+                        execute_job_cluster_local_id=execute_job_cluster_local_id
+                    )
                 )
                 dag_final_tasks = self._set_dag_final_tasks(
                     execute_job_cluster_local_id
@@ -68,8 +70,10 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER, self.config_service
         )
-        self.load_database_pull_raw_task_creator = task_creator_factory.get_database_task_creator(
-            self.workflow_args["database_type"]
+        self.load_database_pull_raw_task_creator = (
+            task_creator_factory.get_database_task_creator(
+                self.workflow_args["database_type"]
+            )
         )
         self.load_query_clean_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_QUERY
@@ -77,14 +81,16 @@ class RawDatabasePullWorkflow(BaseWorkflow):
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
-        self.generate_database_table_metrics_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.GENERATE_DATABASE_TABLE_METRICS
+        self.generate_database_table_metrics_task_creator = (
+            task_creator_factory.get_task_creator(
+                TaskEnum.GENERATE_DATABASE_TABLE_METRICS
+            )
         )
 
     def _create_raw_tasks(
@@ -183,9 +189,11 @@ class RawDatabasePullWorkflow(BaseWorkflow):
             )
             and execute_job_cluster_local_id == 1
         ):
-            first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
-                self.generate_database_table_metrics_task_creator,
-                self.sync_metadata_task_creator,
+            first_metrics_task, last_metrics_task = (
+                self._create_generate_metrics_task_group(
+                    self.generate_database_table_metrics_task_creator,
+                    self.sync_metadata_task_creator,
+                )
             )
             last_metrics_task >> dummy_terminate_job_cluster_task
             return first_metrics_task

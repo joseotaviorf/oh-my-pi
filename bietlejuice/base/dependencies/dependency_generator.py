@@ -238,8 +238,8 @@ class DependencyGenerator:
         :rtype: dict
         """
         logger.info("m=remove_cyclic_dependencies, msg=removing cyclic dependencies.")
-        cyclic_dependencies = BietlejuiceCyclicDependencyFinder.find_all_cyclic_dependencies(
-            dependencies
+        cyclic_dependencies = (
+            BietlejuiceCyclicDependencyFinder.find_all_cyclic_dependencies(dependencies)
         )
         return BietlejuiceDependencyHelper.subtract_dependencies(
             dependencies, cyclic_dependencies

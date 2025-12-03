@@ -20,8 +20,10 @@ class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
         """
 
         self.data_documentation_bucket = data_documentation_bucket
-        self.data_documentation_volume_path = VolumeMapper().get_volume_path_by_bucket_name(
-            self.data_documentation_bucket
+        self.data_documentation_volume_path = (
+            VolumeMapper().get_volume_path_by_bucket_name(
+                self.data_documentation_bucket
+            )
         )
         self.spark = spark
 

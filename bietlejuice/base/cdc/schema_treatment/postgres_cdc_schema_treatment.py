@@ -104,8 +104,10 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
         """
         To persist the data type from previously saved table on datalake, we must apply the necessary transformations.
         """
-        transactional_dataframe = self._treat_timestamp_columns_from_existing_datalake_table(
-            transactional_dataframe, datalake_dataframe
+        transactional_dataframe = (
+            self._treat_timestamp_columns_from_existing_datalake_table(
+                transactional_dataframe, datalake_dataframe
+            )
         )
         transactional_dataframe = self._cast_differing_types(
             transactional_dataframe, datalake_dataframe

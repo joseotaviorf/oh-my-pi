@@ -139,9 +139,9 @@ class BaseTaskGroup(object):
         }
 
         if independent_tasks:
-            tasks_boundaries[
-                BaseTaskGroup.TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY
-            ] = independent_tasks
+            tasks_boundaries[BaseTaskGroup.TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY] = (
+                independent_tasks
+            )
         return tasks_boundaries
 
     @staticmethod

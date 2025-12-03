@@ -43,8 +43,10 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             self.config_service,
             minimum_databricks_version="12.2",
         )
-        self.load_database_pull_raw_task_creator = task_creator_factory.get_database_task_creator(
-            self.workflow_args["database_type"]
+        self.load_database_pull_raw_task_creator = (
+            task_creator_factory.get_database_task_creator(
+                self.workflow_args["database_type"]
+            )
         )
         self.load_query_clean_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_DELTA
@@ -52,8 +54,8 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
@@ -64,8 +66,10 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
-        self.generate_database_table_metrics_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.GENERATE_DATABASE_TABLE_METRICS
+        self.generate_database_table_metrics_task_creator = (
+            task_creator_factory.get_task_creator(
+                TaskEnum.GENERATE_DATABASE_TABLE_METRICS
+            )
         )
 
     def _get_raw_tables(self) -> List[TableAttributes]:
@@ -256,9 +260,11 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             )
             and execute_job_cluster_local_id == 1
         ):
-            first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
-                self.generate_database_table_metrics_task_creator,
-                self.register_delta_table_task_creator,
+            first_metrics_task, last_metrics_task = (
+                self._create_generate_metrics_task_group(
+                    self.generate_database_table_metrics_task_creator,
+                    self.register_delta_table_task_creator,
+                )
             )
             last_metrics_task >> dummy_terminate_job_cluster_task
             return first_metrics_task

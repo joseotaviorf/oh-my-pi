@@ -164,18 +164,18 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
         return cluster_configuration
 
     def __input_spark_env_vars(self, cluster_configuration: dict) -> dict:
-        cluster_configuration["spark_env_vars"][
-            "SPARK_VERSION"
-        ] = self.__get_spark_version(cluster_configuration["spark_version"])
-        cluster_configuration["spark_env_vars"][
-            "INMETRO_VERSION"
-        ] = self.__input_inmetro_version(
-            cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
+        cluster_configuration["spark_env_vars"]["SPARK_VERSION"] = (
+            self.__get_spark_version(cluster_configuration["spark_version"])
         )
-        cluster_configuration["spark_env_vars"][
-            "DEEQU_JAR_VERSION"
-        ] = self.__input_deequ_version(
-            cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
+        cluster_configuration["spark_env_vars"]["INMETRO_VERSION"] = (
+            self.__input_inmetro_version(
+                cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
+            )
+        )
+        cluster_configuration["spark_env_vars"]["DEEQU_JAR_VERSION"] = (
+            self.__input_deequ_version(
+                cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
+            )
         )
         cluster_configuration = self.__input_databricks_default_service_credential_name(
             cluster_configuration

@@ -107,7 +107,7 @@ class SparkMetastoreHelper:
         """
         if not df_partition_values or "partition" not in df_partition_values.columns:
             logger.info(
-                f"m=format_df_partition_values, msg=No partition found in table's dataframe"
+                "m=format_df_partition_values, msg=No partition found in table's dataframe"
             )
             return []
 
@@ -134,8 +134,8 @@ class SparkMetastoreHelper:
         databricks_consumer = DatabricksConsumer(
             {"db": self.spark_database_name}, SparkClient()
         )
-        databricks_partition_values = databricks_consumer.get_partition_values_from_table(
-            table_name=table_name
+        databricks_partition_values = (
+            databricks_consumer.get_partition_values_from_table(table_name=table_name)
         )
         formatted_partition_values = self.format_df_partition_values(
             df_partition_values=databricks_partition_values
@@ -201,14 +201,16 @@ class SparkMetastoreHelper:
         tables_spark_metadata = dict()
         for table_name in self.get_table_names():
             spark_ms_table_columns = self.get_spark_metastore_table_columns(table_name)
-            spark_ms_table_partition_keys = self.spark_metastore_service.get_table_partition_keys(
-                self.spark_database_name, table_name
+            spark_ms_table_partition_keys = (
+                self.spark_metastore_service.get_table_partition_keys(
+                    self.spark_database_name, table_name
+                )
             )
 
             spark_ms_table_partition_values = []
             if get_partition_values and spark_ms_table_partition_keys:
-                spark_ms_table_partition_values = self.get_spark_metastore_table_partition_values(
-                    table_name
+                spark_ms_table_partition_values = (
+                    self.get_spark_metastore_table_partition_values(table_name)
                 )
 
             tables_spark_metadata[table_name] = dict()

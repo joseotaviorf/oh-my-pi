@@ -278,7 +278,7 @@ class DAGPackagesPathService:
             intermediate_path,
         )
 
-        filename_regex = re.compile(rf"([a-z0-9_-]+)\.sql")
+        filename_regex = re.compile(r"([a-z0-9_-]+)\.sql")
         files = glob(f"{sql_files_folder}/*.sql")
         table_names = []
         for file_path in files:
@@ -307,13 +307,19 @@ class DAGPackagesPathService:
         )
 
         try:
-            data_quality_content = DAGPackagesPathService._read_dag_package_file_from_s3(
-                sql_file_relative_path=data_quality_file_path
+            data_quality_content = (
+                DAGPackagesPathService._read_dag_package_file_from_s3(
+                    sql_file_relative_path=data_quality_file_path
+                )
             )
         except Exception as e:
             if "NoSuchKey" in str(e):
-                data_quality_content = DAGPackagesPathService._read_dag_package_file_from_s3(
-                    sql_file_relative_path=data_quality_file_path.replace("yml", "yaml")
+                data_quality_content = (
+                    DAGPackagesPathService._read_dag_package_file_from_s3(
+                        sql_file_relative_path=data_quality_file_path.replace(
+                            "yml", "yaml"
+                        )
+                    )
                 )
             else:
                 raise e
@@ -366,7 +372,7 @@ class DAGPackagesPathService:
         )
 
         files = glob(f"{data_quality_folder}/**/*.yml", recursive=True)
-        filename_regex = re.compile(rf".*/([a-z0-9_-]+)(?:\.yml|\.yaml)")
+        filename_regex = re.compile(r".*/([a-z0-9_-]+)(?:\.yml|\.yaml)")
 
         table_names = []
         for file_path in files:

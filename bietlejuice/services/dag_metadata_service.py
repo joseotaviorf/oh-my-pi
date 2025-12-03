@@ -301,9 +301,7 @@ class DAGMetadataService:
         # TODO: this method and the other metadata methods in this class with rules out
         #  of the FileServices context must be replaced to another place like some Metadata Service
         dag_path = DAGPackagesPathService.get_dag_path(dag_name)
-        path = (
-            f"{dag_path}/metadata/{layer}/**/{table_name}.*"
-        )  # Para Databricks: pegar do S3.
+        path = f"{dag_path}/metadata/{layer}/**/{table_name}.*"  # Para Databricks: pegar do S3.
         files_found = glob.glob(path, recursive=True)
 
         if not files_found:

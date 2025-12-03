@@ -478,7 +478,7 @@ class BaseCoreModelSparkJob(ABC):
                 )
             else:
                 self.logger.info(
-                    f"m=_send_schema_validation_webhook, msg=No CORE_MODEL_WEBHOOK secret found in dbutils for schema validation notifications"
+                    "m=_send_schema_validation_webhook, msg=No CORE_MODEL_WEBHOOK secret found in dbutils for schema validation notifications"
                 )
 
         except Exception as e:
@@ -537,9 +537,9 @@ class BaseCoreModelSparkJob(ABC):
         for col in source_cols:
             if col in target_cols:
                 # Existing column: preserve non-null target values
-                default_when_matched_operation[
-                    col
-                ] = f"CASE WHEN source.{col} IS NOT NULL THEN source.{col} ELSE target.{col} END"
+                default_when_matched_operation[col] = (
+                    f"CASE WHEN source.{col} IS NOT NULL THEN source.{col} ELSE target.{col} END"
+                )
             else:
                 # New column: use source value directly (target column doesn't exist yet)
                 default_when_matched_operation[col] = f"source.{col}"

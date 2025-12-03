@@ -57,8 +57,8 @@ class WonkaWorkflow(BaseWorkflow):
         self.load_cdf_to_datazord_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_CDF_TO_DATAZORD, config_service=self.config_service
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
@@ -117,11 +117,15 @@ class WonkaWorkflow(BaseWorkflow):
 
             tables_to_optimize.append(wonka_latest_table_attributes)
 
-            load_cdf_to_datazord_task = self.load_cdf_to_datazord_task_creator.create_task(
-                wonka_latest_table_attributes,
-                key_columns=datazord_config["key_columns"]
-                if "key_columns" in datazord_config
-                else [],
+            load_cdf_to_datazord_task = (
+                self.load_cdf_to_datazord_task_creator.create_task(
+                    wonka_latest_table_attributes,
+                    key_columns=(
+                        datazord_config["key_columns"]
+                        if "key_columns" in datazord_config
+                        else []
+                    ),
+                )
             )
 
         # We keep only a single "optimize table" task that will be used to optimize all the tables

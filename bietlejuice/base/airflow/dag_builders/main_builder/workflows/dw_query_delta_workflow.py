@@ -148,6 +148,6 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )

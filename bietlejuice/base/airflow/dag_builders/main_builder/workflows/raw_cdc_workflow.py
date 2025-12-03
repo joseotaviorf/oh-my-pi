@@ -94,8 +94,8 @@ class RawCDCWorkflow(BaseWorkflow):
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA
@@ -103,8 +103,10 @@ class RawCDCWorkflow(BaseWorkflow):
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
-        self.generate_database_table_metrics_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.GENERATE_DATABASE_TABLE_METRICS
+        self.generate_database_table_metrics_task_creator = (
+            task_creator_factory.get_task_creator(
+                TaskEnum.GENERATE_DATABASE_TABLE_METRICS
+            )
         )
 
     def _get_transactional_tables(self) -> List[TableAttributes]:
@@ -224,8 +226,10 @@ class RawCDCWorkflow(BaseWorkflow):
         for transactional_table, raw_table, clean_table in zip(
             transactional_tables, cluster_raw_tables, cluster_clean_tables
         ):
-            transactional_initial_task, transactional_final_task = self._create_transactional_tasks(
-                transactional_table, optimize_transactional_task
+            transactional_initial_task, transactional_final_task = (
+                self._create_transactional_tasks(
+                    transactional_table, optimize_transactional_task
+                )
             )
             raw_initial_task, raw_final_task = self._create_raw_tasks(
                 raw_table, optimize_raw_task, dag_final_tasks=dag_final_tasks
@@ -278,8 +282,10 @@ class RawCDCWorkflow(BaseWorkflow):
 
         if self._check_include_sync_hive_tasks(raw_table_attributes_lower_case):
             if self._check_include_propagate_metadata_task(raw_table_attributes):
-                propagate_table_lineage_raw_task = self.sync_metadata_task_creator.create_task(
-                    raw_table_attributes, "--bypass-hive"
+                propagate_table_lineage_raw_task = (
+                    self.sync_metadata_task_creator.create_task(
+                        raw_table_attributes, "--bypass-hive"
+                    )
                 )
                 (load_raw_task >> propagate_table_lineage_raw_task >> dag_final_tasks)
             else:
@@ -311,8 +317,10 @@ class RawCDCWorkflow(BaseWorkflow):
         last_clean_task = load_clean_task
 
         if self._check_include_sync_hive_tasks(clean_table_attributes):
-            register_delta_table_clean_task = self.register_delta_table_task_creator.create_task(
-                clean_table_attributes
+            register_delta_table_clean_task = (
+                self.register_delta_table_task_creator.create_task(
+                    clean_table_attributes
+                )
             )
 
             sync_metadata_clean_task = self.sync_metadata_task_creator.create_task(
@@ -351,9 +359,11 @@ class RawCDCWorkflow(BaseWorkflow):
             )
             and execute_job_cluster_local_id == 1
         ):
-            first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
-                self.generate_database_table_metrics_task_creator,
-                self.sync_metadata_task_creator,
+            first_metrics_task, last_metrics_task = (
+                self._create_generate_metrics_task_group(
+                    self.generate_database_table_metrics_task_creator,
+                    self.sync_metadata_task_creator,
+                )
             )
             last_metrics_task >> dummy_terminate_job_cluster_task
             return first_metrics_task

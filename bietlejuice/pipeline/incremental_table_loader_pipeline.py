@@ -22,9 +22,9 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
             # With unity Catalog, we're supposed to save directly as table, not save the files and update
             # the metastore separately.
             # The exception is for non-parquet tables, because they don't support the mergeSchema option
-            load_options[
-                "full_table_name"
-            ] = f"{self.target_database_name}.{self.table_name}"
+            load_options["full_table_name"] = (
+                f"{self.target_database_name}.{self.table_name}"
+            )
             load_options["mergeSchema"] = not force_recreate
             load_options["overwriteSchema"] = force_recreate
 

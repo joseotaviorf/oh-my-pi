@@ -163,11 +163,13 @@ class DataQualityTestsPipeline:
         """
         Reads and validates the YAML configuration file content using the inmetro library.
         """
-        validation_file_content = DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
-            dag_name=self.relative_file_path,
-            layer=self.layer.value,
-            table_name=self.table_name,
-            intermediate_path=self.intermediate_path,
+        validation_file_content = (
+            DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
+                dag_name=self.relative_file_path,
+                layer=self.layer.value,
+                table_name=self.table_name,
+                intermediate_path=self.intermediate_path,
+            )
         )
 
         config_reader = _create_compatible_config_reader(validation_file_content)
@@ -236,8 +238,10 @@ class DataQualityTestsPipeline:
         self, input_configs: dict, database_name: str, table_name: str, df: DataFrame
     ) -> dict:
         validation_suite_builder = ValidationSuiteBuilder(self.spark_client.conn)
-        validation_suite = validation_suite_builder.build_validation_suite_from_input_config(
-            input_configs
+        validation_suite = (
+            validation_suite_builder.build_validation_suite_from_input_config(
+                input_configs
+            )
         )
         pydeequ_validator = PyDeequValidator(
             suite_name=f"Pipeline Validations: {database_name}.{table_name}",

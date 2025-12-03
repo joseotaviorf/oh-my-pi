@@ -186,8 +186,10 @@ class TestSparkMetastoreService:
         )
 
         # act
-        returned_value = spark_metastore_service._get_partition_keys_from_table_description(
-            mocked_result_df
+        returned_value = (
+            spark_metastore_service._get_partition_keys_from_table_description(
+                mocked_result_df
+            )
         )
 
         # assert

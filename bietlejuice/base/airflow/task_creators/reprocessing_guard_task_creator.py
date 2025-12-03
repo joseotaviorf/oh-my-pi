@@ -48,8 +48,10 @@ class ReprocessingGuardTaskCreator(BaseTaskCreator):
             )
 
         # If the reprocessing originated from a different DAG, we check if all dependencies that connect to the origin have finished.
-        dependencies_that_should_have_finished = self._find_dependencies_that_should_have_finished(
-            context, reprocessing_source
+        dependencies_that_should_have_finished = (
+            self._find_dependencies_that_should_have_finished(
+                context, reprocessing_source
+            )
         )
         # And we compare that with the dependencies that have actually finished.
         dependencies_that_have_finished = self._find_dependencies_that_have_finished(
@@ -85,8 +87,8 @@ class ReprocessingGuardTaskCreator(BaseTaskCreator):
 
         # First, we find all DAGs that the current DAG depends on
         # We'll only consider the dependencies that end with ":reprocessing"
-        reprocessing_dependencies_of_current_dag = self._find_reprocessing_dependencies_of_current_dag(
-            context
+        reprocessing_dependencies_of_current_dag = (
+            self._find_reprocessing_dependencies_of_current_dag(context)
         )
         reprocessing_dag_dependencies_of_current_dag = {
             dataset_name.split(":")[0]  # Extract the DAG name from the dataset name

@@ -23,11 +23,13 @@ class ProfilingFromYaml:
         """
 
         try:
-            data_quality_yml = DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
-                dag_name=dag_name,
-                layer=layer,
-                table_name=table_name,
-                intermediate_path="",
+            data_quality_yml = (
+                DAGPackagesPathService.get_data_quality_file_content_in_spark_jobs(
+                    dag_name=dag_name,
+                    layer=layer,
+                    table_name=table_name,
+                    intermediate_path="",
+                )
             )
         except ClientError as cle:
             if cle.response["Error"]["Code"] == "NoSuchKey":

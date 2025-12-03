@@ -65,8 +65,8 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA
@@ -149,8 +149,10 @@ class RawDMSCDCWorkflow(BaseWorkflow):
 
         if self._check_include_sync_hive_tasks(raw_table_attributes_lower_case):
             if self._check_include_propagate_metadata_task(raw_table_attributes):
-                propagate_table_lineage_raw_task = self.sync_metadata_task_creator.create_task(
-                    raw_table_attributes, "--bypass-hive"
+                propagate_table_lineage_raw_task = (
+                    self.sync_metadata_task_creator.create_task(
+                        raw_table_attributes, "--bypass-hive"
+                    )
                 )
                 (load_raw_task >> propagate_table_lineage_raw_task >> dag_final_tasks)
             else:
@@ -182,8 +184,10 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         last_clean_task = load_clean_task
 
         if self._check_include_sync_hive_tasks(clean_table_attributes):
-            register_delta_table_clean_task = self.register_delta_table_task_creator.create_task(
-                clean_table_attributes
+            register_delta_table_clean_task = (
+                self.register_delta_table_task_creator.create_task(
+                    clean_table_attributes
+                )
             )
 
             sync_metadata_clean_task = self.sync_metadata_task_creator.create_task(

@@ -16,9 +16,11 @@ class TestPostgresCdcSchemaFinder:
                 "column1",
                 "column2",
             ]
-            postgres_consumer.get_table_schema.return_value = BaseSparkContext.spark.createDataFrame(
-                [("column1", "VARCHAR", 255, None), ("column2", "NUMERIC", 11, 2)],
-                ["col_name", "col_type", "col_length", "col_scale"],
+            postgres_consumer.get_table_schema.return_value = (
+                BaseSparkContext.spark.createDataFrame(
+                    [("column1", "VARCHAR", 255, None), ("column2", "NUMERIC", 11, 2)],
+                    ["col_name", "col_type", "col_length", "col_scale"],
+                )
             )
             yield postgres_consumer
 

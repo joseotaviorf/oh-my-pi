@@ -420,8 +420,8 @@ class RawGsheetsWorkflow(BaseWorkflow):
                     )
                 )
             ]
-            done_task_groups[
-                clean_table_name
-            ] = DatalakeTaskGroup.format_tasks_boundaries(done_task, done_task)
+            done_task_groups[clean_table_name] = (
+                DatalakeTaskGroup.format_tasks_boundaries(done_task, done_task)
+            )
 
         return done_task_groups

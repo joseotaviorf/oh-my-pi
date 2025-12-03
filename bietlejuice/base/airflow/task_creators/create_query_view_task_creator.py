@@ -59,19 +59,21 @@ class CreateQueryViewTaskCreator(BaseTaskCreator):
     def _get_extra_query_template_params(
         self, table_attributes: TableAttributes
     ) -> dict:
-        default_extra_query_template_params = self.dag_execution_context.workflow_args.get(
-            "extra_query_template_params", {}
+        default_extra_query_template_params = (
+            self.dag_execution_context.workflow_args.get(
+                "extra_query_template_params", {}
+            )
         )
         extra_query_template_params = table_attributes.table_customization.get(
             "extra_query_template_params", default_extra_query_template_params
         )
         if "load_start_date" not in extra_query_template_params:
-            extra_query_template_params[
-                "load_start_date"
-            ] = self.dag_execution_context.load_start_date
+            extra_query_template_params["load_start_date"] = (
+                self.dag_execution_context.load_start_date
+            )
         if "load_end_date" not in extra_query_template_params:
-            extra_query_template_params[
-                "load_end_date"
-            ] = self.dag_execution_context.load_end_date
+            extra_query_template_params["load_end_date"] = (
+                self.dag_execution_context.load_end_date
+            )
 
         return extra_query_template_params

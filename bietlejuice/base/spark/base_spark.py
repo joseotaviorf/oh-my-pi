@@ -109,7 +109,7 @@ def _get_conf():
         return SparkConf()
     except Py4JError:
         logger.warning(
-            f"SparkConf constructor cannot be used in SHARED clusters in Unity Catalog. Either find an alternative to it, or switch to a single-user cluster. Returning None instead."
+            "SparkConf constructor cannot be used in SHARED clusters in Unity Catalog. Either find an alternative to it, or switch to a single-user cluster. Returning None instead."
         )
         return None
 
@@ -132,7 +132,7 @@ def _get_sql_context(spark, sc):
             raise e
 
         logger.warning(
-            f"HiveContext constructor cannot be used in SHARED clusters in Unity Catalog. Either find an alternative to it, or switch to a single-user cluster. Returning the spark session instead."
+            "HiveContext constructor cannot be used in SHARED clusters in Unity Catalog. Either find an alternative to it, or switch to a single-user cluster. Returning the spark session instead."
         )
         return spark
 

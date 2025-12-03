@@ -32,8 +32,10 @@ class BietlejuiceDependencyHelper:
             return dag_name, None
 
         if ":load-into-redshift" in task_name:
-            return BietlejuiceDependencyHelper._extract_dag_and_table_from_redshift_task(
-                task_name
+            return (
+                BietlejuiceDependencyHelper._extract_dag_and_table_from_redshift_task(
+                    task_name
+                )
             )
         table_group_number = 4
         if ":create-external-table" in task_name:
@@ -164,8 +166,10 @@ class BietlejuiceDependencyHelper:
                 if isinstance(dependency, str):
                     unique_dependencies.add(dependency.replace(":first-run-of-day", ""))
                 elif isinstance(dependency, dict):
-                    internal_unique_dependencies = cls.find_unique_dependencies_in_dependency_object(
-                        list(dependency.values())[0]
+                    internal_unique_dependencies = (
+                        cls.find_unique_dependencies_in_dependency_object(
+                            list(dependency.values())[0]
+                        )
                     )
                     unique_dependencies = unique_dependencies.union(
                         internal_unique_dependencies

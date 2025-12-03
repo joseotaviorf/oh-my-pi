@@ -59,8 +59,10 @@ class DagBagDependencyGenerator(DependencyGenerator):
         logger.info(
             "m=table_dependencies_from_all_dags, msg=getting table dependencies from all DAGs"
         )
-        dags_queries_paths = self.dag_bag_service.find_query_paths_by_load_task_for_all_dags(
-            self.base_spark_jobs_path, self.base_dags_path
+        dags_queries_paths = (
+            self.dag_bag_service.find_query_paths_by_load_task_for_all_dags(
+                self.base_spark_jobs_path, self.base_dags_path
+            )
         )
         dags_tables_dependencies = self._find_all_tables_in_query_files(
             dags_queries_paths

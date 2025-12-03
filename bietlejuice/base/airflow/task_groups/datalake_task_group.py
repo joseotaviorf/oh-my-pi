@@ -172,8 +172,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
             tables_names = [table_name]
 
         elif sync_mode == self.ALL_TABLES:
-            tables_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
-                dag_name=self.relative_query_path, layer=layer
+            tables_names = (
+                DAGPackagesPathService.list_data_quality_tests_files_in_composer(
+                    dag_name=self.relative_query_path, layer=layer
+                )
             )
         else:
             return data_quality_tasks

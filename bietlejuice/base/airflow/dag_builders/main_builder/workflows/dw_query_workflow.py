@@ -131,8 +131,8 @@ class DWQueryWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER, self.config_service
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )
 
     def _get_dw_task_groups_boundaries(self, dw_task_groups, dw_staging_task_groups):

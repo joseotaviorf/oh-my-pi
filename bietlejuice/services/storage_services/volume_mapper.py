@@ -25,9 +25,9 @@ class VolumeMapper:
         """
         mapping = {}
         for bucket_name, volume_path in self.volume_mapping.items():
-            mapping[
-                self._global_confs.get_config(bucket_name)
-            ] = self._global_confs.get_config(volume_path)
+            mapping[self._global_confs.get_config(bucket_name)] = (
+                self._global_confs.get_config(volume_path)
+            )
         return mapping
 
     def get_volume_path_by_bucket_name(self, bucket_name: str) -> str:

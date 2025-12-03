@@ -38,8 +38,8 @@ class ReverseLoadWorkflow(BaseWorkflow):
         tables = self._get_tables()
         for table in tables:
             load_reverse_task = self.load_reverse_task_creator.create_task(table)
-            optimize_delta_table_task = self.optimize_delta_table_task_creator.create_task(
-                [table]
+            optimize_delta_table_task = (
+                self.optimize_delta_table_task_creator.create_task([table])
             )
             (
                 execute_job_cluster_task
@@ -87,6 +87,6 @@ class ReverseLoadWorkflow(BaseWorkflow):
         self.optimize_delta_table_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.OPTIMIZE_DELTA_TABLE
         )
-        self.dummy_job_cluster_finished_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.DUMMY_JOB_CLUSTER_FINISHED
+        self.dummy_job_cluster_finished_task_creator = (
+            task_creator_factory.get_task_creator(TaskEnum.DUMMY_JOB_CLUSTER_FINISHED)
         )

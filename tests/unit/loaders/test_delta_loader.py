@@ -349,7 +349,7 @@ class TestDeltaLoader:
         delta_loader.vacuum_table(table_name, retention_hours)
 
         mock_spark_context.spark.sql.assert_called_once_with(
-            f"VACUUM test_table RETAIN 24 HOURS"
+            "VACUUM test_table RETAIN 24 HOURS"
         )
 
     def test_optimize_table_without_z_order(self, mock_spark_context):
@@ -358,7 +358,7 @@ class TestDeltaLoader:
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.optimize_table(table_name)
 
-        mock_spark_context.spark.sql.assert_called_once_with(f"OPTIMIZE test_table")
+        mock_spark_context.spark.sql.assert_called_once_with("OPTIMIZE test_table")
 
     def test_optimize_table_with_z_order(self, mock_spark_context):
         table_name = "test_table"
@@ -369,5 +369,5 @@ class TestDeltaLoader:
         delta_loader.optimize_table(table_name, z_order_by)
 
         mock_spark_context.spark.sql.assert_called_once_with(
-            f"OPTIMIZE test_table ZORDER BY column1,column2"
+            "OPTIMIZE test_table ZORDER BY column1,column2"
         )

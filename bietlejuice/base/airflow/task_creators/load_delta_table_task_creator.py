@@ -33,8 +33,10 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
         when_matched_delete_condition = table_attributes.table_customization.get(
             "when_matched_delete_condition", None
         )
-        when_not_matched_by_source_delete_condition = table_attributes.table_customization.get(
-            "when_not_matched_by_source_delete_condition", None
+        when_not_matched_by_source_delete_condition = (
+            table_attributes.table_customization.get(
+                "when_not_matched_by_source_delete_condition", None
+            )
         )
         when_matched_operation = table_attributes.table_customization.get(
             "when_matched_operation", None
@@ -79,20 +81,22 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
     def _get_extra_query_template_params(
         self, table_attributes: TableAttributes
     ) -> dict:
-        default_extra_query_template_params = self.dag_execution_context.workflow_args.get(
-            "extra_query_template_params", {}
+        default_extra_query_template_params = (
+            self.dag_execution_context.workflow_args.get(
+                "extra_query_template_params", {}
+            )
         )
         extra_query_template_params = table_attributes.table_customization.get(
             "extra_query_template_params", default_extra_query_template_params
         )
         if "load_start_date" not in extra_query_template_params:
-            extra_query_template_params[
-                "load_start_date"
-            ] = self.dag_execution_context.load_start_date
+            extra_query_template_params["load_start_date"] = (
+                self.dag_execution_context.load_start_date
+            )
         if "load_end_date" not in extra_query_template_params:
-            extra_query_template_params[
-                "load_end_date"
-            ] = self.dag_execution_context.load_end_date
+            extra_query_template_params["load_end_date"] = (
+                self.dag_execution_context.load_end_date
+            )
 
         return extra_query_template_params
 

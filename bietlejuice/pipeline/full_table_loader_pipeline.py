@@ -24,9 +24,9 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
         if save_to_unity_catalog:
             # With unity Catalog, we're supposed to save directly as table, not save the files and update
             # the metastore separately
-            load_options[
-                "full_table_name"
-            ] = f"{self.target_database_name}.{self.table_name}"
+            load_options["full_table_name"] = (
+                f"{self.target_database_name}.{self.table_name}"
+            )
 
         s3_loader.load_df(
             df=df,

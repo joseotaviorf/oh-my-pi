@@ -116,7 +116,7 @@ class TestUnityCatalogHelper(unittest.TestCase):
         table_name = "default.table_name"
         privilege_type = TablePrivilegeTypeEnum.ALL_PRIVILEGES
         principal = "principal"
-        expected = f"GRANT ALL PRIVILEGES ON TABLE quintoandar_forno.default.table_name TO `principal`"
+        expected = "GRANT ALL PRIVILEGES ON TABLE quintoandar_forno.default.table_name TO `principal`"
 
         # act
         UnityCatalogHelper.grant_table_permission(privilege_type, table_name, principal)

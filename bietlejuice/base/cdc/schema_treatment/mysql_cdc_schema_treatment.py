@@ -94,8 +94,10 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
     ) -> DataFrame:
         """Forces the columns of the transactional dataframe to match the schema of the existing datalake table, to avoid type mismatches."""
 
-        transactional_dataframe = self._treat_timestamp_columns_from_existing_datalake_table(
-            transactional_dataframe, datalake_dataframe
+        transactional_dataframe = (
+            self._treat_timestamp_columns_from_existing_datalake_table(
+                transactional_dataframe, datalake_dataframe
+            )
         )
         transactional_dataframe = self._cast_differing_types(
             transactional_dataframe, datalake_dataframe
@@ -143,11 +145,13 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         string_columns = []
 
         for column in datalake_dataframe.columns:
-            if column not in transactional_dataframe.columns or transactional_dataframe.schema[
-                column
-            ].dataType.typeName() in (
-                "date",
-                "timestamp",
+            if (
+                column not in transactional_dataframe.columns
+                or transactional_dataframe.schema[column].dataType.typeName()
+                in (
+                    "date",
+                    "timestamp",
+                )
             ):
                 continue
 

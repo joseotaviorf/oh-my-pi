@@ -27,7 +27,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         :param optimize_delta_table_local_id: This ID is used for adding a suffix to the task name since we can have multiple optmization tasks in the same DAG.
         """
 
-        spark_job_name = f"optimize_delta_table"
+        spark_job_name = "optimize_delta_table"
         task_id = self.generate_task_id(table_attributes)
         if optimize_delta_table_local_id:
             task_id = f"{task_id}-{optimize_delta_table_local_id}"
