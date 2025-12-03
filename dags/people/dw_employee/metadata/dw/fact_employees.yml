@@ -77,10 +77,6 @@ columns:
     description: Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports.
     lineage:
     - dw_employee.fact_assignments.is_manager
-  has_self_declared_disability:
-    description: Flag (TRUE/FALSE) indicating if the employee has a self-declared disability.
-    lineage:
-    - dw_employee.fact_assignments.has_self_declared_disability
   assignment_age_months:
     description: Tenure in months, calculated from the start date to the end date (or current date if active).
     lineage:

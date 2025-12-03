@@ -17,7 +17,6 @@ SELECT
     is_active,
     is_pending_worker,
     is_manager,
-    has_self_declared_disability,
     assignment_age_months,
     qnt_directly_led,
     qnt_undirectly_led,

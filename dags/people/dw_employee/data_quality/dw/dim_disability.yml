@@ -17,10 +17,10 @@ column_level_validations:
     is_unique:
       severity_level: Warning
   documented_name:
-    custom:
+    custom: # Unmapped documented names are marked with '*' in the source table (enrich_hr_system) and need to be investigated and mapped.
       constraint: "(SELECT COUNT(*) FROM dw_employee.dim_disability WHERE documented_name LIKE '%*') = 0"
       severity_level: Warning
   self_declared_name:
-    custom:
+    custom: # Unmapped self declared names are marked with '*' in the source table (enrich_hr_system) and need to be investigated and mapped.
       constraint: "(SELECT COUNT(*) FROM dw_employee.dim_disability WHERE self_declared_name LIKE '%*') = 0"
       severity_level: Warning
