@@ -1,0 +1,84 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: photo_session_details
+description: |
+  This table contains the details of the photo session checked by the LQ Team.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.id
+    description: ID of the table, it’s the primary key.
+  id_photo_session:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.photo_session_id
+    description: ID of the photo session job in Main.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.version
+    description: Photo Session Details version.
+  video:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.video
+    description: Indicates whether the photo session includes a video.
+  quantity_photos:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.quantity_photos
+    description: Indicates whether the photo session has the correct number of photos.
+  same_day_listing:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.same_day_listing
+    description: Indicates whether the photo session was uploaded on the same day it was published.
+  has_plaque:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.has_plaque
+    description: Indicates whether the photo session includes the plaque photo.
+  ticket_reference:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.ticket_reference
+    description: Reference of the Zendesk ticket where the photo session was approved.
+  status:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.status
+    description: Status of the Zendesk ticket.
+  plaque_status:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.plaque_status
+    description: Status of the plaque identified in the ticket.
+  responsible:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.responsible
+    description: Person who approved the ticket.
+  plaque_responsible_approver:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.plaque_responsible_approver
+    description: Person who approved the status of the plaque.
+  video_value:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.video_value
+    description: Value that indicates the video status.
+  quantity_photos_value:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.quantity_photos_value
+    description: Value that indicates the number of photos in the photo session.
+  dt_source_status_update:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.source_status_update_at
+    description: Date when the Zendesk ticket status was set as approved.
+  dt_publication:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.publication_date
+    description: Date when the photo session was published.
+  dt_uploaded:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.uploaded_date
+    description: Date when the photo session was uploaded by the photographer.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.created_at
+    description: Timestamp of the creation of the photo session details record.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.photo_session_details.updated_at
+    description: Timestamp of the update of the photo session details record.

@@ -1,0 +1,56 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: payments_period
+description: |
+  This table contains the periods to execute the closing.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.id
+    description: ID of the table, it’s the primary key.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.version
+    description: Payments period version.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.agent_type
+    description: Type of the agent related to the period. It can be “inspection” or “photo session”.
+  dt_initial:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.initial_date
+    description: Date when the period starts.
+  dt_final:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.final_date
+    description: Date when the period ends.
+  dt_executed:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.executed_date
+    description: Date when the period was executed.
+  dt_accounting:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.accounting_date
+    description: Indicates the accountable date for the period.
+  dt_due:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.due_date
+    description: Indicates the due date for the period related to the accounting process.
+  dt_accrual:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.accrual_date
+    description: Indicates the date when the events happen (inspections and photo sessions).
+  dt_closing:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.closing_date
+    description: Indicates the closing date related to the period.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.created_at
+    description: Timestamp of the creation of the period.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.updated_at
+    description: Timestamp of the update of the period.
