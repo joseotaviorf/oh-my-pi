@@ -9,13 +9,14 @@ SELECT DISTINCT
     m.last_queue,
     s.name,
     s.value,
+    s2.value as matthew_version,
     CASE
-        WHEN s.value = 1 AND s.value IS NOT NULL THEN True
+        WHEN (s.value = 1 AND s.value IS NOT NULL) OR (CAST(s2.value AS DOUBLE) <> 0 AND s2.value IS NOT NULL) THEN True
         ELSE False
     END AS flag_eval_matthew_in_chat,
     CASE
-        WHEN s.value = 1 AND s.value IS NOT NULL THEN 'Matthew in Chat'
         WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
+        WHEN m.bot = 'wall-e' AND (s.value = 1 AND s.value IS NOT NULL) OR (CAST(s2.value AS DOUBLE) <> 0 AND s2.value IS NOT NULL) THEN 'Matthew in Chat'
         ELSE 'Wall-e'
     END AS ai_agent_source,
     m.is_escalated AS is_escalation,
@@ -28,4 +29,8 @@ LEFT JOIN
     datalake_langfuse_clean.scores s
         ON s.id_session = m.id_langfuse_session
         AND s.name = 'SessionContainsMatthewAgentEvaluator'
+LEFT JOIN
+    datalake_langfuse_clean.scores s2
+        ON s2.id_session = m.id_langfuse_session
+        AND s2.name = 'MatthewVersionEvaluator'
 WHERE (bot = 'matthew' OR (bot = 'wall-e'))
