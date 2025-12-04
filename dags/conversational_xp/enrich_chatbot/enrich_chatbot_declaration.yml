@@ -12,9 +12,9 @@ workflow:
     sessions:
       merge_on: [id_sauron_session]
       z_order_by: [ts_created, id_sauron_session]
-    support_sessions:
-      merge_on: [id_session]
-      z_order_by: [id_session, ts_created]
+    messages:
+      merge_on: [id_message]
+      z_order_by: [ts_created]
 
 cluster:
   type: custom_cluster

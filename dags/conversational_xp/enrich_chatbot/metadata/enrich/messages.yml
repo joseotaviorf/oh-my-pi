@@ -1,0 +1,69 @@
+---
+database_name: datalake_chatbot
+table_name: messages
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: Table containing message data, includes both human-human and human-AI conversations with message sequencing and timing information.
+columns:
+  id_message:
+    description: 'Message identifier'
+    lineage:
+    - datalake_copilot_service_clean.message.id
+    - datalake_quinto_messenger_clean.channel_event.id
+    - datalake_internal_chat_clean.internal_chat_messages.id_message
+  id_sauron_session:
+    description: 'Sauron session ID associated with the message'
+    lineage:
+    - datalake_copilot_service_clean.session.id_sauron_session
+    - datalake_quinto_messenger_clean.channel.id_session
+    - datalake_quinto_messenger_clean.chat.id_session
+    - datalake_sauron_clean.session.id
+  id_user:
+    description: 'User ID associated with the message. -1 for bot/system messages, NULL for users without account'
+    lineage:
+    - datalake_copilot_service_clean.session.id_user
+    - datalake_sauron_clean.session.user_data
+    - datalake_ebdb_user.user.id
+  message:
+    description: 'Message content/text'
+    lineage:
+    - datalake_copilot_service_clean.message.content
+    - datalake_quinto_messenger_clean.channel_event.message_body
+    - datalake_internal_chat_clean.internal_chat_messages.message
+  message_index:
+    description: 'Sequential message number within the session (1-based)'
+    lineage:
+    - datalake_copilot_service_clean.message.ts_created
+    - datalake_quinto_messenger_clean.channel_event.ts_created
+    - datalake_internal_chat_clean.internal_chat_messages.ts_created
+  conversation_type:
+    description: 'Type of conversation'
+    categories:
+      HUMAN-HUMAN: 'Human-to-human conversation (support chat)'
+      HUMAN-AI: 'Human-to-AI conversation (chatbot)'
+    lineage:
+    - datalake_copilot_service_clean.message.role
+  role:
+    description: 'Message sender role'
+    categories:
+      HUMAN: 'Human user'
+      SYSTEM: 'System message/template'
+      ANALYST: 'Human support analyst'
+      AI: 'Bot'
+    lineage:
+    - datalake_copilot_service_clean.message.role
+    - datalake_quinto_messenger_clean.channel_event.from_phone_number
+    - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+  reply_time:
+    description: 'Time in seconds since the previous message in the session (only when role changes)'
+    lineage:
+    - datalake_copilot_service_clean.message.ts_created
+    - datalake_quinto_messenger_clean.channel_event.ts_created
+    - datalake_internal_chat_clean.internal_chat_messages.ts_created
+  ts_created:
+    description: 'Message creation timestamp'
+    lineage:
+    - datalake_copilot_service_clean.message.ts_created
+    - datalake_quinto_messenger_clean.channel_event.ts_created
+    - datalake_internal_chat_clean.internal_chat_messages.ts_created
+

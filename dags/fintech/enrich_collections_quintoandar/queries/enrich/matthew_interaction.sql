@@ -4,13 +4,12 @@ WITH mathew_session AS (
         s.id_session AS score_session,
         ss.id_session,
         ss.id_user,
-        ss.ts_created,
-        ss.ts_finished
+        ss.ts_created
     FROM
-        datalake_chatbot.support_sessions ss
+        datalake_chatbot.sessions ss
     LEFT JOIN
         datalake_langfuse_clean.scores s
-        ON s.id_session = ss.id_external
+        ON s.id_langfuse_session = ss.id_external
     WHERE
         name = 'SessionContainsMatthewAgentEvaluator'
         AND value = 1
