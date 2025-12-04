@@ -642,6 +642,7 @@ SELECT
     has_app_events_overdue,
     qt_app_events,
     qt_app_events_overdue,
+    CAST(promessas AS BIGINT) AS promessas,
     CAST(qt_acordo_quebrado AS BIGINT) AS qt_acordo_quebrado,
     CAST(qt_promessa_quebrada_fp AS BIGINT) AS qt_promessa_quebrada_fp,
     CAST(qt_aco_deconto AS BIGINT) AS qt_aco_desconto,

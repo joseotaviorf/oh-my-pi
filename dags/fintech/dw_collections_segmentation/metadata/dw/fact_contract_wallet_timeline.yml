@@ -137,6 +137,10 @@ columns:
     description: Quantity of overdue-related app events for the contract on reference date
     lineage:
       - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
+  promessas:
+    description: Quantity of promises (negotiations without the payment of the first installment) for the contract on reference date
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
   qt_acordo_quebrado:
     description: Quantity of broken agreements for the contract
     lineage:
@@ -237,6 +241,10 @@ columns:
     description: Total number of invoices in the contract wallet
     lineage:
       - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+  monthly_income:
+    description: Monthly income of the contract proponent
+    lineage:
+      - datalake_sorting_hat_clean.proponent.monthly_income
   open_wallet_overdue_t1:
     description: Open wallet amount overdue using T1 methodology
   open_wallet_overdue_t2:
@@ -245,6 +253,8 @@ columns:
     description: Open wallet amount overdue using T3 methodology
   wallet_overdue_t2:
     description: Wallet amount overdue using T2 methodology
+  debts_in_income_share_t2:
+    description: Ratio of overdue wallet amount to monthly income using T2 methodology
   overdue_recovered_amount_t2:
     description: Amount recovered from overdue invoices using T2 methodology
   open_wallet:
@@ -257,6 +267,8 @@ columns:
     description: Wallet amount paid on time using T1 methodology
   wallet_overdue_t1:
     description: Wallet amount overdue using T1 methodology
+  debts_in_income_share_t1:
+    description: Ratio of overdue wallet amount to monthly income using T1 methodology
   open_wallet_on_time_t1:
     description: Open wallet amount on time using T1 methodology
   overdue_recovered_amount_t1:
@@ -287,6 +299,10 @@ columns:
     description: Contract end date
   dt_contract_start:
     description: Contract start date
+  dt_pipe:
+    description: Invoice due date (pipeline date) for monthly invoices, used to identify pipeturn day
+    lineage:
+      - datalake_retsuko.invoice.ts_due
   year:
     description: Year extracted from reference date
   month:
