@@ -39,7 +39,7 @@ cte_demand AS (
     LEFT JOIN
         datalake_gsheets_clean.forbrokers_3p_partner_conditions pc
             ON UPPER(dp.demand_3p_partner) = UPPER(pc.partner_short_name)
-    WHERE TRIM(is_3p_demand) = 'true'
+    WHERE TRIM(COALESCE(dp.is_3p_demand, False)) = 'true'
 ),
 
 
