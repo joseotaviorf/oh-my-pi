@@ -1,0 +1,201 @@
+---
+database_name: metric_sale
+table_name: exp_visit_cohort
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Experiment cohort analysis table tracking visit status and funnel progression
+  across multiple time windows (1d, 3d, 7d, 14d, 21d, 28d) for visits within active experiments.
+  Each row is a unique visit of an experiment and cohort in a specific date
+  between the creation date of the visit and the end date of the experiment.
+columns:
+  sk_exp_visit_cohort:
+    lineage:
+      - dw_for_sale_experiment.fact_experiment.sk_neotribe_exp
+      - dw_visit.fact_visits.sk_visit
+      - dw_public.dim_date.date
+    description: Unique key combining experiment, visit, cohort period, and reference date.
+    dimension: True
+  sk_neotribe_exp:
+    lineage:
+      - dw_for_sale_experiment.fact_experiment.sk_neotribe_exp
+    description: Foreign key to experiment dimension table identifying the specific experiment.
+    dimension: True
+  sk_visit:
+    lineage:
+      - dw_visit.fact_visits.sk_visit
+    description: Foreign key to visit fact table identifying the specific visit.
+    dimension: True
+  sk_house:
+    lineage:
+      - dw_visit.fact_visits.sk_house
+    description: Foreign key identifying the house visited.
+    dimension: True
+  sk_visitor:
+    lineage:
+      - dw_visit.fact_visits.sk_visitor
+    description: Foreign key identifying the visitor.
+    dimension: True
+  sk_owner:
+    lineage:
+      - dw_visit.fact_visits.sk_owner
+    description: Foreign key identifying the property owner.
+    dimension: True
+  sk_first_associated_agent:
+    lineage:
+      - dw_visit.fact_visits.sk_first_associated_agent
+    description: Foreign key identifying the first agent associated with the visit.
+    dimension: True
+  business_context:
+    lineage:
+      - dw_visit.dim_visit.business_context
+    description: Business context of the visit (RENT or SALE).
+    dimension: True
+  exp_name_neotribe:
+    lineage:
+      - dw_for_sale_experiment.dim_experiment.name_neotribe
+    description: Name of the neotribe conducting the experiment.
+    dimension: True
+  exp_name_experiment:
+    lineage:
+      - dw_for_sale_experiment.dim_experiment.name_experiment
+    description: Name of the specific experiment being conducted.
+    dimension: True
+  exp_identifier_type:
+    lineage:
+      - dw_for_sale_experiment.dim_experiment.identifier_type
+    description: Type of identifier used for experiment participants (e.g., VISITOR, HOUSE, AGENT).
+    dimension: True
+  exp_test_group:
+    lineage:
+      - dw_for_sale_experiment.fact_experiment.test_group
+    description: Test group assignment for the experiment participant.
+    categories:
+      CONTROL: Participant assigned to the control group.
+      TREATMENT: Participant assigned to the treatment group.
+    dimension: True
+  metric_cohort:
+    lineage:
+      - dw_visit.dim_date.date
+      - dw_visit.dim_visit.dt_created
+    description: Cohort time window for metric calculation.
+    categories:
+      1d: 1-day cohort metrics.
+      3d: 3-day cohort metrics.
+      7d: 7-day cohort metrics.
+      14d: 14-day cohort metrics.
+      21d: 21-day cohort metrics.
+      28d: 28-day cohort metrics.
+    dimension: True
+  num_vb:
+    lineage:
+      - dw_visit.dim_date.date
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if visit was booked within the cohort time window.
+    metric:
+      name: Visits Booked
+      description: Target of visits Booked within the aggregation.
+      acronym: VB
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vc:
+    lineage:
+      - dw_visit.dim_visit.ts_visit_done
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if visit was completed within the cohort time window.
+    metric:
+      name: Visits Completed
+      description: Target of visits Completed within the aggregation.
+      acronym: VC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vcc:
+    lineage:
+      - dw_visit.dim_visit.ts_visit_canceled
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if visit was canceled within the cohort time window.
+    metric:
+      name: Visits Canceled
+      description: Target of visits Canceled within the aggregation.
+      acronym: VCc
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vu:
+    lineage:
+      - dw_visit.dim_visit.ts_visit_unsuccessful
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if visit was unsuccessful within the cohort time window.
+    metric:
+      name: Visits Unsuccessful
+      description: Target of visits Unsuccessful within the aggregation.
+      acronym: VU
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_os:
+    lineage:
+      - dw_visit.dim_visit_funnel.ts_first_event
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if offer was submitted within the cohort time window.
+    metric:
+      name: Offers Submitted
+      description: Target of offers Submitted within the aggregation.
+      acronym: OS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_oa:
+    lineage:
+      - dw_visit.dim_visit_funnel.ts_first_event
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if offer was accepted within the cohort time window.
+    metric:
+      name: Offers Accepted
+      description: Target of offers Accepted within the aggregation.
+      acronym: OA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_cs:
+    lineage:
+      - dw_visit.dim_visit_funnel.ts_first_event
+      - dw_visit.dim_visit.dt_created
+    description: Binary indicator (1/0) if contract was signed within the cohort time window.
+    metric:
+      name: Contract Signed
+      description: Target of contract Signed within the aggregation.
+      acronym: CS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  dt_exp_started:
+    lineage:
+      - dw_for_sale_experiment.dim_experiment.dt_started
+    description: Official start date of the experiment.
+    dimension: True
+  dt_exp_ended:
+    lineage:
+      - dw_for_sale_experiment.dim_experiment.dt_ended
+    description: Official end date of the experiment (or current date if ongoing).
+    dimension: True
+  dt_ref:
+    lineage:
+      - dw_public.dim_date.date
+    description: Reference date for cohort calculation, representing the analysis date for time-based metrics.
+    dimension: True

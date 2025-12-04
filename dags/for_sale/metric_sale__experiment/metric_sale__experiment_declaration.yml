@@ -1,16 +1,18 @@
----
 dag:
-  name: enrich_for_sale_experiment
+  name: metric_sale__experiment
+  schedule_start_date: 2025,12,03
   owner: Data ForSale
-  schedule_start_date: 2025, 11, 14
   documentation:
-    dag_purpose:
-      This DAG creates enriched tables for experiments of For Sale line.
+    dag_purpose: "This DAG creates the For Sale experiment metrics."
 workflow:
   type: query_delta
-  layer: enrich
+  layer: metric
+  custom_schema: sale
 cluster:
   type: databricks_16_4_med_memory_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"

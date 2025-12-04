@@ -4134,6 +4134,12 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.metric_rent__contracts:load-metric-ended-rentals-confirmed-daily:first-run-of-day
   - bietlejuice.metric_rent__contracts:load-metric-new-contracts-signed-daily:first-run-of-day
   - bietlejuice.metric_rent__contracts:load-metric-ongoing-rentals-daily:first-run-of-day
+bietlejuice.metric_sale__experiment:
+  - bietlejuice.dw_for_sale_experiment:load-dw-for-sale-experiment-dim-experiment:first-run-of-day
+  - bietlejuice.dw_for_sale_experiment:load-dw-for-sale-experiment-fact-experiment:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-dim-visit-funnel:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
 bietlejuice.metric_ss__segments:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy:first-run-of-day
@@ -4358,6 +4364,9 @@ bietlejuice.reverse_kyc:
   - bietlejuice.sales_flow:load-clean-sales-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-seller-data:first-run-of-day
   - bietlejuice.vans:load-clean-payment:first-run-of-day
+bietlejuice.reverse_listings_locations_load:
+  - bietlejuice.ebdb_location:load-clean-city:first-run-of-day
+  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people:first-run-of-day
@@ -4395,9 +4404,6 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_fintech:done-clean-hub-bonus:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-negotiation-executive-bonus:first-run-of-day
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers:first-run-of-day
-bietlejuice.reverse_listings_locations_load:
-  - bietlejuice.ebdb_location:load-clean-city:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
 bietlejuice.reverse_neighborhood_price_range_access:
   - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range:first-run-of-day
 bietlejuice.reverse_neighborhood_price_range_load:

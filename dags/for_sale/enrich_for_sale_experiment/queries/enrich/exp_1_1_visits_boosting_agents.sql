@@ -13,12 +13,12 @@ SELECT
     END AS test_group,
     CAST(NULL AS STRING) AS documentation_link,
     'Os BP são identificados de acordo com as visitas marcadas e divididos de acordo com o final do id' AS additional_information,
-    DATE('2025-07-13') AS dt_started,
-    CAST(NULL AS DATE) AS dt_ended,
+    DATE('2025-06-26') AS dt_started,
+    DATE('2025-07-13') AS dt_ended,
     MIN(ts_created::DATE) AS dt_identifier_started
 FROM
     datalake_ebdb_clean.visit
 WHERE
-    ts_created::DATE >= '2025-11-14'
+    ts_created::DATE >= '2025-06-26'
     AND business_context = 'RENT'
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
