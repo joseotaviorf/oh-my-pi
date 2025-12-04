@@ -70,10 +70,9 @@ if __name__ == "__main__":
             logger.info(f"m=Building dataframe from {schema}.{table_name}, execution_date={execution_date_str}...")
             df = spark.sql(f"""
                 SELECT 
-                    * except (ts_load),
-                    ts_load as execution_date
+                    *,
+                    DATE('{execution_date_str}') as execution_date
                 FROM {schema}.{table_name}
-                WHERE DATE(ts_load) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
             """)
             
             # Check if any organization column exists and apply filter

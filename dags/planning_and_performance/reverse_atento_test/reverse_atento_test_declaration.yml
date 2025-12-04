@@ -14,7 +14,7 @@ workflow:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
-    - "{schema}"
+    - "dw_bpo_performance"
     - "{table_name}"
     - "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
     - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
