@@ -1,182 +1,185 @@
 ---
 database_name: datalake_demand_flows
 table_name: prospect_results
-owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
-description: This table contains records of demand prospect conversion events across Rent and Sale business contexts. Each record represents a specific action (booking a visit, submitting an offer, or initiating a talk to an agent) performed by a prospect. This table also adds ad hoc rules and the construction of id_media_setup. 
-columns:  
+owner: "@data-growth"
+domain: Growth
+description: This table contains records of demand prospect conversion events across Rent and Sale business contexts. Each record represents a specific action (booking a visit, submitting an offer, or initiating a talk to an agent) performed by a prospect. This table also adds ad hoc rules and the construction of id_media_setup.
+columns:
   id_demand_prospect_conversion_event:
-    description: 'Unique identifier for demand prospect conversion event (FLOW). A flow is an booking/offer/talk to agent event made by a prospect to a specific house and business context.'
-    lineage: 
-      - datalake_demand_flows.demand_prospect_conversion_events.id_demand_prospect_conversion_event   
+    description: "Unique identifier for demand prospect conversion event (FLOW). A flow is an booking/offer/talk to agent event made by a prospect to a specific house and business context."
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.id_demand_prospect_conversion_event
   id_rent_flow:
-    description: 'Identifier of a user flow with a house in rent context.'
+    description: "Identifier of a user flow with a house in rent context."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_rent_flow  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_rent_flow
   id_sale_flow:
-    description: 'Identifier of a user flow with a house in sale context.'
+    description: "Identifier of a user flow with a house in sale context."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_sale_flow  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_sale_flow
   id_event_type:
-    description: 'Identifier of the event type'
+    description: "Identifier of the event type"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_event_type  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_event_type
   event_name:
-    description: 'Name of the demand prospect conversion event'
+    description: "Name of the demand prospect conversion event"
   id_booking:
-    description: 'Id of the visit booking.'
+    description: "Id of the visit booking."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_booking  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_booking
   id_offer:
-    description: 'Id of the offer made from a prospect to a house owner.'
+    description: "Id of the offer made from a prospect to a house owner."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_offer  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_offer
   id_talk_to_agent:
-    description: 'Synthetic id created to idendtify a TTA event.'
+    description: "Synthetic id created to identify a TTA event."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_talk_to_agent  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_talk_to_agent
   id_house:
-    description: 'ID of the property for which the conversion was registered'
+    description: "ID of the property for which the conversion was registered"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_house  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_house
   id_region:
-    description: 'Id of the house region.'
+    description: "Id of the house region."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_region  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_region
   id_prospect:
-    description: 'Id user of the prospect.'
+    description: "Id user of the prospect."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_prospect  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_prospect
   id_owner:
-    description: 'Id user of the house owner.'
+    description: "Id user of the house owner."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_owner  
+      - datalake_demand_flows.demand_prospect_conversion_events.id_owner
   id_agent:
-    description: 'Id of the agent whose made the booking.'
+    description: "Id of the agent whose made the booking."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.id_agent  
-  id_media_setup_from_adhoc:
-    description: 'Identifier for media setup originating from ad hoc rules.'
+      - datalake_demand_flows.demand_prospect_conversion_events.id_agent
+  media_setup_from_adhoc:
+    description: "Media setup string originating from ad hoc rules."
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.product_origin
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign 
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_source 
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_medium  
-      - datalake_demand_flows.demand_prospect_conversion_events.app_type  
-  id_media_setup_from_dictionary:
-    description: 'Identifier for media setup originating from taxonomia dictionary.'
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_source
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_medium
+      - datalake_demand_flows.demand_prospect_conversion_events.app_type
+  media_setup_from_dictionary:
+    description: "Media setup string originating from taxonomia dictionary."
     lineage:
-      - datalake_growth_taxonomy.unified_taxonomy_dictionary.sk_media_setup
-  id_media_setup_from_exception_flow:
-    description: 'Identifier for media setup originating from exception flow gsheets.'
+      - datalake_growth_taxonomy.unified_taxonomy_dictionary.naming_convention_sufix
+  media_setup_from_exception_flow:
+    description: "Media setup string originating from exception flow gsheets."
     lineage:
       - datalake_gsheets_clean.taxonomy_demand_exception_flow.correct_utm_campaign
-  id_media_setup_from_naming_convention:
-    description: 'Identifier for media setup originating from naming convention.'
+  media_setup_from_naming_convention:
+    description: "Media setup string originating from naming convention extracted from utm_campaign."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_camapign  
-  final_id_media_setup:
-    description: 'The final media setup identifier for the conversion event, determined by a prioritization logic among the different sources.'
-  final_media_setup_id_origin:
-    description: 'Origin of the final media setup identifier, indicating the priority source from which it was extracted.'
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign
+  naming_convention_sufix:
+    description: "The final media setup naming convention suffix for the conversion event, determined by a prioritization logic among the different sources (adhoc rule, exception flow, dictionary, naming convention)."
+  naming_convention_sufix_origin:
+    description: "Origin of the final media setup naming convention suffix, indicating the priority source from which it was extracted."
+  utm_adhoc_rule:
+    description: "Ad hoc rule applied based on utm parameters and app type to categorize the conversion event."
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_source
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_medium
+      - datalake_demand_flows.demand_prospect_conversion_events.app_type
+      - datalake_demand_flows.demand_prospect_conversion_events.product_origin
   business_context:
-    description: 'Context in witch that conversion happened.'
+    description: "Context in which that conversion happened."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.business_context  
+      - datalake_demand_flows.demand_prospect_conversion_events.business_context
   booking_creator:
-    description: 'Person/team that scheduled the visit to the property.'
+    description: "Person/team that scheduled the visit to the property."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.booking_creator  
+      - datalake_demand_flows.demand_prospect_conversion_events.booking_creator
   product_origin:
-    description: 'System where the booking was registered'
+    description: "System where the booking was registered"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.product_origin  
+      - datalake_demand_flows.demand_prospect_conversion_events.product_origin
   is_3p_demand:
-    description: 'Flag to point if that booking was created by an Rede agent.'
+    description: "Flag to point if that booking was created by an Rede agent."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.is_3p_demand  
-  flg_via_reschedule:
-    description: 'Flag to indicate whether the visit is a reschedule.'
-    lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.flg_via_reschedule  
+      - datalake_demand_flows.demand_prospect_conversion_events.is_3p_demand
   app_type:
-    description: 'Application from which the user made the conversion event.'
+    description: "Application from which the user made the conversion event."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.app_type  
+      - datalake_demand_flows.demand_prospect_conversion_events.app_type
   utm_medium:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_medium  
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_medium
   utm_source:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_source  
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_source
   utm_campaign:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign  
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_campaign
   utm_term:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_term  
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_term
   utm_content:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.utm_content  
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_content
   entrance_uri:
-    description: 'The URL of the first page a user visits in a session.'
+    description: "The URL of the first page a user visits in a session."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.entrance_uri              
-  branded:
-    description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
-    lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.branded  
-  country_code:
-    description: 'Country code of the house.'
-    lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.country_code 
+      - datalake_demand_flows.demand_prospect_conversion_events.entrance_uri
   operation_channel:
-    description: 'Physical agent, internal or external, who performed the conversion in the funnel stage under analysis'
+    description: "Physical agent, internal or external, who performed the conversion in the funnel stage under analysis"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.booking_creator 
-      - datalake_demand_flows.demand_prospect_conversion_events.id_booking 
+      - datalake_demand_flows.demand_prospect_conversion_events.booking_creator
+      - datalake_demand_flows.demand_prospect_conversion_events.id_booking
+      - datalake_demand_flows.demand_prospect_conversion_events.product_origin
     categories:
-      SelfService: 'Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion.'
-      Secretaria: 'Conversions that are recorded by the Sales Secretariat'
-      CX: 'Conversions that are recorded by CX Operation'
-      Agents: 'Conversions that are recorded by the Agents operation'
+      Concierge: "Conversions that originated from WhatsApp Concierge."
+      Lost Tracking: "Conversions where booking creator information is missing but a booking exists."
+      SelfService: "Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion."
+      Secretaria: "Conversions that are recorded by the Sales Secretariat"
+      CX: "Conversions that are recorded by CX Operation"
+      Agent: "Conversions that are recorded by the Agents operation"
+      Other: "Conversions from other sources not categorized above."
   referral_type:
-    description: 'Grouping of results by type of user prospecting program/initiative. Program/Initiative: Program or initiative that has different types of partners.'
+    description: "Grouping of results by type of user prospecting program/initiative. Program/Initiative: Program or initiative that has different types of partners."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.booking_creator 
-      - datalake_demand_flows.demand_prospect_conversion_events.is_3p_demand 
+      - datalake_demand_flows.demand_prospect_conversion_events.booking_creator
+      - datalake_demand_flows.demand_prospect_conversion_events.is_3p_demand
+      - datalake_demand_flows.demand_prospect_conversion_events.utm_medium
+      - datalake_demand_flows.demand_prospect_conversion_events.id_agent
     categories:
-      Agents: 'Third-party brokers who make visits and can prospect tenants.'
-      Rede: 'Real estate partners that prospect tenants and such prospecting is encouraged by Fifth Floor.'
-      NA: 'This level of characterization is not applicable to the event/context.'
+      TQC: "Conversions from TQC (Terceiro Quintoandar) referral program or when utm_medium is TQC."
+      Agent: "Conversions recorded by agents who are not part of TQC or Rede programs."
+      Rede: "Real estate partners that prospect tenants and such prospecting is encouraged by Fifth Floor."
+      NA: "This level of characterization is not applicable to the event/context."
   origin:
-    description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis.
+    description: "QuintoAndar application where the conversion was carried out in the funnel stage under analysis."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.product_origin 
+      - datalake_demand_flows.demand_prospect_conversion_events.product_origin
   platform:
-    description: Platform of the prospect device where the evaluated event took place.
+    description: "Platform of the prospect device where the evaluated event took place. Possible values: Lost Tracking, App Android, App iOS, Web Desktop, Web Mobile, Other."
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.app_type 
+      - datalake_demand_flows.demand_prospect_conversion_events.app_type
   content_page:
-    description: Classification of content pages depending on the strategy adopted.  
+    description: "Classification of content pages depending on the strategy adopted. Currently identifies 'guias' pages when entrance_uri contains '/guias/', otherwise NULL."
   ts_event:
-    description: 'Timestamp of the conversion event'
+    description: "Timestamp of the conversion event"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.ts_event  
+      - datalake_demand_flows.demand_prospect_conversion_events.ts_event
   year:
-    description: 'Year of the conversion event'
+    description: "Year of the conversion event"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.year  
+      - datalake_demand_flows.demand_prospect_conversion_events.year
   month:
-    description: 'Month of the conversion event'
+    description: "Month of the conversion event"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.month  
+      - datalake_demand_flows.demand_prospect_conversion_events.month
   day:
-    description: 'Day of the conversion event'
+    description: "Day of the conversion event"
     lineage:
-      - datalake_demand_flows.demand_prospect_conversion_events.day  
+      - datalake_demand_flows.demand_prospect_conversion_events.day

@@ -90,10 +90,10 @@ SELECT
   origin,
   CASE 
     WHEN channel = 'Facebook' THEN 'ZEBRA.hybr.acq.nonorg.na.d.webdisplay.facebook'
-    WHEN channel = 'Placas' THEN CONCAT('ZEBRA.', LOWER(business_context), '.acq.nonorg.na.d.placas.na')
+    WHEN channel = 'Placas' THEN CONCAT('ZEBRA.', CASE WHEN LOWER(business_context) = 'hybrid' THEN 'hybr' ELSE LOWER(business_context) END, '.acq.nonorg.na.d.placas.na')
     WHEN channel = 'Online Classifieds' THEN CONCAT(
       'ZEBRA.', 
-      LOWER(business_context), 
+      CASE WHEN LOWER(business_context) = 'hybrid' THEN 'hybr' ELSE LOWER(business_context) END, 
       '.acq.nonorg.na.d.onlineclassifieds.', 
       CASE 
         WHEN source IN ('Imovelweb', 'Chaves na Mão') THEN LOWER(REPLACE(source, ' ', ''))

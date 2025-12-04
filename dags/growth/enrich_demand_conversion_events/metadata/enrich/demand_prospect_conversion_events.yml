@@ -1,212 +1,224 @@
 ---
 database_name: datalake_demand_flows
 table_name: demand_prospect_conversion_events
-owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
-description: Each row of this table is a demand prospect conversion event (visit booked, offer submited or talk to agent) from both Rent and Sale busness contexts.
+owner: "@data-growth"
+domain: Growth
+description: Each row of this table is a demand prospect conversion event (visit booked, offer submitted or talk to agent) from both Rent and Sale business contexts.
 columns:
   id_demand_prospect_conversion_event:
-    description: 'Unique identifier for demand prospect conversion event (FLOW). A flow is an booking/offer/talk to agent event made by a prospect to a specific house and business context.'
+    description: "Unique identifier for demand prospect conversion event (FLOW). A flow is an booking/offer/talk to agent event made by a prospect to a specific house and business context."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.ts_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
-    - datalake_sale_demand_events.sale_demand_events.id_booking
-    - datalake_rent_demand_events.rent_demand_events.id_booking
-    - datalake_sale_demand_events.sale_demand_events.id_offer
-    - datalake_rent_demand_events.rent_demand_events.id_offer
-    - datalake_talk_to_agent.talk_to_agent.tenant_id
-    - datalake_talk_to_agent.talk_to_agent.agent_id
-    - datalake_talk_to_agent.talk_to_agent.sk_house_listing
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
-    - datalake_sale_demand_events.sale_demand_events.id_buyer
-    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
-    - datalake_talk_to_agent.talk_to_agent.tenant_id
-    - datalake_sale_demand_events.sale_demand_events.id_house
-    - datalake_rent_demand_events.rent_demand_events.id_house
-    - datalake_talk_to_agent.talk_to_agent.house_id
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+      - datalake_rent_demand_events.rent_demand_events.id_booking
+      - datalake_sale_demand_events.sale_demand_events.id_offer
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.agent_id
+      - datalake_talk_to_agent.talk_to_agent.sk_house_listing
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_sale_demand_events.sale_demand_events.id_house
+      - datalake_rent_demand_events.rent_demand_events.id_house
+      - datalake_talk_to_agent.talk_to_agent.house_id
   id_rent_flow:
-    description: 'Identifier of a user flow with a house in rent context.'
+    description: "Identifier of a user flow with a house in rent context."
     lineage:
-    - datalake_rent_demand_events.rent_demand_events.id_rent_flow
-    - datalake_talk_to_agent.talk_to_agent.tenant_id
-    - datalake_talk_to_agent.talk_to_agent.house_id
+      - datalake_rent_demand_events.rent_demand_events.id_rent_flow
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.house_id
   id_sale_flow:
-    description: 'Identifier of a user flow with a house in sale context.'
+    description: "Identifier of a user flow with a house in sale context."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_sale_flow
-    - datalake_talk_to_agent.talk_to_agent.id_sale_flow
+      - datalake_sale_demand_events.sale_demand_events.id_sale_flow
+      - datalake_talk_to_agent.talk_to_agent.id_sale_flow
+  id_event_date:
+    description: "Date identifier for the conversion event in format yyyyMMdd."
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
   id_event_type:
-    description: 'Identifier of the event type'
+    description: "Identifier of the event type"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.sk_event_type
-    - datalake_rent_demand_events.rent_demand_events.id_event_type
+      - datalake_sale_demand_events.sale_demand_events.sk_event_type
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
   event_name:
-    description: 'Name of the demand prospect conversion event'
+    description: "Name of the demand prospect conversion event"
   id_booking:
-    description: 'Id of the visit booking.'
+    description: "Id of the visit booking."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_booking
-    - datalake_rent_demand_events.rent_demand_events.id_booking
+      - datalake_sale_demand_events.sale_demand_events.id_booking
+      - datalake_rent_demand_events.rent_demand_events.id_booking
   id_offer:
-    description: 'Id of the offer made from a prospect to a house owner.'
+    description: "Id of the offer made from a prospect to a house owner."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_offer
-    - datalake_rent_demand_events.rent_demand_events.id_offer
+      - datalake_sale_demand_events.sale_demand_events.id_offer
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+  id_firestore:
+    description: "Firestore identifier for offer events (used for sale and rent offers)."
+    lineage:
+      - datalake_amplitude_offer.sale_offer_raw_events.id_offer
+      - datalake_amplitude_offer.offer_submitted_events.id_firestore
+      - datalake_rental_transact.offer.id_firestore
   id_talk_to_agent:
-    description: 'Synthetic id created to idendtify a TTA event.'
+    description: "Synthetic id created to identify a TTA event."
     lineage:
-    - datalake_talk_to_agent.talk_to_agent.tenant_id
-    - datalake_talk_to_agent.talk_to_agent.agent_id
-    - datalake_talk_to_agent.talk_to_agent.sk_house_listing
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.agent_id
+      - datalake_talk_to_agent.talk_to_agent.sk_house_listing
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
   id_house:
-    description: 'ID of the property for which the conversion was registered'
+    description: "ID of the property for which the conversion was registered"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_house
-    - datalake_rent_demand_events.rent_demand_events.id_house
-    - datalake_talk_to_agent.talk_to_agent.house_id
+      - datalake_sale_demand_events.sale_demand_events.id_house
+      - datalake_rent_demand_events.rent_demand_events.id_house
+      - datalake_talk_to_agent.talk_to_agent.house_id
   id_region:
-    description: 'Id of the house region.'
+    description: "Id of the house region."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_region
-    - datalake_rent_demand_events.rent_demand_events.id_region
+      - datalake_sale_demand_events.sale_demand_events.id_region
+      - datalake_rent_demand_events.rent_demand_events.id_region
   id_prospect:
-    description: 'Id user of the prospect.'
+    description: "Id user of the prospect."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_buyer
-    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
-    - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
   id_owner:
-    description: 'Id user of the house owner'
+    description: "Id user of the house owner"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_owner
-    - datalake_rent_demand_events.rent_demand_events.id_owner
-    - datalake_talk_to_agent.talk_to_agent.id_user
+      - datalake_sale_demand_events.sale_demand_events.id_owner
+      - datalake_rent_demand_events.rent_demand_events.id_owner
+      - datalake_talk_to_agent.talk_to_agent.id_user
   id_agent:
-    description: 'Id of the agent whose made the booking.'
+    description: "Id of the agent whose made the booking."
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.id_agent
-    - datalake_rent_demand_events.rent_demand_events.id_agent
-    - datalake_talk_to_agent.talk_to_agent.agent_id
+      - datalake_sale_demand_events.sale_demand_events.id_agent
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+      - datalake_talk_to_agent.talk_to_agent.agent_id
   visit_code:
-    description: Code of the visit when the event is related to a visit.
+    description: "Code of the visit when the event is related to a visit."
     lineage:
-      -  datalake_booking.booking.code  
+      - datalake_booking.booking.code
   business_context:
-    description: 'Context in witch that conversion happened.'
+    description: "Context in which that conversion happened."
     lineage:
-    - datalake_talk_to_agent.talk_to_agent.business_context
+      - datalake_talk_to_agent.talk_to_agent.business_context
   booking_creator:
-    description: 'Person/team that scheduled the visit to the property.'
+    description: "Person/team that scheduled the visit to the property."
     lineage:
-    - datalake_booking.booking.user_sale_booking_creator
+      - datalake_booking.booking.user_sale_booking_creator
   product_origin:
-    description: 'System where the booking was registered'
+    description: "System where the booking was registered"
     lineage:
-    - datalake_booking.booking.first_update_source
+      - datalake_booking.booking.first_update_source
   is_3p_demand:
-    description: 'Flag to point if that booking was created by an Rede agent.'
+    description: "Flag to point if that booking was created by an Rede agent."
     lineage:
-    - datalake_booking.booking.id_3p_demand
+      - datalake_booking.booking.id_3p_demand
   flg_via_reschedule:
-    description: 'Flag to indicate whether the visit is a reschedule.'
+    description: "Flag to indicate whether the visit is a reschedule."
     lineage:
-    - datalake_booking.booking.flg_via_reschedule
+      - datalake_booking.booking.flg_via_reschedule
   app_type:
-    description: 'Application from which the user made the conversion event.'
+    description: "Application from which the user made the conversion event."
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.app_type
-    - datalake_amplitude_visit.aplitude_visit.app_type
-    - datalake_amplitude_offer.offer_submitted_events.app_type
-    - datalake_amplitude_offer.sale_offer_raw_events.app_type
-    - datalake_talk_to_agent.talk_to_agent.app_type
+      - datalake_tracked_events.attribution_cross_channel.app_type
+      - datalake_amplitude_visit.aplitude_visit.app_type
+      - datalake_amplitude_offer.offer_submitted_events.app_type
+      - datalake_amplitude_offer.sale_offer_raw_events.app_type
+      - datalake_talk_to_agent.talk_to_agent.app_type
   utm_medium:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.utm_medium
-    - datalake_amplitude_visit.aplitude_visit.utm_medium
-    - datalake_amplitude_offer.offer_submitted_events.utm_medium
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_medium
-    - datalake_talk_to_agent.talk_to_agent.utm_medium
+      - datalake_tracked_events.attribution_cross_channel.utm_medium
+      - datalake_amplitude_visit.aplitude_visit.utm_medium
+      - datalake_amplitude_offer.offer_submitted_events.utm_medium
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_medium
+      - datalake_talk_to_agent.talk_to_agent.utm_medium
   utm_source:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.utm_source
-    - datalake_amplitude_visit.aplitude_visit.utm_source
-    - datalake_amplitude_offer.offer_submitted_events.utm_source
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_source
-    - datalake_talk_to_agent.talk_to_agent.utm_source
+      - datalake_tracked_events.attribution_cross_channel.utm_source
+      - datalake_amplitude_visit.aplitude_visit.utm_source
+      - datalake_amplitude_offer.offer_submitted_events.utm_source
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_source
+      - datalake_talk_to_agent.talk_to_agent.utm_source
   utm_campaign:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.utm_campaign
-    - datalake_amplitude_visit.aplitude_visit.utm_campaign
-    - datalake_amplitude_offer.offer_submitted_events.utm_campaign
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
-    - datalake_talk_to_agent.talk_to_agent.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.utm_campaign
+      - datalake_amplitude_visit.aplitude_visit.utm_campaign
+      - datalake_amplitude_offer.offer_submitted_events.utm_campaign
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
+      - datalake_talk_to_agent.talk_to_agent.utm_campaign
   utm_term:
-    description: 'Marketing parameter defined at campaing configuration at marketing platforms'
+    description: "Marketing parameter defined at campaign configuration at marketing platforms"
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.utm_term
-    - datalake_amplitude_visit.aplitude_visit.utm_term
-    - datalake_amplitude_offer.offer_submitted_events.utm_term
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_term
-    - datalake_talk_to_agent.talk_to_agent.utm_term  
+      - datalake_tracked_events.attribution_cross_channel.utm_term
+      - datalake_amplitude_visit.aplitude_visit.utm_term
+      - datalake_amplitude_offer.offer_submitted_events.utm_term
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_term
+      - datalake_talk_to_agent.talk_to_agent.utm_term
   utm_content:
-    description: 'Marketing parameter defined at campaing configuration at marketing platforms'
+    description: "Marketing parameter defined at campaign configuration at marketing platforms"
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.utm_content
-    - datalake_amplitude_visit.aplitude_visit.utm_content
-    - datalake_amplitude_offer.offer_submitted_events.utm_content
-    - datalake_amplitude_offer.sale_offer_raw_events.utm_content
-    - datalake_talk_to_agent.talk_to_agent.utm_content
+      - datalake_tracked_events.attribution_cross_channel.utm_content
+      - datalake_amplitude_visit.aplitude_visit.utm_content
+      - datalake_amplitude_offer.offer_submitted_events.utm_content
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_content
+      - datalake_talk_to_agent.talk_to_agent.utm_content
   entrance_uri:
-    description: 'The URL of the first page a user visits in a session.'
+    description: "The URL of the first page a user visits in a session."
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.entrance_uri
-    - datalake_amplitude_visit.aplitude_visit.entrance_uri
-    - datalake_amplitude_offer.offer_submitted_events.entrance_uri
-    - datalake_amplitude_offer.sale_offer_raw_events.entrance_uri  
+      - datalake_tracked_events.attribution_cross_channel.entrance_uri
+      - datalake_amplitude_visit.aplitude_visit.entrance_uri
+      - datalake_amplitude_offer.offer_submitted_events.entrance_uri
+      - datalake_amplitude_offer.sale_offer_raw_events.entrance_uri
   branded:
-    description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
+    description: "Points if the campaign responsible for the user conversion was a Branded advertising"
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.branded
-    - datalake_amplitude_visit.aplitude_visit.branded
-    - datalake_amplitude_offer.offer_submitted_events.branded
-    - datalake_amplitude_offer.sale_offer_raw_events.branded
-    - datalake_talk_to_agent.talk_to_agent.branded
+      - datalake_tracked_events.attribution_cross_channel.branded
+      - datalake_amplitude_visit.aplitude_visit.branded
+      - datalake_amplitude_offer.offer_submitted_events.branded
+      - datalake_amplitude_offer.sale_offer_raw_events.branded
+      - datalake_talk_to_agent.talk_to_agent.branded
   country_code:
-    description: 'Country code of the house.'
+    description: "Country code of the house."
     lineage:
-    - datalake_ebdb_listing.house.country_code
+      - datalake_ebdb_listing.house.country_code
   dt_event:
-    description: 'Date of the conversion event'
+    description: "Date of the conversion event"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.dt_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.dt_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
   ts_event:
-    description: 'Timestamp of the conversion event'
+    description: "Timestamp of the conversion event"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.ts_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
   year:
-    description: 'Year of the conversion event'
+    description: "Year of the conversion event"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.ts_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
   month:
-    description: 'Month of the conversion event'
+    description: "Month of the conversion event"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.ts_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
   day:
-    description: 'Day of the conversion event'
+    description: "Day of the conversion event"
     lineage:
-    - datalake_sale_demand_events.sale_demand_events.ts_event
-    - datalake_rent_demand_events.rent_demand_events.ts_event
-    - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_talk_to_agent.talk_to_agent.first_message_sent_ts
