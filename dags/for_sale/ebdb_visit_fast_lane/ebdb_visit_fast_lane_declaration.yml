@@ -24,6 +24,8 @@ workflow:
       clean_primary_keys: [id]
       raw_z_order_by: [house_id, ts_database_transaction]
       clean_z_order_by: [id_house, business_context]
+    VisitBusinessModel:
+      clean_table_name: visit_business_model
     VisitStatusLog:
       clean_table_name: visit_status_log
       clean_primary_keys: [id_visit_status_log]
