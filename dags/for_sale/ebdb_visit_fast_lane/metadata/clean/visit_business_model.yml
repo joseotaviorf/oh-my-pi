@@ -1,4 +1,4 @@
-database_name: datalake_ebdb_visit_clean
+database_name: datalake_ebdb_clean
 table_name: visit_business_model
 owner: vitor.musachio@quintoandar.com.br
 domain: For Sale
@@ -11,20 +11,20 @@ columns:
   id:
     description: Unique identifier of the visit business model entry
     lineage:
-      - datalake_ebdb_raw.visit_business_model.id
+      - datalake_ebdb_raw.VisitBusinessModel.id
   id_visit:
     description: Unique identifier for the visit (visit_id)
     lineage:
-      - datalake_ebdb_raw.visit_business_model.visit_id
+      - datalake_ebdb_raw.VisitBusinessModel.visit_id
   business_model:
     description: Business model associated with the visit, refering if the supply or demand is 1P or 3P.
     lineage:
-      - datalake_ebdb_raw.visit_business_model.business_model
+      - datalake_ebdb_raw.VisitBusinessModel.business_model
   ts_created:
     description: Timestamp when the entry was created (created_at)
     lineage:
-      - datalake_ebdb_raw.visit_business_model.created_at
+      - datalake_ebdb_raw.VisitBusinessModel.created_at
   ts_updated:
     description: Timestamp when the entry was last updated (updated_at)
     lineage:
-      - datalake_ebdb_raw.visit_business_model.updated_at
+      - datalake_ebdb_raw.VisitBusinessModel.updated_at

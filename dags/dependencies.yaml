@@ -1571,6 +1571,7 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
 bietlejuice.enrich_business_model:
   - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-business-model:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
