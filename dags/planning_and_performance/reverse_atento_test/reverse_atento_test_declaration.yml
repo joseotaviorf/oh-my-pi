@@ -19,7 +19,7 @@ workflow:
     - "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
     - "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
     - "atento"
-    - "(atento', 'atn')"
+    - "('atento', 'atn')"
     
   tables_customization:
     backlog_metric: {}
