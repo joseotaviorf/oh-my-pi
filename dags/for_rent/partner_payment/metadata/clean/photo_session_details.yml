@@ -12,7 +12,7 @@ columns:
     description: ID of the table, it’s the primary key.
   id_photo_session:
     lineage:
-      - datalake_partner_payment_raw.photo_session_details.photo_session_id
+      - datalake_partner_payment_raw.photo_session_details.photo_sesion_id
     description: ID of the photo session job in Main.
   version:
     lineage:
@@ -62,9 +62,9 @@ columns:
     lineage:
       - datalake_partner_payment_raw.photo_session_details.quantity_photos_value
     description: Value that indicates the number of photos in the photo session.
-  dt_source_status_update:
+  dt_source_status_updated:
     lineage:
-      - datalake_partner_payment_raw.photo_session_details.source_status_update_at
+      - datalake_partner_payment_raw.photo_session_details.source_status_updated_at
     description: Date when the Zendesk ticket status was set as approved.
   dt_publication:
     lineage:

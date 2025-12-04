@@ -1,6 +1,6 @@
 SELECT
     id,
-    photo_session_id AS id_photo_session,
+    photo_sesion_id AS id_photo_session,
     version,
     video,
     quantity_photos,
@@ -13,7 +13,7 @@ SELECT
     plaque_responsible_approver,
     video_value,
     quantity_photos_value,
-    source_status_update_at AS dt_source_status_update,
+    source_status_updated_at AS dt_source_status_updated,
     publication_date AS dt_publication,
     uploaded_date AS dt_uploaded,
     created_at AS ts_created,
