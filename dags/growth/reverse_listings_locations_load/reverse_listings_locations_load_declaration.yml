@@ -1,0 +1,21 @@
+dag:
+  name: reverse_listings_locations_load
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for loading the reverse listings locations data into the reverse listings locations table.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: listings_locations
+  default_extraction_type: full
+  short_circuit_customization:
+    function: CHECK_IS_SPECIFIC_WEEKDAY
+    function_params:
+      weekday: 0
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
