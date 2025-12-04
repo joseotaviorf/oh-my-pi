@@ -1,4 +1,0 @@
----
-cozy_bucket: '5a-datalake-forno'
-source_path: "s3://{cozy_bucket}/cozy/{execution_date}/*/{metric}.json"
-raw_partition_cols: ["year","month","day"]

@@ -1,4 +1,0 @@
----
-cozy_bucket: 'cozy-metrics-automation-prod-s3'
-source_path: "s3://{cozy_bucket}/CozyFoundations/v1/{execution_date}/*/{metric}.json"
-raw_partition_cols: ["year","month","day"]

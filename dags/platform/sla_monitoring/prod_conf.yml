@@ -3,7 +3,7 @@
 # We're getting the P70 from the last week and adding one hour to it
 expected_times_to_finish:
   bietlejuice.airtable: 04:24
-  bietlejuice.alert_manager: '10:57'
+  bietlejuice.alert_manager: "10:57"
   bietlejuice.amplitude: 05:23
   bietlejuice.amplitude_demand: 03:28
   bietlejuice.amplitude_new: 08:27
@@ -12,7 +12,7 @@ expected_times_to_finish:
   bietlejuice.arquivo_confidencial_integration_report: 07:20
   bietlejuice.atta: 01:29
   bietlejuice.authx_scim: 05:17
-  bietlejuice.batch_inference: '12:57'
+  bietlejuice.batch_inference: "12:57"
   bietlejuice.betopera: 07:27
   bietlejuice.big_agent: 04:30
   bietlejuice.bigfone: 04:24
@@ -31,35 +31,34 @@ expected_times_to_finish:
   bietlejuice.condominium_payments: 04:20
   bietlejuice.copilot_judge_metrics: 09:13
   bietlejuice.copilot_service: 05:16
-  bietlejuice.cozy_metrics: 04:20
   bietlejuice.criteo_campaigns: 06:18
   bietlejuice.criteo_temp: 09:35
   bietlejuice.crm: 04:24
   bietlejuice.currency: 07:22
-  bietlejuice.cyber: '11:45'
-  bietlejuice.cyber_complement: '11:35'
+  bietlejuice.cyber: "11:45"
+  bietlejuice.cyber_complement: "11:35"
   bietlejuice.cypress_reports: 07:27
   bietlejuice.dag_inventory: 01:32
-  bietlejuice.databricks_usage: '11:23'
-  bietlejuice.demand_balancer_service: '15:15'
+  bietlejuice.databricks_usage: "11:23"
+  bietlejuice.demand_balancer_service: "15:15"
   bietlejuice.demand_contact_submission: 04:23
-  bietlejuice.dependency_tree: '10:25'
+  bietlejuice.dependency_tree: "10:25"
   bietlejuice.docpilot: 07:26
   bietlejuice.documentation_metrics: 09:28
   bietlejuice.docx: 04:39
   bietlejuice.dw_affiliate_costs: 07:40
-  bietlejuice.dw_agent: '10:22'
+  bietlejuice.dw_agent: "10:22"
   bietlejuice.dw_agent_contract: 07:36
   bietlejuice.dw_agents_availability: 07:40
   bietlejuice.dw_atta: 08:28
-  bietlejuice.dw_banking_file_payments: '13:08'
+  bietlejuice.dw_banking_file_payments: "13:08"
   bietlejuice.dw_booking: 06:57
   bietlejuice.dw_braze_events_user_centric: 06:43
   bietlejuice.dw_braze_events_user_dispatch: 07:36
   bietlejuice.dw_business_unit_region: 05:16
   bietlejuice.dw_buyer_prospect: 08:17
   bietlejuice.dw_ciq_supply: 09:46
-  bietlejuice.dw_collection_recovery_quintocred: '12:46'
+  bietlejuice.dw_collection_recovery_quintocred: "12:46"
   bietlejuice.dw_company: 03:57
   bietlejuice.dw_condo_monitoring: 08:04
   bietlejuice.dw_contract: 08:25
@@ -69,13 +68,13 @@ expected_times_to_finish:
   bietlejuice.dw_crm_inspections: 08:21
   bietlejuice.dw_customer_satisfaction: 07:42
   bietlejuice.dw_customer_support: 08:34
-  bietlejuice.dw_data_quality: '10:38'
+  bietlejuice.dw_data_quality: "10:38"
   bietlejuice.dw_datamarts_cross: 08:53
   bietlejuice.dw_datamarts_for_rent: 08:37
   bietlejuice.dw_datamarts_for_rent_cross: 09:53
   bietlejuice.dw_datamarts_for_sale: 08:35
   bietlejuice.dw_datamarts_for_sale_cross: 09:17
-  bietlejuice.dw_datamarts_growth_cross: '11:12'
+  bietlejuice.dw_datamarts_growth_cross: "11:12"
   bietlejuice.dw_demand: 09:47
   bietlejuice.dw_house: 04:32
   bietlejuice.dw_house_amenities: 04:04
@@ -87,13 +86,13 @@ expected_times_to_finish:
   bietlejuice.dw_listing: 08:00
   bietlejuice.dw_listing_owners: 03:58
   bietlejuice.dw_listing_temp: 08:09
-  bietlejuice.dw_media_platform_metrics: '10:22'
-  bietlejuice.dw_media_sharing_rules: '10:04'
+  bietlejuice.dw_media_platform_metrics: "10:22"
+  bietlejuice.dw_media_sharing_rules: "10:04"
   bietlejuice.dw_neurotech_quintocred: 08:18
   bietlejuice.dw_offboarding: 08:41
   bietlejuice.dw_offer: 06:31
-  bietlejuice.dw_operator_performance: '13:00'
-  bietlejuice.dw_payments_platform: '13:11'
+  bietlejuice.dw_operator_performance: "13:00"
+  bietlejuice.dw_payments_platform: "13:11"
   bietlejuice.dw_person: 02:06
   bietlejuice.dw_photo_jobs: 04:54
   bietlejuice.dw_pricing: 06:33
@@ -105,7 +104,7 @@ expected_times_to_finish:
   bietlejuice.dw_rent_demand_events_snapshot: 09:28
   bietlejuice.dw_rent_flow: 07:50
   bietlejuice.dw_rent_listing_flow: 07:20
-  bietlejuice.dw_rental_payments: '12:42'
+  bietlejuice.dw_rental_payments: "12:42"
   bietlejuice.dw_repairs: 08:27
   bietlejuice.dw_reservation: 05:13
   bietlejuice.dw_retention: 08:59
@@ -192,7 +191,7 @@ expected_times_to_finish:
   bietlejuice.enrich_braze_events_user_centric: 06:02
   bietlejuice.enrich_braze_events_user_centric_periodicity: 06:33
   bietlejuice.enrich_braze_webhook_notification: 07:28
-  bietlejuice.enrich_brokerage: '16:44'
+  bietlejuice.enrich_brokerage: "16:44"
   bietlejuice.enrich_brokers_supply_processor: 04:51
   bietlejuice.enrich_buyer_prospect: 07:57
   bietlejuice.enrich_cdp_personas: 07:48
@@ -202,12 +201,11 @@ expected_times_to_finish:
   bietlejuice.enrich_collections_quintocred: 08:24
   bietlejuice.enrich_company: 03:22
   bietlejuice.enrich_condo_monitoring: 07:50
-  bietlejuice.enrich_consolidated_growth_metrics: '10:05'
+  bietlejuice.enrich_consolidated_growth_metrics: "10:05"
   bietlejuice.enrich_consolidated_marketing_metrics: 09:07
   bietlejuice.enrich_consumption_bill: 03:02
   bietlejuice.enrich_content_funnel: 09:50
   bietlejuice.enrich_copilot_service: 05:42
-  bietlejuice.enrich_cozy_metrics: 04:35
   bietlejuice.enrich_credit_analysis: 04:53
   bietlejuice.enrich_criteo: 09:38
   bietlejuice.enrich_crm: 04:37
@@ -219,14 +217,14 @@ expected_times_to_finish:
   bietlejuice.enrich_crm_tasks_transitions: 04:47
   bietlejuice.enrich_customer_demand: 08:00
   bietlejuice.enrich_customer_support: 07:43
-  bietlejuice.enrich_cyber: '12:38'
+  bietlejuice.enrich_cyber: "12:38"
   bietlejuice.enrich_dai_report: 08:32
   bietlejuice.enrich_dashboard_governance: 09:40
-  bietlejuice.enrich_data_quality: '10:47'
+  bietlejuice.enrich_data_quality: "10:47"
   bietlejuice.enrich_databricks: 04:19
   bietlejuice.enrich_databricks_job_runs: 05:20
   bietlejuice.enrich_date: 04:36
-  bietlejuice.enrich_debt_recovery: '12:29'
+  bietlejuice.enrich_debt_recovery: "12:29"
   bietlejuice.enrich_demand_consolidated_targets: 02:19
   bietlejuice.enrich_demand_conversion_events: 09:30
   bietlejuice.enrich_demand_score_report: 09:42
@@ -252,19 +250,19 @@ expected_times_to_finish:
   bietlejuice.enrich_ebdb_work_contract: 04:59
   bietlejuice.enrich_emlio: 07:40
   bietlejuice.enrich_golden_set: 05:02
-  bietlejuice.enrich_google_search_console: '14:35'
-  bietlejuice.enrich_google_search_console_classified: '14:40'
+  bietlejuice.enrich_google_search_console: "14:35"
+  bietlejuice.enrich_google_search_console_classified: "14:40"
   bietlejuice.enrich_greenseer: 08:04
-  bietlejuice.enrich_growth_automatic_daily_costs: '10:16'
+  bietlejuice.enrich_growth_automatic_daily_costs: "10:16"
   bietlejuice.enrich_growth_commission_costs: 07:51
   bietlejuice.enrich_growth_costs_sharing_rules: 09:51
-  bietlejuice.enrich_growth_manual_daily_costs: '10:12'
+  bietlejuice.enrich_growth_manual_daily_costs: "10:12"
   bietlejuice.enrich_growth_manual_media_platform_metrics: 04:52
-  bietlejuice.enrich_growth_media_platform_metrics: '10:07'
+  bietlejuice.enrich_growth_media_platform_metrics: "10:07"
   bietlejuice.enrich_growth_media_platform_scd: 09:52
   bietlejuice.enrich_growth_taxonomy: 01:57
   bietlejuice.enrich_gsheets: 05:06
-  bietlejuice.enrich_health_metrics: '16:24'
+  bietlejuice.enrich_health_metrics: "16:24"
   bietlejuice.enrich_hefesto: 05:25
   bietlejuice.enrich_heimdall: 05:07
   bietlejuice.enrich_house_feature_inference: 05:07
@@ -296,11 +294,11 @@ expected_times_to_finish:
   bietlejuice.enrich_marketing_automatic_daily_costs: 09:17
   bietlejuice.enrich_marketing_costs_offline: 01:57
   bietlejuice.enrich_marketing_costs_sharing_rules: 08:24
-  bietlejuice.enrich_marketing_manual_daily_costs: '14:40'
+  bietlejuice.enrich_marketing_manual_daily_costs: "14:40"
   bietlejuice.enrich_mission_control: 05:07
   bietlejuice.enrich_monopoly: 07:09
   bietlejuice.enrich_neurotech_quintocred: 08:09
-  bietlejuice.enrich_nexxera: '12:31'
+  bietlejuice.enrich_nexxera: "12:31"
   bietlejuice.enrich_nps_answer_drivers: 06:58
   bietlejuice.enrich_nps_quintocred: 08:12
   bietlejuice.enrich_offboarding: 08:24
@@ -308,9 +306,9 @@ expected_times_to_finish:
   bietlejuice.enrich_olos_dialer: 06:23
   bietlejuice.enrich_ongoing_terminations_snapshot: 08:47
   bietlejuice.enrich_online_attribution: 06:14
-  bietlejuice.enrich_opsgenie: '10:50'
+  bietlejuice.enrich_opsgenie: "10:50"
   bietlejuice.enrich_owner_fees: 09:28
-  bietlejuice.enrich_payments_platform: '12:57'
+  bietlejuice.enrich_payments_platform: "12:57"
   bietlejuice.enrich_people_public: 09:41
   bietlejuice.enrich_person: 01:48
   bietlejuice.enrich_pin: 09:21
@@ -335,7 +333,7 @@ expected_times_to_finish:
   bietlejuice.enrich_rental_management: 06:01
   bietlejuice.enrich_rental_transact: 06:03
   bietlejuice.enrich_repairs: 06:39
-  bietlejuice.enrich_retsuko: '12:21'
+  bietlejuice.enrich_retsuko: "12:21"
   bietlejuice.enrich_reverses_monitoring: 09:30
   bietlejuice.enrich_robin_hood: 07:39
   bietlejuice.enrich_sale_available_booking_hours: 06:34
@@ -356,7 +354,7 @@ expected_times_to_finish:
   bietlejuice.enrich_sale_visit: 07:11
   bietlejuice.enrich_sale_visit_hubs: 06:48
   bietlejuice.enrich_sap: 07:02
-  bietlejuice.enrich_sap_gateway: '11:41'
+  bietlejuice.enrich_sap_gateway: "11:41"
   bietlejuice.enrich_satisfaction_rating: 07:35
   bietlejuice.enrich_search: 08:29
   bietlejuice.enrich_search_session_event: 06:00
@@ -394,9 +392,9 @@ expected_times_to_finish:
   bietlejuice.enrich_user: 07:42
   bietlejuice.enrich_velo: 07:56
   bietlejuice.enrich_velo_zendesk: 06:47
-  bietlejuice.enrich_vespucio_pipeline: '12:30'
+  bietlejuice.enrich_vespucio_pipeline: "12:30"
   bietlejuice.enrich_visit: 07:08
-  bietlejuice.enrich_visit_agent_performance: '10:10'
+  bietlejuice.enrich_visit_agent_performance: "10:10"
   bietlejuice.enrich_wololo: 04:31
   bietlejuice.enrich_worker_details: 08:47
   bietlejuice.enrich_zendesk: 05:16
@@ -404,10 +402,10 @@ expected_times_to_finish:
   bietlejuice.fastforward: 08:23
   bietlejuice.godfather: 04:49
   bietlejuice.google_ads: 06:02
-  bietlejuice.google_calendar: '16:00'
-  bietlejuice.google_search_console: '14:20'
-  bietlejuice.google_search_console_classified: '14:28'
-  bietlejuice.grb: '10:15'
+  bietlejuice.google_calendar: "16:00"
+  bietlejuice.google_search_console: "14:20"
+  bietlejuice.google_search_console_classified: "14:28"
+  bietlejuice.grb: "10:15"
   bietlejuice.greenseer: 04:25
   bietlejuice.growth_lab: 06:15
   bietlejuice.gsheets_agents: 05:09
@@ -418,7 +416,7 @@ expected_times_to_finish:
   bietlejuice.gsheets_for_sale: 05:18
   bietlejuice.gsheets_governance: 02:01
   bietlejuice.gsheets_growth: 02:29
-  bietlejuice.gsheets_growth_intraday: '14:16'
+  bietlejuice.gsheets_growth_intraday: "14:16"
   bietlejuice.gsheets_growth_targets: 02:03
   bietlejuice.gsheets_people: 06:50
   bietlejuice.gsheets_platform: 04:18
@@ -438,7 +436,7 @@ expected_times_to_finish:
   bietlejuice.insider: 05:46
   bietlejuice.inspection_services: 07:46
   bietlejuice.internal_chat: 05:12
-  bietlejuice.invoice_preview: '12:20'
+  bietlejuice.invoice_preview: "12:20"
   bietlejuice.itau_statements: 06:20
   bietlejuice.jaiminho: 07:36
   bietlejuice.jira: 04:31
@@ -451,26 +449,26 @@ expected_times_to_finish:
   bietlejuice.legaut: 01:26
   bietlejuice.lifull_campaigns: 06:25
   bietlejuice.linhadireta: 07:23
-  bietlejuice.meetcall: '10:16'
+  bietlejuice.meetcall: "10:16"
   bietlejuice.metabase: 09:29
-  bietlejuice.metric_agents__performance: '10:43'
+  bietlejuice.metric_agents__performance: "10:43"
   bietlejuice.metric_fintech__atta: 08:44
-  bietlejuice.metric_growth__demand: '10:10'
+  bietlejuice.metric_growth__demand: "10:10"
   bietlejuice.metric_rent__bookings: 08:03
   bietlejuice.metric_rent__contracts: 08:49
   bietlejuice.metric_rent__demand_events: 09:38
   bietlejuice.metric_rent__demand_targets: 05:15
   bietlejuice.metric_rent__listings: 08:10
   bietlejuice.metric_rent__nps: 09:27
-  bietlejuice.metric_rent__retention: '10:22'
+  bietlejuice.metric_rent__retention: "10:22"
   bietlejuice.metric_rent__tickets: 08:59
   bietlejuice.metric_ss__segments: 08:40
   bietlejuice.metric_ss__tickets: 08:43
   bietlejuice.metrics_governance: 09:29
   bietlejuice.mission_control: 05:02
   bietlejuice.monopoly: 04:24
-  bietlejuice.nazare: '16:24'
-  bietlejuice.nexxera: '12:16'
+  bietlejuice.nazare: "16:24"
+  bietlejuice.nexxera: "12:16"
   bietlejuice.olos_dialer: 06:03
   bietlejuice.openapi: 07:19
   bietlejuice.owner_fees: 09:19
@@ -495,23 +493,23 @@ expected_times_to_finish:
   bietlejuice.rental_management: 05:48
   bietlejuice.rental_transact: 06:05
   bietlejuice.repairs: 05:32
-  bietlejuice.retsuko: '12:18'
-  bietlejuice.reverse_anonymization: '10:01'
+  bietlejuice.retsuko: "12:18"
+  bietlejuice.reverse_anonymization: "10:01"
   bietlejuice.reverse_atento: 09:17
   bietlejuice.reverse_atento_access: 09:33
   bietlejuice.reverse_atlas_pricing_report_access: 09:06
   bietlejuice.reverse_demand_classifieds_ranking: 07:01
   bietlejuice.reverse_demand_classifieds_ranking_access: 07:48
   bietlejuice.reverse_demand_score: 09:20
-  bietlejuice.reverse_demand_score_access: '10:10'
-  bietlejuice.reverse_kyc: '13:00'
+  bietlejuice.reverse_demand_score_access: "10:10"
+  bietlejuice.reverse_kyc: "13:00"
   bietlejuice.reverse_minority_report_ss: 09:06
   bietlejuice.reverse_nazare: 08:39
   bietlejuice.reverse_neighborhood_price_range_load: 02:07
-  bietlejuice.reverse_nexxera: '12:43'
+  bietlejuice.reverse_nexxera: "12:43"
   bietlejuice.reverse_rent_listings_report_access: 08:47
   bietlejuice.reverse_rent_listings_report_load: 08:20
-  bietlejuice.reverse_robbyson_access: '13:17'
+  bietlejuice.reverse_robbyson_access: "13:17"
   bietlejuice.reverse_sale_listings_report_access: 09:43
   bietlejuice.reverse_sale_listings_report_load: 09:01
   bietlejuice.reverse_sale_unavailable_listings_access: 08:43
@@ -527,14 +525,14 @@ expected_times_to_finish:
   bietlejuice.salesforce: 07:23
   bietlejuice.salesforce_growth: 07:23
   bietlejuice.sap_4hana: 06:42
-  bietlejuice.sap_gateway: '11:29'
+  bietlejuice.sap_gateway: "11:29"
   bietlejuice.saruman: 07:24
   bietlejuice.sauron: 04:25
   bietlejuice.schedules: 04:20
-  bietlejuice.search_metrics_service: '11:38'
-  bietlejuice.semrush: '14:00'
-  bietlejuice.semrush_classified: '14:00'
-  bietlejuice.signatures: '10:19'
+  bietlejuice.search_metrics_service: "11:38"
+  bietlejuice.semrush: "14:00"
+  bietlejuice.semrush_classified: "14:00"
+  bietlejuice.signatures: "10:19"
   bietlejuice.skip_list_cleaner: 04:02
   bietlejuice.sorting_hat: 05:02
   bietlejuice.superset_entities: 04:29
@@ -548,13 +546,13 @@ expected_times_to_finish:
   bietlejuice.tracksale: 06:34
   bietlejuice.trato_feito: 07:32
   bietlejuice.twilio_flex_insights: 04:23
-  bietlejuice.union_cdc: '15:10'
-  bietlejuice.vans: '12:44'
+  bietlejuice.union_cdc: "15:10"
+  bietlejuice.vans: "12:44"
   bietlejuice.velo_neurotech: 07:21
   bietlejuice.velo_neurotech_pj: 07:20
   bietlejuice.velo_zendesk: 06:29
   bietlejuice.vespucio_service: 04:45
-  bietlejuice.wall_street: '10:24'
+  bietlejuice.wall_street: "10:24"
   bietlejuice.wololo: 04:35
-  bietlejuice.workable_redshift: '13:40'
+  bietlejuice.workable_redshift: "13:40"
   bietlejuice.zendesk: 04:27
