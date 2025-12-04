@@ -10,8 +10,6 @@ workflow:
     layer: dw
     custom_schema: visit
     tables_customization:
-      dim_visit:
-        custom_schema: public
       dim_author_type:
         extraction_type: incremental
         merge_on: [ "author_type", "author_user_role", "on_behalf_of", "channel" ]

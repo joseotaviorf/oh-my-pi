@@ -102,7 +102,7 @@ bookings AS (
 ),
 computed_visits AS (
   SELECT DISTINCT
-    UPPER(dv.cd_visit) AS visit_code,
+    UPPER(dv.visit_code) AS visit_code,
     b.sk_booking,
     b.sk_visit,
     b.sk_prospect,
@@ -132,7 +132,7 @@ computed_visits AS (
     b.business_context,
     b.country,
     b.city,
-    b.city_group,    
+    b.city_group,
     IF(
       MIN(b.computed_status) OVER (PARTITION BY b.sk_visit) = 1,
       1,
@@ -171,7 +171,7 @@ computed_visits AS (
   FROM
     bookings AS b
   LEFT JOIN
-    dw_public.dim_visit AS dv
+    dw_visit.dim_visit AS dv
       ON dv.sk_visit = b.sk_visit
 ),
 confirmed_by_cases_zendesk AS (
@@ -246,7 +246,7 @@ visits AS (
     cancelled_at AS visit_cancelled_at
   FROM
     computed_visits
-  WHERE    
+  WHERE
       UPPER(computed_status) = 'COMPLETED'
       OR UPPER(computed_status) = 'CANCELLED'
   QUALIFY
@@ -428,7 +428,7 @@ SELECT DISTINCT
   prospect_cpf,
   prospect_name,
   owner_cpf,
-  owner_name,  
+  owner_name,
   house_city,
   house_zipcode,
   house_address,
@@ -439,7 +439,7 @@ SELECT DISTINCT
   house_total_area,
   house_garages,
   house_lat,
-  house_lng,   
+  house_lng,
   dt_visit_scheduled,
   dt_visit_cancelled,
   dt_offer_submitted,

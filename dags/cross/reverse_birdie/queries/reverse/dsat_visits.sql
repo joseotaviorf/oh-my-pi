@@ -62,7 +62,7 @@ schedules as (
   FROM
     dw_visit.fact_visit_schedules AS schedules
   LEFT JOIN
-    dw_public.dim_visit AS visit
+    dw_visit.dim_visit AS visit
       ON schedules.sk_visit = visit.sk_visit
   where
     schedules.sk_succeed_schedule is null

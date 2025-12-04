@@ -4240,7 +4240,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker:first-run-of-day
   - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day
   - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-public-dim-visit:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
@@ -4333,7 +4333,7 @@ bietlejuice.reverse_idactum_load:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
-  - bietlejuice.dw_visit:load-dw-public-dim-visit:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-visitor:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day

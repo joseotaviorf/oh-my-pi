@@ -3,7 +3,7 @@ table_name: fact_listing_sale_flows
 description:
   "Deprecated table, previously used to track the booking/visit flow of a listing.
   In other words, each row represented a booking for a listing, where we have information about the visit and the people involved.
-  Today we can track all this information directly in the visits model: dw_sale.fact_visits, dw_public.dim_booking and dw_public.dim_visit."
+  Today we can track all this information directly in the visits model: dw_sale.fact_visits, dw_public.dim_booking and dw_visit.dim_visit."
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
