@@ -2,78 +2,86 @@
 database_name: datalake_invoice
 table_name: fraud
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
-description: Fraud base
+domain: Fintech
+description: "Table containing fraudulent invoices data with contamination delay metrics"
 columns:
   id_contract:
-    description: ""
+    description: "External contract identifier from retsuko invoice system"
     lineage:
       - datalake_retsuko.invoice.id_contract_external
   id_invoice:
-    description: ""
+    description: "External invoice identifier from retsuko invoice system"
     lineage:
       - datalake_retsuko.invoice.id_external
   purpose:
-    description: ""
+    description: "Invoice purpose type indicating the invoice category"
     lineage:
       - datalake_retsuko.invoice.purpose
   country_code:
-    description: ""
+    description: "Country code where the invoice was issued"
     lineage:
       - datalake_retsuko.invoice.country_code
   invoice_status:
-    description: ""
+    description: "Current status of the invoice in the system"
     lineage:
-      - datalake_retsuko.invoice.invoice_status
+      - datalake_retsuko.invoice.status
   user:
-    description: ""
+    description: "User identifier associated with the invoice"
     lineage:
       - datalake_retsuko.invoice_info.invoice_user
   contract_status:
-    description: ""
+    description: "Current status of the contract associated with invoice"
     lineage:
       - datalake_ebdb_contract.contract.status
   contract_guarantee:
-    description: ""
+    description: "Type of guarantee associated with the contract"
     lineage:
       - datalake_ebdb_contract.contract.guarantee_type
   due_amount:
-    description: ""
+    description: "Amount due for the fraudulent invoice write-off"
     lineage:
       - datalake_retsuko.bill_items.value_sign_bill_item
   accrual_year_month:
-    description: ""
+    description: "Accrual year and month for the invoice accounting period"
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
-  delay_days_invoice:
-    description: ""
+  delay_contamined_days:
+    description: "Number of days between oldest write-off month and oldest invoice due date"
     lineage:
-      - datalake_retsuko.invoice.delay_days_invoice
+      - "Calculated as DATE_DIFF(dt_oldest_month_write_off, dt_due_oldest_invoice)"
+  delay_contamined_range:
+    description: "Categorical range classification of contamination delay days"
+    lineage:
+      - "Calculated based on delay_contamined_days with ranges: a. Current, b. 1-30, c. 31-60, d. 61-90, e. 91-120, f. 121-150, g. 151-180, h. over 180"
+  dt_oldest_month_write_off:
+    description: "Date of the oldest month write-off for the contract"
+    lineage:
+      - datalake_retsuko.bill_items.dt_created
   dt_due_oldest_invoice:
-    description: ""
+    description: "Due date of the oldest invoice for the contract"
     lineage:
-      - datalake_retsuko.invoice.dt_due_oldest_invoice
+      - datalake_retsuko.invoice.dt_due_adjusted
   dt_invoice_due_adjusted:
-    description: ""
+    description: "Adjusted due date of the invoice accounting for holidays"
     lineage:
-      - datalake_retsuko.invoice.dt_invoice_due_adjusted
+      - datalake_retsuko.invoice.dt_due_adjusted
   dt_invoice_creation:
-    description: ""
+    description: "Date when the invoice was created in the system"
     lineage:
-      - datalake_retsuko.invoice.dt_invoice_creation
+      - datalake_retsuko.invoice.ts_created
   dt_month_write_off:
-    description: ""
+    description: "Month date when the invoice was written off"
     lineage:
       - datalake_retsuko.bill_items.dt_created
   dt_invoice_write_off:
-    description: ""
+    description: "Date when the invoice was written off from the system"
     lineage:
       - datalake_retsuko.bill_items.dt_created
   dt_contract_annulment:
-    description: ""
+    description: "Date when the contract was terminated or annulled"
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
   ts_contract_signature:
-    description: ""
+    description: "Timestamp when the contract was signed by the parties"
     lineage:
       - datalake_ebdb_contract.contract.ts_signed
