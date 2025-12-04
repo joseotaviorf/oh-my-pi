@@ -21,46 +21,6 @@ assessment AS (
         datalake_inspection_services_clean.assessment
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
-),
-room AS (
-    SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.room_aud
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_room ORDER BY ts_updated DESC) = 1
-),
-issue_type AS (
-    SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.issue_type_aud
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_issue_type ORDER BY ts_updated DESC) = 1
-),
-item_type AS (
-    SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.item_type_aud
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_item_type ORDER BY ts_updated DESC) = 1
-),
-room_type AS (
-    SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.room_type_aud
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_room_type ORDER BY ts_updated DESC) = 1
-),
-item_group_type AS (
-    SELECT
-        *
-    FROM
-        datalake_inspection_services_clean.item_group_type_aud
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_item_group_type ORDER BY ts_updated DESC) = 1
 )
 SELECT DISTINCT
     MD5(
@@ -84,9 +44,9 @@ SELECT DISTINCT
     ii.id_item_issue,
     im.id_item_media,
     ia.type AS inspection_type,
-    room_type.type AS room_type,
-    item_group_type.type AS item_group_type,
-    item_type.type AS item_type,
+    rt.type AS room_type,
+    igt.type AS item_group_type,
+    itp.type AS item_type,
     ita.type AS issue_type,
     im.type AS media_type,
     ig.status AS item_group_status,
@@ -109,7 +69,7 @@ LEFT JOIN
     assessment AS ass
       ON ia.id_inspection = ass.id_inspection
 LEFT JOIN
-    room AS ra
+    datalake_inspection_services_clean.room AS ra
       ON ass.id_assessment = ra.id_assessment
 LEFT JOIN
     datalake_inspection_services_clean.item_group_aud AS ig
@@ -128,14 +88,14 @@ LEFT JOIN
       ON it.id_item = im.id_item
       AND im.is_active IS NULL
 LEFT JOIN
-    issue_type AS ita
+    datalake_inspection_services_clean.issue_type AS ita
       ON ii.id_type = ita.id_issue_type
 LEFT JOIN
-    item_type
-      ON it.id_type = item_type.id_item_type
+    datalake_inspection_services_clean.item_type AS itp
+      ON it.id_type = itp.id_item_type
 LEFT JOIN
-    room_type
-      ON ra.id_type = room_type.id_room_type
+    datalake_inspection_services_clean.room_type AS rt
+      ON ra.id_type = rt.id_room_type
 LEFT JOIN
-    item_group_type
-      ON ig.id_type = item_group_type.id_item_group_type
+    datalake_inspection_services_clean.item_group_type AS igt
+      ON ig.id_type = igt.id_item_group_type
