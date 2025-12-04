@@ -1,5 +1,5 @@
 WITH ai_messages AS (
-  SELECT
+  SELECT DISTINCT
     s.id_sauron_session,
     m.id AS id_message,
     CASE
@@ -56,7 +56,7 @@ whatsapp_messages AS (
 inapp_messages AS (
   SELECT DISTINCT
     icm.id_message,
-    c.id_session AS id_sauron_session,
+    MAX(c.id_session) AS id_sauron_session,
     REPLACE(REPLACE(icm.id_user_external,'_2E', '.'), '_40', '@') AS user_sender,
     icm.message,
     icm.ts_created,
@@ -73,6 +73,7 @@ inapp_messages AS (
       ON c.id_channel = icm.id_channel
   WHERE
     MAKE_DATE(icm.year, icm.month, icm.day) >= '{load_start_date}'
+  GROUP BY ALL
 ),
 messages AS (
   SELECT
@@ -130,31 +131,33 @@ messages_w_users AS (
       ON u1.email = m.user_sender
       AND CONTAINS(m.user_sender, '@')
       AND u1.country_code = 'BR'
+  WHERE
+    s.source_environment != 'QuintoandarSupport:OFFBOARDING'
 ),
 all_messages AS (
-SELECT
-  id_message,
-  id_sauron_session,
-  id_user,
-  message,
-  'HUMAN-HUMAN' AS conversation_type,
-  role,
-  ts_created
-FROM
-  messages_w_users
-UNION ALL
-SELECT 
-  id_message,
-  id_sauron_session,
-  id_user,
-  message,
-  'HUMAN-AI' AS conversation_type,
-  role,
-  ts_created
-FROM 
-  ai_messages
+  SELECT
+    id_message,
+    id_sauron_session,
+    id_user,
+    message,
+    'HUMAN-HUMAN' AS conversation_type,
+    role,
+    ts_created
+  FROM
+    messages_w_users
+  UNION ALL
+  SELECT 
+    id_message,
+    id_sauron_session,
+    id_user,
+    message,
+    'HUMAN-AI' AS conversation_type,
+    role,
+    ts_created
+  FROM 
+    ai_messages
 )
-SELECT
+SELECT DISTINCT
   id_message,
   id_sauron_session,
   id_user,
