@@ -89,27 +89,23 @@ segments AS (
     )
 )
 SELECT
-  is_last_interaction,
-	team,
-	department,
-	transfer_reason_detailed,
+  sk_ticket,
+  sk_segment,
+  agent_email,
+  organization,
+  team,
+  department, 
 	ticket_origin,
-	sk_ticket,
 	task_transferred,
-	ts_started,
 	status,
 	theme,
 	last_department,
 	task_idled,
 	first_department,
-	sk_segment,
 	session_expired,
-	agent_email,
-	month,
-	organization,
 	theme_detail,
 	transferred_to,
-	transfer_reason,
+  is_last_interaction,
   CASE
     WHEN (first_department = last_department OR transferred_to != last_department)
       AND status = 'transferred' THEN 'human_error'
@@ -123,6 +119,7 @@ SELECT
     WHEN is_last_interaction = FALSE AND transferred_to = last_department
       AND status = 'transferred' THEN 'department_correction'
   END AS transfer_reason_detailed,
+  ts_started,
   YEAR(CURRENT_DATE - 1) AS year,
   MONTH(CURRENT_DATE - 1) AS month,
   DAY(CURRENT_DATE - 1) AS day,

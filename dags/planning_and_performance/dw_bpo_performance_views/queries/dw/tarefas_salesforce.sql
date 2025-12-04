@@ -192,5 +192,5 @@ SELECT
 FROM 
   main_query mq
 WHERE 
-  mq.dt_task_created >= DATE('{load_start_date}') - INTERVAL '12' MONTH 
+  mq.ts_task_created >= DATE('{load_start_date}') - INTERVAL '12' MONTH 
   AND mq.ts_task_created >= DATE('2025-01-01')
