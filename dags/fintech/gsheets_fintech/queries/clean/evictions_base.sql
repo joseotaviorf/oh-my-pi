@@ -35,6 +35,7 @@ SELECT
     LDT_Decisao_citacao_judicial AS ldt_judicial_summons_decision,
     LDT_Decisao_coercitivo AS ldt_coercive_decision,
     LDT_Decisao_emissao_coercitivo AS ldt_coercive_order_issuance_decision,
+    LDT_coercitivo AS ldt_coercive,
     Defesa_arbitral AS has_arbitration_defense,
     Redistribuicao AS has_redistribution,
     CAST(Pre_cadastro_arbitral AS DATE) AS dt_registered,

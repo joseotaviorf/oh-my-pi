@@ -149,6 +149,10 @@ columns:
     description: "Lead time para decisão de emissão de ordem coercitiva"
     lineage:
       - datalake_gsheets_raw.evictions_base.LDT_Decisao_emissao_coercitivo
+  ldt_coercive:
+    description: "Lead time do início da fase Coerciva até a sua finalização"
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_coercitivo
   has_arbitration_defense:
     description: "Indica se houve defesa no processo arbitral"
     lineage:
@@ -225,3 +229,5 @@ columns:
     description: "Data de penhora de bens"
     lineage:
       - datalake_gsheets_raw.evictions_base.Data_penhora
+  ts_load:
+    description: "Timestamp que o conjunto de dados foi carregado"
