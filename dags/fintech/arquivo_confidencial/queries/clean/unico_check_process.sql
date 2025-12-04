@@ -4,6 +4,7 @@ SELECT
     process_id AS id_process,
     version,
     external_source,
+    attributes,
     GET_JSON_OBJECT(attributes, '$.liveness') AS liveness,
     GET_JSON_OBJECT(attributes, '$.faceMatch') AS face_match,
     GET_JSON_OBJECT(attributes, '$.status') AS status,
