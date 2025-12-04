@@ -14,7 +14,7 @@ WITH ciq_daily_history AS (
   LEFT JOIN
       datalake_quintoandar.aux_date AS dd
         ON dd.date BETWEEN DATE(cu.ts_agent_status_start)
-        AND COALESCE(DATE(cu.ts_agent_status_end), (DATE('{load_end_date}')))
+        AND COALESCE(DATE(cu.ts_agent_status_end), DATE('{load_end_date}'))
   LEFT JOIN
       datalake_ebdb_user.user AS u
         ON cu.id_user = u.id
@@ -41,8 +41,6 @@ agent_profile_history AS (
       ts_revision_ended
   FROM
       datalake_agent_accreditation.agent_profile AS ap
-  WHERE
-      ap.profile = 'Visita'
 ),
 accreditation_history AS (
   SELECT
@@ -59,20 +57,32 @@ accreditation_history AS (
       ROW_NUMBER() OVER (PARTITION BY id_agent, dt_action ORDER BY ts_revision DESC) = 1
 ),
 agent_status_history AS (
-  SELECT
-      id_agent,
-      id_user,
-      id_work_contract,
-      visit_agent_type,
-      is_active,
-      DATE(ts_revision) AS dt_started,
-      DATE(COALESCE(LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY ts_revision ASC) - INTERVAL '1' DAY, DATE('{load_end_date}'))) AS dt_ended
-  FROM
-      datalake_agent_accreditation.agent_registration_actions_log
-  WHERE
-      DATE(ts_revision) <= DATE('{load_end_date}')
-  QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY id_agent, dt_action ORDER BY ts_revision DESC) = 1
+    WITH agent_registration_actions_log AS (
+        SELECT
+            id_agent,
+            id_user,
+            id_work_contract,
+            visit_agent_type,
+            is_active,
+            ts_revision,
+            dt_action AS dt_started
+        FROM
+            datalake_agent_accreditation.agent_registration_actions_log
+        WHERE
+            DATE(ts_revision) <= DATE('{load_end_date}')
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY id_agent, dt_action ORDER BY ts_revision DESC) = 1
+    )
+    SELECT 
+        id_agent,
+        id_user,
+        id_work_contract,
+        visit_agent_type,
+        is_active,
+        dt_started,
+        COALESCE(LEAD(dt_started) OVER (PARTITION BY id_agent ORDER BY ts_revision ASC) - INTERVAL '1' DAY, DATE(NOW())) AS dt_ended
+    FROM 
+        agent_registration_actions_log 
 )
 SELECT
     cdh.id_partner,
@@ -99,11 +109,11 @@ LEFT JOIN
 LEFT JOIN
     agent_profile_history AS aph
       ON cdh.id_agent = aph.id_agent
-      AND cdh.dt_reference BETWEEN aph.ts_revision_started AND COALESCE(aph.ts_revision_ended, DATE('{load_end_date}'))
+      AND cdh.dt_reference BETWEEN DATE(aph.ts_revision_started) AND DATE(COALESCE(aph.ts_revision_ended, '{load_end_date}'))
 LEFT JOIN
-    datalake_agent_accreditation.business_context_activity AS bca
+    datalake_agent_accreditation.business_context AS bca
       ON cdh.id_agent = bca.id_agent
-      AND cdh.dt_reference BETWEEN bca.dt_started AND bca.dt_ended
+      AND cdh.dt_reference BETWEEN DATE(bca.ts_revision_started) AND DATE(COALESCE(bca.ts_revision_ended, '{load_end_date}'))
 LEFT JOIN
     agent_status_history AS ash
       ON cdh.id_agent = ash.id_agent

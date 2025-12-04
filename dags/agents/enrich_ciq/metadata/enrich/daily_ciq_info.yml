@@ -47,7 +47,7 @@ columns:
       "RENT": "The agent is responsible for conducting visits with potential tenants for rental properties."
       "N/A": "The agent is not assigned to a specific business context during this period."
     lineage:
-      - datalake_agent_accreditation.business_context_activity.business_context
+      - datalake_agent_accreditation.business_context.business_context
   is_agent_active:
     description: Indicates whether the Agent has an active registration.
     lineage:

@@ -1603,7 +1603,7 @@ bietlejuice.enrich_ciq:
   - bietlejuice.amplitude_subpartitioned:load-clean-440441-home-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-registration-actions-log:first-run-of-day
-  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context-activity:first-run-of-day
+  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
