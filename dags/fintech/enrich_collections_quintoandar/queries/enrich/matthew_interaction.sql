@@ -9,7 +9,7 @@ WITH mathew_session AS (
         datalake_chatbot.sessions ss
     LEFT JOIN
         datalake_langfuse_clean.scores s
-        ON s.id_langfuse_session = ss.id_external
+        ON s.id_session = ss.id_langfuse_session
     WHERE
         name = 'SessionContainsMatthewAgentEvaluator'
         AND value = 1
