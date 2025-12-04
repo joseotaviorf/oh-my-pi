@@ -1,4 +1,16 @@
 WITH
+bill_items_validation AS (
+  SELECT
+    id_invoice,
+    ABS(SUM(value_sign_bill_item)) AS due_amount,
+    LAST_DAY(MIN(dt_created)) AS dt_month_write_off,
+    MIN(dt_created) AS dt_invoice_write_off
+  FROM  datalake_retsuko.bill_items
+  WHERE bill_item LIKE "%LOSS%"
+  AND ((LOWER(bill_item_description) LIKE "%ação boletos%") OR (LOWER(bill_item_description) LIKE "%liminar judicial%"))
+  AND value_sign_bill_item <0
+  GROUP BY 1
+),
 fraudulent_invoices AS (
   SELECT
     i.id_contract_external AS id_contract,
@@ -9,26 +21,22 @@ fraudulent_invoices AS (
     ii.invoice_user AS user,
     c.status AS contract_status,
     c.guarantee_type AS contract_guarantee,
-    ABS(b.value_sign_bill_item) AS due_amount,
+    b.due_amount,
     i.accrual_year_month,
     i.dt_due_adjusted AS dt_invoice_due_adjusted,
     DATE(i.ts_created) AS dt_invoice_creation,
-    LAST_DAY(b.dt_created) AS dt_month_write_off,
-    b.dt_created AS dt_invoice_write_off,
+    b.dt_month_write_off,
+    b.dt_invoice_write_off,
     c.dt_termination AS dt_contract_annulment,
     c.ts_signed AS ts_contract_signature
   FROM datalake_retsuko.invoice AS i
-  INNER JOIN datalake_retsuko.bill_items AS b
+  INNER JOIN bill_items_validation AS b
     ON i.id_external = b.id_invoice
   LEFT JOIN datalake_retsuko.invoice_info AS ii
     ON i.id_external = ii.id_invoice
   LEFT JOIN datalake_ebdb_contract.contract AS c
     ON c.id = i.id_contract_external
-  WHERE 1=1
-    AND i.status IN ("not-payable", 'open')
-    AND b.bill_item LIKE "%LOSS%"
-    AND ((LOWER(b.bill_item_description) LIKE "%ação boletos%") OR (LOWER(b.bill_item_description) LIKE "%liminar judicial%")) 
-    AND b.value_sign_bill_item <0
+  WHERE i.status IN ("not-payable", 'open')
 ),
 fraudulent_contracts AS (
   SELECT DISTINCT id_contract
