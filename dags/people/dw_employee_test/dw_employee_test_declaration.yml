@@ -33,3 +33,10 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    fact_assignments:
+      - dim_cost_center
+      - dim_job
+      - dim_hierarchy
+    fact_employees:
+      - fact_assignments

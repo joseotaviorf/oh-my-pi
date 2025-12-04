@@ -1,0 +1,207 @@
+database_name: dw_employee_test
+table_name: fact_assignments
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Fact table with consolidated information about employee work assignments with historical tracking (SCD Type 2).
+  This table tracks changes to assignment attributes over time, including cost center changes, job changes,
+  manager changes, salary changes, and other assignment-related attributes.
+  Data is sourced from multiple origins, including identification information, contract details, salaries,
+  hierarchy, and demographic data to provide a 360-degree view of each assignment version.
+  Grain: One record per assignment per version.
+  This is an SCD Type 2 fact table tracking historical changes in assignment attributes.
+columns:
+  sk_assignment_version:
+    description: Versioned surrogate key that uniquely identifies each version of an assignment record. Generated as MD5 hash of sk_assignment + dt_valid_from.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+  sk_assignment:
+    description: Surrogate key for the assignment (period of service). Corresponds to id_period_of_service. Same value for all versions of the same assignment.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.id_period_of_service
+  sk_employee:
+    description: Surrogate key for the person (employee) associated with the assignment.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.id_person
+  sk_demographic_information:
+    description: Surrogate key for the employee's demographic information.
+    lineage:
+    - datalake_hr_system.demographic_attributes.sk_demographic_information
+  sk_disability:
+    description: Surrogate key for the employee's self-declared disability information.
+    lineage:
+    - datalake_hr_system.disability.sk_disability
+  sk_cost_center_version:
+    description: Versioned surrogate key for the cost center dimension version that was valid at the time of this assignment version. Links to dw_employee_test.dim_cost_center.sk_cost_center_version.
+    lineage:
+    - dw_employee_test.dim_cost_center.sk_cost_center_version
+    - datalake_pin_core_clean.all_assignments.id_organization
+  sk_business_unit:
+    description: Surrogate key for the business unit to which the assignment is allocated.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.id_business_unit
+  sk_job_version:
+    description: Versioned surrogate key for the job dimension version that was valid at the time of this assignment version. Links to dw_employee_test.dim_job.sk_job_version.
+    lineage:
+    - dw_employee_test.dim_job.sk_job_version
+    - datalake_pin_core_clean.all_assignments.id_job
+  sk_manager:
+    description: Surrogate key for the employee's manager.
+    lineage:
+    - datalake_pin.managers_history.id_manager
+  sk_manager_assignment:
+    description: Surrogate key for the manager's assignment (period of service).
+    lineage:
+    - datalake_pin.managers_history.id_manager_period_of_service
+  sk_work_relationship_started_date:
+    description: Start date of the work relationship, formatted as a surrogate key (YYYYMMDD).
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  sk_work_relationship_ended_date:
+    description: End date of the work relationship, formatted as a surrogate key (YYYYMMDD).
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  sk_last_salary_increase_date:
+    description: Date of the last salary increase, formatted as a surrogate key (YYYYMMDD).
+    lineage:
+    - datalake_pin_compensation_clean.salary.dt_started
+  sk_hierarchy_version:
+    description: Versioned surrogate key for the hierarchy dimension version that was valid at the time of this assignment version. Links to dw_employee_test.dim_hierarchy.sk_hierarchy_version.
+    lineage:
+    - dw_employee_test.dim_hierarchy.sk_hierarchy_version
+    - dw_employee_test.dim_hierarchy.assignment_number
+    - dw_employee_test.dim_hierarchy.dt_valid_from
+    - dw_employee_test.dim_hierarchy.dt_valid_to
+    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+  assignment_number:
+    description: Employee's registration number in the source system (PIN).
+    lineage:
+    - datalake_employee_registration.identifier_mapping.assignment_number
+  salary_currency_code:
+    description: Currency code of the salary.
+    lineage:
+    - datalake_pin_compensation_clean.salary.currency_code
+  is_last_valid_work_relationship:
+    description: Flag (TRUE/FALSE) indicating if this is the most recent valid work relationship for the employee, prioritizing non-pending records, partitioned by person id.
+    lineage:
+    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_employment.employee_details.assignment_type
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  is_active:
+    description: Flag (TRUE/FALSE) indicating if the assignment is active.
+    lineage:
+    - datalake_employment.employee_details.assignment_status_type
+  is_pending_worker:
+    description: Flag (TRUE/FALSE) indicating if the assignment is for a worker pending admission.
+    lineage:
+    - datalake_employment.employee_details.assignment_type
+  is_manager:
+    description: Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports.
+    lineage:
+    - datalake_employment.employee_details.assignment_status_type
+    - dw_employee_test.dim_hierarchy.assignment_number_l1
+    - dw_employee_test.dim_hierarchy.assignment_number_l2
+    - dw_employee_test.dim_hierarchy.assignment_number_l3
+    - dw_employee_test.dim_hierarchy.assignment_number_l4
+    - dw_employee_test.dim_hierarchy.assignment_number_l5
+    - dw_employee_test.dim_hierarchy.assignment_number_l6
+    - dw_employee_test.dim_hierarchy.assignment_number_l7
+    - dw_employee_test.dim_hierarchy.assignment_number_l8
+    - dw_employee_test.dim_hierarchy.assignment_number_l9
+    - datalake_pin_core_clean.all_assignments.career_track
+  has_self_declared_disability:
+    description: Flag (TRUE/FALSE) indicating if the employee has a self-declared disability.
+    lineage:
+    - datalake_hr_system.disability.has_self_declared_disability
+  assignment_age_months:
+    description: Tenure in months, calculated from the start date to the end date (or current date if active).
+    lineage:
+    - datalake_employment.employee_details.assignment_type
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  qnt_directly_led:
+    description: Number of direct reports. Calculated using dim_hierarchy, where the direct leader is identified as the highest non-null lx level (l9 > l8 > ... > l1) in the hierarchy chain.
+    lineage:
+    - dw_employee_test.dim_hierarchy.assignment_number
+    - dw_employee_test.dim_hierarchy.assignment_number_l1
+    - dw_employee_test.dim_hierarchy.assignment_number_l2
+    - dw_employee_test.dim_hierarchy.assignment_number_l3
+    - dw_employee_test.dim_hierarchy.assignment_number_l4
+    - dw_employee_test.dim_hierarchy.assignment_number_l5
+    - dw_employee_test.dim_hierarchy.assignment_number_l6
+    - dw_employee_test.dim_hierarchy.assignment_number_l7
+    - dw_employee_test.dim_hierarchy.assignment_number_l8
+    - dw_employee_test.dim_hierarchy.assignment_number_l9
+    - dw_employee_test.dim_hierarchy.dt_valid_from
+    - dw_employee_test.dim_hierarchy.dt_valid_to
+    - datalake_pin_core_clean.all_assignments.assignment_status_type
+  qnt_undirectly_led:
+    description: Number of indirect reports. Calculated using dim_hierarchy, where indirect leaders are managers in the hierarchy chain but not the highest non-null lx level.
+    lineage:
+    - dw_employee_test.dim_hierarchy.assignment_number
+    - dw_employee_test.dim_hierarchy.assignment_number_l1
+    - dw_employee_test.dim_hierarchy.assignment_number_l2
+    - dw_employee_test.dim_hierarchy.assignment_number_l3
+    - dw_employee_test.dim_hierarchy.assignment_number_l4
+    - dw_employee_test.dim_hierarchy.assignment_number_l5
+    - dw_employee_test.dim_hierarchy.assignment_number_l6
+    - dw_employee_test.dim_hierarchy.assignment_number_l7
+    - dw_employee_test.dim_hierarchy.assignment_number_l8
+    - dw_employee_test.dim_hierarchy.assignment_number_l9
+    - dw_employee_test.dim_hierarchy.dt_valid_from
+    - dw_employee_test.dim_hierarchy.dt_valid_to
+    - datalake_pin_core_clean.all_assignments.assignment_status_type
+  salary:
+    description: Employee's current salary amount for this version.
+    lineage:
+    - datalake_pin_compensation_clean.salary.salary_amount
+  last_salary_increase:
+    description: Amount of the last salary adjustment for this version.
+    lineage:
+    - datalake_pin_compensation_clean.salary.adjustment_amount
+  pct_last_salary_increase:
+    description: Percentage of the last salary adjustment for this version.
+    lineage:
+    - datalake_pin_compensation_clean.salary.adjustment_percent
+  version:
+    description: |
+      Sequential version number for this assignment record, starting at 1. Increments with each attribute change.
+      Used to identify how many times an assignment's tracked attributes have changed over time.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.id_period_of_service
+    - datalake_pin_core_clean.all_assignments.id_organization
+    - datalake_pin_core_clean.all_assignments.id_business_unit
+    - datalake_pin_core_clean.all_assignments.id_job
+    - datalake_pin.managers_history.id_manager
+    - datalake_pin_compensation_clean.salary.salary_amount
+  dt_valid_from:
+    description: |
+      The date from which this version of the assignment becomes effective (SCD Type 2).
+      Calculated based on effective dates from source tables (all_assignments, managers_history, salary).
+      Represents when a tracked attribute changed (cost center, job, manager, salary, etc.).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+    - datalake_pin.managers_history.dt_effective_started
+    - datalake_pin_compensation_clean.salary.dt_started
+  dt_valid_to:
+    description: |
+      The date until which this version of the assignment remains valid (exclusive, SCD Type 2).
+      Set to '9999-12-31' for the current version.
+      For historical versions, equals the minimum between (next version's dt_valid_from - 1 day) and the maximum effective end date from source tables.
+      This ensures we don't create validity periods beyond what the source data supports.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.dt_effective_ended
+    - datalake_pin.managers_history.dt_effective_ended
+    - datalake_pin_compensation_clean.salary.dt_ended
+  is_current:
+    description: |
+      Boolean flag indicating if this is the current active version of the assignment (TRUE) or a historical version (FALSE).
+      SCD Type 2 control field.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.id_period_of_service
+    - datalake_pin_core_clean.all_assignments.dt_effective_started
+  ts_load:
+    description: Timestamp when the record was loaded into the table.
+

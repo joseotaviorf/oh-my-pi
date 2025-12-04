@@ -1,0 +1,38 @@
+---
+table_name: dw_employee_test.dim_cost_center
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 100
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 20
+    severity_level: Warning
+
+column_level_validations:
+  sk_cost_center_version:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  cost_center_code:
+    custom:
+      # Validate that each cost center code has exactly one current version
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT cost_center_code, COUNT(*) as current_count
+           FROM dw_employee_test.dim_cost_center
+           WHERE is_current = TRUE
+           GROUP BY cost_center_code
+           HAVING current_count > 1
+         )) = 0
+      severity_level: Warning
+  version:
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Warning
+

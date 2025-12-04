@@ -10,7 +10,7 @@ description: |-
   L0 is always the CEO (top-most manager in the company structure).
 columns:
   sk_hierarchy_version:
-    description: Deterministic surrogate key for the hierarchy version (MD5 of assignment + validity period).
+    description: Deterministic surrogate key for the hierarchy version. Generated as MD5 hash of assignment_number + dt_valid_from + dt_valid_to. Returns STRING type (consistent with other versioned SKs like sk_cost_center_version and sk_job_version).
     lineage:
       - datalake_employee_registration.identifier_mapping.assignment_number
       - datalake_pin_core_clean.assignment_supervisor.dt_effective_started

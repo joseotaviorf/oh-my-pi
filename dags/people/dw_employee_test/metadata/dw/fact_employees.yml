@@ -1,0 +1,150 @@
+database_name: dw_employee_test
+table_name: fact_employees
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Fact table providing a consolidated view of employees with historical tracking (SCD Type 2).
+  This table considers only the last valid work relationship per employee and excludes pending workers.
+  It tracks changes to employee attributes over time, even for the same last valid work relationship,
+  capturing changes such as job changes, cost center changes, manager changes, salary changes, etc.
+  Grain: One record per employee per version.
+  This is an SCD Type 2 fact table tracking historical changes in employee attributes.
+columns:
+  sk_employee_version:
+    description: Versioned surrogate key that uniquely identifies each version of an employee record. Generated as MD5 hash of sk_employee + dt_valid_from.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_employee
+    - dw_employee_test.fact_assignments.dt_valid_from
+  sk_employee:
+    description: Surrogate key for the person (employee). Same value for all versions of the same employee.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_employee
+  sk_assignment:
+    description: Surrogate key for the assignment (period of service). Corresponds to id_period_of_service.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_assignment
+  sk_demographic_information:
+    description: Surrogate key for the employee's demographic information.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_demographic_information
+  sk_disability:
+    description: Surrogate key for the employee's self-declared disability information.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_disability
+  sk_cost_center_version:
+    description: Versioned surrogate key for the cost center dimension version that was valid at the time of this employee version. Links to dw_employee_test.dim_cost_center.sk_cost_center_version.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_cost_center_version
+    - dw_employee_test.dim_cost_center.sk_cost_center_version
+  sk_business_unit:
+    description: Surrogate key for the business unit to which the assignment is allocated.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_business_unit
+  sk_job_version:
+    description: Versioned surrogate key for the job dimension version that was valid at the time of this employee version. Links to dw_employee_test.dim_job.sk_job_version.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_job_version
+    - dw_employee_test.dim_job.sk_job_version
+  sk_manager:
+    description: Surrogate key for the employee's manager.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_manager
+  sk_manager_assignment:
+    description: Surrogate key for the manager's assignment (period of service).
+    lineage:
+    - dw_employee_test.fact_assignments.sk_manager_assignment
+  sk_work_relationship_started_date:
+    description: Start date of the work relationship, formatted as a surrogate key (YYYYMMDD).
+    lineage:
+    - dw_employee_test.fact_assignments.sk_work_relationship_started_date
+  sk_work_relationship_ended_date:
+    description: End date of the work relationship, formatted as a surrogate key (YYYYMMDD).
+    lineage:
+    - dw_employee_test.fact_assignments.sk_work_relationship_ended_date
+  sk_last_salary_increase_date:
+    description: Date of the last salary increase, formatted as a surrogate key (YYYYMMDD).
+    lineage:
+    - dw_employee_test.fact_assignments.sk_last_salary_increase_date
+  sk_hierarchy_version:
+    description: Versioned surrogate key for the hierarchy dimension version that was valid at the time of this employee version. Links to dw_employee_test.dim_hierarchy.sk_hierarchy_version.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_hierarchy_version
+    - dw_employee_test.dim_hierarchy.sk_hierarchy_version
+  assignment_number:
+    description: Employee's registration number in the source system (PIN).
+    lineage:
+    - dw_employee_test.fact_assignments.assignment_number
+  salary_currency_code:
+    description: Currency code of the salary.
+    lineage:
+    - dw_employee_test.fact_assignments.salary_currency_code
+  is_active:
+    description: Flag (TRUE/FALSE) indicating if the assignment is active.
+    lineage:
+    - dw_employee_test.fact_assignments.is_active
+  is_pending_worker:
+    description: Flag (TRUE/FALSE) indicating if the assignment is for a worker pending admission. Always FALSE in this table as pending workers are excluded.
+    lineage:
+    - dw_employee_test.fact_assignments.is_pending_worker
+  is_manager:
+    description: Flag (TRUE/FALSE) indicating if the employee is a manager, based on career track ('L') or having direct reports.
+    lineage:
+    - dw_employee_test.fact_assignments.is_manager
+  has_self_declared_disability:
+    description: Flag (TRUE/FALSE) indicating if the employee has a self-declared disability.
+    lineage:
+    - dw_employee_test.fact_assignments.has_self_declared_disability
+  assignment_age_months:
+    description: Tenure in months, calculated from the start date to the end date (or current date if active).
+    lineage:
+    - dw_employee_test.fact_assignments.assignment_age_months
+  qnt_directly_led:
+    description: Number of direct reports.
+    lineage:
+    - dw_employee_test.fact_assignments.qnt_directly_led
+  qnt_undirectly_led:
+    description: Number of indirect reports.
+    lineage:
+    - dw_employee_test.fact_assignments.qnt_undirectly_led
+  salary:
+    description: Employee's current salary amount for this version.
+    lineage:
+    - dw_employee_test.fact_assignments.salary
+  last_salary_increase:
+    description: Amount of the last salary adjustment for this version.
+    lineage:
+    - dw_employee_test.fact_assignments.last_salary_increase
+  pct_last_salary_increase:
+    description: Percentage of the last salary adjustment for this version.
+    lineage:
+    - dw_employee_test.fact_assignments.pct_last_salary_increase
+  version:
+    description: |
+      Sequential version number for this employee record, starting at 1. Increments with each attribute change.
+      Used to identify how many times an employee's tracked attributes have changed over time.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_employee
+    - dw_employee_test.fact_assignments.dt_valid_from
+  dt_valid_from:
+    description: |
+      The date from which this version of the employee becomes effective (SCD Type 2).
+      Derived from fact_assignments dt_valid_from. Represents when a tracked attribute changed.
+    lineage:
+    - dw_employee_test.fact_assignments.dt_valid_from
+  dt_valid_to:
+    description: |
+      The date until which this version of the employee remains valid (exclusive, SCD Type 2).
+      Set to '9999-12-31' for the current version.
+      For historical versions, equals the minimum between (next version's dt_valid_from - 1 day) and the dt_valid_to from fact_assignments.
+    lineage:
+    - dw_employee_test.fact_assignments.dt_valid_to
+  is_current:
+    description: |
+      Boolean flag indicating if this is the current active version of the employee (TRUE) or a historical version (FALSE).
+      SCD Type 2 control field.
+    lineage:
+    - dw_employee_test.fact_assignments.sk_employee
+    - dw_employee_test.fact_assignments.dt_valid_from
+  ts_load:
+    description: Timestamp when the record was loaded into the table.
+

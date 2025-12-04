@@ -769,14 +769,12 @@ WITH filtered_managers_history /* Bring supervisor relationships and enrich them
   SELECT
     *,
     DENSE_RANK() OVER (PARTITION BY assignment_number ORDER BY dt_valid_from NULLS LAST) AS hierarchy_version_seq,
-    UNHEX(
-      MD5(
-        CONCAT_WS(
-          '|',
-          assignment_number,
-          DATE_FORMAT(dt_valid_from, 'yyyy-MM-dd'),
-          COALESCE(DATE_FORMAT(dt_valid_to, 'yyyy-MM-dd'), '4712-12-31')
-        )
+    MD5(
+      CONCAT_WS(
+        '|',
+        assignment_number,
+        DATE_FORMAT(dt_valid_from, 'yyyy-MM-dd'),
+        COALESCE(DATE_FORMAT(dt_valid_to, 'yyyy-MM-dd'), '4712-12-31')
       )
     ) AS sk_hierarchy_version
   FROM hierarchy_filtered

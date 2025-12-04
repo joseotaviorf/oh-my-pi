@@ -1,0 +1,41 @@
+---
+table_name: dw_employee_test.fact_assignments
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 100
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 20
+    severity_level: Warning
+
+column_level_validations:
+  sk_assignment_version:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  sk_assignment:
+    is_complete:
+      severity_level: Warning
+  version:
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Warning
+  is_current:
+    custom:
+      # Validate that each assignment has exactly one current version
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT sk_assignment, COUNT(*) as current_count
+           FROM dw_employee_test.fact_assignments
+           WHERE is_current = TRUE
+           GROUP BY sk_assignment
+           HAVING current_count > 1
+         )) = 0
+      severity_level: Warning
+
