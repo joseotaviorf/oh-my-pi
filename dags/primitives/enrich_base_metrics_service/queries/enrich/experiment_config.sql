@@ -56,8 +56,7 @@ For full list of metrics, see the file: models/search/search-monitoring/search_m
 
 */
 
-SELECT
-    *
+SELECT experiment_name, config
 FROM VALUES
     -- dummy experiment to have the field types correct.
     -- Otherwise if all end_date are null it raises error due to unknown data type
@@ -146,7 +145,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
@@ -196,11 +195,34 @@ FROM VALUES
         )
     ),
 
-    -- Talk to Concierge button test
+    -- New Pclick Rent Exp
     (
-        "ab_beakman_talk_to_concierge",
+        "ab_beakman_search_services_p_click_experiment_v7",
         named_struct(
-            'begin_date', DATE('2025-11-07'),
+            'begin_date', DATE('2025-12-06'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
+    ),
+
+    -- HUE V3 Rent exp
+    (
+        "ab_beakman_search_services_hue_v3_experiment",
+        named_struct(
+            'begin_date', DATE('2025-12-10'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
