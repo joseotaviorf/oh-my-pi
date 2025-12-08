@@ -1,0 +1,122 @@
+database_name: dw_customer_support
+table_name: fact_chat_metrics
+description:
+  Fact table that describes all chats conducted by QuintoAndar, including both chatbot and human interactions.
+  Each session represents a chat conversation carried out with QuintoAndar, and in this fact table we compile
+  metrics that describe the interactions that occur within these chats.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_session:
+    lineage:
+      - datalake_chatbot.messages.id_sauron_session
+    description: Identifier of the chat session in Sauron.
+  total_messages:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description: Total messages sent in chat session.
+  total_talk_time:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Total time between first and last message in chat session.
+  total_talk_time_with_ai:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Total time between first and last message with AI in chat session.
+  total_messages_with_ai:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description: Total messages sent in chat session between Human and AI.
+  total_human_messages_with_ai:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description: Total messages sent by human in a chat session between Human and AI.
+  total_ai_messages:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description: Total messages sent by AI in chat session between Human and AI.
+  avg_reply_time_ai:
+    lineage:
+      - datalake_chatbot.messages.reply_time
+    description: The average of reply time between messages sent by AI in a chat session between Human and AI.
+  first_reply_time_ai:
+    lineage:
+      - datalake_chatbot.messages.reply_rime
+      - datalake_chatbot.messages.id_sauron_session
+    description: Reply time of the first message replied by an AI in a chat session between Human and AI.
+  is_first_message_idled_with_ai:
+    lineage:
+      - datalake_chatbot.messages.reply_time
+    description: Flag indicating if the first message sent by the AI was idled.
+  total_talk_time_with_analyst:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Total time between first and last message with Analyst in chat session between Human and Analyst.
+  total_messages_with_analyst:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description:  Total messages sent in chat session between Human and Analyst.
+  total_analyst_messages:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description:  Total messages sent by the Analyst in a chat session between Human and Analyst.
+  avg_reply_time_analyst:
+    lineage:
+      - datalake_chatbot.messages.reply_time
+    description: The average of reply time between messages sent by an Analyst in a chat session between Human and Analyst.
+  total_human_messages_with_analyst:
+    lineage:
+      - datalake_chatbot.messages.id_message
+    description: Total messages sent by human in a chat session between Human and Analyst.
+  first_reply_time_analyst:
+    lineage:
+      - datalake_chatbot.messages.reply_time
+    description: Reply time of the first message replied by an Analyst in a chat session between Human and Analyst.
+  is_first_message_idled_with_analyst:
+    lineage:
+      - datalake_chatbot.messages.reply_time
+    description: Flag indicating if the first message sent by the Analyst was idled.
+  ts_first_message_on_ai_handler:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent on the session with the AI handler.
+  ts_last_message_on_ai_handler:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the last message sent by the AI.
+  ts_first_message_human_on_ai_handler:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent by the Human in an AI session.
+  ts_first_message_sent_by_ai:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent by AI.
+  ts_first_message_on_analyst_handler:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent in the session with the Analyst handler.
+  ts_last_message_on_analyst_handler:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the last message sent in the session with the Analyst handler.
+  ts_first_message_human_on_analyst_handler:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent by the human in a chat session with the Analyst handler.
+  ts_first_message_sent_by_analyst:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent by the Analyst.
+  ts_first_message_session_human:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent by human in the chat session.
+  ts_first_message_session:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the first message sent in the chat session.
+  ts_last_message_session:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: Timestamp of the last message sent in the chat session.

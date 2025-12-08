@@ -76,6 +76,9 @@ workflow:
     fact_chat_messages:
       merge_on: [sk_channel, sk_message]
       z_order_by: [ts_created, sk_user_sender]
+    fact_chat_metrics:
+      z_order_by: [sk_session]
+
 
 cluster:
   type: custom_cluster
