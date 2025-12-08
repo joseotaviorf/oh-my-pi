@@ -610,7 +610,7 @@ SELECT
     CAST(has_negotiation_in_contract AS BOOLEAN) AS has_negotiation_in_contract,
     CAST(sum_monthly_overdue_days_paid_t1 AS BIGINT) AS sum_monthly_overdue_days_paid_t1,
     CAST(count_monthly_overdue_invoices_paid_t1 AS BIGINT) AS count_monthly_overdue_invoices_paid_t1,
-    CAST(DATEDIFF(DAY, dt_contract_end, DATE(dt_reference)) AS BIGINT) AS days_since_ending,
+    CASE WHEN reference_contract_status = 'Finalizado' THEN CAST(DATEDIFF(DAY, dt_contract_end, DATE(dt_reference)) AS BIGINT) ELSE NULL END AS days_since_ending,
     CAST(DATEDIFF(DAY, dt_contract_start, DATE(dt_reference)) AS BIGINT) AS days_since_contract_start,
     CAST(n_reparos_invoices AS BIGINT) AS n_reparos_invoices,
     CAST(n_condominio_invoices AS BIGINT) AS n_condominio_invoices,
