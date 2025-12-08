@@ -17,7 +17,6 @@ This pipeline produces the following tables in enrich layer, via full load:
 - `p-click`
 - `billboard`
 - `citadel`
-- `girafales`
 - `casio`
 - `emma_watson`
 
