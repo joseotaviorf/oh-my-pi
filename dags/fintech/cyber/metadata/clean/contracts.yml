@@ -29,8 +29,14 @@ columns:
     description: "Client UUID in legacy. TF: client.person-uuid"
     lineage:
       - datalake_cyber_raw.uda1.U1UUIDCLIE
+  source:
+    description: "Source of the data"
   contract_group:
     description: "Contract group (quintoandar or quintocred). TF: debtor.group*"
+    lineage:
+      - datalake_cyber_raw.uda1.U1ACCTG
+  creditor:
+    description: "Creditor name based on contract group (QuintoAndar or QuintoCred)"
     lineage:
       - datalake_cyber_raw.uda1.U1ACCTG
   cpf_cnpj:
@@ -41,6 +47,18 @@ columns:
     description: "RG - personal document"
     lineage:
       - datalake_cyber_raw.uda1.U1RG
+  agency_campaign:
+    description: "Agency campaign value"
+    lineage:
+      - datalake_cyber_raw.uda1.U1VLCAMPANHA
+  campaign_indicator:
+    description: "Campaign indicator"
+    lineage:
+      - datalake_cyber_raw.uda1.U1NOCAMPANHA
+  is_boletagem:
+    description: "Flag indicating if boletagem is enabled"
+    lineage:
+      - datalake_cyber_raw.uda1.U1TIPOBOL
   collection_phase:
     description: "Collection phase"
     lineage:
@@ -49,6 +67,14 @@ columns:
     description: "Return date"
     lineage:
       - datalake_cyber_raw.uda1.U1DTRETOR
+  dt_cycle:
+    description: "Cycle date"
+    lineage:
+      - datalake_cyber_raw.uda1.DT_CICLO
+  ts_boletagem_request:
+    description: "Timestamp of boletagem request"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DTSOLBOL
   has_spc_credit_denial:
     description: "Indicates that there is a Negative action for the Bureau SPC"
     lineage:
@@ -193,11 +219,11 @@ columns:
     description: "Guarantor Negative Flag in the Internal Bureau"
     lineage:
       - datalake_cyber_raw.uda1.U1NEGAVAINT
-  U1FLACNEGCYB:
+  has_negative_cyb:
     description: "indicates that there is a Deny action for the CYB Bureau – Internal - (0-unchecked 1 -checked) - Default 0;"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGCYB
-  U1DTACNEGCYB:
+  ts_negative_cyb:
     description: "Date of the Denial action at the CYB Bureau (Internal);"
     lineage:
       - datalake_cyber_raw.uda1.U1DTACNEGCYB
@@ -217,6 +243,10 @@ columns:
     description: "has_guarantor_denial"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACAVAL
+  days_until_contract_updated_evic_queue:
+    description: "Days until contract updated in eviction queue"
+    lineage:
+      - datalake_cyber_raw.uda1.U1DIASEVIC
   ts_rg_issuance:
     description: "RG document issuance date"
     lineage:
@@ -229,7 +259,7 @@ columns:
     description: "State of the country referring to the RG document"
     lineage:
       - datalake_cyber_raw.uda1.U1UFRG
-  dt_birth:
+  ts_birth:
     description: "Date of birth. TF: client.birthDate where client-type = 'main-tenant'"
     lineage:
       - datalake_cyber_raw.uda1.U1DTNASC
@@ -369,7 +399,7 @@ columns:
     description: "Value of the oldest negative invoice (used in the negative and rehabilitation rules). TF: select total amount from bill where contract_id = contract.external id order by due-date"
     lineage:
       - datalake_cyber_raw.uda1.U1VLRFMAN
-  dt_due_oldest_negative_invoice:
+  ts_due_oldest_negative_invoice:
     description: "Due date of the oldest negative invoice (used in the negative and rehabilitation rules)"
     lineage:
       - datalake_cyber_raw.uda1.U1VEFMAN
@@ -405,6 +435,10 @@ columns:
     description: "Pause reason.Possible reasons: fraud, legal proceedings, operational errors, friction"
     lineage:
       - datalake_cyber_raw.uda1.U1INDMOTPA
+  subset:
+    description: "Contract subset"
+    lineage:
+      - datalake_cyber_raw.uda1.U1SUBSET
   reason_written_down:
     description: "Reason written down"
     lineage:
@@ -477,3 +511,25 @@ columns:
     description: "Restrictive occurrence (pt: ocorrência restritiva)"
     lineage:
       - datalake_cyber_raw.uda1.U1OCOREVIC
+  dt_olos_dialer_label_update:
+    description: "Data da última mudança da Label 1 (OLOS Dialer)"
+    lineage:
+      - datalake_cyber_raw.uda1.U1LCHGDT1
+  dt_evictions_reason_update:
+    description: "Data da última mudança da Label 2 (Razão de Despejos)"
+    lineage:
+      - datalake_cyber_raw.uda1.U1LCHGDT2
+  dt_campaign_label_update:
+    description: "Data da última mudança da Label 3 (Label de Campanha)"
+    lineage:
+      - datalake_cyber_raw.uda1.U1LCHGDT3
+  dt_evictions_label_update:
+    description: "Data da última mudança da Label 5 (Label de Despejos - Contexto Pré-Jurídico)"
+    lineage:
+      - datalake_cyber_raw.uda1.U1LCHGDT5
+  dt_not_collection_label_update:
+    description: "Data da última mudança da Label 6 (Label de Não Cobrança)"
+    lineage:
+      - datalake_cyber_raw.uda1.U1LCHGDT6
+  ts_load:
+    description: "Timestamp de carregamento dos dados no datalake"

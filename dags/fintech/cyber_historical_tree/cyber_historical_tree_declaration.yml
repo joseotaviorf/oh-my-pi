@@ -30,7 +30,7 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
-    - "{dag_name}"
+    - "{schema}"
     - "{table_name}"
     - "{load_start_date}"
     - "{load_end_date}"

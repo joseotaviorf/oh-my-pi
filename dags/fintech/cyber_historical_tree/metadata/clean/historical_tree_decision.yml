@@ -85,57 +85,63 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hidlqdt
     description: "Data de Vencimento"
-  dt_segmentation_queue_change:
+  dt_segmentation_queue_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiqchgdt
     description: "Data de alteração da Fila de Segmentação"
-  dt_commission_queue_change:
+  dt_commission_queue_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiqchgdt2
     description: "Data de alteração da Fila de Comissão"
-  dt_agreement_queue_change:
+  dt_agreement_queue_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiqchgdt3
     description: "Data de alteração da Fila de Acordo"
-  dt_digital_channel_queue_change:
+  dt_digital_channel_queue_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiqchgdt4
     description: "Data de alteração da Fila de Canal Digital"
-  dt_eviction_queue_change:
+  dt_eviction_queue_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiqchgdt5
     description: "Data de alteração da Fila de Despejo"
-  dt_credit_denial_queue_change:
+  dt_credit_denial_queue_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiqchgdt6
     description: "Data de alteração da Fila de Negativa de Crédito"
-  dt_olos_dialer_label_change:
+  dt_olos_dialer_label_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hilchgdt1
     description: "Data de alteração da Label OLOS Dialer"
-  dt_evictions_reason_change:
+  dt_evictions_reason_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hilchgdt2
     description: "Data de alteração da Razão de Despejos"
-  dt_campaign_label_change:
+  dt_campaign_label_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hilchgdt3
     description: "Data de alteração da Label de Campanha"
-  dt_serasa_limpa_nome_label_change:
+  dt_serasa_limpa_nome_label_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hilchgdt4
     description: "Data de alteração da Label Serasa Limpa Nome"
-  dt_evictions_label_change:
+  dt_evictions_label_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hilchgdt5
     description: "Data de alteração da Label de Despejos"
-  dt_label_change_6:
+  dt_not_collection_label_update:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hilchgdt6
-    description: "Data de alteração da Label 6"
+    description: "Data de alteração da Label de Não Cobrança"
   ts_record_insertion:
     lineage:
       - datalake_cyber_raw.tb_historico_arvore.hiregistro
     description: "Data e hora (SYSDATE) que o registro foi inserido na tabela - timestamp de criação do snapshot"
   ts_load:
     description: "Timestamp de carregamento dos dados no datalake"
+  year:
+    description: "Ano - coluna de particionamento"
+  month:
+    description: "Mês - coluna de particionamento"
+  day:
+    description: "Dia - coluna de particionamento"

@@ -24,15 +24,15 @@ columns:
     description: "Product ID. TF: debtor.product-code"
     lineage:
       - datalake_cyber_raw.delqmst.DMPROD
-  id_proof:
+  proof:
     description: "Proof identifier code"
     lineage:
       - datalake_cyber_raw.delqmst.DMCHID
-  id_sample:
+  sample:
     description: "Sample identifier for account categorization"
     lineage:
       - datalake_cyber_raw.delqmst.DMSAMPLE
-  id_work_area:
+  work_area:
     description: "Work area identifier code"
     lineage:
       - datalake_cyber_raw.delqmst.DMBACODE
@@ -40,10 +40,14 @@ columns:
     description: "Group (QuintoAndar or QuintoCred). TF: debtor.group"
     lineage:
       - datalake_cyber_raw.delqmst.DMACCTG
-  day_management_flag:
-    description: "Day management flag. If null it was not managed that day. Otherwise, it indicates the code of the manager who worked on the account."
+  id_user:
+    description: "User identifier (day management flag). If null it was not managed that day. Otherwise, it indicates the code of the manager who worked on the account."
     lineage:
       - datalake_cyber_raw.delqmst.DMWKFLAG
+  creditor:
+    description: "Creditor name based on contract group (QuintoAndar or QuintoCred)"
+    lineage:
+      - datalake_cyber_raw.delqmst.DMACCTG
   sequence_number:
     description: "Sequence number for record ordering"
     lineage:
@@ -128,7 +132,7 @@ columns:
     description: "Home address. TF: contract.address"
     lineage:
       - datalake_cyber_raw.delqmst.DMADDR1
-  additional_address_residential_address:
+  additional_residential_address:
     description: "Additional residential address. TF: contract.complement"
     lineage:
       - datalake_cyber_raw.delqmst.DMADDR2
@@ -288,7 +292,7 @@ columns:
     description: "Code of the last action taken on the account"
     lineage:
       - datalake_cyber_raw.delqmst.DMLASTAC
-  last_result_code:
+  last_result:
     description: "Result code from the last activity"
     lineage:
       - datalake_cyber_raw.delqmst.DMLASTRC
@@ -629,28 +633,28 @@ columns:
     description: "Score for most important activity in class 3"
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3
-  pre_legal_label:
-    description: "Pre legal label"
+  evictions_label:
+    description: "Evictions label (dmlabel5)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL5
   olos_dialer_label:
     description: "Label for Olos Dialer segmentation (dmlabel1)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL1
-  label_2:
-    description: "Segmentation label 2 for portfolio classification (dmlabel2)"
+  evictions_reason:
+    description: "Evictions reason label (dmlabel2)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL2
   campaign_label:
     description: "Campaign label for segmentation (dmlabel3)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL3
-  label_4:
-    description: "Segmentation label 4 for portfolio classification (dmlabel4)"
+  serasa_limpa_nome_label:
+    description: "Serasa Limpa Nome label (dmlabel4)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL4
-  label_6:
-    description: "Segmentation label 6 for portfolio classification (dmlabel6)"
+  not_collection_label:
+    description: "Not collection label (dmlabel6)"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL6
   history_2_most_important_ativity_score_class_1:
@@ -793,10 +797,6 @@ columns:
     description: "Package amount in the contract (base amount of invoices), adding rent, IPTU and Condo. TF: contract.rentalAmount + contract.iptuAmount + contract.condominiumAmount"
     lineage:
       - datalake_cyber_raw.delqmst.DMOPNAMT
-  total_due_amount:
-    description: "Sum of all invoices due under the contract. TF: sum(bill.dueAmount) where status = 'open'"
-    lineage:
-      - datalake_cyber_raw.delqmst.DMAMTDLQ
   credit_limit:
     description: "Credit limit for the account"
     lineage:
@@ -905,20 +905,20 @@ columns:
     description: "Queue Change Date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT2
-  ts_last_update_queue_3:
+  ts_last_update_agreement_queue:
     description: "Agreement queue change date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT3
-  ts_last_update_queue_4:
-    description: "Queue Change Date"
+  ts_last_update_digital_channel_queue:
+    description: "Digital channel queue change date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT4
-  ts_last_update_queue_5:
-    description: "Queue Change Date"
+  ts_last_update_eviction_queue:
+    description: "Eviction queue change date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT5
-  ts_last_update_queue_6:
-    description: "Queue Change Date"
+  ts_last_update_credit_denial_queue:
+    description: "Credit denial queue change date"
     lineage:
       - datalake_cyber_raw.delqmst.DMQCHGDT6
   ts_most_important_activity_class_1:
@@ -1005,3 +1005,11 @@ columns:
     description: "Timestamp of last payment in agreement"
     lineage:
       - datalake_cyber_raw.delqmst.DMAGLSTPAYDT
+  year:
+    description: "Ano - coluna de particionamento"
+  month:
+    description: "Mês - coluna de particionamento"
+  day:
+    description: "Dia - coluna de particionamento"
+  ts_load:
+    description: "Timestamp de carregamento dos dados no datalake"

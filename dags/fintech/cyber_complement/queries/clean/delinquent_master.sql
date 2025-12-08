@@ -160,7 +160,7 @@ SELECT
     DMLABEL5 AS evictions_label,
     DMLABEL2 AS evictions_reason,
     DMLABEL4 AS serasa_limpa_nome_label,
-    DMLABEL6 AS label_6,
+    DMLABEL6 AS not_collection_label,
     DMACAC1 AS most_important_action_class_1,
     DMACAC2 AS most_important_action_class_2,
     DMACAC3 AS most_important_action_class_3,
