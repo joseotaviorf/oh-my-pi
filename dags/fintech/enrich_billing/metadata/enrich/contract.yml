@@ -3,7 +3,7 @@ database_name: datalake_billing
 table_name: contract
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "Contract data enriched with the latest signature date extracted from contract revisions."
+description: "Contract data enriched with financial details and timestamps extracted from the latest contract revision."
 columns:
   id:
     description: "Unique identifier of the contract record"
@@ -21,8 +21,56 @@ columns:
     description: "Current revision number of the contract"
     lineage:
       - datalake_billing_clean.contract.current_revision
+  condominium_amount:
+    description: "Condominium amount from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  home_insurance_amount:
+    description: "Home insurance amount from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  brokerage_fee:
+    description: "Brokerage fee from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  tenant_service_fee:
+    description: "Tenant service fee from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  admin_fee:
+    description: "Administration fee from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  brokerage_based_fee:
+    description: "Brokerage fee base information from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  min_admin_fee:
+    description: "Minimum administration fee amount from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  last_rental:
+    description: "Last rental amount from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  last_iptu:
+    description: "Last IPTU amount from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  is_rental_paid_in_advance:
+    description: "Indicates if rental is paid in advance (paga mora) from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
   ts_signature:
     description: "Signature timestamp extracted from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  ts_charge_started:
+    description: "Charge start timestamp extracted from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  ts_charge_ended:
+    description: "Charge end timestamp extracted from the latest contract revision"
     lineage:
       - datalake_billing_clean.contract_revision.contract_data
   ts_created:
@@ -33,5 +81,7 @@ columns:
     description: "Record last update timestamp"
     lineage:
       - datalake_billing_clean.contract.ts_updated
-
-
+  ts_load:
+    description: "Timestamp when the record was loaded into the enriched table"
+    lineage:
+      - NOW()
