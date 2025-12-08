@@ -140,7 +140,13 @@ all_messages AS (
     id_sauron_session,
     id_user,
     message,
-    'HUMAN-HUMAN' AS conversation_type,
+    CASE
+      WHEN MIN(CASE WHEN role = 'ANALYST' THEN ts_created END)
+        OVER(PARTITION BY id_sauron_session) IS NULL THEN 'HUMAN-AI'
+      WHEN ts_created < MIN(CASE WHEN role = 'ANALYST' THEN ts_created END)
+        OVER(PARTITION BY id_sauron_session) THEN 'HUMAN-AI'
+      ELSE 'HUMAN-HUMAN'
+    END AS conversation_type,
     role,
     ts_created
   FROM
