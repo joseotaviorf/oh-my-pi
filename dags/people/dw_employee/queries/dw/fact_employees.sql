@@ -70,11 +70,8 @@ SELECT
 FROM
     dw_employee.fact_assignments AS fa
 LEFT JOIN
-    datalake_employee_registration.identifier_mapping AS im
-        ON im.id_period_of_service = fa.sk_assignment
-LEFT JOIN
     terminated_for_assignment_change AS tfac
-        ON tfac.id_assignment_next = im.id_assignment
+        ON tfac.id_assignment_next = fa.sk_assignment
 WHERE 
     NOT fa.is_pending_worker
     AND fa.is_last_valid_work_relationship
