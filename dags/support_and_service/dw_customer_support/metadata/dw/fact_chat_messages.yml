@@ -15,6 +15,10 @@ columns:
       - datalake_quinto_messenger_clean.chat.id_session
       - datalake_sauron_clean.session.id
     description: Session identifier.
+  sk_task:
+    lineage:
+      - datalake_customer_support.chats.id_task
+    description: Twilio task identifier.
   sk_message:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.event_payload
@@ -35,14 +39,39 @@ columns:
       - datalake_quinto_messenger_clean.channel_event.message_body
       - datalake_internal_chat_clean.internal_chat_messages.message
     description: Content of the message.
+  message_index:
+    lineage: 
+      - datalake_quinto_messenger_clean.chat.id_session
+      - datalake_quinto_messenger_clean.channel.id_session
+      - datalake_quinto_messenger_clean.channel_event.ts_created
+      - datalake_internal_chat_clean.internal_chat_messages.ts_created
+      - datalake_chatbot.messages.message_index
+    description: Message index.
+  reply_time:
+    lineage:
+    - datalake_chatbot.messages.reply_time
+    - datalake_quinto_messenger_clean.channel_event.ts_created
+    - datalake_internal_chat_clean.internal_chat_messages.ts_created
+    - datalake_quinto_messenger_clean.chat.id_session
+    - datalake_quinto_messenger_clean.channel.id_session
+    - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+    - datalake_quinto_messenger_clean.channel_event.from_phone_number
+    - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+    description: Reply time between messages, in seconds, from the previous message of other user sender.
   user_type:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.from_phone_number
+      - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+      - datalake_chatbot.messages.role
     description: Type of user who sent the message, either 'Bot', 'User' or 'Analyst'.
   ts_created:
     lineage:
       - datalake_quinto_messenger_clean.channel_event.ts_created
       - datalake_internal_chat_clean.internal_chat_messages.ts_created
     description: Timestamp indicating when the message was created.
+  ts_task_twilio_created:
+    lineage:
+      - datalake_customer_support.chats.ts_created
+    description: Timestamp indicating when the task was created in Twilio.
   ts_load:
     description: Timestamp of when data was loaded to the table.

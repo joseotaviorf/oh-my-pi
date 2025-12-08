@@ -410,7 +410,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-chat:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-task-event:first-run-of-day
-  - bietlejuice.quinto_messenger:load-clean-task:first-run-of-day
   - bietlejuice.reclameaqui:load-clean-tickets:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
   - bietlejuice.twilio_flex_insights:load-clean-analyst-activity-time:first-run-of-day
