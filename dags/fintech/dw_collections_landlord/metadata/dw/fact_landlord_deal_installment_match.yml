@@ -1,0 +1,50 @@
+database_name: dw_collections_segmentation
+table_name: fact_landlord_deal_installment_match
+description: Matching between original invoices and deal invoices (installments) for landlord portfolio
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_invoice_original:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice
+    description: "Original invoice identifier"
+  id_invoice_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice
+    description: "Deal invoice (installment) identifier matched to the original invoice"
+  due_amount_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.due_amount_adjustment
+    description: "Due amount of the deal invoice"
+  status_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.status
+    description: "Status of the deal invoice"
+  payment_status_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.payment_status
+    description: "Payment status of the deal invoice"
+  purpose_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.purpose
+    description: "Purpose of the deal invoice"
+  dt_begin_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.dt_begin
+    description: "Begin date of the deal invoice"
+  dt_due_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.dt_due
+    description: "Due date of the deal invoice"
+  dt_paid_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.dt_paid
+    description: "Date when the deal invoice was paid"
+  dt_end_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.dt_end
+    description: "End date of the deal invoice"
+  rn_deal_order:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice
+    description: "Row number indicating the order of deal invoices matched to the same original invoice"

@@ -1,0 +1,245 @@
+database_name: dw_collections_segmentation
+table_name: fact_invoice_landlord_portfolio
+description: Invoice portfolio data for landlords with bill items breakdown and invoice status information
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_invoice:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: "External invoice identifier"
+  invoice_user:
+    lineage:
+      - datalake_retsuko.invoice_info.invoice_user
+    description: "Type of invoice user (landlord)"
+  id_contract:
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+    description: "External contract identifier"
+  id_account:
+    lineage:
+      - datalake_retsuko.invoice.id_account
+    description: "Account identifier"
+  id_original_invoice_external:
+    lineage:
+      - datalake_retsuko.invoice.id_original_invoice_external
+    description: "Original invoice external identifier"
+  tipo_fat:
+    lineage:
+      - datalake_retsuko.invoice.purpose
+      - datalake_retsuko.bill_items.bill_item
+    description: "Invoice type classification (original_invoice or deal_invoice)"
+  status:
+    lineage:
+      - datalake_retsuko.invoice.status
+    description: "Invoice status"
+  payment_status:
+    lineage:
+      - datalake_retsuko.invoice.payment_status
+    description: "Payment status of the invoice"
+  purpose:
+    lineage:
+      - datalake_retsuko.invoice.purpose
+    description: "Invoice purpose"
+  reason:
+    lineage:
+      - datalake_retsuko.invoice.reason
+    description: "Invoice reason"
+  country_code:
+    lineage:
+      - datalake_retsuko.invoice.country_code
+    description: "Country code"
+  list_bill_items:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Array of bill items associated with the invoice"
+  due_amount_adjustment:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Adjusted due amount considering between contracts adjustments"
+  due_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: "Original due amount"
+  paid_amount:
+    lineage:
+      - datalake_retsuko.invoice.paid_amount
+    description: "Paid amount"
+  balance_adm_fee:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for administration fee bill items"
+  balance_between_contracts:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for between contracts bill items"
+  balance_brokerage:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for brokerage bill items"
+  balance_collections_deal:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for collections deal bill items"
+  balance_condominium:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for condominium bill items"
+  balance_fines:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for fines bill items"
+  balance_loss:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for loss bill items"
+  balance_outros:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for other bill items"
+  balance_postponement:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for postponement bill items"
+  balance_non_protection_5a:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for non-protection 5A bill items"
+  balance_rental_antecipation:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for rental anticipation bill items"
+  balance_rental_core:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for rental core bill items"
+  balance_repair:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for repair bill items"
+  balance_termination_fee:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for termination fee bill items"
+  balance_utilities:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for utilities bill items"
+  balance_unknown:
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Balance for unknown bill items"
+  flag_invoice_nulled_by_encontro:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+      - datalake_retsuko.bill_items.value_sign_bill_item
+    description: "Flag indicating if invoice was nulled by encontro de contas"
+  has_bi_adm_fee:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has administration fee bill items"
+  has_bi_between_contracts:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has between contracts bill items"
+  has_bi_brokerage:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has brokerage bill items"
+  has_bi_collections_deal:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has collections deal bill items"
+  has_bi_condominium:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has condominium bill items"
+  has_bi_fines:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has fines bill items"
+  has_bi_loss:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has loss bill items"
+  has_bi_outros:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has other bill items"
+  has_bi_postponement:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has postponement bill items"
+  has_bi_non_protection_5a:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has non-protection 5A bill items"
+  has_bi_rental_antecipation:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has rental anticipation bill items"
+  has_bi_rental_core:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has rental core bill items"
+  has_bi_repair:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has repair bill items"
+  has_bi_termination_fee:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has termination fee bill items"
+  has_bi_utilities:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has utilities bill items"
+  has_bi_unknown:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item
+    description: "Flag indicating if invoice has unknown bill items"
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "Accrual year and month"
+  dt_begin:
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_due
+    description: "Invoice begin date"
+  dt_end:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_canceled
+      - datalake_retsuko.invoice.ts_retsuko_updated
+    description: "Invoice end date"
+  dt_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+    description: "Date when invoice was paid"
+  dt_canceled:
+    lineage:
+      - datalake_retsuko.invoice.ts_canceled
+    description: "Date when invoice was canceled"
+  dt_sent:
+    lineage:
+      - datalake_retsuko.invoice.ts_sent
+    description: "Date when invoice was sent"
+  dt_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: "Invoice due date"
+  dt_due_adjusted:
+    lineage:
+      - datalake_retsuko.invoice.dt_due_adjusted
+    description: "Adjusted due date"
+  dt_created:
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+    description: "Date when invoice was created"
+  ts_retsuko_updated:
+    lineage:
+      - datalake_retsuko.invoice.ts_retsuko_updated
+    description: "Timestamp when invoice was last updated in Retsuko"
