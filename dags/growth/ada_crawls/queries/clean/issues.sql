@@ -35,7 +35,7 @@ SELECT
   i.day
 FROM 
   issues AS i
-LEFT JOIN
+INNER JOIN
   issues_overview_report AS o
 ON
   i.normalized_issue_name = o.normalized_issue_name AND i.dt_report = o.dt_report AND i.device = o.device

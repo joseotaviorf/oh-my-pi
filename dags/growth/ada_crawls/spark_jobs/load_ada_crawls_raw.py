@@ -97,19 +97,22 @@ def get_issues_dataframe(most_recent_crawl_issues_path: str, crawl_device: str, 
 
     rows = []
     for report_file in report_file_list:        
-        df = spark.read \
-            .option("header", "true") \
-            .option("multiline", "true") \
-            .option("escape", "\"") \
-            .option("quote", "\"") \
-            .csv(report_file.path)
-        if "Address" in df.columns:
-            issue_name = report_file.name.replace(".csv", "").replace("_", " ").title()
-            df_sel = df.select("Address") \
-                .withColumn("issue_name", lit(issue_name)) \
-                .withColumn("device", lit(crawl_device)) \
-                .withColumn("date", lit(crawl_date))
-            rows.append(df_sel)
+        if report_file.name.endswith(".csv"):
+            df = spark.read \
+                .option("header", "true") \
+                .option("multiline", "true") \
+                .option("escape", "\"") \
+                .option("quote", "\"") \
+                .csv(report_file.path)
+            if "Address" in df.columns or "Source" in df.columns:
+                issue_name = report_file.name.replace(".csv", "").replace("_", " ").title()
+                if "Source" in df.columns:
+                    df = df.withColumnRenamed("Source", "Address")
+                df_sel = df.select("Address") \
+                    .withColumn("issue_name", lit(issue_name)) \
+                    .withColumn("device", lit(crawl_device)) \
+                    .withColumn("date", lit(crawl_date))
+                rows.append(df_sel)
     if rows:
         return reduce(lambda df1, df2: df1.unionByName(df2), rows)
     else:
