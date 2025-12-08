@@ -1,5 +1,6 @@
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark.base_spark import BaseSparkContext
+from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from pyspark.sql import DataFrame
 from pyspark.sql.utils import AnalysisException
 from pyspark.sql.types import StructField, StructType
@@ -236,16 +237,38 @@ class DeltaLoader:
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""
 
-        command = f"VACUUM {table_name} RETAIN {retention_hours} HOURS"
-        logger.info(f"Running vacuum with command {command}")
+        # We shouldn't use RETAIN HOURS anymore
+        # https://docs.databricks.com/aws/en/release-notes/whats-coming#behavioral-change-for-working-with-delta-table-history-and-vacuum
+        SparkTablePropertyHelper.set_property(
+            table_name,
+            property_name="delta.deletedFileRetentionDuration",
+            property_value=f"{retention_hours} hours",
+            spark=self.spark,
+        )
+
+        command = f"VACUUM {table_name}"
+        logger.info(
+            f"Running vacuum with command {command}, and retention hours {retention_hours}"
+        )
         self.spark.sql(command)
         logger.info(f"Vacuum successful for table {table_name}")
 
     def vacuum_lite_table(self, table_name: str, retention_hours: int) -> None:
-        """Vacuum a Delta table in lite mode. Only available in Databricks Runtine 16.1 and above."""
+        """Vacuum a Delta table in lite mode. Only available in Databricks Runtime 16.1 and above."""
 
-        command = f"VACUUM {table_name} LITE RETAIN {retention_hours} HOURS"
-        logger.info(f"Running vacuum lite with command {command}")
+        # We shouldn't use RETAIN HOURS anymore
+        # https://docs.databricks.com/aws/en/release-notes/whats-coming#behavioral-change-for-working-with-delta-table-history-and-vacuum
+        SparkTablePropertyHelper.set_property(
+            table_name,
+            property_name="delta.deletedFileRetentionDuration",
+            property_value=f"{retention_hours} hours",
+            spark=self.spark,
+        )
+
+        command = f"VACUUM {table_name} LITE"
+        logger.info(
+            f"Running vacuum lite with command {command}, and retention hours {retention_hours}"
+        )
         self.spark.sql(command)
         logger.info(f"Vacuum lite successful for table {table_name}")
 

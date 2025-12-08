@@ -348,8 +348,13 @@ class TestDeltaLoader:
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.vacuum_table(table_name, retention_hours)
 
-        mock_spark_context.spark.sql.assert_called_once_with(
-            "VACUUM test_table RETAIN 24 HOURS"
+        mock_spark_context.spark.sql.assert_has_calls(
+            [
+                mock.call(
+                    "ALTER TABLE test_table SET TBLPROPERTIES ('delta.deletedFileRetentionDuration'='24 hours')"
+                ),
+                mock.call("VACUUM test_table"),
+            ]
         )
 
     def test_optimize_table_without_z_order(self, mock_spark_context):
