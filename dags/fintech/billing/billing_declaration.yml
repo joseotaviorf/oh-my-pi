@@ -14,6 +14,10 @@ workflow:
   dbutils_secret_key: BILLING_DB
   lineage_product_database_name: billing
   tables_customization:
+    account:
+      clean_table_name: account
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     contract_revision:
       source_schema: contract
       raw_primary_keys: [id]

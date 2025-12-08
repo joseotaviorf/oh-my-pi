@@ -1,0 +1,25 @@
+database_name: datalake_billing_clean
+table_name: account
+domain: Fintech
+description: Data from the account table containing account information with actor details and role information
+columns:
+  id:
+    description: Unique identifier of the account record
+    lineage:
+      - datalake_billing_raw.account.id
+  id_actor:
+    description: Identifier of the actor associated with this account
+    lineage:
+      - datalake_billing_raw.account.actor_id
+  actor_role:
+    description: Role of the actor associated with this account
+    lineage:
+      - datalake_billing_raw.account.actor_role
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.account.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.account.updated_at
