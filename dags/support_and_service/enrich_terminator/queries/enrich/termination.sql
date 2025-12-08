@@ -164,6 +164,17 @@ repair_metrics AS (
     GROUP BY
           1
 ),
+bandaid AS (
+    SELECT
+        id_contract
+    FROM
+        datalake_inspection_services_clean.automatic_invoice 
+    WHERE
+        tag = 'AUTOMATIC_BANDAID'
+        AND (owner_cost - tenant_cost) > 0
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created) = 1
+),
 unset_repairs AS (
     SELECT
         rr.id_contract,
@@ -216,9 +227,10 @@ SELECT
     tc.has_automatic_repair_analysis,
     tc.is_automatic_repair_analysis_opted_out,
     neg.has_landlord_comment,
+    b.id_contract IS NOT NULL AS has_bandaid,
     CASE
         WHEN rm.total_tentant_repair_ac > 0
-            OR (rm.total_tentant_repair_ac = 0 AND rm.total_tentant_repair_review > 0 AND (rm.has_early_mediation OR rm.is_early_both_agree))
+            OR (rm.total_tentant_repair_ac = 0 AND rm.total_tentant_repair_review > 0 AND (rm.has_early_mediation OR rm.is_early_both_agree OR b.id_contract IS NOT NULL))
             OR ur.total_unset_repairs > 0        
         THEN TRUE
         ELSE FALSE
@@ -292,6 +304,9 @@ LEFT JOIN
 LEFT JOIN
     unset_repairs AS ur
         ON t.id_contract = ur.id_contract
+LEFT JOIN
+    bandaid AS b
+        ON t.id_contract = b.id_contract
 LEFT JOIN
     datalake_terminator_clean.inspection_opted_out AS ioo
       ON t.id = ioo.id_termination
