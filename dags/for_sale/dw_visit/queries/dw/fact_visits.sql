@@ -34,6 +34,7 @@ SELECT
   funnel_os.sk_visit_funnel AS sk_funnel_offer_submitted,
   funnel_oa.sk_visit_funnel AS sk_funnel_offer_accepted,
   funnel_cs.sk_visit_funnel AS sk_funnel_contract_signed,
+  pvd.sk_visit AS sk_post_visit_demand,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_visit_requested,1, 10),'-','') AS BIGINT), -1) AS sk_visit_request_date,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_created,1, 10),'-','') AS BIGINT), -1) AS sk_visit_created_date,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_visit_local_tz,1, 10),'-','') AS BIGINT), -1) AS sk_visit_date_local_tz,
@@ -115,3 +116,6 @@ LEFT JOIN
     ON ppa.id_house = v.id_house
     AND v.business_context = ppa.business_context
     AND v.ts_created BETWEEN ppa.ts_relation_started AND COALESCE(ppa.ts_relation_ended, NOW())
+LEFT JOIN
+  dw_visit.dim_post_visit_demand AS pvd
+    ON v.id_visit = pvd.sk_visit

@@ -1,145 +1,141 @@
 ---
-database_name: datalake_visit
-table_name: post_visit_demand
+database_name: dw_visit
+table_name: dim_post_visit_demand
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Post-visit evaluation data from the demand perspective, consolidating both agent and house
-  ratings provided by visitors after completing property visits. This table combines feedback
-  about agent performance (ratings, improvements, good points) and house evaluation (like/dislike,
-  positive/negative points).
+description: Dimension table containing post-visit evaluation data from the demand perspective,
+  consolidating both agent and house ratings provided by visitors after completing property visits.
+  This dimension provides comprehensive feedback about agent performance and house evaluation
+  with structured categorical assessments across multiple evaluation dimensions.
   Each record represents a unique visit evaluation.
 columns:
-  id_visit:
+  sk_visit:
     lineage:
-      - datalake_ebdb_clean.visit.id
-    description: Unique identifier of the visit being evaluated.
-  visit_code:
-    lineage:
-      - datalake_insider_clean.review.id_reviewed
-    description: Visit code extracted from review identifiers.
+      - datalake_visit.post_visit_demand.id_visit
+    description: Key of visit.
   agent_rating:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
-    description: Numerical rating given by the visitor to evaluate the agent's performance during the visit.
+      - datalake_visit.post_visit_demand.agent_rating
+    description: Numerical rating given by the visitor to evaluate the agent's performance during the visit (1 to 5).
   agent_rating_comment:
     lineage:
-      - datalake_insider_clean.review_feature.comment
-    description: Text comment provided by the visitor about the agent's performance.
+      - datalake_visit.post_visit_demand.agent_rating_comment
+    description: Text comment provided by the visitor about the agent's performance during the visit.
   house_rating:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
-    description: Visitor's overall satisfaction rating for the house visited.
+      - datalake_visit.post_visit_demand.house_rating
+    description: Visitor's overall satisfaction rating for the house visited (yes, partially, no).
   house_rating_comment:
     lineage:
-      - datalake_insider_clean.review_feature.comment
-    description: Text comment provided by the visitor about the house.
+      - datalake_visit.post_visit_demand.house_rating_comment
+    description: Text comment provided by the visitor about the house visited.
   agent_improvements:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_improvements
     description: Array of improvement areas identified by the visitor regarding the agent's performance.
   agent_good_points:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_good_points
     description: Array of positive aspects highlighted by the visitor about the agent's performance.
   agent_thoughtfulness:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_thoughtfulness
     description: Evaluation of agent's thoughtfulness and attention.
     categories:
       GOOD: Agent showed good thoughtfulness and attention.
       NEEDS_IMPROVEMENT: Agent needs to improve thoughtfulness and attention.
   agent_punctuality:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_punctuality
     description: Evaluation of agent's punctuality.
     categories:
       GOOD: Agent was punctual.
       NEEDS_IMPROVEMENT: Agent needs to improve punctuality.
   agent_house_features_knowledge:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_house_features_knowledge
     description: Evaluation of agent's knowledge about house features, condominium and region.
     categories:
       GOOD: Agent demonstrated good knowledge about the property.
       NEEDS_IMPROVEMENT: Agent needs to improve knowledge about property features.
   agent_rent_sale_process_knowledge:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_rent_sale_process_knowledge
     description: Evaluation of agent's knowledge about the rental or sale process.
     categories:
       GOOD: Agent demonstrated good process knowledge.
       NEEDS_IMPROVEMENT: Agent needs to improve process knowledge.
   agent_get_in_touch:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_get_in_touch
     description: Whether agent needs improvement in getting in touch with clients.
     categories:
       NEEDS_IMPROVEMENT: Agent needs to improve communication and contact.
   agent_other:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_other
     description: Other aspects of agent performance evaluation.
     categories:
       GOOD: Agent performed well in other aspects.
       NEEDS_IMPROVEMENT: Agent needs improvement in other aspects.
   agent_bypass_attempt:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.agent_bypass_attempt
     description: Whether agent attempted to suggest negotiating outside QuintoAndar platform.
     categories:
       NEEDS_IMPROVEMENT: Agent suggested bypassing platform, which needs improvement.
   house_improvements:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_improvements
     description: Array of improvement areas identified by the visitor about the house.
   house_good_points:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_good_points
     description: Array of positive aspects or features appreciated by the visitor about the house.
   house_location:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_location
     description: Evaluation of the house location.
     categories:
       GOOD: Location was rated positively.
       NEEDS_IMPROVEMENT: Location needs improvement.
   house_conservation:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_conservation
     description: Evaluation of the house conservation status.
     categories:
       GOOD: House conservation was rated positively.
       NEEDS_IMPROVEMENT: House conservation needs improvement.
   house_neighborhood:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_neighborhood
     description: Evaluation of the neighborhood quality.
     categories:
       GOOD: Neighborhood was rated positively.
       NEEDS_IMPROVEMENT: Neighborhood needs improvement.
   house_cost_benefit:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_cost_benefit
     description: Evaluation of the house cost-benefit ratio.
     categories:
       GOOD: Cost-benefit was rated positively.
       NEEDS_IMPROVEMENT: Cost-benefit needs improvement.
   house_condominium_features:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_condominium_features
     description: Evaluation of condominium features and amenities.
     categories:
       GOOD: Condominium features were rated positively.
       NEEDS_IMPROVEMENT: Condominium features need improvement.
   house_ad_discrepancies:
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+      - datalake_visit.post_visit_demand.house_ad_discrepancies
     description: Whether there were discrepancies between the advertisement and the actual property.
     categories:
       NEEDS_IMPROVEMENT: Property had discrepancies from advertisement.
   evaluation_domain:
     lineage:
-      - datalake_insider_clean.review.id_reviewed
+      - datalake_visit.post_visit_demand.evaluation_domain
     description: Classification of the evaluation scope based on the available feedback.
     categories:
       AGENT_HOUSE: Both agent and house were evaluated.
@@ -147,5 +143,5 @@ columns:
       AGENT: Only agent was evaluated.
   ts_creation:
     lineage:
-      - datalake_insider_clean.review.dt_creation
+      - datalake_visit.post_visit_demand.ts_creation
     description: Timestamp when visitor evaluated the agent or house.

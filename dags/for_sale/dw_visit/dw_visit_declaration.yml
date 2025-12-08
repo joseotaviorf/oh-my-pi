@@ -37,6 +37,7 @@ workflow:
         - dim_visit_status
         - dim_business_context
         - dim_visit_funnel
+        - dim_post_visit_demand
 cluster:
     type: custom_cluster
     access_control_list:

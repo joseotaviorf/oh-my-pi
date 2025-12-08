@@ -73,6 +73,10 @@ columns:
     description: Foreign key from dim_visit_funnel about visits with contract signed.
     lineage:
       - dw_visit.dim_visit_funnel.sk_visit_funnel
+  sk_post_visit_demand:
+    description: Foreign key from dim_post_visit_demand about visits with post-visit demand.
+    lineage:
+      - dw_visit.dim_post_visit_demand.sk_visit
   sk_visit_request_date:
     description: Requested date of the visit.
     lineage:

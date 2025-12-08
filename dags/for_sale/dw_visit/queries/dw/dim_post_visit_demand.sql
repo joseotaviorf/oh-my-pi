@@ -1,0 +1,27 @@
+SELECT
+    id_visit AS sk_visit,
+    agent_rating,
+    agent_rating_comment,
+    house_rating,
+    house_rating_comment,
+    agent_improvements,
+    agent_good_points,
+    agent_thoughtfulness,
+    agent_punctuality,
+    agent_house_features_knowledge,
+    agent_rent_sale_process_knowledge,
+    agent_get_in_touch,
+    agent_other,
+    agent_bypass_attempt,
+    house_improvements,
+    house_good_points,
+    house_location,
+    house_conservation,
+    house_neighborhood,
+    house_cost_benefit,
+    house_condominium_features,
+    house_ad_discrepancies,
+    evaluation_domain,
+    ts_creation
+FROM
+    datalake_visit.post_visit_demand
