@@ -27,7 +27,7 @@ workflow:
         - ALL PRIVILEGES
 cluster:
   type: custom_cluster
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

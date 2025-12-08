@@ -29,7 +29,7 @@ workflow:
     - outbound_contact_attempts
 cluster:
   type: custom_cluster
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: m5d.xlarge
     node_type_id: m5d.xlarge
