@@ -122,8 +122,11 @@ LEFT JOIN
     ON c.id_channel = mw.id_channel
     AND c.id_session = mw.id_sauron_session
     AND mw.ts_created >= c.ts_created
+    AND mw.ts_created <= c.ts_ended
 WHERE
   MAKE_DATE(year, month, day) >= '{load_start_date}'
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY mw.id_message ORDER BY c.ts_created DESC) = 1
 ),
 ai_without_spoc AS (
   SELECT DISTINCT
@@ -151,6 +154,8 @@ LEFT JOIN
     AND m.conversation_type = 'HUMAN-AI'
 WHERE
   MAKE_DATE(year, month, day) >= '{load_start_date}'
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY c.ts_created DESC) = 1
 ),
 human_without_spoc AS (
   SELECT 
@@ -175,7 +180,9 @@ FROM
 LEFT JOIN 
   datalake_customer_support.chats AS c
     ON c.id_session = m.id_sauron_session
+    AND m.conversation_type = 'HUMAN-HUMAN'
     AND m.ts_created >= c.ts_created
+    AND m.ts_created <= c.ts_ended
 WHERE
   MAKE_DATE(year, month, day) >= '{load_start_date}'
 QUALIFY
