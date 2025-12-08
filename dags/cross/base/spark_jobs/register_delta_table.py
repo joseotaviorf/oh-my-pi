@@ -6,6 +6,7 @@ from bietlejuice.clients.db_clients.trino_client import TrinoClient
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
+from trino.exceptions import TrinoUserError
 
 JOB_NAME = "register_delta_table"
 DELTA_CATALOG = "delta"
@@ -46,13 +47,25 @@ def register_table(
     Registers the table in Trino. If the schema does not exist, it will be created.
     If the table already exists but in parquet instead of Delta, it will be dropped.
     """
-    trino_client.run(f"CREATE SCHEMA IF NOT EXISTS {DELTA_CATALOG}.{database_name}")
-    if trino_client.table_exists(database_name, table_name):
+
+    # This is structured in a way to minimize queries to Trino. We found that most times that this function
+    # is called, the table is already registered as Delta. So we will query only once to find the DDL, realize that
+    # it is Delta, and do nothing.
+
+    try:
         table_ddl = trino_client.get_table_ddl(database_name, table_name)
         is_delta = f"{DELTA_CATALOG}.{database_name}.{table_name}" in table_ddl.replace("\"", "")
-        if not is_delta:
+        if not is_delta: # The table exists but is not in Delta, so we need to drop it
             trino_client.drop_table(database_name, table_name)
+        else: # Already registered as Delta, nothing to be done
+            return
+    except TrinoUserError as e:
+        if e.error_name != "TABLE_NOT_FOUND":
+            raise e
+        # If the table was not found, we can just proceed to create the schema and register the table
+        trino_client.run(f"CREATE SCHEMA IF NOT EXISTS {DELTA_CATALOG}.{database_name}")
 
+    # We will get to this point either if the table does not exist, or if it was dropped due to not being Delta
     trino_client.register_table(
         schema_name=database_name, table_name=table_name, table_location=table_location
     )
