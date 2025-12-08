@@ -236,7 +236,6 @@ all_messages_with_tasks AS (
     origin,
     message,
     user_type,
-    message_index,
     reply_time,
     ts_created,
     id_task,
