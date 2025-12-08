@@ -188,6 +188,8 @@ columns:
       (1) it is not an eviction,
       (2) has repairs and
       (3) is not early both agree, nor had "Both Agreed" on budget approval or required band-aid. 
+  has_termination_date_rescheduling:
+    description: Flag indicating whether the termination request included rescheduling of the termination date.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -239,6 +241,11 @@ columns:
   dt_termination:
     description: Date when the property became or will become vacant.
     lineage:
+      - datalake_terminator_clean.termination.dt_vacancy
+  dt_original_termination:
+    description: Original date of when the property should become vacant.
+    lineage:
+      - datalake_terminator_clean.termination.rescheduling_history
       - datalake_terminator_clean.termination.dt_vacancy
   dt_last_rescheduled:
     description: Date of last rescheduling of termination.

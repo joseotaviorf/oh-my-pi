@@ -1,4 +1,32 @@
-WITH last_inspection_synch AS(
+WITH raw_data AS (
+    SELECT
+        *,
+        get_json_object(rescheduling_history, '$.entries') AS entries
+    FROM 
+        datalake_terminator_clean.termination
+),
+expanded_entries AS (
+    SELECT
+        *,
+        entry
+    FROM raw_data
+    LATERAL VIEW EXPLODE(
+        from_json(entries, 'array<string>')
+    ) AS entry
+),
+first_td AS (
+    SELECT DISTINCT
+        id AS id_termination,
+        TO_DATE(GET_JSON_OBJECT(entry, '$.fromVacancyDate'), 'yyyy-MM-dd') AS rescheduled_from_vacancy_date,
+        TO_DATE(GET_JSON_OBJECT(entry, '$.toVacancyDate'), 'yyyy-MM-dd') AS original_dt_termination
+    FROM
+        expanded_entries
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY id 
+        ORDER BY to_timestamp(get_json_object(entry, '$.rescheduledAt'), 'dd/MM/yyyy HH:mm:ss') ASC
+    ) = 1
+),
+last_inspection_synch AS(
     SELECT
         t.id,
         ib.id_external AS id_exit_inspection,
@@ -235,6 +263,11 @@ SELECT
         THEN TRUE
         ELSE FALSE
     END AS has_repairs,
+    CASE
+        WHEN first_td.original_dt_termination IS NOT NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS has_termination_date_rescheduling,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
     ln.fee_discount_value,
@@ -251,6 +284,7 @@ SELECT
     neg.repair_cost,
     t.spoc_wave,
     t.dt_vacancy AS dt_termination,
+    COALESCE(first_td.original_dt_termination, t.dt_vacancy) AS dt_original_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
     t.ts_created AS ts_termination_request,
     t.ts_updated AS ts_termination_updated,
@@ -313,6 +347,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_terminator_clean.termination_characteristics AS tc
         ON tc.id_termination = t.id
+LEFT JOIN
+    first_td
+      ON t.id = first_td.id_termination
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
