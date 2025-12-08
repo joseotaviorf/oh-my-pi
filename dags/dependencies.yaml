@@ -573,6 +573,8 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_absence:load-clean-type-translation:first-run-of-day
   - bietlejuice.pin_absence:load-clean-type:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-assignment-extra-info:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day

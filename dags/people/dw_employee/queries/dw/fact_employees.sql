@@ -1,31 +1,76 @@
+WITH
+terminated_for_assignment_change AS (
+  SELECT
+    aa.id_assignment AS id_assignment_terminated,
+    aa_next.id_assignment AS id_assignment_next,
+    ps_prev.dt_started AS previous_dt_started,
+    art.action_reason IN ('Efetivação Aprendiz', 'Efetivação Estágio') AS is_converted_to_permanent_hire,
+    art.action_reason IN ('Recrutamento Interno', 'Movimentação Internacional') AS is_transfered
+  FROM
+    datalake_pin_core_clean.all_assignments AS aa
+  INNER JOIN
+    datalake_pin_core_clean.all_assignments AS aa_next
+      ON aa_next.id_person = aa.id_person
+      AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+  LEFT JOIN
+    datalake_pin_core_clean.action_reason_base AS arb
+      ON arb.action_reason_code = aa.reason_code
+  LEFT JOIN
+    datalake_pin_core_clean.action_reason_translation AS art
+      ON art.id_action_reason = arb.id_action_reason
+      AND art.language = 'PTB'
+  LEFT JOIN
+    datalake_pin_core_clean.periods_of_service AS ps_prev
+      ON ps_prev.id_period_of_service = aa.id_period_of_service
+  WHERE
+    aa.assignment_status_type = 'INACTIVE'
+    AND art.action_reason IN (
+      'Recrutamento Interno',
+      'Efetivação Aprendiz',
+      'Movimentação Internacional',
+      'Efetivação Estágio'
+    )
+)
+
 SELECT
-    sk_assignment,
-    sk_employee,
-    sk_demographic_information,
-    sk_cost_center,
-    sk_business_unit,
-    sk_job,
-    sk_manager,
-    sk_manager_assignment,
-    sk_disability,
-    sk_work_relationship_started_date,
-    sk_work_relationship_ended_date,
-    sk_last_salary_increase_date,
-    sk_hierarchy,
-    assignment_number,
-    salary_currency_code,
-    is_active,
-    is_pending_worker,
-    is_manager,
-    assignment_age_months,
-    qnt_directly_led,
-    qnt_undirectly_led,
-    salary,
-    last_salary_increase,
-    pct_last_salary_increase,
+    fa.sk_assignment,
+    fa.sk_employee,
+    fa.sk_demographic_information,
+    fa.sk_cost_center,
+    fa.sk_business_unit,
+    fa.sk_job,
+    fa.sk_manager,
+    fa.sk_manager_assignment,
+    fa.sk_disability,
+    COALESCE(
+        DATE_FORMAT(tfac.previous_dt_started, 'yyyyMMdd'),
+        fa.sk_work_relationship_started_date
+    ) AS sk_work_relationship_started_date,
+    fa.sk_work_relationship_ended_date,
+    fa.sk_last_salary_increase_date,
+    fa.sk_hierarchy,
+    fa.assignment_number,
+    fa.salary_currency_code,
+    fa.is_active,
+    fa.is_pending_worker,
+    fa.is_manager,
+    fa.assignment_age_months,
+    fa.qnt_directly_led,
+    fa.qnt_undirectly_led,
+    fa.salary,
+    fa.last_salary_increase,
+    fa.pct_last_salary_increase,
+    COALESCE(tfac.is_converted_to_permanent_hire, FALSE) AS is_converted_to_permanent_hire,
+    COALESCE(tfac.is_transfered, FALSE) AS is_transfered,
     NOW() AS ts_load
 FROM
-    dw_employee.fact_assignments
+    dw_employee.fact_assignments AS fa
+LEFT JOIN
+    datalake_employee_registration.identifier_mapping AS im
+        ON im.id_period_of_service = fa.sk_assignment
+LEFT JOIN
+    terminated_for_assignment_change AS tfac
+        ON tfac.id_assignment_next = im.id_assignment
 WHERE 
-    NOT is_pending_worker
-    AND is_last_valid_work_relationship
+    NOT fa.is_pending_worker
+    AND fa.is_last_valid_work_relationship
