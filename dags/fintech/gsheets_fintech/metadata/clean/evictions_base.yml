@@ -153,6 +153,10 @@ columns:
     description: "Lead time do início da fase Coerciva até a sua finalização"
     lineage:
       - datalake_gsheets_raw.evictions_base.LDT_coercitivo
+  last_occurrence:
+    description: "Dado do campo Complemento da última tabulação registrada no Cyber"
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Ultima_tabulacao
   has_arbitration_defense:
     description: "Indica se houve defesa no processo arbitral"
     lineage:
