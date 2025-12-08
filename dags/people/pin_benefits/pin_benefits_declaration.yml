@@ -68,13 +68,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_benefits
           date_column_to_partition: last_update_date
-    ben_elig_per_elctbl_chc:
-      clean_table_name: person_electable_benefit_choices
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_benefits
-          date_column_to_partition: last_update_date
     ben_ler_f:
       clean_table_name: life_event_reasons
       vacuum_retention_hours: 168
