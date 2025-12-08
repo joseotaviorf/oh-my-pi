@@ -30,6 +30,8 @@ columns:
     description: "Bot type that handled the session (matthew or wall-e)"
   matthew_version:
     description: "Matthew version that handled the session"
+  matthew_version_host_refined:
+    description: "Matthew version that handled the session, refined by the host"
   first_queue:
     lineage:
       - datalake_chatbot.sessions.first_queue
