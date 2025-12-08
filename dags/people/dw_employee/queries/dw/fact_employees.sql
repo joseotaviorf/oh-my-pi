@@ -1,7 +1,6 @@
 WITH
 terminated_for_assignment_change AS (
   SELECT
-    aa.id_assignment AS id_assignment_terminated,
     aa_next.id_assignment AS id_assignment_next,
     ps_prev.dt_started AS previous_dt_started,
     art.action_reason IN ('Efetivação Aprendiz', 'Efetivação Estágio') AS is_converted_to_permanent_hire,
@@ -30,6 +29,11 @@ terminated_for_assignment_change AS (
       'Movimentação Internacional',
       'Efetivação Estágio'
     )
+  QUALIFY
+    ROW_NUMBER() OVER(
+      PARTITION BY aa.id_assignment
+      ORDER BY aa.dt_effective_started ASC
+      ) = 1
 )
 
 SELECT
