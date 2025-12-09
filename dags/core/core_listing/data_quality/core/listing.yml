@@ -1,0 +1,57 @@
+---
+table_name: core_listing.listing
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+column_level_validations:
+  sk_core_listing:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_listing_business_context:
+    is_complete:
+      severity_level: Error
+  id_house_listing:
+    is_complete:
+      severity_level: Error
+  id_listing:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  status:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  category:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - RENT
+        - SALE
+      severity_level: Error
+  is_extended_rental:
+    is_complete:
+      severity_level: Error
+  has_termination_canceled:
+    is_complete:
+      severity_level: Error
+  is_last_listing_version:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error

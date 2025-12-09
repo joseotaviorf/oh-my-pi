@@ -347,6 +347,15 @@ bietlejuice.core_credit_evaluation:
     - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
     - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
+bietlejuice.core_listing:
+  add:
+    - bietlejuice.core_aux_listing:load-core-aux--house-listing-category
+    - bietlejuice.core_aux_listing:load-core-aux--lbc-status-version-order
+    - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
+  remove:
+    - bietlejuice.core_aux_listing:load-core-aux--house-listing-category:first-run-of-day
+    - bietlejuice.core_aux_listing:load-core-aux--lbc-status-version-order:first-run-of-day
+    - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
 bietlejuice.core_aux_listing:
   add:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud

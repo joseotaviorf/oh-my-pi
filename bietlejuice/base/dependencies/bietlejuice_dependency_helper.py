@@ -39,14 +39,10 @@ class BietlejuiceDependencyHelper:
             )
         table_group_number = 4
         if ":create-external-table" in task_name:
-            task_name_pattern = (
-                "bietlejuice\.(.*):create-external-table-(enrich|raw|clean|dw)*-([^:]*)"
-            )
+            task_name_pattern = "bietlejuice\.(.*):create-external-table-(enrich|raw|clean|core|dw)*-([^:]*)"
             table_group_number = 3
         else:
-            task_name_pattern = (
-                "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|dw|metric)*-([^:]*)"
-            )
+            task_name_pattern = "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|core|dw|metric)*-([^:]*)"
 
         match = re.search(task_name_pattern, task_name)
         if match is None:
@@ -56,7 +52,7 @@ class BietlejuiceDependencyHelper:
 
         dag_name = match.group(1)
 
-        match_layer = re.search("(dw|enrich|clean|raw|metric)", task_name)
+        match_layer = re.search("(dw|enrich|clean|core|raw|metric)", task_name)
         if match_layer is None:
             return dag_name, None
 

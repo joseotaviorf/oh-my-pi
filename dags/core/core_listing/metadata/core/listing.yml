@@ -1,0 +1,107 @@
+database_name: core_listing
+table_name: listing
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description: Listing Core Model that provides a consolidated view of RENT and SALE house listings, with their current
+  status, version history and business context information. It contains history from the House table, but only includes
+  listings that are present in the Listing Business Context table.
+columns:
+  sk_core_listing:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id
+      - core_listing.aux__lbc_status_version_order.id_house
+    description: Surrogate key related to the Listing Core Model. This key must always be unique.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - core_listing.aux__lbc_status_version_order.id_house
+    description: House identifier related to the listing. It's the ID of the House table, from Main's database (EBDB).
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id
+    description: Identifier of the record in Listing Business Context table, from Main's database (EBDB).
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: Composite identifier for the house listing, created by concatenating id_house with a zero-padded version number (3 digits).
+  id_listing:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_ebdb_clean.listing_business_context.business_context
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: Unique identifier for the listing, generated using SHA256 hash of id_house_listing concatenated with business_context.
+      This ensures uniqueness across both RENT and SALE contexts.
+  version:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: Version number of the listing. In RENT context, it's an incremental number based on listing lifecycle events.
+      In SALE, it's always 0 (single version).
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+      - core_listing.aux__lbc_status_version_order.status
+    description: Last status of the listing for the related version.
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status_reason
+      - core_listing.aux__lbc_status_version_order.status_reason
+    description: Last status reason of the listing for the related version.
+  category:
+    lineage:
+      - core_listing.aux__house_listing_category.listing_category
+    description: Category of the listing based on its history.
+    categories:
+      'First Listing': First time the property is listed (version 1).
+      'Re-Listing': Property was previously rented and is being listed again.
+      'Recovered': Property was unpublished for 84+ days and is being listed again.
+      'NA': Not Applicable. All cases of SALE. Cases of version 0 of RENT.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: Business context of the listing.
+    categories:
+      RENT: houses for rent.
+      SALE: houses for sale.
+  is_extended_rental:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.is_extended_rental
+    description: Boolean flag indicating if the listing is part of an extended rental agreement.
+      For SALE listings, it's always FALSE.
+  has_termination_canceled:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.has_termination_canceled
+    description: Boolean flag indicating if the contract termination was canceled. This typically happens when a tenant decides to stay after initiating termination.
+      For SALE listings, it's always FALSE.
+  is_last_listing_version:
+    lineage:
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: Boolean flag indicating if this is the most recent version of the listing.
+      For SALE listings, this is always TRUE (only one version exists).
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_created
+    description: Timestamp of when the listing was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Last timestamp of when the listing was updated.
+  ts_load:
+    description: Timestamp of when the Listing Core Model was updated and loaded for the last time.
+      This is set to current_timestamp() during the ETL process.
+  year:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Year extracted from ts_updated. Used as partition column.
+  month:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Month extracted from ts_updated. Used as partition column.
+  day:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Day of month extracted from ts_updated. Used as partition column.

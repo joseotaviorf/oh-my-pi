@@ -1,0 +1,33 @@
+dag:
+  name: core_listing
+  schedule_start_date: 2025, 1, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Creates the Listing Core Model by processing listing data from both RENT and SALE business contexts.
+      This model unifies listing_business_context data with auxiliary tables (aux__lbc_status_version_order
+      and aux__house_listing_category) to provide a consolidated view of house listings.
+
+workflow:
+  type: core_model
+  layer: core
+  default_extraction_type: full
+  load_spark_job: load_core_listing
+  execution_timeout_hours: 1
+  tables_customization:
+    listing:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+      partitions: [year, month, day]
+      z_order_by: [id_house_listing, business_context]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster_3_workers
+  databricks_conn_id: databricks_new

@@ -1,0 +1,101 @@
+# Schema validation file for core listing table
+# This file defines the expected schema for the core_listing.listing table
+# Path: dags/core/core_listing/schemas/core/listing.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_listing:
+    type: string
+    required: true
+
+  # House identifier
+  id_house:
+    type: bigint
+    required: true
+
+  # Listing business context identifier (from listing_business_context table)
+  id_listing_business_context:
+    type: bigint
+    required: true
+
+  # House listing identifier (concatenation of id_house + padded version)
+  id_house_listing:
+    type: bigint
+    required: true
+
+  # Listing identifier (SHA256 hash of id_house_listing + business_context)
+  id_listing:
+    type: string
+    required: true
+
+  # Listing version number
+  version:
+    type: int
+    required: true
+
+  # Current status of the listing
+  status:
+    type: string
+    required: false
+
+  # Reason for the current status
+  status_reason:
+    type: string
+    required: false
+
+  # Listing category
+  category:
+    type: string
+    required: false
+
+  # Business context - RENT or SALE
+  business_context:
+    type: string
+    required: true
+
+  # Flag indicating if the listing is an extended rental
+  is_extended_rental:
+    type: boolean
+    required: true
+
+  # Flag indicating if termination was canceled
+  has_termination_canceled:
+    type: boolean
+    required: true
+
+  # Flag indicating if this is the last version of the listing
+  is_last_listing_version:
+    type: boolean
+    required: true
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: true
+
+  ts_updated:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 19
+max_columns: 19
+strict: true
