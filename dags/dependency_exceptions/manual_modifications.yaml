@@ -832,6 +832,7 @@ bietlejuice.enrich_transactional_entities:
     - bietlejuice.ebdb_listing_fast_lane:load-clean-house-listing-relation:first-run-of-day
     - bietlejuice.ebdb_test:load-clean-house:first-run-of-day
     - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
+    - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
     - bietlejuice.enrich_entities_views:load-enrich-listing:first-run-of-day
     - bietlejuice.enrich_entities_views:load-enrich-onboarding:first-run-of-day

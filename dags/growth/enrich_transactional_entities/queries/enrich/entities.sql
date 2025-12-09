@@ -288,7 +288,7 @@ inspection AS (
        TO_JSON(
         STRUCT(
           ib.status AS status,
-          ib.dt_inspected AS when
+          COALESCE(ib.dt_inspected, b.dt_booking) AS when
         )
       ) AS properties,
       CASE
@@ -303,6 +303,9 @@ inspection AS (
     INNER JOIN
         core_contract.contract AS c
             ON ib.id_contract = c.id_contract
+    LEFT JOIN
+        datalake_ebdb_clean.booking AS b
+            ON b.id = ib.id_booking
     WHERE
         YEAR(ib.ts_created) >= 2025
   )

@@ -185,7 +185,7 @@ columns:
       For FR_CONTRACT entities - contains status and dt_started fields.
       For FR_TERMINATION entities - contains status and ts_created fields.
       For LISTING entities - contains status and ts_created fields.
-      For FR_INSPECTION entities - contains status field.
+      For FR_INSPECTION entities - contains status and Inspection's inspection date (dt_inspected) or Booking's booking date (dt_booking) fields.
       For FR_ONBOARDING entities - contains status and ts_created fields.
       For FR_CREDIT_EVALUATION entities - contains status and ts_created fields.
       For FR_RESERVATION entities - contains status and ts_created fields.
