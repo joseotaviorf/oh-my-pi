@@ -17,6 +17,7 @@ workflow:
     state: {}
     message_flow: {}
     voice_call_attempt: {}
+    voice_session: {}
 
 cluster:
   type: custom_cluster

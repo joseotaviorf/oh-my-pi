@@ -1,0 +1,71 @@
+---
+database_name: datalake_copilot_service_clean
+table_name: voice_session
+owner: juliana.hocihara@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores voice sessions in the Copilot service"
+columns:
+  id:
+    description: "The voice session identifier"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.id
+  id_user:
+    description: "The user identifier"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.user_id
+  id_idempotency:
+    description: "The idempotency identifier"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.idempotency_id
+  user_phone:
+    description: "The user phone number"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.user_phone
+  user_name:
+    description: "The user name"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.user_name
+  user_document_number:
+    description: "The user document number"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.user_document_number
+  channel:
+    description: "The channel"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.channel
+  call_context:
+    description: "The call context"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.call_context
+  state:
+    description: "The voice session state"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.state
+  completion_state:
+    description: "The completion state"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.completion_state
+  min_interval_between_calls:
+    description: "The minimum interval between calls"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.min_interval_between_calls
+  max_retries:
+    description: "The maximum retry attempts"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.max_retries
+  ts_started:
+    description: "The voice session start date"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.initial_date
+  ts_ended:
+    description: "The voice session end date"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.end_date
+  ts_created:
+    description: "The voice session creation date"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.created_at
+  ts_updated:
+    description: "The voice session last update date"
+    lineage:
+      - datalake_copilot_service_raw.voice_session.updated_at
