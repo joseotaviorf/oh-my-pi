@@ -193,7 +193,7 @@ columns:
       For FR_OFFER entities - contains status field.
       For FR_CONTRACT entities - contains status and dt_started fields.
       For FR_TERMINATION entities - contains status and ts_created fields.
-      For LISTING entities - contains status and ts_created fields.
+      For LISTING entities - contains transformed status (reflecting API response) and ts_created fields. The status field undergoes transformation logic and it's not the same found in the product database in some cases.
       For FR_INSPECTION entities - contains status and Inspection's inspection date (dt_inspected) or Booking's booking date (dt_booking) fields.
       For FR_ONBOARDING entities - contains status and ts_created fields.
       For FR_CREDIT_EVALUATION entities - contains status and ts_created fields.

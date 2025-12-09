@@ -17,7 +17,13 @@ listing_base AS (
         lbc.business_context,
         TO_JSON(
             STRUCT(
-                lbc.status AS status,
+                CASE
+                    WHEN lbc.status = 'OPTED_OUT' AND lbc.status_reason IS NULL THEN 'EXCLUDED'
+                    WHEN lbc.status = 'SUSPENDED' AND lbc.status_reason = 'RENTED' THEN 'CONTRACT_ONGOING'
+                    WHEN lbc.status = 'SUSPENDED'
+                        AND lbc.status_reason IN ('ContractDraft', 'HouseReserved', 'PaidGuarantee', 'RENTAL_GUARANTEE', 'ProposalDocumentationApproved', 'ProposalDocumentationSentToCardiff', 'CCV_SIGNED') THEN 'ADVANCED_OFFER'
+                    ELSE lbc.status
+                END AS status,
                 lbc.ts_created AS when
             )
         ) AS properties,

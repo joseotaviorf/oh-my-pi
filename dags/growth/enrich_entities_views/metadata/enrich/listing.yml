@@ -8,8 +8,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
       - datalake_ebdb_clean.listing_business_context.business_context
-    description: |
-      Primary key of the listing entity, created by concatenating the house id and business context (CONCAT(id_house, '_', business_context)).
+    description: Primary key of the listing entity, created by concatenating the house id and business context (CONCAT(id_house, '_', business_context)).
       This ensures uniqueness per business context (RENT/SALE) for the same house, allowing the same property to have separate listing entities for rental and sale contexts. 
   id_house:
     lineage:
@@ -19,6 +18,7 @@ columns:
     lineage:
       - core_contract.contract.id_contract
     description: Foreign key referencing the contract entity. Only populated for listings with business_context 'RENT', NULL for 'SALE' listings.
+      The contract is selected as the most recent contract for the house (last contract by ts_created DESC).
   id_user:
     lineage:
       - datalake_ebdb_clean.house.id_user
@@ -38,14 +38,20 @@ columns:
   properties:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status
+      - datalake_ebdb_clean.listing_business_context.status_reason
       - datalake_ebdb_clean.listing_business_context.ts_created
-    description: JSON structure containing listing properties including status and creation timestamp (when).
+    description: |
+      JSON structure containing listing properties including transformed status and creation timestamp (when), to reflect the API response.
+      The status field undergoes transformation logic:
+      - 'OPTED_OUT' without status_reason becomes 'EXCLUDED'
+      - 'SUSPENDED' with status_reason 'RENTED' becomes 'CONTRACT_ONGOING'
+      - 'SUSPENDED' with status_reason in ('ContractDraft', 'HouseReserved', 'PaidGuarantee', 'RENTAL_GUARANTEE', 'ProposalDocumentationApproved', 'ProposalDocumentationSentToCardiff', 'CCV_SIGNED') becomes 'ADVANCED_OFFER'
+      - Otherwise, the original status is preserved
       Used to provide detailed contextual information about the current state of each listing entity.
   is_active:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status
-    description: |
-      Boolean flag indicating if the listing is currently active.
+    description: Boolean flag indicating if the listing is currently active.
       Set to TRUE when status is 'PUBLISHED' or 'EDITING'.
       Set to FALSE when status is 'OPTED_OUT', 'UNPUBLISHED' or 'SUSPENDED'.
       Set to NULL for any other status values.
