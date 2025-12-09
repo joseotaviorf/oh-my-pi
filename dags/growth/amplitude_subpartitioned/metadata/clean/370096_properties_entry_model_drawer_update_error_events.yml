@@ -1,0 +1,50 @@
+---
+database_name: datalake_amplitude_clean
+table_name: 370096_properties_entry_model_drawer_update_error_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  This table contains properties_entry_model_drawer_update_error events from app 370096.
+  It tracks errors that occur when users attempt to update property entry model drawer information.
+  Each record represents an error event with details about the specific error type, step, and user interaction context.
+columns:
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.house_id
+    description: Unique identifier of the house where the error occurred during property entry model drawer update.
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.user_id
+    description: Unique identifier of the user who encountered the error.
+  step_name:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.step_name
+    description: Name of the step in the property entry model drawer update process where the error occurred.
+  error_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.error_type
+    description: Type or category of error that occurred during the property entry model drawer update process.
+  selected_entry_access:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties.selected_entry_access
+    description: The entry access method that was selected when the error occurred.
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+    description: City where the user was located when the error event occurred.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the error event occurred.
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.

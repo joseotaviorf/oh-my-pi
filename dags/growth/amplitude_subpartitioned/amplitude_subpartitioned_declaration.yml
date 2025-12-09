@@ -873,6 +873,9 @@ workflow:
     170698_tile_perform_action_events:
       run_optimize: false
       run_vacuum: false
+    370096_properties_entry_model_drawer_update_error_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_13_3_med_memory_on_demand_cluster
   databricks_conn_id: databricks_new
