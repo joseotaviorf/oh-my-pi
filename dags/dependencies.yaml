@@ -2072,6 +2072,14 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-person:first-run-of-day
   - bietlejuice.docx:load-clean-rev-info:first-run-of-day
   - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
+bietlejuice.enrich_dual_write:
+  - bietlejuice.billing:load-clean-entry:first-run-of-day
+  - bietlejuice.billing:load-clean-invoice:first-run-of-day
+  - bietlejuice.enrich_billing:load-enrich-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-invoice:first-run-of-day
+  - bietlejuice.retsuko:load-clean-entry:first-run-of-day
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_finance:load-clean-account-transaction:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day

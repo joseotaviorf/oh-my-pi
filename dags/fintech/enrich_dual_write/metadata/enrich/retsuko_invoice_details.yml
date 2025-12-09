@@ -1,0 +1,147 @@
+---
+database_name: datalake_dual_write
+table_name: retsuko_invoice_details
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Enriched table containing detailed invoice and entry information from Retsuko system, including account types, bill items, amounts, and timestamps. This table joins invoice, entry, contract, and account tables to provide a comprehensive view of invoice details."
+columns:
+  id_retsuko_invoice:
+    description: "External identifier of the Retsuko invoice"
+    lineage:
+      - datalake_retsuko_clean.invoice.id_external
+  id_retsuko_entry:
+    description: "Internal identifier of the Retsuko entry"
+    lineage:
+      - datalake_retsuko_clean.entry.id
+  id_account:
+    description: "External identifier of the account associated with the invoice"
+    lineage:
+      - datalake_retsuko_clean.account.id_external
+  id_contract:
+    description: "External identifier of the contract associated with the invoice"
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  id_account_invoice_purpose:
+    description: "Composite identifier combining account external ID, accrual year-month, and invoice purpose"
+    lineage:
+      - datalake_retsuko_clean.account.id_external
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.purpose
+  source:
+    description: "Source system identifier, always 'retsuko' for this table"
+    categories:
+      retsuko: ""
+  invoice_account_type:
+    description: "Type of account associated with the invoice (e.g., tenant, landlord, contract)"
+    lineage:
+      - datalake_retsuko_clean.account.type
+  invoice_status:
+    description: "Current status of the invoice"
+    categories:
+      open: "The invoice was not paid yet"
+      not-payable: "The net invoice value of all the entries (invoice due amount) is zero, therefore the invoice can not be paid. Yet the invoice has an invoice_due_date. In onboarding and monthly invoices, this status can appear when a postponed value is created in order to the tenant invoice not to become a payable or to the landlord invoice not to become a receivable"
+      paid: "The invoice was paid"
+      written-down: "The invoice was not paid and it was written down, the invoice_paid_date is the written down date. The process is done in general to not consider anymore the due amount (it's not going to be paid anymore or it has a negotiation)"
+      canceled: "The invoice was canceled, and there's no more values to be paid"
+      divergent-payment: "The invoice was paid with a different value than the due amount in an invoice_paid_date"
+    lineage:
+      - datalake_retsuko_clean.invoice.status
+  invoice_purpose:
+    description: "Purpose or frequency of the invoice (e.g., monthly, one-time)"
+    categories:
+      monthly: "Monthly invoice"
+      onboarding: "First invoice after contract signature"
+      early-termination: "Early termination invoice"
+      estate-agent-services: "Estate agent services invoice"
+      extra: "Extra invoice"
+      pos-rental: "Pos rental invoice"
+      ciq: ""
+    lineage:
+      - datalake_retsuko_clean.invoice.purpose
+  invoice_due_amount:
+    description: "Total amount due for the invoice"
+    lineage:
+      - datalake_retsuko_clean.invoice.due_amount
+  invoice_accrual_year_month:
+    description: "Accrual period in YYYYMM format when the invoice should be recognized"
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  invoice_number:
+    description: "Sequential invoice number within a contract, ranked by due date and invoice ID"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+      - datalake_retsuko_clean.invoice.id_external
+  from_account:
+    description: "External identifier of the source account in the entry transaction"
+    lineage:
+      - datalake_retsuko_clean.account.id_external
+  from_account_type:
+    description: "Type of the source account (e.g., tenant, landlord, contract, quinto-andar)"
+    lineage:
+      - datalake_retsuko_clean.account.type
+  to_account:
+    description: "External identifier of the destination account in the entry transaction"
+    lineage:
+      - datalake_retsuko_clean.account.id_external
+  to_account_type:
+    description: "Type of the destination account (e.g., tenant, landlord, contract, quinto-andar)"
+    lineage:
+      - datalake_retsuko_clean.account.type
+  bill_item:
+    description: "Bill item name without the 'entry.bill-item/' prefix (e.g., rent, iptu, condo)"
+    lineage:
+      - datalake_retsuko_clean.entry.bill_item
+  bill_item_description:
+    description: "Free-text description of the bill item"
+    lineage:
+      - datalake_retsuko_clean.entry.description
+  producer:
+    description: "System or routine that created the entry (e.g., monthly-routine, manual, onboarding-routine)"
+    lineage:
+      - datalake_retsuko_clean.entry.producer
+  entry_amount:
+    description: "Monetary amount of the individual entry"
+    lineage:
+      - datalake_retsuko_clean.entry.amount
+  total_entries:
+    description: "Total count of entries associated with the invoice"
+    lineage:
+      - datalake_retsuko_clean.entry.id
+  total_entry_amount:
+    description: "Sum of all entry amounts for the invoice"
+    lineage:
+      - datalake_retsuko_clean.entry.amount
+  dt_contract_signature:
+    description: "Date when the contract was signed"
+    lineage:
+      - datalake_retsuko_clean.contract.ts_signature
+  dt_invoice_due_date:
+    description: "Date when the invoice payment is due"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  ts_charge_started:
+    description: "Timestamp when contract charges started"
+    lineage:
+      - datalake_retsuko_clean.contract.ts_charge_started
+  ts_charge_ended:
+    description: "Timestamp when contract charges ended"
+    lineage:
+      - datalake_retsuko_clean.contract.ts_charge_ended
+  ts_invoice_created:
+    description: "Timestamp when the invoice was created"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_created
+  ts_invoice_updated:
+    description: "Timestamp when the invoice was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_retsuko_updated
+  ts_entry_created:
+    description: "Timestamp when the entry was created"
+    lineage:
+      - datalake_retsuko_clean.entry.ts_created
+  ts_entry_updated:
+    description: "Timestamp when the entry was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_clean.entry.ts_retsuko_updated
+  ts_load:
+    description: "Timestamp when the record was loaded into this table"

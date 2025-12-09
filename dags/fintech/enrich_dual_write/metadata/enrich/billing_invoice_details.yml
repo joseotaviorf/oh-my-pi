@@ -1,0 +1,137 @@
+---
+database_name: datalake_dual_write
+table_name: billing_invoice_details
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: "Enriched table containing detailed invoice and entry information from Billing system, including account types, bill items, amounts, and timestamps. This table joins invoice, entry, and contract tables to provide a comprehensive view of invoice details from the new Finance Platform."
+columns:
+  id_billing_invoice:
+    description: "Internal identifier of the billing invoice"
+    lineage:
+      - datalake_billing_clean.invoice.id
+  id_billing_entry:
+    description: "Internal identifier of the billing entry"
+    lineage:
+      - datalake_billing_clean.entry.id
+  id_account:
+    description: "Identifier of the account associated with the invoice"
+    lineage:
+      - datalake_billing_clean.invoice.id_account
+  id_contract:
+    description: "Identifier of the contract associated with the invoice"
+    lineage:
+      - datalake_billing_clean.invoice.id_contract
+  id_account_invoice_purpose:
+    description: "Composite identifier combining account ID, accrual year-month, and invoice purpose"
+    lineage:
+      - datalake_billing_clean.invoice.id_account
+      - datalake_billing_clean.invoice.dt_accrual_year_month
+      - datalake_billing_clean.invoice.purpose
+  source:
+    description: "Source system identifier, always 'billing' for this table"
+    categories:
+      billing: ""
+  invoice_account_type:
+    description: "Type of account associated with the invoice (e.g., tenant, landlord, contract)"
+    lineage:
+      - datalake_billing_clean.invoice.account_type
+  invoice_status:
+    description: "Current status of the invoice"
+    categories:
+      open: "The invoice was not paid yet"
+      not-payable: "The net invoice value of all the entries (invoice due amount) is zero, therefore the invoice can not be paid. Yet the invoice has an invoice_due_date. In onboarding and monthly invoices, this status can appear when a postponed value is created in order to the tenant invoice not to become a payable or to the landlord invoice not to become a receivable"
+    lineage:
+      - datalake_billing_clean.invoice.status
+  invoice_purpose:
+    description: "Purpose or frequency of the invoice (e.g., monthly, onboarding)"
+    categories:
+      monthly: "Monthly invoice"
+      onboarding: "First invoice after contract signature"
+    lineage:
+      - datalake_billing_clean.invoice.purpose
+  invoice_transaction_type:
+    description: "Type of transaction for the invoice used to categorise a payment or collection"
+    categories:
+      transfer: "Transfer of funds between accounts"
+      bill: "Bill payment"
+    lineage:
+      - datalake_billing_clean.invoice.transaction_type
+  invoice_due_amount:
+    description: "Total amount due for the invoice"
+    lineage:
+      - datalake_billing_clean.invoice.due_amount
+  invoice_accrual_year_month:
+    description: "Accrual period in YYYYMM format when the invoice should be recognized"
+    lineage:
+      - datalake_billing_clean.invoice.dt_accrual_year_month
+  invoice_number:
+    description: "Sequential invoice number within a contract, ranked by due date and invoice ID"
+    lineage:
+      - datalake_billing_clean.invoice.dt_due
+      - datalake_billing_clean.invoice.id
+  from_account:
+    description: "Identifier of the source account in the entry transaction"
+    lineage:
+      - datalake_billing_clean.entry.from_account
+  to_account:
+    description: "Identifier of the destination account in the entry transaction"
+    lineage:
+      - datalake_billing_clean.entry.to_account
+  bill_item:
+    description: "Bill item name (e.g., rent, iptu, condo)"
+    lineage:
+      - datalake_billing_clean.entry.bill_item
+  bill_item_description:
+    description: "Free-text description of the bill item"
+    lineage:
+      - datalake_billing_clean.entry.description
+  producer:
+    description: "System or routine that created the entry (e.g., monthly-routine, manual, onboarding-routine)"
+    lineage:
+      - datalake_billing_clean.entry.producer
+  entry_amount:
+    description: "Monetary amount of the individual entry"
+    lineage:
+      - datalake_billing_clean.entry.amount
+  total_entries:
+    description: "Total count of entries associated with the invoice"
+    lineage:
+      - datalake_billing_clean.entry.id
+  total_entry_amount:
+    description: "Sum of all entry amounts for the invoice"
+    lineage:
+      - datalake_billing_clean.entry.amount
+  dt_contract_signature:
+    description: "Date when the contract was signed"
+    lineage:
+      - datalake_billing.contract.ts_signature
+  dt_invoice_due_date:
+    description: "Date when the invoice payment is due"
+    lineage:
+      - datalake_billing_clean.invoice.dt_due
+  ts_charge_started:
+    description: "Timestamp when contract charges started"
+    lineage:
+      - datalake_billing.contract.ts_charge_started
+  ts_charge_ended:
+    description: "Timestamp when contract charges ended"
+    lineage:
+      - datalake_billing.contract.ts_charge_ended
+  ts_invoice_created:
+    description: "Timestamp when the invoice was created"
+    lineage:
+      - datalake_billing_clean.invoice.ts_created
+  ts_invoice_updated:
+    description: "Timestamp when the invoice was last updated"
+    lineage:
+      - datalake_billing_clean.invoice.ts_updated
+  ts_entry_created:
+    description: "Timestamp when the entry was created"
+    lineage:
+      - datalake_billing_clean.entry.ts_created
+  ts_entry_updated:
+    description: "Timestamp when the entry was last updated"
+    lineage:
+      - datalake_billing_clean.entry.ts_updated
+  ts_load:
+    description: "Timestamp when the record was loaded into this table"
