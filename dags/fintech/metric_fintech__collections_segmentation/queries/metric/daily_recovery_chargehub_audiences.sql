@@ -8,7 +8,7 @@ WITH chargehub_allocation AS (
     id_segment,
     ts_entered_segment,
     ts_entered_audience
-  FROM datalake_collections_quintoandar.segmentation_distribution
+  FROM datalake_debt_recovery.segmentation_distribution
   WHERE is_active
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, dt_last_appearance ORDER BY ts_entered_segment DESC, ts_entered_audience DESC) = 1
 ),

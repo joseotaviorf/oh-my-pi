@@ -8,7 +8,7 @@ columns:
   segment:
     description: Chargehub audience name from the contract segment distribution history.
     lineage:
-      - datalake_collections_quintoandar.segmentation_distribution.audience_name
+      - datalake_debt_recovery.segmentation_distribution.audience_name
     dimension: True
   days_to_pipe:
     description: Number of days between the reference date and the pipe date.
@@ -575,7 +575,7 @@ columns:
     dimension: True
   segment_name:
     lineage:
-      - datalake_collections_quintoandar.segmentation_distribution.segment_name
+      - datalake_debt_recovery.segmentation_distribution.segment_name
     description: Chargehub segment name from the contract segment distribution history.
     dimension: True
   dt_pipe:

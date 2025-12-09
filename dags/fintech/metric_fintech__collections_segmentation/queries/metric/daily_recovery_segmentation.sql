@@ -347,7 +347,6 @@ SELECT
     recovered_amount_DT1_Digital_acc,
     recovered_amount_OT1_Digital_acc,
     recovered_amount_Digital_at_reference,
-    recovered_amount_acc,
     DATE_DIFF(dt_reference, dt_pipe) AS days_to_pipe,
     dt_reference,
     DATE_TRUNC('month', dt_reference) AS dt_month_ref,
