@@ -1,0 +1,45 @@
+---
+table_name: metric_fintech.daily_recovery_chargehub_audiences
+alert_channel: FINTECH_INMETRO_ALERTS
+column_level_validations:
+  dt_reference:
+    not_null:
+      severity_level: Error
+  segment:
+    not_null:
+      severity_level: Error
+  month_ref:
+    not_null:
+      severity_level: Error
+  n_contracts_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_contracts_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_invoices_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  n_invoices_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_due_amount_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_due_amount_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  recovered_amount_at_reference:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  recovered_amount_acc:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error

@@ -1,0 +1,588 @@
+---
+database_name: metric_fintech
+table_name: daily_recovery_chargehub_audiences
+description: Daily recovery metrics by Chargehub audiences. Provides recovery metrics aggregated by audience names from the Chargehub system. Metrics are calculated both at reference date and accumulated from invoice creation until observation date, with breakdowns by delay buckets (T1, T2) and digital recovery channels.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  segment:
+    description: Chargehub audience name from the contract segment distribution history.
+    lineage:
+      - datalake_collections_quintoandar.segmentation_distribution.audience_name
+    dimension: True
+  days_to_pipe:
+    description: Number of days between the reference date and the pipe date.
+    dimension: True
+  n_contracts_at_reference:
+    description: Number of distinct contracts in the audience at the reference date.
+    metric:
+      name: Contracts at Reference
+      description: Number of distinct contracts in the audience at the reference date.
+      acronym: CAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Contract analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_contracts_acc:
+    description: Accumulated number of distinct contracts in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Contracts
+      description: Accumulated number of distinct contracts in the audience from invoice creation until the observation date.
+      acronym: AC
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Contract analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_at_reference:
+    description: Number of distinct invoices in the audience at the reference date.
+    metric:
+      name: Invoices at Reference
+      description: Number of distinct invoices in the audience at the reference date.
+      acronym: IAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_acc:
+    description: Accumulated number of distinct invoices in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Invoices
+      description: Accumulated number of distinct invoices in the audience from invoice creation until the observation date.
+      acronym: AI
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  total_due_amount_acc:
+    description: Accumulated total due amount in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Total Due Amount
+      description: Accumulated total due amount in the audience from invoice creation until the observation date.
+      acronym: ATDA
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  total_due_amount_at_reference:
+    description: Total due amount in the audience at the reference date.
+    metric:
+      name: Total Due Amount at Reference
+      description: Total due amount in the audience at the reference date.
+      acronym: TDAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_at_reference:
+    description: Total recovered amount in the audience at the reference date.
+    metric:
+      name: Recovered Amount at Reference
+      description: Total recovered amount in the audience at the reference date.
+      acronym: RAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_acc:
+    description: Accumulated total recovered amount in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount
+      description: Accumulated total recovered amount in the audience from invoice creation until the observation date.
+      acronym: ARA
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_at_reference:
+    description: Number of distinct recovered invoices in the audience at the reference date.
+    metric:
+      name: Recovered Invoices at Reference
+      description: Number of distinct recovered invoices in the audience at the reference date.
+      acronym: RIAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_acc:
+    description: Accumulated number of distinct recovered invoices in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Invoices
+      description: Accumulated number of distinct recovered invoices in the audience from invoice creation until the observation date.
+      acronym: ARI
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_contracts_at_reference:
+    description: Number of distinct recovered contracts in the audience at the reference date.
+    metric:
+      name: Recovered Contracts at Reference
+      description: Number of distinct recovered contracts in the audience at the reference date.
+      acronym: RCAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Contract analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_contracts_acc:
+    description: Accumulated number of distinct recovered contracts in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Contracts
+      description: Accumulated number of distinct recovered contracts in the audience from invoice creation until the observation date.
+      acronym: ARC
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Contract analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_DT1_at_reference:
+    description: Number of distinct invoices with delay T1 (overdue) in the audience at the reference date.
+    metric:
+      name: Invoices Delay T1 at Reference
+      description: Number of distinct invoices with delay T1 (overdue) in the audience at the reference date.
+      acronym: IDT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_DT1_acc:
+    description: Accumulated number of distinct invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Invoices Delay T1
+      description: Accumulated number of distinct invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+      acronym: AIDT1
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_OT1_at_reference:
+    description: Number of distinct invoices on time T1 (not overdue) in the audience at the reference date.
+    metric:
+      name: Invoices On Time T1 at Reference
+      description: Number of distinct invoices on time T1 (not overdue) in the audience at the reference date.
+      acronym: IOT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_OT1_acc:
+    description: Accumulated number of distinct invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Invoices On Time T1
+      description: Accumulated number of distinct invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: AIOT1
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  due_amount_DT1_at_reference:
+    description: Total due amount for invoices with delay T1 (overdue) in the audience at the reference date.
+    metric:
+      name: Due Amount Delay T1 at Reference
+      description: Total due amount for invoices with delay T1 (overdue) in the audience at the reference date.
+      acronym: DADT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  due_amount_OT1_at_reference:
+    description: Total due amount for invoices on time T1 (not overdue) in the audience at the reference date.
+    metric:
+      name: Due Amount On Time T1 at Reference
+      description: Total due amount for invoices on time T1 (not overdue) in the audience at the reference date.
+      acronym: DAOT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT1_at_reference:
+    description: Total recovered amount for invoices with delay T1 (overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Amount Delay T1 at Reference
+      description: Total recovered amount for invoices with delay T1 (overdue) in the audience at the reference date.
+      acronym: RADT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT1_at_reference:
+    description: Total recovered amount for invoices on time T1 (not overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Amount On Time T1 at Reference
+      description: Total recovered amount for invoices on time T1 (not overdue) in the audience at the reference date.
+      acronym: RAOT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT1_acc:
+    description: Accumulated total recovered amount for invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount Delay T1
+      description: Accumulated total recovered amount for invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARADT1
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT1_acc:
+    description: Accumulated total recovered amount for invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount On Time T1
+      description: Accumulated total recovered amount for invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ARAOT1
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_DT1_at_reference:
+    description: Number of distinct recovered invoices with delay T1 (overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Invoices Delay T1 at Reference
+      description: Number of distinct recovered invoices with delay T1 (overdue) in the audience at the reference date.
+      acronym: RIDT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_OT1_at_reference:
+    description: Number of distinct recovered invoices on time T1 (not overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Invoices On Time T1 at Reference
+      description: Number of distinct recovered invoices on time T1 (not overdue) in the audience at the reference date.
+      acronym: RIOT1AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_OT1_acc:
+    description: Accumulated number of distinct recovered invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Invoices On Time T1
+      description: Accumulated number of distinct recovered invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ARIOT1
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_DT1_acc:
+    description: Accumulated number of distinct recovered invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Invoices Delay T1
+      description: Accumulated number of distinct recovered invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARIDT1
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_DT2_at_reference:
+    description: Number of distinct invoices with delay T2 (overdue) in the audience at the reference date.
+    metric:
+      name: Invoices Delay T2 at Reference
+      description: Number of distinct invoices with delay T2 (overdue) in the audience at the reference date.
+      acronym: IDT2AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_DT2_acc:
+    description: Accumulated number of distinct invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Invoices Delay T2
+      description: Accumulated number of distinct invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+      acronym: AIDT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_OT2_at_reference:
+    description: Number of distinct invoices on time T2 (not overdue) in the audience at the reference date.
+    metric:
+      name: Invoices On Time T2 at Reference
+      description: Number of distinct invoices on time T2 (not overdue) in the audience at the reference date.
+      acronym: IOT2AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  n_invoices_OT2_acc:
+    description: Accumulated number of distinct invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Invoices On Time T2
+      description: Accumulated number of distinct invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: AIOT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  due_amount_DT2_at_reference:
+    description: Total due amount for invoices with delay T2 (overdue) in the audience at the reference date.
+    metric:
+      name: Due Amount Delay T2 at Reference
+      description: Total due amount for invoices with delay T2 (overdue) in the audience at the reference date.
+      acronym: DADT2AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  due_amount_OT2_at_reference:
+    description: Total due amount for invoices on time T2 (not overdue) in the audience at the reference date.
+    metric:
+      name: Due Amount On Time T2 at Reference
+      description: Total due amount for invoices on time T2 (not overdue) in the audience at the reference date.
+      acronym: DAOT2AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  due_amount_OT2_acc:
+    description: Accumulated total due amount for invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Due Amount On Time T2
+      description: Accumulated total due amount for invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ADAOT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  due_amount_DT2_acc:
+    description: Accumulated total due amount for invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Due Amount Delay T2
+      description: Accumulated total due amount for invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ADADT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT2_acc:
+    description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount Delay T2
+      description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARADT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT2_acc:
+    description: Accumulated total recovered amount for invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount On Time T2
+      description: Accumulated total recovered amount for invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ARAOT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_DT2_at_reference:
+    description: Number of distinct recovered invoices with delay T2 (overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Invoices Delay T2 at Reference
+      description: Number of distinct recovered invoices with delay T2 (overdue) in the audience at the reference date.
+      acronym: RIDT2AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_OT2_at_reference:
+    description: Number of distinct recovered invoices on time T2 (not overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Invoices On Time T2 at Reference
+      description: Number of distinct recovered invoices on time T2 (not overdue) in the audience at the reference date.
+      acronym: RIOT2AR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_invoices_DT2_acc:
+    description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Invoices Delay T2
+      description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARIDT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Invoice analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_contracts_DT2_acc:
+    description: Accumulated number of distinct recovered contracts with delay T2 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Contracts Delay T2
+      description: Accumulated number of distinct recovered contracts with delay T2 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARCDT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Contract analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_contracts_OT2_acc:
+    description: Accumulated number of distinct recovered contracts on time T2 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Contracts On Time T2
+      description: Accumulated number of distinct recovered contracts on time T2 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ARCOT2
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Contract analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT2_Digital_at_reference:
+    description: Total recovered amount through digital channels for invoices with delay T2 (overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Amount Delay T2 Digital at Reference
+      description: Total recovered amount through digital channels for invoices with delay T2 (overdue) in the audience at the reference date.
+      acronym: RADT2DAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT1_Digital_at_reference:
+    description: Total recovered amount through digital channels for invoices with delay T1 (overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Amount Delay T1 Digital at Reference
+      description: Total recovered amount through digital channels for invoices with delay T1 (overdue) in the audience at the reference date.
+      acronym: RADT1DAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT2_Digital_at_reference:
+    description: Total recovered amount through digital channels for invoices on time T2 (not overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Amount On Time T2 Digital at Reference
+      description: Total recovered amount through digital channels for invoices on time T2 (not overdue) in the audience at the reference date.
+      acronym: RAOT2DAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT1_Digital_at_reference:
+    description: Total recovered amount through digital channels for invoices on time T1 (not overdue) in the audience at the reference date.
+    metric:
+      name: Recovered Amount On Time T1 Digital at Reference
+      description: Total recovered amount through digital channels for invoices on time T1 (not overdue) in the audience at the reference date.
+      acronym: RAOT1DAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT2_Digital_acc:
+    description: Accumulated total recovered amount through digital channels for invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount Delay T2 Digital
+      description: Accumulated total recovered amount through digital channels for invoices with delay T2 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARADT2D
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT2_Digital_acc:
+    description: Accumulated total recovered amount through digital channels for invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount On Time T2 Digital
+      description: Accumulated total recovered amount through digital channels for invoices on time T2 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ARAOT2D
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_DT1_Digital_acc:
+    description: Accumulated total recovered amount through digital channels for invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount Delay T1 Digital
+      description: Accumulated total recovered amount through digital channels for invoices with delay T1 (overdue) in the audience from invoice creation until the observation date.
+      acronym: ARADT1D
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_OT1_Digital_acc:
+    description: Accumulated total recovered amount through digital channels for invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+    metric:
+      name: Accumulated Recovered Amount On Time T1 Digital
+      description: Accumulated total recovered amount through digital channels for invoices on time T1 (not overdue) in the audience from invoice creation until the observation date.
+      acronym: ARAOT1D
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  recovered_amount_Digital_at_reference:
+    description: Total recovered amount through digital channels in the audience at the reference date.
+    metric:
+      name: Recovered Amount Digital at Reference
+      description: Total recovered amount through digital channels in the audience at the reference date.
+      acronym: RADAR
+      is_additive: True
+      business_stage: Collections
+      hierarchy: Financial analysis
+      approved_by: ae-finance-fintech@quintoandar.com.br
+      link_to_metric: ""
+  dt_reference:
+    lineage:
+      - dw_public.dim_date.date
+    description: Reference date for the metrics observation.
+    dimension: True
+  dt_month_ref:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    description: Reference month for the metrics aggregation, calculated as DATE_TRUNC('month', dt_reference).
+    dimension: True
+  segment_name:
+    lineage:
+      - datalake_collections_quintoandar.segmentation_distribution.segment_name
+    description: Chargehub segment name from the contract segment distribution history.
+    dimension: True
+  dt_pipe:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_pipe
+    description: Pipe date indicating when the contract entered the collections pipeline.
+    dimension: True
+  ts_load:
+    description: Timestamp when the record was loaded into the table.
+    dimension: True

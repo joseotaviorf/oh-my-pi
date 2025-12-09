@@ -1,0 +1,173 @@
+---
+database_name: datalake_collections_quintoandar
+table_name: segmentation_distribution
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Enriched table combining contract segment distribution history with segment and audience information from Chargehub system. This table provides a unified view of contract segmentation data for use in metric layer queries.
+columns:
+  id_contract_segment_distribution_history:
+    description: Unique identifier for the contract segment distribution history record (Primary Key)
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.id_contract_segment_distribution_history
+  id_segment:
+    description: Identifier of the communication segment the contract belongs to
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.id_segment
+  id_audience:
+    description: Identifier of the communication audience associated with the segment
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.id_audience
+  id_contract:
+    description: Contract identifier associated with this segment distribution
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.id_contract
+  id_customer:
+    description: Array or list of customer IDs associated with this contract
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.id_customer
+  revision_number:
+    description: Audit revision number indicating the version of the change
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.revision_number
+  revision_type:
+    description: Type of revision operation (INSERT, UPDATE, DELETE)
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.revision_type
+  dt_revision_end:
+    description: End date for this record version revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.revision_end
+  is_active:
+    description: Flag indicating whether the segment distribution is currently active
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_active
+  is_active_modified:
+    description: Flag indicating if active was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_active_modified
+  is_segment_modified:
+    description: Flag indicating if segment_id was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_segment_modified
+  is_audience_modified:
+    description: Flag indicating if audience_id was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_audience_modified
+  is_contract_modified:
+    description: Flag indicating if contract_id was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_contract_modified
+  is_entered_segment_modified:
+    description: Flag indicating if entered_segment_at was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_entered_segment_modified
+  is_entered_audience_modified:
+    description: Flag indicating if entered_audience_at was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_entered_audience_modified
+  is_last_appearance_modified:
+    description: Flag indicating if last_appearance_date was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_last_appearance_modified
+  is_id_customers_modified:
+    description: Flag indicating if customer_ids was modified in this revision
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.is_id_customers_modified
+  dt_last_appearance:
+    description: Date when the contract was last observed in the segment
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.dt_last_appearance
+  ts_entered_segment:
+    description: Timestamp when the contract entered the segment for the first time
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.ts_entered_segment
+  ts_entered_audience:
+    description: Timestamp when the contract entered the audience for the first time
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.ts_entered_audience
+  ts_created:
+    description: Timestamp when the record was initially created in the source system
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.ts_created
+  ts_updated:
+    description: Timestamp of the most recent update to the record in the source system
+    lineage:
+      - datalake_trato_feito_clean.contract_segment_distribution_history.ts_updated
+  segment_name:
+    description: Name of the segment
+    lineage:
+      - datalake_trato_feito_clean.segment.name
+  segment_description:
+    description: Optional description of the segment
+    lineage:
+      - datalake_trato_feito_clean.segment.description
+  segment_version:
+    description: Version number for optimistic locking of the segment
+    lineage:
+      - datalake_trato_feito_clean.segment.version
+  segment_priority:
+    description: Priority level of the segment for processing order
+    lineage:
+      - datalake_trato_feito_clean.segment.priority
+  is_segment_active:
+    description: Indicates if the segment is currently active
+    lineage:
+      - datalake_trato_feito_clean.segment.is_active
+  segment_collector_key:
+    description: Collector key identifier for the segment
+    lineage:
+      - datalake_trato_feito_clean.segment.collector_key
+  ts_segment_created:
+    description: Timestamp when the segment was created
+    lineage:
+      - datalake_trato_feito_clean.segment.ts_created
+  ts_segment_updated:
+    description: Timestamp when the segment was last updated
+    lineage:
+      - datalake_trato_feito_clean.segment.ts_updated
+  id_communication_audience:
+    description: Unique identifier for the audience
+    lineage:
+      - datalake_trato_feito_clean.audience.id_communication_audience
+  id_communication_sequence:
+    description: Identifier for the communication sequence
+    lineage:
+      - datalake_trato_feito_clean.audience.id_communication_sequence
+  audience_name:
+    description: Name of the audience
+    lineage:
+      - datalake_trato_feito_clean.audience.name
+  audience_version:
+    description: Version number for optimistic locking of the audience
+    lineage:
+      - datalake_trato_feito_clean.audience.version
+  collector_audience_key:
+    description: Key used to identify the audience in the collector system
+    lineage:
+      - datalake_trato_feito_clean.audience.collector_audience_key
+  is_audience_active:
+    description: Indicates if the audience is currently active
+    lineage:
+      - datalake_trato_feito_clean.audience.is_active
+  distribution_percentage:
+    description: Percentage of distribution for this audience (must sum to 100% per segment)
+    lineage:
+      - datalake_trato_feito_clean.audience.distribution_percentage
+  dt_audience_start:
+    description: First date when this audience is active (inclusive)
+    lineage:
+      - datalake_trato_feito_clean.audience.dt_start
+  dt_audience_end:
+    description: Last date when this audience is active (inclusive, optional)
+    lineage:
+      - datalake_trato_feito_clean.audience.dt_end
+  ts_audience_created:
+    description: Timestamp when the audience was created
+    lineage:
+      - datalake_trato_feito_clean.audience.ts_created
+  ts_audience_updated:
+    description: Timestamp when the audience was last updated
+    lineage:
+      - datalake_trato_feito_clean.audience.ts_updated
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich table

@@ -1992,15 +1992,18 @@ bietlejuice.enrich_date:
 bietlejuice.enrich_debt_recovery:
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.trato_feito:load-clean-accounting-installment:first-run-of-day
+  - bietlejuice.trato_feito:load-clean-audience:first-run-of-day
   - bietlejuice.trato_feito:load-clean-bill:first-run-of-day
   - bietlejuice.trato_feito:load-clean-billing:first-run-of-day
   - bietlejuice.trato_feito:load-clean-collector:first-run-of-day
+  - bietlejuice.trato_feito:load-clean-contract-segment-distribution-history:first-run-of-day
   - bietlejuice.trato_feito:load-clean-debt:first-run-of-day
   - bietlejuice.trato_feito:load-clean-debtor:first-run-of-day
   - bietlejuice.trato_feito:load-clean-installment-charges:first-run-of-day
   - bietlejuice.trato_feito:load-clean-installment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-negotiation:first-run-of-day
   - bietlejuice.trato_feito:load-clean-payment:first-run-of-day
+  - bietlejuice.trato_feito:load-clean-segment:first-run-of-day
 bietlejuice.enrich_demand_consolidated_targets:
   - bietlejuice.gsheets_growth_targets:done-clean-mkt-cost-target:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-rental-prospect-target:first-run-of-day
@@ -4058,6 +4061,10 @@ bietlejuice.metric_fintech__atta:
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
+bietlejuice.metric_fintech__collections_segmentation:
+  - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
+  - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
+  - bietlejuice.enrich_debt_recovery:load-enrich-segmentation-distribution:first-run-of-day
 bietlejuice.metric_fintech__velo:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker:first-run-of-day
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values:first-run-of-day
