@@ -27,7 +27,6 @@ workflow:
     demand_metric: {}
     fcr_metric: {}
     general_metric: {}
-    recontact_mx: {}
     recontact: {}
     speech_call: {}
     speech_chat: {}
