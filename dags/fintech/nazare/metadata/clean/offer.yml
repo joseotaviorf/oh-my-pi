@@ -1,61 +1,87 @@
 ---
 database_name: datalake_nazare_clean
 table_name: offer
+description: Offers with property details, agreed price, brokerage and lifecycle dates produced by the Nazare service.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
 columns:
   id_offer:
     lineage:
       - datalake_nazare_raw.offer.id
+    description: Unique identifier for the offer.
   id_external:
     lineage:
       - datalake_nazare_raw.offer.external_id
+    description: External identifier from the source system.
   id_business_unit:
     lineage:
       - datalake_nazare_raw.offer.business_unit_id
+    description: Identifier of the business unit associated with the offer.
   id_house:
     lineage:
       - datalake_nazare_raw.offer.house_id
+    description: Identifier of the property (house) related to the offer.
   category:
     lineage:
       - datalake_nazare_raw.offer.category
+    description: Offer category.
   house_address:
     lineage:
       - datalake_nazare_raw.offer.house_address
+    description: Property address.
   house_city:
     lineage:
       - datalake_nazare_raw.offer.house_city
+    description: Property city.
   house_complement:
     lineage:
       - datalake_nazare_raw.offer.house_complement
+    description: Additional address information.
   house_neighborhood:
     lineage:
       - datalake_nazare_raw.offer.house_neighborhood
+    description: Property neighborhood.
   house_number:
     lineage:
       - datalake_nazare_raw.offer.house_number
+    description: Property street number.
   house_zipcode:
     lineage:
       - datalake_nazare_raw.offer.house_zipcode
+    description: Property ZIP/postal code.
   price_agreed:
     lineage:
       - datalake_nazare_raw.offer.price_agreed
+    description: Price agreed for the offer.
   cancellation_reason:
     lineage:
       - datalake_nazare_raw.offer.cancellation_reason
+    description: Reason for offer cancellation.
   brokerage:
     lineage:
       - datalake_nazare_raw.offer.brokerage
+    description: Brokerage fee amount agreed for the offer.
+  is_restored:
+    lineage:
+      - datalake_nazare_raw.offer.is_restored
+    description: Flag indicating whether the offer has been restored
   dt_signature:
     lineage:
       - datalake_nazare_raw.offer.signature_date
+    description: Offer signature date.
   dt_payment_allowed:
     lineage:
       - datalake_nazare_raw.offer.payment_allowed_date
+    description: Date when payment is allowed for the offer.
   dt_cancellation:
     lineage:
       - datalake_nazare_raw.offer.cancellation_date
+    description: Offer cancellation date.
   ts_created:
     lineage:
       - datalake_nazare_raw.offer.created_at
+    description: Record creation timestamp.
   ts_updated:
     lineage:
       - datalake_nazare_raw.offer.updated_at
+    description: Record last update timestamp.

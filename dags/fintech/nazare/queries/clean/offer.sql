@@ -13,6 +13,7 @@ SELECT
     price_agreed,
     cancellation_reason,
     CAST(brokerage AS DECIMAL(38,20)) AS brokerage,
+    is_restored,
     DATE(signature_date) AS dt_signature,
     DATE(payment_allowed_date) AS dt_payment_allowed,
     DATE(cancellation_date) AS dt_cancellation,
