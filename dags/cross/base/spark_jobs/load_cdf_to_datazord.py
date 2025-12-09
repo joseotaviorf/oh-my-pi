@@ -14,7 +14,7 @@ import os
 
 from pyspark.sql import SparkSession
 
-from bietlejuice.services.cdf_to_kafka_service import DeltaCDFToKafkaService
+from bietlejuice.services.cdf_services.cdf_to_kafka_service import DeltaCDFToKafkaService
 
 logger = logging.getLogger(__name__)
 
