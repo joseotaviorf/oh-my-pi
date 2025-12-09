@@ -34,7 +34,7 @@ cluster:
     driver_node_type_id: m5d.4xlarge
     node_type_id: m5d.4xlarge
     runtime_engine: PHOTON
-    num_workers: 2
+    num_workers: 1
     spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
