@@ -197,14 +197,20 @@ columns:
     lineage:
     - datalake_ebdb_user.user.email
     description: Email of user.
+  ts_last_self_validation_email:
+    description: Timestamp of when the user carried out the most recent self validation for their email.
   email_alternativo:
     lineage:
     - datalake_ebdb_user.user.alternative_email
     description: Alternative email of user.
+  ts_last_self_validation_alternative_email:
+    description: Timestamp of when the user carried out the most recent self validation for their alternative email.
   telefone_principal:
     lineage:
     - datalake_ebdb_user.user.main_phone
     description: Main contact phone of user.
+  ts_last_self_validation_main_phone_number:
+    description: Timestamp of when the user carried out the most recent self validation for their phone number.
   endereco:
     lineage:
     - datalake_ebdb_user.user.address

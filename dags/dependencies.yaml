@@ -1183,6 +1183,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-allocation-history:first-run-of-day
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history:first-run-of-day
   - bietlejuice.enrich_pro_owners:load-enrich-owner-category:first-run-of-day
+  - bietlejuice.person:load-clean-person-identity:first-run-of-day
 bietlejuice.dw_user_affiliate:
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
   - bietlejuice.enrich_amplitude_user:load-enrich-user-affiliate-origin:first-run-of-day

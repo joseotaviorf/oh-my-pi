@@ -65,7 +65,20 @@ booking_counts AS (
         datalake_hub_services.secretariat_allocation_history
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_secretariat_user ORDER BY version DESC) = 1
- )
+ ),
+email_and_phone_number_self_validations AS (
+    SELECT
+        value,
+        type,
+        MAX(ts_last_validated) AS ts_most_recent_self_validation
+    FROM 
+      datalake_person_clean.person_identity
+    WHERE
+        validation_type = 'SELF'
+        AND type IN ('EMAIL', 'PHONE')
+    GROUP BY value, type
+)
+
 SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
     u.id AS sk_user,
     COALESCE(CAST(date_format(ad.ts_doorman_joined, 'yyyyMMdd') AS bigint), -1) AS sk_doorman_joined_date,
@@ -104,8 +117,11 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     u.rg,
     u.gender AS sexo,
     NULLIF(u.email, '') AS email,
+    pi_email.ts_most_recent_self_validation AS ts_last_self_validation_email,
     NULLIF(u.alternative_email, '') AS email_alternativo,
+    pi_alt_email.ts_most_recent_self_validation AS ts_last_self_validation_alternative_email,
     NULLIF(u.main_phone, '') AS telefone_principal,
+    pi_phone.ts_most_recent_self_validation AS ts_last_self_validation_main_phone_number,
     NULLIF(u.address, '') AS endereco,
     NULLIF(u.number, '') AS numero,
     NULLIF(u.complement, '') AS complemento,
@@ -193,3 +209,18 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_user.user_merge AS um
         ON u.id = um.id_user
+LEFT JOIN
+    email_and_phone_number_self_validations AS pi_email
+        ON pi_email.value IS NOT NULL
+        AND pi_email.type = 'EMAIL'
+        AND u.email = pi_email.value
+LEFT JOIN
+    email_and_phone_number_self_validations AS pi_alt_email
+        ON pi_alt_email.value IS NOT NULL 
+        AND pi_alt_email.type = 'EMAIL' 
+        AND u.alternative_email = pi_alt_email.value
+LEFT JOIN 
+    email_and_phone_number_self_validations AS pi_phone
+        ON pi_phone.value IS NOT NULL 
+        AND pi_phone.type = 'PHONE' 
+        AND u.main_phone = pi_phone.value
