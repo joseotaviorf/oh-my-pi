@@ -1,0 +1,91 @@
+---
+database_name: datalake_sales_flow_clean
+
+table_name: listing_fee_aud
+
+domain: For Sale
+
+owner: rachel.carvalho@quintoandar.com.br
+
+description: Audit table for listing_fee containing historical changes and modifications.
+
+columns:
+  id:
+    description: Unique ID for the listing fee record.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.id
+
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.rev
+
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.revtype
+
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.revend
+
+  id_region:
+    description: Region ID for the listing fee.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.region_id
+
+  ticket_model:
+    description: Ticket model for the listing fee.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.ticket_model
+
+  ts_valid_from:
+    description: Timestamp from which the listing fee is valid.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.valid_from
+
+  ts_valid_to:
+    description: Timestamp until which the listing fee is valid.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.valid_to
+
+  fee:
+    description: Fee value for the listing.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.fee
+
+  is_active:
+    description: Flag indicating if the listing fee is active.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.active
+
+  ts_created:
+    description: Timestamp when the listing fee was created.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.created_at
+
+  ts_updated:
+    description: Timestamp of the last update to the listing fee.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.updated_at
+
+  year:
+    description: Year partition for the listing fee record.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.year
+
+  month:
+    description: Month partition for the listing fee record.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.month
+
+  day:
+    description: Day partition for the listing fee record.
+    lineage:
+      - datalake_sales_flow_raw.listing_fee_aud.day
+

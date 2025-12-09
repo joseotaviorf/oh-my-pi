@@ -1,0 +1,87 @@
+---
+database_name: datalake_sales_flow_clean
+
+table_name: invoice_tracking
+
+domain: For Sale
+
+owner: rachel.carvalho@quintoandar.com.br
+
+description: Contains invoice tracking information for sales flows.
+
+columns:
+  id:
+    description: Unique ID for the invoice tracking record.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.id
+
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.sales_flow_id
+
+  id_offer:
+    description: Offer ID associated with the invoice tracking.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.offer_id
+
+  recipient_type:
+    description: Type of invoice recipient.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.recipient_type
+
+  status:
+    description: Current status of the invoice tracking.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.status
+
+  failure_reason:
+    description: Reason for invoice tracking failure, if applicable.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.failure_reason
+
+  attempt_count:
+    description: Number of attempts made to process the invoice.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.attempt_count
+
+  expected_invoices_count:
+    description: Expected number of invoices.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.expected_invoices_count
+
+  found_invoices_count:
+    description: Number of invoices found.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.found_invoices_count
+
+  last_error_message:
+    description: Last error message encountered during invoice processing.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.last_error_message
+
+  ts_created:
+    description: Timestamp when the invoice tracking was created.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.created_at
+
+  ts_updated:
+    description: Timestamp of the last update to the invoice tracking.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.updated_at
+
+  year:
+    description: Year partition for the invoice tracking record.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.year
+
+  month:
+    description: Month partition for the invoice tracking record.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.month
+
+  day:
+    description: Day partition for the invoice tracking record.
+    lineage:
+      - datalake_sales_flow_raw.invoice_tracking.day
+

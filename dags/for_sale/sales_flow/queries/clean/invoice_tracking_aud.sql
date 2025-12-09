@@ -1,0 +1,31 @@
+SELECT
+    id,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    sales_flow_id AS id_sales_flow,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    offer_id AS id_offer,
+    offer_id_mod AS mod_id_offer,
+    recipient_type,
+    recipient_type_mod AS mod_recipient_type,
+    status,
+    status_mod AS mod_status,
+    failure_reason,
+    failure_reason_mod AS mod_failure_reason,
+    attempt_count,
+    attempt_count_mod AS mod_attempt_count,
+    expected_invoices_count,
+    expected_invoices_count_mod AS mod_expected_invoices_count,
+    found_invoices_count,
+    found_invoices_count_mod AS mod_found_invoices_count,
+    last_error_message,
+    last_error_message_mod AS mod_last_error_message,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.invoice_tracking_aud
+

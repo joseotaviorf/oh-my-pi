@@ -174,6 +174,22 @@ workflow:
       clean_table_name: house_registration_order_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
+    invoice_tracking:
+      clean_table_name: invoice_tracking
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    invoice_tracking_aud:
+      clean_table_name: invoice_tracking_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    listing_fee:
+      clean_table_name: listing_fee
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    listing_fee_aud:
+      clean_table_name: listing_fee_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
     microstatus_order:
       clean_table_name: microstatus_order
       raw_primary_keys: ["id"]
@@ -190,6 +206,22 @@ workflow:
       clean_table_name: mortgage_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id_mortgage_aud", "rev"]
+    monthly_discount_quota:
+      clean_table_name: monthly_discount_quota
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    monthly_discount_quota_aud:
+      clean_table_name: monthly_discount_quota_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    monthly_discount_quota_registry:
+      clean_table_name: monthly_discount_quota_registry
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    monthly_discount_quota_registry_aud:
+      clean_table_name: monthly_discount_quota_registry_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
     negotiation:
       clean_table_name: negotiation
       raw_primary_keys: ["id"]
@@ -216,6 +248,14 @@ workflow:
       clean_primary_keys: ["id"]
     offer_aud:
       clean_table_name: offer_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    offer_fee_rule:
+      clean_table_name: offer_fee_rule
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    offer_fee_rule_aud:
+      clean_table_name: offer_fee_rule_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
     payment:

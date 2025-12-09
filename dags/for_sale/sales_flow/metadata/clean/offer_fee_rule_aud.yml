@@ -1,0 +1,111 @@
+---
+database_name: datalake_sales_flow_clean
+
+table_name: offer_fee_rule_aud
+
+domain: For Sale
+
+owner: rachel.carvalho@quintoandar.com.br
+
+description: Audit table for offer_fee_rule containing historical changes and modifications.
+
+columns:
+  id:
+    description: Unique ID for the offer fee rule record.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.id
+
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.rev
+
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.revtype
+
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.revend
+
+  id_listing_fee:
+    description: Foreign key to the listing_fee table.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.listing_fee_id
+
+  business_model:
+    description: Business model for the offer fee rule.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.business_model
+
+  mod_business_model:
+    description: Flag indicating if the column business_model has changed.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.business_model_mod
+
+  payment_model:
+    description: Payment model for the offer fee rule.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.payment_model
+
+  mod_payment_model:
+    description: Flag indicating if the column payment_model has changed.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.payment_model_mod
+
+  ts_valid_from:
+    description: Timestamp from which the rule is valid.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.valid_from
+
+  ts_valid_to:
+    description: Timestamp until which the rule is valid.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.valid_to
+
+  min_fee:
+    description: Minimum fee percentage.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.min_fee
+
+  max_fee:
+    description: Maximum fee percentage.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.max_fee
+
+  is_active:
+    description: Flag indicating if the offer fee rule is active.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.active
+
+  ts_created:
+    description: Timestamp when the offer fee rule was created.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.created_at
+
+  ts_updated:
+    description: Timestamp of the last update to the offer fee rule.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.updated_at
+
+  year:
+    description: Year partition for the offer fee rule record.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.year
+
+  month:
+    description: Month partition for the offer fee rule record.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.month
+
+  day:
+    description: Day partition for the offer fee rule record.
+    lineage:
+      - datalake_sales_flow_raw.offer_fee_rule_aud.day
+
