@@ -6,10 +6,13 @@ workflow:
   type: query
   layer: metric
 cluster:
-  type: custom_cluster
+  type: databricks_16_4_max_io-memory_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
   custom_configurations:
-    driver_node_type_id: r5d.2xlarge
-    node_type_id: m5d.8xlarge
-    spark_version: 16.4.x-scala2.12
-    num_workers: 4
-  databricks_conn_id: databricks_new_env
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
