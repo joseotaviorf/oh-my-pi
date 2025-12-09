@@ -17,10 +17,8 @@ google-crc32c==1.1.2
 hive-metastore-client>=1.0.9
 hierarchical-conf==1.0.4
 ordereddict==1.1
-pandas
 pendulum
 psycopg2-binary>=2.8.4,<3.0.0
-PyArrow>=1.0.0
 py4j==0.10.9.5
 pymongo==3.8.0
 pyparsing==2.4.2
