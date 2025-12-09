@@ -1,7 +1,7 @@
 WITH
 terminated_for_assignment_change AS (
   SELECT
-    aa_next.id_assignment AS id_assignment_next,
+    aa_next.id_period_of_service AS id_period_of_service_next,
     ps_prev.dt_started AS previous_dt_started,
     art.action_reason IN ('Efetivação Aprendiz', 'Efetivação Estágio') AS is_converted_to_permanent_hire,
     art.action_reason IN ('Recrutamento Interno', 'Movimentação Internacional') AS is_transfered
@@ -31,7 +31,7 @@ terminated_for_assignment_change AS (
     )
   QUALIFY
     ROW_NUMBER() OVER(
-      PARTITION BY aa.id_assignment
+      PARTITION BY aa.id_period_of_service
       ORDER BY aa.dt_effective_started ASC
       ) = 1
 )
@@ -58,7 +58,19 @@ SELECT
     fa.is_active,
     fa.is_pending_worker,
     fa.is_manager,
-    fa.assignment_age_months,
+    CASE 
+      WHEN fa.is_pending_worker THEN 0
+      ELSE FLOOR(MONTHS_BETWEEN(
+        COALESCE(
+          TO_DATE(CAST(fa.sk_work_relationship_ended_date AS STRING), 'yyyyMMdd'),
+          DATE('{load_start_date}')
+        ),
+        COALESCE(
+          tfac.previous_dt_started,
+          TO_DATE(CAST(fa.sk_work_relationship_started_date AS STRING), 'yyyyMMdd')
+        )
+      ))
+    END AS assignment_age_months,
     fa.qnt_directly_led,
     fa.qnt_undirectly_led,
     fa.salary,
@@ -71,7 +83,7 @@ FROM
     dw_employee.fact_assignments AS fa
 LEFT JOIN
     terminated_for_assignment_change AS tfac
-        ON tfac.id_assignment_next = fa.sk_assignment
+        ON tfac.id_period_of_service_next = fa.sk_assignment
 WHERE 
     NOT fa.is_pending_worker
     AND fa.is_last_valid_work_relationship

@@ -82,9 +82,14 @@ columns:
     lineage:
     - dw_employee.fact_assignments.is_manager
   assignment_age_months:
-    description: Tenure in months, calculated from the start date to the end date (or current date if active).
+    description: |-
+      Tenure in months, calculated from the actual work relationship start date (sk_work_relationship_started_date)
+      to the end date (or current date if active). This uses the actual admission date, which may be adjusted
+      for transfers and conversions from apprentice/intern to permanent hire.
     lineage:
-    - dw_employee.fact_assignments.assignment_age_months
+    - dw_employee.fact_assignments.sk_work_relationship_started_date
+    - dw_employee.fact_assignments.sk_work_relationship_ended_date
+    - datalake_pin_core_clean.periods_of_service.dt_started
   qnt_directly_led:
     description: Number of direct reports.
     lineage:
