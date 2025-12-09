@@ -31,7 +31,7 @@ cluster:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.2xlarge
     runtime_engine: PHOTON
-    spark_version: 12.2.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     num_workers: 3
     aws_attributes:
       first_on_demand: 1

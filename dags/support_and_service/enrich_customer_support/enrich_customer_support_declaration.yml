@@ -59,7 +59,7 @@ cluster:
     autotermination_minutes: 20
     driver_node_type_id: r7a.4xlarge
     node_type_id: r7a.4xlarge
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     num_workers: 20
     aws_attributes:
       first_on_demand: 1
