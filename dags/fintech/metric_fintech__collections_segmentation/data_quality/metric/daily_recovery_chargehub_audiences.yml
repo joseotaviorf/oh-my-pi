@@ -3,13 +3,13 @@ table_name: metric_fintech.daily_recovery_chargehub_audiences
 alert_channel: FINTECH_INMETRO_ALERTS
 column_level_validations:
   dt_reference:
-    not_null:
+    is_complete:
       severity_level: Error
   segment:
-    not_null:
+    is_complete:
       severity_level: Error
   month_ref:
-    not_null:
+    is_complete:
       severity_level: Error
   n_contracts_at_reference:
     has_min_value:
