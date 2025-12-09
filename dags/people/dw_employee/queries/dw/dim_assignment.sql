@@ -25,6 +25,11 @@ unions AS (
     EXPLODE(wr.assignments) AS a
   WHERE
     TO_DATE(w.dt_effective, 'yyyyMMdd') <= DATE('{load_end_date}')
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY wr.PeriodOfServiceId 
+      ORDER BY w.dt_effective DESC
+    ) = 1
 )
 
 SELECT

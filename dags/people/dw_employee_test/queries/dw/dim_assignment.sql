@@ -41,6 +41,11 @@ union_info AS (
   WHERE
     TO_DATE(w.dt_effective, 'yyyyMMdd') <= CURRENT_DATE()
     AND a.UnionName IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY wr.PeriodOfServiceId
+      ORDER BY TO_DATE(w.dt_effective, 'yyyyMMdd') DESC
+    ) = 1
 ),
 -- Get dismissal type and reason for terminated assignments
 -- Only captures the first termination event per period of service

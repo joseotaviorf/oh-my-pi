@@ -4,6 +4,11 @@ WITH hr_system_workers AS (
     national_identifiers
   FROM
     datalake_hr_system_clean.workers
+  QUALIFY DENSE_RANK() OVER (
+      PARTITION BY id_person
+      ORDER BY
+        dt_effective
+    ) = 2
 ),
 national_identifiers_step1 AS (
   SELECT

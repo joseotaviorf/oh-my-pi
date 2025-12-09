@@ -110,4 +110,3 @@ parsing_skip_list:
   - dags/growth/enrich_google_search_console_classified/queries/enrich/gsc_keyword_region_attributes_bra.sql
   - dags/platform/enrich_databricks_table_usage/queries/enrich/daily_table_usage_per_user.sql
   - dags/fintech/payable_accounts_transactions/queries/clean/accounts_payable.sql
-  - dags/people/enrich_hr_system/queries/enrich/employee_info.sql
