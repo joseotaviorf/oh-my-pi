@@ -11,14 +11,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  casamineira_ai_overview_kw:
+  casamineira_serp_features_kw:
     configs:
       subdomain: casamineira.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
     display_limit: 2
   chavesnamao_organic_search_kw:
     configs:
@@ -29,23 +28,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  chavesnamao_ai_overview_kw:
+  chavesnamao_serp_features_kw:
     configs:
       subdomain: chavesnamao.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  chavesnamao_featured_snippet_kw:
-    configs:
-      subdomain: chavesnamao.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   imoveismercadolivre_organic_search_kw:
     configs:
@@ -56,14 +45,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  imoveismercadolivre_ai_overview_kw:
+  imoveismercadolivre_serp_features_kw:
     configs:
       subdomain: imoveis.mercadolivre.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
     display_limit: 2
   imovelweb_organic_search_kw:
     configs:
@@ -74,23 +62,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  imovelweb_ai_overview_kw:
+  imovelweb_serp_features_kw:
     configs:
       subdomain: imovelweb.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  imovelweb_featured_snippet_kw:
-    configs:
-      subdomain: imovelweb.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   loft_organic_search_kw:
     configs:
@@ -101,23 +79,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  loft_ai_overview_kw:
+  loft_serp_features_kw:
     configs:
       subdomain: loft.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  loft_featured_snippet_kw:
-    configs:
-      subdomain: loft.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   lopes_organic_search_kw:
     configs:
@@ -128,23 +96,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  lopes_ai_overview_kw:
+  lopes_serp_features_kw:
     configs:
       subdomain: lopes.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  lopes_featured_snippet_kw:
-    configs:
-      subdomain: lopes.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   quintoandar_organic_search_kw:
     configs:
@@ -155,23 +113,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  quintoandar_ai_overview_kw:
+  quintoandar_serp_features_kw:
     configs:
       subdomain: quintoandar.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  quintoandar_featured_snippet_kw:
-    configs:
-      subdomain: quintoandar.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   vivareal_organic_search_kw:
     configs:
@@ -182,23 +130,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  vivareal_ai_overview_kw:
+  vivareal_serp_features_kw:
     configs:
       subdomain: vivareal.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  vivareal_featured_snippet_kw:
-    configs:
-      subdomain: vivareal.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   wimoveis_organic_search_kw:
     configs:
@@ -209,14 +147,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  wimoveis_ai_overview_kw:
+  wimoveis_serp_features_kw:
     configs:
       subdomain: wimoveis.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
     display_limit: 2
   zapimoveis_organic_search_kw:
     configs:
@@ -227,23 +164,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  zapimoveis_ai_overview_kw:
+  zapimoveis_serp_features_kw:
     configs:
       subdomain: zapimoveis.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
-    display_limit: 2
-  zapimoveis_featured_snippet_kw:
-    configs:
-      subdomain: zapimoveis.com.br
-      type: subdomain_organic
-      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
-      database: br
-      display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C11" # +|Fp|Eq|52 -> SERP Features | Equals to | 11 (Featured Snippet)
     display_limit: 2
   olximoveis_organic_search_kw:
     configs:
@@ -254,14 +181,13 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  olximoveis_ai_overview_kw:
+  olximoveis_serp_features_kw:
     configs:
       subfolder: olx.com.br%2Fimoveis
       type: subfolder_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
     display_limit: 2
   dfimoveis_organic_search_kw:
     configs:
@@ -272,12 +198,11 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
-  dfimoveis_ai_overview_kw:
+  dfimoveis_serp_features_kw:
     configs:
       subdomain: dfimoveis.com.br
       type: subdomain_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: serp_features
-      display_filter: "%2B%7CFp%7CEq%7C52" # +|Fp|Eq|52 -> SERP Features | Equals to | 52 (AI Overview)
     display_limit: 2
