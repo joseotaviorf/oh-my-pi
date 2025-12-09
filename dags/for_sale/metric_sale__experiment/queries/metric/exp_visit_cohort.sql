@@ -102,7 +102,7 @@ visit_exp AS (
     FROM
         visit_by_visitor
 ),
-exp_cohort_1d AS (
+exp_cohort AS (
     SELECT
         visit_exp.sk_neotribe_exp,
         visit_exp.sk_visit,
@@ -115,7 +115,6 @@ exp_cohort_1d AS (
         visit_exp.exp_name_experiment,
         visit_exp.exp_identifier_type,
         visit_exp.exp_test_group,
-        '1d' AS metric_cohort,
         DATEDIFF(dim_date.date, visit_exp.dt_created) AS days_since_vb,
         DATEDIFF(visit_exp.ts_visit_done, visit_exp.dt_created) AS days_to_vc,
         DATEDIFF(visit_exp.ts_visit_canceled, visit_exp.dt_created) AS days_to_vcc,
@@ -123,203 +122,48 @@ exp_cohort_1d AS (
         DATEDIFF(visit_exp.ts_offer_submitted, visit_exp.dt_created) AS days_to_os,
         DATEDIFF(visit_exp.ts_offer_accepted, visit_exp.dt_created) AS days_to_oa,
         DATEDIFF(visit_exp.ts_contract_signed, visit_exp.dt_created) AS days_to_cs,
-        IF(days_since_vb > 1, 1, 0) AS num_vb,
-        IF(days_since_vb > 1 AND days_to_vc <= 1, 1, 0) AS num_vc,
-        IF(days_since_vb > 1 AND days_to_vcc <= 1, 1, 0) AS num_vcc,
-        IF(days_since_vb > 1 AND days_to_vu <= 1, 1, 0) AS num_vu,
-        IF(days_since_vb > 1 AND days_to_os <= 1, 1, 0) AS num_os,
-        IF(days_since_vb > 1 AND days_to_oa <= 1, 1, 0) AS num_oa,
-        IF(days_since_vb > 1 AND days_to_cs <= 1, 1, 0) AS num_cs,
-        visit_exp.dt_exp_started,
-        visit_exp.dt_exp_ended,
-        dim_date.date AS dt_ref
-    FROM
-        visit_exp
-    JOIN
-        dw_public.dim_date
-            ON dim_date.date >= visit_exp.dt_created::DATE
-            AND dim_date.date <= visit_exp.dt_exp_ended
-),
-exp_cohort_3d AS (
-    SELECT
-        visit_exp.sk_neotribe_exp,
-        visit_exp.sk_visit,
-        visit_exp.sk_house,
-        visit_exp.sk_visitor,
-        visit_exp.sk_owner,
-        visit_exp.sk_first_associated_agent,
-        visit_exp.business_context,
-        visit_exp.exp_name_neotribe,
-        visit_exp.exp_name_experiment,
-        visit_exp.exp_identifier_type,
-        visit_exp.exp_test_group,
-        '3d' AS metric_cohort,
-        DATEDIFF(dim_date.date, visit_exp.dt_created) AS days_since_vb,
-        DATEDIFF(visit_exp.ts_visit_done, visit_exp.dt_created) AS days_to_vc,
-        DATEDIFF(visit_exp.ts_visit_canceled, visit_exp.dt_created) AS days_to_vcc,
-        DATEDIFF(visit_exp.ts_visit_unsuccessful, visit_exp.dt_created) AS days_to_vu,
-        DATEDIFF(visit_exp.ts_offer_submitted, visit_exp.dt_created) AS days_to_os,
-        DATEDIFF(visit_exp.ts_offer_accepted, visit_exp.dt_created) AS days_to_oa,
-        DATEDIFF(visit_exp.ts_contract_signed, visit_exp.dt_created) AS days_to_cs,
-        IF(days_since_vb > 3, 1, 0) AS num_vb,
-        IF(days_since_vb > 3 AND days_to_vc <= 3, 1, 0) AS num_vc,
-        IF(days_since_vb > 3 AND days_to_vcc <= 3, 1, 0) AS num_vcc,
-        IF(days_since_vb > 3 AND days_to_vu <= 3, 1, 0) AS num_vu,
-        IF(days_since_vb > 3 AND days_to_os <= 3, 1, 0) AS num_os,
-        IF(days_since_vb > 3 AND days_to_oa <= 3, 1, 0) AS num_oa,
-        IF(days_since_vb > 3 AND days_to_cs <= 3, 1, 0) AS num_cs,
-        visit_exp.dt_exp_started,
-        visit_exp.dt_exp_ended,
-        dim_date.date AS dt_ref
-    FROM
-        visit_exp
-    JOIN
-        dw_public.dim_date
-            ON dim_date.date >= visit_exp.dt_created::DATE
-            AND dim_date.date <= visit_exp.dt_exp_ended
-),
-exp_cohort_7d AS (
-    SELECT
-        visit_exp.sk_neotribe_exp,
-        visit_exp.sk_visit,
-        visit_exp.sk_house,
-        visit_exp.sk_visitor,
-        visit_exp.sk_owner,
-        visit_exp.sk_first_associated_agent,
-        visit_exp.business_context,
-        visit_exp.exp_name_neotribe,
-        visit_exp.exp_name_experiment,
-        visit_exp.exp_identifier_type,
-        visit_exp.exp_test_group,
-        '7d' AS metric_cohort,
-        DATEDIFF(dim_date.date, visit_exp.dt_created) AS days_since_vb,
-        DATEDIFF(visit_exp.ts_visit_done, visit_exp.dt_created) AS days_to_vc,
-        DATEDIFF(visit_exp.ts_visit_canceled, visit_exp.dt_created) AS days_to_vcc,
-        DATEDIFF(visit_exp.ts_visit_unsuccessful, visit_exp.dt_created) AS days_to_vu,
-        DATEDIFF(visit_exp.ts_offer_submitted, visit_exp.dt_created) AS days_to_os,
-        DATEDIFF(visit_exp.ts_offer_accepted, visit_exp.dt_created) AS days_to_oa,
-        DATEDIFF(visit_exp.ts_contract_signed, visit_exp.dt_created) AS days_to_cs,
-        IF(days_since_vb > 7, 1, 0) AS num_vb,
-        IF(days_since_vb > 7 AND days_to_vc <= 7, 1, 0) AS num_vc,
-        IF(days_since_vb > 7 AND days_to_vcc <= 7, 1, 0) AS num_vcc,
-        IF(days_since_vb > 7 AND days_to_vu <= 7, 1, 0) AS num_vu,
-        IF(days_since_vb > 7 AND days_to_os <= 7, 1, 0) AS num_os,
-        IF(days_since_vb > 7 AND days_to_oa <= 7, 1, 0) AS num_oa,
-        IF(days_since_vb > 7 AND days_to_cs <= 7, 1, 0) AS num_cs,
-        visit_exp.dt_exp_started,
-        visit_exp.dt_exp_ended,
-        dim_date.date AS dt_ref
-    FROM
-        visit_exp
-    JOIN
-        dw_public.dim_date
-            ON dim_date.date >= visit_exp.dt_created::DATE
-            AND dim_date.date <= visit_exp.dt_exp_ended
-),
-exp_cohort_14d AS (
-    SELECT
-        visit_exp.sk_neotribe_exp,
-        visit_exp.sk_visit,
-        visit_exp.sk_house,
-        visit_exp.sk_visitor,
-        visit_exp.sk_owner,
-        visit_exp.sk_first_associated_agent,
-        visit_exp.business_context,
-        visit_exp.exp_name_neotribe,
-        visit_exp.exp_name_experiment,
-        visit_exp.exp_identifier_type,
-        visit_exp.exp_test_group,
-        '14d' AS metric_cohort,
-        DATEDIFF(dim_date.date, visit_exp.dt_created) AS days_since_vb,
-        DATEDIFF(visit_exp.ts_visit_done, visit_exp.dt_created) AS days_to_vc,
-        DATEDIFF(visit_exp.ts_visit_canceled, visit_exp.dt_created) AS days_to_vcc,
-        DATEDIFF(visit_exp.ts_visit_unsuccessful, visit_exp.dt_created) AS days_to_vu,
-        DATEDIFF(visit_exp.ts_offer_submitted, visit_exp.dt_created) AS days_to_os,
-        DATEDIFF(visit_exp.ts_offer_accepted, visit_exp.dt_created) AS days_to_oa,
-        DATEDIFF(visit_exp.ts_contract_signed, visit_exp.dt_created) AS days_to_cs,
-        IF(days_since_vb > 14, 1, 0) AS num_vb,
-        IF(days_since_vb > 14 AND days_to_vc <= 14, 1, 0) AS num_vc,
-        IF(days_since_vb > 14 AND days_to_vcc <= 14, 1, 0) AS num_vcc,
-        IF(days_since_vb > 14 AND days_to_vu <= 14, 1, 0) AS num_vu,
-        IF(days_since_vb > 14 AND days_to_os <= 14, 1, 0) AS num_os,
-        IF(days_since_vb > 14 AND days_to_oa <= 14, 1, 0) AS num_oa,
-        IF(days_since_vb > 14 AND days_to_cs <= 14, 1, 0) AS num_cs,
-        visit_exp.dt_exp_started,
-        visit_exp.dt_exp_ended,
-        dim_date.date AS dt_ref
-    FROM
-        visit_exp
-    JOIN
-        dw_public.dim_date
-            ON dim_date.date >= visit_exp.dt_created::DATE
-            AND dim_date.date <= visit_exp.dt_exp_ended
-),
-exp_cohort_21d AS (
-    SELECT
-        visit_exp.sk_neotribe_exp,
-        visit_exp.sk_visit,
-        visit_exp.sk_house,
-        visit_exp.sk_visitor,
-        visit_exp.sk_owner,
-        visit_exp.sk_first_associated_agent,
-        visit_exp.business_context,
-        visit_exp.exp_name_neotribe,
-        visit_exp.exp_name_experiment,
-        visit_exp.exp_identifier_type,
-        visit_exp.exp_test_group,
-        '21d' AS metric_cohort,
-        DATEDIFF(dim_date.date, visit_exp.dt_created) AS days_since_vb,
-        DATEDIFF(visit_exp.ts_visit_done, visit_exp.dt_created) AS days_to_vc,
-        DATEDIFF(visit_exp.ts_visit_canceled, visit_exp.dt_created) AS days_to_vcc,
-        DATEDIFF(visit_exp.ts_visit_unsuccessful, visit_exp.dt_created) AS days_to_vu,
-        DATEDIFF(visit_exp.ts_offer_submitted, visit_exp.dt_created) AS days_to_os,
-        DATEDIFF(visit_exp.ts_offer_accepted, visit_exp.dt_created) AS days_to_oa,
-        DATEDIFF(visit_exp.ts_contract_signed, visit_exp.dt_created) AS days_to_cs,
-        IF(days_since_vb > 21, 1, 0) AS num_vb,
-        IF(days_since_vb > 21 AND days_to_vc <= 21, 1, 0) AS num_vc,
-        IF(days_since_vb > 21 AND days_to_vcc <= 21, 1, 0) AS num_vcc,
-        IF(days_since_vb > 21 AND days_to_vu <= 21, 1, 0) AS num_vu,
-        IF(days_since_vb > 21 AND days_to_os <= 21, 1, 0) AS num_os,
-        IF(days_since_vb > 21 AND days_to_oa <= 21, 1, 0) AS num_oa,
-        IF(days_since_vb > 21 AND days_to_cs <= 21, 1, 0) AS num_cs,
-        visit_exp.dt_exp_started,
-        visit_exp.dt_exp_ended,
-        dim_date.date AS dt_ref
-    FROM
-        visit_exp
-    JOIN
-        dw_public.dim_date
-            ON dim_date.date >= visit_exp.dt_created::DATE
-            AND dim_date.date <= visit_exp.dt_exp_ended
-),
-exp_cohort_28d AS (
-    SELECT
-        visit_exp.sk_neotribe_exp,
-        visit_exp.sk_visit,
-        visit_exp.sk_house,
-        visit_exp.sk_visitor,
-        visit_exp.sk_owner,
-        visit_exp.sk_first_associated_agent,
-        visit_exp.business_context,
-        visit_exp.exp_name_neotribe,
-        visit_exp.exp_name_experiment,
-        visit_exp.exp_identifier_type,
-        visit_exp.exp_test_group,
-        '28d' AS metric_cohort,
-        DATEDIFF(dim_date.date, visit_exp.dt_created) AS days_since_vb,
-        DATEDIFF(visit_exp.ts_visit_done, visit_exp.dt_created) AS days_to_vc,
-        DATEDIFF(visit_exp.ts_visit_canceled, visit_exp.dt_created) AS days_to_vcc,
-        DATEDIFF(visit_exp.ts_visit_unsuccessful, visit_exp.dt_created) AS days_to_vu,
-        DATEDIFF(visit_exp.ts_offer_submitted, visit_exp.dt_created) AS days_to_os,
-        DATEDIFF(visit_exp.ts_offer_accepted, visit_exp.dt_created) AS days_to_oa,
-        DATEDIFF(visit_exp.ts_contract_signed, visit_exp.dt_created) AS days_to_cs,
-        IF(days_since_vb > 28, 1, 0) AS num_vb,
-        IF(days_since_vb > 28 AND days_to_vc <= 28, 1, 0) AS num_vc,
-        IF(days_since_vb > 28 AND days_to_vcc <= 28, 1, 0) AS num_vcc,
-        IF(days_since_vb > 28 AND days_to_vu <= 28, 1, 0) AS num_vu,
-        IF(days_since_vb > 28 AND days_to_os <= 28, 1, 0) AS num_os,
-        IF(days_since_vb > 28 AND days_to_oa <= 28, 1, 0) AS num_oa,
-        IF(days_since_vb > 28 AND days_to_cs <= 28, 1, 0) AS num_cs,
+        IF(days_since_vb > 1, 1, 0) AS num_vb_1d,
+        IF(days_since_vb > 1 AND days_to_vc <= 1, 1, 0) AS num_vc_1d,
+        IF(days_since_vb > 1 AND days_to_vcc <= 1, 1, 0) AS num_vcc_1d,
+        IF(days_since_vb > 1 AND days_to_vu <= 1, 1, 0) AS num_vu_1d,
+        IF(days_since_vb > 1 AND days_to_os <= 1, 1, 0) AS num_os_1d,
+        IF(days_since_vb > 1 AND days_to_oa <= 1, 1, 0) AS num_oa_1d,
+        IF(days_since_vb > 1 AND days_to_cs <= 1, 1, 0) AS num_cs_1d,
+        IF(days_since_vb > 3, 1, 0) AS num_vb_3d,
+        IF(days_since_vb > 3 AND days_to_vc <= 3, 1, 0) AS num_vc_3d,
+        IF(days_since_vb > 3 AND days_to_vcc <= 3, 1, 0) AS num_vcc_3d,
+        IF(days_since_vb > 3 AND days_to_vu <= 3, 1, 0) AS num_vu_3d,
+        IF(days_since_vb > 3 AND days_to_os <= 3, 1, 0) AS num_os_3d,
+        IF(days_since_vb > 3 AND days_to_oa <= 3, 1, 0) AS num_oa_3d,
+        IF(days_since_vb > 3 AND days_to_cs <= 3, 1, 0) AS num_cs_3d,
+        IF(days_since_vb > 7, 1, 0) AS num_vb_7d,
+        IF(days_since_vb > 7 AND days_to_vc <= 7, 1, 0) AS num_vc_7d,
+        IF(days_since_vb > 7 AND days_to_vcc <= 7, 1, 0) AS num_vcc_7d,
+        IF(days_since_vb > 7 AND days_to_vu <= 7, 1, 0) AS num_vu_7d,
+        IF(days_since_vb > 7 AND days_to_os <= 7, 1, 0) AS num_os_7d,
+        IF(days_since_vb > 7 AND days_to_oa <= 7, 1, 0) AS num_oa_7d,
+        IF(days_since_vb > 7 AND days_to_cs <= 7, 1, 0) AS num_cs_7d,
+        IF(days_since_vb > 14, 1, 0) AS num_vb_14d,
+        IF(days_since_vb > 14 AND days_to_vc <= 14, 1, 0) AS num_vc_14d,
+        IF(days_since_vb > 14 AND days_to_vcc <= 14, 1, 0) AS num_vcc_14d,
+        IF(days_since_vb > 14 AND days_to_vu <= 14, 1, 0) AS num_vu_14d,
+        IF(days_since_vb > 14 AND days_to_os <= 14, 1, 0) AS num_os_14d,
+        IF(days_since_vb > 14 AND days_to_oa <= 14, 1, 0) AS num_oa_14d,
+        IF(days_since_vb > 14 AND days_to_cs <= 14, 1, 0) AS num_cs_14d,
+        IF(days_since_vb > 21, 1, 0) AS num_vb_21d,
+        IF(days_since_vb > 21 AND days_to_vc <= 21, 1, 0) AS num_vc_21d,
+        IF(days_since_vb > 21 AND days_to_vcc <= 21, 1, 0) AS num_vcc_21d,
+        IF(days_since_vb > 21 AND days_to_vu <= 21, 1, 0) AS num_vu_21d,
+        IF(days_since_vb > 21 AND days_to_os <= 21, 1, 0) AS num_os_21d,
+        IF(days_since_vb > 21 AND days_to_oa <= 21, 1, 0) AS num_oa_21d,
+        IF(days_since_vb > 21 AND days_to_cs <= 21, 1, 0) AS num_cs_21d,
+        IF(days_since_vb > 28, 1, 0) AS num_vb_28d,
+        IF(days_since_vb > 28 AND days_to_vc <= 28, 1, 0) AS num_vc_28d,
+        IF(days_since_vb > 28 AND days_to_vcc <= 28, 1, 0) AS num_vcc_28d,
+        IF(days_since_vb > 28 AND days_to_vu <= 28, 1, 0) AS num_vu_28d,
+        IF(days_since_vb > 28 AND days_to_os <= 28, 1, 0) AS num_os_28d,
+        IF(days_since_vb > 28 AND days_to_oa <= 28, 1, 0) AS num_oa_28d,
+        IF(days_since_vb > 28 AND days_to_cs <= 28, 1, 0) AS num_cs_28d,
         visit_exp.dt_exp_started,
         visit_exp.dt_exp_ended,
         dim_date.date AS dt_ref
@@ -331,163 +175,44 @@ exp_cohort_28d AS (
             AND dim_date.date <= visit_exp.dt_exp_ended
 )
 SELECT
-    MD5(sk_neotribe_exp || sk_visit || metric_cohort || dt_ref) AS sk_exp_visit_cohort,
-    sk_neotribe_exp,
-    sk_visit,
-    sk_house,
-    sk_visitor,
-    sk_owner,
-    sk_first_associated_agent,
-    business_context,
-    exp_name_neotribe,
-    exp_name_experiment,
-    exp_identifier_type,
-    exp_test_group,
-    metric_cohort,
-    num_vb,
-    num_vc,
-    num_vcc,
-    num_vu,
-    num_os,
-    num_oa,
-    num_cs,
-    dt_exp_started,
-    dt_exp_ended,
-    dt_ref
+    MD5(ec.sk_neotribe_exp || ec.sk_visit || c.metric_cohort || ec.dt_ref) AS sk_exp_visit_cohort,
+    ec.sk_neotribe_exp,
+    ec.sk_visit,
+    ec.sk_house,
+    ec.sk_visitor,
+    ec.sk_owner,
+    ec.sk_first_associated_agent,
+    ec.business_context,
+    ec.exp_name_neotribe,
+    ec.exp_name_experiment,
+    ec.exp_identifier_type,
+    ec.exp_test_group,
+    c.metric_cohort,
+    c.num_vb,
+    c.num_vc,
+    c.num_vcc,
+    c.num_vu,
+    c.num_os,
+    c.num_oa,
+    c.num_cs,
+    ec.dt_exp_started,
+    ec.dt_exp_ended,
+    ec.dt_ref
 FROM
-    exp_cohort_1d
-UNION ALL
-SELECT
-    MD5(sk_neotribe_exp || sk_visit || metric_cohort || dt_ref) AS sk_exp_visit_cohort,
-    sk_neotribe_exp,
-    sk_visit,
-    sk_house,
-    sk_visitor,
-    sk_owner,
-    sk_first_associated_agent,
-    business_context,
-    exp_name_neotribe,
-    exp_name_experiment,
-    exp_identifier_type,
-    exp_test_group,
-    metric_cohort,
-    num_vb,
-    num_vc,
-    num_vcc,
-    num_vu,
-    num_os,
-    num_oa,
-    num_cs,
-    dt_exp_started,
-    dt_exp_ended,
-    dt_ref
-FROM
-    exp_cohort_3d
-UNION ALL
-SELECT
-    MD5(sk_neotribe_exp || sk_visit || metric_cohort || dt_ref) AS sk_exp_visit_cohort,
-    sk_neotribe_exp,
-    sk_visit,
-    sk_house,
-    sk_visitor,
-    sk_owner,
-    sk_first_associated_agent,
-    business_context,
-    exp_name_neotribe,
-    exp_name_experiment,
-    exp_identifier_type,
-    exp_test_group,
-    metric_cohort,
-    num_vb,
-    num_vc,
-    num_vcc,
-    num_vu,
-    num_os,
-    num_oa,
-    num_cs,
-    dt_exp_started,
-    dt_exp_ended,
-    dt_ref
-FROM
-    exp_cohort_7d
-UNION ALL
-SELECT
-    MD5(sk_neotribe_exp || sk_visit || metric_cohort || dt_ref) AS sk_exp_visit_cohort,
-    sk_neotribe_exp,
-    sk_visit,
-    sk_house,
-    sk_visitor,
-    sk_owner,
-    sk_first_associated_agent,
-    business_context,
-    exp_name_neotribe,
-    exp_name_experiment,
-    exp_identifier_type,
-    exp_test_group,
-    metric_cohort,
-    num_vb,
-    num_vc,
-    num_vcc,
-    num_vu,
-    num_os,
-    num_oa,
-    num_cs,
-    dt_exp_started,
-    dt_exp_ended,
-    dt_ref
-FROM
-    exp_cohort_14d
-UNION ALL
-SELECT
-    MD5(sk_neotribe_exp || sk_visit || metric_cohort || dt_ref) AS sk_exp_visit_cohort,
-    sk_neotribe_exp,
-    sk_visit,
-    sk_house,
-    sk_visitor,
-    sk_owner,
-    sk_first_associated_agent,
-    business_context,
-    exp_name_neotribe,
-    exp_name_experiment,
-    exp_identifier_type,
-    exp_test_group,
-    metric_cohort,
-    num_vb,
-    num_vc,
-    num_vcc,
-    num_vu,
-    num_os,
-    num_oa,
-    num_cs,
-    dt_exp_started,
-    dt_exp_ended,
-    dt_ref
-FROM
-    exp_cohort_21d
-UNION ALL
-SELECT
-    MD5(sk_neotribe_exp || sk_visit || metric_cohort || dt_ref) AS sk_exp_visit_cohort,
-    sk_neotribe_exp,
-    sk_visit,
-    sk_house,
-    sk_visitor,
-    sk_owner,
-    sk_first_associated_agent,
-    business_context,
-    exp_name_neotribe,
-    exp_name_experiment,
-    exp_identifier_type,
-    exp_test_group,
-    metric_cohort,
-    num_vb,
-    num_vc,
-    num_vcc,
-    num_vu,
-    num_os,
-    num_oa,
-    num_cs,
-    dt_exp_started,
-    dt_exp_ended,
-    dt_ref
-FROM
-    exp_cohort_28d
+    exp_cohort AS ec
+LATERAL VIEW
+    STACK(
+        6, -- Number of cohorts to stack
+
+        '1d', ec.num_vb_1d, ec.num_vc_1d, ec.num_vcc_1d, ec.num_vu_1d, ec.num_os_1d, ec.num_oa_1d, ec.num_cs_1d,
+
+        '3d', ec.num_vb_3d, ec.num_vc_3d, ec.num_vcc_3d, ec.num_vu_3d, ec.num_os_3d, ec.num_oa_3d, ec.num_cs_3d,
+
+        '7d', ec.num_vb_7d, ec.num_vc_7d, ec.num_vcc_7d, ec.num_vu_7d, ec.num_os_7d, ec.num_oa_7d, ec.num_cs_7d,
+
+        '14d', ec.num_vb_14d, ec.num_vc_14d, ec.num_vcc_14d, ec.num_vu_14d, ec.num_os_14d, ec.num_oa_14d, ec.num_cs_14d,
+
+        '21d', ec.num_vb_21d, ec.num_vc_21d, ec.num_vcc_21d, ec.num_vu_21d, ec.num_os_21d, ec.num_oa_21d, ec.num_cs_21d,
+
+        '28d', ec.num_vb_28d, ec.num_vc_28d, ec.num_vcc_28d, ec.num_vu_28d, ec.num_os_28d, ec.num_oa_28d, ec.num_cs_28d
+    ) c AS metric_cohort, num_vb, num_vc, num_vcc, num_vu, num_os, num_oa, num_cs

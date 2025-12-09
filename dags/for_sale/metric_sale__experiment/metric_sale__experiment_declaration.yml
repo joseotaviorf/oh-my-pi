@@ -8,6 +8,9 @@ workflow:
   type: query_delta
   layer: metric
   custom_schema: sale
+  inner_dependencies:
+    exp_visit_metric_conversion:
+      - exp_visit_cohort
 cluster:
   type: databricks_16_4_med_memory_cluster
   access_control_list:
