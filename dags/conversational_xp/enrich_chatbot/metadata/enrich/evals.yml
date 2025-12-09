@@ -1,0 +1,19 @@
+---
+database_name: datalake_chatbot
+table_name: evals
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Aggregated evaluation scores from Langfuse per session. IMPORTANT: backfilled evals will replace previous evals for the same session."
+columns:
+  id_langfuse_session:
+    description: "Langfuse session identifier"
+    lineage:
+      - datalake_langfuse_clean.scores.id_session
+  evals:
+    description: "Map of evaluation scores with id, value, and creation timestamp"
+    lineage:
+      - datalake_langfuse_clean.scores.name
+      - datalake_langfuse_clean.scores.id_score
+      - datalake_langfuse_clean.scores.value
+      - datalake_langfuse_clean.scores.ts_created
+
