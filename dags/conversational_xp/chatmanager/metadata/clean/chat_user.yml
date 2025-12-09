@@ -1,30 +1,42 @@
 database_name: datalake_chatmanager_clean
 table_name: chat_user
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Chat users from chat-manager service"
 columns:
   id:
+    description: "Chat user identifier"
     lineage:
       - datalake_chatmanager_raw.chat_user.id
   uuid:
+    description: "Chat user unique identifier"
     lineage:
       - datalake_chatmanager_raw.chat_user.uuid
   id_participant:
+    description: "Participant identifier"
     lineage:
       - datalake_chatmanager_raw.chat_user.participant_id
   id_origin:
+    description: "Origin identifier"
     lineage:
       - datalake_chatmanager_raw.chat_user.origin_id
   origin_type:
+    description: "Origin type"
     lineage:
       - datalake_chatmanager_raw.chat_user.origin_type
   attributes:
+    description: "Chat user attributes"
     lineage:
       - datalake_chatmanager_raw.chat_user.attributes
   version:
+    description: "Chat user version"
     lineage:
       - datalake_chatmanager_raw.chat_user.version
   ts_created:
+    description: "Chat user creation date"
     lineage:
       - datalake_chatmanager_raw.chat_user.created_at
   ts_updated:
+    description: "Chat user update date"
     lineage:
       - datalake_chatmanager_raw.chat_user.updated_at

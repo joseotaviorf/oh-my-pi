@@ -1,85 +1,86 @@
 database_name: datalake_chatmanager_clean
 table_name: chat_group
-domain: Support and Services
-description: Chat group information from chat-manager product database
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Chat groups from chat-manager service"
 columns:
   id:
-    description: Unique identifier of the chat group
+    description: "Chat group identifier"
     lineage:
       - datalake_chatmanager_raw.chat_group.id
   id_last_chat_vendor:
-    description: Identifier of the last chat vendor associated with the group
+    description: "Last chat vendor identifier"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_chat_vendor_id
   id_chat_subtype:
-    description: Identifier of the chat subtype
+    description: "Chat subtype identifier"
     lineage:
       - datalake_chatmanager_raw.chat_group.chat_subtype_id
   uuid:
-    description: Universally unique identifier of the chat group
+    description: "Chat group unique identifier"
     lineage:
       - datalake_chatmanager_raw.chat_group.uuid
   version:
-    description: Version number of the chat group record
+    description: "Chat group version"
     lineage:
       - datalake_chatmanager_raw.chat_group.version
   type:
-    description: Type of the chat group
+    description: "Chat group type"
     lineage:
       - datalake_chatmanager_raw.chat_group.type
   chat_group:
-    description: Chat group name or identifier
+    description: "Chat group name"
     lineage:
       - datalake_chatmanager_raw.chat_group.chat_group
   state:
-    description: Current state of the chat group
+    description: "Chat group state"
     lineage:
       - datalake_chatmanager_raw.chat_group.state
   last_message_sent_by:
-    description: Identifier of the user who sent the last message
+    description: "Last message sender identifier"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_message_sent_by
   last_message_type:
-    description: Type of the last message sent in the group
+    description: "Last message type"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_message_type
   last_message_body:
-    description: Content/body of the last message sent in the group
+    description: "Last message body"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_message_body
   last_message_index:
-    description: Index or position of the last message in the conversation
+    description: "Last message index"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_message_index
   last_message_data:
-    description: Additional data or metadata associated with the last message
+    description: "Last message data"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_message_data
   attributes:
-    description: Additional attributes or properties of the chat group
+    description: "Chat group attributes"
     lineage:
       - datalake_chatmanager_raw.chat_group.attributes
   last_message_media_content_type:
-    description: Content type of media in the last message (if applicable)
+    description: "Last message media content type"
     lineage:
       - datalake_chatmanager_raw.chat_group.customer_name
   last_chat_vendor_name:
-    description: Name of the last chat vendor associated with the group
+    description: "Last chat vendor name"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_chat_vendor_name
   chat_subtype:
-    description: Subtype or category of the chat
+    description: "Chat subtype"
     lineage:
       - datalake_chatmanager_raw.chat_group.chat_subtype
   ts_created:
-    description: Timestamp when the chat group was created
+    description: "Chat group creation date"
     lineage:
       - datalake_chatmanager_raw.chat_group.created_at
   ts_last_message_sent:
-    description: Timestamp when the last message was sent in the group
+    description: "Last message sent date"
     lineage:
       - datalake_chatmanager_raw.chat_group.last_message_sent_at
   ts_updated:
-    description: Timestamp when the chat group was last updated
+    description: "Chat group update date"
     lineage:
       - datalake_chatmanager_raw.chat_group.updated_at

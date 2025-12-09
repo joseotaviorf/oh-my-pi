@@ -18,6 +18,7 @@ SELECT
     to_leg_duration,
     to_voip_rang,
     vendor_name,
+    is_from_answered_by_machine,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

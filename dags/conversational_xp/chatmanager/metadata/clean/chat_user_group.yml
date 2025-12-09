@@ -1,33 +1,46 @@
 database_name: datalake_chatmanager_clean
 table_name: chat_user_group
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Chat user group associations"
 columns:
   id_chat_group:
+    description: "Chat group identifier"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.chat_group_id
   id_chat_user:
+    description: "Chat user identifier"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.chat_user_id
   state:
+    description: "Chat user group state"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.state
   visible:
+    description: "Visibility indicator"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.visible
   profile:
+    description: "User profile"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.profile
   last_read_index:
+    description: "Last read message index"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.last_read_index
   attributes:
+    description: "Chat user group attributes"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.attributes
   ts_last_read:
+    description: "Last read date"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.last_read_at
   ts_created:
+    description: "Chat user group creation date"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.created_at
   ts_updated:
+    description: "Chat user group update date"
     lineage:
       - datalake_chatmanager_raw.chat_user_group.updated_at

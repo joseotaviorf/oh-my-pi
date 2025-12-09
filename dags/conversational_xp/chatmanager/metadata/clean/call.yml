@@ -1,66 +1,94 @@
 database_name: datalake_chatmanager_clean
 table_name: call
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Call records from chat-manager service"
 columns:
   id:
+    description: "Call identifier"
     lineage:
       - datalake_chatmanager_raw.call.id
   uuid:
+    description: "Call unique identifier"
     lineage:
       - datalake_chatmanager_raw.call.uuid
   id_chat_group:
+    description: "Chat group identifier"
     lineage:
       - datalake_chatmanager_raw.call.chat_group_id
   id_from_chat_user:
+    description: "From chat user identifier"
     lineage:
       - datalake_chatmanager_raw.call.from_chat_user_id
   id_to_chat_user:
+    description: "To chat user identifier"
     lineage:
       - datalake_chatmanager_raw.call.to_chat_user_id
   id_vendor:
+    description: "Vendor identifier"
     lineage:
       - datalake_chatmanager_raw.call.vendor_id
   version:
+    description: "Call version"
     lineage:
       - datalake_chatmanager_raw.call.version
   state:
+    description: "Call state"
     lineage:
       - datalake_chatmanager_raw.call.state
   result:
+    description: "Call result"
     lineage:
       - datalake_chatmanager_raw.call.result
   from_leg_type:
+    description: "From leg type"
     lineage:
       - datalake_chatmanager_raw.call.from_leg_type
   from_leg_state:
+    description: "From leg state"
     lineage:
       - datalake_chatmanager_raw.call.from_leg_state
   from_leg_result:
+    description: "From leg result"
     lineage:
       - datalake_chatmanager_raw.call.from_leg_result
   from_leg_duration:
+    description: "From leg duration"
     lineage:
       - datalake_chatmanager_raw.call.from_leg_duration
   to_leg_type:
+    description: "To leg type"
     lineage:
       - datalake_chatmanager_raw.call.to_leg_type
   to_leg_state:
+    description: "To leg state"
     lineage:
       - datalake_chatmanager_raw.call.to_leg_state
   to_leg_result:
+    description: "To leg result"
     lineage:
       - datalake_chatmanager_raw.call.to_leg_result
   to_leg_duration:
+    description: "To leg duration"
     lineage:
       - datalake_chatmanager_raw.call.to_leg_duration
   to_voip_rang:
+    description: "VoIP ring indicator"
     lineage:
       - datalake_chatmanager_raw.call.to_voip_rang
   vendor_name:
+    description: "Vendor name"
     lineage:
       - datalake_chatmanager_raw.call.vendor_name
+  is_from_answered_by_machine:
+    description: "Indicates if from leg was answered by machine"
+    lineage:
+      - datalake_chatmanager_raw.call.is_from_answered_by_machine
   ts_created:
+    description: "Call creation date"
     lineage:
       - datalake_chatmanager_raw.call.created_at
   ts_updated:
+    description: "Call update date"
     lineage:
       - datalake_chatmanager_raw.call.updated_at
