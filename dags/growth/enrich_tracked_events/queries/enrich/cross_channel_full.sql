@@ -265,7 +265,7 @@ cross_channel AS (
         'offline_table' AS attribution_source_conversion,
         COALESCE(channel,'') AS attribution_medium,
         'offline_table' AS attribution_medium_conversion,
-        'offline_table' AS attribution_campaign,
+        COALESCE(channel,'offline_table') AS attribution_campaign,
         'offline_table' AS attribution_campaign_conversion,
         'offline_table' AS attribution_term,
         'offline_table' AS attribution_term_conversion,

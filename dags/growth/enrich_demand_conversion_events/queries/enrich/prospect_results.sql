@@ -35,8 +35,6 @@ WITH adhoc_rules AS (
     dpce.id_agent,
     CASE WHEN dpce.utm_medium = 'plaquinhas_ada_whatsapp' AND dpce.utm_campaign = 'offline_table'
       THEN "hybr.acq.nonorg.na.d.placas.na.ada_whatsapp"
-      WHEN dpce.product_origin = 'WHATSAPP_CONCIERGE' AND dpce.utm_campaign = 'offline_table'
-      THEN dpce.utm_medium
       ELSE dpce.utm_campaign
     END AS utm_campaign,
     dpce.utm_medium,

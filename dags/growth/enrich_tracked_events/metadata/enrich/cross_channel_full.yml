@@ -70,6 +70,7 @@ columns:
     description: Final campaign attributed to the event.
     lineage:
       - datalake_online_attribution.online_attribution.utm_campaign
+      - datalake_tracked_events.offline_attribution.channel
   final_attribution_term:
     description: Final term attributed to the event.
     lineage:
