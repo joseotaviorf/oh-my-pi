@@ -48,4 +48,4 @@ cluster:
         coordinates: "org.datasyslab:geotools-wrapper:1.1.0-25.2"
     - pypi:
         package: apache-sedona==1.2.1
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env

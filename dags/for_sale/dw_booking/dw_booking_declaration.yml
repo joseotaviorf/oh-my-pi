@@ -15,7 +15,7 @@ cluster:
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: USER_ISOLATION

@@ -43,7 +43,7 @@ cluster:
     access_control_list:
         group_name: analytics-engineers
         permission_level: CAN_MANAGE
-    databricks_conn_id: databricks_new
+    databricks_conn_id: databricks_new_env
     custom_configurations:
       driver_node_type_id: r5a.2xlarge
       node_type_id: r5a.xlarge

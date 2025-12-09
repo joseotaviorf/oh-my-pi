@@ -20,4 +20,4 @@ cluster:
     spark_conf:
       spark.sql.shuffle.partitions: 200
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
