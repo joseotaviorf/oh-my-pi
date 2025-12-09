@@ -34,11 +34,6 @@ columns:
       The city of the listing.
       It is obtained from the address field, which contains the city.
       All the listings where the city is not available are removed from the table.
-  region:
-    lineage:
-      - datalake_crawler_zap_imoveis_raw.zap_imoveis.region
-    description: |
-      The region of the listing.
   geolocation:
     lineage:
       - datalake_crawler_zap_imoveis_raw.zap_imoveis.geolocation
@@ -83,6 +78,12 @@ columns:
     description: |
       The contact information of the listing.
       It has the fields advertiser_name and advertiser_phones.
+  advertiser:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.advertiser
+    description: |
+      The advertiser information of the listing.
+      It has all relevant fields about the advertiser, such as name, id, license_number, phones, etc.
   price:
     lineage:
       - datalake_crawler_zap_imoveis_raw.zap_imoveis.price
