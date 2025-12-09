@@ -1,8 +1,18 @@
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from quintoandar_logger import QuintoAndarLogger
+from pyspark.sql.types import NullType
+from pyspark.sql import functions as F
 
 JOB_NAME = "load_reverse_atento"
+
+
+def cast_void_columns_to_string(df):
+    """Cast void/null type columns to string to avoid parquet write errors."""
+    for field in df.schema.fields:
+        if isinstance(field.dataType, NullType):
+            df = df.withColumn(field.name, F.col(field.name).cast("string"))
+    return df
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -101,6 +111,7 @@ if __name__ == "__main__":
                 
                 try:
                     logger.info(f"m=Loading Dataframe into s3, s3_path={s3_path}")
+                    df = cast_void_columns_to_string(df)
                     df.coalesce(1).write.mode("overwrite").parquet(s3_path)
                     logger.info(f"m=Dataframe succesfully loaded, s3_path={s3_path}")
                     
