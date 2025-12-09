@@ -4,8 +4,8 @@ description:
   Information about Rent and Sale visits, which is a subset of bookings.
   A visit is when a tenant prospect/buyer prospect visits a property because it's interested in it.
   Each line is an unique visit.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_visit:
     lineage:
@@ -189,6 +189,30 @@ columns:
     lineage:
       - datalake_visit.visits.is_stalled
     description: If the visit is stalled. Data since 2020.
+  is_visit_registered:
+    lineage:
+      - datalake_visit.visits.is_registered
+    description: If the visit was registered by the agent. Data since 2020.
+  is_visit_fitted:
+    lineage:
+      - datalake_visit.visits.is_fitted
+    description: If the visit was fitted by the agent. Data since 2020.
+  is_visit_3p_supply:
+    lineage:
+      - datalake_visit.visits.is_3p_supply
+    description: If the visit has a 3P supply partner. Data since 2020.
+  is_visit_3p_demand:
+    lineage:
+      - datalake_visit.visits.is_3p_demand
+    description: If the visit has a 3P demand partner. Data since 2020.
+  is_visit_3p_lead_gen:
+    lineage:
+      - datalake_visit.visits.is_3p_lead_gen
+    description: If the visit has a 3P lead generation partner. Data since 2020.
+  has_3p_access_control:
+    lineage:
+      - datalake_visit.visits.has_3p_access_control
+    description: If the visit has any 3P access control. Data since 2020.
   has_visit_tenant_living:
     lineage:
       - datalake_visit.visits.has_tenant_living

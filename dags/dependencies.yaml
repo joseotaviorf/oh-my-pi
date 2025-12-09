@@ -4298,7 +4298,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.enrich_survicate:load-enrich-response-content:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-questions:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-responses:first-run-of-day
-  - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified:first-run-of-day
   - bietlejuice.help_center_api:load-clean-call-in-app-eligibility:first-run-of-day
   - bietlejuice.insider:load-clean-feature:first-run-of-day
   - bietlejuice.insider:load-clean-review-feature:first-run-of-day

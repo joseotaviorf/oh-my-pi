@@ -2,48 +2,48 @@ database_name: dw_visit
 table_name: fact_visits
 description: This fact table has the most important visit metrics. Each line is a visit.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_visit:
     description: Visit's id.
     lineage:
-        - datalake_visit.visits.id_visit
+      - datalake_visit.visits.id_visit
   sk_visitor:
     description: Visitor's id. (Connect with dim_user)
     lineage:
-        - datalake_visit.visits.id_visitor
+      - datalake_visit.visits.id_visitor
   sk_owner:
     description: Owner's id. (Connect with dim_user)
     lineage:
-        - datalake_visit.visits.id_owner
+      - datalake_visit.visits.id_owner
   sk_user_visit_request:
     description: User's id who requested the visit.
     lineage:
-        - datalake_visit.visits.id_user_visit_request
+      - datalake_visit.visits.id_user_visit_request
   sk_first_associated_agent:
     description: Is the Id of the first agent who was associated with the visit.
     lineage:
-        - datalake_visit.visits.sk_first_associated_agent
+      - datalake_visit.visits.id_first_associated_agent
   sk_last_associated_agent:
     description: Is the Id of the last agent who was associated with the visit.
     lineage:
-        - datalake_visit.visits.sk_last_associated_agent
+      - datalake_visit.visits.id_last_associated_agent
   sk_house:
     description: House's Id.
     lineage:
-        - datalake_visit.visits.id_house
+      - datalake_visit.visits.id_house
   sk_house_listing:
     description: House's Id.
     lineage:
-        - datalake_visit.visits.id_house_listing
+      - datalake_visit.visits.id_house_listing
   sk_company_demand:
     description: Id of company demand.
     lineage:
-        - datalake_visit.visits.id_company_demand
+      - datalake_visit.visits.id_company_demand
   sk_company_supply:
     description: Id of company supply.
     lineage:
-        - datalake_visit.visits.id_company_supply
+      - datalake_visit.visits.id_company_supply
   sk_house_entrance:
     lineage:
       - dw_house.dim_house_entrance_history.sk_house_entrance
@@ -55,8 +55,7 @@ columns:
   sk_ppa_relation:
     lineage:
       - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
-    description:
-      ID of the preferred property agent relation.
+    description: ID of the preferred property agent relation.
   sk_business_context:
     description: Context type Id.
     lineage:
@@ -74,93 +73,17 @@ columns:
     lineage:
       - dw_visit.dim_visit_funnel.sk_visit_funnel
   sk_post_visit_demand:
-    description: Foreign key from dim_post_visit_demand about visits with post-visit demand.
+    description: Foreign key from dim_post_visit_demand about visits with post visit demand.
     lineage:
-      - dw_visit.dim_post_visit_demand.sk_visit
-  sk_visit_request_date:
-    description: Requested date of the visit.
-    lineage:
-        - datalake_visit.visits.ts_visit_requested
-  sk_visit_created_date:
-    description: First event of the visit.
-    lineage:
-        - datalake_visit.visits.ts_created
-  sk_visit_date_local_tz:
-    description: Date of the visit.
-    lineage:
-        - datalake_visit.visits.ts_visit_local_tz
-  sk_first_visit_confirmed_date:
-    description: First confirmed date of the visit.
-    lineage:
-        - datalake_visit.visits.ts_first_confirmation
-  sk_last_visit_confirmed_date:
-    description: Last confirmed date of the visit.
-    lineage:
-        - datalake_visit.visits.ts_last_confirmation
-  sk_first_visit_reschedule_date:
-    description: First reschedule date.
-    lineage:
-        - datalake_visit.visits.ts_first_reschedule
-  sk_last_visit_reschedule_date:
-    description: Last reschedule date.
-    lineage:
-        - datalake_visit.visits.ts_last_reschedule
-  sk_visit_done:
-    description: Date of the end of the visit.
-    lineage:
-        - datalake_visit.visits.ts_visit_done
-  sk_visit_canceled:
-    description: Date of the canceled of the visit. (If applicable)
-    lineage:
-        - datalake_visit.visits.ts_visit_canceled
-  ts_visit_requested:
-    description: Requested timestamp of the visit.
-    lineage:
-        - datalake_visit.visits.ts_visit_requested
-  ts_visit_created:
-    description: Timestamp of visit creation, its first event.
-    lineage:
-        - datalake_visit.visits.ts_created
-  ts_visit_local_tz:
-    description: Timestamp of the visit.
-    lineage:
-        - datalake_visit.visits.ts_visit_local_tz
-  ts_first_visit_confirmed:
-    description: Timestamp of the first visit confirmed.
-    lineage:
-        - datalake_visit.visit_status_events.ts_event_created
-  ts_last_visit_confirmed:
-    description: Timestamp of the last visit confirmed.
-    lineage:
-        - datalake_visit.visit_status_events.ts_event_created
-  ts_first_visit_rescheduled:
-    description: Timestamp of the first visit rescheduled.
-    lineage:
-        - datalake_visit.visit_status_events.ts_event_created
-  ts_last_visit_rescheduled:
-    description: Timestamp of the last visit rescheduled.
-    lineage:
-        - datalake_visit.visit_status_events.ts_event_created
-  ts_visit_done:
-    description: Timestamp of the end of the visit.
-    lineage:
-        - datalake_visit.visits.ts_visit_done
-  ts_visit_canceled:
-    description: Timestamp of the visit cancellation (if applicable).
-    lineage:
-        - datalake_visit.visits.ts_visit_canceled
+      - dw_visit.dim_post_visit_demand.sk_post_visit_demand
   nbr_reschedule:
     description: Number of reschedules.
     lineage:
-        - datalake_visit.visits.nbr_reschedule
+      - datalake_visit.visits.nbr_reschedule
   nbr_bookings:
-    description: Number of bookings from this visit.
+    description: Number of bookings from this visit (nbr_reschedule + 1).
     lineage:
       - datalake_visit.visits.nbr_reschedule
-  is_waiting_for_response:
-    description: If is waiting for response.
-    lineage:
-      - datalake_visit.visits.is_waiting_for_response
   num_agents_associated:
     description: Number of agents associated with the visit.
     lineage:
@@ -183,64 +106,9 @@ columns:
     description: Number of visit unsuccessful. The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
     lineage:
       - datalake_visit.visits.is_visit_unsuccessful
-  is_confirmed:
-    description: If the visit is confirmed.
-    lineage:
-      - datalake_visit.visits.is_confirmed
-  is_completed:
-    description: If the visit is completed.
-    lineage:
-      - datalake_visit.visits.is_completed
-  is_registered:
-    description: If the visit was registered by the agent.
-    lineage:
-      - datalake_visit.visits.is_registered
-  is_reschedule:
-    description: If the visit is reschedule.
-    lineage:
-      - datalake_visit.visits.is_reschedule
-  is_canceled:
-    description: If the visit is canceled.
-    lineage:
-      - datalake_visit.visits.is_canceled
-  is_unsuccessful:
-    description: If the visit is unsuccessful.
-    lineage:
-      - datalake_visit.visits.is_unsuccessful
-  is_3p_supply:
-    lineage:
-      - datalake_visit.visits.is_3p_supply
-    description: Boolean flag indicating if the visit has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
-  is_3p_demand:
-    lineage:
-      - datalake_visit.visits.is_3p_demand
-    description: Boolean flag indicating if the visit has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
-  is_3p_lead_gen:
-    lineage:
-      - datalake_visit.visits.is_3p_lead_gen
-    description: Boolean flag indicating if the visit has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
   has_3p_access_control:
     lineage:
       - datalake_visit.visits.has_3p_access_control
     description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
-  journey_days:
-    description: Journey days since the first created event.
-    lineage:
-        - datalake_visit.visits.journey_days
-  hours_between_created_and_visit_day:
-    description: Hours between the creation of visit and visit day.
-  hours_between_request_and_cancellation:
-    description: Hours between requested date and visit day.
-  hours_between_first_booked_and_visit_day:
-    description: Hours first booking and visit day.
-  hours_between_last_booked_and_visit_day:
-    description: Hours between last booking and visit day.
-  hours_between_cancellation_and_visit_date:
-    description: Hours between cancellation and visit day.
-  hours_waiting_for_answers:
-    description: Hours waiting for the answers.
-    lineage:
-        - datalake_visit.visits.hours_waiting_for_answers
   ts_load:
-    description:
-      Timestamp of the load of the table.
+    description: Timestamp of the load of the table.

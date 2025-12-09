@@ -74,10 +74,10 @@ select
   schedules.is_completed,
   schedules.is_canceled,
   schedules.is_unsuccessful,
-  visits.is_registered,
-  cancelation_details.channel as cancelation_channel,
-  cancelation_details.reason as cancelation_reason,
-  cancelation_details.on_behalf_of as cancelation_on_behalf_of,
+  dv.is_visit_registered AS is_registered,
+  dv.cancellation_channel AS cancelation_channel,
+  dv.cancellation_reason AS cancelation_reason,
+  dv.cancellation_on_behalf_of AS cancelation_on_behalf_of,
   schedules.has_tenant_living,
   schedules.sk_author_creator,
   if(
@@ -85,8 +85,8 @@ select
     'Demand',
     if(schedules.sk_author_creator = schedules.sk_user_agent, 'Agent', 'OPS')
   ) as author_user_role,
-  date_format.date as visit_date,
-  visits.ts_visit_local_tz as ts_visit_date,
+  DATE(dv.ts_visit) AS visit_date,
+  dv.ts_visit AS ts_visit_date,
   rating_agent.status as review_status,
   cast(coalesce(rating_agent.review_date, rating_house.review_date) as timestamp) as ts_review_date,
   if(
@@ -117,9 +117,9 @@ select
         'Visit Incomplete',
         if(
           schedules.is_canceled = 1
-          AND cancelation_details.on_behalf_of = 'DEMAND'
-          AND cancelation_details.channel <> 'TENANT_PWA'
-          AND cancelation_details.channel <> 'TENANT_NATIVE',
+          AND dv.cancellation_on_behalf_of = 'DEMAND'
+          AND dv.cancellation_channel <> 'TENANT_PWA'
+          AND dv.cancellation_channel <> 'TENANT_NATIVE',
           'Visit Incomplete',
             if(
               schedules.is_completed = 0
@@ -141,9 +141,9 @@ select
         'Visit Unsuccessful',
         if(
           schedules.is_canceled = 1
-          AND cancelation_details.on_behalf_of = 'DEMAND'
-          AND cancelation_details.channel <> 'TENANT_PWA'
-          AND cancelation_details.channel <> 'TENANT_NATIVE',
+          AND dv.cancellation_on_behalf_of = 'DEMAND'
+          AND dv.cancellation_channel <> 'TENANT_PWA'
+          AND dv.cancellation_channel <> 'TENANT_NATIVE',
           'Visit Canceled on Behalf of Demand',
           if(
             schedules.is_canceled = 1,
@@ -322,11 +322,8 @@ FROM
   schedules as schedules
     LEFT JOIN dw_visit.fact_visits as visits on schedules.sk_visit = visits.sk_visit
     LEFT JOIN
-      datalake_visit.visit_cancellation_unified AS cancelation_details
-      on cancelation_details.id_visit = visits.sk_visit
-    LEFT JOIN
-      dw_public.dim_date as date_format
-      on visits.sk_visit_date_local_tz = date_format.sk_date
+      dw_visit.dim_visit AS dv
+        ON visits.sk_visit = dv.sk_visit
     LEFT JOIN dw_public.dim_region AS dim_region ON schedules.sk_region = dim_region.sk_region
     LEFT JOIN dw_public.dim_agent AS dim_agent ON dim_agent.sk_agent = schedules.sk_agent
     LEFT JOIN
@@ -384,7 +381,7 @@ where
     rating_agent.review_date is null
     or date(rating_agent.review_date) < date(now())
   )
-  and date(date_format.date) < date(now())
+  and date(dv.ts_visit) < date(now())
   and dim_region.country_name = 'Brazil'
  ),
   contract_count AS (

@@ -277,6 +277,7 @@ SELECT
     END AS has_more_one_agent,
     IF(visit_log.ts_visit_confirmed IS NOT NULL, TRUE, FALSE) AS is_confirmed,
     visit_log.ts_visit_registered IS NOT NULL AS is_registered,
+    visit_log.ts_visit_fitted IS NOT NULL AS is_fitted,
     IF(pva.event_type = 'VISIT_DONE', TRUE, FALSE) AS is_completed,
     IF(nbr_reschedule >= 1, TRUE, FALSE) AS is_reschedule,
     IF(visit_cancellation.ts_created IS NOT NULL, TRUE, FALSE) AS is_canceled,

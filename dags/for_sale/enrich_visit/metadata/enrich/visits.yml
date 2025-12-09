@@ -264,6 +264,11 @@ columns:
       - datalake_ebdb_clean.visit_status_log.event_type
       - datalake_ebdb_clean.booking_status_change.reason
     description: If the visit was registered by the agent. Data since 2020.
+  is_fitted:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.event_type
+      - datalake_ebdb_clean.booking_status_change.reason
+    description: If the visit was fitted by the agent. Data since 2020.
   is_completed:
     lineage:
       - datalake_visit.post_visit_agent_unified.event_type
@@ -288,14 +293,6 @@ columns:
       - datalake_visit.post_visit_agent_unified.id_visit
       - datalake_ebdb_clean.visit.ts_visit
     description: If the visit is stalled. Data since 2020.
-  is_3p_demand:
-    lineage:
-      - datalake_visit.visit_business_model.business_model
-    description: If this visit is by 3p demand. Data since 2020.
-  is_3p_supply:
-    lineage:
-      - datalake_visit.visit_business_model.business_model
-    description: If this visit is by 3p supply. Data since 2020.
   is_fixed_agent:
     lineage:
       - datalake_visit.preferred_fixed_agent_history.id_pfa_history
