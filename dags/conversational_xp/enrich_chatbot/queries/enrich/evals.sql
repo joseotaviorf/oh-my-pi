@@ -1,13 +1,13 @@
 SELECT
-  sc.id_session AS id_langfuse_session,
+  id_session AS id_langfuse_session,
   MAP_FROM_ENTRIES(
     COLLECT_LIST(
       STRUCT(
-        sc.name,
+        name,
         NAMED_STRUCT(
-          'id', sc.id_score,
-          'value', sc.value,
-          'ts_created', sc.ts_created
+          'id', id_score,
+          'value', value,
+          'ts_created', ts_created
         )
       )
     )
@@ -15,5 +15,6 @@ SELECT
 FROM
   datalake_langfuse_clean.scores AS sc
 WHERE
-  sc.ts_created >= '{load_start_date}'
+  ts_created >= '{load_start_date}'
+  AND id_session IS NOT NULL
 GROUP BY 1
