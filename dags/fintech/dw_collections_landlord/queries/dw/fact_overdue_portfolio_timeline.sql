@@ -19,7 +19,7 @@ list_invoices_installments AS (
     SELECT DISTINCT
         id_invoice_deal
     FROM
-        deal_deduplication
+        dw_collections_landlord.fact_landlord_deal_installment_match
 ),
 full_list_pp_invoices AS (
     SELECT
