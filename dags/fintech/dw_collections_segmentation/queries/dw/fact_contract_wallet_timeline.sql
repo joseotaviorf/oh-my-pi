@@ -349,18 +349,19 @@ app_events_features AS (
         id_contract,
         COUNT(DISTINCT id_amplitude) AS qnt_app_events,
         COUNT(DISTINCT CASE
-            WHEN funnel_step IN ('Overdue Self Service Viewed', 'Overdue Self Service Action')
+            WHEN funnel_step IN ('Overdue Self Service Viewed', 'Overdue Self Service Action', 'Pending Invoices', 'Overdue Invoices')
                 AND id_invoice IS NOT NULL
             THEN id_amplitude
         END) AS qnt_app_events_overdue,
         CAST(COUNT(DISTINCT id_amplitude) > 0 AS BOOLEAN) AS has_app_events,
         CAST(COUNT(DISTINCT CASE
-            WHEN funnel_step IN ('Overdue Self Service Viewed', 'Overdue Self Service Action')
+            WHEN funnel_step IN ('Overdue Self Service Viewed', 'Overdue Self Service Action', 'Pending Invoices', 'Overdue Invoices')
                 AND id_invoice IS NOT NULL
             THEN id_amplitude
         END) > 0 AS BOOLEAN) AS has_app_events_overdue
     FROM datalake_collections_quintoandar.delinquency_app_events
     WHERE id_contract IS NOT NULL
+        AND funnel_step not in ('Home Page')
         AND DATE(ts_event) >= DATE('{load_start_date}')
         AND DATE(ts_event) <= DATE('{load_end_date}')
     GROUP BY 1, 2
