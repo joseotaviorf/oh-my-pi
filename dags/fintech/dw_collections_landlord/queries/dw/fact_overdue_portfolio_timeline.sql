@@ -555,6 +555,7 @@ add_aux_calendar AS (
         AND g.id_contract = m.id_contract
 )
 SELECT
+    CONCAT(id_invoice, id_contract, DATE_FORMAT(dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
     id_invoice,
     id_contract,
     id_account,
