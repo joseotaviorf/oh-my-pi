@@ -24,10 +24,15 @@ workflow:
       transactional_datatype_overrides:
         bonus_fee: decimal(38,20)
     business_unit: {}
+    calculation_error: {}
     campaign:
       transactional_datatype_overrides:
         bonus_fee: decimal(38,20)
     hub_bonus: {}
+    importation_error: {}
+    job: {}
+    message: {}
+    offer_agent_importation_error: {}
     hub_bonus_revision:
       transactional_datatype_overrides:
         bonus_fee: decimal(38,20)
@@ -35,6 +40,7 @@ workflow:
       transactional_datatype_overrides:
         brokerage: decimal(38,20)
     offer_agent: {}
+    offer_importation_error: {}
     offer_partner: {}
     partner: {}
     revenue_share_by_offer: {}

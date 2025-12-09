@@ -1,0 +1,43 @@
+---
+database_name: datalake_nazare_clean
+table_name: calculation_error
+description: Errors captured when calculating revenue share and related values for offers, agents, and partners.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
+columns:
+  id_calculation_error:
+    lineage:
+      - datalake_nazare_raw.calculation_error.id
+    description: Unique identifier of the calculation error.
+  id_offer_agent:
+    lineage:
+      - datalake_nazare_raw.calculation_error.offer_agent_id
+    description: Identifier of the related offer agent.
+  id_offer_partner:
+    lineage:
+      - datalake_nazare_raw.calculation_error.offer_partner_id
+    description: Identifier of the related offer partner.
+  id_offer:
+    lineage:
+      - datalake_nazare_raw.calculation_error.offer_id
+    description: Identifier of the related offer.
+  type:
+    lineage:
+      - datalake_nazare_raw.calculation_error.type
+    description: Classification/type of the calculation error.
+  message:
+    lineage:
+      - datalake_nazare_raw.calculation_error.message
+    description: Human-readable error message describing the issue.
+  metadata:
+    lineage:
+      - datalake_nazare_raw.calculation_error.metadata
+    description: Additional metadata about the calculation error in JSON format.
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.calculation_error.created_at
+    description: Record creation timestamp.
+  ts_solved:
+    lineage:
+      - datalake_nazare_raw.calculation_error.solved_at
+    description: Timestamp when the error was solved, if applicable.

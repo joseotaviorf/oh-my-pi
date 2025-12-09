@@ -1,0 +1,27 @@
+---
+database_name: datalake_nazare_clean
+table_name: offer_agent_importation_error
+description: Errors captured when importing offer agent records from source systems.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
+columns:
+  id_offer_agent_importation_error:
+    lineage:
+      - datalake_nazare_raw.offer_agent_importation_error.id
+    description: Unique identifier of the offer agent importation error.
+  id_offer:
+    lineage:
+      - datalake_nazare_raw.offer_agent_importation_error.offer_id
+    description: Identifier of the related offer.
+  error_messages:
+    lineage:
+      - datalake_nazare_raw.offer_agent_importation_error.error_messages
+    description: Array of error messages describing the import issues.
+  original_value:
+    lineage:
+      - datalake_nazare_raw.offer_agent_importation_error.original_value
+    description: Original payload/value that failed during import in JSON format.
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.offer_agent_importation_error.created_at
+    description: Record creation timestamp.

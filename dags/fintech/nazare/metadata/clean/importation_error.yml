@@ -1,0 +1,47 @@
+---
+database_name: datalake_nazare_clean
+table_name: importation_error
+description: Errors captured when importing various revenue share entities from source systems.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
+columns:
+  id_importation_error:
+    lineage:
+      - datalake_nazare_raw.importation_error.id
+    description: Unique identifier of the importation error.
+  entity:
+    lineage:
+      - datalake_nazare_raw.importation_error.entity
+    description: Entity type that failed to import.
+  type:
+    lineage:
+      - datalake_nazare_raw.importation_error.type
+    description: Classification of the importation error.
+  key:
+    lineage:
+      - datalake_nazare_raw.importation_error.key
+    description: Key fields of the entity involved in the error in JSON format.
+  original_value:
+    lineage:
+      - datalake_nazare_raw.importation_error.original_value
+    description: Original payload/value that failed during import in JSON format.
+  message:
+    lineage:
+      - datalake_nazare_raw.importation_error.message
+    description: Human-readable error message.
+  metadata:
+    lineage:
+      - datalake_nazare_raw.importation_error.metadata
+    description: Additional metadata about the error in JSON format.
+  dt_relevance:
+    lineage:
+      - datalake_nazare_raw.importation_error.relevance_date
+    description: Date when the error is considered relevant for processing.
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.importation_error.created_at
+    description: Record creation timestamp.
+  ts_solved:
+    lineage:
+      - datalake_nazare_raw.importation_error.solved_at
+    description: Timestamp when the error was solved, if applicable.

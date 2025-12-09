@@ -1,0 +1,51 @@
+---
+database_name: datalake_nazare_clean
+table_name: job
+description: Jobs executed by the Nazare service with references to offers and execution timestamps.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
+columns:
+  id_job:
+    lineage:
+      - datalake_nazare_raw.job.id
+    description: Unique identifier of the job.
+  id_parent_job:
+    lineage:
+      - datalake_nazare_raw.job.id_parent_job
+    description: Identifier of the parent job, when applicable.
+  id_offer:
+    lineage:
+      - datalake_nazare_raw.job.offer_id
+    description: Identifier of the related offer.
+  id_offer_agent:
+    lineage:
+      - datalake_nazare_raw.job.offer_agent_id
+    description: Identifier of the related offer agent.
+  id_offer_partner:
+    lineage:
+      - datalake_nazare_raw.job.offer_partner_id
+    description: Identifier of the related offer partner.
+  id_offer_sales_flow:
+    lineage:
+      - datalake_nazare_raw.job.offer_sales_flow_id
+    description: Identifier of the related offer sales flow.
+  job_type:
+    lineage:
+      - datalake_nazare_raw.job.job_type
+    description: Type of the executed job.
+  dt_job:
+    lineage:
+      - datalake_nazare_raw.job.job_date
+    description: Job execution date.
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.job.created_at
+    description: Record creation timestamp.
+  ts_started:
+    lineage:
+      - datalake_nazare_raw.job.started_at
+    description: Job start timestamp.
+  ts_finished:
+    lineage:
+      - datalake_nazare_raw.job.finished_at
+    description: Job finish timestamp.

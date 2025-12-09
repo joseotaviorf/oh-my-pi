@@ -1,0 +1,111 @@
+---
+database_name: datalake_nazare_clean
+table_name: message
+description: Event messages produced by the Nazare service with delivery and processing metadata.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
+columns:
+  id_message:
+    lineage:
+      - datalake_nazare_raw.message.id
+    description: Unique identifier of the message.
+  id_incremental:
+    lineage:
+      - datalake_nazare_raw.message.incremental_id
+    description: Incremental identifier used for ordering and partitioning.
+  id_aggregate:
+    lineage:
+      - datalake_nazare_raw.message.aggregate_id
+    description: Aggregate identifier related to the event source.
+  id_correlation:
+    lineage:
+      - datalake_nazare_raw.message.correlation_id
+    description: Correlation identifier used for request tracing across services.
+  id_trace:
+    lineage:
+      - datalake_nazare_raw.message.trace_id
+    description: Trace identifier used for distributed tracing.
+  aggregate_type:
+    lineage:
+      - datalake_nazare_raw.message.aggregate_type
+    description: Type of the aggregate that produced the event.
+  event_type:
+    lineage:
+      - datalake_nazare_raw.message.event_type
+    description: Type/name of the event.
+  payload:
+    lineage:
+      - datalake_nazare_raw.message.payload
+    description: Event payload in JSON format.
+  metadata:
+    lineage:
+      - datalake_nazare_raw.message.metadata
+    description: Additional event metadata in JSON format.
+  headers:
+    lineage:
+      - datalake_nazare_raw.message.headers
+    description: Transport/message headers in JSON format.
+  status:
+    lineage:
+      - datalake_nazare_raw.message.status
+    description: Current processing status of the message.
+  destination:
+    lineage:
+      - datalake_nazare_raw.message.destination
+    description: Target destination used for message publishing.
+  last_error:
+    lineage:
+      - datalake_nazare_raw.message.last_error
+    description: Last error captured during processing in JSON format.
+  provider:
+    lineage:
+      - datalake_nazare_raw.message.provider
+    description: Provider of the messaging infrastructure or channel.
+  idempotency_key:
+    lineage:
+      - datalake_nazare_raw.message.idempotency_key
+    description: Idempotency key to prevent duplicate processing.
+  retry_count:
+    lineage:
+      - datalake_nazare_raw.message.retry_count
+    description: Number of retry attempts performed for the message.
+  locked_by:
+    lineage:
+      - datalake_nazare_raw.message.locked_by
+    description: Worker or process that acquired the message lock.
+  creation_time:
+    lineage:
+      - datalake_nazare_raw.message.creation_time
+    description: Message creation time as epoch milliseconds.
+  is_published:
+    lineage:
+      - datalake_nazare_raw.message.published
+    description: Flag indicating whether the message was published to the destination.
+  ts_created:
+    lineage:
+      - datalake_nazare_raw.message.created_at
+    description: Record creation timestamp.
+  ts_creation:
+    lineage:
+      - datalake_nazare_raw.message.creation_datetime
+    description: Message creation timestamp derived from creation time.
+  ts_failed:
+    lineage:
+      - datalake_nazare_raw.message.failed_at
+    description: Timestamp when the message processing failed.
+  ts_next_attempt:
+    lineage:
+      - datalake_nazare_raw.message.next_attempt_at
+    description: Timestamp for the next scheduled processing attempt.
+  ts_locked:
+    lineage:
+      - datalake_nazare_raw.message.locked_at
+    description: Timestamp when the message was locked for processing.
+  ts_lease_until:
+    lineage:
+      - datalake_nazare_raw.message.lease_until
+    description: Lease expiration timestamp for the processing lock.
+  ts_processed:
+    lineage:
+      - datalake_nazare_raw.message.processed_at
+    description: Timestamp when the message was successfully processed.
