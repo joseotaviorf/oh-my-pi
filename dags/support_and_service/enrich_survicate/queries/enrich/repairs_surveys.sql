@@ -75,11 +75,11 @@ SELECT
     MAX(
       CASE
         WHEN rc.id_question IN (1852451, 1852461) THEN rc.answer_content
-        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Extremely happy' THEN  5
-        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Happy' THEN  4
-        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Neutral' THEN  3
-        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Unsatisfied' THEN  2
-        WHEN rc.id_question = '2864547' OR rc.id_question = 3230545 AND rc.answer_content = 'Extremely unsatisfied' THEN  1
+        WHEN (rc.id_question = '2864547' OR rc.id_question = 3230545) AND rc.answer_content = 'Extremely happy' THEN  5
+        WHEN (rc.id_question = '2864547' OR rc.id_question = 3230545) AND rc.answer_content = 'Happy' THEN  4
+        WHEN (rc.id_question = '2864547' OR rc.id_question = 3230545) AND rc.answer_content = 'Neutral' THEN  3
+        WHEN (rc.id_question = '2864547' OR rc.id_question = 3230545) AND rc.answer_content = 'Unsatisfied' THEN  2
+        WHEN (rc.id_question = '2864547' OR rc.id_question = 3230545) AND rc.answer_content = 'Extremely unsatisfied' THEN  1
       END
     ) AS INT
   ) AS satisfaction_score,
@@ -109,7 +109,27 @@ GROUP BY
   ALL
 )
 SELECT
-  *
+  id_answer,
+  id_survey,
+  id_respondent,
+  id_ticket,
+  respondent_email,
+  survey_name,
+  respondent_type,
+  service_type,
+  service_context,
+  source_name,
+  improvement_tags,
+  respondent_comments,
+  satisfaction_score,
+  score_description,
+  secondary_satisfaction_score,
+  secondary_score_description,
+  ts_submitted,
+  dt_load,
+  year,
+  month,
+  day
 FROM
   final_df
 QUALIFY ROW_NUMBER() OVER (PARTITION BY id_answer ORDER BY dt_load DESC) = 1
