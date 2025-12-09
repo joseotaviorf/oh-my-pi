@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import (
+    coalesce,
     col,
     concat,
     current_timestamp,
@@ -104,7 +105,7 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
         # Window for deduplication
         dedup_window = Window.partitionBy("id_house_listing").orderBy(
             col("ts_state_started").desc(),
-            col("ts_state_ended").desc()
+            coalesce(col("ts_state_ended"), current_timestamp()).desc()
         )
 
         # Window for max_listing_version
