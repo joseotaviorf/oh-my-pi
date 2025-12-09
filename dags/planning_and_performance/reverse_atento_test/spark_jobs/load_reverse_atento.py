@@ -97,18 +97,18 @@ if __name__ == "__main__":
                 
                 # Create partitioned S3 path
                 s3_path = f"s3a://{bucket}/{partner_name.lower()}/{table_name}/year={year}/month={month}/day={day}/"
-                file_name = f"{table_name}_{year}_{month}_{day}.csv"
+                file_name = f"{table_name}_{year}_{month}_{day}.parquet"
                 
                 try:
                     logger.info(f"m=Loading Dataframe into s3, s3_path={s3_path}")
-                    df.coalesce(1).write.mode("overwrite").option("header", True).csv(s3_path)
+                    df.coalesce(1).write.mode("overwrite").parquet(s3_path)
                     logger.info(f"m=Dataframe succesfully loaded, s3_path={s3_path}")
                     
                     # Rename the part file to the desired file name
                     logger.info(f"m=Renaming S3 file, s3_path={s3_path}")
                     files = dbutils.fs.ls(s3_path)
                     for f in files:
-                        if f.name.startswith("part-") and f.name.endswith(".csv"):
+                        if f.name.startswith("part-") and f.name.endswith(".parquet"):
                             source_path = f.path
                             destination_path = f"{s3_path}{file_name}"
                             dbutils.fs.cp(source_path, destination_path)
