@@ -1,7 +1,7 @@
 WITH visit AS (
     WITH visit_events AS (
         SELECT
-            id_visit, 
+            id_visit,
             event_type,
             ts_created
         FROM
@@ -484,7 +484,7 @@ photo_session AS (
         AND YEAR(ts_created) >= 2025
 ),
 listing AS (
-    SELECT 
+    SELECT
         id_entity,
         id_house,
         id_contract,
@@ -496,8 +496,25 @@ listing AS (
         is_active,
         ts_created,
         ts_updated
-    FROM 
+    FROM
         datalake_entities_views.listing
+),
+
+house_draft AS (
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_owner AS id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        datalake_entities_views.house_draft
 ),
 reservation AS (
     WITH reservation_base AS (
@@ -622,7 +639,7 @@ repair AS (
             rr.year >= 2025
     ),
     union_all AS (
-        SELECT 
+        SELECT
             id_entity,
             id_house,
             id_contract,
@@ -949,6 +966,22 @@ base AS (
         ts_updated
     FROM
         invoice
+    UNION ALL
+    SELECT
+        {sk_entity} AS sk_entity,
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        persona,
+        business_context,
+        properties,
+        is_active,
+        ts_created,
+        ts_updated
+    FROM
+        house_draft
 )
 SELECT
     b.sk_entity,

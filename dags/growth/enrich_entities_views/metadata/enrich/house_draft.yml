@@ -1,0 +1,66 @@
+database_name: datalake_entities_views
+table_name: house_draft
+description: |
+  Enriched view of house draft data that consolidates house draft, house, and owner information for full self-service house drafts.
+  This view only includes house drafts with type 'FULL_SELF_SERVICE', representing property registration drafts created through the self-service flow by the owner.
+domain: Growth
+owner: eduardo.soares@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_bob_clean.house_draft.id
+    description: Primary key of the house draft entity, directly from the house_draft table.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.house.id_external
+    description: |
+      Foreign key referencing the house entity, sourced from the house table via the id_external join.
+      This field can be NULL if the house draft has not yet been linked to a house in the main system.
+  id_owner:
+    lineage:
+      - datalake_bob_clean.registrar.id_main
+      - datalake_bob_clean.house_draft.registrar
+    description: |
+      Foreign key referencing the property owner, sourced from the registrar table via the registrar join.
+      This field can be NULL if the registrar information is not available.
+  id_contract:
+    description: |
+      Foreign key referencing the contract entity. Always NULL for house drafts as they are not directly linked to contracts.
+      House drafts represent properties in the registration process before contract creation.
+  entity:
+    description: Fixed value 'HOUSE_DRAFT' indicating the type of entity.
+  persona:
+    description: |
+      A persona describes the primary role of a user (id_owner) in relation to the house draft entity.
+      Fixed value 'OWNER' indicating this entity is associated with the property owner.
+    categories:
+      OWNER: The property owner associated with the house draft registration process.
+  business_context:
+    description: |
+      Business context categorizing the type of transaction. Currently always NULL in the query implementation.
+  properties:
+    lineage:
+      - datalake_bob_clean.house_draft.status
+      - datalake_bob_clean.house_draft.ts_created
+    description: |
+      JSON structure containing house draft properties including status and creation timestamp (when).
+      Used to provide detailed contextual information about the current state of each house draft entity.
+      Structure: {"status": "<status_value>", "when": "<timestamp>"}
+      Note: The status field is only available within this JSON structure, not as a separate column.
+      Status values include 'EDITING' (when the house draft is being edited or modified) and 'PROCESSING' (when the house draft is being processed in the system workflow).
+  is_active:
+    lineage:
+      - datalake_bob_clean.house_draft.status
+    description: |
+      Boolean flag indicating if the house draft is currently active.
+      Set to TRUE when status is 'EDITING' or 'PROCESSING', FALSE for all other statuses.
+      Active house drafts are those that can still receive interactions and are in progress.
+  ts_created:
+    lineage:
+      - datalake_bob_clean.house_draft.ts_created
+    description: Timestamp when the house draft record was created.
+  ts_updated:
+    lineage:
+      - datalake_bob_clean.house_draft.ts_updated
+    description: Timestamp when the house draft record was last updated.
