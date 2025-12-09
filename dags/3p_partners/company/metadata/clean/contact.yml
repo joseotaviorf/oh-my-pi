@@ -1,0 +1,76 @@
+---
+database_name: datalake_company_clean
+table_name: contact
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Contact information for companies including emails and phone numbers.
+  Supports multiple contact information per company.
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.contact.id
+    description: |
+      Primary key - Auto-incrementing internal identifier for the contact record.
+      Used for internal database relationships and efficient indexing.
+  id_company:
+    lineage:
+      - datalake_company_raw.contact.company_id
+    description: |
+      Foreign key reference to the company table (company.id).
+      **Relationship:** Many-to-One with company table
+      **Business Rule:** Required field, cannot be null
+      **Usage:** Links contact information to the owning company record.
+  uuid_contact:
+    lineage:
+      - datalake_company_raw.contact.contact_uuid
+    description: |
+      Business identifier - Unique UUID for this contact, automatically generated.
+      Used for external API references and cross-service communication when referring to specific contact methods.
+  type:
+    lineage:
+      - datalake_company_raw.contact.type
+    description: |
+      Type of contact information stored in this record.
+      **Allowed Values:**
+      - 'EMAIL': Email addresses (example: email@example.com)
+      - 'PHONE': Phone numbers (example: +5511999999999)
+  name:
+    lineage:
+      - datalake_company_raw.contact.name
+    description: |
+      Name of the contact information stored in this record.
+      **Usage:** Used for display and identification purposes.
+  value:
+    lineage:
+      - datalake_company_raw.contact.value
+    description: |
+      Value of the contact information stored in this record.
+      **Usage:** Used for display and identification purposes.
+  version:
+      lineage:
+        - datalake_company_raw.contact.version
+      description: |
+        Optimistic locking version number (BIGINT) for concurrent update protection. Incremented on each update to prevent lost update problems in distributed systems.
+  ts_created:
+    lineage:
+      - datalake_company_raw.contact.created_at
+    description: |
+      Record creation timestamp (UTC). Automatically set to now() on insert. Used for data lineage, audit trails, and temporal analysis.
+  ts_updated:
+    lineage:
+      - datalake_company_raw.contact.updated_at
+    description: |
+      Last modification timestamp (UTC). Automatically updated on each record change. Critical for CDC change detection and incremental processing.
+  year:
+    lineage:
+      - datalake_company_raw.contact.year
+    description: 'Partition column (YYYY format). Extracted from ts_created for efficient data lake partitioning and query performance optimization. Enables year-over-year partner growth analysis.'
+  month:
+    lineage:
+      - datalake_company_raw.contact.month
+    description: 'Partition column (MM format). Extracted from ts_created for monthly data organization and time-based analytics. Supports monthly partner acquisition reporting.'
+  day:
+    lineage:
+      - datalake_company_raw.contact.day
+    description: 'Partition column (DD format). Extracted from ts_created for daily data segmentation and incremental processing strategies. Enables daily operational dashboards.'
