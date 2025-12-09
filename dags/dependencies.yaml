@@ -2076,10 +2076,10 @@ bietlejuice.enrich_dual_write:
   - bietlejuice.billing:load-clean-entry:first-run-of-day
   - bietlejuice.billing:load-clean-invoice:first-run-of-day
   - bietlejuice.enrich_billing:load-enrich-contract:first-run-of-day
+  - bietlejuice.retsuko:load-clean-entry:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-invoice:first-run-of-day
-  - bietlejuice.retsuko:load-clean-entry:first-run-of-day
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_finance:load-clean-account-transaction:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
@@ -2507,6 +2507,8 @@ bietlejuice.enrich_hr_system:
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy:first-run-of-day
   - bietlejuice.hr_system:load-clean-workers:first-run-of-day
   - bietlejuice.pin_core:load-clean-lookup:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person:first-run-of-day
 bietlejuice.enrich_hr_system_custom:
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
 bietlejuice.enrich_hub_services:
@@ -3040,11 +3042,10 @@ bietlejuice.enrich_person:
 bietlejuice.enrich_pin:
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
-  - bietlejuice.hr_system:load-clean-workers:first-run-of-day
-  - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
-  - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-assignment-supervisor:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade:first-run-of-day
   - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
 bietlejuice.enrich_pixar:

@@ -7,12 +7,6 @@ WITH hr_system_workers AS (
     religions
   FROM
     datalake_hr_system_clean.workers
-  QUALIFY
-    DENSE_RANK() OVER (
-      PARTITION BY id_person
-      ORDER BY
-        dt_effective
-    ) = 2
 ),
 external_identifiers_step1 AS (
   SELECT
