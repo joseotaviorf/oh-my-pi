@@ -6,13 +6,21 @@ WITH union_inspection_history AS (
             datalake_inspection_services_clean.inspection_aud AS ia
         QUALIFY
             ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
+    ),
+    last_appointment_update AS (
+        SELECT
+            *
+        FROM 
+            datalake_inspection_services_clean.appointment AS a 
+        QUALIFY 
+            a.ts_created = FIRST(a.ts_created) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_created DESC) 
     )
     SELECT
         i.id_inspection,
         i.id_previous_inspection,
         i.id_external,
         i.id_inspector,
-        COALESCE(a.id_external_appointment, i.id_schedule) AS id_booking,
+        COALESCE(a.id_external_appointment, im.id_booking) AS id_booking,
         NULL AS id_appointment,
         i.id_contract,
         i.id_client_side,
@@ -35,8 +43,14 @@ WITH union_inspection_history AS (
     FROM
         last_inspection_update AS i
     LEFT JOIN
-        datalake_inspection_services_clean.appointment AS a
+        last_appointment_update AS a
           ON i.id_inspection = a.id_inspection
+    LEFT JOIN 
+        datalake_schedules_clean.appointment AS asd
+          ON a.id_schedules = asd.id
+    LEFT JOIN 
+        datalake_ebdb_clean.inspection AS im 
+          ON asd.id_internal_reference = im.id
     UNION
     SELECT
         i.id_inspection,
