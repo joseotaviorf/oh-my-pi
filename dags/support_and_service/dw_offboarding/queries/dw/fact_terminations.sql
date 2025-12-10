@@ -19,6 +19,7 @@ SELECT
     t.id_workflow_assignee AS sk_workflow_assignee,
     BIGINT(t.id_zendesk_task) AS sk_zendesk_task,
     BIGINT(DATE_FORMAT(t.dt_termination, 'yyyyMMdd')) AS sk_termination_date,
+    BIGINT(DATE_FORMAT(t.dt_original_termination, 'yyyyMMdd')) AS sk_original_termination_date,
     BIGINT(DATE_FORMAT(t.dt_last_rescheduled, 'yyyyMMdd')) AS sk_last_rescheduled_date,
     sc.id_analyst AS sk_analyst,
     sc.id_worker_twilio AS sk_worker_twilio,

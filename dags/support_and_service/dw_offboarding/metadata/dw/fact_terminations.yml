@@ -40,9 +40,13 @@ columns:
     lineage:
       - datalake_terminator.termination.id_zendesk_task
   sk_termination_date:
-    description: Date when the property became or will become vacant in sk format.
+    description: Date when the property became or will become vacant in sk format. If a rescheduling was made, this will be different from sk_original_termination_date.
     lineage:
       - datalake_terminator.termination.dt_termination
+  sk_original_termination_date:
+    description: Original date when the property would become vacant in sk format.
+    lineage:
+      - datalake_terminator.termination.dt_original_termination
   sk_last_rescheduled_date:
     description: Date of last rescheduling of termination in sk format.
     lineage:
