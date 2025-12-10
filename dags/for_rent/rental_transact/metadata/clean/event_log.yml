@@ -7,33 +7,48 @@ columns:
   id:
     lineage:
       - datalake_rental_transact_raw.event_log.id
+    description: Unique identifier for the event log entry.
   id_flow:
     lineage:
       - datalake_rental_transact_raw.event_log.flow_id
+    description: Flow identifier associated with the event.
   id_external_author:
     lineage:
       - datalake_rental_transact_raw.event_log.author_external_id
+    description: External identifier of the author who created the event.
   id_rent_flow:
     lineage:
       - datalake_rental_transact_raw.event_log.rent_flow_id
+    description: Rent flow identifier associated with the event.
   id_event_domain:
     lineage:
       - datalake_rental_transact_raw.event_log.event_domain_id
+    description: Event domain identifier that categorizes the event.
   actor_role:
     lineage:
       - datalake_rental_transact_raw.event_log.actor_role
+    description: Role of the actor who performed the event.
   type:
     lineage:
       - datalake_rental_transact_raw.event_log.type
+    description: Type of event that was logged.
   debug_additional_info:
     lineage:
       - datalake_rental_transact_raw.event_log.debug_additional_info
+    description: Additional debug information related to the event.
   source:
     lineage:
       - datalake_rental_transact_raw.event_log.source
+    description: Source system or origin of the event.
+  cancellation_reason:
+    lineage:
+      - datalake_rental_transact_raw.event_log.cancellation_reason
+    description: Reason for cancellation, if the event was cancelled.
   ts_created:
     lineage:
       - datalake_rental_transact_raw.event_log.created_at
+    description: Timestamp when the event was created.
   ts_updated:
     lineage:
       - datalake_rental_transact_raw.event_log.updated_at
+    description: Timestamp when the event was last updated.

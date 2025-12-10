@@ -8,6 +8,7 @@ SELECT
 	type,
 	debug_additional_info,
 	source,
+	cancellation_reason,
 	created_at AS ts_created,
 	updated_at AS ts_updated
 FROM 
