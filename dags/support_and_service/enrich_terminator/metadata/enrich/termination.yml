@@ -188,8 +188,6 @@ columns:
       (1) it is not an eviction,
       (2) has repairs and
       (3) is not early both agree, nor had "Both Agreed" on budget approval or required band-aid. 
-  has_termination_date_rescheduling:
-    description: Flag indicating whether the termination request included rescheduling of the termination date.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:

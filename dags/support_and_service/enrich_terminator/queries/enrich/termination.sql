@@ -17,8 +17,7 @@ expanded_entries AS (
 first_td AS (
     SELECT DISTINCT
         id AS id_termination,
-        TO_DATE(GET_JSON_OBJECT(entry, '$.fromVacancyDate'), 'yyyy-MM-dd') AS rescheduled_from_vacancy_date,
-        TO_DATE(GET_JSON_OBJECT(entry, '$.toVacancyDate'), 'yyyy-MM-dd') AS original_dt_termination
+        TO_DATE(GET_JSON_OBJECT(entry, '$.fromVacancyDate'), 'yyyy-MM-dd') AS original_dt_termination
     FROM
         expanded_entries
     QUALIFY ROW_NUMBER() OVER (
@@ -243,7 +242,11 @@ SELECT
     tw.has_automatically_closed_task,
     ci.is_contract_b2b,
     (t.ts_created < ci.dt_started) AS is_before_contract_start,
-    (tm.id IS NOT NULL) AS has_been_rescheduled,
+    CASE
+        WHEN first_td.original_dt_termination IS NOT NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS has_been_rescheduled,
     checklist.is_active AS is_checklist_active,
     checklist.is_done AS is_checklist_done,
     cdr.is_relisting_enabled,
@@ -263,11 +266,6 @@ SELECT
         THEN TRUE
         ELSE FALSE
     END AS has_repairs,
-    CASE
-        WHEN first_td.original_dt_termination IS NOT NULL
-        THEN TRUE
-        ELSE FALSE
-    END AS has_termination_date_rescheduling,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
     ln.fee_discount_value,
