@@ -5,12 +5,12 @@ dag:
   documentation:
     dag_purpose: |
       This DAG imports critical tables from the Company microservice, which centralizes legal entity data for QuintoAndar's partner ecosystem.
-      
+
       BUSINESS CONTEXT:
       The Company service manages QuintoAndar's paradigm shift to support broker partners (For Brokers initiative), where QuintoAndar
       itself becomes one entity among many companies in the platform. This CDC pipeline captures real-time changes from the production
       PostgreSQL database (company.db.core-prd.habitat.zone) to support analytics, reporting, and downstream data products.
-      
+
       INGESTED ENTITIES:
       - Company hierarchies (headquarters → branches)
       - Legal documents (CNPJ, CRECI, CPF, RFC) with validation status
@@ -19,9 +19,9 @@ dag:
       - Revenue sharing configurations and commission structures
       - User membership and role assignments across companies/products
       - Product catalogs and tier-based service levels
-      
+      - Contact information for companies including emails and phone numbers.
       SCHEDULE: Runs 3x daily (8:00, 12:00, 21:00 UTC) to capture business-hour changes and end-of-day settlements.
-      
+
       DATA LINEAGE: PostgreSQL (OLTP) → Raw Layer → Clean Layer → Analytics Layer
 workflow:
   type: cdc
@@ -50,9 +50,10 @@ workflow:
     profile: {}
     revenue_share: {}
     tier: {}
+    contact: {}
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}" 
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
