@@ -31,5 +31,5 @@ workflow:
     aux__house_listing_category:
       - aux__lbc_status_version_order
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster_5_workers
+  type: databricks_16_4_rfleet_instance_cluster_7_workers
   databricks_conn_id: databricks_new
