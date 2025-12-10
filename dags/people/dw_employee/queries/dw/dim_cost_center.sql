@@ -19,6 +19,7 @@ SELECT
   o.status = 'A' AS is_active,
   o.dt_effective_start,
   o.dt_effective_end,
+  o.ts_created,
   NOW () AS ts_load
 FROM
   datalake_hr_system_clean.organizations AS o
