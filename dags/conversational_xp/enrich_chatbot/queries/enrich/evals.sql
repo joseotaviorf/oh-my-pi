@@ -13,7 +13,7 @@ SELECT
     )
   ) AS evals
 FROM
-  datalake_langfuse_clean.scores AS sc
+  datalake_langfuse_clean.scores
 WHERE
   ts_created >= '{load_start_date}'
   AND id_session IS NOT NULL

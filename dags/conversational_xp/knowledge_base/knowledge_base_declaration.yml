@@ -31,9 +31,7 @@ cluster:
     driver_node_type_id: r7a.xlarge
     node_type_id: r7a.xlarge
     num_workers: 1
-    spark_version: 15.4.x-scala2.12
-    aws_attributes:
-      availability: ON_DEMAND
+    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.driver.maxResultSize: "0"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
