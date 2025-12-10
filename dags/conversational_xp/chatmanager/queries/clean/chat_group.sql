@@ -3,7 +3,6 @@ SELECT
     uuid,
     last_chat_vendor_id AS id_last_chat_vendor,
     chat_subtype_id AS id_chat_subtype,
-    uuid,
     version,
     type,
     chat_group,
