@@ -1,0 +1,12 @@
+---
+table_name: datalake_greenhouse_v3_clean.approval_flows
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Warning
+

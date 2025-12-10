@@ -1,0 +1,90 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: approvers
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Table containing approvers information, sourced from the Greenhouse Harvest API v3 'approvers' endpoint. Approvers are users who can approve job-related actions.
+columns:
+  id:
+    description: The approver's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.id
+  id_user:
+    description: The unique identifier of the user who is an approver.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.user_id
+  id_approver_group:
+    description: The unique identifier of the approver group this approver belongs to, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.approver_group_id
+  id_resolved_by:
+    description: The unique identifier of the user who resolved this approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.resolved_by_id
+  id_reminder_sent_by:
+    description: The unique identifier of the user who sent the reminder, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.reminder_sent_by_id
+  id_added_by_custom_field:
+    description: The unique identifier of the custom field that added this approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.added_by_custom_field_id
+  status:
+    description: The current status of the approver (waiting, due, approved, rejected).
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.status
+  sort_order:
+    description: The sort order of the approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.sort_order
+  version_sent:
+    description: The version number sent to the approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.version_sent
+  reminders_sent:
+    description: The number of reminders sent to the approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.reminders_sent
+  auto_reminders_sent:
+    description: The number of auto reminders sent to the approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.auto_reminders_sent
+  send_auto_reminder_at:
+    description: The date and time when auto reminder should be sent, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.send_auto_reminder_at
+  ts_created:
+    description: The timestamp when the approver record was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.created_at
+  ts_updated:
+    description: The timestamp when the approver record was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.updated_at
+  ts_resolved:
+    description: The timestamp when the approver was resolved, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.resolved_at
+  ts_request_sent:
+    description: The timestamp when the request was sent to the approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.request_sent_at
+  ts_reminder_sent:
+    description: The timestamp when the reminder was sent to the approver, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.reminder_sent_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approvers.day
+

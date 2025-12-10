@@ -1,0 +1,42 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: referrers
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Table containing referrers information, sourced from the Greenhouse Harvest API v3 'referrers' endpoint. Referrers are users who have referred candidates to job openings.
+columns:
+  id:
+    description: The referrer's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.id
+  id_user:
+    description: The unique identifier of the user who is the referrer, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.user_id
+  name:
+    description: The name of the referrer.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.name
+  ts_created:
+    description: The timestamp when the referrer record was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.created_at
+  ts_updated:
+    description: The timestamp when the referrer record was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.referrers.day
+

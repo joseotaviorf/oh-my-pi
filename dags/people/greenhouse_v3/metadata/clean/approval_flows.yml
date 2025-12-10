@@ -1,0 +1,62 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: approval_flows
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Table containing approval flows configuration, sourced from the Greenhouse Harvest API v3 'approval_flows' endpoint. Approval flows define the approval process for job-related actions.
+columns:
+  id:
+    description: The approval flow's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.id
+  id_job:
+    description: The unique identifier of the job associated with this approval flow.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.job_id
+  id_offer:
+    description: The unique identifier of the offer associated with this approval flow, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.offer_id
+  id_requested_by:
+    description: The unique identifier of the user who requested the approval, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.requested_by_id
+  approval_type:
+    description: The type of approval (open_job, offer_job, offer_candidate).
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.approval_type
+  approval_status:
+    description: The current status of the approval (pending, rejected, approved, or null).
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.approval_status
+  version:
+    description: The version number of the approval flow.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.version
+  is_sequential:
+    description: A boolean flag indicating whether approvals are sequential.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.sequential
+  ts_created:
+    description: The timestamp when the approval flow was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.created_at
+  ts_updated:
+    description: The timestamp when the approval flow was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approval_flows.day
+

@@ -77,3 +77,48 @@ workflow:
           date_column_to_partition: "updated_at"
           params:
             per_page: 500
+
+    approval_flows:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "approval_flows"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    approver_groups:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "approver_groups"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    approvers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "approvers"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    users:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "users"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    referrers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "referrers"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500

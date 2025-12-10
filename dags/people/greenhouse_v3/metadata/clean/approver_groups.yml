@@ -1,0 +1,54 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: approver_groups
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Table containing approver groups configuration, sourced from the Greenhouse Harvest API v3 'approver_groups' endpoint. Approver groups define collections of users who can approve job-related actions.
+columns:
+  id:
+    description: The approver group's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.id
+  id_approval_flow:
+    description: The unique identifier of the approval flow this group belongs to.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.approval_flow_id
+  approvals_required:
+    description: The number of approvals required within this group.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.approvals_required
+  sort_order:
+    description: The sort order of the approver group in the approval flow.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.sort_order
+  is_required_for_exception:
+    description: A boolean flag indicating whether this group is required for exception handling.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.required_for_exception
+  ts_created:
+    description: The timestamp when the approver group was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.created_at
+  ts_updated:
+    description: The timestamp when the approver group was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.updated_at
+  ts_resolved:
+    description: The timestamp when the approver group was resolved, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.resolved_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.approver_groups.day
+
