@@ -7,80 +7,80 @@ columns:
   id:
     description: "Chat group identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_group.id
+      - datalake_chatmanager_raw.chatgroup.id
   id_last_chat_vendor:
     description: "Last chat vendor identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_chat_vendor_id
+      - datalake_chatmanager_raw.chatgroup.last_chat_vendor_id
   id_chat_subtype:
     description: "Chat subtype identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_group.chat_subtype_id
+      - datalake_chatmanager_raw.chatgroup.chat_subtype_id
   uuid:
     description: "Chat group unique identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_group.uuid
+      - datalake_chatmanager_raw.chatgroup.uuid
   version:
     description: "Chat group version"
     lineage:
-      - datalake_chatmanager_raw.chat_group.version
+      - datalake_chatmanager_raw.chatgroup.version
   type:
     description: "Chat group type"
     lineage:
-      - datalake_chatmanager_raw.chat_group.type
+      - datalake_chatmanager_raw.chatgroup.type
   chat_group:
     description: "Chat group name"
     lineage:
-      - datalake_chatmanager_raw.chat_group.chat_group
+      - datalake_chatmanager_raw.chatgroup.chat_group
   state:
     description: "Chat group state"
     lineage:
-      - datalake_chatmanager_raw.chat_group.state
+      - datalake_chatmanager_raw.chatgroup.state
   last_message_sent_by:
     description: "Last message sender identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_message_sent_by
+      - datalake_chatmanager_raw.chatgroup.last_message_sent_by
   last_message_type:
     description: "Last message type"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_message_type
+      - datalake_chatmanager_raw.chatgroup.last_message_type
   last_message_body:
     description: "Last message body"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_message_body
+      - datalake_chatmanager_raw.chatgroup.last_message_body
   last_message_index:
     description: "Last message index"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_message_index
+      - datalake_chatmanager_raw.chatgroup.last_message_index
   last_message_data:
     description: "Last message data"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_message_data
+      - datalake_chatmanager_raw.chatgroup.last_message_data
   attributes:
     description: "Chat group attributes"
     lineage:
-      - datalake_chatmanager_raw.chat_group.attributes
+      - datalake_chatmanager_raw.chatgroup.attributes
   last_message_media_content_type:
     description: "Last message media content type"
     lineage:
-      - datalake_chatmanager_raw.chat_group.customer_name
+      - datalake_chatmanager_raw.chatgroup.customer_name
   last_chat_vendor_name:
     description: "Last chat vendor name"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_chat_vendor_name
+      - datalake_chatmanager_raw.chatgroup.last_chat_vendor_name
   chat_subtype:
     description: "Chat subtype"
     lineage:
-      - datalake_chatmanager_raw.chat_group.chat_subtype
+      - datalake_chatmanager_raw.chatgroup.chat_subtype
   ts_created:
     description: "Chat group creation date"
     lineage:
-      - datalake_chatmanager_raw.chat_group.created_at
+      - datalake_chatmanager_raw.chatgroup.created_at
   ts_last_message_sent:
     description: "Last message sent date"
     lineage:
-      - datalake_chatmanager_raw.chat_group.last_message_sent_at
+      - datalake_chatmanager_raw.chatgroup.last_message_sent_at
   ts_updated:
     description: "Chat group update date"
     lineage:
-      - datalake_chatmanager_raw.chat_group.updated_at
+      - datalake_chatmanager_raw.chatgroup.updated_at

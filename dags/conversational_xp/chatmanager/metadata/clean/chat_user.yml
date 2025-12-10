@@ -7,36 +7,36 @@ columns:
   id:
     description: "Chat user identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_user.id
+      - datalake_chatmanager_raw.chatuser.id
   uuid:
     description: "Chat user unique identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_user.uuid
+      - datalake_chatmanager_raw.chatuser.uuid
   id_participant:
     description: "Participant identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_user.participant_id
+      - datalake_chatmanager_raw.chatuser.participant_id
   id_origin:
     description: "Origin identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_user.origin_id
+      - datalake_chatmanager_raw.chatuser.origin_id
   origin_type:
     description: "Origin type"
     lineage:
-      - datalake_chatmanager_raw.chat_user.origin_type
+      - datalake_chatmanager_raw.chatuser.origin_type
   attributes:
     description: "Chat user attributes"
     lineage:
-      - datalake_chatmanager_raw.chat_user.attributes
+      - datalake_chatmanager_raw.chatuser.attributes
   version:
     description: "Chat user version"
     lineage:
-      - datalake_chatmanager_raw.chat_user.version
+      - datalake_chatmanager_raw.chatuser.version
   ts_created:
     description: "Chat user creation date"
     lineage:
-      - datalake_chatmanager_raw.chat_user.created_at
+      - datalake_chatmanager_raw.chatuser.created_at
   ts_updated:
     description: "Chat user update date"
     lineage:
-      - datalake_chatmanager_raw.chat_user.updated_at
+      - datalake_chatmanager_raw.chatuser.updated_at

@@ -7,40 +7,40 @@ columns:
   id_chat_group:
     description: "Chat group identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.chat_group_id
+      - datalake_chatmanager_raw.chatusergroup.chat_group_id
   id_chat_user:
     description: "Chat user identifier"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.chat_user_id
+      - datalake_chatmanager_raw.chatusergroup.chat_user_id
   state:
     description: "Chat user group state"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.state
+      - datalake_chatmanager_raw.chatusergroup.state
   visible:
     description: "Visibility indicator"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.visible
+      - datalake_chatmanager_raw.chatusergroup.visible
   profile:
     description: "User profile"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.profile
+      - datalake_chatmanager_raw.chatusergroup.profile
   last_read_index:
     description: "Last read message index"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.last_read_index
+      - datalake_chatmanager_raw.chatusergroup.last_read_index
   attributes:
     description: "Chat user group attributes"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.attributes
+      - datalake_chatmanager_raw.chatusergroup.attributes
   ts_last_read:
     description: "Last read date"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.last_read_at
+      - datalake_chatmanager_raw.chatusergroup.last_read_at
   ts_created:
     description: "Chat user group creation date"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.created_at
+      - datalake_chatmanager_raw.chatusergroup.created_at
   ts_updated:
     description: "Chat user group update date"
     lineage:
-      - datalake_chatmanager_raw.chat_user_group.updated_at
+      - datalake_chatmanager_raw.chatusergroup.updated_at
