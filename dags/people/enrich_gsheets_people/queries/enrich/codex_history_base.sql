@@ -102,10 +102,6 @@ LEFT JOIN
     ON codex.cost_center_code = cc_hctype.cost_center_code
     AND codex.dt_updated = cc_hctype.dt_updated
 LEFT JOIN
-  cost_center_headcount_type AS codex_hctp
-    ON codex.cost_center_code = codex_hctp.cost_center_code
-    AND codex.dt_updated = codex_hctp.dt_updated
-LEFT JOIN
   employee_ids_enrich AS emp_id1
     ON codex.owner_l1_email = emp_id1.work_email
 LEFT JOIN
