@@ -9,8 +9,6 @@ column_level_validations:
   id_organization_unit_classification:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Warning
   dt_effective_started:
     custom:
       # Ensure the effective period is valid (start date not after end date).
