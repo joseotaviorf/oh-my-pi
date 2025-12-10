@@ -75,7 +75,43 @@ columns:
   sk_post_visit_demand:
     description: Foreign key from dim_post_visit_demand about visits with post visit demand.
     lineage:
-      - dw_visit.dim_post_visit_demand.sk_post_visit_demand
+      - dw_visit.dim_post_visit_demand.sk_visit
+  sk_visit_request_date:
+    description: Date key (YYYYMMDD format) of when the visit was requested. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_requested
+  sk_visit_created_date:
+    description: Date key (YYYYMMDD format) of when the visit was first created. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_created
+  sk_visit_date_local_tz:
+    description: Date key (YYYYMMDD format) of the scheduled visit date in local timezone. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_local_tz
+  sk_first_visit_confirmed_date:
+    description: Date key (YYYYMMDD format) of when the visit was first confirmed. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_first_confirmed
+  sk_last_visit_confirmed_date:
+    description: Date key (YYYYMMDD format) of when the visit was last confirmed. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_last_confirmed
+  sk_first_visit_reschedule_date:
+    description: Date key (YYYYMMDD format) of when the visit was first rescheduled. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_first_rescheduled
+  sk_last_visit_reschedule_date:
+    description: Date key (YYYYMMDD format) of when the visit was last rescheduled. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_rescheduled
+  sk_visit_done:
+    description: Date key (YYYYMMDD format) of when the visit was completed. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_done
+  sk_visit_canceled:
+    description: Date key (YYYYMMDD format) of when the visit was canceled. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_canceled
   nbr_reschedule:
     description: Number of reschedules.
     lineage:
@@ -91,24 +127,133 @@ columns:
   num_visit_booked:
     description: Number of visit booked. The sum aggregate function can be used to get the total number of booked visits grouped in some way.
   num_visit_confirmed:
-    description: Number of visit confirmed. The sum aggregate function can be used to get the total number of confirmed visits grouped in some way.
+    description: Number of visit confirmed (CAST of is_confirmed as INTEGER). The sum aggregate function can be used to get the total number of confirmed visits grouped in some way.
     lineage:
-      - datalake_visit.visits.is_visit_confirmed
+      - datalake_visit.visits.is_confirmed
   num_visit_completed:
-    description: Number of visit completed. The sum aggregate function can be used to get the total number of completed visits grouped in some way.
+    description: Number of visit completed (CAST of is_completed as INTEGER). The sum aggregate function can be used to get the total number of completed visits grouped in some way.
     lineage:
-      - datalake_visit.visits.is_visit_completed
+      - datalake_visit.visits.is_completed
   num_visit_canceled:
-    description: Number of visit canceled. The sum aggregate function can be used to get the total number of canceled visits grouped in some way.
+    description: Number of visit canceled (CAST of is_canceled as INTEGER). The sum aggregate function can be used to get the total number of canceled visits grouped in some way.
     lineage:
-      - datalake_visit.visits.is_visit_canceled
+      - datalake_visit.visits.is_canceled
   num_visit_unsuccessful:
-    description: Number of visit unsuccessful. The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
+    description: Number of visit unsuccessful (CAST of is_unsuccessful as INTEGER). The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
     lineage:
-      - datalake_visit.visits.is_visit_unsuccessful
+      - datalake_visit.visits.is_unsuccessful
+  is_confirmed:
+    description: If the visit is confirmed. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_confirmed
+  is_completed:
+    description: If the visit is completed. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_completed
+  is_registered:
+    description: If the visit was registered by the agent. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_registered
+  is_reschedule:
+    description: If the visit is a reschedule. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_reschedule
+  is_canceled:
+    description: If the visit is canceled. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_canceled
+  is_unsuccessful:
+    description: If the visit is unsuccessful. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_unsuccessful
+  is_3p_supply:
+    lineage:
+      - datalake_visit.visits.is_3p_supply
+    description: Boolean flag indicating if the visit has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform. Will be deprecated.
+  is_3p_demand:
+    lineage:
+      - datalake_visit.visits.is_3p_demand
+    description: Boolean flag indicating if the visit has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform. Will be deprecated.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_visit.visits.is_3p_lead_gen
+    description: Boolean flag indicating if the visit has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform. Will be deprecated.
   has_3p_access_control:
     lineage:
       - datalake_visit.visits.has_3p_access_control
     description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
+  journey_days:
+    description: Journey days since the first created event. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.journey_days
+  hours_between_created_and_visit_day:
+    description: Hours between the creation of visit and visit day (with timezone adjustment). Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_created
+      - datalake_visit.visits.ts_visit_local_tz
+  hours_between_request_and_cancellation:
+    description: Hours between visit creation and cancellation. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_created
+      - datalake_visit.visits.ts_visit_canceled
+  hours_between_first_booked_and_visit_day:
+    description: Hours between first confirmation and cancellation. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_first_confirmed
+      - datalake_visit.visits.ts_visit_canceled
+  hours_between_last_booked_and_visit_day:
+    description: Hours between last confirmation and cancellation. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_last_confirmed
+      - datalake_visit.visits.ts_visit_canceled
+  hours_between_cancellation_and_visit_date:
+    description: Hours between cancellation and visit day (with timezone adjustment). Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_canceled
+      - datalake_visit.visits.ts_visit_local_tz
+  hours_waiting_for_answers:
+    description: Hours waiting for the answers. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.hours_waiting_for_answers
+  is_waiting_for_response:
+    description: If is waiting for response. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.is_waiting_for_response
+  ts_visit_requested:
+    description: Requested timestamp of the visit. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_requested
+  ts_visit_created:
+    description: Timestamp of visit creation, its first event. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_created
+  ts_visit_local_tz:
+    description: Timestamp of the visit in local timezone. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_local_tz
+  ts_first_visit_confirmed:
+    description: Timestamp of the first visit confirmed. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_first_confirmed
+  ts_last_visit_confirmed:
+    description: Timestamp of the last visit confirmed. Will be deprecated.
+    lineage:
+      - datalake_visit.visit_status_events.ts_visit_last_confirmed
+  ts_first_visit_rescheduled:
+    description: Timestamp of the first visit rescheduled. Will be deprecated.
+    lineage:
+      - datalake_visit.visit_status_events.ts_visit_first_rescheduled
+  ts_last_visit_rescheduled:
+    description: Timestamp of the last visit rescheduled. Will be deprecated.
+    lineage:
+      - datalake_visit.visit_status_events.ts_visit_rescheduled
+  ts_visit_done:
+    description: Timestamp of the end of the visit. Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_done
+  ts_visit_canceled:
+    description: Timestamp of the visit cancellation (if applicable). Will be deprecated.
+    lineage:
+      - datalake_visit.visits.ts_visit_canceled
   ts_load:
     description: Timestamp of the load of the table.
