@@ -1,0 +1,106 @@
+database_name: dw_collection_ai_agents
+table_name: dim_eval_sessions
+description: Table containing Tag format and evaluation scores for Matthew agent sessions
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_session:
+    lineage:
+      - datalake_langfuse_clean.scores.id_session
+    description: "Langfuse session ID"
+  status_tag_format:
+    lineage:
+      - datalake_langfuse_clean.scores.name
+    description: "Tag format for the session"
+  old_tag_value:
+    lineage:
+      - datalake_langfuse_clean.scores.string_value
+    description: "Old tag value for the session"
+  eval_auth_requested:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for authentication requested"
+  eval_auth_completed:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for authentication completed"
+  eval_debt_presented:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for debt presented"
+  eval_negotiation_offered:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for negotiation offered"
+  eval_user_requested_alternative:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for user requested alternative"
+  eval_negotiation_closed:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for negotiation closed"
+  eval_bot_encountered_error:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for bot encountered error"
+  eval_no_contract_found:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for no contract found"
+  eval_no_matthew_interaction:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for no Matthew interaction"
+  eval_escalated_to_human:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for escalated to human"
+  eval_user_disagreed:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for user disagreed"
+  status_authentication_requested:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for authentication requested"
+  status_authentication_completed:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for authentication completed"
+  status_debt_presented:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for debt presented"
+  status_negotiation_offered:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for negotiation offered"
+  status_user_requested_alternative:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for user requested alternative"
+  status_negotiation_closed:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for negotiation closed"
+  status_bot_encountered_error:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for bot encountered error"
+  status_no_contract_found:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for no contract found"
+  status_no_matthew_interaction:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for no Matthew interaction"
+  status_escalated_to_human:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for escalated to human"
+  status_user_disagreed:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for user disagreed"
