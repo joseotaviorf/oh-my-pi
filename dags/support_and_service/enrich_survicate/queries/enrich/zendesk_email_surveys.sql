@@ -17,7 +17,7 @@ zendesk_tickets AS (
     id_response,
     id_survey,
     id_respondent,
-    SPLIT(parse, '=')[1] AS id_ticket,
+    REGEXP_EXTRACT(parse,'id=([0-9]+)') AS id_ticket,
     survey_name
   FROM
     explode_parse_url
