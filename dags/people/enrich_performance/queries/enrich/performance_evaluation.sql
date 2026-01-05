@@ -35,6 +35,7 @@ base_evaluations AS (
     CASE
         WHEN hsdvl.name ILIKE '%Leadership%' THEN 'Leadership'
         WHEN hsdvl.name ILIKE '%Impact%' THEN 'Impact'
+        WHEN hsdvl.name ILIKE '%Achieveme%' THEN 'Impact'
         WHEN hsdvl.name ILIKE '%Behavi%' THEN 'Behavior'
     END AS section_name
   FROM
