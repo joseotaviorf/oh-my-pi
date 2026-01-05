@@ -30,6 +30,11 @@ columns:
       - Current: company_document junction table for many-to-many
       - NULL values: Documents shared across multiple companies
       - Non-NULL values: Legacy documents not yet migrated to junction table
+  uuid_document:
+    lineage:
+      - datalake_company_raw.document.document_uuid
+    description: |
+      Unique business identifier (UUID) for external API integrations and cross-service document identification.
   identification_number:
     lineage:
       - datalake_company_raw.document.identification_number

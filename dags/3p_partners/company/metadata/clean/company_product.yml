@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_company_raw.company_product.product_id
     description: 'Foreign key to product.id (BIGINT). Identifies the specific product/service being offered by the company. Combined with id_company forms the composite primary key for this relationship table.'
+  status:
+    lineage:
+      - datalake_company_raw.company_product.status
+    description: 'Status of the company-product relationship. Used to track the if the product is active or inactive.'
   product_settings:
     lineage:
       - datalake_company_raw.company_product.product_settings

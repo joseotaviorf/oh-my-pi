@@ -1,6 +1,7 @@
 SELECT
     id,
     company_uuid AS uuid_company,
+    document_uuid AS uuid_document,
     identification_number,
     document_validation_status,
     document_type,
