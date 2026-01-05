@@ -49,7 +49,8 @@ columns:
   final_attribution_branded:
     description: If in the final attribution, the user came through a branded campaign.
     lineage:
-      - datalake_online_attribution.online_attribution.app_branded
+      - datalake_online_attribution.online_attribution.branded
+      - datalake_tracked_events.offline_attribution.origin
   final_attribution_origin:
     description: Final origin attributed to the event.
     lineage:

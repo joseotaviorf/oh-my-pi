@@ -164,8 +164,9 @@ events_app AS (
     FROM 
         events_filtered
     WHERE
-        (adjust_network <> 'Organic')
-        OR (adjust_network = 'Organic' AND adjust_campaign IS NOT NULL)
+        -- After 2024 it was not possible to segment events between Organic and organic
+        (adjust_network <> CASE WHEN EXTRACT(YEAR FROM ts_event) < 2024 THEN 'Organic' ELSE 'organic' END)
+        OR (adjust_network = CASE WHEN EXTRACT(YEAR FROM ts_event) < 2024 THEN 'Organic' ELSE 'organic' END AND adjust_campaign IS NOT NULL)
 ),
 events_web AS (
     SELECT

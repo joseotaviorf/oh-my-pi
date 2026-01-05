@@ -1,117 +1,202 @@
 ---
 database_name: datalake_online_attribution
 table_name: online_attribution
+domain: Growth
+owner: "@data-growth"
+description: Table utilized by the Growth team to describe online attribution events for conversion actions (visit schedule confirmed, offer submitted, sale offer form accepted). Combines web attribution data (UTM parameters, Google Click ID) with app attribution data (Adjust, AppsFlyer) to provide a unified view of online marketing channel performance and user acquisition sources.
 columns:
   id_user:
+    description: Unique identifier for the user associated with the conversion event. Derived from conversion events (visit schedule confirmed, offer submitted, sale offer form accepted) and matched through amplitude user merge logic.
     lineage:
       - datalake_online_attribution.events_exploded.id_user
+      - datalake_amplitude_clean.170698_user_merge.id_user
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.id_user
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.id_user
+      - datalake_amplitude_clean.170698_offer_submitted_events.id_user
+      - datalake_amplitude_clean.183049_offer_submitted_events.id_user
       - datalake_amplitude_clean.170698_offer_submitted_new_events.id_user
       - datalake_amplitude_clean.183047_offer_submitted_new_events.id_user
+      - datalake_amplitude_clean.170698_sale_offer_form_accepted_events.id_user
   id_amplitude:
+    description: Unique identifier for the Amplitude user associated with the conversion event. Used to track user behavior across sessions and platforms.
     lineage:
       - datalake_online_attribution.events_exploded.id_amplitude
+      - datalake_amplitude_clean.170698_user_merge.id_amplitude
       - datalake_amplitude_clean.170698_user_merge.id_amplitude_merged
+      - datalake_amplitude_clean.170698_visit_schedule_confirmed_events.id_amplitude
+      - datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events.id_amplitude
+      - datalake_amplitude_clean.170698_offer_submitted_events.id_amplitude
+      - datalake_amplitude_clean.183049_offer_submitted_events.id_amplitude
       - datalake_amplitude_clean.170698_offer_submitted_new_events.id_amplitude
       - datalake_amplitude_clean.183047_offer_submitted_new_events.id_amplitude
+      - datalake_amplitude_clean.170698_sale_offer_form_accepted_events.id_amplitude
   id_session:
+    description: Unique identifier for the user session during which the conversion event occurred.
     lineage:
       - datalake_online_attribution.events_exploded.id_session
   id_house:
+    description: Unique identifier for the house property associated with the conversion event.
     lineage:
       - datalake_online_attribution.events_exploded.id_house
   id_firestore:
+    description: Unique identifier from Firestore database associated with the conversion event.
     lineage:
       - datalake_online_attribution.events_exploded.id_firestore
   visit_code:
+    description: Unique code identifying the visit when the conversion event is related to a property visit.
     lineage:
       - datalake_online_attribution.events_exploded.visit_code
   amplitude_platform:
+    description: Platform identifier from Amplitude analytics indicating where the event was tracked (e.g., web, iOS, Android).
     lineage:
       - datalake_online_attribution.events_exploded.amplitude_platform
   event_type_sanitized:
+    description: Sanitized name of the conversion event type (e.g., visit_schedule_confirmed, offer_submitted, sale_offer_form_accepted).
     lineage:
-      - datalake_online_attribution.event_type_sanitized
+      - datalake_online_attribution.events_exploded.event_type_sanitized
   entrance_uri:
+    description: The URL of the first page a user visited in the session that led to the conversion event.
     lineage:
       - datalake_online_attribution.events_exploded.entrance_uri
   referrer:
+    description: The referrer URL indicating where the user came from before visiting the site.
     lineage:
       - datalake_online_attribution.events_exploded.referrer
   business_context:
+    description: Business context of the event, indicating whether it relates to Rent, Sale, or other business operations.
     lineage:
       - datalake_online_attribution.events_exploded.business_context
   attributed_at:
+    description: Timestamp indicating when the attribution was assigned to the conversion event.
     lineage:
       - datalake_online_attribution.events_exploded.attributed_at
   web_gclid:
+    description: Google Click Identifier (GCLID) for web traffic, used to track Google Ads clicks and conversions.
     lineage:
       - datalake_online_attribution.events_exploded.gclid
   web_medium:
+    description: UTM medium parameter from web traffic indicating the marketing medium (e.g., cpc, email, social).
     lineage:
       - datalake_online_attribution.events_exploded.web_medium
   web_source:
+    description: UTM source parameter from web traffic indicating the traffic source (e.g., google, facebook, direct).
     lineage:
       - datalake_online_attribution.events_exploded.web_source
   web_campaign:
+    description: UTM campaign parameter from web traffic identifying the specific marketing campaign name.
     lineage:
       - datalake_online_attribution.events_exploded.web_campaign
   web_content:
+    description: UTM content parameter from web traffic used to differentiate similar content or links within the same campaign.
     lineage:
       - datalake_online_attribution.events_exploded.web_content
   web_term:
+    description: UTM term parameter from web traffic typically used for paid search keywords.
     lineage:
       - datalake_online_attribution.events_exploded.web_term
   web_platform:
+    description: Platform identifier for web traffic (e.g., web_desktop, web_mobile) indicating the device type used.
     lineage:
       - datalake_online_attribution.events_exploded.web_platform
+  web_branded:
+    description: Indicates whether the web campaign is branded (contains 'BRANDED' or 'INSTITUCIONAL' keywords) or non-branded.
+    lineage:
+      - datalake_online_attribution.events_exploded.web_campaign
   adjust_adgroup:
+    description: Ad group identifier from Adjust or AppsFlyer attribution platform for mobile app traffic.
     lineage:
       - datalake_online_attribution.events_exploded.adjust_adgroup
+      - datalake_online_attribution.events_exploded.appsflyer_adset
   adjust_campaign:
+    description: Campaign identifier from Adjust or AppsFlyer attribution platform for mobile app traffic.
     lineage:
       - datalake_online_attribution.events_exploded.adjust_campaign
+      - datalake_online_attribution.events_exploded.appsflyer_campaign
   adjust_creative:
+    description: Creative identifier from Adjust or AppsFlyer attribution platform identifying the specific ad creative used.
     lineage:
       - datalake_online_attribution.events_exploded.adjust_creative
+      - datalake_online_attribution.events_exploded.appsflyer_ad
   adjust_reattributed_at:
+    description: Timestamp indicating when the user was reattributed in Adjust attribution platform.
     lineage:
       - datalake_online_attribution.events_exploded.adjust_reattributed_at
   adjust_network:
+    description: Network identifier from Adjust or AppsFlyer attribution platform indicating the advertising network or media source.
     lineage:
       - datalake_online_attribution.events_exploded.adjust_network
+      - datalake_online_attribution.events_exploded.appsflyer_media_source
   app_platform:
+    description: Platform identifier for mobile app traffic (e.g., iOS, Android) indicating the mobile operating system.
     lineage:
       - datalake_online_attribution.events_exploded.app_platform
+  app_branded:
+    description: Indicates whether the app campaign is branded (contains 'BRANDED' or 'INSTITUCIONAL' keywords) or non-branded.
+    lineage:
+      - datalake_online_attribution.events_exploded.adjust_campaign
   platform:
+    description: Final platform attribution determined by comparing web and app attribution timestamps, selecting the most recent touchpoint (web_platform or app_platform).
     lineage:
       - datalake_online_attribution.events_exploded.web_platform
       - datalake_online_attribution.events_exploded.app_platform
   utm_source:
+    description: Unified UTM source parameter combining web_source and adjust_network/appsflyer_media_source, selected based on the most recent attribution timestamp.
     lineage:
       - datalake_online_attribution.events_exploded.web_source
       - datalake_online_attribution.events_exploded.adjust_network
+      - datalake_online_attribution.events_exploded.appsflyer_media_source
   utm_medium:
+    description: Unified UTM medium parameter combining web_medium and adjust_campaign/appsflyer_campaign, selected based on the most recent attribution timestamp.
     lineage:
       - datalake_online_attribution.events_exploded.web_medium
       - datalake_online_attribution.events_exploded.adjust_campaign
+      - datalake_online_attribution.events_exploded.appsflyer_campaign
   utm_campaign:
+    description: Unified UTM campaign parameter combining web_campaign and adjust_campaign/appsflyer_campaign, selected based on the most recent attribution timestamp.
     lineage:
       - datalake_online_attribution.events_exploded.web_campaign
       - datalake_online_attribution.events_exploded.adjust_campaign
+      - datalake_online_attribution.events_exploded.appsflyer_campaign
   utm_term:
+    description: Unified UTM term parameter combining web_term and adjust_creative/appsflyer_ad, selected based on the most recent attribution timestamp.
     lineage:
       - datalake_online_attribution.events_exploded.web_term
       - datalake_online_attribution.events_exploded.adjust_creative
+      - datalake_online_attribution.events_exploded.appsflyer_ad
   utm_content:
+    description: Unified UTM content parameter combining web_content and adjust_adgroup/appsflyer_adset, selected based on the most recent attribution timestamp.
     lineage:
       - datalake_online_attribution.events_exploded.web_content
       - datalake_online_attribution.events_exploded.adjust_adgroup
+      - datalake_online_attribution.events_exploded.appsflyer_adset
+  branded:
+    description: Final branded indicator combining web_branded and app_branded, selected based on the most recent attribution timestamp to determine if the conversion came through a branded campaign.
+    lineage:
+      - datalake_online_attribution.events_exploded.web_campaign
+      - datalake_online_attribution.events_exploded.adjust_campaign
+      - datalake_online_attribution.events_exploded.appsflyer_campaign
+  media_source:
+    description: Unified media source identifier combining web_source (for web platforms) and adjust_network/appsflyer_media_source (for app platforms), defaulting to 'organic' when no attribution data is available.
+    lineage:
+      - datalake_online_attribution.events_exploded.web_platform
+      - datalake_online_attribution.events_exploded.web_source
+      - datalake_online_attribution.events_exploded.adjust_network
+      - datalake_online_attribution.events_exploded.appsflyer_media_source
   ts_event:
+    description: Timestamp of when the conversion event occurred, combining web and app event timestamps.
     lineage:
       - datalake_online_attribution.events_exploded.ts_event
   ts_web_attribution:
+    description: Timestamp of the first web attribution touchpoint for the user, calculated as the earliest event timestamp grouped by amplitude ID and web attribution parameters.
     lineage:
       - datalake_online_attribution.events_exploded.ts_event
   ts_app_attribution:
+    description: Timestamp of the first app attribution touchpoint for the user, calculated as the earliest event timestamp grouped by amplitude ID and app attribution parameters (excluding organic traffic).
     lineage:
       - datalake_online_attribution.events_exploded.ts_event
+  year:
+    description: Year extracted from the load_end_date parameter, used for partitioning the data.
+  month:
+    description: Month extracted from the load_end_date parameter, used for partitioning the data.
+  day:
+    description: Day extracted from the load_end_date parameter, used for partitioning the data.

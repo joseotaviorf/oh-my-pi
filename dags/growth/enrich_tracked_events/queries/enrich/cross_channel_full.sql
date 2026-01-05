@@ -315,34 +315,34 @@ apply_attribution_rule AS (
         id_contact,
         visit_code,
         event_name,
-        LAST(attribution_app_type, TRUE) OVER(
+        LAST(NULLIF(attribution_app_type, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_app_type,
-        LAST(attribution_branded, TRUE) OVER(
+        LAST(NULLIF(attribution_branded, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_branded,
-        LAST(attribution_origin, TRUE) OVER(
+        LAST(NULLIF(attribution_origin, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_origin,
-        LAST(attribution_source, TRUE) OVER(
+        LAST(NULLIF(attribution_source, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_source,
-        LAST(attribution_medium, TRUE) OVER(
+        LAST(NULLIF(attribution_medium, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_medium,
-        LAST(attribution_campaign, TRUE) OVER(
+        LAST(NULLIF(attribution_campaign, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_campaign,
-        LAST(attribution_term, TRUE) OVER(
+        LAST(NULLIF(attribution_term, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_term,
-        LAST(attribution_content, TRUE) OVER(
+        LAST(NULLIF(attribution_content, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_content,
-        LAST(attribution_media_source, TRUE) OVER(
+        LAST(NULLIF(attribution_media_source, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_media_source,
-        LAST(attribution_entrance_uri, TRUE) OVER(
+        LAST(NULLIF(attribution_entrance_uri, ''), TRUE) OVER(
             PARTITION BY id_user_conversion 
             ORDER BY ts_event ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS final_attribution_entrance_uri,    
         attribution_app_type_conversion,
