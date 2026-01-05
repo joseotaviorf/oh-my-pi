@@ -1,0 +1,83 @@
+database_name: datalake_search
+table_name: global_metrics
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Table with ids, dimensions, metrics and timestamps related to user and house global metrics datasets.
+columns:
+  ids:
+    description: Ids such as id_user or id_house
+    lineage:
+      - datalake_search.search_impressions.ids
+      - datalake_search.rent_flow_past_30_days.id_house
+      - datalake_search.sale_flow_past_30_days.id_house
+      - datalake_search.house_publication_dates.id_house
+      - wonka.house_main.id
+  dimensions:
+    description: A json with all relevant dimensions for user analysis. Ex. business_context and city
+    lineage:
+      - datalake_search.search_impressions.dimensions
+      - datalake_search.rent_flow_past_30_days.id_house
+      - datalake_search.sale_flow_past_30_days.id_house
+      - wonka.house_main.city
+  variants:
+    description: A json mapping `experiment_name` to `variant` the user was allocated to.
+    lineage:
+      - datalake_search.search_impressions.variants
+      - datalake_search.experiment_config.experiment_name
+  metrics:
+    description: A json with all relevant metrics for user analysis. Ex. contracts, offer, visit_completed
+    lineage:
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  timestamps:
+    description: A json with all relevant timestamp
+    lineage:
+      - datalake_search.search_impressions.timestamps
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  date:
+    description: The date of a user interaction with a search.
+    lineage:
+      - datalake_search.search_impressions.date
+      - datalake_search.house_publication_dates.ts_house_published
+  year:
+    description: The year of a user interaction with a search.
+    lineage:
+      - datalake_search.search_impressions.year
+      - datalake_search.house_publication_dates.ts_house_published
+  month:
+    description: The month of a user interaction with a search.
+    lineage:
+      - datalake_search.search_impressions.month
+      - datalake_search.house_publication_dates.ts_house_published
+  day:
+    description: The day of a user interaction with a search.
+    lineage:
+      - datalake_search.search_impressions.day
+      - datalake_search.house_publication_dates.ts_house_published
+  week:
+    description: The week of a user interaction with a search.
+    lineage:
+      - datalake_search.search_impressions.week
+      - datalake_search.house_publication_dates.ts_house_published

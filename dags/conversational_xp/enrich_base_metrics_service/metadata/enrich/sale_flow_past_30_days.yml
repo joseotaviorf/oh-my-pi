@@ -1,0 +1,43 @@
+database_name: datalake_search
+table_name: sale_flow_past_30_days
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  This is intermediate table to help process datasets and metrics
+columns:
+  id_user:
+    description: The id of the user.
+    lineage:
+      - datalake_sale_flows.sale_flow.id_buyer
+  id_house:
+    description: The id of the house.
+    lineage:
+      - datalake_sale_flows.sale_flow.id_house
+  ts_visit_booked:
+    description: The timestamp in which a visit was booked.
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+  ts_visit_completed:
+    description: The timestamp in which a visit was completed.
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_visit_completed
+  ts_offer:
+    description: The timestamp in which an offer was made. Contemplates direct and submitted offers.
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+  ts_contract_signed:
+    description: The timestamp in which a contract was signed.
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+  ts_offer_approved:
+    description: The timestamp in which an offer was accepted.
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
+  ts_sale_flow_latest_event:
+    description: The latest event in the sale flow.
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+      - datalake_sale_flows.sale_flow.ts_first_visit_completed
+      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed

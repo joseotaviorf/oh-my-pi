@@ -1,0 +1,91 @@
+database_name: datalake_search
+table_name: recs_impressions
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Table with ids, dimensions, metrics and timestamps related to user and house global metrics datasets.
+columns:
+  recset_id:
+    description: The id os the recommendation shown
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
+  recset_id_fix:
+    description: Unique identifier combining recset_id, id_user, and id_session to handle cases where recset_id repeats.
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+      - datalake_amplitude_clean.170698_recset_impression_events.id_user
+      - datalake_amplitude_clean.170698_recset_impression_events.id_session
+      - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.id_user
+      - datalake_amplitude_clean.170698_recset_viewed_events.id_session
+  id_user:
+    description: The id of the user
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.id_user
+      - datalake_amplitude_clean.170698_recset_viewed_events.id_user
+  id_session:
+    description: The id of the session
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.id_session
+      - datalake_amplitude_clean.170698_recset_viewed_events.id_session
+  id_amplitude:
+    description: Amplitude id
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.id_amplitude
+      - datalake_amplitude_clean.170698_recset_viewed_events.id_amplitude
+  id_device:
+    description: The id of the device
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.id_device
+      - datalake_amplitude_clean.170698_recset_viewed_events.id_device
+  id_house:
+    description: The id of the house
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
+  position:
+    description: The position in which the house was shown on the carrousel
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
+  business_context:
+    description: The business context.
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
+  platform:
+    description: The platform (web or app)
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.user_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.user_properties
+  showcase:
+    description: The showcase or carrousel type where the recommendations was shown
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.event_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.event_properties
+  user_properties:
+    description: The user properties for the recommendation event. Holds the info related to which AB test the user was on
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.user_properties
+      - datalake_amplitude_clean.170698_recset_viewed_events.user_properties
+  ts_recommendation:
+    description: The timestamp of the recommendations event
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.ts_event
+      - datalake_amplitude_clean.170698_recset_viewed_events.ts_event
+  year:
+    description: The year of the recommendations event
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.year
+      - datalake_amplitude_clean.170698_recset_viewed_events.year
+  month:
+    description: The month of the recommendations event
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.month
+      - datalake_amplitude_clean.170698_recset_viewed_events.month
+  day:
+    description: The day of the recommendations event
+    lineage:
+      - datalake_amplitude_clean.170698_recset_impression_events.day
+      - datalake_amplitude_clean.170698_recset_viewed_events.day

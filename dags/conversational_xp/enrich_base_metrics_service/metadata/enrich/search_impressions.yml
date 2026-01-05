@@ -1,0 +1,102 @@
+database_name: datalake_search
+table_name: search_impressions
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Table with ids, dimensions, metrics and timestamps related to search.
+columns:
+  ids:
+    description: A json with all relevant ids for search analysis. Ex. id_user, id_house, id_search, id_amplitude, ...
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.event_properties
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.event_properties
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
+  dimensions:
+    description: A json with all relevant dimensions for search analysis. Ex. business_context, city, ...
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.event_properties
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.event_properties
+      - datalake_amplitude_clean.170698_search_page_viewed_events.user_properties
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.user_properties
+      - wonka.house_main.city
+      - datalake_search.house_publication_dates.ts_house_published
+      - datalake_search.rent_outlier_users_past_30_days.id_user
+      - datalake_search.sale_outlier_users_past_30_days.id_user
+  variants:
+    description: A json mapping `experiment_name` to `variant` the user was on that search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.user_properties
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.user_properties
+      - datalake_search.experiment_config_processed.experiment_name
+      - datalake_search.experiment_config_processed.variant_standard_name
+  metrics:
+    description: A json with all relevant metrics for search analysis. Ex. clicks, offer, visit_completed
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  timestamps:
+    description: A json with all relevant timestamps
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+      - datalake_search.house_publication_dates.ts_house_published
+      - datalake_search.rent_flow_past_30_days.ts_visit_booked
+      - datalake_search.rent_flow_past_30_days.ts_visit_completed
+      - datalake_search.rent_flow_past_30_days.ts_offer
+      - datalake_search.rent_flow_past_30_days.ts_direct_offer
+      - datalake_search.rent_flow_past_30_days.ts_offer_submitted
+      - datalake_search.rent_flow_past_30_days.ts_offer_approved
+      - datalake_search.rent_flow_past_30_days.ts_contract_signed
+      - datalake_search.sale_flow_past_30_days.ts_visit_booked
+      - datalake_search.sale_flow_past_30_days.ts_visit_completed
+      - datalake_search.sale_flow_past_30_days.ts_offer
+      - datalake_search.sale_flow_past_30_days.ts_offer_approved
+      - datalake_search.sale_flow_past_30_days.ts_contract_signed
+  ts_event:
+    description: The timestamp of the search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+  date:
+    description: The date of the search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+  year:
+    description: The year of the search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+  month:
+    description: The month of the search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+  day:
+    description: The day of the search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
+  week:
+    description: The week of the search.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event

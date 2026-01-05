@@ -1,13 +1,22 @@
 database_name: datalake_search
 table_name: house_publication_dates
 owner: pedro.nogueira@quintoandar.com.br
-domain: primitives
+domain: Conversational XP
 description: |
   This table holds the publication date for each id house
 columns:
   id_house:
     description: The id of house
+    lineage:
+      - dw_rent.fact_house_listing_status.sk_house_listing
+      - dw_sale.fact_listing_status.sk_sale_listing
   business_context:
     description: the business context of the house.
+    lineage:
+      - dw_rent.fact_house_listing_status
+      - dw_sale.fact_listing_status
   ts_house_published:
     description: The timestamp in which the house was published
+    lineage:
+      - dw_rent.fact_house_listing_status.ts_status_start
+      - dw_sale.fact_listing_status.ts_status_started

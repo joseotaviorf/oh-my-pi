@@ -1,0 +1,53 @@
+database_name: datalake_search
+table_name: rent_flow_past_30_days
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  This is intermediate table to help process datasets and metrics
+columns:
+  id_user:
+    description: The id of the user.
+    lineage:
+      - datalake_rent_flows.rent_flows.id_tenant_prospect
+  id_house:
+    description: The id of the house.
+    lineage:
+      - datalake_rent_flows.rent_flows.id_house
+  ts_visit_booked:
+    description: The timestamp in which a visit was booked.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
+  ts_visit_completed:
+    description: The timestamp in which a visit was completed.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_visit_completed
+  ts_offer:
+    description: The timestamp in which an offer was made. Contemplates direct and submitted offers.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+  ts_contract_signed:
+    description: The timestamp in which a contract was signed.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_contract_signed
+  ts_direct_offer:
+    description: The timestamp in which a direct offer was made.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+  ts_offer_submitted:
+    description: The timestamp in which a submitted offer was made.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+  ts_offer_approved:
+    description: The timestamp in which an offer was accepted.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_approved
+  ts_rent_flow_latest_event:
+    description: The latest event in the rent flow.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
+      - datalake_rent_flows.rent_flows.ts_visit_completed
+      - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
+      - datalake_rent_flows.rent_flows.ts_offer_approved
+      - datalake_rent_flows.rent_flows.ts_contract_signed

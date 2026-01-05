@@ -130,4 +130,15 @@ global_user_recs_metrics AS (
     LEFT JOIN house_cities ON COALESCE(rent_flow.id_house, sale_flow.id_house) = house_cities.id_house
 )
 
-SELECT * FROM global_user_recs_metrics
+SELECT
+    ids,
+    dimensions,
+    variants,
+    metrics,
+    timestamps,
+    date,
+    year,
+    month,
+    day,
+    week
+FROM global_user_recs_metrics

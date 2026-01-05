@@ -1,17 +1,27 @@
 database_name: datalake_search
 table_name: experiment_config_processed
 owner: pedro.nogueira@quintoandar.com.br
-domain: primitives
+domain: Conversational XP
 description: |
   This table has the configuration of the experiments.
 columns:
   experiment_name:
     description: The name of the experiment.
+    lineage:
+      - datalake_search.experiment_config.experiment_name
   begin_date:
     description: The start date of the experiment.
+    lineage:
+      - datalake_search.experiment_config.config.begin_date
   end_date:
     description: The end date of the experiment.
+    lineage:
+      - datalake_search.experiment_config.config.end_date
   variant_name:
     description: The name of the variant (0 or 1)
+    lineage:
+      - datalake_search.experiment_config.config.variants
   variant_standard_name:
     description: The standard name of the variant (baseline or treatment).
+    lineage:
+      - datalake_search.experiment_config.config.variants

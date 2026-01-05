@@ -1,7 +1,7 @@
 dag:
   name: demand_balancer_service
   schedule_start_date: 2022, 1, 1
-  owner: Data Primitives
+  owner: Data Conversational XP
 
 workflow:
   layer: raw

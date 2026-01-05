@@ -1,28 +1,36 @@
 ---
 database_name: datalake_search
 table_name: demand_balancer
-owner: thays.silva@quintoandar.com.br
-domain: primitives
+owner: pedro.nogueira@quintoandar.com.br
+domain: Conversational XP
+description: Predictions from Demand Balancer model.
 
 columns:
   id_house:
+    description: ID of the house.
     lineage:
       - datalake_search.demand_balancer.id_house
   prediction:
+    description: Prediction value from the Demand Balancer model.
     lineage:
       - datalake_search.demand_balancer.prediction
   model_version:
+    description: Version of the model used to generate the prediction.
     lineage:
       - datalake_search.demand_balancer.model_version
   timestamp_available:
+    description: Timestamp when the prediction data became available.
     lineage:
       - datalake_search.demand_balancer.timestamp_available
   year:
+    description: Year partition for the prediction data.
     lineage:
       - datalake_search.demand_balancer.year
   month:
+    description: Month partition for the prediction data.
     lineage:
       - datalake_search.demand_balancer.month
   day:
+    description: Day partition for the prediction data.
     lineage:
       - datalake_search.demand_balancer.day

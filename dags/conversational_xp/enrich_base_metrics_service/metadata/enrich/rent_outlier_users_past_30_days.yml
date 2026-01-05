@@ -1,14 +1,20 @@
 database_name: datalake_search
-table_name: sale_outlier_users_past_30_days
+table_name: rent_outlier_users_past_30_days
 owner: pedro.nogueira@quintoandar.com.br
-domain: primitives
+domain: Conversational XP
 description: |
-  This table contains the users that are outliers in the sale flow in the past 30 days.
+  This table contains the users that are outliers in the rent flow in the past 30 days.
   These should be identified as outliers and removed from AB test metrics.
 columns:
   id_user:
     description: The id of the user.
+    lineage:
+      - datalake_rent_flows.rent_flows.id_tenant_prospect
   total_bookings:
     description: The total number of bookings in the past 30 days.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_booking_created
   total_offers:
     description: The total number of offers in the past 30 days.
+    lineage:
+      - datalake_rent_flows.rent_flows.ts_offer_submitted
