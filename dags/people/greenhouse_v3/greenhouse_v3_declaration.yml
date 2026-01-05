@@ -49,6 +49,22 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
 
+  raw_inner_dependencies:
+    job_interview_stages:
+      - application_stages
+    job_notes:
+      - job_interview_stages
+    approval_flows:
+      - job_notes
+    approver_groups:
+      - approval_flows
+    approvers:
+      - approver_groups
+    users:
+      - approvers
+    referrers:
+      - users
+
   tables_customization:
 
     application_stages:
