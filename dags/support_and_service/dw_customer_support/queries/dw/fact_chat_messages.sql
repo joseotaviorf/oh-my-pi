@@ -75,10 +75,10 @@ messages_w_users AS (
     m.id_sauron_session,
     CASE
       WHEN m.user_sender = 'system' THEN -1
-      WHEN STARTSWITH(m.user_sender, '+') THEN NULL
       WHEN s.user_data:["user_id"] IS NOT NULL 
         AND m.user_type = 'User' THEN s.user_data:["user_id"]
       WHEN u1.id IS NOT NULL THEN u1.id
+      WHEN STARTSWITH(m.user_sender, '+') THEN NULL
     END AS id_user,
     s.source as origin,
     m.message,
@@ -96,6 +96,7 @@ messages_w_users AS (
       AND u1.country_code = 'BR'
   WHERE
     s.source_environment = 'QuintoandarSupport:OFFBOARDING'
+    AND m.id_sauron_session IS NOT NULL
 ),
 messages_w_tasks AS (
   SELECT
@@ -123,8 +124,7 @@ LEFT JOIN
     AND c.id_session = mw.id_sauron_session
     AND mw.ts_created >= c.ts_created
     AND mw.ts_created <= c.ts_ended
-WHERE
-  MAKE_DATE(year, month, day) >= '{load_start_date}'
+    AND MAKE_DATE(c.year, c.month, c.day) >= '{load_start_date}'
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY mw.id_message ORDER BY c.ts_created DESC) = 1
 ),
@@ -132,8 +132,8 @@ ai_without_spoc AS (
   SELECT DISTINCT
   c.id_channel,
   m.id_message,
-  c.id_session,
-  c.id_user,
+  m.id_sauron_session AS id_session,
+  COALESCE(m.id_user, c.id_user) AS id_user,
   c.origin,
   m.message,
   CASE WHEN m.role LIKE 'HUMAN' THEN 'User'
@@ -151,9 +151,9 @@ FROM
 LEFT JOIN  
   datalake_customer_support.chats AS c
     ON c.id_session = m.id_sauron_session
-    AND m.conversation_type = 'HUMAN-AI'
+    AND MAKE_DATE(c.year, c.month, c.day) >= '{load_start_date}'
 WHERE
-  MAKE_DATE(year, month, day) >= '{load_start_date}'
+  m.conversation_type = 'HUMAN-AI'
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY c.ts_created DESC) = 1
 ),
@@ -161,8 +161,8 @@ human_without_spoc AS (
   SELECT 
   c.id_channel,
   m.id_message,
-  c.id_session,
-  c.id_user,
+  m.id_sauron_session AS id_session,
+  COALESCE(m.id_user, c.id_user) AS id_user,
   c.origin,
   m.message,
   CASE WHEN m.role LIKE 'HUMAN' THEN 'User'
@@ -180,11 +180,11 @@ FROM
 LEFT JOIN 
   datalake_customer_support.chats AS c
     ON c.id_session = m.id_sauron_session
-    AND m.conversation_type = 'HUMAN-HUMAN'
     AND m.ts_created >= c.ts_created
     AND m.ts_created <= c.ts_ended
+    AND MAKE_DATE(c.year, c.month, c.day) >= '{load_start_date}'
 WHERE
-  MAKE_DATE(year, month, day) >= '{load_start_date}'
+  m.conversation_type = 'HUMAN-HUMAN'
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY m.id_message ORDER BY c.ts_created DESC) = 1
 ), 

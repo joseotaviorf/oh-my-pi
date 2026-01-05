@@ -14,6 +14,7 @@ columns:
       - datalake_quinto_messenger_clean.channel.id_session
       - datalake_quinto_messenger_clean.chat.id_session
       - datalake_sauron_clean.session.id
+      - datalake_chatbot.messages.id_sauron_session
     description: Session identifier.
   sk_task:
     lineage:
@@ -29,6 +30,8 @@ columns:
       - datalake_ebdb_user.user.id
       - datalake_quinto_messenger_clean.channel_event.from_phone_number
       - datalake_internal_chat_clean.internal_chat_messages.id_user_external
+      - datalake_chatbot.messages.id_user
+      - datalake_customer_support.chats.id_user
     description: Identifier of the user who sent the message.
   origin:
     lineage:
