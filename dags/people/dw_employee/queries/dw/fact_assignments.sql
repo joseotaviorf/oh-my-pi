@@ -61,16 +61,19 @@ current_assignments AS (
 ),
 managers AS (
   SELECT
-    id_period_of_service,
-    id_manager_period_of_service,
-    id_assignment,
-    id_manager
+    ma.id_manager_period_of_service,
+    ma.id_assignment,
+    ma.id_manager,
+    COALESCE(ed_manager.assignment_status_type = 'ACTIVE', FALSE) AS has_active_manager
   FROM
-    datalake_pin.managers_history
+    datalake_pin.managers_history AS ma
+  LEFT JOIN
+    datalake_employment.employee_details AS ed_manager
+      ON ed_manager.id_period_of_service = ma.id_manager_period_of_service
   WHERE
-    dt_effective_started <= DATE('{load_start_date}')
+    ma.dt_effective_started <= DATE('{load_start_date}')
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY dt_effective_started DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY ma.id_assignment ORDER BY ma.dt_effective_started DESC) = 1
 ),
 active_jobs AS (
   SELECT
@@ -113,7 +116,6 @@ latest_rate_values AS (
   QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY id_rate ORDER BY ts_updated DESC) = 1
 )
-
 SELECT
   im.id_period_of_service AS sk_assignment,
   im.id_person AS sk_employee,
@@ -142,6 +144,7 @@ SELECT
     THEN TRUE
     ELSE FALSE
   END AS is_manager,
+  am.has_active_manager,
   CASE 
     WHEN ed.assignment_type = 'P' THEN 0
     ELSE FLOOR(MONTHS_BETWEEN(COALESCE(ps.dt_actual_termination, DATE('{load_start_date}')), ps.dt_started)) 

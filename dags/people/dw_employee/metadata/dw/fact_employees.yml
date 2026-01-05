@@ -124,5 +124,9 @@ columns:
       When TRUE, the sk_work_relationship_started_date uses the start date from the previous assignment.
     lineage:
     - datalake_pin_core_clean.action_reason_translation.action_reason
+  has_active_manager:
+    description: Flag (TRUE/FALSE) indicating if the assignment has an active manager. Returns TRUE when the manager assignment exists and is active, FALSE otherwise.
+    lineage:
+    - dw_employee.fact_assignments.has_active_manager
   ts_load:
     description: Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed.

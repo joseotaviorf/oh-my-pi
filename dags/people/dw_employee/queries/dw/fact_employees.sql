@@ -78,6 +78,7 @@ SELECT
     fa.pct_last_salary_increase,
     COALESCE(tfac.is_converted_to_permanent_hire, FALSE) AS is_converted_to_permanent_hire,
     COALESCE(tfac.is_transfered, FALSE) AS is_transfered,
+    fa.has_active_manager,
     NOW() AS ts_load
 FROM
     dw_employee.fact_assignments AS fa
