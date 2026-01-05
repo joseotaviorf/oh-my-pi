@@ -10,13 +10,15 @@ columns:
     lineage:
       - datalake_hr_system_clean.organizations.id_organization
   sk_business_partner_assignment:
-    description: Unique identifier for the business partner’s assignment.
+    description: Unique identifier for the business partner's assignment.
     lineage:
       - datalake_employee_registration.identifier_mapping.id_period_of_service
+      - datalake_hr_system_clean.areas_of_responsibility.id_department
   sk_business_partner:
     description: Unique identifier for the business partner related to the assignment.
     lineage:
       - datalake_employee_registration.identifier_mapping.id_person
+      - datalake_hr_system_clean.areas_of_responsibility.id_department
   cost_center_name:
     description: Cost center name
     lineage:

@@ -25,7 +25,7 @@ FROM
   datalake_hr_system_clean.organizations AS o
 LEFT JOIN 
   datalake_hr_system_clean.areas_of_responsibility AS r 
-    ON o.codigo_dff = r.template_code
+    ON o.id_organization = r.id_department
     AND r.active_status = 'A'
 LEFT JOIN 
   datalake_employee_registration.identifier_mapping AS e 
