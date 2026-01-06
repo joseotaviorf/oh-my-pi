@@ -125,6 +125,7 @@ if __name__ == "__main__":
         .option("subscribe", kafka_topic)
         .option("auto.offset.reset", "earliest")
         .option("failOnDataLoss", "false")
+        .option("kafka.group.id", "emlio")
         .option("enable.auto.commit", False)
         .load()
     )
