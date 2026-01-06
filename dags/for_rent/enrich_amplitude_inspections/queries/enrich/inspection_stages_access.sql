@@ -11,10 +11,6 @@ WITH inspections AS (
         day
     FROM
         datalake_inspection_services_clean.inspection_aud AS ia
-    WHERE
-        DATE(ia.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    QUALIFY
-        ia.ts_updated = MAX(ia.ts_updated) OVER(PARTITION BY ia.id_inspection)
 ),
 review_events AS (
     SELECT
@@ -24,8 +20,8 @@ review_events AS (
         ia.inspection_type,
         COALESCE(SUM(CAST(insp.user_type = 'Proprietario' AS SMALLINT)), 0) AS total_owner_access_review,
         COALESCE(MAX(insp.user_type = 'Proprietario'), FALSE) AS has_owner_access_review,
-        COALESCE(SUM(CAST(insp.user_type = 'Inquilino' AS SMALLINT)), 0) AS total_tenant_access_review,
-        COALESCE(MAX(insp.user_type = 'Inquilino'), FALSE) AS has_tenant_access_review,
+        COALESCE(SUM(CAST(insp.user_type IN ('Inquilino', 'Morador') AS SMALLINT)), 0) AS total_tenant_access_review,
+        COALESCE(MAX(insp.user_type IN ('Inquilino', 'Morador')), FALSE) AS has_tenant_access_review,
         MIN(
             CASE
             WHEN insp.user_type = 'Proprietario' THEN insp.ts_event
@@ -38,12 +34,12 @@ review_events AS (
         ) AS ts_last_owner_access_review,
         MIN(
             CASE
-            WHEN insp.user_type = 'Inquilino' THEN insp.ts_event
+            WHEN insp.user_type IN ('Inquilino', 'Morador') THEN insp.ts_event
             END
         ) AS ts_first_tenant_access_review,
         MAX(
             CASE
-                WHEN insp.user_type = 'Inquilino' THEN insp.ts_event
+                WHEN insp.user_type IN ('Inquilino', 'Morador') THEN insp.ts_event
             END
         ) AS ts_last_tenant_access_review,
         ia.ts_created AS ts_inspection_created,
