@@ -1,3 +1,9 @@
+bietlejuice.enrich_criteo:
+  add:
+    - bietlejuice.criteo_temp:done-clean-criteo-costs:first-run-of-day
+  remove:
+    - bietlejuice.criteo_temp:load-clean-criteo-costs:first-run-of-day
+
 bietlejuice.enrich_hightouch:
   add:
     - bietlejuice.hightouch_logs:load-clean-audience-membership-databricks

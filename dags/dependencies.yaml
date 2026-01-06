@@ -1858,7 +1858,7 @@ bietlejuice.enrich_credit_passport_ab_test:
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.enrich_docx:load-enrich-person-document-information:first-run-of-day
 bietlejuice.enrich_criteo:
-  - bietlejuice.criteo_temp:load-clean-criteo-costs:first-run-of-day
+  - bietlejuice.criteo_temp:done-clean-criteo-costs:first-run-of-day
 bietlejuice.enrich_crm:
   - bietlejuice.crm:load-clean-task-status-histories:first-run-of-day
   - bietlejuice.crm:load-clean-task-titles:first-run-of-day
