@@ -11,6 +11,8 @@ WITH inspections AS (
         day
     FROM
         datalake_inspection_services_clean.inspection_aud AS ia
+    QUALIFY
+        ia.ts_updated = MAX(ia.ts_updated) OVER(PARTITION BY ia.id_inspection)
 ),
 review_events AS (
     SELECT
