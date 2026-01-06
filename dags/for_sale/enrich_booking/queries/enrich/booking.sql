@@ -9,30 +9,14 @@ WITH status_change AS (
         datalake_booking.booking_status_change_unified
 ),
 canceled_date AS (
-    WITH min_canceled_date AS (
-        SELECT
-            b_aud.id AS id_booking,
-            b_aud.REV AS rev_canceled
-        FROM
-            datalake_ebdb_clean.booking_aud AS b_aud
-        WHERE
-            b_aud.status = 'Cancelado'
-            AND b_aud.mod_status = 1
-        QUALIFY
-            MIN(b_aud.REV) OVER (PARTITION BY b_aud.id) = b_aud.REV
-    )
     SELECT
-        mcd.id_booking,
-        ure.id_user AS id_user_cancelation,
-        -- TODO [ODS] check if milliseconds is really needed for this column
-        CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP)
-          + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS
-        AS ts_first_canceled
+        id_booking,
+        id_user as id_user_cancelation,
+        ts_created as ts_first_canceled
     FROM
-        min_canceled_date AS mcd
-    JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure
-            ON ure.id = mcd.rev_canceled
+        datalake_booking.booking_status_change_unified
+    WHERE
+        status = 'Cancelado'
 ),
 visit_origin_unified AS (
     WITH old_origin AS (

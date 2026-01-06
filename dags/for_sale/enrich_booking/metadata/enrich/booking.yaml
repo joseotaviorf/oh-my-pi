@@ -34,7 +34,7 @@ columns:
     description: An identifier for who had created the booking.
   id_user_cancelation:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.id_user
+      - datalake_booking.booking_status_change_unified.id_user
     description: An identifier for who had cancelled the booking for the first time.
       Its value can be NULL and in this case the cancellation was made by an automatic
       process.
@@ -467,11 +467,11 @@ columns:
     description: Datetime of the booking updating.
   ts_first_canceled:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_booking.booking_status_change.ts_created
     description: Datetime of the first cancellation.
   ts_first_canceled_unevaluated:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+    - datalake_booking.booking_status_change.ts_created
     description: Date time of the first cancelation even if the date time is greater than the dt_booking
   ts_booking_local_tz:
     lineage:
@@ -717,10 +717,6 @@ columns:
     description: If the agent is working under the HUB type of contract, it shows the region of the HUB it is allocated
   is_hub_flow:
     description: Boolean column indicating if the agent of that visit is working under the HUB flow. True if it is.
-  is_3p_demand:
-    description: Boolean column that identifies if the visitor came from a QuintoAndar demand partner.
-  is_3p_supply:
-    description: Boolean column that identifies if the listing is from a real estate partner (Rede Supply). Regardless if it is from QuintoAndar or CasaMineira.
   is_visit_completed:
     description: Boolean column indicating if he visit was completed by the visitor. The confirmation event is not registered yet.
   is_house_rented:
