@@ -27,6 +27,7 @@ LEFT JOIN
   datalake_hr_system_clean.areas_of_responsibility AS r 
     ON o.id_organization = r.id_department
     AND r.active_status = 'A'
+    AND r.id_template IS NOT NULL
 LEFT JOIN 
   datalake_employee_registration.identifier_mapping AS e 
     ON e.id_assignment = r.id_assignment
