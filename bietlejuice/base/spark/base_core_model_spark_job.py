@@ -556,11 +556,22 @@ class BaseCoreModelSparkJob(ABC):
         when_matched_delete_condition = self.get_config(
             "when_matched_delete_condition", required=False, default=None
         )
-        when_matched_operation = self.get_config(
+
+        # Get user overrides for when_matched_operation and merge with defaults
+        when_matched_operation_overrides = self.get_config(
             "when_matched_operation",
             required=False,
-            default=default_when_matched_operation,
+            default=None,
         )
+        if when_matched_operation_overrides:
+            # Merge user overrides into default (user overrides take precedence)
+            when_matched_operation = {
+                **default_when_matched_operation,
+                **when_matched_operation_overrides,
+            }
+        else:
+            when_matched_operation = default_when_matched_operation
+
         when_not_matched_operation = self.get_config(
             "when_not_matched_operation", required=False, default=None
         )

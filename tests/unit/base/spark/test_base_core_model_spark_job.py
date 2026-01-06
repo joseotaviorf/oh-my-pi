@@ -231,7 +231,7 @@ class TestBaseCoreModelSparkJob:
         mock_dataframe,
         mock_args,
     ):
-        """Test that run_pipeline uses custom when_matched_operation when provided in config."""
+        """Test that run_pipeline merges custom when_matched_operation with defaults when provided in config."""
         # Arrange
         mock_config_instance = Mock()
         mock_config_service.return_value = mock_config_instance
@@ -243,7 +243,7 @@ class TestBaseCoreModelSparkJob:
             mock_privileges_instance
         )
 
-        # Set up custom when_matched_operation
+        # Set up custom when_matched_operation overrides for specific columns
         custom_operation = {"id": "source.id", "name": "source.name"}
 
         def mock_get_config(key, required=True, default=None):
@@ -267,8 +267,17 @@ class TestBaseCoreModelSparkJob:
             call_args = mock_pipeline_class.call_args
             when_matched_operation = call_args.kwargs["when_matched_operation"]
 
-            # Should use the custom operation, not the default
-            assert when_matched_operation == custom_operation
+            # Custom overrides should be applied to specified columns
+            assert when_matched_operation["id"] == "source.id"
+            assert when_matched_operation["name"] == "source.name"
+
+            # Other columns should use the default behavior (source.column for new columns)
+            # since target table doesn't exist in this test (no spark.table mock)
+            for col in mock_dataframe.columns:
+                assert col in when_matched_operation
+                if col not in custom_operation:
+                    # Default behavior for new columns: use source value directly
+                    assert when_matched_operation[col] == f"source.{col}"
 
     def test_default_when_matched_operation_with_complex_column_names(
         self, job_instance

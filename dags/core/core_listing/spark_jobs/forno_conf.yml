@@ -4,3 +4,7 @@ AUX_LBC_STATUS_VERSION_ORDER_TABLE: "core_listing.aux__lbc_status_version_order"
 AUX_HOUSE_LISTING_CATEGORY_TABLE: "core_listing.aux__house_listing_category"
 merge_on: ["sk_core_listing"]
 when_matched_update_condition: "source.ts_updated > target.ts_updated"
+
+when_matched_operation:
+  status_reason: "source.status_reason"
+  ts_updated: "source.ts_updated"
