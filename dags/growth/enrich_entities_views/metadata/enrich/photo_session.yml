@@ -24,11 +24,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.id
       - datalake_ebdb_clean.house.id_user
-      - datalake_ebdb_clean.photographer_job.id
     description: |
       The unique identifier for a user associated with the photo session entity.
-      This field contains either the property owner (COALESCE of user.id from photographer relationship or house.id_user as fallback) when persona is 'OWNER', 
-      or the photographer job ID (photographer_job.id) when persona is 'AGENT_PHOTOGRAPHER'.
+      This field contains either the property owner (COALESCE of user.id from house_listing_relation join where related_as='PROPERTY_OWNER' or house.id_user as fallback) when persona is 'OWNER', 
+      or the photographer user ID (user.id from user table joined via id_photographer_data) when persona is 'AGENT_PHOTOGRAPHER'.
       Each photo session entity generates two rows with different id_user values based on persona.
   entity:
     lineage:
@@ -47,8 +46,8 @@ columns:
       A persona describes the primary role of a user (id_user) in relation to the photo session entity.
       Each photo session generates exactly 2 rows - one for OWNER and one for AGENT_PHOTOGRAPHER persona.
     categories:
-      OWNER: The property owner associated with the photo session. id_user comes from COALESCE(user.id, house.id_user) where user is matched via photographer relationship.
-      AGENT_PHOTOGRAPHER: The photographer assigned to the photo session job. id_user is set to photographer_job.id.
+      OWNER: The property owner associated with the photo session. id_user comes from COALESCE(user.id, house.id_user) where user is matched via house_listing_relation join (related_as='PROPERTY_OWNER') with conditions u.id = hl.id_related OR u.uuid_person = hl.id_related.
+      AGENT_PHOTOGRAPHER: The photographer assigned to the photo session job. id_user is set to user.id from the user table joined via id_photographer_data (uu.id_photographer_data = pj.id_photographer_data).
   properties:
     lineage:
       - datalake_ebdb_clean.photographer_job.status

@@ -2,7 +2,7 @@ WITH photo_session_exploded AS (
   SELECT DISTINCT
     pj.id AS id_entity,
     pj.id_house,
-    pj.id AS id_photographer,
+    uu.id AS id_photographer,
     'PHOTO_SESSION' AS entity,
     COALESCE(u.id, h.id_user) AS id_owner,
     NULL AS business_context,
@@ -21,12 +21,14 @@ WITH photo_session_exploded AS (
           AND hl.related_as = 'PROPERTY_OWNER'
   LEFT JOIN
     datalake_ebdb_clean.user AS u
-      ON pj.id_photographer_data = u.id_photographer_data
-      AND (u.id = hl.id_related
-          OR u.uuid_person = hl.id_related)
+      ON u.id = hl.id_related
+        OR u.uuid_person = hl.id_related
   LEFT JOIN
     datalake_ebdb_clean.house AS h
       ON pj.id_house = h.id
+  LEFT JOIN
+    datalake_ebdb_clean.user AS uu
+      ON pj.id_photographer_data = uu.id_photographer_data
   WHERE
     YEAR(pj.ts_created) >= 2025
 ),
