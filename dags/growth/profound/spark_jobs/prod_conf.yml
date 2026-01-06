@@ -7,8 +7,8 @@ metrics:
   - executions
 filters:
   - field: asset_name
-    operator: IN
-    values:
+    operator: in
+    value:
       - QuintoAndar
       - Imovelweb
       - Viva Real
