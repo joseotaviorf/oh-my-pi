@@ -2,7 +2,7 @@
 database_name: datalake_collections_quintoandar
 table_name: delinquency_app_events
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Table that contains app engagement events of defaulting customers, tracking their interaction with the app, including session starts, contract page views, pending invoice page views, and self-service negotiation actions.
 columns:
   id_amplitude:
@@ -129,3 +129,9 @@ columns:
     description: Month of the reference date.
   day:
     description: Day of the reference date.
+  event_properties:
+    description: Event properties.
+  feature:
+    description: Feature of the event.
+  summary_state:
+    description: Summary state of the event.

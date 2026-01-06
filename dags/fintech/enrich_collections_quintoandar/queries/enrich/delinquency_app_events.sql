@@ -525,7 +525,8 @@ SELECT
 FROM
   datalake_amplitude_clean.170698_native_home_section_tiles_list_events
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GET_JSON_OBJECT(event_properties, '$.tiles_ids') LIKE '%collections%'
+  AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
 UNION ALL
 
@@ -551,7 +552,8 @@ SELECT
 FROM
   datalake_amplitude_clean.170698_tile_perform_action_events
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GET_JSON_OBJECT(event_properties, '$.domain') LIKE '%collections%'
+  AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
 UNION ALL
 
@@ -577,7 +579,8 @@ SELECT
 FROM
   datalake_amplitude_clean.170698_native_home_section_banner_events
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GET_JSON_OBJECT(event_properties, '$.banner_id') LIKE '%EVICTIONS%'
+  AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
 UNION ALL
 
@@ -603,7 +606,8 @@ SELECT
 FROM
   datalake_amplitude_clean.170698_banner_perform_action_events
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GET_JSON_OBJECT(event_properties, '$.banner_id') LIKE '%EVICTIONS%'
+  AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
 UNION ALL
 
