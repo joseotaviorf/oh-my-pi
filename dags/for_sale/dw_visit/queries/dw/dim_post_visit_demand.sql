@@ -22,6 +22,8 @@ SELECT
     house_condominium_features,
     house_ad_discrepancies,
     evaluation_domain,
+    is_visit_completed_by_demand,
+    is_visit_canceled_by_demand,
     ts_creation
 FROM
     datalake_visit.post_visit_demand

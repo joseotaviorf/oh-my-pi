@@ -219,6 +219,27 @@ house_evaluation AS (
     LEFT JOIN
         house_good_point AS hgp
             ON house.id_reviewed = hgp.id_reviewed
+),
+visit_status_by_demand AS (
+    SELECT
+        id_visit,
+        CASE
+            WHEN event_type = 'ANSWER_VISIT_DONE' THEN TRUE
+            WHEN event_type = 'ANSWER_VISIT_UNSUCCESSFUL' THEN FALSE
+            ELSE NULL
+        END AS is_visit_completed_by_demand,
+        CASE
+            WHEN event_type = 'ANSWER_VISIT_RIGHTFULLY_CANCELED' THEN TRUE
+            WHEN event_type = 'ANSWER_VISIT_WRONGFULLY_CANCELED' THEN FALSE
+            ELSE NULL
+        END AS is_visit_canceled_by_demand
+    FROM
+        datalake_ebdb_clean.visit_status_log
+    WHERE
+        event_type IN ('ANSWER_VISIT_DONE', 'ANSWER_VISIT_UNSUCCESSFUL', 'ANSWER_VISIT_RIGHTFULLY_CANCELED', 'ANSWER_VISIT_WRONGFULLY_CANCELED')
+        AND on_behalf_of = 'DEMAND'
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
 )
 SELECT
     v.id AS id_visit,
@@ -249,6 +270,8 @@ SELECT
         WHEN agent.visit_code IS NULL AND house.visit_code IS NOT NULL THEN 'HOUSE'
         WHEN agent.visit_code IS NOT NULL AND house.visit_code IS NULL THEN 'AGENT'
     END AS evaluation_domain,
+    vsbd.is_visit_completed_by_demand,
+    vsbd.is_visit_canceled_by_demand,
     COALESCE(agent.dt_creation, house.dt_creation) AS ts_creation
 FROM
     agent_evaluation AS agent
@@ -258,3 +281,6 @@ FULL OUTER JOIN
 JOIN
     datalake_ebdb_clean.visit AS v
         ON v.code = COALESCE(agent.visit_code, house.visit_code)
+LEFT JOIN
+    visit_status_by_demand AS vsbd
+        ON vsbd.id_visit = v.id

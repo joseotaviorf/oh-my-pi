@@ -141,6 +141,14 @@ columns:
       AGENT_HOUSE: Both agent and house were evaluated.
       HOUSE: Only house was evaluated.
       AGENT: Only agent was evaluated.
+  is_visit_completed_by_demand:
+    lineage:
+      - datalake_visit.post_visit_demand.is_visit_completed_by_demand
+    description: What the demand answered about the visit completion. TRUE when the visit was completed by demand. FALSE when the visit was not completed by demand. NULL when the visit was canceled so the demand didn't answer.
+  is_visit_canceled_by_demand:
+    lineage:
+      - datalake_visit.post_visit_demand.is_visit_canceled_by_demand
+    description: What the demand answered about the visit cancellation. TRUE when the visit was canceled by demand. FALSE when the visit was not canceled by demand. NULL when the visit was not canceled so the demand didn't answer.
   ts_creation:
     lineage:
       - datalake_visit.post_visit_demand.ts_creation

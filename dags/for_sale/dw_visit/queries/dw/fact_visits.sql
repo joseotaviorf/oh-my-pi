@@ -74,7 +74,6 @@ LEFT JOIN
   dw_house.dim_house_entrance_history AS dim_heh
     ON v.id_house = dim_heh.sk_house
     AND v.ts_visit >= dim_heh.ts_entrance_started
-    AND v.ts_visit < COALESCE(dim_heh.ts_entrance_ended, NOW())
     AND IF(v.ts_visit > NOW(), NOW(), v.ts_visit) < COALESCE(dim_heh.ts_entrance_ended, DATE_ADD(MINUTE, 1, NOW()))
 LEFT JOIN
   dw_visit.dim_visit_funnel AS funnel_os
