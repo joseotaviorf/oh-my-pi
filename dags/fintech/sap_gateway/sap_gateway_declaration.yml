@@ -23,12 +23,8 @@ workflow:
     business_partner: {}
     card_code: {}
     consolidated_invoice: {}
-    consolidated_journal_entry_lines: {}
-    consolidated_journal_entry: {}
     feature: {}
     invoice: {}
-    journal_entry_lines: {}
-    journal_entry: {}
     operation: {}
     person: {}
     rule_account_type: {}
