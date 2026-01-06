@@ -32,6 +32,10 @@ columns:
     lineage:
       - datalake_sale_offer.core_sale_offer.id_region
     description: Region identification key where the property is located.
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+    description: City group classification based on the region where the property is located.
   id_agent:
     lineage:
       - datalake_sale_offer.core_sale_offer.id_agent
@@ -74,6 +78,14 @@ columns:
     lineage:
       - datalake_visit.visits.id_user_visit_request
     description: User identification key of the secretariat member who created the booking when different from the assigned agent.
+  flow_type:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.flow_type
+    description: Type of sales flow used for the offer (e.g., DEFAULT, DEAL_MAKING). Only available for SalesFlow originated offers.
+  offer_flow:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.flow_type
+    description: Derived offer flow classification. Returns 'DEAL_MAKING' for deal making flows, otherwise returns the flow_type or 'NOT DEFINED'.
   id_user_agent:
     lineage:
       - datalake_sale_offer_flows.offer_specialists.id_user_agent
@@ -102,6 +114,10 @@ columns:
     lineage:
       - datalake_sale_offer.core_sale_offer.planned_payment_method
     description: Initial payment method planned by the buyer at the moment of offer creation.
+  credit_model:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.credit_model
+    description: Credit model used for the mortgage financing. Only available for offers with mortgage.
   has_used_fgts_in_payment:
     lineage:
       - datalake_sale_offer.core_sale_offer.has_used_fgts_in_payment
@@ -134,6 +150,42 @@ columns:
     lineage:
       - datalake_sale_offer.core_sale_offer.last_discount_proposed
     description: Last discount percentage proposed by the buyer calculated as (sale_price - last_offer_price) / sale_price.
+  payment_entry_amount:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.payment_entry_amount
+    description: Entry amount paid by the buyer at the beginning of the contract.
+  registry_price:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.registry_price
+    description: Property registry price for legal documentation.
+  itbi_price:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.itbi_price
+    description: ITBI (Real Estate Transfer Tax) value for the property transaction.
+  has_used_negotiation_chat:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.has_used_negotiation_chat
+    description: Boolean flag indicating if the negotiation chat feature was used for this offer.
+  offer_status:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.status
+    description: Current status of the sales flow and offer in the negotiation process.
+  drop_reason:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.drop_reason
+    description: Reason why the offer was dropped or rejected before sale agreement signature.
+  drop_reason_responsible:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.drop_reason_responsible
+    description: Type of user responsible for dropping the offer (Buyer, Seller, Agent, or Other).
+  business_unit:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Name of the business unit (hub) responsible for the offer.
+  is_a_rescued_offer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.is_a_rescued_offer
+    description: Boolean flag indicating if the offer was rescued after being previously discarded or canceled.
   price_segment:
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.price_segment
@@ -210,6 +262,10 @@ columns:
     lineage:
       - datalake_sales_flow_clean.sales_flow_details.ts_buyer_fup
     description: Timestamp of buyer follow-up interaction.
+  ts_updated:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_updated
+    description: Timestamp when the offer was last updated.
   ts_load:
     description: Timestamp when the data was loaded into the datalake.
 
