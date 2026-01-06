@@ -38,12 +38,15 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   has_active_manager:
-    custom: # Validates that all active assignments have an active manager
+    custom: # Validates that all active assignments have an active manager (excludes known employees without manager exceptions)
       constraint: |-
-        (SELECT COUNT(*)
-         FROM dw_employee.fact_assignments
-         WHERE is_active = TRUE
-           AND (sk_manager_assignment = '-1' OR has_active_manager = FALSE)
+        (
+          SELECT COUNT(*)
+          FROM dw_employee.fact_assignments
+          WHERE
+            is_active = TRUE
+            AND sk_employee != 300000008567329
+            AND (sk_manager_assignment = '-1' OR has_active_manager = FALSE)
         ) = 0
       severity_level: Warning
   ts_load:
