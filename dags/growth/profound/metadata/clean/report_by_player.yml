@@ -1,0 +1,44 @@
+---
+database_name: datalake_profound_clean
+table_name: report_by_player
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
+description: This table contains the clean informations about Profound data in the player granularity.
+columns:
+  player:
+    description: Asset name (player) from Profound.
+    lineage:
+      - datalake_profound_raw.report_by_player.asset_name
+  executions:
+    description: Number of executions for the player.
+    lineage:
+      - datalake_profound_raw.report_by_player.executions
+  mentions_count:
+    description: Number of mentions for the player.
+    lineage:
+      - datalake_profound_raw.report_by_player.mentions_count
+  visibility_score:
+    description: Visibility score for the player.
+    lineage:
+      - datalake_profound_raw.report_by_player.visibility_score
+  share_of_voice:
+    description: Share of voice percentage for the player.
+    lineage:
+      - datalake_profound_raw.report_by_player.share_of_voice
+  dt_created:
+    description: Extraction date.
+    lineage:
+      - datalake_profound_raw.report_by_player.date
+  year:
+    description: Extraction year.
+    lineage:
+      - datalake_profound_raw.report_by_player.date
+  month:
+    description: Extraction month.
+    lineage:
+      - datalake_profound_raw.report_by_player.date
+  day:
+    description: Extraction day.
+    lineage:
+      - datalake_profound_raw.report_by_player.date
+

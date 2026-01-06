@@ -1,0 +1,43 @@
+---
+raw_partition_cols: ["date"]
+metrics:
+  - share_of_voice
+  - mentions_count
+  - visibility_score
+  - executions
+filters:
+  - field: asset_name
+    operator: in
+    values:
+      - QuintoAndar
+      - Imovelweb
+      - Viva Real
+      - VivaReal
+      - OLX
+      - Zap Imóveis
+      - ZAP
+      - Zap
+      - Wimoveis
+      - Lopes
+      - Mercado Livre
+      - Casa Mineira
+      - Loft
+      - Chaves Na Mão
+      - DF Imóveis
+tables:
+  by_player:
+    dimensions:
+      - date
+      - asset_name
+  by_model:
+    dimensions:
+      - date
+      - model
+      - asset_name
+  by_topic:
+    dimensions:
+      - date
+      - model
+      - asset_name
+      - topic
+

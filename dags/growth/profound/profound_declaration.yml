@@ -1,0 +1,48 @@
+dag:
+  name: profound
+  owner: Data Growth
+  schedule_start_date: 2025, 12, 16
+  schedule_interval: "0 10 * * *"
+  documentation:
+    dag_purpose: |
+      Profound DAG retrieves Profound data metrics from API.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_profound_raw
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{load_start_date}"   # load_start_date
+  - "{load_end_date}"   # load_end_date
+  tables_customization:
+    report_by_player:
+      extra_spark_job_arguments:
+      - by_player   # report_type
+    report_by_model:
+      extra_spark_job_arguments:
+      - by_model   # report_type
+    report_by_topic:
+      extra_spark_job_arguments:
+      - by_topic   # report_type
+cluster:
+  type: databricks_13_3_min_general_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
+  custom_libraries:
+  - pypi:
+      package: "profound"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+

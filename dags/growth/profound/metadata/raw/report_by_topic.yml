@@ -1,0 +1,5 @@
+---
+database_name: datalake_profound_raw
+table_name: report_by_topic
+owner: caio.francisco@quintoandar.com.br
+domain: Growth
