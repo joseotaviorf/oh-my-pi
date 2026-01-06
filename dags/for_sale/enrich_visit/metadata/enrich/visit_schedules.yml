@@ -48,10 +48,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.id_agent
     description: Is the id agent of the agent.
-  id_offer:
-    lineage:
-      - datalake_offer.sale_offer.id_offer
-    description: If the house have a offer, we fill this field.
   id_fixed_agent:
     lineage:
       - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
@@ -251,10 +247,6 @@ columns:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
     description: Days between the booking creation and the visit completed date. Data since 2020.
-  hours_booking_to_offer:
-    description: Hours between the booking created and the first offer.
-  hours_visit_to_offer:
-    description: Hours between the visit completed and the first offer.
   ts_visit:
     lineage:
       - datalake_ebdb_clean.visit.ts_visit

@@ -96,11 +96,6 @@ columns:
       - datalake_visit.visit_schedules.visit_code
     description:
       Code of the visit.
-  sk_offer:
-    lineage:
-      - datalake_visit.visit_schedules.id_offer
-    description:
-      If the house have a offer, we fill this field.
   sk_house_entrance:
     lineage:
       - dw_house.dim_house_entrance_history.sk_house_entrance
@@ -129,16 +124,6 @@ columns:
       - datalake_visit.visit_schedules.days_visit_booked_to_visit_completed
     description:
       Days between the booking creation and the visit completed date.
-  hours_booking_to_offer:
-    lineage:
-      - datalake_visit.visit_schedules.hours_booking_to_offer
-    description:
-      Hours between the booking created and the first offer.
-  hours_visit_to_offer:
-    lineage:
-      - datalake_visit.visit_schedules.hours_visit_to_offer
-    description:
-      Hours between the visit completed and the first offer.
   is_hub_flow:
     lineage:
       - datalake_visit.visit_schedules.is_hub_flow

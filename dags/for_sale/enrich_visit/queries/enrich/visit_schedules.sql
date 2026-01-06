@@ -210,17 +210,6 @@ visit_model AS (
   WHERE
     vse.event_type IN ('VISIT_FITTED', 'VISIT_REGISTERED')
 ),
-offer_after_booking AS (
-  SELECT
-    id_booking AS id_schedule,
-    id_offer,
-    hours_booking_to_offer,
-    hours_visit_to_offer
-  FROM
-    datalake_offer.sale_offer
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY ts_offer_submitted) = 1
-),
 agent_contract_aud AS (
   SELECT
     adaud.id AS id_agent,
@@ -463,7 +452,6 @@ SELECT DISTINCT
   vcu.id_user AS id_user_cancelation,
   v.id_agent AS id_user_agent,
   ua.id_agent,
-  so.id_offer,
   fa.id_fixed_agent,
   su.id_user_5a AS id_user_sale_attendence_5a,
   sovd.id_user_secretariat_on_visit_date,
@@ -533,8 +521,6 @@ SELECT DISTINCT
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
   DATEDIFF(vcu.ts_created, ts_schedule_created) AS days_visit_booked_to_cancelled,
   DATEDIFF(IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL), ts_schedule_created) AS days_visit_booked_to_visit_completed,
-  so.hours_booking_to_offer,
-  so.hours_visit_to_offer,
   v.ts_visit,
   s.ts_schedule_created,
   s.ts_schedule_requested,
@@ -583,9 +569,6 @@ LEFT JOIN
 LEFT JOIN
   last_secretariat AS ls
     ON s.id_schedule = ls.id_schedule
-LEFT JOIN
-  offer_after_booking AS so
-    ON s.id_schedule = so.id_schedule
 LEFT JOIN
   booking_hub_agent AS bha
     ON bha.id_schedule = s.id_schedule
