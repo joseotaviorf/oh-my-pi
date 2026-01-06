@@ -155,6 +155,25 @@ brokerage AS (
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
 ),
+mortgage AS (
+  SELECT
+    mg.id_mortgage,
+    mg.id_sales_flow,
+    mg.bank,
+    mg.status,
+    mg.credit_model,
+    mg.credit_status,
+    mg.dt_bank_started,
+    mg.dt_credit_started,
+    mg.dt_credit_ended,
+    mg.dt_started,
+    mg.dt_ended,
+    DATE(mg.ts_seller_paid) AS dt_seller_paid
+  FROM
+    datalake_sales_flow_clean.mortgage     AS mg
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY mg.id_mortgage ORDER BY mg.ts_updated DESC) = 1    
+),
 house AS (
     SELECT
          h.id,
@@ -360,6 +379,7 @@ sale_offer AS (
             THEN TRUE
             ELSE FALSE
         END AS has_used_negotiation_chat,
+        ft.flow_type,
         off.last_discount_proposed,
         off.first_discount_proposed,
         p.payment_method,
@@ -374,6 +394,7 @@ sale_offer AS (
         off.itbi_price,
         p.entry_amount,
         mpl.financing_value,
+        mt.credit_model,
         p.fgts_value,
         p.down_payment_value,
         COALESCE(b.brokerage_fee, 0.06::DECIMAL(5,4)) AS brokerage_fee,
@@ -411,6 +432,9 @@ sale_offer AS (
         house AS h
             ON h.id = sf.id_house
     LEFT JOIN
+        mortgage AS mt
+            ON mt.id_sales_flow = sf.id
+    LEFT JOIN
         ccv_flow AS ccv_flow
             ON ccv_flow.id_sales_flow = sf.id
     LEFT JOIN
@@ -431,8 +455,10 @@ unified_offers AS (
         vo.id_agent,
         vo.payment_method AS current_payment_method,
         vo.planned_payment_method,
+        vo.credit_model,
         vo.status,
         vo.ccv_status,
+        vo.flow_type,
         vo.drop_reason,
         vo.drop_reason_responsible,
         ROUND(vo.sale_listing_price, 2) AS sale_price,
@@ -478,8 +504,10 @@ unified_offers AS (
         g.id_agent,
         g.current_payment_method AS current_payment_method,
         CAST(NULL AS STRING) AS planned_payment_method,
+        CAST(NULL AS STRING) AS credit_model,
         CAST(NULL AS STRING) AS status,
         CAST(NULL AS STRING) AS ccv_status,
+        CAST(NULL AS STRING) AS flow_type,
         CAST(NULL AS STRING) AS drop_reason,
         CAST(NULL AS STRING) AS drop_reason_responsible,
         ROUND(g.sale_price, 2) AS sale_price,
@@ -514,6 +542,48 @@ unified_offers AS (
         NOT EXISTS (SELECT 1 FROM sale_offer AS o WHERE o.id_offer = g.id)
 )
 SELECT
-    *
+    id_offer,
+    id_sales_flow,
+    id_sale_flow,        
+    id_house,
+    id_region,
+    id_hub,
+    id_buyer,
+    id_owner,
+    id_agent,
+    current_payment_method,
+    planned_payment_method,
+    credit_model,
+    status,
+    ccv_status,
+    flow_type,
+    drop_reason,
+    drop_reason_responsible,
+    sale_price,
+    sale_price_agreed,
+    first_price_offered_by_buyer,
+    last_price_offered_by_buyer,
+    last_discount_proposed,
+    first_discount_proposed,
+    registry_price,
+    itbi_price,
+    payment_entry_amount,
+    financing_value,
+    fgts_value,
+    earnest_value,
+    brokerage_fee,
+    has_used_fgts_in_payment,
+    has_used_negotiation_chat,
+    is_5a_model,
+    is_canceled,
+    is_a_rescued_offer,
+    ts_offer_created,
+    ts_offer_canceled,
+    ts_offer_accepted,
+    ts_offer_discarded,
+    ts_offer_rescued,
+    ts_updated,
+    ts_sale_agreement_created,
+    ts_sale_agreement_signed
 FROM
     unified_offers

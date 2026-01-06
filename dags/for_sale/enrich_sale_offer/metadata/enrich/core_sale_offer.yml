@@ -50,12 +50,8 @@ columns:
   status:
     lineage:
       - datalake_sales_flow_clean.sales_flow.status
-    description: Current status of the sales flow. Only available for SalesFlow originated offers.
-  offer_status:
-    lineage:
-      - datalake_sales_flow_clean.sales_flow.status
       - datalake_firestore_clean.sale_offer.status
-    description: Current status of the offer in the negotiation process.
+    description: Current status of the sales flow and offer in the negotiation process.
     categories:
       "OFFER SENT": "Offer submitted by buyer, awaiting response"
       "OFFER ACCEPTED": "Offer accepted by seller"
@@ -88,6 +84,14 @@ columns:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.status
     description: Status of the sale agreement (CCV - Contrato de Compra e Venda) in the signing flow. Only available for SalesFlow originated offers.
+  credit_model:
+    lineage:
+      - datalake_sales_flow_clean.mortgage.credit_model
+    description: Credit model used for the mortgage financing. Only available for SalesFlow originated offers with mortgage.
+  flow_type:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_type
+    description: Type of sales flow used for the offer (e.g., DEFAULT for negotiation chat). Only available for SalesFlow originated offers.
   sale_price:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
