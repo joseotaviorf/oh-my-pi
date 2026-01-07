@@ -21,6 +21,14 @@ columns:
     description: "Version number for optimistic locking"
     lineage:
       - datalake_trato_feito_raw.communication_step.version
+  config:
+    description: "Generic JSON configuration for the specific communication step"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.config
+  type:
+    description: "Communication type (enum, e.g., COMMS_PLATFORM)"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.type
   ts_created:
     description: "Timestamp when the step was created"
     lineage:
