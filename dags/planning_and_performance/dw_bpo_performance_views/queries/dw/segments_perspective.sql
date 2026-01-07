@@ -260,4 +260,4 @@ LEFT JOIN contacts AS c
 LEFT JOIN first_resolution AS fr
   ON sp.agent_email = fr.email
 WHERE 
-  sp.dt_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  sp.dt_created BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
