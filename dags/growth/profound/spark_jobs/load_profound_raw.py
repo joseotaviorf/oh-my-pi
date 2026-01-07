@@ -1,8 +1,8 @@
 import json
 from functools import reduce
 from argparse import ArgumentParser
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import lit, col, to_date
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import lit, col, to_date, element_at
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 from quintoandar_logger import QuintoAndarLogger
@@ -25,11 +25,11 @@ CATEGORY_ID = "92504126-efe7-4f21-b17a-344f300a685d"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
-def get_profound_data(client: Client, metrics: list[str], dimensions: list[str], filters: list[str], offset: int = 0) -> ReportResponse:
+def get_profound_data(profound_client: Client, metrics: list[str], dimensions: list[str], filters: list[str], start_date: str, end_date: str, offset: int = 0) -> ReportResponse:
     response = profound_client.reports.visibility(
         category_id=CATEGORY_ID,
-        start_date=args.load_start_date,
-        end_date=args.load_end_date,
+        start_date=start_date,
+        end_date=end_date,
         metrics=metrics,
         dimensions=dimensions,
         filters=filters,
@@ -37,9 +37,9 @@ def get_profound_data(client: Client, metrics: list[str], dimensions: list[str],
     )
     return response
 
-def generate_dataframe(spark_client: SparkClient, response: ReportResult) -> DataFrame:
+def generate_dataframe(spark: SparkSession, response: ReportResult) -> DataFrame:
     if response and hasattr(response, "data") and response.data:
-        df = spark_client.createDataFrame(response.data)
+        df = spark.createDataFrame(response.data)
         for idx, dimension_name in enumerate(response.info.query.get("dimensions", [])):
             df = df.withColumn(dimension_name, element_at("dimensions", idx + 1))
         for idx, metric_name in enumerate(response.info.query.get("metrics", [])):
@@ -101,13 +101,14 @@ if __name__ == "__main__":
     )
 
     spark_client = SparkClient()
+    spark = SparkSession.builder.getOrCreate() 
 
     dfs = []
     
     try:
-        response = get_profound_data(profound_client, metrics, dimensions, filters)
+        response = get_profound_data(profound_client, metrics, dimensions, filters, load_start_date, load_end_date)
 
-        df = generate_dataframe(spark_client, response)
+        df = generate_dataframe(spark, response)
         
         dfs.append(df)
 
@@ -116,14 +117,14 @@ if __name__ == "__main__":
         offset = limit
 
         while offset < total_rows:
-            response = get_profound_data(profound_client, metrics, dimensions, filters, offset)
-            df = generate_dataframe(spark_client, response)
+            response = get_profound_data(profound_client, metrics, dimensions, filters, load_start_date, load_end_date, offset)
+            df = generate_dataframe(spark, response)
             dfs.append(df)
             offset += limit
                 
         logger.info(
             f"""
-                m={JOB_NAME}, {len(total_rows)} rows extracted
+                m={JOB_NAME}, {total_rows} rows extracted
                 for the period {load_start_date} to {load_end_date}.
             """
         )
