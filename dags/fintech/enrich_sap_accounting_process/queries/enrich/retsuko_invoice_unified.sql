@@ -106,17 +106,16 @@ WHERE
 sap_ledger AS (
   SELECT
     id_finance_entity,
-    CAST(id_external_payment AS INT) AS id_external_payment,
     account_number,
+    id_external_payment,
     SUM(debit_credit) AS debit_credit,
     MAX(DATE(dt_created)) AS dt_sap_created,
     MAX(DATE(dt_reference)) AS dt_sap_reference
   FROM
-    datalake_accounting_funnel.ledger
+    datalake_pas.ledger
   WHERE
-    dt_reference >= DATE('2025-01-01')
+    dt_reference >= DATE('2024-01-01')
     AND account_number IN ('420002', '420005')
-    AND id_finance_entity IN ('SFNFUnica', 'AdmNFUnica')
   GROUP BY 1, 2, 3
 ),
 
@@ -147,7 +146,10 @@ errors_base AS (
     MIN(IF(sl.id_external_payment IS NULL, FALSE, TRUE)) AS is_completeness,
     CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
     MIN(CASE
-      WHEN sl.id_external_payment IS NOT NULL THEN CAST(sg.amount AS DECIMAL(12,2))
+      WHEN 
+        sg.doc_entry IS NOT NULL AND sl.id_external_payment IS NOT NULL THEN CAST(sg.amount AS DECIMAL(12,2))
+      WHEN 
+        sl.debit_credit IS NOT NULL THEN CAST(sl.debit_credit AS DECIMAL(12,2))
       ELSE NULL
     END) AS sap_amount,
     MAX(r.dt_source_trigger) AS dt_source_trigger,
@@ -163,7 +165,8 @@ errors_base AS (
       ON se.id_sap_gateway_feature = sg.id_feature
   LEFT JOIN
     sap_ledger sl
-      ON sl.id_external_payment  = sg.doc_entry
+      ON sl.id_external_payment = sg.doc_entry
+      OR ( r.account_number = sl.account_number AND r.id_finance_entity = sl.id_finance_entity)
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
 ),
 
