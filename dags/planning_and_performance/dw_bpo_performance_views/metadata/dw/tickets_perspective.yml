@@ -1,0 +1,462 @@
+database_name: dw_bpo_performance
+table_name: tickets_perspective
+description: Table with pre-calculated information for tickets via Zendesk.
+domain: Cross
+owner: alef.vieiras@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_customer_support.tickets.id_ticket
+    description: Ticket identifier associated with the contact.
+  sk_user:
+    lineage:
+      - datalake_customer_support.calls.id_user
+      - datalake_customer_support.chats.id_user
+    description: User identifier associated with the contact.
+  sk_user_contract:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.fact_tickets.sk_contract
+    description: Identifies the user number associated with the contract. Ex. IQ user ID.
+  ts_last_move_to_final_group:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_last_move_to_final_group
+    description: The moment the ticket moved to the last department.
+  sk_contract:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_contract
+    description: Contract number related to the ticket
+  sk_session:
+    lineage:
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.chats.id_session
+    description: Session identifier associated with the contact.
+  channel:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+    description: Communication channel of the contact (call or chat).
+  status:
+    lineage:
+      - dw_customer_support.dim_ticket.status
+    description: Ticket status (Ex. Solved, Open...)
+  last_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.last_csat_score
+    description: Last satisfaction score applied to that ticket in the Satisfaction Survey.
+  last_csat_comment:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.last_csat_comment
+    description: Comment related to the latest ticket satisfaction survey score.
+  last_csat_ts_response:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.ts_last_response
+    description: Date of the last response to the Satisfaction Survey related to that ticket.
+  first_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: First satisfaction score applied to that ticket in the Satisfaction Survey.
+  first_csat_comment:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_comment
+    description: Comment related to the first score of the ticket satisfaction survey.
+  first_csat_ts_response:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.ts_first_response
+    description: Date of the first response in the Satisfaction Survey related to that ticket.
+  resolution_survey:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.is_solved
+    description: Indicates whether the ticket was resolved or solved, through the satisfaction survey.
+  replies:
+    lineage:
+      - dw_customer_support.fact_tickets.replies
+    description: Volume of public comments made on the ticket
+  reopens:
+    lineage:
+      - dw_customer_support.fact_tickets.reopens
+    description: Volume of reopens that the ticket received
+  front_or_back:
+    lineage:
+      - dw_customer_support.fact_tickets.front_or_back
+    description: Indicates whether the ticket belongs to the Front or Back.
+  has_answered_csat:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.sk_ticket
+    description: Indicates whether the customer responded to the Satisfaction Survey.
+  is_ticket_rate:
+    lineage:
+      - dw_customer_support.fact_tickets.is_ticket_rate
+    description: Indicates whether the ticket qualifies for Ticket Rate calculation.
+  ticket_rate_weight:
+    lineage:
+      - dw_customer_support.fact_tickets.ticket_rate_weight
+    description: Ticket weight for Ticket Rate calculation
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Ticket opening date
+  ts_started_new:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Returns the earliest creation date value by comparing the ticket creation date to the date of a contact in the front-end.
+  ts_started_week:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Returns to the week the ticket was created.
+  ts_closed:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_closed
+    description: Returns the date the ticket was closed.
+  ts_solved:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Returns the date the ticket was resolved.
+  ticket_age:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+      - dw_customer_support.fact_tickets.ts_created
+    description: Returns the ticket age between ts_solved and ts_started.
+  tags:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Returns the list of tags applied to the ticket.
+  ticket_type:
+    lineage:
+      - dw_customer_support.dim_ticket.type
+    description: Returns the type assigned to the ticket (e.g., "Problem", "Incident")
+  first_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Returns to the first department/queue associated with the ticket.
+  first_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Returns the first team belonging to the ticket.
+  first_area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Returns to the first area belonging to the ticket.
+  first_is_partner:
+    lineage:
+      - dw_customer_support.dim_department.is_partner
+    description: Indicates whether the first department/row belongs to a 5A partner.
+  journey_step:
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+    description: Indicates the stage of that contact's journey (Pre-Contract or Post-Contract).
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Returns the last department/queue associated with the ticket.
+  last_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Returns the last team associated with the ticket.
+  last_area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Returns the last area belonging to the ticket.
+  last_is_partner:
+    lineage:
+      - dw_customer_support.dim_department.is_partner
+    description: Indicates whether the last department/queue belongs to a 5A partner.
+  customer_type:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Contact user rating
+  motivation:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Classification of user motivation (e.g., doubt).
+  step_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.step_tag
+    description: Classification of the stages of the user journey.
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Taxonomy related to contact (Theme)
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Detailed taxonomy related to contact
+  journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.journey
+    description: Ticket journey linked to contact (Post Contract or Pre Contract)
+  sub_journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: Sub-ticket journey, indicates the area
+  line_owner:
+    lineage:
+      - dw_customer_support.dim_taxonomy.line_owner
+    description: Macro area responsible for contact (e.g., For Rent)
+  refined_direction:
+    lineage:
+      - dw_customer_support.fact_tickets.ticket_origin
+      - dw_customer_support.fact_tickets.direction
+    description: Type of Service (Inbound or Outbound)
+  refined_ticket_origin:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+      - dw_customer_support.fact_tickets.ticket_origin
+    description: Indicates the channel + type of service.
+  first_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Returns the email address of the first analyst assigned to the ticket.
+  first_agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Returns the organization of the first analyst assigned to the ticket.
+  first_agent_dt_start:
+    lineage:
+      - dw_customer_support.dim_analyst.dt_agent_start
+    description: Returns the start date of the first assigned analyst, based on the ticket.
+  last_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Returns the last analyst assigned to the ticket.
+  last_agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Returns the organization of the analyst of the last analyst assigned to the ticket.
+  last_agent_dt_start:
+    lineage:
+      - dw_customer_support.dim_analyst.dt_agent_start
+    description: Returns the start date of the first assigned analyst, based on the ticket.
+  ts_updated:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_updated
+    description: Returns the date the ticket was last updated.
+  days_since_last_update:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_updated
+    description: Counting the number of days from the current date since the last update.
+  minutes_first_reply_time_business:
+    lineage:
+      - dw_customer_support.fact_tickets.reply_time_min_business
+    description: Time in business minutes it took for the first response to the ticket.
+  minutes_first_reply_time_calendar:
+    lineage:
+      - dw_customer_support.fact_tickets.reply_time_min_calendar
+    description: Time in minutes it took for the first response to the ticket to occur.
+  is_ticket_solved_within_sla:
+    lineage:
+      - dw_customer_support.fact_tickets.is_backlog_in_time
+    description: Indicates whether the ticket was resolved within or outside the SLA.
+  days_worked:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Returns ticket age in business days.
+  days_worked_with_days_off:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_calendar
+    description: Returns the ticket age in consecutive days.
+  sla_target:
+    lineage:
+      - dw_customer_support.fact_tickets.sla_target
+    description: Returns the estimated SLA for ticket resolution.
+  ts_latest_customer_comment:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_latest_customer_comment
+    description: Returns the date of the customer's last public comment on the ticket.
+  ts_latest_analyst_comment:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_latest_analyst_comment
+    description: Returns the date of the analyst's last public comment on the ticket.
+  is_brz_business_day:
+    lineage:
+      - dw_public.dim_date.is_brz_business_day
+    description: Indicates whether the date the ticket was closed is a business day.
+  canal_de_entrada:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+      - dw_customer_support.dim_ticket.ticket_via
+    description: Indicates the ticket's entry channel (e.g., API, WhatsApp, Front End).
+  description:
+    lineage:
+      - dw_customer_support.dim_ticket.description
+    description: Returns the first comment in the ticket. This is the text of the support request or, when an end user submits a support request via email, the email body is used as the description.
+  cas_pesquisa_enviada:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+      - dw_customer_support.dim_ticket.score
+    description: Indicates whether the ticket has had a survey sent.
+  subject:
+    lineage:
+      - dw_customer_support.dim_ticket.subject
+    description: Subject related to the ticket
+  customer_type_csi_mapped:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the specific client type for CSI cases.
+  customer_type_ro:
+    lineage:
+      - dw_repairs.dim_ongoing_repairs.client_type
+    description: Returns the type of customer associated with the Repair ticket (e.g., Tenant or Owner).
+  group_name_ro:
+    lineage:
+      - dw_repairs.dim_ongoing_repairs.group_name
+    description: Returns the queue/department associated with the Repair ticket.
+  journey_ro:
+    lineage:
+      - dw_repairs.dim_ongoing_repairs.contract_journey
+    description: Return the journey to a Repair Ticket.
+  last_agent_aging:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.dim_analyst.dt_agent_start
+    description: Indicates how many months ago this ticket was created from the analyst's start date.
+  total_talk_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.total_talk_time
+    description: Total talk time for Twilio cases
+  ts_task_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Indicates the date the task was created in Twilio.
+  bot:
+    lineage:
+      - datalake_chatbot.sessions.bot
+    description: Bot persona managing the session for Twilio cases.
+  sk_main_department:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_main_department
+    description: ID identifier of the department/ticket queue
+  criticidade_ro:
+    lineage:
+      - dw_repairs.dim_ongoing_repairs.criticality
+    description: Returns the criticality level to Repair tickets.
+  deadline_ticket_reparos:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_repairs.dim_ongoing_repairs.criticality
+    description: Returns the latest date by which a repair ticket should be closed.
+  dt_viagem_chaves:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the trip date when it's a keys task.
+  ss_motivo_acionamento:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Root Cause" field to the ticket when available.
+  N_Jira_privacy:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "PIAE Number in JIRA" field to the ticket when available.
+  ss_assunto_contato:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "[CC] - Contact Subject" field to the ticket when available.
+  ss_ofensor_processo:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Process Offender" field to the ticket when available.
+  ss_area_negocio:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Business Area" field to the ticket when available.
+  ss_area:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Areas" field to the ticket when available.
+  ss_tarefa_aberta_corretamente:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns whether the "Task opened correctly?" field in the ticket is populated when available.
+  intermitencia_condo:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Intermittent Condo" field to the ticket when available.
+  tipo_de_cliente:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Customer Type" field to the ticket when available.
+  jornada_hub:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "[HUB] Journey" field to the ticket when available.
+  tipo_de_demanda:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Type of Demand" field to the ticket when available.
+  tipo_de_processo:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns the "Process Type" field to the ticket when available.
+  tarefa_partners:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+    description: Returns whether the "Task opened correctly?" field in the ticket is populated when available.
+  recontact_search_window_from_d4:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Return the date to 3 days prior to the creation of the current ticket for the Recontact calculation.
+  recontact_flag_d4:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+    description: Indicates whether the ticket meets the contact rules.
+  is_pp_multi:
+    lineage:
+      - datalake_pp_multi.pp_multi_classification_history.pp_multi_classification
+    description: Indicates whether the ticket owner is a PP Multi.
+  is_closed_by_merge:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Indicates whether the ticket was closed due to a merge with another ticket.
+  spoc_class:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_request
+      - dw_offboarding.fact_terminations.is_spoc_contract
+      - dw_offboarding.fact_terminations.is_spoc_control_group
+      - dw_offboarding.dim_termination.team
+    description: Indicates the SPOC team's ranking.
+  onboarding_synced_insp_date:
+    lineage:
+      - dw_inspections.fact_inspection.ts_synced
+      - dw_inspections.dim_inspection.inspection_type
+    description: Returns the entry inspection date of the contract attached to the ticket.
+  first_resolution_last_agent:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Returns the date of the first resolution by the analyst associated with the ticket.
+  dt_max_end_reparos:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_repairs.dim_ongoing_repairs.criticality
+      - dw_public.dim_date.is_brz_holiday
+    description: Returns the deadline for closing the repair ticket.
+  squad:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Returns the "Squad" to Offboarding mediation tickets.
+  status_agreement:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Returns the Mediation Agreement Status in the Offboarding process.
+  off_area:
+    lineage:
+      - datalake_terminator_clean.termination_task.type
+      - datalake_offboarding.mediations.has_mediation_ticket
+    description: Returns the macro area of the Offboarding team associated with the ticket (e.g., AR, AC, Mediation...)
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.
