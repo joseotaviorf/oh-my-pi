@@ -11,6 +11,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  inmuebles24_serp_features_kw:
+    configs:
+      subdomain: inmuebles24.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
+    display_limit: 2
   vivanuncios_organic_search_kw:
     configs:
       subdomain: vivanuncios.com.mx
@@ -19,6 +27,14 @@ report_list:
       database: mx
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  vivanuncios_serp_features_kw:
+    configs:
+      subdomain: vivanuncios.com.mx
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
     display_limit: 2
   lamudi_organic_search_kw:
     configs:
@@ -29,6 +45,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  lamudi_serp_features_kw:
+    configs:
+      subdomain: lamudi.com.mx
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
+    display_limit: 2
   propiedades_organic_search_kw:
     configs:
       subdomain: propiedades.com
@@ -37,6 +61,14 @@ report_list:
       database: mx
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  propiedades_serp_features_kw:
+    configs:
+      subdomain: propiedades.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
     display_limit: 2
   inmuebles_organic_search_kw:
     configs:
@@ -47,6 +79,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  inmuebles_serp_features_kw:
+    configs:
+      subdomain: inmuebles.mercadolibre.com.mx
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
+    display_limit: 2
   easyaviso_organic_search_kw:
     configs:
       subdomain: easyaviso.com
@@ -55,6 +95,14 @@ report_list:
       database: mx
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  easyaviso_serp_features_kw:
+    configs:
+      subdomain: easyaviso.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
     display_limit: 2
   pincali_organic_search_kw:
     configs:
@@ -65,6 +113,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  pincali_serp_features_kw:
+    configs:
+      subdomain: pincali.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: mx
+      display_positions_type: serp_features
+    display_limit: 2
   zonaprop_organic_search_kw:
     configs:
       subdomain: zonaprop.com.ar
@@ -73,6 +129,14 @@ report_list:
       database: ar
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  zonaprop_serp_features_kw:
+    configs:
+      subdomain: zonaprop.com.ar
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ar
+      display_positions_type: serp_features
     display_limit: 2
   argenprop_organic_search_kw:
     configs:
@@ -83,6 +147,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  argenprop_serp_features_kw:
+    configs:
+      subdomain: argenprop.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ar
+      display_positions_type: serp_features
+    display_limit: 2
   inmueblesmercadolibre_organic_search_kw:
     configs:
       subdomain: inmuebles.mercadolibre.com.ar
@@ -91,6 +163,14 @@ report_list:
       database: ar
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  inmueblesmercadolibre_serp_features_kw:
+    configs:
+      subdomain: inmuebles.mercadolibre.com.ar
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ar
+      display_positions_type: serp_features
     display_limit: 2
   remax_organic_search_kw:
     configs:
@@ -101,6 +181,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  remax_serp_features_kw:
+    configs:
+      subdomain: remax.com.ar
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ar
+      display_positions_type: serp_features
+    display_limit: 2
   properati_organic_search_kw:
     configs:
       subdomain: properati.com.ar
@@ -109,6 +197,14 @@ report_list:
       database: ar
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  properati_serp_features_kw:
+    configs:
+      subdomain: properati.com.ar
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ar
+      display_positions_type: serp_features
     display_limit: 2
   mudafy_organic_search_kw:
     configs:
@@ -119,6 +215,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  mudafy_serp_features_kw:
+    configs:
+      subdomain: mudafy.com.ar
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ar
+      display_positions_type: serp_features
+    display_limit: 2
   urbania_organic_search_kw:
     configs:
       subdomain: urbania.pe
@@ -127,6 +231,14 @@ report_list:
       database: pe
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  urbania_serp_features_kw:
+    configs:
+      subdomain: urbania.pe
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pe
+      display_positions_type: serp_features
     display_limit: 2
   adondevivir_organic_search_kw:
     configs:
@@ -137,6 +249,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  adondevivir_serp_features_kw:
+    configs:
+      subdomain: adondevivir.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pe
+      display_positions_type: serp_features
+    display_limit: 2
   infocasas_organic_search_kw:
     configs:
       subdomain: infocasas.com.pe
@@ -145,6 +265,14 @@ report_list:
       database: pe
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  infocasas_serp_features_kw:
+    configs:
+      subdomain: infocasas.com.pe
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pe
+      display_positions_type: serp_features
     display_limit: 2
   properatipe_organic_search_kw:
     configs:
@@ -155,6 +283,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  properatipe_serp_features_kw:
+    configs:
+      subdomain: properati.com.pe
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pe
+      display_positions_type: serp_features
+    display_limit: 2
   nexoinmobiliario_organic_search_kw:
     configs:
       subdomain: nexoinmobiliario.pe
@@ -163,6 +299,14 @@ report_list:
       database: pe
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  nexoinmobiliario_serp_features_kw:
+    configs:
+      subdomain: nexoinmobiliario.pe
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pe
+      display_positions_type: serp_features
     display_limit: 2
   plusvalia_organic_search_kw:
     configs:
@@ -173,6 +317,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  plusvalia_serp_features_kw:
+    configs:
+      subdomain: plusvalia.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ec
+      display_positions_type: serp_features
+    display_limit: 2
   properatiec_organic_search_kw:
     configs:
       subdomain: properati.com.ec
@@ -181,6 +333,14 @@ report_list:
       database: ec
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  properatiec_serp_features_kw:
+    configs:
+      subdomain: properati.com.ec
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ec
+      display_positions_type: serp_features
     display_limit: 2
   icasas_organic_search_kw:
     configs:
@@ -191,6 +351,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  icasas_serp_features_kw:
+    configs:
+      subdomain: icasas.ec
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ec
+      display_positions_type: serp_features
+    display_limit: 2
   inmueblesmercadolibreec_organic_search_kw:
     configs:
       subdomain: inmuebles.mercadolibre.com.ec
@@ -199,6 +367,14 @@ report_list:
       database: ec
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  inmueblesmercadolibreec_serp_features_kw:
+    configs:
+      subdomain: inmuebles.mercadolibre.com.ec
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: ec
+      display_positions_type: serp_features
     display_limit: 2
   compreoalquile_organic_search_kw:
     configs:
@@ -209,6 +385,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  compreoalquile_serp_features_kw:
+    configs:
+      subdomain: compreoalquile.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pa
+      display_positions_type: serp_features
+    display_limit: 2
   encuentra24_organic_search_kw:
     configs:
       subdomain: encuentra24.com
@@ -217,6 +401,14 @@ report_list:
       database: pa
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  encuentra24_serp_features_kw:
+    configs:
+      subdomain: encuentra24.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pa
+      display_positions_type: serp_features
     display_limit: 2
   panama_real_estate_organic_search_kw:
     configs:
@@ -227,6 +419,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  panama_real_estate_serp_features_kw:
+    configs:
+      subdomain: panama-real-estate.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pa
+      display_positions_type: serp_features
+    display_limit: 2
   inmopanama_organic_search_kw:
     configs:
       subdomain: inmopanama.com
@@ -236,6 +436,14 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 2
+  inmopanama_serp_features_kw:
+    configs:
+      subdomain: inmopanama.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pa
+      display_positions_type: serp_features
+    display_limit: 2
   panamaequity_organic_search_kw:
     configs:
       subdomain: panamaequity.com
@@ -244,4 +452,12 @@ report_list:
       database: pa
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
+    display_limit: 2
+  panamaequity_serp_features_kw:
+    configs:
+      subdomain: panamaequity.com
+      type: subdomain_organic
+      export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
+      database: pa
+      display_positions_type: serp_features
     display_limit: 2

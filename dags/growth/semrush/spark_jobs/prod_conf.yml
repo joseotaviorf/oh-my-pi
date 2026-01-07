@@ -10,7 +10,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 165000 # expected number of results * 1,25
+    display_limit: 106250 # expected number of results * 1,25
   casamineira_serp_features_kw:
     configs:
       subdomain: casamineira.com.br
@@ -27,7 +27,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 800000 # expected number of results * 1,25
+    display_limit: 960000 # expected number of results * 1,25
   chavesnamao_serp_features_kw:
     configs:
       subdomain: chavesnamao.com.br
@@ -44,7 +44,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 20000 # expected number of results * 1,25
+    display_limit: 11125 # expected number of results * 1,25
   imoveismercadolivre_serp_features_kw:
     configs:
       subdomain: imoveis.mercadolivre.com.br
@@ -61,7 +61,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 300000 # expected number of results * 1,25
+    display_limit: 508750 # expected number of results * 1,25
   imovelweb_serp_features_kw:
     configs:
       subdomain: imovelweb.com.br
@@ -78,7 +78,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 200000 # expected number of results * 1,25
+    display_limit: 256250 # expected number of results * 1,25
   loft_serp_features_kw:
     configs:
       subdomain: loft.com.br
@@ -95,7 +95,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 250000 # expected number of results * 1,25
+    display_limit: 275000 # expected number of results * 1,25
   lopes_serp_features_kw:
     configs:
       subdomain: lopes.com.br
@@ -112,7 +112,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 450000 # expected number of results * 1,25
+    display_limit: 600000 # expected number of results * 1,25
   quintoandar_serp_features_kw:
     configs:
       subdomain: quintoandar.com.br
@@ -129,7 +129,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 800000 # expected number of results * 1,25
+    display_limit: 762500 # expected number of results * 1,25
   vivareal_serp_features_kw:
     configs:
       subdomain: vivareal.com.br
@@ -146,7 +146,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 250000 # expected number of results * 1,25
+    display_limit: 193750 # expected number of results * 1,25
   wimoveis_serp_features_kw:
     configs:
       subdomain: wimoveis.com.br
@@ -163,7 +163,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 700000 # expected number of results * 1,25
+    display_limit: 693750 # expected number of results * 1,25
   zapimoveis_serp_features_kw:
     configs:
       subdomain: zapimoveis.com.br
@@ -180,7 +180,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 300000 # expected number of results * 1,25
+    display_limit: 375000 # expected number of results * 1,25
   olximoveis_serp_features_kw:
     configs:
       subfolder: olx.com.br%2Fimoveis
@@ -197,7 +197,7 @@ report_list:
       database: br
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
-    display_limit: 41250 # expected number of results * 1,25
+    display_limit: 44500 # expected number of results * 1,25
   dfimoveis_serp_features_kw:
     configs:
       subdomain: dfimoveis.com.br
