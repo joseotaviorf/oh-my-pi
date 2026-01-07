@@ -10,6 +10,6 @@ SELECT
     MONTH(date) AS month,
     DAY(date) AS day
 FROM
-    datalake_profound_raw.report_by_player
+    datalake_profound_raw.report_by_model
 WHERE
     date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
