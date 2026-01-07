@@ -20,7 +20,7 @@ chat_reservation_timestamp AS (
     datalake_quinto_messenger_clean.task_event
   WHERE
     event_type = 'reservation.accepted'
-    AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 2 YEAR
+    AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 3 YEAR
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created) = 1
 ),
@@ -83,7 +83,7 @@ twilio_demand AS (
   FROM
     datalake_customer_support.calls
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 2 YEAR AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_end_date}')
   UNION ALL
   SELECT DISTINCT
     id_session,
@@ -130,7 +130,7 @@ twilio_demand AS (
   FROM
     datalake_customer_support.chats
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 2 YEAR AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_end_date}')
 ),
 twilio_contacts AS (
   SELECT DISTINCT
@@ -320,7 +320,7 @@ front_contacts AS (
     customer_email AS ce
       ON ce.email = usr.email
   WHERE
-    MAKE_DATE(t.year, t.month, t.day) BETWEEN DATE('{load_start_date}') - INTERVAL 2 YEAR AND DATE('{load_end_date}')
+    MAKE_DATE(t.year, t.month, t.day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 YEAR AND DATE('{load_end_date}')
     AND t.channel = 'email'
     AND front_or_back = 'front'
 )

@@ -38,6 +38,10 @@ columns:
     lineage:
       - datalake_customer_support.calls.id_call
     description: Twilio call ID.
+  sk_reservation:
+    lineage:
+      - datalake_customer_support.calls.id_reservation
+    description: Twilio reservation ID.
   sk_ticket:
     lineage:
       - datalake_customer_support.tickets.id_ticket
@@ -77,6 +81,11 @@ columns:
       - datalake_customer_support.calls.queue_name
       - datalake_customer_support.chats.queue_name
     description: Last department associated with the contact, based on task creation time.
+  origin:
+    lineage:
+      - datalake_customer_support.calls.origin
+      - datalake_customer_support.chats.origin
+    description: Origin of the contact.
   direction:
     lineage:
       - datalake_customer_support.calls.direction
@@ -104,6 +113,10 @@ columns:
       - datalake_customer_support.calls.from_phone_number
       - datalake_customer_support.chats.twilio_phone_number
     description: Phone number from 5A
+  completion_reason:
+    lineage:
+      - datalake_customer_support.chats.task_completion_reason
+    description: Completion reason of the contact.
   customer_phone_number:
     lineage:
       - datalake_customer_support.calls.from_phone_number
