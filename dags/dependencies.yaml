@@ -1019,6 +1019,8 @@ bietlejuice.dw_sale_available_booking_hours:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status:first-run-of-day
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours:first-run-of-day
 bietlejuice.dw_sale_closing_flows:
+  - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
+  - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day

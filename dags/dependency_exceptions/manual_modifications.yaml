@@ -1167,3 +1167,7 @@ bietlejuice.core_company:
     - bietlejuice.company:load-clean-tier
     - bietlejuice.company:load-clean-company-product-tier
     - bietlejuice.company:load-clean-company-product-region
+bietlejuice.dw_sale_closing_flows:
+  add:    
+    - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
+    - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
