@@ -1,0 +1,95 @@
+database_name: datalake_arquivo_confidencial
+table_name: provider_consumption_daily
+owner: marcos.mota@quintoandar.com.br
+domain: Fintech
+description: Daily aggregated consumption data of provider API requests, including costs and savings calculations based on pricing rules and contract validity periods
+columns:
+  dt_requested:
+    description: Date when the requests were made (aggregation key)
+    lineage:
+      - datalake_arquivo_confidencial_clean.request_tracker.ts_created
+  business_unit:
+    description: Business unit that originated the request
+    lineage:
+      - datalake_arquivo_confidencial_clean.request_tracker.business_unit
+  integration_provider:
+    description: Normalized provider code (uppercase and trimmed) from the integration report
+    lineage:
+      - datalake_arquivo_confidencial_clean.integration_report.integration_provider
+  is_cached:
+    description: Boolean flag indicating if the request was served from cache (true) or fetched from provider (false)
+    lineage:
+      - datalake_arquivo_confidencial_clean.request_tracker.is_cached
+  success:
+    description: Boolean flag indicating if the request was successful
+    lineage:
+      - datalake_arquivo_confidencial_clean.request_tracker.success
+  external_product_code:
+    description: Unique identifier for the product in the external provider system
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.external_product_code
+  product_name:
+    description: Human-readable name of the product or service being priced
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.product_name
+  provider:
+    description: Full name of the provider company offering the product or service
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.provider
+  unit_price:
+    description: Base price per unit for the product or service in decimal format
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.unit_price
+  included_monthly:
+    description: Monthly included quantity or allowance included in the base price
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.included_monthly
+  included_annual:
+    description: Annual included quantity or allowance included in the base price
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.included_annual
+  exceed_unit_price:
+    description: Price per unit charged when usage exceeds the included monthly or annual limits
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.exceed_unit_price
+  pricing_type:
+    description: Type of pricing model - FRANCHISE (has included limits) or UNIT_PRICE (pay per use)
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.included_monthly
+      - datalake_gsheets_clean.provider_pricing.included_annual
+  weight:
+    description: Weighting factor or priority value used for pricing calculations or sorting
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.weight
+  valid_from:
+    description: Start date when this pricing configuration becomes effective
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.valid_from
+  valid_to:
+    description: End date when this pricing configuration expires or becomes invalid
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.valid_to
+  is_within_contract:
+    description: Boolean flag indicating if the request date falls within the contract validity period (valid_from to valid_to)
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.valid_from
+      - datalake_gsheets_clean.provider_pricing.valid_to
+      - datalake_arquivo_confidencial_clean.request_tracker.ts_created
+  daily_requests:
+    description: Count of distinct requests for the given aggregation group on that day
+    lineage:
+      - datalake_arquivo_confidencial_clean.request_tracker.id
+  daily_cost:
+    description: Total cost for non-cached requests within contract period (request_cost * daily_requests when is_cached=false and is_within_contract=true)
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.unit_price
+      - datalake_gsheets_clean.provider_pricing.exceed_unit_price
+      - datalake_arquivo_confidencial_clean.request_tracker.id
+      - datalake_arquivo_confidencial_clean.request_tracker.is_cached
+  daily_saving:
+    description: Total savings from cached requests within contract period (request_cost * daily_requests when is_cached=true and is_within_contract=true)
+    lineage:
+      - datalake_gsheets_clean.provider_pricing.unit_price
+      - datalake_gsheets_clean.provider_pricing.exceed_unit_price
+      - datalake_arquivo_confidencial_clean.request_tracker.id
+      - datalake_arquivo_confidencial_clean.request_tracker.is_cached

@@ -4,6 +4,7 @@ SELECT
     business_unit,
     version,
     is_cached,
+    success,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

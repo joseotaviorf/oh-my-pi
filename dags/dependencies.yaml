@@ -1389,8 +1389,11 @@ bietlejuice.enrich_anonymization_validation:
 bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
 bietlejuice.enrich_arquivo_confidencial:
+  - bietlejuice.arquivo_confidencial:load-clean-request-tracker:first-run-of-day
   - bietlejuice.arquivo_confidencial:load-clean-rev-info:first-run-of-day
   - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud:first-run-of-day
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-provider-pricing:first-run-of-day
 bietlejuice.enrich_atlas_db_quality_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-atlas-db-house-characteristics-events:first-run-of-day
 bietlejuice.enrich_atlas_pricing_report:
