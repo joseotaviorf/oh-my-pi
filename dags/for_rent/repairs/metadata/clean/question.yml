@@ -1,0 +1,30 @@
+database_name: datalake_repairs_clean
+table_name: question
+description: This table contains the questions of the repair request triage form.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.question.id
+    description: ID of the table, it's the primary key.
+  id_question_content:
+    lineage:
+      - datalake_repairs_raw.question.question_content_id
+    description: ID of the question's textual content
+  id_subgroup:
+    lineage:
+      - datalake_repairs_raw.question.subgroup_id
+    description: ID of the question's subgroup in the triage form
+  type:
+    lineage:
+      - datalake_repairs_raw.question.type
+    description: Question type. It can be multiple choice or single choice
+  ts_created:
+    lineage:
+      - datalake_repairs_raw.question.created_at
+    description: Timestamp of the creation of the event.
+  ts_updated:
+    lineage:
+      - datalake_repairs_raw.question.updated_at
+    description: Timestamp of the update of the event

@@ -1,0 +1,34 @@
+database_name: datalake_repairs_clean
+table_name: question_option
+description: This table contains the questions' options (answers) of the repair request triage form.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.question_option.id
+    description: ID of the table, it's the primary key.
+  id_question:
+    lineage:
+      - datalake_repairs_raw.question_option.question_id
+    description: ID of the question that the option belongs to
+  id_next_question:
+    lineage:
+      - datalake_repairs_raw.question_option.next_question_id
+    description: ID of the next question once the option has been chosen
+  id_diagnosis:
+    lineage:
+      - datalake_repairs_raw.question_option.diagnosis_id
+    description: ID of the repair diagnosis defined once the option has been chosen
+  id_question_option_content:
+    lineage:
+      - datalake_repairs_raw.question_option.question_option_content_id
+    description: ID of the option's textual content
+  ts_created:
+    lineage:
+      - datalake_repairs_raw.question_option.created_at
+    description: Timestamp of the creation of the event.
+  ts_updated:
+    lineage:
+      - datalake_repairs_raw.question_option.updated_at
+    description: Timestamp of the update of the event

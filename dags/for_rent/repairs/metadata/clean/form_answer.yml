@@ -1,0 +1,30 @@
+database_name: datalake_repairs_clean
+table_name: form_answer
+description: This table contains the questions and options chosen by users during the repair request.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.form_answer.id
+    description: ID of the table, it's the primary key.
+  id_question:
+    lineage:
+      - datalake_repairs_raw.form_answer.question_id
+    description: ID of the question that the form answer is associated with
+  id_question_option:
+    lineage:
+      - datalake_repairs_raw.form_answer.question_option_id
+    description: ID of the question option that the form answer is associated with
+  id_repair_request_item:
+    lineage:
+      - datalake_repairs_raw.form_answer.repair_request_item_id
+    description: ID of the repair request item the form answer is associated with
+  ts_created:
+    lineage:
+      - datalake_repairs_raw.form_answer.created_at
+    description: Timestamp of the creation of the event.
+  ts_updated:
+    lineage:
+      - datalake_repairs_raw.form_answer.updated_at
+    description: Timestamp of the update of the event
