@@ -1588,6 +1588,16 @@ databricks_16_4_min_2xlarge_memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_16_4_min_2xlarge_memory_cluster_4_workers:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.large
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
