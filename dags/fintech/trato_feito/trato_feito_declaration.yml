@@ -69,8 +69,6 @@ workflow:
         count: "id"
     events_batch: {}
     status_sync: {}
-    document_generation: {}
-    document_generation_aud: {}
     rollout_cyber_contract: {}
     blocklist: {}
     comms: {}
