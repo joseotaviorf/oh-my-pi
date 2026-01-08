@@ -99,14 +99,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id_region
     description: ID of the region where house is located.
-  id_business_unit:
-    lineage:
-      - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
-    description: ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
-  id_user_en:
-    lineage:
-      - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
-    description: ID of the user of the trading executive.
   visit_code:
     lineage:
       - datalake_ebdb_clean.visit.code

@@ -7,12 +7,12 @@ SELECT
     es.id_house AS sk_house,
     bc.sk_business_context,
     vm.sk_visit_model,
-    es.id_business_unit AS sk_business_unit,
+    svh.id_business_unit AS sk_business_unit,
     es.id_company_supply AS sk_company_supply,
     es.id_company_demand AS sk_company_demand,
     es.id_agent AS sk_agent,
     es.id_user_agent AS sk_user_agent,
-    es.id_user_en AS sk_user_en,
+    svh.id_user_en AS sk_user_en,
     es.id_fixed_agent AS sk_fixed_agent,
     ppa.id_house_listing_relation AS sk_ppa_relation,
     es.id_user_creation AS sk_author_creator,
@@ -67,3 +67,6 @@ LEFT JOIN
         ON ppa.id_house = es.id_house
         AND es.business_context = ppa.business_context
         AND es.ts_schedule_created BETWEEN ppa.ts_relation_started AND COALESCE(ppa.ts_relation_ended, CURRENT_TIMESTAMP())
+LEFT JOIN
+    datalake_sale_visit_hubs.sale_visit_hubs AS svh
+        ON svh.id_booking = es.id_schedule

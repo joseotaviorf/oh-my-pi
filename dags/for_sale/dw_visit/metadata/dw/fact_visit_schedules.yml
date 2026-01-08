@@ -43,7 +43,7 @@ columns:
       Is the key of the visit model.
   sk_business_unit:
     lineage:
-      - datalake_visit.visit_schedules.id_business_unit
+      - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
     description:
       ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
   sk_company_supply:
@@ -68,7 +68,7 @@ columns:
       Is the user Id of the agent.
   sk_user_en:
     lineage:
-      - datalake_visit.visit_schedules.id_user_en
+      - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
     description:
       ID of the user of the trading executive.
   sk_fixed_agent:

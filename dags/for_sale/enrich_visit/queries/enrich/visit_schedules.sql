@@ -465,8 +465,6 @@ SELECT DISTINCT
   s.id_succeed_schedule,
   CONCAT(v.id_visitor, '_', v.id_house) AS id_sale_flow,
   h.id_region,
-  svh.id_business_unit,
-  svh.id_user_en,
   v.code AS visit_code,
   v.business_context,
   v.business_model,
@@ -551,9 +549,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.user AS ua
     ON v.id_agent = ua.id
-LEFT JOIN
-  datalake_sale_visit_hubs.sale_visit_hubs AS svh
-    ON svh.id_booking = s.id_schedule
 LEFT JOIN
   visit_model AS vm
     ON s.id_visit = vm.id_visit

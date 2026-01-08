@@ -2,7 +2,6 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.id_visit AS sk_visit,
   v.id_visit AS id_visit,
   v.code AS visit_code,
-  sv.business_unit,
   v.dt_visit AS day_visit,
   v.slot,
   v.slot_count,
@@ -74,6 +73,3 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   NOW() AS ts_load
 FROM
   datalake_visit.visits AS v
-LEFT JOIN
-  datalake_sale_visit_hubs.sale_visit_hubs AS sv
-    ON sv.id_booking = v.id_visit

@@ -19,10 +19,6 @@ columns:
     lineage:
       - datalake_visit.visits.code
     description: Code of visit. Data since 2020.
-  business_unit:
-    lineage:
-      - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
-    description: Business unit name, already standardized with Teams data. Data since 2023.
   day_visit:
     lineage:
       - datalake_visit.visits.dt_visit

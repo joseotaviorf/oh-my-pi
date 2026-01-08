@@ -130,7 +130,7 @@ business_unit_region_relations AS (
         COALESCE(DATE(bur.ts_end_coverage), CURRENT_DATE) AS dt_end
     FROM
         datalake_hub_services.business_unit_region AS bur
-    WHERE 
+    WHERE
         NOT (bur.hub_name LIKE '%[For rent]%' OR bur.hub_name LIKE '%HUB FR%')
 ),
 
@@ -139,21 +139,24 @@ visit_relation AS (
         b.id AS id_booking,
         COALESCE(tr.id_business_unit, whp.id_hub, bur.id_hub) AS id_business_unit,
         COALESCE(tr.hub_name, whp.hub_name, bur.hub_name) AS business_unit,
-        b.id_user_sale_agent AS id_user_agent,
+        ua.id AS id_user_agent,
         tr.id_user_en,
         b.ts_created AS ts_visit_intent
     FROM
-        datalake_booking.booking AS b
+        datalake_ebdb_clean.booking AS b
+    LEFT JOIN
+        datalake_ebdb_clean.user AS ua
+          ON ua.id_agent = b.id_agent
     LEFT JOIN
         datalake_ebdb_clean.house AS h
           ON h.id = b.id_house
     LEFT JOIN
         teams_relations AS tr
-          ON tr.id_user_agent = b.id_user_sale_agent
+          ON tr.id_user_agent = ua.id
           AND b.ts_created BETWEEN tr.ts_started AND tr.ts_ended
     LEFT JOIN
         wc_hubs_padronization AS whp
-          ON whp.id_user_agent = b.id_user_sale_agent
+          ON whp.id_user_agent = ua.id
           AND b.ts_created BETWEEN whp.ts_started AND whp.ts_ended
           AND whp.id_hub IS NOT NULL
     LEFT JOIN
@@ -162,8 +165,8 @@ visit_relation AS (
            AND b.ts_created BETWEEN bur.dt_start AND bur.dt_end
            AND bur.id_hub IS NOT NULL
     WHERE
-        b.visit_intent = 'SALE'
-        AND b.id_user_sale_agent IS NOT NULL
+        b.business_context = 'SALE'
+        AND ua.id IS NOT NULL
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY tr.ts_started ASC) = 1
 )

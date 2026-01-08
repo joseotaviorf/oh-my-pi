@@ -8,7 +8,7 @@ columns:
     id_booking:
         description: An unique booking identifier. Currently, it is a PK for this table.
         lineage:
-            - datalake_booking.booking.id
+            - datalake_ebdb_clean.booking.id
     id_business_unit:
         description: A business unit identifier (only for sale hubs) has a direct relationship with teams, since a from/to of all sources was made for this standardization.
         lineage:
@@ -18,7 +18,7 @@ columns:
     id_user_agent:
         description: An identifier for the brokers.
         lineage:
-            - datalake_booking.booking.id_user_sale_agent
+            - datalake_ebdb_clean.user.id
     id_user_en:
         description: An identifier for trading executives.
         lineage:
@@ -31,4 +31,4 @@ columns:
     ts_visit_intent:
         description: Date when the booking was generated.
         lineage:
-            - datalake_booking.booking.ts_created
+            - datalake_ebdb_clean.booking.ts_created
