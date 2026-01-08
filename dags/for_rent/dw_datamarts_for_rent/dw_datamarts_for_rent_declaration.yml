@@ -9,10 +9,10 @@ workflow:
   layer: dw
   custom_schema: datamarts
 cluster:
-  type: databricks_16_4_med_cluster
+  type: databricks_12_2_med_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: USER_ISOLATION
+    data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -29,7 +29,7 @@ cluster:
     driver_node_type_id: m5d.4xlarge
     node_type_id: m5d.4xlarge
     runtime_engine: PHOTON
-    spark_version: 16.4.x-scala2.12
+    spark_version: 13.3.x-scala2.12
     num_workers: 4
     aws_attributes:
       first_on_demand: 1
@@ -38,7 +38,7 @@ cluster:
       availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: USER_ISOLATION
+    data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   databricks_conn_id: databricks_new
