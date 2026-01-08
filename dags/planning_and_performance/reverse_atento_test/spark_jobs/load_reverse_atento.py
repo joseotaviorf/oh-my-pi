@@ -78,24 +78,32 @@ if __name__ == "__main__":
 
         try:
             logger.info(f"m=Building dataframe from {schema}.{table_name}, execution_date={execution_date_str}...")
-            df = spark.sql(f"""
-                SELECT 
-                    *,
-                    DATE('{execution_date_str}') as execution_date
-                FROM {schema}.{table_name}
-            """)
+            df = spark.sql(
+                f"""
+                    SELECT 
+                        *,
+                        DATE('{execution_date_str}') as execution_date
+                    FROM 
+                        {schema}.{table_name} 
+                    WHERE 
+                        year={execution_date.year} 
+                        AND month={execution_date.month} 
+                        AND day={execution_date.day}
+                """
+            )
+            # Check if any organization columns exist and apply filter to all of them
+            organization_columns = [col for col in df.columns if "organization" in col.lower()]
+
+            if table_name == 'tickets_perspective':
+                organization_columns = ['last_agent_organization']
             
-            # Check if any organization column exists and apply filter
-            organization_column = None
-            for col in df.columns:
-                if "organization" in col.lower():
-                    organization_column = col
-                    break
-            
-            if organization_column:
-                logger.info(f"m=Filtering by organization, column={organization_column}, organization_filters={organization_filters}")
-                df = df.filter(f"{organization_column} IN {organization_filters}")
+            if organization_columns:
+                logger.info(f"m=Filtering by organization, columns={organization_columns}, organization_filters={organization_filters}")
+                filter_conditions = " OR ".join([f"{col} IN {organization_filters}" for col in organization_columns])
+                df = df.filter(filter_conditions)
                 logger.info("m=Filter applied successfully")
+            else:
+                logger.info("m=No organization columns found, skipping filter")
             
             if df.isEmpty():
                 logger.info(f"m=Empty {schema}.{table_name} for execution_date={execution_date_str}!")
@@ -113,7 +121,7 @@ if __name__ == "__main__":
                     logger.info(f"m=Loading Dataframe into s3, s3_path={s3_path}")
                     df = cast_void_columns_to_string(df)
                     df.coalesce(1).write.mode("overwrite").parquet(s3_path)
-                    logger.info(f"m=Dataframe succesfully loaded, s3_path={s3_path}")
+                    logger.info(f"m=Dataframe successfully loaded, s3_path={s3_path}")
                     
                     # Rename the part file to the desired file name
                     logger.info(f"m=Renaming S3 file, s3_path={s3_path}")

@@ -937,6 +937,20 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred:first-run-of-day
     - bietlejuice.reverse_atento:load-reverse-tmr:first-run-of-day
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht:first-run-of-day
+bietlejuice.reverse_atento_test:
+  add:
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metric:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-csat-front:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-demand-metric:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-fcr-metric:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-general-metric:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-recontact:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-speech-call:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-speech-chat:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-taxonomy:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-transferred:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tmr:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-twilio-chat-aht:first-run-of-day
 bietlejuice.reverse_birdie:
   remove:
     - bietlejuice.dw_chattermill:load-dw-chattermill-dim-answer-category:first-run-of-day
