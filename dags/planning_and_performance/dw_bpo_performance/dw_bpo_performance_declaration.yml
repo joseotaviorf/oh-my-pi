@@ -1,0 +1,92 @@
+dag:
+  name: dw_bpo_performance
+  schedule_start_date: 2025, 11, 25
+  owner: Data Planning and Performance
+  documentation:
+    dag_purpose: |
+      Creates tables for planning and performance datasets, related to customer support.
+workflow:
+  type: query_delta
+  layer: dw
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  tables_customization:
+    backlog_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    csat_front:
+      partitions: [year, month, day]
+      extraction_type: full
+    demand_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    fcr_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    email:
+      partitions: [year, month, day]
+      extraction_type: full
+    general_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    listing_quality_sla:
+      partitions: [year, month, day]
+      extraction_type: full
+    listing_quality_tasks:
+      partitions: [year, month, day]
+      extraction_type: full
+    nps_offboarding:
+      partitions: [year, month, day]
+      extraction_type: full
+    recontact:
+      partitions: [year, month, day]
+      extraction_type: full
+    repair_tickets:
+      partitions: [year, month, day]
+      extraction_type: full
+    segments_perspective:
+      partitions: [year, month, day]
+      extraction_type: full
+    speech_call:
+      partitions: [year, month, day]
+      extraction_type: full
+    speech_chat:
+      partitions: [year, month, day]
+      extraction_type: full
+    tarefas_salesforce:
+      partitions: [year, month, day]
+      extraction_type: full
+    taxonomy:
+      partitions: [year, month, day]
+      extraction_type: full
+    tickets_perspective:
+      partitions: [year, month, day]
+      extraction_type: full
+    tickets_transferred:
+      partitions: [year, month, day]
+      extraction_type: full
+    tmr:
+      partitions: [year, month, day]
+      extraction_type: full
+    twilio_chat_aht:
+      partitions: [year, month, day]
+      extraction_type: full
+    twilio_spoc:
+      partitions: [year, month, day]
+      extraction_type: full
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r7g.2xlarge
+    node_type_id: r7g.2xlarge
+    spark_version: 16.4.x-scala2.12
+    num_workers: 4
+    spark_conf:
+      spark.sql.broadcastTimeout: "600"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: USER_ISOLATION
+  databricks_conn_id: databricks_new_env

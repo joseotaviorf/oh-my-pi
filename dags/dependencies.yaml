@@ -100,7 +100,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_booking:load-enrich-booking-review:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
-bietlejuice.dw_bpo_performance_views:
+bietlejuice.dw_bpo_performance:
   - bietlejuice.bigfone:load-clean-call:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer:first-run-of-day

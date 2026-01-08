@@ -468,9 +468,9 @@ SELECT
   off.squad,
   off.status_agreement,
   off.off_area,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(tp.ts_started) AS year,
+  MONTH(tp.ts_started) AS month,
+  DAY(tp.ts_started) AS day,
   NOW() AS ts_load
 FROM tickets_perspective AS tp
 LEFT JOIN recontact_drilldown_d4 AS rd4 
@@ -491,4 +491,4 @@ LEFT JOIN dw_public.dim_date as ddend
 LEFT JOIN off_tickets off 
   ON tp.sk_ticket = off.sk_ticket 
 WHERE 
-  tp.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(tp.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
