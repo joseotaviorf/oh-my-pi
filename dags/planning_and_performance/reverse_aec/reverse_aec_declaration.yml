@@ -1,7 +1,6 @@
 dag:
   name: reverse_aec
   schedule_start_date: 2026,1,7
-  schedule_interval: 0 10 * * *
   owner: Data Planning and Performance
   documentation:
     dag_purpose: |
