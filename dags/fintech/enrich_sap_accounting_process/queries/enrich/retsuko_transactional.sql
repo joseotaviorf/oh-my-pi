@@ -415,6 +415,7 @@ WITH retsuko AS (
         AND af.type IN ('contract', 'tenant','landlord')
         AND at.type IN ('contract', 'tenant','landlord')
         AND e.amount != 0
+        AND i.status NOT IN ('written-down', 'canceled', 'not-payable')
 ),
 
 sap_entity AS (
@@ -462,6 +463,7 @@ sap_gateway AS (
         AND s.type IN ('LCM')
         AND s.status NOT IN ('ignore', 'ignored')
         AND DATE(f.ts_created) >= DATE('2024-01-01')
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY s.hash DESC) = 1
 ),
 
 sap AS (
