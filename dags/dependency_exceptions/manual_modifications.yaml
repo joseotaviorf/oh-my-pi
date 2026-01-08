@@ -917,6 +917,10 @@ bietlejuice.metric_agents__performance:
 bietlejuice.enrich_viva_real_crawler_listings:
   remove:
     - bietlejuice.listings.viva_real:load-clean-viva-real:first-run-of-day
+bietlejuice.reverse_aec:
+  add:
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
 bietlejuice.reverse_atento_access:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
