@@ -2,6 +2,7 @@
 
 import logging
 import struct
+from typing import List
 
 import pandas as pd
 from pyspark.sql import DataFrame
@@ -9,7 +10,7 @@ from pyspark.sql import functions as F
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import BinaryType
 
-from .cdf_headers import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.headers import (
     create_kafka_headers,
     get_data_columns_from,
 )
@@ -44,7 +45,7 @@ def _create_confluent_encoder_udf(schema_id: int):
 
 def cdf_to_kafka_format_with_schema_registry(
     cdf_dataframe: DataFrame,
-    key_columns: list[str],
+    key_columns: List[str],
     source_table: str,
     schema_id: int,
     entity: str,
@@ -86,4 +87,7 @@ def cdf_to_kafka_format_with_schema_registry(
     encoder_udf = _create_confluent_encoder_udf(schema_id)
     values_col_encoded = encoder_udf(values_col).alias("value")
 
-    return cdf_dataframe.select(headers_col, keys_col, values_col_encoded)
+    # Drop _change_type before writing to Kafka (only needed for metrics)
+    return cdf_dataframe.select(
+        headers_col, keys_col, values_col_encoded, F.col("_change_type")
+    )

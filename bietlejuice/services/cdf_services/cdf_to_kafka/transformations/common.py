@@ -1,12 +1,12 @@
 import logging
+from typing import List, Optional
 
 from pyspark.sql import DataFrame
-from typing import Optional
 
-from .cdf_plain_json_transformations import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.plain_json import (
     cdf_to_kafka_format_plain_json,
 )
-from .cdf_wire_format_transformations import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.wire_format import (
     cdf_to_kafka_format_with_schema_registry,
 )
 
@@ -34,10 +34,10 @@ def drop_partition_columns(df: DataFrame) -> DataFrame:
 
 def cdf_to_kafka_format(
     cdf_dataframe: DataFrame,
-    key_columns: list[str],
+    key_columns: List[str],
     source_table: str,
     schema_id: Optional[int],
-    entity: str = None,
+    entity: str,
     use_schema_registry: bool = True,
 ) -> DataFrame:
     """Convert CDF DataFrame to Kafka format with headers, key, and value columns.
@@ -62,10 +62,6 @@ def cdf_to_kafka_format(
     Returns:
         DataFrame with 3 columns: headers, key, value
     """
-
-    if entity is None:
-        raise ValueError("Parameter 'entity' is required")
-
     if use_schema_registry:
         if schema_id is None:
             raise ValueError("schema_id is required when use_schema_registry=True")

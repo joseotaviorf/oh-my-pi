@@ -141,7 +141,7 @@ class DAGDeclarationValidator(Validator):
                     "required": False,
                     "schema": {
                         "name": {"type": "string", "required": True, "empty": False},
-                        "pipeline": {
+                        "pipeline_runner": {
                             "type": "string",
                             "required": True,
                             "empty": False,
@@ -155,6 +155,11 @@ class DAGDeclarationValidator(Validator):
                     "schema": {
                         "entity": {"type": "string", "required": True, "empty": False},
                         "table": {"type": "string", "required": True, "empty": False},
+                        "key_columns": {
+                            "type": "list",
+                            "required": True,
+                            "empty": False,
+                        },
                     },
                 },
             },

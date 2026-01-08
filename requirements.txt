@@ -16,6 +16,9 @@ GitPython==2.1.11
 google-crc32c==1.1.2
 hive-metastore-client>=1.0.9
 hierarchical-conf==1.0.4
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-exporter-otlp-proto-http>=1.22.0
 ordereddict==1.1
 pendulum
 psycopg2-binary>=2.8.4,<3.0.0

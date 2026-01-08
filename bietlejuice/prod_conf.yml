@@ -228,10 +228,6 @@ custom_cluster_with_sedona:
 
 wonka_cluster:
     <<: *cluster_anchor
-    node_type_id: m5a.large
-    driver_node_type_id: m5a.large
-    num_workers: 1
-    spark_version: 13.3.x-scala2.12
     spark_env_vars:
       PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"
       PREV_DATA_INTERVAL_END_SUCCESS: "{{ prev_data_interval_end_success }}"
@@ -266,6 +262,7 @@ wonka_cluster:
       WONKA_END_DATE: "{{ dag_run.conf.get('end_date', '') }}"
       WONKA_DISABLE_ONLINE_WRITER: "{{ dag_run.conf.get('disable_online_writer', 'false')}}"
       WONKA_FORCE_FULL_LOAD: "{{ dag_run.conf.get('force_full_load', 'false')}}"
+      CDF_TO_KAFKA_USE_SCHEMA_REGISTRY: "false"
     aws_attributes:
         <<: *aws_anchor
         availability: SPOT_WITH_FALLBACK

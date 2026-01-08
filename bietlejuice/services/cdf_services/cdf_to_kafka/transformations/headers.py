@@ -1,8 +1,9 @@
 """Shared constants and functions for CDF Kafka transformations."""
 
+from typing import List, Optional
+
 from pyspark.sql import Column, DataFrame
 from pyspark.sql import functions as F
-from typing import Optional
 
 CDF_METADATA_COLUMNS = [
     "_change_type",
@@ -11,7 +12,7 @@ CDF_METADATA_COLUMNS = [
 ]
 
 
-def _create_cdf_column_headers(cdf_dataframe: DataFrame) -> list[Column]:
+def _create_cdf_column_headers(cdf_dataframe: DataFrame) -> List[Column]:
     """Create headers from CDF metadata columns present in the DataFrame."""
     headers = []
     for col in cdf_dataframe.columns:
@@ -29,7 +30,7 @@ def _create_static_headers(
     source_table: str,
     entity: str,
     schema_id: Optional[int] = None,
-) -> list[Column]:
+) -> List[Column]:
     """Create static headers with literal values."""
     headers = []
 
@@ -58,13 +59,13 @@ def create_kafka_headers(
     source_table: str,
     entity: str,
     schema_id: Optional[int] = None,
-) -> list[Column]:
+) -> List[Column]:
     """Create Kafka headers for CDF messages."""
     cdf_headers = _create_cdf_column_headers(cdf_dataframe)
     static_headers = _create_static_headers(source_table, entity, schema_id)
     return cdf_headers + static_headers
 
 
-def get_data_columns_from(dataframe: DataFrame) -> list[str]:
+def get_data_columns_from(dataframe: DataFrame) -> List[str]:
     """Get data columns from DataFrame, excluding CDF metadata columns."""
     return [col for col in dataframe.columns if col not in CDF_METADATA_COLUMNS]

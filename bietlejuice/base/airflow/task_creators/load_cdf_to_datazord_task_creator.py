@@ -1,4 +1,3 @@
-import json
 from typing import List
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -46,10 +45,8 @@ class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
             self.kafka_bootstrap_servers,
             "--checkpoint-location",
             checkpoint_location,
-            # This extra metadata will be added to the "metadata.extra"
-            # field of every payload sent to Datazord
-            "--extra-metadata",
-            json.dumps({"entity": entity}),
+            "--entity",
+            entity,
         ]
 
     def create_task(

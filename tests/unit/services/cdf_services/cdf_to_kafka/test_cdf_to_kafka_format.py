@@ -2,8 +2,8 @@
 
 This test module focuses on testing the wrapper function that delegates to
 specific implementations. Detailed tests for each implementation are in:
-- test_cdf_wire_format_transformations.py
-- test_cdf_plain_json_transformations.py
+- test_wire_format.py
+- test_plain_json.py
 """
 
 import json
@@ -11,15 +11,10 @@ import struct
 from datetime import datetime
 
 import pytest
-from pyspark.sql import SparkSession
 
-from bietlejuice.services.cdf_services.cdf_transformations import cdf_to_kafka_format
-
-
-@pytest.fixture
-def spark_session():
-    """Create a Spark session for testing."""
-    return SparkSession.builder.appName("test_cdf_to_kafka_format").getOrCreate()
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.common import (
+    cdf_to_kafka_format,
+)
 
 
 @pytest.fixture

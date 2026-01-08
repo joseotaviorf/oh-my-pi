@@ -1,11 +1,12 @@
 """Transformations for CDF to Kafka with plain JSON format (no wire format)."""
 
 import logging
+from typing import List
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from .cdf_headers import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.headers import (
     create_kafka_headers,
     get_data_columns_from,
 )
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def cdf_to_kafka_format_plain_json(
     cdf_dataframe: DataFrame,
-    key_columns: list[str],
+    key_columns: List[str],
     source_table: str,
     entity: str,
 ) -> DataFrame:
@@ -37,4 +38,7 @@ def cdf_to_kafka_format_plain_json(
     data_struct = F.struct(*data_columns)
     values_col = F.to_json(data_struct).cast("binary").alias("value")
 
-    return cdf_dataframe.select(headers_col, keys_col, values_col)
+    # Drop _change_type before writing to Kafka (only needed for metrics)
+    return cdf_dataframe.select(
+        headers_col, keys_col, values_col, F.col("_change_type")
+    )

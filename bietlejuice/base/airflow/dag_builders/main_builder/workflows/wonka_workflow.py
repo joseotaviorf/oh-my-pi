@@ -1,3 +1,5 @@
+import logging
+
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -11,6 +13,8 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
+logger = logging.getLogger("WonkaWorkflow")
+
 
 class WonkaWorkflow(BaseWorkflow):
     """
@@ -18,11 +22,18 @@ class WonkaWorkflow(BaseWorkflow):
     """
 
     _WONKA_CUSTOM_SCHEMA = "wonka"
+    _WONKA_CLUSTER_CONFIG_KEY = "wonka_cluster"
 
     def __init__(self, dag_args, workflow_args, cluster_args, dataset_dependencies):
         super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
 
         self.dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
+
+        # We need to update the cluster configs with values that come from the DAG declaration file.
+        self._deep_update(
+            self.config_service._configs[self._WONKA_CLUSTER_CONFIG_KEY],
+            self.cluster_args,
+        )
 
     def build_dag(self):
         dag = super().dag_instance()
@@ -36,8 +47,31 @@ class WonkaWorkflow(BaseWorkflow):
         )
         self._initialize_task_creators(self.dag_execution_context)
         self._create_all_tasks()
+        logger.info(
+            f"m=build_dag, msg=DAG build completed successfully, dag_id={self.dag_id}"
+        )
 
         return dag
+
+    @staticmethod
+    def _deep_update(base_dict, update_dict):
+        """
+        Recursively update a dictionary with another dictionary.
+
+        Args:
+            base_dict: The dictionary to update (modified in place)
+            update_dict: The dictionary with values to merge in
+        """
+        for key, value in update_dict.items():
+            if (
+                key in base_dict
+                and isinstance(base_dict[key], dict)
+                and isinstance(value, dict)
+            ):
+                WonkaWorkflow._deep_update(base_dict[key], value)
+            else:
+                base_dict[key] = value
+        return base_dict
 
     def _get_dag_documentation(self):
         # The original _get_dag_documentation method couples orchestration abstraction
@@ -66,6 +100,9 @@ class WonkaWorkflow(BaseWorkflow):
         self.skip_run_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SKIP_RUN
         )
+        logger.info(
+            "m=_initialize_task_creators, msg=All task creators initialized successfully for DAG {self.dag_id}"
+        )
 
     def __set_env_vars_from_dag_args(self, task, dag_args):
         task.cluster_configuration["spark_env_vars"]["PACKAGE_PATH"] = dag_args[
@@ -76,8 +113,10 @@ class WonkaWorkflow(BaseWorkflow):
         """
         Creates all the tasks for the workflow, and sets their internal dependencies
         """
+        created_tasks_ids = []
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+        created_tasks_ids.append(execute_job_cluster_task.task_id)
 
         # For the Wonka workflows, we want to be able to pass
         # some extra env vars to the task so we can parametrize
@@ -88,11 +127,13 @@ class WonkaWorkflow(BaseWorkflow):
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
+            created_tasks_ids.append(skip_run_task.task_id)
             skip_run_task >> execute_job_cluster_task
 
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        created_tasks_ids.append(dummy_terminate_job_cluster_task.task_id)
         wonka_table_attributes = TableAttributes(
             self.dag_args,
             self.workflow_args,
@@ -103,6 +144,7 @@ class WonkaWorkflow(BaseWorkflow):
         load_wonka_task = self.load_wonka_task_creator.create_task(
             wonka_table_attributes
         )
+        created_tasks_ids.append(load_wonka_task.task_id)
 
         tables_to_optimize = [wonka_table_attributes]
 
@@ -127,11 +169,13 @@ class WonkaWorkflow(BaseWorkflow):
                     ),
                 )
             )
+            created_tasks_ids.append(load_cdf_to_datazord_task.task_id)
 
         # We keep only a single "optimize table" task that will be used to optimize all the tables
         optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
             tables_to_optimize
         )
+        created_tasks_ids.append(optimize_delta_tables_task.task_id)
 
         (
             execute_job_cluster_task
@@ -146,3 +190,8 @@ class WonkaWorkflow(BaseWorkflow):
                 >> load_cdf_to_datazord_task
                 >> dummy_terminate_job_cluster_task
             )
+
+        task_list = ", ".join(created_tasks_ids)
+        logger.info(
+            f"DAG {self.dag_name} was created with the following tasks: {{{task_list}}}"
+        )

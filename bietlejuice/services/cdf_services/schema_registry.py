@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .cdf_json_schema_builder import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.schema_builder import (
     generate_json_schema_from_dataframe,
 )
 

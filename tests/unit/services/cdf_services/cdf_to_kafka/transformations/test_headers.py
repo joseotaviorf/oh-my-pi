@@ -1,19 +1,12 @@
 from datetime import datetime
 
 import pytest
-from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
-from bietlejuice.services.cdf_services.cdf_headers import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.headers import (
     create_kafka_headers,
     get_data_columns_from,
 )
-
-
-@pytest.fixture
-def spark_session():
-    """Create a Spark session for testing."""
-    return SparkSession.builder.appName("test_cdf_headers").getOrCreate()
 
 
 @pytest.fixture

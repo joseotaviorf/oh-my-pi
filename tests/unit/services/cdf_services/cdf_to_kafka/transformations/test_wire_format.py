@@ -3,18 +3,11 @@ import struct
 from datetime import datetime
 
 import pytest
-from pyspark.sql import SparkSession
 
-from bietlejuice.services.cdf_services.cdf_wire_format_transformations import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.wire_format import (
     _create_confluent_encoder_udf,
     cdf_to_kafka_format_with_schema_registry,
 )
-
-
-@pytest.fixture
-def spark_session():
-    """Create a Spark session for testing."""
-    return SparkSession.builder.appName("test_cdf_wire_format").getOrCreate()
 
 
 @pytest.fixture

@@ -2,12 +2,12 @@
 
 This module tests simple transformation functions. Complex format transformations
 are tested in dedicated modules:
-- test_cdf_wire_format_transformations.py
-- test_cdf_plain_json_transformations.py
+- test_wire_format.py
+- test_plain_json.py
 - test_cdf_to_kafka_format.py
 """
 
-from bietlejuice.services.cdf_services.cdf_transformations import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.common import (
     drop_partition_columns,
     filter_cdf_events,
 )

@@ -14,7 +14,7 @@ import os
 
 from pyspark.sql import SparkSession
 
-from bietlejuice.services.cdf_services.cdf_to_kafka_service import DeltaCDFToKafkaService
+from bietlejuice.services.cdf_services.cdf_to_kafka.service import DeltaCDFToKafkaService
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,10 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--entity", required=True, help="Entity name"
+    )
+
+    parser.add_argument(
         "--extra-metadata", required=False, default="{}", help="Extra metadata to be added to the payload"
     )
 
@@ -66,7 +70,6 @@ def main():
         spark=spark,
         delta_table=args.delta_table,
         key_columns=args.key_columns.split(","),
-        checkpoint_location=args.checkpoint_location,
         kafka_options={
             "kafka.bootstrap.servers": args.kafka_bootstrap_servers,
             "topic": args.kafka_topic,
@@ -74,6 +77,8 @@ def main():
             "kafka.sasl.mechanism": "PLAIN",
             "kafka.sasl.jaas.config": f'org.apache.kafka.common.security.plain.PlainLoginModule required username="{kafka_api_key}" password="{kafka_api_secret}";',
         },
+        checkpoint_location=args.checkpoint_location,
+        entity=args.entity,
     )
 
     service.run()

@@ -2,17 +2,10 @@ import json
 from datetime import datetime
 
 import pytest
-from pyspark.sql import SparkSession
 
-from bietlejuice.services.cdf_services.cdf_plain_json_transformations import (
+from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.plain_json import (
     cdf_to_kafka_format_plain_json,
 )
-
-
-@pytest.fixture
-def spark_session():
-    """Create a Spark session for testing."""
-    return SparkSession.builder.appName("test_cdf_plain_json").getOrCreate()
 
 
 @pytest.fixture
