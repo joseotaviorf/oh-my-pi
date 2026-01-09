@@ -35,10 +35,6 @@ workflow:
       z_order_by: [id]
     business_context_detail_aud:
       raw_primary_keys: ["id", "rev"]
-    file:
-      z_order_by: [id]
-    file_aud:
-      raw_primary_keys: ["id", "rev"]
     lead3p:
       clean_table_name: lead_3p
       z_order_by: [id]

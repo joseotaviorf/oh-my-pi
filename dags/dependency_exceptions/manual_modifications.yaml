@@ -1189,3 +1189,6 @@ bietlejuice.dw_sale_closing_flows:
   add:    
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
     - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
+bietlejuice.enrich_brokers_supply_processor:
+  remove:
+    - bietlejuice.brokers_supply_processor:load-clean-file:first-run-of-day
