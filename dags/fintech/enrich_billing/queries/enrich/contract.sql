@@ -13,8 +13,22 @@ SELECT
     CAST(get_json_object(contract_data, '$.administrationFee') AS DOUBLE) AS admin_fee,
     get_json_object(contract_data, '$.brokerageFeeBaseOn') AS brokerage_based_fee,
     CAST(get_json_object(contract_data, '$.admFeeMinimumAmount') AS DECIMAL(10,2)) AS min_admin_fee,
-    CAST(get_json_object(contract_data, '$.rentals[0].amount') AS DECIMAL(10,2)) AS last_rental,
-    CAST(get_json_object(contract_data, '$.iptus[0].amount') AS DECIMAL(10,2)) AS last_iptu,
+    element_at(
+      array_sort(
+        from_json(
+          get_json_object(contract_data, '$.rentals'), 'ARRAY<STRUCT<since:INT, amount:DOUBLE>>'
+        )
+      ),
+      -1
+    ).amount AS last_rental,
+    element_at(
+      array_sort(
+        from_json(
+          get_json_object(contract_data, '$.iptus'), 'ARRAY<STRUCT<since:INT, amount:DOUBLE>>'
+        )
+      ),
+      -1
+    ).amount AS last_iptu,
 	ts_created
 FROM
 	datalake_billing_clean.contract_revision
@@ -33,8 +47,8 @@ SELECT
 	cr.admin_fee,
 	cr.brokerage_based_fee,
 	cr.min_admin_fee,
-	cr.last_rental,
-  	cr.last_iptu,
+	CAST(cr.last_rental AS DECIMAL(10,2)) AS last_rental,
+	CAST(cr.last_iptu AS DECIMAL(10,2)) AS last_iptu,
   	cr.is_rental_paid_in_advance,
 	cr.ts_signature,
   	cr.ts_charge_started,
