@@ -210,4 +210,4 @@ LEFT JOIN
       ON ad.id_inspection = i.id_inspection
       OR ad.id_main_appointment = i.id_booking
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC, ad.ts_appointment_updated_utc DESC) = 1
