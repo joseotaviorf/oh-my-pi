@@ -75,7 +75,7 @@ SELECT
   cs.performa_score_numeric,
   CASE
     WHEN cs.performa_score_numeric < 70 THEN 'Insufficient'
-    WHEN cs.performa_score_numeric BETWEEN 70 AND 89 THEN 'Partially misses expecatations'
+    WHEN cs.performa_score_numeric BETWEEN 70 AND 89 THEN 'Partially misses expectations'
     WHEN cs.performa_score_numeric BETWEEN 90 AND 109 THEN 'Meets expectations'
     WHEN cs.performa_score_numeric BETWEEN 110 AND 137 THEN 'Above expectations'
     WHEN cs.performa_score_numeric BETWEEN 138 AND 150 THEN 'Outstanding'

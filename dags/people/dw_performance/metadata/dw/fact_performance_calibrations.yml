@@ -107,7 +107,7 @@ columns:
     - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
     categories:
       Insufficient: Performance score is less than 70.
-      'Partially misses expecatations': Performance score is between 70 and 89.
+      'Partially misses expectations': Performance score is between 70 and 89.
       'Meets expectations': Performance score is between 90 and 109.
       'Above expectations': Performance score is between 110 and 137.
       Outstanding: Performance score is between 138 and 150.
