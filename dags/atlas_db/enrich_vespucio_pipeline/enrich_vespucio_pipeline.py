@@ -34,6 +34,9 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 EXECUTION_HOURS_TIMEOUT = 3.0
 
+_GEOCODE_MAX_PARTITIONS = 6
+_GEOCODE_MAX_REQUESTS_PER_PARTITION = 15000
+
 config_service = ConfigurationService(DAG_NAME)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -370,6 +373,8 @@ address_tasks = [
             f"--google_geocode_api_keys_from_secret={APIEnum.GOOGLE_GEOCODING}",
             f"--geocode_cache_table={Tables.geocode_step_cache}",
             f"--update_cache",
+            f"--max_partitions={_GEOCODE_MAX_PARTITIONS}",
+            f"--max_requests_per_partition={_GEOCODE_MAX_REQUESTS_PER_PARTITION}",
             f"--input_staged_condos={Tables.stage_step_condos}",
             f"--input_staged_houses={Tables.stage_step_houses}",
             f"--overwrite_schema",
