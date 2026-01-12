@@ -40,7 +40,7 @@ SELECT DISTINCT
     WHEN ftc.sk_ticket IS NOT NULL THEN TRUE
     ELSE FALSE
   END AS has_answered_csat,
-  NULL AS has_transfers,
+  CAST(NULL AS BOOLEAN) AS has_transfers,
   ftc.is_solved AS is_resolution,
   ft.ts_created AS ts_started,
   ftc.ts_last_response AS ts_survey,

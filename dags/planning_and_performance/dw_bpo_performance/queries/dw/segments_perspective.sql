@@ -173,7 +173,7 @@ SELECT
   sp.per_team_flag,
   sp.status,
   sp.ts_reservation_created,
-  NULL AS average_reply_time,
+  CAST(NULL AS STRING) AS average_reply_time,
   sp.total_handling_time,
   sp.total_talk_time,      
   sp.quinto_andar_phone_number,
