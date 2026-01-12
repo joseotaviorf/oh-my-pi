@@ -16,6 +16,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 from pyspark.sql.functions import lit, coalesce, col
+from pyspark.sql.types import StructType, StructField, StringType
 
 JOB_NAME = f"load_quires_raw"
 
@@ -117,9 +118,12 @@ if __name__ == "__main__":
     api_url = config_service.get_config("api_url")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
 
+    schema_config = config_service.get_config("table_schemas")[table_name] if table_name in config_service.get_config("table_schemas") else None
+    schema = StructType.fromJson(json.loads(schema_config.get("schema"))) if schema_config else None
+
     logger.info(
         f"m={JOB_NAME}, environment={env}, datalake_bucket={datalake_bucket}, table_name={table_name}, "
-        f"load_start_date={load_start_date}, load_end_date={load_end_date}, raw_partition_cols={raw_partition_cols}, "
+        f"load_start_date={load_start_date}, load_end_date={load_end_date}, raw_partition_cols={raw_partition_cols}, table_schema={schema}, "
         f"msg=Starting spark job..."
     )
 
@@ -128,7 +132,10 @@ if __name__ == "__main__":
     if client_response:
 
         spark_client = SparkClient()
-        df = spark_client.create_dataframe(client_response)
+        if schema:
+            df = spark_client.create_dataframe(client_response, schema=schema)
+        else:
+            df = spark_client.create_dataframe(client_response)
 
         if table_name == "properties":
             df = df.withColumn("load_date", lit(load_end_date))
