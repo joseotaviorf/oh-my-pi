@@ -1,0 +1,25 @@
+dag:
+  name: legalops
+  schedule_start_date: 2026, 1, 1
+  schedule_interval: 0 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from LegalOps database, a service used to track real state dillinges.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: legalops
+  custom_schema: legalops
+  dbutils_secret_key: LEGALOPS_DB
+  tables_customization:
+    contract_analysis_request:
+      clean_table_name: contract_analysis_request
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"] 
+cluster:
+  type: databricks_16_4_med_memory_general_cluster
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200

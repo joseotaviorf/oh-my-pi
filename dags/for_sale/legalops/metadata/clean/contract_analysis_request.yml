@@ -1,0 +1,55 @@
+---
+database_name: datalake_legalops_clean
+table_name: contract_analysis_request
+domain: For Sale
+owner: thiago.bueno@quintoandar.com.br
+description: Table with contract analysis requests made by Sales Flow to Lego Contract.
+columns:
+  id:
+    description: Unique ID for the contract analysis request record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.id
+  id_contract_analysis_job:
+    description: Foreign key to the contract analysis job that processed this request.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.contract_analysis_job_id
+  id_sales_flow:
+    description: Foreign key to the sales flow associated with this contract analysis.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.sales_flow_id
+  status:
+    description: Current status of the contract analysis request.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.status
+  request_payload:
+    description: JSON payload containing the contract analysis request details.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.request_payload
+  contract_analysis_result:
+    description: Result of the contract analysis after processing.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.contract_analysis_result
+  error_message:
+    description: Error message if the contract analysis request failed.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.error_message
+  ts_created:
+    description: Timestamp when the contract analysis request was created.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.created_at
+  ts_updated:
+    description: Timestamp of the last update to the contract analysis request.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.updated_at
+  year:
+    description: Year partition for the contract analysis request record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.year
+  month:
+    description: Month partition for the contract analysis request record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.month
+  day:
+    description: Day partition for the contract analysis request record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.day
