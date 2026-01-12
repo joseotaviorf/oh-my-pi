@@ -34,6 +34,10 @@ columns:
     lineage:
       - dw_customer_support.dim_department.team
     description: Team of the analyst who answered the ticket.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department of the analyst who answered the ticket.
   organization:
     lineage:
       - dw_customer_support.dim_analyst.agent_organization
@@ -71,6 +75,12 @@ columns:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_handling_time
     description: Total handling time of the contact in minutes.
+  total_minutes_handling_time_previous_contact:
+    lineage:
+      - dw_customer_support.fact_customer_contats.ts_started
+      - dw_customer_support.fact_customer_contats.sk_user
+      - dw_customer_support.fact_customer_contacts.total_handling_time
+    description: Total handling time of the previous contact in minutes.
   total_minutes_queue_time:
     lineage:
       - dw_customer_support.fact_customer_contacts.total_waiting_time
@@ -86,12 +96,25 @@ columns:
     lineage:
       - dw_satisfaction_rating.fact_ticket_csat.last_csat_score
     description: CSAT score of the last contact.
+  ticket_back:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+      - dw_customer_support.fact_tickets.ts_started
+      - dw_customer_support.fact_tickets.ts_solved
+    description: If the ticked is created between the start and solved timestamp, or is not solved, it is included in the ticket_back array.
   recontact_flag:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
       - dw_customer_support.fact_tickets.sk_user
       - dw_customer_support.dim_department.team
     description: Indicates if the contact is a recontact.
+  recontact_flag_taxo:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates if the contact is a recontact by taxonomy.
   search_window_from:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
@@ -100,6 +123,11 @@ columns:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
     description: Search window until of the ticket created date.
+  refined_direction:
+    lineage:
+      - dw_customer_support.fact_tickets.ticket_origin
+      - dw_customer_support.fact_tickets.direction
+    description: Type of Service and if it's inbound or outbound.
   ts_started_first_contact:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
@@ -112,15 +140,15 @@ columns:
     description: Timestamp of the start of the ticket.
   year:
     lineage:
-      - CURRENT_DATE - 1
+      - dw_customer_support.fact_tickets.ts_started
     description: Year of the ticket.
   month:
     lineage:
-      - CURRENT_DATE - 1
+      - dw_customer_support.fact_tickets.ts_started
     description: Month of the ticket.
   day:
     lineage:
-      - CURRENT_DATE - 1
+      - dw_customer_support.fact_tickets.ts_started
     description: Day of the ticket.
   ts_load:
     lineage:
