@@ -229,10 +229,14 @@ def main():
 
     if len(insights_list) <= 0:
         logger.info("No data returned from API")
-        exit(0)
+        return
     
     df = spark.createDataFrame(insights_list)
 
+    if "impressions" not in df.columns:
+        logger.info("Schema mismatch")
+        return
+        
     logger.info("DataFrame Spark created successfully")
         
     df = df.withColumn(
