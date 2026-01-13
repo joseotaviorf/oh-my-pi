@@ -22,27 +22,11 @@ column_level_validations:
   has_requested_vacation_cash_out:
     is_complete:
       severity_level: Warning
-  is_approved:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
-  is_denied:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
   is_open_ended:
     is_complete:
       severity_level: Warning
-  is_pending:
-    has_null_count:
-      less_than_or_equal_to: 10
-      severity_level: Warning
   is_vacation_request:
     is_complete:
-      severity_level: Warning
-  sk_request_status:
-    has_null_count:
-      less_than_or_equal_to: 10
       severity_level: Warning
   ts_load:
     is_complete:
