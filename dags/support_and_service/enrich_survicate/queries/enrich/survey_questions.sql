@@ -19,6 +19,4 @@ LEFT JOIN
     datalake_survicate_clean.surveys AS s
         ON sq.id_survey = s.id_survey
 WHERE
-    sq.year = {year}
-    AND sq.month = {month}
-    AND sq.day = {day}
+  MAKE_DATE(sq.year, sq.month, sq.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")

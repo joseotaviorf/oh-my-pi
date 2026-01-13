@@ -31,9 +31,7 @@ JOIN
         ON sr.id_response = rc.id_response
 WHERE
     sr.id_survey IN ('8214bf6281ffdb53', '0d7587def9ac6325')
-    AND rc.year = {year}
-    AND rc.month = {month}
-    AND rc.day = {day}
+    AND MAKE_DATE(rc.year, rc.month, rc.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19
 UNION ALL
 SELECT
@@ -59,7 +57,7 @@ SELECT
 FROM
     datalake_gsheets_clean.tenant_onboarding_keys_csat
 WHERE
-    DATE(ts_input) = DATE('{year}-{month}-{day}')
+    DATE(ts_input) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
 SELECT
     NULL AS id_answer,
@@ -84,4 +82,4 @@ SELECT
 FROM
     datalake_gsheets_clean.owner_offboarding_keys_csat
 WHERE
-    DATE(ts_input) = DATE('{year}-{month}-{day}')
+    DATE(ts_input) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

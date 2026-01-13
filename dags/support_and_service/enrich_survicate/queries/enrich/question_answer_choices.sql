@@ -13,9 +13,7 @@
     FROM
         datalake_survicate_clean.survey_questions
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
 ),
 format_answer_choices AS (
     SELECT

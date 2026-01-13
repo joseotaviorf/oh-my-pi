@@ -30,7 +30,5 @@ JOIN
         ON sr.id_response = rc.id_response
 WHERE
     sr.id_survey IN ('b1133bc4925426d0', '278f21b367c2344c')
-    AND rc.year = {year}
-    AND rc.month = {month}
-    AND rc.day = {day}
+  AND MAKE_DATE(rc.year, rc.month, rc.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18

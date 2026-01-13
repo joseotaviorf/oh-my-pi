@@ -48,10 +48,6 @@ columns:
     lineage:
       - datalake_survicate.response_content.answer_content
     description: Respondent open comment
-  user_comment:
-    lineage:
-      - datalake_survicate.response_content.answer_content
-    description: Respondent open comment
   satisfaction_rating:
     lineage:
       - datalake_survicate.response_content.answer_content

@@ -25,9 +25,7 @@ WITH parse_url_format AS (
         datalake_survicate.survey_responses AS sr
     WHERE
         sr.id_survey IN ('00f46ff66c2ff389', '9d64bf0e2f6faa48', 'ccecd6dbe925b337', '29d847ff4d17cc18')
-        AND sr.year = {year}
-        AND sr.month = {month}
-        AND sr.day = {day}
+        AND MAKE_DATE(sr.year, sr.month, sr.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
 )
 SELECT
     rc.id_response AS id_answer,

@@ -8,9 +8,7 @@ WITH explode_parse_url AS (
   FROM
     datalake_survicate.survey_responses AS sr
   WHERE
-    sr.year = {year}
-    AND sr.month = {month}
-    AND sr.day = {day}
+    MAKE_DATE(sr.year, sr.month, sr.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
 ),
 zendesk_tickets AS (
   SELECT DISTINCT
@@ -55,7 +53,5 @@ JOIN
   zendesk_tickets AS sr
     ON sr.id_response = rc.id_response
 WHERE
-  rc.year = {year}
-  AND rc.month = {month}
-  AND rc.day = {day}
+  MAKE_DATE(rc.year, rc.month, rc.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
 GROUP BY 1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14
