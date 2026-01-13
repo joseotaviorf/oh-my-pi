@@ -6,7 +6,7 @@ domain: Conversational XP
 description: Table containing session data for all chatbot hosts.
 columns:
   id_session:
-    description: 'Copilot Service session ID'
+    description: 'Copilot Service session ID. NULL for old bot (Greenseer) sessions'
     lineage:
     - datalake_copilot_service_clean.session.id
   id_sauron_session:
@@ -15,7 +15,7 @@ columns:
     - datalake_greenseer_clean.session.id_session
     - datalake_sauron_clean.session.id
   id_langfuse_session:
-    description: 'Langfuse session ID (external session ID in Copilot)'
+    description: 'Langfuse session ID (external session ID in Copilot). NULL for old bot (Greenseer) sessions'
     lineage:
     - datalake_copilot_service_clean.session.id_external
   id_ticket:
@@ -65,6 +65,7 @@ columns:
   first_queue:
     description: 'First support queue (department)'
     lineage:
+    - datalake_langfuse_clean.observations.input
     - datalake_customer_support.tickets.first_queue
     - datalake_sauron_clean.session.department
   last_queue:

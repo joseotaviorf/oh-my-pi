@@ -92,7 +92,7 @@ sessions AS (
   FROM
     orchestrator_sessions
 ),
-escalated_sessions AS (
+tickets AS (
   SELECT DISTINCT
     t.id_ticket,
     t.id_session,
@@ -103,16 +103,30 @@ escalated_sessions AS (
   INNER JOIN
     sessions AS s
       ON t.id_session = s.id_sauron_session
-  WHERE
-    t.front_or_back = 'front'
+      AND t.front_or_back = 'front'
+      AND t.channel = 'chat'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_updated DESC) = 1
+),
+escalation_queue AS (
+  SELECT DISTINCT
+    t.id_session,
+    GET_JSON_OBJECT(o.input, '$.department_name') AS queue
+  FROM
+    datalake_langfuse_clean.traces AS t
+  INNER JOIN
+    datalake_langfuse_clean.observations AS o
+      ON o.id_trace = t.id_trace
+      AND o.ts_started >= '{load_start_date}'
+      AND o.name = 'escalate_tool'
+      AND o.type = 'TOOL'
+    
 )
 SELECT
   s.id_session,
   s.id_sauron_session,
   s.id_langfuse_session,
-  es.id_ticket,
+  t.id_ticket,
   s.id_user,
   s.user_phone_number,
   s.bot,
@@ -126,13 +140,19 @@ SELECT
     WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'others'
     ELSE NULL
   END AS whatsapp_number,
-  es.first_queue,
-  es.last_queue,
-  es.id_ticket IS NOT NULL AS is_escalated,
+  CASE
+    WHEN t.id_ticket IS NOT NULL THEN eq.queue
+    ELSE NULL
+  END AS first_queue,
+  t.last_queue,
+  t.id_ticket IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
 FROM
   sessions AS s
 LEFT JOIN
-  escalated_sessions AS es
-    ON es.id_session = s.id_sauron_session
+  tickets AS t
+    ON t.id_session = s.id_sauron_session
+LEFT JOIN
+  escalation_queue AS eq
+    ON eq.id_session = s.id_langfuse_session
