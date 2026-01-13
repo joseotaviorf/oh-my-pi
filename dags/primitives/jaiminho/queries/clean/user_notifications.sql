@@ -7,6 +7,7 @@ SELECT
 	COALESCE(referenceName, entity_name) AS entity_name,
 	action,
 	status,
+	state,
 	channel,
 	profile,
 	tags,

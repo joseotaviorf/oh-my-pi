@@ -40,6 +40,10 @@ columns:
     description: Current status of the notification (e.g., pending, sent, delivered, failed).
     lineage:
       - datalake_jaiminho_raw.user_notifications.status
+  state:
+    description: Current state of the notification (e.g., processing_at_gateway, build_failed, delivered, failed).
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.state
   channel:
     description: Communication channel used for the notification (e.g., email, SMS, push, in-app).
     lineage:
