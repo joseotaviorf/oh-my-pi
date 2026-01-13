@@ -141,10 +141,10 @@ SELECT
     ELSE NULL
   END AS whatsapp_number,
   CASE
-    WHEN t.id_ticket IS NOT NULL THEN eq.queue
+    WHEN t.id_ticket IS NOT NULL THEN REPLACE(eq.queue, '[AeC] ', '')
     ELSE NULL
   END AS first_queue,
-  t.last_queue,
+  REPLACE(t.last_queue, '[AeC] ', '') AS last_queue,
   t.id_ticket IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
