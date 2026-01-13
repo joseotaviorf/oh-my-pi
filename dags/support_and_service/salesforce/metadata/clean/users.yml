@@ -260,3 +260,21 @@ columns:
     lineage:
       - datalake_salesforce_raw.users.OfflineTrialExpirationDate
     description: Timestamp when the offline trial period expires.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_raw.users.dt_updated
+    description: Timestamp of the last update of the user record.
+  year:
+    lineage:
+      - datalake_salesforce_raw.users.year
+    description: Year of the user record.
+  month:
+    lineage:
+      - datalake_salesforce_raw.users.month
+    description: Month of the user record.
+  day:
+    lineage:
+      - datalake_salesforce_raw.users.day
+    description: Day of the user record.
+  ts_load:
+    description: Timestamp of the load.

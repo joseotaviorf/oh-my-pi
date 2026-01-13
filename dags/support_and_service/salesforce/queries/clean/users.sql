@@ -62,7 +62,12 @@ SELECT
     CAST(SystemModstamp AS TIMESTAMP) AS ts_system_mod,
     CAST(PasswordExpirationDate AS TIMESTAMP) AS ts_password_expiration,
     CAST(SuAccessExpirationDate AS TIMESTAMP) AS ts_su_access_expiration,
-    CAST(OfflineTrialExpirationDate AS TIMESTAMP) AS ts_offline_trial_expiration
+    CAST(OfflineTrialExpirationDate AS TIMESTAMP) AS ts_offline_trial_expiration,
+    dt_updated,
+    year,
+    month,
+    day,
+    NOW() AS ts_load
 FROM
     datalake_salesforce_raw.users
 WHERE
