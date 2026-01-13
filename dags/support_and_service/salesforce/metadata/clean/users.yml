@@ -1,0 +1,262 @@
+database_name: datalake_salesforce_clean
+table_name: users
+description: Clean table for ingesting users data from the Sales Force tool.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_user_salesforce:
+    lineage:
+      - datalake_salesforce_raw.users.Id
+    description: Unique identification key for user in Salesforce.
+  id_user_role:
+    lineage:
+      - datalake_salesforce_raw.users.UserRoleId
+    description: Identification key of the role assigned to the user.
+  id_profile:
+    lineage:
+      - datalake_salesforce_raw.users.ProfileId
+    description: Identification key of the user's profile in Salesforce.
+  id_delegated_approver:
+    lineage:
+      - datalake_salesforce_raw.users.DelegatedApproverId
+    description: Identification key of the delegated approver for the user.
+  id_manager:
+    lineage:
+      - datalake_salesforce_raw.users.ManagerId
+    description: Identification key of the user's manager.
+  id_individual:
+    lineage:
+      - datalake_salesforce_raw.users.IndividualId
+    description: Identification key of the individual record associated with the user.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.users.CreatedById
+    description: Identification key of the user who created this record.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.users.LastModifiedById
+    description: Identification key of the user who last modified this record.
+  username:
+    lineage:
+      - datalake_salesforce_raw.users.Username
+    description: Unique username for login to Salesforce.
+  last_name:
+    lineage:
+      - datalake_salesforce_raw.users.LastName
+    description: Last name of the user.
+  first_name:
+    lineage:
+      - datalake_salesforce_raw.users.FirstName
+    description: First name of the user.
+  middle_name:
+    lineage:
+      - datalake_salesforce_raw.users.MiddleName
+    description: Middle name of the user.
+  suffix:
+    lineage:
+      - datalake_salesforce_raw.users.Suffix
+    description: Name suffix of the user.
+  name:
+    lineage:
+      - datalake_salesforce_raw.users.Name
+    description: Full name of the user.
+  company_name:
+    lineage:
+      - datalake_salesforce_raw.users.CompanyName
+    description: Name of the company the user belongs to.
+  division:
+    lineage:
+      - datalake_salesforce_raw.users.Division
+    description: Division within the company where the user works.
+  department:
+    lineage:
+      - datalake_salesforce_raw.users.Department
+    description: Department within the company where the user works.
+  title:
+    lineage:
+      - datalake_salesforce_raw.users.Title
+    description: Job title or position of the user.
+  street:
+    lineage:
+      - datalake_salesforce_raw.users.Street
+    description: Street address of the user.
+  city:
+    lineage:
+      - datalake_salesforce_raw.users.City
+    description: City where the user is located.
+  state:
+    lineage:
+      - datalake_salesforce_raw.users.State
+    description: State or province where the user is located.
+  postal_code:
+    lineage:
+      - datalake_salesforce_raw.users.PostalCode
+    description: Postal code or ZIP code of the user's address.
+  country:
+    lineage:
+      - datalake_salesforce_raw.users.Country
+    description: Country where the user is located.
+  latitude:
+    lineage:
+      - datalake_salesforce_raw.users.Latitude
+    description: Latitude coordinate of the user's address.
+  longitude:
+    lineage:
+      - datalake_salesforce_raw.users.Longitude
+    description: Longitude coordinate of the user's address.
+  geocode_accuracy:
+    lineage:
+      - datalake_salesforce_raw.users.GeocodeAccuracy
+    description: Accuracy level of the geocoded address.
+  address:
+    lineage:
+      - datalake_salesforce_raw.users.Address
+    description: Complete address of the user.
+  email:
+    lineage:
+      - datalake_salesforce_raw.users.Email
+    description: Email address of the user.
+  email_preferences_auto_bcc:
+    lineage:
+      - datalake_salesforce_raw.users.EmailPreferencesAutoBcc
+    description: Indicates if automatic BCC is enabled for outgoing emails.
+  email_preferences_auto_bcc_stay_in_touch:
+    lineage:
+      - datalake_salesforce_raw.users.EmailPreferencesAutoBccStayInTouch
+    description: Indicates if automatic BCC is enabled for Stay-in-Touch emails.
+  email_preferences_stay_in_touch_reminder:
+    lineage:
+      - datalake_salesforce_raw.users.EmailPreferencesStayInTouchReminder
+    description: Indicates if Stay-in-Touch reminder emails are enabled.
+  sender_email:
+    lineage:
+      - datalake_salesforce_raw.users.SenderEmail
+    description: Email address used as sender for outgoing emails.
+  sender_name:
+    lineage:
+      - datalake_salesforce_raw.users.SenderName
+    description: Name displayed as sender for outgoing emails.
+  signature:
+    lineage:
+      - datalake_salesforce_raw.users.Signature
+    description: Email signature of the user.
+  stay_in_touch_subject:
+    lineage:
+      - datalake_salesforce_raw.users.StayInTouchSubject
+    description: Default subject line for Stay-in-Touch emails.
+  stay_in_touch_signature:
+    lineage:
+      - datalake_salesforce_raw.users.StayInTouchSignature
+    description: Signature used for Stay-in-Touch emails.
+  stay_in_touch_note:
+    lineage:
+      - datalake_salesforce_raw.users.StayInTouchNote
+    description: Default note content for Stay-in-Touch emails.
+  phone:
+    lineage:
+      - datalake_salesforce_raw.users.Phone
+    description: Primary phone number of the user.
+  fax:
+    lineage:
+      - datalake_salesforce_raw.users.Fax
+    description: Fax number of the user.
+  mobile_phone:
+    lineage:
+      - datalake_salesforce_raw.users.MobilePhone
+    description: Mobile phone number of the user.
+  alias:
+    lineage:
+      - datalake_salesforce_raw.users.Alias
+    description: Short alias or nickname for the user.
+  community_nickname:
+    lineage:
+      - datalake_salesforce_raw.users.CommunityNickname
+    description: Nickname displayed in Salesforce communities.
+  badge_text:
+    lineage:
+      - datalake_salesforce_raw.users.BadgeText
+    description: Text displayed on the user's badge.
+  time_zone_sid_key:
+    lineage:
+      - datalake_salesforce_raw.users.TimeZoneSidKey
+    description: Time zone identifier for the user.
+  locale_sid_key:
+    lineage:
+      - datalake_salesforce_raw.users.LocaleSidKey
+    description: Locale identifier for the user's regional settings.
+  receives_info_emails:
+    lineage:
+      - datalake_salesforce_raw.users.ReceivesInfoEmails
+    description: Indicates if the user receives informational emails from Salesforce.
+  receives_admin_info_emails:
+    lineage:
+      - datalake_salesforce_raw.users.ReceivesAdminInfoEmails
+    description: Indicates if the user receives administrative information emails.
+  email_encoding_key:
+    lineage:
+      - datalake_salesforce_raw.users.EmailEncodingKey
+    description: Character encoding used for email messages.
+  user_type:
+    lineage:
+      - datalake_salesforce_raw.users.UserType
+    description: Type of user license.
+  start_day:
+    lineage:
+      - datalake_salesforce_raw.users.StartDay
+    description: Starting day of the week for calendar display.
+  end_day:
+    lineage:
+      - datalake_salesforce_raw.users.EndDay
+    description: Ending day of the week for calendar display.
+  language_locale_key:
+    lineage:
+      - datalake_salesforce_raw.users.LanguageLocaleKey
+    description: Language locale identifier for the user's interface.
+  employee_number:
+    lineage:
+      - datalake_salesforce_raw.users.EmployeeNumber
+    description: Employee number or ID from the HR system.
+  failed_logins:
+    lineage:
+      - datalake_salesforce_raw.users.NumberOfFailedLogins
+    description: Number of consecutive failed login attempts.
+  bpo:
+    lineage:
+      - datalake_salesforce_raw.users.BPO__c
+    description: Custom field indicating if the user belongs to a BPO (Business Process Outsourcing) team.
+  is_active:
+    lineage:
+      - datalake_salesforce_raw.users.IsActive
+    description: Indicates if the user account is active.
+  ts_last_login:
+    lineage:
+      - datalake_salesforce_raw.users.LastLoginDate
+    description: Timestamp of the user's last login to Salesforce.
+  ts_last_password_change:
+    lineage:
+      - datalake_salesforce_raw.users.LastPasswordChangeDate
+    description: Timestamp of the last password change.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.users.CreatedDate
+    description: Timestamp when the user record was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.users.LastModifiedDate
+    description: Timestamp when the user record was last modified.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.users.SystemModstamp
+    description: System modification timestamp for internal tracking.
+  ts_password_expiration:
+    lineage:
+      - datalake_salesforce_raw.users.PasswordExpirationDate
+    description: Timestamp when the user's password will expire.
+  ts_su_access_expiration:
+    lineage:
+      - datalake_salesforce_raw.users.SuAccessExpirationDate
+    description: Timestamp when superuser access expires.
+  ts_offline_trial_expiration:
+    lineage:
+      - datalake_salesforce_raw.users.OfflineTrialExpirationDate
+    description: Timestamp when the offline trial period expires.
