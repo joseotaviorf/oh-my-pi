@@ -26,7 +26,7 @@ columns:
   bp_person_number:
     description: Business partner person number assigned to this cost center. Represents the person responsible for the cost center.
     lineage:
-    - datalake_pin_core_clean.assignment_responsibilities.id_person
+    - datalake_pin_core_clean.assignment_responsibility.id_person
   business:
     description: Business unit to which the cost center belongs.
     categories:
@@ -140,7 +140,7 @@ columns:
       Used to identify how many times a cost center's tracked attributes have changed over time.
     lineage:
     - datalake_pin_core_clean.all_organization_units.id_organization
-    - datalake_pin_core_clean.assignment_responsibilities.id_person
+    - datalake_pin_core_clean.assignment_responsibility.id_person
     - datalake_pin_core_clean.organization_unit_translation.name
     - datalake_pin_core_clean.all_organization_units.cost_center_code
     - datalake_pin_core_clean.all_organization_units.business
@@ -182,7 +182,7 @@ columns:
       SCD Type 2 control field.
     lineage:
     - datalake_pin_core_clean.all_organization_units.id_organization
-    - datalake_pin_core_clean.assignment_responsibilities.id_person
+    - datalake_pin_core_clean.assignment_responsibility.id_person
     - datalake_pin_core_clean.organization_unit_translation.name
     - datalake_pin_core_clean.all_organization_units.cost_center_code
     - datalake_pin_core_clean.all_organization_units.business

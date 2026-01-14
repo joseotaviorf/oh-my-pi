@@ -618,6 +618,7 @@ bietlejuice.dw_employee_test:
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-organization-units:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-assignment-responsibility:first-run-of-day
   - bietlejuice.pin_core:load-clean-assignment-supervisor:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day

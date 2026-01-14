@@ -46,7 +46,7 @@ cost_center_base AS (
       AND org.dt_effective_started >= t.dt_effective_started
       AND org.dt_effective_started < COALESCE(t.dt_effective_ended, DATE('9999-12-31'))
   LEFT JOIN
-    datalake_pin_core_clean.assignment_responsibilities AS ar
+    datalake_pin_core_clean.assignment_responsibility AS ar
       ON ar.id_organization = org.id_organization
   WHERE 
     class.classification_code = 'DEPARTMENT'
