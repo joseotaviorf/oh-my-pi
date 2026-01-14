@@ -1,39 +1,58 @@
 database_name: datalake_monopoly_clean
 table_name: income
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Data from the income table containing income information and status details.
 columns:
   id:
+    description: Unique identifier for the income.
     lineage:
       - datalake_monopoly_raw.income.id
   id_person_sale:
+    description: Identifier of the person sale associated with the income.
     lineage:
       - datalake_monopoly_raw.income.person_sale_id
   id_invoice:
+    description: Identifier of the invoice associated with the income.
     lineage:
       - datalake_monopoly_raw.income.invoice_id
+  id_refunded_by:
+    description: Identifier of the user who refunded the income.
+    lineage:
+      - datalake_monopoly_raw.income.refunded_by
   event:
+    description: Event associated with the income.
     lineage:
       - datalake_monopoly_raw.income.event
   status:
+    description: Status of the income.
     lineage:
       - datalake_monopoly_raw.income.status
   amount:
+    description: Amount of the income.
     lineage:
       - datalake_monopoly_raw.income.amount
   payer_info:
+    description: Information about the payer of the income.
     lineage:
       - datalake_monopoly_raw.income.payer_info
   invoice_link:
+    description: Link to the invoice associated with the income.
     lineage:
       - datalake_monopoly_raw.income.invoice_link
   dt_due:
+    description: Date when the income is due.
     lineage:
       - datalake_monopoly_raw.income.due_date
   dt_expiration:
+    description: Date when the income expires.
     lineage:
       - datalake_monopoly_raw.income.expiration_date
   ts_created:
+    description: Timestamp when the income was created.
     lineage:
       - datalake_monopoly_raw.income.created_at
   ts_updated:
+    description: Timestamp when the income was updated.
     lineage:
       - datalake_monopoly_raw.income.updated_at

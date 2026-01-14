@@ -2,6 +2,7 @@ SELECT
     id,
     person_sale_id AS id_person_sale,
     invoice_id AS id_invoice,
+    refunded_by AS id_refunded_by,
     event,
     status,
     CAST(amount AS float) AS amount,

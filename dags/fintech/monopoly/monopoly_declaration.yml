@@ -2,6 +2,10 @@ dag:
   name: monopoly
   owner: Data Fintech
   schedule_interval: 0 0,8,12 * * *
+  documentation:
+    dag_purpose: |
+      Process data from Monopoly database (postgresql), retrieved using the CDC process.
+      [Monopoly](https://github.com/quintoandar/monopoly) is a microservice responsible for payment and charge business rules of selling houses.
 workflow:
   type: cdc
   layer: raw
