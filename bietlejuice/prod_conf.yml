@@ -41,7 +41,7 @@ dags_out_of_pattern:
         "reverse_demand_score",
         "reverse_demand_classifieds_ranking",
         "reverse_dsat_report_load",
-        "reverse_sale_listings_report_load",
+        "reverse_sale_listings_report",
         "reverse_rent_listings_report_load",
         "reverse_idactum_load",
         "reverse_minority_report_ss",

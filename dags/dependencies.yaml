@@ -4485,22 +4485,8 @@ bietlejuice.reverse_rent_listings_report_load:
   - bietlejuice.enrich_similarity_score:load-enrich-house-metrics-score:first-run-of-day
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
-bietlejuice.reverse_sale_listings_report_access:
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-accepted:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-sent:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-published:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-signed-contract:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-traffic:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-confirmed:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-scheduled:first-run-of-day
-  - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-ongoing-listings:first-run-of-day
-bietlejuice.reverse_sale_listings_report_load:
+bietlejuice.reverse_sale_listings_report:
   - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-reason:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-status-reason:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day

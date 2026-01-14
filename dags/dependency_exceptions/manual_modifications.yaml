@@ -1003,17 +1003,6 @@ bietlejuice.reverse_rent_listings_report_access:
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent:first-run-of-day
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-traffic:first-run-of-day
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-visit-scheduled:first-run-of-day
-bietlejuice.reverse_sale_listings_report_access:
-  add:
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-accepted:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-sent:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-published:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-signed-contract:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-traffic:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-confirmed:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-scheduled:first-run-of-day
-    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-ongoing-listings:first-run-of-day
 bietlejuice.reverse_sale_unavailable_listings_access:
   add:
     - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings:first-run-of-day

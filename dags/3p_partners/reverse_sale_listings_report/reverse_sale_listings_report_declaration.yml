@@ -1,11 +1,11 @@
 dag:
-  name: reverse_sale_listings_report_access
-  schedule_start_date: 2022,7,12
+  name: reverse_sale_listings_report
+  schedule_start_date: 2020,1,1
   owner: Data 3P Partners
   documentation:
-    dag_purpose: This DAG collects data saved in the schema "reverse_listings_report" by the DAG reverse_sale_listings_report_load, and sends them via SNS to a service called "Member's Area". There, they will be displayed as an analytical report for Rede Members.
+    dag_purpose: This DAG collects several events from sale listings and collects data saved in the schema "reverse_listings_report", and sends them via SNS to a service called "Member's Area". There, they will be displayed as an analytical report for 3P Members in "Central da Imobiliária".
 workflow:
-  type: access
+  type: load_access
   layer: reverse
   custom_schema: listings_report
   load_spark_job: load_into_sns
@@ -13,44 +13,92 @@ workflow:
   - "{dag_name}"
   - "reverse_listings_report"
   - "{table_name}"
-  - "{{ data_interval_start | ds }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     demand_score:
       extra_spark_job_arguments:
       - DEMAND_SCORE
       - sns_topic_arn_scores
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      merge_on: ['id_house', 'demand_score']
+      z_order_by: ["id_house"]
     sale_listing_traffic:
       extra_spark_job_arguments:
       - NEW_LISTING_TRAFFIC
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_listing_published:
       extra_spark_job_arguments:
       - NEW_LISTING_PUBLISHED
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_ongoing_listings:
       extra_spark_job_arguments:
       - ONGOING_LISTINGS
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_listing_visit_scheduled:
       extra_spark_job_arguments:
       - NEW_LISTING_VISIT_SCHEDULED
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_listing_visit_confirmed:
       extra_spark_job_arguments:
       - NEW_LISTING_VISIT_CONFIRMED
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_listing_offer_sent:
       extra_spark_job_arguments:
       - NEW_LISTING_OFFER_SENT
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_listing_offer_accepted:
       extra_spark_job_arguments:
       - NEW_LISTING_OFFER_ACCEPTED
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
     sale_listing_signed_contract:
       extra_spark_job_arguments:
       - NEW_LISTING_SIGNED_CONTRACT
       - sns_topic_arn_reports
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -70,7 +118,7 @@ cluster:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
+    data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
