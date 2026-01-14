@@ -2,8 +2,6 @@ import argparse
 import importlib
 import logging
 
-logger = logging.getLogger(__name__)
-
 
 def main():
     parser = argparse.ArgumentParser(description="Run a Wonka pipeline.")
@@ -12,6 +10,9 @@ def main():
         help="The path to the runner of the pipeline, e.g., "
         "dummy_feature_set.runner",
     )
+
+    logging.info("Starting Wonka pipeline.")
+
     args = parser.parse_args()
 
     split_pipeline_runner = args.pipeline_runner.split(".")
