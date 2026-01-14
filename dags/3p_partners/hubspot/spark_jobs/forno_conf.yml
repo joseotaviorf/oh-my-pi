@@ -230,6 +230,21 @@ deal:
       - qualificacao_sales___ticket_medio_de_imoveis_de_locacao
       - qualificacao_sales___ticket_medio_de_imoveis_de_venda
       - demand_only__priorizacao_de_negociacoes
+      - cons_lead_uuid
+      - cons_utm_campaign_negocio
+      - cons_utm_medium_negocio
+      - cons_utm_source_negocio
+      - cons_template_first_contact
+      - cons_fluxo_is
+      - cons_motivo_de_descarte
+      - cons_form_origem
+      - cons_prioridade_lead
+      - cons_qtd_cotas
+      - cons_parcela_reduzida
+      - cons_email
+      - cons_phone
+      - cons_telefonetratado
+      - cons_canal_origem
     propertiesWithHistory:
       - dealstage
       - pipeline
