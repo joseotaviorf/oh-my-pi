@@ -677,6 +677,16 @@ databricks_12_2_med_io-memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_16_4_med_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_10_4_max_io-memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.4xlarge
@@ -1318,6 +1328,16 @@ databricks_12_2_med_cluster:
     node_type_id: m5a.4xlarge
     num_workers: 4
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
