@@ -50,7 +50,7 @@ DAI_CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_16_4_min_memory_cluster")
 
 
-CLUSTER_DESCRIPTION["data_security_mode"] = "USER_ISOLATION"
+CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
