@@ -118,7 +118,7 @@ cluster:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: USER_ISOLATION
+    data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   databricks_conn_id: databricks_new_env
