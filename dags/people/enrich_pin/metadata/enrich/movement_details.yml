@@ -64,7 +64,7 @@ columns:
   comp_ladder_directorate:
     description: Name of the compensation ladder directorate associated with the band ladder.
     lineage:
-    - datalake_hr_system_clean.workers.work_relationships.assignments.assignmentsDFF.GradeLadderName
+    - datalake_pin_core_clean.grade_ladder_translation.name
   business_unit_name:
     description: Name of the business unit to which the employee was associated.
     lineage:

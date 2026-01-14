@@ -23,7 +23,7 @@ cluster:
     driver_node_type_id: r5a.2xlarge
     node_type_id: r5a.2xlarge
     num_workers: 3
-    spark_version: 13.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"  
@@ -118,8 +118,6 @@ workflow:
         - deduplication_key: "PersonId"
           column_to_partition: "CreationDate"
           has_dt_effective: true
-          future_offset: 30
-          past_offset: 35
           params:
             onlyData: true
             limit: 100

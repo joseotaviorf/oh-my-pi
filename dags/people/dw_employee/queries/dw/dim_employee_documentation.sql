@@ -8,7 +8,7 @@ WITH hr_system_workers AS (
       PARTITION BY id_person
       ORDER BY
         dt_effective
-    ) = 2
+    ) = 1
 ),
 national_identifiers_step1 AS (
   SELECT

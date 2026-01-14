@@ -7,7 +7,7 @@ WITH
       phones
     FROM
       datalake_hr_system_clean.workers
-    QUALIFY 2 = DENSE_RANK() OVER (
+    QUALIFY 1 = DENSE_RANK() OVER (
         PARTITION BY
           id_person
         ORDER BY

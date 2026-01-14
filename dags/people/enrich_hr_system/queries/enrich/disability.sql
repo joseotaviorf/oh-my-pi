@@ -16,7 +16,7 @@ disabilities AS (
   FROM
     datalake_hr_system_clean.workers
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY person_number ORDER BY dt_effective) = 2
+    ROW_NUMBER() OVER(PARTITION BY person_number ORDER BY dt_effective) = 1
 ),
 selfdeclared_lookup AS (
   SELECT
