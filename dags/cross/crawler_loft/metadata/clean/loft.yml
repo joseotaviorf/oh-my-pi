@@ -56,11 +56,6 @@ columns:
       The house info of the listing.
       It has all the main information about the house, such as amenities, area, bedrooms, bathrooms, suites,
       parking spaces, etc.
-  status:
-    lineage:
-      - datalake_crawler_loft_raw.loft.status
-    description: |
-      Indicates if the listing is FOR_SALE, FOR_RENT or FOR_SALE_OR_RENT.
   type:
     lineage:
       - datalake_crawler_loft_raw.loft.type
@@ -116,11 +111,6 @@ columns:
     description: |
       Amount of the installment if the listing is financed. Currently is zero for all listings, which is the same
       behavior of the historic Zyte data.      
-  ts_created:
-    lineage:
-      - datalake_crawler_loft_raw.loft.created_at
-    description: |
-      The timestamp of the listing creation. 
   date_info:
     lineage:
       - datalake_crawler_loft_raw.loft.date_info

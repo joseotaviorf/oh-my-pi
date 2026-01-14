@@ -28,7 +28,7 @@ workflow:
     - "{partitions}" # partition_cols
     - "{load_start_date}" # load_start_date
     - "{load_end_date}" # load_end_date
-    - "s3://listing-crawler.s3.data.quintoandar.com.br/spinver/" # source_root_path
+    - "s3://listing-crawler.s3.data.quintoandar.com.br/spinver/crawler_data/" # source_root_path
     - "loft" # origin
   tables_customization:
     loft:
