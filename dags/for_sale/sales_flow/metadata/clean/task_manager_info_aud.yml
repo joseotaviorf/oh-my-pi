@@ -1,0 +1,71 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: task_manager_info_aud
+domain: For Sale
+owner: thiago.bueno@quintoandar.com.br
+description: Audit table for task manager info containing historical changes and modifications.
+columns:
+  id:
+    description: Unique ID for the task manager info record.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.id  
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.revend
+  id_sales_flow:
+    description: Foreign key to the sales_flow table.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.sales_flow_id
+  mod_id_sales_flow:
+    description: Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.sales_flow_id_mod
+  sync_status:
+    description: Current synchronization status with the task manager.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.sync_status
+  mod_sync_status:
+    description: Flag indicating if the column sync_status has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.sync_status_mod
+  ts_created:
+    description: Timestamp when the task manager info was created.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.created_at
+  mod_ts_created:
+    description: Flag indicating if the column ts_created has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.created_at_mod
+  ts_updated:
+    description: Timestamp of the last update to the task manager info.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.updated_at
+  mod_ts_updated:
+    description: Flag indicating if the column ts_updated has changed.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.updated_at_mod
+  year:
+    description: Year partition for the task manager info record.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.year
+  month:
+    description: Month partition for the task manager info record.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.month
+  day:
+    description: Day partition for the task manager info record.
+    lineage:
+      - datalake_sales_flow_raw.task_manager_info_aud.day

@@ -410,6 +410,14 @@ workflow:
       clean_table_name: task_association
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
+    task_manager_info:
+      clean_table_name: task_manager_info
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    task_manager_info_aud:
+      clean_table_name: task_manager_info_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
     users:
       clean_table_name: users
       raw_primary_keys: ["id"]
