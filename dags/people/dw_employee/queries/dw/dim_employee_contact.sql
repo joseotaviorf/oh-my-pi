@@ -70,8 +70,14 @@ WITH
       DATE(addresses['EffectiveStartDate']) AS dt_effective_start
     FROM
       addresses_step1
-    WHERE
-      addresses['PrimaryFlag'] = 'true'
+    QUALIFY
+      ROW_NUMBER() OVER(
+        PARTITION BY
+          id_person
+        ORDER BY
+          addresses['PrimaryFlag'] DESC,
+          DATE(addresses['EffectiveStartDate']) DESC
+      ) = 1
   ),
   phones_step1 AS (
     SELECT
