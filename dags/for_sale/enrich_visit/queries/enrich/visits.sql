@@ -284,7 +284,6 @@ SELECT
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', TRUE, FALSE) AS is_unsuccessful,
     IF(pva.id_visit IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
     IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
-    IF(pfa.id_pfa_history IS NOT NULL, TRUE, FALSE) AS is_fixed_agent,
     IF(computed_status_unified IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
     CASE
         WHEN visit_log.ts_visit_tenant_answer IS NOT NULL
@@ -370,12 +369,5 @@ LEFT JOIN
 LEFT JOIN
     visit_by_history AS vbh
         ON visit.id = vbh.id_visit
-LEFT JOIN
-    datalake_visit.preferred_fixed_agent_history AS pfa
-        ON visit.id_agent = pfa.id_user_agent
-        AND visit.id_visitor = pfa.id_visitor
-        AND visit.ts_created >= pfa.ts_started
-        AND visit.ts_created < COALESCE(pfa.ts_ended, NOW())
-        AND pfa.is_enabled
 WHERE
     DATE(visit.ts_created) >= '2020-01-01'

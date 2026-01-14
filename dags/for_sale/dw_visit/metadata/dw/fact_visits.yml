@@ -28,10 +28,22 @@ columns:
     description: Is the Id of the last agent who was associated with the visit.
     lineage:
       - datalake_visit.visits.id_last_associated_agent
+  sk_fixed_agent:
+    description: ID of the fixed agent associated with the visitor.
+    lineage:
+      - datalake_ebdb_agents.preferred_fixed_agent_history.id_agent
+  sk_user_fixed_agent:
+    description: User ID of the fixed agent associated with the visitor.
+    lineage:
+      - datalake_ebdb_agents.preferred_fixed_agent_history.id_user_agent
   sk_house:
     description: House's Id.
     lineage:
       - datalake_visit.visits.id_house
+  sk_region:
+    description: Region's Id.
+    lineage:
+      - datalake_ebdb_listing.house.id_region
   sk_house_listing:
     description: House's Id.
     lineage:

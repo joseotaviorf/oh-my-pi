@@ -13,7 +13,8 @@ SELECT
     es.id_agent AS sk_agent,
     es.id_user_agent AS sk_user_agent,
     svh.id_user_en AS sk_user_en,
-    es.id_fixed_agent AS sk_fixed_agent,
+    pfa.id_agent AS sk_fixed_agent,
+    pfa.id_user_agent AS sk_user_fixed_agent,
     ppa.id_house_listing_relation AS sk_ppa_relation,
     es.id_user_creation AS sk_author_creator,
     es.id_user_cancelation AS sk_author_cancelation,
@@ -70,3 +71,12 @@ LEFT JOIN
 LEFT JOIN
     datalake_sale_visit_hubs.sale_visit_hubs AS svh
         ON svh.id_booking = es.id_schedule
+LEFT JOIN
+    datalake_region.region AS r
+        ON es.id_region = r.id
+LEFT JOIN
+    datalake_ebdb_agents.preferred_fixed_agent_history AS pfa
+        ON es.id_visitor = pfa.id_visitor
+        AND r.id_city = pfa.id_region
+        AND es.business_context = pfa.business_context
+        AND es.ts_schedule_created BETWEEN pfa.ts_status_started AND COALESCE(pfa.ts_status_ended, NOW())

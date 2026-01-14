@@ -311,66 +311,6 @@ booking_in_rented_house AS (
   GROUP BY
     b.id_schedule
 ),
-fixed_agent_disabled AS (
-  SELECT
-    pfa_aud.id,
-    MAX(
-      CASE
-        WHEN pfa_aud.is_enabled = FALSE THEN FROM_UNIXTIME(ure.ts_revision / 1000)
-      END
-    ) AS ts_fixed_agent_disabled
-  FROM
-    datalake_ebdb_clean.preferred_fixed_agent_aud AS pfa_aud
-  LEFT JOIN
-    datalake_ebdb_clean.user_revision_entity AS ure
-      ON ure.id = pfa_aud.rev
-  WHERE
-    pfa_aud.mod_is_enabled = true
-  GROUP BY
-    pfa_aud.id
-),
-preferred_fixed_agent AS (
-  SELECT
-    id,
-    id_user_visit_preferences,
-    id_agent_data,
-    id_region,
-    business_context,
-    is_enabled,
-    ts_created
-  FROM
-    datalake_ebdb_clean.preferred_fixed_agent
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_user_visit_preferences ORDER BY ts_updated DESC) = 1
-),
-fixed_agent AS (
-  SELECT
-    pfa.id_agent_data AS id_fixed_agent,
-    b.id_schedule,
-    pfa.business_context
-  FROM
-    datalake_ebdb_clean.user_visit_preferences AS uvp
-  INNER JOIN
-    preferred_fixed_agent AS pfa
-      ON pfa.id_user_visit_preferences = uvp.id
-  LEFT JOIN
-    fixed_agent_disabled AS fad
-      ON fad.id = pfa.id
-  INNER JOIN
-    schedule_aux AS b
-      ON b.id_visitor = uvp.id_user
-      AND b.business_context = pfa.business_context
-  INNER JOIN
-    datalake_ebdb_clean.house AS h
-      ON h.id = b.id_house
-  INNER JOIN
-    datalake_region.region AS r
-      ON r.id = h.id_region
-  WHERE
-    b.ts_created BETWEEN pfa.ts_created
-    AND IF(pfa.is_enabled = TRUE, NOW(), fad.ts_fixed_agent_disabled)
-    AND r.id_city = pfa.id_region
-),
 secretariat_on_visit_date AS (
   SELECT
     b.id_schedule,
@@ -452,7 +392,6 @@ SELECT DISTINCT
   vcu.id_user AS id_user_cancelation,
   v.id_agent AS id_user_agent,
   ua.id_agent,
-  fa.id_fixed_agent,
   su.id_user_5a AS id_user_sale_attendence_5a,
   sovd.id_user_secretariat_on_visit_date,
   ls.id_user_last_secretariat,
@@ -555,9 +494,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_hub_services.secretariat_hierarchy AS su
     ON su.id_user_5a = s.id_user_creator
-LEFT JOIN
-  fixed_agent AS fa
-    ON s.id_schedule = fa.id_schedule
 LEFT JOIN
   secretariat_on_visit_date AS sovd
     ON s.id_schedule = sovd.id_schedule

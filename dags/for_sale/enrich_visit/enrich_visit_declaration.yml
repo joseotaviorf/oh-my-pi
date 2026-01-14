@@ -10,7 +10,6 @@ workflow:
     inner_dependencies:
       visits:
         - visit_cancellation_unified
-        - preferred_fixed_agent_history
         - post_visit_agent_unified
         - visit_origin_unified
       visit_schedules:

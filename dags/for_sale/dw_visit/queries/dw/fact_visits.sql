@@ -5,7 +5,10 @@ SELECT
   v.id_user_visit_request AS sk_user_visit_request,
   v.id_first_associated_agent AS sk_first_associated_agent,
   v.id_last_associated_agent AS sk_last_associated_agent,
+  pfa.id_agent AS sk_fixed_agent,
+  pfa.id_user_agent AS sk_user_fixed_agent,
   v.id_house AS sk_house,
+  h.id_region AS sk_region,
   v.id_house_listing AS sk_house_listing,
   v.id_company_demand AS sk_company_demand,
   v.id_company_supply AS sk_company_supply,
@@ -98,3 +101,15 @@ LEFT JOIN
 LEFT JOIN
   dw_visit.dim_post_visit_demand AS pvd
     ON v.id_visit = pvd.sk_visit
+LEFT JOIN
+  datalake_ebdb_listing.house AS h
+    ON h.id = v.id_house
+LEFT JOIN
+  datalake_region.region AS r
+    ON h.id_region = r.id
+LEFT JOIN
+  datalake_ebdb_agents.preferred_fixed_agent_history AS pfa
+    ON v.id_visitor = pfa.id_visitor
+    AND r.id_city = pfa.id_region
+    AND v.business_context = pfa.business_context
+    AND v.ts_created BETWEEN pfa.ts_status_started AND COALESCE(pfa.ts_status_ended, NOW())

@@ -1,0 +1,59 @@
+---
+database_name: datalake_ebdb_agents
+table_name: preferred_fixed_agent_history
+description: Historical table of preferred fixed agent relationships showing the timeline of agent-visitor preferences with status changes.
+  Each line represents a period when a specific agent was preferred for a visitor in a given region and business context.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: Unique identifier for each snapshot record, generated using hash of key fields and timestamp.
+  id:
+    description: ID of the preferred fixed agent relationship record.
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent_aud.id
+  id_user_visit_preferences:
+    description: ID of the user visit preferences record.
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent.id_user_visit_preferences
+  id_region:
+    description: ID of the region where the preference applies (id_city from enrich_region or original id_region).
+    lineage:
+      - datalake_region.region.id_city
+      - datalake_ebdb_clean.preferred_fixed_agent.id_region
+  id_visitor:
+    description: ID of the visitor/user who has the preference.
+    lineage:
+      - datalake_ebdb_clean.user_visit_preferences.id_user
+  id_agent:
+    description: ID of the agent data record for the preferred agent.
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
+  id_user_agent:
+    description: User ID of the preferred agent.
+    lineage:
+      - datalake_ebdb_user.user.id
+  business_context:
+    description: Business context where the preference applies.
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent_aud.business_context
+  origin:
+    description: Origin/source of the preference relationship.
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent.origin
+  is_enabled:
+    description: Boolean flag indicating if the preference relationship is currently enabled.
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent_aud.is_enabled
+  ts_relation_created:
+    description: Timestamp when the preference relationship was first created.
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_status_started:
+    description: Timestamp when this specific status period started.
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_status_ended:
+    description: Timestamp when this specific status period ended (null if currently active).
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

@@ -293,10 +293,6 @@ columns:
       - datalake_visit.post_visit_agent_unified.id_visit
       - datalake_ebdb_clean.visit.ts_visit
     description: If the visit is stalled. Data since 2020.
-  is_fixed_agent:
-    lineage:
-      - datalake_visit.preferred_fixed_agent_history.id_pfa_history
-    description: True when the visit was requested with the visitor's preferred fixed agent.
   has_finisher_status:
     lineage:
       - datalake_visit.visits.computed_status_unified

@@ -31,7 +31,6 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.first_tenant_living_answer_channel,
   v.visit_first_confirmed_channel,
   v.visit_first_confirmed_user_role,
-  v.is_fixed_agent AS is_visit_with_fixed_agent,
   v.is_confirmed AS is_visit_confirmed,
   v.is_completed AS is_visit_completed,
   v.is_canceled AS is_visit_canceled,

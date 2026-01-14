@@ -48,10 +48,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.id_agent
     description: Is the id agent of the agent.
-  id_fixed_agent:
-    lineage:
-      - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
-    description: ID of the fixed agent associated with the buyer when the schedule was created.
   id_user_sale_attendence_5a:
     lineage:
       - datalake_hub_services.secretariat_hierarchy.id_user_5a

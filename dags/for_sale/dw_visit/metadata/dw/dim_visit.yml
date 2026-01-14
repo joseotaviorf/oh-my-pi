@@ -153,10 +153,6 @@ columns:
     lineage:
       - datalake_visit.visits.visit_first_confirmed_user_role
     description: Role of user who is related to the first visit confirmation. Data since 2024-11.
-  is_visit_with_fixed_agent:
-    lineage:
-      - datalake_visit.visits.is_fixed_agent
-    description: If this visit has a fixed agent by the visitor. Data since 2020.
   is_visit_confirmed:
     lineage:
       - datalake_visit.visits.is_confirmed

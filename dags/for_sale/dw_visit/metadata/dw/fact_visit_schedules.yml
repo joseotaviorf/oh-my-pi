@@ -73,9 +73,14 @@ columns:
       ID of the user of the trading executive.
   sk_fixed_agent:
     lineage:
-      - datalake_visit.visit_schedules.id_fixed_agent
+      - datalake_ebdb_agents.preferred_fixed_agent_history.id_agent
     description:
       ID of the fixed agent associated with the buyer when the schedule was created.
+  sk_user_fixed_agent:
+    lineage:
+      - datalake_ebdb_agents.preferred_fixed_agent_history.id_user_agent
+    description:
+      User ID of the fixed agent associated with the buyer when the schedule was created.
   sk_ppa_relation:
     lineage:
       - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
