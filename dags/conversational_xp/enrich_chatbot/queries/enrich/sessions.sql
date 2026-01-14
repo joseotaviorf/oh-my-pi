@@ -103,7 +103,6 @@ tickets AS (
   INNER JOIN
     sessions AS s
       ON t.id_session = s.id_sauron_session
-      AND t.front_or_back = 'front'
       AND t.channel = 'chat'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_updated DESC) = 1
