@@ -615,3 +615,34 @@ SELECT
   NOW() AS ts_load
 FROM 
   datalake_sap_accounting_process.retsuko_invoice_unified_reverse
+
+    UNION ALL
+
+SELECT
+  id_accounting_process AS sk_accounting_process,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  'reverse straw' AS type,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  COALESCE(dt_sap_reference, dt_source_trigger) AS dt_filter,
+  NOW() AS ts_load
+FROM 
+  datalake_sap_accounting_process.monopoly_invoices_reverse

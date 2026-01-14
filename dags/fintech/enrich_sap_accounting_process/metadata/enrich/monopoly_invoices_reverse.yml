@@ -1,0 +1,101 @@
+database_name: datalake_sap_accounting_process
+table_name: monopoly_invoices_reverse
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track reverse Monopoly (for sale) invoice transactions, identifying cases where
+  entries exist in SAP Ledger but do not have a corresponding match in the Monopoly source system.
+  These are classified as 'reverse straw failure' transactions, indicating potential data
+  inconsistencies or manual entries in SAP that were not originated from the Monopoly system.
+  The table supports monitoring and root-cause analysis for these reverse transactions.
+columns:
+  id_accounting_process:
+    description: Unique key for each record on this table, formatted as 'RE-MNPL-I-{id_finance_entity}-{account_number}'
+    lineage:
+      - datalake_pas.ledger.id_finance_entity
+      - datalake_pas.ledger.account_number
+  id_business_entity:
+    description: Business key for the feature/sync identifier used in SAP Gateway.
+    lineage:
+      - datalake_sap_gateway_clean.feature.id_feature
+      - datalake_sap_gateway_clean.sync_sap_job.id_feature
+  id_finance_entity:
+    description: Business key for the invoice/sale transaction, used for external integration.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: Business key for the accounting entry in SAP Ledger.
+    lineage:
+      - datalake_pas.ledger.id_finance_entity_entry
+  version:
+    description: Version identifier from source system (if applicable); kept for schema compatibility. Always NULL for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.version
+  business_unit:
+    description: Identifier created in this table to segment the business unit (e.g. for sale).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.business_unit
+  source_name:
+    description: Origin system/source label. Always 'S4' for reverse transactions as they originate from SAP.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.source_name
+  accounting_type:
+    description: Type indicator used to segregate accounts (e.g. invoice, provision, revenue share).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP (e.g. 420007, 420008, 420032).
+    lineage:
+      - datalake_pas.ledger.account_number
+  accounting_name:
+    description: Human readable name for SAP accounts based on business rules (e.g. Brokerage (Casa Mineira), Brokerage (Platform)).
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.accounting_name
+  source_amount:
+    description: Value from the source system (Monopoly). NULL for reverse transactions as there is no corresponding Monopoly entry.
+    lineage:
+      - datalake_monopoly_clean.accounting_entry.credit
+  sap_amount:
+    description: Value recorded in SAP Ledger.
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether there is a corresponding entry/invoice in SAP. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.is_completeness
+  is_correctness:
+    description: TRUE if the difference between source and SAP amount is less than R$0.05. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.is_correctness
+  is_temporality:
+    description: TRUE if the SAP date is within 3 days after the source date. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness, and temporality checks are all TRUE. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.is_compliance
+  accounting_process_status:
+    description: Classification of accounting status. Always 'reverse straw failure' for records in this table.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.accounting_process_status
+  error_description:
+    description: Textual reason for accounting process failure. Can be 'manual transaction' or 'wrong account number or postponed entry'.
+    lineage:
+      - datalake_sap_accounting_process.monopoly_invoice_reverse.error_description
+  accrual_year_month:
+    description: Account reference in the format YYYYMM from SAP Ledger.
+    lineage:
+      - datalake_pas.ledger.accrual_year_month
+  dt_source_trigger:
+    description: Trigger date based on accounting workflow rules in Monopoly. NULL for reverse transactions as there is no Monopoly entry.
+    lineage:
+      - datalake_monopoly_clean.sale_revision.dt_notary_start
+  dt_sap_reference:
+    description: Reference date in SAP associated with accrual.
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of transaction in SAP.
+    lineage:
+      - datalake_pas.ledger.dt_created
