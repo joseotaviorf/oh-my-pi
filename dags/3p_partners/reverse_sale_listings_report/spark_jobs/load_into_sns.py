@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from argparse import ArgumentParser
 from datetime import datetime, date
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import boto3
 from bietlejuice.services import ConfigurationService
 from pyspark.sql.functions import make_date
@@ -14,6 +14,22 @@ BATCH_SIZE = 1000
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def get_temporary_credentials() -> Dict[str, str]:
+    """
+    Get temporary AWS credentials from the driver's instance profile.
+    These credentials can be broadcast to workers in USER_ISOLATION mode.
+    """
+    session = boto3.Session()
+    credentials = session.get_credentials()
+    frozen_credentials = credentials.get_frozen_credentials()
+    
+    return {
+        "aws_access_key_id": frozen_credentials.access_key,
+        "aws_secret_access_key": frozen_credentials.secret_key,
+        "aws_session_token": frozen_credentials.token
+    }
 
 
 def main():
@@ -80,8 +96,23 @@ def load_table_into_sns(
 
     region = sns_topic_arn.split(":")[3]
 
+    # Get temporary credentials from driver's instance profile and broadcast to workers
+    # This is required for USER_ISOLATION mode where workers don't have direct access to instance profile
+    logger.info("m=load_table_into_sns, msg=Obtaining temporary AWS credentials from driver")
+    temp_credentials = get_temporary_credentials()
+    credentials_broadcast = spark.sparkContext.broadcast(temp_credentials)
+    logger.info("m=load_table_into_sns, msg=Credentials broadcast to workers successfully")
+
     def send_partition_to_sns(partition):
-        sns_client = boto3.client("sns", region_name=region)
+        # Get credentials from broadcast variable
+        creds = credentials_broadcast.value
+        sns_client = boto3.client(
+            "sns",
+            region_name=region,
+            aws_access_key_id=creds["aws_access_key_id"],
+            aws_secret_access_key=creds["aws_secret_access_key"],
+            aws_session_token=creds["aws_session_token"]
+        )
         batch = []
 
         for row in partition:
