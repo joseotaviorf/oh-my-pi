@@ -119,7 +119,8 @@ escalation_queue AS (
       AND o.ts_started >= '{load_start_date}'
       AND o.name = 'escalate_tool'
       AND o.type = 'TOOL'
-    
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_created DESC) = 1
 )
 SELECT
   s.id_session,
