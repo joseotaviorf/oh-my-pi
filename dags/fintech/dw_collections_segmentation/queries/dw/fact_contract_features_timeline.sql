@@ -56,6 +56,8 @@ essential_features AS (
         debts_in_income_share_t1,
         debts_in_income_share_t2,
         overdue_recovered_amount_t2,
+        open_wallet_to_due_deals,
+        package_amount,
         dt_contract_start
     FROM dw_collections_segmentation.fact_contract_wallet_timeline
 ),
@@ -316,6 +318,45 @@ prob_payment_calculation AS (
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'NULL PROB ACTIVE [1-30]'
             WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 > 30
+                AND (
+                    avg_days_overdue_invoices_paid_t1 <= 5 
+                  OR avg_days_overdue_invoices_paid_t1 > 40 
+                  OR (n_evictions_processes_lifetime >= 1 AND mob_months <= 6)
+                    ) 
+                  AND open_wallet_to_due_deals = 0 
+                  AND package_amount > 2000 
+                  THEN 'LOW'
+            WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 > 30
+                AND (
+               avg_days_overdue_invoices_paid_t1 <= 5 
+            OR avg_days_overdue_invoices_paid_t1 > 40 
+            OR (n_evictions_processes_lifetime >= 1 AND mob_months <= 6)
+        )
+        AND (open_wallet_to_due_deals = 1 OR (open_wallet_to_due_deals = 1 and package_amount <= 2000)) THEN 'MEDIUM'
+          WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 > 30
+                AND (
+            mob_months <= 12 
+            OR (n_evictions_processes_lifetime >= 1 AND mob_months > 12 AND avg_days_overdue_invoices_paid_t1 > 30)
+        ) then 'MEDIUM'
+        WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 > 30
+                AND (
+            (n_evictions_processes_lifetime >= 1 AND mob_months > 12 AND avg_days_overdue_invoices_paid_t1 <= 30)
+            OR (n_evictions_processes_lifetime = 0 AND mob_months > 12)
+        )
+        AND open_wallet_to_due_deals = 0 
+        AND package_amount > 6000  then 'MEDIUM'
+        WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 > 30
+                AND (
+            (n_evictions_processes_lifetime >= 1 AND mob_months > 12 AND avg_days_overdue_invoices_paid_t1 <= 30)
+            OR (n_evictions_processes_lifetime = 0 AND mob_months > 12)
+        )
+        AND NOT (open_wallet_to_due_deals = 0 AND package_amount > 6000) then 'HIGH'
+            WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 > 30 THEN 'NULL PROB ACTIVE [31+]'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30
@@ -348,13 +389,11 @@ prob_payment_calculation AS (
                 THEN 'LOW'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'LOW'
-
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 30
                 AND f.max_delay_contaminated_contract_t2 <= 90
                 AND f.n_reparos_invoices = f.n_invoices_in_wallet
                 THEN 'LOW'
-    
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 > 90
                 AND f.n_reparos_invoices = f.n_invoices_in_wallet
@@ -381,14 +420,17 @@ prob_payment_calculation AS (
         CASE
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 <= 3 THEN 'TREE 0'
+
             WHEN f.reference_contract_status = 'Ativo'
                 AND f.max_delay_contaminated_contract_t2 > 3
                 AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'TREE 1'
+            WHEN f.reference_contract_status = 'Ativo'
+                AND f.max_delay_contaminated_contract_t2 > 30 THEN 'TREE 2'
             WHEN f.reference_contract_status = 'Finalizado'
-                AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'TREE 2'
+                AND f.max_delay_contaminated_contract_t2 <= 30 THEN 'TREE 3'
             WHEN f.reference_contract_status = 'Finalizado'
                 AND f.max_delay_contaminated_contract_t2 >=31
-                THEN 'TREE 3'
+                THEN 'TREE 4'
             ELSE 'NO_TREE'
         END AS tree_class,
         DATE(DATE_TRUNC('MONTH', dt_reference)) AS dt_month_start
@@ -773,6 +815,8 @@ SELECT
     overdue_recovered_amount_t2,
     avg_days_overdue_invoices_paid_t1,
     monthly_income,
+    package_amount,
+    open_wallet_to_due_deals,
     pct_monthly_paid_ontime_t2_l12m,
     pct_monthly_paid_ontime_t1_l12m,
     pct_invoices_paid_ontime_t2_l12m,

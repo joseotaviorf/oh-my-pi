@@ -295,6 +295,42 @@ columns:
     description: Maximum open delay with contamination at contract level using T1 methodology
   max_open_delay_contaminated_contract_t2:
     description: Maximum open delay with contamination at contract level using T2 methodology
+  rent:
+    description: Rent value of the contract
+    lineage:
+      - dw_rent.dim_contract.rent
+  condo:
+    description: CONDO value of the contract
+    lineage:
+      - dw_rent.dim_contract.condo
+  iptu:
+    description: IPTU value of the contract
+    lineage:
+      - dw_rent.dim_contract.iptu
+  contract_guarantee:
+    description: Type of guarantee associated with the rental contract
+    lineage:
+      - dw_rent.dim_contract.guarantee
+  package_amount:
+    description: Sum of RENT, CONDO and IPTU of contract
+    lineage:
+      - dw_rent.dim_contract.condo
+      - dw_rent.dim_contract.rent
+      - dw_rent.dim_contract.iptu
+  open_wallet_to_due_deals:
+    description: Total amount of open deal debt that is not overdue yet considering T1 contamination methodology, i.e it is to-due
+  open_wallet_to_due_deals_at_reference_month:
+    description: Total amount of open deal debt that has due date equivalent or before the reference month of observation
+  open_wallet_to_due_deals_at_future_month:
+    description: Total amount of open deal debt that has due date greater than reference month of observation
+  
+  sum_overdue_monthlys_t1:
+    description: Sum of overdue monthly invoice amounts using T1 methodology
+  sum_overdue_deals_t1:
+    description: Sum of overdue deal invoice amounts using T1 methodology
+  sum_overdue_others_t1:
+    description: Sum of overdue other invoice amounts using T1 methodology
+
   dt_contract_end:
     description: Contract end date
   dt_contract_start:

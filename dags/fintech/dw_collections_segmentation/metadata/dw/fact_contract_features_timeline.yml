@@ -327,10 +327,18 @@ columns:
       - dw_rent.fact_listing_rent_flows.sk_proposal
       - dw_rent.fact_listing_rent_flows.sk_contract
       - dw_rent.dim_contract.sk_contract
+  package_amount:
+    description: Sum of RENT, CONDO and IPTU of contract
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.package_amount
   wallet_overdue_t2:
     description: Total overdue amount in wallet using T2 contamination methodology
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.wallet_overdue_t2
+  open_wallet_to_due_deals:
+    description: Total amount of open deal debt that is not overdue yet considering T1 contamination methodology, i.e it is to-due
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.open_wallet_to_due_deals
   overdue_recovered_amount_t2:
     description: Total amount recovered from overdue invoices using T2 methodology
     lineage:

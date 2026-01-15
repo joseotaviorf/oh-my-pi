@@ -96,7 +96,17 @@ contract_features AS (
         COUNT(CASE WHEN payment_status IN ('paid', 'written-down') AND invoice_type IN ('monthly') AND invoice_delay_t2 > 0 THEN sk_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t2,
         COUNT(CASE WHEN payment_status IN ('paid', 'written-down') AND invoice_type IN ('monthly') AND invoice_delay_t1 > 0 THEN sk_invoice ELSE NULL END) AS n_monthly_overdue_invoices_paid_t1,
         COUNT(CASE WHEN invoice_type IN ('monthly') AND dt_reference = dt_begin THEN sk_invoice ELSE NULL END) AS n_monthly_invoices_created,
-        COUNT(DISTINCT sk_invoice) AS n_invoices_in_wallet_total
+        COUNT(DISTINCT sk_invoice) AS n_invoices_in_wallet_total,
+
+        SUM(CASE WHEN is_child_negotiation AND invoice_delay_t1 <= 0 and payment_status = 'open' then ABS(due_amount) else 0 end) as open_wallet_to_due_deals,
+        SUM(CASE WHEN is_child_negotiation AND  date_trunc('month', dt_due) = date_trunc('month', dt_reference) and payment_status = 'open' then ABS(due_amount) else 0 end) AS open_wallet_to_due_deals_at_reference_month,
+        SUM(CASE WHEN is_child_negotiation AND  date_trunc('month', dt_due) > date_trunc('month', dt_reference) and payment_status = 'open' then ABS(due_amount) else 0 end) AS open_wallet_to_due_deals_at_future_month,
+
+        SUM(CASE WHEN invoice_type IN ('monthly', 'onboarding') AND invoice_delay_t1 > 0 THEN ABS(due_amount) ELSE 0 END)  AS sum_overdue_monthlys_t1,
+        SUM(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND is_child_negotiation AND invoice_delay_t1 > 0 THEN ABS(due_amount) ELSE 0 END)  AS sum_overdue_deals_t1,
+        SUM(CASE WHEN invoice_type NOT IN ('monthly', 'onboarding') AND NOT is_child_negotiation AND invoice_delay_t1 > 0 THEN ABS(due_amount) ELSE 0 END)  AS sum_overdue_others_t1
+
+
     FROM dw_collections_segmentation.fact_invoice_wallet_timeline
     WHERE dt_reference BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY 1, 2
@@ -308,7 +318,16 @@ contract_timeline AS (
         COALESCE(f.n_monthly_overdue_invoices_paid_t2, 0) AS n_monthly_overdue_invoices_paid_t2,
         COALESCE(f.n_monthly_overdue_invoices_paid_t1, 0) AS n_monthly_overdue_invoices_paid_t1,
         COALESCE(f.n_monthly_invoices_created, 0) AS n_monthly_invoices_created,
-        COALESCE(f.n_invoices_in_wallet_total, 0) AS n_invoices_in_wallet_total
+        COALESCE(f.n_invoices_in_wallet_total, 0) AS n_invoices_in_wallet_total,
+
+        COALESCE(f.open_wallet_to_due_deals, 0) AS open_wallet_to_due_deals,
+        COALESCE(f.open_wallet_to_due_deals_at_reference_month, 0) AS open_wallet_to_due_deals_at_reference_month,
+        COALESCE(f.open_wallet_to_due_deals_at_future_month, 0) AS open_wallet_to_due_deals_at_future_month,
+
+        COALESCE(f.sum_overdue_monthlys_t1, 0) AS sum_overdue_monthlys_t1,
+        COALESCE(f.sum_overdue_deals_t1, 0) AS sum_overdue_deals_t1,
+        COALESCE(f.sum_overdue_others_t1, 0) AS sum_overdue_others_t1
+
     FROM
         contract_date_references m
     LEFT JOIN
@@ -526,25 +545,47 @@ negotiations AS (
     FROM
         base_negotiations
 ),
+contract_static_info AS (
+    SELECT 
+        dpdc.sk_contract,
+        COALESCE(dpdc.rent, 0) AS rent,
+        COALESCE(dpdc.condo, 0) AS condo,
+        COALESCE(dpdc.iptu, 0) AS iptu,
+        COALESCE(dpdc.rent, 0) + COALESCE(dpdc.condo, 0) + COALESCE(dpdc.iptu, 0) AS package_amount,
+        CASE
+            WHEN upper(dpdc.guarantee) = 'SEGUROFAIRFAX' THEN 'FAIRFAX'
+            WHEN upper(dpdc.guarantee) = 'PRO_GUARANTOR' THEN 'PRO_GUARANTOR'
+            WHEN upper(dpdc.guarantee) = 'RENTALGUARANTEE' THEN 'RENTAL_GUARANTEE'
+            WHEN upper(dpdc.guarantee) = 'RENTALDEPOSIT' OR dpdc.guarantee = 'DEPOSITO' THEN 'RENTAL_DEPOSIT'
+            WHEN upper(dpdc.guarantee) IN ('STANDALONE', 'THIRDPARTYGUARANTEE') THEN 'BROKERAGE_ONLY'
+        ELSE 'OTHERS' END AS contract_guarantee
+    FROM
+        dw_rent.dim_contract AS dpdc
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY dpdc.sk_contract ORDER BY dpdc.ts_updated DESC) = 1
+),
 contract_info AS (
     SELECT
-      c.sk_contract,
-      ROUND(SUM(p.monthly_income), 2) AS monthly_income
-    FROM dw_rent.dim_contract c
+        c.sk_contract,
+        ROUND(SUM(p.monthly_income), 2) AS monthly_income
+    FROM 
+        dw_rent.dim_contract c
     LEFT JOIN dw_rent.fact_listing_rent_flows f
-      ON c.sk_contract = f.sk_contract
-      AND f.sk_contract <> -1
+        ON c.sk_contract = f.sk_contract
+        AND f.sk_contract <> -1
     LEFT JOIN datalake_sorting_hat_clean.proponent p
-      ON p.id_proposal = f.sk_proposal
-    GROUP BY
-      c.sk_contract, f.sk_proposal, f.sk_proposal_approved_date,
-      c.ts_canceled, c.guarantee
+        ON p.id_proposal = f.sk_proposal
+    GROUP BY c.sk_contract, f.sk_proposal, f.sk_proposal_approved_date, c.ts_canceled, c.guarantee
     QUALIFY ROW_NUMBER() OVER(PARTITION BY c.sk_contract ORDER BY f.sk_proposal DESC) = 1
 ),
 contract_enhanced AS (
     SELECT /*+ RANGE_JOIN(e, 1), RANGE_JOIN(be, 1), RANGE_JOIN(app, 1), RANGE_JOIN(bl, 1), RANGE_JOIN(d, 1) */
         m.*,
         c.monthly_income,
+        csi.condo,
+        csi.rent,
+        csi.iptu,
+        csi.package_amount,
+        coalesce(csi.contract_guarantee, 'OTHERS') as contract_guarantee,
         COALESCE(m.wallet_overdue_t1/c.monthly_income, 0) AS debts_in_income_share_t1,
         COALESCE(m.wallet_overdue_t2/c.monthly_income, 0) AS debts_in_income_share_t2,
         COALESCE(e.is_evictions, FALSE) AS is_evictions,
@@ -585,6 +626,9 @@ contract_enhanced AS (
     LEFT JOIN
         contract_info AS c
             ON c.sk_contract = m.sk_contract
+    LEFT JOIN
+        contract_static_info AS csi
+            ON csi.sk_contract = m.sk_contract
 )
 SELECT
     MD5(CONCAT(sk_contract, DATE_FORMAT(dt_reference, 'yyyyMMdd'))) AS sk_contract_wallet_timeline,
@@ -694,7 +738,7 @@ SELECT
     CAST(n_anchor_invoices_not_negativable AS BIGINT) AS n_anchor_invoices_not_negativable,
     CAST(n_invoices_negativable AS BIGINT) AS n_invoices_negativable,
     CAST(n_first_invoices_open AS BIGINT) AS n_first_invoices_open,
-    IF(n_first_invoices_open > 0, TRUE, FALSE) AS has_fpd_in_wallet,
+    IF(n_first_invoices_open > 0 AND contract_guarantee <> 'BROKERAGE_ONLY', TRUE, FALSE) AS has_fpd_in_wallet,
     array_open_invoices,
     array_paid_invoices,
     array_negotiated_invoices,
@@ -711,6 +755,11 @@ SELECT
     CAST(n_monthly_invoices_created AS BIGINT) AS n_monthly_invoices_created,
     CAST(n_invoices_in_wallet_total AS BIGINT) AS n_invoices_in_wallet,
     monthly_income,
+    rent,
+    condo,
+    iptu,
+    package_amount,
+    contract_guarantee,
     open_wallet_overdue_t1,
     open_wallet_overdue_t2,
     open_wallet_overdue_t3,
@@ -734,6 +783,13 @@ SELECT
     open_wallet_on_time_t3,
     overdue_recovered_amount_t3,
     on_time_paid_amount_t3,
+    open_wallet_to_due_deals,
+    open_wallet_to_due_deals_at_reference_month,
+    open_wallet_to_due_deals_at_future_month,
+
+    sum_overdue_monthlys_t1,
+    sum_overdue_deals_t1,
+    sum_overdue_others_t1,
     CAST(max_open_delay_contaminated_contract_t1 AS BIGINT) AS max_open_delay_contaminated_contract_t1,
     CAST(max_open_delay_contaminated_contract_t2 AS BIGINT) AS max_open_delay_contaminated_contract_t2,
     dt_contract_end,
