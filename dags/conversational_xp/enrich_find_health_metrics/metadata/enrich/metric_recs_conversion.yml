@@ -18,7 +18,19 @@ columns:
     lineage:
     - datalake_rent_flows.rent_flows.id_house
     - datalake_sale_flows.sale_flow.id_house
+    - datalake_rent_flows.rent_flows.id_tenant_prospect
+    - datalake_sale_flows.sale_flow.id_buyer
     description: A concatenation of the id of the user and the id of the house.
+  id_unique:
+    lineage:
+    - datalake_rent_flows.rent_flows.id_house
+    - datalake_sale_flows.sale_flow.id_house
+    - datalake_rent_flows.rent_flows.id_tenant_prospect
+    - datalake_sale_flows.sale_flow.id_buyer
+    - datalake_rent_flows.rent_flows.ts_booking_created
+    - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
+    description: A unique identifier for the user and the house.
   business_context:
     lineage:
     - datalake_rent_flows.rent_flows.business_context

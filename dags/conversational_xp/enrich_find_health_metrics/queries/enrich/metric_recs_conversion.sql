@@ -87,7 +87,14 @@ recs_impressions_actions AS (
 SELECT
   rent_sale_flow.id_user,
   rent_sale_flow.id_house,
-  CONCAT(rent_sale_flow.id_user, rent_sale_flow.id_house) AS id_user_house,
+  CONCAT(
+    rent_sale_flow.id_user, 
+    rent_sale_flow.id_house
+  ) AS id_user_house,
+  MD5(CONCAT(
+    rent_sale_flow.id_user, 
+    rent_sale_flow.id_house, 
+    rent_sale_flow.ts_first_flow_action)) AS id_unique,
   rent_sale_flow.business_context,
   IF(NOT rent_sale_flow.ts_direct_offer IS NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
   COALESCE(recs_impressions_actions.is_rec_click, FALSE) AS is_rec_click,

@@ -19,6 +19,7 @@ workflow:
     metric_recs_listing_page_viewed:
       partitions: [year, month, day]
     metric_recs_conversion: 
+      merge_on: [id_unique]
       partitions: [year, month, day]
     metric_recs_click_through_rate:
       partitions: [year, month, day]
