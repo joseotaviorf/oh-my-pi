@@ -93,6 +93,7 @@ base_date AS (
                             OR (CASE
                                     WHEN LOWER(br_holiday_name) LIKE "%carnival end (until 2pm)%" THEN 'No holiday'
                                     WHEN LOWER(br_holiday_name) LIKE "%christmas eve (from 2pm)" THEN 'No holiday'
+                                    WHEN LOWER(br_holiday_name) LIKE "new year's eve (from 2pm)" THEN 'No holiday'
                                     WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
                                     ELSE 'No holiday'
                                 END) = 'Holiday') THEN 0
@@ -107,6 +108,7 @@ base_date AS (
         CASE
             WHEN LOWER(br_holiday_name) LIKE "%carnival end (until 2pm)%" THEN 'No holiday'
             WHEN LOWER(br_holiday_name) LIKE "%christmas eve (from 2pm)" THEN 'No holiday'
+            WHEN LOWER(br_holiday_name) LIKE "new year's eve (from 2pm)" THEN 'No holiday'
             WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
             ELSE 'No holiday'
         END AS is_brz_fintech_holiday,
