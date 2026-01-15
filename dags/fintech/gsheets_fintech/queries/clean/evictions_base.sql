@@ -1,5 +1,6 @@
 SELECT
     ID_Processo AS id_process,
+    id_anonimizado AS id_anonymized,
     Contrato AS contract,
     Processo AS process,
     Tipo_entrada AS input_type,

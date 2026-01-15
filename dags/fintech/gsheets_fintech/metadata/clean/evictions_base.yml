@@ -9,6 +9,10 @@ columns:
     description: "Identificador único do processo de despejo"
     lineage:
       - datalake_gsheets_raw.evictions_base.ID_Processo
+  id_anonymized:
+    description: "Identificador de anonimização do Id_processo"
+    lineage:
+      - datalake_gsheets_raw.evictions_base.id_anonimizado
   contract:
     description: "Número do contrato relacionado ao processo de despejo"
     lineage:
