@@ -1116,7 +1116,9 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-invoices-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-invoices:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-provision:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-provision-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-revenue-share:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-monopoly-revenue-share-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice:first-run-of-day
