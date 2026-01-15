@@ -1,0 +1,70 @@
+database_name: datalake_datazord_clean
+table_name: business_object
+domain: Growth
+description: Business object table from datazord containing business entity information, relationships, and context data
+owner: eduardo.soares@quintoandar.com.br
+columns:
+  sk_business_object:
+    description: Primary key identifier for the business object
+    lineage:
+      - datalake_datazord_raw.business_object.surrogate_key
+  id_user:
+    description: User identifier associated with the business object
+    lineage:
+      - datalake_datazord_raw.business_object.id_user
+  uuid_person:
+    description: Person UUID identifier
+    lineage:
+      - datalake_datazord_raw.business_object.uuid_person
+  id_house:
+    description: House identifier associated with the business object
+    lineage:
+      - datalake_datazord_raw.business_object.id_house
+  id_contract:
+    description: Contract identifier associated with the business object
+    lineage:
+      - datalake_datazord_raw.business_object.id_contract
+  id_object:
+    description: Object identifier
+    lineage:
+      - datalake_datazord_raw.business_object.id_object
+  business_type:
+    description: Type of business object
+    lineage:
+      - datalake_datazord_raw.business_object.business_type
+  persona:
+    description: Persona classification for the business object
+    lineage:
+      - datalake_datazord_raw.business_object.persona
+  is_active:
+    description: Boolean flag indicating if the business object is active
+    lineage:
+      - datalake_datazord_raw.business_object.is_active
+  house_address:
+    description: Address of the house associated with the business object
+    lineage:
+      - datalake_datazord_raw.business_object.house_address
+  properties:
+    description: Additional properties stored as JSONB
+    lineage:
+      - datalake_datazord_raw.business_object.properties
+  business_context:
+    description: Context information for the business object
+    lineage:
+      - datalake_datazord_raw.business_object.business_context
+  journey_step:
+    description: Current step in the journey for the business object
+    lineage:
+      - datalake_datazord_raw.business_object.journey_step
+  ts_inactive:
+    description: Timestamp when the business object was marked as inactive
+    lineage:
+      - datalake_datazord_raw.business_object.inactive_at
+  ts_created:
+    description: Timestamp when the business object was created
+    lineage:
+      - datalake_datazord_raw.business_object.ts_created
+  ts_updated:
+    description: Timestamp when the business object was last updated
+    lineage:
+      - datalake_datazord_raw.business_object.ts_updated

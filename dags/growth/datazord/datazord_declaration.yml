@@ -1,0 +1,30 @@
+dag:
+  name: datazord
+  schedule_start_date: 2026, 1, 12
+  schedule_interval: 0 12 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG loads tables from Datazord, the service that manages business objects and entity relationships.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: datazord
+  source_schema: public
+  custom_schema: datazord
+  dbutils_secret_key: DATAZORD_CDC_DB
+  lineage_product_database_name: datazord
+  tables_customization:
+    business_object:
+      clean_table_name: business_object
+      clean_primary_keys: [sk_business_object]
+      raw_primary_keys: [surrogate_key]
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
