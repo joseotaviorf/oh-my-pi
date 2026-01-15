@@ -39,19 +39,15 @@ SELECT DISTINCT
   INITCAP(
     TRIM(
       REGEXP_REPLACE(
-        REGEXP_REPLACE(
-          REGEXP_REPLACE(p.mother_name, '[^a-zA-ZÀ-ÿ ]', ''), 
-        ' +', ' ')
-      )
+        REGEXP_REPLACE(p.mother_name, '[^a-zA-ZÀ-ÿ ]', ''), 
+      ' +', ' ')
     )
   ) AS mother_name,
   INITCAP(
     TRIM(
       REGEXP_REPLACE(
-        REGEXP_REPLACE(
-          REGEXP_REPLACE(p.father_name, '[^a-zA-ZÀ-ÿ ]', ''), 
-        ' +', ' ')
-      )
+        REGEXP_REPLACE(p.father_name, '[^a-zA-ZÀ-ÿ ]', ''), 
+      ' +', ' ')
     )
   ) AS father_name,
   p.town_of_birth AS birth_town,
