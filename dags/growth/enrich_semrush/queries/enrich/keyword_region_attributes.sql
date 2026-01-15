@@ -7,6 +7,54 @@ WITH cities AS (
     municipio_clean IS NOT NULL AND municipio_clean != ' '
 ),
 
+keywords AS (
+  SELECT
+    player,
+    keyword,
+    keyword_clean,
+    url,
+    trends,
+    position,
+    previous_position,
+    position_difference,
+    keyword_intents,
+    position_type,
+    serp_features_by_position,
+    serp_features_by_keyword,
+    search_volume,
+    cpc,
+    traffic,
+    share_of_traffic,
+    traffic_cost_percentage,
+    competition,
+    number_of_results,
+    keyword_difficulty,
+    city_abbreviation,
+    is_goldenset,
+    dt_display,
+    dt_display AS dt_report,
+    ts_report,
+    year,
+    month,
+    day
+  FROM
+    datalake_semrush.keywords_from_players AS kfp
+  WHERE
+    kfp.year = YEAR(DATE('{load_start_date}'))
+    AND kfp.month = MONTH(DATE('{load_start_date}'))
+),
+
+keywords_grouped AS (
+  SELECT
+    player,
+    keyword,
+    keyword_clean,
+    url
+  FROM
+    keywords AS kfp
+  GROUP BY player, keyword, keyword_clean, url
+),
+
 -- Enrichment of keywords from a IGBE database contains all Brazilian cities.
 general_city_level_enrichment AS (
   SELECT
@@ -35,46 +83,18 @@ general_city_level_enrichment AS (
       WHEN CONTAINS(keyword_clean, ' sao bernardo do campo') THEN COALESCE(c.city_name, 'sao bernardo do campo')
       ELSE COALESCE(c.city_name, '')
     END AS match_igbe_city,
-    url,
-    trends,
-    position,
-    previous_position,
-    position_difference,
-    keyword_intents,
-    position_type,
-    serp_features_by_position,
-    serp_features_by_keyword,
-    search_volume,
-    cpc,
-    traffic,
-    share_of_traffic,
-    traffic_cost_percentage,
-    competition,
-    number_of_results,
-    keyword_difficulty,
-    city_abbreviation,
-    is_goldenset,
-    dt_display,
-    dt_display AS dt_report,
-    ts_report,
-    year,
-    month,
-    day
+    url
   FROM
-    datalake_semrush.keywords_from_players AS kfp
+    keywords_grouped AS kg
   LEFT JOIN 
     cities AS c 
-      ON CHARINDEX(LOWER(c.city_name), LOWER(kfp.keyword_clean)) > 0
-  WHERE
-    kfp.year = YEAR(DATE('{load_start_date}'))
-    AND kfp.month = MONTH(DATE('{load_start_date}'))
+      ON CHARINDEX(LOWER(c.city_name), LOWER(kg.keyword_clean)) > 0
   QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY 
         player,
         keyword,
-        url, 
-        dt_display
+        url
       ORDER BY 
         LENGTH(match_igbe_city) DESC, 
         CHARINDEX(match_igbe_city, keyword) DESC
@@ -135,24 +155,6 @@ operation_city_level_enrichment AS (
       ELSE COALESCE(r.name, '')
     END AS match_operation_city,
     url,
-    trends,
-    position,
-    previous_position,
-    position_difference,
-    keyword_intents,
-    position_type,
-    serp_features_by_position,
-    serp_features_by_keyword,
-    search_volume,
-    cpc,
-    traffic,
-    share_of_traffic,
-    traffic_cost_percentage,
-    competition,
-    number_of_results,
-    keyword_difficulty,
-    city_abbreviation,
-    is_goldenset,
     CASE
       WHEN match_igbe_city != '' THEN 1
       ELSE 0
@@ -160,14 +162,7 @@ operation_city_level_enrichment AS (
     CASE
       WHEN match_igbe_city != '' THEN 1
       ELSE 0
-    END AS has_mention_to_city,
-
-    dt_display,
-    dt_display AS dt_report,
-    ts_report,
-    year,
-    month,
-    day
+    END AS has_mention_to_city
   FROM
     general_city_level_enrichment AS gcle
   LEFT JOIN 
@@ -178,8 +173,7 @@ operation_city_level_enrichment AS (
       PARTITION BY 
         player,
         keyword,
-        url, 
-        dt_display
+        url
       ORDER BY 
         LENGTH(match_operation_city) DESC, 
         CHARINDEX(match_operation_city, keyword) DESC
@@ -225,24 +219,6 @@ operation_neighborhood_level_enrichment AS (
       ELSE ''
     END AS match_operation_neighborhood,
     url,
-    trends,
-    position,
-    previous_position,
-    position_difference,
-    keyword_intents,
-    position_type,
-    serp_features_by_position,
-    serp_features_by_keyword,
-    search_volume,
-    cpc,
-    traffic,
-    share_of_traffic,
-    traffic_cost_percentage,
-    competition,
-    number_of_results,
-    keyword_difficulty,
-    city_abbreviation,
-    is_goldenset, 
     COALESCE(
       gcle.has_mention_to_location,
       CASE
@@ -254,13 +230,7 @@ operation_neighborhood_level_enrichment AS (
       CASE
         WHEN match_operation_city != '' THEN 1
         ELSE 0
-      END) AS has_mention_to_city,
-    dt_display,
-    dt_display AS dt_report,
-    ts_report,
-    year,
-    month,
-    day
+      END) AS has_mention_to_city
   FROM
     operation_city_level_enrichment AS gcle
   LEFT JOIN 
@@ -271,8 +241,7 @@ operation_neighborhood_level_enrichment AS (
       PARTITION BY 
         player,
         keyword,
-        url, 
-        dt_display
+        url
       ORDER BY 
         LENGTH(match_operation_neighborhood) DESC, 
         CHARINDEX(match_operation_neighborhood, keyword) DESC
@@ -282,13 +251,13 @@ operation_neighborhood_level_enrichment AS (
 SELECT
   id_region_match_operation_city,
   id_region_match_operation_neighborhood,
-  player,
-  keyword,
-  keyword_clean,
+  k.player,
+  k.keyword,
+  k.keyword_clean,
   match_igbe_city,
   match_operation_city,
   match_operation_neighborhood,
-  url,
+  k.url,
   trends,
   position,
   previous_position,
@@ -325,4 +294,10 @@ SELECT
   month,
   day
 FROM
-  operation_neighborhood_level_enrichment
+  keywords AS k
+LEFT JOIN 
+  operation_neighborhood_level_enrichment AS onle
+    ON
+      k.keyword = onle.keyword
+      AND k.player = onle.player
+      AND k.url = onle.url
