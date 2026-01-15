@@ -209,5 +209,17 @@ LEFT JOIN
     datalake_inspections.appointment_inspection AS ad
       ON ad.id_inspection = i.id_inspection
       OR ad.id_main_appointment = i.id_booking
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC, ad.ts_appointment_updated_utc DESC) = 1
+QUALIFY 
+    ROW_NUMBER() OVER (
+    PARTITION BY i.id_inspection 
+    ORDER BY 
+        i.ts_updated DESC, 
+        CASE ad.status
+            WHEN 'DONE' THEN 0
+            WHEN 'SCHEDULED' THEN 1
+            WHEN 'WAITING_CONFIRMATION' THEN 2
+            WHEN 'CANCELLED' THEN 3
+            ELSE 4
+        END ASC,
+        ad.ts_appointment_updated_utc DESC
+    ) = 1
