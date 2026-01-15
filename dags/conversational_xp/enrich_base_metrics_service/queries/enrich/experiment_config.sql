@@ -177,7 +177,7 @@ FROM VALUES
         "ab_beakman_native_home_feed_recommendations_experiment",
         named_struct(
             'begin_date', DATE('2025-11-18'),
-            'end_date', NULL,
+            'end_date', DATE('2026-01-11'),
             'variants', to_json(
                 named_struct(
                     'baseline', 'baseline',
@@ -191,7 +191,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
