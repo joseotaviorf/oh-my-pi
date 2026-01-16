@@ -8,6 +8,7 @@ dag:
 workflow:
   type: query_delta
   layer: clean
+  load_spark_job: dummy_job
   custom_schema: amplitude
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
@@ -884,3 +885,5 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment}}
+    aws_attributes:
+      ebs_volume_size: 500
