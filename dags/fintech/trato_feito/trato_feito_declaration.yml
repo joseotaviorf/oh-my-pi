@@ -70,7 +70,6 @@ workflow:
     events_batch: {}
     status_sync: {}
     rollout_cyber_contract: {}
-    blocklist: {}
     comms: {}
     communication_sequence: {}
     communication_step: {}
