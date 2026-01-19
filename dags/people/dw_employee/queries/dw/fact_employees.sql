@@ -1,9 +1,8 @@
 WITH
-terminated_for_assignment_change AS (
+terminated_for_transfer AS (
   SELECT
     aa_next.id_period_of_service AS id_period_of_service_next,
     ps_prev.dt_started AS previous_dt_started,
-    art.action_reason IN ('Efetivação Aprendiz', 'Efetivação Estágio') AS is_converted_to_permanent_hire,
     art.action_reason IN ('Recrutamento Interno', 'Movimentação Internacional') AS is_transfered
   FROM
     datalake_pin_core_clean.all_assignments AS aa
@@ -25,9 +24,7 @@ terminated_for_assignment_change AS (
     aa.assignment_status_type = 'INACTIVE'
     AND art.action_reason IN (
       'Recrutamento Interno',
-      'Efetivação Aprendiz',
-      'Movimentação Internacional',
-      'Efetivação Estágio'
+      'Movimentação Internacional'
     )
   QUALIFY
     ROW_NUMBER() OVER(
@@ -76,14 +73,13 @@ SELECT
     fa.salary,
     fa.last_salary_increase,
     fa.pct_last_salary_increase,
-    COALESCE(tfac.is_converted_to_permanent_hire, FALSE) AS is_converted_to_permanent_hire,
     COALESCE(tfac.is_transfered, FALSE) AS is_transfered,
     fa.has_active_manager,
     NOW() AS ts_load
 FROM
     dw_employee.fact_assignments AS fa
 LEFT JOIN
-    terminated_for_assignment_change AS tfac
+    terminated_for_transfer AS tfac
         ON tfac.id_period_of_service_next = fa.sk_assignment
 WHERE 
     NOT fa.is_pending_worker

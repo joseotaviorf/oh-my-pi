@@ -44,7 +44,7 @@ columns:
   sk_work_relationship_started_date:
     description: |-
       Start date of the work relationship, formatted as a surrogate key (YYYYMMDD).
-      For assignments that follow a previous assignment terminated due to promotion or transfer,
+      For assignments that follow a previous assignment terminated due to transfer,
       this field uses the start date of the previous assignment to maintain continuity of the work relationship.
     lineage:
     - dw_employee.fact_assignments.sk_work_relationship_started_date
@@ -85,7 +85,7 @@ columns:
     description: |-
       Tenure in months, calculated from the actual work relationship start date (sk_work_relationship_started_date)
       to the end date (or current date if active). This uses the actual admission date, which may be adjusted
-      for transfers and conversions from apprentice/intern to permanent hire.
+      for transfers.
     lineage:
     - dw_employee.fact_assignments.sk_work_relationship_started_date
     - dw_employee.fact_assignments.sk_work_relationship_ended_date
@@ -110,13 +110,6 @@ columns:
     description: Percentage of the last salary adjustment.
     lineage:
     - dw_employee.fact_assignments.pct_last_salary_increase
-  is_converted_to_permanent_hire:
-    description: |-
-      Flag (TRUE/FALSE) indicating if the current assignment follows a previous assignment
-      that was terminated due to promotion from apprentice or intern ('Efetivação Aprendiz' or 'Efetivação Estágio').
-      When TRUE, the sk_work_relationship_started_date uses the start date from the previous assignment.
-    lineage:
-    - datalake_pin_core_clean.action_reason_translation.action_reason
   is_transfered:
     description: |-
       Flag (TRUE/FALSE) indicating if the current assignment follows a previous assignment
