@@ -3619,6 +3619,7 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.enrich_survicate:load-enrich-photo-surveys:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-repairs-surveys:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys:first-run-of-day
+  - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys:first-run-of-day
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat:first-run-of-day
   - bietlejuice.gsheets_fintech:done-clean-owner-exit-inspection-csat:first-run-of-day

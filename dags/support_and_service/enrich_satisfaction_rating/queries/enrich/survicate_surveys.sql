@@ -1,5 +1,6 @@
-WITH survicate_surveys AS (
-    SELECT
+WITH survicate_surveys_base AS 
+  (
+     SELECT
         iss.id_answer,
         iss.id_survey,
         iss.id_contract,
@@ -35,7 +36,7 @@ WITH survicate_surveys AS (
         NULL AS id_contract,
         rss.id_ticket,
         NULL AS id_origin,
-        NULL AS id_respondent,
+        rss.id_respondent,
         rss.respondent_email,
         rss.respondent_type,
         rss.survey_name,
@@ -177,9 +178,48 @@ WITH survicate_surveys AS (
         datalake_survicate.photo_surveys AS pss
     WHERE
         MAKE_DATE(pss.year, pss.month, pss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+zendesk_email_cte AS (
+   SELECT
+        zes.response_uuid AS id_answer,
+        zes.id_survey,
+        NULL AS id_contract,
+        zes.id_ticket,
+        NULL AS id_origin,
+        zes.id_visitor AS id_respondent,
+        NULL AS respondent_email,
+        NULL AS respondent_type,
+        zes.survey_name,
+        NULL AS service_type,
+        NULL AS service_context,
+        NULL AS source_name,
+        NULL AS improvement_tags,
+        zes.user_comment AS respondent_comments,
+        zes.csat_score AS satisfaction_score,
+        NULL AS score_description,
+        NULL AS secondary_satisfaction_score,
+        NULL AS secondary_score_description,
+        zes.ts_first_response AS ts_submitted,
+        zes.year,
+        zes.month,
+        zes.day
+    FROM 
+        datalake_survicate.zendesk_email_surveys AS zes
+    WHERE 
+        MAKE_DATE(zes.year, zes.month, zes.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND zes.response_uuid NOT IN (
+            SELECT id_answer FROM survicate_surveys_base
+        )
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY zes.response_uuid ORDER BY zes.ts_first_response DESC) = 1
+),
+survicate_surveys AS (
+    SELECT * FROM survicate_surveys_base
+    UNION ALL
+    SELECT * FROM zendesk_email_cte
 )
 SELECT
-    MD5(CONCAT(ss.id_answer, year, month, day)) AS id_answer,
+    MD5(CONCAT(ss.id_answer, ss.year, ss.month, ss.day)) AS id_answer,
     ss.id_survey,
     ss.id_contract,
     ss.id_ticket,
