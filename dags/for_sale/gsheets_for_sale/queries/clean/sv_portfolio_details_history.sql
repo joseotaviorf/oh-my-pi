@@ -1,0 +1,9 @@
+SELECT    
+    city_group,
+    portfolio_group,
+    portfolio,
+    email_secretary,
+    email_supervisor,
+    dt_reference
+FROM
+    datalake_gsheets_raw.sv_portfolio_details_history

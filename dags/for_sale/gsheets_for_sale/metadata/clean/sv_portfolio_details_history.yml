@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sv_portfolio_details_history
+owner: esthella.silva@quintoandar.com
+domain: For Sale
+description: 'Sheets with sv_portfolio_history.'
+columns:
+  city_group:
+    description: 'Identifier for the metropolitan area or high-level regional cluster (e.g., "RMSP" for Região Metropolitana de São Paulo).'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_details_history.city_group
+  portfolio_group:
+    description: 'Descriptive name of the macro operational cluster, usually representing a broad district or zone (e.g., "Santana" or "Bela Vista").'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_details_history.portfolio_group
+  portfolio:
+    description: 'Descriptive name of the detailed operational cluster combining the neighborhood/region with a specific team identifier (e.g., "Vila Mariana 6").'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_details_history.portfolio
+  email_secretary:
+    description: 'Email of the secretary responsible for the portfolio.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_history.email_secretary
+  email_supervisor:
+    description: 'Links to the user dimension table.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_details_history.email_supervisor
+  dt_reference:
+    description: 'Reference date for the monthly snapshot. Used for partitioning and historical tracking (Format: YYYY-MM-DD).'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_details_history.dt_reference

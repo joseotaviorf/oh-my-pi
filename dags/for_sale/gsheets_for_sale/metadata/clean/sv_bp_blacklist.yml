@@ -1,0 +1,23 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sv_bp_blacklist
+owner: esthella.silva@quintoandar.com
+domain: For Sale
+description: 'Sheets with sv_bp_blacklist'
+columns:
+  id_visitor:
+    description: 'Unique identifier of the visitor (potential buyer). Primary key for visitor identification across all QuintoAndar systems.'
+    lineage:
+    - datalake_gsheets_raw.sv_bp_blacklist.id_visitor
+  id_check_duplicate:
+    description: 'Count indicating how many times the visitor has been flagged to avoid duplication.'
+    lineage:
+    - datalake_gsheets_raw.sv_bp_blacklist.id_check_duplicate
+  reason:
+    description: 'Descriptive term that specifies the reason for blacklisting (e.g., policy violation, suspicious activity, fraud).'
+    lineage:
+    - datalake_gsheets_raw.sv_bp_blacklist.reason
+  dt_blacklist:
+    description: 'The date when the visitor was flagged and added to the blacklist (Format: YYYY-MM-DD).'
+    lineage:
+    - datalake_gsheets_raw.sv_bp_blacklist.blacklist_date

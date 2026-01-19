@@ -1,0 +1,40 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sv_portfolio_targets
+owner: esthella.silva@quintoandar.com
+domain: For Sale
+description: 'Sheets with sv_portfolio_targets'
+columns:
+  city_group:
+    description: 'Identifier for the metropolitan area or high-level regional cluster.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_targets.city_group
+  portfolio_group:
+    description: 'Descriptive name of the macro operational cluster.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_targets.portfolio_group
+  portfolio:
+    description: 'Descriptive name of the detailed operational cluster.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_targets.portfolio
+  indicator:
+    description: 'The specific name or code of the metric being measured (e.g., "nbp_fss", "vc_fss", "1a_vc"). It defines the type of data stored in the record.'
+    categories:
+      nbp_fss: 'Target for New Business Partners (potential buyers) interacting with the platform for the first time via Full Self Service (FSS). These records do not carry over between months.'
+      vc_fss: 'Target for completed visits performed by NBP FSS users.'
+      1a_vc: 'Target for the first visit completed by a potential buyer within the last 90 days, provided they have visited fewer than 3 properties in total.'
+      3a_vc: 'Target for potential buyers who have completed their third property visit within the last 90 days.'
+      2a_exit_deferred: 'Expected volume of potential buyers (BPs) returning for a 2nd Exit. Eligible BPs must have completed their 1st VC more than 90 days ago and visited up to 3 properties during their 1st Exit.'
+      share_2a_exit: 'Target percentage (share) of BPs returning to complete their 2nd "Exit" following the completion of the 1st Exit.'
+      1a_vc_deferred: 'Expected volume of first visits (1st VC) within the 1st Exit phase for specific cohorts. Refers to potential buyers whose initial engagement occurred over 90 days ago but who have visited 3 or fewer properties.'
+      3a_vc_deferred: 'Expected volume of third visits (3rd VC) specifically for returning BPs during their 2nd Exit phase, tracking the progression of high-intent potential buyers.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_targets.indicator
+  target_value:
+    description: 'The numerical measurement, count, or percentage associated with the specific indicator for a given period and portfolio.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_targets.value
+  dt_reference:
+    description: 'Reference date for the target period, typically the first day of the month (Format: YYYY-MM-DD).'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_targets.date

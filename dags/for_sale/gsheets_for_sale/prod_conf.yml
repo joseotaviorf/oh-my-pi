@@ -313,3 +313,38 @@ sheets_info:
     clean_table_name: instant_payout_history
     sheet_context: for_sale
     preload_time_in_seconds: 30
+  
+  sv_portfolio_history:
+    sheet_id: 1SOMkrhKIv32s9dOvtCiYwYHImD76BhszYza2qOdJdkc
+    sheet_name: sv_portfolio_history
+    clean_table_name: sv_portfolio_history
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
+
+  sv_portfolio_details_history:
+    sheet_id: 1SOMkrhKIv32s9dOvtCiYwYHImD76BhszYza2qOdJdkc
+    sheet_name: sv_portfolio_details_history
+    clean_table_name: sv_portfolio_details_history
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
+  
+  sv_portfolio_targets:
+    sheet_id: 1SOMkrhKIv32s9dOvtCiYwYHImD76BhszYza2qOdJdkc
+    sheet_name: sv_portfolio_targets
+    clean_table_name: sv_portfolio_targets
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
+  
+  sv_portfolio_agents_gp:
+    sheet_id: 1SOMkrhKIv32s9dOvtCiYwYHImD76BhszYza2qOdJdkc
+    sheet_name: sv_portfolio_agents_gp
+    clean_table_name: sv_portfolio_agents_gp
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
+
+  sv_bp_blacklist:
+    sheet_id: 1SOMkrhKIv32s9dOvtCiYwYHImD76BhszYza2qOdJdkc
+    sheet_name: sv_bp_blacklist
+    clean_table_name: sv_bp_blacklist
+    sheet_context: for_sale
+    preload_time_in_seconds: 30

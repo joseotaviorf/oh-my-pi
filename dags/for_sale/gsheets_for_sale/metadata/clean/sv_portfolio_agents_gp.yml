@@ -1,0 +1,27 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sv_portfolio_agents_gp
+owner: esthella.silva@quintoandar.com
+domain: For Sale
+description: 'Sheets with sv_portfolio_agents_gp containing agent performance and classification data.'
+columns:
+  id_user_agent:
+    description: 'Unique identifier representing the user agent. Primary key for user identification across all QuintoAndar systems.'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_agents_gp.sk_user_agent
+  hub:
+    description: 'High-level operational center or regional headquarters (e.g., "HUB MG - Buritis", "CENTRAL SP").'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_agents_gp.hub
+  quartil_subhub:
+    description: 'Performance ranking of the agent within their specific sub-hub, divided into quartiles (e.g., Q4 for top 25%).'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_agents_gp.quartil_subhub
+  agent_type:
+    description: 'Classification of the agents tenure or profile, distinguishing between seasoned and recent members (e.g., "old" for veterans, "new" for juniors).'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_agents_gp.type
+  dt_reference:
+    description: 'Reference date for the monthly performance snapshot. Typically set to the first day of the month (Format: YYYY-MM-DD).'
+    lineage:
+    - datalake_gsheets_raw.sv_portfolio_agents_gp.month_date
