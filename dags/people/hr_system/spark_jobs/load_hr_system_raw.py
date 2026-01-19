@@ -241,5 +241,4 @@ if __name__ == "__main__":
     ingestion.clear_directory("raw")
     for df in dfs:
         ingestion.load_raw(df, spark_client)
-    ingestion.clear_directory("clean")
     logger.info(f"m={JOB_NAME}, msg=Spark job finished.")
