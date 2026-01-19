@@ -876,6 +876,12 @@ workflow:
     370096_properties_entry_model_drawer_update_error_events:
       run_optimize: false
       run_vacuum: false
+    183047_mra_description_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_mra_acceptance_viewed_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
