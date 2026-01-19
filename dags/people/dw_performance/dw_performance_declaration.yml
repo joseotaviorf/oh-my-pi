@@ -29,6 +29,8 @@ workflow:
   inner_dependencies:
     fact_performance_evaluations:
       - dim_performance_evaluation
+    fact_performance_calibrations:
+      - dim_performance_calibration
   tables_customization:
     dim_committee_meeting:
       vacuum_retention_hours: 168
