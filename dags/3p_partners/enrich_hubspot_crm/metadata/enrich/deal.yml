@@ -2,11 +2,11 @@
 database_name: datalake_hubspot
 table_name: deal
 description: |
-  Enriched deal opportunities from HubSpot CRM with comprehensive sales pipeline analytics and business context. 
-  Each row represents a unique sales opportunity in its current state, enriched with calculated metrics, 
-  pipeline positioning, and relationship data. This table provides an analytics-ready view of the sales 
+  Enriched deal opportunities from HubSpot CRM with comprehensive sales pipeline analytics and business context.
+  Each row represents a unique sales opportunity in its current state, enriched with calculated metrics,
+  pipeline positioning, and relationship data. This table provides an analytics-ready view of the sales
   funnel with business logic for deal classification, stage progression analysis, and revenue forecasting.
-  
+
   **Key Enrichments:**
   - Pipeline and stage progression tracking with historical context
   - Deal classification and business context enrichment
@@ -243,6 +243,66 @@ columns:
       - datalake_hubspot.deal_history.has_partnerships_with_other_agencies
     description: Whether the company has partnerships with other agencies. Comes from
       the field trabalha_em_parceria_com_outras_imobiliarias_.
+  consorcio_id_lead:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_id_lead
+    description: id of the lead for the consorcio pipeline
+  consorcio_utm_source:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_utm_source
+    description: Informs the main source of the lead for the consorcio pipeline.
+  consorcio_utm_medium:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_utm_medium
+    description: More detailed information about the origin of the Consorcio lead.
+  consorcio_utm_campaign:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_utm_campaign
+    description: Details the specific campaign from which the Consorcio lead originated from.
+  consorcio_template_first_contact:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_template_first_contact
+    description: Name of the template used to contact the user for the first time after the lead was generated.
+  consorcio_inside_sales_pipeline:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_inside_sales_pipeline
+    description: Whether it was the AI Agent that guided the lead through the Consorcio pipeline or an ops analyst.
+  consorcio_discard_reason:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_discard_reason
+    description: Details the reason why the lead was discarded from the Consorcio pipeline
+  consorcio_forms_origin:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_forms_origin
+    description: Details the origin of the forms submitted by the user.
+  consorcio_lead_priority:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_lead_priority
+    description: Details the order of priority of the lead on the Consorcio pipeline.
+  consorcio_quota_amount:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_quota_amount
+    description: Amount of quotas chosen by the user for the Consorcio offer.
+  consorcio_installment_type:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_installment_type
+    description: Details the type of the installment chosen by the user for the Consorcio Offer. It can be full or reduced by X%.
+  consorcio_email:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_email
+    description: Email of the user attached to the Consorcio deal.
+  consorcio_phone_number:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_phone_number
+    description: Phone number of the user attached to the Consorcio deal, unformatted.
+  consorcio_phone_number_formatted:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_phone_number_formatted
+    description: Formatted phone number of the user attached to the Consorcio deal.
+  consorcio_channel_origin:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_channel_origin
+    description: Informs the channel used to generate the lead.
   is_archived:
     lineage:
       - datalake_hubspot.deal_history.is_archived

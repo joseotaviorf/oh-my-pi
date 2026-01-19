@@ -2,11 +2,11 @@
 database_name: datalake_hubspot
 table_name: deal_history
 description: |
-  Historical tracking table for deal changes in HubSpot CRM with comprehensive sales analytics and pipeline progression tracking. 
-  Each row represents a daily snapshot of deal state changes, enabling time-series analysis and sales performance measurement. 
-  This table captures the complete evolution of sales opportunities over time with enriched metadata for pipeline optimization, 
+  Historical tracking table for deal changes in HubSpot CRM with comprehensive sales analytics and pipeline progression tracking.
+  Each row represents a daily snapshot of deal state changes, enabling time-series analysis and sales performance measurement.
+  This table captures the complete evolution of sales opportunities over time with enriched metadata for pipeline optimization,
   conversion analysis, and revenue forecasting.
-  
+
   **Key Features:**
   - Daily granularity change tracking with complete deal progression history
   - Pipeline and stage movement tracking for sales velocity analysis
@@ -52,19 +52,19 @@ columns:
   deal_name:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Name of the deal. Comes from the field dealname. 
+    description: Name of the deal. Comes from the field dealname.
   state:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: State of the company associated with the deal. Comes from the field estado. 
+    description: State of the company associated with the deal. Comes from the field estado.
   hs_priority:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Priority of the deal in HubSpot. Comes from the field hs_priority. 
+    description: Priority of the deal in HubSpot. Comes from the field hs_priority.
   partnership_model:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Partnership model of the deal. Comes from the field modelo_da_parceria. 
+    description: Partnership model of the deal. Comes from the field modelo_da_parceria.
     categories:
       'Supply + Demanda': Supply + Demand
       'Supply': Supply
@@ -72,11 +72,11 @@ columns:
   unqualification_reason:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Reason why the deal was unqualified. Comes from the field motivo_de_desqualificacao. 
+    description: Reason why the deal was unqualified. Comes from the field motivo_de_desqualificacao.
   gain_reason:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Reason why the deal was won. Comes from the field motivo_de_ganho. 
+    description: Reason why the deal was won. Comes from the field motivo_de_ganho.
   loss_reason:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -88,7 +88,7 @@ columns:
   product:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Product of the deal. Comes from the field produtos. 
+    description: Product of the deal. Comes from the field produtos.
     categories:
       '3P': 'Rede QuintoAndar'
       'Garantia': 'Rental Guarantee'
@@ -97,7 +97,7 @@ columns:
   soft_opening_priority:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Priority of the deal in the soft opening phase. Comes from the field priorizacao. 
+    description: Priority of the deal in the soft opening phase. Comes from the field priorizacao.
   soft_opening_phase:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -113,7 +113,7 @@ columns:
   commercial_closing_format:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Format of the commercial closing. Comes from the field formato_de_fechamento_comercial. 
+    description: Format of the commercial closing. Comes from the field formato_de_fechamento_comercial.
     categories:
       'Inside Sales + Field Sales': 'Inside Sales + Field Sales are involved'
       'Inside Sales': 'Only Inside Sales is involved'
@@ -121,55 +121,55 @@ columns:
   partner_agencies:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: List of other real estate agencies the company is partnered with. Comes from the field com_quais_imobiliarias_tem_parceria_. 
+    description: List of other real estate agencies the company is partnered with. Comes from the field com_quais_imobiliarias_tem_parceria_.
   advertising_portals:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: List of advertising portals the company uses. Comes from the field em_quais_portais_anuncia_. 
+    description: List of advertising portals the company uses. Comes from the field em_quais_portais_anuncia_.
   rental_guarantee_solutions:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: List of rental guarantee solutions the company uses. Comes from the field qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao___clonado_. 
+    description: List of rental guarantee solutions the company uses. Comes from the field qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao___clonado_.
   financing_banks:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: List of financing banks the company uses. Comes from the field trabalha_com_financiamento__se_sim__quais_bancos_. 
+    description: List of financing banks the company uses. Comes from the field trabalha_com_financiamento__se_sim__quais_bancos_.
   amount:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Amount of the deal. Not used often. Comes from the field amount. 
+    description: Amount of the deal. Not used often. Comes from the field amount.
   brokerage_fee:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Brokerage fee of the deal. Comes from the field taxa_de_corretagem. 
+    description: Brokerage fee of the deal. Comes from the field taxa_de_corretagem.
   platform_fee:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Platform fee of the deal. Comes from the field taxa_de_plataforma. 
+    description: Platform fee of the deal. Comes from the field taxa_de_plataforma.
   revenue_share_demand:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Revenue share of the deal for Demand. Comes from the field revenue_share___demanda_. 
+    description: Revenue share of the deal for Demand. Comes from the field revenue_share___demanda_.
   revenue_share_supply:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Revenue share of the deal for Supply. Comes from the field revenue_share___supply_. 
+    description: Revenue share of the deal for Supply. Comes from the field revenue_share___supply_.
   revenue_share_total:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Total revenue share of the deal. Comes from the field revenue_share_total. 
+    description: Total revenue share of the deal. Comes from the field revenue_share_total.
   monthly_average_new_rental_contracts:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Monthly average of new rental contracts. Comes from the field qual_a_media_de_novos_contratos_de_locacao_mes_. 
+    description: Monthly average of new rental contracts. Comes from the field qual_a_media_de_novos_contratos_de_locacao_mes_.
   num_managed_properties:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Number of managed properties. Comes from the field qual_a_quantidade_de_imoveis_administrados_. 
+    description: Number of managed properties. Comes from the field qual_a_quantidade_de_imoveis_administrados_.
   num_monthly_leads:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Number of monthly leads. Comes from the field quantos_leads_recebem_por_mes. 
+    description: Number of monthly leads. Comes from the field quantos_leads_recebem_por_mes.
   average_sale_property_ticket:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -181,7 +181,7 @@ columns:
   average_rent_property_ticket:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Average ticket of rent properties sent by Growth. Comes from the field ticket_medio_de_imoveis_para_locacao. 
+    description: Average ticket of rent properties sent by Growth. Comes from the field ticket_medio_de_imoveis_para_locacao.
   average_rent_property_ticket_by_sales_team:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -189,19 +189,19 @@ columns:
   monthly_repayment_volume_in_real:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Monthly repayment volume in BRL. Comes from the field volume_de_repasse_mensal__vgv_r__. 
+    description: Monthly repayment volume in BRL. Comes from the field volume_de_repasse_mensal__vgv_r__.
   monthly_sale_volume_in_real:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Monthly sale volume in BRL. Comes from the field volume_de_vendas_mensais__vgv_r__. 
+    description: Monthly sale volume in BRL. Comes from the field volume_de_vendas_mensais__vgv_r__.
   num_properties_for_sale:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Number of properties for sale sent by Growth. Comes from the field quantidade_de_imoveis_a_venda. 
+    description: Number of properties for sale sent by Growth. Comes from the field quantidade_de_imoveis_a_venda.
   num_properties_for_sale_by_sales_team:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Number of properties for sale, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___quantidade_de_imoveis_para_venda. 
+    description: Number of properties for sale, obtained by the Sales Qualification team. Comes from the field qualificacao_sales___quantidade_de_imoveis_para_venda.
   num_properties_for_rent:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -217,31 +217,91 @@ columns:
   has_property_advertisement_online:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company has property advertisement online. Comes from the field anuncia_os_imoveis_online_. 
+    description: Whether the company has property advertisement online. Comes from the field anuncia_os_imoveis_online_.
   has_crm:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company has CRM. Comes from the field utiliza_algum_crm_. 
+    description: Whether the company has CRM. Comes from the field utiliza_algum_crm_.
   is_correspondent_bank:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company is correspondent bank. Comes from the field atua_como_correspondente_bancario_. 
+    description: Whether the company is correspondent bank. Comes from the field atua_como_correspondente_bancario_.
   has_financing:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company has financing. Comes from the field trabalha_com_financiamento_. 
+    description: Whether the company has financing. Comes from the field trabalha_com_financiamento_.
   is_for_sale:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company works with sale. Comes from the field trabalha_com_venda_e_locacao_. 
+    description: Whether the company works with sale. Comes from the field trabalha_com_venda_e_locacao_.
   is_for_rent:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company works with rent. Comes from the field trabalha_com_venda_e_locacao_. 
+    description: Whether the company works with rent. Comes from the field trabalha_com_venda_e_locacao_.
   has_partnerships_with_other_agencies:
     lineage:
       - datalake_hubspot_clean.deal.properties
-    description: Whether the company has partnerships with other agencies. Comes from the field trabalha_em_parceria_com_outras_imobiliarias_. 
+    description: Whether the company has partnerships with other agencies. Comes from the field trabalha_em_parceria_com_outras_imobiliarias_.
+  consorcio_id_lead:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: id of the lead for the consorcio pipeline
+  consorcio_utm_source:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Informs the main source of the lead for the consorcio pipeline.
+  consorcio_utm_medium:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: More detailed information about the origin of the Consorcio lead.
+  consorcio_utm_campaign:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Details the specific campaign from which the Consorcio lead originated from.
+  consorcio_template_first_contact:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Name of the template used to contact the user for the first time after the lead was generated.
+  consorcio_inside_sales_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Whether it was the AI Agent that guided the lead through the Consorcio pipeline or an ops analyst.
+  consorcio_discard_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Details the reason why the lead was discarded from the Consorcio pipeline
+  consorcio_forms_origin:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Details the origin of the forms submitted by the user.
+  consorcio_lead_priority:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Details the order of priority of the lead on the Consorcio pipeline.
+  consorcio_quota_amount:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Amount of quotas chosen by the user for the Consorcio offer.
+  consorcio_installment_type:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Details the type of the installment chosen by the user for the Consorcio Offer. It can be full or reduced by X%.
+  consorcio_email:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Email of the user attached to the Consorcio deal.
+  consorcio_phone_number:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Phone number of the user attached to the Consorcio deal, unformatted.
+  consorcio_phone_number_formatted:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Formatted phone number of the user attached to the Consorcio deal.
+  consorcio_channel_origin:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Informs the channel used to generate the lead.
   is_archived:
     lineage:
       - datalake_hubspot_clean.deal.is_archived
