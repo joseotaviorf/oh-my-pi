@@ -95,9 +95,19 @@ messages_w_users AS (
       AND CONTAINS(m.user_sender, '@')
       AND u1.country_code = 'BR'
   WHERE
-    s.source_environment = 'QuintoandarSupport:OFFBOARDING'
-    AND m.id_sauron_session IS NOT NULL
+    m.id_sauron_session IS NOT NULL
 ),
+spoc_session AS (
+  SELECT
+    c.id_session,
+    MAX(c.is_spoc_task) AS is_spoc_session
+  FROM
+    datalake_customer_support.chats AS c
+  WHERE 
+    MAKE_DATE(c.year, c.month, c.day) >= '{load_start_date}'
+  GROUP BY 
+    c.id_session
+  ),
 messages_w_tasks AS (
   SELECT
     mw.id_channel,
@@ -125,6 +135,10 @@ LEFT JOIN
     AND mw.ts_created >= c.ts_created
     AND mw.ts_created <= c.ts_ended
     AND MAKE_DATE(c.year, c.month, c.day) >= '{load_start_date}'
+LEFT JOIN spoc_session AS ss
+  ON ss.id_session = mw.id_sauron_session
+WHERE 
+  ss.is_spoc_session = true
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY mw.id_message ORDER BY c.ts_created DESC) = 1
 ),
@@ -255,7 +269,7 @@ SELECT
   MD5(id_message) AS sk_message,
   id_task AS sk_task,
   id_session AS sk_session,
-  id_user AS sk_user_sender,
+  COALESCE(id_user, -1) AS sk_user_sender,
   origin,
   user_type,
   message,

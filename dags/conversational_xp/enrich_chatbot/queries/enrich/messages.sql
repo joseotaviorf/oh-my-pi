@@ -131,8 +131,6 @@ messages_w_users AS (
       ON u1.email = m.user_sender
       AND CONTAINS(m.user_sender, '@')
       AND u1.country_code = 'BR'
-  WHERE
-    s.source_environment != 'QuintoandarSupport:OFFBOARDING'
 ),
 all_messages AS (
   SELECT
@@ -162,23 +160,41 @@ all_messages AS (
     ts_created
   FROM 
     ai_messages
+),
+spoc_sessions AS (
+  SELECT
+    id_session,
+    MAX(is_spoc_task) AS is_spoc_session
+  FROM
+    datalake_customer_support.chats
+  WHERE
+    ts_created >= '{load_start_date}'
+  GROUP BY 1
 )
 SELECT DISTINCT
-  id_message,
-  id_sauron_session,
-  id_user,
-  message,
-  ROW_NUMBER() OVER(PARTITION BY id_sauron_session ORDER BY ts_created) AS message_index,
-  conversation_type,
-  role,
+  am.id_message,
+  am.id_sauron_session,
+  am.id_user,
+  am.message,
+  ROW_NUMBER() OVER(PARTITION BY am.id_sauron_session ORDER BY am.ts_created) AS message_index,
+  am.conversation_type,
+  am.role,
   CASE
-    WHEN LAG(ts_created) OVER(PARTITION BY id_sauron_session ORDER BY ts_created) IS NOT NULL
-      AND LAG(role) OVER(PARTITION BY id_sauron_session ORDER BY ts_created) <> role
-        THEN DATE_DIFF(SECOND, LAG(ts_created) OVER (PARTITION BY id_sauron_session ORDER BY ts_created), ts_created)
+    WHEN LAG(am.ts_created) OVER(PARTITION BY am.id_sauron_session ORDER BY am.ts_created) IS NOT NULL
+      AND LAG(am.role) OVER(PARTITION BY am.id_sauron_session ORDER BY am.ts_created) != role
+        THEN DATE_DIFF(
+          SECOND,
+          LAG(am.ts_created) OVER (PARTITION BY am.id_sauron_session ORDER BY am.ts_created),
+          am.ts_created
+        )
     ELSE NULL
   END AS reply_time,
-  ts_created
+  am.ts_created
 FROM 
-  all_messages
+  all_messages AS am
+LEFT JOIN
+  spoc_sessions AS ss
+    ON ss.id_session = am.id_sauron_session
 WHERE
-  id_sauron_session IS NOT NULL
+  am.id_sauron_session IS NOT NULL
+  AND ss.is_spoc_session IS FALSE
