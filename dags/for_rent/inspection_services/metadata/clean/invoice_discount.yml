@@ -90,6 +90,34 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_reviewed_value
     description: The discount value after restriction evaluations calculated at persist/update time.
+  discount_acceptance_by:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.discount_acceptance_by
+    description: Type of client who accepted the discount.
+  tenant_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.tenant_cost
+    description: Value assigned as the tenant's responsibility.
+  company_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.company_cost
+    description: Value assigned as QuintoAndar's responsibility.
+  landlord_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.landlord_cost
+    description: Value assigned as the landlord's responsibility.
+  unassigned_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.unassigned_cost
+    description: Value whose responsibility has not been defined.
+  landlord_receivables:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.landlord_receivables
+    description: Value that the landlord should receive.
+  exempted_cost:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.exempted_cost
+    description: Discount value granted.
   dt_discount_accepted:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_accepted_at

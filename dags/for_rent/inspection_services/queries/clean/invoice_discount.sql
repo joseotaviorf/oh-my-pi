@@ -20,6 +20,13 @@ SELECT
     person_blocked_reason,
     discount_accepted AS is_discount_accepted,
     discount_reviewed_value,
+    discount_acceptance_by,
+    tenant_cost,
+    company_cost,
+    landlord_cost,
+    unassigned_cost,
+    landlord_receivables,
+    exempted_cost,
     discount_accepted_at AS dt_discount_accepted,
     created_at AS ts_created,
     updated_at AS ts_updated
