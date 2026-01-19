@@ -4,7 +4,7 @@ WITH rating_value AS (
     r.rating_description,
     b.numeric_rating,
     r.ts_updated
-  FROM 
+  FROM
     datalake_pin_talent_clean.rating_level_translation r
   LEFT JOIN
     datalake_pin_talent_clean.rating_level_base b
@@ -19,12 +19,19 @@ WITH rating_value AS (
       ORDER BY
         b.dt_started DESC
     ) = 1
+),
+meeting_year AS (
+  SELECT
+    m.id_meeting,
+    COALESCE(EXTRACT(YEAR FROM m.ts_meeting), EXTRACT(YEAR FROM m.ts_created)) AS value
+  FROM
+    datalake_pin_hr_review_clean.meeting m
 )
 SELECT
   d.id_dashboard AS id_calibration_evaluation,
-  im.person_number,  
+  im.person_number,
   m.id_meeting,
-  COALESCE(EXTRACT(YEAR FROM m.ts_meeting), EXTRACT(YEAR FROM m.ts_created)) AS meeting_year,
+  meeting_year.value AS meeting_year,
   m.meeting_title,
   m.meeting_status_code,
   cb.rating_description AS calibrated_behavior_description,
@@ -35,17 +42,32 @@ SELECT
   ci.numeric_rating AS calibrated_impact_numeric,
   pci.rating_description AS pre_calibration_impact_description,
   pci.numeric_rating AS pre_calibration_impact_numeric,
-  cl.rating_description AS calibrated_leadership_description,
-  cl.numeric_rating AS calibrated_leadership_numeric,
-  pcl.rating_description AS pre_calibration_leadership_description,
-  pcl.numeric_rating AS pre_calibration_leadership_numeric,
+  CASE
+    WHEN meeting_year.value < 2026 THEN cl.rating_description
+    ELSE NULL
+  END AS calibrated_leadership_description,
+  CASE
+    WHEN meeting_year.value < 2026 THEN cl.numeric_rating
+    ELSE NULL
+  END AS calibrated_leadership_numeric,
+  CASE
+    WHEN meeting_year.value < 2026 THEN pcl.rating_description
+    ELSE NULL
+  END AS pre_calibration_leadership_description,
+  CASE
+    WHEN meeting_year.value < 2026 THEN pcl.numeric_rating
+    ELSE NULL
+  END AS pre_calibration_leadership_numeric,
   m.ts_meeting
-FROM 
+FROM
   datalake_pin_hr_review_clean.dashboard d
 LEFT JOIN
   datalake_pin_hr_review_clean.meeting m ON (m.id_meeting = d.id_meeting)
 LEFT JOIN
-  datalake_employee_registration.identifier_mapping im 
+  meeting_year
+    ON meeting_year.id_meeting = m.id_meeting
+LEFT JOIN
+  datalake_employee_registration.identifier_mapping im
     ON (im.id_assignment = d.id_assignment)
 LEFT JOIN
   datalake_pin_hr_review_clean.dashboard_template_translation dtl
@@ -58,10 +80,10 @@ LEFT JOIN
   rating_value pcb
     ON (pcb.id_rating_level = d.id_metric_value_4)
 LEFT JOIN
-  rating_value ci 
+  rating_value ci
     ON (ci.id_rating_level = d.id_metric_calibrated_value_5)
 LEFT JOIN
-  rating_value pci 
+  rating_value pci
     ON (pci.id_rating_level = d.id_metric_value_5)
 LEFT JOIN
   rating_value cl
@@ -70,5 +92,5 @@ LEFT JOIN
   rating_value pcl
     ON (pcl.id_rating_level = d.id_metric_value_3)
 WHERE
-  dtl.id_dashboard_template IN (300000008237707, 300000145965905) 
+  dtl.id_dashboard_template IN (300000008237707, 300000145965905)
   AND cb.rating_description IS NOT NULL

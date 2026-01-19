@@ -4,7 +4,7 @@ WITH rating_value AS (
     r.rating_description,
     b.numeric_rating,
     r.ts_updated
-  FROM 
+  FROM
     datalake_pin_talent_clean.rating_level_translation r
   LEFT JOIN
     datalake_pin_talent_clean.rating_level_base b
@@ -19,22 +19,35 @@ WITH rating_value AS (
       ORDER BY
         b.dt_started DESC
     ) = 1
+),
+meeting_year AS (
+  SELECT
+    m.id_meeting,
+    COALESCE(EXTRACT(YEAR FROM m.ts_meeting), EXTRACT(YEAR FROM m.ts_created)) AS value
+  FROM
+    datalake_pin_hr_review_clean.meeting m
 )
 SELECT
   pei.id_person_extra_info,
   im.person_number,
   m.id_meeting,
-  COALESCE(EXTRACT(YEAR FROM m.ts_meeting), EXTRACT(YEAR FROM m.ts_created)) AS meeting_year,
+  meeting_year.value AS meeting_year,
   m.meeting_title,
   m.meeting_status_code,
   ci.rating_description AS impact_description,
   ci.numeric_rating AS impact_numeric,
   cb.rating_description AS behavior_description,
   cb.numeric_rating AS behavior_numeric,
-  cl.rating_description AS leadership_description,
-  cl.numeric_rating AS leadership_numeric,
+  CASE
+    WHEN meeting_year.value < 2026 THEN cl.rating_description
+    ELSE NULL
+  END AS leadership_description,
+  CASE
+    WHEN meeting_year < 2026 THEN cl.numeric_rating
+    ELSE NULL
+    END AS leadership_numeric,
   pei.dt_evaluation
-FROM 
+FROM
   datalake_pin_core_clean.all_assignments aa
 LEFT JOIN
   datalake_employee_registration.identifier_mapping im
@@ -47,6 +60,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_pin_hr_review_clean.meeting m
     ON (m.id_meeting = pei.id_meeting)
+LEFT JOIN
+  meeting_year
+    ON meeting_year.id_meeting = m.id_meeting
 LEFT JOIN
   datalake_pin_hr_review_clean.dashboard_template_translation dtl
     ON (m.id_dashboard_template = dtl.id_dashboard_template
