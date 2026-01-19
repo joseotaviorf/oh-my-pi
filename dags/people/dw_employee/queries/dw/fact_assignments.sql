@@ -12,21 +12,45 @@ subordinates AS (
   GROUP BY
     mh.id_manager_period_of_service
 ),
-salaries AS (
+current_salaries AS (
   SELECT 
     s.id_assignment,
     s.currency_code,
-    s.salary_amount,
-    s.adjustment_amount,
-    s.adjustment_percent,
-    s.dt_started,
-    s.dt_ended
+    s.salary_amount
   FROM 
     datalake_pin_compensation_clean.salary AS s
   WHERE 
     s.dt_started <= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) = 1
+),
+valid_salary_adjustments AS (
+  SELECT 
+    s.id_assignment,
+    s.adjustment_amount,
+    s.adjustment_percent,
+    s.dt_started,
+    art.action_reason AS last_salary_increase_type
+  FROM 
+    datalake_pin_compensation_clean.salary AS s
+  INNER JOIN
+    datalake_pin_core_clean.action_base AS ab
+      ON ab.id_action = s.id_action
+      AND ab.dt_ended = DATE('4712-12-31')
+  LEFT JOIN
+    datalake_pin_core_clean.action_reason_translation AS art
+      ON art.id_action_reason = s.id_action_reason
+      AND art.language = 'PTB'
+  WHERE 
+    s.dt_started <= DATE('{load_start_date}')
+    AND ab.action_code IN ('CHANGE_SALARY', 'PROMOTION', 'GLB_TRANSFER')
+    AND (
+      (s.adjustment_amount IS NOT NULL AND s.adjustment_amount <> 0)
+      OR (s.adjustment_percent IS NOT NULL AND s.adjustment_percent <> 0)
+    )
+    AND art.action_reason IN ('Mérito', 'Promoção', 'Recrutamento Interno')
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_started DESC) = 1
 ),
 current_assignments AS (
   SELECT 
@@ -74,47 +98,6 @@ managers AS (
     ma.dt_effective_started <= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY ma.id_assignment ORDER BY ma.dt_effective_started DESC) = 1
-),
-active_jobs AS (
-  SELECT
-    id_job,
-    id_grade_ladder
-  FROM
-    datalake_pin_core_clean.job
-  WHERE
-    dt_effective_ended = DATE('4712-12-31')
-    AND is_active
-),
-active_valid_grades AS (
-  SELECT
-    id_job,
-    id_grade
-  FROM
-    datalake_pin_core_clean.valid_grades 
-  WHERE
-    dt_effective_ended = DATE('4712-12-31')
-),
-salary_rates AS (
-  SELECT
-    id_rate,
-    id_grade_ladder
-  FROM
-    datalake_pin_core_clean.rates
-  WHERE
-    dt_effective_ended = DATE('4712-12-31')
-    AND rate_type = 'SALARY'
-),
-latest_rate_values AS (
-  SELECT
-    id_rate,
-    id_rate_object,
-    mid_value
-  FROM 
-    datalake_pin_core_clean.rate_values
-  WHERE 
-    dt_effective_ended = DATE('4712-12-31')
-  QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY id_rate ORDER BY ts_updated DESC) = 1
 )
 SELECT
   im.id_period_of_service AS sk_assignment,
@@ -128,10 +111,11 @@ SELECT
   COALESCE(am.id_manager_period_of_service, '-1') AS sk_manager_assignment,
   DATE_FORMAT(ps.dt_started, 'yyyyMMdd') AS sk_work_relationship_started_date,
   DATE_FORMAT(ps.dt_actual_termination, 'yyyyMMdd') AS sk_work_relationship_ended_date,
-  DATE_FORMAT(s.dt_started, 'yyyyMMdd') AS sk_last_salary_increase_date,
+  COALESCE(DATE_FORMAT(sa.dt_started, 'yyyyMMdd'), '-1') AS sk_last_salary_increase_date,
   COALESCE(h.sk_hierarchy, '-1') AS sk_hierarchy,
   im.assignment_number,
-  s.currency_code AS salary_currency_code,
+  cs.currency_code AS salary_currency_code,
+  sa.last_salary_increase_type,
   ROW_NUMBER() OVER (
     PARTITION BY im.id_person
     ORDER BY CASE WHEN ed.assignment_type <> 'P' THEN ps.dt_started ELSE NULL END DESC NULLS LAST
@@ -145,15 +129,18 @@ SELECT
     ELSE FALSE
   END AS is_manager,
   am.has_active_manager,
+  ps.dt_started AS dt_work_relationship_started,
+  ps.dt_actual_termination AS dt_work_relationship_ended,
+  sa.dt_started AS dt_last_salary_increase,
   CASE 
     WHEN ed.assignment_type = 'P' THEN 0
     ELSE FLOOR(MONTHS_BETWEEN(COALESCE(ps.dt_actual_termination, DATE('{load_start_date}')), ps.dt_started)) 
   END AS assignment_age_months,
   COALESCE(sub.qnt_directly_led, 0) AS qnt_directly_led,
   COALESCE(sub.qnt_undirectly_led, 0) AS qnt_undirectly_led,
-  s.salary_amount AS salary,
-  s.adjustment_amount AS last_salary_increase,
-  s.adjustment_percent AS pct_last_salary_increase,
+  cs.salary_amount AS salary,
+  COALESCE(sa.adjustment_amount, 0) AS last_salary_increase,
+  COALESCE(sa.adjustment_percent, 0) AS pct_last_salary_increase,
   NOW() AS ts_load
 FROM 
   datalake_employee_registration.identifier_mapping AS im
@@ -170,8 +157,11 @@ LEFT JOIN
   subordinates AS sub 
     ON sub.id_manager_period_of_service = im.id_period_of_service
 LEFT JOIN
-  salaries AS s
-    ON s.id_assignment = im.id_assignment
+  current_salaries AS cs
+    ON cs.id_assignment = im.id_assignment
+LEFT JOIN
+  valid_salary_adjustments AS sa
+    ON sa.id_assignment = im.id_assignment
 LEFT JOIN
   datalake_hr_system.disability AS d
     ON d.id_person = im.id_person

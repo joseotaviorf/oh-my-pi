@@ -50,9 +50,11 @@ columns:
     lineage:
     - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   sk_last_salary_increase_date:
-    description: Date of the last salary increase, formatted as a surrogate key (YYYYMMDD).
+    description: Date of the last valid salary increase, formatted as a surrogate key (YYYYMMDD). Only includes increases from valid action reasons (Mérito, Promoção, Recrutamento Interno).
     lineage:
     - datalake_pin_compensation_clean.salary.dt_started
+    - datalake_pin_core_clean.action_base.action_code
+    - datalake_pin_core_clean.action_reason_translation.action_reason
   sk_hierarchy:
     description: Surrogate key for the organizational hierarchy related to the assignment.
     lineage:
@@ -65,6 +67,11 @@ columns:
     description: Currency code of the salary.
     lineage:
     - datalake_pin_compensation_clean.salary.currency_code
+  last_salary_increase_type:
+    description: Type or reason for the last valid salary increase. Possible values > Mérito, Promoção, Recrutamento Interno.
+    lineage:
+    - datalake_pin_core_clean.action_reason_translation.action_reason
+    - datalake_pin_core_clean.action_base.action_code
   is_last_valid_work_relationship:
     description: Flag (TRUE/FALSE) indicating if this is the most recent valid work relationship for the employee, prioritizing non-pending records, partitioned by person id.
     lineage:
@@ -90,6 +97,20 @@ columns:
     lineage:
     - datalake_pin.managers_history.id_manager_period_of_service
     - datalake_employment.employee_details.assignment_status_type
+  dt_work_relationship_started:
+    description: Start date of the work relationship.
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_work_relationship_ended:
+    description: End date of the work relationship (actual termination date).
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  dt_last_salary_increase:
+    description: Date of the last valid salary increase. Only includes increases from valid action codes (CHANGE_SALARY, PROMOTION, GLB_TRANSFER) and valid action reasons (Mérito, Promoção, Recrutamento Interno).
+    lineage:
+    - datalake_pin_compensation_clean.salary.dt_started
+    - datalake_pin_core_clean.action_base.action_code
+    - datalake_pin_core_clean.action_reason_translation.action_reason
   assignment_age_months:
     description: Tenure in months, calculated from the start date to the end date (or current date if active).
     lineage:
@@ -111,12 +132,16 @@ columns:
     lineage:
     - datalake_pin_compensation_clean.salary.salary_amount
   last_salary_increase:
-    description: Amount of the last salary adjustment.
+    description: Amount of the last valid salary adjustment. Only includes increases from valid action codes (CHANGE_SALARY, PROMOTION, GLB_TRANSFER) and valid action reasons (Mérito, Promoção, Recrutamento Interno). Returns 0 if no valid adjustment exists.
     lineage:
     - datalake_pin_compensation_clean.salary.adjustment_amount
+    - datalake_pin_core_clean.action_base.action_code
+    - datalake_pin_core_clean.action_reason_translation.action_reason
   pct_last_salary_increase:
-    description: Percentage of the last salary adjustment.
+    description: Percentage of the last valid salary adjustment. Only includes increases from valid action codes (CHANGE_SALARY, PROMOTION, GLB_TRANSFER) and valid action reasons (Mérito, Promoção, Recrutamento Interno). Returns 0 if no valid adjustment exists.
     lineage:
     - datalake_pin_compensation_clean.salary.adjustment_percent
+    - datalake_pin_core_clean.action_base.action_code
+    - datalake_pin_core_clean.action_reason_translation.action_reason
   ts_load:
     description: Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed.
