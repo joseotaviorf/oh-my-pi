@@ -253,7 +253,7 @@ all_messages_with_tasks AS (
     id_channel, 
     id_message,
     id_session,
-    id_user,
+    CAST(COALESCE(id_user, -1) AS BIGINT) AS id_user,
     origin,
     message,
     user_type,
