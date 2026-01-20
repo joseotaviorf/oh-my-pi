@@ -2,6 +2,7 @@ SELECT
     id,
     third_party_bills_uuid AS uuid_third_party_bills,
     contract_id AS id_contract,
+    payment_request_uuid AS uuid_payment_request,
     bar_code,
     beneficiary_name,
     beneficiary_doc,
@@ -18,6 +19,12 @@ SELECT
     fine,
     interest,
     discount,
-    due_date AS dt_due
+    payment_request_status,
+    payment_flow,
+    payout_idempotency_key,
+    currency,
+    due_date AS dt_due,
+    created_at AS ts_created,
+    updated_at AS ts_updated
 FROM
     datalake_rental_management_raw.third_party_bills

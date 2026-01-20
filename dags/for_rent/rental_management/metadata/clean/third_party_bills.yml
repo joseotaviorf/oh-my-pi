@@ -18,6 +18,10 @@ columns:
     description: ID of the contract.
     lineage:
       - datalake_rental_management_raw.third_party_bills.contract_id
+  uuid_payment_request:
+    description: Unique identifier for the payment request of the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.payment_request_uuid
   bar_code:
     description: Bar code of the third party bill.
     lineage:
@@ -82,7 +86,31 @@ columns:
     description: Discount of the third party bill.
     lineage:
       - datalake_rental_management_raw.third_party_bills.discount
-  due_date:
+  payment_request_status:
+    description: Payment request status of the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.payment_request_status
+  payment_flow:
+    description: Payment flow used for the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.payment_flow
+  payout_idempotency_key:
+    description: Payout unique identifier used for idempotency for the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.payout_idempotency_key
+  currency:
+    description: Currency code of the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.currency
+  dt_due:
     description: Due date of the third party bill.
     lineage:
       - datalake_rental_management_raw.third_party_bills.due_date
+  ts_created:
+    description: Timestamp of the creation of the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.created_at
+  ts_updated:
+    description: Timestamp of the update of the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.updated_at
