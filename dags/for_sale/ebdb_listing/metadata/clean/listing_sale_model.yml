@@ -1,0 +1,30 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_sale_model
+domain: For Sale
+description: Table containing sale model information for listing properties.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.id
+    description: Primary key identifier for the listing sale model record.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.listingBusinessContext_id
+    description: Foreign key identifier referencing the listing business context.
+  is_primary_market:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.isprimarymarket
+    description: Boolean flag indicating if this is a primary market listing.
+  has_great_sale_price_tag:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.hasGreatSalePriceTag
+    description: Boolean flag indicating if the listing has a great sale price tag.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.created_at
+    description: Timestamp when this record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.updated_at
+    description: Timestamp of the last update to this record.

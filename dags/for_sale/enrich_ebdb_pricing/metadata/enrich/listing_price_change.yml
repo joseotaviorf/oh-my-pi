@@ -1,0 +1,72 @@
+---
+database_name: datalake_ebdb_pricing
+table_name: listing_price_change
+description: Enrich table that handles sale and rental listing price change information and enriches it with some comparison columns and pricing scheme information.
+  If the price change occurred before versioning, it will be associated with the first version of the listing. Each row represents a price exchange for the listing.
+domain: For Rent
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+    description: Foreign key referring to the house ID.
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_sale_listings.sale_listing_status.id_sale_listing
+    description: Foreign key of the listing. The last 3 numbers indicate the version of the listing when the price started.
+  id_user_revision:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+    description: Foreign key referring to the author who made the price change.
+  id_revision:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+    description: Foreign key refering to the revision entity of the price change.
+  business_context:
+    description: Listing business context.
+    categories:
+      RENT: For rent.
+      SALE: For sale.
+  change_reason:
+    description: The reason of the price change.
+  price:
+    lineage:
+      - datalake_ebdb_clean.house_aud.sale_price
+      - datalake_ebdb_clean.house_aud.rent
+    description: Published rental or sale price for a listing in a given time period.
+  previous_price:
+    lineage:
+      - datalake_ebdb_clean.house_aud.sale_price
+      - datalake_ebdb_clean.house_aud.rent
+    description: Price previous to the price of the referenced row.
+  last_price_variation:
+    description: Percent difference between the published price for the row and the previous published price.
+  first_price_variation:
+    description: Percent difference between the published price for the row and the first published price.
+  change_type:
+    description: Describes the type of price change.
+    categories:
+      First price: First price of the listing.
+      Price increase: Price of the listing went up.
+      Price decrease: Price of the listing went down.
+  change_number:
+    description: Tells the number of listing price changes.
+  days_with_pricing_scheme:
+    description: Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
+  is_first_price:
+    description: Boolean that tells if the price is the first publication price of the listing.
+  is_last_price:
+    description: Boolean that tells if the price is the most recent publication price of the listing.
+  is_last_price_of_day:
+    description: Boolean that tells if the price is the listing's most recent publication price of the day.
+  ts_price_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_sale_listings.sale_listing_status.ts_status_started
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+    description: Timestamp of the beginning of the price scheme observed in that row.
+  ts_price_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the end of the price scheme observed in that row, if any.

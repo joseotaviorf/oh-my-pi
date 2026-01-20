@@ -1,0 +1,30 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_rent_model
+domain: For Rent
+description: Table containing rental model information for listing properties.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.id
+    description: Primary key identifier for the listing rent model record.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.listingBusinessContext_id
+    description: Foreign key identifier referencing the listing business context.
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.rentalAdministrator
+    description: Entity responsible for administering the rental.
+  is_early_relisting:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.isEarlyRelisting
+    description: Boolean flag indicating if this is an early relisting.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.created_at
+    description: Timestamp when this record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.updated_at
+    description: Timestamp of the last update to this record.

@@ -1,0 +1,53 @@
+database_name: datalake_ebdb_clean
+table_name: listing_info
+domain: For Rent
+description: Table containing additional listing information for rental properties.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.id
+    description: Primary key identifier for the listing info record.
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.house_id
+    description: Foreign key identifier referencing the house entity.
+  moving_date:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.movingdate
+    description: Date when the property will be available for moving in.
+  days_to_vacate:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.daystovacate
+    description: Number of days until the property is vacated.
+  display_custom_offer_preference:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.displaycustomofferpreference
+    description: Preference for displaying custom offer options.
+  awaiting_availability_reason:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.awaitingavailabilityreason
+    description: Reason why the property is awaiting availability.
+  allows_custom_offer:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.allowscustomoffer
+    description: Boolean flag indicating if custom offers are allowed.
+  availability_type:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.availabilitytype
+    description: Type of availability for the property.
+  furniture:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.furniture
+    description: Information about furniture included in the property.
+  dt_moving_defined:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.movingdatedefined
+    description: Date when the moving date was defined.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.updated_on
+    description: Timestamp of the last update to this record.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.created_on
+    description: Timestamp when this record was created.

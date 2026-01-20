@@ -1,0 +1,34 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_rent_model_aud
+domain: For Rent
+description: Audit table containing the history of changes for listing rent model records.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.id
+    description: Primary key identifier for the listing rent model record.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.listingBusinessContext_id
+    description: Foreign key identifier referencing the listing business context.
+  rev:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.rev
+    description: Revision number from the audit entity.
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.revtype
+    description: Type of revision (insert, update, delete).
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.rentalAdministrator
+    description: Entity responsible for administering the rental.
+  mod_rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.rentalAdministrator_MOD
+    description: Flag indicating if rental administrator was modified.
+  is_early_relisting:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.isEarlyRelisting
+    description: Boolean flag indicating if this is an early relisting.

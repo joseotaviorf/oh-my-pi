@@ -1,0 +1,113 @@
+database_name: datalake_ebdb_clean
+table_name: dynamic_pricing_house_aud
+domain: For Rent
+description: Audit table containing the history of changes for dynamic pricing house records.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.id
+    description: Primary key identifier for the dynamic pricing house record.
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.houseid
+    description: Foreign key identifier referencing the house entity.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.listingBusinessContextId
+    description: Foreign key identifier referencing the listing business context.
+  id_dynamic_pricing_parameter:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.dynamicpricingparameterid
+    description: Foreign key identifier referencing the dynamic pricing parameters.
+  rev:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.rev
+    description: Revision number from the audit entity.
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.revtype
+    description: Type of revision (insert, update, delete).
+  status:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.status
+    description: Current status of the dynamic pricing for this house.
+  operation_mode:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.operationmode
+    description: Operation mode of the dynamic pricing (automatic or manual).
+  origin:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.origin
+    description: Origin of the dynamic pricing activation.
+  min_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.minrent
+    description: Minimum rental price allowed for this property.
+  initial_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.initialrent
+    description: Initial rental price when dynamic pricing was activated.
+  occurred_price_changes:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.pricechangesoccurred
+    description: Number of price changes that occurred for this property.
+  pre_publication_rent_probability:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.prepublicationrentprobability
+    description: Probability of rental before publication based on pricing.
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.enabled
+    description: Boolean flag indicating if dynamic pricing is enabled.
+  mod_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.listingBusinessContextId_MOD
+    description: Flag indicating if listing business context was modified.
+  mod_dynamic_pricing_parameter:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.dynamicpricingparameterid_MOD
+    description: Flag indicating if dynamic pricing parameter was modified.
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.status_MOD
+    description: Flag indicating if status was modified.
+  mod_operation_mode:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.operationmode_MOD
+    description: Flag indicating if operation mode was modified.
+  mod_origin:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.origin_MOD
+    description: Flag indicating if origin was modified.
+  mod_price_changes_occurred:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.pricechangesoccurred_MOD
+    description: Flag indicating if price changes occurred was modified.
+  mod_pre_publication_rent_probability:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.prepublicationrentprobability_MOD
+    description: Flag indicating if pre publication rent probability was modified.
+  mod_is_enabled:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.enabled_MOD
+    description: Flag indicating if enabled status was modified.
+  mod_dt_activated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.activatedAt_MOD
+    description: Flag indicating if activation date was modified.
+  mod_dt_deactivated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.deactivatedAt_MOD
+    description: Flag indicating if deactivation date was modified.
+  dt_last_price_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.lastpriceupdate
+    description: Date of the last price update for this property.
+  dt_activated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.activatedAt
+    description: Date when dynamic pricing was activated for this property.
+  dt_deactivated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.deactivatedAt
+    description: Date when dynamic pricing was deactivated for this property.

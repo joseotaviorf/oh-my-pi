@@ -1,0 +1,40 @@
+---
+database_name: datalake_ebdb_smart_price
+table_name: rental_price_history
+description:
+  Enrich table that contains the rental cost change history of rental properties. Each row is a change in rental cost for a property.
+domain: For Rent
+owner: matheus.baroni@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+    description: Unique identifier for the house entity
+  rev:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+    description: Revision ID (from user_revision_entity)
+  change_reason:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.reason
+    description: Rental cost change reason
+  previous_rent:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rent
+    description: Previous rental cost (-1 when it is the first cost of that property)
+  rent:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rent
+    description: New rental cost
+  is_last_status_of_day:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rev
+    description: Boolean indicating if this one is the last rental cost change of that day
+  ts_price_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp on which the rental cost was changed
+  ts_price_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the next change in rental cost (null if it is the one currently in effect)

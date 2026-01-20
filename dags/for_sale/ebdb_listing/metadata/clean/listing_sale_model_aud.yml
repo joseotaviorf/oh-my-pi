@@ -1,0 +1,38 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_sale_model_aud
+domain: For Sale
+description: Audit table containing the history of changes for listing sale model records.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.id
+    description: Primary key identifier for the listing sale model record.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.listingBusinessContext_id
+    description: Foreign key identifier referencing the listing business context.
+  is_primary_market:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.isPrimaryMarket
+    description: Boolean flag indicating if this is a primary market listing.
+  rev:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.rev
+    description: Revision number from the audit entity.
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.revtype
+    description: Type of revision (insert, update, delete).
+  mod_is_primary_market:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.isPrimaryMarket_MOD
+    description: Flag indicating if primary market status was modified.
+  has_great_sale_price_tag:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.hasGreatSalePriceTag
+    description: Boolean flag indicating if the listing has a great sale price tag.
+  mod_has_great_sale_price_tag:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel_aud.hasGreatSalePriceTag_MOD
+    description: Flag indicating if great sale price tag was modified.

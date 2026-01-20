@@ -1,0 +1,17 @@
+SELECT
+    sk_house_listing,
+    sk_region,
+    sk_company_supply,
+    sk_first_publication_date,
+    sk_status_start_date,
+    sk_status_end_date,
+    country_code,
+    ts_status_start,
+    ts_status_end,
+    status_history,
+    status_change_reason,
+    revision_reason,
+    is_last_status_of_day,
+    ts_load
+FROM
+    dw_rent.fact_house_listing_status

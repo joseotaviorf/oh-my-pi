@@ -1,0 +1,77 @@
+database_name: datalake_ebdb_clean
+table_name: dynamic_pricing_parameters
+domain: For Rent
+description: Table containing dynamic pricing parameters configuration for rental properties.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.id
+    description: Primary key identifier for the dynamic pricing parameters record.
+  parameters_name:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.name
+    description: Name of the dynamic pricing parameters set.
+  parameters_description:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.description
+    description: Description of the dynamic pricing parameters set.
+  days_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.daysthreshold
+    description: Number of days threshold for price reduction trigger.
+  days_from_automatic_activation:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.daysFromAutomaticActivation
+    description: Number of days from automatic activation of dynamic pricing.
+  offers_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.offersthreshold
+    description: Number of offers threshold for price reduction trigger.
+  visits_days_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.visitsdaysthreshold
+    description: Number of days threshold for visits evaluation.
+  visits_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.visitsthreshold
+    description: Number of visits threshold for price reduction trigger.
+  drops:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.dropscount
+    description: Number of price drops allowed in the dynamic pricing.
+  initial_rent_percentile:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.initialrentpercentile
+    description: Percentile used to calculate the initial rent price.
+  min_rent_percentile:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.minrentpercentile
+    description: Percentile used to calculate the minimum rent price.
+  initial_rent_ratio:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.initialrentratio
+    description: Ratio used to calculate the initial rent price.
+  min_rent_ratio:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.minrentratio
+    description: Ratio used to calculate the minimum rent price.
+  max_value_per_reduction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.maximumValuePerReduction
+    description: Maximum value allowed per price reduction.
+  ts_started:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.begindate
+    description: Timestamp when these parameters became active.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.enddate
+    description: Timestamp when these parameters were deactivated.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.criadoem
+    description: Timestamp when this record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.atualizadoem
+    description: Timestamp of the last update to this record.
