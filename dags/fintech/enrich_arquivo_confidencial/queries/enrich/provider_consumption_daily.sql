@@ -123,13 +123,19 @@ SELECT
     daily_requests,
     CASE
         WHEN is_cached = FALSE
-            AND is_within_contract = TRUE
+            AND (
+                pricing_type = 'UNIT_PRICE'
+                OR is_within_contract = TRUE
+            )
         THEN request_cost * daily_requests
         ELSE 0
     END AS daily_cost,
     CASE
         WHEN is_cached = TRUE
-            AND is_within_contract = TRUE
+            AND (
+                pricing_type = 'UNIT_PRICE'
+                OR is_within_contract = TRUE
+            )
         THEN request_cost * daily_requests
         ELSE 0
     END AS daily_saving
