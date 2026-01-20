@@ -29,6 +29,9 @@ workflow:
       clean_table_name: report_dashboard
     report_dashboardcard:
       clean_table_name: report_dashboard_card
+    permissions:
+      clean_table_name: permissions
+      clean_primary_keys: ["id"]
     permissions_group:
       clean_table_name: permissions_group
       clean_primary_keys: ["id"]

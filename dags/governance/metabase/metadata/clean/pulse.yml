@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: pulse
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Contains refined and structured data related to pulse measurements
 columns:
   id:

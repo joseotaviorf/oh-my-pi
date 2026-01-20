@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: report_dashboard_card
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Information about report cards that are part of dashboards in Metabase
 columns:
   id:
@@ -11,11 +11,15 @@ columns:
   id_card:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.card_id
-    description: Card id
+    description: Identifier of the card that the report dashboard card belongs to
   id_dashboard:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.dashboard_id
     description: Dashboard id
+  id_entity:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.entity_id
+    description: Identifier of entity that the report dashboard card belongs to
   size_x:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.sizex

@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: pulse_channel_recipient
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Who will receive the report sent by a Pulse channel
 columns:
   id:
@@ -15,4 +15,4 @@ columns:
   id_user:
     lineage:
       - datalake_metabase_raw.pulse_channel_recipient.user_id
-    description: User Id
+    description: Identifier of the user that will receive the Pulse report

@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: query
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Information about queries executed in Metabase
 columns:
   query:
@@ -13,7 +13,7 @@ columns:
       - datalake_metabase_raw.query.query_hash
     description: Hash for the query
   query_hash_string:
-    Lineage:
+    lineage:
       - datalake_metabase_raw.query
     description: Hash for the query in string
   average_execution_time_in_milliseconds:

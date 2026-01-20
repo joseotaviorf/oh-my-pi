@@ -1,0 +1,18 @@
+database_name: datalake_metabase_clean
+table_name: permissions
+owner: luisa.ladeira@quintoandar.com.br
+domain: Data Ops & Governance
+description: Information about permissions in Metabase
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.permissions.id
+    description: Unique Id of the permission
+  object:
+    lineage:
+      - datalake_metabase_raw.permissions.object
+    description: Object that the group has permission
+  id_group:
+    lineage:
+      - datalake_metabase_raw.permissions.group_id
+    description: Id of the group that has permission

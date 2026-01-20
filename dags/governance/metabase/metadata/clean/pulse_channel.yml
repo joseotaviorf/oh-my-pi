@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: pulse_channel
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Information about the channels through which Pulse reports are sent
 columns:
   id:
@@ -11,7 +11,7 @@ columns:
   id_pulse:
     lineage:
       - datalake_metabase_raw.pulse_channel.pulse_id
-    description: Pulse id
+    description: Identifier of the pulse that the channel belongs to
   channel_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.channel_type

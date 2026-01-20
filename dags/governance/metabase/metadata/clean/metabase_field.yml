@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: metabase_field
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Information about Metabase table columns
 columns:
   id:
@@ -11,7 +11,7 @@ columns:
   id_table:
     lineage:
       - datalake_metabase_raw.metabase_field.table_id
-    description: ID table
+    description: Identifier of the table that the field belongs to
   id_parent:
     lineage:
       - datalake_metabase_raw.metabase_field.parent_id
@@ -36,10 +36,6 @@ columns:
     lineage:
       - datalake_metabase_raw.metabase_field.base_type
     description: Primary data type
-  special_type:
-    lineage:
-      - datalake_metabase_raw.metabase_field.special_type
-    description: Information about the modification applied
   position:
     lineage:
       - datalake_metabase_raw.metabase_field.position
@@ -68,6 +64,22 @@ columns:
     lineage:
       - datalake_metabase_raw.metabase_field.settings
     description: Custom Settings
+  semantic_type:
+    lineage:
+      - datalake_metabase_raw.metabase_field.semantic_type
+    description: Semantic type
+  preview_display:
+    lineage:
+      - datalake_metabase_raw.metabase_field.preview_display
+    description: Configured preview view
+  database_field_effective_type:
+    lineage:
+      - datalake_metabase_raw.metabase_field.effective_type
+    description: Effective type
+  database_field_position:
+    lineage:
+      - datalake_metabase_raw.metabase_field.database_position
+    description: Database position
   is_active:
     lineage:
       - datalake_metabase_raw.metabase_field.active

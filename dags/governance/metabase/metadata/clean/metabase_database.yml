@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: metabase_database
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Information about data sources configured in Metabase
 columns:
   id:
@@ -24,14 +24,18 @@ columns:
     lineage:
       - datalake_metabase_raw.metabase_database.engine
     description: Type of database used for each data source configured in Metabase
-  options:
-    lineage:
-      - datalake_metabase_raw.metabase_database.options
-    description: Additional Settings
   timezone:
     lineage:
       - datalake_metabase_raw.metabase_database.timezone
     description: Time zone configured for the data source
+  cache_field_values_schedule:
+    lineage:
+      - datalake_metabase_raw.metabase_database.cache_field_values_schedule
+    description: Schedule for caching field values
+  metadata_sync_schedule:
+    lineage:
+      - datalake_metabase_raw.metabase_database.metadata_sync_schedule
+    description: Schedule for metadata sync
   is_on_demand:
     lineage:
       - datalake_metabase_raw.metabase_database.is_on_demand

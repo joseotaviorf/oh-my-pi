@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: pulse_card
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Store information about pulse cards
 columns:
   id:
@@ -11,11 +11,11 @@ columns:
   id_pulse:
     lineage:
       - datalake_metabase_raw.pulse_card.pulse_id
-    description: Pulse Id
+    description: Identifier of the pulse that the card belongs to
   id_card:
     lineage:
       - datalake_metabase_raw.pulse_card.card_id
-    description: Card Id
+    description: Identifier of the card that the pulse card belongs to
   position:
     lineage:
       - datalake_metabase_raw.pulse_card.position

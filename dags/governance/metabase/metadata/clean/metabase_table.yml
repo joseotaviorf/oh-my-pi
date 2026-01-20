@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: metabase_table
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Table structure information within the Metabase system
 columns:
   id:
@@ -24,10 +24,6 @@ columns:
     lineage:
       - datalake_metabase_raw.metabase_table.description
     description: Description table
-  entity_name:
-    lineage:
-      - datalake_metabase_raw.metabase_table.entity_name
-    description: Entity name
   entity_type:
     lineage:
       - datalake_metabase_raw.metabase_table.entity_type

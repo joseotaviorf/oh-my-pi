@@ -1,7 +1,7 @@
 database_name: datalake_metabase_clean
 table_name: query_execution
 owner: herivelto.junior@quintoandar.com.br
-domain: Data Governance
+domain: Data Ops & Governance
 description: Query execution information
 columns:
   id:
@@ -15,7 +15,7 @@ columns:
   id_card:
     lineage:
       - datalake_metabase_raw.query_execution.card_id
-    description: Card Id
+    description: Identifier of the card that the query execution belongs to
   id_dashboard:
     lineage:
       - datalake_metabase_raw.query_execution.dashboard_id
@@ -23,7 +23,7 @@ columns:
   id_pulse:
     lineage:
       - datalake_metabase_raw.query_execution.pulse_id
-    description: Pulse Id
+    description: Identifier of the pulse that the query execution belongs to
   id_database:
     lineage:
       - datalake_metabase_raw.query_execution.database_id
