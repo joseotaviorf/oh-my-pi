@@ -15,7 +15,7 @@ workflow:
   has_hive_sync: false
 cluster:
   type: custom_cluster
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: r5a.4xlarge
     node_type_id: r5a.4xlarge

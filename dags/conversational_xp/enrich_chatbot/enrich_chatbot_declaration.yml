@@ -31,4 +31,4 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.sql.mapKeyDedupPolicy: LAST_WIN
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
