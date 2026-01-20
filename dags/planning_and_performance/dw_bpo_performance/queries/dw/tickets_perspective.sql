@@ -491,4 +491,4 @@ LEFT JOIN dw_public.dim_date as ddend
 LEFT JOIN off_tickets off 
   ON tp.sk_ticket = off.sk_ticket 
 WHERE 
-  DATE(tp.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(tp.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '6' MONTH AND DATE('{load_end_date}')

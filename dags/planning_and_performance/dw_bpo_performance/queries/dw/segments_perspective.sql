@@ -247,9 +247,9 @@ SELECT
   END AS transfer_reason_detailed,
   ast.start_date AS analyst_start_date,
   fr.first_resolution AS first_resouluiton_analyst,
-  YEAR(sp.dt_created) AS year,
-  MONTH(sp.dt_created) AS month,
-  DAY(sp.dt_created) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM 
   segments_perspective AS sp
@@ -260,4 +260,4 @@ LEFT JOIN contacts AS c
 LEFT JOIN first_resolution AS fr
   ON sp.agent_email = fr.email
 WHERE 
-  DATE(sp.dt_created) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(sp.dt_created) BETWEEN DATE('{load_start_date}') - INTERVAL '6' MONTH AND DATE('{load_end_date}')
