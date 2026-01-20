@@ -41,7 +41,7 @@ SELECT
     id_sauron_session,
     id_external,
     id_ticket,
-    id_user,
+    IF(id_user = '', NULL, id_user) AS id_user,
     bot,
     first_queue,
     last_queue,
