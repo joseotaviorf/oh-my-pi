@@ -1,96 +1,102 @@
 database_name: datalake_zendesk_clean
 table_name: ticket_metrics
+description: Table with all metrics related to the ticket
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
 columns:
-  id_ticket_metrics:
+  id_ticket_metric:
+    description: Unique identification key for the ticket metric.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.id
-  url_ticket_metrics:
+  id_ticket:
+    description: Zendesk's ticket ID.
     lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.url
+      - datalake_zendesk_tickets_raw.ticket_metrics.ticket_id
   assignee_stations:
+    description: Number of agents assigned to the ticket.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.assignee_stations
   reopens:
+    description: Number of times the ticket was reopened.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.reopens
-  id_ticket:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.ticket_id
   replies:
+    description: Number of public replies the agent added to the ticket.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.replies
+  url:
+    description: URL of the ticket.
+    lineage:
+      - datalake_zendesk_tickets_raw.ticket_metrics.url
   group_stations:
+    description: Number of groups the ticket passed through.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.group_stations
-  minutes_reply_calendar:
+  reply_time_min:
+    description: Number of minutes to the first reply.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.reply_time_in_minutes
-  minutes_reply_business:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.reply_time_in_minutes
-  minutes_first_resolution_calendar:
+  first_resolution_time_min:
+    description: Number of minutes to the first resolution time.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.first_resolution_time_in_minutes
-  minutes_first_resolution_business:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.first_resolution_time_in_minutes
-  minutes_full_resolution_calendar:
+  full_resolution_time_min:
+    description: Number of minutes to the full resolution time.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.full_resolution_time_in_minutes
-  minutes_full_resolution_business:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.full_resolution_time_in_minutes
-  minutes_requester_wait_calendar:
+  requester_wait_time_min:
+    description: Number of minutes to the requester wait time.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.requester_wait_time_in_minutes
-  minutes_requester_wait_business:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.requester_wait_time_in_minutes
-  minutes_agent_wait_calendar:
+  agent_wait_time_min:
+    description: Number of minutes to the agent wait time.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.agent_wait_time_in_minutes
-  minutes_agent_wait_business:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.agent_wait_time_in_minutes
-  minutes_on_hold_calendar:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.on_hold_time_in_minutes
-  minutes_on_hold_business:
+  on_hold_time_min:
+    description: Number of minutes to the on hold time.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.on_hold_time_in_minutes
   dt_extracted:
+    description: Timestamp of the extraction.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.dt
   ts_requester_updated:
+    description: Timestamp of the requester updated.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.requester_updated_at
   ts_solved:
+    description: Timestamp of the solved.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.solved_at
   ts_latest_comment_added:
+    description: Timestamp of the latest comment added.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.latest_comment_added_at
   ts_initially_assigned:
+    description: Timestamp of the initially assigned.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.initially_assigned_at
   ts_assignee_updated:
+    description: Timestamp of the assignee updated.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.assignee_updated_at
   ts_assigned:
+    description: Timestamp of the assigned.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.assigned_at
   ts_created:
+    description: Timestamp of the created.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.created_at
   ts_updated:
+    description: Timestamp of the updated.
     lineage:
       - datalake_zendesk_tickets_raw.ticket_metrics.updated_at
+  ts_load:
+    description: Timestamp of the load.
   year:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.dt
+    description: Year of the ticket metric.
   month:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.dt
+    description: Month of the ticket metric.
   day:
-    lineage:
-      - datalake_zendesk_tickets_raw.ticket_metrics.dt
+    description: Day of the ticket metric.
