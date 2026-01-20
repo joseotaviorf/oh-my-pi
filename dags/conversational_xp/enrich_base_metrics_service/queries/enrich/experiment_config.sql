@@ -218,6 +218,29 @@ FROM VALUES
         )
     ),
 
+    -- New Pclick Sale Exp
+    (
+        "ab_beakman_search_services_p_click_experiment_sale_v7",
+        named_struct(
+            'begin_date', DATE('2026-01-21'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
+    ),
+
     -- HUE V3 Rent exp
     (
         "ab_beakman_search_services_hue_v3_experiment",
