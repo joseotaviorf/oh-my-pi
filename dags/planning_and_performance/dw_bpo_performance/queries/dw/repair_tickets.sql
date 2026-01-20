@@ -116,9 +116,9 @@ SELECT
   sf.ts_help_request,
   rt.ts_latest_customer_comment,
   rt.ts_latest_analyst_comment,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   datalake_repairs.repair_tickets AS rt

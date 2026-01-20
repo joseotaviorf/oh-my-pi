@@ -16,9 +16,9 @@ SELECT
   ts_created_local,
   dt_analyzed_utc,
   dt_analyzed,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   datalake_listing_jobs.listing_quality_tasks

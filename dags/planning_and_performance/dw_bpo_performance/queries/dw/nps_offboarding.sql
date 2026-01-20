@@ -211,9 +211,9 @@ SELECT DISTINCT
   med.sk_ticket AS med_sk_ticket,
   IF(spc.agent_email LIKE '%webhelp%', spc.agent_email, NULL) spoc_agent_email,
   ans.comment,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM dw_customer_satisfaction.dim_nps_answer ans
 LEFT JOIN dw_customer_satisfaction.fact_nps_dispatches disp

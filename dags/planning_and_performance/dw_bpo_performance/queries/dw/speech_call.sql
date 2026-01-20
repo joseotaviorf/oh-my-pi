@@ -10,9 +10,9 @@ SELECT DISTINCT
   bc.recording_url,
   bc.ts_started,
   bc.ts_ended,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   datalake_customer_support.calls AS c

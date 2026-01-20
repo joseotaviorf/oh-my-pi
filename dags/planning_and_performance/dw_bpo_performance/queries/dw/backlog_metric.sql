@@ -47,9 +47,9 @@ SELECT
   bmt.ts_started,
   bmt.ts_solved,
   tf.replies,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_backlog_metrics_tasks AS bmt

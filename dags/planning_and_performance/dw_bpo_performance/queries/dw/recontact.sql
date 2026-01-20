@@ -213,9 +213,9 @@ SELECT
   rc.ts_started_previous_contact AS ts_started_first_contact,
   rc.ts_started,
   refined_direction,
-  YEAR(rc.ts_started) AS year,
-  MONTH(rc.ts_started) AS month,
-  DAY(rc.ts_started) AS day,
+  YEAR(CURRENT_DATE()) AS year,
+  MONTH(CURRENT_DATE()) AS month,
+  DAY(CURRENT_DATE()) AS day,
   NOW() AS ts_load
 FROM
   recontact_check AS rc

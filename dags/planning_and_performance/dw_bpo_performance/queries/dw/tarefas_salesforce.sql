@@ -185,9 +185,9 @@ SELECT
       AND DATE(mq.dt_task_expiration) >= DATE(DATE('{load_start_date}')) THEN 0
     ELSE NULL
   END overdue_task,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM 
   main_query mq

@@ -19,9 +19,9 @@ SELECT DISTINCT
   DATE(ft.ts_created) AS ts_started,
   DATE(ft.ts_closed) AS ts_closed,
   DATE(ftc.ts_first_response) AS ts_response,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_tickets AS ft

@@ -468,9 +468,9 @@ SELECT
   off.squad,
   off.status_agreement,
   off.off_area,
-  YEAR(tp.ts_started) AS year,
-  MONTH(tp.ts_started) AS month,
-  DAY(tp.ts_started) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM tickets_perspective AS tp
 LEFT JOIN recontact_drilldown_d4 AS rd4 

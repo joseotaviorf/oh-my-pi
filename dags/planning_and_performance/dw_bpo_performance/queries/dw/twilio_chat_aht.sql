@@ -9,9 +9,9 @@ SELECT
   ca.average_concurrency,
   ca.average_handling_time_seconds,
   dc.team AS area_aux,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   datalake_customer_support.chat_aht AS ca
