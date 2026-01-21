@@ -6,6 +6,9 @@ dag_documentation:
 elastic_search_url: "https://vpc-vespucio-prod-us-east-1-o56l6pbmnwaphvb7rqxzsapso4.us-east-1.es.amazonaws.com/"
 sqs_url_house_enrichment: "https://sqs.us-east-1.amazonaws.com/632540934959/ProdMainHouseEnrichmentHousesToBeReEnriched"
 kodak_photo_sns_arn: "arn:aws:sns:us-east-1:632540934959:ProdKodakPhoto"
+callback_by_task_failure: True
+callback_by_task_success: False
+webhook_vespucio_pipeline: WEBHOOK_VESPUCIO_PIPELINE_PROD
 
 custom_cluster:
   driver_node_type_id: r-fleet.4xlarge

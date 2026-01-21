@@ -17,7 +17,7 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.notification.gchat_callback import GchatCallback
 
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
@@ -81,14 +81,24 @@ LIBRARIES = [
 
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
 DAG_OWNER = DAGOwnerEnum.DATA_ATLAS_DB
-jiraops_callback = JiraOpsCallback()
+webhook_vespucio_pipeline = config_service.get_config("webhook_vespucio_pipeline")
+callback_by_task_failure = config_service.get_config("callback_by_task_failure")
+callback_by_task_success = config_service.get_config("callback_by_task_success")
+
+gchat_callback = GchatCallback(webhook_url_variable=webhook_vespucio_pipeline)
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
-        "on_failure_callback": jiraops_callback.task_failure_alert,
+        "on_success_callback": (
+            gchat_callback.task_success_alert if callback_by_task_success else None
+        ),
+        "on_failure_callback": (
+            gchat_callback.task_failure_alert if callback_by_task_failure else None
+        ),
     },
     start_date=MAIN_START_DATE,
     schedule_interval=DatasetService.get_dag_datasets(DAG_ID),
@@ -99,6 +109,12 @@ dag = DAG(
         dag_owner=DAG_OWNER,
     ),
     params=BaseDAG.get_default_trigger_form_params(),
+    on_success_callback=(
+        gchat_callback.dag_success_alert if not callback_by_task_success else None
+    ),
+    on_failure_callback=(
+        gchat_callback.dag_failure_alert if not callback_by_task_failure else None
+    ),
 )
 
 execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
