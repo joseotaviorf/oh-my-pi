@@ -45,14 +45,17 @@ columns:
   has_keys_with_agent_attributed:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+      - datalake_ebdb_listing.house_entrance_history.event_type
     description: Flag to indicate if the agent was attributed.
   has_keys_with_agent_delivered:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+      - datalake_ebdb_listing.house_entrance_history.event_type
     description: Flag to indicate if the keys were delivered to agent.
   has_keys_with_agent_returned:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+      - datalake_ebdb_listing.house_entrance_history.event_type
     description: Flag to indicate if the key was returned.
   is_delivered_on_another_listing:
     lineage:
@@ -65,12 +68,16 @@ columns:
   is_fss:
     description: Boolean indicating if the id_user is equal to id_user_registrant.
   is_keys_with_agent_eligible:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.event_type
+      - datalake_ebdb_clean.house_agent_aud.relation_type
     description: Boolean indicating if the keys are with the agent.
   is_returned_on_time:
     description: Boolean indicating if the keys were returned in less than 3 days after the contract was signed.
   ts_attributed:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
     description: Timestamp of when the agent was attributed.
   ts_contract_signed:
     lineage:
@@ -79,6 +86,7 @@ columns:
   ts_delivered:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
     description: Timestamp of when the key was delivered.
   ts_listing_version_start:
     lineage:
@@ -95,6 +103,7 @@ columns:
   ts_returned:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
     description: Timestamp of when the key was returned.
   ts_publicated:
     lineage:

@@ -26,20 +26,114 @@ key_location_changes AS (
         mod_authorization
 ),
 agent_aud AS (
+    WITH old AS (
+        SELECT
+            haa.id_house,
+            CASE haa.relation_type
+                WHEN 'KEY_HOLDER' THEN TRUE
+                ELSE FALSE
+            END AS is_keys_with_agent_eligible,
+            FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision
+        FROM
+            datalake_ebdb_clean.user_revision_entity AS ure
+        JOIN
+            datalake_ebdb_clean.house_agent_aud AS haa
+                ON haa.rev = ure.id
+        WHERE
+            FROM_UNIXTIME(ure.ts_revision/1000)::DATE < '2025-11-01'
+    ),
+    new AS (
+        SELECT
+            heh.id_house,
+            IF(heh.event_type = 'KEY_HOLDER_DEALLOCATED', FALSE, TRUE) AS is_keys_with_agent_eligible,
+            heh.ts_entrance_started AS ts_revision
+        FROM
+            datalake_ebdb_listing.house_entrance_history AS heh
+        WHERE
+            ts_entrance_started::DATE >= '2025-11-01'
+            AND key_location = 'AGENT'
+    )
     SELECT
-        haa.id_house,
-        haa.rev AS agent_rev,
-        haa.relation_type,
-        CASE haa.relation_type
-            WHEN 'KEY_HOLDER' THEN TRUE
-            ELSE FALSE
-        END AS is_keys_with_agent_eligible,
-        FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision
+        id_house,
+        is_keys_with_agent_eligible,
+        ts_revision
     FROM
-        datalake_ebdb_clean.user_revision_entity ure
-    JOIN
-        datalake_ebdb_clean.house_agent_aud haa
-            ON haa.rev = ure.id
+        old
+    UNION ALL
+    SELECT
+        id_house,
+        is_keys_with_agent_eligible,
+        ts_revision
+    FROM
+        new
+),
+attributions_context AS (
+    WITH old AS (
+        SELECT
+            MD5(CAST(hakt.id AS STRING)) AS id,
+            hakt.id_agent,
+            hakt.id_house,
+            hakt.comments,
+            'attributions_context' AS query_context,
+            CASE
+                WHEN hakt.status = 'NOT_DELIVERED' THEN 'KEY_HOLDER_ALLOCATED'
+                WHEN hakt.status = 'DELIVERED' THEN 'KEY_HOLDER_VALIDATED'
+                WHEN hakt.status = 'RETURNED' THEN 'KEY_HOLDER_DEALLOCATED'
+                ELSE NULL
+            END AS status,
+            FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision,
+            ts_revision AS ts_revision_unix
+        FROM
+            datalake_ebdb_clean.house_agent_key_tracking_aud AS hakt
+        JOIN
+            datalake_ebdb_clean.user_revision_entity AS ure
+                ON hakt.rev = ure.id
+        WHERE
+            FROM_UNIXTIME(ure.ts_revision/1000)::DATE < '2025-06-17'
+    ),
+    new AS (
+        SELECT
+            MD5(CAST(heh.id AS STRING)) AS id,
+            user.id_agent,
+            heh.id_house,
+            heh.entry_model_details AS comments,
+            'attributions_context' AS query_context,
+            heh.event_type AS status,
+            heh.ts_entrance_started AS ts_revision,
+            1000*UNIX_TIMESTAMP(heh.ts_entrance_started) AS ts_revision_unix
+        FROM
+            datalake_ebdb_listing.house_entrance_history AS heh
+        LEFT JOIN
+            datalake_ebdb_clean.user
+                ON heh.key_holder_identifier = user.id
+        WHERE
+            heh.ts_entrance_started::DATE >= '2025-06-17'
+            AND heh.key_location = 'AGENT'
+            AND heh.event_type IN ('KEY_HOLDER_ALLOCATED', 'KEY_HOLDER_VALIDATED', 'KEY_HOLDER_DEALLOCATED')
+    )
+    SELECT
+        id,
+        id_agent,
+        id_house,
+        comments,
+        query_context,
+        status,
+        ts_revision,
+        ts_revision_unix
+    FROM
+        old
+    UNION ALL
+    SELECT
+        id,
+        id_agent,
+        id_house,
+        comments,
+        query_context,
+        status,
+        ts_revision,
+        ts_revision_unix
+    FROM
+        new
 ),
 -- Associate each revision with its corresponding listing version
 -- Criterea being closer to listing version start or end date
@@ -63,19 +157,16 @@ merged_key_status AS (
         AND has_opted_keys_with_agent IS NOT NULL
     UNION
     SELECT
-        MD5(CAST(hakt.id AS STRING)) AS id,
-        hakt.id_agent,
-        hakt.id_house,
-        hakt.comments,
-        'attributions_context' AS query_context,
-        hakt.status,
-        FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision,
-        ts_revision AS ts_revision_unix
+        id,
+        id_agent,
+        id_house,
+        comments,
+        query_context,
+        status,
+        ts_revision,
+        ts_revision_unix
     FROM
-        datalake_ebdb_clean.house_agent_key_tracking_aud AS hakt
-    JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure
-            ON hakt.rev = ure.id
+        attributions_context
 ),
 key_status_listings AS (
     SELECT
@@ -125,9 +216,9 @@ keys_attributions AS (
         id_agent,
         id_house_listing,
         COLLECT_SET(IF(id_agent > 0, id_agent, NULL)) AS id_agents,
-        MAX(status = 'NOT_DELIVERED') AS has_keys_with_agent_attributed,
-        MAX(status = 'DELIVERED') AS has_keys_with_agent_delivered,
-        MAX(status = 'RETURNED') AS has_keys_with_agent_returned,
+        MAX(status = 'KEY_HOLDER_ALLOCATED') AS has_keys_with_agent_attributed,
+        MAX(status = 'KEY_HOLDER_VALIDATED') AS has_keys_with_agent_delivered,
+        MAX(status = 'KEY_HOLDER_DEALLOCATED') AS has_keys_with_agent_returned,
         MAX(IF(comments rlike '(?i)chave recebida durante visita ao imóvel', TRUE, FALSE)) AS is_delivered_on_another_listing,
         MAX(
             CASE
@@ -135,11 +226,11 @@ keys_attributions AS (
                 WHEN status = 'NO_OPT_IN' THEN FALSE
             END
         ) AS is_keys_with_agent_opt_in,
-        MIN(IF(status = 'NOT_DELIVERED', ts_revision,NULL)) AS ts_attributed,
-        MIN(IF(status = 'DELIVERED', ts_revision,NULL)) AS ts_delivered,
+        MIN(IF(status = 'KEY_HOLDER_ALLOCATED', ts_revision,NULL)) AS ts_attributed,
+        MIN(IF(status = 'KEY_HOLDER_VALIDATED', ts_revision,NULL)) AS ts_delivered,
         MIN(IF(status IN ('OPT_IN', 'NO_OPT_IN'), ts_revision,NULL)) AS ts_optin,
         ts_listing_version_start AS ts_publicated,
-        MIN(IF(status = 'RETURNED', ts_revision,NULL)) AS ts_returned
+        MIN(IF(status = 'KEY_HOLDER_DEALLOCATED', ts_revision,NULL)) AS ts_returned
 
     FROM
         keys_closer_listings
