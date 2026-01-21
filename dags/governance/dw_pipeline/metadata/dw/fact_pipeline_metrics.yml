@@ -28,6 +28,8 @@ columns:
   total_dags_special_scheduler_executed:
     description: The total amount of DAGs that has an special scheduler condition (e.g. DAGs that runs only on Fridays, only on the day 15th,
       etc.) and that are listed on the gsheet and that executed on the specific date.
+  total_intraday_dags:
+    description: The total amount of active DAGs that the line has that are intraday DAGs in the specific date.
   total_dags_in_sla_exclusion_list:
     description: The total amount of active DAGs that are in the SLA exclusion list in the specific date.
   total_dags_ignoring_list:

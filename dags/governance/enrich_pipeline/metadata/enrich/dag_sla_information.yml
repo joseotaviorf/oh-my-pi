@@ -51,6 +51,10 @@ columns:
     description: Boolean flag indicating if the DAG run was manually created.
   is_run_triggered_by_mediator:
     description: Boolean flag indicating if the DAG run was triggered by the Mediator.
+  is_intraday_dag:
+    lineage:
+      - datalake_airflow.dag.schedule_interval
+    description: Boolean flag indicating if the DAG has an intraday schedule (hourly or more frequent).
   dt_snapshot:
     lineage:
       - datalake_quintoandar.aux_date.date

@@ -16,6 +16,7 @@ WITH totals_base AS (
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_manual_run = TRUE) AS total_dags_with_manual_run,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_run_triggered_by_mediator = TRUE) AS total_dags_triggered_by_mediator,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'raw/clean') AS total_raw_clean_dags,
+        COUNT(DISTINCT ds.id_dag) FILTER (WHERE ds.is_intraday_dag = TRUE) AS total_intraday_dags,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'enrich') AS total_enrich_dags,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'dw') AS total_dw_dags,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'metric') AS total_metric_dags,
@@ -30,10 +31,22 @@ WITH totals_base AS (
         ROUND(
             100 * (
                 COUNT(DISTINCT ds.id_dag) FILTER (
-                    WHERE ds.is_inside_sla = TRUE AND ((ds.is_active_and_unpaused AND NOT ds.is_in_ignoring_list) OR ds.is_special_scheduler_executed)
+                    WHERE ds.is_inside_sla = TRUE
+                        AND ds.is_intraday_dag IS FALSE
+                        AND (
+                                (
+                                    ds.is_active_and_unpaused
+                                    AND NOT ds.is_in_ignoring_list
+                                ) 
+                            OR ds.is_special_scheduler_executed
+                        )
                 ) / (
                     COUNT(DISTINCT ds.id_dag) FILTER (
-                        WHERE (ds.is_active_and_unpaused AND NOT ds.is_in_ignoring_list) OR ds.is_special_scheduler_executed
+                        WHERE (
+                            ds.is_active_and_unpaused
+                            AND NOT ds.is_in_ignoring_list
+                            AND ds.is_intraday_dag IS FALSE
+                        ) OR ds.is_special_scheduler_executed
                     )
                 )
             ),
@@ -58,6 +71,7 @@ SELECT
     tb.total_dags_executed,
     tb.total_dags_special_scheduler,
     tb.total_dags_special_scheduler_executed,
+    tb.total_intraday_dags,
     tb.total_dags_in_sla_exclusion_list,
     tb.total_dags_ignoring_list,
     tb.total_dags_inside_sla,

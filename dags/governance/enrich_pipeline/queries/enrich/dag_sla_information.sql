@@ -1,4 +1,28 @@
-WITH dag_run_base AS (
+WITH intraday_dags AS (
+    SELECT
+        id_dag,
+        schedule_interval,
+        CASE
+            WHEN schedule_interval IS NULL OR schedule_interval = '' THEN FALSE
+            WHEN schedule_interval LIKE "%@hourly%" THEN TRUE
+            -- check for intraday cron expressions
+            WHEN SPLIT(schedule_interval, ' ')[1] = '*' THEN TRUE
+            WHEN CONTAINS(SPLIT(schedule_interval, ' ')[1], ',') THEN TRUE
+            WHEN CONTAINS(SPLIT(schedule_interval, ' ')[1], '-') THEN TRUE
+            WHEN CONTAINS(SPLIT(schedule_interval, ' ')[1], '/') THEN TRUE
+            WHEN SPLIT(schedule_interval, ' ')[0] = '*' THEN TRUE
+            WHEN CONTAINS(SPLIT(schedule_interval, ' ')[0], ',') THEN TRUE
+            WHEN CONTAINS(SPLIT(schedule_interval, ' ')[0], '-') THEN TRUE
+            WHEN CONTAINS(SPLIT(schedule_interval, ' ')[0], '/') THEN TRUE
+            ELSE FALSE
+        END AS is_intraday
+    FROM
+        datalake_airflow.dag
+    -- get the most recent schedule interval for each DAG
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_dag ORDER BY ts_last_parsed DESC) = 1
+),
+dag_run_base AS (
     SELECT
         dr.id_dag,
         dr.state,
@@ -209,6 +233,7 @@ base AS (
             WHEN db.id_dag IS NOT NULL AND db.is_triggered_by_mediator <> TRUE THEN FALSE
             ELSE NULL
         END AS is_run_triggered_by_mediator,
+        id.is_intraday AS is_intraday_dag,
         d.dt_event,
         db.dt_run,
         db.ts_first_execution_success,
@@ -233,6 +258,9 @@ base AS (
         sla_exclusion_list AS ds
             ON ds.id_dag = d.id_dag
             AND ds.dt_event = d.dt_event
+    LEFT JOIN
+        intraday_dags AS id
+            ON id.id_dag = d.id_dag
 )
 SELECT
     id_dag,
@@ -251,6 +279,7 @@ SELECT
     is_run_failed,
     is_manual_run,
     is_run_triggered_by_mediator,
+    is_intraday_dag,
     CASE
         WHEN is_active_and_unpaused = TRUE AND COALESCE(is_inside_sla, is_outside_sla, is_null_sla) IS NULL THEN TRUE
         WHEN is_active_and_unpaused = TRUE AND is_in_ignoring_list = FALSE AND COALESCE(is_inside_sla, is_outside_sla) IS NULL THEN TRUE
