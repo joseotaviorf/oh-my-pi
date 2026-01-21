@@ -200,7 +200,7 @@ FROM VALUES
         "ab_beakman_search_services_p_click_experiment_v7",
         named_struct(
             'begin_date', DATE('2025-12-06'),
-            'end_date', NULL,
+            'end_date', DATE('2026-01-21'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -214,7 +214,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
@@ -246,7 +246,7 @@ FROM VALUES
         "ab_beakman_search_services_hue_v3_experiment",
         named_struct(
             'begin_date', DATE('2025-12-10'),
-            'end_date', NULL,
+            'end_date', DATE('2026-01-21'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -260,7 +260,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     )
 
