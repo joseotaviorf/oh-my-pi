@@ -197,10 +197,18 @@ columns:
     description: A boolean flag indicating if the person being replaced had disabilities (PWD), if applicable.
     lineage:
     - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.person_with_disabilties_.value
+  is_confidential:
+    description: A boolean flag indicating if the job opening is marked as confidential.
+    lineage:
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.confidentiality_flag.value
   is_dedicated_to_for_sale_team:
     description: A boolean flag indicating if the position is dedicated to the 'For Sale' team.
     lineage:
     - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value
+  dt_kickoff:
+    description: The kickoff date for the job opening.
+    lineage:
+    - datalake_greenhouse_clean.jobs.openings.keyed_custom_fields.kickoff_date.value
   ts_opened:
     description: The timestamp when the job opening was opened.
     lineage:

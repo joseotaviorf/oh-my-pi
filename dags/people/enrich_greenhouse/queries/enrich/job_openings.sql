@@ -48,7 +48,9 @@ jobs_with_parsed_openings AS (
               plr_latam: STRUCT<value: STRING>,
               person_with_disabilties_: STRUCT<value: STRING>,
               will_this_position_be_100__dedicated_to_the_for_sale_team_: STRUCT<value: STRING>,
-              updated_at_oic: STRUCT<value: STRING>
+              updated_at_oic: STRUCT<value: STRING>,
+              confidentiality_flag: STRUCT<value: STRING>,
+              kickoff_date: STRUCT<value: STRING>
           >
       >>'
     ) AS openings_array
@@ -118,12 +120,17 @@ SELECT
   CAST(open.keyed_custom_fields.rvv.value.value AS DECIMAL(10, 2)) AS rvv,
   CAST(open.keyed_custom_fields.sop.value.value AS DECIMAL(10, 2)) AS sop,
   -- boolean
+  CASE
+    WHEN open.keyed_custom_fields.confidentiality_flag.value = 'Confidential' THEN TRUE
+    ELSE FALSE
+  END AS is_confidential,
   CAST(open.keyed_custom_fields.person_with_disabilties_.value AS BOOLEAN) AS has_disabilities_pwd_person_replaced,
   CASE
     WHEN open.keyed_custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value = 'Yes' THEN True
     WHEN open.keyed_custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value = 'No' THEN False
   END AS is_dedicated_to_for_sale_team,
   -- timestamps
+  CAST(open.keyed_custom_fields.kickoff_date.value AS DATE) AS dt_kickoff,
   CAST(open.opened_at AS TIMESTAMP) AS ts_opened,
   CAST(open.closed_at AS TIMESTAMP) AS ts_closed,
   CAST(open.keyed_custom_fields.updated_at_oic.value AS TIMESTAMP) AS ts_updated_at_oracle,
