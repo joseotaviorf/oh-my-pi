@@ -149,29 +149,6 @@ FROM VALUES
         )
     ),
 
-    -- UCB Sale experiment
-    (
-        "ab_beakman_search_services_demand_sufficiency_v1_sale_experiment_v1",
-        named_struct(
-            'begin_date', DATE('2025-09-24'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'sale'",
-            'metrics', to_json(
-                                    named_struct(
-                                                    'default_metrics', true,
-                                                    'experiment_metrics', array()
-                                                )
-                                ),
-           'running', False
-        )
-    ),
-
     -- New feed experiment
     (
         "ab_beakman_native_home_feed_recommendations_experiment",
