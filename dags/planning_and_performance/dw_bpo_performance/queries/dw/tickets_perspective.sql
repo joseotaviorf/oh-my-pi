@@ -492,3 +492,4 @@ LEFT JOIN off_tickets off
   ON tp.sk_ticket = off.sk_ticket 
 WHERE 
   DATE(tp.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '6' MONTH AND DATE('{load_end_date}')
+  AND tp.last_area = 'CX'

@@ -261,3 +261,4 @@ LEFT JOIN first_resolution AS fr
   ON sp.agent_email = fr.email
 WHERE 
   DATE(sp.dt_created) BETWEEN DATE('{load_start_date}') - INTERVAL '6' MONTH AND DATE('{load_end_date}')
+  AND sp.area = 'CX'
