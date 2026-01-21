@@ -82,8 +82,8 @@ sap AS (
         CONCAT_WS(', ', COLLECT_LIST(hash)) AS hash
     FROM
         datalake_pas.ledger AS l
-    LEFT JOIN 
-        seu_barriga_sap AS sb 
+    LEFT JOIN
+        seu_barriga_sap AS sb
             ON l.id_finance_entity = sb.id_invoice
     WHERE
         (
@@ -111,7 +111,7 @@ vans_checkout_union AS (
     SELECT
         NULLIF(b.your_number, '') AS company_use,
         b.id_finance_entity AS id_invoice,
-        DATE(b.ts_paid - interval '3' hour) AS ts_paid,
+        DATE(b.ts_paid) AS ts_paid,
         b.paid_amount,
         NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
     FROM
