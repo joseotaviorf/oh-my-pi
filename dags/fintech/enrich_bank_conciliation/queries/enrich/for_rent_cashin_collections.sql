@@ -17,39 +17,40 @@ WITH pre_francesinha AS (
 
     UNION
 
-    SELECT 
-        CASE 
+    SELECT
+        CASE
             WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
-            substring(ext.origin_complement, 20, 20), 
-            '^0+', 
-            '') 
-            ELSE regexp_replace(ext.origin_complement, '^0+', '') 
+            substring(ext.origin_complement, 20, 20),
+            '^0+',
+            '')
+            ELSE regexp_replace(ext.origin_complement, '^0+', '')
         END AS our_number,
         '04526' AS bank_account,
         DATE(ext.date_accounting) AS dt_paid,
         ext.amount_value AS amount
-    FROM 
-        datalake_itau_statements_clean.statement_879200452685 ext 
-    WHERE 
-        ext.operation in ('C') 
+    FROM
+        datalake_itau_statements_clean.statement_879200452685 ext
+    WHERE
+        ext.operation in ('C')
         AND ext.literal_code in ('9489')
 ),
 
 francesinha AS (
-    SELECT 
-        IF(LENGTH(our_number) > 30, LEFT(our_number, LENGTH(our_number)-2), our_number) AS our_number,
+    SELECT
+        IF(LENGTH(our_number) >= 30, LEFT(our_number, LENGTH(our_number)-2), our_number) AS our_number,
         bank_account,
         dt_paid,
         amount
-    FROM 
+    FROM
         pre_francesinha
 ),
 
-sap AS (
+pre_sap AS (
     SELECT DISTINCT
         id_business_entity,
         id_finance_entity,
-        COALESCE(CAST(SPLIT_PART(id_external_payment, '|', 2) AS INTEGER), id_external_payment) AS our_number,
+        id_external_payment,
+        COALESCE(CAST(SPLIT_PART(id_external_payment, '|', 2) AS INTEGER), id_external_payment) our_number,
         dt_tax AS dt_paid,
         account_number,
         SUM(debit_credit) AS amount,
@@ -72,9 +73,23 @@ sap AS (
         AND id_finance_entity IS NOT NULL
         AND dt_tax >= current_date - 180
     GROUP BY
-        1,2,3,4,5
+        1,2,3,4,5, 6
     HAVING
         SUM(debit_credit) != 0
+),
+
+sap AS (
+  SELECT
+    id_business_entity,
+    id_finance_entity,
+    id_external_payment,
+    IF(LENGTH(REGEXP_REPLACE(our_number, '^0+', '')) > 30, LEFT(REGEXP_REPLACE(our_number, '^0+', ''), LENGTH(REGEXP_REPLACE(our_number, '^0+', '')) - 2), REGEXP_REPLACE(our_number, '^0+', '')) AS our_number,
+    dt_paid,
+    account_number,
+    amount,
+    hash
+  FROM
+    pre_sap
 ),
 
 checkout AS (
@@ -113,14 +128,14 @@ checkout_union AS (
             ON vc.ts_paid = dd.date
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
-    
-    UNION 
+
+    UNION
 
     SELECT
-      b.our_number, 
+      b.our_number,
       b.paid_amount AS amount,
       COALESCE(dt_credit, DATE(ts_paid)) AS dt_paid
-    FROM 
+    FROM
       datalake_checkout_clean.bolecode b
     WHERE
         b.requester_name = 'trato-feito'
@@ -128,52 +143,56 @@ checkout_union AS (
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
         AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
         AND COALESCE(dt_credit, DATE(ts_paid)) >= current_date - 180
-    
+
     UNION ALL
 
     SELECT
-      IF(LENGTH(id_transaction) > 30, LEFT(id_transaction, LENGTH(id_transaction)-2), id_transaction) AS our_number,
+    IF(LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(b.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(b.id_transaction, '^0+', '')) AS our_number,
       b.due_amount AS amount,
       DATE(b.ts_paid) AS dt_paid
-    FROM 
+    FROM
         datalake_checkout_clean.pix b
     WHERE
         b.requester_name = 'trato-feito'
         AND b.id NOT IN (5855, 5856, 5857)
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
-        AND DATE(ts_paid) >= current_date - 180   
+        AND DATE(ts_paid) >= current_date - 180
 ),
 
 trato_feito AS (
-    SELECT 
+    SELECT
         COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) AS our_number,
         b.id_external AS id_invoice,
         i.total_amount AS amount,
         COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) AS dt_paid
-    FROM 
+    FROM
         datalake_trato_feito_clean.installment i
-    LEFT JOIN 
-        datalake_trato_feito_clean.payment p 
+    LEFT JOIN
+        datalake_trato_feito_clean.payment p
             ON p.id_installment = i.id
-    LEFT JOIN 
-        datalake_trato_feito_clean.accounting_installment aci 
+    LEFT JOIN
+        datalake_trato_feito_clean.accounting_installment aci
             ON aci.id_installment = i.id
-    LEFT JOIN 
-        datalake_trato_feito_clean.bill b 
+    LEFT JOIN
+        datalake_trato_feito_clean.bill b
             ON b.id_external = aci.id_external
 
-    UNION ALL 
+    UNION ALL
 
-    SELECT 
-        LEFT(px.id_transaction, LENGTH(px.id_transaction)-2) AS our_number,
+    SELECT
+         IF(LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(px.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(px.id_transaction, '^0+', '')) AS our_number,
         CAST(NULL AS STRING) AS id_invoice,
         ic.paid_amount AS amount,
-        ic.dt_paid
-    FROM 
+        CASE WHEN dd.weekend <> 'Weekday' THEN dd.next_brz_fintech_business_day
+        ELSE DATE(ic.ts_last_received - interval '3' hour) END AS dt_paid
+    FROM
         datalake_trato_feito_clean.installment_charges AS ic
     LEFT JOIN
         datalake_checkout_clean.pix AS px
             ON ic.id_charge = px.id_charge
+    LEFT JOIN
+        dw_public.dim_date dd
+            ON ic.dt_paid = dd.date
 ),
 
 seu_barriga_sap AS (
@@ -268,12 +287,12 @@ df AS (
     LEFT JOIN
         checkout_union vc
             ON vc.our_number = cs.our_number
-    LEFT JOIN 
+    LEFT JOIN
         trato_feito tf
             ON tf.our_number = cs.our_number
-    LEFT JOIN 
+    LEFT JOIN
         seu_barriga_sap sbs
-            ON (sbs.company_use = cs.our_number) OR (sbs.id_invoice = tf.id_invoice) 
+            ON (sbs.company_use = cs.our_number) OR (sbs.id_invoice = tf.id_invoice)
     LEFT JOIN
         sap s
             ON (cs.our_number = s.our_number) OR (tf.id_invoice = s.id_finance_entity)
@@ -283,7 +302,7 @@ df AS (
         (
             DATE(f.dt_paid) >= '2024-01-01' OR
             DATE(vc.dt_paid) >= '2024-01-01' OR
-            DATE(s.dt_paid) >= '2024-01-01' OR 
+            DATE(s.dt_paid) >= '2024-01-01' OR
             DATE(sbs.dt_paid) >= '2024-01-01' OR
             DATE(tf.dt_paid) >= '2024-01-01'
     )
