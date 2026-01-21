@@ -197,4 +197,4 @@ LEFT JOIN
     ON ss.id_session = am.id_sauron_session
 WHERE
   am.id_sauron_session IS NOT NULL
-  AND ss.is_spoc_session IS FALSE
+  AND ss.is_spoc_session IS NOT TRUE
