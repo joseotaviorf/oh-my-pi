@@ -3195,6 +3195,7 @@ bietlejuice.enrich_region:
   - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region:first-run-of-day
 bietlejuice.enrich_rent_demand_events:
+  - bietlejuice.docx:load-clean-message:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day

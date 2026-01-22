@@ -1,4 +1,59 @@
-WITH rent_flow_house_listing AS (
+WITH proposal_events AS (
+  SELECT
+    GET_JSON_OBJECT(payload, '$.payload.aggregateId') AS id_proposal,
+    GET_JSON_OBJECT(payload, '$.payload.status') AS status,
+    CAST(GET_JSON_OBJECT(payload, '$.eventDate') AS TIMESTAMP) AS event_date
+  FROM
+    datalake_docx_clean.message
+  WHERE
+    GET_JSON_OBJECT(payload, '$.eventName') = 'TENANT_DOCUMENTATION_STATUS_EVENT'
+  ORDER BY
+    ts_created
+),
+proposal_events_agg AS (
+  SELECT
+    id_proposal,
+    MIN(
+      CASE
+        WHEN status = 'EVALUATION_STARTED' THEN event_date
+      END
+    ) AS ts_evaluation_start,
+    MIN(
+      CASE
+        WHEN status IN ('EVALUATION_POSITIVE', 'EVALUATION_POSITIVE_WITH_GUARANTEE') THEN event_date
+      END
+    ) AS ts_evaluation_positive,
+    MIN(
+      CASE
+        WHEN status = 'DOCS_ANALYSIS' THEN event_date
+      END
+    ) AS ts_document_sent,
+    MIN(
+      CASE
+        WHEN status = 'APPROVED' THEN event_date
+      END
+    ) AS ts_credit_approved
+  FROM
+    proposal_events
+  GROUP BY
+    id_proposal
+),
+proposals AS (
+  SELECT
+    p.id,
+    p.id_offer,
+    COALESCE(pe.ts_evaluation_start, p.ts_credit_evaluation_first_init) AS ts_evaluation_start,
+    COALESCE(pe.ts_evaluation_positive, p.ts_first_credit_evaluation_positive) AS ts_evaluation_positive,
+    COALESCE(pe.ts_document_sent, p.ts_tenant_auto_first_doc_sent, p.ts_tenant_first_doc_sent) AS ts_document_sent,
+    COALESCE(pe.ts_credit_approved, p.ts_credit_approved_last) AS ts_credit_approved,
+    p.has_tenant_sent_documentation
+  FROM
+    datalake_proposal.proposal AS p
+  LEFT JOIN
+    proposal_events_agg AS pe
+      ON p.id = pe.id_proposal
+),
+rent_flow_house_listing AS (
   /**
   It was necessary to add some validations related to what's coming from this first CTE (based on the rent flows enriched table) because there
   we can find several bookings, offers, proposals and contracts that not necessarily are following the rules used for this table.
@@ -47,10 +102,11 @@ WITH rent_flow_house_listing AS (
       -    Offers that have status approved and have a timestamp of analysis (which indicates OA event)
     **/
     CASE
-      WHEN pp.ts_credit_evaluation_first_init IS NOT NULL
-        OR pp.ts_first_credit_evaluation_positive IS NOT NULL
-        OR (pp.has_tenant_sent_documentation = TRUE OR (pp.ts_tenant_auto_first_doc_sent IS NOT NULL OR pp.ts_tenant_first_doc_sent IS NOT NULL))
-        OR pp.ts_credit_approved_last IS NOT NULL THEN rf.id_proposal
+      WHEN pp.ts_evaluation_start IS NOT NULL
+        OR pp.ts_evaluation_positive IS NOT NULL
+        OR pp.ts_document_sent IS NOT NULL
+        OR pp.has_tenant_sent_documentation = TRUE
+        OR pp.ts_credit_approved IS NOT NULL THEN rf.id_proposal
       ELSE NULL
     END AS id_proposal,
     /** Conditions to accept a proposal:
@@ -98,7 +154,7 @@ WITH rent_flow_house_listing AS (
     datalake_offer.offer AS off
       ON off.id_offer_context = rf.id_offer_context
   LEFT JOIN
-    datalake_proposal.proposal AS pp
+    proposals AS pp
       ON pp.id = rf.id_proposal
   WHERE
     (lbc.business_context = 'RENT'
@@ -297,7 +353,7 @@ rent_demand_events AS (
     rf.id_agent,
     off.id_rent_flow,
     NULL AS id_schedule,
-    pp.ts_credit_evaluation_first_init AS ts_event,
+    pp.ts_evaluation_start AS ts_event,
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
@@ -306,11 +362,11 @@ rent_demand_events AS (
     rf.id_company_hubspot,
     rf.partner_3p_supply,
     rf.country_code,
-    YEAR(ts_credit_evaluation_first_init) AS year,
-    MONTH(ts_credit_evaluation_first_init) AS month,
-    DAY(ts_credit_evaluation_first_init) AS day
+    YEAR(ts_evaluation_start) AS year,
+    MONTH(ts_evaluation_start) AS month,
+    DAY(ts_evaluation_start) AS day
   FROM
-    datalake_proposal.proposal AS pp
+    proposals AS pp
   JOIN
     datalake_offer.offer AS off
       ON off.id = pp.id_offer
@@ -320,10 +376,10 @@ rent_demand_events AS (
   LEFT JOIN
     datalake_pro_owners.house_b2b_history AS hbh
       ON off.id_house = hbh.id_house
-      AND DATE(pp.ts_credit_evaluation_first_init) >= DATE(hbh.ts_started)
-      AND DATE(pp.ts_credit_evaluation_first_init) < COALESCE(DATE(hbh.ts_ended), NOW())
+      AND DATE(pp.ts_evaluation_start) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_evaluation_start) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
-    pp.ts_credit_evaluation_first_init IS NOT NULL
+    pp.ts_evaluation_start IS NOT NULL
   UNION ALL
   SELECT --evaluation_positive
     pp.id AS id_event,
@@ -339,7 +395,7 @@ rent_demand_events AS (
     rf.id_agent,
     off.id_rent_flow,
     NULL AS id_schedule,
-    pp.ts_first_credit_evaluation_positive AS ts_event,
+    pp.ts_evaluation_positive AS ts_event,
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
@@ -348,11 +404,11 @@ rent_demand_events AS (
     rf.id_company_hubspot,
     rf.partner_3p_supply,
     rf.country_code,
-    YEAR(pp.ts_first_credit_evaluation_positive) AS year,
-    MONTH(pp.ts_first_credit_evaluation_positive) AS month,
-    DAY(pp.ts_first_credit_evaluation_positive) AS day
+    YEAR(pp.ts_evaluation_positive) AS year,
+    MONTH(pp.ts_evaluation_positive) AS month,
+    DAY(pp.ts_evaluation_positive) AS day
   FROM
-    datalake_proposal.proposal AS pp
+    proposals AS pp
    JOIN
     datalake_offer.offer AS off
       ON off.id = pp.id_offer
@@ -362,10 +418,10 @@ rent_demand_events AS (
   LEFT JOIN
     datalake_pro_owners.house_b2b_history AS hbh
       ON off.id_house = hbh.id_house
-      AND DATE(pp.ts_first_credit_evaluation_positive) >= DATE(hbh.ts_started)
-      AND DATE(pp.ts_first_credit_evaluation_positive) < COALESCE(DATE(hbh.ts_ended), NOW())
+      AND DATE(pp.ts_evaluation_positive) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_evaluation_positive) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
-    pp.ts_first_credit_evaluation_positive IS NOT NULL
+    pp.ts_evaluation_positive IS NOT NULL
   UNION ALL
   SELECT --document_sent
     pp.id AS id_event,
@@ -381,7 +437,7 @@ rent_demand_events AS (
     rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
     NULL AS id_schedule,
-    COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent) AS ts_event,
+    pp.ts_document_sent AS ts_event,
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
@@ -390,11 +446,11 @@ rent_demand_events AS (
     rf.id_company_hubspot,
     rf.partner_3p_supply,
     rf.country_code,
-    YEAR(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS year,
-    MONTH(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS month,
-    DAY(COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent)) AS day
+    YEAR(pp.ts_document_sent) AS year,
+    MONTH(pp.ts_document_sent) AS month,
+    DAY(pp.ts_document_sent) AS day
   FROM
-    datalake_proposal.proposal AS pp
+    proposals AS pp
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
@@ -404,12 +460,11 @@ rent_demand_events AS (
   LEFT JOIN
     datalake_pro_owners.house_b2b_history AS hbh
       ON COALESCE(off.id_house, rf.id_house) = hbh.id_house
-      AND DATE(pp.ts_tenant_auto_first_doc_sent) >= DATE(hbh.ts_started)
-      AND DATE(pp.ts_tenant_auto_first_doc_sent) < COALESCE(DATE(hbh.ts_ended), NOW())
+      AND DATE(pp.ts_document_sent) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_document_sent) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
-    pp.has_tenant_sent_documentation = TRUE
-    OR (pp.ts_tenant_auto_first_doc_sent IS NOT NULL
-      OR pp.ts_tenant_first_doc_sent IS NOT NULL)
+    pp.ts_document_sent IS NOT NULL
+    OR pp.has_tenant_sent_documentation = TRUE
     /** Some proposals already had a documentation sent (which will be marked by the ts_tenant_first_doc_sent)
         but the boolean flag could turn into false. This behavior is mostly seen from 2022 backwards
     **/
@@ -428,7 +483,7 @@ rent_demand_events AS (
     rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
     NULL AS id_schedule,
-    pp.ts_credit_approved_last AS ts_event,
+    pp.ts_credit_approved AS ts_event,
     rf.id_house_listing,
     rf.id_region,
     rf.id_user,
@@ -437,11 +492,11 @@ rent_demand_events AS (
     rf.id_company_hubspot,
     rf.partner_3p_supply,
     rf.country_code,
-    YEAR(ts_credit_approved_last) AS year,
-    MONTH(ts_credit_approved_last) AS month,
-    DAY(ts_credit_approved_last) AS day
+    YEAR(ts_credit_approved) AS year,
+    MONTH(ts_credit_approved) AS month,
+    DAY(ts_credit_approved) AS day
   FROM
-    datalake_proposal.proposal AS pp
+    proposals AS pp
   JOIN
     rent_flow_house_listing AS rf
       ON rf.id_proposal = pp.id
@@ -451,10 +506,10 @@ rent_demand_events AS (
   LEFT JOIN
     datalake_pro_owners.house_b2b_history AS hbh
       ON COALESCE(off.id_house, rf.id_house) = hbh.id_house
-      AND DATE(pp.ts_credit_approved_last) >= DATE(hbh.ts_started)
-      AND DATE(pp.ts_credit_approved_last) < COALESCE(DATE(hbh.ts_ended), NOW())
+      AND DATE(pp.ts_credit_approved) >= DATE(hbh.ts_started)
+      AND DATE(pp.ts_credit_approved) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
-    pp.ts_credit_approved_last IS NOT NULL
+    pp.ts_credit_approved IS NOT NULL
   UNION ALL
   SELECT --contract_signed
     ct.id AS id_event,
@@ -488,7 +543,7 @@ rent_demand_events AS (
     rent_flow_house_listing AS rf
       ON rf.id_contract = ct.id
   LEFT JOIN -- We may have several contracts without offer and proposal (portability). In order to don't lose track of them, we're applying a left join.
-    datalake_proposal.proposal AS pp
+    proposals AS pp
       ON ct.id_proposal = pp.id
   LEFT JOIN
     datalake_offer.offer AS off
@@ -534,7 +589,7 @@ rent_demand_events AS (
     rent_flow_house_listing AS rf
       ON rf.id_contract = ct.id
   LEFT JOIN -- We may have several contracts without offer and proposal (portability). In order to don't lose track of them, we're applying a left join.
-    datalake_proposal.proposal AS pp
+    proposals AS pp
       ON ct.id_proposal = pp.id
   LEFT JOIN
     datalake_offer.offer AS off

@@ -8,11 +8,13 @@ columns:
   id_event:
     lineage:
       - datalake_booking.booking.id
+      - datalake_docx_clean.message.payload
+      - datalake_ebdb_clean.visit_status_log.id_visit
       - datalake_ebdb_contract.contract.id
       - datalake_offer.offer.id_offer_context
       - datalake_proposal.proposal.id
-      - datalake_ebdb_clean.visit_status_log.id_visit
-    description: "Id of the event (which could be the id of a booking, offer, proposal or contract)."
+      - datalake_rental_transact.advance_payment.id
+    description: "Id of the event (which could be the id of a booking, offer, proposal, contract, visit, or advance payment)."
   id_booking:
     lineage:
       - datalake_booking.booking.id
@@ -31,6 +33,7 @@ columns:
     description: "Id of the offer (it's the id_offer_context, created on the offer's pipeline)."
   id_proposal:
     lineage:
+      - datalake_docx_clean.message.payload
       - datalake_ebdb_rent_flow.rent_flow.id_proposal
       - datalake_proposal.proposal.id
     description: "Id of the proposal."
@@ -140,6 +143,7 @@ columns:
     lineage:
       - datalake_booking.booking.ts_created
       - datalake_booking.booking.ts_booking_utc
+      - datalake_docx_clean.message.payload
       - datalake_ebdb_contract.contract.ts_created
       - datalake_ebdb_contract.contract.ts_signed
       - datalake_offer.offer.ts_first_sent
