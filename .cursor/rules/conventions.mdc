@@ -1,0 +1,654 @@
+---
+alwaysApply: false
+description: This document provides SQL style conventions and naming standards. All code must adhere to these standards to ensure consistency, readability, and maintainability.
+---
+# Part 1: SQL Style Guide
+
+## General SQL Principles
+
+- **Enforce consistency**: All SQL code should follow these guidelines
+- **Prioritize readability**: Code should be easy to read and understand
+- **Use explicit syntax**: Always use explicit keywords (e.g., `AS` for aliases)
+- **Avoid ambiguity**: Use descriptive names and avoid generic aliases
+
+---
+
+## 1. Column Naming and Arrangement
+
+### Naming Conventions
+
+- **Language**: All columns must be in English
+- **Case**: Use lowercase, except for reserved words and functions (UPPERCASE)
+- **Format**: Use snake_case (e.g., `column_name`)
+- **Aliases**: Avoid generic aliases (e.g., `table_name AS t`)
+- **Reserved words**: Avoid using reserved words as column names (e.g., `type`, `date`)
+- **IDs**: Avoid ambiguous `id` - add context (e.g., `user_id`, `order_id` instead of just `id`)
+
+### Column Arrangement Priority
+
+Columns must be arranged in the following order:
+
+1. **Sks** (e.g., primary/foreign keys) - Priority 0
+2. **Non-sks** (e.g., other ids) - Priority 1
+3. **Non-metrics** (e.g., properties) - Priority 2
+4. **Metrics** (e.g., SLA) - Priority 3
+5. **Date type** - Priority 4
+6. **Timestamp type** - Priority 5
+
+**Example:**
+
+```sql
+SELECT
+    user_sk,              -- SK (Priority 0)
+    order_id,             -- Non-SK ID (Priority 1)
+    user_name,            -- Non-metric property (Priority 2)
+    total_amount,         -- Metric (Priority 3)
+    order_date,           -- Date type (Priority 4)
+    created_timestamp     -- Timestamp type (Priority 5)
+FROM
+    orders
+```
+
+---
+
+## 2. Aliasing and Correlations
+
+### Rules
+
+- **Avoid generic aliases**: Do not use single letters or generic names (e.g., `table_name AS t`)
+- **Use descriptive aliases**: Aliases should relate to the object/expression they represent
+- **Avoid full names**: Don't use the whole table name as alias (becomes cluttered)
+- **Always use AS**: Always include the `AS` keyword for explicit readability
+
+**Good Example:**
+
+```sql
+SELECT
+    tn1.id AS id_table,
+    DATE(tn2.submission_timestamp) AS day
+FROM
+    table_name_1 AS tn1
+JOIN
+    table_name_2 AS tn2
+    ON tn1.id = tn2.id
+```
+
+**Bad Example:**
+
+```sql
+SELECT
+    table_name_1.id id_table,
+    DATE(table_name_2.submission_timestamp) day
+FROM
+    table_name_1
+JOIN
+    table_name_2
+    ON table_name_1.id = table_name_2.id
+```
+
+---
+
+## 3. Reserved Words and Functions
+
+### Rule
+
+Always use **UPPERCASE** for reserved keywords and functions.
+
+**Examples:**
+- `SELECT`, `FROM`, `WHERE`, `JOIN`, `AS`
+- `COUNT()`, `DATE()`, `CASE WHEN`, `SUM()`, `MAX()`, `MIN()`
+- `AND`, `OR`, `ON`, `IN`, `IS`, `NOT`, `NULL`
+
+**Good:**
+
+```sql
+SELECT
+    COUNT(*) AS total_count,
+    DATE(created_at) AS created_date
+FROM
+    users
+WHERE
+    status = 'active'
+    AND created_at > '2024-01-01'
+```
+
+**Bad:**
+
+```sql
+select
+    count(*) as total_count,
+    date(created_at) as created_date
+from
+    users
+where
+    status = 'active'
+    and created_at > '2024-01-01'
+```
+
+---
+
+## 4. White Spaces
+
+### Rules
+
+- Add spaces before and after operators (e.g., `=`, `>`, `<`)
+- Add spaces after commas (`,`)
+- Add spaces surrounding apostrophes (`'`) where not within parentheses
+- Do not crowd code or remove natural language spaces
+
+**Good Example:**
+
+```sql
+SELECT
+    column_1,
+    column_2
+FROM
+    table_name
+WHERE
+    column_1 = 1
+    AND column_2 IN ('A', 'B')
+```
+
+**Bad Example:**
+
+```sql
+SELECT
+    column_1,
+    column_2
+FROM
+    table_name
+WHERE
+    column_1=1
+    AND column_2 IN('A','B')
+```
+
+---
+
+## 5. Line Spacing
+
+### Rules
+
+Always include new lines:
+
+- **Before** `AND`, `OR`, `ON`
+- **After** root keywords (`SELECT`, `FROM`, `WHERE`, `JOIN`)
+- **After** semicolon (`;`) to separate queries
+- **After** comma when separating multiple columns into logical groups
+- **To separate** code into sections for readability
+
+**Important**: Do not use blank lines - they don't work in DBeaver and similar tools.
+
+**Good Example:**
+
+```sql
+SELECT
+    column_1,
+    column_2,
+    column_3
+FROM
+    table_1
+WHERE
+    column_1 = 1
+    AND column_2 = 2
+    OR column_3 = 3
+```
+
+**Bad Example:**
+
+```sql
+SELECT column_1, column_2, column_3 FROM table_1 WHERE column_1 = 1 AND column_2 = 2 OR column_3 = 3
+```
+
+---
+
+## 6. Indentation
+
+### Rules
+
+- **Basic indentation**: Keywords aligned to the left side
+- **Indents**: Use TAB or 2/4 spaces from the basic part of a query
+- **Commas**: Place at end-of-line (EOL), as right comma
+- **SELECT columns**: Always give each column its own row (except `SELECT *`)
+- **DISTINCT**: Include on the same row as `SELECT`
+
+**Good Example:**
+
+```sql
+SELECT DISTINCT
+    client_id,
+    submission_date
+FROM
+    main_summary
+WHERE
+    sample_id = '42'
+    AND submission_date > '20180101'
+```
+
+**Bad Example:**
+
+```sql
+SELECT client_id
+    ,submission_date
+  FROM main_summary
+ WHERE sample_id = '42'
+   AND submission_date > '20180101'
+```
+
+---
+
+## 7. CTEs (Common Table Expressions)
+
+### Rules
+
+- **Use CTEs instead of subqueries**: CTEs make SQL more readable and performant
+- **Placement**: CTEs should be placed at the top of the query
+- **Naming**: CTE names should be concise but clear
+- **Avoid generic names**: Do not use generic names like "a", "test", etc.
+
+### Format
+
+```sql
+WITH context_1 AS (
+    SELECT
+        column_1,
+        column_2
+    FROM
+        table_1
+),
+context_2 AS (
+    SELECT
+        column_3,
+        column_4
+    FROM
+        table_2
+)
+SELECT
+    c1.column_1,
+    c2.column_3
+FROM
+    context_1 AS c1
+JOIN
+    context_2 AS c2
+    ON c1.column_1 = c2.column_3
+```
+
+---
+
+## 8. Joins
+
+### Rules
+
+- **Root keys**: Join keywords should have their own line
+- **Table names**: Use new lines for table names
+- **ON/AND**: Place `ON` and `AND` on new lines an aditional identation
+- **Indentation**: Use TAB or 2/4 spaces when moving to new row
+
+**Good Example:**
+
+```sql
+SELECT
+    tn_1.column_1,
+    tn_2.column_2,
+    tn_3.column_3
+FROM
+    table_name_1 AS tn_1
+LEFT JOIN
+    table_name_2 AS tn_2
+        ON tn_1.column_1 = tn_2.column_1
+        AND tn_1.column_2 = tn_2.column_2
+LEFT JOIN
+    table_name_3 AS tn_3
+        ON tn_1.column_3 = tn_3.column_3
+```
+
+**Bad Example:**
+
+```sql
+SELECT
+    tn_1.column_1,
+    tn_1.column_2,
+    tn_2.column_3
+FROM table_name_1 AS tn_1
+LEFT JOIN 
+    table_name_2 AS tn_2 
+    ON tn_1.column_1 = tn_2.column_1
+    AND tn_1.column_2 = tn_2.column_2
+LEFT JOIN table_name_3 AS tn_3 ON tn_1.column_3 = tn_3.column_3
+```
+
+---
+
+## 9. Case-When Statements
+
+### Rules
+
+- **Each WHEN**: Should be on a new indented row
+- **END AS**: Should be on a new row, indented the same way as `CASE`
+- **Nested CASE**: When inside another function, break it as aforementioned but at the new indentation level
+
+**Good Example:**
+
+```sql
+SELECT
+    CASE column_1
+        WHEN 'a'
+         OR 'aa' THEN 'first'
+        WHEN 'b' THEN 'second'
+        ELSE 'third'
+    END AS new_column
+FROM
+    table_1
+WHERE
+    column_2 IS NOT NULL
+```
+
+**Good Example (Nested in Function):**
+
+```sql
+SELECT
+    COUNT(
+        CASE column_1
+            WHEN 'b' THEN 1
+        END
+    ) > 0 AS is_bee
+FROM
+    table_1
+WHERE
+    column_2 IS NOT NULL
+```
+
+---
+
+## 10. Commenting
+
+### Rules
+
+- **Placement**: Comments should go near the top of your query, or at least near the closest `SELECT`
+- **Single line**: Use `--` syntax (necessarily at the beginning of the line)
+- **Multi-line**: Use `/* */` syntax, a line above
+- **Indentation**: Keep comments indented - avoid too large lines mixed with small ones
+- **Length**: If the comment is too long, it probably shouldn't be there, but in the model documentation
+- **No blank lines**: Do not use blank lines between comment and query
+
+**Good Example:**
+
+```sql
+-- Single line comment goes here
+SELECT
+    column_1,
+    column_2
+FROM
+    table_name
+WHERE
+    column_1 IS NOT NULL
+```
+
+**Good Example (Multi-line):**
+
+```sql
+/* Multi-line comment goes here. Always keep in
+mind that it is not cool to have long lines. You should
+try to keep them with a similar size, alright? */
+SELECT
+    column_1,
+    column_2
+FROM
+    table_name
+WHERE
+    column_1 IS NOT NULL
+```
+
+---
+
+# Part 2: Naming Conventions
+
+## General Naming Principles
+
+- **Language**: All names MUST be in English
+- **Format**: Use snake_case (elements separated by one underscore)
+- **Meaningful**: Names should be meaningful, distinct, and pronounceable
+- **Clarity**: Make variables and columns/tables clear from their name
+- **Avoid misleading**: Do not use names which could misguide data users
+
+---
+
+## Data Lake Terms
+
+| Term | Text Format | Snake Case Format |
+|------|-------------|-------------------|
+| Data lake | datalake | datalake |
+| Data lake layer | datalake layer | datalake_layer |
+| Layers | raw, clean, enrich | raw, clean, enrich |
+
+---
+
+## Database Column Naming Conventions
+
+### Data Lake Columns
+
+| Source Column Type | Convention | Examples |
+|-------------------|------------|----------|
+| id (table) | `id` | `id` (house) |
+| Foreign key | `id_{foreign_key_property}` | `usuario_id` → `id_user` |
+| Name property | `{property}_name` | `nome` (user) → `user_name` |
+| Timestamp | `ts_{property_in_past_tense}` | `created_at` → `ts_created` |
+| Date | `dt_{property_in_past_tense}` | `dataAssinado` → `dt_signed` |
+| Epoch (unix) | `epoch_{property_in_past_tense}` | `event_unix_timestamp` → `epoch_event` |
+| Boolean | `is_{property}` or `has_{property}` | `temImovel` → `has_house`<br>`ativo` → `is_active` |
+| Modified column | `mod_{clean_col_name}` | `is_penthouse_mod` → `mod_is_penthouse` |
+
+### Data Lake Column Arrangement Priority
+
+| Column Type | Priority |
+|-------------|----------|
+| IDs | 0 |
+| Non-IDs (e.g., external ids, natural keys) | 1 |
+| Non-metrics (e.g., properties) | 2 |
+| Metrics (e.g., SLA, booleans, MOD) | 3 |
+| Date, timestamp | 4 |
+| Partitions (e.g., year-month-day) | 5 |
+
+---
+
+## Data Warehouse Naming Conventions
+
+### Table Naming
+
+- **Dimensions**: Use singular nouns
+  - Examples: `dim_contract_person`, `dim_user`
+- **Facts**: Use plural nouns
+  - Examples: `fact_contract_people`, `fact_users`
+
+### Data Warehouse Columns
+
+| Source Column Type | Lake Convention | DW Convention | Examples |
+|-------------------|-----------------|---------------|----------|
+| id (table) | `id_{table}` | `sk_{table}` | `id` (house) → `id_house` (lake) → `sk_house` (dw) |
+| Foreign key | `id_{foreign_key_property}` | `sk_{foreign_key_property}` | `usuario_id` → `id_user` (lake) → `sk_user` (dw) |
+| Name property | `{property}_name` | `{property}_name` | `nome` (user) → `user_name` (lake and dw) |
+| Timestamp | `ts_{property_in_past_tense}` | `sk_{property_in_past_tense}_date` and `ts_{property_in_past_tense}` | `created_at` → `ts_created` (lake) → `sk_created_date` and `ts_created` (dw) |
+| Epoch (unix) | `epoch_{property_in_past_tense}` | `epoch_{property_in_past_tense}` | `event_unix_timestamp` → `epoch_event` |
+| Date | `dt_{property_in_past_tense}` | `sk_{property_in_past_tense}_date` and `dt_{property_in_past_tense}` | `dataAssinado` → `dt_signed` (lake) → `sk_signed_date` and `dt_signed` (dw) |
+| Boolean | `is_{property}` or `has_{property}` | `is_{property}` or `has_{property}` | `temImovel` → `has_house` (lake and dw) |
+| Modified column | `mod_{clean_col_name}` | `mod_{clean_col_name}` | `is_penthouse_mod` → `mod_is_penthouse` (lake and dw) |
+| SLA metric | `{granularity}_{from}_to_{to}` | `{granularity}_{from}_to_{to}` | Days between first listing and contract signed → `days_first_listing_to_contract_signed` |
+
+**Granularity options**: `days`, `minutes`, `seconds`, `hours`
+
+### Data Warehouse Column Arrangement Priority
+
+**Fact Table Example:**
+
+```sql
+SELECT
+    sk_dim0,                          -- Priority 0: SKs
+    sk_dim1,                          -- Priority 0: SKs
+    sk_date0_date,                    -- Priority 0: SKs
+    id_external,                      -- Priority 1: Non-SKs
+    property_name,                    -- Priority 2: Non-metrics
+    is_property0,                     -- Priority 3: Metrics
+    days_property0_property1,         -- Priority 3: Metrics
+    ts_load                           -- Priority 4: Load timestamp
+FROM
+    fact_table
+```
+
+**Dimension Table Example:**
+
+```sql
+SELECT
+    sk_dim,                           -- Priority 0: SKs
+    id_external,                      -- Priority 1: Non-SKs
+    property0,                        -- Priority 2: Non-metrics
+    is_property1,                     -- Priority 3: Metrics
+    days_property0_property1,         -- Priority 3: Metrics
+    ts_load                           -- Priority 4: Load timestamp
+FROM
+    dim_table
+```
+
+| Column Type | Priority |
+|-------------|----------|
+| SKs (e.g., primary/foreign keys) | 0 |
+| Non-SKs (e.g., other ids) | 1 |
+| Non-metrics (e.g., properties) | 2 |
+| Metrics (e.g., SLA) | 3 |
+| ts_load | 4 |
+| Partitions (e.g., year-month-day) | 5 |
+
+---
+
+## Schema Naming Conventions
+
+### Data Warehouse Schemas
+
+Choose schema placement based on context:
+
+1. **Public schema**: For QuintoAndar's main core topics without well-defined context
+   - Examples: `contract`, `offer`
+
+2. **Context schema**: For team-specific contexts with general naming
+   - Examples: `customer_experience`, `credit`
+   - May use multiple data sources
+
+3. **Tool naming schema**: For contexts well-defined by a specific tool
+   - Examples: `zendesk`, `chattermill`
+
+---
+
+## Database Metastore Naming
+
+### Metastore Patterns by Layer
+
+| Layer | Metastore | Pattern | Examples |
+|-------|-----------|---------|----------|
+| **Raw** | Spark | `datalake_{source}_raw` | `datalake_ebdb_raw` |
+| | Athena | `datalake_{source}_raw_prod` | `datalake_ebdb_raw_prod` |
+| **Clean** | Spark | `datalake_{source}_clean` | `datalake_ebdb_clean` |
+| | Athena | `datalake_{source}_clean_prod` | `datalake_ebdb_clean_prod` |
+| **Enrich** | Spark | `datalake_{source}_{context}` | `datalake_ebdb_booking`<br>`datalake_banking` |
+| | Athena | `datalake_{source}_{context}_prod` | `datalake_ebdb_booking_prod`<br>`datalake_banking_prod` |
+| **DW Staging** | Spark | `dw_{schema_name}_staging` | `dw_janus_staging` |
+| **DW Final** | Spark | `dw_{schema_name}` | `dw_janus` |
+
+**Notes:**
+- Use `{source}` in enrich layer only if it depends on one source
+- Database name in forno environment does not contain the `_prod` suffix
+- `source`: Source of extraction for the database
+- `context`: Meaningful name to group enriched tables or DW models
+- `schema_name`: Final schema name in DW
+
+---
+
+## DAG Naming Conventions
+
+### DAG Name Patterns by Layer
+
+| Layer | Pattern | Examples |
+|-------|---------|----------|
+| **Raw + Clean** | `bietlejuice.{source}` | `bietlejuice.ebdb`<br>`bietlejuice.amplitude` |
+| **Enrich** | `bietlejuice.enrich_{source}_{context}` | `bietlejuice.enrich_ebdb_booking`<br>`bietlejuice.enrich_wololo_lead`<br>`bietlejuice.enrich_banking`<br>`bietlejuice.enrich_lead_tracking` |
+| **DW** | `bietlejuice.dw_{context}` | `bietlejuice.dw_banking`<br>`bietlejuice.dw_visit`<br>`bietlejuice.dw_rent_flow` |
+| **Metric** | `bietlejuice.metric_{business_context}__{context}` | `bietlejuice.metric_rent__contracts`<br>`bietlejuice.metric_rent__demand_targets`<br>`bietlejuice.metric_growth__demand` |
+
+**Notes:**
+- Use `{source}` in enrich layer only if it depends on one source
+- `source`: Source of extraction for the DAG
+- `context`: Meaningful name to group enriched tables or DW models
+- `business_context`: High-level business area
+
+### DAG Job Name Patterns
+
+| Step | Pattern | Notes |
+|------|---------|-------|
+| **Create Raw + Clean** | `Load_{source}_{layer}.py` | Only when DAG Builder cannot be used |
+| **Export to External** | `Create_external_{load_type}_tables.py` | DEPRECATED |
+
+**Parameters:**
+- `load_type`: `'incremental'` or `''`
+- `stage`: `'raw'` or `'clean'`
+
+---
+
+## AI Agent Instructions
+
+When writing or reviewing code in this project:
+
+### SQL Code
+
+1. **Always enforce** SQL style guidelines
+2. **Check column arrangement** follows the priority order (SKs → Non-SKs → Non-metrics → Metrics → Date → Timestamp)
+3. **Verify** all reserved words and functions are UPPERCASE
+4. **Ensure** proper indentation and line spacing
+5. **Prefer CTEs** over subqueries
+6. **Use descriptive aliases** with the `AS` keyword
+7. **Format joins** with proper line breaks and indentation
+
+### Naming Conventions
+
+1. **Enforce English** for all names (columns, tables, variables)
+2. **Use snake_case** consistently
+3. **Apply correct prefixes**:
+   - Data Lake: `id_`, `ts_`, `dt_`, `is_`, `has_`, `mod_`, `epoch_`
+   - Data Warehouse: `sk_`, `ts_`, `dt_`, `is_`, `has_`, `mod_`, `epoch_`
+4. **Follow table naming**:
+   - Dimensions: singular nouns (`dim_user`)
+   - Facts: plural nouns (`fact_users`)
+5. **Apply correct metastore patterns** based on layer
+6. **Use proper DAG naming** based on layer and context
+7. **Follow credential patterns** for Databricks and Airflow
+
+### Column Arrangement
+
+1. **Data Lake**: IDs → Non-IDs → Non-metrics → Metrics → Date/Timestamp → Partitions
+2. **Data Warehouse**: SKs → Non-SKs → Non-metrics → Metrics → ts_load → Partitions
+
+---
+
+## Quick Reference Checklist
+
+### SQL Style
+- [ ] Columns are in English, lowercase, snake_case
+- [ ] Columns arranged by priority
+- [ ] All reserved words and functions are UPPERCASE
+- [ ] Proper spacing around operators and commas
+- [ ] New lines before AND/OR/ON, after SELECT/FROM/WHERE/JOIN
+- [ ] Proper indentation (TAB or 2/4 spaces)
+- [ ] Commas at end-of-line (right comma)
+- [ ] Each column on its own row in SELECT
+- [ ] CTEs used instead of subqueries
+- [ ] Descriptive aliases with AS keyword
+- [ ] Joins formatted with proper line breaks
+- [ ] CASE-WHEN properly indented
+- [ ] Comments formatted correctly (no blank lines)
+
+### Naming Conventions
+- [ ] All names in English and snake_case
+- [ ] Correct column prefixes applied (id_, ts_, dt_, sk_, is_, has_, mod_, epoch_)
+- [ ] Table names follow dimension (singular) / fact (plural) convention
+- [ ] Column arrangement follows priority order
+- [ ] Metastore names follow layer patterns
+- [ ] DAG names follow layer and context patterns
+- [ ] Credentials follow naming patterns
+- [ ] SLA metrics use granularity_{from}_to_{to} format
+

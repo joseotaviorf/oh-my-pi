@@ -1,0 +1,348 @@
+---
+alwaysApply: true
+---
+# BI ETL Ejuice Project - Cursor Rules
+
+# Part 3: DAG Builder Guide
+
+## Overview
+
+The DAG Builder creates Airflow DAGs from YAML declaration files instead of Python files. All DAG declarations must be named `{dag_name}_declaration.yml` (use `.yml`, not `.yaml`).
+
+## DAG Declaration Structure
+
+Every DAG declaration has three components:
+
+```yaml
+dag:
+    # Airflow DAG settings
+workflow:
+    # Execution behavior and layer-specific configs
+cluster:
+    # Databricks cluster settings
+```
+
+## Common DAG Parameters
+
+### dag component (required)
+
+```yaml
+dag:
+    name: "dw_banking"  # Required, without "bietlejuice." prefix
+    owner: "Data Fintech"  # Required, from DAGOwnerEnum
+    catchup: false  # Optional, default: false
+    schedule_interval: None  # Optional, default: None
+    schedule_start_date: "2023, 1, 1"  # Optional, format: "YYYY, MM, DD"
+    documentation:
+        dag_purpose: "Brief explanation..."  # Optional
+```
+
+### workflow component (required)
+
+```yaml
+workflow:
+    layer: "dw"  # Required: raw, clean, enrich, dw, metric, reverse, core
+    type: "query_delta"  # Required, depends on layer
+    custom_schema: "banking"  # Optional, default: dag name
+```
+
+### cluster component (required)
+
+```yaml
+cluster:
+    type: "databricks_16_4_med_general_photon_cluster"  # Required
+    access_control_list:  # Optional
+        group_name: "analytics-engineers"
+        permission_level: "CAN_MANAGE"
+    custom_configurations: {}  # Optional
+    custom_libraries: []  # Optional
+```
+
+## Workflow Types by Layer
+
+### Raw Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `cdc` | CDC ingestions (MySQL/Postgres) | ✅ Recommended |
+| `gsheets` | Google Sheets ingestion | ✅ Active |
+| `custom_ingestion` | API/custom ingestions | ✅ Active |
+
+### Core Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `core_model` | Core model tables with custom Spark jobs | ✅ Active |
+
+### Enrich Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `query` | Query-based enrich tables | Deprecated, use `query_delta` |
+| `query_delta` | Query-based enrich tables (Delta) | ✅ Recommended |
+
+### DW Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `query` | Query-based DW tables | Deprecated, use `query_delta` |
+| `query_delta` | Query-based DW tables (Delta) | ✅ Recommended |
+
+### Metric Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `query` | Query-based metric tables | ✅ Active |
+
+### Reverse Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `load` | Load data to reverse layer | ✅ Active |
+| `access` | Export data from reverse layer | ✅ Active |
+| `load_access` | Combined load and export | ✅ Active |
+
+## Common Workflow Parameters
+
+### All Query-Based Workflows (Enrich/DW/Metric)
+
+```yaml
+workflow:
+    layer: "enrich"
+    type: "query_delta"
+    custom_schema: "banking"  # Optional
+    default_extraction_type: "full"  # Optional: "full" or "incremental"
+    default_partitions: []  # Optional
+    default_table_privileges:  # Optional
+        "prod-read-only": ["SELECT"]
+        "prod-read-write": ["SELECT", "MODIFY", "APPLY TAG"]
+    extra_query_template_params:  # Optional
+        load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    inner_dependencies:  # Optional
+        dependent_table:
+            - dependency_table_1
+            - dependency_table_2
+    execution_timeout_hours: 2.0  # Optional
+    has_hive_sync: true  # Optional
+```
+
+### Delta-Specific Parameters (query_delta workflows)
+
+```yaml
+workflow:
+    run_vacuum: true  # Optional, default: true
+    vacuum_retention_hours: 48  # Optional, default: 48
+    vacuum_lite: false  # Optional, default: false (requires DBR 16.1+)
+    run_optimize: true  # Optional, default: true
+    tables_customization:
+        table_name:
+            merge_on: ["id", "date"]  # Optional, for upsert operations
+            when_matched_update_condition: "source.ts_updated > target.ts_updated"  # Optional
+            when_matched_delete_condition: "source.is_deleted = true"  # Optional
+            when_not_matched_insert_condition: "source.is_valid = true"  # Optional
+            z_order_by: ["user_id", "date"]  # Optional
+            table_properties:  # Optional
+                delta.enableChangeDataFeed: "true"
+            execution_timeout_hours: 3.0  # Optional
+```
+
+### Raw Database Pull Delta
+
+```yaml
+workflow:
+    layer: "raw"
+    type: "database_pull_delta"
+    database_type: "postgres"  # Required: "postgres" or "mongo"
+    dbutils_secret_key: "EBDB_DB"  # Optional, default: {CUSTOM_SCHEMA}_DB
+    custom_schema: "ebdb"  # Optional
+    default_extraction_type: "incremental"  # Optional
+    lineage_product_database_name: "ebdb"  # Optional
+    has_hive_sync: true  # Optional
+    extra_query_template_params:  # Optional (Postgres only)
+        load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    tables_customization:  # Required
+        raw_table_name:
+            clean_table_name: "clean_table_name"  # Optional
+            date_filter_column: "created_at"  # Optional, for incremental
+            extraction_type: "incremental"  # Optional
+            partitions: ["year", "month", "day"]  # Optional
+            merge_on: ["id"]  # Optional
+            z_order_by: ["user_id"]  # Optional
+```
+
+### Raw CDC
+
+```yaml
+workflow:
+    layer: "raw"
+    type: "cdc"
+    database_type: "postgres"  # Required: "postgres" or "mysql"
+    custom_schema: "ebdb"  # Optional
+    source_database: "ebdb"  # Optional, default: custom_schema
+    source_schema: "public"  # Optional, default: "public"
+    lineage_product_database_name: "ebdb"  # Optional
+    has_hive_sync: true  # Optional
+    tables_customization:  # Required
+        table_name:
+            clean_table_name: "clean_table_name"  # Optional
+            raw_primary_keys: ["id"]  # Optional, auto-detected if not provided
+            clean_primary_keys: ["id"]  # Optional, from metadata
+            z_order_by: ["user_id"]  # Optional
+            transactional_datatype_overrides:  # Optional
+                column_name: "STRING"
+            database_column_alias:  # Optional
+                year: "year_column"
+            execution_timeout_hours: 3.0  # Optional
+```
+
+### Raw Custom Ingestion
+
+```yaml
+workflow:
+    layer: "raw"
+    type: "custom_ingestion"
+    load_spark_job: "load_{extraction_type}_{dag_name}_into_datalake"  # Required
+    spark_job_arguments:  # Required
+        - "{environment}"
+        - "{bucket}"
+        - "{{ data_interval_start | ds }}"
+        - "{table_name}"
+    custom_schema: "api_source"  # Optional
+    default_extraction_type: "incremental"  # Optional
+    has_hive_sync: true  # Optional
+    tables_customization:  # Required
+        table_name:
+            clean_table_name: "clean_table_name"  # Optional
+            extraction_type: "incremental"  # Optional
+            partitions: ["year", "month", "day"]  # Optional
+            merge_on: ["id"]  # Optional
+            extra_spark_job_arguments: ["extra_arg"]  # Optional
+            raw_inner_dependencies:  # Optional
+                dependent_raw_table:
+                    - dependency_raw_table
+            clean_inner_dependencies:  # Optional
+                dependent_clean_table:
+                    - dependency_clean_table
+```
+
+### Raw Gsheets
+
+```yaml
+workflow:
+    layer: "raw"
+    type: "gsheets"
+    custom_schema: "gsheets"  # Required (historical reasons)
+    has_hive_sync: true  # Optional
+    credentials_scope: "quintoandar"  # Optional: quintoandar, people, mlops
+```
+
+**Note**: Gsheets also requires `forno_conf.yml` and `prod_conf.yml` with sheet configurations.
+
+## DAG Folder Structure
+
+```
+dags/
+└── {line}/
+    └── {dag_name}/
+        ├── {dag_name}_declaration.yml  # Required
+        ├── queries/
+        │   ├── raw/  # For raw layer (if applicable)
+        │   ├── clean/  # For clean layer
+        │   ├── enrich/  # For enrich layer
+        │   ├── dw/  # For DW layer
+        │   └── metric/  # For metric layer
+        ├── metadata/
+        │   ├── clean/
+        │   ├── enrich/
+        │   ├── dw/
+        │   └── metric/
+        ├── data_quality/  # Optional
+        │   ├── clean/
+        │   ├── enrich/
+        │   ├── dw/
+        │   └── metric/
+        └── spark_jobs/  # For custom Spark jobs
+```
+
+## Testing DAGs
+
+### Local Environment
+```bash
+# Transcript all DAGs
+make create-dag-files
+
+# Transcript specific DAG
+make create-dag-files dag_name=<dag_name>
+
+# Run local Airflow
+make run-local-environment
+
+# Clean generated files
+make clean
+```
+
+### Forno Environment
+1. Push to `forno` branch
+2. Watch `validate-dag-declaration-files` step in Woodpecker
+3. Watch `create-dag-files` step in Drone
+4. Access Forno Airflow UI to verify
+
+## Templates Available in Spark Jobs
+
+| Template | Description |
+|----------|-------------|
+| `{environment}` | "forno" or "prod" |
+| `{bucket}` | S3 bucket path |
+| `{dag_name}` | DAG name |
+| `{schema}` | Schema name (without prefixes) |
+| `{table_name}` | Table name |
+| `{partitions}` | JSON list of partitions |
+| `{extraction_type}` | "full" or "incremental" |
+| `{is_incremental}` | Boolean for incremental |
+| `{load_start_date}` | Start date for processing |
+| `{load_end_date}` | End date for processing |
+
+**Jinja templates** (double braces) are also supported: `{{ data_interval_start | ds }}`
+
+## Important Limitations
+
+- **Job cluster DAGs**: Limited to 100 tasks per DAG (applies to: database_pull, database_pull_delta, custom_ingestion, cdc, query, query_delta for enrich/dw)
+- **Interactive cluster DAGs**: No task limit (applies to: gsheets, metric query)
+- **File extension**: Must use `.yml`, not `.yaml`
+- **No Python files**: Don't place custom Python files in DAG folder alongside declaration file
+
+---
+
+# AI Agent Instructions
+
+## When Creating DAGs
+
+1. **Choose correct workflow**: Check layer and use case
+2. **Prefer Delta workflows**: Use `query_delta` or `database_pull_delta` over deprecated versions
+3. **File naming**: `{dag_name}_declaration.yml` (use `.yml`)
+4. **Folder structure**: queries/{layer}/, metadata/{layer}/, data_quality/{layer}/
+5. **DAG naming**: Follow layer-specific patterns
+6. **Metastore naming**: Follow layer-specific patterns
+7. **Check task limit**: Job cluster workflows limited to 100 tasks
+8. **Use templates**: Leverage `{environment}`, `{bucket}`, `{table_name}`, etc.
+9. **Incremental loads**: Use `extra_query_template_params` with `get_date_param`
+10. **Delta features**: Use `merge_on` for upserts, `z_order_by` for optimization
+
+## When Creating Credentials
+
+1. **Databricks secrets**: `{NAME}_DB`, `{NAME}_API`, `{NAME}_CRYPT`
+2. **Airflow secrets**: `{source}_SECRET` (auto-obfuscated)
+3. **Cluster variables**: `databricks_bietlejuice_{dag_name}_cluster`
+
+## Quick Validation Checklist
+
+### DAG Builder
+- [ ] File named `{dag_name}_declaration.yml`
+- [ ] Correct workflow for layer and use case
+- [ ] All required parameters present
+- [ ] Folder structure correct
+- [ ] Task count under 100 (if job cluster)
+- [ ] Delta workflow used (not deprecated)
+- [ ] Templates used correctly
