@@ -17,7 +17,7 @@ WITH intraday_dags AS (
             ELSE FALSE
         END AS is_intraday
     FROM
-        datalake_airflow.dag
+        datalake_astro_clean.dag
     -- get the most recent schedule interval for each DAG
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_dag ORDER BY ts_last_parsed DESC) = 1

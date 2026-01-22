@@ -53,7 +53,7 @@ columns:
     description: Boolean flag indicating if the DAG run was triggered by the Mediator.
   is_intraday_dag:
     lineage:
-      - datalake_airflow.dag.schedule_interval
+      - datalake_astro_clean.dag.schedule_interval
     description: Boolean flag indicating if the DAG has an intraday schedule (hourly or more frequent).
   dt_snapshot:
     lineage:
@@ -61,7 +61,7 @@ columns:
     description: Date of the snapshot.
   dt_run:
     lineage:
-      -  datalake_pipeline.dag_run.ts_run
+      - datalake_pipeline.dag_run.ts_data_interval_started
     description: The DAG run date, which usually is D-1.
   ts_first_execution_success:
     lineage:
