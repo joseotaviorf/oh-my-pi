@@ -5,71 +5,83 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Table used in CyberLegal for accounts transferred from CyberCredit to CyberLegal. Contains notifications and requests."
 columns:
-  assigned_lawyer_id:
-    description: "Assigned responsible lawyer for the case"
+  id_notification_request:
+    description: "Request number identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNASSLWY
-  account_number:
-    description: "Account number"
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQID
+  id_notification_sequence:
+    description: "Sequence number"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNACCT
-  account_group:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNSEQID
+  id_contract_group:
     description: "Account group"
     lineage:
       - datalake_cyber_legal_homolog_raw.cantfylg.CNACCTG
-  dt_assigned_lawyer:
-    description: "Date assigned to responsible lawyer"
+  id_contract:
+    description: "Account number"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNASLWDT
-  case_number:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNACCT
+  id_case:
     description: "Case number"
     lineage:
       - datalake_cyber_legal_homolog_raw.cantfylg.CNCASENO
-  manager_id:
+  id_assigned_attorney:
+    description: "Assigned responsible attorney for the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNASSLWY
+  id_supervisor_attorney:
+    description: "Supervisor attorney who accepts or rejects the request"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNLWYRID
+  id_manager:
     description: "Manager identifier"
     lineage:
       - datalake_cyber_legal_homolog_raw.cantfylg.CNCOLLID
-  comment_text:
-    description: "Comment text"
+  client_ssn:
+    description: "Client social security number"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNCOMM
-  dt_requested:
-    description: "Request date"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNDT
-  dt_judgment_creation_approved:
-    description: "Date of case creation approval"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNLCHKDT
-  create_judgment:
-    description: "Flag to create case (Y=create case, N=do not create)"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNLFLG
-  supervisor_lawyer_id:
-    description: "Supervisor lawyer who accepts or rejects the request"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNLWYRID
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNSSNUM
   debtor_name:
     description: "Debtor name"
     lineage:
       - datalake_cyber_legal_homolog_raw.cantfylg.CNNAME
+  request_comment:
+    description: "Comment text"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNCOMM
+  is_case_creation:
+    description: "Flag to create case (TRUE=create case, FALSE=do not create)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNLFLG
+  is_request_approved:
+    description: "Request approval flag (TRUE=approved, FALSE=not approved)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQFLG
+  dt_assigned_attorney:
+    description: "Date assigned to responsible attorney"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNASLWDT
+  dt_case_creation_approved:
+    description: "Date of case creation approval"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNLCHKDT
+  dt_requested:
+    description: "Request date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNDT
   dt_request_approved:
     description: "Request approval date"
     lineage:
       - datalake_cyber_legal_homolog_raw.cantfylg.CNREQDT
-  request_approved:
-    description: "Request approval flag (Y=approved, N=not approved)"
+  ts_updated:
+    description: "Timestamp of the last update"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQFLG
-  request_id:
-    description: "Request number identifier"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNREQID
-  sequence_id:
-    description: "Sequence number"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNSEQID
-  customer_ssn:
-    description: "Customer social security number"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cantfylg.CNSSNUM
+      - datalake_cyber_legal_homolog_raw.cantfylg.CNDTUPD
+  year:
+    description: "Year partition"
+  month:
+    description: "Month partition"
+  day:
+    description: "Day partition"
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"

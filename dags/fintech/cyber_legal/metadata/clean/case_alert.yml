@@ -5,43 +5,55 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Table used in CyberLegal module containing information about legal processes requiring immediate attention due to procedural stages not completed within estimated time."
 columns:
-  alert_type_id:
-    description: "Alert type identifier - Has LOV"
+  id_alert:
+    description: "Alert identifier - Primary key"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALALERTTP
-  case_number:
+      - datalake_cyber_legal_homolog_raw.caalert.ALID
+  id_case:
     description: "Case number"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALCASENO
-  manager_id:
-    description: "Manager who generated the alert"
+  id_generating_attorney:
+    description: "Attorney who generated the alert"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALCOLLID
-  dt_created:
-    description: "Date the alert was generated"
+  id_revising_attorney:
+    description: "Attorney who reviewed the alert"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALCREDT
+      - datalake_cyber_legal_homolog_raw.caalert.ALREVCOL
+  alert_type_code:
+    description: "Alert type code - Has LOV"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caalert.ALALERTTP
   alert_description:
     description: "Reason why the alert was generated"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALDESC
-  alert_id:
-    description: "Alert identifier - Primary key"
+  is_reviewed:
+    description: "Alert review status (TRUE=Reviewed, FALSE=Not reviewed)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALID
-  reviewer_manager_id:
-    description: "Manager who reviewed the alert"
+      - datalake_cyber_legal_homolog_raw.caalert.ALSTATUS
+  dt_created:
+    description: "Date the alert was generated"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALREVCOL
+      - datalake_cyber_legal_homolog_raw.caalert.ALCREDT
   dt_reviewed:
     description: "Alert review date"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALREVDT
-  alert_status:
-    description: "Alert status (R=Reviewed, N=Not reviewed)"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALSTATUS
   dt_alert:
     description: "Alert date"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALALERTDT
+  ts_updated:
+    description: "Timestamp of the last update"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caalert.ALDTUPD
+  year:
+    description: "Year partition"
+  month:
+    description: "Month partition"
+  day:
+    description: "Day partition"
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"

@@ -28,10 +28,10 @@ workflow:
   tables_customization:
     case:
       clean_table_name: case
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['CEDTUPD']"
         - False
         - "[]"
     casetype:
@@ -60,10 +60,10 @@ workflow:
         - "[]"
     cantfylg:
       clean_table_name: case_notification_log
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['CNDTUPD']"
         - False
         - "[]"
     caseuda:
@@ -76,34 +76,34 @@ workflow:
         - "[]"
     casestag:
       clean_table_name: case_stage
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['CSDTUPD']"
         - False
         - "[]"
     caseacct:
       clean_table_name: case_account
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['CCDTUPD']"
         - False
         - "[]"
     caalert:
       clean_table_name: case_alert
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['ALDTUPD']"
         - False
         - "[]"
     caexpns:
       clean_table_name: case_expense
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['EXDTUPD']"
         - False
         - "[]"
     cardacct:

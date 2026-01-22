@@ -17,38 +17,46 @@ columns:
     description: "Client unique identification (CPF/CNPJ)"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CESSNUM
-  plaintiff_name:
-    description: "Name of the party initiating the legal process, usually the Bank name"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEACTOR
-  id_responsible_lawyer:
-    description: "Responsible lawyer"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CERESPLWYR
-  id_external_lawyer:
-    description: "External lawyer"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEEXTLWYR
-  id_lawyer_agency:
-    description: "External lawyer agency"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CELWYRAGENCY
-  id_supervisor_lawyer:
-    description: "Supervisor lawyer"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CESUPVLWYR
-  id_status_lawyer:
-    description: "Lawyer who performed the case status change"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CESTATLWYR
   id_court:
     description: "Court identification"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CECRTID
+  id_external_attorney:
+    description: "External attorney"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEEXTLWYR
+  id_responsible_attorney:
+    description: "Responsible attorney"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CERESPLWYR
+  id_supervisor_attorney:
+    description: "Supervisor attorney"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESUPVLWYR
+  id_attorney_agency:
+    description: "External attorney agency"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELWYRAGENCY
+  id_status_attorney:
+    description: "Attorney who performed the case status change"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESTATLWYR
   id_branch:
     description: "Branch identifier"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CEBRANCH
+  id_previous_attorney_agency:
+    description: "Previous attorney agency identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELWYRPRVAGN
+  id_previous_agency:
+    description: "Previous agency"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEPRVAGN
+  plaintiff_name:
+    description: "Name of the party initiating the legal process, usually the Bank name"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACTOR
   debtor_name:
     description: "Debtor name"
     lineage:
@@ -99,6 +107,8 @@ columns:
       - datalake_cyber_legal_homolog_raw.case.CEBCITY
   business_state:
     description: "Business state"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEBSTATE
   business_zip_code:
     description: "Debtor business zip code address"
     lineage:
@@ -109,6 +119,8 @@ columns:
       - datalake_cyber_legal_homolog_raw.case.CEBPHONE
   business_phone_extension:
     description: "Business phone extension"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEBPEXT
   previous_name:
     description: "Debtor previous name"
     lineage:
@@ -131,12 +143,12 @@ columns:
       - datalake_cyber_legal_homolog_raw.case.CEPRVCTY
   previous_state:
     description: "Previous state"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEPRVSTA
   previous_zip_code:
     description: "Debtor previous zip code address"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CEPRVZIP
-  id_previous_agency:
-    description: "Previous agency"
   process_type:
     description: "Process type (Despejo, Reivindicatoria...)"
     lineage:
@@ -145,50 +157,74 @@ columns:
     description: "Case subtype"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CESUBTYPE
-  case_status:
-    description: "Legal process status (A=ACTIVE, C=CONCLUDED)"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CESTATUS
-  case_reason:
-    description: "Reason for case final result"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEREASON
-  case_result:
-    description: "Case final result"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CERESULT
-  case_comment:
-    description: "Case comment registered when accepted"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CECOMM
-  case_close_comment:
-    description: "Comment about case closure"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CECLOSECOMM
-  third_party_name:
-    description: "Name of third party involved in the case"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CETHDACT
-  salutation_code:
-    description: "Salutation code"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CESALCD
   product_type:
     description: "Account type (product)"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CEPROD
+  case_comment:
+    description: "Case comment registered when accepted"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CECOMM
+  close_comment:
+    description: "Comment about case closure"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CECLOSECOMM
   currency_code:
     description: "Currency key"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CECURRENCY
-  forecast_percentage:
-    description: "Probability percentage of winning the process"
+  closure_reason:
+    description: "Reason for case final result"
     lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEFORECAST
-  recovery_forecast_percentage:
-    description: "Forecast percentage of lawsuit amount recovery"
+      - datalake_cyber_legal_homolog_raw.case.CEREASON
+  closure_result:
+    description: "Case final result"
     lineage:
-      - datalake_cyber_legal_homolog_raw.case.CERCFCAMT
+      - datalake_cyber_legal_homolog_raw.case.CERESULT
+  third_party_name:
+    description: "Name of third party involved in the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CETHDACT
+  greeting_code:
+    description: "Greeting code"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESALCD
+  action_code_class_1:
+    description: "Highest weight action code class 1"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACAC1
+  action_code_class_2:
+    description: "Highest weight action code class 2"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACAC2
+  action_code_class_3:
+    description: "Highest weight action code class 3"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACAC3
+  letter_code_class_1:
+    description: "Highest weight letter code class 1"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACLC1
+  letter_code_class_2:
+    description: "Highest weight letter code class 2"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACLC2
+  letter_code_class_3:
+    description: "Highest weight letter code class 3"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACLC3
+  result_code_class_1:
+    description: "Highest weight result code class 1"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACRC1
+  result_code_class_2:
+    description: "Highest weight result code class 2"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACRC2
+  result_code_class_3:
+    description: "Highest weight result code class 3"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACRC3
   last_action_code:
     description: "Last action code"
     lineage:
@@ -201,105 +237,135 @@ columns:
     description: "Last result code"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CELASTRC
-  action_code_class_1:
-    description: "Highest weight action code class 1"
+  case_status:
+    description: "Legal process status (New, Active, Finalized, Pending, Completed)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEACAC1
-  action_code_class_2:
-    description: "Highest weight action code class 2"
-  action_code_class_3:
-    description: "Highest weight action code class 3"
-  letter_code_class_1:
-    description: "Highest weight letter code class 1"
-  letter_code_class_2:
-    description: "Highest weight letter code class 2"
-  letter_code_class_3:
-    description: "Highest weight letter code class 3"
-  result_code_class_1:
-    description: "Highest weight result code class 1"
-  result_code_class_2:
-    description: "Highest weight result code class 2"
-  result_code_class_3:
-    description: "Highest weight result code class 3"
-  activity_score_class_1:
-    description: "Activity score (weight) class 1"
-  activity_score_class_2:
-    description: "Activity score (weight) class 2"
-  activity_score_class_3:
-    description: "Activity score (weight) class 3"
-  lawsuit_amount:
-    description: "Lawsuit amount"
-  asset_awarded_amount:
+      - datalake_cyber_legal_homolog_raw.case.CESTATUS
+  action_score_class_1:
+    description: "Action score (weight) class 1"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACSC1
+  action_score_class_2:
+    description: "Action score (weight) class 2"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACSC2
+  action_score_class_3:
+    description: "Action score (weight) class 3"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACSC3
+  adjudicated_assets_amount:
     description: "Value of assets awarded in legal process"
-  discount_amount:
-    description: "Discount amount to debtor"
-  accessory_expenses_amount:
-    description: "Accessory expenses"
-  fee_expenses_amount:
-    description: "Fee expenses amount"
-  other_expenses_amount:
-    description: "Other expenses"
-  recovered_amount:
-    description: "Amount recovered in cash"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEASSTAWRD
   unrecoverable_amount:
     description: "Unrecoverable amount"
-  unrecoverable_document_id:
-    description: "Document ID for unrecoverable amount declaration"
-  dt_accepted:
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEURCAMT
+  lawsuit_amount:
+    description: "Lawsuit amount"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELWSTAMT
+  previous_attorney_amount:
+    description: "Amount assigned to previous attorney agency"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELWYPRVAMT
+  attorney_agency_amount:
+    description: "Amount assigned to attorney agency"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELWYAGNAMT
+  accessory_expenses_amount:
+    description: "Accessory expenses"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEEXPACC
+  expense_fees_amount:
+    description: "Expense fees amount"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEEXPFEE
+  other_expenses_amount:
+    description: "Other expenses"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEEXPOTH
+  discount_amount:
+    description: "Discount amount to debtor"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEDISCOUNT
+  cash_recovered_amount:
+    description: "Amount recovered in cash"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CERCAMT
+  recovery_forecast_percentage:
+    description: "Forecast percentage of lawsuit amount recovery"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CERCFCAMT
+  win_probability_percentage:
+    description: "Probability percentage of winning the process"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEFORECAST
+  dt_case_accepted:
     description: "Date the case was accepted by legal department"
-  dt_assigned:
-    description: "Date the case was assigned to a private lawyer"
-  dt_status_changed:
-    description: "Date when case status changed"
-  dt_last_activity:
-    description: "Last activity date"
-  dt_last_contact:
-    description: "Last contact date"
-  dt_next_contact:
-    description: "Next contact date"
-  dt_last_collector_update:
-    description: "Last collector update date"
-  dt_lawsuit:
-    description: "Lawsuit date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACCEPTDT
+  dt_case_assigned:
+    description: "Date the case was assigned to a private attorney"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEASGNDT
   dt_activity_class_1:
     description: "Highest weight activity date class 1"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACDT1
   dt_activity_class_2:
     description: "Highest weight activity date class 2"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACDT2
   dt_activity_class_3:
     description: "Highest weight activity date class 3"
-  dt_unrecoverable:
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEACDT3
+  dt_last_collector_update:
+    description: "Last collector update date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELCLUPD
+  dt_last_activity:
+    description: "Last activity date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELSTACT
+  dt_last_contact:
+    description: "Last contact date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CELSTCON
+  dt_next_contact:
+    description: "Next contact date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CENXTCON
+  dt_unrecoverable_declaration:
     description: "Date when amount was defined as unrecoverable"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CEURCDT
-  id_previous_lawyer_agency:
-    description: "Previous lawyer agency identifier"
+  dt_lawsuit_filed:
+    description: "Lawsuit date"
     lineage:
-      - datalake_cyber_legal_homolog_raw.case.CELWYRPRVAGN
-  previous_lawyer_amount:
-    description: "Amount assigned to previous lawyer agency"
+      - datalake_cyber_legal_homolog_raw.case.CELWSTDT
+  dt_status_changed:
+    description: "Date when case status changed"
     lineage:
-      - datalake_cyber_legal_homolog_raw.case.CELWYPRVAMT
-  lawyer_agency_amount:
-    description: "Amount assigned to lawyer agency"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CELWYAGNAMT
-  queue_code:
-    description: "Current queue code"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEQUE
-  previous_queue:
-    description: "Previous queue code"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEPREVQ
-  dt_previous_lawyer_reference:
-    description: "Previous lawyer assignment reference date"
+      - datalake_cyber_legal_homolog_raw.case.CESTATDT
+  dt_previous_attorney_assigned:
+    description: "Previous attorney assignment reference date"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CELWYPRVREF
-  dt_lawyer_agency_reference:
-    description: "Lawyer agency assignment reference date"
+  dt_attorney_agency_assigned:
+    description: "Attorney agency assignment reference date"
     lineage:
       - datalake_cyber_legal_homolog_raw.case.CELWYAGNREF
-  dt_queue_change:
-    description: "Queue change date"
+  ts_updated:
+    description: "Timestamp of the last update"
     lineage:
-      - datalake_cyber_legal_homolog_raw.case.CEQCHGDT
+      - datalake_cyber_legal_homolog_raw.case.CEDTUPD
+  year:
+    description: "Year partition"
+  month:
+    description: "Month partition"
+  day:
+    description: "Day partition"
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"

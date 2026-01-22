@@ -5,63 +5,75 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Contains one record per procedural stage of each legal case. Stores start and end dates of each stage."
 columns:
-  pre_authorized_expense_limit_amount:
-    description: "Pre-authorized expense limit amount for the stage"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSAMT
-  case_number:
+  id_case:
     description: "Legal case number - Primary key of the case"
     lineage:
       - datalake_cyber_legal_homolog_raw.casestag.CSCASENO
-  required_stage_days:
-    description: "Number of days required to complete the procedural stage"
+  id_stage:
+    description: "Sequence number corresponding to each stage"
     lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSDAYS
+      - datalake_cyber_legal_homolog_raw.casestag.CSSTGID
+  id_case_type:
+    description: "Lawsuit type - Primary key related to casetype table"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSTYPE
   stage_description:
     description: "Description of the stage taken for this case type"
     lineage:
       - datalake_cyber_legal_homolog_raw.casestag.CSDESC
-  dt_ended:
-    description: "Date when the stage was completed"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSENDDT
   stage_order:
     description: "Order in which the stage should be performed"
     lineage:
       - datalake_cyber_legal_homolog_raw.casestag.CSORDER
-  max_post_system_date_days:
-    description: "Maximum number of days after system date"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSPOSDYS
-  max_pre_system_date_days:
-    description: "Maximum number of days prior to system date"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSPREDYS
-  responsible_lawyer_days:
-    description: "Days for responsible lawyer alert"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSRESPDAYS
-  dt_started:
-    description: "Date when the stage started"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSSTDT
-  stage_id:
-    description: "Sequence number corresponding to each stage"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSSTGID
   case_subtype:
     description: "Case subtype"
     lineage:
       - datalake_cyber_legal_homolog_raw.casestag.CSSUBTYPE
-  supervisor_lawyer_days:
-    description: "Days for supervisor lawyer alert"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSSUPVDAYS
   stage_status:
-    description: "Stage status (R=Current stage Running, S=Scheduled stage, E=Completed End stage)"
+    description: "Stage status (Current=Current stage Running, Scheduled=Scheduled stage, Completed=Completed End stage)"
     lineage:
       - datalake_cyber_legal_homolog_raw.casestag.CSTATUS
-  case_type_code:
-    description: "Lawsuit type - Primary key related to casetype table"
+  authorized_expenses_amount:
+    description: "Authorized expense limit amount for the stage"
     lineage:
-      - datalake_cyber_legal_homolog_raw.casestag.CSTYPE
+      - datalake_cyber_legal_homolog_raw.casestag.CSAMT
+  required_days_for_stage:
+    description: "Number of days required to complete the procedural stage"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSDAYS
+  responsible_attorney_days:
+    description: "Days for responsible attorney alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSRESPDAYS
+  supervisor_attorney_days:
+    description: "Days for supervisor attorney alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSSUPVDAYS
+  max_previous_system_days:
+    description: "Maximum number of days prior to system date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSPREDYS
+  max_post_system_days:
+    description: "Maximum number of days after system date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSPOSDYS
+  dt_stage_start:
+    description: "Date when the stage started"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSSTDT
+  dt_stage_end:
+    description: "Date when the stage was completed"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSENDDT
+  ts_updated:
+    description: "Timestamp of the last update"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.casestag.CSDTUPD
+  year:
+    description: "Year partition"
+  month:
+    description: "Month partition"
+  day:
+    description: "Day partition"
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"

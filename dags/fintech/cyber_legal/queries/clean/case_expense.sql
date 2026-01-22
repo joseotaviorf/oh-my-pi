@@ -24,5 +24,11 @@ SELECT
     EXINVOICEDT AS dt_invoice,
     EXDTRELCLI AS dt_recovered,
     EXDTRELAGN AS dt_reimbursed,
+    EXDTUPD AS ts_updated,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.caexpns
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

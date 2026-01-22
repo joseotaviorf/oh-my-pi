@@ -5,15 +5,27 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Defines the relationship between a specific case and the original accounts or credits. If no records exist for a given case, it means it was manually added in CyberLegal."
 columns:
-  account_number:
-    description: "Account number that associates with the case"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseacct.CCACCT
-  account_group:
-    description: "Account group code"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseacct.CCACCTG
-  case_number:
+  id_case:
     description: "Legal case number - Primary key"
     lineage:
       - datalake_cyber_legal_homolog_raw.caseacct.CCCASENO
+  id_contract_group:
+    description: "Account group code"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseacct.CCACCTG
+  id_contract:
+    description: "Account number that associates with the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseacct.CCACCT
+  ts_updated:
+    description: "Timestamp of the last update"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseacct.CCDTUPD
+  year:
+    description: "Year partition"
+  month:
+    description: "Month partition"
+  day:
+    description: "Day partition"
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"

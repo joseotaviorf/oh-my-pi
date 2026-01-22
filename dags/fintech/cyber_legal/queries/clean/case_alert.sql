@@ -9,5 +9,11 @@ SELECT
     ALCREDT AS dt_created,
     ALREVDT AS dt_reviewed,
     ALALERTDT AS dt_alert,
+    ALDTUPD AS ts_updated,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.caalert
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
