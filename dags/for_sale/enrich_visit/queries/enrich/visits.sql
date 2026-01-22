@@ -228,12 +228,7 @@ SELECT
         WHEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 5) = 'DEMAND' THEN SPLIT_PART(REPLACE(vbm.business_model, 'LEAD_GEN', 'LEADGEN'), '_', 4)
     END AS business_model_demand,
     visit_log.first_event,
-    CASE
-        WHEN pva.id_visit IS NOT NULL THEN 'FOLLOW_UP_COLLECTED'
-        WHEN pva.id_visit IS NULL
-             AND visit_log.ts_visit_registered IS NOT NULL THEN 'VISIT_REGISTERED'
-        ELSE visit_log.last_event
-    END AS last_event,
+    visit_log.last_event,
     visit.slot,
     visit.slot_count,
     visit.business_context,

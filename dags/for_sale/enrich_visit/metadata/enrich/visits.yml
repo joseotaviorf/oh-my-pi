@@ -124,10 +124,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.event_type
     description: Last event computed from VSL.
-    categories:
-      ASSISTED_ENTRANCE: When a third person is needed to enter.
-      EASY_ENTRANCE: When no third person is needed to enter.
-      NOT_CLASSIFIED: Unmapped case.
   slot:
     lineage:
       - datalake_ebdb_clean.visit.slot
