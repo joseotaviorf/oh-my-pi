@@ -3482,6 +3482,8 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   - bietlejuice.sales_flow:load-clean-brokerage:first-run-of-day
   - bietlejuice.sales_flow:load-clean-ccv-flow:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-diligence-appointment:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-diligence:first-run-of-day
   - bietlejuice.sales_flow:load-clean-house:first-run-of-day
   - bietlejuice.sales_flow:load-clean-mortgage:first-run-of-day
   - bietlejuice.sales_flow:load-clean-offer-aud:first-run-of-day
@@ -3489,6 +3491,7 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.sales_flow:load-clean-payment-aud:first-run-of-day
   - bietlejuice.sales_flow:load-clean-payment:first-run-of-day
   - bietlejuice.sales_flow:load-clean-reject-reason:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-sales-flow-aud:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow-details:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-specialist:first-run-of-day
