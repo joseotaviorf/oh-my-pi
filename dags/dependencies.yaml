@@ -2218,8 +2218,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned:first-run-of-day
   - bietlejuice.ebdb_administration:load-clean-property-fee-aud:first-run-of-day
   - bietlejuice.ebdb_administration:load-clean-property-fee:first-run-of-day
-  - bietlejuice.ebdb_agent:load-clean-house-agent-aud:first-run-of-day
-  - bietlejuice.ebdb_agent:load-clean-house-agent-key-tracking-aud:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-access-authorization-type:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-access-type-aud:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-access-type:first-run-of-day

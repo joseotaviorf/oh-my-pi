@@ -51,14 +51,6 @@ workflow:
       clean_table_name: agent_region_data_aud
     # DemandVisitManagementCapabilitySettings:
     #   clean_table_name: demand_visit_management_capability_settings
-    HouseAgent:
-      clean_table_name: house_agent
-    HouseAgent_AUD:
-      clean_table_name: house_agent_aud
-    HouseAgentKeyTracking:
-      clean_table_name: house_agent_key_tracking
-    HouseAgentKeyTracking_AUD:
-      clean_table_name: house_agent_key_tracking_aud
     PreferredFixedAgent:
       clean_table_name: preferred_fixed_agent
     PreferredFixedAgent_AUD:
