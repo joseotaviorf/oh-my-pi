@@ -4711,3 +4711,10 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
+bietlejuice.dw_sale_offers_test:
+ - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
+ - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
+ - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
+ - bietlejuice.enrich_sale_offer:load-enrich-sale-offers:first-run-of-day
+ - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
+ - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
