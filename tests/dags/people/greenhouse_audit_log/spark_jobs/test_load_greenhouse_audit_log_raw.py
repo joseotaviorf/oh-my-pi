@@ -21,6 +21,7 @@ sys.modules["quintoandar_logger"] = MagicMock()
 from dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw import (  # noqa: E402
     GreenhouseAuditLogAPI,
     main,
+    format_search_after_cursor,
     JWT_TOKEN_URL,
     DATABRICKS_SCOPE,
     API_KEY_FIELD,
@@ -32,6 +33,153 @@ from dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw i
     FILTER_PLACEHOLDER_START_DATE,
     FILTER_PLACEHOLDER_END_DATE,
 )
+
+
+class TestFormatSearchAfterCursor(unittest.TestCase):
+    """Tests for the format_search_after_cursor function."""
+
+    def test_format_cursor_none(self):
+        """Test that None input returns None."""
+        result = format_search_after_cursor(None)
+        self.assertIsNone(result)
+
+    def test_format_cursor_list_with_two_elements(self):
+        """Test formatting a list with exactly 2 elements."""
+        cursor = [1769113670314, "8a7243fba6e775b3822a60a254563238"]
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
+
+    def test_format_cursor_list_with_three_elements(self):
+        """Test formatting a list with 3 elements (only first 2 should be used)."""
+        cursor = [
+            1769113670314,
+            "8a7243fba6e775b3822a60a254563238",
+            "d01384f1317d57c567b3f6e06c7f0827",
+        ]
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
+
+    def test_format_cursor_list_with_one_element(self):
+        """Test formatting a list with 1 element."""
+        cursor = [1769113670314]
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314")
+
+    def test_format_cursor_empty_list(self):
+        """Test that empty list returns None."""
+        result = format_search_after_cursor([])
+        self.assertIsNone(result)
+
+    def test_format_cursor_string_with_two_components(self):
+        """Test formatting a string with 2 components."""
+        cursor = "1769113670314,8a7243fba6e775b3822a60a254563238"
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
+
+    def test_format_cursor_string_with_three_components(self):
+        """Test formatting a string with 3 components (only first 2 should be used)."""
+        cursor = "1769113670314,8a7243fba6e775b3822a60a254563238,d01384f1317d57c567b3f6e06c7f0827"
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
+
+    def test_format_cursor_string_with_spaces(self):
+        """Test formatting a string with spaces around components."""
+        cursor = "1769113670314, 8a7243fba6e775b3822a60a254563238, d01384f1317d57c567b3f6e06c7f0827"
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
+
+    def test_format_cursor_string_single_component(self):
+        """Test formatting a string with single component."""
+        cursor = "1769113670314"
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314")
+
+    def test_format_cursor_integer(self):
+        """Test formatting an integer value."""
+        cursor = 1769113670314
+        result = format_search_after_cursor(cursor)
+        self.assertEqual(result, "1769113670314")
+
+
+class TestGreenhouseAuditLogAPIExtractPaginationState(unittest.TestCase):
+    """Tests for the GreenhouseAuditLogAPI._extract_pagination_state method."""
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_extract_pagination_state_with_list_cursor(
+        self, mock_process_filters, mock_auth
+    ):
+        """Test extraction with cursor as a list of 3 elements."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        data = {
+            "paging": {
+                "next_search_after": [
+                    1769113670314,
+                    "8a7243fba6e775b3822a60a254563238",
+                    "d01384f1317d57c567b3f6e06c7f0827",
+                ],
+                "pit_id": "pit123",
+            }
+        }
+
+        state = api_client._extract_pagination_state(data)
+
+        self.assertEqual(
+            state["cursor"], "1769113670314,8a7243fba6e775b3822a60a254563238"
+        )
+        self.assertEqual(state["context"], "pit123")
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_extract_pagination_state_with_string_cursor(
+        self, mock_process_filters, mock_auth
+    ):
+        """Test extraction with cursor as a comma-separated string."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        data = {
+            "paging": {
+                "next_search_after": "1769113670314,hash1,hash2",
+                "pit_id": "pit456",
+            }
+        }
+
+        state = api_client._extract_pagination_state(data)
+
+        self.assertEqual(state["cursor"], "1769113670314,hash1")
+        self.assertEqual(state["context"], "pit456")
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_extract_pagination_state_no_cursor(self, mock_process_filters, mock_auth):
+        """Test extraction when cursor is None."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        data = {"paging": {"next_search_after": None, "pit_id": "pit789"}}
+
+        state = api_client._extract_pagination_state(data)
+
+        self.assertNotIn("cursor", state)
+        self.assertEqual(state["context"], "pit789")
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_extract_pagination_state_empty_paging(
+        self, mock_process_filters, mock_auth
+    ):
+        """Test extraction when paging object is empty."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        data = {"paging": {}}
+
+        state = api_client._extract_pagination_state(data)
+
+        self.assertEqual(state, {})
 
 
 class TestGreenhouseAuditLogAPIInit(unittest.TestCase):
@@ -484,7 +632,9 @@ class TestMainFunction(unittest.TestCase):
         mock_api_client.get_all_paginated_results.assert_called_once()
 
         # Verify DataFrame creation
-        mock_json_to_df.assert_called_once_with(mock_spark, api_data, "raw_payload")
+        mock_json_to_df.assert_called_once_with(
+            mock_spark, api_data, raw_column_name="raw_payload"
+        )
 
         # Verify partitions were added
         mock_insert_partitions.assert_called_once_with(mock_df, "event_time")

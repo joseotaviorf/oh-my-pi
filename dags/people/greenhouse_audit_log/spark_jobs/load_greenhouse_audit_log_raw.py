@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from pyspark.sql import SparkSession
 
@@ -32,6 +32,43 @@ DEFAULT_PARTITION_COLUMN = "event_time"
 # Filter placeholder constants
 FILTER_PLACEHOLDER_START_DATE = "load_start_date"
 FILTER_PLACEHOLDER_END_DATE = "load_end_date"
+
+
+def format_search_after_cursor(cursor_value: Any) -> Optional[str]:
+    """
+    Formats the search_after cursor value for the Greenhouse Audit Log API.
+
+    The Greenhouse API expects the Search-After header to follow the pattern
+    "integer,string" (exactly 2 components). However, the API sometimes returns
+    next_search_after with 3 components. This function ensures we only send
+    the first 2 components.
+
+    Args:
+        cursor_value: The cursor value from the API response. Can be:
+            - A list: [timestamp, hash1, hash2] or [timestamp, hash]
+            - A string: "timestamp,hash1,hash2" or "timestamp,hash"
+
+    Returns:
+        A properly formatted cursor string with exactly 2 components,
+        or None if the cursor is invalid.
+    """
+    if cursor_value is None:
+        return None
+
+    if isinstance(cursor_value, list):
+        if len(cursor_value) >= 2:
+            return f"{cursor_value[0]},{cursor_value[1]}"
+        elif len(cursor_value) == 1:
+            return str(cursor_value[0])
+        return None
+
+    if isinstance(cursor_value, str):
+        parts = [p.strip() for p in cursor_value.split(",")]
+        if len(parts) >= 2:
+            return f"{parts[0]},{parts[1]}"
+        return cursor_value
+
+    return str(cursor_value)
 
 
 class GreenhouseAuditLogAPI(BaseAPIClient):
@@ -144,6 +181,40 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
         
         LOGGER.info("Filters processed. Final params to be sent to API: %s", self.params)
 
+    def _extract_pagination_state(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Extracts pagination state from API response with cursor formatting.
+
+        The Greenhouse Audit Log API returns next_search_after with potentially
+        3 components, but only accepts 2 components in the Search-After header.
+        This method ensures the cursor is properly formatted.
+
+        Args:
+            data: The JSON response from the API.
+
+        Returns:
+            Dict containing 'cursor' and optionally 'context' (pit_id).
+        """
+        state = {}
+
+        paging = data.get("paging", {})
+        cursor_value = paging.get("next_search_after")
+        formatted_cursor = format_search_after_cursor(cursor_value)
+
+        if formatted_cursor is not None:
+            state["cursor"] = formatted_cursor
+            LOGGER.debug(
+                "Formatted cursor from '%s' to '%s'",
+                cursor_value,
+                formatted_cursor,
+            )
+
+        context_value = paging.get("pit_id")
+        if context_value is not None:
+            state["context"] = context_value
+
+        return state
+
     def get_all_paginated_results(self) -> List[Dict[str, Any]]:
         """
         Fetches all paginated results from the Greenhouse Audit Log API.
@@ -193,6 +264,7 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
             page_size_location="header",
             page_size=PAGE_SIZE,
             extract_results=lambda data: data.get("results", []),
+            extract_pagination_state=self._extract_pagination_state,
             page_delay=PAGINATION_RATE_LIMIT_DELAY,
             retry_on_context_expiration=True,
             max_context_retries=3,
