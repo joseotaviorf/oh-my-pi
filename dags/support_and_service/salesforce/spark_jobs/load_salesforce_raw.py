@@ -735,6 +735,110 @@ def schema_define():
                     ]
                 )
             },
+        'case_milestones':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("CaseId", StringType()),
+                        StructField("StartDate", StringType()),
+                        StructField("TargetDate", StringType()),
+                        StructField("CompletionDate", StringType()),
+                        StructField("MilestoneTypeId", StringType()),
+                        StructField("IsCompleted", StringType()),
+                        StructField("IsViolated", StringType()),
+                        StructField("SystemModstamp", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("LastModifiedDate", StringType()),
+                        StructField("LastModifiedById", StringType()),
+                        StructField("IsDeleted", StringType()),
+                        StructField("TargetResponseInMins", StringType()),
+                        StructField("TargetResponseInHrs", StringType()),
+                        StructField("TargetResponseInDays", StringType()),
+                        StructField("TimeRemainingInMins", StringType()),
+                        StructField("TimeRemainingInHrs", StringType()),
+                        StructField("TimeRemainingInDays", StringType()),
+                        StructField("ElapsedTimeInMins", StringType()),
+                        StructField("ElapsedTimeInHrs", StringType()),
+                        StructField("ElapsedTimeInDays", StringType()),
+                        StructField("TimeSinceTargetInMins", StringType()),
+                        StructField("TimeSinceTargetInHrs", StringType()),
+                        StructField("TimeSinceTargetInDays", StringType()),
+                        StructField("BusinessHoursId", StringType()),
+                        ]
+                    )
+            },
+        'dynamic_forms':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("OwnerId", StringType()),
+                        StructField("IsDeleted", StringType()),
+                        StructField("Name", StringType()),
+                        StructField("RecordTypeId", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("LastModifiedDate", StringType()),
+                        StructField("LastModifiedById", StringType()),
+                        StructField("SystemModstamp", StringType()),
+                        StructField("LastViewedDate", StringType()),
+                        StructField("LastReferencedDate", StringType()),
+                        StructField("FormFilterValue__c", StringType()),
+                        StructField("FormFilter__c", StringType()),
+                        StructField("FormObject__c", StringType()),
+                        StructField("IsActive__c", StringType()),
+                        StructField("TaskManagement__c", StringType()),
+                        StructField("TaskType__c", StringType()),
+                        StructField("ExternalId__c", StringType()),
+                        StructField("AnswerOptions__c", StringType()),
+                        StructField("Answer__c", StringType()),
+                        StructField("ConditionField__c", StringType()),
+                        StructField("ConditionObject__c", StringType()),
+                        StructField("ConditionValue__c", StringType()),
+                        StructField("DataType__c", StringType()),
+                        StructField("FieldToValue__c", StringType()),
+                        StructField("IsConcatenation__c", StringType()),
+                        StructField("IsRequired__c", StringType()),
+                        StructField("ObjectToValue__c", StringType()),
+                        StructField("Object__c", StringType()),
+                        StructField("Operator__c", StringType()),
+                        StructField("ParentForm__c", StringType()),
+                        StructField("ParentRecordId__c", StringType()),
+                        StructField("QuestionOrder__c", StringType()),
+                        StructField("Question__c", StringType()),
+                        StructField("RelatedQuestion__c", StringType()),
+                        StructField("Section__c", StringType()),
+                        StructField("TargetField__c", StringType()),
+                        StructField("TargetObject__c", StringType()),
+                        ]
+                    )
+            },
+        'record_types':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("Name", StringType()),
+                        StructField("DeveloperName", StringType()),
+                        StructField("NamespacePrefix", StringType()),
+                        StructField("Description", StringType()),
+                        StructField("BusinessProcessId", StringType()),
+                        StructField("SobjectType", StringType()),
+                        StructField("IsActive", StringType()),
+                        StructField("IsPersonType", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("LastModifiedById", StringType()),
+                        StructField("LastModifiedDate", StringType()),
+                        StructField("SystemModstamp", StringType()),
+                        ]
+                    )
+            },
         }
 
 def get_next_page_data(query, headers, instance_url, table_name, is_done, next_url):

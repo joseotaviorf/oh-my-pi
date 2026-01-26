@@ -1,0 +1,174 @@
+database_name: datalake_salesforce_clean
+table_name: dynamic_forms
+description: Clean table for ingesting dynamic form data from the Sales Force tool.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_dynamic_form:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Id
+    description: Unique identification key for the dynamic form in Sales Force.
+  id_owner:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.OwnerId
+    description: Owner identification key of the dynamic form.
+  id_record_type:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.RecordTypeId
+    description: Record type identification key.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.CreatedById
+    description: User identification key who created the dynamic form.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.LastModifiedById
+    description: User identification key who last modified the dynamic form.
+  id_external:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ExternalId__c
+    description: External identification key for the dynamic form.
+  id_parent_form:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ParentForm__c
+    description: Parent form identification key.
+  id_parent_record:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ParentRecordId__c
+    description: Parent record identification key.
+  id_related_question:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.RelatedQuestion__c
+    description: Related question identification key.
+  form_name:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Name
+    description: Name of the dynamic form.
+  form_filter_value:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.FormFilterValue__c
+    description: Filter value used in the form.
+  form_filter:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.FormFilter__c
+    description: Filter applied to the form.
+  form_object:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.FormObject__c
+    description: Object associated with the form.
+  task_management:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.TaskManagement__c
+    description: Task management configuration for the form.
+  task_type:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.TaskType__c
+    description: Type of task associated with the form.
+  answer_options:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.AnswerOptions__c
+    description: Available answer options for the form question.
+  answer:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Answer__c
+    description: Answer provided in the form.
+  condition_field:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ConditionField__c
+    description: Field used as condition for the form logic.
+  condition_object:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ConditionObject__c
+    description: Object used as condition for the form logic.
+  condition_value:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ConditionValue__c
+    description: Value used as condition for the form logic.
+  data_type:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.DataType__c
+    description: Data type of the form field.
+  field_to_value:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.FieldToValue__c
+    description: Field to value mapping configuration.
+  object_to_value:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.ObjectToValue__c
+    description: Object to value mapping configuration.
+  object_name:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Object__c
+    description: Object name associated with the form field.
+  operator:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Operator__c
+    description: Operator used in form conditions.
+  question:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Question__c
+    description: Question text displayed in the form.
+  section:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.Section__c
+    description: Section where the form field is located.
+  target_field:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.TargetField__c
+    description: Target field for the form response.
+  target_object:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.TargetObject__c
+    description: Target object for the form response.
+  question_order:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.QuestionOrder__c
+    description: Order of the question in the form.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.IsDeleted
+    description: Flag indicating if the dynamic form is deleted.
+  is_active:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.IsActive__c
+    description: Flag indicating if the dynamic form is active.
+  is_concatenation:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.IsConcatenation__c
+    description: Flag indicating if the field value is a concatenation.
+  is_required:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.IsRequired__c
+    description: Flag indicating if the form field is required.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.SystemModstamp
+    description: Timestamp of the last system modification.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.CreatedDate
+    description: Timestamp when the dynamic form was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.LastModifiedDate
+    description: Timestamp of the last modification to the dynamic form.
+  ts_last_viewed:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.LastViewedDate
+    description: Timestamp when the dynamic form was last viewed.
+  ts_last_referenced:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.LastReferencedDate
+    description: Timestamp when the dynamic form was last referenced.
+  year:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.year
+    description: Year of the dynamic_form record.
+  month:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.month
+    description: Month of the dynamic_form record.
+  day:
+    lineage:
+      - datalake_salesforce_raw.dynamic_forms.day
+    description: Day of the dynamic_form record.

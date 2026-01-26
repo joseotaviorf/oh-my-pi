@@ -1,0 +1,74 @@
+database_name: datalake_salesforce_clean
+table_name: record_types
+description: Clean table for ingesting record type data from the Sales Force tool.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_record_type:
+    lineage:
+      - datalake_salesforce_raw.record_types.Id
+    description: Unique identification key for the record type in Sales Force.
+  id_business_process:
+    lineage:
+      - datalake_salesforce_raw.record_types.BusinessProcessId
+    description: Business process identification key associated with the record type.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.record_types.CreatedById
+    description: User identification key who created the record type.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.record_types.LastModifiedById
+    description: User identification key who last modified the record type.
+  record_type_name:
+    lineage:
+      - datalake_salesforce_raw.record_types.Name
+    description: Name of the record type.
+  developer_name:
+    lineage:
+      - datalake_salesforce_raw.record_types.DeveloperName
+    description: Developer name of the record type used in API calls.
+  namespace_prefix:
+    lineage:
+      - datalake_salesforce_raw.record_types.NamespacePrefix
+    description: Namespace prefix of the record type.
+  record_type_description:
+    lineage:
+      - datalake_salesforce_raw.record_types.Description
+    description: Description of the record type.
+  sobject_type:
+    lineage:
+      - datalake_salesforce_raw.record_types.SobjectType
+    description: Salesforce object type associated with the record type.
+  is_active:
+    lineage:
+      - datalake_salesforce_raw.record_types.IsActive
+    description: Flag indicating if the record type is active.
+  is_person_type:
+    lineage:
+      - datalake_salesforce_raw.record_types.IsPersonType
+    description: Flag indicating if the record type is a person type.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.record_types.SystemModstamp
+    description: Timestamp of the last system modification.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.record_types.CreatedDate
+    description: Timestamp when the record type was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.record_types.LastModifiedDate
+    description: Timestamp of the last modification to the record type.
+  year:
+    lineage:
+      - datalake_salesforce_raw.record_types.year
+    description: Year of the record type record.
+  month:
+    lineage:
+      - datalake_salesforce_raw.record_types.month
+    description: Month of the record type record.
+  day:
+    lineage:
+      - datalake_salesforce_raw.record_types.day
+    description: Day of the record type record.

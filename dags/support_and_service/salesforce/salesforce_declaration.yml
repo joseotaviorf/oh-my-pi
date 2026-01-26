@@ -55,6 +55,15 @@ workflow:
     users:
       extra_spark_job_arguments:
         - "SELECT Id,Username,LastName,FirstName,MiddleName,Suffix,Name,CompanyName,Division,Department,Title,Street,City,State,PostalCode,Country,Latitude,Longitude,GeocodeAccuracy,Address,Email,EmailPreferencesAutoBcc,EmailPreferencesAutoBccStayInTouch,EmailPreferencesStayInTouchReminder,SenderEmail,SenderName,Signature,StayInTouchSubject,StayInTouchSignature,StayInTouchNote,Phone,Fax,MobilePhone,Alias,CommunityNickname,BadgeText,IsActive,TimeZoneSidKey,UserRoleId,LocaleSidKey,ReceivesInfoEmails,ReceivesAdminInfoEmails,EmailEncodingKey,ProfileId,UserType,StartDay,EndDay,LanguageLocaleKey,EmployeeNumber,DelegatedApproverId,ManagerId,LastLoginDate,LastPasswordChangeDate,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,PasswordExpirationDate,NumberOfFailedLogins,SuAccessExpirationDate,OfflineTrialExpirationDate,BPO__c FROM User"
+    case_milestones:
+      extra_spark_job_arguments:
+        - "SELECT Id,CaseId,StartDate,TargetDate,CompletionDate,MilestoneTypeId,IsCompleted,IsViolated,SystemModstamp,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,IsDeleted,TargetResponseInMins,TargetResponseInHrs,TargetResponseInDays,TimeRemainingInMins,TimeRemainingInHrs,TimeRemainingInDays,ElapsedTimeInMins,ElapsedTimeInHrs,ElapsedTimeInDays,TimeSinceTargetInMins,TimeSinceTargetInHrs,TimeSinceTargetInDays,BusinessHoursId FROM CaseMilestone"
+    dynamic_forms:
+      extra_spark_job_arguments:
+        - "SELECT Id,OwnerId,IsDeleted,Name,RecordTypeId,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastViewedDate,LastReferencedDate,FormFilterValue__c,FormFilter__c,FormObject__c,IsActive__c,TaskManagement__c,TaskType__c,ExternalId__c,AnswerOptions__c,Answer__c,ConditionField__c,ConditionObject__c,ConditionValue__c,DataType__c,FieldToValue__c,IsConcatenation__c,IsRequired__c,ObjectToValue__c,Object__c,Operator__c,ParentForm__c,ParentRecordId__c,QuestionOrder__c,Question__c,RelatedQuestion__c,Section__c,TargetField__c,TargetObject__c FROM DynamicForm__c"
+    record_types:
+      extra_spark_job_arguments:
+        - "SELECT Id,Name,DeveloperName,NamespacePrefix,Description,BusinessProcessId,SobjectType,IsActive,IsPersonType,CreatedById,CreatedDate,LastModifiedById,LastModifiedDate,SystemModstamp FROM RecordType"
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

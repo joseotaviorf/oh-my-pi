@@ -1,0 +1,35 @@
+SELECT
+    Id AS id_case_milestone,
+    CaseId AS id_case,
+    MilestoneTypeId AS id_milestone_type,
+    CreatedById AS id_created_by,
+    LastModifiedById AS id_last_modified_by,
+    BusinessHoursId AS id_business_hours,
+    CAST(TargetResponseInMins AS INT) AS target_response_in_mins,
+    CAST(TargetResponseInHrs AS INT) AS target_response_in_hrs,
+    CAST(TargetResponseInDays AS INT) AS target_response_in_days,
+    CAST(TimeRemainingInMins AS INT) AS time_remaining_in_mins,
+    CAST(TimeRemainingInHrs AS INT) AS time_remaining_in_hrs,
+    CAST(TimeRemainingInDays AS INT) AS time_remaining_in_days,
+    CAST(ElapsedTimeInMins AS INT) AS elapsed_time_in_mins,
+    CAST(ElapsedTimeInHrs AS INT) AS elapsed_time_in_hrs,
+    CAST(ElapsedTimeInDays AS INT) AS elapsed_time_in_days,
+    CAST(TimeSinceTargetInMins AS INT) AS time_since_target_in_mins,
+    CAST(TimeSinceTargetInHrs AS INT) AS time_since_target_in_hrs,
+    CAST(TimeSinceTargetInDays AS INT) AS time_since_target_in_days,
+    CAST(IsCompleted AS BOOLEAN) AS is_completed,
+    CAST(IsViolated AS BOOLEAN) AS is_violated,
+    CAST(IsDeleted AS BOOLEAN) AS is_deleted,
+    CAST(SystemModstamp AS TIMESTAMP) AS ts_system_mod,
+    CAST(CreatedDate AS TIMESTAMP) AS ts_created,
+    CAST(LastModifiedDate AS TIMESTAMP) AS ts_last_modified,
+    CAST(StartDate AS DATE) AS dt_start,
+    CAST(TargetDate AS DATE) AS dt_target,
+    CAST(CompletionDate AS DATE) AS dt_completion,
+    year,
+    month,
+    day
+FROM
+    datalake_salesforce_raw.case_milestones
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

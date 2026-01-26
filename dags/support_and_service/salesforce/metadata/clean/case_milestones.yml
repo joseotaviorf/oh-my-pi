@@ -1,0 +1,126 @@
+database_name: datalake_salesforce_clean
+table_name: case_milestones
+description: Clean table for ingesting case milestone data from the Sales Force tool.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_case_milestone:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.Id
+    description: Unique identification key for the case milestone in Sales Force.
+  id_case:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.CaseId
+    description: Case identification key related to the milestone.
+  id_milestone_type:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.MilestoneTypeId
+    description: Milestone type identification key.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.CreatedById
+    description: User identification key who created the milestone.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.LastModifiedById
+    description: User identification key who last modified the milestone.
+  id_business_hours:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.BusinessHoursId
+    description: Business hours identification key used to calculate milestone times.
+  target_response_in_mins:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TargetResponseInMins
+    description: Target response time in minutes for the milestone.
+  target_response_in_hrs:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TargetResponseInHrs
+    description: Target response time in hours for the milestone.
+  target_response_in_days:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TargetResponseInDays
+    description: Target response time in days for the milestone.
+  time_remaining_in_mins:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TimeRemainingInMins
+    description: Remaining time in minutes to achieve the milestone target.
+  time_remaining_in_hrs:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TimeRemainingInHrs
+    description: Remaining time in hours to achieve the milestone target.
+  time_remaining_in_days:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TimeRemainingInDays
+    description: Remaining time in days to achieve the milestone target.
+  elapsed_time_in_mins:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.ElapsedTimeInMins
+    description: Elapsed time in minutes since the milestone started.
+  elapsed_time_in_hrs:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.ElapsedTimeInHrs
+    description: Elapsed time in hours since the milestone started.
+  elapsed_time_in_days:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.ElapsedTimeInDays
+    description: Elapsed time in days since the milestone started.
+  time_since_target_in_mins:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TimeSinceTargetInMins
+    description: Time in minutes since the milestone target date.
+  time_since_target_in_hrs:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TimeSinceTargetInHrs
+    description: Time in hours since the milestone target date.
+  time_since_target_in_days:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TimeSinceTargetInDays
+    description: Time in days since the milestone target date.
+  is_completed:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.IsCompleted
+    description: Flag indicating if the milestone has been completed.
+  is_violated:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.IsViolated
+    description: Flag indicating if the milestone has been violated.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.IsDeleted
+    description: Flag indicating if the milestone record is deleted.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.SystemModstamp
+    description: Timestamp of the last system modification.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.CreatedDate
+    description: Timestamp when the milestone was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.LastModifiedDate
+    description: Timestamp of the last modification to the milestone.
+  dt_start:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.StartDate
+    description: Start date of the milestone.
+  dt_target:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.TargetDate
+    description: Target date for completing the milestone.
+  dt_completion:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.CompletionDate
+    description: Date when the milestone was completed.
+  year:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.year
+    description: Year of the case_milestone record.
+  month:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.month
+    description: Month of the case_milestone record.
+  day:
+    lineage:
+      - datalake_salesforce_raw.case_milestones.day
+    description: Day of the case_milestone record.
