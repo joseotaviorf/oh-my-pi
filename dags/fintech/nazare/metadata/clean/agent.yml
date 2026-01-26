@@ -1,25 +1,39 @@
 ---
 database_name: datalake_nazare_clean
 table_name: agent
+description: Cleaned agent data containing information about real estate agents in the Nazare system.
+domain: Fintech
+owner: data-fintech@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_nazare_raw.agent.id
+    description: Unique identifier of the agent.
   id_external:
     lineage:
       - datalake_nazare_raw.agent.external_id
+    description: External identifier of the agent.
+  uuid_external_person:
+    lineage:
+      - datalake_nazare_raw.agent.external_person_uuid
+    description: External person UUID identifier for the agent.
   name:
     lineage:
       - datalake_nazare_raw.agent.name
+    description: Full name of the agent.
   email:
     lineage:
       - datalake_nazare_raw.agent.email
+    description: Email address of the agent.
   document_number:
     lineage:
       - datalake_nazare_raw.agent.document_number
+    description: Document number (CPF/CNPJ) of the agent.
   ts_created:
     lineage:
       - datalake_nazare_raw.agent.created_at
+    description: Record creation timestamp.
   ts_updated:
     lineage:
       - datalake_nazare_raw.agent.updated_at
+    description: Record last update timestamp.

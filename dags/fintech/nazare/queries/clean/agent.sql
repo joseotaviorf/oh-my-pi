@@ -1,6 +1,7 @@
 SELECT
     BIGINT(`id`) AS id_agent,
     BIGINT(external_id) AS id_external,
+    external_person_uuid AS uuid_external_person,
     name,
     email,
     document_number,
