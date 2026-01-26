@@ -172,8 +172,10 @@ def format_and_deduplicate_df(
 
     if database_type == "mysql":
         cdc_binlog_position_column = "source.pos"
+        transaction_id_column = "source.gtid"
     elif database_type == "postgres":
         cdc_binlog_position_column = "source.lsn"
+        transaction_id_column = "source.txId"
     else:
         raise ValueError(
             f"m=format_and_deduplicate_df, database_type={database_type}, msg=Database not supported."
@@ -193,6 +195,7 @@ def format_and_deduplicate_df(
     transactional_df = incoming_df.select(
         *apply_data_alias_expr,
         col("op").alias("op_cdc"),
+        col(transaction_id_column).alias("transaction_id"),
         to_timestamp(col("ts_ms") / 1000).alias("ts_cdc_transaction"),
         col(cdc_binlog_position_column).alias("cdc_binlog_position"),
         *partitions,
