@@ -1,0 +1,197 @@
+database_name: dw_compensation
+table_name: dim_salary_table
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  SCD Type 2 dimension containing the complete history of salary ranges per salary table and band.
+  
+  This table unifies two Oracle HCM entities with a 1:1 relationship:
+  - Grade Ladder (salary table): defines the band structure and salary ranges
+  - Salary Basis: defines payment frequency and annualization factor
+  
+  Main use cases:
+  - Query current salary ranges: WHERE is_current = TRUE
+  - Analyze adjustment history: compare versions by dt_valid_from
+  - Calculate salary positioning: use minimum_value, mid_value, maximum_value
+  - Convert salaries to annual basis: multiply by annualization_factor
+  
+  Each row represents a specific version of a salary_table + band combination.
+  When any attribute changes (values, configuration, etc.), a new version is created.
+
+columns:
+  sk_salary_table:
+    description: |
+      Unique surrogate key for each dimension version.
+      Generated as MD5 hash of: id_grade_ladder + id_rate_object + id_salary_basis + dt_valid_from.
+      Use this key for joins with fact tables.
+
+  salary_table:
+    description: |
+      Name of the salary table that groups the bands (e.g., "Eng SP", "PM SP", "Classifieds Geral").
+      The name usually indicates the area/function and country/region.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+
+  band:
+    description: |
+      Band name within the salary table (e.g., "5", "6", "7", "Assist", "JA").
+      Represents the hierarchical level or seniority of the position.
+      Higher numeric bands usually indicate greater seniority.
+    lineage:
+      - datalake_pin_core_clean.grade_translation.name
+
+  country:
+    description: |
+      Country associated with the salary table, inferred from the table name pattern.
+      Possible values: Brasil, Portugal, Mexico, Argentina, Peru, Ecuador, Panama, Uruguai, Estados Unidos.
+      Logic: suffix "PT" = Portugal, "MX" = Mexico, "ARG" = Argentina, etc.
+      Tables without country suffix are assumed to be Brasil.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+
+  salary_table_group:
+    description: |
+      Grouping category for analysis and reporting.
+      Possible values:
+      - By area: PM, DA, Eng, Prod, DSR, Growth, Ops Sale
+      - By level: EXEC (band >= 12), Estag (interns), JA (young apprentice)
+      - By country: Argentina, Peru, Ecuador, Panama, Portugal, Mexico, Uruguai, Estados Unidos
+      Useful for comparing salary ranges across similar areas.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+      - datalake_pin_core_clean.grade_translation.name
+
+  salary_basis_name:
+    description: |
+      Descriptive name of the salary basis (e.g., "Base Salarial Eng SP").
+      Identifies the payment configuration associated with this table/band.
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.salary_basis_name
+
+  salary_frequency:
+    description: |
+      Payment frequency code of the salary basis.
+      Common values: MONTHLY, HOURLY.
+      Use together with annualization_factor for conversions.
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.salary_basis_code
+
+  salary_basis_type:
+    description: Salary basis type in Oracle HCM. Always "U" (User-defined) for QuintoAndar.
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.salary_basis_type
+
+  annualization_factor:
+    description: |
+      Factor to convert salary value to annual basis.
+      Example: 12 for monthly salary (12 months), 13 for monthly with 13th salary.
+      Calculation: annual_salary = reported_salary * annualization_factor
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.annualization_factor
+
+  salary_range_currency:
+    description: |
+      Currency used for salary range values.
+      Common values: BRL (Brazilian Real), USD (Dollar), UYU (Uruguayan Peso), MXN (Mexican Peso).
+      All values (minimum, mid, maximum) are in this currency.
+    lineage:
+      - datalake_pin_core_clean.rates.currency_code
+
+  minimum_value:
+    description: |
+      Minimum salary range value for this band.
+      Represents the acceptable salary floor for the level.
+      Values below may indicate need for adjustment or promotion.
+    lineage:
+      - datalake_pin_core_clean.rate_values.minimum_value
+
+  mid_value:
+    description: |
+      Midpoint salary range value for this band.
+      Represents the target salary for fully qualified professionals at the level.
+      Commonly used as reference for salary positioning.
+    lineage:
+      - datalake_pin_core_clean.rate_values.mid_value
+
+  maximum_value:
+    description: |
+      Maximum salary range value for this band.
+      Represents the salary ceiling for the level.
+      Values above may indicate need for band promotion.
+    lineage:
+      - datalake_pin_core_clean.rate_values.maximum_value
+
+  is_active:
+    description: |
+      Static flag indicating if the salary table is active in the system.
+      This value does NOT change over time - a table is created as active or inactive.
+      Inactive tables are usually old or discontinued versions.
+      To check if a record is current, use is_current instead.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder.is_active
+
+  dt_valid_from:
+    description: |
+      SCD Type 2: Date from which this version became effective.
+      
+      Calculated as GREATEST (latest date) among all source tables:
+      - grade_ladder.dt_effective_started
+      - grade_ladder_translation.dt_effective_started
+      - rates.dt_effective_started
+      - rate_values.dt_effective_started
+      - grade_translation.dt_effective_started
+      - salary_bases.dt_effective_started
+      
+      Represents when this specific combination of attributes became valid.
+      Use for historical analysis and identifying when adjustments occurred.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
+      - datalake_pin_core_clean.rates.dt_effective_started
+      - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_started
+
+  dt_valid_to:
+    description: |
+      SCD Type 2: Date until which this version remains valid (exclusive).
+      
+      Calculated as LEAST (earliest date) among all source tables:
+      - grade_ladder.dt_effective_ended
+      - grade_ladder_translation.dt_effective_ended
+      - rates.dt_effective_ended
+      - rate_values.dt_effective_ended
+      - grade_translation.dt_effective_ended
+      - salary_bases.dt_effective_ended
+      
+      NULL means no scheduled end date (potentially current record).
+      Note: Oracle HCM uses 4712-12-31 for "no end date", converted to NULL here.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
+      - datalake_pin_core_clean.rates.dt_effective_ended
+      - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
+
+  is_current:
+    description: |
+      Boolean flag indicating if this version is current as of the load reference date.
+      
+      Logic: TRUE when load_end_date >= dt_valid_from AND load_end_date < dt_valid_to
+      
+      Important:
+      - Correctly handles future changes already registered in the system
+      - A record may have dt_valid_to = NULL but is_current = FALSE if a newer version exists
+      - For current data queries, always filter by is_current = TRUE
+      
+      Examples:
+      - Current record without scheduled change: is_current = TRUE, dt_valid_to = NULL
+      - Current record with future change: is_current = TRUE, dt_valid_to = future_date
+      - Historical record: is_current = FALSE, dt_valid_to = past_date
+      - Future record already registered: is_current = FALSE, dt_valid_from = future_date
+
+  ts_load:
+    description: |
+      Timestamp recording when data was loaded into the table.
+      Useful for auditing and identifying the pipeline version that generated the record.

@@ -1,0 +1,35 @@
+---
+table_name: dw_compensation.dim_salary_table
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  sk_salary_table:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  salary_table:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  band:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_valid_from:
+    is_complete:
+      severity_level: Warning
+  is_current:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
