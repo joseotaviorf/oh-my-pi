@@ -195,7 +195,7 @@ def format_and_deduplicate_df(
     transactional_df = incoming_df.select(
         *apply_data_alias_expr,
         col("op").alias("op_cdc"),
-        col(transaction_id_column).alias("transaction_id"),
+        col(transaction_id_column).alias("cdc_transaction_id"),
         to_timestamp(col("ts_ms") / 1000).alias("ts_cdc_transaction"),
         col(cdc_binlog_position_column).alias("cdc_binlog_position"),
         *partitions,
