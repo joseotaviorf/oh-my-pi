@@ -11,7 +11,9 @@ description: Experiment conversion metrics table providing statistical analysis 
 columns:
   sk_exp_visit_metric:
     lineage:
-      - metric_sale.exp_visit_cohort.sk_exp_visit_cohort
+      - metric_sale.exp_visit_cohort.sk_neotribe_exp
+      - metric_sale.exp_visit_cohort.metric_cohort
+      - metric_sale.exp_visit_cohort.dt_ref
     description: Unique key combining experiment, cohort period, metric name and reference date.
     dimension: True
   exp_name_neotribe:

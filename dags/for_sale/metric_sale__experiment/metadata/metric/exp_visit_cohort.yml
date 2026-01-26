@@ -184,6 +184,97 @@ columns:
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
+  number_identifiers:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers within the cohort time window.
+    metric:
+      name: Number of Identifiers
+      description: Target of number of Identifiers within the aggregation.
+      acronym: NI
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  number_identifiers_with_vc:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with visit completed within the cohort time window.
+    metric:
+      name: Number of Identifiers with Visit Completed
+      description: Target of number of Identifiers with Visit Completed within the aggregation.
+      acronym: NIwVC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  number_identifiers_with_vcc:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with visit canceled within the cohort time window.
+    metric:
+      name: Number of Identifiers with Visit Canceled
+      description: Target of number of Identifiers with Visit Canceled within the aggregation.
+      acronym: NIwVCC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  number_identifiers_with_vu:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with visit unsuccessful within the cohort time window.
+    metric:
+      name: Number of Identifiers with Visit Unsuccessful
+      description: Target of number of Identifiers with Visit Unsuccessful within the aggregation.
+      acronym: NIwVU
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  number_identifiers_with_os:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with offer submitted within the cohort time window.
+    metric:
+      name: Number of Identifiers with Offer Submitted
+      description: Target of number of Identifiers with Offer Submitted within the aggregation.
+      acronym: NIwOS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  number_identifiers_with_oa:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with offer accepted within the cohort time window.
+    metric:
+      name: Number of Identifiers with Offer Accepted
+      description: Target of number of Identifiers with Offer Accepted within the aggregation.
+      acronym: NIwOA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  number_identifiers_with_cs:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with contract signed within the cohort time window.
+    metric:
+      name: Number of Identifiers with Contract Signed
+      description: Target of number of Identifiers with Contract Signed within the aggregation.
+      acronym: NIwCS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
   dt_exp_started:
     lineage:
       - dw_for_sale_experiment.dim_experiment.dt_started
