@@ -24,5 +24,31 @@ columns:
     description: "id from table audit"
     lineage:
       - datalake_retsuko_raw.payment_block.deactivated_by_audit_id
+  ticket_number:
+    description: "ticket number related to the paymet block from jira application"
+    lineage:
+      - datalake_retsuko_raw.payment_block.ticket_number
   reason:
     description: "specifies the kind of payment block (e.g.: judicial-order)"
+    lineage:
+      - datalake_retsuko_raw.payment_block.reason
+  description:
+    description: "optional that brings some reasons about the payment_blocked"
+    lineage:
+      - datalake_retsuko_raw.payment_block.description
+  status:
+    description: "The blocking marker can be active or inactive."
+    lineage:
+      - datalake_retsuko_raw.payment_block.status
+  ts_activated:
+    description: "datetime of blocking activation"
+    lineage:
+      - datalake_retsuko_raw.payment_block.activated_at
+  ts_deactivated:
+    description: "datetime of blocking deactivation"
+    lineage:
+      - datalake_retsuko_raw.payment_block.deactivated_at
+  ts_synced:
+    description: "datetime of payment block synced in database"
+    lineage:
+      - datalake_retsuko_raw.payment_block.synced_at

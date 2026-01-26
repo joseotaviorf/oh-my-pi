@@ -4,6 +4,7 @@ SELECT
     contract_id AS id_contract,
     activated_by_audit_id AS id_activated_by_audit,
     deactivated_by_audit_id AS id_deactivated_by_audit,
+    ticket_number,
     reason,
     description,
     status,
