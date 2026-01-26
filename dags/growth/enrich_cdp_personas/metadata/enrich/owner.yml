@@ -3,31 +3,38 @@ database_name: datalake_cdp_personas
 table_name: owner
 description:
   This table consolidates all owners (the main property user) from QuintoAndar, in a historical view.
-  Also, it groups owners based on active periods -- if an user had more than one property active 
+  Data is sourced from both House audit table and Contract Person audit table to capture complete ownership history.
+  It groups owners based on active periods -- if a user had more than one property active 
   in the same time, it will be considered as one segmentation, with the initial timestamp indicating
   the property that started earlier, and the end timestamp related to the property that "finished" later.
-  If an user appears more than once, it indicates that this user was active as a property owner for
+  If a user appears more than once, it indicates that this user was active as a property owner for
   a while, stopped being an owner (e.g. stopped listing with us) and later listed with us again.
+  Prioritizes house-based ownership records, supplementing with contract-based records when users 
+  are only present in Contract Person table.
 domain: Growth
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
     description: The user id of the owner.
-      It may not be unique, as an user may be owner in our platform in different periods.
+      It may not be unique, as a user may be owner in our platform in different periods.
     lineage:
       - datalake_ebdb_clean.house_aud.id_user
+      - datalake_ebdb_clean.contract_person_aud.id_user
   uuid_person:
     description: The UUID Person of the user.
     lineage:
       - datalake_ebdb_clean.user.uuid_person
   is_active:
-    description: Boolean flag indicating if the user is active or not as an owner (e.g. has as active property).
+    description: Boolean flag indicating if the user is active or not as an owner (e.g. has an active property or active contract as owner).
   ts_first_event:
-    description: Timestamp of the first user event while as an active owner. 
+    description: Timestamp of the first user event while as an active owner.
+      It's the timestamp of the first product event related to the property or contract that the user is/was owner of.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_last_event:
     description: Timestamp of the last user event while as an active owner.
+      It may be null if the user is currently active as that persona (still has any active properties or is related to any active contract as owner).
+      If it's not null, the user is considered as not active as that persona anymore and the data is related to the last product timestamp related to the property or contract.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_load:
