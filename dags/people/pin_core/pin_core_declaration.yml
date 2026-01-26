@@ -304,6 +304,20 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_legislative_data_groups:
+      clean_table_name: legislative_data_group
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_legislative_data_groups_tl:
+      clean_table_name: legislative_data_group_translation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_people_legislative_f:
       clean_table_name: people_legislative
       vacuum_retention_hours: 168
