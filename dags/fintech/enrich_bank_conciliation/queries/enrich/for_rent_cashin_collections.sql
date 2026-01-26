@@ -97,7 +97,7 @@ checkout AS (
         NULLIF(b.our_number, '') AS company_use,
         NULLIF(b.id_business_entity, '') AS id_contract,
         b.id_finance_entity AS id_invoice,
-        DATE(b.ts_paid - interval '3' hour) AS ts_paid,
+        DATE(b.ts_paid) AS ts_paid,
         b.paid_amount,
         b.payer_name,
         NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
@@ -147,7 +147,7 @@ checkout_union AS (
     UNION ALL
 
     SELECT
-    IF(LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(b.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(b.id_transaction, '^0+', '')) AS our_number,
+      IF(LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(b.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(b.id_transaction, '^0+', '')) AS our_number,
       b.due_amount AS amount,
       DATE(b.ts_paid) AS dt_paid
     FROM
