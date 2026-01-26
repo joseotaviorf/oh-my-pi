@@ -13,10 +13,6 @@ columns:
     description: Foreign key to the sales_flow table.
     lineage:
       - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.sales_flow_id
-  id_ccv:
-    description: Foreign key to the CCV (sale agreement) table.
-    lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.ccv_id
   id_legocontract_execution:
     description: Identifier for the Lego contract execution.
     lineage:
@@ -25,10 +21,6 @@ columns:
     description: Identifier for the person associated with the contract execution.
     lineage:
       - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.person_id
-  signed_document_token:
-    description: Token or identifier for the signed document.
-    lineage:
-      - datalake_sales_flow_raw.ai_legal_analysis_lego_contract_execution.signed_document_token
   payload_fields_hash:
     description: Hash of the payload fields for integrity verification.
     lineage:
