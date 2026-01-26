@@ -3,7 +3,7 @@ SELECT
     contract_id AS id_contract,
     inspection_uuid AS uuid_inspection,
     checkpoint_id AS id_checkpoint,
-    user_id AS id_user,
+    CAST(user_id AS BIGINT) AS id_user,
     person_uuid AS uuid_person,
     discount_type,
     inspection_cost,
