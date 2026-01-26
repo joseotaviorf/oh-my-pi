@@ -11,12 +11,12 @@ workflow:
   default_partitions: [year, month, day]
   has_hive_sync: false
 cluster:
-  type: databricks_13_3_med_memory_2_workers_cluster
+  type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-    spark_version: 14.3.x-scala2.12
+    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.sql.execution.arrow.pyspark.enabled: True

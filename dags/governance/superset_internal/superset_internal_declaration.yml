@@ -26,7 +26,7 @@ workflow:
     query:
       clean_table_name: query
 cluster:
-  type: databricks_13_3_med_general_driver_2_min_workers_cluster
+  type: databricks_16_4_med_general_driver_2_min_workers_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

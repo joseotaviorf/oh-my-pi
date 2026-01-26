@@ -21,7 +21,7 @@ workflow:
     issues:
     - deleted_issues
 cluster:
-  type: databricks_12_2_med_io-memory_photon_cluster
+  type: databricks_16_4_med_io-memory_photon_cluster
   custom_libraries:
   - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
   databricks_conn_id: databricks_new

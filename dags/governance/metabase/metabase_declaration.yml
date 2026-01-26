@@ -53,4 +53,4 @@ workflow:
     view_log:
       clean_table_name: view_log
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_16_4_med_general_cluster
