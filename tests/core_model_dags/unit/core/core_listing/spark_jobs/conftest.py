@@ -40,6 +40,7 @@ def listing_business_context_df(spark_session):
         [
             StructField("id", LongType(), True),
             StructField("id_house", LongType(), True),
+            StructField("ownership", StringType(), True),
             StructField("business_context", StringType(), True),
             StructField("status", StringType(), True),
             StructField("status_reason", StringType(), True),
@@ -53,6 +54,7 @@ def listing_business_context_df(spark_session):
         (
             1,  # id
             1001,  # id_house
+            "STANDARD",  # ownership
             "RENT",  # business_context
             "PUBLISHED",  # status
             None,  # status_reason
@@ -63,6 +65,7 @@ def listing_business_context_df(spark_session):
         (
             8,  # id
             1002,  # id_house (dual context: RENT + SALE)
+            "STANDARD",  # ownership
             "RENT",  # business_context
             "SUSPENDED",  # status
             "RENTED",  # status_reason
@@ -74,6 +77,7 @@ def listing_business_context_df(spark_session):
         (
             9,  # id
             1002,  # id_house
+            "STANDARD",  # ownership
             "SALE",  # business_context
             "SUSPENDED",  # status
             None,  # status_reason
@@ -84,6 +88,7 @@ def listing_business_context_df(spark_session):
         (
             5,  # id
             2001,  # id_house
+            "THIRD_PARTY",  # ownership
             "SALE",  # business_context
             "PUBLISHED",  # status
             None,  # status_reason
@@ -94,6 +99,7 @@ def listing_business_context_df(spark_session):
         (
             6,  # id
             2003,  # id_house
+            "STANDARD",  # ownership
             "SALE",  # business_context
             "EDITING",  # status
             None,  # status_reason

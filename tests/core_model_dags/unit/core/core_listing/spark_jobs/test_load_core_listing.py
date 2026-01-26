@@ -19,6 +19,7 @@ class TestCoreListingSparkJob:
             "status",
             "status_reason",
             "category",
+            "ownership",
             "business_context",
             "is_extended_rental",
             "has_termination_canceled",

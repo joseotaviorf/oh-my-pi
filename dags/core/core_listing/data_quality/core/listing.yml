@@ -32,6 +32,14 @@ column_level_validations:
     has_completeness:
       greater_than: 0.99
       severity_level: Error
+  ownership:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - THIRD_PARTY
+        - STANDARD
+      severity_level: Error
   business_context:
     is_complete:
       severity_level: Error

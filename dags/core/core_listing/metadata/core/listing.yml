@@ -56,6 +56,13 @@ columns:
       'Re-Listing': Property was previously rented and is being listed again.
       'Recovered': Property was unpublished for 84+ days and is being listed again.
       'NA': Not Applicable. All cases of SALE. Cases of version 0 of RENT.
+  ownership:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ownership
+    description: Ownership type of the listing.
+    categories:
+      THIRD_PARTY: Listing owned by a third-party partner.
+      STANDARD: Listing directly managed by QuintoAndar.
   business_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context

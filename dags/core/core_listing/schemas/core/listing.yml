@@ -48,6 +48,11 @@ columns:
     type: string
     required: false
 
+  # Ownership of the listing
+  ownership:
+    type: string
+    required: true
+
   # Business context - RENT or SALE
   business_context:
     type: string
@@ -96,6 +101,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 19
-max_columns: 19
+min_columns: 20
+max_columns: 20
 strict: true

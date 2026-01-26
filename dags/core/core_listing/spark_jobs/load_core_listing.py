@@ -92,6 +92,7 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
         ).select(
             col("id_house"),
             col("id"),
+            col("ownership"),
             col("ts_created"),
             col("business_context")
         )
@@ -164,6 +165,7 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
                 (col("rb.listing_version") == 0) & col("hlc.listing_category").isNull(),
                 lit("NA")
             ).otherwise(col("hlc.listing_category")).alias("category"),
+            col("lbc.ownership"),
             col("lbc.business_context"),
             col("rb.is_extended_rental"),
             col("rb.has_termination_canceled"),
@@ -198,6 +200,7 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
             col("status"),
             col("status_reason"),
             lit("NA").alias("category"),
+            col("ownership"),
             col("business_context"),
             lit(False).alias("is_extended_rental"),
             lit(False).alias("has_termination_canceled"),
