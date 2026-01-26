@@ -30,6 +30,14 @@ workflow:
       clean_table_name: address_data_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
+    ai_legal_analysis_document_extraction:
+      clean_table_name: ai_legal_analysis_document_extraction
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    ai_legal_analysis_lego_contract_execution:
+      clean_table_name: ai_legal_analysis_lego_contract_execution
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     brokerage:
       clean_table_name: brokerage
       raw_primary_keys: ["id"]
