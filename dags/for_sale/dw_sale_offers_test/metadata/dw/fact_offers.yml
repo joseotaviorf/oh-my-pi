@@ -14,10 +14,6 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offers.id_sales_flow
     description: ID of sales flow
-  sk_sale_flow:
-    lineage:
-    - datalake_sale_offer.sale_offers.id_sale_flow
-    description: ID of sale flow
   sk_house:
     lineage:
     - datalake_sale_offer.sale_offers.id_house

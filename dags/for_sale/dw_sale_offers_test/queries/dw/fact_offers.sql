@@ -1,7 +1,6 @@
 SELECT
     eso.id_offer AS sk_offer,
     eso.id_sales_flow AS sk_sales_flow,
-    eso.id_sale_flow AS sk_sale_flow,
     eso.id_house AS sk_house,
     eso.id_buyer AS sk_buyer,
     eso.id_owner AS sk_owner,

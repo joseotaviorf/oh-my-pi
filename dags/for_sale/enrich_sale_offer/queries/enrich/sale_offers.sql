@@ -211,7 +211,6 @@ rescue_flow AS (
 SELECT    
   o.id_offer,
   o.id_sales_flow,
-  o.id_sale_flow,
   o.id_buyer,
   o.id_house,
   o.id_owner,

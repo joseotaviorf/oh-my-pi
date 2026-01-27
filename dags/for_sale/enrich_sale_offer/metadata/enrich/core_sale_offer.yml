@@ -13,11 +13,6 @@ columns:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id
     description: SalesFlow identification key linked to an offer. Only available for SalesFlow originated offers.
-  id_sale_flow:
-    lineage:
-      - datalake_sales_flow_clean.sales_flow.id_buyer
-      - datalake_sales_flow_clean.house.id_external
-    description: Concatenated identification key for the sales flow (buyer_id + house_id).
   id_house:
     lineage:
       - datalake_sales_flow_clean.sales_flow.id_house

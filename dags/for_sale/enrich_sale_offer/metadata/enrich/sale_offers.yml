@@ -12,10 +12,6 @@ columns:
     lineage:
       - datalake_sale_offer.core_sale_offer.id_sales_flow
     description: SalesFlow identification key linked to an offer.
-  id_sale_flow:
-    lineage:
-      - datalake_sale_offer.core_sale_offer.id_sale_flow
-    description: Concatenated identification key for the sales flow (buyer_id + house_id).
   id_buyer:
     lineage:
       - datalake_sale_offer.core_sale_offer.id_buyer

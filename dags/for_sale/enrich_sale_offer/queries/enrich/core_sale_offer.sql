@@ -544,7 +544,6 @@ unified_offers AS (
 SELECT
     id_offer,
     id_sales_flow,
-    id_sale_flow,        
     id_house,
     id_region,
     id_hub,
