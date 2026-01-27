@@ -69,21 +69,11 @@ columns:
     - datalake_rent_flows.rent_flows.ts_contract_signed
     - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
     description: Whether the user signed a contract or not (independently of whether it was following a recommendation click or not). TRUE/FALSE.
-  days_from_rec_click_to_visit_booked:
-    lineage:
-    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
-    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_visit_booked')
-    description: The number of days between the recommendation click and the visit booked.
   is_rec_click_and_visit_booked_within_14_days:
     lineage:
     - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
     - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_visit_booked')
     description: Whether the user booked a visit within 14 days of the recommendation click. TRUE/FALSE.
-  days_from_rec_click_to_direct_offer:
-    lineage:
-    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
-    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_direct_offer')
-    description: The number of days between the recommendation click and the direct offer submitted.
   is_rec_click_and_direct_offer_within_14_days:
     lineage:
     - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
@@ -94,11 +84,6 @@ columns:
     - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
     - COALESCE(datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_visit_booked'), datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_direct_offer'))
     description: Whether the user booked a visit or submitted a direct offer within 14 days of the recommendation click. TRUE/FALSE.
-  days_from_rec_click_to_offer:
-    lineage:
-    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')
-    - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_offer')
-    description: The number of days between the recommendation click and the offer submitted.
   is_rec_click_and_offer_within_14_days:
     lineage:
     - datalake_search.recs_impressions_processed.get_json_object(timestamps, '$.ts_recommendation')

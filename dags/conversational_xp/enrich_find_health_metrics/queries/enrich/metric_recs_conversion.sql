@@ -1,4 +1,4 @@
-WITH rent_sale_flow AS (
+WITH rent_sale_flow_with_duplicates AS (
   SELECT
     id_tenant_prospect AS id_user,
     id_house,
@@ -19,11 +19,10 @@ WITH rent_sale_flow AS (
       ts_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
       OR ts_direct_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     )
-  GROUP BY
-    1,
-    2,
-    3
+  GROUP BY ALL
+
   UNION ALL
+
   SELECT
     id_buyer AS id_user,
     id_house,
@@ -41,12 +40,33 @@ WITH rent_sale_flow AS (
       ts_first_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
       OR ts_first_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     )
-  GROUP BY
-    1,
-    2,
-    3
-), 
-recs_impressions_actions AS (
+  GROUP BY ALL
+)
+
+, duplicates AS ( -- issue found on 21/01/2026. When solved this should be removed.
+  SELECT
+    id_user,
+    id_house,
+    ts_visit_booked,
+    COUNT(*) AS duplicate_count
+  FROM rent_sale_flow_with_duplicates
+  GROUP BY all
+  HAVING COUNT(*) > 1
+)
+
+, rent_sale_flow AS (
+  SELECT
+    rsd.*
+  FROM rent_sale_flow_with_duplicates rsd
+  LEFT JOIN duplicates d
+    ON rsd.id_user = d.id_user
+    AND rsd.id_house = d.id_house
+    AND rsd.ts_visit_booked = d.ts_visit_booked
+  WHERE d.id_user IS NULL -- All the entries that don't have duplicates
+  OR (d.id_user IS NOT NULL AND rsd.business_context = 'SALE') -- For the entries that have duplicates keep the ones from sale_flows, since the duplication came from rent_flow. 
+)
+
+, recs_impressions_actions AS (
   SELECT
     GET_JSON_OBJECT(ids, '$.id_user') AS id_user,
     GET_JSON_OBJECT(ids, '$.id_house') AS id_house,
@@ -69,79 +89,57 @@ recs_impressions_actions AS (
       GET_JSON_OBJECT(metrics, '$.direct_offer') = '1'
       OR GET_JSON_OBJECT(metrics, '$.visit_booked') = '1'
     ) /* filter users who clicked on a recommendation and did VB or DO */
-  GROUP BY
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13
+  GROUP BY ALL
 )
+
+, rent_sale_flow_recs AS (
+  SELECT
+    rent_sale_flow.id_user,
+    rent_sale_flow.id_house,
+    CONCAT(rent_sale_flow.id_user, rent_sale_flow.id_house) AS id_user_house,
+    MD5(CONCAT(rent_sale_flow.id_user, rent_sale_flow.id_house, rent_sale_flow.ts_first_flow_action)) AS id_unique,
+    rent_sale_flow.business_context,
+    IF(NOT rent_sale_flow.ts_direct_offer IS NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
+    COALESCE(recs_impressions_actions.is_rec_click, FALSE) AS is_rec_click,
+    IF(recs_impressions_actions.has_visit_booked OR NOT rent_sale_flow.ts_visit_booked IS NULL, TRUE, FALSE) AS has_visit_booked,
+    IF(recs_impressions_actions.has_direct_offer OR NOT rent_sale_flow.ts_direct_offer IS NULL, TRUE, FALSE) AS has_direct_offer,
+    IF(recs_impressions_actions.has_offer OR NOT rent_sale_flow.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
+    IF(recs_impressions_actions.has_contract_signed OR NOT rent_sale_flow.ts_contract_signed IS NULL, TRUE, FALSE) AS has_contract_signed,
+    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) <= 14, FALSE) AS is_rec_click_and_visit_booked_within_14_days,
+    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_direct_offer_within_14_days,
+    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) <= 14 OR DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_vb_or_do_within_14_days,
+    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_offer) <= 14, FALSE) AS is_rec_click_and_offer_within_14_days,
+    rent_sale_flow.ts_first_flow_action,
+    YEAR(rent_sale_flow.ts_first_flow_action) AS year,
+    MONTH(rent_sale_flow.ts_first_flow_action) AS month,
+    DAY(rent_sale_flow.ts_first_flow_action) AS day
+  FROM rent_sale_flow
+  LEFT JOIN recs_impressions_actions
+    ON rent_sale_flow.id_house = recs_impressions_actions.id_house
+    AND rent_sale_flow.id_user = recs_impressions_actions.id_user
+    AND rent_sale_flow.business_context = recs_impressions_actions.business_context
+  GROUP BY ALL
+)
+
 SELECT
-  rent_sale_flow.id_user,
-  rent_sale_flow.id_house,
-  CONCAT(
-    rent_sale_flow.id_user, 
-    rent_sale_flow.id_house
-  ) AS id_user_house,
-  MD5(CONCAT(
-    rent_sale_flow.id_user, 
-    rent_sale_flow.id_house, 
-    rent_sale_flow.ts_first_flow_action)) AS id_unique,
-  rent_sale_flow.business_context,
-  IF(NOT rent_sale_flow.ts_direct_offer IS NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
-  COALESCE(recs_impressions_actions.is_rec_click, FALSE) AS is_rec_click,
-  IF(
-    recs_impressions_actions.has_visit_booked OR NOT rent_sale_flow.ts_visit_booked IS NULL,
-    TRUE,
-    FALSE
-  ) AS has_visit_booked,
-  IF(
-    recs_impressions_actions.has_direct_offer OR NOT rent_sale_flow.ts_direct_offer IS NULL,
-    TRUE,
-    FALSE
-  ) AS has_direct_offer,
-  IF(recs_impressions_actions.has_offer OR NOT rent_sale_flow.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
-  IF(
-    recs_impressions_actions.has_contract_signed
-    OR NOT rent_sale_flow.ts_contract_signed IS NULL,
-    TRUE,
-    FALSE
-  ) AS has_contract_signed,
-  DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) AS days_from_rec_click_to_visit_booked,
-  COALESCE(
-    DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) <= 14,
-    FALSE
-  ) AS is_rec_click_and_visit_booked_within_14_days,
-  DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) AS days_from_rec_click_to_direct_offer,
-  COALESCE(
-    DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) <= 14,
-    FALSE
-  ) AS is_rec_click_and_direct_offer_within_14_days,
-  COALESCE(
-    DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) <= 14
-    OR DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) <= 14,
-    FALSE
-  ) AS is_rec_click_and_vb_or_do_within_14_days,
-  DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_offer) AS days_from_rec_click_to_offer,
-  COALESCE(
-    DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_offer) <= 14,
-    FALSE
-  ) AS is_rec_click_and_offer_within_14_days,
-  rent_sale_flow.ts_first_flow_action,
-  YEAR(rent_sale_flow.ts_first_flow_action) AS year,
-  MONTH(rent_sale_flow.ts_first_flow_action) AS month,
-  DAY(rent_sale_flow.ts_first_flow_action) AS day
-FROM rent_sale_flow
-LEFT JOIN recs_impressions_actions
-  ON rent_sale_flow.id_house = recs_impressions_actions.id_house
-  AND rent_sale_flow.id_user = recs_impressions_actions.id_user
-  AND rent_sale_flow.business_context = recs_impressions_actions.business_context
+  id_user,
+  id_house,
+  id_user_house,
+  id_unique,
+  business_context,
+  MAX(user_house_first_contact) AS user_house_first_contact,
+  MAX(is_rec_click) AS is_rec_click,
+  MAX(has_visit_booked) AS has_visit_booked,
+  MAX(has_direct_offer) AS has_direct_offer,
+  MAX(has_offer) AS has_offer,
+  MAX(has_contract_signed) AS has_contract_signed,
+  MAX(is_rec_click_and_visit_booked_within_14_days) AS is_rec_click_and_visit_booked_within_14_days,
+  MAX(is_rec_click_and_direct_offer_within_14_days) AS is_rec_click_and_direct_offer_within_14_days,
+  MAX(is_rec_click_and_vb_or_do_within_14_days) AS is_rec_click_and_vb_or_do_within_14_days,
+  MAX(is_rec_click_and_offer_within_14_days) AS is_rec_click_and_offer_within_14_days,
+  MAX(ts_first_flow_action) AS ts_first_flow_action,
+  year,
+  month,
+  day
+FROM rent_sale_flow_recs
 GROUP BY ALL
