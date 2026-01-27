@@ -16,6 +16,7 @@ WITH orchestrator_sessions AS (
     s.department AS first_queue,
     s.source,
     s.source_environment,
+    s.status,
     COALESCE(s.user_phone, cs.user_phone_number, s.user_data:["user_phone"]) AS user_phone_number,
     cs.ts_created,
     s.ts_updated
@@ -40,6 +41,7 @@ old_bot_sessions AS (
     ss.department AS first_queue,
     ss.source,
     ss.source_environment,
+    ss.status,
     COALESCE(ss.user_phone, ss.user_data:["user_phone"]) AS user_phone_number,
     ss.ts_created,
     ss.ts_updated
@@ -72,6 +74,7 @@ sessions AS (
     first_queue,
     source,
     source_environment,
+    status,
     ts_created,
     ts_updated
   FROM
@@ -87,6 +90,7 @@ sessions AS (
     first_queue,
     source,
     source_environment,
+    status,
     ts_created,
     ts_updated
   FROM
@@ -140,6 +144,7 @@ SELECT
     WHEN s.source = 'whatsapp' AND s.source_environment != 'default' THEN 'others'
     ELSE NULL
   END AS whatsapp_number,
+  s.status,
   CASE
     WHEN t.id_ticket IS NOT NULL THEN REPLACE(eq.queue, '[AeC] ', '')
     ELSE NULL

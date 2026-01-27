@@ -62,6 +62,10 @@ columns:
     lineage:
     - datalake_sauron_clean.session.source
     - datalake_sauron_clean.session.source_environment
+  status:
+    description: 'Session status from Sauron'
+    lineage:
+    - datalake_sauron_clean.session.status
   first_queue:
     description: 'First support queue (department)'
     lineage:
