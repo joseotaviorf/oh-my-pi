@@ -248,6 +248,10 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offers.ts_sale_agreement_signed
     description: Timestamp of sale agreement signature
+  ts_sale_agreement_canceled:
+    lineage:
+    - datalake_sale_offer.sale_offers.ts_sale_agreement_canceled
+    description: Timestamp of sale agreement cancellation
   ts_seller_fup:
     lineage:
       - datalake_sale_offer.sale_offers.ts_seller_fup

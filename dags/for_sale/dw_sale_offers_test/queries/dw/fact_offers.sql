@@ -58,6 +58,7 @@ SELECT
     eso.ts_offer_rescued AS ts_offer_rescued,
     eso.ts_sale_agreement_created AS ts_sale_agreement_created,
     eso.ts_sale_agreement_signed AS ts_sale_agreement_signed,
+    eso.ts_sale_agreement_canceled,
     eso.ts_seller_fup,
     eso.ts_buyer_fup,
     NOW() AS ts_load
