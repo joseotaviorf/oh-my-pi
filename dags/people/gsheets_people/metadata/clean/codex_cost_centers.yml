@@ -40,23 +40,15 @@ columns:
   owner_l1_email:
     description: Email of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.l1
+    - datalake_gsheets_people_raw.codex_cost_centers.l1_mail
   owner_l2_email:
     description: Email of the third highest manager (L2) in the hierarchy responsible for the cost center.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.l2
+    - datalake_gsheets_people_raw.codex_cost_centers.l2_mail
   owner_l3_email:
     description: Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.l3
-  cost_center_status:
-    description: Status of the cost center, indicating if it is active (Active) or inactive (End)
-    lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.status
-  sort_number:
-    description: Unique identifier used to sort the cost centers in a specific order defined by the FP&A team.
-    lineage:
-    - datalake_gsheets_people_raw.codex_cost_centers.sort
+    - datalake_gsheets_people_raw.codex_cost_centers.l3_mail
   dt_updated:
     description: Date representing the offical monthly version of the data. Is used in the partition columns.
     lineage:
