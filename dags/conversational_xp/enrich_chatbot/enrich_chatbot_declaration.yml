@@ -18,6 +18,9 @@ workflow:
     evals:
       merge_on: [id_langfuse_session]
       z_order_by: [id_langfuse_session]
+    isaias_conversational_flow:
+      merge_on: [id_langfuse_session]
+      z_order_by: [id_langfuse_session]
 
 cluster:
   type: custom_cluster
