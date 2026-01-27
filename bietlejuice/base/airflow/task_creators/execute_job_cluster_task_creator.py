@@ -2,6 +2,7 @@ from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCre
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
+from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 
@@ -113,42 +114,6 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             access_control_list=self.__get_access_control_list(),
         )
 
-    def __get_spark_version(self, databricks_version: str) -> str:
-        spark_map = {
-            # These are not the real spark versions
-            # This will only be used to determine the inmetro and deequ libraries
-            "12.2.x-scala2.12": "3.2",  # This is actually 3.3
-            "13.3.x-scala2.12": "3.2",  # And this is actually 3.4
-            "14.3.x-scala2.12": "3.5",
-            "15.4.x-scala2.12": "3.5",
-            "16.4.x-scala2.12": "3.5",
-        }
-        try:
-            return spark_map[databricks_version]
-        except KeyError as exc:
-            raise ValueError(f"Invalid DBR version: {databricks_version}") from exc
-
-    def __input_inmetro_version(self, spark_version: str) -> str:
-        inmetro_map = {
-            "3.2": "2.3.0",  # Databricks 12.2 and 13.3 - keep compatibility
-            "3.3": "4.10.1",  # Databricks 14.3+ - new version with content parameter support
-            "3.4": "4.10.1",
-            "3.5": "4.10.1",
-        }
-
-        try:
-            return inmetro_map[spark_version]
-        except KeyError as exc:
-            raise ValueError(f"Invalid Spark version: {spark_version}") from exc
-
-    def __input_deequ_version(self, spark_version: str) -> str:
-        deequ_map = {"3.2": "2.0.1", "3.3": "2.0.8", "3.4": "2.0.8", "3.5": "2.0.8"}
-
-        try:
-            return deequ_map[spark_version]
-        except KeyError as exc:
-            raise ValueError(f"Invalid Spark version: {spark_version}") from exc
-
     def __input_databricks_default_service_credential_name(
         self, cluster_configuration: dict
     ) -> dict:
@@ -164,18 +129,8 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
         return cluster_configuration
 
     def __input_spark_env_vars(self, cluster_configuration: dict) -> dict:
-        cluster_configuration["spark_env_vars"]["SPARK_VERSION"] = (
-            self.__get_spark_version(cluster_configuration["spark_version"])
-        )
-        cluster_configuration["spark_env_vars"]["INMETRO_VERSION"] = (
-            self.__input_inmetro_version(
-                cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
-            )
-        )
-        cluster_configuration["spark_env_vars"]["DEEQU_JAR_VERSION"] = (
-            self.__input_deequ_version(
-                cluster_configuration["spark_env_vars"]["SPARK_VERSION"]
-            )
+        cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
+            cluster_configuration
         )
         cluster_configuration = self.__input_databricks_default_service_credential_name(
             cluster_configuration

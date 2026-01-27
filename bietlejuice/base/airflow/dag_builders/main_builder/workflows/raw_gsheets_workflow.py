@@ -15,6 +15,7 @@ from airflow.utils.helpers import chain
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -252,6 +253,9 @@ class RawGsheetsWorkflow(BaseWorkflow):
     def get_cluster_params(self):
         cluster_configuration = self.config_service.get_config(
             self.cluster_args["type"]
+        )
+        cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
+            cluster_configuration
         )
         default_libraries = self.config_service.get_config("default_libraries")
         custom_libraries = [
