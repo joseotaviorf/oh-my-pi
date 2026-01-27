@@ -22,10 +22,6 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.checkpoint_id
     description: The checkpoint id identifies the customer journey step where the discount was informed/adopted.
-  id_user:
-    lineage:
-      - datalake_inspection_services_raw.invoice_discount.user_id
-    description: The user ids from MAIN (monolith) legacy system.
   uuid_person:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.person_uuid
