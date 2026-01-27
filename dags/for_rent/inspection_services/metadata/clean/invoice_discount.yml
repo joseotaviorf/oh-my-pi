@@ -22,10 +22,6 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.checkpoint_id
     description: The checkpoint id identifies the customer journey step where the discount was informed/adopted.
-  uuid_person:
-    lineage:
-      - datalake_inspection_services_raw.invoice_discount.person_uuid
-    description: The person uuid of all tenants involved in the inspection.
   discount_type:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_type
@@ -70,14 +66,6 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.is_spoc
     description: Indicates if the context is SPOC.
-  person_blocked:
-    lineage:
-      - datalake_inspection_services_raw.invoice_discount.person_blocked
-    description: Indicates if each person is blocked.
-  person_blocked_reason:
-    lineage:
-      - datalake_inspection_services_raw.invoice_discount.person_blocked_reason
-    description: The reason for each person block.
   is_discount_accepted:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_accepted
