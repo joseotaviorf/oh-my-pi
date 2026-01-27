@@ -1,13 +1,15 @@
 database_name: datalake_arquivo_confidencial
 table_name: scr_pivot
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table with SCR data broken by Months on Booking (mob) and version."
 columns:
   cpf:
     description: "Personal identification number"
-  version:
-    description: "Ranking indicating how many times we executed a consultation for a given cpf."
+  rev_end:
+    description: "Represents the end of the validity period for a particular version of a row. If null, it represents the most current version, otherwise, it is filled with the timestamp of the latest revision when inserted."
+    lineage:
+        - datalake_arquivo_confidencial.scr.rev_end
   mob:
     description: "Months on Booking."
   reference_date:
