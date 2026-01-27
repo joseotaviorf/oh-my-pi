@@ -1,7 +1,7 @@
 database_name: datalake_arquivo_confidencial
 table_name: scr
 owner: felipe.chies@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: "Table with SCR data broken by Months on Booking (mob) and version."
 columns:
   id:
@@ -24,6 +24,10 @@ columns:
     description: "Year month of the credit limits data."
     lineage:
         - datalake_arquivo_confidencial_clean.integration_report_aud.reference_date
+  has_scr_attributes:
+    description: "Indicates if the SCR attributes exist in the data."
+    lineage:
+        - datalake_arquivo_confidencial_clean.integration_report_aud.has_scr_attributes
   value:
     description: "SCR property value."
     lineage:
