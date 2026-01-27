@@ -15,6 +15,10 @@ workflow:
   dbutils_secret_key: RENTAL_TRANSACT_DB
   has_soft_delete: true
   tables_customization:
+    message:
+      clean_table_name: message
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     advance_payment:
       clean_table_name: advance_payment
       raw_primary_keys: [id]

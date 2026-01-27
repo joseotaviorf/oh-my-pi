@@ -1,0 +1,31 @@
+database_name: datalake_rental_transact_clean
+table_name: message
+description: This table consolidates outbox message information from the Rental Transact system.
+  Each line should be unique and identified by the id column.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_transact_raw.message.id
+    description: Unique identifier for the message.
+  id_incremental:
+    lineage:
+      - datalake_rental_transact_raw.message.incremental_id
+    description: Incremental identifier for the message.
+  destination:
+    lineage:
+      - datalake_rental_transact_raw.message.destination
+    description: Message destination.
+  headers:
+    lineage:
+      - datalake_rental_transact_raw.message.headers
+    description: Message headers in text format.
+  payload:
+    lineage:
+      - datalake_rental_transact_raw.message.payload
+    description: Message payload content in text format.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_raw.message.creation_datetime
+    description: Timestamp when the message was created.
