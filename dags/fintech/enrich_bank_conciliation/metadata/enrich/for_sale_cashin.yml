@@ -3,49 +3,81 @@ database_name: datalake_bank_conciliation
 table_name: for_sale_cashin
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: null
+description: Table containing bank reconciliation data for For Sale and SAP entries.
 columns:
-  company_use:
-    description: ''
+  sk_house:
+    description: 'House surrogate key from Monopoly'
     lineage:
-    - .bank_union.company_use
-  type_transaction:
-    description: ''
+    - .final_all.sk_house
+  sk_offer:
+    description: 'External offer surrogate key'
     lineage:
-    - .bank_union.type_transaction
+    - .final_all.sk_offer
+  id_sale:
+    description: 'Monopoly sale identifier'
+    lineage:
+    - .final_all.id_sale
+  id_sap_sale_transaction:
+    description: 'SAP sale transaction identifier'
+    lineage:
+    - .final_all.sap_id_sale_transaction
   bank_account:
-    description: ''
+    description: 'Itaú bank account number'
     lineage:
-    - .bank_union.'49458-8'
+    - .final_all.bank_account
+  company_use:
+    description: 'Company reference used for reconciliation'
+    lineage:
+    - .final_all.company_use
+  counterpart_document:
+    description: 'Counterparty document (masked when applicable)'
+    lineage:
+    - .final_all.counterpart_document
+  counterpart_name:
+    description: 'Counterparty name'
+    lineage:
+    - .final_all.counterpart_name
   bank_paid_amount:
-    description: ''
+    description: 'Paid amount on bank/CNAB'
     lineage:
-    - .bank_union.bu.paid_amount
-  dt_bank_paid:
-    description: ''
+    - .final_all.bank_paid_amount
+  bank_type_transaction:
+    description: 'Bank transaction type (PIX, TED, TEF, BOLETO)'
     lineage:
-    - .bank_union.bu.dt_paid
-  charge_amount:
-    description: ''
+    - .final_all.bank_type_transaction
+  monopoly_income_from:
+    description: 'Monopoly income source'
     lineage:
-    - .bank_union.p.paid_amount
-  is_charge_concilied:
-    description: ''
+    - .final_all.monopoly_income_from
+  monopoly_paid_amount:
+    description: 'Paid amount in Monopoly'
     lineage:
-    - .bank_union.CASE WHEN p.our_number IS NULL THEN FALSE ELSE TRUE END
-  is_sap_concilied:
-    description: ''
+    - .final_all.monopoly_paid_amount
+  monopoly_is_reconcilied:
+    description: 'Flag: matched with Monopoly transaction'
     lineage:
-    - .bank_union.CASE WHEN s.company_use IS NULL THEN FALSE ELSE TRUE END
-  dt_charge_paid:
-    description: ''
-    lineage:
-    - .bank_union.p.dt_paid
+    - .final_all.monopoly_is_reconcilied
   sap_paid_amount:
-    description: ''
+    description: 'Paid amount in SAP ledger'
     lineage:
-    - .bank_union.s.paid_amount
+    - .final_all.sap_paid_amount
+  sap_is_reconcilied:
+    description: 'Flag: matched with SAP transaction'
+    lineage:
+    - .final_all.sap_is_reconcilied
+  origin_transaction:
+    description: 'Origin of record (forsale or bypass)'
+    lineage:
+    - .final_all.origin_transaction
+  dt_bank_paid:
+    description: 'Bank accounting date'
+    lineage:
+    - .final_all.bank_dt_paid
+  dt_monopoly_accounting:
+    description: 'Monopoly accounting date'
+    lineage:
+    - .final_all.monopoly_dt_accounting
   dt_sap_paid:
-    description: ''
+    description: 'SAP reference date'
     lineage:
-    - .bank_union.s.dt_paid
+    - .final_all.sap_dt_paid

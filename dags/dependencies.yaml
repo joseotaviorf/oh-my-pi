@@ -1098,6 +1098,13 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
+bietlejuice.dw_sale_offers_test:
+  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
+  - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
+  - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offers:first-run-of-day
+  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
 bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
@@ -1456,7 +1463,10 @@ bietlejuice.enrich_b2b:
 bietlejuice.enrich_bank_conciliation:
   - bietlejuice.checkout:load-clean-bolecode:first-run-of-day
   - bietlejuice.checkout:load-clean-boleto:first-run-of-day
+  - bietlejuice.checkout:load-clean-charge:first-run-of-day
+  - bietlejuice.checkout:load-clean-order:first-run-of-day
   - bietlejuice.checkout:load-clean-pix:first-run-of-day
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_accounting_funnel:load-enrich-payment-platforms:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
@@ -1465,8 +1475,16 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_sap_gateway:load-enrich-sap-payload:first-run-of-day
+  - bietlejuice.itau_statements:load-clean-statement-879200452586:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-879200452685:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-879200494588:first-run-of-day
+  - bietlejuice.itau_statements:load-clean-statement-879200984646:first-run-of-day
+  - bietlejuice.monopoly:load-clean-income-reference:first-run-of-day
+  - bietlejuice.monopoly:load-clean-person-sale:first-run-of-day
+  - bietlejuice.monopoly:load-clean-person:first-run-of-day
+  - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
+  - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day
+  - bietlejuice.monopoly:load-clean-sale:first-run-of-day
   - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2:first-run-of-day
   - bietlejuice.pixar:load-clean-charge:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-bill:first-run-of-day
@@ -1626,8 +1644,8 @@ bietlejuice.enrich_cdp_personas:
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract-aud:first-run-of-day
-  - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-contract-person-aud:first-run-of-day
+  - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner-agent:first-run-of-day
@@ -4721,10 +4739,3 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
-bietlejuice.dw_sale_offers_test:
- - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
- - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
- - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
- - bietlejuice.enrich_sale_offer:load-enrich-sale-offers:first-run-of-day
- - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
- - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
