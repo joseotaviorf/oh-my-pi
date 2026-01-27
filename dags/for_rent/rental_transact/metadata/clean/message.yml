@@ -25,7 +25,15 @@ columns:
     lineage:
       - datalake_rental_transact_raw.message.payload
     description: Message payload content in text format.
+  is_published:
+    lineage:
+      - datalake_rental_transact_raw.message.published
+    description: Boolean flag indicating whether the message has been published (TRUE) or not (FALSE).
+  message_partition:
+    lineage:
+      - datalake_rental_transact_raw.message.message_partition
+    description: Partition identifier for the message.
   ts_created:
     lineage:
-      - datalake_rental_transact_raw.message.creation_datetime
-    description: Timestamp when the message was created.
+      - datalake_rental_transact_raw.message.creation_time
+    description: Timestamp when the message was created (converted from milliseconds).
