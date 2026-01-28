@@ -34,8 +34,8 @@ workflow:
     external_invoice_aud: {}
     house: {}
     house_aud: {}
-    incentive_engine: {}
-    incentive_engine_aud: {}
+    # incentive_engine: {}
+    # incentive_engine_aud: {}
     incentive_system_configuration: {}
     incentive_system_configuration_aud: {}
     installment: {}
@@ -63,14 +63,14 @@ workflow:
     points_rule_aud: {}
     program: {}
     program_aud: {}
-    revenue_share: {}
-    revenue_share_aud: {}
+    # revenue_share: {}
+    # revenue_share_aud: {}
     score_rule: {}
     score_rule_aud: {}
     share_rule: {}
     share_rule_aud: {}
-    tier: {}
-    tier_aud: {}
+    # tier: {}
+    # tier_aud: {}
     user_revision_entity: {}
 cluster:
   type: custom_cluster
