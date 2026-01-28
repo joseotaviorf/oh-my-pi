@@ -3,6 +3,7 @@ get_process_stages AS (
     SELECT DISTINCT
         id_case,
         stage_description,
+        stage_order,
         expense_amount,
         dt_start,
         dt_end
@@ -14,7 +15,7 @@ get_last_process_stage AS (
     stage_description
   FROM get_process_stages
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY stage_order DESC) = 1
-)
+),
 get_stages_data AS (
     SELECT
     id_case,
