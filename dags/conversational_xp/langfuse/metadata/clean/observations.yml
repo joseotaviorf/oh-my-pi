@@ -1,105 +1,94 @@
 database_name: datalake_langfuse_clean
 table_name: observations
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Observations from Langfuse."
 columns:
   id_observation:
+    description: unique identifier for the observation
     lineage:
       - datalake_langfuse_raw.observations.id
   id_parent_observation:
+    description: identifier of the parent observation if this is a nested observation
     lineage:
-      - datalake_langfuse_raw.observations.parentObservationId
+      - datalake_langfuse_raw.observations.parent_observation_id
   id_trace:
+    description: identifier of the trace this observation belongs to
     lineage:
-      - datalake_langfuse_raw.observations.traceId
-  id_model:
-    lineage:
-      - datalake_langfuse_raw.observations.modelId
+      - datalake_langfuse_raw.observations.trace_id
   id_project:
+    description: identifier of the project this observation belongs to
     lineage:
-      - datalake_langfuse_raw.observations.projectId
-  id_prompt:
-    lineage:
-      - datalake_langfuse_raw.observations.promptId
+      - datalake_langfuse_raw.observations.project_id
   input:
+    description: input data sent to the model
     lineage:
       - datalake_langfuse_raw.observations.input
   output:
+    description: output data returned by the model
     lineage:
       - datalake_langfuse_raw.observations.output
   environment:
+    description: environment where the observation was created
     lineage:
       - datalake_langfuse_raw.observations.environment
-  model:
+  metadata:
+    description: additional metadata associated with the observation
     lineage:
-      - datalake_langfuse_raw.observations.model
+      - datalake_langfuse_raw.observations.metadata
+  provided_model_name:
+    description: name of the model used for this observation
+    lineage:
+      - datalake_langfuse_raw.observations.provided_model_name
   model_parameters:
+    description: parameters used when calling the model
     lineage:
-      - datalake_langfuse_raw.observations.modelParameters
+      - datalake_langfuse_raw.observations.model_parameters
   name:
+    description: name of the observation
     lineage:
       - datalake_langfuse_raw.observations.name
-  prompt_name:
-    lineage:
-      - datalake_langfuse_raw.observations.promptName
-  prompt_tokens:
-    lineage:
-      - datalake_langfuse_raw.observations.promptTokens
-  prompt_version:
-    lineage:
-      - datalake_langfuse_raw.observations.promptVersion
   type:
+    description: type of observation (e.g., generation, span, event)
     lineage:
       - datalake_langfuse_raw.observations.type
-  unit:
-    lineage:
-      - datalake_langfuse_raw.observations.unit
-  usage:
-    lineage:
-      - datalake_langfuse_raw.observations.usage
-  usage_details:
-    lineage:
-      - datalake_langfuse_raw.observations.usageDetails
-  latency:
-    lineage:
-      - datalake_langfuse_raw.observations.latency
   level:
+    description: log level of the observation
     lineage:
       - datalake_langfuse_raw.observations.level
-  input_price:
+  usage_details:
+    description: token usage details for the observation
     lineage:
-      - datalake_langfuse_raw.observations.inputPrice
-  output_price:
+      - datalake_langfuse_raw.observations.usage_details
+  latency:
+    description: latency in milliseconds for the observation
     lineage:
-      - datalake_langfuse_raw.observations.outputPrice
-  completion_tokens:
-    lineage:
-      - datalake_langfuse_raw.observations.completionTokens
-  calculated_input_cost:
-    lineage:
-      - datalake_langfuse_raw.observations.calculatedInputCost
-  calculated_output_cost:
-    lineage:
-      - datalake_langfuse_raw.observations.calculatedOutputCost
-  calculated_total_cost:
-    lineage:
-      - datalake_langfuse_raw.observations.calculatedTotalCost
+      - datalake_langfuse_raw.observations.latency
   cost_details:
+    description: cost information for the observation
     lineage:
-      - datalake_langfuse_raw.observations.costDetails
-  ts_created:
+      - datalake_langfuse_raw.observations.cost_details
+  ts_started:
+    description: timestamp when the observation started
     lineage:
-      - datalake_langfuse_raw.observations.createdAt
-  ts_updated:
+      - datalake_langfuse_raw.observations.start_time
+  ts_ended:
+    description: timestamp when the observation ended
     lineage:
-      - datalake_langfuse_raw.observations.updatedAt
+      - datalake_langfuse_raw.observations.end_time
   year:
+    description: year partition
     lineage:
       - datalake_langfuse_raw.observations.year
   month:
+    description: month partition
     lineage:
       - datalake_langfuse_raw.observations.month
   day:
+    description: day partition
     lineage:
       - datalake_langfuse_raw.observations.day
   hour:
+    description: hour partition
     lineage:
       - datalake_langfuse_raw.observations.hour 

@@ -133,7 +133,7 @@ class S3Service(StorageService):
         bucket_name, key = self._split_s3_path(object_path)
         self.s3_resource.Bucket(bucket_name).put_object(Key=key)
 
-    @logger
+    @logger(exclude_return=True)
     def list_objects_by_prefix(self, prefix: str):
         """
         List all objects from a given s3 path by prefix

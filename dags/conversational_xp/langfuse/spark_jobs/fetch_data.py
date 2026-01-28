@@ -1,12 +1,11 @@
 import json
 import logging
-import re
 import time
 import random
-import threading
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Callable, Dict, List
 
 import boto3
 from langfuse import Langfuse
@@ -31,13 +30,12 @@ DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "fetch_data"
 SOURCE = "langfuse"
 
-MAX_WORKERS = 5 # maximum number of workers to use for API fetching
+MAX_WORKERS = 8 # maximum number of workers to use for API fetching
 MAX_RETRIES = 5 # maximum number of times to retry a failed request
 EXPONENTIAL_BACKOFF_BASE = 2 # base for exponential backoff, e.g. 2^0 = 1s, 2^1 = 2s, 2^2 = 4s, etc.
-JITTER_MIN = 0.15 # minimum jitter added to delay API calls when retrying
-JITTER_MAX = 0.6 # maximum jitter added to delay API calls when retrying
-BATCH_SIZE = 100  # number of score IDs to fetch per API call
-LOG_INTERVAL_SECONDS = 30  # log progress every N seconds
+JITTER_MIN = 0.5 # min seconds of jitter added to delay API calls when retrying
+JITTER_MAX = 2 # max seconds of jitter added to delay API calls when retrying
+BATCH_SIZE = 100  # number IDs to fetch from API per batch
 MAX_CONSECUTIVE_FAILURES = 10  # halt job after N consecutive batch failures
 
 
@@ -55,25 +53,193 @@ class TooManyConsecutiveFailuresError(Exception):
     pass
 
 
-def fetch_page_with_retry(langfuse, score_ids_str, page, max_retries=MAX_RETRIES):
-    """Fetch a single page with retry logic."""
+def call_with_retry(*, make_call, call_label, max_retries=MAX_RETRIES):
     for attempt in range(max_retries + 1):
         try:
-            resp = langfuse.api.score_v_2.get(score_ids=score_ids_str, page=page)
-            return resp
+            return make_call()
         except Exception as e:
             if attempt == max_retries:
-                logger.error(f"Page {page}: All {max_retries} retries exhausted. Final error: {str(e)}")
+                logger.error(f"{call_label}: all {max_retries} retries exhausted after {type(e).__name__}: {str(e)}")
                 raise e
             base_delay = EXPONENTIAL_BACKOFF_BASE ** attempt
             jitter = random.uniform(JITTER_MIN, JITTER_MAX)
             delay = base_delay + jitter
             logger.warning(
-                f"Page {page}: Retry {attempt + 1}/{max_retries} after error: {type(e).__name__}. "
-                f"Waiting {delay:.2f}s"
+                f"{call_label}: attempt {attempt + 1}/{max_retries + 1} failed with {type(e).__name__}"
+                f"Retrying in {delay:.2f}s (base={base_delay}s, jitter={jitter:.2f}s)"
             )
             time.sleep(delay)
-    return None
+
+
+def iter_batches(id_iter, batch_size: int):
+    batch: List[str] = []
+    for item_id in id_iter:
+        batch.append(item_id)
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
+
+
+def collect_batch_results(
+    *,
+    future_to_batch_num: Dict,
+    is_valid_record: Callable[[Dict], bool],
+    entity_label: str,
+    total_batches: int,
+):
+    api_data: List[Dict] = []
+    failed_batches = 0
+    successful_batches = 0
+    consecutive_failures = 0
+    completed_batches = 0
+
+    for future in as_completed(future_to_batch_num):
+        batch_num = future_to_batch_num[future]
+        try:
+            results = future.result()
+            consecutive_failures = 0
+            if results:
+                valid_results = [r for r in results if is_valid_record(r)]
+                if valid_results:
+                    successful_batches += 1
+                else:
+                    failed_batches += 1
+                api_data.extend(results)
+            else:
+                failed_batches += 1
+        except TooManyConsecutiveFailuresError:
+            raise
+        except Exception as e:
+            consecutive_failures += 1
+            failed_batches += 1
+            if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                raise TooManyConsecutiveFailuresError(
+                    f"Job halted after {consecutive_failures} consecutive batch failures "
+                    f"while fetching {entity_label}. Last error: {type(e).__name__}: {str(e)}"
+                ) from e
+
+        completed_batches += 1
+        if completed_batches % 10 == 0 or completed_batches == total_batches:
+            logger.info(f"{entity_label}: processed {completed_batches}/{total_batches} batches")
+
+    return api_data, successful_batches, failed_batches
+
+
+def coalesce_columns(enriched_df, original_df, columns_map: Dict[str, str]):
+    """Apply coalesce pattern for API enrichment columns.
+    
+    Args:
+        enriched_df: DataFrame after join with API data
+        original_df: Original DataFrame before join
+        columns_map: Mapping of api_column -> target_column names
+    """
+    for api_col, target_col in columns_map.items():
+        if target_col in original_df.columns:
+            enriched_df = enriched_df.withColumn(target_col, coalesce(col(api_col), col(target_col)))
+        else:
+            enriched_df = enriched_df.withColumn(target_col, col(api_col))
+        enriched_df = enriched_df.drop(api_col)
+    return enriched_df
+
+
+def validate_paginated_response(resp, batch_num: int, page: int):
+    """Validate that API response has required pagination attributes."""
+    if not hasattr(resp, 'data'):
+        raise ValueError(f"Invalid API response: missing 'data' attribute (batch {batch_num}, page {page})")
+    if not hasattr(resp, 'meta') or not hasattr(resp.meta, 'total_pages'):
+        raise ValueError(f"Invalid API response: missing 'meta.total_pages' attribute (batch {batch_num}, page {page})")
+
+
+def paginate_api_response(make_request: Callable, batch_num: int, extract_data: Callable[[List], List[Dict]]) -> List[Dict]:
+    """Generic pagination handler for Langfuse API responses."""
+    results = []
+    page = 1
+    while True:
+        resp = call_with_retry(
+            make_call=lambda p=page: make_request(page=p),
+            call_label=f"batch {batch_num} page {page}",
+        )
+        validate_paginated_response(resp, batch_num, page)
+        results.extend(extract_data(resp.data))
+        if page >= resp.meta.total_pages:
+            break
+        page += 1
+    return results
+
+
+def fetch_and_collect_api_data(
+    df,
+    langfuse,
+    fetch_batch_func: Callable,
+    is_valid_record: Callable[[Dict], bool],
+    entity_label: str,
+) -> List[Dict]:
+    start_time = time.time()
+    logger.info(f"Starting API enrichment for {entity_label} (workers={MAX_WORKERS}, batch_size={BATCH_SIZE})")
+
+    id_iter = (row.id for row in df.select("id").distinct().toLocalIterator())
+
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        future_to_batch_num = {
+            executor.submit(fetch_batch_func, langfuse, batch, batch_num): batch_num
+            for batch_num, batch in enumerate(iter_batches(id_iter, BATCH_SIZE), start=1)
+        }
+        batches_submitted = len(future_to_batch_num)
+
+        if batches_submitted == 0:
+            logger.info(f"No {entity_label} IDs found, skipping enrichment")
+            return []
+
+        api_data, successful_batches, failed_batches = collect_batch_results(
+            future_to_batch_num=future_to_batch_num,
+            is_valid_record=is_valid_record,
+            entity_label=entity_label,
+            total_batches=batches_submitted,
+        )
+
+    elapsed = time.time() - start_time
+    success_rate = (successful_batches / batches_submitted * 100) if batches_submitted else 0
+
+    logger.info(
+        f"{entity_label.capitalize()} enrichment done in {elapsed:.2f}s "
+        f"(batches={batches_submitted}, ok={successful_batches}, failed={failed_batches}, success_rate={success_rate:.1f}%, api_records={len(api_data)})"
+    )
+    return api_data
+
+
+def enrich_df_from_api(
+    df,
+    langfuse,
+    fetch_batch_func: Callable,
+    is_valid_record: Callable[[Dict], bool],
+    entity_label: str,
+    columns_to_enrich: List[str],
+):
+    """Generic DataFrame enrichment from API data."""
+    df = df.dropDuplicates(subset=["id"])
+
+    api_data = fetch_and_collect_api_data(
+        df=df,
+        langfuse=langfuse,
+        fetch_batch_func=fetch_batch_func,
+        is_valid_record=is_valid_record,
+        entity_label=entity_label,
+    )
+
+    if not api_data:
+        return df
+
+    api_df = spark.createDataFrame(api_data)  # type: ignore[name-defined]
+    for col_name in columns_to_enrich:
+        api_df = api_df.withColumnRenamed(col_name, f"api_{col_name}")
+    api_df = api_df.select("id", *[f"api_{c}" for c in columns_to_enrich])
+
+    enriched_df = df.join(api_df, df.id == api_df.id, "left").drop(api_df.id)
+
+    columns_map = {f"api_{c}": c for c in columns_to_enrich}
+    return coalesce_columns(enriched_df, df, columns_map)
 
 
 def extract_score_data(score):
@@ -99,205 +265,85 @@ def extract_score_data(score):
     }
 
 
-def fetch_scores_batch_with_retry(langfuse, score_ids, batch_num, total_batches, log_state):
-    """Fetch all pages for a batch of score IDs."""
-    start_time = time.time()
-    try:
-        score_ids_str = ",".join(score_ids)
-
-        first_resp = fetch_page_with_retry(langfuse, score_ids_str, 1)
-        if not first_resp or not hasattr(first_resp, 'data'):
-            raise ValueError("Invalid response from API")
-        
-        results = [extract_score_data(score) for score in first_resp.data]
-        total_pages = first_resp.meta.total_pages if hasattr(first_resp, 'meta') else 1
-
-        if total_pages > 1:
-            for page in range(2, total_pages + 1):
-                resp = fetch_page_with_retry(langfuse, score_ids_str, page)
-                results.extend([extract_score_data(score) for score in resp.data])
-        
-        elapsed = time.time() - start_time
-
-        valid_count = sum(1 for r in results if r.get('session_id') or r.get('metadata'))
-        
-        if valid_count < len(results):
-            logger.warning(f"Batch {batch_num}: {len(results) - valid_count} scores with no data")
-
-        current_time = time.time()
-        should_log = False
-        batches_completed = 0
-        
-        with log_state['lock']:
-            log_state['batches_completed'] += 1
-            batches_completed = log_state['batches_completed']
-            time_since_last_log = current_time - log_state['last_log_time']
-            is_last_batch = (batches_completed == total_batches)
-            
-            if time_since_last_log >= LOG_INTERVAL_SECONDS or is_last_batch:
-                should_log = True
-                log_state['last_log_time'] = current_time
-        
-        if should_log:
-            progress_pct = (batches_completed / total_batches * 100) if total_batches > 0 else 0
-            logger.info(
-                f"Progress ({progress_pct:.1f}%): {batches_completed}/{total_batches} batches completed. "
-            )
-        
-        with log_state['lock']:
-            log_state['consecutive_failures'] = 0
-        
-        return results
-        
-    except Exception as e:
-        elapsed = time.time() - start_time
-        
-        with log_state['lock']:
-            log_state['consecutive_failures'] += 1
-            consecutive_failures = log_state['consecutive_failures']
-        
-        logger.error(
-            f"Batch {batch_num}/{total_batches}: Failed after {elapsed:.2f}s. "
-            f"{len(score_ids)} scores affected. Error: {str(e)} "
-            f"(consecutive failures: {consecutive_failures})"
-        )
-        
-        if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
-            error_msg = (
-                f"Job halted after {consecutive_failures} consecutive batch failures. "
-                f"This indicates persistent API issues. Please check API health and retry the job."
-            )
-            logger.error(error_msg)
-            raise TooManyConsecutiveFailuresError(error_msg)
-        
-        return [{'id': sid, 'session_id': None, 'metadata': None} for sid in score_ids]
+def fetch_scores_batch(langfuse, score_ids, batch_num):
+    score_ids_str = ",".join(score_ids)
+    return paginate_api_response(
+        make_request=lambda page: langfuse.api.score_v_2.get(score_ids=score_ids_str, page=page),
+        batch_num=batch_num,
+        extract_data=lambda data: [extract_score_data(s) for s in data],
+    )
 
 
-def enrich_scores_from_api(df, langfuse):
-    """Enrich scores dataframe with session_id and metadata from API."""
-    start_time = time.time()
-    logger.info("=" * 60)
-    logger.info("Starting API enrichment for scores table")
-    logger.info(f"Config: {MAX_WORKERS} workers, batch size {BATCH_SIZE}")
-
-    total_rows = df.count()
-    df = df.dropDuplicates(subset=["id"])
-    deduplicated_rows = df.count()
-    
-    if total_rows > deduplicated_rows:
-        logger.warning(
-            f"Removed {total_rows - deduplicated_rows} duplicate IDs from S3 data. "
-            f"Original rows: {total_rows}, After deduplication: {deduplicated_rows}"
-        )
-
-    score_ids = [row.id for row in df.select("id").distinct().collect()]
-    
-    if not score_ids:
-        logger.warning("No score IDs found, skipping enrichment")
-        return df
-
-    batches = [score_ids[i:i + BATCH_SIZE] for i in range(0, len(score_ids), BATCH_SIZE)]
-    logger.info(f"Processing {len(batches)} batches of {BATCH_SIZE} scores")
-
-    api_data = []
-    failed_batches = 0
-    successful_batches = 0
-    
-    # thread-safe state for time-based logging and failure tracking
-    log_state = {
-        'last_log_time': time.time(),
-        'batches_completed': 0,
-        'consecutive_failures': 0,
-        'lock': threading.Lock()
+def extract_observation_data(observation):
+    return {
+        "id": getattr(observation, "id", None),
+        "latency": getattr(observation, "latency", None),
     }
-    
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        future_to_batch = {
-            executor.submit(fetch_scores_batch_with_retry, langfuse, batch, batch_num + 1, len(batches), log_state): (batch_num + 1, len(batch))
-            for batch_num, batch in enumerate(batches)
-        }
-        
-        for future in as_completed(future_to_batch):
-            batch_num, batch_size = future_to_batch[future]
-            try:
-                results = future.result()
-                if results:
-                    valid_results = [r for r in results if r.get('session_id') is not None or r.get('metadata') is not None]
-                    if valid_results:
-                        successful_batches += 1
-                    else:
-                        failed_batches += 1
-                        logger.warning(f"Batch {batch_num}/{len(batches)}: No valid data returned")
-                    api_data.extend(results)
-            except TooManyConsecutiveFailuresError:
-                # re-raise to halt the entire job
-                raise
-            except Exception as e:
-                failed_batches += 1
-                logger.error(f"Batch {batch_num}/{len(batches)}: Unexpected error - {str(e)}")
-    
-    elapsed = time.time() - start_time
-    success_rate = (successful_batches / len(batches) * 100) if batches else 0
-    
-    logger.info("=" * 60)
-    logger.info(f"API enrichment completed in {elapsed:.2f}s")
-    logger.info(f"Summary: {successful_batches}/{len(batches)} batches successful ({success_rate:.1f}%)")
-    logger.info(f"Total API records retrieved: {len(api_data)}")
-    if failed_batches > 0:
-        logger.warning(f"Failed batches: {failed_batches} (scores will have null session_id/metadata)")
-    logger.info("=" * 60)
-    
-    if api_data:
-        api_df = spark.createDataFrame(api_data)
-        
-        api_df = api_df.withColumnRenamed("session_id", "api_session_id") \
-                       .withColumnRenamed("metadata", "api_metadata") \
-                       .withColumnRenamed("value", "api_value") \
-                       .select("id", "api_session_id", "api_metadata", "api_value")
-        
-        enriched_df = df.join(api_df, df.id == api_df.id, "left") \
-                        .drop(api_df.id)
-        
-        if "session_id" in df.columns:
-            enriched_df = enriched_df.withColumn(
-                "session_id",
-                coalesce(col("api_session_id"), col("session_id"))
-            )
-        else:
-            enriched_df = enriched_df.withColumn(
-                "session_id",
-                col("api_session_id")
-            )
-        
-        if "metadata" in df.columns:
-            enriched_df = enriched_df.withColumn(
-                "metadata",
-                coalesce(col("api_metadata"), col("metadata"))
-            )
-        else:
-            enriched_df = enriched_df.withColumn(
-                "metadata",
-                col("api_metadata")
-            )
-        
-        if "value" in df.columns:
-            enriched_df = enriched_df.withColumn(
-                "value",
-                coalesce(col("api_value"), col("value"))
-            )
-        else:
-            enriched_df = enriched_df.withColumn(
-                "value",
-                col("api_value")
-            )
-        
-        enriched_df = enriched_df.drop("api_session_id", "api_metadata", "api_value")
-        
-        logger.info("Successfully enriched dataframe with API data")
-        return enriched_df
-    else:
-        logger.warning("No API data found")
+
+
+def fetch_observations_batch(langfuse, observation_ids, batch_num):
+    filter_json = json.dumps(
+        [{"type": "stringOptions", "column": "id", "operator": "any of", "value": observation_ids}],
+        separators=(",", ":"),
+    )
+
+    def extract_valid_observations(data):
+        results = []
+        for obs in data:
+            extracted = extract_observation_data(obs)
+            if extracted and extracted.get("id") is not None:
+                results.append(extracted)
+        return results
+
+    return paginate_api_response(
+        make_request=lambda page: langfuse.api.observations.get_many(filter=filter_json, limit=100, page=page),
+        batch_num=batch_num,
+        extract_data=extract_valid_observations,
+    )
+
+
+def enrich_from_langfuse_api(df, table_name, config_service, databricks_scope):
+    """Enrich DataFrame with Langfuse API data for scores or observations tables."""
+    langfuse_host = config_service.get_config("langfuse_host")
+
+    base_dbutils = BaseDBUtils()
+    dbutils = base_dbutils.get_dbutils()
+    if dbutils is None:
+        logger.warning("dbutils is not available; skipping API enrichment")
         return df
+
+    langfuse_pk = dbutils.secrets.get(scope=databricks_scope, key='LANGFUSE_PUBLIC_KEY')
+    langfuse_sk = dbutils.secrets.get(scope=databricks_scope, key='LANGFUSE_SECRET_KEY')
+
+    langfuse = Langfuse(
+        secret_key=langfuse_sk,
+        public_key=langfuse_pk,
+        host=langfuse_host
+    )
+
+    logger.info(f"Enriching {table_name} table with API data")
+
+    if table_name == "scores":
+        return enrich_df_from_api(
+            df=df,
+            langfuse=langfuse,
+            fetch_batch_func=fetch_scores_batch,
+            is_valid_record=lambda r: r.get("session_id") is not None or r.get("metadata") is not None,
+            entity_label="scores",
+            columns_to_enrich=["session_id", "metadata", "value"],
+        )
+
+    if table_name == "observations":
+        return enrich_df_from_api(
+            df=df,
+            langfuse=langfuse,
+            fetch_batch_func=fetch_observations_batch,
+            is_valid_record=lambda r: r.get("latency") is not None,
+            entity_label="observations",
+            columns_to_enrich=["latency"],
+        )
+
+    return df
 
 
 def fetch_from_s3(s3_service, proxy_path, start_timestamp, end_timestamp, table_name):
@@ -305,18 +351,17 @@ def fetch_from_s3(s3_service, proxy_path, start_timestamp, end_timestamp, table_
     logger.info(f"Fetching data from S3 for table: {table_name}")
     logger.info(f"S3 path: {proxy_path}")
 
+    base_path = proxy_path if proxy_path.endswith("/") else f"{proxy_path}/"
     hours_diff = int((end_timestamp - start_timestamp) / timedelta(hours=1)) + 1
-    timestamp_strs = [
-        (start_timestamp + timedelta(hours=i)).strftime("%Y-%m-%dT%H*") for i in range(hours_diff)
-    ]
+    
+    valid_files = []
+    for i in range(hours_diff):
+        # construct timestamp prefix for the hour: YYYY-MM-DDTHH
+        ts_str = (start_timestamp + timedelta(hours=i)).strftime("%Y-%m-%dT%H")
+        prefix = f"{base_path}{ts_str}"
 
-    objs = s3_service.list_objects(proxy_path)
-    timestamp_patterns = [re.compile(ts_str.replace('*', '.*')) for ts_str in timestamp_strs]
-    valid_files = [
-        filename for filename in objs if any(
-            pattern.search(filename) for pattern in timestamp_patterns
-        )
-    ]
+        files = s3_service.list_objects_by_prefix(prefix)
+        valid_files.extend(files)
     
     logger.info(f"Found {len(valid_files)} files")
     
@@ -324,7 +369,7 @@ def fetch_from_s3(s3_service, proxy_path, start_timestamp, end_timestamp, table_
         logger.warning(f"No files found between {start_timestamp} and {end_timestamp}")
         return None
 
-    df = spark.read.json(valid_files)
+    df = spark.read.json(valid_files)  # type: ignore[name-defined]
 
     if df.isEmpty():
         logger.warning(f"Dataframe is empty for table {table_name} between {start_timestamp} and {end_timestamp}. Skipping data loading operations.")
@@ -381,29 +426,11 @@ if __name__ == "__main__":
     s3_service = S3Service(boto3.resource("s3"))
     df = fetch_from_s3(s3_service, proxy_path, start_timestamp, end_timestamp, table_name)
 
-    # for scores table, enrich with API data (session_id and metadata)
-    if table_name == "scores" and df is not None:
-        logger.info("Enriching scores table with API data")
-        
-        langfuse_host = config_service.get_config("langfuse_host")
-        
-        base_dbutils = BaseDBUtils()
-        if base_dbutils.get_dbutils() is not None:
-            dbutils = base_dbutils.get_dbutils()
-
-        langfuse_pk = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key='LANGFUSE_PUBLIC_KEY')
-        langfuse_sk = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key='LANGFUSE_SECRET_KEY')
-
-        langfuse = Langfuse(
-            secret_key=langfuse_sk,
-            public_key=langfuse_pk,
-            host=langfuse_host
-        )
-
-        df = enrich_scores_from_api(df, langfuse)
+    if table_name in ("scores", "observations") and df is not None:
+        df = enrich_from_langfuse_api(df, table_name, config_service, DATABRICKS_SCOPE)
 
     if df is None:
-        logger.warning(f"No data to process for table {table_name}")
+        logger.warning(f"No data to process for table {table_name}, skipping...")
     else:
         df = (
             df.withColumn("year", lit(start_timestamp.year))
