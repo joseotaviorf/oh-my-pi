@@ -1,0 +1,41 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: legal_process_document_generation
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Tracks document generation events for legal processes"
+columns:
+  id:
+    description: "Unique identifier of the document generation"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.id
+  id_legal_process:
+    description: "Reference to the related legal process"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.legal_process_id
+  type:
+    description: "Type of the generated document"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.type
+  status:
+    description: "Generation status (e.g., SUCCESS, FAILED)"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.status
+  file_path:
+    description: "Storage path where the document is saved"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.file_path
+  version:
+    description: "Optimistic lock/version column"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.version
+  ts_created:
+    description: "Creation timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.created_at
+  ts_updated:
+    description: "Last update timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_document_generation.updated_at
+  ts_load:
+    description: "Load timestamp of the table"

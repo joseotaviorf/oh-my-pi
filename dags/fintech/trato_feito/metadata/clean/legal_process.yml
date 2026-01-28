@@ -1,0 +1,61 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: legal_process
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Main table that stores legal processes handled by Trato Feito"
+columns:
+  id:
+    description: "Unique identifier of the legal process"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.id
+  process_type:
+    description: "Type of legal process (EVICTIONS, CLAIM, EXECUTION)"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.process_type
+  id_external:
+    description: "External identifier of the process"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.external_id
+  entity_type:
+    description: "Type of the related entity (e.g., CONTRACT)"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.entity_type
+  id_entity:
+    description: "Identifier of the related entity"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.entity_id
+  law_firm:
+    description: "Law firm handling the process"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.law_firm
+  status:
+    description: "Current status of the process"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.status
+  status_order:
+    description: "Numeric order used to validate progression"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.status_order
+  is_active:
+    description: "Flag indicating if the process is active"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.active
+  version:
+    description: "Optimistic lock/version column"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.version
+  ts_last_update_event:
+    description: "Timestamp of the last update event"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.last_update_event_at
+  ts_created:
+    description: "Creation timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.created_at
+  ts_updated:
+    description: "Last update timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process.updated_at
+  ts_load:
+    description: "Load timestamp of the table"

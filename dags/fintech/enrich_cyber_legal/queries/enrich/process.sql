@@ -26,7 +26,12 @@ SELECT
     c.id_dossier AS id_process,
     c.id_court,
     crt.court_name,
-    c.process_type,
+    CASE
+        WHEN c.process_type = "Despejo" THEN "EVICTIONS"
+        WHEN c.process_type = "Execucao" THEN "EXECUTION"
+        WHEN c.process_type = "Reivindicatoria" THEN "CLAIM"
+        ELSE c.process_type
+    END AS process_type,
     c.id_attorney_agency AS id_agency,
     ag.agency_name,
     c.id_responsible_attorney AS internal_lawyer,

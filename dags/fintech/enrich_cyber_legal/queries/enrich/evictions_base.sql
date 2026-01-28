@@ -1,6 +1,6 @@
 WITH
 get_process_stages AS (
-     SELECT DISTINCT
+    SELECT DISTINCT
         id_case,
         stage_description,
         expense_amount,
@@ -8,6 +8,13 @@ get_process_stages AS (
         dt_end
     FROM datalake_cyber_legal_homolog.process_stages
 ),
+get_last_process_stage AS (
+  SELECT
+    id_case,
+    stage_description
+  FROM get_process_stages
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY stage_order DESC) = 1
+)
 get_stages_data AS (
     SELECT
     id_case,
@@ -68,10 +75,11 @@ SELECT
     p.court_name,
     p.process_type,
     p.id_agency,
-    p.agency_name,
+    p.agency_name AS law_firm,
     p.internal_lawyer,
     p.external_lawyer,
     p.supervising_lawyer,
+    ps.stage_description AS last_process_stage,
     p.contract_evictions_status,
     p.evictions_label,
     p.eviction_step,
@@ -124,3 +132,5 @@ SELECT
 FROM datalake_cyber_legal_homolog.process AS p
 LEFT JOIN get_stages_data AS s
     ON p.id_case = s.id_case
+LEFT JOIN get_last_process_stage AS ps
+    ON p.id_case = ps.id_case

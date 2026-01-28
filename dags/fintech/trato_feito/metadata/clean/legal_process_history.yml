@@ -1,0 +1,109 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: legal_process_history
+owner: bianca.martins@quintoandar.com.br
+domain: Fintech
+description: "Audit history for legal processes, capturing revisions and field changes"
+columns:
+  id_legal_process_history:
+    description: "Unique identifier for the legal process history record"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.id
+  rev:
+    description: "Revision number"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.rev
+  revtype:
+    description: "Revision type (INSERT, UPDATE, DELETE)"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.revtype
+  revend:
+    description: "Revision end"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.revend
+  process_type:
+    description: "Process type value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.process_type
+  has_process_type_modified:
+    description: "Flag indicating if process_type changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.process_type_mod
+  id_external:
+    description: "External identifier value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.external_id
+  has_id_external_modified:
+    description: "Flag indicating if external_id changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.external_id_mod
+  entity_type:
+    description: "Entity type value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.entity_type
+  has_entity_type_modified:
+    description: "Flag indicating if entity_type changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.entity_type_mod
+  id_entity:
+    description: "Entity identifier value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.entity_id
+  has_id_entity_modified:
+    description: "Flag indicating if entity_id changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.entity_id_mod
+  law_firm:
+    description: "Law firm value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.law_firm
+  has_law_firm_modified:
+    description: "Flag indicating if law_firm changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.law_firm_mod
+  status:
+    description: "Status value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.status
+  has_status_modified:
+    description: "Flag indicating if status changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.status_mod
+  is_active:
+    description: "Active flag value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.active
+  has_active_modified:
+    description: "Flag indicating if active changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.active_mod
+  status_order:
+    description: "Status order value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.status_order
+  has_status_order_modified:
+    description: "Flag indicating if status_order changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.status_order_mod
+  version:
+    description: "Version value"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.version
+  ts_last_update_event:
+    description: "Last update event timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.last_update_event_at
+  has_ts_last_update_event_modified:
+    description: "Flag indicating if last_update_event_at changed"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.last_update_event_at_mod
+  ts_created:
+    description: "Creation timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.created_at
+  ts_updated:
+    description: "Update timestamp"
+    lineage:
+      - datalake_trato_feito_raw.legal_process_history.updated_at
+  ts_load:
+    description: "Load timestamp of the table"
