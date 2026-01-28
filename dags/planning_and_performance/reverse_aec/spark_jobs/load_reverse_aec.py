@@ -6,7 +6,6 @@ from pyspark.sql import functions as F
 
 JOB_NAME = "load_reverse_aec"
 
-
 def cast_void_columns_to_string(df):
     """
     Cast void/null type columns to string to avoid parquet write errors.
@@ -113,6 +112,7 @@ if __name__ == "__main__":
 
             # get all columns with "organization" in the name
             organization_columns = [col for col in df.columns if "organization" in col.lower()]
+            agent_filters = []
 
             if table_name == 'tickets_perspective':
                 # for this table, we only need to filter by the last agent organization

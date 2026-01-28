@@ -112,7 +112,8 @@ if __name__ == "__main__":
 
             # get all columns with "organization" in the name
             organization_columns = [col for col in df.columns if "organization" in col.lower()]
-
+            agent_filters = []
+            
             if table_name == 'tickets_perspective':
                 # for this table, we only need to filter by the last agent organization
                 organization_columns = ['last_agent_organization']
