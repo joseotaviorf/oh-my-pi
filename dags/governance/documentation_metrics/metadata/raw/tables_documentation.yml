@@ -1,0 +1,22 @@
+database_name: datalake_documentation_metrics_raw
+table_name: tables_documentation
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table provides the documentation about tables, created and maintained through bi-etl-ejuice
+columns:
+  database_name:
+    description: This column indicates the schema name of the table
+  table_name:
+    description: This column indicates the name of the tables
+  domain:
+    description: The domain that the table belongs to
+  owner:
+    description: The user or team responsible for the table
+  table_description:
+    description: The description of the table contents
+  year:
+    description: The year this data was ingested
+  month:
+    description: The month this data was ingested
+  day:
+    description: The day this data was ingested

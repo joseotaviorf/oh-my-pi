@@ -1,4 +1,3 @@
----
 database_name: datalake_documentation_metrics_clean
 table_name: columns_metastore
 owner: herivelto.junior@quintoandar.com.br
@@ -12,7 +11,7 @@ columns:
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.database_name
-    documentation: This column indicates the schema name of the table
+    description: This column indicates the schema name of the table
   table_name:
     lineage:
       - datalake_documentation_metrics_raw.columns_metastore.table_name
