@@ -1,0 +1,53 @@
+---
+database_name: datalake_big_agent_clean
+table_name: earning_invalidations
+description: |
+  Invalidation events for earnings, including the original earning reference,
+  replacement linkage, author, reason, timestamps, and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.id
+    description: Invalidation record identifier.
+  id_earning:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.earning_id
+    description: Identifier of the earning being invalidated.
+  id_replaced_by:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.replaced_by
+    description: Identifier of the new earning that replaces the invalidated one, if any.
+  author:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.author
+    description: Actor metadata responsible for the invalidation.
+  reason:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.reason
+    description: Business reason describing why the earning was invalidated.
+  ts_invalidated:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.invalidated_at
+    description: Timestamp when the earning was invalidated.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.created_at
+    description: Record creation timestamp.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.updated_at
+    description: Record last update timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.day
+    description: Partition day.

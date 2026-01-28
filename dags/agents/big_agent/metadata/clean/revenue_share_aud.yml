@@ -1,0 +1,109 @@
+---
+database_name: datalake_big_agent_clean
+table_name: revenue_share_aud
+description: |
+  Audit view for revenue share with revision metadata, modification flags,
+  relation/condition fields and status, with timestamps and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.id
+    description: Revenue share identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.revend
+    description: End revision marker.
+  id_relation:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.relation_id
+    description: Identifier of the related entity for this revenue share.
+  id_invalidated_by:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.invalidated_by
+    description: Identifier of the entity that invalidated this record, if any.
+  uuid_revenue_share:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.revenue_share_uuid
+    description: UUID of the revenue share record.
+  relation_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.relation_type
+    description: Type discriminator for the relation.
+  condition_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.condition_type
+    description: Type of condition applied to compute revenue share.
+  value:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.value
+    description: Value applied (amount or percentage as per configuration).
+  invalidation_reason:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.invalidation_reason
+    description: Reason explaining why this record was invalidated, if applicable.
+  status:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.status
+    description: Current status of this revenue share.
+  mod_relation_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.relation_type_mod
+    description: Modification flag/column for relation_type.
+  mod_id_relation:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.relation_id_mod
+    description: Modification flag/column for relation_id.
+  mod_condition_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.condition_type_mod
+    description: Modification flag/column for condition_type.
+  mod_value:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.value_mod
+    description: Modification flag/column for value.
+  mod_id_invalidated_by:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.invalidated_by_mod
+    description: Modification flag/column for invalidated_by.
+  mod_invalidation_reason:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.invalidation_reason_mod
+    description: Modification flag/column for invalidation_reason.
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.status_mod
+    description: Modification flag/column for status.
+  mod_uuid_revenue_share:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.revenue_share_uuid_mod
+    description: Modification flag/column for revenue_share_uuid.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.created_at
+    description: Creation timestamp of the raw audit record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.updated_at
+    description: Update timestamp of the raw audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_aud.day
+    description: Partition day.

@@ -47,19 +47,19 @@ columns:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.status_mod
     description: Modification flag/column for status.
-  mod_dt_init:
+  mod_dt_initiated:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.init_date_mod
     description: Modification flag/column for init date.
-  mod_dt_end:
+  mod_dt_ended:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.end_date_mod
     description: Modification flag/column for end date.
-  dt_init:
+  dt_initiated:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.init_date
     description: Start date of the metric period (audited).
-  dt_end:
+  dt_ended:
     lineage:
       - datalake_big_agent_raw.metric_period_aud.end_date
     description: End date of the metric period (audited).

@@ -71,22 +71,22 @@ columns:
     lineage:
       - datalake_big_agent_raw.partner_tier_aud.overwritten_reason_mod
     description: Modification flag/column for overwritten_reason.
-  mod_ts_validity_start:
+  mod_dt_validity_started:
     lineage:
       - datalake_big_agent_raw.partner_tier_aud.validity_start_at_mod
-    description: Modification flag/column for validity start timestamp.
-  mod_ts_validity_end:
+    description: Modification flag/column for validity start date.
+  mod_dt_validity_ended:
     lineage:
       - datalake_big_agent_raw.partner_tier_aud.validity_end_at_mod
-    description: Modification flag/column for validity end timestamp.
-  ts_validity_start:
+    description: Modification flag/column for validity end date.
+  dt_validity_started:
     lineage:
       - datalake_big_agent_raw.partner_tier_aud.validity_start_at
-    description: Validity window start timestamp for the tier mapping.
-  ts_validity_end:
+    description: Validity window start date for the tier mapping.
+  dt_validity_ended:
     lineage:
       - datalake_big_agent_raw.partner_tier_aud.validity_end_at
-    description: Validity window end timestamp for the tier mapping.
+    description: Validity window end date for the tier mapping.
   ts_created:
     lineage:
       - datalake_big_agent_raw.partner_tier_aud.created_at

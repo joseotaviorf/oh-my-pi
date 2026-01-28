@@ -111,25 +111,25 @@ columns:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.status_mod
     description: Indicates if the status field has been changed
-  mod_dt_start:
+  mod_dt_started:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.start_at_mod
-    description: Indicates if the dt_start field has been changed
-  mod_dt_end:
+    description: Indicates if the dt_started field has been changed
+  mod_dt_ended:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.end_at_mod
-    description: Indicates if the dt_end field has been changed
+    description: Indicates if the dt_ended field has been changed
   mod_ts_invalidated:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.invalidated_at_mod
     description: Indicates if the ts_invalidated field has been changed
-  dt_start:
+  dt_started:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.start_at
     description:
       If the rule is valid, it indicates the start of the period 
       in which the rule applies to the program.
-  dt_end:
+  dt_ended:
     lineage:
       - datalake_big_agent_raw.points_rule_aud.end_at
     description:

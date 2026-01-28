@@ -15,14 +15,14 @@ columns:
     lineage:
       - datalake_big_agent_raw.tier.incentive_engine_id
     description: Identifier of the incentive engine linked to this tier.
-  id_classifier_score_rule:
+  id_classifier:
     lineage:
-      - datalake_big_agent_raw.tier.classifier_score_rule_id
-    description: Identifier of the classifier score rule.
-  id_qualifier_score_rule:
+      - datalake_big_agent_raw.tier.classifier_id
+    description: Identifier of the classifier.
+  id_qualifier:
     lineage:
-      - datalake_big_agent_raw.tier.qualifier_score_rule_id
-    description: Identifier of the qualifier score rule.
+      - datalake_big_agent_raw.tier.qualifier_id
+    description: Identifier of the qualifier.
   name:
     lineage:
       - datalake_big_agent_raw.tier.name

@@ -3,7 +3,7 @@ database_name: datalake_big_agent_clean
 table_name: incentive_engine_aud
 description: |
   Incentive engine audit with revision metadata, modification columns, and
-  audited validity windows.
+  audited classification and partner tier validity dates.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -55,22 +55,38 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.status_mod
     description: Modification flag/column for status.
-  mod_ts_validity_start:
+  mod_dt_classification_started:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.validity_start_at_mod
-    description: Modification flag/column for validity_start_at.
-  mod_ts_validity_end:
+      - datalake_big_agent_raw.incentive_engine_aud.classification_start_at_mod
+    description: Modification flag/column for classification_start_at.
+  mod_dt_classification_ended:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.validity_end_at_mod
-    description: Modification flag/column for validity_end_at.
-  ts_validity_start:
+      - datalake_big_agent_raw.incentive_engine_aud.classification_end_at_mod
+    description: Modification flag/column for classification_end_at.
+  mod_dt_partner_tier_validity_started:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.validity_start_at
-    description: Validity start (audited).
-  ts_validity_end:
+      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_start_at_mod
+    description: Modification flag/column for partner_tier_validity_start_at.
+  mod_dt_partner_tier_validity_ended:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.validity_end_at
-    description: Validity end (audited).
+      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_end_at_mod
+    description: Modification flag/column for partner_tier_validity_end_at.
+  dt_classification_started:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.classification_start_at
+    description: Start date of the classification window (audited).
+  dt_classification_ended:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.classification_end_at
+    description: End date of the classification window (audited).
+  dt_partner_tier_validity_started:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_start_at
+    description: Start date of the partner tier validity window (audited).
+  dt_partner_tier_validity_ended:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_end_at
+    description: End date of the partner tier validity window (audited).
   ts_created:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.created_at

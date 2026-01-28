@@ -23,11 +23,11 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.tier_validity_period
     description: Tier validity period.
-  ts_classification_start:
+  ts_classification_started:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.classification_start_at
     description: Classification window start timestamp.
-  ts_classification_end:
+  ts_classification_ended:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.classification_end_at
     description: Classification window end timestamp.

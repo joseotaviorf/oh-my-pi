@@ -63,13 +63,13 @@ columns:
     lineage:
       - datalake_big_agent_raw.points_rule.status
     description: Indicates the rule is still valid.
-  dt_start:
+  dt_started:
     lineage:
       - datalake_big_agent_raw.points_rule.start_at
     description:
       If the rule is valid, it indicates the start of the period 
       in which the rule applies to the program.
-  dt_end:
+  dt_ended:
     lineage:
       - datalake_big_agent_raw.points_rule.end_at
     description:

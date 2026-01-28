@@ -1,0 +1,85 @@
+---
+database_name: datalake_big_agent_clean
+table_name: earning_invalidations_aud
+description: |
+  Audit records for earning invalidations with revision metadata, modification
+  markers, invalidation timestamp, and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.id
+    description: Invalidation record identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.revend
+    description: End revision marker.
+  id_earning:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.earning_id
+    description: Identifier of the earning being invalidated.
+  id_replaced_by:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.replaced_by
+    description: Identifier of the replacement earning, if present.
+  author:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.author
+    description: Actor metadata responsible for the invalidation.
+  reason:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.reason
+    description: Business reason for the invalidation.
+  mod_id_earning:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.earning_id_mod
+    description: Modification flag/column for earning_id.
+  mod_id_replaced_by:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.replaced_by_mod
+    description: Modification flag/column for replaced_by.
+  mod_author:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.author_mod
+    description: Modification flag/column for author.
+  mod_reason:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.reason_mod
+    description: Modification flag/column for reason.
+  mod_ts_invalidated:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.invalidated_at_mod
+    description: Modification flag/column for invalidated_at.
+  ts_invalidated:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.invalidated_at
+    description: Invalidation timestamp (audited).
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.created_at
+    description: Creation timestamp of the raw audit record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.updated_at
+    description: Update timestamp of the raw audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations_aud.day
+    description: Partition day.

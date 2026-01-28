@@ -3,7 +3,7 @@ database_name: datalake_big_agent_clean
 table_name: incentive_engine
 description: |
   Incentive engine configurations, including external condition, incentive system,
-  status, and validity windows, plus timestamps and partitions.
+  status, and classification/partner tier validity dates, plus timestamps and partitions.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -27,14 +27,22 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_engine.status
     description: Record status.
-  ts_validity_start:
+  dt_classification_started:
     lineage:
-      - datalake_big_agent_raw.incentive_engine.validity_start_at
-    description: Validity start timestamp.
-  ts_validity_end:
+      - datalake_big_agent_raw.incentive_engine.classification_start_at
+    description: Start date of the classification window.
+  dt_classification_ended:
     lineage:
-      - datalake_big_agent_raw.incentive_engine.validity_end_at
-    description: Validity end timestamp.
+      - datalake_big_agent_raw.incentive_engine.classification_end_at
+    description: End date of the classification window.
+  dt_partner_tier_validity_started:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine.partner_tier_validity_start_at
+    description: Start date of the partner tier validity window.
+  dt_partner_tier_validity_ended:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine.partner_tier_validity_end_at
+    description: End date of the partner tier validity window.
   ts_created:
     lineage:
       - datalake_big_agent_raw.incentive_engine.created_at

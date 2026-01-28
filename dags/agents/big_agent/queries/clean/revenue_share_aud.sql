@@ -1,0 +1,28 @@
+SELECT
+    id,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    relation_id AS id_relation,
+    invalidated_by AS id_invalidated_by,
+    revenue_share_uuid AS uuid_revenue_share,
+    relation_type,
+    condition_type,
+    value,
+    invalidation_reason,
+    status,
+    relation_type_mod AS mod_relation_type,
+    relation_id_mod AS mod_id_relation,
+    condition_type_mod AS mod_condition_type,
+    value_mod AS mod_value,
+    invalidated_by_mod AS mod_id_invalidated_by,
+    invalidation_reason_mod AS mod_invalidation_reason,
+    status_mod AS mod_status,
+    revenue_share_uuid_mod AS mod_uuid_revenue_share,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_big_agent_raw.revenue_share_aud

@@ -21,11 +21,11 @@ columns:
     lineage:
       - datalake_big_agent_raw.metric_period.status
     description: Current status of the period record.
-  dt_init:
+  dt_initiated:
     lineage:
       - datalake_big_agent_raw.metric_period.init_date
     description: Start date of the metric validity period.
-  dt_end:
+  dt_ended:
     lineage:
       - datalake_big_agent_raw.metric_period.end_date
     description: End date of the metric validity period.

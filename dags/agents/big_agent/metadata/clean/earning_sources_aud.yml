@@ -1,0 +1,126 @@
+---
+database_name: datalake_big_agent_clean
+table_name: earning_sources_aud
+description: |
+  Audit view for earning sources with revision metadata, modification markers,
+  monetary amounts, status, and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.id
+    description: Earning source identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.rev
+    description: Revision identifier.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.revend
+    description: End revision marker.
+  id_external_domain:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.external_domain_id
+    description: External domain identifier related to the earning source.
+  uuid_earning_source:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.earning_source_uuid
+    description: UUID of the earning source.
+  uuid_external_cart:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.external_cart_uuid
+    description: UUID of the external cart associated with the earning source.
+  external_domain_type:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.external_domain_type
+    description: Type discriminator for the external domain.
+  revenue_share_total_amount:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.revenue_share_total_amount
+    description: Total amount considered for revenue share.
+  base_amount:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.base_amount
+    description: Base amount used to compute earnings.
+  currency:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.currency
+    description: Currency code for monetary fields.
+  status:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.status
+    description: Processing status of the earning source.
+  failure_reason:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.failure_reason
+    description: Failure reason when processing was not successful.
+  incentive_systems_calculated:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.incentive_systems_calculated
+    description: Incentive systems considered/calculated for this source.
+  mod_uuid_earning_source:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.earning_source_uuid_mod
+    description: Modification flag/column for earning_source_uuid.
+  mod_uuid_external_cart:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.external_cart_uuid_mod
+    description: Modification flag/column for external_cart_uuid.
+  mod_external_domain_type:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.external_domain_type_mod
+    description: Modification flag/column for external_domain_type.
+  mod_id_external_domain:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.external_domain_id_mod
+    description: Modification flag/column for external_domain_id.
+  mod_revenue_share_total_amount:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.revenue_share_total_amount_mod
+    description: Modification flag/column for revenue_share_total_amount.
+  mod_base_amount:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.base_amount_mod
+    description: Modification flag/column for base_amount.
+  mod_currency:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.currency_mod
+    description: Modification flag/column for currency.
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.status_mod
+    description: Modification flag/column for status.
+  mod_failure_reason:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.failure_reason_mod
+    description: Modification flag/column for failure_reason.
+  mod_incentive_systems_calculated:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.incentive_systems_calculated_mod
+    description: Modification flag/column for incentive_systems_calculated.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.created_at
+    description: Creation timestamp of the raw audit record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.updated_at
+    description: Update timestamp of the raw audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.earning_sources_aud.day
+    description: Partition day.
+

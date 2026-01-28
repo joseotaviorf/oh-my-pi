@@ -1,8 +1,8 @@
 SELECT
     id,
     incentive_engine_id AS id_incentive_engine,
-    classifier_score_rule_id AS id_classifier_score_rule,
-    qualifier_score_rule_id AS id_qualifier_score_rule,
+    classifier_id AS id_classifier,
+    qualifier_id AS id_qualifier,
     name,
     priority,
     TIMESTAMP(created_at) AS ts_created,

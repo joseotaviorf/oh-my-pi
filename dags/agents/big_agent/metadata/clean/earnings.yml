@@ -1,57 +1,77 @@
+---
 database_name: datalake_big_agent_clean
 table_name: earnings
+description: |
+  Earnings produced by the incentive system, including agency/program, external
+  domain/receiver, monetary value, status, details and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_big_agent_raw.earnings.id
+    description: Earning identifier.
   id_agency:
     lineage:
       - datalake_big_agent_raw.earnings.agency_id
+    description: Agency identifier linked to the earning.
   id_program:
     lineage:
       - datalake_big_agent_raw.earnings.program_id
-  id_house_external:
-    lineage:
-      - datalake_big_agent_raw.earnings.house_external_id
+    description: Program identifier linked to the earning.
   id_external_domain:
     lineage:
       - datalake_big_agent_raw.earnings.external_domain_id
+    description: External domain identifier related to the earning context.
   id_external_receiver:
     lineage:
       - datalake_big_agent_raw.earnings.external_receiver_id
+    description: External receiver identifier.
   status:
     lineage:
       - datalake_big_agent_raw.earnings.status
+    description: Processing status of the earning.
   type:
     lineage:
       - datalake_big_agent_raw.earnings.type
+    description: Earning type discriminator.
   failure_count:
     lineage:
       - datalake_big_agent_raw.earnings.failure_count
+    description: Number of processing failures encountered.
   details:
     lineage:
       - datalake_big_agent_raw.earnings.details
+    description: Additional metadata and details in JSON.
   remuneration_value:
     lineage:
       - datalake_big_agent_raw.earnings.remuneration_value
+    description: Monetary value remunerated by this earning.
   external_domain_type:
     lineage:
       - datalake_big_agent_raw.earnings.external_domain_type
+    description: Type discriminator for the external domain.
   external_receiver_type:
     lineage:
       - datalake_big_agent_raw.earnings.external_receiver_type
+    description: Type discriminator for the external receiver.
   ts_created:
     lineage:
       - datalake_big_agent_raw.earnings.created_at
+    description: Record creation timestamp.
   ts_updated:
     lineage:
       - datalake_big_agent_raw.earnings.updated_at
+    description: Record last update timestamp.
   year:
     lineage:
       - datalake_big_agent_raw.earnings.year
+    description: Partition year.
   month:
     lineage:
       - datalake_big_agent_raw.earnings.month
+    description: Partition month.
   day:
     lineage:
       - datalake_big_agent_raw.earnings.day
+    description: Partition day.
