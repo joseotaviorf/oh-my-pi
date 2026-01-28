@@ -60,10 +60,6 @@ columns:
     description: token usage details for the observation
     lineage:
       - datalake_langfuse_raw.observations.usage_details
-  latency:
-    description: latency in milliseconds for the observation
-    lineage:
-      - datalake_langfuse_raw.observations.latency
   cost_details:
     description: cost information for the observation
     lineage:
