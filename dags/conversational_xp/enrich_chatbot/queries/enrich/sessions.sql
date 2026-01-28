@@ -125,6 +125,15 @@ escalation_queue AS (
       AND o.type = 'TOOL'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_created DESC) = 1
+),
+langfuse_version AS (
+  SELECT DISTINCT
+    id_session,
+    version
+  FROM
+    datalake_langfuse_clean.traces
+  WHERE
+    ts_created >= '{load_start_date}'
 )
 SELECT
   s.id_session,
@@ -145,6 +154,7 @@ SELECT
     ELSE NULL
   END AS whatsapp_number,
   s.status,
+  lv.version,
   CASE
     WHEN t.id_ticket IS NOT NULL THEN REPLACE(eq.queue, '[AeC] ', '')
     ELSE NULL
@@ -161,3 +171,6 @@ LEFT JOIN
 LEFT JOIN
   escalation_queue AS eq
     ON eq.id_session = s.id_langfuse_session
+LEFT JOIN
+  langfuse_version AS lv
+    ON lv.id_session = s.id_langfuse_session

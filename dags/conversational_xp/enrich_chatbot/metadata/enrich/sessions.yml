@@ -66,6 +66,10 @@ columns:
     description: 'Session status from Sauron'
     lineage:
     - datalake_sauron_clean.session.status
+  version:
+    description: 'Langfuse version for the session'
+    lineage:
+    - datalake_langfuse_clean.traces.version
   first_queue:
     description: 'First support queue (department)'
     lineage:
