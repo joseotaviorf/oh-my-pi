@@ -60,7 +60,7 @@ support_tasks AS (
       WHEN ca.direction = 'inbound' THEN REGEXP_EXTRACT(ca.to_phone_number, '[0-9]+', 0)
       WHEN ca.direction = 'outbound' THEN REGEXP_EXTRACT(ca.from_phone_number, '[0-9]+', 0)
     END AS quinto_andar_phone_number,
-    ca.ts_task_created
+    ca.ts_reservation_created AS ts_task_created
   FROM
     datalake_customer_support.calls AS ca
 ),
@@ -129,6 +129,10 @@ indirect_attribution AS ( -- when we don't have the identifier coming from sourc
     st.department,
     il.phone_number,
     st.quinto_andar_phone_number,
+    ss.ctwa_clid,
+    ss.id_source_ctwa,
+    ss.url_source_ctwa,
+    ss.type_source_ctwa,
     ss.ts_created
   FROM 
     inbound_leads AS il
@@ -159,10 +163,10 @@ final_attribution AS (
     department,
     phone_number,
     quinto_andar_phone_number,
-    NULL AS ctwa_clid,
-    NULL AS id_source_ctwa,
-    NULL AS url_source_ctwa,
-    NULL AS type_source_ctwa,
+    ctwa_clid,
+    id_source_ctwa,
+    url_source_ctwa,
+    type_source_ctwa,
     ts_created
   FROM
     indirect_attribution
@@ -208,7 +212,7 @@ FROM
 LEFT JOIN 
   support_sessions
     ON support_sessions.phone_number = final_attribution.phone_number
-      AND support_sessions.ts_created < final_attribution.ts_created
+      AND support_sessions.ts_created <= final_attribution.ts_created
       AND support_sessions.ctwa_clid IS NOT NULL
 QUALIFY 
   ROW_NUMBER() OVER (PARTITION BY final_attribution.id_lead_ebdb ORDER BY support_sessions.ts_created DESC) = 1
