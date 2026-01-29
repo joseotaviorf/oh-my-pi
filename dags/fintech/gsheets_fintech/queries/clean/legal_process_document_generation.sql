@@ -9,4 +9,4 @@ SELECT
     ts_updated,
     ts_load
 FROM
-    datalake_gsheets_fintech_raw.legal_process_document_generation
+    datalake_gsheets_raw.legal_process_document_generation
