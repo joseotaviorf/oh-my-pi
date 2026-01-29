@@ -13,6 +13,14 @@ table_level_validations:
     severity_level: Warning
 
 column_level_validations:
-  sk_request_status:
+  sk_absence_request_status:
     is_unique:
+      severity_level: Warning
+  approval_status:
+    custom: # Unmapped approval codes are surfaced with '*' suffix (exception rule); alert when any appear so they can be investigated and mapped.
+      constraint: "(SELECT COUNT(*) FROM dw_employee.dim_absence_request_status WHERE approval_status LIKE '%*') = 0"
+      severity_level: Warning
+  user_request_status:
+    custom: # Unmapped absence status codes are surfaced with '*' suffix (exception rule); alert when any appear so they can be investigated and mapped.
+      constraint: "(SELECT COUNT(*) FROM dw_employee.dim_absence_request_status WHERE user_request_status LIKE '%*') = 0"
       severity_level: Warning

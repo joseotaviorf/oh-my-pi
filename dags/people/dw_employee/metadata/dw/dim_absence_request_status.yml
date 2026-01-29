@@ -1,17 +1,41 @@
 database_name: dw_employee
 table_name: dim_absence_request_status
-owner: isabella.araujo@quintoandar.com.br
+owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |-
-  Dimension table that stores the different possible statuses for an absence request, such as approved, pending, or denied.
+  Dimension table that stores status data for absence requests. Each row represents a combination of user-side and approver-side status, with readable descriptions and a unified request status.
 columns:
-  sk_request_status:
-    description: Primary key (MD5 hash) that uniquely and deterministically identifies the absence request status.
+  sk_absence_request_status:
+    description: Primary key (MD5 of approval_status_code and absence_status_code) that uniquely identifies each status combination.
     lineage:
     - datalake_pin_absence_clean.person_entry.approval_status_code
-  request_status_name:
-    description: Descriptive name of the absence request status (e.g., 'Approved', 'Pending', 'Denied').
+    - datalake_pin_absence_clean.person_entry.absence_status_code
+  request_status:
+    description: Combines both user and approver status into a single general status for the request, centralizing the most important information about the status of the absence request.
+    categories:
+      Withdrawn: Absence was withdrawn (highest priority in hierarchy).
+      Denied: Approver denied the request.
+      Approved: Approver approved the request.
+      "Awaiting approval": Request is pending approver decision.
+      "In draft": No approval status yet; request not submitted or not in approval flow.
     lineage:
     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.absence_status_code
+  approval_status:
+    description: Human-readable approval status (e.g. Approved, Denied, Awaiting approval).
+    categories:
+      Approved: Request was approved by the approver.
+      Denied: Request was denied by the approver.
+      "Awaiting approval": Request is pending approval.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.approval_status_code
+  user_request_status:
+    description: Human-readable version of absence_status_code (e.g. Saved, Awaiting Approval, Withdrawn).
+    categories:
+      Saved: User saved the request but has not submitted it yet.
+      "Awaiting Approval": User submitted the request; it is in the approval flow.
+      Withdrawn: User withdrew the request and withdrawal was approved.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.absence_status_code
   ts_load:
     description: Timestamp of when the record was loaded into the table.

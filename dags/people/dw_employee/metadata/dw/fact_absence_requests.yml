@@ -17,67 +17,103 @@ columns:
     description: Foreign key to the absence type dimension, indicating the category of absence requested.
     lineage:
     - datalake_pin_absence_clean.person_entry.id_absence_type
-  sk_request_status:
-    description: Foreign key to the request status dimension.
+  sk_absence_request_status:
+    description: Foreign key to the absence request status dimension (dim_absence_request_status).
     lineage:
     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.absence_status_code
   sk_revision_date:
-    description: Foreign key to the date dimension (format yyyyMMdd) for the revision/approval date of the request. Populated with -1 if the date is null.
+    description: Foreign key to the date dimension (format yyyyMMdd) for the revision/approval date. Populated with -1 if null.
     lineage:
     - datalake_pin_absence_clean.person_entry.ts_approved
   sk_request_date:
-    description: Foreign key to the date dimension (format yyyyMMdd) for the submission date of the request. Populated with -1 if the date is null.
+    description: Foreign key to the date dimension (format yyyyMMdd) for the submission date. Populated with -1 if null.
     lineage:
     - datalake_pin_absence_clean.person_entry.dt_submitted
   sk_notification_date:
-    description: Foreign key to the date dimension (format yyyyMMdd) for the notification date of the absence. Populated with -1 if the date is null.
+    description: Foreign key to the date dimension (format yyyyMMdd) for the notification date. Populated with -1 if null.
     lineage:
     - datalake_pin_absence_clean.person_entry.dt_notificated
   sk_absence_started_date:
-    description: Foreign key to the date dimension (format yyyyMMdd) for the start date of the absence. Populated with -1 if the date is null.
+    description: Foreign key to the date dimension (format yyyyMMdd) for the absence start date. Populated with -1 if null.
     lineage:
     - datalake_pin_absence_clean.person_entry.dt_started
   sk_absence_ended_date:
-    description: Foreign key to the date dimension (format yyyyMMdd) for the end date of the absence. Populated with -1 if the date is null.
+    description: Foreign key to the date dimension (format yyyyMMdd) for the absence end date. Populated with -1 if null.
     lineage:
     - datalake_pin_absence_clean.person_entry.dt_ended
+  request_comments:
+    description: Comments about the absence request.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.comments
   days_requested:
     description: Total number of days requested for the absence.
     lineage:
     - datalake_pin_absence_clean.person_entry.days_duration
   days_vacation_cash_out:
-    description: Number of vacation days converted to cash (vacation cash-out). Returns the value for a specific absence type (ID 300000004800809) and -1 for all others.
+    description: Vacation days converted to cash (vacation cash-out). Value for absence type 300000004800809; -1 otherwise.
     lineage:
     - datalake_pin_absence_clean.person_entry.id_absence_type
     - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   is_vacation_request:
     description: |-
-      Identifies absence entries that are specifically for vacation leave. This flag is set to TRUE if the id_absence_type from the source system is '300000004800809', signaling a formal request for vacation time. Otherwise, it is FALSE.
+      TRUE when the absence is vacation leave (id_absence_type = 300000004800809). See dim_absence_request_status for status context.
     lineage:
     - datalake_pin_absence_clean.person_entry.id_absence_type
   is_approved:
-    description: Boolean flag indicating if the approval_status_code is 'APPROVED'.
+    description: |-
+      Main flag for identifying valid absence requests. TRUE when the approver approved the request (approval_status_code = 'APPROVED') and the request is not withdrawn. Withdrawn invalidates the request above any approval status; when is_withdrawn is TRUE, is_approved is always FALSE. See dim_absence_request_status.
     lineage:
     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.absence_status_code
   is_denied:
-    description: Boolean flag indicating if the approval_status_code is 'DENIED'.
+    description: |-
+      TRUE when the approver denied the request (approval_status_code = 'DENIED') and the request is not withdrawn. Withdrawn invalidates the request above any approval status; when is_withdrawn is TRUE, is_denied is always FALSE. See dim_absence_request_status.
     lineage:
     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.absence_status_code
   is_pending:
-    description: Boolean flag indicating if the approval_status_code is 'AWAITING'.
+    description: |-
+      TRUE when the request is pending approval (approval_status_code = 'AWAITING' or 'ORA_AWAIT_AWAIT') and the request is not withdrawn. Withdrawn invalidates the request above any approval status; when is_withdrawn is TRUE, is_pending is always FALSE. See dim_absence_request_status.
     lineage:
     - datalake_pin_absence_clean.person_entry.approval_status_code
+    - datalake_pin_absence_clean.person_entry.absence_status_code
+  is_withdrawn:
+    description: |-
+      TRUE when the requester withdrew the absence (absence_status_code = 'ORA_WITHDRAWN'). Withdrawn invalidates the request above any approval status: when TRUE, is_approved, is_denied, and is_pending are always FALSE. See dim_absence_request_status.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.absence_status_code
   is_open_ended:
-    description: Boolean flag indicating if the absence has an indefinite end date.
+    description: TRUE when the absence has no fixed end date.
     lineage:
     - datalake_pin_absence_clean.person_entry.is_open_ended
   has_requested_vacation_cash_out:
-    description: Boolean flag indicating if a value for vacation_cash_out_request exists (is not null).
+    description: TRUE when vacation_cash_out_request is not null.
     lineage:
     - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   has_requested_13th_salary_advance:
-    description: Boolean flag indicating if the employee has requested a 13th-salary advance, based on the 'S'/'N' value in the source.
+    description: TRUE when the employee requested 13th-salary advance ('S' in source).
     lineage:
     - datalake_pin_absence_clean.person_entry.advance_13th_salary
+  dt_requested:
+    description: Date when the request was submitted.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.dt_submitted
+  dt_notificated:
+    description: Date when the absence was notified.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.dt_notificated
+  dt_absence_started:
+    description: Start date of the absence.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.dt_started
+  dt_absence_ended:
+    description: End date of the absence.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.dt_ended
+  ts_approved:
+    description: Timestamp when the request was approved or revised.
+    lineage:
+    - datalake_pin_absence_clean.person_entry.ts_approved
   ts_load:
-    description: Timestamp of when the record was loaded into the table.
+    description: Timestamp when the record was loaded into the table.

@@ -2,30 +2,40 @@ SELECT
     id_per_absence_entry AS sk_absence_request,
     id_period_of_service AS sk_assignment,
     id_absence_type AS sk_absence_type,
-    MD5(approval_status_code) AS sk_request_status,
+    MD5(CONCAT(COALESCE(approval_status_code, ''), '|', COALESCE(absence_status_code, ''))) AS sk_absence_request_status,
     COALESCE(DATE_FORMAT(ts_approved, 'yyyyMMdd'), -1) AS sk_revision_date,
     COALESCE(DATE_FORMAT(dt_submitted, 'yyyyMMdd'), -1) AS sk_request_date,
     COALESCE(DATE_FORMAT(dt_notificated, 'yyyyMMdd'), -1) AS sk_notification_date,
     COALESCE(DATE_FORMAT(dt_started, 'yyyyMMdd'), -1) AS sk_absence_started_date,
     COALESCE(DATE_FORMAT(dt_ended, 'yyyyMMdd'), -1) AS sk_absence_ended_date,
+    comments AS request_comments,
     days_duration AS days_requested,
-    CASE 
-        WHEN id_absence_type = 300000004800809 
-        THEN COALESCE(vacation_cash_out_request, 0) 
-        ELSE -1 
+    CASE
+        WHEN id_absence_type = 300000004800809
+        THEN COALESCE(vacation_cash_out_request, 0)
+        ELSE -1
     END AS days_vacation_cash_out,
     IF(id_absence_type = 300000004800809, TRUE, FALSE) AS is_vacation_request,
-    approval_status_code = 'APPROVED' AS is_approved,
-    approval_status_code = 'DENIED' AS is_denied,
-    approval_status_code = 'AWAITING' AS is_pending,
+    approval_status_code = 'APPROVED' AND absence_status_code <> 'ORA_WITHDRAWN' AS is_approved,
+    approval_status_code = 'DENIED' AND absence_status_code <> 'ORA_WITHDRAWN' AS is_denied,
+    approval_status_code IN ('AWAITING', 'ORA_AWAIT_AWAIT') AND absence_status_code <> 'ORA_WITHDRAWN' AS is_pending,
+    absence_status_code = 'ORA_WITHDRAWN' AS is_withdrawn,
     is_open_ended,
     IF(vacation_cash_out_request IS NOT NULL, TRUE, FALSE) AS has_requested_vacation_cash_out,
     CASE advance_13th_salary
-        WHEN 'S' THEN TRUE 
-        WHEN 'N' THEN FALSE 
+        WHEN 'S' THEN TRUE
+        WHEN 'N' THEN FALSE
     END AS has_requested_13th_salary_advance,
+    dt_submitted AS dt_requested,
+    dt_notificated AS dt_notificated,
+    dt_started AS dt_absence_started,
+    dt_ended AS dt_absence_ended,
+    ts_approved,
     NOW() AS ts_load
 FROM
     datalake_pin_absence_clean.person_entry
-QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY id_per_absence_entry ORDER BY object_version_number DESC) = 1
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY id_per_absence_entry
+        ORDER BY object_version_number DESC
+        ) = 1

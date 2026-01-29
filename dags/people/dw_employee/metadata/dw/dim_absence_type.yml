@@ -10,7 +10,18 @@ columns:
     lineage:
     - datalake_pin_absence_clean.type.id_absence_type
   absence_type:
-    description: Descriptive name of the absence type in Portuguse.
+    description: Descriptive name of the absence type.
+    lineage:
+    - datalake_pin_absence_clean.type_translation.name
+  is_paid_leave:
+    description: |-
+      Indicates whether the absence type is paid (remunerated). TRUE when the employee is paid during the absence; FALSE otherwise.
+      The only exception is the type 'Licença Sem Vencimentos' (unpaid leave), which is the absence type used for non-remunerated leave and is set to FALSE. Unpaid leave also turns its period into a non-eligible period in the PLR calculation.
+    lineage:
+    - datalake_pin_absence_clean.type_translation.name
+  is_performa_protected:
+    description: |-
+      TRUE for absence types that guarantee a minimum individual performance attainment (IPA) of 100% during the absence period. Applies to Afastamento Temporário por Acidente de Trabalho, Licença Parental, and Afastamento Temporário por Doença; FALSE otherwise.
     lineage:
     - datalake_pin_absence_clean.type_translation.name
   max_days_allowed:
