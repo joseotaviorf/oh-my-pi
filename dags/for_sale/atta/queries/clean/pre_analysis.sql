@@ -20,6 +20,6 @@ SELECT
     Archivedat AS ts_archived,
     TIMESTAMP(data_solicitacao) AS ts_registration,
     MortgageIntentionUuid AS mortgage_intention_uuid,
-    TIMESTAMP(FormCompletedAt) AS ts_multibanks_form_completed,
+    TIMESTAMP(FormCompletedAt) AS ts_multibanks_form_completed
 FROM
     datalake_atta_raw.consulta_score
