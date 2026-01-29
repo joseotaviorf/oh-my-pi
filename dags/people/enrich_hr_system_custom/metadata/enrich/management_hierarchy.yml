@@ -3,7 +3,7 @@ table_name: management_hierarchy
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  This table outlines the reporting structure within the organization, detailing the hierarchical relationships between employees and their managers. It specifies each employee's upward management chain and the degree of separation to each manager in that chain, based on historical assignment data.
+  This table outlines the reporting structure within the organization, detailing the hierarchical relationships between employees and their managers. It specifies each employee's upward management chain and the degree of separation to each manager in that chain, based on historical assignment data. Each employee is also included as their own manager with separation_degree = 0, ensuring they appear in their own hierarchy.
 columns:
   id_assignment:
     description: Unique identifier for the specific job assignment of the employee.
@@ -14,12 +14,12 @@ columns:
     lineage:
     - datalake_pin.managers_history.id_period_of_service
   id_manager_assignment:
-    description: Unique identifier for the period of service of a manager in the employee's upward reporting line, corresponding to their managerial assignment.
+    description: Unique identifier for the period of service of a manager in the employee's upward reporting line, corresponding to their managerial assignment. When separation_degree = 0, this equals the employee's own id_assignment.
     lineage:
     - datalake_pin.managers_history.id_manager_assignment
   id_manager_period_of_service:
-    description: Id period of service of a person who is higher in hierarchy.
+    description: Id period of service of a person who is higher in hierarchy. When separation_degree = 0, this equals the employee's own id_period_of_service.
     lineage:
     - datalake_pin.managers_history.id_period_of_service
   separation_degree:
-    description: Indicates the number of hierarchical levels between the employee and the listed manager. For example, a value of '1' signifies a direct manager, '2' signifies the manager's manager, and so forth.
+    description: Indicates the number of hierarchical levels between the employee and the listed manager. A value of '0' represents the employee themselves, '1' signifies a direct manager, '2' signifies the manager's manager, and so forth.

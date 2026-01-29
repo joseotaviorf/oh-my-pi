@@ -46,7 +46,6 @@ if __name__ == "__main__":
             datalake_pin.managers_history
         WHERE
             dt_effective_started <= CURRENT_DATE
-            AND id_manager_assignment <> '300000008488092'
         QUALIFY
             ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY dt_effective_started DESC) = 1
     """
@@ -84,6 +83,18 @@ if __name__ == "__main__":
 
         df_result = df_result.union(df_next_degree)
         df_degree = df_next_degree
+
+    # Add employees as themselves (separation_degree = 0)
+    df_employee_as_self = df.select(
+        col("id_assignment"),
+        col("id_assignment").alias("id_manager_assignment"),
+        lit(0).alias("separation_degree"),
+        lit(False).alias("is_direct_manager"),
+        col("id_period_of_service"),
+        col("id_period_of_service").alias("id_manager_period_of_service")
+    ).distinct()
+
+    df_result = df_result.union(df_employee_as_self)
 
     df_separation = df_result.orderBy("id_assignment", "separation_degree")
 
