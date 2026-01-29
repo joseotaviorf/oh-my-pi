@@ -6,6 +6,8 @@ dag:
   documentation:
     dag_purpose: This DAG brings [PropertyTax](https://github.com/quintoandar/property-tax) data, service responsible for updating municipal taxes for ongoing contracts.
 workflow:
+  source_database: propertytax
+  custom_schema: property_tax
   type: cdc
   layer: raw
   database_type: postgres
