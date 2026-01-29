@@ -13,6 +13,7 @@ from databricks_plugin import (
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
@@ -44,6 +45,9 @@ default_libraries = config_service.get_config("default_libraries")
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
 cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
+    cluster_configuration
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
