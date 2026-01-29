@@ -103,9 +103,6 @@ checkout AS (
         NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
     FROM
         datalake_checkout_clean.boleto b
-    LEFT JOIN
-        dw_public.dim_date dd
-            ON b.ts_paid = dd.date
     WHERE
         b.requester_name = 'trato-feito'
         AND b.id NOT IN (5855, 5856, 5857)
@@ -134,9 +131,13 @@ checkout_union AS (
     SELECT
       b.our_number,
       b.paid_amount AS amount,
-      COALESCE(dt_credit, DATE(ts_paid)) AS dt_paid
+      CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+      ELSE DATE(COALESCE(dt_credit, DATE(ts_paid))) END AS dt_paid
     FROM
       datalake_checkout_clean.bolecode b
+    LEFT JOIN
+        dw_public.dim_date dd
+            ON COALESCE(dt_credit, DATE(ts_paid)) = dd.date
     WHERE
         b.requester_name = 'trato-feito'
         AND b.id NOT IN (5855, 5856, 5857)
@@ -147,16 +148,20 @@ checkout_union AS (
     UNION ALL
 
     SELECT
-      IF(LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(b.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(b.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(b.id_transaction, '^0+', '')) AS our_number,
-      b.due_amount AS amount,
-      DATE(b.ts_paid) AS dt_paid
+      IF(LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(p.id_transaction, '^0+', '')) AS our_number,
+      p.due_amount AS amount,
+      CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+      ELSE DATE(p.ts_paid) END AS dt_paid
     FROM
-        datalake_checkout_clean.pix b
+        datalake_checkout_clean.pix p
+    LEFT JOIN
+        dw_public.dim_date dd
+            ON DATE(p.ts_paid) = dd.date
     WHERE
-        b.requester_name = 'trato-feito'
-        AND b.id NOT IN (5855, 5856, 5857)
-        AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
-        AND DATE(ts_paid) >= current_date - 180
+        p.requester_name = 'trato-feito'
+        AND p.id NOT IN (5855, 5856, 5857)
+        AND p.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
+        AND DATE(p.ts_paid) >= current_date - 180
 ),
 
 trato_feito AS (
@@ -164,7 +169,8 @@ trato_feito AS (
         COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) AS our_number,
         b.id_external AS id_invoice,
         i.total_amount AS amount,
-        COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) AS dt_paid
+        CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+        ELSE COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) END AS dt_paid
     FROM
         datalake_trato_feito_clean.installment i
     LEFT JOIN
@@ -176,6 +182,9 @@ trato_feito AS (
     LEFT JOIN
         datalake_trato_feito_clean.bill b
             ON b.id_external = aci.id_external
+    LEFT JOIN
+        dw_public.dim_date dd
+            ON COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) = dd.date
 
     UNION ALL
 
@@ -183,7 +192,7 @@ trato_feito AS (
          IF(LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(px.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(px.id_transaction, '^0+', '')) AS our_number,
         CAST(NULL AS STRING) AS id_invoice,
         ic.paid_amount AS amount,
-        CASE WHEN dd.weekend <> 'Weekday' THEN dd.next_brz_fintech_business_day
+        CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
         ELSE DATE(ic.ts_last_received - interval '3' hour) END AS dt_paid
     FROM
         datalake_trato_feito_clean.installment_charges AS ic
@@ -192,7 +201,7 @@ trato_feito AS (
             ON ic.id_charge = px.id_charge
     LEFT JOIN
         dw_public.dim_date dd
-            ON ic.dt_paid = dd.date
+            ON DATE(ic.ts_last_received - interval '3' hour) = dd.date
 ),
 
 seu_barriga_sap AS (
