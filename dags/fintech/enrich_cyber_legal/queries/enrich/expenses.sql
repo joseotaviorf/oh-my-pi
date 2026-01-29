@@ -17,7 +17,7 @@ LEFT JOIN
     ON e.expense_type = v.id_value
       AND e.expense_subtype = v.value_code
 LEFT JOIN
-    datalake_cyber_clean.agency AS a
+    datalake_cyber_legal_homolog_clean.agency AS a
       ON e.id_agency = a.id_agency
 WHERE is_authorized IS TRUE
   AND is_reimbursed IS TRUE

@@ -138,6 +138,14 @@ workflow:
         - "[]"
         - False
         - "[]"
+    agency:
+      clean_table_name: agency
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:

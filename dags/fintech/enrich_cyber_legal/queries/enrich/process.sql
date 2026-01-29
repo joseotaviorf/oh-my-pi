@@ -90,5 +90,5 @@ LEFT JOIN
     datalake_cyber_legal_homolog_clean.court AS crt
         ON c.id_court = crt.id_court
 LEFT JOIN
-    datalake_cyber_clean.agency AS ag
+    datalake_cyber_legal_homolog_clean.agency AS ag
         ON c.id_attorney_agency = ag.id_agency
