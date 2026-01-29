@@ -266,12 +266,13 @@ WITH retsuko AS (
                 'entry.bill-item/home-insurance-claim'
             )) THEN 'Alugueis a repassar - Novo modelo'
         END AS accounting_name,
-        e.bill_item,
+        -- e.bill_item,
         i.accrual_year_month,
         DATE(e.ts_created) AS dt_source_trigger,
         e.ts_created,
         e.amount AS source_amount,
-        e.accounting_version AS accounting_version
+        e.accounting_version AS accounting_version,
+        i.status
     FROM
         datalake_retsuko.entry e
     INNER JOIN
@@ -289,8 +290,7 @@ WITH retsuko AS (
     INNER JOIN
         datalake_retsuko_clean.contract ct
             ON ct.id = e.id_contract
-    WHERE
-        DATE(e.ts_created) > DATE('2025-01-01')
+    WHERE 1=1
         AND e.bill_item IN (
           'entry.bill-item/evictions-debt-relief-negotiation',
           'entry.bill-item/debit-negotiation',
@@ -461,118 +461,101 @@ sap_gateway AS (
         s.erp_solution IN ('S4')
         AND s.type IN ('LCM')
         AND s.status NOT IN ('ignore', 'ignored')
-        AND DATE(f.ts_created) >= DATE('2024-01-01')
+        AND DATE(f.ts_created) >= DATE('2025-01-01')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature, s.hash ORDER BY w.ts_updated DESC) = 1
 ),
 
 sap AS (
     SELECT 
+        id_business_entity,
         id_finance_entity,
         id_finance_entity_entry,
         hash,
         account_number,
-        SUM(debit_credit) AS debit_credit,
+        accrual_year_month,
+        source_client,
         DATE(dt_created) AS dt_sap_created,
-        DATE(dt_reference) AS dt_sap_reference
+        DATE(dt_reference) AS dt_sap_reference,
+        SUM(debit_credit) AS debit_credit
     FROM 
         datalake_accounting_funnel.ledger 
     WHERE
         dt_reference >= '2025-01-01'
         AND account_number IN (211406, 113404, 113480)
-    GROUP BY 1, 2, 3, 4, 6, 7
-),
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+)
+,
 
-errors_base AS (
+base AS (
     SELECT 
-        r.id_business_entity,
-        r.id_finance_entity,
-        r.id_finance_entity_entry,
+        ('RE-RTSK-T-' || COALESCE(sl_hash.id_finance_entity,'') || '-' || COALESCE(sl_hash.account_number, '')) AS id_accounting_process,
+        sl_hash.id_business_entity,
+        sl_hash.id_finance_entity, 
+        sl_hash.id_finance_entity_entry,
         se.version,
-        r.source_name,
-        r.account_number,
+        'for rent' AS business_unit,
+        'S4' AS source_name,
+        'transactional' AS accounting_type,
+        sl_hash.account_number,
         r.accounting_name,
-        r.accrual_year_month,
-        MIN(CASE
-        WHEN sl_hash.hash IS NOT NULL THEN 'success'
-        WHEN sl_hash.hash IS NULL AND (se.id_finance_entity IS NULL OR se.status = 'failed' OR se.failed_reason IS NOT NULL) THEN 'source failure'
-        WHEN sl_hash.hash IS NULL AND (sg.id_feature IS NULL OR sg.sync_sap_job_status = 'error' OR sg.webhook_error IS NOT NULL) THEN 'gateway failure'
-        ELSE 'unknown failure'
-        END) AS accounting_process_status,
-        MIN(CASE
-        WHEN sl_hash.hash IS NULL AND se.id_finance_entity IS NULL THEN 'source not found'
-        WHEN sl_hash.hash IS NULL AND se.status = 'failed' THEN se.failed_reason
-        WHEN sl_hash.hash IS NULL AND sg.id_feature IS NULL THEN 'gateway not found'
-        WHEN sl_hash.hash IS NULL AND sg.sync_sap_job_status = 'error' THEN sg.webhook_error
-        WHEN sl_hash.hash IS NULL AND se.id_finance_entity IS NOT NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
-        ELSE NULL
-        END) AS error_description,
-        MIN(IF(sl_hash.hash IS NULL, FALSE, TRUE)) AS is_completeness,
+        sl_hash.accrual_year_month,
+        'reverse straw failure' AS accounting_process_status,
+        CASE
+            WHEN sl_hash.source_client <> 'seubarriga' THEN CONCAT('source','-',sl_hash.source_client)
+            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'manual transaction'
+            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
+            WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
+            ELSE NULL
+        END AS error_description,
+        FALSE AS is_completeness,
+        FALSE AS is_correctness,
+        FALSE AS is_temporality,
+        FALSE AS is_compliance,
         CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
         CAST(SUM(COALESCE(sl_hash.debit_credit, 0)) AS DECIMAL(12,2)) AS sap_amount,
-        MAX(r.dt_source_trigger) AS dt_source_trigger,
-        MAX(sl_hash.dt_sap_created) AS dt_sap_created,
-        MAX(sl_hash.dt_sap_reference) AS dt_sap_reference
+        r.dt_source_trigger AS dt_source_trigger,
+        sl_hash.dt_sap_created AS dt_sap_created,
+        sl_hash.dt_sap_reference AS dt_sap_reference,
+        r.id_finance_entity_entry as id_finance_entity_entry_r
     FROM
-        retsuko AS r
-    LEFT JOIN
-        sap_entity AS se
-        ON r.id_finance_entity_entry = se.id_finance_entity
+        sap AS sl_hash
     LEFT JOIN
         sap_gateway AS sg
+            ON sl_hash.hash = sg.hash
+    LEFT JOIN
+        sap_entity AS se
             ON se.id_sap_gateway_feature = sg.id_feature
     LEFT JOIN
-        sap AS sl_hash
-            ON sl_hash.hash = sg.hash AND r.account_number = sl_hash.account_number
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
-),
-
-assertions_base AS (
-  SELECT
-    'RTSK-P'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||COALESCE(account_number, '') AS id_accounting_process,
+        retsuko AS r
+        ON (
+            (se.id_finance_entity  = r.id_finance_entity_entry)
+        OR  (sl_hash.id_finance_entity_entry  = r.id_finance_entity_entry)
+        OR ((sl_hash.id_finance_entity = r.id_finance_entity) AND (r.account_number = sl_hash.account_number))
+            )
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23
+)
+SELECT
+    id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY id_accounting_process ORDER BY dt_sap_created) AS id_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
     version,
+    business_unit,
     source_name,
+    accounting_type,
     account_number,
     accounting_name,
     source_amount,
     sap_amount,
     is_completeness,
+    is_correctness,
+    is_temporality,
+    is_compliance,
     accounting_process_status,
     error_description,
     accrual_year_month,
     dt_source_trigger,
     dt_sap_reference,
-    dt_sap_created,
-    IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
-    IF(dt_sap_reference BETWEEN dt_source_trigger AND DATE_ADD(dt_source_trigger, 3), TRUE, FALSE) AS is_temporality
-  FROM 
-    errors_base
-)
-
-SELECT
-  id_accounting_process||'-'||ROW_NUMBER() OVER (PARTITION BY id_accounting_process ORDER BY dt_sap_created) AS id_accounting_process,
-  id_business_entity,
-  id_finance_entity,
-  id_finance_entity_entry,
-  version,
-  'for rent' AS business_unit,
-  source_name,
-  'transactional' AS accounting_type,
-  account_number,
-  accounting_name,
-  source_amount,
-  sap_amount,
-  is_completeness,
-  is_correctness,
-  is_temporality,
-  IF(is_completeness IS TRUE AND is_correctness IS TRUE AND is_temporality IS TRUE, TRUE, FALSE) AS is_compliance,
-  accounting_process_status,
-  error_description,
-  accrual_year_month,
-  dt_source_trigger,
-  dt_sap_reference,
-  dt_sap_created
-FROM 
-  assertions_base
+    dt_sap_created
+FROM base
+WHERE id_finance_entity_entry_r IS NULL
