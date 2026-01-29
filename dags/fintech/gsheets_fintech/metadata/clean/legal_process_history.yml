@@ -1,0 +1,111 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: legal_process_history
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Clean table for legal process history data from E-law system, containing audit trail and versioning information
+columns:
+  id_legal_process_history:
+    description: "Identificador único do histórico do processo legal"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.id_legal_process_history
+  id_external:
+    description: "Identificador externo do processo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.id_external
+  id_entity:
+    description: "Identificador da entidade relacionada ao processo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.id_entity
+  process_type:
+    description: "Tipo do processo legal"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.process_type
+  entity_type:
+    description: "Tipo da entidade relacionada"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.entity_type
+  law_firm:
+    description: "Escritório de advocacia responsável"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.law_firm
+  status:
+    description: "Status do processo legal"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.status
+  is_active:
+    description: "Indica se o processo está ativo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.is_active
+  status_order:
+    description: "Ordem do status do processo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.status_order
+  version:
+    description: "Versão do registro no histórico"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.version
+  rev:
+    description: "Número de revisão do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.rev
+  revtype:
+    description: "Tipo de revisão (ADD, MOD, DEL)"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.revtype
+  revend:
+    description: "Indica se a revisão foi finalizada"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.revend
+  has_process_type_modified:
+    description: "Indica se o tipo de processo foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_process_type_modified
+  has_entity_type_modified:
+    description: "Indica se o tipo de entidade foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_entity_type_modified
+  has_law_firm_modified:
+    description: "Indica se o escritório foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_law_firm_modified
+  has_status_modified:
+    description: "Indica se o status foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_status_modified
+  has_active_modified:
+    description: "Indica se o status ativo foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_active_modified
+  has_id_external_modified:
+    description: "Indica se o identificador externo foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_id_external_modified
+  has_id_entity_modified:
+    description: "Indica se o identificador da entidade foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_id_entity_modified
+  has_status_order_modified:
+    description: "Indica se a ordem do status foi modificada nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_status_order_modified
+  has_ts_last_update_event_modified:
+    description: "Indica se o timestamp do último evento foi modificado nesta revisão"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.has_ts_last_update_event_modified
+  ts_last_update_event:
+    description: "Timestamp do último evento de atualização"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.ts_last_update_event
+  ts_created:
+    description: "Timestamp de criação do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.ts_created
+  ts_updated:
+    description: "Timestamp de atualização do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.ts_updated
+  ts_load:
+    description: "Timestamp que o conjunto de dados foi carregado"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_history.ts_load

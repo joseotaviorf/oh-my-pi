@@ -1,0 +1,43 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: legal_process_document_generation
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Clean table for legal process document generation data from E-law system
+columns:
+  id:
+    description: "Identificador único do documento de geração"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.id
+  id_legal_process:
+    description: "Identificador do processo legal relacionado"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.id_legal_process
+  type:
+    description: "Tipo do documento de geração"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.type
+  status:
+    description: "Status do documento de geração"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.status
+  file_path:
+    description: "Caminho do arquivo do documento"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.file_path
+  version:
+    description: "Versão do documento"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.version
+  ts_created:
+    description: "Timestamp de criação do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.ts_created
+  ts_updated:
+    description: "Timestamp de atualização do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.ts_updated
+  ts_load:
+    description: "Timestamp que o conjunto de dados foi carregado"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process_document_generation.ts_load

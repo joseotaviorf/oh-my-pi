@@ -1,0 +1,17 @@
+SELECT
+    id,
+    id_external,
+    id_entity,
+    process_type,
+    entity_type,
+    law_firm,
+    status,
+    is_active,
+    status_order,
+    version,
+    ts_last_update_event,
+    ts_created,
+    ts_updated,
+    ts_load
+FROM
+    datalake_gsheets_fintech_raw.legal_process

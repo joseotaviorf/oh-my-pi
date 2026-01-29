@@ -344,3 +344,21 @@ sheets_info:
     sheet_name: "[base stilingue] midias sociais"
     clean_table_name: stilingue_data
     sheet_context: fintech
+
+  legal_process:
+    sheet_id: 1XbDQUSgSOw3_IrTduHvIEaxuBewj3C6yVrgvj06O4GM
+    sheet_name: "legal_process"
+    clean_table_name: legal_process
+    sheet_context: fintech
+
+  legal_process_history:
+    sheet_id: 1XbDQUSgSOw3_IrTduHvIEaxuBewj3C6yVrgvj06O4GM
+    sheet_name: "legal_process_history"
+    clean_table_name: legal_process_history
+    sheet_context: fintech
+
+  legal_process_document_generation:
+    sheet_id: 1XbDQUSgSOw3_IrTduHvIEaxuBewj3C6yVrgvj06O4GM
+    sheet_name: "legal_process_document_generation"
+    clean_table_name: legal_process_document_generation
+    sheet_context: fintech

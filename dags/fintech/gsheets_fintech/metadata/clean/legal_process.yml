@@ -1,0 +1,63 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: legal_process
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Clean table for legal process data from E-law system
+columns:
+  id:
+    description: "Identificador único do processo legal"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.id
+  id_external:
+    description: "Identificador externo do processo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.id_external
+  id_entity:
+    description: "Identificador da entidade relacionada ao processo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.id_entity
+  process_type:
+    description: "Tipo do processo legal"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.process_type
+  entity_type:
+    description: "Tipo da entidade relacionada"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.entity_type
+  law_firm:
+    description: "Escritório de advocacia responsável"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.law_firm
+  status:
+    description: "Status do processo legal"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.status
+  is_active:
+    description: "Indica se o processo está ativo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.is_active
+  status_order:
+    description: "Ordem do status do processo"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.status_order
+  version:
+    description: "Versão do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.version
+  ts_last_update_event:
+    description: "Timestamp do último evento de atualização"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.ts_last_update_event
+  ts_created:
+    description: "Timestamp de criação do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.ts_created
+  ts_updated:
+    description: "Timestamp de atualização do registro"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.ts_updated
+  ts_load:
+    description: "Timestamp que o conjunto de dados foi carregado"
+    lineage:
+      - datalake_gsheets_fintech_raw.legal_process.ts_load

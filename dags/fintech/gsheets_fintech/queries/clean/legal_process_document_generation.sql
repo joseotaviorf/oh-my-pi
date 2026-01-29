@@ -1,0 +1,12 @@
+SELECT
+    id,
+    id_legal_process,
+    type,
+    status,
+    file_path,
+    version,
+    ts_created,
+    ts_updated,
+    ts_load
+FROM
+    datalake_gsheets_fintech_raw.legal_process_document_generation
