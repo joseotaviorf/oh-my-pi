@@ -817,8 +817,10 @@ bietlejuice.dw_payments_platform:
 bietlejuice.dw_performance:
   - bietlejuice.enrich_performance:load-enrich-performance-evaluation:first-run-of-day
   - bietlejuice.enrich_performance:load-enrich-talent-review:first-run-of-day
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
+  - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
 bietlejuice.dw_person:
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day

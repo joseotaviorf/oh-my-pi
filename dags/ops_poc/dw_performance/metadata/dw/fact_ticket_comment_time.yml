@@ -1,0 +1,34 @@
+database_name: dw_performance
+table_name: fact_ticket_comment_time
+description: The table returns a detailed breakdown of public comments on Back's ticket (email) and calculates the time elapsed between comments.
+domain: Support and Services
+owner: alef.vieiras@quintoandar.com.br
+columns:
+    id_ticket:
+        lineage:
+            - datalake_customer_support.tickets.id_ticket
+        description: Ticket identifier associated with the contact.
+    ts_comment:
+        lineage:
+            - datalake_zendesk_clean.ticket_comments.ts_created
+        description: Date the comment was made on the ticket.
+    role:
+        lineage:
+            - datalake_support_users.zendesk_users.role
+        description: Type of user who made the comment.
+    ts_previous_comment:
+        lineage:
+            - datalake_zendesk_clean.ticket_comments.ts_created
+        description: Date the previous comment occurred
+    previous_role:
+        lineage: 
+            - datalake_support_users.zendesk_users.role
+        description: Type of user who made the previous comment on the ticket.
+    seconds_since_previous_comment:
+        lineage: 
+            - datalake_zendesk_clean.ticket_comments.ts_created 
+        description: Time in seconds that has elapsed between this comment and the previous one.
+    comment:
+        lineage: 
+            - datalake_zendesk_clean.ticket_comments.body
+        description: Comment made on the ticket

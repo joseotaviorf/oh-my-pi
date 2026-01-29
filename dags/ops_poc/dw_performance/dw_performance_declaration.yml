@@ -1,0 +1,30 @@
+dag:
+  name: dw_performance
+  schedule_start_date: 2026,01,27
+  owner: Data Planning and Performance
+  documentation:
+    dag_purpose: |
+      This DAG load the DW tables for Performance.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: performance
+  default_extraction_type: full
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r7g.2xlarge
+    node_type_id: r7g.2xlarge
+    spark_version: 16.4.x-scala2.12
+    num_workers: 4
+    spark_conf:
+      spark.sql.broadcastTimeout: "600"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: USER_ISOLATION
+  databricks_conn_id: databricks_new_env
+
+
+
+
+
