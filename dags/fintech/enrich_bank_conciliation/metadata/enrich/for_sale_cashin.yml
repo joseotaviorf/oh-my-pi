@@ -25,6 +25,10 @@ columns:
     description: 'Itaú bank account number'
     lineage:
     - .final_all.bank_account
+  account_number:
+    description: 'account number'
+    lineage:
+    - .final_all.account_number
   company_use:
     description: 'Company reference used for reconciliation'
     lineage:

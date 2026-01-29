@@ -440,12 +440,14 @@ final_bypass AS (
 final_all AS (
   SELECT
     *,
+    bank_account AS account_number,
     'forsale' AS origin_transaction
   FROM
     final_base 
   UNION ALL
   SELECT
     *,
+    bank_account AS account_number,
     'bypass' AS origin_transaction
   FROM
     final_bypass fb
@@ -457,6 +459,7 @@ SELECT
   id_sale, 
   sap_id_sale_transaction as id_sap_sale_transaction,
   bank_account,
+  account_number,
   company_use,
   counterpart_document,
   counterpart_name,
