@@ -3,7 +3,7 @@ terminated_for_transfer AS (
   SELECT
     aa_next.id_period_of_service AS id_period_of_service_next,
     ps_prev.dt_started AS previous_dt_started,
-    art.action_reason IN ('Recrutamento Interno', 'Movimentação Internacional') AS is_transfered
+    (aa.action_code = 'GLB_TRANSFER') AS is_transfered
   FROM
     datalake_pin_core_clean.all_assignments AS aa
   INNER JOIN
@@ -11,21 +11,11 @@ terminated_for_transfer AS (
       ON aa_next.id_person = aa.id_person
       AND aa_next.assignment_sequence = aa.assignment_sequence + 1
   LEFT JOIN
-    datalake_pin_core_clean.action_reason_base AS arb
-      ON arb.action_reason_code = aa.reason_code
-  LEFT JOIN
-    datalake_pin_core_clean.action_reason_translation AS art
-      ON art.id_action_reason = arb.id_action_reason
-      AND art.language = 'PTB'
-  LEFT JOIN
     datalake_pin_core_clean.periods_of_service AS ps_prev
       ON ps_prev.id_period_of_service = aa.id_period_of_service
   WHERE
     aa.assignment_status_type = 'INACTIVE'
-    AND art.action_reason IN (
-      'Recrutamento Interno',
-      'Movimentação Internacional'
-    )
+    AND aa.action_code = 'GLB_TRANSFER'
   QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY aa.id_period_of_service
