@@ -127,13 +127,15 @@ escalation_queue AS (
     ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_created DESC) = 1
 ),
 langfuse_version AS (
-  SELECT DISTINCT
+  SELECT
     id_session,
     version
   FROM
     datalake_langfuse_clean.traces
   WHERE
     ts_created >= '{load_start_date}'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1
 )
 SELECT
   s.id_session,
