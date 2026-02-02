@@ -1,7 +1,7 @@
 ---
-database_name: datalake_cyber_clean
+database_name: datalake_cyber_legal_homolog_clean
 table_name: values_list
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   This table contains the specific valid values and their descriptions associated with each list defined in the values_list_catalog table.

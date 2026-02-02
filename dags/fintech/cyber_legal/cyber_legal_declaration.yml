@@ -138,8 +138,32 @@ workflow:
         - "[]"
         - False
         - "[]"
+    tb_lote_legal:
+      clean_table_name: legal_batch
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
     agency:
       clean_table_name: agency
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    delqmst:
+      clean_table_name: delinquent_master
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    uda1:
+      clean_table_name: contracts
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:

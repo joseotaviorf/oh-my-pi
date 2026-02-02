@@ -153,3 +153,15 @@ columns:
     description: "Date when the case was assigned to the attorney agency"
     lineage:
       - datalake_cyber_legal_homolog_clean.case.dt_case_assigned
+  city:
+    description: "City where the case is being processed"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.city
+  state:
+    description: "State where the case is being processed"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.state
+  contract_status:
+    description: "Status of the contract"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.contracts.contract_status

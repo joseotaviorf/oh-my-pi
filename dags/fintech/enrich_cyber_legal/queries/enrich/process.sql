@@ -3,10 +3,11 @@ get_external_id_contract AS (
     SELECT DISTINCT
         id_contract_external,
         id_contract,
+        contract_status,
         eviction_step,
         eviction_law_firm,
         reason_eviction
-    FROM datalake_cyber_clean.contracts
+    FROM datalake_cyber_legal_homolog_clean.contracts
 ),
 get_last_delqmst_data AS (
     SELECT
@@ -16,7 +17,7 @@ get_last_delqmst_data AS (
         ts_last_update,
         ts_last_activity,
         MAKE_DATE(year,month,day) AS partition
-    FROM datalake_cyber_clean.delinquent_master
+    FROM datalake_cyber_legal_homolog_clean.delinquent_master
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_last_update DESC) = 1
 )
 SELECT
@@ -37,6 +38,9 @@ SELECT
     c.id_responsible_attorney AS internal_lawyer,
     c.id_external_attorney AS external_lawyer,
     c.id_supervisor_attorney AS supervising_lawyer,
+    c.city,
+    c.state,
+    ct.contract_status,
     dq.flag_account_in_agency_or_court AS contract_evictions_status,
     dq.evictions_label,
     ct.eviction_step,

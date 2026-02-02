@@ -4,4 +4,4 @@ SELECT
     LSDESC AS value_description,
     LSDFLT AS default_flag
 FROM
-    datalake_cyber_raw.lov_vals
+    datalake_cyber_legal_homolog_raw.lov_vals

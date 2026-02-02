@@ -5,4 +5,4 @@ SELECT
     LVNAME AS name,
     LVTYPE AS field_data_type
 FROM
-    datalake_cyber_raw.lov
+    datalake_cyber_legal_homolog_raw.lov

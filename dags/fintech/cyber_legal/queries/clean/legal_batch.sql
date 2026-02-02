@@ -1,0 +1,27 @@
+SELECT
+    LLCODIGO AS id_legal_batch,
+	LLTIPO AS batch_type,
+    LLSTATUS AS batch_status,
+    LLESCRITORIO AS office,
+    LLORIGEM AS origin,
+    LLQTD AS quantity,
+    LLVALOR AS value,
+    LLNOTAFISCAL AS invoice_number,
+    LLPROGRAMACAOCONPAG AS conpag_programming,
+	LLBANCON AS bank,
+	LLCODVW AS code_vw,
+	LLUSUARIOC AS user_c,
+	LLUSUARIOF AS user_f,
+	LLUSUARIOI AS user_i,
+	LLUSUARIOAP AS user_ap,
+	LLUSUARIOR AS user_r,
+    LLDATACRIACAO AS dt_creation,
+    LLDATAFECHAMENTO AS dt_closed,
+    LLDATAIMPRESSAO AS dt_print,
+    LLDATAAPROVACAO AS dt_approval,
+    LLDATAPAGAMENTO AS dt_payment,
+    LLDATACANCELAMENTO AS dt_canceled,
+    LLDATAREJEICAO AS dt_rejected,
+    LLDATAEMISSAO AS dt_issued
+FROM
+    datalake_cyber_legal_homolog_raw.tb_lote_legal

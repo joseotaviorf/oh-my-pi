@@ -25,10 +25,14 @@ columns:
     description: "Alert type code - Has LOV"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALALERTTP
-  alert_description:
+  alert_comment:
     description: "Reason why the alert was generated"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALDESC
+  alert_creator:
+    description: "Attorney who created the alert"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caalert.ALCREATOR
   is_reviewed:
     description: "Alert review status (TRUE=Reviewed, FALSE=Not reviewed)"
     lineage:
@@ -41,7 +45,7 @@ columns:
     description: "Alert review date"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALREVDT
-  dt_alert:
+  dt_alert_expired:
     description: "Alert date"
     lineage:
       - datalake_cyber_legal_homolog_raw.caalert.ALALERTDT
