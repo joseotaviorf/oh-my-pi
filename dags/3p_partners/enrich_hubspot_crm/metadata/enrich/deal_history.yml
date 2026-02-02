@@ -246,6 +246,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: id of the lead for the consorcio pipeline
+  consorcio_id_device:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: id of the device of the user who generated the lead. Used to join with amplitude
   consorcio_utm_source:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -258,10 +262,22 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Details the specific campaign from which the Consorcio lead originated from.
+  consorcio_utm_content:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: The type of the creative used on the campaign.
+  consorcio_utm_term:
+      lineage:
+        - datalake_hubspot_clean.deal.properties
+      description: Terms used on the google search made by the user before accessing our landing page.
   consorcio_template_first_contact:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Name of the template used to contact the user for the first time after the lead was generated.
+  consorcio_template_last_contact:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Name of the last template used to contact the user on BLIP.
   consorcio_inside_sales_pipeline:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -302,6 +318,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Informs the channel used to generate the lead.
+  consorcio_deal_duplicado:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: The automatic integration with hubspot can sometimes generate duplicated leads, so this columns informs if this lead is duplicated or not.
   is_archived:
     lineage:
       - datalake_hubspot_clean.deal.is_archived

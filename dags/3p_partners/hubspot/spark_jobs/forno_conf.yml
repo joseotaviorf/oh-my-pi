@@ -245,6 +245,11 @@ deal:
       - cons_phone
       - cons_telefonetratado
       - cons_canal_origem
+      - cons_deal_duplicado
+      - cons_id_device
+      - cons_template_last_sent
+      - cons_utm_content
+      - cons_utm_term
     propertiesWithHistory:
       - dealstage
       - pipeline
