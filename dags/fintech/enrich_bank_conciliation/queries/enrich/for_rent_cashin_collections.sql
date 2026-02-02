@@ -1,5 +1,6 @@
 WITH pre_francesinha AS (
     SELECT
+        our_number AS id_bank,
         CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS our_number,
         bank_account,
         dt_credit AS dt_paid,
@@ -13,11 +14,12 @@ WITH pre_francesinha AS (
         AND TRIM(our_number) != ''
         AND dt_credit >= current_date - 180
     GROUP BY
-        1,2,3
+        1,2,3,4
 
     UNION
 
     SELECT
+        ext.origin_complement AS id_bank,
         CASE
             WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
             substring(ext.origin_complement, 20, 20),
@@ -37,6 +39,7 @@ WITH pre_francesinha AS (
 
 francesinha AS (
     SELECT
+        id_bank,
         IF(LENGTH(our_number) >= 30, LEFT(our_number, LENGTH(our_number)-2), our_number) AS our_number,
         bank_account,
         dt_paid,
@@ -251,6 +254,7 @@ df_all AS (
 
 df AS (
     SELECT DISTINCT
+        f.id_bank AS bank_number,
         cs.our_number AS id_our_number,
         s.hash,
         f.bank_account AS bank_account_number,
@@ -320,6 +324,7 @@ df AS (
 SELECT
     id_our_number,
     hash,
+    bank_number,
     bank_account_number,
     sap_account_number,
     bank_amount,

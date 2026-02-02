@@ -1,6 +1,7 @@
 WITH francesinha AS (
     SELECT
-        UPPER(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', '')) AS company_use,
+        UPPER(REPLACE(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', ''), 'C|', '')) AS company_use,
+        document_number AS bank_number,
         bank_account,
         dt_credit AS dt_paid,
         SUM(net_amount) AS amount
@@ -12,7 +13,7 @@ WITH francesinha AS (
         AND document_number IS NOT NULL
         AND TRIM(document_number) != ''
     GROUP BY
-        1,2,3
+        1,2,3,4
 ),
 
 seu_barriga AS (
@@ -196,6 +197,7 @@ df AS (
     SELECT DISTINCT
         cs.company_use AS id_company_use,
         s.hash,
+        f.bank_number,
         f.bank_account AS bank_account_number,
         s.account_number AS sap_account_number,
         f.amount AS bank_amount,
@@ -259,6 +261,7 @@ df AS (
 SELECT
     id_company_use,
     hash,
+    bank_number,
     bank_account_number,
     sap_account_number,
     bank_amount,
