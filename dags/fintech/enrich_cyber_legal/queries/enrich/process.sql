@@ -15,8 +15,8 @@ get_last_delqmst_data AS (
         flag_account_in_agency_or_court,
         evictions_label,
         ts_last_update,
-        ts_last_activity,
-        MAKE_DATE(year,month,day) AS partition
+        ts_last_activity
+        -- MAKE_DATE(year,month,day) AS partition
     FROM datalake_cyber_legal_homolog_clean.delinquent_master
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_last_update DESC) = 1
 )
