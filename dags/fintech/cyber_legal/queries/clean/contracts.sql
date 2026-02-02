@@ -103,7 +103,6 @@ SELECT
     IF(U1OCOREVIC = 'S', TRUE, FALSE) AS has_restrictive_evic_occurrence,
     U1FLACAVAL AS has_guarantor_denial,
     U1DIASEVIC AS days_until_contract_updated_evic_queue,
-    DATE(DT_CICLO) AS dt_cycle,
     DATE(U1LCHGDT1) AS dt_olos_dialer_label_update,
     DATE(U1LCHGDT2) AS dt_evictions_reason_update,
     DATE(U1LCHGDT3) AS dt_campaign_label_update,

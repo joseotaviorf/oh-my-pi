@@ -67,10 +67,6 @@ columns:
     description: "Return date"
     lineage:
       - datalake_cyber_raw.uda1.U1DTRETOR
-  dt_cycle:
-    description: "Cycle date"
-    lineage:
-      - datalake_cyber_raw.uda1.DT_CICLO
   ts_boletagem_request:
     description: "Timestamp of boletagem request"
     lineage:
