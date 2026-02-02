@@ -31,4 +31,4 @@ columns:
   auditor_notes:
     description: "Auditor notes and observations for the case."
     lineage:
-      - datalake_gsheets_raw.fraud_contracts.observacao_do_auditor
+      - datalake_gsheets_raw.fraud_contracts.observacao_do_auditora

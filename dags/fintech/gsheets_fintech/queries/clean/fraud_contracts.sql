@@ -5,6 +5,6 @@ SELECT
     group,
     motivo_identificado as identified_reason,
     motivo_macro as macro_reason,
-    observacao_do_auditor as auditor_notes
+    observacao_do_auditora as auditor_notes
 FROM
     datalake_gsheets_raw.fraud_contracts
