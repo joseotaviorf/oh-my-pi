@@ -7,43 +7,50 @@ WITH visit_metrics AS (
         business_context,
         metric_cohort,
         dt_ref,
+        -- vb
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vb ELSE 0 END) AS sum_vb_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vb ELSE 0 END) AS sum_vb_treatment,
+        -- vc
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vc ELSE 0 END) AS sum_vc_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vc ELSE 0 END) AS sum_vc_treatment,
+        (sum_vc_control/sum_vb_control)*100 AS vb2vc_control,
+        (sum_vc_treatment/sum_vb_treatment)*100 AS vb2vc_treatment,
+        1.96 * SQRT(sum_vc_control / sum_vb_control * (1 - sum_vc_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vc_control_error,
+        1.96 * SQRT(sum_vc_treatment / sum_vb_treatment * (1 - sum_vc_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vc_treatment_error,
+        -- vcc
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcc ELSE 0 END) AS sum_vcc_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcc ELSE 0 END) AS sum_vcc_treatment,
+        (sum_vcc_control/sum_vb_control)*100 AS vb2vcc_control,
+        (sum_vcc_treatment/sum_vb_treatment)*100 AS vb2vcc_treatment,
+        1.96 * SQRT(sum_vcc_control / sum_vb_control * (1 - sum_vcc_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vcc_control_error,
+        1.96 * SQRT(sum_vcc_treatment / sum_vb_treatment * (1 - sum_vcc_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vcc_treatment_error,
+        -- vu
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vu ELSE 0 END) AS sum_vu_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vu ELSE 0 END) AS sum_vu_treatment,
+        (sum_vu_control/sum_vb_control)*100 AS vb2vu_control,
+        (sum_vu_treatment/sum_vb_treatment)*100 AS vb2vu_treatment,
+        1.96 * SQRT(sum_vu_control / sum_vb_control * (1 - sum_vu_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vu_control_error,
+        1.96 * SQRT(sum_vu_treatment / sum_vb_treatment * (1 - sum_vu_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vu_treatment_error,
+        -- os
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_os ELSE 0 END) AS sum_os_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_os ELSE 0 END) AS sum_os_treatment,
+        (sum_os_control/sum_vb_control)*100 AS vb2os_control,
+        (sum_os_treatment/sum_vb_treatment)*100 AS vb2os_treatment,
+        1.96 * SQRT(sum_os_control / sum_vb_control * (1 - sum_os_control / sum_vb_control) / sum_vb_control) * 100 AS vb2os_control_error,
+        1.96 * SQRT(sum_os_treatment / sum_vb_treatment * (1 - sum_os_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2os_treatment_error,
+        -- oa
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_oa ELSE 0 END) AS sum_oa_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_oa ELSE 0 END) AS sum_oa_treatment,
+        (sum_oa_control/sum_vb_control)*100 AS vb2oa_control,
+        (sum_oa_treatment/sum_vb_treatment)*100 AS vb2oa_treatment,
+        1.96 * SQRT(sum_oa_control / sum_vb_control * (1 - sum_oa_control / sum_vb_control) / sum_vb_control) * 100 AS vb2oa_control_error,
+        1.96 * SQRT(sum_oa_treatment / sum_vb_treatment * (1 - sum_oa_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2oa_treatment_error,
+        -- cs
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_cs ELSE 0 END) AS sum_cs_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_cs ELSE 0 END) AS sum_cs_treatment,
-        (sum_vc_control/sum_vb_control)*100 AS vb2vc_control,
-        (sum_vcc_control/sum_vb_control)*100 AS vb2vcc_control,
-        (sum_vu_control/sum_vb_control)*100 AS vb2vu_control,
-        (sum_os_control/sum_vb_control)*100 AS vb2os_control,
-        (sum_oa_control/sum_vb_control)*100 AS vb2oa_control,
         (sum_cs_control/sum_vb_control)*100 AS vb2cs_control,
-        (sum_vc_treatment/sum_vb_treatment)*100 AS vb2vc_treatment,
-        (sum_vcc_treatment/sum_vb_treatment)*100 AS vb2vcc_treatment,
-        (sum_vu_treatment/sum_vb_treatment)*100 AS vb2vu_treatment,
-        (sum_os_treatment/sum_vb_treatment)*100 AS vb2os_treatment,
-        (sum_oa_treatment/sum_vb_treatment)*100 AS vb2oa_treatment,
         (sum_cs_treatment/sum_vb_treatment)*100 AS vb2cs_treatment,
-        1.96 * SQRT(sum_vc_control / sum_vb_control * (1 - sum_vc_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vc_control_error,
-        1.96 * SQRT(sum_vcc_control / sum_vb_control * (1 - sum_vcc_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vcc_control_error,
-        1.96 * SQRT(sum_vu_control / sum_vb_control * (1 - sum_vu_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vu_control_error,
-        1.96 * SQRT(sum_os_control / sum_vb_control * (1 - sum_os_control / sum_vb_control) / sum_vb_control) * 100 AS vb2os_control_error,
-        1.96 * SQRT(sum_oa_control / sum_vb_control * (1 - sum_oa_control / sum_vb_control) / sum_vb_control) * 100 AS vb2oa_control_error,
         1.96 * SQRT(sum_cs_control / sum_vb_control * (1 - sum_cs_control / sum_vb_control) / sum_vb_control) * 100 AS vb2cs_control_error,
-        1.96 * SQRT(sum_vc_treatment / sum_vb_treatment * (1 - sum_vc_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vc_treatment_error,
-        1.96 * SQRT(sum_vcc_treatment / sum_vb_treatment * (1 - sum_vcc_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vcc_treatment_error,
-        1.96 * SQRT(sum_vu_treatment / sum_vb_treatment * (1 - sum_vu_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vu_treatment_error,
-        1.96 * SQRT(sum_os_treatment / sum_vb_treatment * (1 - sum_os_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2os_treatment_error,
-        1.96 * SQRT(sum_oa_treatment / sum_vb_treatment * (1 - sum_oa_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2oa_treatment_error,
         1.96 * SQRT(sum_cs_treatment / sum_vb_treatment * (1 - sum_cs_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2cs_treatment_error
     FROM
         metric_sale.exp_visit_cohort
@@ -66,7 +73,19 @@ FROM
     visit_metrics AS vm
 LATERAL VIEW
     STACK(
-        6, -- Number of metrics
+        12, -- Number of metrics
+
+        'number_vc', CAST(vm.sum_vc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vcc', CAST(vm.sum_vcc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vcc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vu', CAST(vm.sum_vu_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vu_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_os', CAST(vm.sum_os_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_os_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_oa', CAST(vm.sum_oa_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_oa_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_cs', CAST(vm.sum_cs_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_cs_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
         'vb2vc', vm.vb2vc_control, vm.vb2vc_control_error, vm.vb2vc_treatment, vm.vb2vc_treatment_error,
 

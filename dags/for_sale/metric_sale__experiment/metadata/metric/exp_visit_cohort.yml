@@ -45,6 +45,11 @@ columns:
       - dw_visit.fact_visits.sk_first_associated_agent
     description: Foreign key identifying the first agent associated with the visit.
     dimension: True
+  sk_exp_identifier:
+    lineage:
+      - dw_for_sale_experiment.fact_experiment.sk_identifier
+    description: Foreign key identifying the experiment identifier.
+    dimension: True
   business_context:
     lineage:
       - dw_visit.dim_visit.business_context
