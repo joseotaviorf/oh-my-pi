@@ -2079,6 +2079,7 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
+  - bietlejuice.enrich_business_model:load-enrich-visit-business-model:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
@@ -2088,6 +2089,7 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_rental_transact:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow:first-run-of-day
 bietlejuice.enrich_demand_score_report:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
@@ -3973,6 +3975,7 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day

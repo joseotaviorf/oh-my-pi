@@ -2,7 +2,7 @@
 database_name: dw_growth
 table_name: fact_demand_prospect_events
 owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
+domain: Growth
 description: This table contains records of demand prospect conversion events across Rent and Sale business contexts. Each record represents a specific action (booking a visit, submitting an offer, or initiating a talk to an agent) performed by a prospect. This table also adds ad hoc rules and the construction of id_media_setup. 
 columns:
   sk_prospect_event:
@@ -13,10 +13,6 @@ columns:
     description: 'Id user of the prospect.'
     lineage:
       - datalake_demand_flows.prospect_daily_results.id_prospect
-  sk_media_setup:
-    description: 'The media setup identifier.'
-    lineage:
-      - datalake_demand_flows.prospect_daily_results.id_media_setup
   sk_rent_flow:
     description: 'Identifier of a user flow with a house in rent context.'
     lineage:
@@ -58,6 +54,10 @@ columns:
     description: 'Id of the agent whose made the booking.'
     lineage:
       - datalake_demand_flows.prospect_daily_results.id_agent
+  naming_convention_sufix:
+    description: 'The final media setup naming convention suffix for the conversion event, determined by a prioritization logic among the different sources (adhoc rule, exception flow, dictionary, naming convention).'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.naming_convention_sufix
   sk_event_date:
     description: 'Identifier of the date of conversion event'
     lineage:
@@ -80,7 +80,11 @@ columns:
     description: 'Name of the event that trigged the change to that current row status.'
     lineage:
       - datalake_demand_flows.buyer_prospect_status.status_trigger_event_name 
-      - datalake_demand_flows.tenant_prospect_status.status_trigger_event_name    
+      - datalake_demand_flows.tenant_prospect_status.status_trigger_event_name
+  product_origin:
+    description: 'System where the booking was registered'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.product_origin
   app_type:
     description: 'Application from which the user made the conversion event.'
     lineage:
@@ -105,10 +109,10 @@ columns:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
       - datalake_demand_flows.prospect_daily_results.utm_content
-  branded:
-    description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
+  is_cqa_demand:
+    description: 'Flag indicating if the demand is from CQA (Casa QuintoAndar) business model.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.branded  
+      - datalake_demand_flows.prospect_daily_results.is_cqa_demand
   operation_channel:
     description: 'Physical agent, internal or external, who performed the conversion in the funnel stage under analysis'
     lineage:

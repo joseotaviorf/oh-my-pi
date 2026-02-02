@@ -113,20 +113,27 @@ columns:
       - datalake_growth_costs.daily_costs.source
     description: The source from where the event was initiated.
     dimension: True
+  is_cqa_demand:
+    lineage:
+      - dw_growth.fact_demand_prospect_events.is_cqa_demand
+    description: Flag indicating if the demand is from CQA (Casa QuintoAndar) business model.
+    dimension: True
   tof_users:
     description: Count of unique top-of-funnel users.
     metric:
       name: TOF Users
       description: Total count of unique users who entered the top of the funnel.
+      acronym: tof_users
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
-  tof_users_3p:
-    description: Count of unique top-of-funnel users from third-party sources.
+  tof_users_rede:
+    description: Count of unique top-of-funnel users from Rede (third-party) sources.
     metric:
-      name: TOF Users 3P
-      description: Total count of unique users from third-party sources who entered the top of the funnel.
+      name: TOF Users Rede
+      description: Total count of unique users from Rede sources who entered the top of the funnel.
+      acronym: tof_users_rede
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
@@ -136,15 +143,17 @@ columns:
     metric:
       name: TOF Events
       description: Total count of unique events occurring at the top of the funnel.
+      acronym: tof_events
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
-  tof_events_3p:
-    description: Count of unique top-of-funnel events from third-party sources.
+  tof_events_rede:
+    description: Count of unique top-of-funnel events from Rede (third-party) sources.
     metric:
-      name: TOF Events 3P
-      description: Total count of unique events from third-party sources occurring at the top of the funnel.
+      name: TOF Events Rede
+      description: Total count of unique events from Rede sources occurring at the top of the funnel.
+      acronym: tof_events_rede
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
@@ -154,6 +163,7 @@ columns:
     metric:
       name: New Prospects
       description: Total number of new prospects identified during the specified period.
+      acronym: new_prospects
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
@@ -163,6 +173,7 @@ columns:
     metric:
       name: Recovered Prospects
       description: Total number of prospects re-engaged after previously being inactive.
+      acronym: recovered_prospects
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
@@ -172,6 +183,7 @@ columns:
     metric:
       name: Flows Initiated
       description: Total number of unique flow sessions started within the aggregation period.
+      acronym: flows
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
@@ -183,6 +195,7 @@ columns:
     metric:
       name: Marketing Cost
       description: Aggregate cost of marketing campaigns captured daily.
+      acronym: marketing_cost
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth

@@ -45,20 +45,36 @@ FROM
 GROUP BY ALL
 UNION ALL 
 SELECT
-  COALESCE(id_user_lead,lead_phone) AS id_user,
-  COALESCE(id_user_lead, lead_phone, id_referral_flow) AS id_contact,
-  'TQC' AS event_name,
-  LOWER(origin) AS origin,
-  'TQC' AS channel,
-  'TQC' AS agent,
+  COALESCE(tqc.id_user_lead, tqc.lead_phone) AS id_user,
+  COALESCE(tqc.id_user_lead, tqc.lead_phone, tqc.id_referral_flow) AS id_contact,
+  CASE
+    WHEN agent.agent_type = 'CORRETOR_REDE'
+    THEN 'TQC 3P'
+    ELSE 'TQC 1P'
+  END AS event_name,
+  LOWER(tqc.origin) AS origin,
+  CASE
+    WHEN agent.agent_type = 'CORRETOR_REDE'
+    THEN 'TQC 3P'
+    ELSE 'TQC 1P'
+  END AS channel,
+  CASE
+    WHEN agent.agent_type = 'CORRETOR_REDE'
+    THEN 'TQC 3P'
+    ELSE 'TQC 1P'
+  END AS agent,
   NULL AS business_context,
-  ts_created AS ts_event,
-  YEAR(ts_created) AS year,
-  MONTH(ts_created) AS month,
-  DAY(ts_created) AS day
-FROM datalake_tqc_referral.unified_lead_referral_flow
-WHERE 
-  status IN ('CONFIRMED','TRUE')
+  tqc.ts_created AS ts_event,
+  YEAR(tqc.ts_created) AS year,
+  MONTH(tqc.ts_created) AS month,
+  DAY(tqc.ts_created) AS day
+FROM
+  datalake_tqc_referral.unified_lead_referral_flow AS tqc
+LEFT JOIN
+  datalake_ebdb_clean.agent_data AS agent
+    ON agent.id = tqc.id_agent
+WHERE
+  status IN ('CONFIRMED', 'TRUE')
 UNION ALL
 SELECT 
   COALESCE(u.id, bqr.phone_number, bqr.id_business) AS id_user,

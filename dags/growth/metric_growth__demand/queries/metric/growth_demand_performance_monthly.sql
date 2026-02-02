@@ -18,6 +18,7 @@ monthly_tof_metrics AS (
     fdtof.campaign_strategy_intent, 
     fdtof.medium, 
     fdtof.source,
+    CAST(NULL AS BOOLEAN) AS is_cqa_demand,
     fdtof.year,
     fdtof.month,
     COUNT(DISTINCT fdtof.sk_tof_user) AS tof_users, 
@@ -41,7 +42,7 @@ monthly_prospect_metrics AS (
     dr.country_code, 
     dr.city_group, 
     fdpe.operation_channel, 
-    fdpe.referral_type, 
+    IFNULL(fdpe.referral_type, 'NA') as referral_type, 
     fdpe.platform,
     fdpe.utm_campaign, 
     fdpe.utm_term,
@@ -54,6 +55,7 @@ monthly_prospect_metrics AS (
     dms.behavior_type, 
     dms.medium, 
     dms.source,
+    IFNULL(fdpe.is_cqa_demand, FALSE) AS is_cqa_demand,
     fdpe.year,
     fdpe.month,
     COUNT(DISTINCT 
@@ -92,6 +94,7 @@ SELECT
   COALESCE(t.campaign_strategy_intent, p.campaign_strategy_intent) AS campaign_strategy_intent,
   COALESCE(t.medium, p.medium) AS medium,
   COALESCE(t.source, p.source) AS source,
+  COALESCE(t.is_cqa_demand, p.is_cqa_demand) AS is_cqa_demand,
   t.tof_users,
   t.tof_users_rede,
   t.tof_events,
@@ -123,3 +126,4 @@ FROM
     AND t.campaign_strategy_intent = p.campaign_strategy_intent
     AND t.medium = p.medium
     AND t.source = p.source
+    AND t.is_cqa_demand = p.is_cqa_demand

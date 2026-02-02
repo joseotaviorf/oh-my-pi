@@ -103,6 +103,14 @@ columns:
     description: "Flag to point if that booking was created by an Rede agent."
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.is_3p_demand
+  is_1p_demand:
+    description: "Flag indicating if the demand is from 1P (First Party) business model."
+    lineage:
+      - datalake_visit.visit_business_model.business_model
+  is_cqa_demand:
+    description: "Flag indicating if the demand is from CQA (Casa QuintoAndar) business model."
+    lineage:
+      - datalake_demand_flows.prospect_results.is_cqa_demand
   app_type:
     description: "Application from which the user made the conversion event."
     lineage:

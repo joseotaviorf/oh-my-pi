@@ -1,4 +1,17 @@
-WITH adhoc_rules AS (
+WITH business_model AS (
+  SELECT DISTINCT
+    V.code AS visit_code,
+    VBM.business_model AS business_model,
+    VBM.business_model IN ('BM_3P_LEAD_GEN_3P_SUPPLY', 'BM_3P_LEAD_GEN_1P_SUPPLY') AS is_cqa_demand,
+    VBM.business_model IN ('BM_1P', 'BM_3P_SUPPLY_1P_DEMAND_AGENT') AS is_1p_demand,
+    VBM.is_3p_demand
+  FROM
+    datalake_visit.visits AS V
+  INNER JOIN
+    datalake_visit.visit_business_model AS VBM
+      ON V.id_visit = VBM.id_visit
+),
+adhoc_rules AS (
   SELECT
     dpce.id_demand_prospect_conversion_event,
     dpce.id_prospect,
@@ -6,12 +19,18 @@ WITH adhoc_rules AS (
     dpce.id_event_type,
     dpce.event_name,
     CASE
-      WHEN dpce.utm_medium = 'TQC'
-        OR (dpce.product_origin = 'AGENT_PWA' AND dpce.id_agent = sef.id_agent)
-      THEN "sale.acq.nonorg.na.d.referral.tqc"
+      WHEN dpce.product_origin = 'AGENT_PWA'
+        AND dpce.id_agent = sef.id_agent
+      THEN "sale.acq.nonorg.na.d.referral.tqc1p"
+      WHEN dpce.utm_medium = 'TQC 1P'
+      THEN "sale.acq.nonorg.na.d.referral.tqc1p"
+      WHEN dpce.utm_medium = 'TQC 3P'
+        OR (dpce.product_origin = 'AGENT_PWA'
+          AND bm.is_3p_demand = TRUE)
+      THEN "sale.acq.nonorg.na.d.referral.tqc3p"
       WHEN dpce.product_origin = 'AGENT_PWA'
       THEN "hybr.acq.nonorg.na.d.referral.agents"
-      WHEN  dpce.utm_medium = 'plaquinhas_ada_whatsapp'
+      WHEN dpce.utm_medium = 'plaquinhas_ada_whatsapp'
       THEN "hybr.acq.nonorg.na.d.placas.na"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
@@ -33,7 +52,9 @@ WITH adhoc_rules AS (
     dpce.id_region,
     dpce.id_owner,
     dpce.id_agent,
-    CASE WHEN dpce.utm_medium = 'plaquinhas_ada_whatsapp' AND dpce.utm_campaign = 'offline_table'
+    CASE
+      WHEN dpce.utm_medium = 'plaquinhas_ada_whatsapp'
+        AND dpce.utm_campaign = 'offline_table'
       THEN "hybr.acq.nonorg.na.d.placas.na.ada_whatsapp"
       ELSE dpce.utm_campaign
     END AS utm_campaign,
@@ -45,22 +66,50 @@ WITH adhoc_rules AS (
     dpce.app_type,
     dpce.booking_creator,
     dpce.product_origin,
-    dpce.is_3p_demand,
+    bm.is_3p_demand,
+    bm.is_1p_demand,
+    bm.is_cqa_demand,
     CASE
-      WHEN dpce.product_origin = 'WHATSAPP_CONCIERGE' THEN "Concierge"
-      WHEN dpce.booking_creator IS NULL AND dpce.id_booking IS NOT NULL THEN "Lost Tracking"
-      WHEN dpce.booking_creator IS NULL AND dpce.id_booking IS NULL THEN "SelfService"
-      WHEN dpce.booking_creator = 'SelfService' THEN 'SelfService'
-      WHEN dpce.booking_creator = 'Admin/CX' THEN 'CX'
+      WHEN dpce.product_origin = 'WHATSAPP_CONCIERGE'
+      THEN "Concierge"
+      WHEN dpce.booking_creator IS NULL
+        AND dpce.id_booking IS NOT NULL
+      THEN "Lost Tracking"
+      WHEN dpce.booking_creator IS NULL
+        AND dpce.id_booking IS NULL
+      THEN "SelfService"
+      WHEN dpce.booking_creator = 'SelfService'
+      THEN 'SelfService'
+      WHEN dpce.booking_creator = 'Secretaria'
+      THEN 'Secretaria'
+      WHEN dpce.booking_creator = 'Admin/CX'
+      THEN 'CX'
+      WHEN dpce.product_origin = 'AGENT_PWA'
+        AND dpce.id_agent = sef.id_agent
+      THEN 'Agent'
+      WHEN dpce.product_origin = 'AGENT_PWA'
+        AND bm.is_3p_demand = TRUE
+      THEN 'Rede'
+      WHEN dpce.product_origin = 'AGENT_PWA'
+      THEN 'Agent'
+      -- WHEN dpce.booking_creator = 'Agent' THEN 'Agent'
+      -- WHEN bm.is_1p_demand = TRUE THEN 'Agent'
+      -- WHEN bm.is_3p_demand = TRUE THEN 'Rede'
       ELSE dpce.booking_creator
     END AS operation_channel,
     CASE
-      WHEN utm_medium = 'TQC'
-        OR (dpce.booking_creator = 'Agent' AND dpce.id_agent = sef.id_agent)
-        THEN 'TQC'
-      WHEN dpce.is_3p_demand = TRUE THEN 'Rede'
-      WHEN dpce.booking_creator = 'Agent' AND dpce.is_3p_demand = FALSE THEN 'Agent'
-      ELSE 'NA' -- TQC
+      WHEN (dpce.product_origin = 'AGENT_PWA'
+          AND dpce.id_agent = sef.id_agent)
+        OR dpce.utm_medium = 'TQC 1P'
+      THEN 'TQC 1P'
+      WHEN dpce.utm_medium = 'TQC 3P'
+        OR (dpce.product_origin = 'AGENT_PWA'
+          AND bm.is_3p_demand = TRUE)
+      THEN 'TQC 3P'
+      WHEN dpce.product_origin = 'AGENT_PWA'
+        OR dpce.booking_creator = 'Agent'
+      THEN 'Agent'
+      ELSE 'NA'
     END AS referral_type,
     CASE
       WHEN dpce.product_origin IS NULL THEN 'Lost Tracking'
@@ -74,15 +123,22 @@ WITH adhoc_rules AS (
       WHEN LOWER(dpce.app_type) LIKE '%web_mobile%' THEN 'Web Mobile'
       ELSE "Other"
     END AS platform,
-    CASE WHEN dpce.entrance_uri LIKE '%/guias/%' THEN "guias" END AS content_page,
+    CASE
+      WHEN dpce.entrance_uri LIKE '%/guias/%'
+      THEN "guias"
+    END AS content_page,
     dpce.ts_event,
     dpce.year,
     dpce.month,
     dpce.day
   FROM
     datalake_demand_flows.demand_prospect_conversion_events AS dpce
-    LEFT JOIN datalake_tqc_referral.sale_events_flow sef
+  LEFT JOIN
+    datalake_tqc_referral.sale_events_flow AS sef
       ON dpce.visit_code = sef.visit_code
+  LEFT JOIN
+    business_model AS bm
+      ON dpce.visit_code = bm.visit_code
   WHERE
     DATE(dpce.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
@@ -117,7 +173,9 @@ media_setup_ids AS (
     dpce.app_type,
     dpce.booking_creator,
     dpce.product_origin,
-    dpce.is_3p_demand,
+    COALESCE(dpce.is_3p_demand, FALSE) AS is_3p_demand,
+    COALESCE(dpce.is_1p_demand, FALSE) AS is_1p_demand,
+    COALESCE(dpce.is_cqa_demand, FALSE) AS is_cqa_demand,
     dpce.operation_channel,
     dpce.referral_type,
     dpce.origin,
@@ -183,6 +241,8 @@ SELECT
   booking_creator,
   product_origin,
   is_3p_demand,
+  is_1p_demand,
+  is_cqa_demand,
   operation_channel,
   referral_type,
   origin,

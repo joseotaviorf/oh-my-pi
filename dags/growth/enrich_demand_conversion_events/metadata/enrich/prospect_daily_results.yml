@@ -102,6 +102,10 @@ columns:
     description: "Marketing parameter that characterizes the campaign responsible for user conversion."
     lineage:
       - datalake_demand_flows.prospect_results.utm_content
+  is_cqa_demand:
+    description: "Flag indicating if the demand is from CQA (Casa QuintoAndar) business model."
+    lineage:
+      - datalake_demand_flows.prospect_results.is_cqa_demand
   entrance_uri:
     description: "The URL of the first page a user visits in a session."
     lineage:
