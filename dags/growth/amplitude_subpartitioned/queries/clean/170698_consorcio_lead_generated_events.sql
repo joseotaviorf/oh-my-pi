@@ -19,6 +19,8 @@ SELECT
     NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_source'),'') as up_utm_source,
     NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_medium'),'') as up_utm_medium,
     NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_campaign'),'') as up_utm_campaign,
+    NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_content'),'') as up_utm_content,
+    NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_term'),'') as up_utm_term,
     NULLIF(GET_JSON_OBJECT(user_properties, '$.ab_beakman_consorcio_new_landing_page'), '') as up_ab_beakman_consorcio_new_landing_page,
     event_properties,
     user_properties,

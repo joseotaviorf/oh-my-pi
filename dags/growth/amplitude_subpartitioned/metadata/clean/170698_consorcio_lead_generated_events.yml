@@ -81,6 +81,14 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.user_properties
     description: User property that indicates the utm campaign of the user when the event was triggered
+  up_utm_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: User property that indicates the content of the campaign sent to the user.
+  up_utm_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: User property that indicates the terms searched on google by the user before accessing the consorcio page.
   up_ab_beakman_consorcio_new_landing_page:
     lineage:
     - datalake_amplitude_clean.events.user_properties
