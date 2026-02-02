@@ -23,6 +23,13 @@ workflow:
       partitions: [year, month, day]
     metric_recs_click_through_rate:
       partitions: [year, month, day]
+    metric_search_listing_page_viewed:
+      partitions: [year, month, day]
+    metric_search_conversion: 
+      merge_on: [id_unique]
+      partitions: [year, month, day]
+    metric_search_click_through_rate:
+      partitions: [year, month, day]
 
 cluster:
     type: databricks_16_4_med_general_2_workers_cluster

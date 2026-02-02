@@ -20,5 +20,8 @@ This pipeline produces the following output table on enrich layer:
 - `metric_recs_listing_page_viewed`
 - `metric_recs_conversion`
 - `metric_recs_click_through_rate`
+- `metric_search_listing_page_viewed`
+- `metric_search_conversion`
+- `metric_search_click_through_rate`
 
 </details>

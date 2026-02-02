@@ -1,0 +1,54 @@
+database_name: datalake_search
+table_name: metric_search_click_through_rate
+owner: joseph.magiya@quintoandar.com
+domain: Conversational XP
+description: Table containing information about search results generated and which listing within the search results were clicked to calculate search health metrics related to click though rate (CTR). 
+columns:
+  id_search:
+    lineage:
+    - datalake_search.search_impressions.id_search
+    description: Id of the search.
+  id_house:
+    lineage:
+    - datalake_search.search_impressions.id_house
+    description: ID of the house (property).
+  business_context:
+    lineage:
+    - datalake_search.search_impressions.business_context
+    description: The business context of the house. Can be SALE or RENT.
+  house_city:
+    lineage:
+    - datalake_search.search_impressions.house_city
+    description: The city of the house.
+  platform:
+    lineage:
+    - datalake_search.search_impressions.platform
+    description: Platform from which the user is accessing. Can be WEB or APP.
+  absolute_position:
+    lineage:
+    - datalake_search.search_impressions.absolute_position
+    description: The absolute position of the house in the search results.
+  listing_age:
+    lineage:
+    - datalake_search.search_impressions.listing_age
+    description: The age of the house in days from when it was published to the time of the search event.
+  listing_clicked:
+    lineage:
+    - datalake_search.search_impressions.listing_clicked
+    description: Whether the house listing was clicked.
+  ts_search_event:
+    lineage:
+    - datalake_search.search_impressions.ts_search_event
+    description: The timestamp of the search event.
+  year:
+    lineage:
+    - datalake_search.search_impressions.year
+    description: The year when the search event was processed on the server. Might differ from ts_search_event.
+  month:
+    lineage:
+    - datalake_search.search_impressions.month
+    description: The month when the search event was processed on the server. Might differ from ts_search_event.
+  day:
+    lineage:
+    - datalake_search.search_impressions.day
+    description: The day when the search event was processed on the server. Might differ from ts_search_event.

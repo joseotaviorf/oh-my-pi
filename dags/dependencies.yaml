@@ -2412,6 +2412,7 @@ bietlejuice.enrich_facebook_insights:
 bietlejuice.enrich_find_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-recs-impressions-processed:first-run-of-day
+  - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
 bietlejuice.enrich_fintech_snapshot:

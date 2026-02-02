@@ -1,0 +1,106 @@
+database_name: datalake_search
+table_name: metric_search_listing_page_viewed
+owner: joseph.magiya@quintoandar.com
+domain: Conversational XP
+description: Table containing listing page viewed (LPV) events data for calculating search health metrics related to LPV. 
+columns:
+  id_house:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: ID of the house (property).
+  id_user:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
+    description: ID of the user.
+  id_search:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: ID of the search.
+  business_context:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: Business context, can be SALE or RENT.
+  platform:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.up_platform
+    description: Platform from which the user is accessing.
+  platform_grouped:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.up_platform
+    description: Platform from which the user is accessing. Grouped into "app" and "web".
+  device_type:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.up_platform
+    description: Device type from which the user is accessing. Grouped into "mobile" and "desktop".
+  user_city:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.city
+    description: City of the user obtained from Amplitude tracking data.
+  user_region:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.region
+    description: Region of the user obtained from Amplitude tracking data.
+  user_country:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.country
+    description: Country of the user obtained from Amplitude tracking data.
+  house_city:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: City of the property.
+  house_macro_region:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: Macro region of the property.
+  house_state:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: State of the property.
+  house_country:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: Country of the property.
+  lpv_from_route:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: Which page (route) the user were before visiting the current listing. LPV = listing page viewed.
+  rent_total_value:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: Total value of the rent which is the sum of base rent, condominium value and other applicable fees.
+  sale_value:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+    description: Value of the sale.
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+    description: Timestamp of the LPV event (UTC timezone).
+  dt_event:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+    description: Date of the LPV event (UTC timezone).
+  ts_event_week:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+    description: Week of the LPV event (UTC timezone).
+  ts_event_month:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+    description: Month of the LPV event (UTC timezone).
+  ts_event_quarter:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+    description: Quarter of the LPV event (UTC timezone).
+  year:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.year
+    description: The year when the LPV event was processed on the server. Might differ from ts_event.
+  month:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.month
+    description: The month when the LPV event was processed on the server. Might differ from ts_event.
+  day:
+    lineage:
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.day
+    description: The day when the LPV event was processed on the server. Might differ from ts_event.
