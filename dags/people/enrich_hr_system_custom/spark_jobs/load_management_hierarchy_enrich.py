@@ -61,6 +61,22 @@ if __name__ == "__main__":
 
     df = spark_client.conn.sql(managers_query)
     df = df.filter(df.id_manager_assignment.isNotNull())
+    
+    # Filter out test users (both employees and managers)
+    test_users_query = """
+        SELECT DISTINCT id_period_of_service
+        FROM datalake_employee_registration.identifier_mapping
+        WHERE is_user_test = true
+    """
+    df_test_users = spark_client.conn.sql(test_users_query)
+    # Filter employees who are test users
+    df = df.join(df_test_users, 
+                  df.id_period_of_service == df_test_users.id_period_of_service, 
+                  how="left_anti")
+    # Filter managers who are test users
+    df = df.join(df_test_users, 
+                  df.id_manager_assignment == df_test_users.id_period_of_service, 
+                  how="left_anti")
 
     df_degree = df.withColumn("separation_degree", lit(1))\
                   .withColumn("is_direct_manager", lit(True))\
@@ -84,6 +100,18 @@ if __name__ == "__main__":
 
         df_result = df_result.union(df_next_degree)
         df_degree = df_next_degree
+
+    # Add employees as themselves (separation_degree = 0)
+    df_employee_as_self = df.select(
+        col("id_assignment"),
+        col("id_assignment").alias("id_manager_assignment"),
+        lit(0).alias("separation_degree"),
+        lit(False).alias("is_direct_manager"),
+        col("id_period_of_service"),
+        col("id_period_of_service").alias("id_manager_period_of_service")
+    ).distinct()
+
+    df_result = df_result.union(df_employee_as_self)
 
     df_separation = df_result.orderBy("id_assignment", "separation_degree")
 
