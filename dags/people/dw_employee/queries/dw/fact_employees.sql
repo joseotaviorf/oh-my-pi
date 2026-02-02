@@ -65,6 +65,9 @@ SELECT
     fa.pct_last_salary_increase,
     COALESCE(tfac.is_transfered, FALSE) AS is_transfered,
     fa.has_active_manager,
+    COALESCE(tfac.previous_dt_started, fa.dt_work_relationship_started) AS dt_work_relationship_started,
+    fa.dt_work_relationship_ended AS dt_work_relationship_ended,
+    fa.dt_last_salary_increase AS dt_last_salary_increase,
     NOW() AS ts_load
 FROM
     dw_employee.fact_assignments AS fa

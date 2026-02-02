@@ -121,5 +121,20 @@ columns:
     description: Flag (TRUE/FALSE) indicating if the assignment has an active manager. Returns TRUE when the manager assignment exists and is active, FALSE otherwise.
     lineage:
     - dw_employee.fact_assignments.has_active_manager
+  dt_work_relationship_started:
+    description: |-
+      Start date of the work relationship (DATE type). Mandatory because everyone has an initial effective date.
+      Same transfer rule as the sk (uses previous assignment start when applicable).
+    lineage:
+    - dw_employee.fact_assignments.sk_work_relationship_started_date
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_work_relationship_ended:
+    description: End date of the work relationship (DATE type). Only populated when the person has been terminated.
+    lineage:
+    - dw_employee.fact_assignments.sk_work_relationship_ended_date
+  dt_last_salary_increase:
+    description: Date of the last salary increase (DATE type). Only populated when the person has had a career progression.
+    lineage:
+    - dw_employee.fact_assignments.sk_last_salary_increase_date
   ts_load:
     description: Timestamp that records when the data was loaded into the table. This value is updated if the data is reprocessed.

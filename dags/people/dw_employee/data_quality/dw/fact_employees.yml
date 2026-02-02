@@ -34,6 +34,9 @@ column_level_validations:
   qnt_undirectly_led:
     is_complete:
       severity_level: Warning
+  dt_work_relationship_started:
+    is_complete:
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning
