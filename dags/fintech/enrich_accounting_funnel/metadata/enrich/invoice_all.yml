@@ -140,6 +140,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice.paid_via
     description: "Description of how the invoice was paid"
+  type:
+    lineage:
+      - dw_rent.dim_contract.type
+    description: "Invoice type"
   due_amount:
     lineage:
       - dw_payment.fact_invoice_entries.brl_entry_due_amount

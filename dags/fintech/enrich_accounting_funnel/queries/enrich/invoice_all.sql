@@ -60,7 +60,10 @@ FROM
 next_business_day AS (
   SELECT
     dd.date,
-    MIN(dd_next.date) AS date_next_bd
+    CASE 
+      WHEN dd.date = DATE('2025-12-30') THEN DATE('2025-12-31')
+      ELSE MIN(dd_next.date) 
+    END AS date_next_bd
   FROM
     dw_public.dim_date AS dd
   LEFT JOIN
@@ -155,10 +158,6 @@ SELECT DISTINCT
     ELSE 'other'
   END AS account_type,
   CASE
-    WHEN (i.payment_status IN ('preview') OR fie.sk_invoice = -1) AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord') THEN 'payable'
-    WHEN (i.payment_status IN ('preview') OR fie.sk_invoice = -1) AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
-    WHEN entry_type IN ('brokerage installment fee', 'brokerage loan fidc', 'brokerage fidc', 'property damage fine') THEN 'receivable'
-    WHEN entry_type IN ('rental anticipation fee') THEN 'payable'
     WHEN entry_type IN ('payment adjustment') AND (ie.from_account_type = 'tenant' OR ie.to_account_type = 'tenant') THEN 'receivable'
     WHEN entry_type IN ('payment adjustment') AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord') THEN 'payable'
     WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2) = 0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
@@ -167,6 +166,7 @@ SELECT DISTINCT
   IF(fie.sk_invoice = -1, 'not-invoiceable', i.payment_status) AS status,
   i.closing_mode,
   i.paid_via,
+  c.type,
   ROUND(fie.brl_entry_due_amount,2) AS due_amount,
   ROUND(-1.0*i.due_amount,2) AS invoice_due_amount,
   ROUND(i.paid_amount,2) AS invoice_paid_amount,
@@ -257,8 +257,12 @@ LEFT JOIN
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')
-    AND ( (ie.from_account_type IN ('contract', 'tenant','landlord')) OR
-        (ie.from_account_type = 'contract expenses' AND ie.entry_type IN ('condominium fine', 'condominium 5A paid')))
-    AND ( (ie.to_account_type IN ('contract', 'tenant','landlord')) OR
-        (ie.to_account_type = 'quinto andar' AND ie.entry_type IN ('condominium' , 'condominium usage', 'condominium fine', 'condominium 5A paid')) OR
-        (ie.to_account_type = 'contract expenses' AND ie.entry_type IN ('postponement', 'condominium fine', 'condominium 5A paid')))
+    AND ( 
+          (ie.from_account_type IN ('contract', 'tenant','landlord')) OR
+          (ie.from_account_type = 'contract expenses' AND ie.entry_type IN ('condominium fine', 'condominium 5A paid'))
+        )
+    AND ( 
+          (ie.to_account_type IN ('contract', 'tenant','landlord')) OR
+          (ie.to_account_type = 'quinto andar' AND ie.entry_type IN ('condominium' , 'condominium usage', 'condominium fine', 'condominium 5A paid')) OR
+          (ie.to_account_type = 'contract expenses' AND ie.entry_type IN ('postponement', 'condominium fine', 'condominium 5A paid'))
+        )
