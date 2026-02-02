@@ -122,8 +122,8 @@ sheets_info:
     sheet_context: fintech
 
   fraud_contracts:
-    sheet_id: 1Dq9FJ56DJfbauri5EOky3U2C42_wV1u0UICQY1mFl94
-    sheet_name: Controle
+    sheet_id: 136-4lHPUEE4FZL9lPws8DfNOUGF5o8KeZM_kIaReeBM
+    sheet_name: BaseConsolidada
     clean_table_name: fraud_contracts
     sheet_context: fintech
 
