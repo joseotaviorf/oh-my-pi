@@ -1,4 +1,4 @@
-WITH rent_sale_flow_with_duplicates AS (
+WITH rent_sale_flow AS (
   SELECT
     id_tenant_prospect AS id_user,
     id_house,
@@ -43,29 +43,6 @@ WITH rent_sale_flow_with_duplicates AS (
   GROUP BY ALL
 )
 
-, duplicates AS ( -- issue found on 21/01/2026. When solved this should be removed.
-  SELECT
-    id_user,
-    id_house,
-    ts_visit_booked,
-    COUNT(*) AS duplicate_count
-  FROM rent_sale_flow_with_duplicates
-  GROUP BY all
-  HAVING COUNT(*) > 1
-)
-
-, rent_sale_flow AS (
-  SELECT
-    rsd.*
-  FROM rent_sale_flow_with_duplicates rsd
-  LEFT JOIN duplicates d
-    ON rsd.id_user = d.id_user
-    AND rsd.id_house = d.id_house
-    AND rsd.ts_visit_booked = d.ts_visit_booked
-  WHERE d.id_user IS NULL -- All the entries that don't have duplicates
-  OR (d.id_user IS NOT NULL AND rsd.business_context = 'SALE') -- For the entries that have duplicates keep the ones from sale_flows, since the duplication came from rent_flow. 
-)
-
 , recs_impressions_actions AS (
   SELECT
     GET_JSON_OBJECT(ids, '$.id_user') AS id_user,
@@ -94,30 +71,30 @@ WITH rent_sale_flow_with_duplicates AS (
 
 , rent_sale_flow_recs AS (
   SELECT
-    rent_sale_flow.id_user,
-    rent_sale_flow.id_house,
-    CONCAT(rent_sale_flow.id_user, rent_sale_flow.id_house) AS id_user_house,
-    MD5(CONCAT(rent_sale_flow.id_user, rent_sale_flow.id_house, rent_sale_flow.ts_first_flow_action)) AS id_unique,
-    rent_sale_flow.business_context,
-    IF(NOT rent_sale_flow.ts_direct_offer IS NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
-    COALESCE(recs_impressions_actions.is_rec_click, FALSE) AS is_rec_click,
-    IF(recs_impressions_actions.has_visit_booked OR NOT rent_sale_flow.ts_visit_booked IS NULL, TRUE, FALSE) AS has_visit_booked,
-    IF(recs_impressions_actions.has_direct_offer OR NOT rent_sale_flow.ts_direct_offer IS NULL, TRUE, FALSE) AS has_direct_offer,
-    IF(recs_impressions_actions.has_offer OR NOT rent_sale_flow.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
-    IF(recs_impressions_actions.has_contract_signed OR NOT rent_sale_flow.ts_contract_signed IS NULL, TRUE, FALSE) AS has_contract_signed,
-    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) <= 14, FALSE) AS is_rec_click_and_visit_booked_within_14_days,
-    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_direct_offer_within_14_days,
-    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_visit_booked) <= 14 OR DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_vb_or_do_within_14_days,
-    COALESCE(DATEDIFF(DAY, recs_impressions_actions.ts_recommendation, recs_impressions_actions.ts_offer) <= 14, FALSE) AS is_rec_click_and_offer_within_14_days,
-    rent_sale_flow.ts_first_flow_action,
-    YEAR(rent_sale_flow.ts_first_flow_action) AS year,
-    MONTH(rent_sale_flow.ts_first_flow_action) AS month,
-    DAY(rent_sale_flow.ts_first_flow_action) AS day
-  FROM rent_sale_flow
-  LEFT JOIN recs_impressions_actions
-    ON rent_sale_flow.id_house = recs_impressions_actions.id_house
-    AND rent_sale_flow.id_user = recs_impressions_actions.id_user
-    AND rent_sale_flow.business_context = recs_impressions_actions.business_context
+    rs.id_user,
+    rs.id_house,
+    CONCAT(rs.id_user, rs.id_house) AS id_user_house,
+    MD5(CONCAT(rs.id_user, rs.id_house, rs.ts_first_flow_action, rs.business_context)) AS id_unique,
+    rs.business_context,
+    IF(NOT rs.ts_direct_offer IS NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
+    COALESCE(ri.is_rec_click, FALSE) AS is_rec_click,
+    IF(ri.has_visit_booked OR NOT rs.ts_visit_booked IS NULL, TRUE, FALSE) AS has_visit_booked,
+    IF(ri.has_direct_offer OR NOT rs.ts_direct_offer IS NULL, TRUE, FALSE) AS has_direct_offer,
+    IF(ri.has_offer OR NOT rs.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
+    IF(ri.has_contract_signed OR NOT rs.ts_contract_signed IS NULL, TRUE, FALSE) AS has_contract_signed,
+    COALESCE(DATEDIFF(DAY, ri.ts_recommendation, ri.ts_visit_booked) <= 14, FALSE) AS is_rec_click_and_visit_booked_within_14_days,
+    COALESCE(DATEDIFF(DAY, ri.ts_recommendation, ri.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_direct_offer_within_14_days,
+    COALESCE(DATEDIFF(DAY, ri.ts_recommendation, ri.ts_visit_booked) <= 14 OR DATEDIFF(DAY, ri.ts_recommendation, ri.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_vb_or_do_within_14_days,
+    COALESCE(DATEDIFF(DAY, ri.ts_recommendation, ri.ts_offer) <= 14, FALSE) AS is_rec_click_and_offer_within_14_days,
+    rs.ts_first_flow_action,
+    YEAR(rs.ts_first_flow_action) AS year,
+    MONTH(rs.ts_first_flow_action) AS month,
+    DAY(rs.ts_first_flow_action) AS day
+  FROM rent_sale_flow rs
+  LEFT JOIN recs_impressions_actions ri
+    ON rs.id_house = ri.id_house
+    AND rs.id_user = ri.id_user
+    AND rs.business_context = ri.business_context
   GROUP BY ALL
 )
 
