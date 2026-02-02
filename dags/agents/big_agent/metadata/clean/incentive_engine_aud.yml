@@ -55,38 +55,22 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.status_mod
     description: Modification flag/column for status.
-  mod_dt_classification_started:
+  mod_ts_validity_started:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.classification_start_at_mod
-    description: Modification flag/column for classification_start_at.
-  mod_dt_classification_ended:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_start_at_mod
+    description: Modification flag/column for validity_start_at.
+  mod_ts_validity_ended:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.classification_end_at_mod
-    description: Modification flag/column for classification_end_at.
-  mod_dt_partner_tier_validity_started:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_end_at_mod
+    description: Modification flag/column for validity_end_at.
+  ts_validity_started:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_start_at_mod
-    description: Modification flag/column for partner_tier_validity_start_at.
-  mod_dt_partner_tier_validity_ended:
+      - datalake_big_agent_raw.incentive_engine_aud.validity_start_at
+    description: Start date of the validity window (audited).
+  ts_validity_ended:
     lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_end_at_mod
-    description: Modification flag/column for partner_tier_validity_end_at.
-  dt_classification_started:
-    lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.classification_start_at
-    description: Start date of the classification window (audited).
-  dt_classification_ended:
-    lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.classification_end_at
-    description: End date of the classification window (audited).
-  dt_partner_tier_validity_started:
-    lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_start_at
-    description: Start date of the partner tier validity window (audited).
-  dt_partner_tier_validity_ended:
-    lineage:
-      - datalake_big_agent_raw.incentive_engine_aud.partner_tier_validity_end_at
-    description: End date of the partner tier validity window (audited).
+      - datalake_big_agent_raw.incentive_engine_aud.validity_end_at
+    description: End date of the validity window (audited).
   ts_created:
     lineage:
       - datalake_big_agent_raw.incentive_engine_aud.created_at

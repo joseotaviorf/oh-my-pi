@@ -4,7 +4,7 @@ SELECT
     invalidated_by AS id_invalidated_by,
     revenue_share_uuid AS uuid_revenue_share,
     relation_type,
-    condition_type,
+    type,
     value,
     status,
     invalidation_reason,

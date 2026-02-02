@@ -27,22 +27,14 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_engine.status
     description: Record status.
-  dt_classification_started:
+  ts_validity_started:
     lineage:
-      - datalake_big_agent_raw.incentive_engine.classification_start_at
-    description: Start date of the classification window.
-  dt_classification_ended:
+      - datalake_big_agent_raw.incentive_engine.validity_start_at
+    description: Start date of the validity window.
+  ts_validity_ended:
     lineage:
-      - datalake_big_agent_raw.incentive_engine.classification_end_at
-    description: End date of the classification window.
-  dt_partner_tier_validity_started:
-    lineage:
-      - datalake_big_agent_raw.incentive_engine.partner_tier_validity_start_at
-    description: Start date of the partner tier validity window.
-  dt_partner_tier_validity_ended:
-    lineage:
-      - datalake_big_agent_raw.incentive_engine.partner_tier_validity_end_at
-    description: End date of the partner tier validity window.
+      - datalake_big_agent_raw.incentive_engine.validity_end_at
+    description: End date of the validity window.
   ts_created:
     lineage:
       - datalake_big_agent_raw.incentive_engine.created_at

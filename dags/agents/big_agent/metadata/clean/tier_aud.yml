@@ -27,14 +27,14 @@ columns:
     lineage:
       - datalake_big_agent_raw.tier_aud.incentive_engine_id
     description: Incentive engine identifier.
-  id_classifier:
+  id_classifier_score_rule:
     lineage:
-      - datalake_big_agent_raw.tier_aud.classifier_id
-    description: Classifier identifier.
-  id_qualifier:
+      - datalake_big_agent_raw.tier_aud.classifier_score_rule_id
+    description: Classifier score rule identifier.
+  id_qualifier_score_rule:
     lineage:
-      - datalake_big_agent_raw.tier_aud.qualifier_id
-    description: Qualifier identifier.
+      - datalake_big_agent_raw.tier_aud.qualifier_score_rule_id
+    description: Qualifier score rule identifier.
   name:
     lineage:
       - datalake_big_agent_raw.tier_aud.name
@@ -47,14 +47,14 @@ columns:
     lineage:
       - datalake_big_agent_raw.tier_aud.incentive_engine_id_mod
     description: Modification flag/column for incentive_engine_id.
-  mod_id_classifier:
+  mod_id_classifier_score_rule:
     lineage:
-      - datalake_big_agent_raw.tier_aud.classifier_id_mod
-    description: Modification flag/column for classifier_id.
-  mod_id_qualifier:
+      - datalake_big_agent_raw.tier_aud.classifier_score_rule_id_mod
+    description: Modification flag/column for classifier_score_rule_id.
+  mod_id_qualifier_score_rule:
     lineage:
-      - datalake_big_agent_raw.tier_aud.qualifier_id_mod
-    description: Modification flag/column for qualifier_id.
+      - datalake_big_agent_raw.tier_aud.qualifier_score_rule_id_mod
+    description: Modification flag/column for qualifier_score_rule_id.
   mod_name:
     lineage:
       - datalake_big_agent_raw.tier_aud.name_mod

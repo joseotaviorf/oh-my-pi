@@ -39,9 +39,9 @@ columns:
     lineage:
       - datalake_big_agent_raw.revenue_share_aud.relation_type
     description: Type discriminator for the relation.
-  condition_type:
+  type:
     lineage:
-      - datalake_big_agent_raw.revenue_share_aud.condition_type
+      - datalake_big_agent_raw.revenue_share_aud.type
     description: Type of condition applied to compute revenue share.
   value:
     lineage:
@@ -63,10 +63,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.revenue_share_aud.relation_id_mod
     description: Modification flag/column for relation_id.
-  mod_condition_type:
+  mod_type:
     lineage:
-      - datalake_big_agent_raw.revenue_share_aud.condition_type_mod
-    description: Modification flag/column for condition_type.
+      - datalake_big_agent_raw.revenue_share_aud.type_mod
+    description: Modification flag/column for type.
   mod_value:
     lineage:
       - datalake_big_agent_raw.revenue_share_aud.value_mod
