@@ -1,8 +1,8 @@
 database_name: datalake_amplitude_clean
-table_name: 417002_datahub_search_results_view_events
+table_name: 417002_datahub_page_view_events
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table contains the 'Search Results View' events from DataHub (Amplitude App ID 417002). It is triggered when the search results page is loaded/rendered for the user.
+description: This table contains the 'Page View' events from DataHub (Amplitude App ID 417002).
 columns:
   id_amplitude:
     description: Amplitude user identifier
@@ -40,14 +40,26 @@ columns:
     description: Event name
     lineage:
     - datalake_amplitude_clean.events.event_type
-  search_query:
-    description: The keyword used that generated these results.
+  page_title:
+    description: Page title is the text shown in the browser tab and search results that identifies a web page.
     lineage:
-    - datalake_amplitude_clean.events.event_properties 
-  results_total:
-    description: The total count of entities found for the query.
+    - datalake_amplitude_clean.events.event_properties
+  page_path:
+    description: Page path is the portion of the URL that comes after the domain, representing the specific route or location of a page within a website.
     lineage:
-    - datalake_amplitude_clean.events.event_properties                       
+    - datalake_amplitude_clean.events.event_properties
+  previous_path:
+    description: Previous path is the page path of the last page visited by the user before navigating to the current page.
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+  page_url:
+    description: URL is the full web address of a page, including protocol, domain, path, and any query parameters.
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+  url_query_parameter:
+    description: Search contains the URL query parameters, such as search terms or filters.
+    lineage:
+    - datalake_amplitude_clean.events.event_properties        
   dt_event:
     description: Date when the event was triggered
     lineage:
