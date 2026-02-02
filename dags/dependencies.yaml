@@ -4470,6 +4470,8 @@ bietlejuice.reverse_kyc:
   - bietlejuice.sales_flow:load-clean-sales-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-seller-data:first-run-of-day
   - bietlejuice.vans:load-clean-payment:first-run-of-day
+bietlejuice.reverse_listings_locations_access:
+  - bietlejuice.reverse_listings_locations_load:load-reverse-listings-locations:first-run-of-day
 bietlejuice.reverse_listings_locations_load:
   - bietlejuice.ebdb_location:load-clean-city:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-state:first-run-of-day

@@ -24,7 +24,7 @@ INNER JOIN
 INNER JOIN
   datalake_ebdb_clean.city c ON lower(c.name) = lower(h.address.city) AND c.uf = s.abbreviation
 WHERE
-  l.source_name = "ebdb_houses" AND h.address.country_code = "BR"
+  l.source_name = "ebdb_houses" AND h.address.country_code = "BR" AND l.status = "PUBLISHED"
 GROUP BY GROUPING SETS (
     (h.address.street, h.address.neighborhood, h.address.city, c.id, h.address.state_code, s.name, country_code),
     (h.address.neighborhood, h.address.city, c.id, h.address.state_code, s.name, country_code),
