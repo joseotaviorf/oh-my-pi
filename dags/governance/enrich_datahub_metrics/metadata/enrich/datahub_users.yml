@@ -1,0 +1,61 @@
+database_name: datalake_datahub_metrics
+table_name: datahub_users
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: It aims to extract detailed information about DataHub Users, enriching org_chart data with tool usage flags to analyze adoption.
+columns:
+  user_email:
+    lineage:
+      - datalake_people_public.org_chart.work_email
+      - datalake_amplitude_clean.events.event_properties
+    description: The unique corporate email of the employee. Extracted by parsing the DataHub URN (split on 'urn:li:corpuser:') or directly from the Org Chart.
+  area_class:
+    lineage:
+      - datalake_people_public.org_chart.chapter
+      - datalake_people_public.org_chart.directorate
+      - datalake_people_public.org_chart.vertical
+    description:  |
+      Classifies the user into high-level business segments for analysis. 
+      Business Logic: 
+      - IF chapter = 'Data' OR directorate = 'Dados' THEN 'Tech - Data'
+      - ELSE COALESCE(vertical, 'Corp')
+  job_class:
+    lineage:
+      - datalake_people_public.org_chart.job_class
+    description: The classification of the employee's role level (e.g., Specialist, Manager, Director) derived from org_chart table.
+  business:
+    lineage:
+      - datalake_people_public.org_chart.business
+    description: The broader business unit or division the employee belongs to.
+  product:
+    lineage:
+      - datalake_people_public.org_chart.product
+    description: The specific product context associated with the employee's team.
+  vertical:
+    lineage:
+      - datalake_people_public.org_chart.vertical
+    description: The specific vertical the employee is allocated to.
+  line:
+    lineage:
+      - datalake_people_public.org_chart.line
+    description: Represents the Product Line that the employee serves or supports within the organization.
+  chapter:
+    lineage:
+      - datalake_people_public.org_chart.chapter
+    description: The technical or professional discipline chapter the employee is part of (e.g., Data, Engineering, Design). Critical for identifying 'Tech - Data' users.
+  assignment_status_type:
+    lineage:
+      - datalake_people_public.org_chart.assignment_status_type
+    description: The current employment status of the user (e.g., Active, Terminated). Useful for filtering adoption metrics to current employees only.
+  is_datahub_user:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Flag indicating if the user has ever accessed DataHub. True if the user ID appears in any events.
+  is_databricks_user:
+    lineage:
+      - datalake_databricks.unique_users.email
+    description: Flag indicating if the user is an active user of the Databricks platform.
+  is_trino_user:
+    lineage:
+      - datalake_trino.query_usage_information.session_user
+    description: Flag indicating if the user has executed queries via Trino.

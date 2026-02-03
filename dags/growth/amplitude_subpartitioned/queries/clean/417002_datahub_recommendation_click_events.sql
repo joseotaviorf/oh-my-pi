@@ -13,6 +13,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.renderType') AS recommendation_render_type,
     GET_JSON_OBJECT(event_properties, '$.index') AS recommendation_index,
     GET_JSON_OBJECT(event_properties, '$.moduleId') AS recommendation_module_id,    
+    ts_event,    
     DATE(ts_event) AS dt_event,
     year,
     month,

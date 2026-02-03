@@ -2046,6 +2046,11 @@ bietlejuice.enrich_databricks_usage_costs:
   - bietlejuice.enrich_databricks:load-enrich-unique-clusters:first-run-of-day
   - bietlejuice.enrich_pipeline:load-enrich-dag:first-run-of-day
   - bietlejuice.gsheets_platform:done-clean-databricks-contract-details:first-run-of-day
+bietlejuice.enrich_datahub_metrics:
+  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+  - bietlejuice.enrich_databricks:load-enrich-unique-users:first-run-of-day
+  - bietlejuice.enrich_people_public:load-enrich-org-chart:first-run-of-day
+  - bietlejuice.enrich_trino:load-enrich-query-usage-information:first-run-of-day
 bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays:first-run-of-day

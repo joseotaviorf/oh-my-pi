@@ -48,6 +48,10 @@ columns:
     description: The total count of entities found for the query.
     lineage:
     - datalake_amplitude_clean.events.event_properties                       
+  ts_event:
+    description: Timestamp when the event was triggered
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
   dt_event:
     description: Date when the event was triggered
     lineage:

@@ -10,6 +10,7 @@ SELECT
     event_type,
     GET_JSON_OBJECT(event_properties, '$.query') AS search_query,
     CAST(GET_JSON_OBJECT(event_properties, '$.total') AS INT) AS results_total,    
+    ts_event,    
     DATE(ts_event) AS dt_event,
     year,
     month,

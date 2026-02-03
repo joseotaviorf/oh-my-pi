@@ -13,6 +13,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.prevPathname') AS previous_path,
     GET_JSON_OBJECT(event_properties, '$.url') AS page_url,
     GET_JSON_OBJECT(event_properties, '$.search') AS url_query_parameter,
+    ts_event,    
     DATE(ts_event) AS dt_event,
     year,
     month,

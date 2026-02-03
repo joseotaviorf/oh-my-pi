@@ -11,6 +11,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.entityUrn') AS entity_urn,
     GET_JSON_OBJECT(event_properties, '$.entityType') AS entity_type,
     GET_JSON_OBJECT(event_properties, '$.section') AS entity_section,    
+    ts_event,
     DATE(ts_event) AS dt_event,
     year,
     month,

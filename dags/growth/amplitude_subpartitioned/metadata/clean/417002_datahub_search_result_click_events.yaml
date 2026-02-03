@@ -60,6 +60,10 @@ columns:
     description: The total number of results found for that query. Helps distinguish broad searches (thousands of results) vs. specific searches.
     lineage:
     - datalake_amplitude_clean.events.event_properties                       
+  ts_event:
+    description: Timestamp when the event was triggered
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
   dt_event:
     description: Date when the event was triggered
     lineage:

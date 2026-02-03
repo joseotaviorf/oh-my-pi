@@ -11,6 +11,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.originPath') AS search_origin_path,
     GET_JSON_OBJECT(event_properties, '$.pageNumber') AS search_page_number,
     GET_JSON_OBJECT(event_properties, '$.query') AS search_query,    
+    ts_event,    
     DATE(ts_event) AS dt_event,
     year,
     month,

@@ -52,6 +52,10 @@ columns:
     description: The category of the autocomplete suggestion selected. Usually matches the entity type, but helps distinguish between entity suggestions vs. query suggestions.
     lineage:
     - datalake_amplitude_clean.events.event_properties                                  
+  ts_event:
+    description: Timestamp when the event was triggered
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
   dt_event:
     description: Date when the event was triggered
     lineage:

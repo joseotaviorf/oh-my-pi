@@ -8,6 +8,7 @@ SELECT
     city,
     country,
     event_type,
+    ts_event,    
     DATE(ts_event) AS dt_event,
     year,
     month,

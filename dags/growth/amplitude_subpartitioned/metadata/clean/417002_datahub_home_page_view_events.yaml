@@ -40,6 +40,10 @@ columns:
     description: Event name
     lineage:
     - datalake_amplitude_clean.events.event_type
+  ts_event:
+    description: Timestamp when the event was triggered
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
   dt_event:
     description: Date when the event was triggered
     lineage:
