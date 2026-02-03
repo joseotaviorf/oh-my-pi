@@ -86,7 +86,7 @@ LEFT JOIN
         ON cacct.id_contract = ct.id_contract
 LEFT JOIN
     get_last_delqmst_data AS dq
-        ON regexp_replace(cacct.id_contract, '^([0-9])9{6}', '\1') = dq.id_contract
+        ON cacct.id_contract = dq.id_contract
 LEFT JOIN
     datalake_cyber_legal_homolog_clean.case_notification_log AS cntf
         ON c.id_case = cntf.id_case
