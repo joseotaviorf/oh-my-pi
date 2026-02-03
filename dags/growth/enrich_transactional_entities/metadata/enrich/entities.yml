@@ -223,7 +223,7 @@ columns:
       A contract entity will be considered as active for statuses ativo, minuta or PreAssinaturas, and inactive for statuses cancelado or finalizado.
       A termination entity will be considered as active for statuses requested, inspection_under_review, inspection_scheduled, inspection_opted_out, inspection_executed, or inspection_canceled, and inactive for statuses done or canceled.
       A listing entity will be considered as active for statuses 'PUBLISHED' or 'EDITING', and inactive for statuses 'OPTED_OUT', 'UNPUBLISHED', or 'SUSPENDED'.
-      An inspection entity will be considered as active for statuses Agendada, Comentada, EmAcordo, EmRevisao, Nova, or Revisada, and inactive for statuses Finalizada, Cancelada, or ContratoCancelado.
+      An inspection entity will be considered as active for statuses Agendada, Comentada, EmAcordo, EmRevisao, or Nova, and inactive for statuses Finalizada, Cancelada, Revisada, or ContratoCancelado.
       An onboarding entity will be considered as active for all statuses except "Finished" and "Aborted", which are considered inactive.
       A credit evaluation entity will be considered as active for statuses NOT_SENT, ON_HOLD or PROCESSING, and inactive for statuses CANCELLED, FAILED or FINISHED.
       A reservation entity will be considered as active when is_ongoing = TRUE, and inactive when is_ongoing = FALSE.

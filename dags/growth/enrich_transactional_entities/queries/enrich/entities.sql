@@ -292,8 +292,8 @@ inspection AS (
         )
       ) AS properties,
       CASE
-        WHEN ib.status IN ('Finalizada', 'Cancelada', 'ContratoCancelado') THEN FALSE
-        WHEN ib.status IN ('Agendada', 'Comentada', 'EmAcordo', 'EmRevisao', 'Nova', 'Revisada') THEN TRUE
+        WHEN ib.status IN ('Finalizada', 'Cancelada', 'ContratoCancelado', 'Revisada') THEN FALSE
+        WHEN ib.status IN ('Agendada', 'Comentada', 'EmAcordo', 'EmRevisao', 'Nova') THEN TRUE
         ELSE NULL
       END AS is_active,
       ib.ts_created,
