@@ -53,7 +53,7 @@ def _create_dataframe_with_standard_columns(response_data: dict, display_date: s
     df = spark.read\
         .option("inferSchema",False)\
         .option("header", "true")\
-        .option("mode","FAILFAST")\
+        .option("mode","PERMISSIVE")\
         .option("delimiter",";")\
         .csv(rdd_data)\
         .withColumn("domain", lit(domain))\
