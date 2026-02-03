@@ -4,7 +4,7 @@ description: It stores revision information for all audited tables. Each record 
   capturing who made the change, when it occurred, and why. This table serves as the central spine for the audit system,
   with all _AUD tables referencing it through their rev field.
 domain: Growth
-owner: henrique.paulo@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id:
     lineage:
