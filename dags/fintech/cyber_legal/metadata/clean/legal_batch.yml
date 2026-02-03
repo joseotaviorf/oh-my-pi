@@ -77,11 +77,11 @@ columns:
     description: "Bank of the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLBANCON
-  user_c:
+  user_created:
     description: "User who created the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOC
-  user_f:
+  user_closed:
     description: "User who finalized the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOF
@@ -89,15 +89,15 @@ columns:
     description: "Code of the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLCODVW
-  user_i:
-    description: "User who inserted the legal batch"
+  user_printed:
+    description: "User who printed the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOI
-  user_ap:
+  user_approved:
     description: "User who approved the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOAP
-  user_r:
+  user_rejected:
     description: "User who rejected the legal batch"
     lineage:
       - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOR

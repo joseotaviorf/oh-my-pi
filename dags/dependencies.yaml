@@ -1142,8 +1142,8 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-accounting:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-share:first-run-of-day
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-third-parties:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-third-parties-reverse:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-third-parties:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-write-off:first-run-of-day
@@ -2007,6 +2007,7 @@ bietlejuice.enrich_cyber:
 bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber_legal:load-clean-agency:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-case-account:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-alert:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-case-expense:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-case-notification-log:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-case-stage:first-run-of-day
@@ -2395,6 +2396,8 @@ bietlejuice.enrich_employment:
   - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
+bietlejuice.enrich_evictions:
+  - bietlejuice.gsheets_fintech:done-clean-legal-process:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference:first-run-of-day
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day

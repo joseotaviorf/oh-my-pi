@@ -8,15 +8,27 @@ columns:
   id_case:
     description: "Unique case identifier linking the expense to a specific legal case."
     lineage:
-      - datalake_cyber_legal_homolog_clean.caexpns.id_case
+      - datalake_cyber_legal_homolog_clean.case_expense.id_case
   id_agency:
     description: "Agency identifier associated with the expense, linking to the agency responsible for the case."
     lineage:
-      - datalake_cyber_legal_homolog_clean.caexpns.id_agency
+      - datalake_cyber_legal_homolog_clean.case_expense.id_agency
+  id_expense:
+    description: "Sequential expense identifier within the procedural stage."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.id_expense
+  id_contract:
+    description: "Account number that associates with the case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_account.id_contract
+  id_process:
+    description: "Dossier number - Business primary key of the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.id_dossier
   agency_name:
     description: "Human-readable name of the agency associated with the expense."
     lineage:
-      - datalake_cyber_clean.agency.agency_name
+      - datalake_cyber_legal_homolog_clean.agency.agency_name
   debtor_name:
     description: "Name of the debtor in the associated legal case."
     lineage:
@@ -24,20 +36,28 @@ columns:
   case_type:
     description: "Type of legal case associated with the expense."
     lineage:
-      - datalake_cyber_legal_homolog_clean.caexpns.case_type
+      - datalake_cyber_legal_homolog_clean.case_expense.case_type
   expense_amount:
     description: "Monetary amount of the expense in the original currency."
     lineage:
-      - datalake_cyber_legal_homolog_clean.caexpns.expense_amount
+      - datalake_cyber_legal_homolog_clean.case_expense.expense_amount
   expense_type_description:
     description: "Human-readable description of the expense type, enriched from the values list."
     lineage:
-      - datalake_cyber_clean.values_list.value_description
+      - datalake_cyber_legal_homolog_clean.values_list.value_description
   expense_description:
     description: "Detailed description of the specific expense, providing additional context about the expense purpose."
     lineage:
-      - datalake_cyber_legal_homolog_clean.caexpns.expense_description
+      - datalake_cyber_legal_homolog_clean.case_expense.expense_description
+  dt_captured:
+    description: "Date when the expense was captured in the system."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.dt_captured
+  dt_invoice:
+    description: "Invoice date when expense was actually incurred."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.dt_invoice
   dt_reimbursed:
     description: "Date when the expense was reimbursed, indicating completion of the expense process."
     lineage:
-      - datalake_cyber_legal_homolog_clean.caexpns.dt_reimbursed
+      - datalake_cyber_legal_homolog_clean.case_expense.dt_reimbursed

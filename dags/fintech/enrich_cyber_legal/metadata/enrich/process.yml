@@ -165,3 +165,7 @@ columns:
     description: "Status of the contract"
     lineage:
       - datalake_cyber_legal_homolog_clean.contracts.contract_status
+  ts_updated:
+    description: "Timestamp of the last update"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.ts_updated

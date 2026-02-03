@@ -1,0 +1,102 @@
+---
+database_name: datalake_cyber_legal_homolog
+table_name: process
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: "Unified eviction cases base combining cyber legal, gsheets, and Trato Feito sources."
+columns:
+  id_case:
+    description: "Identifier of the legal case across all sources."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.id_case
+      - datalake_gsheets_clean.evictions_base.id_process
+      - datalake_gsheets_clean.legal_process.id_external
+  id_anonymized:
+    description: "Identifier of the anonymized case."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.id_anonymized
+      - datalake_gsheets_clean.evictions_base.id_anonymized
+      - datalake_gsheets_clean.legal_process.id_anonymized
+  id_contract:
+    description: "Contract linked to the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.id_contract
+      - datalake_gsheets_clean.evictions_base.contract
+      - datalake_gsheets_clean.legal_process.id_entity
+  process_type:
+    description: "Process type from source systems."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.process_type
+      - datalake_gsheets_clean.evictions_base.process
+      - datalake_gsheets_clean.legal_process.process_type
+  law_firm:
+    description: "Law firm or office handling the case."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.law_firm
+      - datalake_gsheets_clean.evictions_base.office
+      - datalake_gsheets_clean.legal_process.law_firm
+  status:
+    description: "Case status derived per source."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.process_type
+      - datalake_cyber_legal_homolog.evictions_base.last_process_stage
+      - datalake_gsheets_clean.evictions_base.last_stage
+      - datalake_gsheets_clean.legal_process.status
+  is_active:
+    description: "Flag indicating if the case is active."
+    lineage:
+      - datalake_gsheets_clean.evictions_base.elaw_status
+      - datalake_gsheets_clean.legal_process.is_active
+  status_order:
+    description: "Progression order of the process (when available)."
+    lineage:
+      - datalake_gsheets_clean.legal_process.status_order
+  last_process_stage:
+    description: "Last process stage for cyber legal cases."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.last_process_stage
+      - datalake_gsheets_clean.evictions_base.last_stage
+  ts_created:
+    description: "Creation timestamp of the case in source."
+    lineage:
+      - datalake_gsheets_clean.evictions_base.dt_registered
+      - datalake_gsheets_clean.legal_process.ts_created
+  ts_last_update_event:
+    description: "Last update event timestamp in source."
+    lineage:
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_distribution
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_citation
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_contestation
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_sentence
+      - datalake_gsheets_clean.evictions_base.dt_judiciary_pre_registration
+      - datalake_gsheets_clean.evictions_base.dt_judiciary_distribution
+      - datalake_gsheets_clean.evictions_base.dt_judicial_summons_decision
+      - datalake_gsheets_clean.evictions_base.dt_judicial_summons
+      - datalake_gsheets_clean.evictions_base.dt_judicial_defense
+      - datalake_gsheets_clean.evictions_base.dt_coercive_decision
+      - datalake_gsheets_clean.evictions_base.dt_coercive_issuance
+      - datalake_gsheets_clean.legal_process.ts_last_update_event
+  ts_updated:
+    description: "Last updated timestamp in source."
+    lineage:
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_distribution
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_citation
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_contestation
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_sentence
+      - datalake_gsheets_clean.evictions_base.dt_judiciary_pre_registration
+      - datalake_gsheets_clean.evictions_base.dt_judiciary_distribution
+      - datalake_gsheets_clean.evictions_base.dt_judicial_summons_decision
+      - datalake_gsheets_clean.evictions_base.dt_judicial_summons
+      - datalake_gsheets_clean.evictions_base.dt_judicial_defense
+      - datalake_gsheets_clean.evictions_base.dt_coercive_decision
+      - datalake_gsheets_clean.evictions_base.dt_coercive_issuance
+      - datalake_gsheets_clean.evictions_base.dt_finalizing
+      - datalake_gsheets_clean.evictions_base.dt_finalized_erc
+      - datalake_gsheets_clean.evictions_base.dt_elaw_closure
+      - datalake_gsheets_clean.legal_process.ts_updated
+  source:
+    description: "Source of the data"
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.source
+      - datalake_gsheets_clean.evictions_base.source
+      - datalake_gsheets_clean.legal_process.source

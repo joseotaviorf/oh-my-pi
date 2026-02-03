@@ -26,5 +26,5 @@ LEFT JOIN
     expenses AS cexp
         ON cstg.id_case = cexp.id_case
         AND cstg.id_stage = cexp.id_stage
-WHERE
-    cstg.stage_status IN ('Current', 'Completed')
+-- WHERE
+    -- cstg.stage_status IN ('Current', 'Completed')

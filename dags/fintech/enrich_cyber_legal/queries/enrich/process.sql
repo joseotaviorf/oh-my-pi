@@ -65,7 +65,8 @@ SELECT
     c.dt_lawsuit_filed AS dt_lawsuit,
     c.dt_case_accepted AS dt_case_acceptance,
     c.dt_unrecoverable_declaration AS dt_case_completion,
-    c.dt_case_assigned AS dt_agency_assignment
+    c.dt_case_assigned AS dt_agency_assignment,
+    c.ts_updated
 FROM
     datalake_cyber_legal_homolog_clean.case AS c
 LEFT JOIN
@@ -85,7 +86,7 @@ LEFT JOIN
         ON cacct.id_contract = ct.id_contract
 LEFT JOIN
     get_last_delqmst_data AS dq
-        ON cacct.id_contract = dq.id_contract
+        ON regexp_replace(cacct.id_contract, '^([0-9])9{6}', '\1') = dq.id_contract
 LEFT JOIN
     datalake_cyber_legal_homolog_clean.case_notification_log AS cntf
         ON c.id_case = cntf.id_case
