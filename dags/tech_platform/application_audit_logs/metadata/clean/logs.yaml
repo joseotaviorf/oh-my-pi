@@ -1,0 +1,54 @@
+database_name: datalake_application_audit_logs_clean
+table_name: logs
+description: Cleaned application audit logs containing structured event data, used for tracking application activities relevant for compliance auditing.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  namespace:
+    lineage:
+      - s3_auditlogs_bucket/logs.namespace
+    description: Kubernetes namespace where the application pod is deployed, used to identify the logical grouping of resources.
+  pod_name:
+    lineage:
+      - s3_auditlogs_bucket/logs.pod_name
+    description: Name of the Kubernetes pod that generated the audit log event, useful for identifying the specific instance.
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket/logs.timestamp
+    description: Timestamp when the audit log event was recorded, in UTC format.
+  id_trace:
+    lineage:
+      - s3_auditlogs_bucket/logs.id_trace
+    description: Distributed tracing identifier used to correlate related events across multiple services in a request flow.
+  id_log:
+    lineage:
+      - s3_auditlogs_bucket/logs.id_log
+    description: Unique identifier for each individual audit log entry.
+  id_transaction:
+    lineage:
+      - s3_auditlogs_bucket/logs.id_transaction
+    description: Identifier that groups related operations within a single database transaction.
+  payload:
+    lineage:
+      - s3_auditlogs_bucket/logs.payload
+    description: JSON-formatted content containing the detailed audit event data, including contextual information.
+  app:
+    lineage:
+      - s3_auditlogs_bucket/logs.app
+    description: Name of the application that generated the audit log event.
+  year:
+    lineage:
+      - s3_auditlogs_bucket/logs.year
+    description: Year component of the event timestamp, used as partition key for efficient querying.
+  month:
+    lineage:
+      - s3_auditlogs_bucket/logs.month
+    description: Month component of the event timestamp, used as partition key for efficient querying.
+  day:
+    lineage:
+      - s3_auditlogs_bucket/logs.day
+    description: Day component of the event timestamp, used as partition key for efficient querying.
+  hour:
+    lineage:
+      - s3_auditlogs_bucket/logs.hour
+    description: Hour component of the event timestamp, used as partition key for efficient querying.
