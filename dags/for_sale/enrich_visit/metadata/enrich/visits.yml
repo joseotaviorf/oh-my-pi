@@ -255,6 +255,12 @@ columns:
       - datalake_ebdb_clean.visit_status_log.event_type
       - datalake_ebdb_clean.booking_status_change.reason
     description: If the visit was confirmed by all. Data since 2020.
+  is_confirmed_last_schedule:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+      - datalake_ebdb_clean.booking_status_change.ts_created
+      - datalake_visit.visit_origin_unified.ts_visit_requested
+    description: If the visit was confirmed by the last schedule. Data since 2020.
   is_registered:
     lineage:
       - datalake_ebdb_clean.visit_status_log.event_type

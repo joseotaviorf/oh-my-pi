@@ -32,6 +32,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.visit_first_confirmed_channel,
   v.visit_first_confirmed_user_role,
   v.is_confirmed AS is_visit_confirmed,
+  v.is_confirmed_last_schedule AS is_visit_confirmed_last_schedule,
   v.is_completed AS is_visit_completed,
   v.is_canceled AS is_visit_canceled,
   v.is_unsuccessful AS is_visit_unsuccessful,

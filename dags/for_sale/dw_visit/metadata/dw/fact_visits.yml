@@ -142,6 +142,10 @@ columns:
     description: Number of visit confirmed (CAST of is_confirmed as INTEGER). The sum aggregate function can be used to get the total number of confirmed visits grouped in some way.
     lineage:
       - datalake_visit.visits.is_confirmed
+  num_visit_confirmed_last_schedule:
+    description: Number of visit confirmed in the last schedule (CAST of is_confirmed_last_schedule as INTEGER). The sum aggregate function can be used to get the total number of confirmed visits in the last schedule grouped in some way.
+    lineage:
+      - datalake_visit.visits.is_confirmed_last_schedule
   num_visit_completed:
     description: Number of visit completed (CAST of is_completed as INTEGER). The sum aggregate function can be used to get the total number of completed visits grouped in some way.
     lineage:

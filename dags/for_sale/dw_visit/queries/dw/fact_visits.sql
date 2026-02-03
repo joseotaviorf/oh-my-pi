@@ -34,6 +34,7 @@ SELECT
   1 AS num_visit_booked,
   v.nbr_agent AS num_agents_associated,
   CAST(v.is_confirmed AS INTEGER) AS num_visit_confirmed,
+  CAST(v.is_confirmed_last_schedule AS INTEGER) AS num_visit_confirmed_last_schedule,
   CAST(v.is_completed AS INTEGER) AS num_visit_completed,
   CAST(v.is_canceled AS INTEGER) AS num_visit_canceled,
   CAST(v.is_unsuccessful AS INTEGER) AS num_visit_unsuccessful,

@@ -157,6 +157,10 @@ columns:
     lineage:
       - datalake_visit.visits.is_confirmed
     description: If the visit was confirmed by all. Data since 2020.
+  is_visit_confirmed_last_schedule:
+    lineage:
+      - datalake_visit.visits.is_confirmed_by_last_schedule
+    description: If the visit was confirmed by the last schedule. Data since 2020.
   is_visit_completed:
     lineage:
       - datalake_visit.visits.is_completed
