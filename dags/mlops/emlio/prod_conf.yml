@@ -8,8 +8,8 @@ clean_partition_cols:
   - year
   - month
   - day
-kafka_brokers: kafka-prod-0.data.quintoandar.com.br:9092,kafka-prod-1.data.quintoandar.com.br:9092,kafka-prod-2.data.quintoandar.com.br:9092
-kafka_topic: emlio-logs
+kafka_brokers: lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092
+kafka_topic: prod_mlops.emlio-logs
 load_format: json
 path_prefix: s3://
 checkpoints_path_suffix: /raw/emlio/checkpoints

@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 from argparse import ArgumentParser
 
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.clients.db_clients import SparkClient
@@ -118,17 +119,25 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
+    
+    base_dbutils = BaseDBUtils()
+    dbutils = base_dbutils.get_dbutils()
+    kafka_api_key = dbutils.secrets.get(scope="quintoandar", key="EMLIO_KAFKA_API_KEY")
+    kafka_api_secret = dbutils.secrets.get(scope="quintoandar", key="EMLIO_KAFKA_API_SECRET")
 
-    df = (
-        spark_client.conn.readStream.format("kafka")
-        .option("kafka.bootstrap.servers", kafka_brokers)
-        .option("subscribe", kafka_topic)
-        .option("auto.offset.reset", "earliest")
-        .option("failOnDataLoss", "false")
-        .option("kafka.group.id", "emlio")
-        .option("enable.auto.commit", False)
-        .load()
-    )
+    logger.info(f"m={JOB_NAME}, msg=Retrieved Kafka credentials, key_length={len(kafka_api_key) if kafka_api_key else 0}, secret_length={len(kafka_api_secret) if kafka_api_secret else 0}")
+
+    kafka_options = {
+        "kafka.bootstrap.servers": kafka_brokers,
+        "subscribe": kafka_topic,
+        "kafka.security.protocol": "SASL_SSL",
+        "kafka.sasl.mechanism": "PLAIN",
+        "kafka.sasl.jaas.config": f'org.apache.kafka.common.security.plain.PlainLoginModule required username="{kafka_api_key}" password="{kafka_api_secret}";',
+        "kafka.group.id": "emlio",
+        "startingOffsets": "earliest",
+        "failOnDataLoss": "false",
+    }
+    df = spark_client.conn.readStream.format("kafka").options(**kafka_options).load()
 
     raw_df = df.withColumn("key", col("key").cast("string")).withColumn(
         "value", col("value").cast("string")

@@ -8,8 +8,8 @@ clean_partition_cols:
   - year
   - month
   - day
-kafka_brokers: kafka-01.svc.core-frn.habitat.zone:9092,kafka-02.svc.core-frn.habitat.zone:9092,kafka-03.svc.core-frn.habitat.zone:9092
-kafka_topic: emlio-logs
+kafka_brokers: lkc-2yo85o-j29g53.us-east-1.aws.glb.confluent.cloud:9092
+kafka_topic: forno_mlops.emlio-logs
 load_format: json
 path_prefix: s3://
 checkpoints_path_suffix: /raw/emlio/checkpoints
