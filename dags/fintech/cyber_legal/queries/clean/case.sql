@@ -100,5 +100,3 @@ SELECT
     day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.case
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
