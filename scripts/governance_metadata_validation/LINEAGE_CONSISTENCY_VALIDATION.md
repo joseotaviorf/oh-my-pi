@@ -16,8 +16,8 @@ As confirmed by code analysis:
 
 ## What does the script validate?
 
-✅ All columns in the SQL query exist in the metadata file  
-✅ All columns in the metadata exist in the SQL query  
+✅ All columns in the SQL query exist in the metadata file
+✅ All columns in the metadata exist in the SQL query
 ✅ Column names match exactly (case-insensitive)
 
 ## Parsing Skip List
@@ -34,14 +34,13 @@ As confirmed by code analysis:
 1. `weekly_available_booking_hours.sql` - PIVOT clause
 2. `proposal_situation_changes.sql` - GET_JSON_OBJECT() with complex syntax
 3. `trino_detractor_queries.sql` - CAST + templates
-4. `repressed_demand.sql` - Complex syntax
-5. `keywords_from_players.sql` - 1223 lines with multiple UNION ALL
-6. `iptu_bh.sql` - String/syntax edge cases
-7. `gsc_keyword_region_attributes_bra.sql` - Parsing issues
-8. `daily_table_usage_per_user.sql` - Token issues
-9. `accounts_payable.sql` - Underscore field names
+4. `keywords_from_players.sql` - 1223 lines with multiple UNION ALL
+5. `iptu_bh.sql` - String/syntax edge cases
+6. `gsc_keyword_region_attributes_bra.sql` - Parsing issues
+7. `daily_table_usage_per_user.sql` - Token issues
+8. `accounts_payable.sql` - Underscore field names
 
-**Total**: 9 SQL files
+**Total**: 8 SQL files
 
 ### How to add a file to the parsing skip list:
 
@@ -52,7 +51,7 @@ As confirmed by code analysis:
    ```yaml
    parsing_skip_list:
      # ... existing files ...
-     
+
      # REASON for skipping (PIVOT, GET_JSON_OBJECT, etc.)
      - dags/domain/dag_name/queries/layer/file.sql
    ```
@@ -62,10 +61,10 @@ As confirmed by code analysis:
 
 ### What happens to files in the parsing skip list:
 
-✅ **CI/CD won't fail** if you modify them  
-⚠️ **Warning is shown** in validation output  
-📝 **Manual validation strongly recommended** when modifying these files  
-✅ **Other files continue to be validated** normally  
+✅ **CI/CD won't fail** if you modify them
+⚠️ **Warning is shown** in validation output
+📝 **Manual validation strongly recommended** when modifying these files
+✅ **Other files continue to be validated** normally
 📄 **Centralized in skip_list.yml** for easier maintenance
 
 ## How to use
@@ -224,4 +223,3 @@ Validation works for the following layers:
 - [Main README](README.md)
 - [Validation script](validate_lineage_consistency.py)
 - [Lineage documentation](../../docs/lineage.md) (if exists)
-
