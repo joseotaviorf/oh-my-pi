@@ -32,7 +32,7 @@ WHERE
     AND updated_at >= TIMESTAMP(MAKE_DATE({year}, {month}, {day})) + INTERVAL 3 HOUR
     AND updated_at < TIMESTAMP(MAKE_DATE({year}, {month}, {day}) + INTERVAL 1 DAY) + INTERVAL 3 HOUR
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_ticket_metric, ts_updated ORDER BY dt_extracted, solved_at DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY id_ticket_metric, ts_updated ORDER BY dt_extracted DESC, solved_at DESC) = 1
 )
 SELECT
     id_ticket_metric,
