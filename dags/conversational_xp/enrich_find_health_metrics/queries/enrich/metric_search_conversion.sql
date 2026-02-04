@@ -50,7 +50,7 @@ search_impressions_actions AS (
   SELECT
     GET_JSON_OBJECT(ids, '$.id_user') AS id_user,
     GET_JSON_OBJECT(ids, '$.id_house') AS id_house,
-    GET_JSON_OBJECT(dimensions, '$.business_context') AS business_context,
+    UPPER(GET_JSON_OBJECT(dimensions, '$.business_context')) AS business_context,
     GET_JSON_OBJECT(metrics, '$.click') = '1' AS is_search_click,
     GET_JSON_OBJECT(metrics, '$.direct_offer') = '1' AS has_direct_offer,
     GET_JSON_OBJECT(metrics, '$.offer') = '1' AS has_offer,
