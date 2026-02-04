@@ -578,20 +578,6 @@ bietlejuice.enrich_repairs:
     - bietlejuice.repairs_fast_lane:load-clean-repair-request:first-run-of-day
 bietlejuice.enrich_reverses_monitoring:
   add:
-    - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-csat-front:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-demand-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-email:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-fcr-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-general-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-recontact-mx:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-recontact:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-speech-call:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-speech-chat:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-taxonomy:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-tickets-transferred:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-tmr:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-csat-front:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric:first-run-of-day
@@ -921,23 +907,7 @@ bietlejuice.reverse_aec:
   add:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
-bietlejuice.reverse_atento_access:
-  add:
-    - bietlejuice.reverse_atento:load-reverse-backlog-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-csat-front:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-demand-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-email:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-fcr-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-general-metric:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-recontact-mx:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-recontact:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-speech-call:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-speech-chat:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-taxonomy:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-tickets-transferred:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-tmr:first-run-of-day
-    - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht:first-run-of-day
-bietlejuice.reverse_atento_test:
+bietlejuice.reverse_atento:
   add:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metric:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-csat-front:first-run-of-day

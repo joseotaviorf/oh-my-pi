@@ -4,7 +4,7 @@ dag:
   owner: Data SS
   documentation:
     dag_purpose: |
-      Reverses atento & Webhelp context enrichment table. The objective of this table is to be able to maintain daily monitoring of the execution of the bases.
+      Reverse Webhelp context enrichment table. The objective of this table is to be able to maintain daily monitoring of the execution of the Webhelp bases.
 workflow:
   type: query_delta
   layer: enrich
