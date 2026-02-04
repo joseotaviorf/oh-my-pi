@@ -291,8 +291,14 @@ bietlejuice.dw_compensation:
   - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-ladder:first-run-of-day
   - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job:first-run-of-day
   - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
   - bietlejuice.pin_core:load-clean-rates:first-run-of-day
+  - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
+  - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-communication:first-run-of-day
   - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events:first-run-of-day

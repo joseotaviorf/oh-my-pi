@@ -1,0 +1,223 @@
+database_name: dw_compensation
+table_name: dim_job
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  SCD Type 2 dimension containing job information with compensation targets and salary table details.
+  Includes information about jobs, bands, and salary tables.
+  Tracks historical changes in job attributes, variable compensation targets, and salary ranges.
+  Used for PLR calculation, compensation reporting, and salary positioning analysis.
+  
+  Each row represents a specific version of a job with its associated salary table and band information.
+  When any dimension attribute changes (job details, salary table, band, country, etc.), a new version is created.
+  Consecutive periods with identical dimension attributes are automatically consolidated into a single version to avoid unnecessary versioning.
+
+columns:
+  sk_job:
+    description: Surrogate key for the job version, directly uses id_job.
+    lineage:
+      - datalake_pin_core_clean.job.id_job
+  job_code:
+    description: Business code for the job (e.g., "00033", "00134").
+    lineage:
+      - datalake_pin_core_clean.job.job_code
+  job_name:
+    description: Job title in English (US).
+    lineage:
+      - datalake_pin_core_clean.job_translation.name
+  job_family:
+    description: Job family name grouping similar jobs (e.g., Analistas, Gerentes).
+    lineage:
+      - datalake_pin_core_clean.job_family_translation.job_family_name
+  band:
+    description: |
+      Salary/seniority band for the job (e.g., "5", "6", "7", "Assist", "JA").
+      Represents the hierarchical level or seniority of the position.
+      Higher numeric bands usually indicate greater seniority.
+    lineage:
+      - datalake_pin_core_clean.grade_translation.name
+      - datalake_pin_core_clean.valid_grades.id_grade
+  career_track:
+    description: Contribution level (e.g., Contribuidor Individual, Líder).
+    lineage:
+      - datalake_pin_core_clean.job.contribution_level
+  job_business_unit_group:
+    description: Business unit from set identifiers.
+    lineage:
+      - datalake_pin_core_clean.set_identifiers.set_name
+  salary_table:
+    description: |
+      Name of the salary table that groups the bands (e.g., "Eng SP", "PM SP", "Classifieds Geral").
+      The name usually indicates the area/function and country/region.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+  country:
+    description: |
+      Country associated with the salary table, inferred from the table name pattern.
+      Possible values: Brazil, Portugal, Mexico, Argentina, Peru, Ecuador, Panama, Uruguay, United States.
+      Detection logic:
+      - Special cases: "Deel" = United States, "Classifieds Geral" = Uruguay
+      - Country codes detected when at the end of the table name: "PT" = Portugal, "MX" = Mexico, "ARG" = Argentina, "PER" = Peru, "ECU" = Ecuador, "PAN" = Panama
+      - Examples: "Corp PT" → Portugal, "Classifieds - Sales L ARG" → Argentina
+      - Tables without country suffix or with country code in the middle (e.g., "Corp ARG - Dridco S.A.U") default to Brazil
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+  salary_table_group:
+    description: |
+      Grouping category for analysis and reporting.
+      Possible values:
+      - By area: PM, DA, Eng, Prod, DSR, Growth, Ops Sale
+      - By level: EXEC (band >= 12), Estag (interns), JA (young apprentice)
+      - By country: Argentina, Peru, Ecuador, Panama, Portugal, Mexico, Uruguay, United States
+      Useful for comparing salary ranges across similar areas.
+      Country detection follows the same logic as the country column.
+    lineage:
+      - datalake_pin_core_clean.grade_ladder_translation.name
+      - datalake_pin_core_clean.grade_translation.name
+  salary_basis_name:
+    description: |
+      Descriptive name of the salary basis (e.g., "Base Salarial Eng SP").
+      Identifies the payment configuration associated with this table/band.
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.salary_basis_name
+  salary_frequency:
+    description: |
+      Payment frequency code of the salary basis.
+      Common values: MONTHLY, HOURLY.
+      Use together with annualization_factor for conversions.
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.salary_basis_code
+  salary_basis_type:
+    description: Salary basis type in Oracle HCM. Always "U" (User-defined) for QuintoAndar.
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.salary_basis_type
+  brazilian_occupation_code:
+    description: CBO - Classificação Brasileira de Ocupações.
+    lineage:
+      - datalake_pin_core_clean.job_legislative.brazilian_occupation_code
+  working_hours_regime:
+    description: Work arrangement or legal working hours regime.
+    lineage:
+      - datalake_pin_core_clean.job.work_arrangement
+  workload:
+    description: Weekly working hours.
+    lineage:
+      - datalake_pin_core_clean.job.weekly_hours
+  currency_target_sop:
+    description: Currency for SOP target values.
+    lineage:
+      - datalake_pin_core_clean.job.target_sop_currency
+  currency_salary_range:
+    description: |
+      Currency used for salary range values.
+      Common values: BRL (Brazilian Real), USD (Dollar), UYU (Uruguayan Peso), MXN (Mexican Peso).
+      All values (minimum, mid, maximum) are in this currency.
+    lineage:
+      - datalake_pin_core_clean.rates.currency_code
+  annualization_factor:
+    description: |
+      Factor to convert salary value to annual basis.
+      Example: 12 for monthly salary (12 months), 13 for monthly with 13th salary.
+      Calculation: annual_salary = reported_salary * annualization_factor
+    lineage:
+      - datalake_pin_compensation_clean.salary_bases.annualization_factor
+  target_plr:
+    description: PLR target percentage for the job.
+    lineage:
+      - datalake_pin_core_clean.job.target_plr
+  target_plr_salary_multiplier:
+    description: PLR salary multiplier used in Classifieds (LATAM).
+    lineage:
+      - datalake_pin_core_clean.job.target_plr_salary_multiplier
+  target_rvv:
+    description: RVV (variable compensation) target for the job.
+    lineage:
+      - datalake_pin_core_clean.job.target_rvv
+  target_sop:
+    description: SOP (stock option) target for the job.
+    lineage:
+      - datalake_pin_core_clean.job.target_sop
+  target_hiring_sop:
+    description: Hiring SOP target for the job.
+    lineage:
+      - datalake_pin_core_clean.job.target_hiring_sop
+  target_exceptional_bonus:
+    description: Exceptional bonus target for the job (renamed from target_bonus_tech_usd).
+    lineage:
+      - datalake_pin_core_clean.job.target_bonus_tech_usd
+  salary_range_min:
+    description: |
+      Minimum salary range value for this band (P80).
+      Represents the acceptable salary floor for the level.
+      Values below may indicate need for adjustment or promotion.
+    lineage:
+      - datalake_pin_core_clean.rate_values.minimum_value
+  salary_range_mid:
+    description: |
+      Midpoint salary range value for this band (P100).
+      Represents the target salary for fully qualified professionals at the level.
+      Commonly used as reference for salary positioning.
+    lineage:
+      - datalake_pin_core_clean.rate_values.mid_value
+  salary_range_max:
+    description: |
+      Maximum salary range value for this band (P120).
+      Represents the salary ceiling for the level.
+      Values above may indicate need for band promotion.
+    lineage:
+      - datalake_pin_core_clean.rate_values.maximum_value
+  has_clock_in:
+    description: Whether the job requires clock-in/clock-out.
+    lineage:
+      - datalake_pin_core_clean.job.is_time_clocking_required
+  is_active:
+    description: Whether the job is currently active in the system.
+    lineage:
+      - datalake_pin_core_clean.job.is_active
+  is_current:
+    description: |
+      Boolean flag indicating if this version is current as of the load reference date.
+      For current data queries, always filter by is_current = TRUE.
+      Calculated based on dt_valid_from and dt_valid_to relative to the load reference date.
+    lineage:
+      - datalake_pin_core_clean.job.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
+      - datalake_pin_core_clean.rates.dt_effective_started
+      - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_started
+      - datalake_pin_core_clean.job.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
+      - datalake_pin_core_clean.rates.dt_effective_ended
+      - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
+  dt_valid_from:
+    description: |
+      Date from which this job version became effective.
+      Represents when this specific combination of job and salary table attributes became valid.
+      Use for historical analysis and identifying when adjustments occurred.
+    lineage:
+      - datalake_pin_core_clean.job.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder.dt_effective_started
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
+      - datalake_pin_core_clean.rates.dt_effective_started
+      - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_started
+  dt_valid_to:
+    description: |
+      Date until which this job version remains valid (exclusive).
+      NULL means no scheduled end date (potentially current record).
+    lineage:
+      - datalake_pin_core_clean.job.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder.dt_effective_ended
+      - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
+      - datalake_pin_core_clean.rates.dt_effective_ended
+      - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
+      - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
+  ts_load:
+    description: Timestamp recording when data was loaded into the table.

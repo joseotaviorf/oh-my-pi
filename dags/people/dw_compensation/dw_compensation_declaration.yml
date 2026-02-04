@@ -27,6 +27,6 @@ workflow:
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   tables_customization:
-    dim_salary_table:
+    dim_job:
       vacuum_retention_hours: 168
       vacuum_lite: true
