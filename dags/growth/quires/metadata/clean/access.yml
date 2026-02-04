@@ -12,6 +12,10 @@ columns:
     description: Plate information associated with the access record
     lineage:
       - datalake_quires_raw.access.plate
+  id_device:
+    description: Device identifier associated with the access record
+    lineage:
+      - datalake_quires_raw.access.deviceId
   ts_created:
     description: Timestamp when the access record was created
     lineage:

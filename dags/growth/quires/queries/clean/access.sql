@@ -1,5 +1,6 @@
 SELECT
     id,
+    deviceId AS id_device,
     plate,
     CAST(createdAt AS TIMESTAMP) AS ts_created,
     year,
