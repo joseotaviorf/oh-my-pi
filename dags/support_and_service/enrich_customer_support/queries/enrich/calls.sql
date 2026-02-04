@@ -18,6 +18,7 @@ WITH sss_and_sauron_call_sessions AS (
   WHERE 
     source in ('call_in_app', 'call')
     AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
+    AND ts_created >= DATE('2025-11-10')
 ), call_sessions AS ( 
   SELECT
     source_identity,
