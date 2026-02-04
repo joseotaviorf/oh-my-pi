@@ -70,10 +70,6 @@ columns:
     description: "Month when the alert was created (truncated to first day of the month)"
     lineage:
       - datalake_cyber_legal_homolog_clean.case_alert.dt_created
-  dt_alert:
-    description: "Date when the alert was triggered"
-    lineage:
-      - datalake_cyber_legal_homolog_clean.case_alert.dt_alert_expired
   dt_alert_expired:
     description: "Alert expiration date"
     lineage:

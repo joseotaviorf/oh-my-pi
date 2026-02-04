@@ -51,7 +51,6 @@ SELECT
     END AS aging,
     DATE(a.dt_created),
     DATE(DATE_TRUNC('month',a.dt_created)) AS month_created,
-    DATE(a.dt_alert) AS dt_alert,
     DATE(a.dt_alert_expired) AS dt_alert_expired,
     DATE(a.dt_reviewed) AS dt_reviewed
 FROM datalake_cyber_legal_homolog_clean.case_alert AS a

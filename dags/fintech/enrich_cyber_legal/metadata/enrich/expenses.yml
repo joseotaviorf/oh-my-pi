@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_homolog
 table_name: expenses
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Expense report from the cyber legal system, based on 'Relatório de Custas - Fechamento de Lote', including case details, agency information, and expense type descriptions. Only includes authorized expenses that have been reimbursed.
 columns:
@@ -9,6 +9,10 @@ columns:
     description: "Unique case identifier linking the expense to a specific legal case."
     lineage:
       - datalake_cyber_legal_homolog_clean.case_expense.id_case
+  id_invoice:
+    description: "Invoice identifier code - Mandatory field provided by attorney."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.id_invoice
   id_agency:
     description: "Agency identifier associated with the expense, linking to the agency responsible for the case."
     lineage:
@@ -25,6 +29,34 @@ columns:
     description: "Dossier number - Business primary key of the legal case."
     lineage:
       - datalake_cyber_legal_homolog_clean.case.id_dossier
+  id_stage:
+    description: "Procedural stage identifier where expense is being registered."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.id_stage
+  id_attorney:
+    description: "Attorney or manager who registered the expense."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.id_attorney
+  id_supervisor_attorney:
+    description: "Supervisor attorney or manager who authorized the expense."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.id_supervisor_attorney
+  invoice_description:
+    description: "Invoice description provided by attorney."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.invoice_description
+  action:
+    description: "Type of legal process or case classification (process_type from case table)."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.process_type
+  expense_type:
+    description: "Expense type as parameterized in CyberEngine and selected by attorney."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.expense_type
+  expense_subtype:
+    description: "Expense subtype as parameterized in CyberEngine."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.expense_subtype
   agency_name:
     description: "Human-readable name of the agency associated with the expense."
     lineage:
@@ -49,15 +81,35 @@ columns:
     description: "Detailed description of the specific expense, providing additional context about the expense purpose."
     lineage:
       - datalake_cyber_legal_homolog_clean.case_expense.expense_description
-  dt_captured:
-    description: "Date when the expense was captured in the system."
+  is_authorized:
+    description: "Expense authorization flag (TRUE=authorized, FALSE=not authorized)."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.is_authorized
+  is_payment_made:
+    description: "Payment made flag indicating if payment was realized (TRUE/FALSE)."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.is_payment_made
+  is_reimbursed:
+    description: "Expense reimbursement status (TRUE=reimbursed, FALSE=not reimbursed)."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.is_reimbursed
+  dt_lauch:
+    description: "Date when the expense was captured in the system (launch date)."
     lineage:
       - datalake_cyber_legal_homolog_clean.case_expense.dt_captured
-  dt_invoice:
-    description: "Invoice date when expense was actually incurred."
+  dt_expense_real:
+    description: "Invoice date when expense was actually incurred - Mandatory field."
     lineage:
       - datalake_cyber_legal_homolog_clean.case_expense.dt_invoice
+  dt_authorized:
+    description: "Date of expense authorization or rejection."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.dt_authorized
   dt_reimbursed:
     description: "Date when the expense was reimbursed, indicating completion of the expense process."
     lineage:
       - datalake_cyber_legal_homolog_clean.case_expense.dt_reimbursed
+  dt_recovered:
+    description: "Date when expense was recovered from client."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_expense.dt_recovered
