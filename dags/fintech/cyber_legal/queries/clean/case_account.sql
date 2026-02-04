@@ -3,8 +3,5 @@ SELECT
     CCACCTG AS id_contract_group,
     CCACCT AS id_contract,
     CCDTUPD AS ts_updated,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.caseacct

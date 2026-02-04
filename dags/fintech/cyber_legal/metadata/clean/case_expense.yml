@@ -109,11 +109,5 @@ columns:
     description: "Timestamp of the last update"
     lineage:
       - datalake_cyber_legal_homolog_raw.caexpns.EXDTUPD
-  year:
-    description: "Year partition"
-  month:
-    description: "Month partition"
-  day:
-    description: "Day partition"
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"

@@ -17,8 +17,5 @@ SELECT
     CNDT AS dt_requested,
     CNREQDT AS dt_request_approved,
     CNDTUPD AS ts_updated,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.cantfylg

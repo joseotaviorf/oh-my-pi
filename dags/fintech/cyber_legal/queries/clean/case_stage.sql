@@ -20,8 +20,5 @@ SELECT
     CSSTDT AS dt_stage_start,
     CSENDDT AS dt_stage_end,
     CSDTUPD AS ts_updated,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.casestag

@@ -11,8 +11,5 @@ SELECT
     ALREVDT AS dt_reviewed,
     ALALERTDT AS dt_alert_expired,
     ALDTUPD AS ts_updated,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.caalert

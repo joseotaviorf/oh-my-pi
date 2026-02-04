@@ -95,8 +95,5 @@ SELECT
     CELWYPRVREF AS dt_previous_attorney_assigned,
     CELWYAGNREF AS dt_attorney_agency_assigned,
     CEDTUPD AS ts_updated,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.case

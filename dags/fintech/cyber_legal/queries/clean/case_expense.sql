@@ -25,8 +25,5 @@ SELECT
     EXDTRELCLI AS dt_recovered,
     EXDTRELAGN AS dt_reimbursed,
     EXDTUPD AS ts_updated,
-    year,
-    month,
-    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_homolog_raw.caexpns
