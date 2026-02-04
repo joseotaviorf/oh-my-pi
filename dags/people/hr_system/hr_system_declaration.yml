@@ -80,7 +80,6 @@ workflow:
     jobs:
       extra_spark_job_arguments:
         - deduplication_key: "JobId"
-          column_to_partition: "CreationDate"
           params:
             onlyData: true
             orderBy: "JobId:asc"
@@ -91,7 +90,6 @@ workflow:
     organizations:
       extra_spark_job_arguments:
         - deduplication_key: "OrganizationId"
-          column_to_partition: "CreationDate"
           params:
             onlyData: true
             orderBy: "OrganizationId:asc"
@@ -103,7 +101,6 @@ workflow:
       extraction_type: full
       extra_spark_job_arguments:
         - deduplication_key: "SalaryId"
-          column_to_partition: "LastUpdateDate"
           params:
             onlyData: true
             orderBy: "SalaryId:asc"
@@ -113,10 +110,8 @@ workflow:
               - "salaryPayRateComponents"
               - "salarySimpleComponents"
     workers:
-      partitions: ["dt_effective"]
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
-          column_to_partition: "CreationDate"
           has_dt_effective: true
           params:
             onlyData: true
