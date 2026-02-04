@@ -30,3 +30,6 @@ workflow:
     dim_job:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    dim_plr_parameters:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

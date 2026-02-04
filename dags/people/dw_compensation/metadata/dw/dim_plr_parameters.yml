@@ -1,0 +1,110 @@
+database_name: dw_compensation
+table_name: dim_plr_parameters
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Dimension containing PLR (Profit and Results Sharing) calculation parameters by reference year.
+  Includes corporate goals achievement percentages, IPA defaults, eligibility rules, and payment dates.
+  Used for PLR calculation in fact_plr_monthly table.
+  
+  Each row represents the PLR parameters for a specific reference year.
+  Parameters are configured annually and include:
+  - Corporate goals achievement percentage and minimum thresholds
+  - Default IPA percentage for terminated employees
+  - Eligibility rules (minimum days worked, admission cutoff dates)
+  - Payment dates for different employee categories (active, terminated before/after cutoff)
+
+columns:
+  sk_plr_parameters:
+    description: Surrogate key for PLR parameters, directly uses reference_year.
+  reference_year:
+    description: PLR reference year (e.g., 2025, 2026).
+  pct_corporate_goals:
+    description: |
+      Final corporate goals achievement percentage for the year.
+      Used to calculate final PLR amount: gross_plr = sum_potential_plr × pct_corporate_goals
+      Example: 0.85 = 85% achievement
+      This value is determined after the year ends and is available by 31/03 of the following year.
+      NULL until final result is available.
+  pct_min_corporate_goals:
+    description: |
+      Minimum corporate goals achievement percentage required to trigger PLR payment.
+      Default value is 0.70 (70%).
+      If pct_corporate_goals < pct_min_corporate_goals, no PLR is paid.
+  pct_default_corporate_goals_terminated:
+    description: |
+      Default corporate goals percentage used for LATAM/PT/USA employees terminated before evaluation.
+      Default value is 0.70 (70%).
+      Applied when employee left before evaluation cycle completion (all terminated employees in LATAM/PT/USA).
+  pct_default_ipa_terminated:
+    description: |
+      Default Individual Performance Assessment (IPA) percentage for employees terminated before evaluation.
+      Default value is 0.70 (70%).
+      Applied when:
+      - Brazil: Employee left before dt_evaluation_cycle_started (01/12/2025)
+      - LATAM/PT/USA: All terminated employees (regardless of termination date)
+  pct_min_protected_leave_ipa:
+    description: |
+      Minimum IPA percentage guaranteed for employees on protected leave (parental, health/maternity).
+      Default value is 1.0 (100%).
+      When employee has protected leave (parental leave, health/maternity leave recognized by local authorities),
+      the IPA is guaranteed to be at least 100%.
+      If the employee's actual performance evaluation exceeds 100%, the higher evaluation value is used instead.
+      This ensures employees on protected leave receive at least full PLR for those months, but can receive more if their evaluation warrants it.
+  min_days_worked_in_year_for_eligibility:
+    description: |
+      Minimum number of days worked in the reference year to be eligible for PLR.
+      Default value is 90 days.
+      Employees with fewer days worked in the year are not eligible for PLR.
+      Applies to all countries (Brazil, Portugal, USA, LATAM).
+  min_days_worked_in_month_to_count:
+    description: |
+      Minimum number of days worked in a month for it to count as a full month in PLR calculation.
+      Default value is 15 days.
+      If employee worked at least 15 days in a month, the entire month counts for PLR calculation.
+      Months that count: Worked (>=15 days), Vacation, Parental Leave, Health/Maternity Leave (INSS or equivalent).
+      Months that do not count: Unpaid Leave.
+  dt_admission_cutoff:
+    description: |
+      Latest admission date for PLR eligibility.
+      Employees admitted after this date are not eligible for PLR in the reference year.
+      Example: 2025-10-01 (employees admitted on or after October 2nd, 2025 are not eligible).
+      Applies to all countries (Brazil, Portugal, USA, LATAM).
+  dt_evaluation_cycle_started:
+    description: |
+      Date when the evaluation cycle starts for the reference year (Brazil only).
+      Used to determine if employee was terminated before evaluation.
+      Example: 2025-12-01 for Brazil (evaluation cycle starts December 1st).
+      For Brazil: If terminated before this date, uses pct_default_ipa_terminated (70%).
+      For Brazil: If terminated after this date, uses actual evaluation result.
+      For LATAM/PT/USA: Not applicable (all terminated use pct_default_ipa_terminated).
+  dt_payment_cutoff:
+    description: |
+      Cutoff date for payment timing determination.
+      Used to determine which payment date applies to terminated employees.
+      Employees terminated before this date use dt_payment_terminated_br_before_cutoff.
+      Employees terminated after this date use dt_payment_terminated_br_after_cutoff.
+      Example: 2026-03-31
+  dt_payment_active_br:
+    description: |
+      Payment date for active Brazil employees.
+      Date when PLR is paid to Brazil employees who are still active on dt_payment_cutoff (31/03/2026).
+      Example: 2026-04-30 (payment until April 30th, 2026).
+  dt_payment_active_latam_pt_usa:
+    description: |
+      Payment date for active LATAM, Portugal, and USA employees.
+      Date when PLR is paid to active employees in these countries.
+      Example: 2026-04-30 (payment until April 30th, 2026).
+  dt_payment_terminated_br_after_cutoff:
+    description: |
+      Payment date for Brazil employees terminated after dt_payment_cutoff.
+      Date when PLR is paid to Brazil employees who were terminated on or after 31/03/2026.
+      These employees were active on the cutoff date, so they receive payment with active employees.
+      Example: 2026-04-30 (payment until April 30th, 2026).
+  dt_payment_terminated_br_before_cutoff:
+    description: |
+      Payment date for Brazil employees terminated before dt_payment_cutoff.
+      Date when PLR is paid to Brazil employees who were terminated before 31/03/2026.
+      Example: 2026-06-30 (payment on June 30th, 2026).
+  ts_load:
+    description: Timestamp recording when data was loaded into the table.
