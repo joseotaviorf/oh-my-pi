@@ -35,8 +35,6 @@ workflow:
       clean_table_name: user_pro_owner
     UserProOwner_AUD:
       clean_table_name: user_pro_owner_aud
-    Usuario:
-      clean_table_name: user
     Usuario_AUD:
       clean_table_name: user_aud
   extra_query_template_params:

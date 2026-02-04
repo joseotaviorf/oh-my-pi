@@ -68,4 +68,4 @@ SELECT
     lastLoggedAt AS ts_last_logged,
     instantLogin AS is_instant_login
 FROM
-    datalake_ebdb_test_raw.`Usuario`
+    datalake_ebdb_raw.`Usuario`
