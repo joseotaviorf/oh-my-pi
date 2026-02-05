@@ -1,7 +1,7 @@
 SELECT
     2025 AS sk_plr_parameters,
     2025 AS reference_year,
-    NULL AS pct_corporate_goals,
+    CAST(NULL AS DECIMAL(3,2)) AS pct_corporate_goals,
     0.70 AS pct_min_corporate_goals,
     0.70 AS pct_default_corporate_goals_terminated,
     0.70 AS pct_default_ipa_terminated,

@@ -39,8 +39,8 @@ column_level_validations:
         (SELECT COUNT(*)
          FROM dw_compensation.dim_plr_parameters
          WHERE pct_corporate_goals IS NOT NULL
-            AND (pct_corporate_goals < 0
-                 OR pct_corporate_goals > 1.5)
+           AND (pct_corporate_goals < 0
+                OR pct_corporate_goals > 1.5)
         ) = 0
       severity_level: Error
   pct_min_corporate_goals:
