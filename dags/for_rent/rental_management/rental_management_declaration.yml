@@ -35,7 +35,6 @@ workflow:
     key_location_preference_log: {}
     key_location_return_address: {}
     third_party_bills: {}
-    billback: {}
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
