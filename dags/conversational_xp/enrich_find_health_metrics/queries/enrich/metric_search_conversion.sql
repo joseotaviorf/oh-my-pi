@@ -56,11 +56,11 @@ search_impressions_actions AS (
     GET_JSON_OBJECT(metrics, '$.offer') = '1' AS has_offer,
     GET_JSON_OBJECT(metrics, '$.visit_booked') = '1' AS has_visit_booked,
     GET_JSON_OBJECT(metrics, '$.contract_signed') = '1' AS has_contract_signed,
-    GET_JSON_OBJECT(timestamps, '$.ts_search') AS ts_search,
-    GET_JSON_OBJECT(timestamps, '$.ts_direct_offer') AS ts_direct_offer,
-    GET_JSON_OBJECT(timestamps, '$.ts_offer') AS ts_offer,
-    GET_JSON_OBJECT(timestamps, '$.ts_visit_booked') AS ts_visit_booked,
-    GET_JSON_OBJECT(timestamps, '$.ts_contract_signed') AS ts_contract_signed
+    TO_TIMESTAMP(GET_JSON_OBJECT(timestamps, '$.ts_search')) AS ts_search,
+    TO_TIMESTAMP(GET_JSON_OBJECT(timestamps, '$.ts_direct_offer')) AS ts_direct_offer,
+    TO_TIMESTAMP(GET_JSON_OBJECT(timestamps, '$.ts_offer')) AS ts_offer,
+    TO_TIMESTAMP(GET_JSON_OBJECT(timestamps, '$.ts_visit_booked')) AS ts_visit_booked,
+    TO_TIMESTAMP(GET_JSON_OBJECT(timestamps, '$.ts_contract_signed')) AS ts_contract_signed
   FROM datalake_search.search_impressions
   WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
@@ -71,62 +71,66 @@ search_impressions_actions AS (
     ) /* filter users who clicked on a search and did VB or DO */
   GROUP BY ALL
 )
+
+, rent_sale_flow_search AS (
 SELECT
-  rent_sale_flow.id_user,
-  rent_sale_flow.id_house,
+  rs.id_user,
+  rs.id_house,
   CONCAT(
-    rent_sale_flow.id_user, '__',
-    rent_sale_flow.id_house
+    rs.id_user, '__',
+    rs.id_house
   ) AS id_user_house,
   MD5(CONCAT(
-    rent_sale_flow.id_user, '__',
-    rent_sale_flow.id_house, 
-    rent_sale_flow.business_context, --  to ensure uniqueness as there are visits from SALE that was also in rent_flow
-    rent_sale_flow.ts_first_flow_action)) AS id_unique,
-  rent_sale_flow.business_context,
-  IF(NOT rent_sale_flow.ts_direct_offer IS NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
-  COALESCE(search_impressions_actions.is_search_click, FALSE) AS is_search_click,
-  IF(
-    search_impressions_actions.has_visit_booked OR NOT rent_sale_flow.ts_visit_booked IS NULL,
-    TRUE,
-    FALSE
-  ) AS has_visit_booked,
-  IF(
-    search_impressions_actions.has_direct_offer OR NOT rent_sale_flow.ts_direct_offer IS NULL,
-    TRUE,
-    FALSE
-  ) AS has_direct_offer,
-  IF(search_impressions_actions.has_offer OR NOT rent_sale_flow.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
-  IF(
-    search_impressions_actions.has_contract_signed
-    OR NOT rent_sale_flow.ts_contract_signed IS NULL,
-    TRUE,
-    FALSE
-  ) AS has_contract_signed,
-  COALESCE(
-    DATEDIFF(DAY, search_impressions_actions.ts_search, search_impressions_actions.ts_visit_booked) <= 14,
-    FALSE
-  ) AS is_search_click_and_visit_booked_within_14_days,
-  COALESCE(
-    DATEDIFF(DAY, search_impressions_actions.ts_search, search_impressions_actions.ts_direct_offer) <= 14,
-    FALSE
-  ) AS is_search_click_and_direct_offer_within_14_days,
-  COALESCE(
-    DATEDIFF(DAY, search_impressions_actions.ts_search, search_impressions_actions.ts_visit_booked) <= 14
-    OR DATEDIFF(DAY, search_impressions_actions.ts_search, search_impressions_actions.ts_direct_offer) <= 14,
-    FALSE
-  ) AS is_search_click_and_vb_or_do_within_14_days,
-  COALESCE(
-    DATEDIFF(DAY, search_impressions_actions.ts_search, search_impressions_actions.ts_offer) <= 14,
-    FALSE
-  ) AS is_search_click_and_offer_within_14_days,
-  rent_sale_flow.ts_first_flow_action,
-  YEAR(rent_sale_flow.ts_first_flow_action) AS year,
-  MONTH(rent_sale_flow.ts_first_flow_action) AS month,
-  DAY(rent_sale_flow.ts_first_flow_action) AS day
-FROM rent_sale_flow
-LEFT JOIN search_impressions_actions
-  ON rent_sale_flow.id_house = search_impressions_actions.id_house
-  AND rent_sale_flow.id_user = search_impressions_actions.id_user
-  AND rent_sale_flow.business_context = search_impressions_actions.business_context
+    rs.id_user, '__',
+    rs.id_house, 
+    rs.business_context, --  to ensure uniqueness as there are visits from SALE that was also in rent_flow
+    rs.ts_first_flow_action)) AS id_unique,
+  rs.business_context,
+  IF(rs.ts_direct_offer IS NOT NULL, 'Direct Offer', 'Visit Booked') AS user_house_first_contact,
+
+  COALESCE(sia.is_search_click, FALSE) AS is_search_click,
+  IF(sia.has_visit_booked OR NOT rs.ts_visit_booked IS NULL, TRUE, FALSE) AS has_visit_booked,
+  IF(sia.has_direct_offer OR NOT rs.ts_direct_offer IS NULL, TRUE, FALSE) AS has_direct_offer,
+  IF(sia.has_offer OR NOT rs.ts_offer IS NULL, TRUE, FALSE) AS has_offer,
+  IF(sia.has_contract_signed OR NOT rs.ts_contract_signed IS NULL, TRUE, FALSE) AS has_contract_signed,
+
+  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_visit_booked) <= 14, FALSE) AS is_search_click_and_visit_booked_within_14_days,
+  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_direct_offer) <= 14, FALSE) AS is_search_click_and_direct_offer_within_14_days,
+  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_visit_booked) <= 14 OR DATEDIFF(DAY, sia.ts_search, sia.ts_direct_offer) <= 14, FALSE) AS is_search_click_and_vb_or_do_within_14_days,
+  COALESCE(DATEDIFF(DAY, sia.ts_search, sia.ts_offer) <= 14, FALSE) AS is_search_click_and_offer_within_14_days,
+
+  rs.ts_first_flow_action,  
+  YEAR(rs.ts_first_flow_action) AS year,
+  MONTH(rs.ts_first_flow_action) AS month,
+  DAY(rs.ts_first_flow_action) AS day
+FROM rent_sale_flow AS rs
+LEFT JOIN search_impressions_actions AS sia
+  ON rs.id_house = sia.id_house
+  AND rs.id_user = sia.id_user
+  AND rs.business_context = sia.business_context
 GROUP BY ALL
+)
+SELECT 
+      id_user,
+      id_house,
+      id_user_house,
+      id_unique,
+      business_context,
+      MAX(user_house_first_contact) AS user_house_first_contact,
+      MAX(is_search_click) AS is_search_click,
+      MAX(has_visit_booked) AS has_visit_booked,
+      MAX(has_direct_offer) AS has_direct_offer,
+      MAX(has_offer) AS has_offer,
+      MAX(has_contract_signed) AS has_contract_signed,
+      MAX(is_search_click_and_visit_booked_within_14_days) AS is_search_click_and_visit_booked_within_14_days,
+      MAX(is_search_click_and_direct_offer_within_14_days) AS is_search_click_and_direct_offer_within_14_days,
+      MAX(is_search_click_and_vb_or_do_within_14_days) AS is_search_click_and_vb_or_do_within_14_days,
+      MAX(is_search_click_and_offer_within_14_days) AS is_search_click_and_offer_within_14_days,
+      MAX(ts_first_flow_action) AS ts_first_flow_action,
+      MAX(year) AS year,
+      MAX(month) AS month,
+      MAX(day) AS day
+
+FROM rent_sale_flow_search
+GROUP BY
+  id_user, id_house, id_user_house, id_unique, business_context
