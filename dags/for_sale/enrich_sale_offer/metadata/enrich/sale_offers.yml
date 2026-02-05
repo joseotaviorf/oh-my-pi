@@ -295,6 +295,10 @@ columns:
     lineage:
       - datalake_sale_offer.core_sale_offer.ts_offer_rescued
     description: Timestamp when a previously discarded or canceled offer was rescued and accepted again.
+  ts_sale_agreement_drafted:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_sale_agreement_drafted
+    description: Timestamp when the sale agreement draft was sent to operations support. Only available for SalesFlow originated offers.
   ts_sale_agreement_created:
     lineage:
       - datalake_sale_offer.core_sale_offer.ts_sale_agreement_created

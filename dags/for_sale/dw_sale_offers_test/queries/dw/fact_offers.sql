@@ -56,6 +56,7 @@ SELECT
     eso.ts_offer_dismissed AS ts_offer_dismissed,
     eso.ts_offer_canceled,
     eso.ts_offer_rescued AS ts_offer_rescued,
+    eso.ts_sale_agreement_drafted,
     eso.ts_sale_agreement_created AS ts_sale_agreement_created,
     eso.ts_sale_agreement_signed AS ts_sale_agreement_signed,
     eso.ts_sale_agreement_canceled,

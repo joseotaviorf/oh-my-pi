@@ -350,6 +350,7 @@ SELECT
   o.ts_offer_discarded AS ts_offer_dismissed,
   o.ts_offer_canceled,
   o.ts_offer_rescued,
+  o.ts_sale_agreement_drafted,
   o.ts_sale_agreement_created,
   o.ts_sale_agreement_signed,
   rf.ts_sale_agreement_canceled AS ts_sale_agreement_canceled,

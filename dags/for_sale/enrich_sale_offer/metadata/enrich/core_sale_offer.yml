@@ -198,6 +198,10 @@ columns:
       - datalake_sales_flow_clean.offer.ts_updated
       - datalake_firestore_clean.sale_offer.ts_updated
     description: Timestamp when the offer was last updated.
+  ts_sale_agreement_drafted:
+    lineage:
+      - datalake_sales_flow_clean.negotiation.ts_sent_to_operations_support
+    description: Timestamp when the sale agreement draft was sent to operations support. Only available for SalesFlow originated offers.
   ts_sale_agreement_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_confection_started

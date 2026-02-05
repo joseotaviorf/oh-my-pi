@@ -320,6 +320,18 @@ payment AS (
         offers AS sfo
             ON sfo.id_sales_flow = p.id_sales_flow
 ),
+negotiation AS (
+    SELECT
+        n.id_sales_flow,
+        n.sent_to_operations_support_by,
+        n.ts_sent_to_operations_support AS ts_sale_agreement_drafted, 
+        n.ts_created,
+        n.ts_updated
+    FROM
+        datalake_sales_flow_clean.negotiation AS n
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
+),
 ccv_flow AS (
     SELECT
         ccv_flow.id_ccv_flow,
@@ -407,7 +419,8 @@ sale_offer AS (
         off_drh.ts_last_offer_accepted AS ts_offer_accepted,
         off_drh.ts_last_offer_discarded AS ts_offer_discarded,
         off_drh.is_a_rescued_offer,
-        off_drh.ts_rescued_offer AS ts_offer_rescued
+        off_drh.ts_rescued_offer AS ts_offer_rescued,
+        nne.ts_sale_agreement_drafted
     FROM
         offers AS off
     LEFT JOIN
@@ -433,13 +446,16 @@ sale_offer AS (
             ON h.id = sf.id_house
     LEFT JOIN
         mortgage AS mt
-            ON mt.id_sales_flow = sf.id
+            ON mt.id_sales_flow = off.id_sales_flow
+    LEFT JOIN
+        negotiation AS nne
+            ON nne.id_sales_flow = off.id_sales_flow
     LEFT JOIN
         ccv_flow AS ccv_flow
-            ON ccv_flow.id_sales_flow = sf.id
+            ON ccv_flow.id_sales_flow = off.id_sales_flow
     LEFT JOIN
         agent AS a
-            ON a.id_sales_flow = sf.id
+            ON a.id_sales_flow = off.id_sales_flow
 ),
 unified_offers AS (
     
@@ -485,6 +501,7 @@ unified_offers AS (
         vo.ts_offer_discarded,
         vo.ts_offer_rescued,
         vo.ts_offer_updated AS ts_updated,
+        vo.ts_sale_agreement_drafted,
         vo.ts_sale_agreement_created,
         vo.ts_sale_agreement_signed
     FROM
@@ -534,6 +551,7 @@ unified_offers AS (
         CAST(NULL AS TIMESTAMP) AS ts_offer_discarded,
         CAST(NULL AS TIMESTAMP) AS ts_offer_rescued,
         g.ts_updated AS ts_updated,
+        CAST(NULL AS TIMESTAMP) AS ts_sale_agreement_drafted,
         CAST(NULL AS TIMESTAMP) AS ts_sale_agreement_created,
         CAST(NULL AS TIMESTAMP) AS ts_sale_agreement_signed
     FROM
@@ -582,6 +600,7 @@ SELECT
     ts_offer_discarded,
     ts_offer_rescued,
     ts_updated,
+    ts_sale_agreement_drafted,
     ts_sale_agreement_created,
     ts_sale_agreement_signed
 FROM

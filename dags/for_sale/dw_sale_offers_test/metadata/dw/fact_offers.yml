@@ -240,6 +240,10 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offers.ts_offer_rescued
     description: Timestamp of offer rescued
+  ts_sale_agreement_drafted:
+    lineage:
+    - datalake_sale_offer.sale_offers.ts_sale_agreement_drafted
+    description: Timestamp of sale agreement draft creation
   ts_sale_agreement_created:
     lineage:
     - datalake_sale_offer.sale_offers.ts_sale_agreement_created
