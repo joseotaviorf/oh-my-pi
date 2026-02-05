@@ -1,0 +1,81 @@
+database_name: datalake_ebdb_clean
+table_name: house_event_log
+owner: camila.stenico@quintoandar.com.br
+domain: For Sale
+description: 'Abstract base table for tracking different types of house and listing events, providing an audit history of changes.'
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.id
+    description: 'Primary ID for the house event log (auto-generated).'
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.house_id
+    description: 'ID of the house (Imovel) that was updated.'
+  id_actor:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.actor_identifier
+    description: '"The identifier of the user who performed the action that triggered the status change.'
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.business_context
+    description: 'Business context related to the event.'
+    categories:
+      RENT: 'Event related to a rental listing.'
+      SALE: 'Event related to a sale listing.'
+  actor_type:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.actor_type
+    description: 'Type of actor who performed the action'
+    categories:
+      USER: 'A user registered in the platform (owner, renter, agent, etc.)'
+      PERSON: 'A person identified by CPF or other personal identifier'
+      SERVICE: 'An internal or external service making API calls.'
+      SYSTEM: 'System-generated action (automated processes, scheduled jobs, background tasks)'
+  actor_role:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.actor_role
+    description: 'Role of the actor in the context of this operation'
+    categories:
+      SUPPLY: 'The owner of the property.'
+      DEMAND: 'The person interested in renting or buying the property.'
+      OPS: 'A member of the internal teams (operations, support, etc.).'
+      AGENT: 'The agent responsible for the property.'
+      TENANT: 'The current tenant living in the property.'
+      COMPANY_REPRESENTATIVE: 'A representative of a company when the property belongs to third-party companies.'
+      SYSTEM: 'System-generated action (automated processes, scheduled jobs, etc.).'
+  on_behalf_of:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.on_behalf_of
+    description: 'Indicates on whose behalf the action was performed. Used when the actor performs an action representing another party. The values are the same as the actor_role.'
+    categories:
+      SUPPLY: 'The owner of the property.'
+      DEMAND: 'The person interested in renting or buying the property.'
+      OPS: 'A member of the internal teams (operations, support, etc.).'
+      AGENT: 'The agent responsible for the property.'
+      TENANT: 'The current tenant living in the property.'
+      COMPANY_REPRESENTATIVE: 'A representative of a company when the property belongs to third-party companies.'
+  channel:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.channel
+    description: 'Channel through which the event occurred (e.g., MAGIC_LINK, OWNER_PWA, WHATSAPP).'
+  event_type:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.event_type
+    description: 'Type of event that occurred'
+    categories:
+      LISTING_STATUS_UPDATE: 'The listing status was updated.'
+      PRICE_UPDATE: 'The price was updated.'
+  journey:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.journey
+    description: 'Journey or flow associated with this event (e.g., onboarding, maintenance, relisting).'
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.created_at
+    description: 'Timestamp of when the event record was created in the source.'
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.HouseEventLog.updated_at
+    description: 'Timestamp of the last update to the event record in the source.'
+

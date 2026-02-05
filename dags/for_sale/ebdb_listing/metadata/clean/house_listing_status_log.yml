@@ -1,0 +1,60 @@
+database_name: datalake_ebdb_clean
+table_name: house_listing_status_log
+owner: camila.stenico@quintoandar.com.br
+domain: For Sale
+description: 'Table for tracking status change events for house listings, recording status and sub-status transitions, along with the reason and additional context. It can be joined to the `HouseEventLog` table to capture detailed event information (house ID, business context, actor information, etc.).'
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.id
+    description: 'Primary ID for the house listing status log (shared with parent HouseEventLog via JOINED inheritance).'
+  status_from:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.status_from
+    description: 'Previous status of the listing before the change. Examples: EDITING, PUBLISHED, SUSPENDED, UNPUBLISHED, EXCLUDED.'
+  status_to:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.status_to
+    description: 'New status of the listing after the change. Examples: EDITING, PUBLISHED, SUSPENDED, UNPUBLISHED, EXCLUDED.'
+  substatus_from:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.substatus_from
+    description: 'Previous substatus of the listing before the change. Examples: WAITING_CONFIRMATION, CONSEQUENCES_MANAGEMENT, ADVANCED_OFFER, CONTRACT_ONGOING.'
+  substatus_to:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.substatus_to
+    description: 'New substatus of the listing after the change. Examples: WAITING_CONFIRMATION, CONSEQUENCES_MANAGEMENT, ADVANCED_OFFER, CONTRACT_ONGOING.'
+  reason_category:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.reason_category
+    description: 'Category of the reason for the status change. Broader classification that groups similar reasons together.'
+    categories:
+      RENT_GAVE_UP: 'The owner gave up renting the property.'
+      SALE_GAVE_UP: 'The owner gave up selling the property.'
+      RENTED_EXTERNALLY: 'The property was rented externally.'
+      RENT_PLATFORM_DISSATISFACTION: 'The owner is dissatisfied with the platform in the rental context.'
+      SALE_PLATFORM_DISSATISFACTION: 'The owner is dissatisfied with the platform in the sale context.'
+      RENT_TEMPORARILY_UNAVAILABLE: 'The property is temporarily unavailable in the rental context.'
+      SALE_TEMPORARILY_UNAVAILABLE: 'The property is temporarily unavailable in the sale context.'
+      CONSEQUENCES_MANAGEMENT: 'The owner is being penalized for not complying with the company policies.'
+      LISTING_QUALITY_NON_COMPLIANT: 'The listing is not compliant with the quality standards.'
+      NEGOTIATION_FAILURE: 'The negotiation failed.'
+      BROKER_DEACCREDITATION: 'The broker was de-credited.'
+      PP_MULTI: 'Related to operational processes of PP Multi.'
+      CONTRACT_TERMINATION: 'The contract was terminated and the listing is not eligible for publication.'
+  reason:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.reason
+    description: 'Specific reason for the status change. Examples: SELLING_INTEREST_ONLY, SHORT_TERM_RENTAL, OWNER_GAVE_UP_RENTING, RELISTING.'
+  additional_context:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.additional_context
+    description: 'Additional context provided by the actor who performed the status change. Optional free-text field that captures user input beyond the predefined reason.'
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.created_at
+    description: 'Timestamp of when the status change event was created in the source.'
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.HouseListingStatusLog.updated_at
+    description: 'Timestamp of the last update to the status change event in the source.'
