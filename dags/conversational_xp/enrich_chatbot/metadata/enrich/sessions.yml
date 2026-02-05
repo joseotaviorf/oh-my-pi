@@ -75,7 +75,6 @@ columns:
     lineage:
     - datalake_langfuse_clean.observations.input
     - datalake_customer_support.tickets.first_queue
-    - datalake_sauron_clean.session.department
   last_queue:
     description: 'Last support queue'
     lineage:

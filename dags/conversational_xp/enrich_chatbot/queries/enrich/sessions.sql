@@ -158,7 +158,11 @@ SELECT
   s.status,
   lv.version,
   CASE
-    WHEN t.id_ticket IS NOT NULL THEN REPLACE(eq.queue, '[AeC] ', '')
+    WHEN t.id_ticket IS NOT NULL THEN 
+      COALESCE(
+        REPLACE(eq.queue, '[AeC] ', ''),
+        t.first_queue
+      )
     ELSE NULL
   END AS first_queue,
   REPLACE(t.last_queue, '[AeC] ', '') AS last_queue,
