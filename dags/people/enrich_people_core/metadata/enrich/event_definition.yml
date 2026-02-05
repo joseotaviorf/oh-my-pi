@@ -1,0 +1,70 @@
+database_name: datalake_people_core
+table_name: event_definition
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Enriched table that combines action and action_reason from PIN Core into event definitions.
+  
+  This table creates a unified view of all action-reason combinations that have been used
+  in action_occurrence, joining with translation tables for human-readable names.
+  
+  The grain is one row per unique combination of id_action + id_action_reason (event definition).
+  
+  Key features:
+  - Unified identifier (id_event_definition) combining action and reason IDs
+  - English and Portuguese translations for action and reason names
+  - Validity dates for both action and reason
+  
+  Use cases:
+  - Reference table for DW dimension tables (dim_event_definition)
+  - Lookup table for action and reason descriptions
+  - Cross-domain reference for People analytics
+
+columns:
+  id_event_definition:
+    description: |
+      Unified identifier combining id_action and id_action_reason.
+      Format: {id_action}-{id_action_reason}
+  id_action:
+    description: System-generated primary key for the action.
+  id_reason:
+    description: System-generated primary key for the action reason.
+  action_code:
+    description: Unique code that identifies the action (e.g., "HIR", "TER", "PROM").
+  reason_code:
+    description: Unique code that identifies the action reason.
+  action_name:
+    description: Action name in English (US).
+  reason_name:
+    description: Action reason name in English (US).
+  action_description:
+    description: Long description of the action in English (US).
+  action_name_ptb:
+    description: Action name in Portuguese (PTB).
+  reason_name_ptb:
+    description: Action reason name in Portuguese (PTB).
+  action_description_ptb:
+    description: Long description of the action in Portuguese (PTB).
+  is_current:
+    description: |
+      TRUE if the event definition is currently valid.
+      Both action and reason must have no end date or end date in the future.
+  dt_valid_from:
+    description: |
+      Start date of the event definition validity.
+      Calculated as GREATEST(dt_action_started, dt_reason_started).
+  dt_valid_to:
+    description: |
+      End date of the event definition validity.
+      Calculated as LEAST(dt_action_ended, dt_reason_ended).
+      NULL if both action and reason have no end date (or Oracle's 4712-12-31).
+  dt_action_started:
+    description: The date from which the action is active.
+  dt_action_ended:
+    description: The date until which the action is active (NULL if still active).
+  dt_reason_started:
+    description: The date from which the action reason is active.
+  dt_reason_ended:
+    description: The date until which the action reason is active (NULL if still active).
+  ts_load:
+    description: Timestamp of when the record was loaded into the table.

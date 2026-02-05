@@ -3072,6 +3072,12 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-store:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
+bietlejuice.enrich_people_core:
+  - bietlejuice.pin_core:load-clean-action-base:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-action-translation:first-run-of-day
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day
