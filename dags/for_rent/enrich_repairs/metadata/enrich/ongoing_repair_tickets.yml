@@ -208,6 +208,14 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.ts_assigned
     description: Local timestamp when the ticket was last assigned.
+  ts_latest_analyst_comment:
+    lineage:
+      - datalake_zendesk_clean.ticket_comments
+    description: Timestamp that identifies when the last public comment was posted by the customer service analyst.
+  ts_latest_customer_comment:
+    lineage:
+      - datalake_zendesk_clean.ticket_comments
+    description: Timestamp that identifies when the last public comment was posted by the client.
   year:
     lineage:
       - datalake_zendesk.tickets_current.ts_updated

@@ -83,7 +83,10 @@ WITH ticket_history_base AS (
       'FullService [BACK]',
       'ReparAção (Piloto Urgente)',
       'Reparos PP Multi [BACK]',
-      'ReparAção Comum [BACK]')
+      'ReparAção Comum [BACK]',
+      'Triagem [Porto]',
+      'Atendimento [Porto]',
+      'ReparAção Emergencial [BACK]')
     AND tc.channel NOT IN ('call')
     AND tc.status NOT IN ('deleted')
     AND tc.tags NOT LIKE '%caso_ticket_agregador%'
@@ -320,8 +323,8 @@ WHERE
   AND tc.channel NOT IN ('call', 'whatsapp')
   AND tc.status NOT IN ('deleted')
   AND tc.tags NOT LIKE '%caso_ticket_agregador%'
-  AND tc.client_type NOT LIKE '%prestador%'
+  AND (tc.client_type != 'prestador_de_serviço' OR tc.client_type IS NULL)
   AND tc.tags NOT LIKE '%reembolso_sem_autorização%'
-  AND tc.tags NOT LIKE '%whatspp_reparos%'
+  AND tc.tags NOT LIKE '%whatsapp_reparos%'
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) = 1
