@@ -35,6 +35,10 @@ workflow:
       clean_table_name: campaigns
       raw_primary_keys: [id]
       clean_primary_keys: [id]
+    notifications_tracking:
+      clean_table_name: notifications_tracking
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
 
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
