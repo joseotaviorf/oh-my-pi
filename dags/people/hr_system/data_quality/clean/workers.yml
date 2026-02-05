@@ -3,9 +3,9 @@ table_name: datalake_hr_system_clean.workers
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 28500
+    greater_than: 9727
     severity_level: Error
 column_level_validations:
   id_person:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
