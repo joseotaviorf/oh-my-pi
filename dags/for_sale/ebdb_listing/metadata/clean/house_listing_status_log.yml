@@ -50,11 +50,3 @@ columns:
     lineage:
       - datalake_ebdb_raw.HouseListingStatusLog.additional_context
     description: 'Additional context provided by the actor who performed the status change. Optional free-text field that captures user input beyond the predefined reason.'
-  ts_created:
-    lineage:
-      - datalake_ebdb_raw.HouseListingStatusLog.created_at
-    description: 'Timestamp of when the status change event was created in the source.'
-  ts_updated:
-    lineage:
-      - datalake_ebdb_raw.HouseListingStatusLog.updated_at
-    description: 'Timestamp of the last update to the status change event in the source.'

@@ -6,8 +6,6 @@ SELECT
     substatus_to,
     reason_category,
     reason,
-    additional_context,
-    created_at AS ts_created,
-    updated_at AS ts_updated
+    additional_context
 FROM
     datalake_ebdb_raw.HouseListingStatusLog
