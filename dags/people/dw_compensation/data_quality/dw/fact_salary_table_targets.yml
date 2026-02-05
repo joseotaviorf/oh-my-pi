@@ -1,0 +1,58 @@
+---
+table_name: dw_compensation.fact_salary_table_targets
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -20
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  sk_salary_table_targets:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  salary_table:
+    is_complete:
+      severity_level: Error
+  band:
+    is_complete:
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  total_active_headcount:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_salary_table_targets
+         WHERE total_active_headcount < 0
+        ) = 0
+      severity_level: Error
+  total_active_jobs:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_salary_table_targets
+         WHERE total_active_jobs < 0
+        ) = 0
+      severity_level: Error
+  has_headcount_exceptions:
+    is_complete:
+      severity_level: Error
+  has_job_exceptions:
+    is_complete:
+      severity_level: Error
+  is_current:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 0
+      severity_level: Error

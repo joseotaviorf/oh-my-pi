@@ -1,0 +1,76 @@
+database_name: dw_compensation
+table_name: fact_salary_table_targets
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Snapshot fact table containing aggregated compensation target values by salary table and band.
+  
+  This table consolidates target values (PLR, RVV, SOP, etc.) at the salary_table + band level,
+  inferring the most representative value based on active headcount frequency.
+  The entire historical base (last 2 years) is rebuilt on each execution using dim_date.
+  
+  The premise is that for each salary_table + band combination, there is a "default" target value
+  used by the majority of employees, and "exception" values used in specific situations.
+  
+  Key features:
+  - Only considers active jobs (is_active = TRUE) to avoid outdated targets influencing the calculation
+  - Most frequent target values weighted by active headcount
+  - Exception flags for quick identification of inconsistencies
+  - Full historical rebuild using cross join with calendar (dw_public.dim_date)
+  
+  Use cases:
+  - Reference table for PLR/RVV/SOP calculations
+  - Audit and validation of compensation configurations
+  - Identification of target value exceptions
+  - Historical analysis of target value changes over time
+
+columns:
+  sk_salary_table_targets:
+    description: Surrogate key (MD5 hash of salary_table + band + dt_reference).
+  salary_table:
+    description: Name of the salary table (e.g., "Eng SP", "PM SP", "Classifieds Geral").
+  band:
+    description: Salary/seniority band (e.g., "5", "6", "7").
+  target_plr:
+    description: |
+      Most frequent PLR target value for this salary_table + band combination.
+      Determined by the value with highest active headcount frequency.
+  target_plr_salary_multiplier:
+    description: |
+      Most frequent PLR salary multiplier target.
+      Used primarily in Classifieds (LATAM) for PLR calculation.
+  target_rvv:
+    description: |
+      Most frequent RVV (Variable Remuneration) target value.
+  target_sop:
+    description: |
+      Most frequent SOP (Stock Option Plan) target value.
+  target_hiring_sop:
+    description: |
+      Most frequent hiring SOP target value.
+      Applied to new hires as part of hiring package.
+  target_exceptional_bonus:
+    description: |
+      Most frequent exceptional bonus target value.
+      Applied to roles with exceptional bonus that does not follow the usual PLR behavior.
+      Can be used across different areas (Tech, Sales, etc.).
+  total_active_headcount:
+    description: Total count of active employees in this salary_table + band combination at the snapshot date.
+  total_active_jobs:
+    description: Total count of active jobs in this salary_table + band combination at the snapshot date.
+  has_headcount_exceptions:
+    description: |
+      TRUE if any active employee has a different value than the default for any target metric.
+      Indicates the need for deeper analysis of this salary_table + band combination.
+  has_job_exceptions:
+    description: |
+      TRUE if any active job has a different value than the default for any target metric.
+      Indicates the need for deeper analysis of this salary_table + band combination.
+  is_current:
+    description: |
+      TRUE if this record represents the most recent snapshot (dt_reference = CURRENT_DATE()).
+      Use this flag to filter for the current state without knowing the exact date.
+  dt_reference:
+    description: Snapshot date for this record. Used to query historical states.
+  ts_load:
+    description: Timestamp recording when data was loaded into the table.

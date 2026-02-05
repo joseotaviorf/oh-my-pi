@@ -30,6 +30,10 @@ workflow:
     dim_job:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    fact_salary_table_targets:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      z_order_by: ["salary_table", "band", "dt_reference"]
     dim_plr_parameters:
       vacuum_retention_hours: 168
       vacuum_lite: true
