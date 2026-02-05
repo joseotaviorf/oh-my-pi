@@ -163,10 +163,18 @@ columns:
     lineage:
       - datalake_sale_offer.core_sale_offer.planned_payment_method
     description: Initial payment method planned by the buyer at the moment of offer creation.
+  payment_model:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.payment_model
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc).
   credit_model:
     lineage:
       - datalake_sale_offer.core_sale_offer.credit_model
     description: Credit model used for the mortgage financing. Only available for offers with mortgage.
+  tags_from_salesflow:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.tags_from_salesflow
+    description: Tags from the sales flow associated with the offer.
   has_used_fgts_in_payment:
     lineage:
       - datalake_sale_offer.core_sale_offer.has_used_fgts_in_payment

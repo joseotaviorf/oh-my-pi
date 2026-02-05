@@ -63,6 +63,10 @@ columns:
     description:
       Financed, Cash or Undecided. Also see dimension 'Has Used FGTS in
       Payment?' to check if the payment method includes FGTS.
+  payment_model:
+    lineage:
+      - datalake_sale_offer.sale_offers.payment_model
+    description: Payment model agreed in the Sale Agreement.
   credit_model:
     lineage:
       - datalake_sale_offer.sale_offers.credit_model

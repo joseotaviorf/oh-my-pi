@@ -105,6 +105,10 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offers.has_used_negotiation_chat
     description: If the offer deal happened through the negotiation chat
+  tags_from_salesflow:
+    lineage:
+    - datalake_sale_offer.sale_offers.tags_from_salesflow
+    description: Tags from the sales flow associated with the offer
   ts_offer_submitted:
     lineage:
     - datalake_sale_offer.sale_offers.ts_offer_submitted

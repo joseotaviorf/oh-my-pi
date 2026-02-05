@@ -3501,7 +3501,6 @@ bietlejuice.enrich_sale_listings_lenses:
 bietlejuice.enrich_sale_offer:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-  - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
@@ -3527,6 +3526,8 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.sales_flow:load-clean-sales-flow-details:first-run-of-day
   - bietlejuice.sales_flow:load-clean-sales-flow:first-run-of-day
   - bietlejuice.sales_flow:load-clean-specialist:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-sales-flow-tag:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-tag:first-run-of-day
   - bietlejuice.sales_flow:load-clean-users:first-run-of-day
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.docx:load-clean-folder-reference:first-run-of-day

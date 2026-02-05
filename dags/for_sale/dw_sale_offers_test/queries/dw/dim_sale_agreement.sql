@@ -8,6 +8,7 @@ SELECT
     eso.sale_price_agreed,
     eso.brokerage_fee,
     eso.current_payment_method AS payment_method,
+    eso.payment_model,
     eso.credit_model,
     CASE
         WHEN eso.is_ccv_5a_model IS NULL THEN "Not Answered"

@@ -302,6 +302,7 @@ sales_flow AS (
 payment AS (
     SELECT
         p.id_sales_flow,
+        p.payment_model,
         p.payment_method,
         fpm.planned_payment_method,
         p.fgts_value,
@@ -331,6 +332,26 @@ negotiation AS (
         datalake_sales_flow_clean.negotiation AS n
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
+),
+last_update_tag AS (
+    SELECT 
+        *
+    FROM 
+        datalake_sales_flow_clean.tag
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+),
+tag AS (
+    SELECT
+        id_sales_flow,
+        CONCAT_WS('; ', COLLECT_SET(CONCAT('#',label))) AS label
+    FROM
+        datalake_sales_flow_clean.sales_flow_tag AS sftag
+    INNER JOIN
+        last_update_tag AS tag
+            ON sftag.id_tag = tag.id
+    GROUP BY
+        id_sales_flow
 ),
 ccv_flow AS (
     SELECT
@@ -394,6 +415,7 @@ sale_offer AS (
         ft.flow_type,
         off.last_discount_proposed,
         off.first_discount_proposed,
+        p.payment_model,
         p.payment_method,
         p.planned_payment_method,
         off.discard_reason AS drop_reason,
@@ -413,6 +435,7 @@ sale_offer AS (
         CONCAT(sf.id_buyer,'_', h.id_external) AS id_sale_flow,
         a.id_agent,
         ccv_flow.status AS ccv_status,
+        t.label AS tags_from_salesflow,
         ccv_flow.is_5a_model,
         ccv_flow.ts_sale_agreement_created,
         ccv_flow.ts_sale_agreement_signed,
@@ -456,6 +479,9 @@ sale_offer AS (
     LEFT JOIN
         agent AS a
             ON a.id_sales_flow = off.id_sales_flow
+    LEFT JOIN
+        tag AS t
+            ON t.id_sales_flow = off.id_sales_flow
 ),
 unified_offers AS (
     
@@ -471,12 +497,14 @@ unified_offers AS (
         vo.id_agent,
         vo.payment_method AS current_payment_method,
         vo.planned_payment_method,
+        vo.payment_model,
         vo.credit_model,
         vo.status,
         vo.ccv_status,
         vo.flow_type,
         vo.drop_reason,
         vo.drop_reason_responsible,
+        vo.tags_from_salesflow,
         ROUND(vo.sale_listing_price, 2) AS sale_price,
         ROUND(vo.sale_price_agreed, 2) AS sale_price_agreed,
         ROUND(vo.first_price_offered_by_buyer, 2) AS first_price_offered_by_buyer,
@@ -521,12 +549,14 @@ unified_offers AS (
         g.id_agent,
         g.current_payment_method AS current_payment_method,
         CAST(NULL AS STRING) AS planned_payment_method,
+        CAST(NULL AS STRING) AS payment_model,
         CAST(NULL AS STRING) AS credit_model,
         CAST(NULL AS STRING) AS status,
         CAST(NULL AS STRING) AS ccv_status,
         CAST(NULL AS STRING) AS flow_type,
         CAST(NULL AS STRING) AS drop_reason,
         CAST(NULL AS STRING) AS drop_reason_responsible,
+        CAST(NULL AS STRING) AS tags_from_salesflow,
         ROUND(g.sale_price, 2) AS sale_price,
         ROUND(COALESCE(g.last_price_offered_by_buyer, g.sale_price), 2) AS sale_price_agreed,
         ROUND(g.first_price_offered_by_buyer, 2) AS first_price_offered_by_buyer,
@@ -570,12 +600,14 @@ SELECT
     id_agent,
     current_payment_method,
     planned_payment_method,
+    payment_model,
     credit_model,
     status,
     ccv_status,
     flow_type,
     drop_reason,
     drop_reason_responsible,
+    tags_from_salesflow,
     sale_price,
     sale_price_agreed,
     first_price_offered_by_buyer,

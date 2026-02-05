@@ -66,6 +66,10 @@ columns:
       "Seller": "Seller was responsible for dropping the offer"
       "Agent": "Agent was responsible for dropping the offer"
       "Other": "Other party or reason not specified"
+  tags_from_salesflow:
+    lineage:
+      - datalake_sales_flow_clean.tag.label
+    description: Tags from the sales flow associated with the offer.
   current_payment_method:
     lineage:
       - datalake_sales_flow_clean.payment.payment_method
@@ -75,6 +79,10 @@ columns:
     lineage:
       - datalake_sales_flow_clean.payment_aud.payment_method
     description: Initial payment method planned by the buyer at the moment of offer creation. Only available for SalesFlow originated offers.
+  payment_model:
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_model
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc)
   ccv_status:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.status
