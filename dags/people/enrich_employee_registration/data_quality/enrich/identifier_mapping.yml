@@ -1,0 +1,100 @@
+---
+table_name: datalake_employee_registration.identifier_mapping
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
+    severity_level: Warning
+
+column_level_validations:
+  id_assignment:
+    is_complete:
+      severity_level: Warning
+  id_period_of_service:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  id_person:
+    is_complete:
+      severity_level: Warning
+  assignment_number:
+    is_unique:
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  person_number:
+    is_complete:
+      severity_level: Warning
+  assignment_type:
+    is_complete:
+      severity_level: Warning
+    is_contained_in:
+      values: ['E', 'C', 'P']
+      severity_level: Warning
+  assignment_status_type:
+    is_complete:
+      severity_level: Warning
+    is_contained_in:
+      values: ['ACTIVE', 'INACTIVE']
+      severity_level: Warning
+  first_name:
+    is_complete:
+      severity_level: Warning
+  last_name:
+    is_complete:
+      severity_level: Warning
+  full_name:
+    is_complete:
+      severity_level: Warning
+  display_name:
+    is_complete:
+      severity_level: Warning
+  work_email:
+    has_null_percentage:
+      less_than_or_equal_to: 5
+      severity_level: Warning
+  personal_email:
+    has_null_percentage:
+      less_than_or_equal_to: 5
+      severity_level: Warning
+  is_user_test:
+    is_complete:
+      severity_level: Warning
+  is_active:
+    is_complete:
+      severity_level: Warning
+  dt_started:
+    is_complete:
+      severity_level: Warning
+  dt_actual_termination:
+    custom:
+      # Active employees should not have a past termination date
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_employee_registration.identifier_mapping
+         WHERE is_active = TRUE
+            AND dt_actual_termination IS NOT NULL
+            AND dt_actual_termination < CURRENT_DATE
+        ) = 0
+      severity_level: Warning
+  dt_notified_termination:
+    custom:
+      # Active employees should not have a past termination notification date
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_employee_registration.identifier_mapping
+         WHERE is_active = TRUE
+            AND dt_notified_termination IS NOT NULL
+            AND dt_notified_termination < CURRENT_DATE
+        ) = 0
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning

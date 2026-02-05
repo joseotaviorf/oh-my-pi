@@ -3,7 +3,7 @@ table_name: identifier_mapping
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Consolidated table that maps all identifiers for an active employee (person, assignment, registration) in a single location.  It serves as a crosswalk table to unify data from different HR systems  and HCM tables.
+  Consolidated table that maps all identifiers for an employee (person, assignment, registration) in a single location. It serves as a crosswalk table to unify data from different HR systems and HCM tables.
 
 columns:
   id_assignment:
@@ -31,6 +31,14 @@ columns:
     description: The person's identification number in the main HR system.
     lineage:
     - datalake_pin_core_clean.all_people.person_number
+  assignment_type:
+    description: Type of assignment (E for Employee, C for Contingent, P for Pending).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.assignment_type
+  assignment_status_type:
+    description: Current status of the work assignment (e.g., ACTIVE, INACTIVE).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.assignment_status_type
   first_name:
     description: The employee's first name.
     lineage:
@@ -43,6 +51,10 @@ columns:
     description: The employee's full name.
     lineage:
     - datalake_pin_core_clean.person_name.full_name
+  display_name:
+    description: The employee's display name, typically a preferred or formatted name.
+    lineage:
+    - datalake_pin_core_clean.person_name.display_name
   work_email:
     description: The employee's primary work email (W1), in lowercase.
     lineage:
@@ -52,8 +64,28 @@ columns:
     lineage:
     - datalake_pin_core_clean.email_address.email_address
   is_user_test:
-    description: Boolean (TRUE/FALSE) indicating if the employee is a test user (has an ID_ONDA1 identifier).
+    description: Boolean flag indicating if the employee is a test user (has an ID_ONDA1 identifier).
     lineage:
     - datalake_pin_core_clean.external_application_identifier.id_person
+  is_active:
+    description: Boolean flag indicating if the assignment is currently active (TRUE) or not (FALSE).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.assignment_status_type
+  dt_projected_started:
+    description: Projected start date for the employee's activities, usually for future hires.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.dt_projected_started
+  dt_started:
+    description: Effective start date of the work assignment.
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_actual_termination:
+    description: Actual termination date of the work assignment.
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  dt_notified_termination:
+    description: Date on which the termination was notified.
+    lineage:
+    - datalake_pin_core_clean.periods_of_service.dt_notified_termination
   ts_load:
     description: Timestamp indicating when the data was loaded into this table.
