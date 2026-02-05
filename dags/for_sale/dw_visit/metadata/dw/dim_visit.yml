@@ -123,6 +123,14 @@ columns:
     lineage:
       - datalake_visit.visits.visit_request_user_role
     description: Role of user who requested the visit. Data since 2024-11.
+  visit_request_application_source:
+    lineage:
+      - datalake_visit.visits.visit_request_application_source
+    description: Application source when the visit was requested. Data since 2025-10.
+  visit_request_source_unified:
+    lineage:
+      - datalake_visit.visits.visit_request_source_unified
+    description: Source of the visit request unified from channel and application source. Data since 2020.
   first_supply_answer:
     lineage:
       - datalake_visit.visits.first_supply_answer

@@ -2,6 +2,8 @@ SELECT
   id_schedule AS sk_schedule,
   schedule_origin,
   channel_creation,
+  application_source_creation,
+  source_creation_unified,
   user_role_creation AS schedule_requested_user_role,
   first_confirmed_channel AS schedule_first_confirmed_channel,
   first_confirmed_user_role AS schedule_first_confirmed_user_role,

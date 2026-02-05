@@ -19,6 +19,14 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.channel_creation
     description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2024-11.
+  application_source_creation:
+    lineage:
+      - datalake_visit.visit_schedules.application_source_creation
+    description: Application source from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2025-10.
+  source_creation_unified:
+    lineage:
+      - datalake_visit.visit_schedules.source_creation_unified
+    description: Source of the schedule creation unified from channel and application source. Data since 2024-11.
   schedule_requested_user_role:
     lineage:
       - datalake_visit.visit_schedules.user_role_creation

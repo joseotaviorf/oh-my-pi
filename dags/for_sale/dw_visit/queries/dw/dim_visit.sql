@@ -25,6 +25,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.visit_request_channel,
   v.visit_request_on_behalf_of,
   v.visit_request_user_role,
+  v.visit_request_application_source,
+  v.visit_request_source_unified,
   v.first_supply_answer,
   v.first_supply_answer_channel,
   v.first_tenant_living_answer,

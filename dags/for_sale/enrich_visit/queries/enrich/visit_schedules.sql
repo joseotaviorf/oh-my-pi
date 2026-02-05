@@ -20,6 +20,11 @@ WITH schedule AS (
       ) AS channel_creation,
       MAX(
         CASE
+          WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.application_source
+        END
+      ) AS application_source_creation,
+      MAX(
+        CASE
           WHEN vsl.on_behalf_of = 'TENANT_LIVING' THEN vsl.ts_created
         END
       ) AS ts_event_tenant,
@@ -102,6 +107,7 @@ WITH schedule AS (
     first_confirmed_channel,
     first_confirmed_user_role,
     channel_creation,
+    application_source_creation,
     NULL AS dt_schedule_visit,
     ts_event_tenant,
     ts_schedule_created,
@@ -131,6 +137,7 @@ WITH schedule AS (
     NULL AS first_confirmed_channel,
     NULL AS first_confirmed_user_role,
     NULL AS channel_creation,
+    NULL AS application_source_creation,
     dt_schedule_visit,
     NULL AS ts_event_tenant,
     ts_schedule_created,
@@ -170,6 +177,7 @@ schedule_enriched AS (
     schedule.first_confirmed_channel,
     schedule.first_confirmed_user_role,
     schedule.channel_creation,
+    schedule.application_source_creation,
     schedule.ts_event_tenant,
     schedule.ts_schedule_created,
     schedule.ts_schedule_requested,
@@ -415,6 +423,8 @@ SELECT DISTINCT
   v.behavior,
   s.schedule_origin,
   s.channel_creation,
+  s.application_source_creation,
+  IF(s.application_source_creation IS NULL, s.channel_creation, s.channel_creation || ' - ' || s.application_source_creation) AS source_creation_unified,
   s.first_confirmed_channel,
   s.first_confirmed_user_role,
   bha.contract_name AS hub_agent_region,

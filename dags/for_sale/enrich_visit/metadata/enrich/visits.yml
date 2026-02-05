@@ -205,6 +205,15 @@ columns:
     lineage:
       - datalake_ebbd_clean.visit_status_log.author_user_role
     description: Role of user who requested the visit.
+  visit_request_application_source:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.application_source
+    description: Application source when the visit was requested. Data since 2025-10.
+  visit_request_source_unified:
+    lineage:
+      - datalake_visit.visit_origin_unified.visit_request_channel
+      - datalake_visit.visits.visit_request_application_source
+    description: Source of the visit request unified from channel and application source. Data since 2020-01.
   first_supply_answer_channel:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
@@ -253,7 +262,7 @@ columns:
   is_confirmed:
     lineage:
       - datalake_ebdb_clean.visit_status_log.event_type
-      - datalake_ebdb_clean.booking_status_change.reason
+      - datalake_ebdb_clean.booking_status_change.status
     description: If the visit was confirmed by all. Data since 2020.
   is_confirmed_last_schedule:
     lineage:
