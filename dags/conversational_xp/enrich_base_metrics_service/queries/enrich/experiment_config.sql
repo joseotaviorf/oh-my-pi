@@ -239,6 +239,30 @@ FROM VALUES
                                 ),
            'running', True
         )
+    ),
+
+    -- Recs using only user profile essential filters
+    (
+        "ab_beakman_search_services_feed_filter_search_profile_experiment",
+        named_struct(
+            'begin_date', DATE('2026-01-22'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
+
 
 AS experiment_config(experiment_name, config)
