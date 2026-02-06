@@ -56,14 +56,6 @@ column_level_validations:
   display_name:
     is_complete:
       severity_level: Warning
-  work_email:
-    has_null_percentage:
-      less_than_or_equal_to: 5
-      severity_level: Warning
-  personal_email:
-    has_null_percentage:
-      less_than_or_equal_to: 5
-      severity_level: Warning
   is_user_test:
     is_complete:
       severity_level: Warning
