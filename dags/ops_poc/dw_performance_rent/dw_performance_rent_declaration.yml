@@ -1,14 +1,14 @@
 dag:
-  name: dw_performance
+  name: dw_performance_rent
   schedule_start_date: 2026,01,27
   owner: Data Planning and Performance
   documentation:
     dag_purpose: |
-      This DAG load the DW tables for Performance.
+      This DAG load the DW tables for Performance in ForRent context.
 workflow:
   type: query_delta
   layer: dw
-  custom_schema: performance
+  custom_schema: performance_rent
   default_extraction_type: full
 cluster:
   type: custom_cluster

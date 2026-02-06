@@ -1,4 +1,4 @@
-database_name: dw_performance
+database_name: dw_performance_rent
 table_name: fact_ticket_comment_time
 description: The table returns a detailed breakdown of public comments on Back's ticket (email) and calculates the time elapsed between comments.
 domain: Support and Services
