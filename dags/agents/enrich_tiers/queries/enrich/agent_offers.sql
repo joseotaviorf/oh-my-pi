@@ -146,7 +146,7 @@ SELECT
     uoa.id_user_ciq,
     uoa.agent_profile,
     uoa.business_context,
-    uoa.agreement_value,
+    CAST(uoa.agreement_value AS DOUBLE) AS agreement_value,
     uoa.has_tqc,
     uoa.is_ciq_first_listing,
     uoa.dt_contract_cancelled IS NOT NULL AS is_contract_cancelled,

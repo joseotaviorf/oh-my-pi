@@ -14,13 +14,13 @@ WITH sale_contracts AS (
       ON h.id = offer.id_house
   WHERE
     1=1
-    AND offer.dt_sale_agreement_signed IS NOT NULL
-    AND DATE_DIFF(CURRENT_DATE, DATE(offer.dt_sale_agreement_signed)) BETWEEN 0 AND 60
+    AND offer.ts_sale_agreement_signed IS NOT NULL
+    AND DATE_DIFF(CURRENT_DATE, DATE(offer.ts_sale_agreement_signed)) BETWEEN 0 AND 60
     AND offer.last_price_offered_by_buyer BETWEEN 100000 AND 20000000
     AND offer.id_house IS NOT NULL
     AND hpp.business_context = 'SALE'
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY offer.id_house ORDER BY offer.dt_sale_agreement_signed DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY offer.id_house ORDER BY offer.ts_sale_agreement_signed DESC) = 1
 ),
 rent_contracts AS (
   SELECT
