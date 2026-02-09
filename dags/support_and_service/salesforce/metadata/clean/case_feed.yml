@@ -1,0 +1,94 @@
+database_name: datalake_salesforce_clean
+table_name: case_feed
+description: Clean table for ingesting case feed data from the Sales Force tool. Contains feed items and activities associated with cases including comments, likes, and posts.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_case_feed:
+    lineage:
+      - datalake_salesforce_raw.case_feed.Id
+    description: Unique identification key for the case feed record in Sales Force.
+  id_parent:
+    lineage:
+      - datalake_salesforce_raw.case_feed.ParentId
+    description: Parent case identification key this feed item belongs to.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.case_feed.CreatedById
+    description: User identification key who created this feed item.
+  id_related_record:
+    lineage:
+      - datalake_salesforce_raw.case_feed.RelatedRecordId
+    description: Related record identification key associated with this feed item.
+  id_inserted_by:
+    lineage:
+      - datalake_salesforce_raw.case_feed.InsertedById
+    description: User identification key who inserted this feed item.
+  id_best_comment:
+    lineage:
+      - datalake_salesforce_raw.case_feed.BestCommentId
+    description: Best comment identification key for this feed item.
+  feed_type:
+    lineage:
+      - datalake_salesforce_raw.case_feed.Type
+    description: Type of feed item.
+  title:
+    lineage:
+      - datalake_salesforce_raw.case_feed.Title
+    description: Title of the feed item.
+  body:
+    lineage:
+      - datalake_salesforce_raw.case_feed.Body
+    description: Body content of the feed item.
+  link_url:
+    lineage:
+      - datalake_salesforce_raw.case_feed.LinkUrl
+    description: URL link associated with the feed item.
+  network_scope:
+    lineage:
+      - datalake_salesforce_raw.case_feed.NetworkScope
+    description: Network scope of the feed item.
+  visibility:
+    lineage:
+      - datalake_salesforce_raw.case_feed.Visibility
+    description: Visibility setting of the feed item.
+  comment_count:
+    lineage:
+      - datalake_salesforce_raw.case_feed.CommentCount
+    description: Number of comments on this feed item.
+  like_count:
+    lineage:
+      - datalake_salesforce_raw.case_feed.LikeCount
+    description: Number of likes on this feed item.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.case_feed.IsDeleted
+    description: Flag indicating if the feed item is deleted.
+  is_rich_text:
+    lineage:
+      - datalake_salesforce_raw.case_feed.IsRichText
+    description: Flag indicating if the body contains rich text.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.case_feed.CreatedDate
+    description: Timestamp when the feed item was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.case_feed.LastModifiedDate
+    description: Timestamp of the last modification to the feed item.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.case_feed.SystemModstamp
+    description: Timestamp of the last system modification.
+  year:
+    lineage:
+      - datalake_salesforce_raw.case_feed.year
+    description: Year of the case feed record partition.
+  month:
+    lineage:
+      - datalake_salesforce_raw.case_feed.month
+    description: Month of the case feed record partition.
+  day:
+    lineage:
+      - datalake_salesforce_raw.case_feed.day
+    description: Day of the case feed record partition.

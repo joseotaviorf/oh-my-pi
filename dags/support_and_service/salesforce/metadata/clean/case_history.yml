@@ -1,0 +1,54 @@
+database_name: datalake_salesforce_clean
+table_name: case_history
+description: Clean table for ingesting case history data from the Sales Force tool. Contains the history of field changes made to cases.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_case_history:
+    lineage:
+      - datalake_salesforce_raw.case_history.Id
+    description: Unique identification key for the case history record in Sales Force.
+  id_case:
+    lineage:
+      - datalake_salesforce_raw.case_history.CaseId
+    description: Case identification key related to this history record.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.case_history.CreatedById
+    description: User identification key who created this history record.
+  field_name:
+    lineage:
+      - datalake_salesforce_raw.case_history.Field
+    description: Name of the field that was changed.
+  data_type:
+    lineage:
+      - datalake_salesforce_raw.case_history.DataType
+    description: Data type of the field that was changed.
+  old_value:
+    lineage:
+      - datalake_salesforce_raw.case_history.OldValue
+    description: Previous value of the field before the change.
+  new_value:
+    lineage:
+      - datalake_salesforce_raw.case_history.NewValue
+    description: New value of the field after the change.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.case_history.IsDeleted
+    description: Flag indicating if the history record is deleted.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.case_history.CreatedDate
+    description: Timestamp when the history record was created.
+  year:
+    lineage:
+      - datalake_salesforce_raw.case_history.year
+    description: Year of the case history record partition.
+  month:
+    lineage:
+      - datalake_salesforce_raw.case_history.month
+    description: Month of the case history record partition.
+  day:
+    lineage:
+      - datalake_salesforce_raw.case_history.day
+    description: Day of the case history record partition.

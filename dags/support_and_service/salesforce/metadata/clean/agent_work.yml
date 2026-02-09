@@ -1,0 +1,186 @@
+database_name: datalake_salesforce_clean
+table_name: agent_work
+description: Clean table for ingesting agent work data from the Sales Force tool. Contains information about work items assigned to agents including routing, capacity, and timing metrics.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_agent_work:
+    lineage:
+      - datalake_salesforce_raw.agent_work.Id
+    description: Unique identification key for the agent work record in Sales Force.
+  id_owner:
+    lineage:
+      - datalake_salesforce_raw.agent_work.OwnerId
+    description: Owner identification key of the agent work record.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CreatedById
+    description: User identification key who created this record.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.agent_work.LastModifiedById
+    description: User identification key who last modified this record.
+  id_user:
+    lineage:
+      - datalake_salesforce_raw.agent_work.UserId
+    description: User identification key of the agent assigned to this work.
+  id_work_item:
+    lineage:
+      - datalake_salesforce_raw.agent_work.WorkItemId
+    description: Work item identification key associated with this agent work.
+  id_service_channel:
+    lineage:
+      - datalake_salesforce_raw.agent_work.ServiceChannelId
+    description: Service channel identification key for this work item.
+  id_original_queue:
+    lineage:
+      - datalake_salesforce_raw.agent_work.OriginalQueueId
+    description: Original queue identification key from which the work item was routed.
+  id_pending_service_routing:
+    lineage:
+      - datalake_salesforce_raw.agent_work.PendingServiceRoutingId
+    description: Pending service routing identification key.
+  id_preferred_user:
+    lineage:
+      - datalake_salesforce_raw.agent_work.PreferredUserId
+    description: Preferred user identification key for routing.
+  id_original_group:
+    lineage:
+      - datalake_salesforce_raw.agent_work.OriginalGroupId
+    description: Original group identification key.
+  agent_work_name:
+    lineage:
+      - datalake_salesforce_raw.agent_work.Name
+    description: Name of the agent work record.
+  agent_work_status:
+    lineage:
+      - datalake_salesforce_raw.agent_work.Status
+    description: Current status of the agent work.
+  decline_reason:
+    lineage:
+      - datalake_salesforce_raw.agent_work.DeclineReason
+    description: Reason for declining the work item.
+  routing_type:
+    lineage:
+      - datalake_salesforce_raw.agent_work.RoutingType
+    description: Type of routing used for this work item.
+  routing_model:
+    lineage:
+      - datalake_salesforce_raw.agent_work.RoutingModel
+    description: Routing model used for this work item.
+  capacity_model:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CapacityModel
+    description: Capacity model used for agent capacity calculation.
+  capacity_weight:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CapacityWeight
+    description: Capacity weight assigned to this work item.
+  capacity_percentage:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CapacityPercentage
+    description: Capacity percentage consumed by this work item.
+  speed_to_answer:
+    lineage:
+      - datalake_salesforce_raw.agent_work.SpeedToAnswer
+    description: Time in seconds for the agent to answer the work item.
+  agent_capacity_when_declined:
+    lineage:
+      - datalake_salesforce_raw.agent_work.AgentCapacityWhenDeclined
+    description: Agent capacity when the work item was declined.
+  push_timeout:
+    lineage:
+      - datalake_salesforce_raw.agent_work.PushTimeout
+    description: Push timeout in seconds.
+  handle_time:
+    lineage:
+      - datalake_salesforce_raw.agent_work.HandleTime
+    description: Total handle time in seconds.
+  active_time:
+    lineage:
+      - datalake_salesforce_raw.agent_work.ActiveTime
+    description: Active time in seconds the agent spent on the work item.
+  routing_priority:
+    lineage:
+      - datalake_salesforce_raw.agent_work.RoutingPriority
+    description: Priority level for routing.
+  secondary_routing_priority:
+    lineage:
+      - datalake_salesforce_raw.agent_work.SecondaryRoutingPriority
+    description: Secondary priority level for routing.
+  after_conversation_actual_time:
+    lineage:
+      - datalake_salesforce_raw.agent_work.AfterConversationActualTime
+    description: Actual time spent after conversation in seconds.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.agent_work.IsDeleted
+    description: Flag indicating if the record is deleted.
+  is_should_skip_capacity_check:
+    lineage:
+      - datalake_salesforce_raw.agent_work.ShouldSkipCapacityCheck
+    description: Flag indicating if capacity check should be skipped.
+  is_status_change_initiated:
+    lineage:
+      - datalake_salesforce_raw.agent_work.IsStatusChangeInitiated
+    description: Flag indicating if status change was initiated.
+  is_owner_change_initiated:
+    lineage:
+      - datalake_salesforce_raw.agent_work.IsOwnerChangeInitiated
+    description: Flag indicating if owner change was initiated.
+  is_preferred_user_required:
+    lineage:
+      - datalake_salesforce_raw.agent_work.IsPreferredUserRequired
+    description: Flag indicating if preferred user is required.
+  ts_request:
+    lineage:
+      - datalake_salesforce_raw.agent_work.RequestDateTime
+    description: Timestamp when the work item was requested.
+  ts_accept:
+    lineage:
+      - datalake_salesforce_raw.agent_work.AcceptDateTime
+    description: Timestamp when the work item was accepted.
+  ts_decline:
+    lineage:
+      - datalake_salesforce_raw.agent_work.DeclineDateTime
+    description: Timestamp when the work item was declined.
+  ts_close:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CloseDateTime
+    description: Timestamp when the work item was closed.
+  ts_push_timeout:
+    lineage:
+      - datalake_salesforce_raw.agent_work.PushTimeoutDateTime
+    description: Timestamp when push timeout occurred.
+  ts_cancel:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CancelDateTime
+    description: Timestamp when the work item was cancelled.
+  ts_assigned:
+    lineage:
+      - datalake_salesforce_raw.agent_work.AssignedDateTime
+    description: Timestamp when the work item was assigned.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.agent_work.CreatedDate
+    description: Timestamp when the record was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.agent_work.LastModifiedDate
+    description: Timestamp of the last modification to the record.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.agent_work.SystemModstamp
+    description: Timestamp of the last system modification.
+  year:
+    lineage:
+      - datalake_salesforce_raw.agent_work.year
+    description: Year of the agent work record partition.
+  month:
+    lineage:
+      - datalake_salesforce_raw.agent_work.month
+    description: Month of the agent work record partition.
+  day:
+    lineage:
+      - datalake_salesforce_raw.agent_work.day
+    description: Day of the agent work record partition.

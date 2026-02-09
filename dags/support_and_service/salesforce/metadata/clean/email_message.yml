@@ -1,0 +1,162 @@
+database_name: datalake_salesforce_clean
+table_name: email_message
+description: Clean table for ingesting email message data from the Sales Force tool. Contains email communications including headers, body, addresses, and tracking information.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_email_message:
+    lineage:
+      - datalake_salesforce_raw.email_message.Id
+    description: Unique identification key for the email message in Sales Force.
+  id_parent:
+    lineage:
+      - datalake_salesforce_raw.email_message.ParentId
+    description: Parent record identification key (typically a case).
+  id_activity:
+    lineage:
+      - datalake_salesforce_raw.email_message.ActivityId
+    description: Activity identification key associated with this email.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.email_message.CreatedById
+    description: User identification key who created this record.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.email_message.LastModifiedById
+    description: User identification key who last modified this record.
+  id_reply_to_email_message:
+    lineage:
+      - datalake_salesforce_raw.email_message.ReplyToEmailMessageId
+    description: Email message identification key this is a reply to.
+  id_email_template:
+    lineage:
+      - datalake_salesforce_raw.email_message.EmailTemplateId
+    description: Email template identification key used for this message.
+  id_related_to:
+    lineage:
+      - datalake_salesforce_raw.email_message.RelatedToId
+    description: Related record identification key.
+  text_body:
+    lineage:
+      - datalake_salesforce_raw.email_message.TextBody
+    description: Plain text body of the email message.
+  html_body:
+    lineage:
+      - datalake_salesforce_raw.email_message.HtmlBody
+    description: HTML body of the email message.
+  headers:
+    lineage:
+      - datalake_salesforce_raw.email_message.Headers
+    description: Email headers.
+  subject:
+    lineage:
+      - datalake_salesforce_raw.email_message.Subject
+    description: Subject line of the email.
+  from_name:
+    lineage:
+      - datalake_salesforce_raw.email_message.FromName
+    description: Display name of the sender.
+  from_address:
+    lineage:
+      - datalake_salesforce_raw.email_message.FromAddress
+    description: Email address of the sender.
+  validated_from_address:
+    lineage:
+      - datalake_salesforce_raw.email_message.ValidatedFromAddress
+    description: Validated email address of the sender.
+  to_address:
+    lineage:
+      - datalake_salesforce_raw.email_message.ToAddress
+    description: Recipient email addresses.
+  cc_address:
+    lineage:
+      - datalake_salesforce_raw.email_message.CcAddress
+    description: CC recipient email addresses.
+  bcc_address:
+    lineage:
+      - datalake_salesforce_raw.email_message.BccAddress
+    description: BCC recipient email addresses.
+  email_status:
+    lineage:
+      - datalake_salesforce_raw.email_message.Status
+    description: Status of the email message.
+  message_identifier:
+    lineage:
+      - datalake_salesforce_raw.email_message.MessageIdentifier
+    description: Unique message identifier from email headers.
+  thread_identifier:
+    lineage:
+      - datalake_salesforce_raw.email_message.ThreadIdentifier
+    description: Thread identifier for email threading.
+  is_incoming:
+    lineage:
+      - datalake_salesforce_raw.email_message.Incoming
+    description: Flag indicating if the email is incoming.
+  has_attachment:
+    lineage:
+      - datalake_salesforce_raw.email_message.HasAttachment
+    description: Flag indicating if the email has attachments.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsDeleted
+    description: Flag indicating if the record is deleted.
+  is_private_draft:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsPrivateDraft
+    description: Flag indicating if this is a private draft.
+  is_externally_visible:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsExternallyVisible
+    description: Flag indicating if the email is externally visible.
+  is_client_managed:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsClientManaged
+    description: Flag indicating if the email is client managed.
+  is_tracked:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsTracked
+    description: Flag indicating if email opens are being tracked.
+  is_opened:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsOpened
+    description: Flag indicating if the email was opened.
+  is_bounced:
+    lineage:
+      - datalake_salesforce_raw.email_message.IsBounced
+    description: Flag indicating if the email bounced.
+  ts_message:
+    lineage:
+      - datalake_salesforce_raw.email_message.MessageDate
+    description: Timestamp of the email message.
+  ts_first_opened:
+    lineage:
+      - datalake_salesforce_raw.email_message.FirstOpenedDate
+    description: Timestamp when the email was first opened.
+  ts_last_opened:
+    lineage:
+      - datalake_salesforce_raw.email_message.LastOpenedDate
+    description: Timestamp when the email was last opened.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.email_message.CreatedDate
+    description: Timestamp when the record was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.email_message.LastModifiedDate
+    description: Timestamp of the last modification to the record.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.email_message.SystemModstamp
+    description: Timestamp of the last system modification.
+  year:
+    lineage:
+      - datalake_salesforce_raw.email_message.year
+    description: Year of the email message record partition.
+  month:
+    lineage:
+      - datalake_salesforce_raw.email_message.month
+    description: Month of the email message record partition.
+  day:
+    lineage:
+      - datalake_salesforce_raw.email_message.day
+    description: Day of the email message record partition.

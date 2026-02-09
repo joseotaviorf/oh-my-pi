@@ -41,6 +41,7 @@ def parse_arguments():
     parser.add_argument("forno_endpoint")
     parser.add_argument("prod_endpoint")
     parser.add_argument("query")
+    parser.add_argument("source_partition_column")
 
     args = parser.parse_args()
 
@@ -54,8 +55,9 @@ def parse_arguments():
     forno_endpoint = args.forno_endpoint
     prod_endpoint = args.prod_endpoint
     query = args.query
+    source_partition_column = args.source_partition_column
 
-    return environment, bucket, load_start_date, load_end_date, table_name, partitions, schema, forno_endpoint, prod_endpoint, query
+    return environment, bucket, load_start_date, load_end_date, table_name, partitions, schema, forno_endpoint, prod_endpoint, query, source_partition_column
 
 def get_access_token(endpoint, env):
     # Initializing clients
@@ -839,6 +841,144 @@ def schema_define():
                         ]
                     )
             },
+        'case_history':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("IsDeleted", StringType()),
+                        StructField("CaseId", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("Field", StringType()),
+                        StructField("DataType", StringType()),
+                        StructField("OldValue", StringType()),
+                        StructField("NewValue", StringType()),
+                        ]
+                    )
+            },
+        'agent_work':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("OwnerId", StringType()),
+                        StructField("IsDeleted", StringType()),
+                        StructField("Name", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("LastModifiedDate", StringType()),
+                        StructField("LastModifiedById", StringType()),
+                        StructField("SystemModstamp", StringType()),
+                        StructField("UserId", StringType()),
+                        StructField("WorkItemId", StringType()),
+                        StructField("Status", StringType()),
+                        StructField("ServiceChannelId", StringType()),
+                        StructField("OriginalQueueId", StringType()),
+                        StructField("CapacityWeight", StringType()),
+                        StructField("CapacityPercentage", StringType()),
+                        StructField("RequestDateTime", StringType()),
+                        StructField("AcceptDateTime", StringType()),
+                        StructField("DeclineDateTime", StringType()),
+                        StructField("CloseDateTime", StringType()),
+                        StructField("SpeedToAnswer", StringType()),
+                        StructField("AgentCapacityWhenDeclined", StringType()),
+                        StructField("PendingServiceRoutingId", StringType()),
+                        StructField("PushTimeout", StringType()),
+                        StructField("PushTimeoutDateTime", StringType()),
+                        StructField("HandleTime", StringType()),
+                        StructField("ActiveTime", StringType()),
+                        StructField("DeclineReason", StringType()),
+                        StructField("CancelDateTime", StringType()),
+                        StructField("ShouldSkipCapacityCheck", StringType()),
+                        StructField("RoutingType", StringType()),
+                        StructField("RoutingModel", StringType()),
+                        StructField("RoutingPriority", StringType()),
+                        StructField("AssignedDateTime", StringType()),
+                        StructField("PreferredUserId", StringType()),
+                        StructField("IsStatusChangeInitiated", StringType()),
+                        StructField("IsOwnerChangeInitiated", StringType()),
+                        StructField("CapacityModel", StringType()),
+                        StructField("OriginalGroupId", StringType()),
+                        StructField("SecondaryRoutingPriority", StringType()),
+                        StructField("IsPreferredUserRequired", StringType()),
+                        StructField("AfterConversationActualTime", StringType()),
+                        ]
+                    )
+            },
+        'email_message':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("ParentId", StringType()),
+                        StructField("ActivityId", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("LastModifiedDate", StringType()),
+                        StructField("LastModifiedById", StringType()),
+                        StructField("SystemModstamp", StringType()),
+                        StructField("TextBody", StringType()),
+                        StructField("HtmlBody", StringType()),
+                        StructField("Headers", StringType()),
+                        StructField("Subject", StringType()),
+                        StructField("FromName", StringType()),
+                        StructField("FromAddress", StringType()),
+                        StructField("ValidatedFromAddress", StringType()),
+                        StructField("ToAddress", StringType()),
+                        StructField("CcAddress", StringType()),
+                        StructField("BccAddress", StringType()),
+                        StructField("Incoming", StringType()),
+                        StructField("HasAttachment", StringType()),
+                        StructField("Status", StringType()),
+                        StructField("MessageDate", StringType()),
+                        StructField("IsDeleted", StringType()),
+                        StructField("ReplyToEmailMessageId", StringType()),
+                        StructField("IsPrivateDraft", StringType()),
+                        StructField("IsExternallyVisible", StringType()),
+                        StructField("MessageIdentifier", StringType()),
+                        StructField("ThreadIdentifier", StringType()),
+                        StructField("IsClientManaged", StringType()),
+                        StructField("RelatedToId", StringType()),
+                        StructField("IsTracked", StringType()),
+                        StructField("IsOpened", StringType()),
+                        StructField("FirstOpenedDate", StringType()),
+                        StructField("LastOpenedDate", StringType()),
+                        StructField("IsBounced", StringType()),
+                        StructField("EmailTemplateId", StringType()),
+                        ]
+                    )
+            },
+        'case_feed':
+            {
+                'schema':
+                    StructType(
+                        [
+                        StructField("Id", StringType()),
+                        StructField("ParentId", StringType()),
+                        StructField("Type", StringType()),
+                        StructField("CreatedById", StringType()),
+                        StructField("CreatedDate", StringType()),
+                        StructField("IsDeleted", StringType()),
+                        StructField("LastModifiedDate", StringType()),
+                        StructField("SystemModstamp", StringType()),
+                        StructField("CommentCount", StringType()),
+                        StructField("LikeCount", StringType()),
+                        StructField("Title", StringType()),
+                        StructField("Body", StringType()),
+                        StructField("LinkUrl", StringType()),
+                        StructField("IsRichText", StringType()),
+                        StructField("RelatedRecordId", StringType()),
+                        StructField("InsertedById", StringType()),
+                        StructField("NetworkScope", StringType()),
+                        StructField("Visibility", StringType()),
+                        StructField("BestCommentId", StringType()),
+                        ]
+                    )
+            },
         }
 
 def get_next_page_data(query, headers, instance_url, table_name, is_done, next_url):
@@ -859,7 +999,7 @@ def get_next_page_data(query, headers, instance_url, table_name, is_done, next_u
     df_schema = schema_define()[table_name]['schema']
     df = spark.createDataFrame(response_json.get('records', []), schema=df_schema)
 
-    df = df.withColumn("dt_updated", col("LastModifiedDate").cast("date"))
+    df = df.withColumn("dt_updated", col(source_partition_column).cast("date"))
     df = df.withColumn("year", year(col("dt_updated")))
     df = df.withColumn("month", month(col("dt_updated")))
     df = df.withColumn("day", day(col("dt_updated")))
@@ -867,12 +1007,12 @@ def get_next_page_data(query, headers, instance_url, table_name, is_done, next_u
     return df, is_done, next_url
 
 def main():
-    environment, bucket, load_start_date, load_end_date, table_name, partitions, schema, forno_endpoint, prod_endpoint, query = parse_arguments()
+    environment, bucket, load_start_date, load_end_date, table_name, partitions, schema, forno_endpoint, prod_endpoint, query, source_partition_column = parse_arguments()
 
     load_start_timstamp = f"{load_start_date}T00:00:00.000000Z"
     load_end_timstamp = f"{load_end_date}T23:59:59.000000Z"
 
-    query += f" WHERE LastModifiedDate >= {load_start_timstamp} AND LastModifiedDate <= {load_end_timstamp}"
+    query += f" WHERE {source_partition_column} >= {load_start_timstamp} AND {source_partition_column} <= {load_end_timstamp}"
 
     if environment == 'forno':
         access_token, instance_url = get_access_token(forno_endpoint, environment)
