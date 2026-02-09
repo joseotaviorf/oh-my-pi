@@ -2900,7 +2900,7 @@ bietlejuice.enrich_mission_control:
   - bietlejuice.mission_control:load-clean-onboarding:first-run-of-day
   - bietlejuice.mission_control:load-clean-user:first-run-of-day
 bietlejuice.enrich_monopoly:
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.monopoly:load-clean-income-reference:first-run-of-day
   - bietlejuice.monopoly:load-clean-outcome-reference:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day

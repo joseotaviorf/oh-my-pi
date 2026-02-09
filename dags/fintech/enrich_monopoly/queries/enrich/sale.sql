@@ -39,7 +39,7 @@ allow_date AS
         ) AS dt_first_full_down_payment_event,
         MAX(dt_created) AS dt_paid_last_update
     FROM
-        datalake_offer.sale_offer AS so
+        datalake_sale_offer.sale_offer AS so
     LEFT JOIN
         cash_flow AS cf
             ON cf.sk_offer = so.id_offer
@@ -54,11 +54,11 @@ SELECT
     cf_total.cash_flow_amount - (ad.brokerage_amount) AS delta_total_cash_flow_to_broakerage_amount,
     cf.cash_flow_amount AS cash_flow_amount_when_payment_allowed,
     ad.dt_first_full_down_payment_event IS NOT NULL AS is_payment_allowed,
-    DATE(so.dt_sale_agreement_signed) AS dt_sale_agreement_signed,
+    DATE(so.ts_sale_agreement_signed) AS dt_sale_agreement_signed,
     ad.dt_paid_last_update AS dt_total_cash_flow_amount_last_updated,
     ad.dt_first_full_down_payment_event AS dt_occurence
 FROM
-    datalake_offer.sale_offer AS so
+    datalake_sale_offer.sale_offer AS so
 LEFT JOIN
     allow_date AS ad
         ON ad.id_offer = so.id_offer
@@ -71,4 +71,4 @@ LEFT JOIN
         ON cf_total.sk_offer = ad.id_offer
         AND cf_total.dt_created = ad.dt_paid_last_update
 WHERE
-    so.dt_sale_agreement_signed IS NOT NULL
+    so.ts_sale_agreement_signed IS NOT NULL
