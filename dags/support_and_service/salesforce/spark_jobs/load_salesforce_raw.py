@@ -981,7 +981,7 @@ def schema_define():
             },
         }
 
-def get_next_page_data(query, headers, instance_url, table_name, is_done, next_url):
+def get_next_page_data(query, headers, instance_url, table_name, is_done, next_url, source_partition_column):
     # Make a GET request to the Salesforce API
     if next_url is None and is_done == False:
         endpoint = f'/services/data/v52.0/query/?q={query.replace(" ", "+")}'
@@ -1040,7 +1040,7 @@ def main():
     unioned_df = None
 
     while is_done == False:
-        df, is_done, next_url = get_next_page_data(query, headers, instance_url, table_name, is_done, next_url)
+        df, is_done, next_url = get_next_page_data(query, headers, instance_url, table_name, is_done, next_url, source_partition_column)
 
         if unioned_df is None:
             unioned_df = df
