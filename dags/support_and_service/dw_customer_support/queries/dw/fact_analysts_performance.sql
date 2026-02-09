@@ -127,7 +127,7 @@ WITH recontact_data AS (
     datalake_customer_support.tickets AS t
       ON zes.id_ticket = t.id_ticket
   LEFT JOIN
-  datalake_offer.sale_offer eso
+  datalake_sale_offer.sale_offer eso
     ON eso.id_offer = GET_JSON_OBJECT(t.custom_fields, '$["[RC] ID Offer do Imóvel"]')
   WHERE
     zes.id_survey = '2f81495a1a142887'
