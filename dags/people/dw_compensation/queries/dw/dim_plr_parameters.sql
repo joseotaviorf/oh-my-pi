@@ -10,6 +10,7 @@ SELECT
     15 AS min_days_worked_in_month_to_count,
     DATE('2025-10-01') AS dt_admission_cutoff,
     DATE('2025-12-01') AS dt_evaluation_cycle_started,
+    DATE('2026-02-14') AS dt_evaluation_cycle_ended,
     DATE('2026-03-31') AS dt_payment_cutoff,
     DATE('2026-04-30') AS dt_payment_active_br,
     DATE('2026-04-30') AS dt_payment_active_latam_pt_usa,

@@ -78,6 +78,14 @@ columns:
       For Brazil: If terminated before this date, uses pct_default_ipa_terminated (70%).
       For Brazil: If terminated after this date, uses actual evaluation result.
       For LATAM/PT/USA: Not applicable (all terminated use pct_default_ipa_terminated).
+  dt_evaluation_cycle_ended:
+    description: |
+      Date when the evaluation/calibration cycle ends for the reference year.
+      Reference date documenting when the calibration cycle completes.
+      Example: 2026-02-14 (calibration ends February 14th).
+      For Brazil: Not directly used in PLR calculation (Brazil employees use only dt_evaluation_cycle_started).
+      For LATAM/PT/USA: All terminated employees use pct_default_ipa_terminated (70%) regardless of termination date relative to this date.
+      This field is maintained for documentation and reference purposes.
   dt_payment_cutoff:
     description: |
       Cutoff date for payment timing determination.

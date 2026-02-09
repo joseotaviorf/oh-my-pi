@@ -127,6 +127,10 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  dt_evaluation_cycle_ended:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
   dt_payment_cutoff:
     has_null_count:
       less_than_or_equal_to: 1
