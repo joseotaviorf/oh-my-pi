@@ -1,0 +1,52 @@
+---
+database_name: datalake_rental_management_clean
+table_name: billback
+description: |
+  This table contains information about the billback.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: ID of the table, it's the primary key.
+    lineage:
+      - datalake_rental_management_raw.billback.id
+  uuid_cart:
+    description: Cart unique identifier of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.cart_uuid
+  id_third_party_bills:
+    description: Foreign key for the third party bills.
+    lineage:
+      - datalake_rental_management_raw.billback.third_party_bills_id
+  contractual_penalty:
+    description: Fine applied to the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.contractual_penalty
+  amount:
+    description: Amount of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.amount
+  currency:
+    description: Currency code of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.currency
+  status:
+    description: Status of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.status
+  cart_idempotency_key:
+    description: Cart System unique identifier used for idempotency of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.cart_idempotency_key
+  version:
+    description: Version of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.version
+  ts_created:
+    description: Timestamp of the creation of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.created_at
+  ts_updated:
+    description: Timestamp of the update of the billback.
+    lineage:
+      - datalake_rental_management_raw.billback.updated_at
