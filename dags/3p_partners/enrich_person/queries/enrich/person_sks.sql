@@ -9,6 +9,18 @@ WITH contact_info_email AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
 ),
+contact_info_email_quintoandar AS (
+  SELECT
+    ci.id AS id_contact_info_email_quintoandar,
+    ci.id_person
+  FROM
+    datalake_person_clean.contact_info AS ci
+  WHERE
+    ci.category = 'EMAIL'
+    AND ENDSWITH(ci.contact_info, '@quintoandar.com.br')
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
+),
 contact_info_phone AS (
   SELECT
     ci.id AS id_contact_info_phone,
@@ -71,6 +83,7 @@ SELECT
   XXHASH64(p.id) AS sk_person,
   p.id AS id_person,
   cie.id_contact_info_email,
+  cie_qa.id_contact_info_email_quintoandar,
   cip.id_contact_info_phone,
   ps.id AS id_preference_settings,
   rf.id_right_to_be_forgotten,
@@ -102,6 +115,9 @@ FROM
 LEFT JOIN
   contact_info_email AS cie
     ON p.id = cie.id_person
+LEFT JOIN
+  contact_info_email_quintoandar AS cie_qa
+    ON p.id = cie_qa.id_person
 LEFT JOIN
   contact_info_phone AS cip
     ON p.id = cip.id_person

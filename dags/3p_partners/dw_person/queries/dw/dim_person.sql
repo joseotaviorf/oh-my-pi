@@ -2,7 +2,7 @@ SELECT
   psk.sk_person,
   psk.id_person,
   psk.id_user,
-  IF(ENDSWITH(cie.contact_info, '@quintoandar.com.br'), SPLIT(cie.contact_info, '@')[0], NULL) AS id_user_email,
+  SPLIT(cie_qa.contact_info, '@')[0] AS id_user_email,
   psk.uuid_person,
   COALESCE(p.country_code, 'Unknown') AS country_code,
   COALESCE(ps.language, 'Unknown') AS language,
@@ -43,6 +43,9 @@ JOIN
 LEFT JOIN
   datalake_person_clean.contact_info AS cie
     ON cie.id = psk.id_contact_info_email
+LEFT JOIN
+  datalake_person_clean.contact_info AS cie_qa
+    ON cie_qa.id = psk.id_contact_info_email_quintoandar
 LEFT JOIN
   datalake_person_clean.contact_info AS cip
     ON cip.id = psk.id_contact_info_phone

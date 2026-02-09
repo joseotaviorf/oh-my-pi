@@ -261,7 +261,7 @@ columns:
     description: |
       Boolean flag indicating if person has a third party agent member profile.
       **Role**: External agent providing specialized services
-  dt_birth:
+  dt_person_birth:
     lineage: 
       - datalake_person_clean.person.dt_birth
     description: |
