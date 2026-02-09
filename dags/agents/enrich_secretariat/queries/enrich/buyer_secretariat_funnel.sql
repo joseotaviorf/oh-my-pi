@@ -253,10 +253,10 @@ sales_reference_table AS (
         id_offer,
         id_booking,
         ts_offer_submitted,
-        dt_offer_accepted,
-        dt_sale_agreement_signed
+        DATE(ts_offer_accepted) AS dt_offer_accepted,
+        DATE(ts_sale_agreement_signed) AS dt_sale_agreement_signed
     FROM
-        datalake_offer.sale_offer
+        datalake_sale_offer.sale_offer
 ),
 total_offers AS (
     SELECT

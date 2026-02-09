@@ -237,14 +237,14 @@ rent_contract AS (
 sale_contract AS (
   SELECT
     id_house,
-    dt_sale_agreement_signed AS ts_signed,
+    ts_sale_agreement_signed AS ts_signed,
     "SALE" AS business_context
   FROM
-    datalake_offer.sale_offer
+    datalake_sale_offer.sale_offer
   WHERE
-    offer_status = 'OFFER_ACCEPTED'
+    ts_sale_agreement_signed IS NOT NULL
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY dt_sale_agreement_signed ASC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_sale_agreement_signed ASC) = 1
 ),
 supply_source_info_by_context AS (
   SELECT

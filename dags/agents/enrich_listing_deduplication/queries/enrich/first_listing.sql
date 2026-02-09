@@ -48,13 +48,13 @@ first_listing AS (
         lbc.status,
         lbc.business_context,
         hlc.ts_enrollment_started,
-        COALESCE(so.dt_sale_agreement_signed, rde.ts_event) AS ts_contract_signed,
+        COALESCE(so.ts_sale_agreement_signed, rde.ts_event) AS ts_contract_signed,
         lbc.ts_first_listing,
         u.ts_first_unpublished,
         GREATEST(
             lbc.ts_first_listing, 
             TIMESTAMP(hlc.ts_enrollment_started), 
-            COALESCE(so.dt_sale_agreement_signed, rde.ts_event),            
+            COALESCE(so.ts_sale_agreement_signed, rde.ts_event),
             u.ts_first_unpublished
         ) AS ts_updated
     FROM
@@ -68,9 +68,9 @@ first_listing AS (
             ON u.id_house = hlc.id_house
             AND u.business_context = hlc.business_context
     LEFT JOIN
-        datalake_offer.sale_offer AS so
+        datalake_sale_offer.sale_offer AS so
             ON so.id_house = hlc.id_house
-            AND lbc.ts_first_listing <= so.dt_sale_agreement_signed
+            AND lbc.ts_first_listing <= so.ts_sale_agreement_signed
             AND hlc.business_context = "SALE"
     LEFT JOIN
         datalake_rent_demand_events.rent_demand_events AS rde

@@ -2796,7 +2796,7 @@ bietlejuice.enrich_listing_deduplication:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking:first-run-of-day
@@ -3682,7 +3682,7 @@ bietlejuice.enrich_secretariat:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region:first-run-of-day
   - bietlejuice.hub_services:load-clean-lead:first-run-of-day
   - bietlejuice.hub_services:load-clean-responsible:first-run-of-day
@@ -3934,7 +3934,7 @@ bietlejuice.enrich_tiers:
   - bietlejuice.enrich_hub_services_agents:load-enrich-member-hub-allocation:first-run-of-day
   - bietlejuice.enrich_hub_services_agents:load-enrich-users:first-run-of-day
   - bietlejuice.enrich_listing_deduplication:load-enrich-valid-first-listing:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
 bietlejuice.enrich_top_of_funnel_affiliates:

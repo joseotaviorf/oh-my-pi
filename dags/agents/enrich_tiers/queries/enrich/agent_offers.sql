@@ -11,21 +11,21 @@ WITH sale_offer_agents AS (
         os.id_offer IS NOT NULL AS has_broker_tqc,
         os2.id_offer IS NOT NULL AS has_negotiation_executive_tqc,
         IF(
-            DATE(so.dt_sale_agreement_signed) <= so.dt_sale_agreement_cancelled,
-            so.dt_sale_agreement_cancelled,
+            DATE(so.ts_sale_agreement_signed) <= so.ts_sale_agreement_canceled,
+            so.ts_sale_agreement_canceled,
             NULL
         ) AS dt_contract_cancelled,
         so.ts_offer_submitted,
-        so.dt_sale_agreement_signed AS ts_contract_signed,
+        so.ts_sale_agreement_signed AS ts_contract_signed,
         GREATEST(
             so.ts_updated,
             so.ts_offer_submitted, 
-            so.dt_sale_agreement_signed, 
+            so.ts_sale_agreement_signed, 
             os.ts_agent_lead_referral_updated, 
             os2.ts_agent_lead_referral_updated
         ) AS ts_updated
     FROM
-        datalake_offer.sale_offer AS so
+        datalake_sale_offer.sale_offer AS so
     LEFT JOIN
         datalake_sale_offer_flows.offer_specialists AS os
             ON os.id_user_agent_lead_referral = so.id_user_agent

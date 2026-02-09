@@ -78,4 +78,4 @@ columns:
   ts_contract_signed_sale:
     description: Timestamp when the sale agreement was signed.
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed

@@ -8,12 +8,12 @@ columns:
   id_offer:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_offer
-      - datalake_offer.sale_offer.id_offer
+      - datalake_sale_offer.sale_offer.id_offer
     description: Unique identifier of the offer.
   id_house:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_house
-      - datalake_offer.sale_offer.id_house
+      - datalake_sale_offer.sale_offer.id_house
     description: Unique identifier of the house associated with the offer.
   id_contract:
     lineage:
@@ -21,20 +21,20 @@ columns:
     description: Unique identifier of the contract (RENT only).
   id_prospect:
     lineage:
-      - datalake_offer.sale_offer.id_buyer
+      - datalake_sale_offer.sale_offer.id_buyer
       - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
     description: Prospect identifier (buyer on SALE, tenant prospect on RENT).
   id_user:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_agent
-      - datalake_offer.sale_offer.id_user_agent
-      - datalake_offer.sale_offer.id_user_consultant
+      - datalake_sale_offer.sale_offer.id_user_agent
+      - datalake_sale_offer.sale_offer.id_user_consultant
     description: User identifier linked to the agent responsible for the offer event.
   id_agent:
     lineage:
       - datalake_sale_offer_flows.offer_specialists.id_agent
       - datalake_ebdb_user.user.id_agent
-      - datalake_offer.sale_offer.id_agent
+      - datalake_sale_offer.sale_offer.id_agent
     description: Agent identifier associated to the user (broker or negotiation executive).
   uuid_person:
     lineage:
@@ -50,7 +50,7 @@ columns:
     description: Business context of the offer (RENT or SALE).
   agreement_value:
     lineage:
-      - datalake_offer.sale_offer.sale_price_agreed
+      - datalake_sale_offer.sale_offer.sale_price_agreed
     description: Final price agreed for the SALE offer (null for RENT).
   has_tqc:
     description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
@@ -63,43 +63,43 @@ columns:
     description: Indicates whether the offer was signed and generated a purchase and sale agreement.
   dt_contract_cancelled:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_cancelled
+      - datalake_sale_offer.sale_offer.dt_sale_agreement_cancelled
     description: Contract cancellation date when applicable (SALE only).
   ts_contract_signed:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.dt_sale_agreement_signed
     description: Contract signature timestamp (SALE agreement date or RENT contract signed event).
   ts_offer_submitted:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
-      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Offer submission timestamp (SALE offer submitted or RENT offer submitted event).
   ts_updated:
     lineage:
-      - datalake_offer.sale_offer.ts_offer_submitted
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_offer.sale_offer.dt_sale_agreement_signed
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Record update date.
   day:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Day extracted from the record update date (ts_updated).
   month:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Month extracted from the record update date (ts_updated).
   year:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
       - datalake_sale_offer_flows.offer_specialists.ts_agent_lead_referral_updated
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Year extracted from the record update date (ts_updated).
