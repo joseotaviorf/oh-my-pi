@@ -5,7 +5,6 @@ from argparse import ArgumentParser
 from http.client import HTTPException
 
 from quintoandar_logger import QuintoAndarLogger
-from inmetro.messengers import SlackMessenger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.base.spark import BaseDBUtils
@@ -119,14 +118,6 @@ if __name__ == "__main__":
                         )
 
     if tables_to_send_warning:
-        base_dbutils = BaseDBUtils()
-        if base_dbutils.get_dbutils() is not None:
-            dbutils = base_dbutils.get_dbutils()
-        slack_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=SlackWebhooksEnum.ALERTS_AIRFLOW_DE_DAGS_INMETRO
-        )
-
-        messenger = SlackMessenger(slack_webhook)
         messages = __build_warning_messages(
             environment,
             f"s3://{datalake_bucket}/{datalake_path_prefix}",
