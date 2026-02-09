@@ -30,6 +30,11 @@ workflow:
     dim_job:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    fact_compensations:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      merge_on: ["sk_compensation"]
+      z_order_by: ["person_number", "dt_valid_from"]
     fact_salary_table_targets:
       vacuum_retention_hours: 168
       vacuum_lite: true
