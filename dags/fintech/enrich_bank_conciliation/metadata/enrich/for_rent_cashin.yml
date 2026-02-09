@@ -6,22 +6,26 @@ domain: Fintech
 description: Table containing bank reconciliation data for For Rent cash-in payments, comparing bank statements, Retsuko billing, Vans checkout, and SAP entries.
 columns:
   id_company_use:
-    description: "Unique identifier for the payment, derived from company_use in various source systems"
+    description: 'Unique identifier for the payment, derived from company_use in various source systems'
     lineage:
-      - datalake_nexxera.cnab_charges.document_number
-      - datalake_retsuko.invoice.payment_company_use_number
-      - datalake_checkout_clean.boleto.your_number
-      - datalake_vans_clean.boleto.company_use
-      - datalake_vans_clean.boleto.document_number
-      - datalake_pas.ledger.id_external_payment
+    - datalake_nexxera.cnab_charges.document_number
+    - datalake_retsuko.invoice.payment_company_use_number
+    - datalake_checkout_clean.boleto.your_number
+    - datalake_vans_clean.boleto.company_use
+    - datalake_vans_clean.boleto.document_number
+    - datalake_pas.ledger.id_external_payment
+  id_invoice:
+    description: 'Invoice identifier from Retsuko'
+    lineage:
+    - datalake_retsuko.invoice.id_external
   hash:
     description: "Hash values from SAP ledger entries for tracking purposes"
     lineage:
-      - datalake_pas.ledger.hash
+    - datalake_pas.ledger.hash
   bank_number:
-    description: "id form bank without treatment."
+    description: 'Bank document identifier from CNAB charges'
     lineage:
-      - datalake_nexxera.cnab_charges.document_number
+    - datalake_nexxera.cnab_charges.document_number
   bank_account_number:
     description: "Bank account number from Nexxera CNAB charges"
     lineage:
@@ -29,7 +33,17 @@ columns:
   sap_account_number:
     description: "SAP account number from ledger entries"
     lineage:
-      - datalake_pas.ledger.account_number
+    - datalake_pas.ledger.account_number
+  payment_method:
+    description: 'Payment method used in checkout sources'
+    lineage:
+    - datalake_checkout_clean.boleto
+    - datalake_vans_clean.boleto
+  payment_status:
+    description: 'Payment status in checkout sources'
+    lineage:
+    - datalake_checkout_clean.boleto.status
+    - datalake_vans_clean.boleto.status
   bank_amount:
     description: "Amount received in bank statements from Nexxera"
     lineage:

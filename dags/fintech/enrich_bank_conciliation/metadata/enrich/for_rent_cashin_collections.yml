@@ -6,27 +6,32 @@ domain: Fintech
 description: Table containing bank reconciliation data for For Rent cash-in collections, comparing bank statements, checkout records, billing systems, and SAP entries.
 columns:
   id_our_number:
-    description: "Unique identifier for the payment, derived from our_number in various source systems"
+    description: 'Unique identifier for the payment, derived from our_number in various source systems'
     lineage:
-      - datalake_nexxera.cnab_charges_recupera.our_number
-      - datalake_itau_statements_clean.statement_879200452685.origin_complement
-      - datalake_checkout_clean.boleto.our_number
-      - datalake_checkout_clean.bolecode.our_number
-      - datalake_checkout_clean.pix.id_transaction
-      - datalake_trato_feito_clean.installment.id_external
-      - datalake_trato_feito_clean.bill.our_number
-      - datalake_trato_feito_clean.installment_charges.id_charge
-      - datalake_retsuko.invoice.payment_company_use_number
-      - datalake_pas.ledger.id_external_payment
+    - datalake_nexxera.cnab_charges_recupera.our_number
+    - datalake_itau_statements_clean.statement_879200452685.origin_complement
+    - datalake_checkout_clean.boleto.our_number
+    - datalake_checkout_clean.bolecode.our_number
+    - datalake_checkout_clean.pix.id_transaction
+    - datalake_trato_feito_clean.installment.id_external
+    - datalake_trato_feito_clean.bill.our_number
+    - datalake_trato_feito_clean.installment_charges.id_charge
+    - datalake_retsuko.invoice.payment_company_use_number
+    - datalake_pas.ledger.id_external_payment
+  id_invoice:
+    description: 'Invoice identifier from billing systems'
+    lineage:
+    - datalake_trato_feito_clean.bill.id_external
+    - datalake_retsuko.invoice.id_external
   hash:
     description: "Hash values from SAP ledger entries for tracking purposes"
     lineage:
-      - datalake_pas.ledger.hash
+    - datalake_pas.ledger.hash
   bank_number:
-    description: "id form bank without treatment."
+    description: 'Bank document identifier from CNAB and Itau statements'
     lineage:
-      - datalake_nexxera.cnab_charges_recupera.our_number
-      - datalake_itau_statements_clean.statement_879200452685.origin_complement
+    - datalake_nexxera.cnab_charges_recupera.our_number
+    - datalake_itau_statements_clean.statement_879200452685.origin_complement
   bank_account_number:
     description: "Bank account number from Nexxera CNAB charges"
     lineage:
@@ -34,7 +39,19 @@ columns:
   sap_account_number:
     description: "SAP account number from ledger entries"
     lineage:
-      - datalake_pas.ledger.account_number
+    - datalake_pas.ledger.account_number
+  payment_method:
+    description: 'Payment method used in checkout (boleto, bolecode, pix)'
+    lineage:
+    - datalake_checkout_clean.boleto
+    - datalake_checkout_clean.bolecode
+    - datalake_checkout_clean.pix
+  payment_status:
+    description: 'Checkout payment status'
+    lineage:
+    - datalake_checkout_clean.boleto.status
+    - datalake_checkout_clean.bolecode.status
+    - datalake_checkout_clean.pix.status
   bank_amount:
     description: "Amount received in bank statements from Nexxera and Itau"
     lineage:
@@ -119,4 +136,8 @@ columns:
   dt_sap_paid:
     description: "Date when the payment was recorded in SAP system"
     lineage:
-      - datalake_pas.ledger.dt_tax
+    - datalake_pas.ledger.dt_tax
+  id_pix_payment:
+    description: 'PIX transaction identifier when payment method is PIX'
+    lineage:
+    - datalake_checkout_clean.pix.id_transaction

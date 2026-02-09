@@ -103,6 +103,7 @@ checkout AS (
         DATE(b.ts_paid) AS ts_paid,
         b.paid_amount,
         b.payer_name,
+        b.status,
         NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
     FROM
         datalake_checkout_clean.boleto b
@@ -119,7 +120,10 @@ checkout AS (
 checkout_union AS (
     SELECT
         CAST(UPPER(vc.our_number) AS INTEGER) AS our_number,
+        NULL AS id_pix_payment,
         vc.paid_amount AS amount,
+        'BOLETO' AS payment_method,
+        vc.status AS payment_status,
         DATE(dd.next_brz_fintech_business_day) AS dt_paid
     FROM
         checkout vc
@@ -133,7 +137,10 @@ checkout_union AS (
 
     SELECT
       b.our_number,
+      NULL AS id_pix_payment,
       b.paid_amount AS amount,
+      'BOLECODE' AS payment_method,
+      b.status AS payment_status,
       CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
       ELSE DATE(COALESCE(dt_credit, DATE(ts_paid))) END AS dt_paid
     FROM
@@ -152,7 +159,10 @@ checkout_union AS (
 
     SELECT
       IF(LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(p.id_transaction, '^0+', '')) AS our_number,
+      p.id_transaction AS id_pix_payment,
       p.due_amount AS amount,
+      'PIX' AS payment_method,
+      p.status AS payment_status,
       CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
       ELSE DATE(p.ts_paid) END AS dt_paid
     FROM
@@ -256,9 +266,13 @@ df AS (
     SELECT DISTINCT
         f.id_bank AS bank_number,
         cs.our_number AS id_our_number,
+        COALESCE(sbs.id_invoice, tf.id_invoice) AS id_invoice,
+        vc.id_pix_payment,
         s.hash,
         f.bank_account AS bank_account_number,
         s.account_number AS sap_account_number,
+        vc.payment_method,
+        vc.payment_status,
         f.amount AS bank_amount,
         COALESCE(sbs.amount, tf.amount) AS billing_amount,
         vc.amount AS checkout_amount,
@@ -323,10 +337,13 @@ df AS (
 
 SELECT
     id_our_number,
+    id_invoice,
     hash,
     bank_number,
     bank_account_number,
     sap_account_number,
+    payment_method,
+    payment_status,
     bank_amount,
     billing_amount,
     checkout_amount,
@@ -339,6 +356,7 @@ SELECT
     dt_bank_paid,
     dt_billing_paid,
     dt_checkout_paid,
-    dt_sap_paid
+    dt_sap_paid,
+    id_pix_payment
 FROM
     df

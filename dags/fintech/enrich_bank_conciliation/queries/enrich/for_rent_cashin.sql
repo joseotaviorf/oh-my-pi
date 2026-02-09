@@ -76,7 +76,8 @@ seu_barriga_sap AS (
 sap AS (
     SELECT DISTINCT
         id_business_entity,
-        COALESCE(UPPER(REPLACE(id_external_payment, 'C!', '')), UPPER(REPLACE(sb.company_use, 'C!', ''))) AS company_use,
+        COALESCE(UPPER(REPLACE(REPLACE(id_external_payment, 'C!', ''), 'C|', '')), 
+        UPPER(REPLACE(REPLACE(sb.company_use, 'C!', ''), 'C|', ''))) AS company_use,
         account_number,
         dt_tax AS dt_paid,
         SUM(debit_credit) AS amount,
@@ -113,6 +114,8 @@ vans_checkout_union AS (
         NULLIF(b.your_number, '') AS company_use,
         b.id_finance_entity AS id_invoice,
         DATE(b.ts_paid) AS ts_paid,
+        'BOLETO' AS payment_method,
+        b.status AS payment_status,
         b.paid_amount,
         NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
     FROM
@@ -131,6 +134,8 @@ vans_checkout_union AS (
         COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, '')) AS company_use,
         b.id_related_document AS id_invoice,
         DATE(b.dt_paid) AS ts_paid,
+        'BOLETO' AS payment_method,
+        UPPER(regexp_extract(b.status, '/(.*)', 1)) AS payment_status,
         b.paid_amount AS paid_amount,
         NULLIF(CAST(b.our_number AS INTEGER), '') AS our_number
     FROM
@@ -147,6 +152,8 @@ pre_vans_checkout AS (
     SELECT
         REPLACE(REPLACE(UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')), 'C!', ''), 'C]', '') AS company_use,
         vc.id_invoice,
+        vc.payment_method,
+        vc.payment_status,
         DATE(dd.next_brz_fintech_business_day) AS dt_paid,
         vc.paid_amount
     FROM
@@ -164,11 +171,13 @@ vans_checkout AS (
     SELECT
         company_use,
         id_invoice,
+        payment_method,
+        payment_status,
         dt_paid,
         SUM(paid_amount) AS amount
     FROM
         pre_vans_checkout vc
-    GROUP BY 1,2,3
+    GROUP BY 1,2,3,4,5
 ),
 
 df_all AS (
@@ -196,10 +205,13 @@ df_all AS (
 df AS (
     SELECT DISTINCT
         cs.company_use AS id_company_use,
+        sb.id_invoice,
         s.hash,
         f.bank_number,
         f.bank_account AS bank_account_number,
         s.account_number AS sap_account_number,
+        vc.payment_method,
+        vc.payment_status,
         f.amount AS bank_amount,
         sb.amount AS retsuko_amount,
         vc.amount AS vans_checkout_amount,
@@ -260,10 +272,13 @@ df AS (
 
 SELECT
     id_company_use,
+    id_invoice,
     hash,
     bank_number,
     bank_account_number,
     sap_account_number,
+    payment_method,
+    payment_status,
     bank_amount,
     retsuko_amount,
     vans_checkout_amount,
