@@ -2018,6 +2018,7 @@ bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber_legal:load-clean-court:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-delinquent-master:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-values-list:first-run-of-day
+  - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows:first-run-of-day

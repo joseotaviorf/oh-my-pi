@@ -30,6 +30,10 @@ columns:
     description: "Alert type code - Has LOV (List of Values)"
     lineage:
       - datalake_cyber_legal_homolog_clean.case_alert.alert_type_code
+  alert_type_description:
+    description: "Description of the alert type"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.values_list.value_description
   alert_comment:
     description: "Reason why the alert was generated"
     lineage:
@@ -58,7 +62,7 @@ columns:
       - datalake_cyber_legal_homolog_clean.case_alert.is_reviewed
   task_status:
     description: "Status of the alert task: 'A vencer' if alert expiration date is greater than or equal to review date, 'Vencida' if alert expiration date is less than review date"
-  Lead_time:
+  lead_time:
     description: "Number of days between alert expiration date and review date (positive values indicate alerts reviewed after expiration, negative values indicate alerts reviewed before expiration)"
   aging:
     description: "Aging classification of the alert based on lead time: 'a) Vence hoje', 'b) A vencer (1 a 3 dias)', 'c) A vencer (4 a 7 dias)', 'd) A vencer (8+ dias)', 'e) Vencida (1 a 3 dias)', 'f) Vencida (4 a 7 dias)', 'g) Vencida (8+ dias)'"
@@ -78,3 +82,11 @@ columns:
     description: "Date when the alert was reviewed"
     lineage:
       - datalake_cyber_legal_homolog_clean.case_alert.dt_reviewed
+  last_process_stage:
+    description: "Last process stage"
+    lineage:
+      - datalake_cyber_legal_homolog.process_stages.stage_description
+  contract_status:
+    description: "Contract status"
+    lineage:
+      - datalake_cyber_legal_homolog.process.contract_status

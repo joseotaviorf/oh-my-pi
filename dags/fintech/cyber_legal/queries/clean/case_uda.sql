@@ -1,9 +1,11 @@
 SELECT
     CUCASENO AS id_case,
+    CUPROJUD AS id_court_case,
     CUPOSSIB AS cause_loss_possibility_code,
     CUVARA AS court_division_name,
     CUCOMARC AS judicial_district_name,
     CUSUBTIP AS process_subtype,
+    CUMOTTOMB AS reason,
     CULOV AS lov_code,
     CUDECIMAL AS decimal_value,
     CUVALREC AS provisioned_amount,

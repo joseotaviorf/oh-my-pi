@@ -6,6 +6,7 @@ SELECT
   cacct.id_contract,
   c.id_dossier AS id_process,
   e.id_stage,
+  cstg.stage_description AS stage_description,
   e.id_attorney,
   e.id_supervisor_attorney,
   e.invoice_description,
@@ -32,7 +33,7 @@ LEFT JOIN
       ON e.id_case = c.id_case
 LEFT JOIN
   datalake_cyber_legal_homolog_clean.values_list AS v
-    ON e.expense_type = v.id_value
+      ON e.expense_type = v.id_value
       AND e.expense_subtype = v.value_code
 LEFT JOIN
     datalake_cyber_legal_homolog_clean.agency AS a
@@ -40,3 +41,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_cyber_legal_homolog_clean.case_account AS cacct
       ON cacct.id_case = c.id_case
+LEFT JOIN
+  datalake_cyber_legal_homolog_clean.case_stage AS cstg
+      ON cstg.id_case = e.id_case
+        AND cstg.id_stage = e.id_stage

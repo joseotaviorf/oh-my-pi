@@ -363,3 +363,7 @@ columns:
       - datalake_cyber_legal_homolog_raw.case.CEDTUPD
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"
+  id_client_clean:
+    description: "Client unique identification (CPF/CNPJ) cleaned"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESSNUM

@@ -217,3 +217,7 @@ columns:
     description: "Date when the case was closed in the e-law system (only populated when case_status is 'Completed')."
     lineage:
       - datalake_cyber_legal_homolog.process.dt_status_changed
+  id_court_case:
+    description: "Court case identifier"
+    lineage:
+      - datalake_cyber_legal_homolog.process.id_court_case

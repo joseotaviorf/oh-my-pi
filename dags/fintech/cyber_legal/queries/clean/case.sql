@@ -2,6 +2,7 @@ SELECT
     CECASENO AS id_case,
     CEDOSSIERID AS id_dossier,
     CESSNUM AS id_client,
+    REGEXP_REPLACE(CESSNUM, '[^0-9]', '') AS id_client_clean,
     CECRTID AS id_court,
     CEEXTLWYR AS id_external_attorney,
     CERESPLWYR AS id_responsible_attorney,

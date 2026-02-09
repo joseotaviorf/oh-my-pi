@@ -5,43 +5,58 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Table containing complementary information for legal processes. Variable structure specific to each company."
 columns:
-  case_number:
+  id_case:
     description: "Case number - Key to link with case table"
     lineage:
       - datalake_cyber_legal_homolog_raw.caseuda.CUCASENO
-  dt_notified:
-    description: "Notification date (uses CUNOTIFDT if available, otherwise CUDATE)"
+  cause_loss_possibility_code:
+    description: "Loss possibility assessment code"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUNOTIFDT
-      - datalake_cyber_legal_homolog_raw.caseuda.CUDATE
+      - datalake_cyber_legal_homolog_raw.caseuda.CUPOSSIB
+  court_division_name:
+    description: "Court division or vara name"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUVARA
+  judicial_district_name:
+    description: "Judicial district or comarca name"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUCOMARC
+  process_subtype:
+    description: "Case subtype identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUSUBTIP
+  reason:
+    description: "Reason for the case"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUMOTTOMB
+  lov_code:
+    description: "List of values reference code"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CULOV
   decimal_value:
     description: "Decimal value field"
     lineage:
       - datalake_cyber_legal_homolog_raw.caseuda.CUDECIMAL
-  lov_value:
-    description: "List of values reference"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CULOV
-  loss_possibility:
-    description: "Loss possibility assessment"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPOSSIB
-  court_division:
-    description: "Court division or vara"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUVARA
-  judicial_district:
-    description: "Judicial district or comarca"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUCOMARC
-  provisioned_value:
-    description: "Provisioned recovery value"
+  provisioned_amount:
+    description: "Provisioned recovery value amount"
     lineage:
       - datalake_cyber_legal_homolog_raw.caseuda.CUVALREC
-  updated_lawsuit_value:
-    description: "Updated lawsuit value total"
+  updated_cause_value_amount:
+    description: "Updated lawsuit value total amount"
     lineage:
       - datalake_cyber_legal_homolog_raw.caseuda.CUVLTTCAUSA
+  procedural_fine_amount:
+    description: "Procedural fine amount"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUPEMULT
+  contingency_fee_amount:
+    description: "Contingency fee amount (honorários)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUPEHONO
+  dt_notified:
+    description: "Notification date"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.caseuda.CUDATE
   dt_last_general_review:
     description: "Date of last general review"
     lineage:
@@ -50,15 +65,9 @@ columns:
     description: "Date of last case movement"
     lineage:
       - datalake_cyber_legal_homolog_raw.caseuda.CUULTDT
-  procedural_fine_percentage:
-    description: "Procedural fine percentage"
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"
+  id_court_case:
+    description: "Court case identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPEMULT
-  contingency_fee_percentage:
-    description: "Contingency fee percentage (honorários)"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPEHONO
-  case_subtype_id:
-    description: "Case subtype identifier"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUSUBTIP
+      - datalake_cyber_legal_homolog_raw.caseuda.CUPROJUD

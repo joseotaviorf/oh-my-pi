@@ -113,3 +113,7 @@ columns:
     description: "Date when expense was recovered from client."
     lineage:
       - datalake_cyber_legal_homolog_clean.case_expense.dt_recovered
+  stage_description:
+    description: "Description of the stage where the expense was registered."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_stage.stage_description

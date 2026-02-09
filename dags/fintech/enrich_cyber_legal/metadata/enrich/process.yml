@@ -169,3 +169,39 @@ columns:
     description: "Timestamp of the last update"
     lineage:
       - datalake_cyber_legal_homolog_clean.case.ts_updated
+  input_type:
+    description: "Input type of the case"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.reason
+  original_process_type:
+    description: "Original process type of the case"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.process_type
+  collection_agency_name:
+    description: "Collection agency name"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.agency.agency_name
+  total_package_amount:
+    description: "Total package amount"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.delinquent_master.total_package_amount
+  overdue_amount:
+    description: "Overdue amount"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.delinquent_master.overdue_amount
+  ts_contract_end:
+    description: "Contract end date"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.contracts.ts_contract_end
+  ldt_resolution:
+    description: "Lead time to resolution"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.ldt_resolution
+  ldt_stock:
+    description: "Lead time to stock"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case.ldt_stock
+  id_court_case:
+    description: "Court case identifier"
+    lineage:
+      - datalake_cyber_legal_homolog_clean.case_uda.id_court_case
