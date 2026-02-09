@@ -12,6 +12,8 @@ SELECT
     MAX(CASE WHEN s.name = 'MatthewTextTagNoContractFound' THEN s.value ELSE 0 END) AS eval_no_contract_found,
     MAX(CASE WHEN s.name = 'MatthewTextTagNoMatthewInteraction' THEN s.value ELSE 0 END) AS eval_no_matthew_interaction,
     MAX(CASE WHEN s.name = 'MatthewTextTagSessionEscalatedToHumanSupport' THEN s.value ELSE 0 END) AS eval_escalated_to_human,
+    MAX(CASE WHEN s.name = 'MatthewTextTagGetPaidInvoicesToolCalled' THEN s.value ELSE 0 END) AS eval_user_paid_invoice_tool,
+    MAX(CASE WHEN s.name = 'MatthewTextTagHandledNonTenantUser' THEN s.value ELSE 0 END) AS eval_user_not_tenant,
     MAX(CASE WHEN s.name = 'MatthewTextTagUserDisagreed' THEN s.value ELSE 0 END) AS eval_user_disagreed,
     MAX(CASE WHEN s.name = 'MatthewTextTagAuthenticationRequested' AND s.value = 1 THEN 'Authentication Requested' ELSE NULL END) AS status_authentication_requested,
     MAX(CASE WHEN s.name = 'MatthewTextTagAuthenticationCompleted' AND s.value = 1 THEN 'Authentication Completed' ELSE NULL END) AS status_authentication_completed,
@@ -23,7 +25,9 @@ SELECT
     MAX(CASE WHEN s.name = 'MatthewTextTagNoContractFound' AND s.value = 1 THEN 'No Contract Found' ELSE NULL END) AS status_no_contract_found,
     MAX(CASE WHEN s.name = 'MatthewTextTagNoMatthewInteraction' AND s.value = 1 THEN 'No Matthew Interaction' ELSE NULL END) AS status_no_matthew_interaction,
     MAX(CASE WHEN s.name = 'MatthewTextTagSessionEscalatedToHumanSupport' AND s.value = 1 THEN 'Session Escalated To Human Support' ELSE NULL END) AS status_escalated_to_human,
-    MAX(CASE WHEN s.name = 'MatthewTextTagUserDisagreed' AND s.value = 1 THEN 'User Disagreed' ELSE NULL END) AS status_user_disagreed
+    MAX(CASE WHEN s.name = 'MatthewTextTagUserDisagreed' AND s.value = 1 THEN 'User Disagreed' ELSE NULL END) AS status_user_disagreed,
+    MAX(CASE WHEN s.name = 'MatthewTextTagGetPaidInvoicesToolCalled' AND s.value = 1 THEN 'User Used Paid Invoice Toll (IR)' ELSE NULL END) AS status_user_paid_invoice_tool,
+    MAX(CASE WHEN s.name = 'MatthewTextTagHandledNonTenantUser' AND s.value = 1 THEN 'User Flagged as Not Tenant' ELSE NULL END) AS status_user_not_tenant
 FROM
     datalake_langfuse_clean.scores s
 WHERE 1=1

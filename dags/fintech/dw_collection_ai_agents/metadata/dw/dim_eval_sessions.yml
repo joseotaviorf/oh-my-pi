@@ -104,3 +104,19 @@ columns:
     lineage:
       - datalake_langfuse_clean.scores.value
     description: "Status for user disagreed"
+  status_user_paid_invoice_tool:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for user paid invoice tool"
+  status_user_not_tenant:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Status for user not tenant"
+  eval_user_not_tenant:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for user not tenant"
+  eval_user_paid_invoice_tool:
+    lineage:
+      - datalake_langfuse_clean.scores.value
+    description: "Evaluation score for user paid invoice tool"

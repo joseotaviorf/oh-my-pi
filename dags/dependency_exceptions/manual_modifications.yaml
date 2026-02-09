@@ -39,6 +39,9 @@ bietlejuice.dw_charging_payment_quintocred:
     - bietlejuice.gsheets_fintech:done-clean-quintocred-test-proposals:first-run-of-day
 bietlejuice.dw_chattermill:
   override: []
+bietlejuice.dw_collection_ai_agents:
+  remove:
+    - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.dw_country:
   override: []
 bietlejuice.dw_crm:
@@ -679,7 +682,7 @@ bietlejuice.enrich_sale_offer:
     - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-status:first-run-of-day
     - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users:first-run-of-day
     - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
-    - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day    
+    - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day
     - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
 bietlejuice.enrich_sale_offer_flows:
   remove:
@@ -1150,7 +1153,7 @@ bietlejuice.core_company:
     - bietlejuice.company:load-clean-company-product-tier
     - bietlejuice.company:load-clean-company-product-region
 bietlejuice.dw_sale_closing_flows:
-  add:    
+  add:
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
     - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
 bietlejuice.enrich_brokers_supply_processor:

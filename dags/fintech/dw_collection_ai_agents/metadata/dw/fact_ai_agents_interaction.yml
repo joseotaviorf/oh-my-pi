@@ -73,3 +73,5 @@ columns:
     lineage:
       - datalake_chatbot.sessions.ts_updated
     description: "Timestamp when the session was last updated"
+  flag_session_with_trace:
+    description: "Boolean flag indicating if the session has a trace in Langfuse"

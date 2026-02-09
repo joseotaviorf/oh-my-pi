@@ -35,7 +35,16 @@ WITH base AS (
             ON s2.id_session = m.id_langfuse_session
             AND s2.name = 'MatthewVersionEvaluator'
     WHERE (bot = 'matthew' OR (bot = 'wall-e'))
+),
+
+-- Check for session existence regarding its traces in Langfuse
+trace_info as (
+  SELECT 
+    id_session as id_session_langfuse,
+    from datalake_langfuse_clean.traces as t
+    QUALIFY(ROW_NUMBER() OVER(PARTITION BY id_session order by ts_created asc)) = 1
 )
+
 SELECT
     id_session,
     id_sauron_session,
@@ -58,8 +67,10 @@ SELECT
     flag_eval_matthew_in_chat,
     ai_agent_source,
     is_escalation,
+    CASE WHEN t.id_session_langfuse is not null then true else false end as flag_session_with_trace,
     dt_session_created,
     ts_created,
     ts_updated
 FROM
     base
+LEFT JOIN trace_info as t on t.id_session_langfuse = base.id_external
