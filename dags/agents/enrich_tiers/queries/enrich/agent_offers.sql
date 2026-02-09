@@ -151,7 +151,7 @@ SELECT
     uoa.is_ciq_first_listing,
     uoa.dt_contract_cancelled IS NOT NULL AS is_contract_cancelled,
     uoa.ts_contract_signed IS NOT NULL AS is_contract_signed,
-    uoa.dt_contract_cancelled,
+    CAST(uoa.dt_contract_cancelled AS DATE) AS dt_contract_cancelled,
     uoa.ts_contract_signed,
     uoa.ts_offer_submitted,
     uoa.ts_updated,
