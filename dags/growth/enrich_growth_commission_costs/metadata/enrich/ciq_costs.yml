@@ -2,7 +2,7 @@
 database_name: datalake_growth_commission_costs
 table_name: ciq_costs
 owner: isabela.matsumoto@quintoandar.com.br
-domain: Data Growth
+domain: Growth
 description: This table consolidates the commission costs within the context of CIQ(Consultor Imobiliario QuintoAndar).
 columns:
   id_house:
@@ -13,7 +13,7 @@ columns:
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
-      - datalake_offer.sale_offer.id_region
+      - datalake_sale_offer.sale_offer.id_region
     description: Unique region identifier.
   id_ciq:
     lineage:

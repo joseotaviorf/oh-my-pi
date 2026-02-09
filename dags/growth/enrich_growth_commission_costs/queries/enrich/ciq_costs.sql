@@ -92,7 +92,7 @@ monopolly AS (
         ON ps.id_sale = s.id
       JOIN datalake_monopoly_clean.sale_revision AS sr
         ON s.id = sr.id AND s.current_revision = sr.revision
-      LEFT JOIN datalake_offer.sale_offer AS so
+      LEFT JOIN datalake_sale_offer.sale_offer AS so
         ON so.id_offer = s.id_external_offer
   WHERE
       rs.type = 'CIQ'

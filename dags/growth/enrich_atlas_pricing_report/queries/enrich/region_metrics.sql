@@ -5,7 +5,7 @@ WITH sale_contracts AS (
     h.city,
     100*(ABS(offer.last_price_offered_by_buyer - hpp.p_50)/offer.last_price_offered_by_buyer) AS percentual_error
   FROM
-    datalake_offer.sale_offer AS offer
+    datalake_sale_offer.sale_offer AS offer
   INNER JOIN
     datalake_ebdb_clean.house_predicted_price AS hpp
       ON offer.id_house = hpp.id_house

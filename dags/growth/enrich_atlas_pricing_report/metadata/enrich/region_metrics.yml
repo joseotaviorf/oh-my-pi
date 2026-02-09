@@ -3,4 +3,23 @@ database_name: datalake_atlas_pricing_report
 table_name: region_metrics
 owner: '@data-growth'
 domain: Growth
-description: WIP
+description: This table contains pricing accuracy metrics (MDAPE) by region and business context (RENT/SALE), comparing actual contract prices against predicted prices from the house_predicted_price model.
+columns:
+  id_region:
+    lineage:
+      - dw_public.dim_region.sk_region
+    description: Unique region identifier from the dimension table.
+  city_name:
+    lineage:
+      - datalake_ebdb_clean.house.city
+    description: Name of the city associated with the region.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.business_context
+    description: Business context indicator, either 'SALE' or 'RENT'.
+  mdape_city:
+    lineage:
+      - datalake_sale_offer.sale_offer.last_price_offered_by_buyer
+      - datalake_ebdb_clean.house_predicted_price.p_50
+      - datalake_ebdb_clean.contract.rent
+    description: Median Absolute Percentage Error (MDAPE) rounded to 2 decimal places, measuring the pricing accuracy at the city level.
