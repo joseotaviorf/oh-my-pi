@@ -159,16 +159,16 @@ offers AS (
         sf.business_unit,
         sf.id_region,
         sf.ts_offer_submitted,
-        sf.dt_sale_agreement_signed,
-        sf.dt_offer_accepted,
+        sf.ts_sale_agreement_signed AS dt_sale_agreement_signed,
+        sf.ts_offer_accepted AS dt_offer_accepted,
         ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted NULLS LAST) AS rw_offer_asc,
         ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted DESC NULLS LAST) AS rw_offer_desc,
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed NULLS LAST) AS rw_ccv_asc,
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed DESC NULLS LAST) AS rw_ccv_desc
+        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_sale_agreement_signed NULLS LAST) AS rw_ccv_asc,
+        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_sale_agreement_signed DESC NULLS LAST) AS rw_ccv_desc
     FROM
         all_users AS u
     JOIN
-        datalake_offer.sale_offer AS sf
+        datalake_sale_offer.sale_offer AS sf
           ON sf.id_buyer = u.id_user
 ),
 

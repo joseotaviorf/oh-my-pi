@@ -162,7 +162,7 @@ offer_submission AS (
     DATE(ts_offer_submitted) AS dt_event,
     ts_offer_submitted AS ts_event
   FROM
-    datalake_offer.sale_offer
+    datalake_sale_offer.sale_offer
   WHERE
     id_buyer IS NOT NULL
     AND id_house IS NOT NULL
@@ -173,33 +173,33 @@ offer_status AS(
     id_buyer,
     id_house,
     CASE
-      WHEN DATE(dt_offer_accepted) IS NOT NULL
-        THEN DATE(dt_offer_accepted)
-      WHEN DATE(dt_offer_dismissed) IS NOT NULL
-        THEN DATE(dt_offer_dismissed)
+      WHEN DATE(ts_offer_accepted) IS NOT NULL
+        THEN DATE(ts_offer_accepted)
+      WHEN DATE(ts_offer_dismissed) IS NOT NULL
+        THEN DATE(ts_offer_dismissed)
       ELSE
         DATE('1970-01-01')
     END AS dt_event,
     CASE
-      WHEN dt_offer_accepted IS NOT NULL
-        THEN DATE(dt_offer_accepted)
-      WHEN dt_offer_dismissed IS NOT NULL
-        THEN DATE(dt_offer_dismissed)
+      WHEN ts_offer_accepted IS NOT NULL
+        THEN DATE(ts_offer_accepted)
+      WHEN ts_offer_dismissed IS NOT NULL
+        THEN DATE(ts_offer_dismissed)
       ELSE
         current_timestamp
     END AS ts_event,
     CASE
-      WHEN dt_offer_accepted IS NOT NULL
+      WHEN ts_offer_accepted IS NOT NULL
         THEN 'Offer Accepted'
-      WHEN dt_offer_dismissed IS NOT NULL
+      WHEN ts_offer_dismissed IS NOT NULL
         THEN 'Offer Rejected'
       ELSE
         NULL
     END AS action
   FROM
-    datalake_offer.sale_offer
+    datalake_sale_offer.sale_offer
   WHERE
-    (dt_offer_accepted IS NOT NULL OR dt_offer_dismissed IS NOT NULL)
+    (ts_offer_accepted IS NOT NULL OR ts_offer_dismissed IS NOT NULL)
     AND id_buyer IS NOT NULL
     AND id_house IS NOT NULL
     AND ts_offer_submitted >= DATE('2022-01-01')

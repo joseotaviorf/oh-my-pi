@@ -19,6 +19,20 @@ WITH sale_booking AS (
         AND b.type = 'Visita'
     GROUP BY 1, 2, 3
 ),
+notary AS (
+    SELECT
+        id_notary,
+        id_sales_flow,
+        status,
+        DATE(ts_started) AS dt_started,
+        DATE(ts_ended) AS dt_ended,
+        DATE(ts_ended) AS dt_house_registry_ended,
+        DATE(ts_buyer_received_keys) AS dt_buyer_received_keys
+    FROM
+        datalake_sales_flow_clean.notary
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY id_notary ORDER BY ts_updated DESC) = 1
+),
 -- Talk to agent events - first dates and counts
 sale_talk_to_agent AS (
     SELECT
@@ -43,22 +57,25 @@ sale_talk_to_agent AS (
 -- Offer funnel events - first dates and counts
 sale_offer AS (
     SELECT
-        id_sale_flow,
-        id_buyer,
-        id_house,
-        MIN(ts_offer_submitted) AS ts_first_offer_submitted,
-        MIN(dt_offer_accepted) AS dt_first_offer_accepted,
-        MIN(dt_offer_dismissed) AS dt_first_offer_dismissed,
-        MIN(dt_sale_agreement_created) AS dt_sale_agreement_created,
-        MIN(dt_sale_agreement_signed) AS dt_sale_agreement_signed,
-        MIN(dt_sale_agreement_cancelled) AS dt_sale_agreement_cancelled,
-        MIN(dt_house_registry_ended) AS dt_house_registry_ended,
-        MAX(first_discount_proposed) AS max_discount_proposed,
-        COUNT(DISTINCT id_offer) AS nbr_offers_submitted
+        CONCAT(so.id_buyer, '_', so.id_house) AS id_sale_flow,
+        so.id_buyer,
+        so.id_house,
+        MIN(so.ts_offer_submitted) AS ts_first_offer_submitted,
+        MIN(so.ts_offer_accepted) AS dt_first_offer_accepted,
+        MIN(so.ts_offer_dismissed) AS dt_first_offer_dismissed,
+        MIN(so.ts_sale_agreement_created) AS dt_sale_agreement_created,
+        MIN(so.ts_sale_agreement_signed) AS dt_sale_agreement_signed,
+        MIN(so.ts_sale_agreement_canceled) AS dt_sale_agreement_cancelled,
+        MIN(n.dt_house_registry_ended) AS dt_house_registry_ended,
+        MAX(so.first_discount_proposed) AS max_discount_proposed,
+        COUNT(DISTINCT so.id_offer) AS nbr_offers_submitted
     FROM
-        datalake_offer.sale_offer
+        datalake_sale_offer.sale_offer AS so
+    LEFT JOIN
+        notary AS n
+            ON so.id_sales_flow = n.id_sales_flow
     WHERE
-        id_sale_flow IS NOT NULL
+        CONCAT(so.id_buyer, '_', so.id_house) IS NOT NULL
     GROUP BY 1, 2, 3
 ),
 current_region AS (

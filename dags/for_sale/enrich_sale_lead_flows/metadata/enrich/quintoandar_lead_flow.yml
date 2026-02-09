@@ -1,7 +1,7 @@
 database_name: datalake_sale_lead_flows
 table_name: quintoandar_lead_flow
 description: Enriched table to track the lead from 5A journey.
-domain: Data ForSale
+domain: For Sale
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id_user:
@@ -46,32 +46,34 @@ columns:
     description: Key of property/house when the last booking were created.
   id_house_first_visit_intent:
     lineage:
-    - datalake_booking.booking.id_house
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.id_house
     description: Key of property/house on the first visit intent.
   id_house_last_visit_intent:
     lineage:
-    - datalake_booking.booking.id_house
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.id_house
     description: Key of property/house on the last visit intent.
   id_house_first_offer:
     lineage:
-    - datalake_booking.booking.id_house
+    - datalake_sale_offer.sale_offer.id_house
     description: Key of property/house of the first offer.
   id_house_last_offer:
     lineage:
-    - datalake_booking.booking.id_house
+    - datalake_sale_offer.sale_offer.id_house
     description: Key of property/house of the last offer.
   id_house_first_sale_agreement:
     lineage:
-    - datalake_booking.booking.id_house
+    - datalake_sale_offer.sale_offer.id_house
     description: Key of property/house for the first CCV.
   id_house_last_sale_agreement:
     lineage:
-    - datalake_booking.booking.id_house
+    - datalake_sale_offer.sale_offer.id_house
     description: Key of property/house for the last CCV.
   id_first_house:
     lineage:
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.id_house
     - datalake_booking.booking.id_house
-    description: Key of first property/house.
+    - datalake_sale_offer.sale_offer.id_house
+    description: Key of first property/house based on the earliest event (visit intent, booking, or offer).
   email:
     description: User email
     lineage:
@@ -82,19 +84,19 @@ columns:
     - datalake_ebdb_clean.user_aud.phone_number
   first_offer_flow:
     lineage:
-    - datalake_offer.sale_offer.offer_flow
+    - datalake_sale_offer.sale_offer.offer_flow
     description: Information about which flow this offer is following
   first_ccv_flow:
     lineage:
-    - datalake_offer.sale_offer.offer_flow
+    - datalake_sale_offer.sale_offer.offer_flow
     description: Information about which flow this offer is following
   first_offer_business_unit:
     lineage:
-    - datalake_offer.sale_offer.business_unit
+    - datalake_sale_offer.sale_offer.business_unit
     description: Name of the business unit where the buyer was served.
   first_ccv_business_unit:
     lineage:
-    - datalake_offer.sale_offer.business_unit
+    - datalake_sale_offer.sale_offer.business_unit
     description: Name of the business unit where the buyer was served.
   first_business_unit_region_new_buyer_prospect:
     lineage:
@@ -116,10 +118,6 @@ columns:
     - datalake_hub_services.business_unit_region.hub_name
     description: Last BU name. So if this BU had a different name in the past it won't
       be considered.
-  ts_first_event:
-    description: Timestamp indicating this user fisrt event on sale flow.
-    lineage:
-    - datalake_sale_flows.sale_flow.ts_first_event
   ts_first_visit_scheduling_event:
     description: Timestamp indicating the first visit intent event on Amplitude
     lineage:
@@ -138,27 +136,27 @@ columns:
     description: Timestamp of when the event happened.
   ts_first_sale_agreement_signed:
     lineage:
-    - datalake_offer.sale_offer.dt_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Date when the CCV was signed
   ts_last_sale_agreement_signed:
     lineage:
-    - datalake_offer.sale_offer.dt_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Date when the CCV was signed
   ts_first_offer_submitted:
     lineage:
-    - datalake_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp when the offer was sent by the buyer
   ts_last_offer_submitted:
     lineage:
-    - datalake_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp when the offer was sent by the buyer
   ts_first_offer_accepted:
     lineage:
-    - datalake_offer.sale_offer.dt_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Date when the offer was accepted by the owner
   ts_last_offer_accepted:
     lineage:
-    - datalake_offer.sale_offer.dt_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Date when the offer was accepted by the owner
   ts_first_booking_created:
     lineage:
@@ -176,3 +174,102 @@ columns:
     lineage:
     - datalake_booking.booking.ts_booking_utc
     description: Timestamp when the last visit happened.
+  ts_first_event:
+    lineage:
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Timestamp indicating this user first event on sale flow.
+  first_booking_creator_5a:
+    lineage:
+    - datalake_booking.booking.user_sale_booking_creator
+    description: Who created the first booking (Agent, Buyer, Secretaria, Others).
+  last_event:
+    lineage:
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+    - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_booking.booking.ts_created
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Last event type in the user journey.
+    categories:
+      lead_submission: Last event was a lead submission (visit intent).
+      booking_created: Last event was a booking creation.
+      visit_completed: Last event was a completed visit.
+      offer_submitted: Last event was an offer submission.
+      offer_accepted: Last event was an offer acceptance.
+      sale_agreement_signed: Last event was a sale agreement signed.
+      talk_to_agent: Last event was a talk to agent interaction.
+  further_funnel_step:
+    lineage:
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_created
+    - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+    - datalake_talk_to_agent.talk_to_agent_events.ts_event
+    description: The furthest step the user has reached in the funnel.
+    categories:
+      sale_agreement_signed: User has signed a sale agreement.
+      offer_accepted: User has had an offer accepted.
+      offer_submitted: User has submitted an offer.
+      visit_completed: User has completed a visit.
+      booking_created: User has created a booking.
+      lead_submission: User has submitted a lead (visit intent).
+      talk_to_agent: User has talked to an agent.
+      not_mapped: Event not mapped.
+  has_first_booking:
+    lineage:
+    - datalake_booking.booking.ts_created
+    description: Flag indicating if the user has created at least one booking.
+  has_tenant_rental_contract:
+    lineage:
+    - datalake_ebdb_clean.contract_person.type
+    - datalake_ebdb_contract.contract.id
+    description: Flag indicating if the user has a tenant rental contract.
+  is_ongoing_tenant_rental_contract:
+    lineage:
+    - datalake_ebdb_clean.contract_person.type
+    - datalake_ebdb_contract.contract.status
+    description: Flag indicating if the user has an ongoing tenant rental contract.
+  has_owner_rental_contract:
+    lineage:
+    - datalake_ebdb_clean.contract_person.type
+    description: Flag indicating if the user is an owner in a rental contract.
+  has_rental_visit:
+    lineage:
+    - datalake_booking.booking.visit_intent
+    - datalake_offer.offer.id_client
+    description: Flag indicating if the user has a rental visit or offer.
+  total_bookings_created:
+    lineage:
+    - datalake_booking.booking.id
+    description: Total number of bookings created by the user.
+  total_bookings_created_by_secretariat:
+    lineage:
+    - datalake_booking.booking.id
+    - datalake_booking.booking.user_sale_booking_creator
+    description: Total number of bookings created by the secretariat for this user.
+  total_bookings_canceled:
+    lineage:
+    - datalake_booking.booking.id
+    - datalake_booking.booking.is_canceled
+    description: Total number of bookings canceled by the user.
+  total_visits_completed:
+    lineage:
+    - datalake_booking.booking.ts_booking_utc
+    description: Total number of visits completed by the user.
+  total_visits_completed_by_secretariat:
+    lineage:
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.user_sale_booking_creator
+    description: Total number of visits completed by the secretariat for this user.
+  total_offer_submitted:
+    lineage:
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Total number of offers submitted by the user.
+  total_sale_agreement_signed:
+    lineage:
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Total number of sale agreements signed by the user.
