@@ -1,7 +1,85 @@
 ---
 database_name: datalake_sale_stranded_listings
 table_name: thresholds
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
+description: >
+  This table contains the monthly thresholds used to classify sale listings as stranded.
+  Thresholds are calculated as the 90th percentile of days in publication for each event type
+  (first visit, first offer, recurrence visit, recurrence offer), segmented by city group and price bins.
+  The table is updated on the first day of each month and used by the stranded_status table to determine
+  if a listing is stranded based on its performance compared to these thresholds.
 columns:
   month_start:
     lineage:
       - datalake_quintoandar.aux_date.month_start
+    description: The first day of the month for which the thresholds were calculated.
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+    description: >
+      City group classification for the listing's region.
+      Grouped into RMSP, Rio de Janeiro, Porto Alegre, or Other City Group.
+    categories:
+      RMSP: Região Metropolitana de São Paulo
+      Rio de Janeiro: Rio de Janeiro metropolitan area
+      Porto Alegre: Porto Alegre metropolitan area
+      Other City Group: All other cities
+  bedrooms_price_bins:
+    lineage:
+      - datalake_ebdb_listing.house.sale_price
+    description: >
+      Price bin classification based on the listing's sale price.
+      Listings with sale price below 150k are excluded (NULL).
+    categories:
+      150-300k: Listings with sale price between R$150,000 and R$300,000
+      300-500k: Listings with sale price between R$300,000 and R$500,000
+      500-900k: Listings with sale price between R$500,000 and R$900,000
+      900-1500k: Listings with sale price between R$900,000 and R$1,500,000
+      1500k+: Listings with sale price above R$1,500,000
+  bins_order:
+    lineage:
+      - datalake_ebdb_listing.house.sale_price
+    description: >
+      Numeric ordering for the price bins (1-5) to facilitate sorting.
+      1 = 150-300k, 2 = 300-500k, 3 = 500-900k, 4 = 900-1500k, 5 = 1500k+.
+  listings:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_sale_listing
+    description: Count of distinct sale listings used to calculate the thresholds for each segment (city_group + price_bin + month).
+  threshold_first_visit:
+    lineage:
+      - datalake_booking.booking.ts_created
+      - datalake_quintoandar.aux_date.id_date
+    description: >
+      The 90th percentile of days in publication until the first visit for each segment.
+      Listings exceeding this threshold are considered stranded for the "first visit" criterion.
+  threshold_first_offer:
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+      - datalake_quintoandar.aux_date.id_date
+    description: >
+      The 90th percentile of days in publication until the first offer for each segment.
+      Listings exceeding this threshold are considered stranded for the "first offer" criterion.
+  threshold_recurrence_visit:
+    lineage:
+      - datalake_booking.booking.ts_created
+      - datalake_quintoandar.aux_date.id_date
+    description: >
+      The 90th percentile of average days between visits for each segment.
+      Listings exceeding this threshold are considered stranded for the "recurrence visit" criterion.
+  threshold_recurrence_offer:
+    lineage:
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
+      - datalake_quintoandar.aux_date.id_date
+    description: >
+      The 90th percentile of average days between offers for each segment.
+      Listings exceeding this threshold are considered stranded for the "recurrence offer" criterion.
+  month:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: The month number (1-12) extracted from month_start. Used as partition column.
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+    description: The year extracted from month_start. Used as partition column.

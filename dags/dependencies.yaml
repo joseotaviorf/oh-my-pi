@@ -3487,11 +3487,11 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_house:load-enrich-maintenance-condition-history:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_sale_offer:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
@@ -3578,13 +3578,13 @@ bietlejuice.enrich_sale_salesforce:
 bietlejuice.enrich_sale_stranded_listings_status:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_sale_stranded_listings_thresholds:
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_sale_visit:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day

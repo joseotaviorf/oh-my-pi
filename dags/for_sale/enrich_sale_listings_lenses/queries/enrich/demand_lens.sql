@@ -1,5 +1,5 @@
-WITH bookings AS ( 
-  SELECT 
+WITH bookings AS (
+  SELECT
     id,
     id_house,
     visit_fup,
@@ -7,74 +7,73 @@ WITH bookings AS (
     TO_DATE(CAST(dt_booking AS TIMESTAMP) + FLOOR((slot_day * 15 / 60)+8) * INTERVAL 1 HOURS + ABS(slot_day * 15 % 60) * INTERVAL 1 MINUTES) AS dt_visit_completed
   FROM
     datalake_ebdb_clean.booking
-  WHERE 
+  WHERE
     business_context = 'SALE'
     AND ts_created IS NOT NULL
 ),
 offers AS (
-  SELECT 
+  SELECT
     id_offer,
     id_house,
-    TO_DATE(ts_offer_submitted) AS dt_offer_submitted,
-    dt_offer_accepted
+    TO_DATE(ts_offer_submitted) AS dt_offer_submitted
   FROM
-    datalake_offer.sale_offer
+    datalake_sale_offer.sale_offer
 ),
-events AS ( 
-  SELECT 
-    dt_booking AS date, 
+events AS (
+  SELECT
+    dt_booking AS date,
     id_house,
     'VB' AS event_name,
     COUNT(DISTINCT id) AS event
-  FROM 
+  FROM
     bookings
-  GROUP BY 
+  GROUP BY
     1, 2, 3
-  UNION ALL 
-  SELECT 
-    dt_visit_completed AS date, 
+  UNION ALL
+  SELECT
+    dt_visit_completed AS date,
     id_house,
     'VC' AS event_name,
     COUNT(DISTINCT id) AS event
-  FROM 
+  FROM
     bookings
-  WHERE 
+  WHERE
     visit_fup IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
     AND dt_visit_completed IS NOT NULL
-  GROUP BY 
+  GROUP BY
     1, 2, 3
-  UNION ALL 
-  SELECT 
+  UNION ALL
+  SELECT
     dt_offer_submitted AS date,
     id_house,
     'OS' AS event_name,
-    COUNT(DISTINCT id_offer) 
-  FROM 
+    COUNT(DISTINCT id_offer)
+  FROM
     offers
-  GROUP BY 
+  GROUP BY
     1, 2, 3
-  UNION ALL 
-  SELECT 
+  UNION ALL
+  SELECT
     dt_offer_submitted AS date,
     id_house,
     'OA' AS event_name,
-    COUNT(DISTINCT id_offer) 
-  FROM 
+    COUNT(DISTINCT id_offer)
+  FROM
     offers
-  WHERE 
+  WHERE
     dt_offer_submitted IS NOT NULL
-  GROUP BY 
+  GROUP BY
     1, 2, 3
 ),
-aggregated_events AS ( 
+aggregated_events AS (
   SELECT
-    date, 
-    id_house, 
+    date,
+    id_house,
     COALESCE(SUM(IF(event_name = 'VB', event, NULL)), 0) AS vbs,
     COALESCE(SUM(IF(event_name = 'VC', event, NULL)), 0) AS vcs,
     COALESCE(SUM(IF(event_name = 'OS', event, NULL)), 0) AS oss,
     COALESCE(SUM(IF(event_name = 'OA', event, NULL)), 0) AS oas
-  FROM 
+  FROM
     events
   GROUP BY
     1, 2
@@ -112,7 +111,7 @@ ongoing_listings AS (
   SELECT
     lbc.id_house,
     d.date,
-    COALESCE(e.vbs, 0) AS vbs, 
+    COALESCE(e.vbs, 0) AS vbs,
     COALESCE(e.vcs, 0) AS vcs,
     COALESCE(e.oas, 0) AS oas,
     COALESCE(e.oss, 0) AS oss,
@@ -132,18 +131,18 @@ ongoing_listings AS (
     SUM(COALESCE(e.oas, 0)) OVER (PARTITION BY lbc.id_house ORDER BY d.id_date ROWS BETWEEN 30 PRECEDING AND CURRENT ROW) as oas_last_30_days,
     SUM(COALESCE(e.oas, 0)) OVER (PARTITION BY lbc.id_house ORDER BY d.id_date ROWS BETWEEN 60 PRECEDING AND CURRENT ROW) as oas_last_60_days,
     SUM(COALESCE(e.oas, 0)) OVER (PARTITION BY lbc.id_house ORDER BY d.id_date ROWS BETWEEN 90 PRECEDING AND CURRENT ROW) as oas_last_90_days
-  FROM 
+  FROM
     datalake_ebdb_clean.listing_business_context AS lbc
-  JOIN 
+  JOIN
     datalake_quintoandar.aux_date AS d
-      ON d.date BETWEEN TO_DATE(lbc.ts_first_publication) AND CURRENT_DATE 
+      ON d.date BETWEEN TO_DATE(lbc.ts_first_publication) AND CURRENT_DATE
   LEFT JOIN
-    aggregated_events AS e 
+    aggregated_events AS e
       ON lbc.id_house = e.id_house
       AND d.date = e.date
-  WHERE 
+  WHERE
     lbc.business_context = 'SALE'
-    AND lbc.ts_first_publication IS NOT NULL 
+    AND lbc.ts_first_publication IS NOT NULL
 ),
 filtering_publisheds AS (
   SELECT
@@ -169,11 +168,11 @@ filtering_publisheds AS (
     ol.date AS dt_published
   FROM
     ongoing_listings AS ol
-  LEFT JOIN 
+  LEFT JOIN
     status_changes AS sc
       ON sc.id_house = ol.id_house
       AND ol.date BETWEEN sc.ts_status_started AND COALESCE(sc.ts_status_ended, CURRENT_TIMESTAMP)
-  WHERE 
+  WHERE
     sc.status = 'PUBLISHED'
 ),
 business_logic AS (
@@ -224,44 +223,44 @@ business_logic AS (
       WHEN vbs_last_90_days > 0 THEN 'VB'
       ELSE 'None'
     END AS highest_funnel_step_achieved_last_90_days,
-    CASE 
+    CASE
       WHEN days_as_published > 90 THEN
-        CASE  
-          WHEN vbs_last_15_days >= 3 THEN 'D5' 
+        CASE
+          WHEN vbs_last_15_days >= 3 THEN 'D5'
           WHEN vcs_last_15_days >= 2 THEN 'D5'
           WHEN oss_last_15_days >= 1 THEN 'D5'
           WHEN oas_last_15_days >= 1 THEN 'D5'
           WHEN vbs_last_15_days = 2 THEN 'D4'
-          WHEN vbs_last_30_days >= 3 THEN 'D4' 
+          WHEN vbs_last_30_days >= 3 THEN 'D4'
           WHEN vcs_last_30_days >= 2 THEN 'D4'
           WHEN oss_last_30_days >= 1 THEN 'D4'
           WHEN oas_last_30_days >= 1 THEN 'D4'
           WHEN vbs_last_30_days = 2 THEN 'D3'
-          WHEN vbs_last_60_days >= 3 THEN 'D3' 
+          WHEN vbs_last_60_days >= 3 THEN 'D3'
           WHEN vcs_last_60_days >= 2 THEN 'D3'
           WHEN oss_last_60_days >= 1 THEN 'D3'
           WHEN oas_last_60_days >= 1 THEN 'D3'
-          WHEN vbs_last_60_days = 2 THEN 'D2' 
-          WHEN vbs_last_90_days >= 3 THEN 'D2' 
+          WHEN vbs_last_60_days = 2 THEN 'D2'
+          WHEN vbs_last_90_days >= 3 THEN 'D2'
           WHEN vcs_last_90_days >= 2 THEN 'D2'
           WHEN oss_last_90_days >= 1 THEN 'D2'
           WHEN oas_last_90_days >= 1 THEN 'D2'
           ELSE 'D1'
         END
-      WHEN days_as_published <= 90 THEN 
-        CASE    
-          WHEN vbs_last_15_days >= 1 THEN 'D5' 
+      WHEN days_as_published <= 90 THEN
+        CASE
+          WHEN vbs_last_15_days >= 1 THEN 'D5'
           WHEN vcs_last_15_days >= 1 THEN 'D5'
           WHEN oss_last_15_days >= 1 THEN 'D5'
           WHEN oas_last_15_days >= 1 THEN 'D5'
           WHEN vcs_last_30_days >= 1 THEN 'D5'
           WHEN oss_last_30_days >= 1 THEN 'D5'
           WHEN oas_last_30_days >= 1 THEN 'D5'
-          WHEN vbs_last_30_days >= 1 THEN 'D4' 
+          WHEN vbs_last_30_days >= 1 THEN 'D4'
           WHEN vcs_last_60_days >= 1 THEN 'D4'
           WHEN oss_last_60_days >= 1 THEN 'D4'
           WHEN oas_last_60_days >= 1 THEN 'D4'
-          WHEN vbs_last_60_days >= 1 THEN 'D3' 
+          WHEN vbs_last_60_days >= 1 THEN 'D3'
           WHEN vcs_last_90_days >= 1 THEN 'D3'
           WHEN oss_last_90_days >= 1 THEN 'D3'
           WHEN oas_last_90_days >= 1 THEN 'D3'
@@ -276,8 +275,8 @@ business_logic AS (
     filtering_publisheds
 ),
 max_day_published_in_tier AS (
-  SELECT 
-    id_house, 
+  SELECT
+    id_house,
     id_region,
     highest_funnel_step_achieved_last_15_days,
     highest_funnel_step_achieved_last_30_days,
@@ -303,12 +302,12 @@ max_day_published_in_tier AS (
     MAX(days_as_published) OVER (PARTITION BY id_house, SUM(IF(LAG(tier) OVER (PARTITION BY id_house ORDER BY dt_published) IS DISTINCT FROM tier, 1, 0)) OVER (PARTITION BY id_house ORDER BY dt_published)) AS max_days_as_published,
     tier,
     dt_published
-  FROM 
+  FROM
     business_logic
 ),
 creating_disclaimer AS (
   SELECT
-    id_house, 
+    id_house,
     id_region,
     highest_funnel_step_achieved_last_15_days,
     highest_funnel_step_achieved_last_30_days,
@@ -317,14 +316,14 @@ creating_disclaimer AS (
     days_as_published AS days_as_published_at_start,
     max_days_as_published AS days_as_published_at_end,
     tier,
-    CASE 
+    CASE
       WHEN days_as_published > 90 AND vbs_last_15_days >= 3 THEN 'The listing has had at least 3 visits booked in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND vcs_last_15_days >= 2 THEN 'The listing has had at least 2 visits completed in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
-      WHEN days_as_published > 90 AND oss_last_15_days >= 1 THEN 'The listing has had at least 1 offer submitted in the past 15 days and has been listed for ' || max_days_as_published || ' days.' 
+      WHEN days_as_published > 90 AND oss_last_15_days >= 1 THEN 'The listing has had at least 1 offer submitted in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND oas_last_15_days >= 1 THEN 'The listing has had at least 1 offer accepted in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND vbs_last_15_days >= 2 THEN 'The listing has had at least 2 visits booked in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND vbs_last_30_days >= 3 THEN 'The listing has had at least 3 visits booked in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
-      WHEN days_as_published > 90 AND vcs_last_30_days >= 2 THEN 'The listing has had at least 2 visits completed in the past 30 days and has been listed for ' || max_days_as_published || ' days.' 
+      WHEN days_as_published > 90 AND vcs_last_30_days >= 2 THEN 'The listing has had at least 2 visits completed in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND oss_last_30_days >= 1 THEN 'The listing has had at least 1 offer submitted in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND oas_last_30_days >= 1 THEN 'The listing has had at least 1 offer accepted in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND vbs_last_60_days >= 3 THEN 'The listing has had at least 3 visits booked in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
@@ -336,16 +335,16 @@ creating_disclaimer AS (
       WHEN days_as_published > 90 AND oss_last_90_days >= 2 THEN 'The listing has had at least 2 offer submitted in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND oas_last_90_days >= 1 THEN 'The listing has had at least 1 offer accepted in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published > 90 AND vbs_last_90_days >= 1 THEN 'The listing has had at least 1 visit booked in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
-      WHEN days_as_published > 90 AND vbs_last_60_days >= 2 THEN 'The listing has had at least 2 visit booked in the past 90 days and has been listed for ' || max_days_as_published || ' days.' 
-      WHEN days_as_published <= 90 AND vbs_last_15_days >= 1 THEN 'The new listing has had at least 1 visit booked in the past 15 days and has been listed for ' || max_days_as_published || ' days.' 
-      WHEN days_as_published <= 90 AND vcs_last_15_days >= 1 THEN 'The new listing has had at least 1 visit completed in the past 15 days and has been listed for ' || max_days_as_published || ' days.' 
+      WHEN days_as_published > 90 AND vbs_last_60_days >= 2 THEN 'The listing has had at least 2 visit booked in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
+      WHEN days_as_published <= 90 AND vbs_last_15_days >= 1 THEN 'The new listing has had at least 1 visit booked in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
+      WHEN days_as_published <= 90 AND vcs_last_15_days >= 1 THEN 'The new listing has had at least 1 visit completed in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oss_last_15_days >= 1 THEN 'The new listing has had at least 1 offer submitted in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oas_last_15_days >= 1 THEN 'The new listing has had at least 1 offer accepted in the past 15 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND vbs_last_30_days >= 1 THEN 'The new listing has had at least 1 visit booked in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND vcs_last_30_days >= 1 THEN 'The new listing has had at least 1 visit completed in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oss_last_30_days >= 1 THEN 'The new listing has had at least 1 offer submitted in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oas_last_30_days >= 1 THEN 'The new listing has had at least 1 offer accepted in the past 30 days and has been listed for ' || max_days_as_published || ' days.'
-      WHEN days_as_published <= 90 AND vbs_last_60_days >= 1 THEN 'The new listing has had at least 1 visit booked in the past 60 days and has been listed for ' || max_days_as_published || ' days.' 
+      WHEN days_as_published <= 90 AND vbs_last_60_days >= 1 THEN 'The new listing has had at least 1 visit booked in the past 60 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND vcs_last_60_days >= 1 THEN 'The new listing has had at least 1 visit completed in the past 60 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oss_last_60_days >= 1 THEN 'The new listing has had at least 1 offer submitted in the past 60 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oas_last_60_days >= 1 THEN 'The new listing has had at least 1 visit booked in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
@@ -354,16 +353,16 @@ creating_disclaimer AS (
       WHEN days_as_published <= 90 AND oss_last_90_days >= 1 THEN 'The new listing has had at least 1 offer submitted in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 90 AND oas_last_90_days >= 1 THEN 'The new listing has had at least 1 offer accepted in the past 90 days and has been listed for ' || max_days_as_published || ' days.'
       WHEN days_as_published <= 45 THEN 'The new listing has not received any demand event and has been listed for at least 45 days.'
-      WHEN days_as_published > 45 THEN 'The listing has not received any demand event and has been listed for more than 45 days.'  
+      WHEN days_as_published > 45 THEN 'The listing has not received any demand event and has been listed for more than 45 days.'
       ELSE 'The listing has not received any demand event and has been listed for more than ' || max_days_as_published || ' days.'
     END AS tier_disclaimer,
     dt_published AS ts_tier_started
-  FROM 
+  FROM
     max_day_published_in_tier
 ),
 grouping_tiers AS (
-  SELECT 
-    id_house, 
+  SELECT
+    id_house,
     id_region,
     highest_funnel_step_achieved_last_15_days,
     highest_funnel_step_achieved_last_30_days,
@@ -376,12 +375,12 @@ grouping_tiers AS (
     ts_tier_started
   FROM
     creating_disclaimer
-  QUALIFY 
-    ts_tier_started = MIN(ts_tier_started) OVER (PARTITION BY id_house) 
-    OR tier != LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started) 
+  QUALIFY
+    ts_tier_started = MIN(ts_tier_started) OVER (PARTITION BY id_house)
+    OR tier != LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started)
 )
-SELECT 
-  id_house, 
+SELECT
+  id_house,
   id_region,
   highest_funnel_step_achieved_last_15_days,
   highest_funnel_step_achieved_last_30_days,
@@ -390,7 +389,7 @@ SELECT
   days_as_published_at_start,
   days_as_published_at_end,
   tier,
-  CASE 
+  CASE
     WHEN tier = 'D5' THEN 'High Demand'
     WHEN tier = 'D4' THEN 'Good Demand'
     WHEN tier = 'D3' THEN 'Some Demand'

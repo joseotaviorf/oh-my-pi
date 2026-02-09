@@ -10,16 +10,16 @@ columns:
       - datalake_ebdb_clean.listing_business_context.id_house
       - datalake_ebdb_clean.listing_business_context_aud.id_house
       - datalake_ebdb_clean.booking.id_house
-      - datalake_offer.sale_offer.id_house
-    description:  > 
+      - datalake_sale_offer.sale_offer.id_house
+    description:  >
       Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
-    description: > 
+    description: >
       ID column of region where house listing is located in. Can be joined with dw_public.dim_region.
   highest_funnel_step_achieved_last_15_days:
-    description: > 
+    description: >
       Column that represents the highest step of the funnel that the listing has achieved in the last 15 days.
     categories:
       OA: >
@@ -28,9 +28,9 @@ columns:
         If the listing has an Offer Submitted in the last 15 days but no Offer Accepted (for the observed row), this column will be flagged as OS, representing the highest possible funnel step achieved by listing.
       VC: >
         If the listing has an Visit Completed in the last 15 days but no Offer Submitted or Accepted (for the observed row), this column will be flagged as VC, representing the highest possible funnel step achieved by listing.
-      VB: > 
+      VB: >
         If the listing has an Visit Booked in the last 15 days but no Visit Completed, Offer Submitted or Accepted (for the observed row), this column will be flagged as VB, representing the highest possible funnel step achieved by listing.
-      "None": > 
+      "None": >
         If the listing has no demand event in the last 15 days, it will fall into this category.
   highest_funnel_step_achieved_last_30_days:
     description: >
@@ -42,9 +42,9 @@ columns:
         If the listing has an Offer Submitted in the last 30 days but no Offer Accepted (for the observed row), this column will be flagged as OS, representing the highest possible funnel step achieved by listing.
       VC: >
         If the listing has an Visit Completed in the last 30 days but no Offer Submitted or Accepted (for the observed row), this column will be flagged as VC, representing the highest possible funnel step achieved by listing.
-      VB: > 
+      VB: >
         If the listing has an Visit Booked in the last 30 days but no Visit Completed, Offer Submitted or Accepted (for the observed row), this column will be flagged as VB, representing the highest possible funnel step achieved by listing.
-      "None": > 
+      "None": >
         If the listing has no demand event in the last 30 days, it will fall into this category.
   highest_funnel_step_achieved_last_60_days:
     description: >
@@ -56,12 +56,12 @@ columns:
         If the listing has an Offer Submitted in the last 60 days but no Offer Accepted (for the observed row), this column will be flagged as OS, representing the highest possible funnel step achieved by listing.
       VC: >
         If the listing has an Visit Completed in the last 60 days but no Offer Submitted or Accepted (for the observed row), this column will be flagged as VC, representing the highest possible funnel step achieved by listing..
-      VB: > 
+      VB: >
         If the listing has an Visit Booked in the last 60 days but no Visit Completed, Offer Submitted or Accepted (for the observed row), this column will be flagged as VB, representing the highest possible funnel step achieved by listing..
-      "None": > 
+      "None": >
         If the listing has no demand event in the last 60 days, it will fall into this category.
   highest_funnel_step_achieved_last_90_days:
-    description: > 
+    description: >
       Column that represents the highest step of the funnel that the listing has achieved in the last 90 days.
     categories:
       OA: >
@@ -70,59 +70,59 @@ columns:
         If the listing has an Offer Submitted in the last 90 days but no Offer Accepted (for the observed row), this column will be flagged as OS, representing the highest possible funnel step achieved by listing.
       VC: >
         If the listing has an Visit Completed in the last 90 days but no Offer Submitted or Accepted (for the observed row), this column will be flagged as VC, representing the highest possible funnel step achieved by listing.
-      VB: > 
+      VB: >
         If the listing has an Visit Booked in the last 90 days but no Visit Completed, Offer Submitted or Accepted (for the observed row), this column will be flagged as VB, representing the highest possible funnel step achieved by listing.
-      "None": > 
+      "None": >
         If the listing has no demand event in the last 90 days, it will fall into this category.
   days_as_published_at_start:
-    description: > 
+    description: >
       Column that represents the number of days of the listing published at the beginning of the tier status on the ForSale context.
   days_as_published_at_end:
-    description: > 
+    description: >
       Column that represents the number of days of the listing published at the end of the tier status on the ForSale context.
-  tier: 
+  tier:
     description: >
      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". In other words, we use two components to define the tier, the number of days published and the number of visits scheduled, visits completed, offers received and offers accepted. With this, based on 4 different time windows (last 15, 30, 60 and 90 days) we assign a demand tier for each listing.''
     categories:
       D5: >
-        "Represent High Demand Listings. To be considered D5, the listing must have: 
+        "Represent High Demand Listings. To be considered D5, the listing must have:
           Either +3 Visits Booked in the last 15 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 15 days if it has more than 90 days published. 
+          Or +2 Visits Completed within the past 15 days if it has more than 90 days published.
           Or +1 Offers Submitted within the past 15 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 15 days if you have more than 90 days published.
           Or any event within the past 30 days if you have less than 90 days published."
-      D4: > 
+      D4: >
         "Represents Good Demand Listings. To be considered D4, the listing must have:
           Either 2 Visits Booked in the last 15 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 30 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 30 days if more than 90 days old. 
+          Or +2 Visits Completed within the past 30 days if more than 90 days old.
           Or +1 Offers Submitted within the past 30 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 30 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 30 days if you have less than 90 days posted.
           Or any event within the last 60 days if you have less than 90 days posted."
-      D3: > 
+      D3: >
         "Represents Some Demand Listings. To be considered D3, the listing must have:
           Either 2 Visits Booked in the last 30 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 60 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 60 days if more than 90 days old. 
+          Or +2 Visits Completed within the past 60 days if more than 90 days old.
           Or +1 Offers Submitted within the past 60 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 60 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 60 days if you have less than 90 days posted.
           Or any event within the last 90 days if you have less than 90 days posted.
           Or if you have less than 45 days posted."
-      D2: > 
+      D2: >
         "Represents Low Demand Listings. To be considered D2, the listing must have:
           Either 2 Visits Booked in the last 60 days if it has more than 90 days published.
           Or +3 Visits Booked in the last 90 days if it has more than 90 days published.
-          Or +2 Visits Completed within the past 90 days if more than 90 days old. 
+          Or +2 Visits Completed within the past 90 days if more than 90 days old.
           Or +1 Offers Submitted within the past 90 days if you have more than 90 days published.
           Or +1 Offers Accepted within the past 90 days if you have more than 90 days published.
           Or +1 Visits Booked within the past 90 days if you have less than 90 days posted.
           Or if you have more than 45 days published"
       D1: >
         "Represent No Demand Listings. To be considered D1, is the listing must be more than 90 days old and have not received any demand."
-  tier_name: 
-    description: > 
+  tier_name:
+    description: >
       Just a full name of the demand tier.
     categories:
       High Demand: >
@@ -138,12 +138,12 @@ columns:
   tier_disclaimer:
     description: >
      Column that shows us, in full, the combination of factors/bins concerning the listing, where with this, we classify it within a tier.
-  is_last_tier: 
+  is_last_tier:
     description: >
      This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
   ts_tier_started:
     description: >
       Date of tier change. It is tied to the date of some event received by the listing, which caused it to fall into a new tier of the demand lens.
   ts_tier_ended:
-    description: > 
+    description: >
       Termination date of the tier. It is strictly linked to the beginning of the next tier for that listing (for the observed row).
