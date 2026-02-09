@@ -109,7 +109,7 @@ sap_ledger AS (
   FROM
     datalake_accounting_funnel.ledger
   WHERE
-    dt_reference >= DATE('2025-01-01')
+    dt_reference >= DATE('2025-01-01') AND dt_reference < DATE('2026-03-01')
     AND account_number IN ('420005')
     AND id_finance_entity IN ('SFNFUnica', 'AdmNFUnica')
   GROUP BY 1, 2, 3, 4, 5, 6, 7

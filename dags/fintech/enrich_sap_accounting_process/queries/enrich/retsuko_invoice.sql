@@ -10,8 +10,8 @@ WITH original_invoice AS (
   GROUP BY 1
 ),
 
-retsuko AS (
-  SELECT DISTINCT
+retsuko_brokerage AS (
+  SELECT 
     ct.id_external AS id_business_entity,
     ct.landlord_legal_person AS contract_type,
     i.id_external AS id_finance_entity,
@@ -33,10 +33,10 @@ retsuko AS (
     END AS accounting_name,
     i.accrual_year_month,
     MAX(CASE
-      WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN last_day(e.ts_created)
-      WHEN o.id_invoice IS NOT NULL THEN DATE(o.ts_due_original)
-      ELSE DATE(i.ts_due)
-    END) AS dt_source_trigger,
+          WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN last_day(e.ts_created)
+          WHEN o.id_invoice IS NOT NULL THEN DATE(o.ts_due_original)
+          ELSE DATE(i.ts_due)
+        END) AS dt_source_trigger,
     CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount,
     MAX(e.accounting_version) AS accounting_version
   FROM
@@ -54,24 +54,102 @@ retsuko AS (
     datalake_retsuko_clean.contract ct
       ON ct.id = i.id_contract
   WHERE
-    description != 'Crédito - Parcelamento corretagem - QuintoAndar'
-    AND (
-      e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment')
-      OR (
-        (ii.invoice_user = 'landlord')
-        AND (NOT(i.ts_due > current_date AND i.accrual_year_month < 202405))
-        AND e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 'entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin', 'entry.bill-item/brokerage-installment-fee')
-      )
-    )
+    DATE(i.ts_created) >= '2024-01-01'
     AND ct.country_code = 'BR'
     AND ii.invoice_frequency != 'extra'
     AND i.status != 'canceled'
-    AND DATE(i.ts_created) >= '2024-01-01'
-    AND NOT(ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
     AND (is_write_off = FALSE OR is_write_off IS NULL)
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-    HAVING
+    AND description != 'Crédito - Parcelamento corretagem - QuintoAndar'
+    AND (
+      e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment')
+      OR (
+          (ii.invoice_user = 'landlord')
+          AND (NOT(i.ts_due > current_date AND i.accrual_year_month < 202405))
+          AND e.bill_item IN (
+            'entry.bill-item/brokerage-quinto-andar', 
+            'entry.bill-item/adm-fee', 
+            'entry.bill-item/igpm-adm-fee', 
+            'entry.bill-item/ipca-adm-fee', 
+            'entry.bill-item/adjustment-agreement-adm-fee', 
+            'entry.bill-item/lockin', 
+            'entry.bill-item/brokerage-installment-fee')
+        )
+    )
+    AND NOT(ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+    
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+  HAVING
       SUM(amount) != 0
+),
+retsuko_adm_service_fee AS (
+  SELECT 
+      ct.id_external AS id_business_entity,
+      ct.landlord_legal_person AS contract_type,
+      i.id_external AS id_finance_entity,
+      CAST(NULL AS INT) AS id_finance_entity_entry,
+      COALESCE(o.id_invoice, i.id_external) AS id_entity,
+      o.id_invoice AS id_original_invoice,
+      'seu barriga' AS source_name,
+      CASE
+        WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'physical' THEN '420002'
+        WHEN e.bill_item = 'entry.bill-item/service-fee' THEN '420005'
+      END AS account_number,
+      CASE
+        WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'physical' THEN 'adm fee PF'
+        WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
+      END AS accounting_name,
+      i.accrual_year_month,
+      MAX(CASE
+        WHEN o.id_invoice IS NOT NULL THEN DATE(o.ts_due_original)
+        ELSE DATE(i.ts_due)
+      END) AS dt_source_trigger,
+      CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount,
+      MAX(e.accounting_version) AS accounting_version
+  FROM
+    datalake_retsuko.entry e
+  INNER JOIN
+    datalake_retsuko_clean.account AS af
+      ON e.id_from_account = af.id
+  INNER JOIN
+    datalake_retsuko_clean.account AS at
+      ON e.id_to_account = at.id
+  INNER JOIN
+    datalake_retsuko.invoice i
+      ON e.id_invoice = i.id
+  LEFT JOIN
+    original_invoice o
+      ON i.id_original_invoice_external = o.id_original_invoice_external
+  INNER JOIN
+    datalake_retsuko.invoice_info ii
+      ON ii.id_invoice = i.id_external
+  INNER JOIN
+    datalake_retsuko_clean.contract ct
+      ON ct.id = i.id_contract
+  WHERE
+    DATE(e.ts_created) >= '2026-03-01'
+    AND IF(o.id_invoice IS NOT NULL,DATE(o.ts_due_original),DATE(i.ts_due)) >= '2026-03-01'
+    AND ct.country_code = 'BR'
+    AND af.type IN ('contract', 'tenant', 'landlord')
+    AND at.type IN ('contract', 'tenant','landlord')
+    AND i.status != 'canceled'
+    AND description != 'Crédito - Parcelamento corretagem - QuintoAndar'
+    AND e.bill_item IN (
+      'entry.bill-item/adm-fee', 
+      'entry.bill-item/igpm-adm-fee', 
+      'entry.bill-item/ipca-adm-fee', 
+      'entry.bill-item/adjustment-agreement-adm-fee', 
+      'entry.bill-item/lockin', 
+      'entry.bill-item/service-fee')
+    AND NOT(ct.landlord_legal_person = 'juridical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+  HAVING
+      SUM(amount) != 0
+),
+
+retsuko AS (
+  SELECT * FROM retsuko_brokerage
+  UNION ALL
+  SELECT * FROM retsuko_adm_service_fee
 ),
 
 sap_entity AS (
@@ -127,7 +205,7 @@ sap_ledger AS (
     datalake_pas.ledger
   WHERE
     dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('420001', '420002', '420004', '420010')
+    AND account_number IN ('420001', '420002', '420004', '420005', '420010')
   GROUP BY 1, 2
 ),
 
@@ -165,7 +243,7 @@ errors_base AS (
     retsuko r
   LEFT JOIN
     sap_entity se
-      ON r.id_entity = se.id_finance_entity
+    ON se.id_finance_entity = r.id_entity
   LEFT JOIN
     sap_gateway sg
       ON se.id_sap_gateway_feature = sg.id_feature
