@@ -1,420 +1,414 @@
-WITH users_base AS (
-    SELECT
-        so.id_offer,
-        u_by.id_external AS u_by_id_buyer,
-        u_sl.id_external AS u_sl_id_seller,
-        u_by.id_house AS u_by_id_house,
-        so.*
-    FROM
-        datalake_sale_offer_flows.sale_offer_flows AS so
-    JOIN
-        datalake_sale_offer_flows.sale_offer_users AS u_by
-            ON so.id_offer = u_by.id_firestore
-            AND u_by.type = 'BUYER'
-    JOIN
-        datalake_sale_offer_flows.sale_offer_users AS u_sl
-            ON so.id_offer = u_sl.id_firestore
-            AND u_sl.type = 'SELLER'
-    WHERE
-        u_by.is_original_user = TRUE
-        AND u_sl.is_original_user = TRUE
+WITH business_unit_by_hub_id AS (
+  SELECT
+    bu.id AS id_hub,
+    bu.hub_name,
+    bu.business_context
+  FROM
+    datalake_hub_services_clean.business_unit AS bu
+  WHERE 
+    bu.business_context = 'SALE'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY bu.id ORDER BY bu.ts_updated DESC) = 1
 ),
-
--- RELATION BOOKING OFFER - Vendas
-visit_before_offer AS (
+base_visits AS (      
+  SELECT 
+    b.id_schedule AS id,  
+    b.id_house,
+    b.id_visitor,
+    b.id_agent,
+    --TODO: TROCAR PELO CAMPO DA TABELA DE ORIGEM (id_user_sale_attendence_5a)    
+    CASE
+      WHEN v.id_agent <> v.id_user_visit_request THEN v.id_user_visit_request
+      ELSE NULL
+    END AS id_user_secretariat_booking_creator,
+    --FIM TODO: TROCAR PELO CAMPO DA TABELA DE ORIGEM
+    b.id_company_supply,
+    b.id_company_demand,
+    v.partner_3p_demand AS partner_3p_demand,    
+    v.visit_request_channel AS visit_channel, 
+    b.is_3p_supply,
+    b.is_3p_demand,
+    b.is_3p_lead_gen,
+    b.has_3p_access_control,
+    b.is_canceled,  
+    b.ts_visit,
+    b.ts_schedule_created AS ts_booking_created             
+  FROM    
+    datalake_visit.visit_schedules AS b
+  LEFT JOIN
+    datalake_visit.visits AS v
+      ON b.id_visit = v.id_visit
+  WHERE
+      b.business_context = 'SALE'
+  AND b.is_completed = TRUE
+),
+visit_offer AS (    
+  SELECT
+    eso.id_offer,
+    eso.id_buyer,
+    bs.id AS id_booking,
+    bs.id_agent,
+    bs.id_user_secretariat_booking_creator,
+    bs.id_company_supply,
+    bs.id_company_demand,
+    bs.partner_3p_demand,
+    bs.is_3p_supply,
+    bs.is_3p_demand,
+    bs.is_3p_lead_gen,
+    bs.has_3p_access_control,
+    CASE
+      WHEN bs.ts_booking_created < eso.ts_offer_created THEN TRUE
+      ELSE FALSE
+    END AS flg_booking_before_offer,
+    CASE
+      WHEN bs.ts_visit < eso.ts_offer_created THEN TRUE
+      ELSE FALSE
+    END AS flg_visit_completed_before_offer,
+    (unix_timestamp(eso.ts_offer_created)-unix_timestamp(bs.ts_booking_created))/(3600) AS hours_booking_to_offer,
+    (unix_timestamp(eso.ts_offer_created)-unix_timestamp(bs.ts_visit))/(3600) AS hours_visit_to_offer,    
+    bs.ts_booking_created ,
+    bs.ts_visit,
+    bs.visit_channel,
+    eso.ts_offer_created
+  FROM
+    datalake_sale_offer.core_sale_offer AS eso
+  JOIN
+    base_visits AS bs
+        ON bs.id_house = eso.id_house
+        AND bs.id_visitor = eso.id_buyer
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY
+          eso.id_offer
+      ORDER BY
+          bs.ts_visit
+    ) = 1
+),
+rank_offers AS (
+  SELECT
+    o.id_offer AS id,
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            o.id_buyer
+                ORDER BY o.ts_offer_created
+    ) AS buyer_rank_offers,
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            o.id_house
+                ORDER BY o.ts_offer_created
+    ) AS house_rank_offers
+  FROM
+        datalake_sale_offer.core_sale_offer as o
+),
+sales_flow_details AS (
+  SELECT
+    sfd.id,
+    sfd.id_sales_flow,        
+    sfd.ts_seller_fup,
+    sfd.ts_buyer_fup,
+    sfd.ts_updated
+  FROM
+    datalake_sales_flow_clean.sales_flow_details AS sfd
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY 
+        sfd.id_sales_flow
+      ORDER BY
+        sfd.ts_updated DESC
+    ) = 1
+),
+latest_ccv_flow AS (
+  SELECT
+    ccv.id_sales_flow,
+    ccv.status AS sale_agreement_status,
+    ccv.is_5a_model
+  FROM
+    datalake_sales_flow_clean.ccv_flow AS ccv
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) = 1
+),
+latest_sales_flow AS (
+  SELECT
+    sf.id AS id_sales_flow,
+    sf.id_house,
+    sf.status_closing AS closing_status,
+    sf.closing_canceled_reason AS sale_agreement_cancellation_reason,
+    sf.is_canceled,
+    sf.flow_step
+  FROM
+    datalake_sales_flow_clean.sales_flow AS sf
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY sf.id ORDER BY sf.ts_updated DESC) = 1
+),
+latest_house AS (
+  SELECT
+    h.id,
+    h.has_seller_debt_payments,
+    h.house_registration_status AS house_dilligence_status
+  FROM
+    datalake_sales_flow_clean.house AS h
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY h.id ORDER BY h.ts_updated DESC) = 1
+),
+latest_diligence AS (
+  SELECT
+    d.id_diligence,
+    d.id_sales_flow,
+    d.classification AS seller_dilligence_status,
+    d.step AS report_dilligence_status
+  FROM
+    datalake_sales_flow_clean.diligence AS d
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY d.id_sales_flow ORDER BY d.ts_updated DESC) = 1
+),
+latest_diligence_appointment AS (
+  SELECT DISTINCT
+    da.id_diligence,
+    CONCAT_WS(' - ', COLLECT_SET(da.appointment)) AS diligence_appointment_reason
+  FROM
+    datalake_sales_flow_clean.diligence_appointment AS da
+  GROUP BY 
+    da.id_diligence
+),
+rescue_flow AS (
+  WITH cancelation_history AS (
     SELECT
-        so.id_offer,
-        bs.id AS id_booking,
-        bs.id_agent,
-        so.id_house,
-        du.id AS id_user_agent,
-        bs.id_company_supply,
-        bs.id_company_demand,
-        bs.partner_3p_supply,
-        bs.partner_3p_demand,
-        bs.is_3p_supply,
-        bs.is_3p_demand,
-        bs.is_3p_lead_gen,
-        bs.has_3p_access_control,
-        TRUE AS flg_visit_completed_before_offer,
-        (UNIX_TIMESTAMP(so.ts_created) - UNIX_TIMESTAMP(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
-        so.ts_offer_created
+      id,
+      is_canceled,
+      closing_canceled_reason,
+      LAG(is_canceled, 1) OVER (PARTITION BY id ORDER BY ts_updated) AS last_cancelation_status,
+      LAG(ts_updated, 1) OVER (PARTITION BY id ORDER BY ts_updated) AS ts_last_canceled,
+      ts_updated
     FROM
-        users_base AS so
-    JOIN
-        datalake_booking.booking AS bs
-            ON bs.id_house = so.id_house
-            AND bs.id_visitor = so.u_by_id_buyer
-    LEFT JOIN
-        datalake_ebdb_user.user AS du
-            ON bs.id_agent = du.id_agent
-    WHERE
-        bs.visit_intent = 'SALE'
-        AND bs.type = 'Visita'
-        AND bs.ts_booking_utc < so.ts_offer_created
-        AND bs.visit_fup ='VaiNegociar'
+      datalake_sales_flow_clean.sales_flow_aud
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY so.id_offer ORDER BY (UNIX_TIMESTAMP(so.ts_offer_created) - UNIX_TIMESTAMP(bs.ts_booking_utc))) = 1
-),
-booking_before_offer AS (
+      last_cancelation_status IS DISTINCT FROM is_canceled
+  ),
+  rescue_and_cancelation_status AS (
     SELECT
-        so.id_offer,
-        bs.id AS id_booking,
-        bs.id_agent,
-        du.id AS id_user_agent,
-        bs.id_company_supply,
-        bs.id_company_demand,
-        bs.partner_3p_supply,
-        bs.partner_3p_demand,
-        bs.is_3p_supply,
-        bs.is_3p_demand,
-        bs.is_3p_lead_gen,
-        bs.has_3p_access_control,
-        TRUE AS flg_booking_before_offer,
-        (UNIX_TIMESTAMP(so.ts_offer_created) - UNIX_TIMESTAMP(bs.ts_created))/(3600) AS hours_booking_to_offer,
-        so.ts_offer_created
+      id AS id_sales_flow,
+      closing_canceled_reason,
+      is_canceled,
+      CASE
+        WHEN is_canceled = FALSE AND last_cancelation_status = TRUE THEN TRUE
+        ELSE FALSE
+      END AS is_a_rescued_ccv,
+      ts_last_canceled AS ts_sale_agreement_canceled,
+      ts_updated
     FROM
-        users_base AS so
-    JOIN
-        datalake_booking.booking AS bs
-            ON bs.id_house = so.id_house
-            AND bs.id_visitor = so.u_by_id_buyer
-    LEFT JOIN
-        datalake_ebdb_user.user AS du
-            ON bs.id_agent = du.id_agent
+      cancelation_history
     WHERE
-        bs.visit_intent = 'SALE'
-        AND bs.type = 'Visita'
-        AND bs.ts_created < so.ts_offer_created
+      ts_last_canceled IS NOT NULL
+      AND closing_canceled_reason IS NOT NULL
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY so.id_offer ORDER BY is_canceled, (UNIX_TIMESTAMP(so.ts_offer_created) - UNIX_TIMESTAMP(bs.ts_created))) = 1
-),
-relation_booking_offer AS (
-    SELECT
-        COALESCE(vo.id_offer, bo.id_offer) AS id_offer,
-        COALESCE(vo.id_booking, bo.id_booking) AS id_booking,
-        COALESCE(vo.id_agent, bo.id_agent) AS id_agent,
-        COALESCE(vo.id_user_agent, bo.id_user_agent) AS id_user_agent,
-        COALESCE(vo.id_company_supply, bo.id_company_supply) AS id_company_supply,
-        COALESCE(vo.id_company_demand, bo.id_company_demand) AS id_company_demand,
-        COALESCE(vo.partner_3p_supply, bo.partner_3p_supply) AS partner_3p_supply,
-        COALESCE(vo.partner_3p_demand, bo.partner_3p_demand) AS partner_3p_demand,
-        COALESCE(vo.is_3p_supply, bo.is_3p_supply) AS is_3p_supply,
-        COALESCE(vo.is_3p_demand, bo.is_3p_demand) AS is_3p_demand,
-        COALESCE(vo.is_3p_lead_gen, bo.is_3p_lead_gen) AS is_3p_lead_gen,
-        COALESCE(vo.has_3p_access_control, bo.has_3p_access_control) AS has_3p_access_control,
-        COALESCE(vo.hours_visit_to_offer, bo.hours_booking_to_offer) AS hours_booking_to_offer,
-        COALESCE(bo.flg_booking_before_offer, vo.flg_visit_completed_before_offer) AS flg_booking_before_offer,
-        vo.flg_visit_completed_before_offer,
-        COALESCE(vo.ts_offer_created, bo.ts_offer_created) AS ts_offer_created
-    FROM
-        visit_before_offer AS vo
-    FULL OUTER JOIN
-        booking_before_offer AS bo
-            ON bo.id_offer = vo.id_offer
-),
--- REGIONS - Vendas
-sale_listings AS (
-    SELECT
-        DISTINCT sl.id_house,
-        h.id_user AS id_owner,
-        h.id_region
-    FROM
-        datalake_sale_listings.sale_listing AS sl
-    JOIN
-        datalake_ebdb_clean.house AS h
-            ON sl.id_house = h.id
-),
-regions_base AS (
-    SELECT
-        so.id_offer,
-        so.id_house,
-        sl.id_region,
-        so.u_sl_id_seller AS id_owner,
-        r.city_group
-    FROM
-        users_base AS so
-    LEFT JOIN
-        sale_listings AS sl
-            ON sl.id_house = so.id_house
-    LEFT JOIN
-        datalake_region.region AS r
-            ON r.id = sl.id_region
-),
-
--- WORK CONTRACT
-work_contract_base AS (
-    SELECT
-        ac.id_agent,
-        ac.id_user_agent,
-        wc.id_hub_teams,
-        wc.hub_name_teams,
-        ac.previous_work_contract_name,
-        ac.work_contract_name AS contract_name,
-        ac.ts_work_contract_started AS ts_work_contract_start,
-        COALESCE(ac.ts_work_contract_ended, CURRENT_DATE) AS ts_work_contract_end
-    FROM
-        datalake_ebdb_agents.agent_contract AS ac
-    LEFT JOIN
-        datalake_ebdb_work_contract.work_contract AS wc
-            ON ac.id_work_contract = wc.id
-),
-work_contract AS (
-    SELECT
-        vo.id_offer,
-        wc.id_agent,
-        wc.id_user_agent,
-        wc.id_hub_teams,
-        wc.contract_name AS agent_work_contract,
-        wc.hub_name_teams,
-        wc.ts_work_contract_start,
-        wc.ts_work_contract_end
-    FROM
-        relation_booking_offer AS rbo
-    LEFT JOIN
-        datalake_sale_offer_flows.sale_offer_flows AS vo
-            ON rbo.id_offer = vo.id_offer
-    LEFT JOIN
-        work_contract_base AS wc
-            ON rbo.id_user_agent = wc.id_user_agent
-            AND vo.ts_offer_created BETWEEN wc.ts_work_contract_start AND wc.ts_work_contract_end
-),
-sale_offer_status AS (
-    SELECT
-        id_sales_flow,
-        id_firestore,
-        primary_closing_type_label,
-        secundary_closing_type_label,
-        macro_status_name,
-        ordering,
-        last_micro_status_name,
-        ts_macro_status_start,
-        ts_macro_status_end,
-        ts_micro_status_last_update
-    FROM
-        datalake_sale_offer_flows.sale_offer_status
-),
-data_from_sales_flow AS (
-    SELECT
-        vo.id_offer,
-        vo.id_sales_flow,
-        vo.id_buyer,
-        vo.id_house,
-        vo.id_seller,
-        IF(vo.id_consultant IS NOT NULL, vo.id_consultant, NULL) AS id_consultant,
-        vo.id_user_consultant,
-        IF(vo.sk_team_lead IS NOT NULL, vo.sk_team_lead, NULL) AS id_team_lead,
-        vo.sk_user_team_lead AS id_user_team_lead,
-        vo.id_pendency,
-        vo.id_user_agent,
-        vo.id_agent,
-        ebdb_user.id_agent AS ebdb_id_agent,
-        vo.id_hub,
-        vo.vendas_offer_flow,
-        vo.sale_agreement_cancellation_reason,
-        vo.payment_method,
-        vo.payment_model,
-        vo.payment_status,
-        vo.credit_status,
-        vo.house_dilligence_status,
-        vo.seller_dilligence_status,
-        vo.report_dilligence_status,
-        vo.vendas_offer_status AS offer_status,
-        vo.sale_agreement_status,
-        vo.credit_model,
-        vo.financing_bank,
-        vo.drop_reason,
-        vo.drop_reason_responsible,
-        vo.fgts_value,
-        vo.sale_listing_price,
-        vo.entry_amount AS earnest_value,
-        vo.first_price_offered_by_buyer,
-        vo.last_price_offered_by_buyer,
-        vo.first_discount_proposed,
-        vo.last_discount_proposed,
-        vo.sale_price_agreed,
-        vo.brokerage_fee,
-        vo.is_ccv_5a_model,
-        vo.is_ccv_canceled,
-        vo.is_a_rescued_ccv,
-        vo.is_a_rescued_offer,
-        vo.days_sale_agreement_created_to_sale_agreement_signed,
-        vo.days_offer_accepted_to_sale_agreement_signed,
-        vo.days_offer_accepted_to_sale_agreement_created,
-        vo.days_offer_accepted_to_offer_dismissed,
-        DATE(vo.ts_accepted) AS dt_offer_accepted,
-        DATE(ts_discarded) AS dt_offer_dismissed,
-        vo.dt_offer_rescued,
-        vo.dt_sale_agreement_created,
-        DATE(vo.ts_signed) AS dt_sale_agreement_signed,
-        vo.dt_sale_transacton_paid,
-        vo.dt_sale_agreement_cancelled,
-        vo.dt_sale_agreement_rescued,
-        vo.ts_offer_created
-    FROM
-        users_base AS vo
-    LEFT JOIN
-        datalake_ebdb_user.user AS ebdb_user
-            ON vo.id_user_agent = ebdb_user.id
-            AND vo.id_user_agent IS NOT NULL
-),
--- BUSINESS UNIT
-business_unit_by_hub_id(
-    SELECT
-        bu.id AS id_hub,
-        bu.hub_name,
-        bu.business_context
-    FROM
-        datalake_hub_services_clean.business_unit AS bu
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY bu.id ORDER BY bu.ts_updated DESC) = 1
+      ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+  )
+  SELECT
+    id_sales_flow,
+    is_a_rescued_ccv,
+    ts_sale_agreement_canceled
+  FROM
+    rescue_and_cancelation_status
 )
-SELECT
-    v.id_offer AS id_offer,
-    v.id_sales_flow AS id_sales_flow,
-    rbo.id_booking,
-    v.id_buyer AS id_buyer,
-    COALESCE(v.id_seller, r.id_owner) AS id_owner,
-    v.id_house AS id_house,
-    COALESCE(v.id_user_agent, rbo.id_user_agent) AS id_user_agent,
-    COALESCE(v.ebdb_id_agent, rbo.id_agent) AS id_agent,
-    v.id_hub,
-    v.id_consultant AS id_consultant,
-    CAST(v.id_user_consultant AS BIGINT) AS id_user_consultant,
-    v.id_user_consultant AS id_closing_specialist,
-    v.id_team_lead,
-    v.id_user_team_lead,
-    v.id_pendency,
-    COALESCE(wc_off.id_hub_teams, busf.id_hub) AS id_business_unit,
-    r.id_region,
-    rbo.id_company_supply,
-    rbo.id_company_demand,
-    h.uuid_company AS uuid_company_supply,
-    UPPER(
+
+SELECT    
+  o.id_offer,
+  o.id_sales_flow,
+  o.id_buyer,
+  o.id_house,
+  o.id_owner,
+  o.id_region,
+  r.city_group,
+  o.id_agent,    
+  vo.id_booking,
+  o.id_hub AS id_business_unit,
+  vo.id_company_supply,
+  vo.id_company_demand,
+  vo.is_3p_supply,
+  vo.is_3p_demand,
+  vo.is_3p_lead_gen,
+  vo.has_3p_access_control,
+  vo.id_user_secretariat_booking_creator,
+  o.flow_type,
+  CASE
+    WHEN o.flow_type = 'DEAL_MAKING'
+      THEN 'DEAL_MAKING' -- Offers que não estão na planilha de trabalho e o Vendas diz ser DM
+    ELSE COALESCE(o.flow_type,'NOT DEFINED') -- Offers que não estão na planilha de trabalho, não foram atribuidas a um deal maker e possuem offer_flows diferentes de DM no Vendas.
+  END AS offer_flow,
+  o.current_payment_method,
+  o.planned_payment_method,
+  o.payment_model,
+  o.credit_model,
+  o.tags_from_salesflow,
+  o.has_used_fgts_in_payment,
+  o.brokerage_fee,
+  o.sale_price,
+  o.first_price_offered_by_buyer,
+  o.last_price_offered_by_buyer,
+  o.sale_price_agreed,
+  o.first_discount_proposed,
+  o.last_discount_proposed,
+  o.payment_entry_amount,
+  o.registry_price,
+  o.itbi_price,
+  o.has_used_negotiation_chat,
+  o.status AS offer_status,
+  o.drop_reason,
+  o.drop_reason_responsible,    
+  bu.hub_name AS business_unit,
+  o.is_a_rescued_offer,
+  slpc.price_segment,    
+  bpt.id_buyer_prospect_type,    
+  sp.id_user_agent,
+  sp.id_user_team_lead,
+  sp.id_user_consultant,
+  sp.id_consultant,
+  sp.id_user_consultant AS id_closing_specialist,
+  ccv.sale_agreement_status,
+  CASE
+    WHEN ccv.is_5a_model IS TRUE THEN 'Default 5A CCV'
+    WHEN ccv.is_5a_model IS FALSE THEN 'Not a 5A CCV Model'
+    ELSE 'Unknown'
+  END AS ccv_type,
+  CASE
+    WHEN ccv.is_5a_model IS NULL THEN 'Not Answered'
+    WHEN ccv.is_5a_model IS FALSE THEN 'Not a 5A model'
+    WHEN ccv.is_5a_model IS TRUE THEN 'Is a 5A model'
+    ELSE 'Undefined'
+  END AS ccv_model,
+  ccv.is_5a_model AS is_ccv_5a_model,
+  sf.closing_status,
+  sf.sale_agreement_cancellation_reason,
+  COALESCE(
+    sf.is_canceled,
+    CASE
+      WHEN o.ts_sale_agreement_signed IS NOT NULL THEN
         CASE
-            WHEN v.vendas_offer_flow = 'CENTRAL' AND r.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
-            WHEN v.vendas_offer_flow = 'CENTRAL' AND r.city_group = 'RMSP' THEN 'CENTRAL SP'
-            WHEN v.vendas_offer_flow = 'CENTRAL' AND r.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            WHEN v.vendas_offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
-            WHEN v.vendas_offer_flow = 'HUB' THEN COALESCE(wc_off.hub_name_teams, busf.hub_name)
-            ELSE v.vendas_offer_flow
+          WHEN sf.flow_step = 'CANCELED_CCV' THEN TRUE
+          ELSE FALSE
         END
-    ) AS business_unit,
-    v.vendas_offer_flow,
-    rbo.partner_3p_supply,
-    rbo.partner_3p_demand,
-    rbo.is_3p_supply,
-    rbo.is_3p_demand,
-    rbo.is_3p_lead_gen,
-    rbo.has_3p_access_control,
-    rbo.flg_booking_before_offer,
-    rbo.flg_visit_completed_before_offer,
-    v.sale_agreement_cancellation_reason AS sale_agreement_cancellation_reason,
-    v.drop_reason AS drop_reason,
-    CASE
-        WHEN LOWER(v.drop_reason_responsible) LIKE '%buyer%'
-            THEN 'Buyer'
-        WHEN LOWER(v.drop_reason_responsible) LIKE '%seller%'
-            THEN 'Seller'
-        ELSE 'Other'
-    END AS drop_reason_responsible,
-    v.fgts_value AS fgts_value,
-    sr.financed_amount AS financing_value,
-    COALESCE(v.earnest_value, sr.entry_payment_amount) AS earnest_value,
-    v.brokerage_fee,
-    v.sale_listing_price AS sale_price,
-    v.first_price_offered_by_buyer AS first_price_offered_by_buyer,
-    v.last_price_offered_by_buyer AS last_price_offered_by_buyer,
-    v.first_discount_proposed AS first_discount_proposed,
-    v.last_discount_proposed AS last_discount_proposed,
-    v.sale_price_agreed AS sale_price_agreed,
-    CASE
-        WHEN v.is_ccv_5a_model IS True THEN "Default 5A CCV"
-        WHEN v.is_ccv_5a_model IS False THEN "Not a 5A CCV Model"
-        ELSE "Unknown"
-    END AS ccv_type,
-    v.payment_status,
-    v.credit_status,
-    v.offer_status,
-    v.sale_agreement_status,
-    v.payment_model,
-    v.credit_model,
-    v.financing_bank,
-    r.city_group,
-    v.house_dilligence_status,
-    v.seller_dilligence_status,
-    v.report_dilligence_status,
-    IF(
-        MIN(v.ts_offer_created) OVER (PARTITION BY v.id_offer ORDER BY v.ts_offer_created) = v.ts_offer_created,
-        TRUE,
-        FALSE
-    ) AS is_buyer_first_offer,
-    IF(
-        MIN(v.ts_offer_created) OVER (PARTITION BY v.id_house ORDER BY v.ts_offer_created) = v.ts_offer_created,
-        TRUE,
-        FALSE
-    ) AS is_house_first_offer,
-    COALESCE(h.is_3p_supply_5a, FALSE) AS is_3p_supply_5a,
-    COALESCE(h.is_3p_supply_bh, FALSE) AS is_3p_supply_bh,
-    v.is_ccv_canceled AS is_ccv_canceled,
-    v.is_a_rescued_ccv,
-    v.is_a_rescued_offer,
-    v.days_sale_agreement_created_to_sale_agreement_signed,
-    v.days_offer_accepted_to_sale_agreement_signed,
-    v.days_offer_accepted_to_sale_agreement_created,
-    v.days_offer_accepted_to_offer_dismissed,
-    CASE
-        WHEN v.dt_offer_accepted IS NOT NULL
-            THEN DATEDIFF(DATE(v.dt_offer_accepted), DATE(v.ts_offer_created))
-        ELSE NULL
-    END AS days_offer_submitted_to_offer_accepted,
-    CASE
-        WHEN v.dt_sale_agreement_created IS NOT NULL
-            THEN DATEDIFF(DATE(v.dt_sale_agreement_created), DATE(v.ts_offer_created))
-        ELSE NULL
-    END AS days_offer_submitted_to_sale_agreement_created,
-    CASE
-        WHEN v.dt_offer_dismissed IS NOT NULL
-            THEN DATEDIFF(DATE(v.dt_offer_dismissed), DATE(v.ts_offer_created))
-        ELSE NULL
-    END AS days_offer_submitted_to_offer_dismissed,
-    CASE
-        WHEN v.dt_sale_agreement_signed IS NOT NULL
-            THEN DATEDIFF(DATE(v.dt_sale_agreement_signed), DATE(v.ts_offer_created))
-        ELSE NULL
-    END AS days_offer_submitted_to_sale_agreement_signed,
-    rbo.hours_booking_to_offer,
-    v.dt_offer_accepted AS dt_offer_accepted,
-    v.dt_offer_dismissed AS dt_offer_dismissed,
-    v.dt_offer_rescued,
-    v.dt_sale_agreement_created,
-    v.dt_sale_agreement_signed AS dt_sale_agreement_signed,
-    v.dt_sale_transacton_paid AS dt_sale_transacton_paid,
-    v.dt_sale_agreement_cancelled AS dt_sale_agreement_cancelled,
-    v.dt_sale_agreement_rescued,
-    DATE(v.ts_offer_created) AS dt_offer_created,
-    v.ts_offer_created AS ts_offer_submitted,
-    CURRENT_TIMESTAMP() AS ts_load
+      ELSE NULL
+    END
+  ) AS is_ccv_canceled,
+  COALESCE(rf.is_a_rescued_ccv, FALSE) AS is_a_rescued_ccv,  
+  h.house_dilligence_status,
+  d.seller_dilligence_status,
+  d.report_dilligence_status,
+  da.diligence_appointment_reason,
+  h.has_seller_debt_payments,
+  vo.flg_booking_before_offer,
+  vo.flg_visit_completed_before_offer,
+  CASE
+    WHEN rk.buyer_rank_offers = 1
+      THEN TRUE
+    ELSE FALSE
+  END AS is_buyer_first_offer,
+  CASE
+    WHEN rk.house_rank_offers = 1
+      THEN TRUE
+    ELSE FALSE
+  END AS is_house_first_offer,
+  vo.ts_booking_created,
+  vo.hours_booking_to_offer,
+  vo.hours_visit_to_offer,
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_accepted)
+      THEN DATEDIFF(DATE(o.ts_offer_accepted), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_offer_accepted,
+
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_created)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_sale_agreement_created,
+  
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_discarded)
+      THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_offer_dismissed,
+
+  CASE
+      WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_signed)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
+  END AS days_offer_submitted_to_sale_agreement_signed,
+
+  CASE
+      WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_created)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
+  END AS days_offer_accepted_to_sale_agreement_created,
+
+  CASE
+      WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_signed)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
+  END AS days_offer_accepted_to_sale_agreement_signed,
+
+  CASE
+      WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_offer_discarded)
+      THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
+  END AS days_offer_accepted_to_offer_dismissed,
+  
+  CASE
+      WHEN DATE(o.ts_sale_agreement_created) <= DATE(o.ts_sale_agreement_signed)
+      THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_sale_agreement_created))
+  END AS days_sale_agreement_created_to_sale_agreement_signed,
+  o.ts_offer_created AS ts_offer_submitted,
+  o.ts_offer_accepted,
+  o.ts_offer_discarded AS ts_offer_dismissed,
+  o.ts_offer_canceled,
+  o.ts_offer_rescued,
+  o.ts_sale_agreement_drafted,
+  o.ts_sale_agreement_created,
+  o.ts_sale_agreement_signed,
+  rf.ts_sale_agreement_canceled AS ts_sale_agreement_canceled,
+  sfd.ts_seller_fup,
+  sfd.ts_buyer_fup,
+  o.ts_updated, 
+  now() as ts_load
 FROM
-    data_from_sales_flow AS v
+  datalake_sale_offer.core_sale_offer AS o
 LEFT JOIN
-    datalake_monopoly_clean.sale_revision AS sr
-        ON v.id_offer = sr.id_external_offer
+  visit_offer AS vo
+  ON o.id_offer = vo.id_offer
 LEFT JOIN
-    relation_booking_offer AS rbo
-        ON rbo.id_offer = v.id_offer
+  datalake_hub_services_clean.business_unit AS bu
+  ON o.id_hub = bu.id
 LEFT JOIN
-    regions_base AS r
-        ON v.id_offer = r.id_offer
+  rank_offers AS rk
+  ON rk.id = o.id_offer
 LEFT JOIN
-    business_unit_by_hub_id AS busf
-        ON v.id_hub = busf.id_hub
-        AND v.id_hub IS NOT NULL
+  sales_flow_details AS sfd
+  ON sfd.id_sales_flow = o.id_sales_flow
+LEFT JOIN 
+  datalake_region.region AS r
+  ON o.id_region = r.id
 LEFT JOIN
-    datalake_ebdb_listing.house AS h
-        ON v.id_house = h.id
+  datalake_sale_listings.sale_listing_price_changes AS slpc
+  ON o.id_house = slpc.id_house
+  AND o.ts_offer_created >= slpc.ts_price_started 
+  AND o.ts_offer_created < COALESCE(slpc.ts_price_ended, NOW())
 LEFT JOIN
-    work_contract AS wc_off
-        ON v.id_offer = wc_off.id_offer
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY v.id_offer ORDER BY revision DESC) = 1
+  datalake_buyer_prospect.buyer_prospect_type AS bpt
+  ON o.id_buyer = bpt.id_prospect
+  AND r.city_group = bpt.city_group
+  AND o.ts_offer_created >= bpt.ts_activation 
+  AND o.ts_offer_created < COALESCE(bpt.ts_activation_end, NOW())
+LEFT JOIN
+  datalake_sale_offer_flows.offer_specialists AS sp
+  ON o.id_offer = sp.id_offer
+LEFT JOIN
+  latest_ccv_flow AS ccv
+  ON ccv.id_sales_flow = o.id_sales_flow
+LEFT JOIN
+  latest_sales_flow AS sf
+  ON sf.id_sales_flow = o.id_sales_flow
+LEFT JOIN
+  rescue_flow AS rf
+  ON rf.id_sales_flow = o.id_sales_flow
+LEFT JOIN
+  latest_house AS h
+  ON h.id = sf.id_house
+LEFT JOIN
+  latest_diligence AS d
+  ON d.id_sales_flow = o.id_sales_flow
+LEFT JOIN
+  latest_diligence_appointment AS da
+  ON da.id_diligence = d.id_diligence

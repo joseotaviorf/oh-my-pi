@@ -8,33 +8,17 @@ owner: data-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-      - datalake_offer.sale_offer.id_offer
+      - datalake_sale_offer.sale_offers.id_offer
     description: Offer unique identifier.
-  pendency:
-    lineage:
-      - datalake_offer.sale_offer.pendency
-    description: Pendency Description
-  pendency_type:
-    lineage:
-      - datalake_offer.sale_offer.pendency_type
-    description: Closing funnel stage where pendency occurred
   ccv_type:
     lineage:
-      - datalake_offer.sale_offer.ccv_type
+      - datalake_sale_offer.sale_offers.ccv_type
     description:
       Type of financed sale agreement considering which financial product
       it has contracted.
-  opportunities_of_the_week:
-    lineage:
-      - datalake_offer.sale_offer.opportunities_of_the_week
-    description:
-      In For Sale it's every lead qualified in the week for the CRI or
-      MA process. In Rent is every listing published, with at least one scheduled
-      in the week. This information is not used by the For Sale operation team, because
-      of the new business model of Closing Assistance.
   sale_agreement_status:
     lineage:
-      - datalake_offer.sale_offer.sale_agreement_status
+      - datalake_sale_offer.sale_offers.sale_agreement_status
     description: Sale agreement status
     categories:
       "": ""
@@ -43,19 +27,19 @@ columns:
       Forms enviado: ""
   offer_flow:
     lineage:
-      - datalake_offer.sale_offer.offer_flow
+      - datalake_sale_offer.sale_offers.offer_flow
     description:
       "The Offer Flow (Negotiation Model) that generated the offer: Deal
       Making (DM), Hub or Central"
   business_unit:
     lineage:
-      - datalake_offer.sale_offer.business_unit
+      - datalake_sale_offer.sale_offers.business_unit
     description:
       "The business unit that generated the offer: Deal Making (DM) or
       specific Hub or Central cell"
   sale_agreement_cancellation_reason:
     lineage:
-      - datalake_offer.sale_offer.sale_agreement_cancellation_reason
+      - datalake_sale_offer.sale_offers.sale_agreement_cancellation_reason
     description: Reason why the sale agreement was cancelled
     categories:
       Buyer Desistiu: ""
@@ -67,202 +51,90 @@ columns:
       Seller Desistiu: ""
   sale_price_agreed:
     lineage:
-      - datalake_offer.sale_offer.sale_price_agreed
+      - datalake_sale_offer.sale_offers.sale_price_agreed
     description: Sale price agreed in the sale contract
   brokerage_fee:
     lineage:
-      - datalake_offer.sale_offer.brokerage_fee
+      - datalake_sale_offer.sale_offers.brokerage_fee
     description: Percentage of brokerage fee
-  fgts_value:
-    lineage:
-      - datalake_offer.sale_offer.fgts_value
-    description: Amount of the FGTS fund applied in the payment
-  financing_bank:
-    lineage:
-      - datalake_offer.sale_offer.financing_bank
-    description: The bank that approved the financing credit
-    categories:
-      Ag. Cliente: ""
-      Bradesco: ""
-      Bradesco (Funcionário): ""
-      CEF: ""
-      CEF (Funcionário): ""
-      Consórcio: ""
-      CrediHome: ""
-      Itaú: ""
-      Itaú (Funcionário): ""
-      NA: ""
-      Outro: ""
-      Santander: ""
-      Santander (Funcionário): ""
-  financing_value:
-    lineage:
-      - datalake_offer.sale_offer.financing_value
-    description: Amount of the sale price that was financed
-  earnest_value:
-    lineage:
-      - datalake_offer.sale_offer.earnest_value
-    description:
-      The value of the security deposit made after the signature of the
-      sale agreement. This payment is mandatory for financed transactions
-  down_payment_amount:
-    lineage:
-      - datalake_offer.sale_offer.payment_entry_amount
-    description: Negotiated down payment for the property.
   payment_method:
     lineage:
-      - datalake_offer.sale_offer.current_payment_method
+      - datalake_sale_offer.sale_offers.current_payment_method
     description:
       Financed, Cash or Undecided. Also see dimension 'Has Used FGTS in
       Payment?' to check if the payment method includes FGTS.
   payment_model:
     lineage:
-      - datalake_offer.sale_offer.payment_model
+      - datalake_sale_offer.sale_offers.payment_model
     description: Payment model agreed in the Sale Agreement.
   credit_model:
     lineage:
-      - datalake_offer.sale_offer.credit_model
+      - datalake_sale_offer.sale_offers.credit_model
     description: Credit model of the financing.
   ccv_model:
     lineage:
-      - datalake_offer.sale_offer.is_ccv_5a_model
+      - datalake_sale_offer.sale_offers.is_ccv_5a_model
     description: Indicates if this CCV uses a 5A model
-  early_keys_status:
-    lineage:
-      - datalake_offer.sale_offer.early_keys_status
-    description: Offer eligibility for 'Early Keys'.
+    categories:
+      Not Answered: ""
+      Not a 5A model: ""
+      Is a 5A model: ""
+      Undefined: ""
   closing_status:
     lineage:
-      - datalake_offer.sale_offer.closing_status
+      - datalake_sale_offer.sale_offers.closing_status
     description: Closing Status
   house_dilligence_status:
     lineage:
-      - datalake_offer.sale_offer.house_dilligence_status
+      - datalake_sale_offer.sale_offers.house_dilligence_status
     description: House Diligence Status (Report results)
   seller_dilligence_status:
     lineage:
-      - datalake_offer.sale_offer.seller_dilligence_status
+      - datalake_sale_offer.sale_offers.seller_dilligence_status
     description: Report result of the Seller Diligence
   report_dilligence_status:
     lineage:
-      - datalake_offer.sale_offer.report_dilligence_status
+      - datalake_sale_offer.sale_offers.report_dilligence_status
     description:
       Status of the preparation of the Report Diligence Status, from 'Não
       Iniciada' (Not started) to 'Relatório disponível' (Report available)
   diligence_appointment_reason:
     lineage:
-      - datalake_offer.sale_offer.diligence_appointment_reason
+      - datalake_sale_offer.sale_offers.diligence_appointment_reason
     description: Appointment Reason of the Diligence
-  bank_analysis_status:
-    lineage:
-      - datalake_offer.sale_offer.bank_analysis_status
-    description: Bank status of credit analysis
-  payment_status:
-    lineage:
-      - datalake_offer.sale_offer.payment_status
-    description:
-      Step of the payment status. Sinal (Earnest value of ~6%), Entrada
-      (Down payment of ~20%, does not include Earnest value) and Valor Total (Full
-      Value), in this order. Pago/Não Pago (Paid/Not Paid).
-  credit_status:
-    lineage:
-      - datalake_offer.sale_offer.credit_status
-    description:
-      Status of the approvation of the credit by a bank. Only for Financed
-      payment method.
-  notary_office_status:
-    lineage:
-      - datalake_offer.sale_offer.notary_office_status
-    description: Status at Notary Office (CRN)
-  notary_office_details:
-    lineage:
-      - datalake_offer.sale_offer.notary_office_details
-    description: Notary office details
-  real_estate_register_office_status:
-    lineage:
-      - datalake_offer.sale_offer.real_estate_register_office_status
-    description: Real Estate Registeer Office Status (CRI)
-  tags_from_salesflow:
-    lineage:
-      - datalake_offer.sale_offer.tags_from_salesflow
-    description: Custom tags set in SalesFlow interface
-  partner_3p_supply:
-    lineage:
-      - datalake_offer.sale_offer.partner_3p_supply
-    description: 3P supply partner name
-  partner_3p_demand:
-    lineage:
-      - datalake_offer.sale_offer.partner_3p_demand
-    description: 3P demand partner name
-  has_credit_pre_analysis:
-    lineage:
-      - datalake_offer.sale_offer.has_credit_pre_analysis
-    description:
-      Check if the sale agreement had credit pre analysis in the offer
-      negotiation step.
-  has_payment_in_protocol:
-    lineage:
-      - datalake_offer.sale_offer.has_payment_in_protocol
-    description:
-      Check if the sale agreement has contracted the financial product
-      payment in protocol.
   has_used_fgts_in_payment:
     lineage:
-      - datalake_offer.sale_offer.has_used_fgts_in_payment
+      - datalake_sale_offer.sale_offers.has_used_fgts_in_payment
     description: Has used (or will use) FGTS in payment
   has_seller_debt_payments:
     lineage:
-      - datalake_offer.sale_offer.has_seller_debt_payments
+      - datalake_sale_offer.sale_offers.has_seller_debt_payments
     description: Has Seller Debt Payments (Interveniente Quitante)
   is_ccv_canceled:
     lineage:
-      - datalake_offer.sale_offer.is_ccv_canceled
+      - datalake_sale_offer.sale_offers.is_ccv_canceled
     description: True if CCV is cancelled
   is_3p_supply:
     lineage:
-      - datalake_offer.sale_offer.is_3p_supply
+      - datalake_sale_offer.sale_offers.is_3p_supply
     description: Flag if supply belongs to a 3P partner
-  is_3p_supply_5a:
-    lineage:
-      - datalake_offer.sale_offer.is_3p_supply_5a
-    description: If the house is 3P supply 5A
-  is_3p_supply_bh:
-    lineage:
-      - datalake_offer.sale_offer.is_3p_supply_bh
-    description: If the house is 3P supply BH
   is_3p_demand:
     lineage:
-      - datalake_offer.sale_offer.is_3p_demand
+      - datalake_sale_offer.sale_offers.is_3p_demand
     description: Flag if offer was submitted by a 3P demand agent
   is_a_rescued_ccv:
     lineage:
-      - datalake_offer.sale_offer.is_a_rescued_ccv
+      - datalake_sale_offer.sale_offers.is_a_rescued_ccv
     description:
       Boolean to identify if this offer has an rescued ccv (A ccv that
       was cancelled and opened again)
   ts_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
-    description: Date of sale agreement cancellation
+      - datalake_sale_offer.sale_offers.ts_sale_agreement_signed
+    description: Timestamp of sale agreement signature
   ts_sale_agreement_cancelled:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_cancelled
-    description: Date of sale agreement cancellation
-  ts_house_registry_started:
-    lineage:
-      - datalake_offer.sale_offer.dt_house_registry_started
-    description: Date of house registry started
-  ts_house_registry_ended:
-    lineage:
-      - datalake_offer.sale_offer.dt_house_registry_ended
-    description: Date of house registry changed to buyers name
-  ts_sale_transaction_paid:
-    lineage:
-      - datalake_offer.sale_offer.dt_sale_transacton_paid
-    description: Date of sale amount  transfered to seller
-  ts_last_updated_pendency:
-    lineage:
-      - datalake_offer.sale_offer.ts_last_updated_pendency
-    description: Date of last updated pendency
+      - datalake_sale_offer.sale_offers.ts_sale_agreement_canceled
+    description: Timestamp of sale agreement cancellation
   ts_load:
     description: Timestamp of when this data row was last loaded

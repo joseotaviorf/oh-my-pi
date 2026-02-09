@@ -1093,12 +1093,9 @@ bietlejuice.dw_sale_offer_users:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users-info:first-run-of-day
 bietlejuice.dw_sale_offers:
   - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
-  - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
-  - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
+  - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day  
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
-  - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
-  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offers:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
 bietlejuice.dw_sale_offers_test:
   - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
@@ -3505,15 +3502,10 @@ bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
 bietlejuice.enrich_sale_offer:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
-  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
-  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
-  - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
   - bietlejuice.sales_flow:load-clean-brokerage:first-run-of-day
   - bietlejuice.sales_flow:load-clean-ccv-flow:first-run-of-day

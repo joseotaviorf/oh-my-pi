@@ -102,26 +102,26 @@ offer_taxonomy AS (
 )
 SELECT
     eso.id_offer AS sk_offer,
-    eso.monday_status,
     eso.offer_status,
     eso.drop_reason,
     eso.drop_reason_responsible,
     eso.current_payment_method AS payment_method,
     eso.business_unit,
-    eso.offer_platform,
     eso.offer_flow,
-    eso.agent_work_contract,
-    eso.team_lead_name,
-    eso.consultant_name AS deal_maker_name,
-    eso.agent_name,
-    eso.partner_3p_supply,
-    eso.partner_3p_demand,
     eso.credit_model,
-    eso.sale_price,
+	eso.tags_from_salesflow,
     eso.registry_price,
     eso.itbi_price,
     eso.payment_entry_amount,
-    ot.app_type,
+    eso.sale_price,
+	eso.is_3p_supply,
+    eso.is_3p_demand,
+    eso.is_a_rescued_offer,
+    eso.has_used_fgts_in_payment,
+    eso.has_used_negotiation_chat,
+    eso.ts_offer_submitted,
+    eso.ts_updated,
+	ot.app_type,
     ot.utm_source,
     ot.utm_medium,
     ot.utm_campaign,
@@ -134,19 +134,10 @@ SELECT
     COALESCE(ot.mkt_medium,'Not Mapped') AS mkt_medium,
     COALESCE(ot.mkt_source,'Not Mapped') AS mkt_source,
     COALESCE(ot.mkt_platform,'Not Mapped') AS mkt_platform,
-    ot.flg_branded AS is_branded,
-    eso.is_3p_supply,
-    eso.is_3p_supply_5a,
-    eso.is_3p_supply_bh,
-    eso.is_3p_demand,
-    eso.is_a_rescued_offer,
-    eso.has_used_fgts_in_payment,
-    eso.has_used_negotiation_chat,
-    eso.ts_offer_submitted,
-    eso.ts_updated,
+    ot.flg_branded AS is_branded, 
     NOW() AS ts_load
 FROM
-	datalake_offer.sale_offer AS eso
+	datalake_sale_offer.sale_offers AS eso
 LEFT JOIN
 	offer_taxonomy AS ot
 		ON eso.id_offer = ot.id_offer

@@ -1,343 +1,336 @@
 database_name: datalake_sale_offer
 table_name: sale_offer
-owner: herivelto.junior@quintoandar.com.br
+owner: thiago.bueno@quintoandar.com.br
 domain: For Sale
-description: With this table we have the objective of consolidating the general data
-  of the offer process, the idea here is to consolidate data mainly from the sources
-  of Sales (main source), Work Contract and others.
+description: Enriched table that consolidates sale offer information with visit and booking data, providing comprehensive metrics and flags for offer analysis including business unit attribution, partner identification, and conversion funnel timing metrics.
 columns:
   id_offer:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_offer
+      - datalake_sale_offer.core_sale_offer.id_offer
     description: Offer unique identifier.
   id_sales_flow:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
-    description: Identification key for the sales flow linked to an offer.
-  id_booking:
-    lineage:
-      - datalake_booking.booking.id
-    description: Booking identification key linked to an offer.
+      - datalake_sale_offer.core_sale_offer.id_sales_flow
+    description: SalesFlow identification key linked to an offer.
   id_buyer:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_buyer
+      - datalake_sale_offer.core_sale_offer.id_buyer
     description: Identification key of the user who sent the offer.
   id_house:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_house
+      - datalake_sale_offer.core_sale_offer.id_house
     description: Identification key of the house linked to the offer.
   id_owner:
     lineage:
-      - datalake_sale_offer_flows.sale_users_users.id_seller
-    description: House owner to whom an offer has been sent.
-  id_user_agent:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_user_agent
-      - datalake_ebdb_user.user.id
-    description: Broker identification key linked to the offer on main tables (EBDB)
-  id_agent:
-    lineage:
-      - datalake_ebdb_user.user.id_agent
-      - datalake_booking.booking.id_agent
-    description: Broker identification key linked to the offer.
-  id_hub:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_hub
-    description: ID to get more information abou the HUB on HubServices tables.
-  id_consultant:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_consultant
-    description: Deal Maker user ID on SalesFlow tables
-  id_user_consultant:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_user_consultant
-      - datalake_ebdb_user.user.id
-    description: Deal Maker user ID on main (EBDB) tables
-  id_closing_specialist:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_user_consultant
-    description: User ID that participated on the CCV step on main (EBDB) tables
-  id_team_lead:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.sk_team_lead
-    description: Team lead ID user on SalesFlow tables
-  id_user_team_lead:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.sk_user_team_lead
-    description: Team lead ID user on main (EBDB) tables
+      - datalake_sale_offer.core_sale_offer.id_owner
+    description: House owner identification key to whom an offer has been sent.
   id_region:
     lineage:
-      - datalake_ebdb_clean.house.id_region
-    description: Identification key of the region where the house in question is located.
-  id_pendency:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_pendency
-    description: Identification key for this offer pendencies on table pendency
-  id_business_unit:
-    lineage:
-      - datalake_ebdb_work_contract.work_contract.id_hub_teams
-      - datalake_sale_offer_flows.sale_offer_flows.id_hub
-    description: Identification key of the business unit where the buyer was served.
-  id_company_supply:
-    lineage:
-      - datalake_booking.booking.id_company_supply
-    description: ID of the supply partner from the company domain. Obtained from booking table which gets it from visit_business_model.
-  uuid_company_supply:
-    lineage:
-      - datalake_ebdb_listing.house.uuid_company
-    description: UUID of the supply partner in the company domain
-  id_company_demand:
-    lineage:
-      - datalake_booking.booking.id_company_demand
-    description: ID of the demand partner from Hubspot. Obtained from booking table which gets it from visit_business_model.
-  vendas_offer_flow:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.vendas_offer_flow
-    description: Information about which flow this offer is following
-  business_unit:
-    lineage:
-      - datalake_hub_services_clean.business_unit.hub_name
-      - datalake_ebdb_work_contract.work_contract.hub_name_teams
-    description: Name of the business unit where the buyer was served.
-  partner_3p_supply:
-    lineage:
-      - datalake_booking.booking.partner_3p_supply
-    description: Name of the supply partner. Obtained from booking table which gets it from visit_business_model.
-  partner_3p_demand:
-    lineage:
-      - datalake_booking.booking.partner_3p_demand
-    description: Name of the demand partner. Obtained from booking table which gets it from visit_business_model.
-  is_3p_supply:
-    lineage:
-      - datalake_booking.booking.is_3p_supply
-    description: Boolean flag indicating if the offer has 3P supply partner. Obtained from booking table which gets it from visit_business_model.
-  is_3p_lead_gen:
-    lineage:
-      - datalake_booking.booking.is_3p_lead_gen
-    description: Boolean flag indicating if the offer has 3P lead generation partner. Obtained from booking table which gets it from visit_business_model.
-  has_3p_access_control:
-    lineage:
-      - datalake_booking.booking.has_3p_access_control
-    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). Obtained from booking table which gets it from visit_business_model.
-  drop_reason:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.drop_reason
-    description: Reason why an offer was discarded.
-  drop_reason_responsible:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.drop_reason_responsible
-    description: Information about which type of user rejected the offer.
-  sale_agreement_cancellation_reason:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_cancellation_reason
-    description: Reason why a sales contract was cancelled.
-  is_buyer_first_offer:
-    description: Validation done to understand if it is the first offer that a buyer
-      has sent.
-  is_house_first_offer:
-    description: Validation done to understand if it is the first offer that a house
-      has received.
-  is_3p_supply_5a:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_5a
-    description: Flag indicating if this offer came from a 5A supply partner
-  is_3p_supply_bh:
-    lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_bh
-    description: Flag indicating if this offer has an supply partner from BH
-  is_3p_demand:
-    lineage:
-      - datalake_booking.booking.is_3p_demand
-    description: Flag indicating if this offer came from a 3p partner
-  is_ccv_canceled:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
-    description: Boolean to identify if the cvv is cancelled.
-  is_a_rescued_ccv:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_ccv
-    description: Boolean to identify if this offer has an rescued ccv (A ccv that
-      was cancelled and opened again)
-  is_a_rescued_offer:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_offer
-    description: Boolean to identify if this offer is a rescued one (An offer that
-      was cancelled and opened again)
-  flg_booking_before_offer:
-    description: Flag indicating if the offer was made after the booking.
-  flg_visit_completed_before_offer:
-    description: Flag indicating if the offer was made after a visit.
-  fgts_value:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.fgts_value
-    description: FGTS value used on the purchase
-  financing_value:
-    lineage:
-      - datalake_monopoly_clean.sale_revision.financed_amount
-    description: Value that will be financed.
-  earnest_value:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.entry_amount
-      - datalake_monopoly_clean.sale_revision.entry_payment_amount
-    description: Entry amount paid by the buyer
-  brokerage_fee:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.brokerage_fee
-    description: Fee paid to the EN on this ofer
-  sale_price:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.sale_listing_price
-    description: Sale listing price
-  first_price_offered_by_buyer:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.first_price_offered_by_buyer
-    description: First value offered by the buyer
-  last_price_offered_by_buyer:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.last_price_offered_by_buyer
-    description: Last value offered by the buyer
-  first_discount_proposed:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.first_discount_proposed
-    description: First discount offered
-  last_discount_proposed:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.last_discount_proposed
-    description: Last discount offered
-  sale_price_agreed:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.sale_price_agreed
-    description: Final price agreed for this offer
-  ccv_type:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.is_ccv_5a_model
-    description: Final price agreed for this offer
-  payment_status:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.payment_status
-    description: Offer payment status
-  credit_status:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.credit_status
-    description: Credit analysis status
-  offer_status:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.vendas_offer_status
-    description: SalesFlow offer status
-  sale_agreement_status:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_status
-    description: CCV status
-  payment_model:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.payment_model
-    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc)
-  credit_model:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.credit_model
-    description: Offer credit model
-  financing_bank:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.financing_bank
-    description: Bank name used on this offer financing
+      - datalake_sale_offer.core_sale_offer.id_region
+    description: Region identification key where the property is located.
   city_group:
     lineage:
       - datalake_region.region.city_group
-    description: Offer city group
+    description: City group classification based on the region where the property is located.
+  id_agent:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_agent
+      - datalake_visit.visits.id_agent
+    description: Agent identification key linked to the offer or visit.
+  id_booking:
+    lineage:
+      - datalake_visit.visits.id_visit
+    description: Booking identification key linked to the visit before the offer.
+  id_business_unit:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.id_hub
+      - datalake_hub_services_clean.business_unit.id
+    description: Business unit identification key responsible for the offer. Populated from id_hub field in core_sale_offer.
+  id_company_supply:
+    lineage:
+      - datalake_visit.visits.id_company_supply
+    description: Identification key of the supply partner company in HubSpot.
+  id_company_demand:
+    lineage:
+      - datalake_visit.visits.id_company_demand
+    description: Identification key of the demand partner company.
+  is_3p_supply:
+    lineage:
+      - datalake_visit.visits.is_3p_supply
+    description: Boolean flag indicating if the offer has 3P supply partner. Obtained from visits table which gets it from visit_business_model.
+  is_3p_demand:
+    lineage:
+      - datalake_visit.visits.is_3p_demand
+    description: Boolean flag indicating if the offer has 3P demand partner. Obtained from visits table which gets it from visit_business_model.
+  is_3p_lead_gen:
+    lineage:
+      - datalake_visit.visits.is_3p_lead_gen
+    description: Boolean flag indicating if the offer has 3P lead generation partner. Obtained from visits table which gets it from visit_business_model.
+  has_3p_access_control:
+    lineage:
+      - datalake_visit.visits.has_3p_access_control
+    description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). Obtained from visits table which gets it from visit_business_model.
+  id_user_secretariat_booking_creator:
+    lineage:
+      - datalake_visit.visits.id_user_visit_request
+    description: User identification key of the secretariat member who created the booking when different from the assigned agent.
+  flow_type:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.flow_type
+    description: Type of sales flow used for the offer (e.g., DEFAULT, DEAL_MAKING). Only available for SalesFlow originated offers.
+  offer_flow:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.flow_type
+    description: Derived offer flow classification. Returns 'DEAL_MAKING' for deal making flows, otherwise returns the flow_type or 'NOT DEFINED'.
+  id_user_agent:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_agent
+    description: Agent user identification key on main tables (EBDB) responsible for the offer.
+  id_user_team_lead:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_team_lead
+    description: Team lead user identification key on main tables (EBDB).
+  id_user_consultant:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_consultant
+    description: Deal Maker/consultant user identification key on main tables (EBDB).
+  id_consultant:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_consultant
+    description: Deal Maker/consultant identification key on SalesFlow tables.
+  id_closing_specialist:
+    lineage:
+      - datalake_sale_offer_flows.offer_specialists.id_user_consultant
+    description: User identification key of the specialist who participated in the CCV (sale agreement) step on main tables (EBDB).
+  sale_agreement_status:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.status
+    description: Current status of the sale agreement (CCV) in SalesFlow.
+  ccv_type:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.is_5a_model
+    description: Derived classification of the CCV type. Returns 'Default 5A CCV' if is_5a_model is true, 'Not a 5A CCV Model' if false, or 'Unknown' otherwise.
+  ccv_model:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.is_5a_model
+    description: Derived CCV model description. Returns 'Is a 5A model', 'Not a 5A model', 'Not Answered', or 'Undefined' based on the is_5a_model flag.
+  is_ccv_5a_model:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.is_5a_model
+    description: Boolean flag indicating if the sale agreement uses the 5A CCV model.
+  closing_status:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.status_closing
+    description: Current closing status of the sales flow after sale agreement signing.
+  sale_agreement_cancellation_reason:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.closing_canceled_reason
+    description: Reason for cancellation of the sale agreement (CCV) when applicable.
+  is_ccv_canceled:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.is_canceled
+      - datalake_sales_flow_clean.sales_flow.flow_step
+    description: Boolean flag indicating if the sale agreement (CCV) was canceled. Derived from is_canceled field or flow_step = 'CANCELED_CCV'.
+  is_a_rescued_ccv:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_aud.is_canceled
+    description: Boolean flag indicating if the sale agreement (CCV) was rescued after being previously canceled.
   house_dilligence_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.house_dilligence_status
-    description: House Diligence status
+      - datalake_sales_flow_clean.house.house_registration_status
+    description: Current status of the house registration diligence process.
   seller_dilligence_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.seller_dilligence_status
-    description: Seller Diligence status
+      - datalake_sales_flow_clean.diligence.classification
+    description: Classification status of the seller diligence process.
   report_dilligence_status:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.seller_dilligence_status
-    description: Diligence report status
-  days_sale_agreement_created_to_sale_agreement_signed:
+      - datalake_sales_flow_clean.diligence.step
+    description: Current step of the diligence report process.
+  diligence_appointment_reason:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.days_sale_agreement_created_to_sale_agreement_signed
-    description: Date difference between sale agreement created and sale agreement signed
-  days_offer_accepted_to_sale_agreement_signed:
+      - datalake_sales_flow_clean.diligence_appointment.appointment
+    description: Concatenated list of diligence appointment reasons separated by ' - '.
+  has_seller_debt_payments:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_signed
-    description: Date difference between offer accepted and sale agreement signed
-  days_offer_accepted_to_sale_agreement_created:
+      - datalake_sales_flow_clean.house.has_seller_debt_payments
+    description: Boolean flag indicating if the seller has debt payments associated with the house.
+  current_payment_method:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_created
-    description: Date difference between offer accepted and sale agreement created
-  days_offer_accepted_to_offer_dismissed:
+      - datalake_sale_offer.core_sale_offer.current_payment_method
+    description: Current payment method chosen for the offer (Cash, financed, etc).
+  planned_payment_method:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_offer_dismissed
-    description: Date difference between offer accepted and offer dismissed
-  days_offer_submitted_to_offer_accepted:
+      - datalake_sale_offer.core_sale_offer.planned_payment_method
+    description: Initial payment method planned by the buyer at the moment of offer creation.
+  payment_model:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_sale_offer_flows.sale_offer_flows.dt_offer_accepted
-    description: Date difference between offer created and offer accepted
-  days_offer_submitted_to_sale_agreement_created:
+      - datalake_sale_offer.core_sale_offer.payment_model
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc).
+  credit_model:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
-    description: Date difference between offer created and sale agreement created
-  days_offer_submitted_to_offer_dismissed:
+      - datalake_sale_offer.core_sale_offer.credit_model
+    description: Credit model used for the mortgage financing. Only available for offers with mortgage.
+  tags_from_salesflow:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_sale_offer_flows.sale_offer_flows.dt_offer_dismissed
-    description: Date difference between offer created and offer dismissed
-  days_offer_submitted_to_sale_agreement_signed:
+      - datalake_sale_offer.core_sale_offer.tags_from_salesflow
+    description: Tags from the sales flow associated with the offer.
+  has_used_fgts_in_payment:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_created
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_signed
-    description: Date difference between offer created and sale agreement signed
+      - datalake_sale_offer.core_sale_offer.has_used_fgts_in_payment
+    description: Boolean flag indicating if FGTS (Employment Compensation Fund) was used in the payment method.
+  brokerage_fee:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.brokerage_fee
+    description: Brokerage fee percentage paid on this offer transaction.
+  sale_price:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.sale_price
+    description: Sale listing price set by the seller.
+  first_price_offered_by_buyer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.first_price_offered_by_buyer
+    description: First value offered by the buyer for the property.
+  last_price_offered_by_buyer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.last_price_offered_by_buyer
+    description: Last value offered by the buyer for the property.
+  sale_price_agreed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.sale_price_agreed
+    description: Final price agreed between buyer and seller for the property.
+  first_discount_proposed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.first_discount_proposed
+    description: First discount percentage proposed by the buyer calculated as (sale_price - first_offer_price) / sale_price.
+  last_discount_proposed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.last_discount_proposed
+    description: Last discount percentage proposed by the buyer calculated as (sale_price - last_offer_price) / sale_price.
+  payment_entry_amount:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.payment_entry_amount
+    description: Entry amount paid by the buyer at the beginning of the contract.
+  registry_price:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.registry_price
+    description: Property registry price for legal documentation.
+  itbi_price:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.itbi_price
+    description: ITBI (Real Estate Transfer Tax) value for the property transaction.
+  has_used_negotiation_chat:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.has_used_negotiation_chat
+    description: Boolean flag indicating if the negotiation chat feature was used for this offer.
+  offer_status:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.status
+    description: Current status of the sales flow and offer in the negotiation process.
+  drop_reason:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.drop_reason
+    description: Reason why the offer was dropped or rejected before sale agreement signature.
+  drop_reason_responsible:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.drop_reason_responsible
+    description: Type of user responsible for dropping the offer (Buyer, Seller, Agent, or Other).
+  business_unit:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Name of the business unit (hub) responsible for the offer.
+  is_a_rescued_offer:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.is_a_rescued_offer
+    description: Boolean flag indicating if the offer was rescued after being previously discarded or canceled.
+  price_segment:
+    lineage:
+      - datalake_sale_listings.sale_listing_price_changes.price_segment
+    description: Price segment classification of the property at the time the offer was created.
+  id_buyer_prospect_type:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect_type.id_buyer_prospect_type
+    description: Buyer prospect type identification key based on buyer behavior and city group at the time of offer.
+  flg_booking_before_offer:
+    description: Boolean flag indicating if a booking was created before the offer was submitted.
+  flg_visit_completed_before_offer:
+    description: Boolean flag indicating if a visit was completed before the offer was submitted.
+  is_buyer_first_offer:
+    description: Boolean flag indicating if this is the first offer submitted by this buyer.
+  is_house_first_offer:
+    description: Boolean flag indicating if this is the first offer received by this house.
+  ts_booking_created:
+    lineage:
+      - datalake_visit.visits.ts_created
+    description: Timestamp when the booking associated with this offer was created.
   hours_booking_to_offer:
-    lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-    description: Hours difference between booking event and offer created
-  dt_offer_accepted:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
-    description: Date when the offer was accepted by the owner
-  dt_offer_dismissed:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_discarded
-    description: Date when the offer was rejected by the owner
-  dt_offer_rescued:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_offer_rescued
-    description: Date when the offer as rescued.
-  dt_sale_agreement_created:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
-    description: Date when the CCV was created
-  dt_sale_agreement_signed:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_signed
-    description: Date when the CCV was signed
-  dt_sale_transacton_paid:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_transacton_paid
-    description: Date when the seller received the payment from the financing company.
-      In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date.
-  dt_sale_agreement_cancelled:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_cancelled
-    description: Date when the CCV was cancelled
-  dt_sale_agreement_rescued:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_rescued
-    description: Date when the CCV was rescued
-  dt_offer_created:
-    lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-    description: Date when the offer was sent by the buyer
+    description: Number of hours between the booking creation and the offer submission.
+  hours_visit_to_offer:
+    description: Number of hours between the visit completion and the offer submission.
+  days_offer_submitted_to_offer_accepted:
+    description: Number of days between offer submission and offer acceptance by seller.
+  days_offer_submitted_to_sale_agreement_created:
+    description: Number of days between offer submission and sale agreement (CCV) creation.
+  days_offer_submitted_to_offer_dismissed:
+    description: Number of days between offer submission and offer dismissal/rejection.
+  days_offer_submitted_to_sale_agreement_signed:
+    description: Number of days between offer submission and sale agreement signing.
+  days_offer_accepted_to_sale_agreement_created:
+    description: Number of days between offer acceptance and sale agreement (CCV) creation.
+  days_offer_accepted_to_sale_agreement_signed:
+    description: Number of days between offer acceptance and sale agreement signing.
+  days_offer_accepted_to_offer_dismissed:
+    description: Number of days between offer acceptance and offer dismissal (for rescued offers).
+  days_sale_agreement_created_to_sale_agreement_signed:
+    description: Number of days between sale agreement creation and sale agreement signing.
   ts_offer_submitted:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-    description: Timestamp when the offer was sent by the buyer
+      - datalake_sale_offer.core_sale_offer.ts_offer_created
+    description: Timestamp when the offer was submitted by the buyer.
+  ts_offer_accepted:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_accepted
+    description: Timestamp when the offer was accepted by the seller.
+  ts_offer_dismissed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_discarded
+    description: Timestamp when the offer was dismissed or rejected.
+  ts_offer_canceled:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_canceled
+    description: Timestamp when the offer was canceled.
+  ts_offer_rescued:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_offer_rescued
+    description: Timestamp when a previously discarded or canceled offer was rescued and accepted again.
+  ts_sale_agreement_drafted:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_sale_agreement_drafted
+    description: Timestamp when the sale agreement draft was sent to operations support. Only available for SalesFlow originated offers.
+  ts_sale_agreement_created:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_sale_agreement_created
+    description: Timestamp when the sale agreement (CCV - Contrato de Compra e Venda) confection was started.
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_sale_agreement_signed
+    description: Timestamp when the sale agreement (CCV) was signed by both parties.
+  ts_sale_agreement_canceled:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_aud.ts_updated
+    description: Timestamp when the sale agreement (CCV) was canceled. Obtained from the audit table tracking cancellation status changes.
+  ts_seller_fup:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.ts_seller_fup
+    description: Timestamp of seller follow-up interaction.
+  ts_buyer_fup:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.ts_buyer_fup
+    description: Timestamp of buyer follow-up interaction.
+  ts_updated:
+    lineage:
+      - datalake_sale_offer.core_sale_offer.ts_updated
+    description: Timestamp when the offer was last updated.
   ts_load:
-    description: Timestamp when the data was loaded on datalake
+    description: Timestamp when the data was loaded into the datalake.
+

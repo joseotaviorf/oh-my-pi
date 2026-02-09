@@ -12,29 +12,32 @@ WITH business_unit_by_hub_id AS (
 ),
 base_visits AS (      
   SELECT 
-    b.id_visit AS id,  
+    b.id_schedule AS id,  
     b.id_house,
     b.id_visitor,
     b.id_agent,
     --TODO: TROCAR PELO CAMPO DA TABELA DE ORIGEM (id_user_sale_attendence_5a)    
     CASE
-      WHEN b.id_agent <> b.id_user_visit_request THEN b.id_user_visit_request
+      WHEN v.id_agent <> v.id_user_visit_request THEN v.id_user_visit_request
       ELSE NULL
     END AS id_user_secretariat_booking_creator,
     --FIM TODO: TROCAR PELO CAMPO DA TABELA DE ORIGEM
     b.id_company_supply,
     b.id_company_demand,
-    b.partner_3p_demand AS partner_3p_demand,    
-    b.visit_request_channel AS visit_channel, 
+    v.partner_3p_demand AS partner_3p_demand,    
+    v.visit_request_channel AS visit_channel, 
     b.is_3p_supply,
     b.is_3p_demand,
     b.is_3p_lead_gen,
     b.has_3p_access_control,
     b.is_canceled,  
     b.ts_visit,
-    b.ts_created AS ts_booking_created             
+    b.ts_schedule_created AS ts_booking_created             
   FROM    
-    datalake_visit.visits AS b
+    datalake_visit.visit_schedules AS b
+  LEFT JOIN
+    datalake_visit.visits AS v
+      ON b.id_visit = v.id_visit
   WHERE
       b.business_context = 'SALE'
   AND b.is_completed = TRUE
