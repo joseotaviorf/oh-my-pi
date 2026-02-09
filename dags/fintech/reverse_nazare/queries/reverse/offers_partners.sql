@@ -52,16 +52,22 @@ cte_categoria AS (
             WHEN da.is_3p_supply = 'true' THEN '3P - Supply'
         END AS tipo,
         CASE
-            WHEN da.is_3p_demand = 'true' THEN da.partner_3p_demand
+            WHEN da.is_3p_demand = 'true' THEN cd.company_name
         END AS agents_partner,
         CASE
-            WHEN da.is_3p_supply = 'true' THEN da.partner_3p_supply
+            WHEN da.is_3p_supply = 'true' THEN cs.company_name
         END AS partner
     FROM
         dw_sale.fact_offers fo
     LEFT JOIN
         dw_sale.dim_sale_agreement da
             ON da.sk_offer = fo.sk_offer
+    LEFT JOIN
+        dw_public.dim_company_3p_partners cd
+            ON cd.sk_company = fo.sk_company_demand
+    LEFT JOIN
+        dw_public.dim_company_3p_partners cs
+            ON cs.sk_company = fo.sk_company_supply
 ),
 
 cte_categoria_filtro AS (
