@@ -24,17 +24,17 @@ column_level_validations:
   person_number:
     is_complete:
       severity_level: Error
-  salary_amount:
+  amount_salary:
     is_complete:
       severity_level: Error
     custom:
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_compensation.fact_compensations
-         WHERE salary_amount < 0
+         WHERE amount_salary < 0
         ) = 0
       severity_level: Error
-  annual_salary:
+  amount_annual_salary:
     is_complete:
       severity_level: Error
   is_salary_approved:
