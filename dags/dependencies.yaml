@@ -519,6 +519,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
 bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-dim-affiliate-cost:first-run-of-day
@@ -1637,7 +1638,6 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-offer:first-run-of-day
-  - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
 bietlejuice.enrich_cdp_personas:
@@ -3182,7 +3182,6 @@ bietlejuice.enrich_prospect_status:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
-  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
 bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays:first-run-of-day
@@ -3405,13 +3404,14 @@ bietlejuice.enrich_sale_available_booking_hours:
   - bietlejuice.enrich_booking:load-enrich-house-available-hours:first-run-of-day
 bietlejuice.enrich_sale_closing_flows:
   - bietlejuice.enrich_monopoly:load-enrich-sale:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
   - bietlejuice.sales_flow:load-clean-diligence-aud:first-run-of-day
   - bietlejuice.sales_flow:load-clean-mortgage-aud:first-run-of-day
-bietlejuice.enrich_sale_demand_events:
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
+  - bietlejuice.sales_flow:load-clean-notary:first-run-of-day
+bietlejuice.enrich_sale_demand_events:  
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit:first-run-of-day
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day

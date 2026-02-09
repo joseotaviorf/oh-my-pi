@@ -1,76 +1,182 @@
 ---
 database_name: dw_datamarts
 table_name: sale_events_funnel
+description: Aggregated funnel table for sale events tracking supply and demand metrics across the sales journey.
+domain: For Sale
+owner: herivelto.junior@quintoandar.com.br
 columns:
   week_start:
     lineage:
       - dw_public.dim_date.week_start
+    description: Start date of the week for the event.
   date:
     lineage:
       - dw_public.dim_date.date
+    description: Date of the event.
   month:
     lineage:
       - dw_public.dim_date.month
+    description: Month of the event.
   quarter:
     lineage:
       - dw_public.dim_date.quarter
-  affiliate_volumetry:
-    lineage:
-      - dw_datamarts.affiliates_clusters.affiliate_volumetry
+    description: Quarter of the event.
   city_group:
     lineage:
       - dw_public.dim_region.city_group
-  is_3p_demand:
-    lineage:
-      - dw_public.dim_booking.is_3p_demand
-      - dw_sale.dim_offer.is_3p_demand
-  is_3p_supply:
-    lineage:
-      - dw_rent.dim_house_listing.is_3p_supply
-      - dw_public.dim_booking.is_3p_supply
-      - dw_sale.dim_offer.is_3p_supply
+    description: City group classification (RMSP, Rio de Janeiro, Belo Horizonte, Porto Alegre, Campinas, or Out of coverage area).
   lead_context:
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_completion
+    description: Lead context classification (B2B, CIQ, FSS, or IS) based on marketing origin and completion type.
   mkt_campaign_context:
     lineage:
       - dw_datamarts.lead_listing_flows.lead_context_origin
+    description: Marketing campaign context (Branded for Organic, otherwise original value).
   mkt_origin:
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
+    description: Marketing origin of the lead.
   mkt_channel:
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_channel
+    description: Marketing channel of the lead.
+  mkt_medium:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_medium
+    description: Marketing medium of the lead.
+  mkt_type:
+    lineage:
+      - dw_datamarts.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_channel
+    description: Marketing type classification (Paid or Non Paid) based on origin and channel.
   sales_company:
     lineage:
       - dw_datamarts.lead_listing_flows.sales_company
+    description: Sales company associated with the lead.
   lead_processing_operation:
     lineage:
       - dw_datamarts.lead_listing_flows.sourcing_ops
+    description: Lead processing operation classification.
+  affiliate_volumetry:
+    lineage:
+      - dw_datamarts.affiliates_clusters.affiliate_volumetry
+    description: Affiliate volumetry classification.
   first_origin_demand:
     lineage:
       - dw_sale.fact_sale_flows.first_event
+    description: First touchpoint of the demand flow.
   origin_before_offer:
     lineage:
       - dw_sale.fact_sale_flows.higher_intent_before_offer
+    description: Higher intent event before offer submission.
   origin_after_offer:
     lineage:
       - dw_sale.fact_sale_flows.higher_intent_after_offer
+    description: Higher intent event after offer submission.
+  form_of_payment:
+    lineage:
+      - datalake_sale_offer.sale_offer.current_payment_method
+      - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
+    description: Form of payment classification (Financiado, À Vista, À Vista + FGTS, Financiado + FGTS, or Other).
   hub_visit:
     lineage:
       - datalake_hub_services_clean.business_unit.hub_name
+    description: Hub name where the visit occurred.
   hub_offer:
     lineage:
       - dw_sale.dim_offer.business_unit
-  supply_3pbh_partner:
-    lineage:
-      - datalake_3p.houses_3p_bh.partner
+    description: Business unit/hub associated with the offer.
   supply_3p_partner:
     lineage:
       - dw_rent.dim_house_listing.partner_3p_supply
       - dw_public.dim_booking.partner_3p_supply
       - dw_sale.dim_offer.partner_3p_supply
+    description: Name of the 3P supply partner.
   demand_3p_partner:
     lineage:
       - dw_public.dim_booking.partner_3p_demand
       - dw_sale.dim_offer.partner_3p_demand
+    description: Name of the 3P demand partner.
+  supply_3pbh_partner:
+    lineage:
+      - datalake_ebdb_listing.house.partner_3p_supply
+    description: Name of the 3P BH supply partner.
+  is_3p_supply:
+    lineage:
+      - dw_rent.dim_house_listing.is_3p_supply
+      - dw_public.dim_booking.is_3p_supply
+      - dw_sale.dim_offer.is_3p_supply
+    description: Flag indicating if the transaction has a 3P supply partner.
+  is_3p_demand:
+    lineage:
+      - dw_public.dim_booking.is_3p_demand
+      - dw_sale.dim_offer.is_3p_demand
+    description: Flag indicating if the transaction has a 3P demand partner.
+  is_3pbh_supply:
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply_bh
+    description: Flag indicating if the transaction has a 3P BH supply partner.
+  leads:
+    description: Count of leads generated.
+  prospects:
+    description: Count of prospects.
+  first_contacts:
+    description: Count of first contacts made.
+  qualifieds:
+    description: Count of qualified leads.
+  available_qualifieds:
+    description: Count of available qualified leads.
+  opportunities:
+    description: Count of opportunities (unique house listings).
+  first_listings:
+    description: Count of first listings (unique house listings).
+  tta_started:
+    description: Count of Talk to Agent conversations started.
+  tta_completed:
+    description: Count of Talk to Agent conversations completed.
+  visits_booked:
+    description: Count of visits booked.
+  visits_completed:
+    description: Count of visits completed.
+  offer_submitted:
+    description: Count of offers submitted.
+  deal_qualified:
+    description: Count of deals qualified (PROPOSAL_ONGOING step reached).
+  offer_accepted:
+    description: Count of offers accepted.
+  ccv_signed:
+    description: Count of sale agreements (CCV) signed.
+  diligence_started_legaut:
+    description: Count of diligences started by Legaut.
+  diligence_ended_legaut:
+    description: Count of diligences ended by Legaut.
+  diligence_ended:
+    description: Count of diligences ended (full legal analysis).
+  diligence_started_legal:
+    description: Count of legal risk analysis started.
+  diligence_ended_legal:
+    description: Count of legal risk analysis ended.
+  credit_sent:
+    description: Count of credit analysis started.
+  credit_approved:
+    description: Count of credit analysis approved.
+  finan_started:
+    description: Count of financing processes started.
+  finan_ended:
+    description: Count of financing processes ended.
+  payment_concluded:
+    description: Count of payments concluded.
+  notes_registry_started:
+    description: Count of notes registry processes started.
+  notes_registry_ended:
+    description: Count of notes registry processes ended.
+  matricula_inicio:
+    description: Count of house registry processes started.
+  matricula_atualizada:
+    description: Count of house registry processes completed.
+  entrega_chave:
+    description: Count of key deliveries completed.
+  ts_load:
+    description: Timestamp indicating when this table was last updated.

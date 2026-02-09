@@ -44,15 +44,38 @@ diligence AS (
 ),
 mortgage AS (
     SELECT
-        id_mortgage_aud AS id_mortgage,
-        id_sales_flow,
-        CAST(dt_credit_ended AS DATE) AS dt_credit_analysis_ended
+        mg.id_mortgage_aud AS id_mortgage,
+        mg.id_sales_flow,
+        mg.bank,
+        mg.status,
+        mg.credit_model,
+        mg.credit_status,
+        mg.dt_bank_started,
+        mg.dt_credit_started,
+        mg.dt_credit_ended,
+        CAST(mg.dt_credit_ended AS DATE) AS dt_credit_analysis_ended,
+        mg.dt_started,
+        mg.dt_ended,
+        DATE(mg.ts_seller_paid) AS dt_seller_paid
     FROM
-        datalake_sales_flow_clean.mortgage_aud
+        datalake_sales_flow_clean.mortgage_aud as mg
     WHERE
-        dt_credit_ended IS NOT NULL
+        mg.dt_credit_ended IS NOT NULL
     QUALIFY 
-      1 = ROW_NUMBER() over (PARTITION BY id_mortgage_aud ORDER BY ts_updated)
+      ROW_NUMBER() over (PARTITION BY mg.id_mortgage_aud ORDER BY mg.ts_updated desc) = 1 
+),
+notary AS (
+    SELECT
+        n.id_notary,
+        n.id_sales_flow,
+        n.status,
+        DATE(n.ts_started) AS dt_started,
+        DATE(n.ts_ended) AS dt_ended,
+        DATE(n.ts_buyer_received_keys) AS dt_buyer_received_keys
+    FROM
+        datalake_sales_flow_clean.notary AS n
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY n.id_notary ORDER BY n.ts_updated DESC) = 1
 ),
 payment_dates AS (
     SELECT
@@ -65,11 +88,12 @@ payment_dates AS (
         pm.payment_method_updated,
         pm.dt_payment_method_change,
         COALESCE(di.dt_legal_analysis_ended, m.dt_legal_analysis_ended) AS  dt_legal_analysis_ended,
-        COALESCE(mg.dt_credit_analysis_ended, m.dt_credit_analysis_ended) AS dt_credit_analysis_ended
+        COALESCE(mg.dt_credit_analysis_ended, m.dt_credit_analysis_ended) AS dt_credit_analysis_ended,
+        COALESCE(mg.dt_seller_paid,m.dt_sale_transacton_paid) AS dt_sale_transacton_paid
     FROM
         datalake_sale_offer_flows.sale_offer_flows AS o
     INNER JOIN
-        datalake_offer.sale_offer AS so
+        datalake_sale_offer.sale_offer AS so
             ON so.id_offer = o.id_offer
     INNER JOIN
         datalake_monopoly.sale AS ms
@@ -119,7 +143,8 @@ payment_rule AS (
                         THEN DATE(GREATEST(dt_occurence, dt_legal_analysis_ended, dt_credit_analysis_ended))
                 END
             ELSE NULL
-        END AS dt_payment_allowed
+        END AS dt_payment_allowed,
+        dt_sale_transacton_paid
     FROM
         payment_dates
 ),
@@ -130,7 +155,7 @@ data_sources AS (
         so.id_owner,
         so.id_house,
         so.id_company_supply,
-        so.uuid_company_supply,
+        cs.uuid_company AS uuid_company_supply,
         so.id_company_demand,
         COALESCE('ID_VENDAS_' || sof.id_consultant, 'ID_MONDAY_' || m.id_closing_specialist) AS id_closing_specialist,
         COALESCE('ID_VENDAS_' || sof.id_legal_risk_analyst, 'ID_MONDAY_' || m.id_legal_risk_analyst) AS id_legal_risk_analyst,
@@ -142,15 +167,15 @@ data_sources AS (
         COALESCE('ID_VENDAS_' || sof.id_credit_specialist, 'ID_MONDAY_' || m.id_credit_specialist) AS id_credit_specialist,
         COALESCE('ID_VENDAS_' || sof.id_notes_registry_specialist, 'ID_MONDAY_' || m.id_notes_registry_specialist) AS id_notes_registry_specialist,
         COALESCE('ID_VENDAS_' || sof.id_real_estate_register_specialist, 'ID_MONDAY_' || m.id_real_estate_register_specialist) AS id_real_estate_register_specialist,
-        so.partner_3p_supply,
-        so.partner_3p_demand,
+        cs.company_name AS partner_3p_supply,
+        cd.company_name AS partner_3p_demand,
         so.is_3p_supply,
         so.is_3p_demand,
         so.is_3p_lead_gen,
         so.has_3p_access_control,
-        so.dt_sale_agreement_created,
-        so.dt_sale_agreement_signed,
-        so.dt_sale_agreement_cancelled,
+        DATE(so.ts_sale_agreement_created) AS dt_sale_agreement_created,        
+        so.ts_sale_agreement_signed AS dt_sale_agreement_signed,
+        DATE(sof.dt_sale_agreement_cancelled) AS dt_sale_agreement_cancelled,
         COALESCE(
             sof.dt_onboarding_ended,
             CASE
@@ -170,18 +195,21 @@ data_sources AS (
         COALESCE(sof.dt_financing_ended, m.dt_financing_ended) AS dt_financing_ended,
         COALESCE(sof.dt_notes_registry_started, m.dt_notes_registry_started) AS dt_notes_registry_started,
         COALESCE(sof.dt_notes_registry_ended, m.dt_notes_registry_ended) AS dt_notes_registry_ended,
-        so.dt_house_registry_started,
-        so.dt_house_registry_ended,
+        COALESCE(n.dt_started, m.dt_house_registry_started) AS dt_house_registry_started,
+        COALESCE(n.dt_ended, m.dt_house_registry_ended) AS dt_house_registry_ended,
         COALESCE(sof.dt_sale_key_delivered, m.dt_sale_key_delivered) AS dt_sale_key_delivered,
-        so.dt_sale_transacton_paid,
-        so.dt_sale_agreement_rescued,
+        pr.dt_sale_transacton_paid,        
+        sof.dt_sale_agreement_rescued AS dt_sale_agreement_rescued,        
         pr.dt_payment_allowed,
         sof.dt_diligence_buyer_sent_at,
         sof.dt_diligence_seller_sent_at,
         ms.dt_occurence AS dt_down_payment,
         so.ts_updated
     FROM
-        datalake_offer.sale_offer AS so
+        datalake_sale_offer.sale_offer AS so
+    LEFT JOIN
+        notary AS n
+            ON so.id_sales_flow = n.id_sales_flow
     LEFT JOIN
         datalake_firestore.monday AS m
             ON so.id_offer = m.id_offer
@@ -194,9 +222,16 @@ data_sources AS (
     LEFT JOIN
         payment_rule AS pr
             ON pr.id_offer = so.id_offer
+    LEFT JOIN
+        datalake_company.company_sks AS cs
+            ON so.id_company_supply = cs.sk_company
+    LEFT JOIN
+        datalake_company.company_sks AS cd
+            ON so.id_company_demand = cd.sk_company
     WHERE
-        so.dt_sale_agreement_signed IS NOT NULL
+        so.ts_sale_agreement_signed IS NOT NULL
 )
+
 
 SELECT
     id_offer,

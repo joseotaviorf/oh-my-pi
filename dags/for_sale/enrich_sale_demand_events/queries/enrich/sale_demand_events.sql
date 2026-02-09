@@ -19,23 +19,23 @@ WITH bookings AS (
 offers AS (
   SELECT
     eso.id_offer,
-    eso.id_sale_flow,
+    CONCAT(eso.id_buyer,'_', eso.id_house) AS id_sale_flow,
     eso.ts_offer_submitted,
-    eso.dt_offer_accepted,
-    eso.dt_sale_agreement_created,
-    eso.dt_sale_agreement_signed,
-    eso.dt_offer_dismissed,
+    eso.ts_offer_accepted AS dt_offer_accepted,
+    eso.ts_sale_agreement_created AS dt_sale_agreement_created,
+    eso.ts_sale_agreement_signed AS dt_sale_agreement_signed,
+    eso.ts_offer_dismissed AS dt_offer_dismissed,
     eso.id_booking,
     eso.id_house,
     eso.id_region,
     eso.id_buyer,
     eso.id_owner AS id_seller,
     eso.id_agent,
-    eso.sk_company_supply,
-    eso.sk_company_demand,
+    eso.id_company_supply AS sk_company_supply,
+    eso.id_company_demand AS sk_company_demand,
     eso.id_business_unit
   FROM
-    datalake_offer.sale_offer AS eso
+    datalake_sale_offer.sale_offer AS eso
 ),
 events AS (
     SELECT -- Visit Booked
@@ -123,7 +123,7 @@ events AS (
         dt_offer_accepted IS NOT NULL
     UNION ALL
     SELECT -- Sale Agreement Created
-        dt_sale_agreement_created AS dt_event,
+        DATE(dt_sale_agreement_created) AS dt_event,
         id_sale_flow,
         5 AS sk_event_type,
         'SALE_AGREEMENT_CREATED' AS event_name,

@@ -69,7 +69,6 @@ data_deal_quali AS (
         mod_flow_step AND flow_step = 'PROPOSAL_ONGOING'
     GROUP BY id
 ),
-
 sale_offers_adjusted AS (
 SELECT
     eso.id_offer,
@@ -84,14 +83,14 @@ SELECT
         WHEN (eso.current_payment_method = 'FINANCED' AND eso.has_used_fgts_in_payment = TRUE) OR eso.current_payment_method = 'FINANCED_WITH_FGTS' THEN 'Financiado + FGTS'
 	ELSE 'Other'END AS form_of_payment,
     eso.is_3p_supply,
-    COALESCE(eso.partner_3p_supply, '') AS supply_3p_partner,
+    COALESCE(eso.id_company_supply, '') AS supply_3p_partner,
     eso.is_3p_demand,
-    COALESCE(eso.partner_3p_demand, '') AS demand_3p_partner,
+    COALESCE(eso.id_company_demand, '') AS demand_3p_partner,
     DATE(eso.ts_offer_submitted) AS dt_offer_sent,
     COALESCE(ddq.dt_deal_qualified, m.dt_deal_qualified) AS dt_deal_qualified,
-    eso.dt_offer_accepted AS dt_offer_accepted,
-    eso.dt_sale_agreement_signed AS dt_ccv_signed,
-    DATE(eso.dt_offer_dismissed) AS dt_offer_rejected,
+    eso.ts_offer_accepted AS dt_offer_accepted,
+    eso.ts_sale_agreement_signed AS dt_ccv_signed,
+    DATE(eso.ts_offer_dismissed) AS dt_offer_rejected,
     COALESCE(sof.dt_legaut_analysis_started, m.dt_legaut_analysis_started) AS dt_diligence_started_legaut,
     COALESCE(sof.dt_legaut_analysis_ended, m.dt_legaut_analysis_ended) AS dt_diligence_ended_legaut,
     COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended) AS dt_diligence_ended,
@@ -99,11 +98,11 @@ SELECT
     COALESCE(sof.dt_legal_risk_ended, m.dt_legal_risk_ended) AS dt_diligence_ended_legal,
     COALESCE(sof.dt_credit_analysis_started, m.dt_credit_analysis_started) AS dt_credit_started,
     COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended) AS dt_credit_approved,
-    eso.dt_sale_transacton_paid AS dt_payment_concluded,
+    sof.dt_sale_transacton_paid AS dt_payment_concluded,
     COALESCE(sof.dt_notes_registry_started, m.dt_notes_registry_started) AS dt_notes_registry_started,
     COALESCE(sof.dt_notes_registry_ended, m.dt_notes_registry_ended) AS dt_notes_registry_ended,
-    eso.dt_house_registry_started AS dt_matricula_inicio,
-    eso.dt_house_registry_ended AS dt_matricula_atualizada,
+    sof.dt_house_registry_started AS dt_matricula_inicio,
+    sof.dt_house_registry_ended AS dt_matricula_atualizada,
     COALESCE(sof.dt_sale_key_delivered, m.dt_sale_key_delivered) AS dt_entrega_chaves,
     COALESCE(sof.dt_financing_started, m.dt_financing_started) AS dt_finan_started,
     COALESCE(sof.dt_financing_ended, m.dt_financing_ended) AS dt_finan_ended,
@@ -111,7 +110,7 @@ SELECT
     eso.first_price_offered_by_buyer AS buyer_offer_price,
     (dl.price - eso.first_price_offered_by_buyer)/dl.price AS offer_discount
 FROM
-	datalake_offer.sale_offer AS eso
+	datalake_sale_offer.sale_offer AS eso
 LEFT JOIN
     dw_sale.dim_listing AS dl
       ON eso.id_house = dl.sk_house
