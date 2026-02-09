@@ -1,0 +1,44 @@
+---
+table_name: dw_compensation.dim_event_definition
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 71
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
+    severity_level: Warning
+
+column_level_validations:
+  sk_event_definition:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  action_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  reason_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  action_name_ptb:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  reason_name_ptb:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  is_career_progression:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning

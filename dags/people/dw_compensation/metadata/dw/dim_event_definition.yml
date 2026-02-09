@@ -1,0 +1,45 @@
+database_name: dw_compensation
+table_name: dim_event_definition
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Dimension table containing event definitions used in employee movements and compensation changes.
+  Each row represents a unique combination of movement type (action) and its reason.
+
+  Key features:
+  - Unified view of movement type + reason combinations
+  - English and Portuguese translations
+  - Career progression flag for compensation-related movements
+  
+  SCD Type 1: only current definitions are stored.
+
+columns:
+  sk_event_definition:
+    description: |
+      Surrogate key for the event definition.
+    lineage:
+      - datalake_people_core.event_definition.id_event_definition
+  action_name:
+    description: Name of the action in English.
+    lineage:
+      - datalake_people_core.event_definition.action_name
+  reason_name:
+    description: Name of the reason in English.
+    lineage:
+      - datalake_people_core.event_definition.reason_name
+  action_name_ptb:
+    description: Name of the action in Portuguese.
+    lineage:
+      - datalake_people_core.event_definition.action_name_ptb
+  reason_name_ptb:
+    description: Name of the reason in Portuguese.
+    lineage:
+      - datalake_people_core.event_definition.reason_name_ptb
+  is_career_progression:
+    description: |
+      TRUE if the reason represents a career progression movement.
+      TRUE for: CMP_MERI (Merit), CMP_PROM (Promotion), INTERNREC (Internal Recruitment), PER_PROMOTION.
+    lineage:
+      - datalake_people_core.event_definition.reason_code
+  ts_load:
+    description: Timestamp recording when data was loaded into the table.
