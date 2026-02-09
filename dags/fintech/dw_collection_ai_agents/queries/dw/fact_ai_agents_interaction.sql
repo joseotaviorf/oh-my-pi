@@ -36,11 +36,9 @@ WITH base AS (
             AND s2.name = 'MatthewVersionEvaluator'
     WHERE (bot = 'matthew' OR (bot = 'wall-e'))
 ),
-
--- Check for session existence regarding its traces in Langfuse
 trace_info as (
-  SELECT 
-    id_session as id_session_langfuse,
+  SELECT
+    id_session as id_session_langfuse
     from datalake_langfuse_clean.traces as t
     QUALIFY(ROW_NUMBER() OVER(PARTITION BY id_session order by ts_created asc)) = 1
 )
