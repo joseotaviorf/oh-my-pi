@@ -121,7 +121,7 @@ SELECT
     svf.id_house,
     svf.id_buyer,
     svf.id_agent,
-    COALESCE(svf.id_sale_flow, so.id_sale_flow) AS id_sales_flow,
+    COALESCE(svf.id_sale_flow, CONCAT(so.id_buyer, '_', so.id_house)) AS id_sales_flow,
     tqc.id_referral_flow,
     so.id_offer,
     svf.first_visit_creation_origin,
@@ -148,14 +148,14 @@ SELECT
     svf.ts_visit_created,
     svf.ts_visit_updated,
     so.ts_offer_submitted,
-    so.dt_offer_accepted AS ts_offer_accepted,
-    so.dt_sale_agreement_created AS ts_sale_agreement_created,
-    so.dt_sale_agreement_signed AS ts_sale_agreement_signed
+    so.ts_offer_accepted AS ts_offer_accepted,
+    so.ts_sale_agreement_created AS ts_sale_agreement_created,
+    so.ts_sale_agreement_signed AS ts_sale_agreement_signed
   FROM
     sale_visit_flows AS svf
   FULL OUTER JOIN
-    datalake_offer.sale_offer AS so
-      ON svf.id_sale_flow = so.id_sale_flow
+    datalake_sale_offer.sale_offer AS so
+      ON svf.id_sale_flow = CONCAT(so.id_buyer, '_', so.id_house)
   LEFT JOIN
     datalake_tqc_referral.unified_lead_referral_flow AS tqc
       ON CONCAT(COALESCE(svf.id_agent,svf.id_user_sale_agent,so.id_agent,so.id_user_agent),'_',COALESCE(svf.id_buyer, so.id_buyer)) = tqc.id_referral_flow

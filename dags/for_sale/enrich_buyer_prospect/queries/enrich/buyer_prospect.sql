@@ -54,26 +54,26 @@ offer_events AS (
     COUNT(DISTINCT id_offer) AS offers_submitted,
     COUNT(DISTINCT
       CASE
-        WHEN dt_offer_accepted IS NOT NULL THEN id_offer
+        WHEN ts_offer_accepted IS NOT NULL THEN id_offer
       END) AS offers_accepted,
     COUNT(DISTINCT
       CASE
-        WHEN dt_offer_dismissed IS NOT NULL THEN id_offer
+        WHEN ts_offer_dismissed IS NOT NULL THEN id_offer
       END) AS offers_dismissed,
     COUNT(DISTINCT
       CASE
-        WHEN dt_sale_agreement_signed IS NOT NULL THEN id_offer
+        WHEN ts_sale_agreement_signed IS NOT NULL THEN id_offer
       END) AS sale_agreements_signed,
     AVG(first_price_offered_by_buyer) AS avg_offer_price,
     AVG(1-(first_price_offered_by_buyer/sale_price)) AS avg_offer_discount,
     MIN(ts_offer_submitted) AS ts_first_offer_submitted,
-    MIN(dt_offer_accepted) AS dt_first_offer_accepted,
-    MIN(dt_sale_agreement_signed) AS dt_first_sale_agreement_signed,
+    MIN(ts_offer_accepted) AS dt_first_offer_accepted,
+    MIN(ts_sale_agreement_signed) AS dt_first_sale_agreement_signed,
     MAX(ts_offer_submitted) AS ts_last_offer_submitted,
-    MAX(dt_offer_accepted) AS dt_last_offer_accepted,
-    MAX(dt_sale_agreement_signed) AS dt_last_sale_agreement_signed
+    MAX(ts_offer_accepted) AS dt_last_offer_accepted,
+    MAX(ts_sale_agreement_signed) AS dt_last_sale_agreement_signed
   FROM
-    datalake_offer.sale_offer
+    datalake_sale_offer.sale_offer
   GROUP BY 1
 ),
 sale_flow_events AS (

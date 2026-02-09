@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.booking.id_visitor
       - datalake_ebdb_clean.booking.id_house
-      - datalake_offer.sale_offer.id_sale_flow
+      - datalake_sale_offer.sale_offer.id_sale_flow
     description: Key of sale flow (id_visitor + id_house).
   id_referral_flow:
     lineage:
@@ -32,7 +32,7 @@ columns:
     description: Id used to identify a lead indication for TQC.
   id_offer:
     lineage:
-      - datalake_offer.sale_offer.id_offer
+      - datalake_sale_offer.sale_offer.id_offer
     description: Offer unique identifier.
   first_visit_creation_origin:
     lineage:
@@ -65,6 +65,11 @@ columns:
     lineage:
       - datalake_tqc_referral.unified_lead_referral_flow.tqc_flow
     description: Indicates the stream where a referral was made. Whether it was old ('Old') or new ('New')
+  is_visit_completed:
+    lineage:
+      - datalake_ebdb_clean.booking.status
+      - datalake_ebdb_clean.booking.visit_fup
+    description: Boolean flag indicating if the visit was completed (visit_status = 'Realizado').
   id_tqc_flow:
     lineage:
       - datalake_tqc_referral.unified_lead_referral_flow.tqc_flow
@@ -100,17 +105,17 @@ columns:
     description: Datetime of the visit updating.
   ts_offer_submitted:
     lineage:
-      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp when the offer was sent by the buyer.
   ts_offer_accepted:
     lineage:
-      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Timestamp when the offer was accepted by the owner.
   ts_sale_agreement_created:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_created
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_created
     description:  Date when the CCV was created.
   ts_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Date when the CCV was signed.
