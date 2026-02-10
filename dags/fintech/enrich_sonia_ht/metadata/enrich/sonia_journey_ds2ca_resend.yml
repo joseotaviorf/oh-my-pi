@@ -1,0 +1,57 @@
+database_name: datalake_sonia_ht
+table_name: sonia_journey_ds2ca_resend
+description: |
+  This table holds the latest group assignment (Control/Test) for the DS2CA
+  resend population experiment per user from the HighTouch audit journey.
+  One row per user is kept, preferring Test over Control when both exist.
+domain: For Rent
+owner: alan.barzilay@quintoandar.com.br
+columns:
+  id_row_instance:
+    lineage:
+      - hightouch_planner.journey_log_1fff99f76153459ca49595e7d9492bd8.row_instance_id
+    description: "Unique identifier of the journey instance"
+  id_row:
+    lineage:
+      - hightouch_planner.journey_log_1fff99f76153459ca49595e7d9492bd8.row_id
+    description: "Primary key reference from HighTouch journey logs."
+  id_user:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.id_user
+      - hightouch_planner.journey_log_1fff99f76153459ca49595e7d9492bd8.row_id
+    description: "User identifier, from fields JSON or fallback to row_id."
+  id_house:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.id_house_338aa0
+    description: "House identifier from audit journey fields."
+  id_rent_flow:
+    lineage:
+      - hightouch_audit.sync_changelog.fields.id_rent_flow_584f65
+    description: "Rent flow identifier from audit journey fields."
+  id_sync:
+    lineage:
+      - hightouch_audit.sync_changelog.sync_id
+    description: "Identifier of the HighTouch sync definition."
+  id_sync_run:
+    lineage:
+      - hightouch_audit.sync_changelog.sync_run_id
+    description: "Identifier of the specific HighTouch sync run."
+  group_name:
+    lineage:
+      - hightouch_planner.journey_metadata_1fff99f76153459ca49595e7d9492bd8.node_name
+    description: "Resend experiment group: Control or Test."
+    categories:
+      "Control": user in Control - Send to destination
+      "Test": user in Jaiminho - Send to destination
+  timestamp:
+    lineage:
+      - hightouch_planner.journey_log_1fff99f76153459ca49595e7d9492bd8.timestamp
+    description: "Timestamp of the journey transition."
+  started_at:
+    lineage:
+      - hightouch_audit.sync_runs.started_at
+    description: "When the HighTouch sync run started for this journey instance."
+  finished_at:
+    lineage:
+      - hightouch_audit.sync_runs.finished_at
+    description: "When the HighTouch sync run finished for this journey instance."
