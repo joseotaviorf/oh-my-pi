@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: banking_information
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Financial institution account details for company payment operations. Critical for revenue distribution, commission payments, and financial settlements with partner companies. Supports multiple bank accounts per company for different transaction types (operational, commission, settlement).
   
@@ -53,6 +53,11 @@ columns:
       - Standard format: "1234" (4 digits) or "12345" (5 digits)
       - With check digit: "1234-5" (4 digits + check)
       - Regional coding: "1234-SP" (branch + state identifier)
+  account_owner_document:
+    lineage:
+      - datalake_company_raw.banking_information.account_owner_document
+    description: |
+      Document number of the account owner. Identifies the owner of the account.
   account_number:
     lineage:
       - datalake_company_raw.banking_information.account_number
@@ -80,6 +85,11 @@ columns:
       - datalake_company_raw.banking_information.version
     description: |
       Optimistic locking version number (BIGINT) for concurrent update protection. Critical for financial data integrity.
+  is_other_account_owner:
+    lineage:
+      - datalake_company_raw.banking_information.other_account_owner
+    description: |
+      Flag indicating if the account owner is not the company. True if the account owner is not the company, false otherwise.
   ts_created:
     lineage:
       - datalake_company_raw.banking_information.created_at

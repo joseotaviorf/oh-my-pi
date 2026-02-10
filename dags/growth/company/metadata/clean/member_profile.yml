@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: member_profile
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   User membership and role assignment matrix linking people to companies, products, and organizational roles. Enables flexible multi-company, multi-product, multi-role relationships where individuals can have different permissions across various business contexts. Critical for access control, organizational reporting, and partner management.
   

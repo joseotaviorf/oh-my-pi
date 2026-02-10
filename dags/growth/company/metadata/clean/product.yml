@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: product
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Product catalog defining business lines and services offered within QuintoAndar's ecosystem. Partners must be associated with specific products to access corresponding features and revenue sharing opportunities. Supports flexible many-to-many relationships with companies through company_product junction table.
   

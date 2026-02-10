@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: revenue_share
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Commission and fee structure configurations for partner companies in revenue-sharing agreements. Defines how transaction revenue is distributed between QuintoAndar and partner companies based on business model (demand-side, supply-side, platform services). Critical for financial calculations, partner payments, and P&L reporting.
   

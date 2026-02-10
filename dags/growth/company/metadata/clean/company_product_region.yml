@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: company_product_region
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Table that maps the regions of a product to a company. This is used to identify the coverage that a company has in a region.
 columns:

@@ -1,6 +1,6 @@
 dag:
   name: company
-  owner: Data 3P Partners
+  owner: Data Growth
   schedule_interval: 0 21,8,12 * * *
   documentation:
     dag_purpose: |

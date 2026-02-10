@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: company_address
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Junction table implementing many-to-many relationships between companies and addresses. Enables flexible address management where companies can have multiple operational locations and addresses can be shared across corporate entities.
 

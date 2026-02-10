@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: company_product_tier
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Table representing the commercial tier or pricing category assigned to each company-product relationship. Used to determine eligibility for features, commission rates, or pricing levels of products offered by partner companies. Enables flexible segmentation and billing logic per partnership agreement.
 

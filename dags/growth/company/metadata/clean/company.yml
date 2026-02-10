@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: company
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Core entity representing legal companies in QuintoAndar's partner ecosystem, supporting the For Brokers paradigm shift. This table stores all legal entities including QuintoAndar itself, partner companies, real estate brokers, and property managers. Features hierarchical relationships (headquarters → branches), logical deletion via status field, and comprehensive audit trails.
 

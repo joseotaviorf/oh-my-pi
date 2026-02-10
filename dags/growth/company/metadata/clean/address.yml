@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: address
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Company address repository for operational locations, legal addresses, and business presence tracking. Supports many-to-many relationships with companies via company_address junction table, enabling companies to have multiple locations and addresses to be shared across corporate entities.
   

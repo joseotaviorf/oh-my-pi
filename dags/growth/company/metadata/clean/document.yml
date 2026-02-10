@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: document
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Legal document repository for company compliance and verification. Stores critical business documents including tax IDs (CNPJ), real estate licenses (CRECI), personal IDs (CPF), and international IDs (RFC). Features document validation pipeline, file attachment management, and versioning capabilities. Supports many-to-many relationships with companies via company_document junction table.
   

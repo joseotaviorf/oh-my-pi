@@ -1,8 +1,8 @@
 ---
 database_name: datalake_company_clean
 table_name: profile
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Organizational role definitions and permission templates for access control across QuintoAndar's partner ecosystem. Profiles define standardized roles that can be assigned to users within specific company-product contexts through member_profile relationships.
   
