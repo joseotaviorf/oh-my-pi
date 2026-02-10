@@ -22,6 +22,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_content'),'') as up_utm_content,
     NULLIF(GET_JSON_OBJECT(user_properties, '$.utm_term'),'') as up_utm_term,
     NULLIF(GET_JSON_OBJECT(user_properties, '$.ab_beakman_consorcio_new_landing_page'), '') as up_ab_beakman_consorcio_new_landing_page,
+    NULLIF(GET_JSON_OBJECT(user_properties, '$.ab_beakman_consorcio_c2w_form'), '') as up_ab_beakman_consorcio_c2w_form,
     event_properties,
     user_properties,
     ts_event,

@@ -89,6 +89,10 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.user_properties
     description: User property that indicates in which variant of the landing page the user was attributed to
+  up_ab_beakman_consorcio_c2w_form:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: User property that indicates in which variant of the click to whatsapp experiment the user was attributed to
   event_properties:
     lineage:
     - datalake_amplitude_clean.events.event_properties
