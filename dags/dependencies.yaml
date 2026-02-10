@@ -1124,6 +1124,7 @@ bietlejuice.dw_sale_visits:
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit:first-run-of-day
 bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement:first-run-of-day
@@ -3608,7 +3609,6 @@ bietlejuice.enrich_sale_visit:
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
-  - bietlejuice.enrich_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs:first-run-of-day
   - bietlejuice.insider:load-clean-review:first-run-of-day
 bietlejuice.enrich_sale_visit_hubs:

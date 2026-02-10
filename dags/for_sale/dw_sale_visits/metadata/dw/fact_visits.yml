@@ -91,7 +91,7 @@ columns:
     description: Code of the visit.
   sk_offer:
     lineage:
-    - datalake_sale_visit.sale_visit.id_offer
+    - datalake_sale_offer.sale_offer.id_offer
     description: ID of the first offer associated with this booking.
   sk_buyer_booking_review:
     lineage:
@@ -190,11 +190,11 @@ columns:
     description: Days between the booking creation and the visit completed date
   hours_booking_to_offer:
     lineage:
-    - datalake_sale_visit.sale_visit.hours_booking_to_offer
+    - datalake_sale_offer.sale_offer.hours_booking_to_offer
     description: Hours between the booking created and the first offer.
   hours_visit_to_offer:
     lineage:
-    - datalake_sale_visit.sale_visit.hours_visit_to_offer
+    - datalake_sale_offer.sale_offer.hours_visit_to_offer
     description: Hours between the visit completed and the first offer.
   ts_booking_created:
     lineage:

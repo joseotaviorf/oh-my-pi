@@ -1,15 +1,4 @@
-WITH offer_after_booking AS (
-    SELECT
-        id_booking,
-        id_offer,
-        hours_booking_to_offer,
-        hours_visit_to_offer
-    FROM
-        datalake_offer.sale_offer
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY ts_offer_submitted) = 1
-),
-buyer_review AS (
+WITH buyer_review AS (
     SELECT
         id_reviewed,
         id_reviewer,
@@ -59,7 +48,6 @@ SELECT DISTINCT
     b.id_user_last_secretariat,
     b.id_visit,
     b.code AS visit_code,
-    so.id_offer,
     b.id AS id_buyer_booking_review,
     b.hub_agent_region AS hub_agent_region,
     COALESCE(b.is_hub_flow,FALSE) AS is_hub_flow,
@@ -69,8 +57,6 @@ SELECT DISTINCT
     b.days_visit_booked_to_visit,
     b.days_visit_booked_to_visit_cancelled,
     b.days_visit_booked_to_visit_completed,
-    so.hours_booking_to_offer,
-    so.hours_visit_to_offer,
     b.ts_created AS ts_booking_created,
     b.ts_booking_utc AS ts_visit,
     b.ts_first_canceled AS ts_visit_canceled,
@@ -85,9 +71,6 @@ JOIN
     datalake_ebdb_clean.house AS h
         ON h.id = b.id_house
 LEFT JOIN
-    offer_after_booking AS so
-        ON b.id = so.id_booking
-LEFT JOIN
     datalake_sale_visit_hubs.sale_visit_hubs AS svh
         ON svh.id_booking = b.id
 LEFT JOIN
@@ -98,7 +81,7 @@ LEFT JOIN
     datalake_ebdb_clean.user AS ua
         ON ua.id_agent = b.id_agent
 LEFT JOIN
-  status_log AS vsl
-    ON b.id = vsl.id_schedule
+    status_log AS vsl
+        ON b.id = vsl.id_schedule
 WHERE
     b.visit_intent = 'SALE'

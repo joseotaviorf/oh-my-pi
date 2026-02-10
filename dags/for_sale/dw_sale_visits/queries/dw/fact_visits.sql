@@ -1,3 +1,14 @@
+WITH offer_after_booking AS (
+    SELECT
+        id_booking,
+        id_offer,
+        hours_booking_to_offer,
+        hours_visit_to_offer
+    FROM
+        datalake_sale_offer.sale_offer
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_booking ORDER BY ts_offer_submitted) = 1
+)
 SELECT
     COALESCE(sv.id_booking, -1) AS sk_booking,
     COALESCE(id_sale_flow, -1) AS sk_sale_flow,
@@ -19,7 +30,7 @@ SELECT
     COALESCE(sa_last_secretariat.sk_secretariat_user_version, -1) AS sk_last_secretariat,
     COALESCE(id_visit, -1) AS sk_visit,
     visit_code AS sk_visit_code,
-    COALESCE(sv.id_offer, -1) AS sk_offer,
+    COALESCE(so.id_offer, -1) AS sk_offer,
     COALESCE(id_buyer_booking_review, -1) AS sk_buyer_booking_review,
     COALESCE(bpt.id_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(dsps_listing.sk_sale_price_segment, -1) AS sk_listing_price_segment,
@@ -42,8 +53,8 @@ SELECT
     days_visit_booked_to_visit,
     days_visit_booked_to_visit_cancelled,
     days_visit_booked_to_visit_completed,
-    hours_booking_to_offer,
-    hours_visit_to_offer,
+    so.hours_booking_to_offer,
+    so.hours_visit_to_offer,
     ts_booking_created,
     ts_visit,
     ts_visit_canceled,
@@ -54,6 +65,9 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_sale_visit.sale_visit AS sv
+LEFT JOIN
+    offer_after_booking AS so
+        ON sv.id_booking = so.id_booking
 LEFT JOIN
     datalake_hub_services.daily_secretariat_allocation AS sa_creator
         ON sa_creator.id_secretariat_user = sv.id_user_sale_attendence_5a
@@ -71,13 +85,13 @@ LEFT JOIN datalake_region.region AS r
 LEFT JOIN
     datalake_sale_listings.sale_listing_price_changes AS slpc
         ON sv.id_house = slpc.id_house
-        AND sv.ts_booking_created >= slpc.ts_price_started 
+        AND sv.ts_booking_created >= slpc.ts_price_started
         AND sv.ts_booking_created < COALESCE(slpc.ts_price_ended, NOW())
 LEFT JOIN
     datalake_buyer_prospect.buyer_prospect_type AS bpt
         ON sv.id_buyer = bpt.id_prospect
         AND r.city_group = bpt.city_group
-        AND sv.ts_booking_created >= bpt.ts_activation 
+        AND sv.ts_booking_created >= bpt.ts_activation
         AND sv.ts_booking_created < COALESCE(bpt.ts_activation_end, NOW())
 LEFT JOIN
     dw_sale.dim_sale_price_segment AS dsps_listing
