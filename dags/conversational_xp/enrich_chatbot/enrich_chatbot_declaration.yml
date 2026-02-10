@@ -21,6 +21,9 @@ workflow:
     isaias_conversational_flow:
       merge_on: [id_langfuse_session]
       z_order_by: [id_langfuse_session]
+    bypass:
+      merge_on: [id_langfuse_session, bypass]
+      z_order_by: [id_langfuse_session]
 
 cluster:
   type: custom_cluster

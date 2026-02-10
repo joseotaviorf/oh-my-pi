@@ -1,0 +1,27 @@
+---
+database_name: datalake_chatbot
+table_name: bypass
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: Pre-bot action bypasses extracted from Langfuse session traces, including inside sales bypasses from observations.
+columns:
+  id_langfuse_session:
+    description: "Langfuse session identifier"
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+  bypass:
+    description: "Pre-bot action bypass title"
+    lineage:
+      - datalake_langfuse_clean.traces.input
+  type:
+    description: "Pre-bot action bypass type"
+    lineage:
+      - datalake_langfuse_clean.traces.input
+  id_ticket:
+    description: "Ticket ID associated with the bypass action"
+    lineage:
+      - datalake_langfuse_clean.traces.input
+  queue:
+    description: "Department from the bypass action"
+    lineage:
+      - datalake_langfuse_clean.traces.input
