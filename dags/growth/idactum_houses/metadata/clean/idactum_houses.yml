@@ -1,0 +1,178 @@
+database_name: datalake_idactum_houses_clean
+table_name: idactum_houses
+description:
+  Table acquired from Idactum. Contain house related data, including address,
+  location, features and others.
+domain: Growth
+owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.id
+    description: |
+      "Table unique identifier."
+  id_municipal_house:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.id_unidade
+    description: |
+      "Municipal house id."
+  id_idactum:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.id_idactum
+    description: |
+      "Idactum house id."
+  id_patrimonial_assets:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.bpatri_key
+    description: |
+      "Patrimonial assets unique identifier."
+  state:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.uf
+    description: |
+      "State acronym."
+  city:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.municipio
+    description: |
+      "City name."
+  neighborhood:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.bairro
+    description: |
+      "Neighborhood name."
+  street:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.logradouro_correios
+    description: |
+      "Street name."
+  address_number:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.numero
+    description: |
+      "Address number."
+  zipcode:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.cep
+    description: |
+      "Zipcode."
+  address_details:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.complemento
+    description: |
+      "Address details: unit and building."
+  address_details_unit:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.unidade
+    description: |
+      "Unit number."
+  address_details_building:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.bloco_id
+    description: |
+      "Building number."
+  real_estate_register:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.cartorio
+    description: |
+      "Real estate register name."
+  real_estate_registry:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.matricula
+    description: |
+      "Real estate registry number."
+  building_year:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.ano_construcao
+    description: |
+      "Building year."
+  lot_area:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.m2_terreno
+    description: |
+      "Lot area in square meters."
+  building_area:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.m2_construido
+    description: |
+      "Building area in square meters."
+  private_area:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.m2_privativo
+    description: |
+      "House private area in square meters."
+  idactum_price_estimation:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.estimativa_ipatri
+    description: |
+      "Idactum price estimation."
+  idactum_price_estimation_quality:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.assertividade_estimativa_ipatri
+    description: |
+      "Idactum price estimation quality."
+  avg_annual_appreciation_idactum_estimation:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.valorizacao_anual_media
+    description: |
+      "Average annual appreciation of idactum price estimation on the last 5 years."
+  estimated_annual_revenue:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.giro_anual_estimado
+    description: |
+      "Idactum estimated annual revenue."
+  condominium_estimation:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.condominio_estimado
+    description: |
+      "Idactum estimated condominium."
+  assessed_iptu_value:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.valor_venal_iptu
+    description: |
+      "Assessed IPTU value."
+  assessed_itbi_value:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.valor_venal_itbi
+    description: |
+      "Assessed ITBI value."
+  latitude:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.latitude
+    description: |
+      "Latitude."
+  longitude:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.longitude
+    description: |
+      "Longitude."
+  kind:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.tipo
+    description: |
+      "House type(apartment, house, etc.)."
+  usage_purpose:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.finalidade
+    description: |
+      "House usage purpose(residential, commercial, etc.)."
+  usage_type:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.tipo_utilizacao
+    description: |
+      "Usage type(private, public, etc.)."
+  is_iptu_exempt:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.isento_iptu
+    description: |
+      "IPTU exempt(1 or 0)."
+  is_active:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.ativo
+    description: |
+      "Idactum's house status (1 or 0)."
+  dt_load:
+    lineage:
+      - datalake_idactum_houses_raw.idactum_houses.dt_load
+    description: |
+      "Date when the idactum houses data was loaded."

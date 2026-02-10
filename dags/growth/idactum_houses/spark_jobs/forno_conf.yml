@@ -1,0 +1,1 @@
+s3_ingestion_path: "s3://5a-datalake-forno/tmp/raw/idactum_snapshot/imoveis_qa.parquet"
