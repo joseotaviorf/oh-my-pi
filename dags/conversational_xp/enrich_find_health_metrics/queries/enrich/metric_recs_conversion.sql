@@ -87,6 +87,7 @@ WITH rent_sale_flow AS (
     COALESCE(DATEDIFF(DAY, ri.ts_recommendation, ri.ts_visit_booked) <= 14 OR DATEDIFF(DAY, ri.ts_recommendation, ri.ts_direct_offer) <= 14, FALSE) AS is_rec_click_and_vb_or_do_within_14_days,
     COALESCE(DATEDIFF(DAY, ri.ts_recommendation, ri.ts_offer) <= 14, FALSE) AS is_rec_click_and_offer_within_14_days,
     rs.ts_first_flow_action,
+    rs.ts_contract_signed AS ts_contract_signed,
     YEAR(rs.ts_first_flow_action) AS year,
     MONTH(rs.ts_first_flow_action) AS month,
     DAY(rs.ts_first_flow_action) AS day
@@ -104,7 +105,7 @@ SELECT
   id_user_house,
   id_unique,
   business_context,
-  MAX(user_house_first_contact) AS user_house_first_contact,
+  user_house_first_contact AS user_house_first_contact,
   MAX(is_rec_click) AS is_rec_click,
   MAX(has_visit_booked) AS has_visit_booked,
   MAX(has_direct_offer) AS has_direct_offer,
@@ -114,7 +115,8 @@ SELECT
   MAX(is_rec_click_and_direct_offer_within_14_days) AS is_rec_click_and_direct_offer_within_14_days,
   MAX(is_rec_click_and_vb_or_do_within_14_days) AS is_rec_click_and_vb_or_do_within_14_days,
   MAX(is_rec_click_and_offer_within_14_days) AS is_rec_click_and_offer_within_14_days,
-  MAX(ts_first_flow_action) AS ts_first_flow_action,
+  ts_first_flow_action AS ts_first_flow_action,
+  ts_contract_signed AS ts_contract_signed,
   year,
   month,
   day

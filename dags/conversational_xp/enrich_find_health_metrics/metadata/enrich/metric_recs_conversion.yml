@@ -95,6 +95,11 @@ columns:
     - datalake_rent_flows.rent_flows.ts_direct_offer_submitted
     - datalake_sale_flows.sale_flow.ts_first_booking_created
     description: The timestamp of the first contact between the user and the house whether it was a visit booked or a direct offer.
+  ts_contract_signed:
+    lineage:
+    - datalake_rent_flows.rent_flows.ts_contract_signed
+    - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    description: The timestamp of the contract signed.
   year:
     lineage:
     - datalake_rent_flows.rent_flows.ts_booking_created
