@@ -10,13 +10,24 @@ WITH visit_metrics AS (
         -- vb
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vb ELSE 0 END) AS sum_vb_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vb ELSE 0 END) AS sum_vb_treatment,
+        -- vcf
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcf ELSE 0 END) AS sum_vcf_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcf ELSE 0 END) AS sum_vcf_treatment,
+        (sum_vcf_control/sum_vb_control)*100 AS vb2vcf_control,
+        (sum_vcf_treatment/sum_vb_treatment)*100 AS vb2vcf_treatment,
+        1.96 * SQRT(sum_vcf_control / sum_vb_control * (1 - sum_vcf_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vcf_control_error,
+        1.96 * SQRT(sum_vcf_treatment / sum_vb_treatment * (1 - sum_vcf_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vcf_treatment_error,
         -- vc
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vc ELSE 0 END) AS sum_vc_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vc ELSE 0 END) AS sum_vc_treatment,
         (sum_vc_control/sum_vb_control)*100 AS vb2vc_control,
+        (sum_vc_control/sum_vcf_control)*100 AS vcf2vc_control,
         (sum_vc_treatment/sum_vb_treatment)*100 AS vb2vc_treatment,
+        (sum_vc_treatment/sum_vcf_treatment)*100 AS vcf2vc_treatment,
         1.96 * SQRT(sum_vc_control / sum_vb_control * (1 - sum_vc_control / sum_vb_control) / sum_vb_control) * 100 AS vb2vc_control_error,
+        1.96 * SQRT(sum_vc_control / sum_vcf_control * (1 - sum_vc_control / sum_vcf_control) / sum_vcf_control) * 100 AS vcf2vc_control_error,
         1.96 * SQRT(sum_vc_treatment / sum_vb_treatment * (1 - sum_vc_treatment / sum_vb_treatment) / sum_vb_treatment) * 100 AS vb2vc_treatment_error,
+        1.96 * SQRT(sum_vc_treatment / sum_vcf_treatment * (1 - sum_vc_treatment / sum_vcf_treatment) / sum_vcf_treatment) * 100 AS vcf2vc_treatment_error,
         -- vcc
         SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcc ELSE 0 END) AS sum_vcc_control,
         SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcc ELSE 0 END) AS sum_vcc_treatment,
@@ -73,9 +84,11 @@ FROM
     visit_metrics AS vm
 LATERAL VIEW
     STACK(
-        12, -- Number of metrics
+        15, -- Number of metrics
 
         'number_vc', CAST(vm.sum_vc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vcf', CAST(vm.sum_vcf_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vcf_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
         'number_vcc', CAST(vm.sum_vcc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vcc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
@@ -88,6 +101,10 @@ LATERAL VIEW
         'number_cs', CAST(vm.sum_cs_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_cs_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
         'vb2vc', vm.vb2vc_control, vm.vb2vc_control_error, vm.vb2vc_treatment, vm.vb2vc_treatment_error,
+
+        'vcf2vc', vm.vcf2vc_control, vm.vcf2vc_control_error, vm.vcf2vc_treatment, vm.vcf2vc_treatment_error,
+
+        'vb2vcf', vm.vb2vcf_control, vm.vb2vcf_control_error, vm.vb2vcf_treatment, vm.vb2vcf_treatment_error,
 
         'vb2vcc', vm.vb2vcc_control, vm.vb2vcc_control_error, vm.vb2vcc_treatment, vm.vb2vcc_treatment_error,
 
