@@ -1,8 +1,8 @@
 WITH offer AS (
   SELECT
       fo.sk_offer,
-      financing_bank,
-      payment_method,
+      sof.financing_bank,
+      sof.payment_method,
       dsa.ts_sale_agreement_signed AS ts_sale_agreement_signed,
       dsa.CREDIT_MODEL,
       SELLER_DILLIGENCE_STATUS,
@@ -18,6 +18,8 @@ WITH offer AS (
     ON fo.sk_region = dim.sk_region
   LEFT JOIN dw_public.dim_region AS dim2 
     ON fl.sk_region = dim2.sk_region
+  LEFT JOIN datalake_sale_offer_flows.sale_offer_flows AS sof
+    ON fo.sk_offer = sof.id_offer
 ),
 justification AS (
   SELECT

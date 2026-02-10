@@ -1,79 +1,190 @@
 ---
 database_name: dw_datamarts
 table_name: sale_cohort_conversions
+owner: data@quintoandar.com.br
+domain: For Sale
+description: Aggregated table containing sale funnel conversion metrics by cohort, tracking conversions between different stages of the sale process (leads, visits, offers, CCV, diligence, financing, etc.) with multiple dimensional breakdowns.
 columns:
   week_start:
+    description: Start date of the week for the conversion event
     lineage:
       - dw_public.dim_date.week_start
   date:
+    description: Date of the conversion event
     lineage:
       - dw_public.dim_date.date
   month:
+    description: Month of the conversion event
     lineage:
       - dw_public.dim_date.month
   quarter:
+    description: Quarter of the conversion event
     lineage:
       - dw_public.dim_date.quarter
-  affiliate_volumetry:
-    lineage:
-      - dw_datamarts.affiliates_clusters.affiliate_volumetry
   city_group:
+    description: City group classification (RMSP, Rio de Janeiro, Belo Horizonte, Porto Alegre, Campinas, Out of coverage area)
     lineage:
       - dw_public.dim_region.city_group
-  demand_3p_partner:
-    lineage:
-      - dw_public.dim_booking.partner_3p_demand
-      - dw_sale.dim_offer.partner_3p_demand
-  is_3p_demand:
-    lineage:
-      - dw_public.dim_booking.is_3p_demand
-      - dw_sale.dim_offer.is_3p_demand
-  is_3p_supply:
-    lineage:
-      - dw_rent.dim_house_listing.is_3p_supply
-      - dw_public.dim_booking.is_3p_supply
-      - dw_sale.dim_offer.is_3p_supply
   lead_context:
+    description: Lead context classification (B2B, CIQ, FSS, IS) based on mkt_origin and mkt_completion
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
+      - dw_datamarts.lead_listing_flows.mkt_completion
   mkt_campaign_context:
+    description: Marketing campaign context (Branded/Organic classification)
     lineage:
       - dw_datamarts.lead_listing_flows.lead_context_origin
   mkt_origin:
+    description: Marketing origin source
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_origin
   mkt_channel:
+    description: Marketing channel
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_channel
   mkt_medium:
+    description: Marketing medium
     lineage:
       - dw_datamarts.lead_listing_flows.mkt_medium
+  mkt_type:
+    description: Marketing type classification (Paid/Non Paid) based on mkt_origin and mkt_channel
   sales_company:
+    description: Sales company responsible for the lead
     lineage:
       - dw_datamarts.lead_listing_flows.sales_company
   lead_processing_operation:
+    description: Lead processing operation type (IS, FSS, B2B, CIQ, Other)
     lineage:
       - dw_datamarts.lead_listing_flows.sourcing_ops
+  affiliate_volumetry:
+    description: Affiliate volumetry classification
+    lineage:
+      - dw_datamarts.affiliates_clusters.affiliate_volumetry
   first_origin_demand:
+    description: First touchpoint/event in the demand journey
     lineage:
       - dw_sale.fact_sale_flows.first_event
   origin_before_offer:
+    description: Higher intent event before offer submission
     lineage:
       - dw_sale.fact_sale_flows.higher_intent_before_offer
   origin_after_offer:
+    description: Higher intent event after offer submission
     lineage:
       - dw_sale.fact_sale_flows.higher_intent_after_offer
-  hub_visit:
+  form_of_payment:
+    description: Payment method classification (Financiado, À Vista, À Vista + FGTS, Financiado + FGTS)
     lineage:
-      - datalake_hub_services_clean.business_unit.hub_visit
+      - datalake_firestore.monday.payment_method
+  hub_visit:
+    description: Hub name where the visit occurred
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
   hub_offer:
+    description: Business unit/hub associated with the offer
     lineage:
       - dw_sale.dim_offer.business_unit
+  weeks_conversion:
+    description: Weeks between conversion events (W0 to W20+)
   supply_3pbh_partner:
+    description: 3P BH partner name for supply side
     lineage:
-      - datalake_3p.houses_3p_bh.partner
+      - datalake_ebdb_listing.house.partner_3p_supply
   supply_3p_partner:
+    description: 3P partner name for supply side
     lineage:
       - dw_rent.dim_house_listing.partner_3p_supply
       - dw_public.dim_booking.partner_3p_supply
       - dw_sale.dim_offer.partner_3p_supply
+  demand_3p_partner:
+    description: 3P partner name for demand side
+    lineage:
+      - dw_public.dim_booking.partner_3p_demand
+      - dw_sale.dim_offer.partner_3p_demand
+  is_3pbh_supply:
+    description: Flag indicating if supply is 3P BH partner (1 = yes, 0 = no)
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply_bh
+  is_3p_supply:
+    description: Flag indicating if supply is 3P partner (1 = yes, 0 = no)
+    lineage:
+      - dw_rent.dim_house_listing.is_3p_supply
+      - dw_public.dim_booking.is_3p_supply
+      - dw_sale.dim_offer.is_3p_supply
+  is_3p_demand:
+    description: Flag indicating if demand is 3P partner (1 = yes, 0 = no)
+    lineage:
+      - dw_public.dim_booking.is_3p_demand
+      - dw_sale.dim_offer.is_3p_demand
+  p2fc:
+    description: Prospect to First Contact conversion count
+  fc2q:
+    description: First Contact to Qualified conversion count
+  p2q:
+    description: Prospect to Qualified conversion count
+  q2aq:
+    description: Qualified to Available Qualified conversion count
+  aq2o:
+    description: Available Qualified to Opportunity conversion count
+  q2o:
+    description: Qualified to Opportunity conversion count
+  o2fl:
+    description: Opportunity to First Listing conversion count
+  fl2ccv:
+    description: First Listing to CCV (Sale Agreement Signed) conversion count
+  vb2vc:
+    description: Visit Booked to Visit Completed conversion count
+  vb2os:
+    description: Visit Booked to Offer Sent conversion count
+  vb2oa:
+    description: Visit Booked to Offer Accepted conversion count
+  vb2ccv:
+    description: Visit Booked to CCV conversion count
+  vc2ccv:
+    description: Visit Completed to CCV conversion count
+  vc2os:
+    description: Visit Completed to Offer Sent conversion count
+  vc2oa:
+    description: Visit Completed to Offer Accepted conversion count
+  os2oa:
+    description: Offer Sent to Offer Accepted conversion count
+  os2dq:
+    description: Offer Sent to Deal Qualified conversion count
+  dq2oa:
+    description: Deal Qualified to Offer Accepted conversion count
+  os2ccv:
+    description: Offer Sent to CCV conversion count
+  oa2ccv:
+    description: Offer Accepted to CCV conversion count
+  ccv2lts:
+    description: CCV to Legaut Diligence Started conversion count
+  lts2lte:
+    description: Legaut Diligence Started to Legaut Diligence Ended conversion count
+  lte2lrs:
+    description: Legaut Diligence Ended to Legal Risk Started conversion count
+  lrs2lre:
+    description: Legal Risk Started to Legal Risk Ended conversion count
+  lre2de:
+    description: Legal Risk Ended to Diligence Ended conversion count
+  ccv2credstart:
+    description: CCV to Credit Started conversion count
+  credstart2credsent:
+    description: Credit Started to Credit Approved conversion count
+  ccv2crnended:
+    description: CCV to Notes Registry Ended conversion count
+  credsent2finstart:
+    description: Credit Approved to Financing Started conversion count
+  ccv2finstart:
+    description: CCV to Financing Started conversion count
+  finstart2finended:
+    description: Financing Started to Financing Ended conversion count
+  ccv2mi:
+    description: CCV to Matricula Inicio (House Registry Started) conversion count
+  mi2ma:
+    description: Matricula Inicio to Matricula Atualizada (House Registry Updated) conversion count
+  ccv2ma:
+    description: CCV to Matricula Atualizada conversion count
+  ccv2pc:
+    description: CCV to Payment Concluded conversion count
+  ts_load:
+    description: Timestamp when the data was loaded

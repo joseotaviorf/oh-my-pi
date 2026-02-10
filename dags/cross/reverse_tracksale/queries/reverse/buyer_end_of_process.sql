@@ -13,13 +13,16 @@ WITH closing_infos AS (
             WHEN cf.sk_sale_agreement_rescued_date != -1 THEN TRUE
             ELSE FALSE
         END AS ccv_rescued,
-        payment_method,
-        ts_house_registry_ended
+        ds.payment_method AS payment_method,
+        sof.dt_house_registry_ended AS ts_house_registry_ended
     FROM
         dw_sale.fact_closing_flows AS cf
     LEFT JOIN
         dw_sale.dim_sale_agreement AS ds
             ON ds.sk_offer = cf.sk_offer
+    LEFT JOIN 
+        datalake_sale_offer_flows.sale_offer_flows AS sof
+            ON cf.sk_offer = sof.id_offer
 ),
 ev AS (
     SELECT DISTINCT
@@ -41,7 +44,7 @@ ev AS (
             ON sf.sk_sale_agreement_signed_date = dd.sk_date
     INNER JOIN
         dw_sale.fact_offers AS fo
-            ON sf.sk_sale_flow = fo.sk_sale_flow
+            ON sf.sk_sale_flow = CONCAT(fo.sk_buyer,'_', fo.sk_house)
     LEFT JOIN
         closing_infos AS ci
             ON fo.sk_offer = ci.sk_offer

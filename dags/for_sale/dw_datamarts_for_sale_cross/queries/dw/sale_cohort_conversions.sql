@@ -165,15 +165,21 @@ sale_closing AS (
             fo.sk_buyer AS sk_buyer,
             fo.sk_agent AS id_agent,
             sdo.is_3p_demand,
-            COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
+            COALESCE(cd.company_name, '') AS partner_3p_demand,
             sdo.is_3p_supply,
-            COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
+            COALESCE(cs.company_name, '') AS partner_3p_supply,
             sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
         LEFT JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = fo.sk_offer_submitted_date
+        LEFT JOIN
+            dw_public.dim_company_3p_partners AS cd 
+                ON cd.sk_company = fo.sk_company_demand
+        LEFT JOIN
+            dw_public.dim_company_3p_partners AS cs 
+                ON cs.sk_company = fo.sk_company_supply
         INNER JOIN
             dw_sale.dim_offer AS sdo
                 ON sdo.sk_offer = fo.sk_offer
@@ -188,15 +194,21 @@ sale_closing AS (
             fo.sk_buyer AS sk_buyer,
             fo.sk_agent AS id_agent,
             sdo.is_3p_demand,
-            COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
+            COALESCE(cd.company_name, '') AS partner_3p_demand,
             sdo.is_3p_supply,
-            COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
+            COALESCE(cs.company_name, '') AS partner_3p_supply,
             sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
         LEFT JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = fo.sk_offer_accepted_date
+        LEFT JOIN
+            dw_public.dim_company_3p_partners AS cd 
+                ON cd.sk_company = fo.sk_company_demand
+        LEFT JOIN
+            dw_public.dim_company_3p_partners AS cs 
+                ON cs.sk_company = fo.sk_company_supply
         INNER JOIN
             dw_sale.dim_offer AS sdo
                 ON sdo.sk_offer = fo.sk_offer
@@ -211,15 +223,21 @@ sale_closing AS (
             fo.sk_buyer AS sk_buyer,
             fo.sk_agent AS id_agent,
             sdo.is_3p_demand,
-            COALESCE(sdo.partner_3p_demand, '') AS partner_3p_demand,
+            COALESCE(cd.company_name, '') AS partner_3p_demand,
             sdo.is_3p_supply,
-            COALESCE(sdo.partner_3p_supply, '') AS partner_3p_supply,
+            COALESCE(cs.company_name, '') AS partner_3p_supply,
             sdo.business_unit AS hub
         FROM
             dw_sale.fact_offers AS fo
         LEFT JOIN
             dw_public.dim_date AS dd
                 ON dd.sk_date = fo.sk_sale_agreement_signed_date
+        LEFT JOIN
+            dw_public.dim_company_3p_partners AS cd 
+                ON cd.sk_company = fo.sk_company_demand
+        LEFT JOIN
+            dw_public.dim_company_3p_partners AS cs 
+                ON cs.sk_company = fo.sk_company_supply
         INNER JOIN
             dw_sale.dim_offer AS sdo
                 ON sdo.sk_offer = fo.sk_offer

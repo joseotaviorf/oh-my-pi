@@ -41,23 +41,20 @@ offer AS (
         dsa.ts_sale_agreement_signed AS ts_sale_agreement_signed,
         fo.sk_buyer,
         fo.sk_owner,
-        financing_bank,
-        payment_method,
+        sof.financing_bank,
+        sof.payment_method,
         dsa.CREDIT_MODEL,
-        CLOSING_STATUS,
-        HOUSE_DILLIGENCE_STATUS,
-        SELLER_DILLIGENCE_STATUS,
-        REPORT_DILLIGENCE_STATUS,
-        BANK_ANALYSIS_STATUS,
-        PAYMENT_STATUS,
-        CREDIT_STATUS,
+        dsa.CLOSING_STATUS,
+        dsa.HOUSE_DILLIGENCE_STATUS,
+        dsa.SELLER_DILLIGENCE_STATUS,
+        dsa.REPORT_DILLIGENCE_STATUS,
         dsa.HAS_USED_FGTS_IN_PAYMENT,
-        HAS_SELLER_DEBT_PAYMENTS,
-        fo.last_price_offered_by_buyer as sale_price,
+        dsa.HAS_SELLER_DEBT_PAYMENTS,
+        fo.last_price_offered_by_buyer AS sale_price,
         dsa.IS_3P_SUPPLY,
         dsa.IS_3P_DEMAND,
         dsa.payment_model,
-        ts_house_registry_ended,
+        sof.dt_house_registry_ended AS ts_house_registry_ended,
         dim.city_group,
         duser.email AS email_especialist,
         dsa.ccv_model,
@@ -70,6 +67,8 @@ offer AS (
         ON fo.sk_region=dim.sk_region
     LEFT JOIN dw_public.dim_user AS duser 
         ON fo.sk_user_consultant=duser.id
+    LEFT JOIN datalake_sale_offer_flows.sale_offer_flows AS sof
+        ON fo.sk_offer = sof.id_offer
 ),
 aux_franchise AS (
     SELECT 

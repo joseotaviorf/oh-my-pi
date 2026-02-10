@@ -80,27 +80,29 @@ dados_offers AS (
     DATE(sa.ts_sale_agreement_signed) AS ccv_signed_date,
     sa.is_ccv_canceled,
     sa.payment_model,
-    CREDIT_MODEL,
+    sa.CREDIT_MODEL,
     CASE
-      WHEN payment_method in ('CASH','CASH_USING_FGTS') 
+      WHEN sa.payment_method in ('CASH','CASH_USING_FGTS') 
       THEN 'CASH'
-      WHEN payment_method in ('FINANCED','FINANCED_USING_FGTS') 
+      WHEN sa.payment_method in ('FINANCED','FINANCED_USING_FGTS') 
       THEN 'FINANCED'
       ELSE NULL
     END AS payment_method,
     CASE 
-      WHEN payment_method in ('FINANCED','FINANCED_USING_FGTS') 
-      AND CREDIT_MODEL IN ('UNDEFINED','ATTA') 
+      WHEN sa.payment_method in ('FINANCED','FINANCED_USING_FGTS') 
+      AND sa.CREDIT_MODEL IN ('UNDEFINED','ATTA') 
       THEN TRUE
       ELSE false
     END AS credit_model_flag,
     dr.city_group,
-    sa.financing_bank
+    sof.financing_bank
   FROM dw_sale.dim_sale_agreement sa
   LEFT JOIN dw_sale.fact_offers AS fo
     ON sa.sk_offer = fo.sk_offer
   LEFT JOIN dw_public.dim_region AS dr
     ON fo.sk_region = dr.sk_region
+  LEFT JOIN datalake_sale_offer_flows.sale_offer_flows AS sof
+    ON fo.sk_offer = sof.id_offer
 ), main_table as (
 SELECT
   'RC' AS csat_campanha,
