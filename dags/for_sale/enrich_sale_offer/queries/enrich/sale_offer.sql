@@ -257,8 +257,10 @@ SELECT
   o.drop_reason_responsible,    
   bu.hub_name AS business_unit,
   o.is_a_rescued_offer,
-  slpc.price_segment,    
-  bpt.id_buyer_prospect_type,    
+  --slpc.price_segment,    
+  --bpt.id_buyer_prospect_type,    
+  NULL AS price_segment,
+  NULL AS id_buyer_prospect_type,
   sp.id_user_agent,
   sp.id_user_team_lead,
   sp.id_user_consultant,
@@ -380,17 +382,17 @@ LEFT JOIN
 LEFT JOIN 
   datalake_region.region AS r
   ON o.id_region = r.id
-LEFT JOIN
-  datalake_sale_listings.sale_listing_price_changes AS slpc
-  ON o.id_house = slpc.id_house
-  AND o.ts_offer_created >= slpc.ts_price_started 
-  AND o.ts_offer_created < COALESCE(slpc.ts_price_ended, NOW())
-LEFT JOIN
-  datalake_buyer_prospect.buyer_prospect_type AS bpt
-  ON o.id_buyer = bpt.id_prospect
-  AND r.city_group = bpt.city_group
-  AND o.ts_offer_created >= bpt.ts_activation 
-  AND o.ts_offer_created < COALESCE(bpt.ts_activation_end, NOW())
+--LEFT JOIN
+--  datalake_sale_listings.sale_listing_price_changes AS slpc
+--  ON o.id_house = slpc.id_house
+--  AND o.ts_offer_created >= slpc.ts_price_started 
+--  AND o.ts_offer_created < COALESCE(slpc.ts_price_ended, NOW())
+--LEFT JOIN
+--  datalake_buyer_prospect.buyer_prospect_type AS bpt
+--  ON o.id_buyer = bpt.id_prospect
+--  AND r.city_group = bpt.city_group
+--  AND o.ts_offer_created >= bpt.ts_activation 
+--  AND o.ts_offer_created < COALESCE(bpt.ts_activation_end, NOW())
 LEFT JOIN
   datalake_sale_offer_flows.offer_specialists AS sp
   ON o.id_offer = sp.id_offer
