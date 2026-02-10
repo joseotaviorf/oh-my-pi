@@ -175,7 +175,7 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_bh
   sk_offer:
-    description: Offer id
+    description: Id of the offer made from a prospect to a house owner.
     lineage:
       - dw_sale.fact_offers.sk_offer
   sk_booking:
