@@ -95,7 +95,7 @@ events AS (
         JOIN dw_sale.fact_offers AS fo
             USING(sk_offer)
         JOIN dw_sale.fact_sale_flows AS fsf
-            ON fsf.sk_sale_flow = fo.sk_sale_flow
+            ON fsf.sk_sale_flow = concat(fo.sk_buyer,'_',fo.sk_house)
         LEFT JOIN dim_house AS dh
             ON fsf.sk_house = dh.sk_house
     --
@@ -162,7 +162,7 @@ sale_flows AS (
         JOIN dw_public.dim_region AS dr
             USING(sk_region)
         LEFT JOIN dw_sale.fact_offers AS fo
-            ON evt.sk_sale_flow = fo.sk_sale_flow
+            ON evt.sk_sale_flow = concat(fo.sk_buyer,'_',fo.sk_house)
 ),
 sale_funnel AS (
     SELECT
@@ -179,7 +179,7 @@ sale_funnel AS (
     FROM
         dw_sale.fact_sale_flows AS fsf
         LEFT JOIN dw_sale.fact_offers AS fo
-            ON fsf.sk_sale_flow = fo.sk_sale_flow
+            ON fsf.sk_sale_flow = concat(fo.sk_buyer,'_',fo.sk_house)
         LEFT JOIN dw_sale.fact_visits AS fv
             ON fsf.sk_sale_flow = fv.sk_sale_flow
         LEFT JOIN dw_public.dim_date AS dd_os
@@ -514,21 +514,173 @@ deactivations AS (
         AND last_status = 'ACTIVE'
 )
 SELECT
-    *
+    dt_event,
+    ts_event,
+    status,
+    status_detail,
+    next_status,
+    ts_status_start,
+    ts_status_end,
+    city_group,
+    flow_event,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    utm_medium,
+    utm_source,
+    campaign_name,
+    utm_campaign,
+    campaign_context,
+    utm_term,
+    utm_content,
+    sk_sale_flow,
+    sk_buyer,
+    sk_house,
+    is_3p,
+    is_3p_bh,
+    sk_offer,
+    sk_booking,
+    dt_offer_submitted,
+    dt_offer_accepted,
+    dt_sale_agreement_signed,
+    dt_booking_created,
+    dt_visit_completed,
+    sale_flow_order,
+    buyer_prospect_order,
+    budget,
+    new_buyer_prospects_target,
+    recovered_buyer_prospects_target,
+    sale_flows_target,
+    marketing_cost
 FROM
     sale_flows_funnel_events
 UNION ALL
 SELECT
-    *
+    date,
+    ts_event,
+    status,
+    status_detail,
+    next_status,
+    ts_status_start,
+    ts_status_end,
+    city_group,
+    flow_event,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    utm_medium,
+    utm_source,
+    campaign_name,
+    utm_campaign,
+    campaign_context,
+    utm_term,
+    utm_content,
+    sk_sale_flow,
+    sk_buyer,
+    sk_house,
+    is_3p,
+    is_3p_bh,
+    sk_offer,
+    sk_booking,
+    dt_offer_submitted,
+    dt_offer_accepted,
+    dt_sale_agreement_signed,
+    dt_booking_created,
+    dt_visit_completed,
+    sale_flow_order,
+    buyer_prospect_order,
+    budget,
+    new_buyer_prospects_target,
+    recovered_buyer_prospects_target,
+    sale_flows_target,
+    marketing_cost
 FROM
     targets
 UNION ALL
 SELECT
-    *
+    date,
+    ts_event,
+    status,
+    status_detail,
+    next_status,
+    ts_status_start,
+    ts_status_end,
+    city_group,
+    flow_event,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    utm_medium,
+    utm_source,
+    campaign_name,
+    utm_campaign,
+    campaign_context,
+    utm_term,
+    utm_content,
+    sk_sale_flow,
+    sk_buyer,
+    sk_house,
+    is_3p,
+    is_3p_bh,
+    sk_offer,
+    sk_booking,
+    dt_offer_submitted,
+    dt_offer_accepted,
+    dt_sale_agreement_signed,
+    dt_booking_created,
+    dt_visit_completed,
+    sale_flow_order,
+    buyer_prospect_order,
+    budget,
+    new_buyer_prospects_target,
+    recovered_buyer_prospects_target,
+    sale_flows_target,
+    marketing_cost
 FROM
     investment
 UNION ALL
 SELECT
-    *
+    dt_event,
+    ts_event,
+    status,
+    status_detail,
+    next_status,
+    ts_status_start,
+    ts_status_end,
+    city_group,
+    flow_event,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    utm_medium,
+    utm_source,
+    campaign_name,
+    utm_campaign,
+    campaign_context,
+    utm_term,
+    utm_content,
+    sk_sale_flow,
+    sk_buyer,
+    sk_house,
+    is_3p,
+    is_3p_bh,
+    sk_offer,
+    sk_booking,
+    dt_offer_submitted,
+    dt_offer_accepted,
+    dt_sale_agreement_signed,
+    dt_booking_created,
+    dt_visit_completed,
+    sale_flow_order,
+    buyer_prospect_order,
+    budget,
+    new_buyer_prospects_target,
+    recovered_buyer_prospects_target,
+    sale_flows_target,
+    marketing_cost
 FROM
     deactivations

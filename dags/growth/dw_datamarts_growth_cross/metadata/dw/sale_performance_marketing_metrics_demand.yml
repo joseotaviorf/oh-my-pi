@@ -32,7 +32,7 @@ columns:
     lineage:
       - dw_datamarts.buyer_prospect_status.status_detail
   next_status:
-    description: The subsequent status in the buyer prospect's journey.
+    description: The subsequent status in the buyer prospect's journey
     lineage:
       - dw_datamarts.buyer_prospect_status.status
   ts_status_start:
@@ -44,7 +44,7 @@ columns:
     lineage:
       - dw_datamarts.buyer_prospect_status.ts_end
   city_group:
-    description: city_group of the prospect intent
+    description: City group of the prospect intent
     lineage:
       - dw_public.dim_region.city_group
       - dw_datamarts.buyer_prospect_status.city_group
@@ -69,9 +69,9 @@ columns:
       Santos: ""
       São José dos Campos: ""
   flow_event:
-    description: The specific event within the sales and marketing flow.
+    description: The specific event within the sales and marketing flow (Booking, Offer, Talk to Agent)
     lineage:
-      -  dw_public.dim_booking
+      - dw_public.dim_booking
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:
@@ -105,52 +105,52 @@ columns:
       - datalake_gsheets_clean.sale_nbp_source_targets.mkt_source
       - datalake_marketing_costs.daily_costs.mkt_source
   utm_medium:
-    description: Returns utm_medium parameter defined at campaing configuration at marketing platforms
+    description: Returns utm_medium parameter defined at campaign configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_medium
       - dw_sale.dim_offer.utm_medium
       - datalake_talk_to_agent.talk_to_agent.utm_medium
   utm_source:
-    description: Returns utm_source parameter defined at campaing configuration at marketing platforms
+    description: Returns utm_source parameter defined at campaign configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_source
       - dw_sale.dim_offer.utm_source
       - datalake_talk_to_agent.talk_to_agent.utm_source
   campaign_name:
-    description: Returns the name of the campaign setted at the marketing plataform
+    description: Returns the name of the campaign set at the marketing platform
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_sale.dim_offer.utm_campaign
       - datalake_talk_to_agent.talk_to_agent.utm_campaign
       - datalake_marketing_costs.daily_costs.campaign_name
   utm_campaign:
-    description: Returns utm_campaign parameter defined at campaing configuration at marketing platforms
+    description: Returns utm_campaign parameter defined at campaign configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_sale.dim_offer.utm_campaign
       - datalake_talk_to_agent.talk_to_agent.utm_campaign
       - datalake_marketing_costs.daily_costs.utm_campaign
   campaign_context:
-    description: Returns the context of the campaign setted at the marketing plataform
+    description: Returns the context of the campaign set at the marketing platform (Sale, Organic, Rental)
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_sale.dim_offer.utm_campaign
       - datalake_talk_to_agent.talk_to_agent.utm_campaign
       - datalake_marketing_costs.daily_costs.utm_campaign
   utm_term:
-    description: Returns the utm_term parameter defined at campaing configuration at marketing platforms
+    description: Returns the utm_term parameter defined at campaign configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_term
       - datalake_talk_to_agent.talk_to_agent.utm_term
       - datalake_marketing_costs.daily_costs.utm_term
   utm_content:
-    description: Returns the utm_content parameter defined at campaing configuration at marketing platforms
+    description: Returns the utm_content parameter defined at campaign configuration at marketing platforms
     lineage:
       - dw_public.dim_booking.utm_content
       - datalake_talk_to_agent.talk_to_agent.utm_content
       - datalake_marketing_costs.daily_costs.utm_content
   sk_sale_flow:
-    description: Sale flow id
+    description: Sale flow id (buyer_id concatenated with house_id)
     lineage:
       - dw_sale.fact_sale_flows.sk_sale_flow
       - datalake_talk_to_agent.talk_to_agent.tenant_id
@@ -167,13 +167,13 @@ columns:
       - datalake_ebdb_clean.house.id
       - dw_sale.fact_sale_flows.sk_house
   is_3p:
-    description: Indicator of whether the source is a third-party entity.
+    description: Indicator of whether the source is a third-party entity
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply
   is_3p_bh:
-    description: Specific indicator for third-party involvement in the Belo Horizonte region.
+    description: Specific indicator for third-party involvement in the Belo Horizonte region
     lineage:
-     - datalake_ebdb_listing.house.is_3p_supply_bh
+      - datalake_ebdb_listing.house.is_3p_supply_bh
   sk_offer:
     description: Offer id
     lineage:
@@ -187,19 +187,19 @@ columns:
     lineage:
       - dw_public.dim_date.date
   dt_offer_accepted:
-    description: Date of accepted
+    description: Date of offer accepted
     lineage:
       - dw_public.dim_date.date
   dt_sale_agreement_signed:
-    description: Date of ccv was signed
+    description: Date of CCV (sale agreement) was signed
     lineage:
       - dw_public.dim_date.date
   dt_booking_created:
-    description: Date of boooking creation
+    description: Date of booking creation
     lineage:
       - dw_public.dim_date.date
   dt_visit_completed:
-    description: Date of booking realized
+    description: Date of visit completed
     lineage:
       - dw_public.dim_date.date
   sale_flow_order:
@@ -221,22 +221,22 @@ columns:
       - dw_sale.dim_offer.ts_offer_submitted
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
   budget:
-    description: Allocated budget for the marketing campaign.
+    description: Allocated budget for the marketing campaign
     lineage:
       - datalake_gsheets_clean.mkt_cost_per_source.daily_value
   new_buyer_prospects_target:
-    description: Target metrics for acquiring new buyer prospects.
+    description: Target metrics for acquiring new buyer prospects
     lineage:
       - datalake_gsheets_clean.sale_nbp_source_targets.nbp_target
   recovered_buyer_prospects_target:
-    description: Target metrics for recovering previous buyer prospects.
+    description: Target metrics for recovering previous buyer prospects
     lineage:
       - datalake_gsheets_clean.sale_nbp_source_targets.rbp_target
   sale_flows_target:
-    description: Target goals for the sales flow processes.
+    description: Target goals for the sales flow processes
     lineage:
       - datalake_gsheets_clean.sale_flows_targets.sf_target
   marketing_cost:
-    description: Total cost associated with the marketing activities.
+    description: Total cost associated with the marketing activities
     lineage:
       - datalake_marketing_costs.daily_costs.cost
