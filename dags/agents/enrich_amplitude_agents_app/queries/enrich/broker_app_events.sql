@@ -28,7 +28,7 @@ SELECT
     bse.id_user,
     bse.id_app,
     bse.city,
-    bse.platform,
+    bse.user_platform AS platform,
     bse.os_name,
     bse.event_type,
     bse.user_properties,
@@ -43,3 +43,5 @@ FROM
     datalake_amplitude_agents_app.agents_search_events AS bse
 WHERE
     MAKE_DATE(bse.year, bse.month, bse.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND bse.web_view_origin = 'agents app'
+    AND COALESCE(bse.is_sale_agent, bse.is_rent_agent) IS NOT NULL

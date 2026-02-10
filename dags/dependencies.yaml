@@ -1361,6 +1361,7 @@ bietlejuice.enrich_airtable:
 bietlejuice.enrich_amplitude_agents_app:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-business-context:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
 bietlejuice.enrich_amplitude_inspections:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-inspection-budgetapproval-home-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-inspection-review-home-page-viewed-events:first-run-of-day

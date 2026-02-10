@@ -2,7 +2,7 @@
 database_name: datalake_amplitude_agents_app
 table_name: agents_search_events
 description: This table contains data from Agents' property search events that were redirected from the Agents application to the Tenant application.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_user:
@@ -12,52 +12,160 @@ columns:
   id_app:
     lineage:
       - datalake_amplitude_clean.events.id_app
-    description: App unique identifier
+    description: App unique identifier.
+  id_session:
+    lineage:
+      - datalake_amplitude_clean.events.id_session
+    description: Session unique identifier.
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean.events.id_amplitude
+    description: Amplitude user identifier associated with the event.
+  id_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_event
+    description: Amplitude event unique identifier.
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: House identifier extracted from event properties.
+  id_region:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Region identifier extracted from event properties.
   city:
     lineage:
       - datalake_amplitude_clean.events.city
-    description: City of origin of the event
+    description: City of origin of the event.
   platform:
     lineage:
+      - datalake_amplitude_clean.events.platform
+    description: Platform (e.g., android, ios, web) recorded by the event.
+  user_platform:
+    lineage:
       - datalake_amplitude_clean.events.user_properties
-    description: Type of platform on which the event occurred
+    description: Platform as reported inside user properties.
   os_name:
     lineage:
       - datalake_amplitude_clean.events.os_name
-    description: By which system/application the event was generated
+    description: Operating system name.
   event_type:
     lineage:
       - datalake_amplitude_clean.events.event_type
-    description: Indicates the type of event generated in the application
+    description: Type of the event generated in the application.
+  device:
+    lineage:
+      - datalake_amplitude_clean.events.device_type
+    description: Device type captured for the event.
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM source parsed from user properties.
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM medium parsed from user properties.
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: UTM campaign parsed from user properties.
+  web_view_origin:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: WebView origin parsed from event properties.
+  gallery_mode:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Gallery display mode parsed from event properties.
+  gallery_tab_room:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Room/tab name selected in gallery, from event properties.
+  lpv_origin:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Origin route for listing page view, from event properties.
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Business context associated to the event (e.g., sale).
+  search_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Search type variant parsed from event properties.
+  type_property:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Property type derived from event properties.
+  listing_section:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Listing section name parsed from event properties.
+  current_page:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Current page name parsed from event properties.
   user_properties:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-    description: Properties of the user who generated the event
+    description: Original user properties JSON from Amplitude.
   event_properties:
     lineage:
       - datalake_amplitude_clean.events.event_properties
-    description: Properties of the generated event
+    description: Original event properties JSON from Amplitude.
+  total_filters_applied:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Number of categories/filters applied in the search.
+  area_m2:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Property area in square meters parsed from event properties.
+  price_tier:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Price tier/color classification parsed from event properties.
+  sale_price:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Sale price parsed from event properties.
+  sale_price_minimum:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Minimum sale price selected in filters, from event properties.
+  sale_price_maximum:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Maximum sale price selected in filters, from event properties.
+  is_sale_price_filtered:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates whether sale price filter is applied.
+  is_sale_good_price:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates whether a listing is flagged as good price.
   is_sale_agent:
     lineage:
       - datalake_ebdb_agents.business_context.business_context
-    description: Indicates whether the user is an agent in the Sale business context
+    description: Indicates whether the user is an agent in the Sale business context.
   is_rent_agent:
     lineage:
       - datalake_ebdb_agents.business_context.business_context
-    description: Indicates whether the user is an agent in the Rent business context
+    description: Indicates whether the user is an agent in the Rent business context.
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
-    description: Event datetime
+    description: Event datetime.
   year:
     lineage:
       - datalake_amplitude_clean.events.year
-    description: Year of event
+    description: Event year.
   month:
     lineage:
       - datalake_amplitude_clean.events.month
-    description: Month of event
+    description: Event month.
   day:
     lineage:
       - datalake_amplitude_clean.events.day
-    description: Day of event
+    description: Event day.
