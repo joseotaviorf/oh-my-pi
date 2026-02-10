@@ -10,8 +10,8 @@ SELECT
     owner_display_name,
     map_index,
     try_number,
-    ts_event,
-    ts_executed,
+    CAST(ts_event AS STRING) AS ts_event, 
+    CAST(ts_executed AS STRING) AS ts_executed,
     year,
     month,
     day
