@@ -4,14 +4,14 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      This flow generates performance metrics for agents in both Sales and Rentals business contexts. 
-      It tracks key activities such as agent availability, visit bookings, offer submissions, and contract signings. 
-      The metrics include averages for active days, booking performance, cancellations, document submissions, and lead 
-      conversions, providing insights into agent productivity and effectiveness. The flow captures data for both the Sales 
-      and Rentals pipelines, allowing for detailed performance tracking of agents across different stages of the customer journey, 
+      This flow generates performance metrics for agents in both Sales and Rentals business contexts.
+      It tracks key activities such as agent availability, visit bookings, offer submissions, and contract signings.
+      The metrics include averages for active days, booking performance, cancellations, document submissions, and lead
+      conversions, providing insights into agent productivity and effectiveness. The flow captures data for both the Sales
+      and Rentals pipelines, allowing for detailed performance tracking of agents across different stages of the customer journey,
       from lead generation to contract finalization.
 workflow:
-  type: query
+  type: query_delta
   layer: metric
   default_extraction_type: incremental
   default_partitions: [year, month, day]

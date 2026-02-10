@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: "Rental contracts metrics, including active and ended, to get the information about the new rentals, new and ended contracts."
 workflow:
-  type: query
+  type: query_delta
   layer: metric
 cluster:
   type: databricks_16_4_med_io-general_cluster
