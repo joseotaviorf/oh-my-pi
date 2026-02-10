@@ -1,8 +1,8 @@
 ---
 database_name: datalake_person_clean
 table_name: contact_info
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Contact information for persons including emails, phone numbers, and push notification tokens.
   Supports multiple contact methods per person with priority ranking and validation status.

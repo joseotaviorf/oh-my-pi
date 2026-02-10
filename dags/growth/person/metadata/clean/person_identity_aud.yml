@@ -1,8 +1,8 @@
 ---
 database_name: datalake_person_clean
 table_name: person_identity_aud
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Audit table that captures the complete change history of person identity records. Each row represents
   a historical version of an identity entity, tracking all modifications including value changes, scope updates,

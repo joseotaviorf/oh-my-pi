@@ -31,8 +31,8 @@ description: |
   - **Profile Types**: Affiliated, buyer prospect, CIQ member, landlord, etc.
   - **Business Classification**: Real estate professional, company member, individual user
   - **Cross-Product Mapping**: Relationships across rental, sales, and company products
-domain: 3P Partners
-owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_person:
     lineage:

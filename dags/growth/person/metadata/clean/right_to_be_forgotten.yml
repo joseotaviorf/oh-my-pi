@@ -1,8 +1,8 @@
 ---
 database_name: datalake_person_clean
 table_name: right_to_be_forgotten
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   LGPD/GDPR compliance table tracking data anonymization requests and "Right to be Forgotten" processes.
   Critical for regulatory compliance and privacy law adherence across jurisdictions.

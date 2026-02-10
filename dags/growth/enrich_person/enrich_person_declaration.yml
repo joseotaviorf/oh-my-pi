@@ -1,7 +1,7 @@
 dag:
   name: enrich_person
   schedule_start_date: 2020, 1, 1
-  owner: Data 3P Partners
+  owner: Data Growth
   documentation:
     dag_purpose: |
       This DAG creates enriched person tables that bridge raw person data with dimensional modeling and cross-entity relationships.

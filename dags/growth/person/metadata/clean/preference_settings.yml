@@ -1,8 +1,8 @@
 ---
 database_name: datalake_person_clean
 table_name: preference_settings
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   User preferences and personalization settings that customize the QuintoAndar experience for each person.
   Enables localization, personalization, and user experience optimization across the platform.

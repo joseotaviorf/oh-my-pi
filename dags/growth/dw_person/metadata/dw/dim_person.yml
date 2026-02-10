@@ -37,8 +37,8 @@ description: |
   - **Partitioning Strategy**: Efficient data organization for query performance
   - **Index Strategy**: Optimized for common analytical access patterns
   - **Scalability**: Supports QuintoAndar's growing customer base across multiple countries
-domain: 3P Partners
-owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_person:
     lineage: 

@@ -1,6 +1,7 @@
 SELECT
     id,
     person_id AS id_person,
+    address_uuid AS uuid_address,
     country,
     state,
     city,

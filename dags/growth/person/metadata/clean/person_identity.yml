@@ -1,8 +1,8 @@
 ---
 database_name: datalake_person_clean
 table_name: person_identity
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 description: |
   Identity resolution table that enables person matching and deduplication across multiple systems and platforms.
   Critical for preventing duplicate accounts and enabling seamless user experience across QuintoAndar's ecosystem.

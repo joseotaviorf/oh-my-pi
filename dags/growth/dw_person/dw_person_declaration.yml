@@ -1,7 +1,7 @@
 dag:
   name: dw_person
   schedule_start_date: 2020, 1, 1
-  owner: Data 3P Partners
+  owner: Data Growth
   documentation:
     dag_purpose: |
       This DAG creates the dimensional person model that serves as the central person dimension for QuintoAndar's data warehouse.
