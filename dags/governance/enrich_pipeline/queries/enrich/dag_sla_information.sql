@@ -45,10 +45,14 @@ dag_run_base AS (
 paused_dates AS (
     SELECT
         id_dag,
-        event,
-        LEAD(event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS next_event,
         ts_event,
-        LEAD(ts_event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS ts_next_event
+        CASE
+            -- astro semantics: event is always 'paused' and the real status comes in the payload.
+            WHEN event = 'paused' THEN CAST(extra:is_paused AS BOOLEAN)
+            -- legacy semantics: 'paused' means paused, 'cli_run' means active/unpaused.
+            WHEN event = 'cli_run' THEN FALSE
+            ELSE NULL
+        END AS is_paused_status
     FROM
         datalake_airflow.log
     WHERE
@@ -58,16 +62,38 @@ paused_dates AS (
 paused_cli_run AS (
     SELECT
         id_dag,
-        event,
-        next_event,
         ts_event,
         ts_next_event
-    FROM
-        paused_dates
+    FROM (
+        SELECT
+            id_dag,
+            ts_event,
+            is_paused_status,
+            LAG(is_paused_status) OVER (PARTITION BY id_dag ORDER BY ts_event) AS prev_is_paused_status,
+            LEAD(ts_event) OVER (PARTITION BY id_dag ORDER BY ts_event) AS ts_next_event
+        FROM
+            paused_dates
+        WHERE
+            is_paused_status IS NOT NULL
+    )
     WHERE
-        (event = 'paused' AND next_event IS NULL)   -- The DAG is currently paused and hasn't had any event since then
-        OR (event = 'paused' AND next_event = 'cli_run')    -- The DAG was paused for a period but had another active event
-        OR (event = 'cli_run' AND next_event = 'paused')    -- The DAG was active but was paused
+        is_paused_status = TRUE
+        AND (prev_is_paused_status IS NULL OR prev_is_paused_status <> is_paused_status)
+),
+astro_dag_pause_status AS (
+    SELECT
+        id_dag,
+        MAKE_DATE(year, month, day) AS dt_event,
+        is_paused
+    FROM
+        datalake_astro_clean.dag
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_dag, MAKE_DATE(year, month, day)
+            ORDER BY ts_last_parsed DESC
+        ) = 1
 ),
 dag_base AS (
     SELECT
@@ -75,7 +101,10 @@ dag_base AS (
         d.id_line,
         d.layer,
         d.is_datamart,
-        IF(ad.date BETWEEN DATE(pc.ts_event) AND COALESCE(DATE(pc.ts_next_event), CURRENT_DATE), TRUE, FALSE) AS is_paused,
+        COALESCE(
+            ads.is_paused,
+            IF(ad.date BETWEEN DATE(pc.ts_event) AND COALESCE(DATE(pc.ts_next_event), CURRENT_DATE), TRUE, FALSE)
+        ) AS is_paused,
         ad.date AS dt_event
     FROM
         datalake_pipeline.dag AS d
@@ -85,6 +114,10 @@ dag_base AS (
     JOIN
         datalake_quintoandar.aux_date AS ad
             ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    LEFT JOIN
+        astro_dag_pause_status AS ads
+            ON ads.id_dag = d.id_dag
+            AND ads.dt_event = ad.date
     LEFT JOIN
         paused_cli_run AS pc
             ON pc.id_dag = d.id_dag
