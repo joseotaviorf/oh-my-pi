@@ -33,8 +33,8 @@ WITH for_sale AS (
         dw_public.dim_date AS dd
             ON fsf.sk_sale_agreement_signed_date = dd.sk_date
     INNER JOIN
-        dw_sale.fact_offers AS fo
-            ON fo.sk_sale_flow = fsf.sk_sale_flow
+        dw_sale.fact_offers AS fo            
+            ON concat(fo.sk_buyer,'_',fo.sk_house) = fsf.sk_sale_flow            
     INNER JOIN
         dw_sale.dim_sale_agreement AS sa
             ON sa.sk_offer = fo.sk_offer
@@ -81,7 +81,26 @@ for_rent AS (
         AND con.status IN ('Ativo', 'Finalizado')
 )
 
-SELECT *
+SELECT 
+         id_house
+        ,trasaction_type
+        ,transaction_situation
+        ,iptu
+        ,transaction_amount
+        ,address
+        ,address_number
+        ,address_complement
+        ,address_neighborhood
+        ,address_zipcode
+        ,house_type
+        ,useful_area
+        ,total_area
+        ,terrain_area
+        ,parking_slots
+        ,bedrooms
+        ,bathrooms
+        ,construction_year
+        ,dt_transaction
 FROM (
     SELECT *
     FROM

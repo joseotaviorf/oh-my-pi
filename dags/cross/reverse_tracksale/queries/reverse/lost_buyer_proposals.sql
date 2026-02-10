@@ -63,7 +63,7 @@ WITH
         ON sf.sk_house = dh.id_house
     LEFT JOIN 
       dw_sale.fact_offers fo 
-        ON sf.sk_sale_flow = fo.sk_sale_flow
+        ON sf.sk_sale_flow = concat(fo.sk_buyer,'_',fo.sk_house)
     LEFT JOIN 
       dw_sale.dim_offer dof 
         ON dof.sk_offer = fo.sk_offer

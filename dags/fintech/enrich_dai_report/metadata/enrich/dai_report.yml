@@ -9,69 +9,86 @@ columns:
     lineage:
       - dw_house.dim_house.sk_house
       - datalake_ebdb_clean.house.id
-    description: ""
-  dt_transaction:
-    lineage:
-      - dw_public.dim_date.date
-      - datalake_ebdb_clean.contract.ts_signed
-    description: ""
+    description: Unique identifier for the house
+  trasaction_type:
+    lineage: []
+    description: Transaction type indicator (1 = sale, 2 = rent)
+  transaction_situation:
+    lineage: []
+    description: Transaction situation indicator (1 = completed)
+  iptu:
+    lineage: []
+    description: IPTU tax value (fixed as 0)
   transaction_amount:
     lineage:
       - dw_sale.dim_sale_agreement.sale_price_agreed
       - datalake_ebdb_clean.contract.rent
-    description: ""
+    description: Transaction amount (sale price or rent value)
   address:
     lineage:
       - dw_house.dim_house.address
       - datalake_ebdb_clean.house.address
-    description: ""
+    description: Property street address
   address_number:
     lineage:
       - dw_house.dim_house.number
       - datalake_ebdb_clean.house.number
-    description: ""
+    description: Property address number
   address_complement:
     lineage:
       - dw_house.dim_house.complement
       - datalake_ebdb_clean.house.complement
-    description: ""
+    description: Property address complement (apt, block, etc.)
   address_neighborhood:
     lineage:
       - dw_house.dim_house.neighborhood
       - datalake_ebdb_clean.house.neighborhood
-    description: ""
+    description: Property neighborhood
   address_zipcode:
     lineage:
       - dw_house.dim_house.zipcode
       - datalake_ebdb_clean.house.zipcode
-    description: ""
+    description: Property ZIP code
+  house_type:
+    lineage:
+      - dw_house.dim_house.type
+      - datalake_ebdb_clean.house.type
+    description: Property type code (2 = house, 3 = apartment/studio, 0 = other)
   useful_area:
     lineage:
       - dw_house.dim_house.total_area
       - datalake_ebdb_clean.house.total_area
-    description: ""
+    description: Property useful area in square meters
   total_area:
     lineage:
       - dw_house.dim_house.total_area
       - datalake_ebdb_clean.house.total_area
-    description: ""
+    description: Property total area in square meters
   terrain_area:
     lineage:
       - dw_house.dim_house.construction_area
       - datalake_ebdb_clean.house.land_area
-    description: ""
+    description: Property terrain/land area in square meters
   parking_slots:
     lineage:
       - dw_house.dim_house.parking_slots
       - datalake_ebdb_clean.house.parking_slots
-    description: ""
+    description: Number of parking slots
   bedrooms:
     lineage:
       - dw_house.dim_house.bedrooms
       - datalake_ebdb_clean.house.bedrooms
-    description: ""
+    description: Number of bedrooms
   bathrooms:
     lineage:
       - dw_house.dim_house.bathrooms
       - datalake_ebdb_clean.house.bathrooms
-    description: ""
+    description: Number of bathrooms
+  construction_year:
+    lineage: []
+    description: Construction year (fixed as 1900 - placeholder value)
+  dt_transaction:
+    lineage:
+      - dw_public.dim_date.date
+      - datalake_ebdb_clean.contract.ts_signed
+    description: Transaction date

@@ -23,7 +23,6 @@ ccvs AS (
     	fo.sk_offer,
     	fo.sk_owner,
     	fo.sk_buyer,
-    	fo.sk_sale_flow as sk_sales_flow,
         DATE_ADD(TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd'), 2) = DATE('2024-07-02') AS gap,
     	DATEDIFF(current_date, TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd')) AS days_since_event
     FROM

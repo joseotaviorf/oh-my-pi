@@ -23,7 +23,6 @@ ccvs AS (
         fo.sk_offer,
         fo.sk_owner,
         fo.sk_buyer,
-        fo.sk_sale_flow as sk_sales_flow,
         DATEDIFF(current_date, TO_DATE(STRING(NULLIF(fo.sk_sale_agreement_signed_date, -1)), 'yyyyMMdd')) AS days_since_event
     FROM
         dw_sale.fact_offers AS fo

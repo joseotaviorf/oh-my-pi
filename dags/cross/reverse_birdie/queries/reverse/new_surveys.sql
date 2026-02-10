@@ -5,7 +5,7 @@ WITH offer AS (
       sof.payment_method,
       dsa.ts_sale_agreement_signed AS ts_sale_agreement_signed,
       dsa.CREDIT_MODEL,
-      SELLER_DILLIGENCE_STATUS,
+      dsa.SELLER_DILLIGENCE_STATUS,
       COALESCE(dim.city_group, dim2.city_group) AS city_group
   FROM dw_sale.fact_offers AS fo
   JOIN dw_sale.dim_sale_agreement AS dsa 

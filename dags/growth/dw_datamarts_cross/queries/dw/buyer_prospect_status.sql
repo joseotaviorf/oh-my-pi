@@ -36,7 +36,7 @@ events AS (
             USING(sk_offer)
     JOIN
         dw_sale.fact_sale_flows AS fsf
-            ON fsf.sk_sale_flow = fo.sk_sale_flow
+            ON fsf.sk_sale_flow = concat(fo.sk_buyer,'_',fo.sk_house)
     UNION ALL
     SELECT
         tenant_id || '_' || house_id AS sk_sale_flow,
