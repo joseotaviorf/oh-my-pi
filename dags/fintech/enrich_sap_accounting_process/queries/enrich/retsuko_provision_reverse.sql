@@ -8,11 +8,13 @@ WITH retsuko AS (
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420021'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '420022'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN '420023'
+            WHEN e.bill_item IN ('entry.bill-item/service-fee') THEN '420037'
         END AS account_number,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'brokerage installment fee'
+            WHEN e.bill_item IN ('entry.bill-item/service-fee') THEN 'service fee'
         END AS accounting_name,
         i.accrual_year_month,
         DATE(e.ts_created) AS dt_source_trigger,
@@ -39,7 +41,8 @@ WITH retsuko AS (
             'entry.bill-item/adjustment-agreement-adm-fee', 
             'entry.bill-item/lockin', 
             'entry.bill-item/brokerage-quinto-andar', 
-            'entry.bill-item/brokerage-installment-fee'
+            'entry.bill-item/brokerage-installment-fee',
+            'entry.bill-item/service-fee'
             )
         AND af.type IN ('contract', 'tenant','landlord')
         AND at.type IN ('contract', 'tenant','landlord')
@@ -103,7 +106,8 @@ sap_ledger AS (
         datalake_pas.ledger
     WHERE
         dt_reference >= DATE('2025-01-01')
-        AND account_number IN ('420021', '420022', '420023')
+        AND (account_number IN ('420021', '420022', '420023') 
+            OR (account_number IN ('420037') AND dt_reference >= DATE('2026-03-01')))
 )
 
 SELECT

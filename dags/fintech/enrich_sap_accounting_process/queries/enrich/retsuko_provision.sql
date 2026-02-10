@@ -5,14 +5,17 @@ WITH retsuko AS (
     e.id_external AS id_finance_entity_entry,
     'seu barriga' AS source_name,
     CASE
-      WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'juridical' THEN '420021'
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420021'
       WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '420022'
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN '420023'
+      WHEN e.bill_item IN ('entry.bill-item/service-fee') THEN '420037'
     END AS account_number,
     CASE
       WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'juridical' THEN 'adm fee PJ'
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'physical' THEN 'adm fee PF'
       WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'brokerage installment fee'
+      WHEN e.bill_item IN ('entry.bill-item/service-fee') THEN 'service fee'
     END AS accounting_name,
     i.accrual_year_month,
     DATE(e.ts_created) AS dt_source_trigger,
@@ -33,8 +36,13 @@ WITH retsuko AS (
       ON ct.id = e.id_contract
   WHERE
     e.description != 'Crédito - Parcelamento corretagem - QuintoAndar'
-    AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin', 'entry.bill-item/brokerage-quinto-andar', 'entry.bill-item/brokerage-installment-fee')
-    AND NOT(ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+    AND 
+    (
+      e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 'entry.bill-item/brokerage-installment-fee')
+      OR (ct.landlord_legal_person = 'juridical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+      OR (DATE(e.ts_created) >= '2026-03-01' AND ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+      OR (DATE(e.ts_created) >= '2026-03-01' AND e.bill_item IN ('entry.bill-item/service-fee'))
+    )
     AND DATE(e.ts_created) >= '2024-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
@@ -95,7 +103,7 @@ sap_ledger AS (
     datalake_pas.ledger
   WHERE
     dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('420021', '420022', '420023')
+    AND account_number IN ('420021', '420022', '420023', '420037')
   GROUP BY 1, 2, 3, 4, 6, 7
 ),
 
