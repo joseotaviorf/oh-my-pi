@@ -137,6 +137,18 @@ columns:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_value
     description: The value of the fifth custom input metric defined for this target.
+  bps_totais:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.bps_totais
+    description: The total number of BPs (Buyer Prospects) targeted.
+  nbp_unicos:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.nbp_unicos
+    description: The number of unique nBPs (New Buyer Prospects) targeted.
+  rbp_unicos:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.rbp_unicos
+    description: The number of unique rBPs (Recovered Buyer Prospects) targeted.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.
