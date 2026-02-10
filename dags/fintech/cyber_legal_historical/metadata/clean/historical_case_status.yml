@@ -1,0 +1,33 @@
+---
+database_name: datalake_cyber_legal_homolog_clean
+table_name: historical_case_status
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Table containing CyberLegal cases change of status history."
+columns:
+  id_case:
+    description: "Legal case number - Primary key"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CECASENO
+  id_dossier:
+    description: "Dossier number - Business primary key"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEDOSSIERID
+  id_client:
+    description: "Client unique identification (CPF/CNPJ)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESSNUM
+  case_status:
+    description: "Legal process status (New, Active, Finalized, Pending, Completed)"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESTATUS
+  dt_status_changed:
+    description: "Date when case status changed"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CESTATDT
+  ts_updated:
+    description: "Timestamp of the last update"
+    lineage:
+      - datalake_cyber_legal_homolog_raw.case.CEDTUPD
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"

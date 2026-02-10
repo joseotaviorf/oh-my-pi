@@ -1,0 +1,50 @@
+---
+database_name: datalake_cyber_legal_homolog
+table_name: contract_agency_distribution
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: Get the changes in contract distribution between agencies/advisories
+columns:
+  id_contract:
+    description: "Unique identifier for the contract."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.history_contract_distribution.id_contract
+  creditor:
+    description: "Creditor associated with the contract."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.history_contract_distribution.creditor
+  id_agency:
+    description: "Identifier for the agency."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.history_contract_distribution.agency
+  id_main_agency:
+    description: "Identifier for the main agency."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.id_main_agency
+  id_agencies_group:
+    description: "Identifier for the agency group."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.id_agencies_group
+  main_agency_name:
+    description: "Name of the main agency."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.main_agency_name
+  main_agency_type:
+    description: "Type of the main agency."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.main_agency_type
+  agencies_name_group:
+    description: "Group name of agencies."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.agencies_name_group
+  dt_start_interval:
+    description: "Start date of the interval during which the agency was responsible for the contract."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.history_contract_distribution.ts_distribution
+      - datalake_cyber_legal_homolog_clean.history_contract_distribution.ts_redistribution
+  dt_end_interval:
+    description: "End date of the interval during which the agency was responsible for the contract."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.history_contract_distribution.ts_redistribution
+  ts_load:
+    description: "Timestamp when the data was loaded."

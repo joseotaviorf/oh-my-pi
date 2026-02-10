@@ -57,7 +57,7 @@ columns:
     description: "Status of the contract."
     lineage:
       - datalake_cyber_legal_homolog.process.contract_status
-  elaw_status:
+  cyber_status:
     description: "Current status of the legal case (e.g., active, closed, pending)."
     lineage:
       - datalake_cyber_legal_homolog.process.case_status

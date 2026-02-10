@@ -1,0 +1,50 @@
+dag:
+  name: cyber_legal_historical
+  schedule_start_date: 2025, 8, 1
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      ingestion of Cyber Legal system tables about debts and collections.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_cyber_raw
+  custom_schema: cyber_legal_homolog
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 2), 'load_end_date') }}"
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
+  tables_customization:
+    case:
+      clean_table_name: historical_case_status
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['CESTATDT', 'CEDTUPD']"
+        - False
+        - "[]"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: r5d.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  databricks_conn_id: databricks_new

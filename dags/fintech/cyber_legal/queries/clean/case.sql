@@ -64,6 +64,7 @@ SELECT
         WHEN CESTATUS = 'F' THEN 'Finalized'
         WHEN CESTATUS = 'P' THEN 'Pending'
         WHEN CESTATUS = 'C' THEN 'Completed'
+        WHEN CESTATUS = 'S' THEN 'Suspended'
         ELSE CESTATUS
     END AS case_status,
     CEACSC1 AS action_score_class_1,

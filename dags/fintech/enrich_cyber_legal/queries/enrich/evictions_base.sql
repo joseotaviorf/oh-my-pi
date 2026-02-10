@@ -92,7 +92,7 @@ SELECT DISTINCT
     p.state AS region,
     p.city,
     p.contract_status,
-    p.case_status AS elaw_status,
+    p.case_status AS cyber_status,
     ps.stage_description AS last_stage,
     s.stage_distribuicao_arbitral_expense_amount,
     s.stage_citacao_arbitral_expense_amount,

@@ -178,6 +178,22 @@ workflow:
         - "[]"
         - False
         - "[]"
+    tb_historico_disponibilizacao:
+      clean_table_name: history_contract_distribution
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    tb_grupo_agency:
+      clean_table_name: agency_group
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:

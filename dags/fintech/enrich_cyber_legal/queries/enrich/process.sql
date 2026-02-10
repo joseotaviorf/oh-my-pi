@@ -75,8 +75,8 @@ SELECT
     dq.overdue_amount,
     c.dt_status_changed,
     CASE
-        WHEN DATE(CASE WHEN c.case_status = 'Completed' THEN c.dt_status_changed ELSE CURRENT_DATE END) IS NULL AND c.dt_case_accepted > LAST_DAY(ADD_MONTHS(CURRENT_DATE, 0)) THEN 0
-        WHEN DATE(CASE WHEN c.case_status = 'Completed' THEN c.dt_status_changed ELSE CURRENT_DATE END) IS NULL THEN DATEDIFF(LAST_DAY(ADD_MONTHS(CURRENT_DATE, 0)), c.dt_case_accepted)
+        WHEN DATE(CASE WHEN c.case_status = 'Completed' THEN c.dt_status_changed ELSE NULL END) IS NULL AND c.dt_case_accepted > LAST_DAY(ADD_MONTHS(CURRENT_DATE, 0)) THEN 0
+        WHEN DATE(CASE WHEN c.case_status = 'Completed' THEN c.dt_status_changed ELSE NULL END) IS NULL THEN DATEDIFF(LAST_DAY(ADD_MONTHS(CURRENT_DATE, 0)), c.dt_case_accepted)
     ELSE NULL END AS ldt_stock,
     CASE
         WHEN DATE(c.dt_case_accepted) > DATE(CASE WHEN c.case_status = 'Completed' THEN c.dt_status_changed ELSE NULL END) THEN 0
