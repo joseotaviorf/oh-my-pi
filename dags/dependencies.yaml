@@ -1343,6 +1343,10 @@ bietlejuice.enrich_agent_accreditation:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_agents_validation:
+  - bietlejuice.big_agent:load-clean-earning-remuneration-log:first-run-of-day
+  - bietlejuice.big_agent:load-clean-earning-sources:first-run-of-day
+  - bietlejuice.big_agent:load-clean-earnings:first-run-of-day
+  - bietlejuice.big_agent:load-clean-new-earnings:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day

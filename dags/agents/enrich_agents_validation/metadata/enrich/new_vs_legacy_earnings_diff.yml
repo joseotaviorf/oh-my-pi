@@ -1,0 +1,53 @@
+---
+database_name: datalake_agents_validation
+table_name: new_vs_legacy_earnings_diff
+description: |
+  Table used to validate the difference between new and legacy earnings.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_contract:
+    description: Id of the contract.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+      - datalake_big_agent_clean.earnings.id_external_domain
+  id_legacy_earning:
+    description: Id of the earning from the legacy system.
+    lineage:
+      - datalake_big_agent_clean.earnings.id
+  id_new_earning:
+    description: Id of the new earning.
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id
+  external_domain_type:
+    description: Type of the external domain.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.external_domain_type
+  status:
+    description: Status of the earning source.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.status
+  new_revenue_percentage:
+    description: Revenue percentage of the new earning.
+    lineage:
+      - datalake_big_agent_clean.new_earnings.revenue_percentage
+  legacy_revenue_percentage:
+    description: Revenue percentage of the earning from the legacy system.
+    lineage:
+      - datalake_big_agent_clean.earnings.remuneration_value
+  has_legacy_percentage_manual_change:
+    description: If the legacy percentage was manually changed.
+    lineage:
+      - datalake_big_agent_clean.earning_remuneration_log.id
+  ts_created:
+    description: Timestamp of the earning source.
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_created
+  ts_legacy_created:
+    description: Timestamp of the earning from the legacy system.
+    lineage:
+      - datalake_big_agent_clean.earnings.ts_created
+  ts_legacy_percentage_manual_changed:
+    description: Timestamp of the manual change of the legacy percentage.
+    lineage:
+      - datalake_big_agent_clean.earning_remuneration_log.ts_created
