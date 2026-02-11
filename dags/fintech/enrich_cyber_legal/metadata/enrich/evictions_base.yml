@@ -51,10 +51,6 @@ columns:
     description: "Name of the collection agency assigned to the legal case."
     lineage:
       - datalake_cyber_legal_homolog.process.collection_agency_name
-  id_court:
-    description: "Identifier of the court handling the legal case."
-    lineage:
-      - datalake_cyber_legal_homolog.process.id_court
   chamber:
     description: "Name of the court where the legal case is being processed."
     lineage:
@@ -211,6 +207,28 @@ columns:
     description: "Lead time to coercive decision (number of business days, excluding holidays, weekends, and arbitration recess)."
   ldt_coercive_order_issuance_decision:
     description: "Lead time to coercive order issuance decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_arbitral_citation:
+    description: "Lead time to arbitral citation (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_judicial_summons:
+    description: "Lead time to judicial summons (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_possesion_imission_decisions:
+    description: "Lead time to possession imission decisions (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_possesion_imission_issuance:
+    description: "Lead time to possession imission issuance (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_judicial_petition:
+    description: "Lead time to judicial petition (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_execution_requirement_decision:
+    description: "Lead time to execution requirement decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_prejudgment_attachment:
+    description: "Lead time to prejudgment attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_executed_citation:
+    description: "Lead time to executed citation (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_asset_attachment:
+    description: "Lead time to asset attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_asset_evaluation:
+    description: "Lead time to asset evaluation (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_redit_satisfaction:
+    description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess). Note: column name has a typo (redit instead of credit)."
   ldt_coercive:
     description: "Lead time to coercive action (set to 'not_in_cyber_legal')."
   last_occurrence:
