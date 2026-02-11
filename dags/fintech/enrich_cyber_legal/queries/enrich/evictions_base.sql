@@ -314,3 +314,4 @@ LEFT JOIN
 LEFT JOIN
     aux_calendar d
     ON p.dt_case_acceptance <= d.date AND (IF(p.case_status = 'Completed', p.dt_status_changed, NULL) >= d.date OR p.dt_status_changed IS NULL)
+GROUP BY ALL
