@@ -16,7 +16,7 @@ SELECT
     eso.id_consultant AS sk_consultant,
     COALESCE(eso.id_closing_specialist, -1) AS sk_closing_specialist,
     COALESCE(sa_creator.sk_secretariat_user_version, -1) AS sk_secretariat_booking_creator,
-    COALESCE(eso.id_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
+    COALESCE(bpt.id_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(dsps_listing.sk_sale_price_segment, -1) AS sk_listing_price_segment,
     COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_offer_submitted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_submitted_date,
     COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_offer_accepted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_accepted_date,
@@ -70,5 +70,16 @@ LEFT JOIN
         ON sa_creator.id_secretariat_user = eso.id_user_secretariat_booking_creator
         AND sa_creator.dt_snapshot = DATE(eso.ts_booking_created)
 LEFT JOIN
+  datalake_sale_listings.sale_listing_price_changes AS slpc
+  ON  eso.id_house = slpc.id_house
+  AND eso.ts_offer_submitted >= slpc.ts_price_started 
+  AND eso.ts_offer_submitted < COALESCE(slpc.ts_price_ended, NOW())
+LEFT JOIN
+  datalake_buyer_prospect.buyer_prospect_type AS bpt
+  ON eso.id_buyer = bpt.id_prospect
+  AND eso.city_group = bpt.city_group
+  AND eso.ts_offer_submitted >= bpt.ts_activation 
+  AND eso.ts_offer_submitted < COALESCE(bpt.ts_activation_end, NOW())
+LEFT JOIN
     dw_sale.dim_sale_price_segment AS dsps_listing
-        ON eso.price_segment = dsps_listing.price_segment
+        ON slpc.price_segment = dsps_listing.price_segment
