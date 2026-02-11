@@ -1,0 +1,34 @@
+database_name: datalake_payout_system_clean
+table_name: payee
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Payee master data; recipient of payments (name, document CPF/CNPJ).
+columns:
+  id:
+    description: Primary key of the payee.
+    lineage:
+      - datalake_payout_system_raw.payee.id
+  name:
+    description: Payee full name.
+    lineage:
+      - datalake_payout_system_raw.payee.name
+  document_number:
+    description: CPF or CNPJ number.
+    lineage:
+      - datalake_payout_system_raw.payee.document_number
+  document_type:
+    description: Document type (CPF or CNPJ).
+    lineage:
+      - datalake_payout_system_raw.payee.document_type
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payee.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payee.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.payee.disabled_at

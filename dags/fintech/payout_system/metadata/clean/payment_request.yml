@@ -1,0 +1,94 @@
+database_name: datalake_payout_system_clean
+table_name: payment_request
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Payment request (amount, payee, flow, status, due/paid dates and amounts).
+columns:
+  id:
+    description: Primary key of the payment request.
+    lineage:
+      - datalake_payout_system_raw.payment_request.id
+  id_requester:
+    description: FK to requester.
+    lineage:
+      - datalake_payout_system_raw.payment_request.requester_id
+  id_flow:
+    description: FK to flow.
+    lineage:
+      - datalake_payout_system_raw.payment_request.flow_id
+  id_payee:
+    description: FK to payee.
+    lineage:
+      - datalake_payout_system_raw.payment_request.payee_id
+  id_account:
+    description: FK to payee_account; optional for BOLETO.
+    lineage:
+      - datalake_payout_system_raw.payment_request.account_id
+  id_payment_method:
+    description: FK to payment_method_config.
+    lineage:
+      - datalake_payout_system_raw.payment_request.payment_method_id
+  id_previous_attempt:
+    description: FK to payment_request (previous attempt for retries).
+    lineage:
+      - datalake_payout_system_raw.payment_request.previous_attempt_id
+  id_external:
+    description: External request identifier from upstream system.
+    lineage:
+      - datalake_payout_system_raw.payment_request.external_id
+  status:
+    description: Current payment status.
+    lineage:
+      - datalake_payout_system_raw.payment_request.status
+  company_use:
+    description: Company usage classification for reporting.
+    lineage:
+      - datalake_payout_system_raw.payment_request.company_use
+  metadata:
+    description: Additional metadata for the request.
+    lineage:
+      - datalake_payout_system_raw.payment_request.metadata
+  attempt_number:
+    description: Attempt number (1 for first attempt, incremented for retries).
+    lineage:
+      - datalake_payout_system_raw.payment_request.attempt_number
+  due_amount:
+    description: Amount to be paid.
+    lineage:
+      - datalake_payout_system_raw.payment_request.due_amount
+  paid_amount:
+    description: Actually paid amount (if any).
+    lineage:
+      - datalake_payout_system_raw.payment_request.paid_amount
+  due_currency:
+    description: Currency code for due amount (ISO 4217).
+    lineage:
+      - datalake_payout_system_raw.payment_request.due_currency
+  paid_currency:
+    description: Currency code for paid amount (ISO 4217).
+    lineage:
+      - datalake_payout_system_raw.payment_request.paid_currency
+  dt_due:
+    description: Payment due date.
+    lineage:
+      - datalake_payout_system_raw.payment_request.due_date
+  dt_accrual:
+    description: Accrual date (competency month) for accounting and reporting.
+    lineage:
+      - datalake_payout_system_raw.payment_request.accrual_date
+  ts_previous_attempt_created:
+    description: Previous attempt partition key (created_at).
+    lineage:
+      - datalake_payout_system_raw.payment_request.previous_attempt_created_at
+  ts_paid:
+    description: Payment completion timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_request.paid_at
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_request.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_request.updated_at

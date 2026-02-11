@@ -1,0 +1,34 @@
+database_name: datalake_payout_system_clean
+table_name: bank_submission_item
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Line items of each bank submission batch; one row per payment request included in the batch.
+columns:
+  id:
+    description: Primary key of the bank submission item (UUIDv7).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.id
+  id_bank_submission:
+    description: FK to bank_submission (batch).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.bank_submission_id
+  id_payment_request:
+    description: FK to payment_request.
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.payment_request_id
+  sequence_number:
+    description: Order of the payment in the batch.
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.sequence_number
+  ts_bank_submission_created:
+    description: Bank submission partition key (created_at of the batch).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.bank_submission_created_at
+  ts_payment_request_created:
+    description: Payment request partition key (created_at of the request).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.payment_request_created_at
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.bank_submission_item.created_at

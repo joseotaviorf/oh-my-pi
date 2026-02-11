@@ -1,0 +1,34 @@
+database_name: datalake_payout_system_clean
+table_name: requester
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Requester (client/system that creates payment requests; code, name, metadata).
+columns:
+  id:
+    description: Primary key of the requester.
+    lineage:
+      - datalake_payout_system_raw.requester.id
+  code:
+    description: Unique requester code.
+    lineage:
+      - datalake_payout_system_raw.requester.code
+  name:
+    description: Requester name.
+    lineage:
+      - datalake_payout_system_raw.requester.name
+  metadata:
+    description: Additional metadata/configuration as JSON.
+    lineage:
+      - datalake_payout_system_raw.requester.metadata
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.requester.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.requester.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.requester.disabled_at

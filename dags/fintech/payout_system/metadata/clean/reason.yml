@@ -1,0 +1,78 @@
+database_name: datalake_payout_system_clean
+table_name: reason
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Reason codes (provider codes, category, mapped status, terminal/retryable flags).
+columns:
+  id:
+    description: Primary key of the reason (UUIDv7).
+    lineage:
+      - datalake_payout_system_raw.reason.id
+  provider:
+    description: Provider identifier (e.g. ITAU, INTERNAL).
+    lineage:
+      - datalake_payout_system_raw.reason.provider
+  provider_code:
+    description: Base code without version suffix.
+    lineage:
+      - datalake_payout_system_raw.reason.provider_code
+  name:
+    description: Reason name.
+    lineage:
+      - datalake_payout_system_raw.reason.name
+  description:
+    description: Reason description.
+    lineage:
+      - datalake_payout_system_raw.reason.description
+  category_key:
+    description: Semantic category key.
+    lineage:
+      - datalake_payout_system_raw.reason.category_key
+  category_label_pt:
+    description: Category label in Portuguese.
+    lineage:
+      - datalake_payout_system_raw.reason.category_label_pt
+  sub_category_key:
+    description: Subcategory key (when category is REJECTION).
+    lineage:
+      - datalake_payout_system_raw.reason.sub_category_key
+  sub_category_label_pt:
+    description: Subcategory label in Portuguese.
+    lineage:
+      - datalake_payout_system_raw.reason.sub_category_label_pt
+  mapped_status:
+    description: Mapped payment status.
+    lineage:
+      - datalake_payout_system_raw.reason.mapped_status
+  version:
+    description: Version number of the code (1, 2, 3...).
+    lineage:
+      - datalake_payout_system_raw.reason.version
+  is_active:
+    description: Whether this is the currently active (latest) version for the provider_code.
+    lineage:
+      - datalake_payout_system_raw.reason.is_active
+  is_terminal:
+    description: Whether the status is terminal.
+    lineage:
+      - datalake_payout_system_raw.reason.terminal
+  is_retryable:
+    description: Whether the payment can be retried.
+    lineage:
+      - datalake_payout_system_raw.reason.retryable
+  documentation_url:
+    description: URL to documentation.
+    lineage:
+      - datalake_payout_system_raw.reason.documentation_url
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.reason.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.reason.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.reason.disabled_at

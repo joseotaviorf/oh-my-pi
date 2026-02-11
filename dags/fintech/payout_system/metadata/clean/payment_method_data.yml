@@ -1,0 +1,30 @@
+database_name: datalake_payout_system_clean
+table_name: payment_method_data
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Method-specific payload per payment request (e.g. boleto/PIX data as JSON).
+columns:
+  id:
+    description: Primary key of the payment method data.
+    lineage:
+      - datalake_payout_system_raw.payment_method_data.id
+  id_payment_request:
+    description: FK to payment_request (one-to-one).
+    lineage:
+      - datalake_payout_system_raw.payment_method_data.payment_request_id
+  method_data:
+    description: Method-specific data in JSON format.
+    lineage:
+      - datalake_payout_system_raw.payment_method_data.method_data
+  ts_payment_request_created:
+    description: Payment request partition key (created_at).
+    lineage:
+      - datalake_payout_system_raw.payment_method_data.payment_request_created_at
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_method_data.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_method_data.updated_at

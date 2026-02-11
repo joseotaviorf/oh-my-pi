@@ -1,0 +1,25 @@
+SELECT
+    id,
+    requester_id AS id_requester,
+    flow_id AS id_flow,
+    payee_id AS id_payee,
+    account_id AS id_account,
+    payment_method_id AS id_payment_method,
+    previous_attempt_id AS id_previous_attempt,
+    external_id AS id_external,
+    status,
+    company_use,
+    metadata,
+    attempt_number,
+    due_amount,
+    paid_amount,
+    due_currency,
+    paid_currency,
+    DATE(due_date) AS dt_due,
+    DATE(accrual_date) AS dt_accrual,
+    TIMESTAMP(previous_attempt_created_at) AS ts_previous_attempt_created,
+    TIMESTAMP(paid_at) AS ts_paid,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated
+FROM
+    datalake_payout_system_raw.payment_request

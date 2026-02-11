@@ -1,0 +1,74 @@
+database_name: datalake_payout_system_clean
+table_name: flow
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Payout flow configuration per requester (approval rules, auto-send, company_use, transaction type).
+columns:
+  id:
+    description: Primary key of the flow.
+    lineage:
+      - datalake_payout_system_raw.flow.id
+  id_requester:
+    description: FK to requester.
+    lineage:
+      - datalake_payout_system_raw.flow.requester_id
+  code:
+    description: Flow code (unique within requester).
+    lineage:
+      - datalake_payout_system_raw.flow.code
+  name:
+    description: Flow name.
+    lineage:
+      - datalake_payout_system_raw.flow.name
+  description:
+    description: Flow description.
+    lineage:
+      - datalake_payout_system_raw.flow.description
+  transaction_type:
+    description: Transaction type identifier for SAP Gateway.
+    lineage:
+      - datalake_payout_system_raw.flow.transaction_type
+  is_auto_approval:
+    description: Whether automatic approval is enabled for this flow.
+    lineage:
+      - datalake_payout_system_raw.flow.auto_approval
+  auto_approval_rules:
+    description: Optional rules for auto-approval (thresholds, constraints).
+    lineage:
+      - datalake_payout_system_raw.flow.auto_approval_rules
+  is_active:
+    description: Whether the flow is currently active.
+    lineage:
+      - datalake_payout_system_raw.flow.is_active
+  is_auto_send:
+    description: Whether automatic bank submission is enabled for approved payments.
+    lineage:
+      - datalake_payout_system_raw.flow.auto_send
+  auto_send_rules:
+    description: Optional rules for auto-send (amounts, payment methods, windows, limits).
+    lineage:
+      - datalake_payout_system_raw.flow.auto_send_rules
+  version:
+    description: Configuration version.
+    lineage:
+      - datalake_payout_system_raw.flow.version
+  required_metadata:
+    description: Required metadata schema for payment requests in this flow.
+    lineage:
+      - datalake_payout_system_raw.flow.required_metadata
+  company_use_rules:
+    description: Configuration for company_use generation (template, sources, format).
+    lineage:
+      - datalake_payout_system_raw.flow.company_use_rules
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.flow.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.flow.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.flow.disabled_at

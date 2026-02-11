@@ -1,0 +1,46 @@
+database_name: datalake_payout_system_clean
+table_name: payee_account
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Bank account details per payee (bank, agency, account number and type).
+columns:
+  id:
+    description: Primary key of the payee account.
+    lineage:
+      - datalake_payout_system_raw.payee_account.id
+  id_payee:
+    description: FK to payee.
+    lineage:
+      - datalake_payout_system_raw.payee_account.payee_id
+  bank_code:
+    description: Bank code.
+    lineage:
+      - datalake_payout_system_raw.payee_account.bank_code
+  agency_number:
+    description: Branch/agency number.
+    lineage:
+      - datalake_payout_system_raw.payee_account.agency_number
+  account_number:
+    description: Account number.
+    lineage:
+      - datalake_payout_system_raw.payee_account.account_number
+  account_type:
+    description: Account type.
+    lineage:
+      - datalake_payout_system_raw.payee_account.account_type
+  is_savings:
+    description: Whether the account is a savings account.
+    lineage:
+      - datalake_payout_system_raw.payee_account.is_savings
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payee_account.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payee_account.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.payee_account.disabled_at

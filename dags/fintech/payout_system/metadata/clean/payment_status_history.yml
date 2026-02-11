@@ -1,0 +1,70 @@
+database_name: datalake_payout_system_clean
+table_name: payment_status_history
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Status change history per payment request (previous/new status, date, origin, principal).
+columns:
+  id:
+    description: Primary key of the status history entry.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.id
+  id_payment_request:
+    description: FK to payment_request.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.payment_request_id
+  id_reason:
+    description: FK to reason (optional).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.reason_id
+  id_correlation:
+    description: Correlation ID for distributed tracing.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.correlation_id
+  previous_status:
+    description: Status before the change.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.previous_status
+  new_status:
+    description: New status after the change.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.new_status
+  description:
+    description: Additional context or description.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.description
+  trace_id:
+    description: Trace ID for request tracking.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.trace_id
+  raw_payload:
+    description: Raw provider payload and/or occurrence codes for auditability.
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.raw_payload
+  principal:
+    description: Principal identifier (user, system, service account).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.principal
+  principal_type:
+    description: Type of principal (USER, SYSTEM, SERVICE, API_KEY).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.principal_type
+  origin:
+    description: Source of status change (SYSTEM, USER, EXTERNAL_SERVICE, AUTO_APPROVAL, etc.).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.origin
+  ts_payment_request_created:
+    description: Payment request partition key (created_at).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.payment_request_created_at
+  ts_status:
+    description: Timestamp of the status change (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.status_date
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_status_history.updated_at

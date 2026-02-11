@@ -1,0 +1,58 @@
+database_name: datalake_payout_system_clean
+table_name: bank_submission
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Bank submission batch records from payout-system; each row is a batch of payment requests submitted to the bank (AUTOMATIC, MANUAL, or RETRY) with status and response.
+columns:
+  id:
+    description: Primary key of the bank submission (UUIDv7).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.id
+  id_batch:
+    description: Batch identifier for the submission (UUIDv7).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.batch_id
+  submission_type:
+    description: Type of submission (AUTOMATIC, MANUAL, RETRY).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.submission_type
+  total_payment_count:
+    description: Number of payment requests in this submission.
+    lineage:
+      - datalake_payout_system_raw.bank_submission.total_payment_count
+  total_amount:
+    description: Total amount of all payments in the submission.
+    lineage:
+      - datalake_payout_system_raw.bank_submission.total_amount
+  total_currency:
+    description: Currency code for total amount (ISO 4217, e.g. BRL).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.total_currency
+  bank_response_status:
+    description: Bank API HTTP response status.
+    lineage:
+      - datalake_payout_system_raw.bank_submission.bank_response_status
+  bank_response_body:
+    description: Bank API response payload (JSONB).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.bank_response_body
+  processing_status:
+    description: Current processing status (PENDING, SENT, CONFIRMED, FAILED).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.processing_status
+  created_by:
+    description: Principal who triggered the submission (or SYSTEM for auto-send).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.created_by
+  ts_submitted:
+    description: When the batch was submitted to the bank (UTC).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.submitted_at
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.bank_submission.updated_at

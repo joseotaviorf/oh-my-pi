@@ -1,0 +1,46 @@
+database_name: datalake_payout_system_clean
+table_name: payment_method_config
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Payment method type configuration (code, name, required_fields schema, active flag).
+columns:
+  id:
+    description: Primary key of the payment method config.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.id
+  code:
+    description: Unique payment method code.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.code
+  name:
+    description: Payment method name.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.name
+  description:
+    description: Payment method description.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.description
+  required_fields:
+    description: JSON schema for validating method_data.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.required_fields
+  is_active:
+    description: Whether the method is currently active.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.is_active
+  version:
+    description: Configuration version.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.version
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.payment_method_config.disabled_at

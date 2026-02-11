@@ -1,0 +1,38 @@
+database_name: datalake_payout_system_clean
+table_name: requester_payment_method
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Per-requester payment method enablement and config overrides.
+columns:
+  id:
+    description: Primary key of the requester_payment_method.
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.id
+  id_requester:
+    description: FK to requester.
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.requester_id
+  id_payment_method:
+    description: FK to payment_method_config.
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.payment_method_id
+  is_enabled:
+    description: Whether the method is enabled for the requester.
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.is_enabled
+  config_overrides:
+    description: Per-requester configuration overrides (JSON).
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.config_overrides
+  ts_created:
+    description: Record creation timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.created_at
+  ts_updated:
+    description: Record last update timestamp (UTC).
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.updated_at
+  ts_disabled:
+    description: Deactivation timestamp (UTC); NULL when active.
+    lineage:
+      - datalake_payout_system_raw.requester_payment_method.disabled_at
