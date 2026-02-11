@@ -1,0 +1,118 @@
+---
+database_name: datalake_tof_taxonomy
+table_name: tof_events_with_taxonomy
+description: This table consolidates the Top of Funnel events triggered by each user enriched with taxonomy classifications from Amplitude.
+domain: Growth
+owner: data-ops-poc@quintoandar.com.br
+columns:
+  id_tof_user:
+    description: "The ID associated with the user. Coalesced from merged and non-merged user ID and Amplitude IDs to ensure user identification."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_amplitude
+      - datalake_tof_taxonomy.amplitude_user_merge.id_amplitude_merged
+  id_session:
+    description: "The Amplitude session ID associated with the event."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_session
+  id_user:
+    description: "User identifier linking events across different pages in the user journey."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
+      - datalake_tof_taxonomy.amplitude_user_merge.id_user
+  id_amplitude:
+    description: "Unique identifier for the user in Amplitude analytics across all tracked page events"
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_amplitude
+  id_device:
+    description: "Device identifier used to track user behavior across different pages and sessions."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_device
+  id_house:
+    description: "Unique identifier of the property being viewed, searched, or scheduled across different page types."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ep_house_id
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.top5_house_id[1]
+  business_context:
+    description: "Business context or product area where the page view event occurred (e.g., rental, sale)."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.business_context
+  tof_event_type:
+    description: "The specific type of Top of Funnel event."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.event_type
+  operation_channel:
+    description: "The operation channel through which the event was triggered."
+  platform:
+    description: "Platform or application where the event occurred (e.g., web, mobile app, iOS, Android)."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.up_platform
+  funnel_side:
+    description: "Side of the funnel to which that campaign was directed."
+    categories:
+      demand: "Campaign made to bring potential buyers or tenants to our platform."
+      supply: "Campaign made to bring potential house owners to our platform."
+      affiliates: "Campaign made to bring affiliates to our platform."
+      branding: "Campaign created by the Branding team."
+    lineage:
+      - datalake_growth_taxonomy.media_setup.funnel_side
+  campaign_business_context:
+    description: "Intention of the actions/campaigns adopted in relation to the business context."
+    categories:
+      rent: "Campaign/Action aims to generate results in Rent"
+      sale: "Campaign/Action aims to generate results in Sale"
+    lineage:
+      - datalake_growth_taxonomy.media_setup.campaign_business_context
+  campaign_strategy_intent:
+    description: "Intention of the actions/campaigns adopted in relation to the growth strategy."
+    categories:
+      Brand Awareness: "One of these objectives is to get people to know QuintoAndar and consider the company as an option at some point: Reach people, drive traffic to the website regardless of the page or generate brand recognition."
+      Acquisition: "It aims to bring people to QuintoAndar who are already in the consideration phase"
+      Activation: "Its objective is to make people perform their 1st flow at QuintoAndar."
+      Engagement: "Its objective is to keep people engaged through flows on QuintoAndar."
+      Recovery: "Its objective is to make people who have become churned users carry out new flows."
+    lineage:
+      - datalake_growth_taxonomy.media_setup.campaign_strategy_intent
+  behavior_type:
+    description: "Type of user behavior in relation to their search decision and entry into the QuintoAndar environment."
+    categories:
+      Organic: "Conversions in which the decision to search for and enter the QuintoAndar environment was made by the user."
+      Non Organic: "Conversions in which entry into the QuintoAndar environment was forced by QuintoAndar."
+    lineage:
+      - datalake_growth_taxonomy.media_setup.behavior_type
+  medium:
+    description: "Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient. More information in the Doc indicated in the table description."
+    lineage:
+      - datalake_growth_taxonomy.media_setup.medium
+  source:
+    description: "QuintoAndar s external platform/operation responsible for generating the result."
+    lineage:
+      - datalake_growth_taxonomy.media_setup.source
+  taxonomy_aggregation_level_1:
+    description: "Taxonomy aggregation level 1 of the taxonomy management aggregation"
+    lineage:
+      - datalake_gsheets_clean.taxonomy_management_aggregation.taxonomy_aggregation_level_1
+  taxonomy_aggregation_level_2:
+    description: "Taxonomy aggregation level 2 of the taxonomy management aggregation"
+    lineage:
+      - datalake_gsheets_clean.taxonomy_management_aggregation.taxonomy_aggregation_level_2
+  tof_event_order_at_all:
+    description: "The order in which the Top of Funnel event occurred for the user across all business contexts."
+  tof_event_order_per_business_context:
+    description: "The order in which the Top of Funnel event occurred for the user within the specific business context."
+  ts_event:
+    description: "Timestamp indicating when the Top of Funnel event occurred."
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  year:
+    description: Year extracted from the event timestamp for partitioning and time-based analysis.
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.year
+  month:
+    description: Month extracted from the event timestamp for partitioning and time-based analysis.
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.month
+  day:
+    description: Day extracted from the event timestamp for partitioning and time-based analysis.
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.day

@@ -3949,6 +3949,14 @@ bietlejuice.enrich_tiers:
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
+bietlejuice.enrich_tof_taxonomy:
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-user-merge:first-run-of-day
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow:first-run-of-day
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-management-aggregation:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
+  - bietlejuice.enrich_online_attribution:load-enrich-events-exploded:first-run-of-day
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-intro-page-viewed-events:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates:first-run-of-day

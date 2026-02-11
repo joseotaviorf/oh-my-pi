@@ -1,0 +1,32 @@
+dag:
+  name: enrich_tof_taxonomy
+  schedule_start_date: 2026, 1, 26
+  owner: Ops POC
+  documentation:
+    dag_purpose: |
+      This DAG enrich provides Top of Funnel events from the past year with taxonomy data from Amplitude.
+      It joins the event data with user merge data to associate events with the correct taxonomy classifications.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_partitions: [funnel_side]
+  default_extraction_type: full
+  spark_session_configs:
+    udfs: [SF_NORMALIZE_STRING]
+  has_hive_sync: false
+  inner_dependencies:
+    tof_events_with_taxonomy:
+      - amplitude_user_merge
+
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
