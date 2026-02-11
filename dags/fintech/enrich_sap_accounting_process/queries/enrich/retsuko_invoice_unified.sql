@@ -20,14 +20,15 @@ retsuko AS (
       WHEN (ct.is_rental_paid_in_advance = true AND e.producer = 'onboarding-routine') THEN e.accrual_year_month
       WHEN (ct.is_rental_paid_in_advance = true AND e.producer = 'onboarding-routine-delayed') THEN e.accrual_year_month
       WHEN ct.is_rental_paid_in_advance = false THEN e.accrual_year_month
-      ELSE e.accrual_year_month + 1
+      ELSE CAST(DATE_FORMAT(TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM') + interval '1' month, 'yyyyMM') AS INT)
     END AS accrual_year_month,
     CASE
-      WHEN e.bill_item != 'entry.bill-item/service-fee' THEN DATE_FORMAT(DATE_TRUNC('month', TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM')) + interval '1' month - interval '1' day, 'yyyy-MM-dd')
-      WHEN (ct.is_rental_paid_in_advance = true AND e.producer = 'onboarding-routine') THEN DATE_FORMAT(DATE_TRUNC('month', TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM')) + interval '1' month - interval '1' day, 'yyyy-MM-dd')
-      WHEN (ct.is_rental_paid_in_advance = true AND e.producer = 'onboarding-routine-delayed') THEN DATE_FORMAT(DATE_TRUNC('month', TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM')) + interval '1' month - interval '1' day, 'yyyy-MM-dd')
-      WHEN ct.is_rental_paid_in_advance = false THEN DATE_FORMAT(DATE_TRUNC('month', TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM')) + interval '1' month - interval '1' day, 'yyyy-MM-dd')
-      ELSE DATE_FORMAT(DATE_TRUNC('month', TO_DATE(CAST((e.accrual_year_month + 1) AS VARCHAR(10)), 'yyyyMM')) + interval '1' month - interval '1' day, 'yyyy-MM-dd')
+      WHEN e.bill_item != 'entry.bill-item/service-fee' 
+           OR (ct.is_rental_paid_in_advance = true AND e.producer IN ('onboarding-routine','onboarding-routine-delayed'))
+           OR ct.is_rental_paid_in_advance = false 
+      THEN DATE_FORMAT(LAST_DAY(TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM')), 
+          'yyyy-MM-dd')
+      ELSE DATE_FORMAT(LAST_DAY(TO_DATE(CAST(e.accrual_year_month AS VARCHAR(10)), 'yyyyMM') + interval '1' month), 'yyyy-MM-dd')
     END AS dt_source_trigger,
     CAST(e.amount AS DECIMAL(12,2)) AS source_amount
   FROM
