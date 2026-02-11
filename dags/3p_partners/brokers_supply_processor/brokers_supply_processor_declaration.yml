@@ -11,8 +11,7 @@ dag:
       property leads for both SALE and RENT contexts.
       
       KEY TABLES: lead_3p (core property lead data), business_context_detail (lead status tracking), 
-      lead_in_flight (concurrency control for duplicate lead processing),
-      file (bulk import management) and audit tables (*_aud) for 
+      file (bulk import management), analytic_event (system events), and audit tables (*_aud) for 
       complete change history and compliance.
       
       PIPELINE: Daily CDC from PostgreSQL with 24-hour latency. Handles medium to high volume data 
@@ -30,6 +29,8 @@ workflow:
   default_partitions: [year, month, day]
   dbutils_secret_key: BROKERS_SUPPLY_PROCESSOR_DB
   tables_customization:
+    analytic_event:
+      z_order_by: [id]
     business_context_detail:
       z_order_by: [id]
     business_context_detail_aud:
@@ -40,8 +41,6 @@ workflow:
     lead3p_aud:
       clean_table_name: lead_3p_aud
       raw_primary_keys: ["id", "rev"]
-    lead_in_flight:
-      z_order_by: [lead_id]
     lead_update_operation_history:
       z_order_by: [id]
     revinfo:
