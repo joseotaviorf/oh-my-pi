@@ -1,3 +1,4 @@
+from datetime import timedelta
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
@@ -112,6 +113,7 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             cluster_configuration=cluster_configuration,
             libraries=self.__get_libraries(),
             access_control_list=self.__get_access_control_list(),
+            execution_timeout=timedelta(hours=self._DEFAULT_EXECUTION_TIMEOUT_HOURS),
         )
 
     def __input_databricks_default_service_credential_name(
