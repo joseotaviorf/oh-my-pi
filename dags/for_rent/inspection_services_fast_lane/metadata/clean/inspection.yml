@@ -90,6 +90,14 @@ columns:
     lineage:
       - datalake_inspection_services_raw.inspection.has_early_mediation
     description: Boolean column indicating if the inspection process had an early mediation.
+  has_agreement:
+    lineage:
+      - datalake_inspection_services_raw.inspection.has_agreement
+    description: Boolean column indicating if tenant and owner agreed on the repair report.
+  has_late_agreement:
+    lineage:
+      - datalake_inspection_services_raw.inspection.has_late_agreement
+    description: Boolean column indicating if tenant and owner agreed on the repair report only after the contestation analysis.
   ts_schedule:
     lineage:
       - datalake_inspection_services_raw.inspection.schedule_date

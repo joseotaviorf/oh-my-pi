@@ -13,6 +13,8 @@ SELECT
     type,
     comparative AS is_comparative,
     has_early_mediation,
+    has_agreement,
+    has_late_agreement,
     schedule_date AS ts_schedule,
     created_at AS ts_created,
     updated_at AS ts_updated,
