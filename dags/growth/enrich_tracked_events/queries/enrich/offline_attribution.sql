@@ -1,3 +1,37 @@
+WITH jaiminho_concierge_events AS (
+  SELECT
+    COALESCE(NULLIF(user_notifications.id_user, 0), ebdb_user.id) AS id_user,
+    user_notifications.id_event AS id_contact,
+    'Contact' AS event_name,
+    'Online Classifieds' AS origin,
+    'Online Classifieds' AS channel,
+    'Concierge' AS agent,
+    CASE
+      WHEN GET_JSON_OBJECT(user_notifications.payload, '$.templateVariables.3') = 'para aluguel'
+       OR GET_JSON_OBJECT(user_notifications.payload, '$.templateVariables.2') = 'para aluguel' THEN 'rent'
+      WHEN GET_JSON_OBJECT(user_notifications.payload, '$.templateVariables.3') = 'à venda'
+       OR GET_JSON_OBJECT(user_notifications.payload, '$.templateVariables.2') = 'à venda' THEN 'sale'
+    END AS business_context,
+    user_notifications.ts_created AS ts_event,
+    user_notifications.year,
+    user_notifications.month,
+    user_notifications.day
+  FROM
+    datalake_jaiminho_clean.user_notifications AS user_notifications
+  LEFT JOIN
+    datalake_ebdb_clean.user AS ebdb_user
+      ON ebdb_user.main_phone = user_notifications.destination
+  WHERE
+    user_notifications.action IN ('ConciergeContactSubmissionClassifieds_presentation', 'ConciergeContactSubmissionClassifieds')
+    AND GET_JSON_OBJECT(user_notifications.payload, '$.body') LIKE '%Vi que se interessou por um imóvel%'
+    AND (
+      GET_JSON_OBJECT(user_notifications.payload, '$.templateVariables.4') = 'Chaves na Mão'
+      OR GET_JSON_OBJECT(user_notifications.payload, '$.templateVariables.5') = 'Chaves na Mão'
+    )
+    AND user_notifications.year = 2026
+    AND COALESCE(NULLIF(user_notifications.id_user, 0), ebdb_user.id) IS NOT NULL
+    AND user_notifications.status != 'failed'
+)
 SELECT
   id_user,
   id_contact,
@@ -126,3 +160,21 @@ SELECT
   day
 FROM
     datalake_tracked_events.concierge_attribution
+UNION ALL
+SELECT
+  id_user,
+  id_contact,
+  event_name,
+  origin,
+  CASE
+    WHEN business_context = 'rent' THEN 'ZEBRA.rent.acq.nonorg.na.d.onlineclassifieds.chavesnamão'
+    WHEN business_context = 'sale' THEN 'ZEBRA.sale.acq.nonorg.na.d.onlineclassifieds.chavesnamão'
+  END AS channel,
+  agent,
+  business_context,
+  ts_event,
+  year,
+  month,
+  day
+FROM
+  jaiminho_concierge_events
