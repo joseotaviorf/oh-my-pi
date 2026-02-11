@@ -9,14 +9,16 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_partitions: [funnel_side]
   default_extraction_type: full
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
-  has_hive_sync: false
   inner_dependencies:
     tof_events_with_taxonomy:
       - amplitude_user_merge
+  tables_customization:
+    amplitude_user_merge: {}
+    tof_events_with_taxonomy:
+      partitions: [funnel_side]
 
 cluster:
   type: custom_cluster
