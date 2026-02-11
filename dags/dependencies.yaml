@@ -3851,6 +3851,7 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-phone:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
+  - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details:first-run-of-day
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners:first-run-of-day
@@ -3950,13 +3951,13 @@ bietlejuice.enrich_tiers:
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists:first-run-of-day
 bietlejuice.enrich_tof_taxonomy:
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-user-merge:first-run-of-day
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
+  - bietlejuice.enrich_online_attribution:load-enrich-events-exploded:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-management-aggregation:first-run-of-day
-  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
-  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
-  - bietlejuice.enrich_online_attribution:load-enrich-events-exploded:first-run-of-day
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-intro-page-viewed-events:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates:first-run-of-day

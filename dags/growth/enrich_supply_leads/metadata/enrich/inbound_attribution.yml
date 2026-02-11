@@ -13,6 +13,7 @@ columns:
     lineage:
       - datalake_sauron_clean.session.id
       - datalake_copilot_service_clean.session.id_sauron_session
+      - datalake_support_session_service_clean.support_session.id
   id_task:
     description: The ID for the lead creation task.
     lineage: 
@@ -23,16 +24,19 @@ columns:
     description: The Id for the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_sauron_clean.session.metadata
+      - datalake_support_session_service_clean.support_session.metadata
   source_environment:
     description: The source environment associated with the support session when the lead was created.
     lineage:
       - datalake_sauron_clean.session.source_environment
+      - datalake_support_session_service_clean.support_session.source_env
   department:
     description: The department associated with the support session when the lead was created.
     lineage:
       - datalake_customer_support.chats.queue_name
       - datalake_customer_support.calls.queue_name
       - datalake_sauron_clean.session.department
+      - datalake_support_session_service_clean.support_session.department
   phone_number:
     description: The customer phone number associated with their lead creation.
     lineage:
@@ -48,16 +52,20 @@ columns:
     lineage:
       - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_sauron_clean.session.metadata
+      - datalake_support_session_service_clean.support_session.metadata
   url_source_ctwa:
     description: The url for the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_sauron_clean.session.metadata
+      - datalake_support_session_service_clean.support_session.metadata
   type_source_ctwa:
     description: The type of the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_sauron_clean.session.metadata
+      - datalake_support_session_service_clean.support_session.metadata
   ts_created:
     description: The timestamp of the session when was the lead creation.
     lineage: 
       - datalake_sauron_clean.session.ts_created
+      - datalake_support_session_service_clean.support_session.ts_created
   

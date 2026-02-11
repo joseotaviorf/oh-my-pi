@@ -34,6 +34,31 @@ support_sessions AS (
   FROM
     datalake_sauron_clean.session AS s
   WHERE 1=1
+    AND ( -- hardcoded fix regarding support session migration
+          (s.ts_created < DATE('2025-10-11') AND s.source IN ('call_in_app', 'call')) 
+          OR s.source NOT IN ('call_in_app', 'call')
+    )
+    AND s.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
+    AND COALESCE(s.user_phone, s.user_data:["user_phone"]) IS NOT NULL
+
+  UNION ALL 
+
+  SELECT
+    s.id AS id_session,
+    s.source_env AS source_environment,
+    s.department,
+    REGEXP_EXTRACT(COALESCE(s.user_phone, s.user_data:["user_phone"]), '[0-9]+', 0) AS phone_number,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type') AS type_source_ctwa,
+    s.ts_created,
+    s.ts_updated
+  FROM
+    datalake_support_session_service_clean.support_session AS s
+  WHERE 1=1
+    AND s.ts_created >= DATE('2025-10-11') -- hardcoded fix regarding support session migration
+    AND s.source IN ('call_in_app', 'call')
     AND s.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
     AND COALESCE(s.user_phone, s.user_data:["user_phone"]) IS NOT NULL
 ),
@@ -144,7 +169,8 @@ indirect_attribution AS ( -- when we don't have the identifier coming from sourc
   INNER JOIN
     support_tasks AS st
       ON st.id_session = ss.id_session
-        AND st.ts_task_created < il.ts_created
+        AND il.ts_created > st.ts_task_created
+        AND il.ts_created <= st.ts_task_created + interval '150' minutes
   LEFT JOIN
     support_tasks AS ops_deviation_fix
       ON ops_deviation_fix.id_task = il.id_task
