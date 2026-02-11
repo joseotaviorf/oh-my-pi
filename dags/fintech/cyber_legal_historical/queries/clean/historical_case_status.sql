@@ -12,5 +12,8 @@ SELECT
     END AS case_status,
     CESTATDT AS dt_status_changed,
     CEDTUPD AS ts_updated,
+    year,
+    month,
+    day,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.case
+FROM datalake_cyber_legal_historical_raw.case
