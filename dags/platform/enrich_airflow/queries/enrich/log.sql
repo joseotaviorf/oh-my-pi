@@ -10,11 +10,11 @@ SELECT
     owner_display_name,
     map_index,
     try_number,
-    CAST(ts_event AS STRING) AS ts_event, 
-    CAST(ts_executed AS STRING) AS ts_executed,
-    year,
-    month,
-    day
+    CAST(ts_event AS STRING) AS ts_event, -- needed in order to avoid casting errors
+    CAST(ts_executed AS STRING) AS ts_executed, -- needed in order to avoid casting errors
+    CAST(year AS BIGINT) AS year,
+    CAST(month AS BIGINT) AS month,
+    CAST(day AS BIGINT) AS day
 FROM
     datalake_astro_clean.log
 WHERE
