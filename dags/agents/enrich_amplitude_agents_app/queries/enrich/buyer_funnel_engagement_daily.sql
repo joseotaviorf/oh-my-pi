@@ -88,4 +88,36 @@ LEFT JOIN
     AND utm.utm_medium = evt.utm_medium
 WHERE
     MAKE_DATE(evt.year, evt.month, evt.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND evt.event_type IN (
+        'home_page_viewed',
+        'home_3rd_section_viewed',
+        'home_4th_section_viewed',
+        'home_5th_section_viewed',
+        'appbar_link_clicked',
+        'search_page_viewed',
+        'search_results_page_viewed',
+        'listing_page_viewed',
+        'listing_sectionexpanded_viewed',
+        'apply_filters',
+        'login_confirmation_viewed',
+        'listing_favorite_intent',
+        'listing_favorite_set',
+        'share_listing',
+        'alert_subscription_confirmed',
+        'visit_intent_clicked',
+        'schedule_page_viewed',
+        'tts_form_page_viewed',
+        'pricing_report_section_viewed',
+        'mtgsimulator_initial_page_viewed',
+        'listing_open_gallery_view',
+        'listing_tab_room_categories_clicked',
+        'listing_video_started',
+        'condo_page_viewed',
+        'consorcio_banner_cta_clicked',
+        'mtgsimulator_simulationresult_viewed',
+        'mortgage_calculator.consorcio_banner_cta_clicked',
+        'consorcio.page_viewed',
+        'consorcio.cta_clicked',
+        'consorcio.specialist_form_viewed'
+    )
 GROUP BY ALL
