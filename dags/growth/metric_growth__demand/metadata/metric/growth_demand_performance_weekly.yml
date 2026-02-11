@@ -30,7 +30,7 @@ columns:
       - dw_growth.fact_demand_top_of_funnel_events.referral_type
       - dw_growth.fact_demand_prospect_events.referral_type
     description: Grouping of results by type of user prospecting program/initiative.
-    dimension: True  
+    dimension: True
   platform:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.platform
@@ -62,8 +62,8 @@ columns:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.content_page
       - dw_growth.fact_demand_prospect_events.content_page
-    description:  Indicates if the user visited a content page.
-    dimension: True 
+    description: Indicates if the user visited a content page.
+    dimension: True
   business_context:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.business_context
@@ -199,7 +199,7 @@ columns:
       is_additive: True
       business_stage: Demmand
       hierarchy: Growth
-      approved_by: uilson.bonfim@quintoandar.com.br   
+      approved_by: uilson.bonfim@quintoandar.com.br
   year:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.year
