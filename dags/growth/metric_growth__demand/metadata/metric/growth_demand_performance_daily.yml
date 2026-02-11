@@ -1,4 +1,4 @@
-database_name: metric_growth
+database_name: growth
 table_name: growth_demand_performance_daily
 description: This table aggregates daily metrics related to top-of-funnel performance, prospect engagement, and associated costs within
 domain: Growth
