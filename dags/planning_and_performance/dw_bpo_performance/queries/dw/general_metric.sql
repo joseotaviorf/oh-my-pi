@@ -1,3 +1,18 @@
+WITH  pp_multi as (
+          SELECT
+    dt_houses_owned as date,
+    id_owner as sk_owner,
+    ongoing_houses,
+    is_pp_multi_active,
+    CASE WHEN is_pp_multi_active = TRUE or ongoing_houses >= 5 THEN true ELSE false END AS is_pp_multi
+
+    FROM datalake_pro_owners.daily_owner_houses_quantity_history ppm
+    
+    WHERE 
+        (ongoing_houses >= 5 OR  is_pp_multi_active = TRUE)
+        )
+
+
 SELECT DISTINCT
   ft.sk_ticket,
   ft.sk_user,
@@ -53,7 +68,8 @@ SELECT DISTINCT
   NOW() AS ts_load,
   ft.requester_wait_time_min_business AS minutes_requester_wait_time_business,
   ft.reply_time_min_business AS minutes_first_reply_time_business,
-  ft.full_resolution_time_min_business AS minutes_full_resolution_time_business
+  ft.full_resolution_time_min_business AS minutes_full_resolution_time_business,
+  ppm.is_pp_multi
 FROM
   dw_customer_support.fact_tickets AS ft
 LEFT JOIN
@@ -72,5 +88,8 @@ LEFT JOIN
   dw_customer_support.dim_analyst AS da
     ON ft.sk_last_analyst = da.sk_analyst
     OR ft.sk_last_analyst = da.sk_agent_twilio
+LEFT JOIN pp_multi AS ppm 
+    ON ppm.sk_owner = ft.sk_user  
+    AND date(ppm.date) = date(ft.ts_created)    
 WHERE
   DATE(ft.ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')

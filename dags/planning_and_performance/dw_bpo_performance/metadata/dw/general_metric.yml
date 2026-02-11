@@ -164,6 +164,10 @@ columns:
     lineage:
       - dw_customer_support.fact_tickets.full_resolution_time_min_business
     description: Minutes of full resolution time during business hours.
+  is_pp_multi:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history
+    description: Identifies whether the PP was PP Multi on the date the ticket was created..  
   year:
     lineage:
       - current_date

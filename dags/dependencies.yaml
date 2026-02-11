@@ -137,6 +137,7 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination:first-run-of-day
   - bietlejuice.enrich_offboarding:load-enrich-mediations:first-run-of-day
   - bietlejuice.enrich_pp_multi:load-enrich-pp-multi-classification-history:first-run-of-day
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history:first-run-of-day
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.enrich_terminator:load-enrich-termination:first-run-of-day
