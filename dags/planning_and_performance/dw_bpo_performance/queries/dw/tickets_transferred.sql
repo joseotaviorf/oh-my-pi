@@ -36,6 +36,7 @@ segments AS (
     dd_last.department AS last_department,
     dd2.department AS transferred_to,
     fcc.is_last_interaction,
+    fcc.is_contact_answered as is_answered,
     CASE
       WHEN fcc.origin = 'chat in app' THEN 'chat5a'
       ELSE 'whatsapp'
@@ -106,6 +107,7 @@ SELECT
 	theme_detail,
 	transferred_to,
   is_last_interaction,
+	is_answered,
   CASE
     WHEN (first_department = last_department OR transferred_to != last_department)
       AND status = 'transferred' THEN 'human_error'

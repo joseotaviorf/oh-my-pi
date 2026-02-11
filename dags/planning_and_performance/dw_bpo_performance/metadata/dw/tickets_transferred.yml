@@ -52,6 +52,10 @@ columns:
     lineage:
       - dw_customer_support.fact_customer_contacts.is_last_interaction
     description: Whether the last interaction of the ticket was with a human agent.
+  is_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_contact_answered
+    description: Indicates if the contact was answered.
   ticket_origin:
     lineage:
       - dw_customer_support.fact_customer_contacts.origin
