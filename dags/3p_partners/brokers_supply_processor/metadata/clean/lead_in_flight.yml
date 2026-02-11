@@ -1,0 +1,76 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_in_flight
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: >
+  Tracks leads currently being processed to control concurrency and prevent duplicate approvals.
+  Each row represents a lead that is actively in the processing pipeline, ensuring that when multiple
+  duplicate leads are detected, only one is approved at a time. This table acts as a concurrency lock
+  mechanism for the lead deduplication workflow.
+
+  BUSINESS CONTEXT: When external partners submit property leads, duplicates may arrive from different
+  sources or at different times. The lead_in_flight table ensures data integrity by tracking which leads
+  are currently under evaluation within a duplicate group, preventing race conditions where multiple
+  duplicates could be simultaneously approved.
+
+  RELATED TABLES: lead_3p (1:1 relationship via id_lead - the core lead being processed),
+  business_context_detail (for business context and status of the associated lead).
+
+  USE CASES: Duplicate lead processing monitoring, concurrency control auditing, lead pipeline
+  throughput analysis, and operational health checks for the deduplication workflow.
+columns:
+  id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.lead_id
+    description: >
+      Unique identifier for the lead record, also serving as the primary key and foreign key
+      to the lead_3p table (BIGINT, Primary Key, Foreign Key, Not Nullable).
+      Establishes a 1:1 relationship with lead_3p, ensuring each lead can only have one
+      in-flight processing record at a time.
+  id_group:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.group_id
+    description: >
+      Identifier for the duplicate group this lead belongs to (BIGINT, Not Nullable).
+      Leads sharing the same id_group are considered duplicates of each other. Used to
+      coordinate processing within a group so that only one lead is approved per group.
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.status
+    description: >
+      Current processing status of the in-flight lead within the deduplication workflow
+      (STRING, Not Nullable, Enum). Indicates whether the lead is pending evaluation,
+      being processed, approved, or rejected within its duplicate group.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this record is subject to 3P Partners access control policies
+      (BOOLEAN, Not Nullable, Always TRUE). Static field used for access control and data governance
+      within the 3P Partners domain. All records in this table are related to 3P Partners operations
+      and require appropriate access permissions.
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.created_at
+    description: >
+      Timestamp when the lead entered the in-flight processing state (TIMESTAMP, Not Nullable).
+      Marks the beginning of the concurrency control window for this lead within its duplicate group.
+      Used for SLA tracking and monitoring processing duration.
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.updated_at
+    description: >
+      Timestamp when the in-flight record was last modified (TIMESTAMP, Not Nullable).
+      Automatically updated on any status change. Used for tracking processing progress
+      and identifying stale or stuck records.
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.year
+    description: 'Partition column: Year extracted from the ingestion date for data lake partitioning optimization (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.month
+    description: 'Partition column: Month extracted from the ingestion date for data lake partitioning optimization (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_in_flight.day
+    description: 'Partition column: Day extracted from the ingestion date for data lake partitioning optimization (INTEGER, Partition Key).'
