@@ -1,0 +1,43 @@
+database_name: datalake_idactum_buyers_clean
+table_name: idactum_buyers
+description:
+  Table acquired from Idactum. Contains buyer/purchaser data from real estate
+  transactions.
+domain: Growth
+owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.id
+    description: |
+      "Table unique identifier."
+  id_transaction:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.id_transacao
+    description: |
+      "Transaction identifier."
+  id_idactum:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.id_idactum
+    description: |
+      "Idactum identifier."
+  buyer_name:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.nome
+    description: |
+      "Buyer name."
+  buyer_document:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.documento
+    description: |
+      "Buyer document number (CPF or CNPJ)."
+  is_document_missing_at_some_step:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.doc_faltante_em_algum_ponto
+    description: |
+      "Whether the buyer document was missing at some point in the transaction."
+  dt_load:
+    lineage:
+      - datalake_idactum_buyers_raw.idactum_buyers.dt_load
+    description: |
+      "Date when the idactum buyers data was loaded."

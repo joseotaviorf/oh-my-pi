@@ -1,0 +1,30 @@
+dag:
+  name: idactum_buyers
+  owner: Data Growth
+  schedule_start_date: 2026, 02, 03
+  documentation:
+    dag_purpose: This DAG imports "Compradores" information from Idactum.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  spark_job_prefix: base
+  load_spark_job: load_idactum_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{table_name}" # table_name
+    - "{{ ds }}" # execution_date
+    - "idactum_buyers" # source
+    - "" # timestamp_ntz_fields (none for buyers)
+  tables_customization:
+    idactum_buyers: {}
+
+cluster:
+  type: databricks_16_4_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
