@@ -35,7 +35,7 @@ WITH tof_events_merged AS (
   FROM
     datalake_amplitude_page_viewed_events.schedule_search_listing_events AS tof
   LEFT JOIN
-    original_user_merge AS u
+    datalake_tof_taxonomy.amplitude_user_merge AS u
       ON u.id_amplitude_all = tof.id_amplitude
   WHERE
     tof.YEAR >= YEAR(CURRENT_DATE) - 1
