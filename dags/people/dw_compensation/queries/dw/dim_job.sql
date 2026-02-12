@@ -41,7 +41,7 @@ SELECT
     dt_valid_to,
     NOW() AS ts_load
 FROM
-    datalake_compensation_enrich.job_with_salary_table
+    datalake_compensation.job_with_salary_table
 WHERE
     dt_valid_from <= CURRENT_DATE
 ORDER BY

@@ -30,7 +30,7 @@ active_assignments AS (
 active_headcount_per_job AS (
     SELECT
         dt_reference,
-        CAST(id_job AS STRING) AS sk_job,
+        id_job,
         COUNT(DISTINCT id_person) AS active_headcount
     FROM
         active_assignments
@@ -41,7 +41,7 @@ active_headcount_per_job AS (
 dim_job_at_date AS (
     SELECT
         dt_ref.dt_reference,
-        dim_job.sk_job,
+        dim_job.id_job,
         dim_job.salary_table,
         dim_job.band,
         dim_job.target_plr,
@@ -76,12 +76,12 @@ frequencies_plr AS (
         dim_job.band,
         dim_job.target_plr,
         SUM(COALESCE(headcount.active_headcount, 0)) AS headcount_frequency,
-        COUNT(dim_job.sk_job) AS job_frequency
+        COUNT(dim_job.id_job) AS job_frequency
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     WHERE
         dim_job.target_plr IS NOT NULL
@@ -116,12 +116,12 @@ frequencies_plr_multiplier AS (
         dim_job.band,
         dim_job.target_plr_salary_multiplier,
         SUM(COALESCE(headcount.active_headcount, 0)) AS headcount_frequency,
-        COUNT(dim_job.sk_job) AS job_frequency
+        COUNT(dim_job.id_job) AS job_frequency
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     WHERE
         dim_job.target_plr_salary_multiplier IS NOT NULL
@@ -156,12 +156,12 @@ frequencies_rvv AS (
         dim_job.band,
         dim_job.target_rvv,
         SUM(COALESCE(headcount.active_headcount, 0)) AS headcount_frequency,
-        COUNT(dim_job.sk_job) AS job_frequency
+        COUNT(dim_job.id_job) AS job_frequency
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     WHERE
         dim_job.target_rvv IS NOT NULL
@@ -196,12 +196,12 @@ frequencies_sop AS (
         dim_job.band,
         dim_job.target_sop,
         SUM(COALESCE(headcount.active_headcount, 0)) AS headcount_frequency,
-        COUNT(dim_job.sk_job) AS job_frequency
+        COUNT(dim_job.id_job) AS job_frequency
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     WHERE
         dim_job.target_sop IS NOT NULL
@@ -236,12 +236,12 @@ frequencies_hiring_sop AS (
         dim_job.band,
         dim_job.target_hiring_sop,
         SUM(COALESCE(headcount.active_headcount, 0)) AS headcount_frequency,
-        COUNT(dim_job.sk_job) AS job_frequency
+        COUNT(dim_job.id_job) AS job_frequency
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     WHERE
         dim_job.target_hiring_sop IS NOT NULL
@@ -276,12 +276,12 @@ frequencies_exceptional_bonus AS (
         dim_job.band,
         dim_job.target_exceptional_bonus,
         SUM(COALESCE(headcount.active_headcount, 0)) AS headcount_frequency,
-        COUNT(dim_job.sk_job) AS job_frequency
+        COUNT(dim_job.id_job) AS job_frequency
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     WHERE
         dim_job.target_exceptional_bonus IS NOT NULL
@@ -315,12 +315,12 @@ totals AS (
         dim_job.salary_table,
         dim_job.band,
         SUM(COALESCE(headcount.active_headcount, 0)) AS total_active_headcount,
-        COUNT(DISTINCT dim_job.sk_job) AS total_active_jobs
+        COUNT(DISTINCT dim_job.id_job) AS total_active_jobs
     FROM
         dim_job_at_date AS dim_job
     LEFT JOIN
         active_headcount_per_job AS headcount
-            ON dim_job.sk_job = headcount.sk_job
+            ON dim_job.id_job = headcount.id_job
             AND dim_job.dt_reference = headcount.dt_reference
     GROUP BY
         dim_job.dt_reference,

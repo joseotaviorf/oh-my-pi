@@ -288,7 +288,6 @@ bietlejuice.dw_company:
   - bietlejuice.rede_platform:load-clean-buyer-company-event:first-run-of-day
   - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day
 bietlejuice.dw_compensation:
-  - bietlejuice.enrich_compensation:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people_core:load-enrich-event-definition:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day

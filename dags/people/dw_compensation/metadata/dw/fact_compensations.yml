@@ -31,11 +31,11 @@ columns:
     description: Foreign key to dim_employee. References the employee (id_person).
   sk_assignment:
     description: Foreign key to dim_assignment. References the assignment (id_period_of_service).
-  sk_job:
-    description: Foreign key to dim_job. References the job at the time of the salary record.
+  sk_job_version:
+    description: Foreign key to dim_job. References the job version at the time of the salary record.
   sk_event_definition:
     description: |
-      Foreign key to dim_event_definition. 
+      Foreign key to dim_event_definition.
       Unified identifier for the action and reason that triggered this compensation change.
   person_number:
     description: Employee's person number (business identifier).

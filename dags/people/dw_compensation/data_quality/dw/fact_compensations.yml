@@ -18,7 +18,7 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  sk_job:
+  sk_job_version:
     is_complete:
       severity_level: Error
   person_number:

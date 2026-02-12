@@ -29,29 +29,6 @@ WITH salary_with_person AS (
         sal.is_salary_approved = TRUE
         AND sal.dt_started <= CURRENT_DATE
 ),
-dim_job_current AS (
-    SELECT
-        sk_job,
-        target_plr,
-        target_plr_salary_multiplier,
-        target_rvv,
-        target_sop,
-        target_hiring_sop,
-        target_exceptional_bonus
-    FROM
-        dw_compensation.dim_job
-    WHERE
-        is_current = TRUE
-),
-event_definition AS (
-    SELECT
-        id_event_definition,
-        id_action,
-        id_reason,
-        action_code
-    FROM
-        datalake_people_core.event_definition
-),
 salary_enriched AS (
     SELECT
         sal.id_salary,
@@ -73,6 +50,7 @@ salary_enriched AS (
         sal.dt_ended,
         ed.id_event_definition,
         ed.action_code,
+        dim_job.sk_job_version,
         dim_job.target_plr,
         dim_job.target_plr_salary_multiplier,
         dim_job.target_rvv,
@@ -87,12 +65,14 @@ salary_enriched AS (
     FROM
         salary_with_person AS sal
     LEFT JOIN
-        event_definition AS ed
+        datalake_people_core.event_definition AS ed
             ON sal.id_action = ed.id_action
             AND sal.id_action_reason = ed.id_reason
     LEFT JOIN
-        dim_job_current AS dim_job
-            ON CAST(sal.id_job AS STRING) = dim_job.sk_job
+        dw_compensation.dim_job AS dim_job
+            ON sal.id_job = dim_job.id_job
+            AND dim_job.dt_valid_from <= sal.dt_started
+            AND (dim_job.dt_valid_to IS NULL OR dim_job.dt_valid_to > sal.dt_started)
 )
 SELECT
     -- Priority 0: SKs
@@ -102,7 +82,7 @@ SELECT
     )) AS sk_compensation,
     sal.id_person AS sk_employee,
     sal.id_period_of_service AS sk_assignment,
-    CAST(sal.id_job AS STRING) AS sk_job,
+    sal.sk_job_version AS sk_job_version,
     sal.id_event_definition AS sk_event_definition,
     -- Non-SKs
     sal.person_number,

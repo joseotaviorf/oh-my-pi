@@ -26,6 +26,12 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    fact_compensations:
+      - dim_job
+      - dim_event_definition
+    fact_salary_table_targets:
+      - dim_job
   tables_customization:
     dim_event_definition:
       vacuum_retention_hours: 168
