@@ -36,3 +36,16 @@ WHERE
         OR e.id IS NULL
     )
     AND e.ts_created >= DATE '2026-02-01'
+UNION ALL
+SELECT
+    -1 AS id_contract,
+    -1 AS id_legacy_earning,
+    -1 AS id_new_earning,
+    NULL AS external_domain_type,
+    NULL AS status,
+    NULL AS new_revenue_percentage,
+    NULL AS legacy_revenue_percentage,
+    NULL AS has_legacy_percentage_manual_change,
+    NULL AS ts_created,
+    NULL AS ts_legacy_created,
+    NULL AS ts_legacy_percentage_manual_changed
