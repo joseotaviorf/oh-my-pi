@@ -1,4 +1,4 @@
-database_name: datalake_compensation_enrich
+database_name: datalake_compensation
 table_name: job_with_salary_table
 owner: isabella.araujo@quintoandar.com.br
 domain: People
