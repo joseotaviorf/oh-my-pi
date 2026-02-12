@@ -82,6 +82,7 @@ visit_offer AS (
           eso.id_offer
       ORDER BY
           bs.ts_visit
+      DESC
     ) = 1
 ),
 rank_offers AS (
