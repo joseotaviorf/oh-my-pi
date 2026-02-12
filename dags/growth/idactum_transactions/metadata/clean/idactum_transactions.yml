@@ -1,0 +1,231 @@
+database_name: datalake_idactum_transactions_clean
+table_name: idactum_transactions
+description: Table acquired from Idactum. Contain real estate transactions data.
+domain: Growth
+owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+columns:
+  id_idactum:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.id_idactum
+    description: |
+      "Idactum house id."
+  id_unit:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.id_unidade
+    description: |
+      "Municipal house id."
+  id_original_unit:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.id_unidade_original
+    description: |
+      "Municipal original house id."
+  id_lot:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.chave_lote
+    description: |
+      "Lot key."
+  id_patrimonial_assets:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.bpatri_key
+    description: |
+      "Patrimonial assets key."
+  id_condominium:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.id_condominio
+    description: |
+      "Condominium id."
+  reported_price:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.preco_declarado
+    description: |
+      "Reported transaction price."
+  assessed_value:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.valor_venal
+    description: |
+      "Transaction assessed value (property tax value)."
+  assessed_value_reference:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.valor_venal_de_referencia
+    description: |
+      "Transaction assessed value reference."
+  transfered_percentage:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.proporcao_transmitida
+    description: |
+      "House transfered percentage (0 to 1)."
+  calculus_base_used:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.base_de_calculo_adotada
+    description: |
+      "Calculus base used."
+  funding_price:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.valor_financiado
+    description: |
+      "Transaction funding price."
+  real_estate_register:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.cartorio
+    description: |
+      "Real estate register name."
+  real_estate_registry:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.matricula
+    description: |
+      "Real estate registry number."
+  building_type:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.situacao
+    description: |
+      "Building type("Apartamento", "Casa", "Loja", etc.)."
+  usage_category:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.padrao
+    description: |
+      "Property usage category("Residencial", "Comercial", etc.)."
+  property_description:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.descricao
+    description: |
+      "Property usage description."
+  building_year:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.acc
+    description: |
+      "Building year."
+  lot_area:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.area_terreno
+    description: |
+      "Lot area in square meters."
+  building_area:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.area_construida
+    description: |
+      "Building area in square meters."
+  private_area:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.area_privativa
+    description: |
+      "Private area in square meters."
+  area:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.area
+    description: |
+      "Property area in square meters."
+  state:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.uf
+    description: |
+      "State acronym."
+  city:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.cidade
+    description: |
+      "City name."
+  neighborhood:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.bairro
+    description: |
+      "Neighborhood name."
+  street:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.logradouro
+    description: |
+      "Street name."
+  number:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.numero
+    description: |
+      "Address number."
+  address_details:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.complemento
+    description: |
+      "Address details (unit and building)."
+  unit:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.unidade
+    description: |
+      "Property unit number."
+  building:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.bloco
+    description: |
+      "Property building."
+  building_number:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.bloco_id
+    description: |
+      "Building id."
+  zipcode:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.cep
+    description: |
+      "Zipcode."
+  postal_street_name:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.logradouro_correios
+    description: |
+      "Postal street standardized name."
+  zone_code:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.sgl_zona
+    description: |
+      "Zone code."
+  block_number:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.setor_quadra
+    description: |
+      "Block number."
+  census_tract:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.zona_censitária
+    description: |
+      "Census tract."
+  transaction_type:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.natureza_transacao
+    description: |
+      "Transaction type("Compra e Venda", "Doação", "Herança", etc.)."
+  funding_method:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.tipo_de_financiamento
+    description: |
+      "Transaction funding method(eg.: "Minha Casa Minha Vida")."
+  property_usage_purpose:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.finalidade
+    description: |
+      "Property usage purpose("Residencial" or "Comercial").
+  is_in_limbo:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.limbo
+    description: |
+      "Property has unresolved legal status."
+  is_vertical_property:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.vertical
+    description: |
+      "Whether the property is vertical(true) or horizontal(false)."
+  typology:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.tipologia
+    description: |
+      "Property typology number."
+  ts_transaction_date:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.data_transacao
+    description: |
+      "Date of the transaction."
+  ts_transaction_declaration_date:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.data_declaracao_transacao
+    description: |
+      "Date of the transaction declaration."
+  dt_load:
+    lineage:
+      - datalake_idactum_transactions_raw.idactum_transactions.dt_load
+    description: |
+      "Date when the idactum transactions data was loaded."
