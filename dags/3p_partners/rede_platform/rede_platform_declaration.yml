@@ -16,6 +16,9 @@ workflow:
   tables_customization:
     buyer_company: {}
     buyer_company_event: {}
+    broker_deaccreditation_process: {}
+    broker_deaccreditation_process_statistics: {}
+    broker_deaccreditation_listing_salesflows: {}
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
