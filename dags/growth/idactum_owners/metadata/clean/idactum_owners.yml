@@ -1,0 +1,66 @@
+database_name: datalake_idactum_owners_clean
+table_name: idactum_owners
+description: Table acquired from Idactum. Contains property owners data.
+domain: Growth
+owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+columns:
+  id_unit:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.id_unidade
+    description: |
+      "Municipal house id."
+  id_idactum:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.id_idactum
+    description: |
+      "Idactum house id."
+  owner_name:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.nome
+    description: |
+      "Owner name."
+  owner_adjusted_name:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.contribuinte_ajustado
+    description: |
+      "Owner adjusted name."
+  owner_document_number:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.documento
+    description: |
+      "Owner document number."
+  city:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.cidade
+    description: |
+      "City name."
+  city_radical:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.radical
+    description: |
+      "City abbreviation."
+  data_source:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.origem
+    description: |
+      "Data source."
+  is_valid:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.valido
+    description: |
+      "Whether the owner is valid."
+  ts_query:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.data_consulta
+    description: |
+      "Timestamp when the data was queried."
+  ts_reference:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.data_referencia
+    description: |
+      "Calculus base used."
+  dt_load:
+    lineage:
+      - datalake_idactum_owners_raw.idactum_owners.dt_load
+    description: |
+      "Date when the idactum owners data was loaded."
