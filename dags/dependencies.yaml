@@ -635,6 +635,11 @@ bietlejuice.dw_employee_test:
   - bietlejuice.pin_core:load-clean-rates:first-run-of-day
   - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
+bietlejuice.dw_evictions:
+  - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
+  - bietlejuice.enrich_cyber_legal:load-enrich-alerts:first-run-of-day
+  - bietlejuice.enrich_cyber_legal:load-enrich-evictions-base:first-run-of-day
+  - bietlejuice.enrich_cyber_legal:load-enrich-expenses:first-run-of-day
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
@@ -1087,7 +1092,7 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
-  - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day  
+  - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offers:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
@@ -2024,7 +2029,6 @@ bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber_legal:load-clean-delinquent-master:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-history-contract-distribution:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-values-list:first-run-of-day
-  - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows:first-run-of-day

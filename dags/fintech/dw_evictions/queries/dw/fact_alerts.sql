@@ -1,0 +1,27 @@
+SELECT
+    a.id_alert AS sk_alert,
+    a.id_case AS sk_case,
+    a.id_contract_cyber,
+    a.id_contract,
+    a.id_generating_attorney,
+    a.id_revising_attorney,
+    a.process_type,
+    a.alert_type_code,
+    a.alert_type_description,
+    a.alert_comment,
+    a.agency_name,
+    a.last_process_stage,
+    a.contract_status,
+    a.alert_creator,
+    a.alert_type,
+    a.task_status,
+    a.lead_time,
+    a.aging,
+    a.is_reviewed,
+    a.month_created,
+    a.dt_created,
+    a.dt_alert_expired,
+    a.dt_reviewed,
+    NOW() AS ts_load
+FROM
+    datalake_cyber_legal_homolog.alerts AS a

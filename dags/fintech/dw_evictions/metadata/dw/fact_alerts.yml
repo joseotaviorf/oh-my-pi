@@ -1,0 +1,103 @@
+---
+database_name: dw_evictions
+table_name: fact_alerts
+description: Fact table containing alert information from CyberLegal system, including alert details, process information, contract data, and calculated fields for alert status, lead time, and aging classification.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  sk_alert:
+    description: "Alert identifier - Primary key"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.id_alert
+  sk_case:
+    description: "Case number associated with the alert"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.id_case
+  id_contract_cyber:
+    description: "Contract identifier in CyberCredit system, validated to ensure numeric format"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.id_contract_cyber
+  id_contract:
+    description: "External contract identifier, derived from contracts table or validated id_contract_cyber"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.id_contract
+  process_type:
+    description: "Type of legal process or case classification"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.process_type
+  alert_type_code:
+    description: "Alert type code - Has LOV (List of Values)"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.alert_type_code
+  alert_type_description:
+    description: "Description of the alert type"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.alert_type_description
+  alert_comment:
+    description: "Reason why the alert was generated"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.alert_comment
+  agency_name:
+    description: "Name of the attorney agency assigned to the legal case"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.agency_name
+  last_process_stage:
+    description: "Last process stage"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.last_process_stage
+  id_generating_attorney:
+    description: "Attorney who generated the alert"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.id_generating_attorney
+  id_revising_attorney:
+    description: "Attorney who reviewed the alert"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.id_revising_attorney
+  contract_status:
+    description: "Contract status"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.contract_status
+  alert_creator:
+    description: "Attorney who created the alert"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.alert_creator
+  alert_type:
+    description: "Classification of alert creation type: 'SISTEMA' for system-generated alerts (when alert_creator is NULL or 'SISTEMA'), 'MANUAL' for manually created alerts"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.alert_type
+  is_reviewed:
+    description: "Alert review status (TRUE=Reviewed, FALSE=Not reviewed)"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.is_reviewed
+  task_status:
+    description: "Status of the alert task: 'A vencer' if alert expiration date is greater than or equal to review date, 'Vencida' if alert expiration date is less than review date"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.task_status
+  lead_time:
+    description: "Number of days between alert expiration date and review date (positive values indicate alerts reviewed after expiration, negative values indicate alerts reviewed before expiration)"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.lead_time
+  aging:
+    description: "Aging classification of the alert based on lead time: 'a) Vence hoje', 'b) A vencer (1 a 3 dias)', 'c) A vencer (4 a 7 dias)', 'd) A vencer (8+ dias)', 'e) Vencida (1 a 3 dias)', 'f) Vencida (4 a 7 dias)', 'g) Vencida (8+ dias)'"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.aging
+  dt_created:
+    description: "Date when the alert was generated"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.dt_created
+  month_created:
+    description: "Month when the alert was created (truncated to first day of the month)"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.month_created
+  dt_alert_expired:
+    description: "Alert expiration date"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.dt_alert_expired
+  dt_reviewed:
+    description: "Date when the alert was reviewed"
+    lineage:
+      - datalake_cyber_legal_homolog.alerts.dt_reviewed
+  ts_load:
+    description: "Timestamp of the load"
+    lineage:
+      - datalake_evictions.alerts.ts_load

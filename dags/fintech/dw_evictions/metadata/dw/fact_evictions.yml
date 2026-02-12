@@ -1,393 +1,477 @@
 ---
-database_name: datalake_cyber_legal_homolog
-table_name: evictions_base
-owner: bianca.martins@quintoandar.com.br
+database_name: dw_evictions
+table_name: fact_evictions
+description: Fact table containing comprehensive eviction cases data aggregated by case, including case details, agency information, court data, process phases, expenses, financial information, and calculated lead times. Includes detailed stage information with dates and expenses for each process stage, enriched with contract wallet timeline data.
 domain: Fintech
-description: Comprehensive eviction cases data from the cyber legal system, enriched with case details, agency information, court data, process phases, expenses, and financial information. Includes detailed stage information with dates and expenses for each process stage.
+owner: juliana.hocihara@quintoandar.com.br
 columns:
-  id_process:
-    description: "Process identifier (currently set to NULL)."
+  sk_process:
+    description: "Process surrogate key - Legal process dossier identifier number."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.id_process
+  sk_contract:
+    description: "Contract surrogate key - External contract identifier for the account under legal proceedings."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.contract
   id_court_case:
     description: "Court case identifier."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_court_case
+      - datalake_cyber_legal_homolog.evictions_base.id_court_case
   id_anonymized:
     description: "Unique identifier for the anonymized legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_case
+      - datalake_cyber_legal_homolog.evictions_base.id_anonymized
   id_contract_cyber:
     description: "Contract identifier in CyberCredit system associated with the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_contract_cyber
-  contract:
-    description: "External contract identifier for the account under legal proceedings."
+      - datalake_cyber_legal_homolog.evictions_base.id_contract_cyber
+  source:
+    description: "Source of the data."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_contract
+      - datalake_cyber_legal_homolog.evictions_base.source
   process:
     description: "Legal process dossier identifier number."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_process
+      - datalake_cyber_legal_homolog.evictions_base.process
   input_type:
     description: "Eviction label classification for the account."
     lineage:
-      - datalake_cyber_legal_homolog.process.evictions_label
-  contract_category_at_registration:
-    description: "Contract category at the time of registration, classified as: Adimplente, FPD, Acordo Ativo, Mensal, Demais Inadimplentes, or Outros."
-    lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline
+      - datalake_cyber_legal_homolog.evictions_base.input_type
   action_type:
     description: "Type of action classification (case subtype)."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_subtype
+      - datalake_cyber_legal_homolog.evictions_base.action_type
   action:
     description: "Type of legal process or case classification (original process type)."
     lineage:
-      - datalake_cyber_legal_homolog.process.original_process_type
+      - datalake_cyber_legal_homolog.evictions_base.action
   office:
     description: "Name of the attorney agency assigned to the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.agency_name
+      - datalake_cyber_legal_homolog.evictions_base.office
   collection_agency:
     description: "Name of the collection agency assigned to the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.collection_agency_name
+      - datalake_cyber_legal_homolog.evictions_base.collection_agency
   chamber:
     description: "Name of the court where the legal case is being processed."
     lineage:
-      - datalake_cyber_legal_homolog.process.court_name
+      - datalake_cyber_legal_homolog.evictions_base.chamber
   region:
     description: "State where the case is being processed."
     lineage:
-      - datalake_cyber_legal_homolog.process.state
+      - datalake_cyber_legal_homolog.evictions_base.region
   city:
     description: "City where the case is being processed."
     lineage:
-      - datalake_cyber_legal_homolog.process.city
+      - datalake_cyber_legal_homolog.evictions_base.city
   contract_status:
     description: "Status of the contract."
     lineage:
-      - datalake_cyber_legal_homolog.process.contract_status
+      - datalake_cyber_legal_homolog.evictions_base.contract_status
   cyber_status:
     description: "Current status of the legal case (e.g., active, closed, pending)."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_status
+      - datalake_cyber_legal_homolog.evictions_base.cyber_status
   last_stage:
     description: "Description of the last process stage completed for the case."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.stage_description
+      - datalake_cyber_legal_homolog.evictions_base.last_stage
   arbitral_distribution_expense_amount:
     description: "Total expense amount for the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.arbitral_distribution_expense_amount
   arbitral_citation_expense_amount:
     description: "Total expense amount for the Citação Arbitral (Arbitral Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.arbitral_citation_expense_amount
   arbitral_sentence_expense_amount:
     description: "Total expense amount for the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.arbitral_sentence_expense_amount
   judiciary_distribution_expense_amount:
     description: "Total expense amount for the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.judiciary_distribution_expense_amount
   judicial_summons_decision_expense_amount:
     description: "Total expense amount for the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.judicial_summons_decision_expense_amount
   judicial_summons_expense_amount:
     description: "Total expense amount for the Citação Judicial (Judicial Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.judicial_summons_expense_amount
   coercive_decision_expense_amount:
     description: "Total expense amount for the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.coercive_decision_expense_amount
   coercive_issuance_expense_amount:
     description: "Total expense amount for the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.coercive_issuance_expense_amount
   judicial_petition_expense_amount:
     description: "Total expense amount for the Petição Judicial (Judicial Petition) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.judicial_petition_expense_amount
   possession_imission_decision_expense_amount:
     description: "Total expense amount for the Decisão Imissão na Posse (Possession Imission Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.possession_imission_decision_expense_amount
   possession_imission_issuance_expense_amount:
     description: "Total expense amount for the Emissão Imissão na Posse (Possession Imission Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.possession_imission_issuance_expense_amount
   execution_requirement_expense_amount:
     description: "Total expense amount for the Requerimento da Execução (Execution Requirement) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.execution_requirement_expense_amount
   prejudgment_attachment_expense_amount:
     description: "Total expense amount for the Arresto Cautelar (Prejudgment Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.prejudgment_attachment_expense_amount
   execution_citation_expense_amount:
     description: "Total expense amount for the Citação do Executado (Execution Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.execution_citation_expense_amount
   asset_attachment_expense_amount:
     description: "Total expense amount for the Penhora (Asset Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.asset_attachment_expense_amount
   asset_evaluation_expense_amount:
     description: "Total expense amount for the Avaliação dos Bens (Asset Evaluation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.asset_evaluation_expense_amount
   credit_satisfaction_expense_amount:
     description: "Total expense amount for the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal_homolog.evictions_base.credit_satisfaction_expense_amount
   passage_status:
     description: "Status of passage between stages, classified as: Em finalização, Execução, Ativo, Quitado, Finalizado, or Encerrado."
     lineage:
-      - datalake_cyber_legal_homolog.process
-  is_reincident:
-    description: "Flag indicating if the contract has multiple legal cases (reincident)."
+      - datalake_cyber_legal_homolog.evictions_base.passage_status
   procedure:
     description: "Procedure classification (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.procedure
   consolidated_reason:
     description: "Consolidated reason description for the case result."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_result_description
+      - datalake_cyber_legal_homolog.evictions_base.consolidated_reason
   standardized_reason:
     description: "Standardized reason description for the case final status."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_final_description
+      - datalake_cyber_legal_homolog.evictions_base.standardized_reason
   result:
     description: "Result classification (set to 'not_in_cyber_legal')."
-  succumbency_fee:
-    description: "Succumbency fee (set to 'not_in_cyber_legal')."
-  total_package:
-    description: "Total package value for the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.total_package_amount
-  total_due_amount:
-    description: "Total due amount (overdue amount) for the contract."
+      - datalake_cyber_legal_homolog.evictions_base.result
+  contract_category_at_registration:
+    description: "Contract category at the time of registration, classified as: Adimplente, FPD, Acordo Ativo, Mensal, Demais Inadimplentes, or Outros. Calculated from contract wallet timeline data."
     lineage:
-      - datalake_cyber_legal_homolog.process.overdue_amount
+      - dw_collections_segmentation.fact_contract_wallet_timeline
   overdue_days_at_registration:
     description: "Number of overdue days at registration (maximum delay of original invoices at T1)."
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+  succumbency_fee:
+    description: "Succumbency fee (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.succumbency_fee
+  total_package:
+    description: "Total package value for the legal case."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.total_package
+  total_due_amount:
+    description: "Total due amount (overdue amount) for the contract."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.total_due_amount
   ldt_stock:
     description: "Lead time to stock (number of days)."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_stock
+      - datalake_cyber_legal_homolog.evictions_base.ldt_stock
   stock_range:
     description: "Stock range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_stock
+      - datalake_cyber_legal_homolog.evictions_base.stock_range
   ldt_resolution:
     description: "Lead time to resolution (number of days)."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_resolution
+      - datalake_cyber_legal_homolog.evictions_base.ldt_resolution
   resolution_range:
     description: "Resolution range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_resolution
-  real_ldt_resolution:
-    description: "Real lead time to resolution calculated as the difference in days between case acceptance date and closure date (only when case is completed)."
-    lineage:
-      - datalake_cyber_legal_homolog.process
-  ldt_arbitral_distribution:
-    description: "Lead time to arbitral distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_arbitral_award:
-    description: "Lead time to arbitral award (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judiciary_distribution:
-    description: "Lead time to judiciary distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judicial_summons_decision:
-    description: "Lead time to judicial summons decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_coercive_decision:
-    description: "Lead time to coercive decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_coercive_order_issuance_decision:
-    description: "Lead time to coercive order issuance decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_arbitral_citation:
-    description: "Lead time to arbitral citation (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judicial_summons:
-    description: "Lead time to judicial summons (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_possession_imission_decisions:
-    description: "Lead time to possession imission decisions (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_possession_imission_issuance:
-    description: "Lead time to possession imission issuance (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judicial_petition:
-    description: "Lead time to judicial petition (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_execution_requirement_decision:
-    description: "Lead time to execution requirement decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_prejudgment_attachment:
-    description: "Lead time to prejudgment attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_executed_citation:
-    description: "Lead time to executed citation (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_asset_attachment:
-    description: "Lead time to asset attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_asset_evaluation:
-    description: "Lead time to asset evaluation (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_redit_satisfaction:
-    description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess). Note: column name has a typo (redit instead of credit)."
+      - datalake_cyber_legal_homolog.evictions_base.resolution_range
   ldt_coercive:
     description: "Lead time to coercive action (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.ldt_coercive
   last_occurrence:
     description: "Last occurrence information (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.last_occurrence
+  real_ldt_resolution:
+    description: "Real lead time to resolution calculated as the difference in days between case registration date and closure date."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.dt_registered
+      - datalake_cyber_legal_homolog.evictions_base.dt_closure
+  ldt_arbitral_distribution:
+    description: "Lead time to arbitral distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_arbitral_citation:
+    description: "Lead time to arbitral citation (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_arbitral_award:
+    description: "Lead time to arbitral award (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_judiciary_distribution:
+    description: "Lead time to judiciary distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_judicial_summons_decision:
+    description: "Lead time to judicial summons decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_judicial_summons:
+    description: "Lead time to judicial summons (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_coercive_decision:
+    description: "Lead time to coercive decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_coercive_order_issuance_decision:
+    description: "Lead time to coercive order issuance decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_possesion_imission_decisions:
+    description: "Lead time to possession imission decisions (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_possesion_imission_issuance:
+    description: "Lead time to possession imission issuance (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_judicial_petition:
+    description: "Lead time to judicial petition (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_execution_requirement_decision:
+    description: "Lead time to execution requirement decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_prejudgment_attachment:
+    description: "Lead time to prejudgment attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_executed_citation:
+    description: "Lead time to executed citation (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_asset_attachment:
+    description: "Lead time to asset attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_asset_evaluation:
+    description: "Lead time to asset evaluation (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
+  ldt_redit_satisfaction:
+    description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess). Note: column name has a typo (redit instead of credit)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base
+      - DW_public.dim_date
   has_arbitration_defense:
     description: "Flag indicating if there is arbitration defense (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.has_arbitration_defense
   has_redistribution:
     description: "Flag indicating if there is redistribution (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.has_redistribution
+  is_reincident:
+    description: "Flag indicating if the contract has multiple legal cases (reincident)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.is_reincident
   dt_registered:
     description: "Date when the case was accepted for legal proceedings."
     lineage:
-      - datalake_cyber_legal_homolog.process.dt_case_acceptance
+      - datalake_cyber_legal_homolog.evictions_base.dt_registered
   dt_arbitral_distribution_start:
     description: "Start date of the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_distribution_start
   dt_arbitral_distribution_end:
     description: "End date of the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_distribution_end
   dt_arbitral_citation_start:
     description: "Start date of the Citação Arbitral (Arbitral Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_citation_start
   dt_arbitral_citation_end:
     description: "End date of the Citação Arbitral (Arbitral Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_citation_end
   dt_arbitral_contestation:
     description: "Date of arbitral contestation (currently not populated)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_contestation
   dt_arbitral_sentence_start:
     description: "Start date of the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_sentence_start
   dt_arbitral_sentence_end:
     description: "End date of the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_arbitral_sentence_end
   dt_judiciary_pre_registration:
     description: "Date of judiciary pre-registration (currently not populated)."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.dt_judiciary_pre_registration
   dt_judiciary_distribution_start:
     description: "Start date of the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_judiciary_distribution_start
   dt_judiciary_distribution_end:
     description: "End date of the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_judiciary_distribution_end
   dt_judicial_summons_decision_start:
     description: "Start date of the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_summons_decision_start
   dt_judicial_summons_decision_end:
     description: "End date of the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_summons_decision_end
   dt_judicial_summons_start:
     description: "Start date of the Citação Judicial (Judicial Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_summons_start
   dt_judicial_summons_end:
     description: "End date of the Citação Judicial (Judicial Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_summons_end
   dt_judicial_defense:
     description: "Date of judicial defense (set to 'not_in_cyber_legal')."
+    lineage:
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_defense
   dt_coercive_decision_start:
     description: "Start date of the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_coercive_decision_start
   dt_coercive_decision_end:
     description: "End date of the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_coercive_decision_end
   dt_coercive_issuance_start:
     description: "Start date of the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_coercive_issuance_start
   dt_coercive_issuance_end:
     description: "End date of the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_coercive_issuance_end
   dt_judicial_petition_start:
     description: "Start date of the Petição Judicial (Judicial Petition) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_petition_start
   dt_judicial_petition_end:
     description: "End date of the Petição Judicial (Judicial Petition) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_judicial_petition_end
   dt_possession_imission_decision_start:
     description: "Start date of the Decisão Imissão na Posse (Possession Imission Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_possession_imission_decision_start
   dt_possession_imission_decision_end:
     description: "End date of the Decisão Imissão na Posse (Possession Imission Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_possession_imission_decision_end
   dt_possession_imission_issuance_start:
     description: "Start date of the Emissão Imissão na Posse (Possession Imission Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_possession_imission_issuance_start
   dt_possession_imission_issuance_end:
     description: "End date of the Emissão Imissão na Posse (Possession Imission Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_possession_imission_issuance_end
   dt_execution_requirement_start:
     description: "Start date of the Requerimento da Execução (Execution Requirement) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_execution_requirement_start
   dt_execution_requirement_end:
     description: "End date of the Requerimento da Execução (Execution Requirement) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_execution_requirement_end
   dt_prejudgment_attachment_start:
     description: "Start date of the Arresto Cautelar (Prejudgment Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_prejudgment_attachment_start
   dt_prejudgment_attachment_end:
     description: "End date of the Arresto Cautelar (Prejudgment Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_prejudgment_attachment_end
   dt_execution_citation_start:
     description: "Start date of the Citação do Executado (Execution Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_execution_citation_start
   dt_execution_citation_end:
     description: "End date of the Citação do Executado (Execution Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_execution_citation_end
   dt_asset_attachment_start:
     description: "Start date of the Penhora (Asset Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_asset_attachment_start
   dt_asset_attachment_end:
     description: "End date of the Penhora (Asset Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_asset_attachment_end
   dt_asset_evaluation_start:
     description: "Start date of the Avaliação dos Bens (Asset Evaluation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_asset_evaluation_start
   dt_asset_evaluation_end:
     description: "End date of the Avaliação dos Bens (Asset Evaluation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_asset_evaluation_end
   dt_credit_satisfaction_start:
     description: "Start date of the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal_homolog.evictions_base.dt_credit_satisfaction_start
   dt_credit_satisfaction_end:
     description: "End date of the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal_homolog.evictions_base.dt_credit_satisfaction_end
   dt_closure:
     description: "Date when the case was closed (only populated when case_status is 'Completed')."
     lineage:
-      - datalake_cyber_legal_homolog.process.dt_status_changed
+      - datalake_cyber_legal_homolog.evictions_base.dt_closure
   ts_updated:
     description: "Timestamp when the record was last updated."
     lineage:
-      - datalake_cyber_legal_homolog.process.ts_updated
+      - datalake_cyber_legal_homolog.evictions_base.ts_updated
+  ts_load:
+    description: "Timestamp when the record was loaded into the data warehouse."
+    lineage:
+      - dw_evictions.fact_evictions.ts_load

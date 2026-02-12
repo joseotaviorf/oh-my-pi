@@ -113,20 +113,6 @@ get_stages_data AS (
             'Satisfacao do Credito' AS stage_satisfacao_credito
             )
         )
-),
-aux_calendar AS (
-    SELECT
-        d.sk_date,
-        d.month_start,
-        d.month_end,
-        d.date,
-        d.quarter,
-        d.weekend,
-        d.is_brz_holiday,
-        CASE WHEN d.date BETWEEN DATE('2025-12-22') AND DATE('2026-01-02') THEN True ELSE False END AS arbitration_recess,
-        CASE WHEN d.date BETWEEN DATE('2025-12-20') and DATE('2026-01-19') THEN True ELSE False END AS judicial_recess
-    FROM DW_public.dim_date AS d
-        WHERE d.month_start <= DATE(DATE_TRUNC('month',CURRENT_DATE()))
 )
 
 SELECT DISTINCT
@@ -137,14 +123,6 @@ SELECT DISTINCT
     p.id_contract AS contract,
     p.id_process AS process,
     p.input_type,
-    CASE
-        WHEN cwt.open_wallet_overdue_t1 IS NULL THEN 'Adimplente'
-        WHEN cwt.has_fpd_in_wallet = True THEN 'FPD'
-        WHEN cwt.open_acordo_balance > 0 THEN 'Acordo Ativo'
-        WHEN cwt.n_monthly_invoices > 0 THEN 'Mensal'
-        WHEN cwt.open_wallet_overdue_t1 IS NOT NULL THEN 'Demais Inadimplentes'
-        ELSE 'Outros'
-    END AS contract_category_at_registration,
     p.case_subtype AS action_type,
     p.original_process_type AS action,
     p.agency_name AS office,
@@ -164,8 +142,8 @@ SELECT DISTINCT
     s.stage_decisao_coercitivo_expense_amount AS coercive_decision_expense_amount,
     s.stage_emissao_coercitivo_expense_amount AS coercive_issuance_expense_amount,
     s.stage_peticao_judicial_expense_amount AS judicial_petition_expense_amount,
-    s.stage_decisao_imissao_posse_expense_amount AS possesion_imission_decision_expense_amount,
-    s.stage_emissao_imissao_posse_expense_amount AS possesion_imission_issuance_expense_amount,
+    s.stage_decisao_imissao_posse_expense_amount AS possession_imission_decision_expense_amount,
+    s.stage_emissao_imissao_posse_expense_amount AS possession_imission_issuance_expense_amount,
     s.stage_requerimento_execucao_expense_amount AS execution_requirement_expense_amount,
     s.stage_arresto_cautelar_expense_amount AS prejudgment_attachment_expense_amount,
     s.stage_citacao_execucao_expense_amount AS execution_citation_expense_amount,
@@ -187,9 +165,6 @@ SELECT DISTINCT
     p.case_final_description AS standardized_reason,
     'not_in_cyber_legal' AS result,
     'not_in_cyber_legal' AS succumbency_fee,
-    p.total_package_amount AS total_package,
-    p.overdue_amount AS total_due_amount,
-    cwt.max_delay_original_invoices_t1 AS overdue_days_at_registration,
     p.ldt_stock,
     CASE
         WHEN p.ldt_stock BETWEEN 0 AND 120 THEN '<120D'
@@ -206,162 +181,6 @@ SELECT DISTINCT
         WHEN p.ldt_resolution BETWEEN 361 AND 5000 THEN '>360D'
         ELSE NULL
     END AS resolution_range,
-    --leadtimes despejo
-    DATE_DIFF(DAY, DATE(p.dt_case_acceptance), DATE(CASE WHEN p.case_status = 'Completed' THEN p.dt_status_changed ELSE NULL END)) AS real_ldt_resolution,
-    COUNT(DISTINCT
-        CASE
-            WHEN DATE(p.dt_case_acceptance) <= d.date AND DATE(p.dt_case_acceptance) IS NOT NULL
-            AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-            AND(
-              (DATE(s.stage_distribuicao_arbitral_dt_start) IS NOT NULL AND DATE(s.stage_distribuicao_arbitral_dt_start) >= d.date) OR
-              (DATE(s.stage_distribuicao_arbitral_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-              ) THEN d.sk_date END) AS ldt_arbitral_distribution,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_distribuicao_arbitral_dt_start) <= d.date AND DATE(s.stage_distribuicao_arbitral_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_citacao_arbitral_dt_start) IS NOT NULL AND DATE(s.stage_citacao_arbitral_dt_start) >= d.date) OR
-                  (DATE(s.stage_citacao_arbitral_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_arbitral_citation,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_distribuicao_arbitral_dt_start) <= d.date AND DATE(s.stage_distribuicao_arbitral_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_sentenca_arbitral_dt_start) IS NOT NULL AND DATE(s.stage_sentenca_arbitral_dt_start) >= d.date) OR
-                  (DATE(s.stage_sentenca_arbitral_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_arbitral_award,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_sentenca_arbitral_dt_start) <= d.date AND DATE(s.stage_sentenca_arbitral_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_distribuicao_judicial_dt_start) IS NOT NULL AND DATE(s.stage_distribuicao_judicial_dt_start) >= d.date) OR
-                  (DATE(s.stage_distribuicao_judicial_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judiciary_distribution,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_distribuicao_judicial_dt_start) <= d.date AND DATE(s.stage_distribuicao_judicial_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_decisao_citacao_judicial_dt_start) IS NOT NULL AND DATE(s.stage_decisao_citacao_judicial_dt_start) >= d.date) OR
-                  (DATE(s.stage_decisao_citacao_judicial_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judicial_summons_decision,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_decisao_citacao_judicial_dt_start) <= d.date AND DATE(s.stage_decisao_citacao_judicial_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_citacao_judicial_dt_start) IS NOT NULL AND DATE(s.stage_citacao_judicial_dt_start) >= d.date) OR
-                  (DATE(s.stage_citacao_judicial_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judicial_summons,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_decisao_citacao_judicial_dt_start) <= d.date AND DATE(s.stage_decisao_citacao_judicial_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_decisao_coercitivo_dt_start) IS NOT NULL AND DATE(s.stage_decisao_coercitivo_dt_start) >= d.date) OR
-                  (DATE(s.stage_decisao_coercitivo_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_coercive_decision,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_decisao_coercitivo_dt_start) <= d.date AND DATE(s.stage_decisao_coercitivo_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_emissao_coercitivo_dt_start) IS NOT NULL AND DATE(s.stage_emissao_coercitivo_dt_start) >= d.date) OR
-                  (DATE(s.stage_emissao_coercitivo_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_coercive_order_issuance_decision,
-    --leadtimes reivindicatoria
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(p.dt_case_acceptance) <= d.date AND DATE(p.dt_case_acceptance) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_decisao_citacao_judicial_dt_start) IS NOT NULL AND DATE(s.stage_decisao_citacao_judicial_dt_start) >= d.date) OR
-                  (DATE(s.stage_decisao_citacao_judicial_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judicial_summons_decision,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_decisao_citacao_judicial_dt_start) <= d.date AND DATE(s.stage_decisao_citacao_judicial_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_citacao_judicial_dt_start) IS NOT NULL AND DATE(s.stage_citacao_judicial_dt_start) >= d.date) OR
-                  (DATE(s.stage_citacao_judicial_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judicial_summons,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_citacao_judicial_dt_start) <= d.date AND DATE(s.stage_citacao_judicial_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_decisao_imissao_posse_dt_start) IS NOT NULL AND DATE(s.stage_decisao_imissao_posse_dt_start) >= d.date) OR
-                  (DATE(s.stage_decisao_imissao_posse_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_possesion_imission_decisions,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_decisao_imissao_posse_dt_start) <= d.date AND DATE(s.stage_decisao_imissao_posse_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_emissao_imissao_posse_dt_start) IS NOT NULL AND DATE(s.stage_emissao_imissao_posse_dt_start) >= d.date) OR
-                  (DATE(s.stage_emissao_imissao_posse_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_possesion_imission_issuance,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_emissao_imissao_posse_dt_start) <= d.date AND DATE(s.stage_emissao_imissao_posse_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_peticao_judicial_dt_start) IS NOT NULL AND DATE(s.stage_peticao_judicial_dt_start) >= d.date) OR
-                  (DATE(s.stage_peticao_judicial_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judicial_petition,
-    --leadtimes execucao
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(p.dt_case_acceptance) <= d.date AND DATE(p.dt_case_acceptance) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_requerimento_execucao_dt_start) IS NOT NULL AND DATE(s.stage_requerimento_execucao_dt_start) >= d.date) OR
-                  (DATE(s.stage_requerimento_execucao_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_execution_requirement_decision,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_requerimento_execucao_dt_start) <= d.date AND DATE(s.stage_requerimento_execucao_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_arresto_cautelar_dt_start) IS NOT NULL AND DATE(s.stage_arresto_cautelar_dt_start) >= d.date) OR
-                  (DATE(s.stage_arresto_cautelar_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_prejudgment_attachment,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_arresto_cautelar_dt_start) <= d.date AND DATE(s.stage_arresto_cautelar_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_citacao_execucao_dt_start) IS NOT NULL AND DATE(s.stage_citacao_execucao_dt_start) >= d.date) OR
-                  (DATE(s.stage_citacao_execucao_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_executed_citation,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_citacao_execucao_dt_start) <= d.date AND DATE(s.stage_citacao_execucao_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_penhora_dt_start) IS NOT NULL AND DATE(s.stage_penhora_dt_start) >= d.date) OR
-                  (DATE(s.stage_penhora_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_asset_attachment,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_penhora_dt_start) <= d.date AND DATE(s.stage_penhora_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_avaliacao_bens_dt_start) IS NOT NULL AND DATE(s.stage_avaliacao_bens_dt_start) >= d.date) OR
-                  (DATE(s.stage_avaliacao_bens_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_asset_evaluation,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(s.stage_avaliacao_bens_dt_start) <= d.date AND DATE(s.stage_avaliacao_bens_dt_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(s.stage_satisfacao_credito_dt_start) IS NOT NULL AND DATE(s.stage_satisfacao_credito_dt_start) >= d.date) OR
-                  (DATE(s.stage_satisfacao_credito_dt_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_redit_satisfaction,
     'not_in_cyber_legal' AS ldt_coercive,
     'not_in_cyber_legal' AS last_occurrence,
     'not_in_cyber_legal' AS has_arbitration_defense,
@@ -388,10 +207,10 @@ SELECT DISTINCT
     s.stage_emissao_coercitivo_dt_end AS dt_coercive_issuance_end,
     s.stage_peticao_judicial_dt_start AS dt_judicial_petition_start,
     s.stage_peticao_judicial_dt_end AS dt_judicial_petition_end,
-    s.stage_decisao_imissao_posse_dt_start AS dt_possesion_imission_decision_start,
-    s.stage_decisao_imissao_posse_dt_end AS dt_possesion_imission_decision_end,
-    s.stage_emissao_imissao_posse_dt_start AS dt_possesion_imission_issuance_start,
-    s.stage_emissao_imissao_posse_dt_end AS dt_possesion_imission_issuance_end,
+    s.stage_decisao_imissao_posse_dt_start AS dt_possession_imission_decision_start,
+    s.stage_decisao_imissao_posse_dt_end AS dt_possession_imission_decision_end,
+    s.stage_emissao_imissao_posse_dt_start AS dt_possession_imission_issuance_start,
+    s.stage_emissao_imissao_posse_dt_end AS dt_possession_imission_issuance_end,
     s.stage_requerimento_execucao_dt_start AS dt_execution_requirement_start,
     s.stage_requerimento_execucao_dt_end AS dt_execution_requirement_end,
     s.stage_arresto_cautelar_dt_start AS dt_prejudgment_attachment_start,
@@ -414,11 +233,3 @@ LEFT JOIN
 LEFT JOIN
     get_last_process_stage AS ps
     ON p.id_case = ps.id_case
-LEFT JOIN
-    dw_collections_segmentation.fact_contract_wallet_timeline cwt
-    ON p.id_contract = cwt.sk_contract
-    AND p.dt_case_acceptance = cwt.dt_reference
-LEFT JOIN
-    aux_calendar d
-    ON p.dt_case_acceptance <= d.date AND (IF(p.case_status = 'Completed', p.dt_status_changed, NULL) >= d.date OR p.dt_status_changed IS NULL)
-GROUP BY ALL
