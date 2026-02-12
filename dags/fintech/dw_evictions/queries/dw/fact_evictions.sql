@@ -9,8 +9,62 @@ WITH aux_calendar AS (
         d.is_brz_holiday,
         CASE WHEN d.date BETWEEN DATE('2025-12-22') AND DATE('2026-01-02') THEN True ELSE False END AS arbitration_recess,
         CASE WHEN d.date BETWEEN DATE('2025-12-20') and DATE('2026-01-19') THEN True ELSE False END AS judicial_recess
-    FROM DW_public.dim_date AS d
+    FROM dw_public.dim_date AS d
         WHERE d.month_start <= DATE(DATE_TRUNC('month',CURRENT_DATE()))
+),
+fpd AS (
+    SELECT id_invoice
+    FROM (SELECT
+              invoice.id_external AS id_invoice,
+              ROW_NUMBER() OVER (PARTITION BY invoice.id_contract_external ORDER BY invoice.dt_due_adjusted, invoice.ts_created) AS row_number
+          FROM datalake_retsuko.invoice AS invoice
+          LEFT JOIN datalake_retsuko.invoice_info AS invoice_info
+              ON invoice.id_external = invoice_info.id_invoice
+          LEFT JOIN dw_rent.dim_contract AS contract
+              ON invoice.id_contract_external = contract.id_contract
+          WHERE invoice_info.invoice_user = 'tenant'
+              AND invoice.due_amount < 0
+              AND invoice.status != 'canceled'
+              AND contract.status != 'Cancelado'
+              AND contract.country_code = 'BR'
+    ) AS retsuko_data
+    WHERE row_number = 1
+),
+open_amount AS (
+    SELECT
+        sk_contract,
+        SUM(due_amount) AS open_amount
+    FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+    WHERE dt_invoice_paid IS NULL AND dt_reference = DATE(NOW())
+    GROUP BY 1
+),
+overdue AS (
+    SELECT
+        o.sk_contract,
+        o.dt_reference,
+        o.delay_contamined_range,
+        DATEDIFF(DAY,MIN(o.dt_invoice_due_adjust), o.dt_reference) AS delay_days,
+        SUM(o.due_amount) AS open_amount,
+        COUNT(o.id_invoice) AS invoices,
+        COUNT(CASE WHEN o.invoice_type = 'monthly' THEN o.id_invoice END) AS monthly_invoices,
+        COUNT(CASE WHEN o.negotiation_installment_number IS NOT NULL THEN o.id_invoice END) AS negotiation_invoices,
+        COUNT(CASE WHEN fpd.id_invoice IS NOT NULL THEN o.id_invoice END) AS fpd_invoices
+    FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline o
+    LEFT JOIN fpd ON o.id_invoice = fpd.id_invoice
+    WHERE o.dt_invoice_paid IS NULL
+    GROUP BY 1, 2, 3
+),
+negotiation AS (
+    SELECT
+        fn.sk_contract,
+        DATE(fn.dt_down_payment) AS dt_down_payment,
+        fni.id_invoice_extra,
+        fni.dt_paid
+    FROM dw_collection_recovery_quintoandar.fact_negotiation_installment AS fni
+    LEFT JOIN dw_collection_recovery_quintoandar.fact_negotiation AS fn
+        ON fni.sk_negotiation = fn.sk_negotiation
+    WHERE fn.dt_down_payment IS NOT NULL
+    AND fni.installment_number >= 2
 )
 
 SELECT DISTINCT
@@ -55,17 +109,24 @@ SELECT DISTINCT
     e.standardized_reason,
     e.result,
     CASE
-        WHEN cwt.open_wallet_overdue_t1 IS NULL THEN 'Adimplente'
-        WHEN cwt.has_fpd_in_wallet = True THEN 'FPD'
-        WHEN cwt.open_acordo_balance > 0 THEN 'Acordo Ativo'
-        WHEN cwt.n_monthly_invoices > 0 THEN 'Mensal'
-        WHEN cwt.open_wallet_overdue_t1 IS NOT NULL THEN 'Demais Inadimplentes'
+        WHEN o.open_amount IS NULL THEN 'Adimplente'
+        WHEN o.fpd_invoices > 0 THEN 'FPD'
+        WHEN EXISTS (
+                SELECT 1
+                FROM negotiation n
+                WHERE n.sk_contract = BIGINT(TRIM(e.contract))
+                  AND n.dt_down_payment <= DATE(e.dt_registered)
+                  AND (n.dt_paid > DATE(e.dt_registered) OR n.dt_paid IS NULL)
+              )
+            OR o.negotiation_invoices > 0 THEN 'Acordo Ativo'
+        WHEN o.monthly_invoices > 0 THEN 'Mensal'
+        WHEN o.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
         ELSE 'Outros'
     END AS contract_category_at_registration,
-    cwt.max_delay_original_invoices_t1 AS overdue_days_at_registration,
+    o.delay_days AS overdue_days_at_registration,
     e.succumbency_fee,
-    cwt.package_amount AS total_package,
-    cwt.wallet_overdue_t1 AS total_due_amount,
+    COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0) AS total_package,
+    IF(e.dt_closure IS NOT NULL, o.open_amount, oa.open_amount) AS total_due_amount,
     e.ldt_stock,
     e.stock_range,
     e.ldt_resolution,
@@ -259,10 +320,16 @@ SELECT DISTINCT
 FROM
     datalake_cyber_legal_homolog.evictions_base e
 LEFT JOIN
-    dw_collections_segmentation.fact_contract_wallet_timeline cwt
-    ON e.contract = cwt.sk_contract
-    AND e.dt_registered = cwt.dt_reference
-LEFT JOIN
     aux_calendar d
     ON e.dt_registered <= d.date AND (e.dt_closure >= d.date OR e.dt_closure IS NULL)
+LEFT JOIN
+    open_amount oa
+    ON e.contract = oa.sk_contract
+LEFT JOIN
+    overdue o
+    ON e.contract = o.sk_contract
+    AND e.dt_registered = o.dt_reference
+LEFT JOIN
+    dw_rent.dim_contract c
+    ON e.contract = c.id_contract
 GROUP BY ALL
