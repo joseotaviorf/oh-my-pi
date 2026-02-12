@@ -1,0 +1,64 @@
+database_name: dw_bpo_performance
+table_name: tickets_contract
+description: Table containing contracts linked to Zendesk tickets.
+domain: Support and Services
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.sk_task
+    description: Task identifier associated with the contact.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Returns the department Zendesk to the ticket.
+  analyst_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Returns the analyst Zendesk to the ticket.
+  agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Returns the analyst's organization to the ticket.
+  contract_identification_rule:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+      - dw_rent.fact_house_listings.sk_contract
+      - dw_customer_support.fact_tickets.sk_contract
+      - dw_rent.fact_contract_people.sk_contract
+    description: Rule for identifying the contract number.
+  sk_contract:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+      - dw_rent.fact_house_listings.sk_contract
+      - dw_customer_support.fact_tickets.sk_contract
+      - dw_rent.fact_contract_people.sk_contract
+    description: Contract number related to the ticket.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+    description: User identifier associated with the contact.
+  user_type:
+    lineage:
+      - dw_rent.fact_contract_people.contract_role
+    description: Returns the type of customer associated the ticket.
+  ticket_status:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.status
+    description: Ticket status (Ex. Solved, Open...)
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp of the load.
