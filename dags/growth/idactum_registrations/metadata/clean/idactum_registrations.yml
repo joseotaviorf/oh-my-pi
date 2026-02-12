@@ -1,0 +1,352 @@
+database_name: datalake_idactum_registrations_clean
+table_name: idactum_registrations
+description: Table acquired from Idactum. Contain property registration data,
+  including address, location, features and others.
+domain: Growth
+owner: data-growth@quintoandar.com.br / gabriel.mota@quintoandar.com.br
+columns:
+  id_unit:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.id_unidade
+    description: |
+      "Property unit unique identifier."
+  id_idactum:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.id_idactum
+    description: |
+      "Idactum property id."
+  id_patrimonial_assets:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.bpatri_key
+    description: |
+      "Patrimonial assets unique identifier."
+  id_lot:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.chave_lote
+    description: |
+      "Lot unique identifier."
+  real_estate_register:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.cartorio
+    description: |
+      "Real estate register name."
+  real_estate_registry:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.matricula
+    description: |
+      "Real estate registry number."
+  building_year:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.ano_construcao_ajustado
+    description: |
+      "Building year."
+  number_of_floors:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.n_pavimentos
+    description: |
+      "Building amount of floors."
+  floor:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.andar_unidade
+    description: |
+      "Property floor."
+  bathrooms_count:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.banheiros
+    description: |
+      "Number of bathrooms."
+  bedrooms_count:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.quartos
+    description: |
+      "Number of bedrooms."
+  suites_count:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.suites
+    description: |
+      "Number of suites."
+  parking_slots:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.vagas
+    description: |
+      "Number of parking slots."
+  lot_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_terreno
+    description: |
+      "Lot area in square meters."
+  occupied_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_ocupada
+    description: |
+      "Occupied area in square meters."
+  tested_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_testada
+    description: |
+      "Tested area in square meters."
+  built_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_construido
+    description: |
+      "Built area in square meters."
+  built_area_with_parking_slots:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_construido_ajustado
+    description: |
+      "Built area with parking slots in square meters."
+  private_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_privativo
+    description: |
+      "Private area in square meters."
+  assessed_market_value_per_lot_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.valor_m2_terreno
+    description: |
+      "Assessed market value per lot area."
+  assessed_market_value_per_built_area:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.valor_m2_construido
+    description: |
+      "Assessed market value per built area in square meters."
+  assessed_market_value:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.valor_venal
+    description: |
+      "Assessed market value."
+  assessed_market_value_year_reference:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.valor_venal_ano
+    description: |
+      "Year used on assessed market value."
+  iptu_value:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.valor_iptu
+    description: |
+      "Property IPTU value."
+  fractional_share:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.fracao_ideal
+    description: |
+      "Fractional share of the property."
+  zipcode:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.cep_original
+    description: |
+      "Zipcode."
+  source_street:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.logradouro_original
+    description: |
+      "Street name."
+  address_number:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.numero
+    description: |
+      "Address number."
+  address_details:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.complemento
+    description: |
+      "Address details: unit and building."
+  address_details_unit:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.unidade
+    description: |
+      "Unit number."
+  address_details_building:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.bloco
+    description: |
+      "Building number."
+  postal_state_code:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.uf_correios
+    description: |
+      "Postal state code."
+  postal_neighborhood_name:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.bairro_correios
+    description: |
+      "Postal neighborhood name."
+  postal_street_name:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.logradouro_correios
+    description: |
+      "Postal street name."
+  latitude:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.latitude
+    description: |
+      "Latitude."
+  longitude:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.longitude
+    description: |
+      "Longitude."
+  private_area_estimated:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.m2_privativo_estimado
+    description: |
+      "Estimated private area in square meters."
+  census_tract_code:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_codigo
+    description: |
+      "Census tract code."
+  census_tract_status:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_situacao
+    description: |
+      "Census tract situation status."
+  census_tract_type:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_tipo
+    description: |
+      "Census tract type."
+  census_tract_status_description:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_desc_situacao
+    description: |
+      "Census tract situation status description."
+  census_tract_type_description:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitaria_desc_tipo
+    description: |
+      "Census tract type description."
+  census_tract:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitária
+    description: |
+      "Census tract code."
+  census_tract_income_avg:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitária_renda_media_responsavel
+    description: |
+      "Census tract household average income."
+  census_tract_income_standard_deviation:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.zona_censitária_renda_media_desvio_padrao
+    description: |
+      "Census tract household income standard deviation."
+  latest_transaction_value:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente_valor_total
+    description: |
+      "Latest transaction value."
+  zone_code:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.sgl_zona
+    description: |
+      "Zone acronym."
+  idactum_price_estimation:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.price_ref_estimate_michel
+    description: |
+      "Idactum price estimation."
+  idactum_price_estimation_percentage_absolute_deviation:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.perc_abs_deviation_estimate_michel
+    description: |
+      "Idactum price estimation percentage absolute deviation."
+  average_annual_appreciation:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.valorizacao_media_anual
+    description: |
+      "Average annual appreciation in last 5 years estimated by Idactum."
+  idactum_market_price_estimation_score:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.estimativa_ipatri_regra
+    description: |
+      "Score of Idactum market price estimation."
+  idactum_market_price_estimation:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.estimativa_ipatri
+    description: |
+      "Idactum market price estimation(model plus transaction median value)."
+  quantity:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.qtd
+    description: |
+      "Quantity."
+  is_iptu_exempt:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.iptu_isento
+    description: |
+      "IPTU exempt(1 or 0)."
+  usage_purpose:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.finalidade
+    description: |
+      "Property usage purpose(residential, commercial, etc.)."
+  building_type:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.tipo_de_construcao
+    description: |
+      "Property building type(apartment, house, etc.)."
+  usage_type:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.tipo_de_uso
+    description: |
+      "Property usage type(private, public, etc.)."
+  is_vertical_property:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.vertical
+    description: |
+      "Property is vertical."
+  typology:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.tipologia
+    description: |
+      "Property typology(apartment, house, etc.)."
+  is_parking_slots_in_latest_transaction:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente_envolve_garagem
+    description: |
+      "Property has parking slots in latest transaction."
+  is_house_in_sp_popular_lot_program:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_loteamento
+    description: |
+      "Property is in SP popular lot program."
+  is_informal_housing_nucleus_sp:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_nucleo
+    description: |
+      "Property is in informal housing nucleus in SP."
+  is_house_in_sp_favela:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_favela
+    description: |
+      "Property is in favela in SP."
+  is_house_in_sp_cortico:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.SIRGAS_SHP_cortico
+    description: |
+      "Property is in cortico in SP."
+  is_house_in_bh_favela:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.VILA_FAVELA
+    description: |
+      "Property is in favela/vila in BH."
+  is_informal_housing_nucleus_bh:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.OCUPACAO_LOTEAMENTO_IRREGULAR
+    description: |
+      "Property is in informal housing nucleus in BH."
+  is_public_housing_bh:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.CONJUNTO_HABITACIONAL
+    description: |
+      "Property is in public housing in BH."
+  dt_load:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.dt_load
+    description: |
+      "Date when the idactum registrations data was loaded."
+  ts_latest_transaction_date:
+    lineage:
+      - datalake_idactum_registrations_raw.idactum_registrations.transacao_mais_recente
+    description: |
+      "Latest transaction date."
