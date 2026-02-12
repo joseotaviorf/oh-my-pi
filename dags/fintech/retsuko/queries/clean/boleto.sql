@@ -3,6 +3,7 @@ SELECT
     external_id as id_external,
     invoice_id as id_invoice,
     checkout_boleto_id AS id_checkout_boleto,
+    pix_emv AS pix_code,
     identifier,
     status,
     due_amount,
