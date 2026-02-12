@@ -34,6 +34,7 @@ workflow:
     taxonomy: {}
     tmr: {}
     tickets_transferred: {}
+    tickets_contract: {}
     twilio_chat_aht: {}
 
 cluster:
