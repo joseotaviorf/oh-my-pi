@@ -1,0 +1,100 @@
+# Schema validation file for core house table
+# This file defines the expected schema for the core_house.house table
+# Path: dags/core/core_house/schemas/core/house.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_house:
+    type: string
+    required: true
+
+  # House identifier
+  id_house:
+    type: bigint
+    required: true
+
+  # Region identifier
+  id_region:
+    type: bigint
+    required: false
+
+  # Owner identifier
+  id_owner:
+    type: bigint
+    required: false
+
+  # Owner UUID
+  uuid_owner:
+    type: string
+    required: false
+
+  # Address components
+  address:
+    type: string
+    required: false
+
+  number:
+    type: string
+    required: false
+
+  neighborhood:
+    type: string
+    required: false
+
+  complement:
+    type: string
+    required: false
+
+  zipcode:
+    type: string
+    required: false
+
+  city:
+    type: string
+    required: false
+
+  # House characteristics
+  total_area:
+    type: int
+    required: false
+
+  # Geographic coordinates
+  lat:
+    type: decimal
+    required: false
+
+  lng:
+    type: decimal
+    required: false
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: true
+
+  ts_updated:
+    type: timestamp
+    required: false
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 20
+max_columns: 20
+strict: true

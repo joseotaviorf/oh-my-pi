@@ -1,0 +1,13 @@
+ENTITY_TYPE: "HOUSE"
+HOUSE_TABLE: "datalake_ebdb_clean.house"
+HOUSE_LISTING_RELATION_TABLE: "datalake_ebdb_clean.house_listing_relation"
+USER_TABLE: "datalake_ebdb_clean.user"
+merge_on: ["sk_core_house"]
+
+when_matched_operation:
+  id_region: "source.id_region"
+  id_owner: "source.id_owner"
+  uuid_owner: "source.uuid_owner"
+  ts_updated: "source.ts_updated"
+
+when_matched_update_condition: "source.ts_updated > target.ts_updated"

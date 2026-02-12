@@ -1,21 +1,20 @@
 dag:
-  name: core_listing
+  name: core_house
   schedule_start_date: 2025, 1, 1
   owner: Data ForSale
   documentation:
     dag_purpose: |
-      Creates the Listing Core Model by processing listing data from both RENT and SALE business contexts.
-      This model unifies listing_business_context data with auxiliary tables (aux__lbc_status_version_order
-      and aux__house_listing_category) to provide a consolidated view of house listings.
+      Creates the House Core Model by processing house data from EBDB. This model provides
+      a consolidated view of house properties with their associated information.
 
 workflow:
   type: core_model
   layer: core
-  default_extraction_type: full
-  load_spark_job: load_core_listing
+  default_extraction_type: incremental
+  load_spark_job: load_core_house
   execution_timeout_hours: 1
   tables_customization:
-    listing:
+    house:
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"
@@ -23,8 +22,9 @@ workflow:
         - "{schema}"
         - "{table_name}"
         - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
       partitions: [year, month, day]
-      z_order_by: [id_house_listing, business_context]
       table_properties:
         "delta.enableChangeDataFeed": "true"
 

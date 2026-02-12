@@ -1,0 +1,52 @@
+---
+table_name: core_house.house
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+column_level_validations:
+  sk_core_house:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_region:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  id_owner:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  uuid_owner:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  address:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  number:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  neighborhood:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  zipcode:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Error
+  city:
+    has_completeness:
+      greater_than: 0.99
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error

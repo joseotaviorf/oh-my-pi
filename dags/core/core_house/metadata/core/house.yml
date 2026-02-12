@@ -1,0 +1,88 @@
+database_name: core_house
+table_name: house
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description: House Core Model that provides a consolidated view of house properties with their
+  associated information. It filters out legacy records (created before 2016 with no updates).
+columns:
+  sk_core_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+    description: Surrogate key related to the House Core Model. This key must always be unique.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+    description: House identifier. It's the primary key of the House table from Main's database (EBDB).
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: Region identifier where the house is located.
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation.id_related
+      - datalake_ebdb_clean.house.id_user
+    description: Owner identifier of the house. Prioritizes the owner from house_listing_relation
+      (PROPERTY_OWNER with MAIN_USER source), falls back to id_user from house table.
+  uuid_owner:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: UUID of the owner's, from Person's database. Resolved from the owner user record.
+  address:
+    lineage:
+      - datalake_ebdb_clean.house.address
+    description: Street address where the house is located.
+  number:
+    lineage:
+      - datalake_ebdb_clean.house.number
+    description: Street number of the house.
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.house.neighborhood
+    description: Neighborhood where the house is located.
+  complement:
+    lineage:
+      - datalake_ebdb_clean.house.complement
+    description: Address complement (apartment number, block, etc.).
+  zipcode:
+    lineage:
+      - datalake_ebdb_clean.house.zipcode
+    description: ZIP/postal code where the house is located.
+  city:
+    lineage:
+      - datalake_ebdb_clean.house.city
+    description: City where the house is located.
+  total_area:
+    lineage:
+      - datalake_ebdb_clean.house.total_area
+    description: Total built area of the house in square meters.
+  lat:
+    lineage:
+      - datalake_ebdb_clean.house.lat
+    description: Geographic latitude coordinate of the house location.
+  lng:
+    lineage:
+      - datalake_ebdb_clean.house.lng
+    description: Geographic longitude coordinate of the house location.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.house.dt_creation
+    description: Timestamp of when the house record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.house.ts_updated
+    description: Last timestamp of when the house record was updated.
+  ts_load:
+    description: Timestamp of when the House Core Model was updated and loaded for the last time.
+      This is set to current_timestamp() during the ETL process.
+  year:
+    lineage:
+      - datalake_ebdb_clean.house.ts_updated
+    description: Year extracted from ts_updated. Used as partition column.
+  month:
+    lineage:
+      - datalake_ebdb_clean.house.ts_updated
+    description: Month extracted from ts_updated. Used as partition column.
+  day:
+    lineage:
+      - datalake_ebdb_clean.house.ts_updated
+    description: Day of month extracted from ts_updated. Used as partition column.
