@@ -1,29 +1,24 @@
-database_name: dw_compensation
-table_name: dim_job
+database_name: datalake_compensation_enrich
+table_name: job_with_salary_table
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Job dimension with compensation targets, salary table details, and salary ranges.
-  Each row represents a unique version of a job. A new version is created whenever any attribute changes
-  (e.g., band, salary table, salary range, PLR target).
-  Consecutive periods with identical attributes are automatically consolidated into a single version.
-
-  The unique key is `sk_job_version` (MD5 hash of job ID + valid from date).
-  `id_job` is the source system job ID, not unique across versions.
-
-  Compensation targets (PLR, RVV, SOP, etc.) default to 0 when not defined.
-  Salary range values (min, mid, max) are in DECIMAL(18, 2) precision.
-  `dt_valid_to` is NULL when the version has no scheduled end date.
-
+  Enriched table containing job information with compensation targets and salary table details.
+  Consolidates job attributes with salary ranges, bands, and compensation targets from multiple source tables.
+  Provides enriched data for downstream data warehouse consumption.
+  
+  Each row represents a job at a specific point in time with its associated salary table and band information.
+  The table tracks temporal validity through dt_valid_from and dt_valid_to fields.
+  Multiple rows can exist for the same job (id_job) when attributes change over time.
+  
+  This table serves as the foundation for the dim_job dimension table in the data warehouse layer,
+  which applies SCD Type 2 logic to consolidate consecutive periods with identical attributes.
 
 columns:
-  sk_job_version:
-    description: Unique key for each job version. MD5 hash generated from job ID and valid from date.
-    lineage:
-      - datalake_pin_core_clean.job.id_job
-      - datalake_pin_core_clean.job.dt_effective_started
   id_job:
-    description: Job ID from the source system. Natural key for the job entity, not unique across versions.
+    description: |
+      Job ID from the source system. This is the natural key for jobs.
+      Multiple rows can exist for the same id_job when job attributes change over time.
     lineage:
       - datalake_pin_core_clean.job.id_job
   job_code:
@@ -46,6 +41,14 @@ columns:
     lineage:
       - datalake_pin_core_clean.grade_translation.name
       - datalake_pin_core_clean.valid_grades.id_grade
+  career_track:
+    description: Contribution level (e.g., Contribuidor Individual, Líder). Use to distinguish individual contributor vs leadership roles.
+    lineage:
+      - datalake_pin_core_clean.job.contribution_level
+  is_leadership_job:
+    description: Flag indicating whether the job is a leadership role, derived from contribution level.
+    lineage:
+      - datalake_pin_core_clean.job.contribution_level
   job_business_unit_group:
     description: Business unit from set identifiers.
     lineage:
@@ -127,27 +130,27 @@ columns:
     lineage:
       - datalake_pin_compensation_clean.salary_bases.annualization_factor
   target_plr:
-    description: Fixed monetary value for the Profit Sharing (PLR) target. Defaults to 0 when not defined. This value is ignored if target_plr_salary_multiplier is present.
+    description: Fixed monetary value for the Profit Sharing (PLR) target. This value is ignored if target_plr_salary_multiplier is present, as the multiplier takes precedence.
     lineage:
       - datalake_pin_core_clean.job.target_plr
   target_plr_salary_multiplier:
-    description: PLR (Profit Sharing) salary multiplier. Defaults to 0 when not defined. For certain BUs (mainly in LATAM), the PLR target is not a fixed amount but a multiple of the salary. This multiplier overrides target_plr when both are present.
+    description: PLR (Profit Sharing) salary multiplier. For certain BUs (mainly in LATAM), the PLR target is not a fixed amount but a multiple of the salary. This column stores that multiplier. In case of conflict, this multiplier overrides the fixed target_plr value.
     lineage:
       - datalake_pin_core_clean.job.target_plr_salary_multiplier
   target_rvv:
-    description: RVV (Variable Sales Compensation) target for the job. Defaults to 0 when not defined.
+    description: RVV (variable compensation) target for the job.
     lineage:
       - datalake_pin_core_clean.job.target_rvv
   target_sop:
-    description: SOP (Stock Option Program) target for the job. Defaults to 0 when not defined.
+    description: SOP (stock option) target for the job.
     lineage:
       - datalake_pin_core_clean.job.target_sop
   target_hiring_sop:
-    description: Hiring SOP target offered to new hires. Defaults to 0 when not defined.
+    description: Hiring SOP target for the job.
     lineage:
       - datalake_pin_core_clean.job.target_hiring_sop
   target_exceptional_bonus:
-    description: Exceptional bonus target (tech bonus in USD). Defaults to 0 when not defined.
+    description: Exceptional bonus target for the job (renamed from target_bonus_tech_usd).
     lineage:
       - datalake_pin_core_clean.job.target_bonus_tech_usd
   salary_range_min:
@@ -175,54 +178,54 @@ columns:
     description: Whether the job requires clock-in/clock-out.
     lineage:
       - datalake_pin_core_clean.job.is_time_clocking_required
-  is_leadership_job:
-    description: Flag indicating whether the job is a leadership role, derived from contribution level.
-    lineage:
-      - datalake_pin_core_clean.job.contribution_level
   is_active:
     description: Whether the job is currently active in the system.
     lineage:
       - datalake_pin_core_clean.job.is_active
   is_current:
-    description: Whether this is the active version as of the load date. Filter by is_current = TRUE for current data.
+    description: |
+      Boolean flag indicating if this version is current as of the load reference date.
+      For current data queries, always filter by is_current = TRUE.
+      Calculated based on dt_valid_from and dt_valid_to relative to the load reference date.
     lineage:
       - datalake_pin_core_clean.job.dt_effective_started
-      - datalake_pin_core_clean.valid_grades.dt_effective_started
       - datalake_pin_core_clean.grade_ladder.dt_effective_started
       - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
-      - datalake_pin_core_clean.grade_translation.dt_effective_started
       - datalake_pin_core_clean.rates.dt_effective_started
       - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
       - datalake_pin_compensation_clean.salary_bases.dt_effective_started
       - datalake_pin_core_clean.job.dt_effective_ended
-      - datalake_pin_core_clean.valid_grades.dt_effective_ended
       - datalake_pin_core_clean.grade_ladder.dt_effective_ended
       - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
-      - datalake_pin_core_clean.grade_translation.dt_effective_ended
       - datalake_pin_core_clean.rates.dt_effective_ended
       - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
       - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
   dt_valid_from:
-    description: Date when this job version became effective. Use for historical analysis and tracking attribute changes over time.
+    description: |
+      Date from which this job version became effective.
+      Represents when this specific combination of job and salary table attributes became valid.
+      Use for historical analysis and identifying when adjustments occurred.
     lineage:
       - datalake_pin_core_clean.job.dt_effective_started
-      - datalake_pin_core_clean.valid_grades.dt_effective_started
       - datalake_pin_core_clean.grade_ladder.dt_effective_started
       - datalake_pin_core_clean.grade_ladder_translation.dt_effective_started
-      - datalake_pin_core_clean.grade_translation.dt_effective_started
       - datalake_pin_core_clean.rates.dt_effective_started
       - datalake_pin_core_clean.rate_values.dt_effective_started
+      - datalake_pin_core_clean.grade_translation.dt_effective_started
       - datalake_pin_compensation_clean.salary_bases.dt_effective_started
   dt_valid_to:
-    description: Date until which this job version is valid (exclusive). NULL means the version has no scheduled end date.
+    description: |
+      Date until which this job version remains valid (exclusive).
+      NULL means no scheduled end date (potentially current record).
     lineage:
       - datalake_pin_core_clean.job.dt_effective_ended
-      - datalake_pin_core_clean.valid_grades.dt_effective_ended
       - datalake_pin_core_clean.grade_ladder.dt_effective_ended
       - datalake_pin_core_clean.grade_ladder_translation.dt_effective_ended
-      - datalake_pin_core_clean.grade_translation.dt_effective_ended
       - datalake_pin_core_clean.rates.dt_effective_ended
       - datalake_pin_core_clean.rate_values.dt_effective_ended
+      - datalake_pin_core_clean.grade_translation.dt_effective_ended
       - datalake_pin_compensation_clean.salary_bases.dt_effective_ended
   ts_load:
     description: Timestamp recording when data was loaded into the table.

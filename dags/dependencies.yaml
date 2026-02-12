@@ -288,22 +288,11 @@ bietlejuice.dw_company:
   - bietlejuice.rede_platform:load-clean-buyer-company-event:first-run-of-day
   - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day
 bietlejuice.dw_compensation:
+  - bietlejuice.enrich_compensation:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.enrich_employee_registration:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people_core:load-enrich-event-definition:first-run-of-day
-  - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
-  - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-grade-ladder:first-run-of-day
-  - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job:first-run-of-day
-  - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
-  - bietlejuice.pin_core:load-clean-rates:first-run-of-day
-  - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
-  - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-communication:first-run-of-day
   - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events:first-run-of-day
@@ -1775,6 +1764,19 @@ bietlejuice.enrich_company:
   - bietlejuice.company:load-clean-document:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
+bietlejuice.enrich_compensation:
+  - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job:first-run-of-day
+  - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
+  - bietlejuice.pin_core:load-clean-rates:first-run-of-day
+  - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
+  - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day

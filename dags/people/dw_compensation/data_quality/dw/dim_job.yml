@@ -13,9 +13,12 @@ table_level_validations:
     severity_level: Warning
 
 column_level_validations:
-  sk_job:
+  sk_job_version:
     is_unique:
+      severity_level: Error
+    is_complete:
       severity_level: Warning
+  sk_job:
     is_complete:
       severity_level: Warning
   job_code:
@@ -48,16 +51,8 @@ column_level_validations:
            AND band IS NULL
         ) = 0
       severity_level: Warning
-  career_track:
-    custom:
-      # Ensure career_track is not null for current active jobs
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM dw_compensation.dim_job
-         WHERE is_current = TRUE
-           AND is_active = TRUE
-           AND career_track IS NULL
-        ) = 0
+  is_leadership_job:
+    is_complete:
       severity_level: Warning
   is_active:
     has_null_count:
@@ -67,7 +62,51 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+    custom:
+      # Ensure no overlapping versions for the same job
+      # Validates that SCD Type 2 versions do not overlap for the same job
+      # Extract sk_job from sk_job_version (format: "{id_job}_{dt_valid_from}")
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT 
+             SPLIT_PART(sk_job_version, '_', 1) AS sk_job,
+             dt_valid_from, 
+             dt_valid_to,
+             LAG(dt_valid_to) OVER (PARTITION BY SPLIT_PART(sk_job_version, '_', 1) ORDER BY dt_valid_from) AS prev_dt_valid_to
+           FROM dw_compensation.dim_job
+         )
+         WHERE prev_dt_valid_to IS NOT NULL
+           AND dt_valid_from < prev_dt_valid_to
+        ) = 0
+      severity_level: Error
   is_current:
     has_null_count:
       less_than_or_equal_to: 1
+      severity_level: Warning
+  target_plr:
+    custom:
+      # Ensure target_plr changes are captured in SCD Type 2 versions
+      # This validation checks that jobs with different target_plr values have separate versions
+      # Extract sk_job from sk_job_version (format: "{id_job}_{dt_valid_from}")
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT SPLIT_PART(sk_job_version, '_', 1) AS sk_job, COUNT(DISTINCT target_plr) AS distinct_target_plr
+           FROM dw_compensation.dim_job
+           WHERE target_plr IS NOT NULL
+           GROUP BY SPLIT_PART(sk_job_version, '_', 1)
+           HAVING COUNT(DISTINCT target_plr) > 1
+           AND COUNT(*) = 1
+         )
+        ) = 0
+      severity_level: Warning
+  target_plr_salary_multiplier:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.dim_job
+         WHERE COALESCE(target_plr, 0) <> 0
+           AND COALESCE(target_plr_salary_multiplier, 0) <> 0
+        ) = 0
       severity_level: Warning

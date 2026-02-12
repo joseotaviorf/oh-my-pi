@@ -1,0 +1,39 @@
+dag:
+  name: enrich_compensation
+  owner: Data People
+  schedule_start_date: 2026, 1, 21
+  documentation:
+    dag_purpose: |
+      Enriched compensation tables that consolidate job information with salary table details.
+      Provides enriched data for downstream data warehouse consumption, including salary ranges,
+      compensation targets, and job attributes. This layer serves as the foundation for
+      dimensional modeling in the compensation data warehouse.
+      
+      Main table: `job_with_salary_table` - Jobs enriched with their associated salary table information,
+      including bands, salary ranges, and compensation targets.
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  type: query_delta
+  layer: enrich
+  bucket_config_name: people_bucket
+  custom_schema: compensation
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  tables_customization:
+    job_with_salary_table:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

@@ -1,0 +1,164 @@
+---
+table_name: datalake_compensation_enrich.job_with_salary_table
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_job:
+    is_complete:
+      severity_level: Error
+  job_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  job_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  job_family:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE is_current = TRUE
+           AND is_active = TRUE
+           AND job_family IS NULL
+        ) = 0
+      severity_level: Warning
+  band:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE is_current = TRUE
+           AND is_active = TRUE
+           AND band IS NULL
+        ) = 0
+      severity_level: Warning
+  career_track:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE is_current = TRUE
+           AND is_active = TRUE
+           AND career_track IS NULL
+        ) = 0
+      severity_level: Warning
+  is_leadership_job:
+    is_complete:
+      severity_level: Warning
+  salary_table:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  is_active:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_valid_from:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT 
+             id_job,
+             dt_valid_from, 
+             dt_valid_to,
+             LAG(dt_valid_to) OVER (PARTITION BY id_job ORDER BY dt_valid_from) AS prev_dt_valid_to
+           FROM datalake_compensation_enrich.job_with_salary_table
+         )
+         WHERE prev_dt_valid_to IS NOT NULL
+           AND dt_valid_from < prev_dt_valid_to
+        ) = 0
+      severity_level: Error
+  dt_valid_to:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE dt_valid_to IS NOT NULL
+           AND dt_valid_to < dt_valid_from
+        ) = 0
+      severity_level: Error
+  target_plr:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_job, COUNT(DISTINCT target_plr) AS distinct_target_plr
+           FROM datalake_compensation_enrich.job_with_salary_table
+           WHERE target_plr IS NOT NULL
+           GROUP BY id_job
+           HAVING COUNT(DISTINCT target_plr) > 1
+           AND COUNT(*) = 1
+         )
+        ) = 0
+      severity_level: Warning
+  target_plr_salary_multiplier:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE COALESCE(target_plr, 0) <> 0
+           AND COALESCE(target_plr_salary_multiplier, 0) <> 0
+        ) = 0
+      severity_level: Warning
+  salary_range_min:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE salary_range_min IS NOT NULL
+           AND salary_range_mid IS NOT NULL
+           AND salary_range_max IS NOT NULL
+           AND (
+             salary_range_min > salary_range_mid
+             OR salary_range_mid > salary_range_max
+             OR salary_range_min > salary_range_max
+           )
+        ) = 0
+      severity_level: Warning
+  salary_range_mid:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE salary_range_mid IS NOT NULL
+           AND salary_range_max IS NOT NULL
+           AND salary_range_mid > salary_range_max
+        ) = 0
+      severity_level: Warning
+  salary_range_max:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE salary_range_max IS NOT NULL
+           AND salary_range_max < 0
+        ) = 0
+      severity_level: Warning
+  annualization_factor:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_compensation_enrich.job_with_salary_table
+         WHERE annualization_factor IS NOT NULL
+           AND annualization_factor <= 0
+        ) = 0
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Error
