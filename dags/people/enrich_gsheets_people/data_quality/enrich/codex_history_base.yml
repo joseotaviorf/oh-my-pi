@@ -11,38 +11,29 @@ column_level_validations:
   id:
     is_unique:
       severity_level: Error
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Error
   cost_center_code:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   business:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   product:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   brand:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   vertical:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   structure:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   team:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Warning
   dt_closing_month:
-    has_null_count:
-      less_than_or_equal_to: 1
+    is_complete:
       severity_level: Error

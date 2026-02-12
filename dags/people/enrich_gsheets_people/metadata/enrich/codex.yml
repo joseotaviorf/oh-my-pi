@@ -57,28 +57,40 @@ columns:
     description: Person number (PIN id) of the second highest manager (L1) in the
       hierarchy responsible for the cost center.
     lineage:
-      - datalake_gsheets_people.codex_history_base.owner_l1_person_number
+      - datalake_gsheets_people.codex_history_base.owner_l1_email
+      - datalake_employee_registration.identifier_mapping.person_number
+      - datalake_gsheets_people_clean.email_employee_mapping
   owner_l2_person_number:
     description: Person number (PIN id) of the third highest manager (L2) in the hierarchy
       responsible for the cost center.
     lineage:
-      - datalake_gsheets_people.codex_history_base.owner_l2_person_number
+      - datalake_gsheets_people.codex_history_base.owner_l2_email
+      - datalake_employee_registration.identifier_mapping.person_number
+      - datalake_gsheets_people_clean.email_employee_mapping
   owner_l3_person_number:
     description: Person number (PIN id) of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
-      - datalake_gsheets_people.codex_history_base.owner_l3_person_number
+      - datalake_gsheets_people.codex_history_base.owner_l3_email
+      - datalake_employee_registration.identifier_mapping.person_number
+      - datalake_gsheets_people_clean.email_employee_mapping
   owner_l1_full_name:
     description: Full name of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
-      - datalake_gsheets_people.codex_history_base.owner_l1_full_name
+      - datalake_gsheets_people.codex_history_base.owner_l1_email
+      - datalake_employee_registration.identifier_mapping.full_name
+      - datalake_gsheets_people_clean.email_employee_mapping
   owner_l2_full_name:
     description: Full name of the third highest manager (L2) in the hierarchy responsible for the cost center.
     lineage:
-      - datalake_gsheets_people.codex_history_base.owner_l2_full_name
+      - datalake_gsheets_people.codex_history_base.owner_l2_email
+      - datalake_employee_registration.identifier_mapping.full_name
+      - datalake_gsheets_people_clean.email_employee_mapping
   owner_l3_full_name:
     description: Full name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
-      - datalake_gsheets_people.codex_history_base.owner_l3_full_name
+      - datalake_gsheets_people.codex_history_base.owner_l3_email
+      - datalake_employee_registration.identifier_mapping.full_name
+      - datalake_gsheets_people_clean.email_employee_mapping
   owner_l1_email:
     description: Email of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
@@ -95,8 +107,8 @@ columns:
     description: Inferred type of headcount allocated in the cost center, being either 'Capacity' or 'Overhead'.
     lineage:
       - datalake_gsheets_people.codex_history_base.headcount_type
-  is_latest_information:
-    description: Boolean flag indicating if that row has the latest information about each Cost Center. Is calculated using the maximum dt_closing_month value for each cost_center_code.
+  is_current:
+    description: Boolean flag indicating if that row is the current version for each cost center. True when dt_closing_month equals the maximum dt_closing_month per cost_center_code.
     lineage:
       - datalake_gsheets_people.codex_history_base.cost_center_code
       - datalake_gsheets_people.codex_history_base.dt_closing_month
@@ -106,16 +118,17 @@ columns:
       - datalake_gsheets_people.codex_history_base.cost_center_code
       - datalake_hr_system_clean.organizations.codigo_dff
   is_outdated_in_system:
-    description: Boolean flag indicating if the information present in the target PIN system is out of date and needs to be updated for any of the following information - brand, business, chapter, headcount_type, line, owner_l1_full_name, owner_l2_full_name, owner_l3_full_name, product, structure, team, vertical. Only applicable if the information is the latest version.
+    description: Boolean flag indicating if the information present in the target PIN system is out of date and needs to be updated for any of the following information - brand, business, chapter, headcount_type, line, owner_l1_full_name, owner_l2_full_name, owner_l3_full_name, product, structure, team, vertical. Only applicable when is_current is true.
     lineage:
       - datalake_gsheets_people.codex_history_base.brand
       - datalake_gsheets_people.codex_history_base.business
       - datalake_gsheets_people.codex_history_base.chapter
       - datalake_gsheets_people.codex_history_base.headcount_type
       - datalake_gsheets_people.codex_history_base.line
-      - datalake_gsheets_people.codex_history_base.owner_l1_full_name
-      - datalake_gsheets_people.codex_history_base.owner_l2_full_name
-      - datalake_gsheets_people.codex_history_base.owner_l3_full_name
+      - datalake_employee_registration.identifier_mapping.full_name
+      - datalake_gsheets_people.codex_history_base.owner_l1_email
+      - datalake_gsheets_people.codex_history_base.owner_l2_email
+      - datalake_gsheets_people.codex_history_base.owner_l3_email
       - datalake_gsheets_people.codex_history_base.product
       - datalake_gsheets_people.codex_history_base.structure
       - datalake_gsheets_people.codex_history_base.team

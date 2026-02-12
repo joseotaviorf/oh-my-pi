@@ -84,9 +84,15 @@ SELECT
     cp.person_number,
     ca.assignment_type,
     ca.assignment_status_type,
-    cn.first_name,
-    cn.last_name,
-    cn.full_name,
+    INITCAP(
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.first_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS first_name,
+    INITCAP(
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.last_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS last_name,
+    INITCAP(
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.full_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS full_name,
     cn.display_name,
     LOWER(we.email_address) AS work_email,
     LOWER(pe.email_address) AS personal_email,
