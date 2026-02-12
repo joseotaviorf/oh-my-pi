@@ -40,6 +40,9 @@ workflow:
     nps_offboarding:
       extra_spark_job_arguments:
       - cx
+    tickets_contract:
+      extra_spark_job_arguments:
+      - cx
     twilio_spoc:
       extra_spark_job_arguments:
       - cx

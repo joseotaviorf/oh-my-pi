@@ -594,6 +594,7 @@ bietlejuice.enrich_reverses_monitoring:
     - bietlejuice.reverse_webhelp:load-reverse-taxonomy:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-contract:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-recontact:first-run-of-day
 bietlejuice.enrich_databricks_usage_costs:
@@ -1036,6 +1037,7 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-tarefas-salesforce:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-nps-offboarding:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-contract:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-vistoria-spoc:first-run-of-day
 bietlejuice.reverse_supply_access:
   add:
