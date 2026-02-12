@@ -192,4 +192,4 @@ LEFT JOIN dw_rent.fact_contract_people fcp
     ON COALESCE(tb.contrato_prioritario, r3.sk_contract) = fcp.sk_contract 
     AND tb.sk_user = fcp.sk_user
     AND fcp.is_user = true
-ORDER BY tb.sk_task
+WHERE da_last.agent_organization IN ('webhelp', 'webhelpbr') 
