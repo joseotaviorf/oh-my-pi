@@ -1,5 +1,5 @@
 database_name: dw_visit
-table_name: dim_visit
+table_name: dim_visit_schedule
 description:
   Information about Rent and Sale schedules (booking). Each schedule is part of a visit.
   When an visit intention is rescheduled another id_schedule is generated for the same id_visit.

@@ -158,6 +158,18 @@ columns:
     description: Number of visit unsuccessful (CAST of is_unsuccessful as INTEGER). The sum aggregate function can be used to get the total number of unsuccessful visits grouped in some way.
     lineage:
       - datalake_visit.visits.is_unsuccessful
+  num_offer_submitted:
+    description: Number of offer submitted.
+    lineage:
+      - datalake_visit.dim_visit_funnel.sk_visit_funnel
+  num_offer_accepted:
+    description: Number of offer accepted.
+    lineage:
+      - datalake_visit.dim_visit_funnel.sk_visit_funnel
+  num_contract_signed:
+    description: Number of contract signed.
+    lineage:
+      - datalake_visit.dim_visit_funnel.sk_visit_funnel
   is_confirmed:
     description: If the visit is confirmed. Will be deprecated.
     lineage:
