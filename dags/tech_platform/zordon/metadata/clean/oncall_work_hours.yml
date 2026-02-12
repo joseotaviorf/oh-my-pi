@@ -1,0 +1,57 @@
+database_name: datalake_zordon_clean
+table_name: oncall_work_hours
+domain: Tech Platform
+description: Oncall work hours data from Zordon
+columns:
+  id:
+    description: Unique identifier of the work hours record
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.id
+  gchat_user:
+    description: Google Chat user identifier
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.gchat_user
+  gchat_user_name:
+    description: Google Chat user name
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.gchat_user_name
+  ts_oncall_start:
+    description: Oncall shift start timestamp
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.oncall_start_date
+  ts_oncall_end:
+    description: Oncall shift end timestamp
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.oncall_end_date
+  ts_oncall_summary:
+    description: Oncall summary timestamp
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.oncall_summary_date
+  hours_oncall:
+    description: Total hours on call
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.hours_oncall
+  nighttime_work_hours:
+    description: Hours worked during nighttime
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.nighttime_work_hours
+  daytime_work_hours:
+    description: Hours worked during daytime
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.daytime_work_hours
+  total_alarms:
+    description: Total number of alarms during the shift
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.total_alarms
+  extra_comments:
+    description: Additional comments about the shift
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.extra_comments
+  checkbox_incident:
+    description: Incident checkbox value
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.checkbox_incident
+  id_oncall_team_channel:
+    description: Identifier of the associated team channel
+    lineage:
+      - datalake_zordon_raw.oncall_work_hours.oncall_team_channel_id

@@ -1,0 +1,34 @@
+dag:
+  name: zordon
+  owner: Tech Platform Engineering Productivity
+  catchup: false
+  schedule_start_date: "2026, 1, 1"
+  schedule_interval: 0 3 * * *
+  documentation:
+    dag_purpose: |
+      Ingest Zordon database tables using CDC.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: ZORDON_DB
+  lineage_product_database_name: zordon
+  tables_customization:
+    culture_principles:
+      clean_table_name: culture_principles
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    kudos:
+      clean_table_name: kudos
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    oncall_team_channel:
+      clean_table_name: oncall_team_channel
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    oncall_work_hours:
+      clean_table_name: oncall_work_hours
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+cluster:
+  type: databricks_16_4_med_general_photon_cluster

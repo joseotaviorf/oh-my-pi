@@ -1,0 +1,37 @@
+database_name: datalake_zordon_clean
+table_name: kudos
+domain: Tech Platform
+description: Kudos data from Zordon
+columns:
+  id:
+    description: Unique identifier of the kudos
+    lineage:
+      - datalake_zordon_raw.kudos.id
+  receiver_email:
+    description: Email of the kudos receiver
+    lineage:
+      - datalake_zordon_raw.kudos.receiver_email
+  sender_email:
+    description: Email of the kudos sender
+    lineage:
+      - datalake_zordon_raw.kudos.sender_email
+  id_principle:
+    description: Identifier of the culture principle associated with the kudos
+    lineage:
+      - datalake_zordon_raw.kudos.principle_id
+  message:
+    description: Kudos message content
+    lineage:
+      - datalake_zordon_raw.kudos.message
+  receiver_info:
+    description: Additional info about the receiver
+    lineage:
+      - datalake_zordon_raw.kudos.receiver_info
+  message_info:
+    description: Additional info about the message
+    lineage:
+      - datalake_zordon_raw.kudos.message_info
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_zordon_raw.kudos.created_at

@@ -1,0 +1,25 @@
+database_name: datalake_zordon_clean
+table_name: oncall_team_channel
+domain: Tech Platform
+description: Oncall team channel configuration from Zordon
+columns:
+  id:
+    description: Unique identifier of the team channel configuration
+    lineage:
+      - datalake_zordon_raw.oncall_team_channel.id
+  opsgenie_team:
+    description: OpsGenie team name
+    lineage:
+      - datalake_zordon_raw.oncall_team_channel.opsgenie_team
+  id_opsgenie_schedule:
+    description: OpsGenie schedule identifier
+    lineage:
+      - datalake_zordon_raw.oncall_team_channel.opsgenie_schedule_id
+  is_previous_day:
+    description: Flag indicating if the schedule refers to the previous day
+    lineage:
+      - datalake_zordon_raw.oncall_team_channel.previous_day
+  gchat_space:
+    description: Google Chat space identifier
+    lineage:
+      - datalake_zordon_raw.oncall_team_channel.gchat_space

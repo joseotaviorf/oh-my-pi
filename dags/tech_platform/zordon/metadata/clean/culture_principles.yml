@@ -1,0 +1,25 @@
+database_name: datalake_zordon_clean
+table_name: culture_principles
+domain: Tech Platform
+description: Culture principles data from Zordon
+columns:
+  id:
+    description: Unique identifier of the culture principle
+    lineage:
+      - datalake_zordon_raw.culture_principles.id
+  pt_br:
+    description: Principle name in Portuguese
+    lineage:
+      - datalake_zordon_raw.culture_principles.pt_br
+  en_us:
+    description: Principle name in English
+    lineage:
+      - datalake_zordon_raw.culture_principles.en_us
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_zordon_raw.culture_principles.created_at
+  is_deprecated:
+    description: Flag indicating if the principle is deprecated
+    lineage:
+      - datalake_zordon_raw.culture_principles.deprecated
