@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM quay.io/astronomer/astro-runtime:12.6.0 AS stage1
+FROM quay.io/astronomer/astro-runtime:13.0.0 AS stage1
 
 LABEL maintainer="Astronomer <humans@astronomer.io>"
 ARG BUILD_NUMBER=-1
