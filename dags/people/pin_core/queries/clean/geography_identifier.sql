@@ -1,0 +1,28 @@
+SELECT
+  geography_identifier_id AS id_geography_identifier,
+  geography_id AS id_geography,
+  import_batch_id AS id_import_batch,
+  request_id AS id_request,
+  created_by,
+  last_updated_by AS updated_by,
+  created_by_module,
+  geo_data_provider,
+  identifier_subtype,
+  identifier_value,
+  identifier_type,
+  language_code,
+  geography_use,
+  geography_type,
+  country_code,
+  job_definition_name,
+  job_definition_package,
+  CAST(object_version_number AS INT) AS object_version_number,
+  primary_flag = 'Y' AS is_primary,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_core_raw.hz_geography_identifiers

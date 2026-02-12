@@ -1,0 +1,14 @@
+---
+table_name: datalake_pin_core_clean.geography_identifier
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_geography_identifier:
+    is_complete:
+      severity_level: Warning
+    custom:
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.geography_identifier GROUP BY id_geography_identifier, object_version_number HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning

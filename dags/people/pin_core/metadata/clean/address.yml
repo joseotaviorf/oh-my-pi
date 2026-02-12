@@ -1,0 +1,111 @@
+---
+database_name: datalake_pin_core_clean
+table_name: address
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Stores addresses associated with people or locations.
+columns:
+  id_address:
+    description: System-generated unique identifier for the address record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.address_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation.
+      Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.business_group_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.last_updated_by
+  record_creator:
+    description: Module identifier for address population.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.record_creator
+  address_line_1:
+    description: First line of the address.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.address_line_1
+  address_line_2:
+    description: Second line of the address.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.address_line_2
+  town_or_city:
+    description: Town or city for the address.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.town_or_city
+  region_1:
+    description: Primary region in which the address is located.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.region_1
+  region_2:
+    description: Sub-region of region 1.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.region_2
+  region_3:
+    description: Sub-region of region 2.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.region_3
+  country:
+    description: Country of the address.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.country
+  postal_code:
+    description: Postal code of the address.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.postal_code
+  addl_address_attribute1:
+    description: Additional address attribute for localization.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.addl_address_attribute1
+  addl_address_attribute2:
+    description: Additional address attribute for localization.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.addl_address_attribute2
+  addl_address_attribute3:
+    description: Additional address attribute for localization.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.addl_address_attribute3
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect
+      concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.object_version_number
+  dt_effective_started:
+    description: Start date of the period for which this address is valid.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.effective_start_date
+  dt_effective_ended:
+    description: End date of the period for which this address is valid.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.effective_end_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects
+      data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning
+      and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_addresses_f.day

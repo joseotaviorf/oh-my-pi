@@ -41,14 +41,66 @@ columns:
     description: Highest level of education attained by the person, specific to the legal code.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.highest_education_level
-  dt_marital_status:
-    description: Date when the current marital status became effective.
+  nationality:
+    description: Nationality of the person based on the DDF category.
     lineage:
-    - datalake_pin_core_raw.per_people_legislative_f.marital_status_date
+    - datalake_pin_core_raw.per_people_legislative_f.attribute_category
+  electoral_zone:
+    description: Electoral zone identifier for the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute1
+  polling_station:
+    description: Polling station identifier for the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute2
+  vote_registration_number:
+    description: Voter registration number recorded in the legislative data.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute4
+  gender_identity:
+    description: Self-declared gender identity.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute9
+  sexual_orientation:
+    description: Self-declared sexual orientation.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute10
+  neurodiversity:
+    description: Neurodiversity information for the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute11
+  housing_type:
+    description: Housing type reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute13
+  quinto_andar_joining_method:
+    description: Reported method by which the person joined QuintoAndar.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute14
+  country_situation:
+    description: Country situation reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute15
+  disability_self_declaration_description:
+    description: Description of the disability self-declaration.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute26
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.object_version_number
+  has_disability:
+    description: Indicates whether the person declared a disability (attribute6 = 'S').
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute6
+  has_salary_advance:
+    description: Indicates whether the person has a salary advance (attribute5 = 'S').
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute5
+  dt_marital_status:
+    description: Date when the current marital status became effective.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.marital_status_date
   dt_effective_ended:
     description: End date of the period for which this legislative person data is valid.
     lineage:

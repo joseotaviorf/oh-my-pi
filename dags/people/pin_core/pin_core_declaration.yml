@@ -82,6 +82,20 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    hz_geographies:
+      clean_table_name: geography
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    hz_geography_identifiers:
+      clean_table_name: geography_identifier
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     hr_all_organization_units_f:
       clean_table_name: all_organization_units
       vacuum_retention_hours: 168
@@ -166,6 +180,13 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_addresses_f:
+      clean_table_name: address
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_allocated_tasks_tl:
       clean_table_name: allocated_task_translation
       vacuum_retention_hours: 168
@@ -227,6 +248,13 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_phones:
+      clean_table_name: phone
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_ethnicities:
       clean_table_name: ethnicity
       vacuum_retention_hours: 168
@@ -236,6 +264,13 @@ workflow:
           date_column_to_partition: last_update_date
     per_ext_app_identifiers:
       clean_table_name: external_application_identifier
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_religions:
+      clean_table_name: religion
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
