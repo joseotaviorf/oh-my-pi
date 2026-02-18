@@ -37,6 +37,7 @@ metadata_files_out_of_pattern:
   - fintech/velo_omie/metadata/clean/country.yml
   - support_and_service/enrich_offboarding/metadata/enrich/ongoing.yml
   - support_and_service/enrich_offboarding/metadata/enrich/tickets.yml
+  - support_and_service/enrich_survicate/metadata/enrich/salesforce_surveys.yml
   # The following files are being added only temporarily to skip list, with permission from the Data Governance team
   - growth/dw_datamarts_growth_cross/metadata/dw/tenant_prospects_activations.yml
   - support_and_service/enrich_offboarding/metadata/enrich/budgeting_window.yml
