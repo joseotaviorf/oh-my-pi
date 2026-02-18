@@ -42,7 +42,6 @@ workflow:
       raw_primary_keys: ["id", "rev"]
     lead_in_flight:
       raw_primary_keys: ["lead_id"]
-      z_order_by: [lead_id]
     lead_update_operation_history:
       z_order_by: [id]
     revinfo:
