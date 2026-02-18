@@ -2,9 +2,12 @@ dag:
   name: metric_fintech__collections_segmentation
   schedule_start_date: 2025, 12, 1
   owner: Data Fintech
+  documentation:
+    dag_purpose: "This DAG consolidates the main metrics related to the Collections Segmentation context."
 workflow:
   type: query_delta
   layer: metric
+  custom_schema: fintech
 cluster:
   type: custom_cluster
   custom_configurations:
