@@ -1104,7 +1104,7 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
-  - bietlejuice.enrich_sale_offer:load-enrich-sale-offers:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
 bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day

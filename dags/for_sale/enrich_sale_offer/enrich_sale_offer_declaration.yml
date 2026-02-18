@@ -9,8 +9,6 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    sale_offers:
-    - core_sale_offer
     sale_offer:
     - core_sale_offer
 cluster:

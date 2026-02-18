@@ -64,7 +64,7 @@ SELECT
     eso.ts_buyer_fup,
     NOW() AS ts_load
 FROM
-    datalake_sale_offer.sale_offers AS eso    
+    datalake_sale_offer.sale_offer AS eso    
 LEFT JOIN
     datalake_hub_services.daily_secretariat_allocation AS sa_creator
         ON sa_creator.id_secretariat_user = eso.id_user_secretariat_booking_creator

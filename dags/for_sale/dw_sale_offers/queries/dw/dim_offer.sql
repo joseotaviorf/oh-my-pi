@@ -137,7 +137,7 @@ SELECT
     ot.flg_branded AS is_branded, 
     NOW() AS ts_load
 FROM
-	datalake_sale_offer.sale_offers AS eso
+	datalake_sale_offer.sale_offer AS eso
 LEFT JOIN
 	offer_taxonomy AS ot
 		ON eso.id_offer = ot.id_offer

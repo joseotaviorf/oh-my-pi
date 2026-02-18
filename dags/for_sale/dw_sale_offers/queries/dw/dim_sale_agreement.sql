@@ -31,6 +31,6 @@ SELECT
     CAST(eso.ts_sale_agreement_canceled AS TIMESTAMP) AS ts_sale_agreement_cancelled,
     NOW() AS ts_load
 FROM
-    datalake_sale_offer.sale_offers eso
+    datalake_sale_offer.sale_offer eso
 WHERE
     eso.ts_sale_agreement_signed IS NOT NULL

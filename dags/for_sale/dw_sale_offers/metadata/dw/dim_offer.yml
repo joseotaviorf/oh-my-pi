@@ -7,11 +7,11 @@ owner: data-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.id_offer
+    - datalake_sale_offer.sale_offer.id_offer
     description: Hash ID offer from firestore
   offer_status:
     lineage:
-    - datalake_sale_offer.sale_offers.offer_status
+    - datalake_sale_offer.sale_offer.offer_status
     description: Offer status
     categories:
       Chat em branco: ''
@@ -33,11 +33,11 @@ columns:
       Teste Corretor: ''
   drop_reason:
     lineage:
-    - datalake_sale_offer.sale_offers.drop_reason
+    - datalake_sale_offer.sale_offer.drop_reason
     description: Reason why the offer dropped before sale agreement signature
   drop_reason_responsible:
     lineage:
-    - datalake_sale_offer.sale_offers.drop_reason_responsible
+    - datalake_sale_offer.sale_offer.drop_reason_responsible
     description: Responsible by Reason why the offer dropped before sale agreement
       signature
     categories:
@@ -46,7 +46,7 @@ columns:
       Seller: ''
   payment_method:
     lineage:
-    - datalake_sale_offer.sale_offers.current_payment_method
+    - datalake_sale_offer.sale_offer.current_payment_method
     description: Payment method chose to accomplish sale transaction. It can be in
       cash, financed or undecided
     categories:
@@ -56,66 +56,66 @@ columns:
       UNDECIDED: ''
   business_unit:
     lineage:
-    - datalake_sale_offer.sale_offers.business_unit
+    - datalake_sale_offer.sale_offer.business_unit
     description: The business unit that originated the offer.
   offer_flow:
     lineage:
-    - datalake_sale_offer.sale_offers.offer_flow
+    - datalake_sale_offer.sale_offer.offer_flow
     description: Negotiation model that originated the offer (Hub, Deal Making or
       Closing Central).
   credit_model:
     lineage:
-    - datalake_sale_offer.sale_offers.credit_model
+    - datalake_sale_offer.sale_offer.credit_model
     description: Offer credit model
   registry_price:
     lineage:
-    - datalake_sale_offer.sale_offers.registry_price
+    - datalake_sale_offer.sale_offer.registry_price
     description: Cost of the registrations changes and house documentation
   itbi_price:
     lineage:
-    - datalake_sale_offer.sale_offers.itbi_price
+    - datalake_sale_offer.sale_offer.itbi_price
     description: Cost of the tax for sale real estate transactions
   payment_entry_amount:
     lineage:
-    - datalake_sale_offer.sale_offers.payment_entry_amount
+    - datalake_sale_offer.sale_offer.payment_entry_amount
     description: Amount of the sale value that will be applied as a down payment on
       the financing
   sale_price:
     lineage:
-    - datalake_sale_offer.sale_offers.sale_price
+    - datalake_sale_offer.sale_offer.sale_price
     description: Sale price set on listing
   is_3p_supply:
     lineage:
-    - datalake_sale_offer.sale_offers.is_3p_supply
+    - datalake_sale_offer.sale_offer.is_3p_supply
     description: Flag if supply belongs to a 3P partner
   is_3p_demand:
     lineage:
-    - datalake_sale_offer.sale_offers.is_3p_demand
+    - datalake_sale_offer.sale_offer.is_3p_demand
     description: Flag if offer was submitted by a 3P demand agent
   is_a_rescued_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.is_a_rescued_offer
+    - datalake_sale_offer.sale_offer.is_a_rescued_offer
     description: Boolean to identify if this offer is a rescued one (An offer that
       was cancelled and opened again)
   has_used_fgts_in_payment:
     lineage:
-    - datalake_sale_offer.sale_offers.has_used_fgts_in_payment
+    - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
     description: If part of the payment will use some amount from the FGTS fund
   has_used_negotiation_chat:
     lineage:
-    - datalake_sale_offer.sale_offers.has_used_negotiation_chat
+    - datalake_sale_offer.sale_offer.has_used_negotiation_chat
     description: If the offer deal happened through the negotiation chat
   tags_from_salesflow:
     lineage:
-    - datalake_sale_offer.sale_offers.tags_from_salesflow
+    - datalake_sale_offer.sale_offer.tags_from_salesflow
     description: Tags from the sales flow associated with the offer
   ts_offer_submitted:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Datetime of offer submission
   ts_updated:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_updated
+    - datalake_sale_offer.sale_offer.ts_updated
     description: Datetime of offer last update
   app_type:
     lineage:

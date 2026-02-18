@@ -8,67 +8,67 @@ owner: data-for-sale@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.id_offer
+    - datalake_sale_offer.sale_offer.id_offer
     description: ID of offer
   sk_sales_flow:
     lineage:
-    - datalake_sale_offer.sale_offers.id_sales_flow
+    - datalake_sale_offer.sale_offer.id_sales_flow
     description: ID of sales flow
   sk_house:
     lineage:
-    - datalake_sale_offer.sale_offers.id_house
+    - datalake_sale_offer.sale_offer.id_house
     description: ID of house
   sk_buyer:
     lineage:
-    - datalake_sale_offer.sale_offers.id_buyer
+    - datalake_sale_offer.sale_offer.id_buyer
     description: ID user of the buyer
   sk_owner:
     lineage:
-    - datalake_sale_offer.sale_offers.id_owner
+    - datalake_sale_offer.sale_offer.id_owner
     description: ID user of the seller
   sk_business_unit:
     lineage:
-    - datalake_sale_offer.sale_offers.id_business_unit
+    - datalake_sale_offer.sale_offer.id_business_unit
     description: ID of the business unit.
   sk_company_supply:
     lineage:
-    - datalake_sale_offer.sale_offers.id_company_supply
+    - datalake_sale_offer.sale_offer.id_company_supply
     description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
   sk_company_demand:
     lineage:
-    - datalake_sale_offer.sale_offers.id_company_demand
+    - datalake_sale_offer.sale_offer.id_company_demand
     description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company.
   sk_region:
     lineage:
-    - datalake_sale_offer.sale_offers.id_region
+    - datalake_sale_offer.sale_offer.id_region
     description: ID of house region
   sk_booking:
     lineage:
-    - datalake_sale_offer.sale_offers.id_booking
+    - datalake_sale_offer.sale_offer.id_booking
     description: ID of booking that originated the offer
   sk_agent:
     lineage:
-    - datalake_sale_offer.sale_offers.id_agent
+    - datalake_sale_offer.sale_offer.id_agent
     description: ID (not id_user) of agent associated with the offer. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id
   sk_user_agent:
     lineage:
-    - datalake_sale_offer.sale_offers.id_user_agent
+    - datalake_sale_offer.sale_offer.id_user_agent
     description: ID user of agent associated with the offer. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user
   sk_user_team_lead:
     lineage:
-    - datalake_sale_offer.sale_offers.id_user_team_lead
+    - datalake_sale_offer.sale_offer.id_user_team_lead
     description: ID user of team lead associated with the offer. Can be joined with dw_public.dim_user.sk_user
   sk_user_consultant:
     lineage:
-    - datalake_sale_offer.sale_offers.id_user_consultant
+    - datalake_sale_offer.sale_offer.id_user_consultant
     description: ID user of consultant that managed the offer negotiation. Can be joined with dw_public.dim_user.sk_user
   sk_consultant:
     lineage:
-    - datalake_sale_offer.sale_offers.id_consultant
+    - datalake_sale_offer.sale_offer.id_consultant
     description: ID of the consultant that managed the offer negotiation, formed by "ID_VENDAS_" or "ID_MONDAY_" concatenated with the id of their respective platforms.
   sk_closing_specialist:
     lineage:
-    - datalake_sale_offer.sale_offers.id_closing_specialist
+    - datalake_sale_offer.sale_offer.id_closing_specialist
     description: ID user of the closing specialist
   sk_secretariat_booking_creator:
     lineage:
@@ -77,7 +77,7 @@ columns:
       on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
   sk_buyer_prospect_type:
     lineage:
-    - datalake_sale_offer.sale_offers.id_buyer_prospect_type
+    - datalake_sale_offer.sale_offer.id_buyer_prospect_type
     description: Surrogate key of the buyer prospect type. Can be joined with dw_sale.dim_buyer_prospect_type.
   sk_listing_price_segment:
     lineage:
@@ -85,184 +85,184 @@ columns:
     description: Surrogate key of the listing price segment. Can be joined with dw_sale.dim_sale_price_segment.
   sk_offer_submitted_date:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Sk date of offer submission
   sk_offer_accepted_date:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Sk date of offer acceptance
   sk_offer_dismissed_date:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_dismissed
+    - datalake_sale_offer.sale_offer.ts_offer_dismissed
     description: Sk date of offer rejection or offer dismissed
   sk_offer_rescued_date:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_rescued
+    - datalake_sale_offer.sale_offer.ts_offer_rescued
     description: Sk date of offer rescued
   sk_sale_agreement_created_date:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_sale_agreement_created
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_created
     description: Sk date of sale agreement creation
   sk_sale_agreement_signed_date:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Sk date of sale agreement signature
   sk_seller_fup_date:
     lineage:
-      - datalake_sale_offer.sale_offers.ts_seller_fup
+      - datalake_sale_offer.sale_offer.ts_seller_fup
     description: Date when the Closing Analyst sent a message to the Seller.
   sk_buyer_fup_date:
     lineage:
-      - datalake_sale_offer.sale_offers.ts_buyer_fup
+      - datalake_sale_offer.sale_offer.ts_buyer_fup
     description: Date when the Closing Analyst sent a message to the Buyer.
   brokerage_fee:
     lineage:
-      - datalake_sale_offer.sale_offers.brokerage_fee
+      - datalake_sale_offer.sale_offer.brokerage_fee
     description: Percentage of brokerage fee
   sale_price_agreed:
     lineage:
-      - datalake_sale_offer.sale_offers.sale_price_agreed
+      - datalake_sale_offer.sale_offer.sale_price_agreed
     description: Sale price agreed in the sale contract
   has_used_fgts_in_payment:
     lineage:
-      - datalake_sale_offer.sale_offers.has_used_fgts_in_payment
+      - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
     description: Has used (or will use) FGTS in payment
   is_buyer_first_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.is_buyer_first_offer
+    - datalake_sale_offer.sale_offer.is_buyer_first_offer
     description: True if the offer is the first offer of the user's life
   is_house_first_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.is_house_first_offer
+    - datalake_sale_offer.sale_offer.is_house_first_offer
     description: True if the offer is the first offer received by the house
   is_3p_supply:
     lineage:
-    - datalake_sale_offer.sale_offers.is_3p_supply
+    - datalake_sale_offer.sale_offer.is_3p_supply
     description: Boolean flag indicating if the offer has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
   is_3p_demand:
     lineage:
-    - datalake_sale_offer.sale_offers.is_3p_demand
+    - datalake_sale_offer.sale_offer.is_3p_demand
     description: Boolean flag indicating if the offer has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
   is_3p_lead_gen:
     lineage:
-    - datalake_sale_offer.sale_offers.is_3p_lead_gen
+    - datalake_sale_offer.sale_offer.is_3p_lead_gen
     description: Boolean flag indicating if the offer has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
   has_3p_access_control:
     lineage:
-    - datalake_sale_offer.sale_offers.has_3p_access_control
+    - datalake_sale_offer.sale_offer.has_3p_access_control
     description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   has_completed_visit_before_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.flg_visit_completed_before_offer
+    - datalake_sale_offer.sale_offer.flg_visit_completed_before_offer
     description: True if buyer had a visit completed in the house before offer submission
   has_booking_before_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.flg_booking_before_offer
+    - datalake_sale_offer.sale_offer.flg_booking_before_offer
     description: True if buyer had a visit booked in the house before offer submission
   first_price_offered_by_buyer:
     lineage:
-    - datalake_sale_offer.sale_offers.first_price_offered_by_buyer
+    - datalake_sale_offer.sale_offer.first_price_offered_by_buyer
     description: First value offered by buyer
   last_price_offered_by_buyer:
     lineage:
-    - datalake_sale_offer.sale_offers.last_price_offered_by_buyer
+    - datalake_sale_offer.sale_offer.last_price_offered_by_buyer
     description: Last price offered by the buyer
   first_discount_proposed:
     lineage:
-    - datalake_sale_offer.sale_offers.first_discount_proposed
+    - datalake_sale_offer.sale_offer.first_discount_proposed
     description: First percentage of discount negotiated
   last_discount_proposed:
     lineage:
-    - datalake_sale_offer.sale_offers.last_discount_proposed
+    - datalake_sale_offer.sale_offer.last_discount_proposed
     description: Last percentage of discount negotiated
   hours_booking_to_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.hours_booking_to_offer
+    - datalake_sale_offer.sale_offer.hours_booking_to_offer
     description: Hours between the visit booked and the offer submission
   hours_visit_completed_to_offer:
     lineage:
-    - datalake_sale_offer.sale_offers.hours_visit_to_offer
+    - datalake_sale_offer.sale_offer.hours_visit_to_offer
     description: Hours between the visit completion and the offer submission
   days_offer_submitted_to_offer_accepted:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_submitted_to_offer_accepted
+    - datalake_sale_offer.sale_offer.days_offer_submitted_to_offer_accepted
     description: Number of days between the offer submission and the offer acceptance
   days_offer_submitted_to_sale_agreement_created:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_submitted_to_sale_agreement_created
+    - datalake_sale_offer.sale_offer.days_offer_submitted_to_sale_agreement_created
     description: Number of days between the offer submission and the creation of the
       sale agreement
   days_offer_submitted_to_offer_dismissed:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_submitted_to_offer_dismissed
+    - datalake_sale_offer.sale_offer.days_offer_submitted_to_offer_dismissed
     description: Number of days between the offer submission and the offer refusal
   days_offer_submitted_to_sale_agreement_signed:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_submitted_to_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.days_offer_submitted_to_sale_agreement_signed
     description: Number of days between the offer submission and the signature of
       the sale agreement
   days_offer_accepted_to_sale_agreement_created:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_accepted_to_sale_agreement_created
+    - datalake_sale_offer.sale_offer.days_offer_accepted_to_sale_agreement_created
     description: Number of days between the offer acceptance and the creation of the
       sale agreement
   days_offer_accepted_to_sale_agreement_signed:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_accepted_to_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.days_offer_accepted_to_sale_agreement_signed
     description: Number of days between the offer acceptance and the signature of
       the sale agreement
   days_offer_accepted_to_offer_dismissed:
     lineage:
-    - datalake_sale_offer.sale_offers.days_offer_accepted_to_offer_dismissed
+    - datalake_sale_offer.sale_offer.days_offer_accepted_to_offer_dismissed
     description: Number of days between the offer acceptance and the offer refusal
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
-    - datalake_sale_offer.sale_offers.days_sale_agreement_created_to_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.days_sale_agreement_created_to_sale_agreement_signed
     description: Number of days between the creation of the sale agreement and the
       signature of the sale agreement
   ts_offer_submitted:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp of offer submission
   ts_offer_accepted:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Timestamp of offer acceptance
   ts_offer_dismissed:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_dismissed
+    - datalake_sale_offer.sale_offer.ts_offer_dismissed
     description: Timestamp of offer rejection or offer dismissed
   ts_offer_canceled:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_canceled
+    - datalake_sale_offer.sale_offer.ts_offer_canceled
     description: Timestamp of offer cancellation
   ts_offer_rescued:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_offer_rescued
+    - datalake_sale_offer.sale_offer.ts_offer_rescued
     description: Timestamp of offer rescued
   ts_sale_agreement_drafted:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_sale_agreement_drafted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_drafted
     description: Timestamp of sale agreement draft creation
   ts_sale_agreement_created:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_sale_agreement_created
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_created
     description: Timestamp of sale agreement creation
   ts_sale_agreement_signed:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Timestamp of sale agreement signature
   ts_sale_agreement_canceled:
     lineage:
-    - datalake_sale_offer.sale_offers.ts_sale_agreement_canceled
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_canceled
     description: Timestamp of sale agreement cancellation
   ts_seller_fup:
     lineage:
-      - datalake_sale_offer.sale_offers.ts_seller_fup
+      - datalake_sale_offer.sale_offer.ts_seller_fup
     description: Timestamp when the Closing Analyst sent a message to the Seller.
   ts_buyer_fup:
     lineage:
-      - datalake_sale_offer.sale_offers.ts_buyer_fup
+      - datalake_sale_offer.sale_offer.ts_buyer_fup
     description: Timestamp when the Closing Analyst sent a message to the Buyer.
   ts_load:
     description: Timestamp of when the table was last loaded
