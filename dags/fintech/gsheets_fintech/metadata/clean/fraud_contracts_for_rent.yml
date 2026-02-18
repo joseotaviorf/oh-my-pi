@@ -1,0 +1,30 @@
+---
+database_name: datalake_gsheets_clean
+table_name: fraud_contracts_for_rent
+domain: Fintech
+description: "Contracts flagged as fraud by the fraud team from For Rent, sourced from Google Sheets."
+columns:
+  id_contract:
+    description: "Contract identifier associated with the proposal."
+    lineage:
+      - datalake_gsheets_raw.fraud_contracts_for_rent.contrato
+  fraud_type:
+    description: "Fraud classification type used for reporting."
+    lineage:
+      - datalake_gsheets_raw.fraud_contracts_for_rent.fraud_type
+  line:
+    description: "Line of the contract that was flagged as fraud."
+    lineage:
+      - datalake_gsheets_raw.fraud_contracts_for_rent.line
+  conclusion_status:
+    description: "Conclusion status of the fraud investigation."
+    lineage:
+      - datalake_gsheets_raw.fraud_contracts_for_rent.conclusion_status
+  source:
+    description: "Source of the fraud investigation."
+    lineage:
+      - datalake_gsheets_raw.fraud_contracts_for_rent.source
+  dt_investigation:
+    description: "Timestamp of the investigation."
+    lineage:
+      - datalake_gsheets_raw.fraud_contracts_for_rent.data_da_investigao

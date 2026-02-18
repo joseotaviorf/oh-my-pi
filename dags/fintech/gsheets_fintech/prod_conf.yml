@@ -127,6 +127,12 @@ sheets_info:
     clean_table_name: fraud_contracts
     sheet_context: fintech
 
+  fraud_contracts_for_rent:
+    sheet_id: 1YlVp7rrWk858IhLInQZXwOCOaSmB0KdHAr-UTYZky4U
+    sheet_name: Contratos fraudados - Credit (Arantxa)
+    clean_table_name: fraud_contracts_for_rent
+    sheet_context: fintech
+
   for_sale_bandaids:
     sheet_id: 1LPSu9lbDddTiHk9EtVKwQKsAVzgzuIwG-nMGcYiP2dA
     sheet_name: forsale
