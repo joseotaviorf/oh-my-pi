@@ -2,18 +2,18 @@
 database_name: datalake_cyber_clean
 table_name: agency
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: This table contains demographic and financial information about the agencies and their contacts.
 columns:
   id_agency:
-    description: "Agency ID"
+    description: "Unique identifier for the agency"
     lineage:
       - datalake_cyber_raw.agency.AGAGENCY
   agency_name:
     description: "Agency Name"
     lineage:
       - datalake_cyber_raw.agency.AGFIRM
-  commercial_name:
+  agency_commercial_name:
     description: "Commercial name of the agency (invented name)"
     lineage:
       - datalake_cyber_raw.agency.AGNICKNAME
@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGDISTTYPE
   address:
-    description: "Address"
+    description: "Street address of the agency location"
     lineage:
       - datalake_cyber_raw.agency.AGADDR1
   neighborhood:
@@ -46,15 +46,15 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGADDR2
   city:
-    description: "City"
+    description: "City where the agency is located"
     lineage:
       - datalake_cyber_raw.agency.AGCITY
   state:
-    description: "State"
+    description: "State where the agency is located"
     lineage:
       - datalake_cyber_raw.agency.AGSTATE
   zip_code:
-    description: "Zip code"
+    description: "Postal zip code of the agency address"
     lineage:
       - datalake_cyber_raw.agency.AGZIP
   address_complement:
@@ -129,3 +129,7 @@ columns:
     description: "Contract termination date"
     lineage:
       - datalake_cyber_raw.agency.AGENDDT
+  ts_load:
+    description: "Timestamp when record was loaded into the clean layer"
+    lineage:
+      - datalake_cyber_raw.agency.ts_load

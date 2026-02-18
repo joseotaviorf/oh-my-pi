@@ -19,6 +19,16 @@ columns:
     description: "Sorted array containing all agency IDs belonging to the group."
     lineage:
       - datalake_cyber_legal_homolog_clean.agency_group.id_agency
+  juridical_agency:
+    description: "Name of the juridical agency (Assessoria Jurídica) within the agency group, selected based on the highest percentage remuneration when multiple juridical agencies exist in the group."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.agency.agency_name
+      - datalake_cyber_legal_homolog_clean.agency_group.agency_group
+  conventional_agency:
+    description: "Name of the conventional agency (Assessoria Convencional) within the agency group, selected based on the highest percentage remuneration when multiple conventional agencies exist in the group."
+    lineage:
+      - datalake_cyber_legal_homolog_clean.agency.agency_name
+      - datalake_cyber_legal_homolog_clean.agency_group.agency_group
   main_agency_name:
     description: "Name of the main agency in the group, or agency name when not grouped."
     lineage:

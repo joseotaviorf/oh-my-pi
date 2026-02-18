@@ -17,6 +17,18 @@ columns:
     description: "Name of the main agency responsible for the contract on the given date."
     lineage:
       - datalake_cyber.contract_agency_distribution.main_agency_name
+  juridical_agency:
+    description: "Name of the juridical agency (Assessoria Jurídica) within the agency group responsible for the contract on the given date."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.juridical_agency
+  conventional_agency:
+    description: "Name of the conventional agency (Assessoria Convencional) within the agency group responsible for the contract on the given date."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.conventional_agency
+  agencies_name_group:
+    description: "Sorted array containing names of all agencies in the group responsible for the contract on the given date."
+    lineage:
+      - datalake_cyber.contract_agency_distribution.agencies_name_group
   dt_reference:
     description: "Date reference for the agency assignment. Generated as a timeline with one row per day from dt_start_interval to dt_end_interval."
     lineage:

@@ -9,6 +9,7 @@ SELECT
         WHEN AGAGCYCD = "AD" THEN "Assessoria Digital"
         WHEN AGAGCYCD IN ("PO", "AP") THEN "Portal"
         WHEN AGAGCYCD = "SE" THEN "Serasa Digital"
+        WHEN AGAGCYCD = "JU" THEN "Assessoria Jurídica"
         ELSE AGAGCYCD
     END AS agency_type,
     AGSUPER AS super_agency,

@@ -4,6 +4,9 @@ expand_interval AS (
         id_contract,
         id_agency,
         main_agency_name,
+        juridical_agency,
+        conventional_agency,
+        agencies_name_group,
         EXPLODE(
             SEQUENCE(
                 dt_start_interval,
@@ -31,6 +34,9 @@ SELECT
   ei.id_contract,
   ei.id_agency,
   ei.main_agency_name,
+  ei.juridical_agency,
+  ei.conventional_agency,
+  ei.agencies_name_group,
   cd.agency AS original_agency_distribution,
   ei.dt_reference
 FROM expand_interval AS ei

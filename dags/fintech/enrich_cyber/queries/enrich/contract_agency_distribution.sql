@@ -62,6 +62,8 @@ SELECT
   ge.id_agency,
   a.id_main_agency,
   a.id_agencies_group,
+  a.juridical_agency,
+  a.conventional_agency,
   a.main_agency_name,
   a.main_agency_type,
   a.agencies_name_group,

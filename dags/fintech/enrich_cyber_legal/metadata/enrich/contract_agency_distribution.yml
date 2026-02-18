@@ -25,6 +25,14 @@ columns:
     description: "Identifier for the agency group."
     lineage:
       - datalake_cyber_legal_homolog.agencies.id_agencies_group
+  juridical_agency:
+    description: "Name of the juridical agency (Assessoria Jurídica) within the agency group."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.juridical_agency
+  conventional_agency:
+    description: "Name of the conventional agency (Assessoria Convencional) within the agency group."
+    lineage:
+      - datalake_cyber_legal_homolog.agencies.conventional_agency
   main_agency_name:
     description: "Name of the main agency."
     lineage:
