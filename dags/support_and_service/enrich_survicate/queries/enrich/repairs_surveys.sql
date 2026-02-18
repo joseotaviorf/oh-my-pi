@@ -23,8 +23,8 @@ zendesk_tickets AS (
     id_survey,
     id_respondent,
     IF(REGEXP_EXTRACT(response_url,'&t_id=([0-9]+)') = '', NULL, REGEXP_EXTRACT(response_url,'&t_id=([0-9]+)')) AS id_ticket,
-    IF(REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{15,18})') = '', NULL, REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{15,18})')) AS id_case,
-    IF(REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{15,18})') = '', NULL, REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{15,18})')) AS id_account,
+    IF(REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{{{15,18}}})') = '', NULL, REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{{{15,18}}})')) AS id_case,
+    IF(REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{{{15,18}}})') = '', NULL, REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{{{15,18}}})')) AS id_account,
     IF(REGEXP_EXTRACT(response_url,'email=([^&]+)') = '', NULL, REGEXP_EXTRACT(response_url,'email=([^&]+)')) AS respondent_email,
     survey_name
   FROM
