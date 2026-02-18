@@ -1,4 +1,3 @@
-%sql
 WITH explode_parse_url AS (
   SELECT
     id_response,
