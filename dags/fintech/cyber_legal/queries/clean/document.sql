@@ -4,7 +4,7 @@ SELECT
      DOACCT AS account,
      DOACCTG AS document_group,
      DODESC AS document_description,
-     DOFILE AS file_blob,
+     base64(DOFILE) AS file_blob,
      DONAFILE AS file_name,
      DOSTATUS AS status,
      DOLSTDT AS dt_last_update,
