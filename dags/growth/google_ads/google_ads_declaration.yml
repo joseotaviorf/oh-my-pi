@@ -63,7 +63,7 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
     - pypi:
-        package: google-ads==27.0.0
+        package: google-ads==29.1.0
     - pypi:
         package: google-auth==2.35
   databricks_conn_id: databricks_new

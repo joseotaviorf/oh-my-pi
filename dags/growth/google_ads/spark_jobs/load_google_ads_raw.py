@@ -63,7 +63,9 @@ def _issue_search_request(args):
         customer_id: a client customer ID str.
         query: a GAQL query str.
     """
-    client, customer_id, query = args
+    credentials, login_customer_id, customer_id, query = args
+    client = GoogleAdsClient.load_from_dict(credentials, version="v23")
+    client.login_customer_id = login_customer_id
     ga_service = client.get_service("GoogleAdsService")
     retry_count = 0
     # Retries until reaches MAX_RETRIES or receives a successfull response
@@ -86,7 +88,23 @@ def _issue_search_request(args):
                 retry_count += 1
                 time.sleep(retry_count * BACKOFF_FACTOR)
             else:
-                return (False, [ex, customer_id])
+                error_details = "\n"
+                for error in ex.failure.errors:
+                    error_details += f'\tError with message "{error.message}".'
+                    if error.location:
+                        for field_path_element in error.location.field_path_elements:
+                            error_details += (
+                                f"\n\t\tOn field: {field_path_element.field_name}"
+                            )
+                return (
+                    False,
+                    {
+                        "request_id": ex.request_id,
+                        "error_code": ex.error.code().name,
+                        "error_details": error_details,
+                        "customer_id": customer_id,
+                    },
+                )
 
 
 if __name__ == "__main__":
@@ -122,7 +140,7 @@ if __name__ == "__main__":
     credentials_str = dbutils.secrets.get(scope="quintoandar", key=APIEnum.GOOGLE_ADS)
     credentials = json.loads(credentials_str)
 
-    googleads_client = GoogleAdsClient.load_from_dict(credentials, version="v19")
+    googleads_client = GoogleAdsClient.load_from_dict(credentials, version="v23")
     googleads_client.login_customer_id = login_customer_id
     customer_ids = _list_customer_ids(
         googleads_client, login_customer_id, customer_filter
@@ -130,14 +148,14 @@ if __name__ == "__main__":
 
     logger.info(f'm=__main__, msg="Starting to run requests"')
 
+    query_str = gaql_query.format(
+        load_start_date=load_start_date, load_end_date=load_end_date
+    )
     args = product(
-        [googleads_client],
+        [credentials],
+        [login_customer_id],
         customer_ids,
-        [
-            gaql_query.format(
-                load_start_date=load_start_date, load_end_date=load_end_date
-            )
-        ],
+        [query_str],
     )
 
     logger.info(f'm=__main__, msg="Collecting requests"')
@@ -159,19 +177,10 @@ if __name__ == "__main__":
 
     if len(failures):
         for failure in failures:
-            exc, cid = failure
-            error_details = "\n"
-            for error in exc.failure.errors:
-                error_details += f'\tError with message "{error.message}".'
-                if error.location:
-                    for field_path_element in error.location.field_path_elements:
-                        error_details += (
-                            f"\n\t\tOn field: {field_path_element.field_name}"
-                        )
             logger.error(
-                f"request_id={exc.request_id}, "
-                f"status={exc.error.code().name}, "
-                f"customer_id={cid}, details={error_details}"
+                f"request_id={failure['request_id']}, "
+                f"status={failure['error_code']}, "
+                f"customer_id={failure['customer_id']}, details={failure['error_details']}"
             )
         raise GoogleAdsException
 
@@ -181,10 +190,8 @@ if __name__ == "__main__":
     logger.info(f'm=__main__, msg="Dataframe created with successfull results"')
 
     if not df.rdd.isEmpty():
-        if report_type == 'geo_target_constant':
-            df = (
-                df.withColumn("report_type", lit(report_type_mapped))
-            )
+        if report_type == "geo_target_constant":
+            df = df.withColumn("report_type", lit(report_type_mapped))
             raw_partition_cols = None
         else:
             df = (
@@ -217,14 +224,14 @@ if __name__ == "__main__":
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
         spark_metastore_loader.update_metastore(
-             df=df,
-             database_name=database_name,
-             table_name=report_type,
-             format_options=SparkTableStorageFormat.DEFAULT_RAW,
-             database_location=database_location,
-             partitions=raw_partition_cols,
-             force_recreate=False,
-         )
+            df=df,
+            database_name=database_name,
+            table_name=report_type,
+            format_options=SparkTableStorageFormat.DEFAULT_RAW,
+            database_location=database_location,
+            partitions=raw_partition_cols,
+            force_recreate=False,
+        )
 
         if raw_partition_cols is not None:
             spark_metastore_service.create_new_partitions_from_df(

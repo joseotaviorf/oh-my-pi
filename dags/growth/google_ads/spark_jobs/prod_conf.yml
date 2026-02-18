@@ -27,9 +27,7 @@ GAQL:
         ad_group_ad.ad.legacy_responsive_display_ad.description,
         ad_group_ad.ad.expanded_text_ad.description,
         ad_group_ad.ad.text_ad.description1,
-        ad_group_ad.ad.call_ad.description1,
         ad_group_ad.ad.text_ad.description2,
-        ad_group_ad.ad.call_ad.description2,
         segments.device,
         ad_group_ad.ad.display_url,
         ad_group_ad.ad.id,
@@ -214,15 +212,7 @@ schema:
           description: STRING
         >,
         textAd STRUCT<
-          description1: STRING
-        >,
-        callAd STRUCT<
-          description1: STRING
-        >,
-        textAd STRUCT<
-          description2: STRING
-        >,
-        callAd STRUCT<
+          description1: STRING,
           description2: STRING
         >,
         displayUrl: STRING,
