@@ -6,6 +6,7 @@ SELECT
     sdr_type,
     negotiation_type,
     lead_types,
+    operational_context,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

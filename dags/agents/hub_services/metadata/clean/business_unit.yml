@@ -36,6 +36,10 @@ columns:
     lineage:
       - datalake_hub_services_raw.business_unit.lead_types
     description: Types of leads the hub serves.
+  operational_context:
+    lineage:
+      - datalake_hub_services_raw.business_unit.operational_context
+    description: Operational context in which the hub operates.
   ts_created:
     lineage:
       - datalake_hub_services_raw.business_unit.created_at

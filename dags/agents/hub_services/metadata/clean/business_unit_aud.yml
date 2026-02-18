@@ -52,6 +52,10 @@ columns:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.lead_types
     description: Types of leads the hub serves.
+  operational_context:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.operational_context
+    description: Operational context in which the hub operates.
   mod_hub_name:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.name_mod
@@ -72,6 +76,10 @@ columns:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.lead_type_mod
     description: Boolean that tells us if the lead_type record has been modified
+  mod_operational_context:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.operational_context_mod
+    description: Boolean that tells us if the operational_context record has been modified
   ts_created:
     lineage:
       - datalake_hub_services_raw.business_unit_aud.created_at
