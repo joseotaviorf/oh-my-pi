@@ -21,6 +21,14 @@ columns:
     lineage:
       - datalake_survicate.survey_responses.response_url
     description: Zendesk ticket unique identifier
+  id_case:
+    lineage:
+      - datalake_survicate.survey_responses.response_url
+    description: Salesforce case unique identifier
+  id_account:
+    lineage:
+      - datalake_survicate.survey_responses.response_url
+    description: Salesforce account unique identifier
   respondent_email:
     lineage:
       - datalake_survicate.survey_responses.response_url
