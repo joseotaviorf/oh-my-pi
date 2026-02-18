@@ -876,6 +876,9 @@ workflow:
     370096_properties_entry_model_drawer_update_error_events:
       run_optimize: false
       run_vacuum: false
+    370096_property_publish_success:
+      run_optimize: false
+      run_vacuum: false
     183047_mra_description_viewed_events:
       run_optimize: false
       run_vacuum: false
