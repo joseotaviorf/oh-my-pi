@@ -1,5 +1,5 @@
 WITH opt_out AS (
-    SELECT 
+    SELECT
         lbc_aud.id_house,
         MAX(CASE WHEN business_context = 'RENT' THEN from_unixtime(ure.ts_revision / 1000) END) AS ts_opt_out_rent,
         MAX(CASE WHEN business_context = 'SALE' THEN from_unixtime(ure.ts_revision / 1000) END) AS ts_opt_out_sale
@@ -22,17 +22,17 @@ status_changes AS (
         lbc_aud.business_context,
         LAG(lbc_aud.status) OVER (PARTITION BY lbc_aud.id_house, lbc_aud.business_context ORDER BY lbc_aud.rev) AS previous_status,
         FROM_UNIXTIME(ure.ts_revision / 1000)::TIMESTAMP AS ts_status_started
-    FROM 
+    FROM
         datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
     JOIN
         datalake_ebdb_clean.user_revision_entity AS ure
             ON ure.id = lbc_aud.rev
-    QUALIFY -- (status_MOD = 1 may not work sometimes)    
+    QUALIFY -- (status_MOD = 1 may not work sometimes)
         status IS DISTINCT FROM previous_status
         AND ts_status_started < current_timestamp() -- Filter out incorrect revisions
 ),
 publication AS (
-    SELECT 
+    SELECT
         id_house,
         business_context,
         MIN(ts_status_started) AS ts_first_publication,
@@ -44,36 +44,73 @@ publication AS (
     GROUP BY
         1, 2
 ),
-revision AS (
-    SELECT 
+consolidated_auditor AS (
+    SELECT
         lbc_aud.id_house,
-        MIN(CASE WHEN business_context = 'RENT' THEN lbc_aud.rev END) AS first_rev_rent,
-        MIN(CASE WHEN business_context = 'SALE' THEN lbc_aud.rev END) AS first_rev_sale
+        lbc_aud.business_context,
+        MIN_BY(ure.id_user, lbc_aud.rev) AS user_listing_registrant
     FROM
         datalake_ebdb_clean.listing_business_context_aud AS lbc_aud
+    JOIN
+        datalake_ebdb_clean.user_revision_entity AS ure
+            ON ure.id = lbc_aud.rev
     GROUP BY
-        1
+        1, 2
+),
+-- Temporary adjustment due to a bug reported in the product
+get_first_pub_event AS (
+    SELECT
+        id_house,
+        id_user,
+        business_context
+    FROM
+        datalake_amplitude_clean.370096_property_publish_success_events
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY ts_event ASC) = 1
 ),
 registrant AS (
-    SELECT 
-        lbc.id_house,
-        ure_rent.id_user AS user_listing_registrant_rent,
-        ure_sale.id_user AS user_listing_registrant_sale
+    SELECT
+    lbc.id_house,
+    MAX(
+        CASE
+            WHEN lbc.business_context = 'RENT'
+            THEN IF(
+                DATE(LEAST(lbc.ts_first_publication, p.ts_first_publication)) >= DATE('2026-02-01')
+                AND aud.user_listing_registrant = 7209527,
+                e.id_user,
+                aud.user_listing_registrant
+            )
+        END
+    ) AS user_listing_registrant_rent,
+    MAX(
+        CASE
+            WHEN lbc.business_context = 'SALE'
+            THEN IF(
+                DATE(LEAST(lbc.ts_first_publication, p.ts_first_publication)) >= DATE('2026-02-01')
+                AND aud.user_listing_registrant = 7209527,
+                e.id_user,
+                aud.user_listing_registrant
+            )
+        END
+    ) AS user_listing_registrant_sale
     FROM
         datalake_ebdb_clean.listing_business_context AS lbc
     LEFT JOIN
-        revision AS rev
-            ON rev.id_house = lbc.id_house
+        consolidated_auditor AS aud
+            ON aud.id_house = lbc.id_house
+            AND aud.business_context = lbc.business_context
     LEFT JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure_rent
-            ON ure_rent.id = rev.first_rev_rent
+        publication AS p
+            ON p.id_house = lbc.id_house
+            AND p.business_context = lbc.business_context
     LEFT JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure_sale
-            ON ure_sale.id = rev.first_rev_sale
+        get_first_pub_event AS e
+            ON e.id_house = lbc.id_house
+            AND e.business_context = lbc.business_context
     GROUP BY
-        1, 2, 3
+        1
 )
-SELECT 
+SELECT
     lbc.id,
     lbc.id_house,
     COALESCE(ch.country_code, 'Undefined') AS country_code,

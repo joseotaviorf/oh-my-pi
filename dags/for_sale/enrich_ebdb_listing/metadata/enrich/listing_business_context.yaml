@@ -64,10 +64,12 @@ columns:
   user_listing_registrant_rent:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+      - datalake_amplitude_clean.370096_property_publish_success_events.id_user
     description: Unique identifier of the user who registered the listing (rent)
   user_listing_registrant_sale:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
+      - datalake_amplitude_clean.370096_property_publish_success_events.id_user
     description: Unique identifier of the user who registered the listing (sale)
   ts_first_listing:
     lineage:
