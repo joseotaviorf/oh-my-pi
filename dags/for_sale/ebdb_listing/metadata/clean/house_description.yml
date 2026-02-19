@@ -1,0 +1,55 @@
+database_name: datalake_ebdb_clean
+table_name: house_description
+owner: bruna.prates@quintoandar.com.br
+domain: For Sale
+description: Stores house descriptions, including long and short descriptions for rent and sale listings.
+  Tracks whether descriptions have been manually overwritten and controls description visibility.
+columns:
+  id:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.id
+    description: Unique identifier for the house description record.
+  id_house:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.house_id
+    description: ID of the house.
+  house_hash:
+    lineage:
+      - datalake_ebdb_raw.HouseDescription.house_hash
+    description: Hash value used to detect changes in house attributes for description regeneration.
+  long_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.long_description
+    description: Full detailed description of the house.
+  short_rent_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.short_rent_description
+    description: Short description used for rental listings.
+  short_sale_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.short_sale_description
+    description: Short description used for sale listings.
+  version_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.version_description
+    description: Version number for tracking description changes.
+  is_overwritten_short_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.overwritten_short_description
+    description: Flag indicating if the short description was manually overwritten (true) or auto-generated (false).
+  is_overwritten_long_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.overwritten_long_description
+    description: Flag indicating if the long description was manually overwritten (true) or auto-generated (false).
+  is_show_description:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.show_description
+    description: Flag indicating if the description should be displayed on the listing (true) or hidden (false).
+  ts_created:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.criadoEm
+    description: Timestamp when the record was created.
+  ts_updated:
+    lineage:
+    - datalake_ebdb_raw.HouseDescription.atualizadoEm
+    description: Timestamp when the record was last updated.

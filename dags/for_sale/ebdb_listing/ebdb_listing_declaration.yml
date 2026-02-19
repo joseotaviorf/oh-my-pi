@@ -21,6 +21,8 @@ workflow:
       clean_table_name: dynamic_pricing_parameters
     DynamicPricingParameters_AUD:
       clean_table_name: dynamic_pricing_parameters_aud
+    HouseDescription:
+      clean_table_name: house_description
     HouseEventLog:
       clean_table_name: house_event_log
     HouseListingStatusLog:
