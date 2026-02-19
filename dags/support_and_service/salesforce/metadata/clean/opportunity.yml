@@ -1,0 +1,243 @@
+database_name: datalake_salesforce_clean
+table_name: opportunity
+description: Clean table for ingesting opportunity data from the Sales Force tool.
+domain: Support and Services
+owner: thiago.bueno@quintoandar.com.br
+columns:
+  id_opportunity:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Id
+    description: Unique identification key for opportunity in Sales Force.
+  id_account:
+    lineage:
+      - datalake_salesforce_raw.opportunity.AccountId
+    description: Account identification key associated with the opportunity.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.opportunity.CreatedById
+    description: Identification key of the user who created the record.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.opportunity.LastModifiedById
+    description: Identification key of the user who last updated the record.
+  id_owner:
+    lineage:
+      - datalake_salesforce_raw.opportunity.OwnerId
+    description: Opportunity Owner Identification Key in Salesforce.
+  id_record_type:
+    lineage:
+      - datalake_salesforce_raw.opportunity.RecordTypeId
+    description: Record type identifier for the opportunity.
+  id_partner_account:
+    lineage:
+      - datalake_salesforce_raw.opportunity.PartnerAccountId
+    description: Partner account identification key.
+  id_pricebook:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Pricebook2Id
+    description: Pricebook identification key associated with the opportunity.
+  id_campaign:
+    lineage:
+      - datalake_salesforce_raw.opportunity.CampaignId
+    description: Campaign identification key associated with the opportunity.
+  id_synced_quote:
+    lineage:
+      - datalake_salesforce_raw.opportunity.SyncedQuoteId
+    description: Synced quote identification key.
+  id_contract:
+    lineage:
+      - datalake_salesforce_raw.opportunity.ContractId
+    description: Contract identification key associated with the opportunity.
+  id_agent:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Agent__c
+    description: Agent identification key responsible for the opportunity.
+  id_offer:
+    lineage:
+      - datalake_salesforce_raw.opportunity.OfferId__c
+    description: Offer identification key associated with the opportunity.
+  id_seller:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Seller__c
+    description: Seller identification key associated with the opportunity.
+  id_fs_chosen_mortgage_application:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_ChosenMortgageApplication__c
+    description: For Sale chosen mortgage application identification key.
+  fs_mortgage_intention_uuid:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_mortgageIntentionUuid__c
+    description: For Sale mortgage intention UUID identifier.
+  opportunity_name:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Name
+    description: Name of the opportunity.
+  opportunity_type:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Type
+    description: Type of the opportunity.
+  stage_name:
+    lineage:
+      - datalake_salesforce_raw.opportunity.StageName
+    description: Current stage of the opportunity in the sales pipeline.
+  lead_source:
+    lineage:
+      - datalake_salesforce_raw.opportunity.LeadSource
+    description: Source from which the lead was generated.
+  forecast_category_name:
+    lineage:
+      - datalake_salesforce_raw.opportunity.ForecastCategoryName
+    description: Forecast category classification for the opportunity.
+  fs_bank_chosen:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_BankChosen__c
+    description: For Sale bank chosen for financing.
+  fs_payment_method:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_paymentMethod__c
+    description: For Sale payment method selected.
+  next_step:
+    lineage:
+      - datalake_salesforce_raw.opportunity.NextStep
+    description: Next step to be taken in the opportunity.
+  fs_account_name:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_AccountName__c
+    description: For Sale account name.
+  fs_seller_name:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_SellerName__c
+    description: For Sale seller name.
+  fs_credit_form_link:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_CreditFormLink__c
+    description: For Sale credit form link URL.
+  isolve_link:
+    lineage:
+      - datalake_salesforce_raw.opportunity.iSolveLink__c
+    description: iSolve system link URL.
+  loss_reason:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Loss_Reason__c
+    description: Reason for losing the opportunity.
+  fs_source_event:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_SourceEvent__c
+    description: For Sale source event identifier.
+  fs_credit_proposal:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_CreditProposal__c
+    description: For Sale credit proposal details.
+  fs_client_response:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_ClientResponse__c
+    description: For Sale client response information.
+  fs_agent_email:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_AgentEmail__c
+    description: For Sale agent email address.
+  fs_seller_email:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_SellerEmail__c
+    description: For Sale seller email address.
+  fs_account_person_email:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_AccountPersonEmail__c
+    description: For Sale account person email address.
+  fs_account_phone:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_AccountPhone__c
+    description: For Sale account phone number.
+  fs_seller_phone:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_SellerPhone__c
+    description: For Sale seller phone number.
+  description:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Description
+    description: Description of the opportunity.
+  amount:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Amount
+    description: Amount value of the opportunity.
+  expected_revenue:
+    lineage:
+      - datalake_salesforce_raw.opportunity.ExpectedRevenue
+    description: Expected revenue from the opportunity.
+  probability:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Probability
+    description: Probability percentage of winning the opportunity.
+  fs_down_payment_amount:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_downPaymentAmount__c
+    description: For Sale down payment amount value.
+  is_budget_confirmed:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Budget_Confirmed__c
+    description: Indicates if the budget has been confirmed.
+  is_fs_proceed_with_quintoandar:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_ProceedWithQuintoAndar__c
+    description: For Sale flag indicating if proceeding with QuintoAndar.
+  is_discovery_completed:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Discovery_Completed__c
+    description: Indicates if discovery phase has been completed.
+  is_fs_credit_form_filled:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_isCreditFormFilled__c
+    description: For Sale flag indicating if credit form has been filled.
+  is_processo_ativo:
+    lineage:
+      - datalake_salesforce_raw.opportunity.Processo_Ativo__c
+    description: Indicates if process is active.
+  is_roi_analysis_completed:
+    lineage:
+      - datalake_salesforce_raw.opportunity.ROI_Analysis_Completed__c
+    description: Indicates if ROI analysis has been completed.
+  is_fs_can_use_fgts:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_CanUseFGTS__c
+    description: For Sale flag indicating if FGTS can be used.
+  is_fs_will_use_savings:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_WillUseSavings__c
+    description: For Sale flag indicating if savings will be used.
+  is_fs_has_updated_amounts:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_HasUpdatedAmounts__c
+    description: For Sale flag indicating if amounts have been updated.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.opportunity.LastModifiedDate
+    description: Timestamp of the last modification.
+  ts_fs_ccv_signed:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_CCVSigned__c
+    description: For Sale timestamp when CCV was signed.
+  ts_fs_ccv_termination_created_at:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_CCVTerminationCreatedAt__c
+    description: For Sale timestamp when CCV termination was created.
+  ts_fs_accepted_at:
+    lineage:
+      - datalake_salesforce_raw.opportunity.FS_AcceptedAt__c
+    description: For Sale timestamp when opportunity was accepted.
+  dt_close:
+    lineage:
+      - datalake_salesforce_raw.opportunity.CloseDate
+    description: Date when the opportunity was closed.
+  year:
+    lineage:
+      - datalake_salesforce_raw.opportunity.year
+    description: Year of the case history record partition.
+  month:
+    lineage:
+      - datalake_salesforce_raw.opportunity.month
+    description: Month of the case history record partition.
+  day:
+    lineage:
+      - datalake_salesforce_raw.opportunity.day
+    description: Day of the case history record partition.
+
