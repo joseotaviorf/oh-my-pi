@@ -3,6 +3,7 @@ import logging
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.enums.task_enum import TaskEnum
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
@@ -190,6 +191,10 @@ class WonkaWorkflow(BaseWorkflow):
                 >> load_cdf_to_datazord_task
                 >> dummy_terminate_job_cluster_task
             )
+
+        DatasetAdder.attach_reprocessing_guard(
+            execute_job_cluster_task, self.dag_execution_context
+        )
 
         task_list = ", ".join(created_tasks_ids)
         logger.info(
