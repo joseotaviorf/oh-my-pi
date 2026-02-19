@@ -5,6 +5,8 @@ WITH survicate_surveys_base AS
         iss.id_survey,
         iss.id_contract,
         NULL AS id_ticket,
+        NULL AS id_case,
+        NULL AS id_account,
         iss.id_inspection AS id_origin,
         iss.id_respondent,
         NULL AS respondent_email,
@@ -35,6 +37,8 @@ WITH survicate_surveys_base AS
         rss.id_survey,
         NULL AS id_contract,
         rss.id_ticket,
+        rss.id_case,
+        rss.id_account,
         NULL AS id_origin,
         rss.id_respondent,
         rss.respondent_email,
@@ -65,6 +69,8 @@ WITH survicate_surveys_base AS
         lss.id_survey,
         NULL AS id_contract,
         NULL AS id_ticket,
+        NULL AS id_case,
+        NULL AS id_account,
         NULL AS id_origin,
         NULL AS id_respondent,
         NULL AS respondent_email,
@@ -95,6 +101,8 @@ WITH survicate_surveys_base AS
         sss.id_survey,
         sss.id_contract,
         NULL AS id_ticket,
+        NULL AS id_case,
+        NULL AS id_account,
         NULL AS id_origin,
         NULL AS id_respondent,
         NULL AS respondent_email,
@@ -125,6 +133,8 @@ WITH survicate_surveys_base AS
         kss.id_survey,
         kss.id_contract,
         kss.id_ticket,
+        NULL AS id_case,
+        NULL AS id_account,
         NULL AS id_origin,
         NULL AS id_respondent,
         kss.email AS respondent_email,
@@ -156,6 +166,8 @@ WITH survicate_surveys_base AS
         pss.id_survey,
         NULL AS id_contract,
         NULL AS id_ticket,
+        NULL AS id_case,
+        NULL AS id_account,
         NULL AS id_origin,
         pss.id_owner AS id_respondent,
         NULL AS respondent_email,
@@ -185,6 +197,8 @@ zendesk_email_cte AS (
         zes.id_survey,
         NULL AS id_contract,
         zes.id_ticket,
+        NULL AS id_case,
+        NULL AS id_account,
         NULL AS id_origin,
         zes.id_visitor AS id_respondent,
         NULL AS respondent_email,
@@ -213,16 +227,69 @@ zendesk_email_cte AS (
     QUALIFY
       ROW_NUMBER() OVER (PARTITION BY zes.response_uuid ORDER BY zes.ts_first_response DESC) = 1
 ),
+salesforce_cte AS (
+  SELECT
+        ss.response_uuid AS id_answer,
+        ss.id_survey,
+        NULL AS id_contract,
+        NULL AS id_ticket,
+        ss.id_case,
+        ss.id_account,
+        NULL AS id_origin,
+        ss.id_respondent,
+        NULL AS respondent_email,
+        NULL AS respondent_type,
+        ss.survey_name,
+        NULL AS service_type,
+        NULL AS service_context,
+        NULL AS source_name,
+        NULL AS improvement_tags,
+        ss.user_comment AS respondent_comments,
+        ss.csat_score AS satisfaction_score,
+        NULL AS score_description,
+        NULL AS secondary_satisfaction_score,
+        NULL AS secondary_score_description,
+        ss.ts_first_response AS ts_submitted,
+        ss.year,
+        ss.month,
+        ss.day
+    FROM 
+        datalake_survicate.salesforce_surveys AS ss
+    WHERE 
+        MAKE_DATE(ss.year, ss.month, ss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND ss.response_uuid NOT IN (
+            SELECT id_answer FROM survicate_surveys_base
+        )
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY ss.response_uuid ORDER BY ss.ts_first_response DESC) = 1
+),
 survicate_surveys AS (
-    SELECT * FROM survicate_surveys_base
+    SELECT 
+        * 
+    FROM 
+        survicate_surveys_base
+
     UNION ALL
-    SELECT * FROM zendesk_email_cte
+
+    SELECT 
+        * 
+    FROM 
+        zendesk_email_cte
+
+    UNION ALL
+
+    SELECT 
+        * 
+    FROM 
+        salesforce_cte
 )
 SELECT
     MD5(CONCAT(ss.id_answer, ss.year, ss.month, ss.day)) AS id_answer,
     ss.id_survey,
     ss.id_contract,
     ss.id_ticket,
+    ss.id_case,
+    ss.id_account,
     ss.id_origin,
     ss.id_respondent,
     ss.respondent_email,

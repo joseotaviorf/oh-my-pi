@@ -37,6 +37,14 @@ columns:
       - datalake_satisfaction_rating.bigfone_surveys.id_ticket
       - datalake_satisfaction_rating.survicate_surveys.id_ticket
       - datalake_satisfaction_rating.chat_fup_surveys.id_ticket
+  id_case:
+    description: Salesforce case unique identifier.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.id_case
+  id_account:
+    description: Salesforce account unique identifier.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.id_account
   id_origin:
     lineage:
       - datalake_satisfaction_rating.survicate_surveys.id_origin

@@ -54,6 +54,16 @@ columns:
     lineage:
       - datalake_survicate.repairs_surveys.id_ticket
       - datalake_survicate.keys_surveys.id_ticket
+  id_case:
+    description: Salesforce case unique identifier.
+    lineage:
+      - datalake_survicate.salesforce_surveys.id_case
+      - datalake_survicate.repairs_surveys.id_case
+  id_account:
+    description: Salesforce account unique identifier.
+    lineage:
+      - datalake_survicate.salesforce_surveys.id_account
+      - datalake_survicate.repairs_surveys.id_account
   id_origin:
     lineage:
       - datalake_survicate.inspections_surveys.id_inspection
