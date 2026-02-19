@@ -21,6 +21,14 @@ columns:
     description: If the satisfaction form was requested after a service, this, in general, will be linked to a service identifier in Zendesk.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_ticket
+  sk_case:
+    description: Salesforce case unique identifier for the satisfaction response.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_case
+  sk_account:
+    description: Salesforce account unique identifier for the satisfaction response.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_account
   sk_origin:
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_origin
