@@ -1,0 +1,83 @@
+database_name: datalake_search
+table_name: concierge_messages
+owner: yiyi.ji@quintoandar.com
+domain: Conversational XP
+description: Table containing information about the outbound notifications sent by concierge and received by users and messages sent by users to concierge in various inbound forms (e.g. Placas, TTC, Click2WPP, etc.). Concierge is identified as Julia in WhatsApp.
+columns:
+  id_user:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.id_user
+    - datalake_copilot_service_clean.session.id_user
+    - datalake_person_clean.credential_reference.id_user
+    description: The id of the user who has interacted with the concierge. We retrieve this id from user_notifications (outbound messages) or from copliot tables (inbound messages), when the user wasn't registered in the moment of the conversation, we retrieve the id_user from "credential_reference" table joining with phone number. This field can be null when the user is not registered or their phone number is not associated to any quinto andar account.
+  id_copilot_session:
+    lineage:
+    - datalake_copilot_service_clean.message.id_session
+    description: The id of the conversation session in the copilot tables.
+  id_langfuse_session:
+    lineage:
+    - datalake_copilot_service_clean.session.id_external
+    description: The id of the conversation session in the langfuse tables.
+  user_phone:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.destination
+    - datalake_sauron_clean.session.user_phone
+    description: The phone number of the user who has interacted with the concierge. This field don't have null values and should be used to count for volume of concierge users.
+  id_phone_session:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.destination
+    - datalake_sauron_clean.session.user_phone
+    - datalake_copilot_service_clean.message.id_session
+    description: Concatenation of the user phone number and the conversation session. This allows to identify a unique conversation session per user.
+  concierge_flow:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+      - datalake_copilot_service_clean.message.content
+    description: Identifies whether the conversation is inbound or outbound.
+  concierge_flow_type:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+      - datalake_copilot_service_clean.message.content
+    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc.   In one session a user can have more than one type of inbound flow (e.g. placas and chaves na mão, id_session = 27884962)
+  has_human_reply:  
+    lineage:
+      - datalake_copilot_service_clean.message.role
+    description: Whether in the conversation there was a message sent by a human. Applies to outbound messages. For inbound it always starts with a message from a Human.
+  ts_concierge_contact:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.ts_sent
+    - datalake_copilot_service_clean.session.ts_created
+    description: The timestamp of the outbound contact or the start of a session in inbound contact.
+  ts_message_sent:
+    lineage:
+    - datalake_copilot_service_clean.message.ts_created
+    description: The timestamp of the message sent.
+  ts_first_outbound_contact:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.ts_sent
+    description: The timestamp of the very first outbound message sent to the user.
+  ts_first_inbound_contact:
+    lineage:
+    - datalake_copilot_service_clean.message.ts_created
+    description: The timestamp of the very first inbound message sent by the user.
+  ts_first_concierge_contact:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.ts_sent
+    - datalake_copilot_service_clean.message.ts_created
+    description: The timestamp of the very first contact with the user (inbound or outbound).
+  year:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.ts_sent
+    - datalake_copilot_service_clean.session.ts_created
+    description: The year of the contact with the user (inbound or outbound). For database partition purposes.
+  month:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.ts_sent
+    - datalake_copilot_service_clean.session.ts_created
+    description: The month of the contact with the user (inbound or outbound). For database partition purposes.
+  day:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.ts_sent
+    - datalake_copilot_service_clean.session.ts_created
+    description: The day of the contact with the user (inbound or outbound). For database partition purposes.
+

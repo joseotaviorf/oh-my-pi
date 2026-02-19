@@ -4754,3 +4754,10 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses:first-run-of-day
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
+bietlejuice.enrich_concierge_health_metrics:
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
+  - bietlejuice.person:load-clean-contact-info:first-run-of-day
+  - bietlejuice.person:load-clean-credential-reference:first-run-of-day
+  - bietlejuice.sauron:load-clean-session:first-run-of-day
