@@ -20,6 +20,6 @@ This pipeline produces the following output table on enrich layer:
 - `concierge_messages`
 - `concierge_direct_vb`
 - `concierge_indirect_vb`
-- `concierge_prospects`
+- `concierge_prospects_aux`
 
 </details>

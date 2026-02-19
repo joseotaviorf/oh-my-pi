@@ -23,7 +23,7 @@ workflow:
       partitions: [year, month, day]
     concierge_indirect_vb:
       partitions: [year, month, day]
-    concierge_prospects:
+    concierge_prospects_aux:
       partitions: [year, month, day]
 
 cluster:
