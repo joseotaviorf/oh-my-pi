@@ -16,11 +16,107 @@ columns:
     description: "id of the offer partner"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.offer_partner_id
-  json_output:
-    description: "output of the transaction in JSON format"
+  id_house:
+    description: "house id from revenue share payload (house-id)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
-  json_output_pd:
+  id_participant:
+    description: "participant id from revenue share payload (participant-id)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  id_business_unit:
+    description: "business unit id from revenue share payload (business-unit-id)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  id_offer_external:
+    description: "external offer id from revenue share payload (offer-external-id)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  tier_name:
+    description: "tier name from revenue share payload (tier-name)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  offer_category:
+    description: "offer category from revenue share payload (offer-category)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  participant_role:
+    description: "participant role from revenue share payload (participant-role)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  business_unit_name:
+    description: "business unit name from revenue share payload (business-unit-name)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  cancellation_reason:
+    description: "cancellation reason from revenue share payload (cancellation-reason)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  brokerage:
+    description: "brokerage amount from revenue share payload (brokerage)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  hub_bonus:
+    description: "hub bonus from revenue share payload (hub-bonus)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  tqc_bonus:
+    description: "tqc bonus from revenue share payload (tqc-bonus)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  sale_price:
+    description: "sale price from revenue share payload (sale-price)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  advance_bonus:
+    description: "advance bonus from revenue share payload (advance-bonus)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  campaign_bonus:
+    description: "campaign bonus from revenue share payload (campaign-bonus)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  gross_remuneration:
+    description: "gross remuneration from revenue share payload (gross-remuneration)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  remuneration_bonus:
+    description: "remuneration bonus from revenue share payload (remuneration-bonus)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  remuneration_baseline:
+    description: "remuneration baseline from revenue share payload (remuneration-baseline)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  participant_paid_fee:
+    description: "participant paid fee from revenue share payload (participant-paid-fee)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  supply_acquisition_share:
+    description: "supply acquisition share from revenue share payload (supply-acquisition-share)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  forbrokers_model_partner_brokerage_fee:
+    description: "forbrokers model partner brokerage fee from revenue share payload (forbrokers-model-partner-brokerage-fee)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  quintoandar_model_partner_brokerage_fee:
+    description: "quintoandar model partner brokerage fee from revenue share payload (quintoandar-model-partner-brokerage-fee)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  cancellation_date:
+    description: "cancellation date from revenue share payload (cancellation-date)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  dt_offer_signature:
+    description: "offer signature date from revenue share payload (offer-signature-date)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  dt_payment_allowed:
+    description: "payment allowed date from revenue share payload (payment-allowed-date)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.output
+  json_output:
     description: "output of the transaction in JSON format"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
