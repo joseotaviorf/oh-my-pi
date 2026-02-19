@@ -132,3 +132,15 @@ columns:
     description: "timestamp of the creation of the transaction"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.created_at
+  op_cdc:
+    description: "CDC operation type (insert, update, delete)"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.op_cdc
+  ts_cdc_transaction:
+    description: "timestamp of the CDC transaction"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.ts_cdc_transaction
+  ts_database_transaction:
+    description: "timestamp of the database transaction"
+    lineage:
+      - datalake_nazare_raw.revenue_share_by_participant.ts_database_transaction

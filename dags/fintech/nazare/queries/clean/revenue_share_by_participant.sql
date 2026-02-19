@@ -36,7 +36,10 @@ WITH parsed AS (
         ) AS json_parsed,
         errors AS json_errors,
         TIMESTAMP(invalidated_at) AS ts_invalidated,
-        TIMESTAMP(created_at) AS ts_created
+        TIMESTAMP(created_at) AS ts_created,
+        op_cdc,
+        ts_cdc_transaction,
+        ts_database_transaction
     FROM
         datalake_nazare_raw.revenue_share_by_participant
 )
@@ -72,6 +75,9 @@ SELECT
     json_output,
     json_errors,
     ts_invalidated,
-    ts_created
+    ts_created,
+    op_cdc,
+    ts_cdc_transaction,
+    ts_database_transaction
 FROM
     parsed
