@@ -16,6 +16,11 @@ workflow:
     "days_past_90": 90
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    concierge_prospects_aux:
+      - concierge_messages
+    concierge_direct_vb:
+      - concierge_messages
   tables_customization:
     concierge_messages:
       partitions: [year, month, day]
