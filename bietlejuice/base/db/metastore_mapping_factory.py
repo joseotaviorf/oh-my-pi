@@ -4,6 +4,7 @@ from bietlejuice.base.db import (
     DwMetastoreMapping,
     ReverseMetastoreMapping,
     MetricMetastoreMapping,
+    QubeMetastoreMapping,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
@@ -26,5 +27,6 @@ class MetastoreMappingFactory:
             LayerEnum.DW_STAGING: DwMetastoreMapping,
             LayerEnum.METRIC: MetricMetastoreMapping,
             LayerEnum.REVERSE: ReverseMetastoreMapping,
+            LayerEnum.QUBE: QubeMetastoreMapping,
             LayerEnum.WONKA: DatalakeMetastoreMapping,
         }[layer](source, bucket)

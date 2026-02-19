@@ -9,6 +9,7 @@ from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.dw_metastore_service import DWMetastoreService
 from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
 from bietlejuice.base.db.metric_metastore_mapping import MetricMetastoreMapping
+from bietlejuice.base.db.qube_metastore_mapping import QubeMetastoreMapping
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 
 # TODO: Refactor project to import directly from bietlejuice.basepaths

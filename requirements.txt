@@ -22,6 +22,7 @@ opentelemetry-exporter-otlp-proto-http>=1.22.0
 ordereddict==1.1
 pendulum
 psycopg2-binary>=2.8.4,<3.0.0
+pydantic>=2.0.0
 py4j==0.10.9.5
 pymongo==3.8.0
 pyparsing==2.4.2

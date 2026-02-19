@@ -12,6 +12,7 @@ class LayerEnum(Enum):
     DW = "dw"
     METRIC = "metric"
     REVERSE = "reverse"
+    QUBE = "qube"
     WONKA = "wonka"
 
     @classmethod
