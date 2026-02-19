@@ -27,4 +27,4 @@ columns:
   dt_investigation:
     description: "Timestamp of the investigation."
     lineage:
-      - datalake_gsheets_raw.fraud_contracts_for_rent.data_da_investigao
+      - datalake_gsheets_raw.fraud_contracts_for_rent.data_da_investigacao
