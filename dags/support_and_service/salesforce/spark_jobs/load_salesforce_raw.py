@@ -984,6 +984,7 @@ def schema_define():
                 'schema':
                     StructType(
                         [
+                        StructField("Id",StringType()),
                         StructField("AccountId",StringType()),
                         StructField("LastModifiedDate",StringType()),									
                         StructField("Amount",StringType()),
