@@ -2692,7 +2692,6 @@ bietlejuice.enrich_inspections:
   - bietlejuice.inspection_services:load-clean-repair-request-media:first-run-of-day
   - bietlejuice.inspection_services:load-clean-review-media:first-run-of-day
   - bietlejuice.inspection_services:load-clean-review:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-reviewer-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-reviewer:first-run-of-day
   - bietlejuice.inspection_services:load-clean-room-type:first-run-of-day
   - bietlejuice.inspection_services_fast_lane:load-clean-assessment:first-run-of-day
