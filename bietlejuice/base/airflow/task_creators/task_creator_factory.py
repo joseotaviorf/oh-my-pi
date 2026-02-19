@@ -59,6 +59,18 @@ from bietlejuice.base.airflow.task_creators.skip_run_task_creator import (
 from bietlejuice.base.airflow.task_creators.sync_metadata_task_creator import (
     SyncMetadataTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.build_qube_dimension_task_creator import (
+    BuildQubeDimensionTaskCreator,
+)
+from bietlejuice.base.airflow.task_creators.build_qube_measure_task_creator import (
+    BuildQubeMeasureTaskCreator,
+)
+from bietlejuice.base.airflow.task_creators.build_qube_metric_task_creator import (
+    BuildQubeMetricTaskCreator,
+)
+from bietlejuice.base.airflow.task_creators.qube_register_delta_table_task_creator import (
+    QubeRegisterDeltaTableTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.create_query_view_task_creator import (
     CreateQueryViewTaskCreator,
 )
@@ -100,6 +112,10 @@ class TaskCreatorFactory:
         TaskEnum.REPROCESSING_GUARD: ReprocessingGuardTaskCreator,
         TaskEnum.SKIP_RUN: SkipRunTaskCreator,
         TaskEnum.SYNC_METADATA: SyncMetadataTaskCreator,
+        TaskEnum.BUILD_QUBE_DIMENSION: BuildQubeDimensionTaskCreator,
+        TaskEnum.BUILD_QUBE_MEASURE: BuildQubeMeasureTaskCreator,
+        TaskEnum.BUILD_QUBE_METRIC: BuildQubeMetricTaskCreator,
+        TaskEnum.QUBE_REGISTER_DELTA_TABLE: QubeRegisterDeltaTableTaskCreator,
         TaskEnum.CREATE_QUERY_VIEW: CreateQueryViewTaskCreator,
         TaskEnum.LOAD_CDF_TO_DATAZORD: LoadCDFtoDatazordTaskCreator,
     }

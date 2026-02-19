@@ -25,4 +25,8 @@ class TaskEnum(Enum):
     SKIP_RUN = "skip_run"
     SYNC_METADATA = "sync_metadata"
     LOAD_CORE_MODEL = "load_core_model"
+    BUILD_QUBE_DIMENSION = "build_qube_dimension"
+    BUILD_QUBE_MEASURE = "build_qube_measure"
+    BUILD_QUBE_METRIC = "build_qube_metric"
+    QUBE_REGISTER_DELTA_TABLE = "qube_register_delta_table"
     CREATE_QUERY_VIEW = "create_query_view"

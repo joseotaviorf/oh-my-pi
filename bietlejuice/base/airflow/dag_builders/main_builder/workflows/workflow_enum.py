@@ -19,6 +19,9 @@ class WorkflowEnum(Enum):
     QUERY_DELTA_WORKFLOW = "query_delta"
     QUERY_WORKFLOW = "query"
     QUERY_VIEW_WORKFLOW = "query_view"
+    QUBE_DIMENSION_WORKFLOW = "qube_dimension"
+    QUBE_MEASURE_WORKFLOW = "qube_measure"
+    QUBE_METRIC_WORKFLOW = "qube_metric"
     WONKA_WORKFLOW = "wonka"
 
     @classmethod

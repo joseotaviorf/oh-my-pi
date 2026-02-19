@@ -135,6 +135,7 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "qube_specs": {"type": "dict", "empty": False},
                 "wonka_config": {
                     "type": "dict",
                     "empty": False,
