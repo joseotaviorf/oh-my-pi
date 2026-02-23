@@ -75,7 +75,7 @@ registrant AS (
         CASE
             WHEN lbc.business_context = 'RENT'
             THEN IF(
-                DATE(LEAST(lbc.ts_first_publication, p.ts_first_publication)) >= DATE('2026-02-01')
+                DATE(LEAST(lbc.ts_first_publication, p.ts_first_publication)) >= DATE('2026-01-01')
                 AND aud.user_listing_registrant = 7209527,
                 e.id_user,
                 aud.user_listing_registrant
@@ -86,7 +86,7 @@ registrant AS (
         CASE
             WHEN lbc.business_context = 'SALE'
             THEN IF(
-                DATE(LEAST(lbc.ts_first_publication, p.ts_first_publication)) >= DATE('2026-02-01')
+                DATE(LEAST(lbc.ts_first_publication, p.ts_first_publication)) >= DATE('2026-01-01')
                 AND aud.user_listing_registrant = 7209527,
                 e.id_user,
                 aud.user_listing_registrant
