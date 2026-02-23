@@ -16,9 +16,6 @@ column_level_validations:
   id_organization:
     is_complete:
       severity_level: Warning
-  id_request:
-    is_complete:
-      severity_level: Warning
   event_type:
     is_complete:
       severity_level: Warning
