@@ -367,6 +367,13 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_person_addr_usages_f:
+      clean_table_name: person_address_usage
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_persons:
       clean_table_name: person
       vacuum_retention_hours: 168

@@ -1,0 +1,69 @@
+database_name: datalake_pin_core_clean
+table_name: person_address_usage
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Stores which address a person uses and the period when it is valid.
+columns:
+  id_person_address_usage:
+    description: Unique identifier of the person address usage record.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.person_addr_usage_id
+  id_person:
+    description: Identifier of the person linked to the address.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.person_id
+  id_business_group:
+    description: Identifier of the business group for tenant separation.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.business_group_id
+  id_address:
+    description: Identifier of the address used by the person.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.address_id
+  address_type:
+    description: Type of address, such as home or work.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.address_type
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.last_updated_by
+  object_version_number:
+    description: Counter that increases on each update to detect conflicts.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.object_version_number
+  dt_effective_started:
+    description: Date when this address usage started to be valid.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.effective_start_date
+  dt_effective_ended:
+    description: Date when this address usage stopped being valid.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.effective_end_date
+  ts_created:
+    description: Timestamp when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.creation_date
+  ts_updated:
+    description: Timestamp when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.last_update_date
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.
+  year:
+    description: Year partition derived from the raw update timestamp.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.year
+  month:
+    description: Month partition derived from the raw update timestamp.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.month
+  day:
+    description: Day partition derived from the raw update timestamp.
+    lineage:
+      - datalake_pin_core_raw.per_person_addr_usages_f.day
