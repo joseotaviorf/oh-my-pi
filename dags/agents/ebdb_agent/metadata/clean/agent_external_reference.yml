@@ -1,0 +1,36 @@
+---
+database_name: datalake_ebdb_clean
+table_name: agent_external_reference
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: |
+  Stores the origin reference for each agent during migration to the unified Agents domain.
+  Agents (brokers) are being migrated into the single Agents table; they were previously spread
+  across multiple sources (e.g. Partner table, DadosAgente, and others). Each row links an agent
+  in the new domain to their source system and identifier (type + value), so migration lineage
+  can be traced.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agentexternalreference.id
+    description: Unique identifier for the external reference record.
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentexternalreference.agent_id
+    description: Agent identifier in the unified Agents table this reference belongs to.
+  type:
+    lineage:
+      - datalake_ebdb_raw.agentexternalreference.type
+    description: Source of the agent before migration (e.g. Partner, DadosAgente, or other origin).
+  value:
+    lineage:
+      - datalake_ebdb_raw.agentexternalreference.value
+    description: Identifier of the agent in the source system (e.g. id in Partner or DadosAgente).
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.agentexternalreference.created_at
+    description: Timestamp when the record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.agentexternalreference.updated_at
+    description: Timestamp when the record was last updated.

@@ -17,6 +17,8 @@ workflow:
       clean_table_name: agent
     AgentEventLog:
       clean_table_name: agent_event_log
+    AgentExternalReference:
+      clean_table_name: agent_external_reference
     AgentLeadReferral:
       clean_table_name: agent_lead_referral
     AgentLeadReferral_AUD:
