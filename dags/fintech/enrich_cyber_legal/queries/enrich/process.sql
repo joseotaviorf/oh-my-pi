@@ -124,5 +124,5 @@ LEFT JOIN
 LEFT JOIN
     datalake_cyber_legal_homolog_clean.values_list vl2
         ON cuda.reason = vl2.value_code
-        AND id_value = 'LSTMOTO'
+        AND vl2.id_value = 'LSTMOTO'
 GROUP BY ALL
