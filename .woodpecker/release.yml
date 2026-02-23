@@ -357,3 +357,25 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
+
+  upload-qube-modules-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: databricks.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: github-repos/bi-etl-ejuice/
+      SOURCE: bietlejuice/qube
+    when:
+      event: push
+      branch: [forno]
+
+  upload-qube-modules-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
+    pull: true
+    environment:
+      BUCKET: databricks.s3.prod.data.quintoandar.com.br
+      S3_PREFIX: github-repos/bi-etl-ejuice/
+      SOURCE: bietlejuice/qube
+    when:
+      event: push
+      branch: [master, hotfix/*]

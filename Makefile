@@ -85,7 +85,7 @@ run-local-environment:
 	@echo "=========="
 	@echo ""
 	@cd ./local/astro; \
-	astro dev start --build-secrets id=GITHUB_TOKEN
+	astro dev start --no-cache --build-secrets id=GITHUB_TOKEN
 	@make import-variables-and-connections
 
 .PHONY: restart-local-environment
@@ -93,7 +93,7 @@ restart-local-environment:
 	@echo "Restart local Airflow environment"
 	@make setup-bietlejuice
 	@cd ./local/astro; \
-	astro dev restart --build-secrets id=GITHUB_TOKEN
+	astro dev restart --no-cache --build-secrets id=GITHUB_TOKEN
 
 .PHONY: stop-local-environment
 stop-local-environment:
