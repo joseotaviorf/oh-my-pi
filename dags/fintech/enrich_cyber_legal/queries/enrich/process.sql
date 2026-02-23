@@ -59,7 +59,7 @@ SELECT
     c.close_comment AS process_end_comment,
     c.case_comment,
     c.case_status,
-    cuda.reason AS input_type,
+    COALESCE(vl2.value_description, cuda.reason) AS input_type,
     cuda.process_subtype AS case_subtype,
     cuda.court_division_name AS court_division,
     cuda.judicial_district_name AS jurisdiction,
@@ -121,4 +121,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_cyber_legal_homolog_clean.agency AS ag2
         ON dq.id_agency = ag2.id_agency
+LEFT JOIN
+    datalake_cyber_legal_homolog_clean.values_list vl2
+        ON cuda.reason = vl2.value_code
+        AND id_value = 'LSTMOTO'
 GROUP BY ALL
