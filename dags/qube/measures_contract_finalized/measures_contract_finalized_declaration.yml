@@ -1,0 +1,27 @@
+dag:
+  name: qube_measure_contract_finalized
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 6 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Builds QUBE measure table for contract.contract_finalized
+  folder_name: measures_contract_finalized
+workflow:
+  type: qube_measure
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "measures"
+  qube_specs:
+    entity: contract
+    name: contract_finalized
+    source:
+      date_expr: unix_timestamp(ts_updated, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    logic:
+      filter_sql: status = 'Finalizado'
+    windows:
+    - 1
+    - 7
+    - 28
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

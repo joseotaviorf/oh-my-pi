@@ -1,0 +1,40 @@
+dag:
+  name: qube_metric_contract_dashboard
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 7 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Builds QUBE metric table for contract.contract_dashboard with automatic
+      dependency resolution
+  folder_name: metrics_contract_dashboard
+workflow:
+  type: qube_metric
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "metrics"
+  qube_specs:
+    entity: contract
+    name: contract_dashboard
+    dimensions:
+    - name: contract_status
+      card: single
+      type: string
+    - name: contract_rental_administrator
+      card: single
+      type: string
+    measures:
+    - name: contract_total
+    - name: contract_active
+    - name: contract_finalized
+    - name: contract_canceled
+    counters:
+      type: long
+    privacy:
+      k_anonymity: 1
+    windows:
+    - 1
+    - 7
+    - 28
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

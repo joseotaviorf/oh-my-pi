@@ -143,7 +143,9 @@ class QubeMetricWorkflow(BaseWorkflow):
             meas_name = meas_spec["name"]
             # Load measure spec from file for dependency tasks
             try:
-                meas_full_spec = load_spec(f"dags/qube/{meas_name}.yaml")
+                meas_full_spec = load_spec(
+                    f"dags/qube/measures_{meas_name}/measures_{meas_name}_declaration.yaml"
+                )
             except FileNotFoundError:
                 meas_full_spec = load_spec(f"qube/specs/measures/{meas_name}.yaml")
 

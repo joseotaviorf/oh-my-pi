@@ -74,7 +74,11 @@ class QubeDimensionWorkflow(BaseWorkflow):
         spec_name = qube_specs.get("name", "")
         if not spec_name:
             # Fallback: try to get from folder_name or dag name
-            spec_name = self.dag_args.get("folder_name", "").replace("dimensions_", "")
+            spec_name = (
+                self.dag_args.get("folder_name", "")
+                .replace("dimensions_", "")
+                .replace("measures_", "")
+            )
 
         return [
             TableAttributes(

@@ -1,0 +1,41 @@
+dag:
+  name: qube_dimension_visit_business_context
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 5 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Builds QUBE dimension table for visit.visit_business_context
+  folder_name: dimensions_visit_business_context
+workflow:
+  type: qube_dimension
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "dimensions"
+  qube_specs:
+    entity: visit
+    name: visit_business_context
+    source:
+      date_expr: unix_timestamp(dt_visit, 'yyyy-MM-dd')
+      select:
+      - id_visit
+      - business_context
+      - dt_visit
+      - ts_created
+      - ts_updated
+    logic:
+      card: single
+      type: string
+      agg: last
+      value_col: business_context
+    order_by:
+      ts_col: dt_visit
+      nulls_last: true
+    extra_cols:
+    - dt_visit
+    - ts_created
+    - ts_updated
+    defaults:
+      unknown_string: UNKNOWN
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

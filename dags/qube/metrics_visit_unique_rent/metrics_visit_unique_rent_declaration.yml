@@ -1,0 +1,38 @@
+dag:
+  name: qube_metric_visit_unique_rent
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0 7 * * *
+  owner: Data Engineering
+  documentation:
+    dag_purpose: Builds QUBE metric table for visit.visit_unique_rent with automatic
+      dependency resolution
+  folder_name: metrics_visit_unique_rent
+workflow:
+  type: qube_metric
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "metrics"
+  qube_specs:
+    entity: visit
+    name: visit_unique_rent
+    dimensions:
+    - name: visit_business_context
+      card: single
+      type: string
+    - name: visit_status
+      card: single
+      type: string
+    measures:
+    - name: unique_visits
+    - name: rent_visits
+    counters:
+      type: long
+    privacy:
+      k_anonymity: 1
+    windows:
+    - 1
+    - 7
+    - 28
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
