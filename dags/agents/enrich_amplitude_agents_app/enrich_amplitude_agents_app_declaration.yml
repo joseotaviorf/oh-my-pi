@@ -14,6 +14,24 @@ workflow:
       - agents_search_events
     buyer_funnel_engagement_daily:
       - agents_search_events
+    buyer_funnel_users:
+      - agents_search_events
+  tables_customization:
+    agents_search_events:
+      z_order_by: [id_amplitude]
+    buyer_funnel_engagement_daily:
+      z_order_by: [id_amplitude, dt_snapshot]      
+    buyer_funnel_users:
+      z_order_by: [id_amplitude, ts_updated]
+      load_spark_job: load_buyer_funnel_users
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{{ data_interval_start | ds }}"
+        - "{{ data_interval_end | ds }}"
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   extra_query_template_params:
