@@ -207,8 +207,8 @@ class TestCoreHouseSparkJob:
         """Test that the core model excludes legacy filtered houses."""
         house_ids = [row["id_house"] for row in core_model_df.collect()]
 
-        # Should have 4 houses (1001, 1002, 1003, 1005) - excluding 1004 (legacy)
-        assert len(house_ids) == 4, f"Expected 4 houses, got {len(house_ids)}"
+        # Should have 5 houses (1001, 1002, 1003, 1005, 1006) - excluding 1004 (legacy)
+        assert len(house_ids) == 5, f"Expected 5 houses, got {len(house_ids)}"
         assert 1004 not in house_ids, "House 1004 should be excluded"
 
     # ==================== Incremental Load Test ====================
@@ -219,16 +219,19 @@ class TestCoreHouseSparkJob:
         """Test that incremental load filters houses by ts_database_transaction (July 2024).
 
         Expected houses based on ts_database_transaction:
-        - House 1001: 2024-07-10 ✓ (within July)
-        - House 1002: 2024-08-15 ✗ (August)
-        - House 1003: 2024-05-20 ✗ (May)
-        - House 1004: 2015-06-01 ✗ (2015 + filtered by legacy rule)
-        - House 1005: 2024-01-15 ✗ (January)
+        - House 1001: 2024-07-10 -> House updated in July
+        - House 1002: 2024-08-15 -> Not included (August)
+        - House 1003: 2024-05-20 -> Not included (May)
+        - House 1004: 2015-06-01 -> Not included (filtered by legacy rule)
+        - House 1005: 2024-01-15 -> Not included (January)
+        - House 1006: 2024-05-15 -> Included because HLR was updated in July
         """
         house_ids = [
             row["id_house"] for row in core_model_incremental_july_df.collect()
         ]
+        house_ids.sort()
 
-        assert house_ids == [
-            1001
-        ], f"Only House 1001 should be included for July 2024, got {house_ids}"
+        assert house_ids == [1001, 1006], (
+            f"Houses 1001 (house updated) and 1006 (HLR updated) "
+            f"should be included for July 2024, got {house_ids}"
+        )

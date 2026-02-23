@@ -148,6 +148,26 @@ def house_df(spark_session):
             datetime(2024, 1, 15, 10, 0),  # ts_updated (NOT NULL)
             datetime(2024, 1, 15, 10, 0),  # ts_database_transaction
         ),
+        # House 1006 - House NOT updated in July, but HLR updated in July
+        (
+            1006,  # id
+            106,  # id_user
+            1,  # id_region
+            "Rua Nova",  # address
+            "200",  # number
+            "Pinheiros",  # neighborhood
+            None,  # complement
+            "05422-000",  # zipcode
+            "São Paulo",  # city
+            90,  # total_area
+            Decimal("-23.5670000"),  # lat
+            Decimal("-46.6900000"),  # lng
+            datetime(2023, 5, 10, 10, 0),  # dt_creation
+            datetime(2024, 5, 15, 10, 0),  # ts_updated (May)
+            datetime(
+                2024, 5, 15, 10, 0
+            ),  # ts_database_transaction (May - outside July)
+        ),
     ]
     return spark_session.createDataFrame(data, schema)
 
@@ -162,6 +182,7 @@ def house_listing_relation_df(spark_session):
             StructField("related_as", StringType(), True),
             StructField("source_type", StringType(), True),
             StructField("ts_updated", TimestampType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
         ]
     )
 
@@ -173,6 +194,7 @@ def house_listing_relation_df(spark_session):
             "PROPERTY_OWNER",  # related_as
             "MAIN_USER",  # source_type
             datetime(2024, 5, 10, 10, 0),  # ts_updated (older)
+            datetime(2024, 5, 10, 10, 0),  # ts_database_transaction
         ),
         (
             1001,  # id_house
@@ -180,6 +202,7 @@ def house_listing_relation_df(spark_session):
             "PROPERTY_OWNER",  # related_as
             "MAIN_USER",  # source_type
             datetime(2024, 7, 10, 14, 0),  # ts_updated (latest)
+            datetime(2024, 7, 10, 14, 0),  # ts_database_transaction
         ),
         # House 1001 - PROPERTY_OWNER but not MAIN_USER (should be ignored)
         (
@@ -188,6 +211,7 @@ def house_listing_relation_df(spark_session):
             "PROPERTY_OWNER",  # related_as
             "SECONDARY_USER",  # source_type (not MAIN_USER)
             datetime(2024, 9, 1, 10, 0),  # ts_updated
+            datetime(2024, 9, 1, 10, 0),  # ts_database_transaction
         ),
         # House 1002 - Single PROPERTY_OWNER relation
         (
@@ -196,6 +220,7 @@ def house_listing_relation_df(spark_session):
             "PROPERTY_OWNER",  # related_as
             "MAIN_USER",  # source_type
             datetime(2024, 8, 15, 10, 0),  # ts_updated
+            datetime(2024, 8, 15, 10, 0),  # ts_database_transaction
         ),
         # House 1002 - Non-PROPERTY_OWNER relation (should be ignored)
         (
@@ -204,6 +229,7 @@ def house_listing_relation_df(spark_session):
             "TENANT",  # related_as (not PROPERTY_OWNER)
             "MAIN_USER",  # source_type
             datetime(2024, 8, 20, 10, 0),  # ts_updated
+            datetime(2024, 8, 20, 10, 0),  # ts_database_transaction
         ),
         # House 1003 has no PROPERTY_OWNER with MAIN_USER (will use fallback to id_user)
         (
@@ -212,6 +238,7 @@ def house_listing_relation_df(spark_session):
             "PROPERTY_OWNER",  # related_as
             "PERSON_REF",  # source_type
             datetime(2024, 8, 23, 10, 0),  # ts_updated
+            datetime(2024, 8, 23, 10, 0),  # ts_database_transaction
         ),
         # House 1005 has no PROPERTY_OWNER with MAIN_USER (will use fallback to id_user)
         (
@@ -220,6 +247,16 @@ def house_listing_relation_df(spark_session):
             "PROPERTY_OWNER",  # related_as
             "MAIN_USER",  # source_type
             datetime(2024, 1, 15, 10, 0),  # ts_updated
+            datetime(2024, 1, 15, 10, 0),  # ts_database_transaction
+        ),
+        # House 1006 - HLR updated in July (House table was not updated in July)
+        (
+            1006,  # id_house
+            206,  # id_related
+            "PROPERTY_OWNER",  # related_as
+            "MAIN_USER",  # source_type
+            datetime(2024, 7, 20, 10, 0),  # ts_updated (July)
+            datetime(2024, 7, 20, 10, 0),  # ts_database_transaction (July)
         ),
     ]
     return spark_session.createDataFrame(data, schema)
@@ -242,10 +279,12 @@ def user_df(spark_session):
         (103, "uuid-person-103"),
         (104, "uuid-person-104"),
         (105, "uuid-person-105"),
+        (106, "uuid-person-106"),
         # Users from house_listing_relation.id_related
         (201, "uuid-person-201"),
-        (202, "uuid-person-202"),  # Latest owner for house 1001
-        (203, "uuid-person-203"),  # Owner for house 1002
+        (202, "uuid-person-202"),
+        (203, "uuid-person-203"),
+        (206, "uuid-person-206"),
     ]
     return spark_session.createDataFrame(data, schema)
 

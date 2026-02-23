@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import (
+    broadcast,
     coalesce,
     col,
     current_timestamp,
@@ -34,15 +35,34 @@ class CoreHouseSparkJob(BaseCoreModelSparkJob):
         }
 
     def _load_house_data(self, spark, config, args):
-        """Load and filter house data."""
+        """Load and filter house data, including houses with updates in HLR."""
         house_df = spark.read.table(config['HOUSE_TABLE'])
 
-        # Apply date filter if provided (for incremental loads)
         if (args.load_start_date is not None and args.load_start_date != "" and
             args.load_end_date is not None and args.load_end_date != ""):
-            house_df = house_df.filter(
-                (col("ts_database_transaction").cast("date") >= lit(args.load_start_date).cast("date")) &
-                (col("ts_database_transaction").cast("date") <= lit(args.load_end_date).cast("date"))
+            start_date = lit(args.load_start_date).cast("date")
+            end_date = lit(args.load_end_date).cast("date")
+
+            # House IDs that were updated in the House table
+            house_updated_ids = house_df.filter(
+                (col("ts_database_transaction").cast("date") >= start_date) &
+                (col("ts_database_transaction").cast("date") <= end_date)
+            ).select(col("id").alias("id_house"))
+
+            # House IDs that were updated in the HLR table
+            hlr_updated_ids = spark.read.table(config['HOUSE_LISTING_RELATION_TABLE']).filter(
+                (col("ts_database_transaction").cast("date") >= start_date) &
+                (col("ts_database_transaction").cast("date") <= end_date)
+            ).select("id_house").distinct()
+
+            # Union of IDs
+            all_house_ids = house_updated_ids.union(hlr_updated_ids).distinct()
+
+            # Returns complete records
+            return house_df.join(
+                broadcast(all_house_ids),  # Spark sends a complete copy to all executors
+                house_df.id == all_house_ids.id_house,
+                "left_semi"
             )
 
         return house_df
