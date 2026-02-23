@@ -1,0 +1,28 @@
+SELECT
+  address_id AS id_address,
+  business_group_id AS id_business_group,
+  created_by,
+  last_updated_by AS updated_by,
+  record_creator,
+  address_line_1 AS street,
+  address_line_2 AS number,
+  address_line_3 AS complement,
+  COALESCE(address_line_4, addl_address_attribute2) AS neighborhood,
+  town_or_city,
+  region_1,
+  region_2 AS state,
+  region_3,
+  country AS country_code,
+  postal_code,
+  addl_address_attribute3 AS street_type,
+  CAST(object_version_number AS INT) AS object_version_number,
+  TO_DATE(effective_start_date) AS dt_effective_started,
+  TO_DATE(effective_end_date) AS dt_effective_ended,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_core_raw.per_addresses_f
