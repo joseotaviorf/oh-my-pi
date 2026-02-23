@@ -70,6 +70,9 @@ workflow:
     recontact:
       extra_spark_job_arguments:
       - cx
+    tickets_contract:
+      extra_spark_job_arguments:
+      - cx
     tickets_transferred:
       extra_spark_job_arguments:
       - cx
