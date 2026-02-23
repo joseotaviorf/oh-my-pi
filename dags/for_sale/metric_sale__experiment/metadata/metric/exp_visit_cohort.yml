@@ -121,13 +121,12 @@ columns:
       link_to_metric: ''
   num_vcf:
     lineage:
-      - dw_visit.dim_visit.is_visit_confirmed_last_schedule
-      - dw_visit.dim_visit.ts_visit_last_confirmed
+      - dw_visit.dim_visit.ts_visit_first_confirmed
       - dw_visit.dim_visit.dt_created
-    description: Binary indicator (1/0) if visit was confirmed in the last schedule within the cohort time window.
+    description: Binary indicator (1/0) if the first confirmation of the visit was within the cohort time window.
     metric:
       name: Visits Confirmed
-      description: Target of visits Confirmed in Last Schedule within the aggregation.
+      description: Target of first confirmation of the visit within the aggregation.
       acronym: VCf
       is_additive: True
       business_stage: Demand
@@ -233,10 +232,10 @@ columns:
   number_identifiers_with_vcf:
     lineage:
       - dw_visit.dim_visit.sk_exp_identifier
-    description: Number of identifiers with visit confirmed in the last schedule within the cohort time window.
+    description: Number of identifiers with first confirmation of the visit within the cohort time window.
     metric:
-      name: Number of Identifiers with Visit Confirmed in Last Schedule
-      description: Target of number of Identifiers with Visit Confirmed in Last Schedule within the aggregation.
+      name: Number of Identifiers with Visit Confirmed
+      description: Target of number of Identifiers with First Confirmation of the Visit within the aggregation.
       acronym: NIwVCf
       is_additive: True
       business_stage: Demand
