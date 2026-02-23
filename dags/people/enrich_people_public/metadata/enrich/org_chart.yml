@@ -132,5 +132,17 @@ columns:
     description: Employee's tenth Product & Technology team assignment (if applicable).
     lineage:
       - datalake_gsheets_people_clean.team_formation_product_tech.team_10
+  is_active:
+    description: Boolean flag indicating if the employee is active.
+    lineage:
+      - datalake_pin.movement_details.assignment_status_type
+  dt_hired:
+    description: Actual start date of the work relationship (hire date).
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_started
+  dt_terminated:
+    description: Actual termination date of the work relationship.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_actual_termination
   ts_load:
     description: Timestamp of when the record was loaded into this table.

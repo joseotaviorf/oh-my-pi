@@ -90,6 +90,9 @@ SELECT
   s.team_8 AS product_and_tech_team_8,
   s.team_9 AS product_and_tech_team_9,
   s.team_10 AS product_and_tech_team_10,
+  IF(a.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
+  e.dt_started AS dt_hired,
+  CASE WHEN e.dt_actual_termination < CURRENT_DATE THEN e.dt_actual_termination ELSE NULL END AS dt_terminated,
   NOW() AS ts_load
 FROM
   datalake_employee_registration.identifier_mapping AS e
