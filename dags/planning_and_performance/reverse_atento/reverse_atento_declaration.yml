@@ -29,6 +29,8 @@ workflow:
     general_metric: {}
     email: {}
     recontact: {}
+    segments_perspective: {}
+    tickets_perspective: {}
     speech_call: {}
     speech_chat: {}
     taxonomy: {}

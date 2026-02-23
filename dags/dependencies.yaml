@@ -1794,7 +1794,13 @@ bietlejuice.enrich_compensation:
 bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
+  - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
+  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
+  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
+  - bietlejuice.langfuse:load-clean-traces:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-credential-reference:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
@@ -4300,10 +4306,12 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-fcr-metric:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-general-metric:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-recontact:first-run-of-day
+  - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-speech-call:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-speech-chat:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-taxonomy:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-contract:first-run-of-day
+  - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-transferred:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tmr:first-run-of-day
   - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-twilio-chat-aht:first-run-of-day

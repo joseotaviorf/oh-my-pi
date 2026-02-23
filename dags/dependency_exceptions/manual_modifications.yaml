@@ -940,6 +940,8 @@ bietlejuice.reverse_atento:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-taxonomy:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-transferred:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-contract:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tmr:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-twilio-chat-aht:first-run-of-day
 bietlejuice.reverse_birdie:
