@@ -706,15 +706,16 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-repair-exempted:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-report-approval:first-run-of-day
-  - bietlejuice.enrich_inspections:load-enrich-report-approvals:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-report-review-media:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-reviewer:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-room:first-run-of-day
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-budget:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation:first-run-of-day
   - bietlejuice.inspection_services:load-clean-reviewer:first-run-of-day
   - bietlejuice.inspection_services_fast_lane:load-clean-assessment:first-run-of-day
+  - bietlejuice.inspection_services_fast_lane:load-clean-inspection:first-run-of-day
   - bietlejuice.inspection_services_fast_lane:load-clean-repair-request:first-run-of-day
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries:first-run-of-day

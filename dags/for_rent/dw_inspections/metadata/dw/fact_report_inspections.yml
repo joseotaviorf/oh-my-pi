@@ -13,23 +13,23 @@ columns:
     description: Inspection unique identifier (number)
   sk_assessment:
     lineage:
-      - datalake_inspections.report_approvals.id_assessment
+      - datalake_inspection_services_clean.assessment.id_assessment
     description: Identification key of the assessment related to the inspection.
   sk_previous_assessment:
     lineage:
-      - datalake_inspections.report_approvals.id_previous_assessment
+      - datalake_inspection_services_clean.assessment.id_previous_assessment
     description: Identification key of the previous assessment.
   total_cost:
     lineage:
-      - datalake_inspections.report_approvals.total_cost
+      - datalake_inspection_services_clean.budget.total_cost
     description: Total cost linked to budget approval.
   owner_amount_payment:
     lineage:
-      - datalake_inspections.report_approvals.owner_amount_payment
+      - datalake_inspection_services_clean.budget.owner_amount_payment
     description: Owner payment amount.
   tenant_amount_payment:
     lineage:
-      - datalake_inspections.report_approvals.tenant_amount_payment
+      - datalake_inspection_services_clean.budget.tenant_amount_payment
     description: Tenant payment amount
   total_tenant_contestation:
     description: Total number of objections made by the tenant.
@@ -61,22 +61,34 @@ columns:
     lineage:
       - datalake_amplitude_inspections.inspection_stages_access.has_tenant_access_budget_approval
     description: Boolean information indicating whether the tenant had access to the budget approval review.
+  has_agreement:
+    lineage:
+      - datalake_inspection_services_clean.inspection.has_agreement
+    description: Boolean information indicating whether the owner and tenant agreed on the repair report.
+  has_early_agreement:
+    lineage:
+      - datalake_inspection_services_clean.budget.is_early_both_agree
+    description: Boolean information indicating whether the owner and tenant agreed to approve the repair report at the first review.
+  has_late_agreement:
+    lineage:
+      - datalake_inspection_services_clean.inspection.has_late_agreement
+    description: Boolean information indicating whether the owner and tenant agreed on the repair report only after the contestation analysis.
   has_owner_approved_review:
+    lineage:
+      - datalake_inspections.reviewer.is_approved
     description: Boolean information indicating whether there was an iteration of the owner in the inspection report review.
   has_tenant_approved_review:
+    lineage:
+      - datalake_inspections.reviewer.is_approved
     description: Boolean information indicating whether there was an iteration of the tenant in the inspection report review.
   has_owner_approved_budget_approval:
     lineage:
-      - datalake_inspections.report_approvals.owner_approved
+      - datalake_inspections.reviewer.is_approved
     description: Boolean information indicating whether there was an iteration of the owner in the budget approval review.
   has_tenant_approved_budget_approval:
     lineage:
-      - datalake_inspections.report_approvals.tenant_approved
+      - datalake_inspections.reviewer.is_approved
     description: Boolean information indicating whether there was an iteration of the tenant in the budget approval review.
-  is_early_both_agree:
-    lineage:
-      - datalake_inspections.report_approvals.is_early_both_agree
-    description: Boolean information indicating whether the owner and tenant agreed to approve the repair report at the first review.
   ts_scheduled:
     lineage:
       - datalake_inspections.inspection_status_change.ts_scheduled
@@ -195,45 +207,45 @@ columns:
     description: Date in timestamp format indicating when the review was completed.
   ts_owner_approved_review:
     lineage:
-      - datalake_inspections.reviewer.ts_owner_approved_review
+      - datalake_inspections.reviewer.ts_approved
     description: Date in timestamp format indicating when the owner approved the review.
   ts_tenant_approved_review:
     lineage:
-      - datalake_inspections.reviewer.ts_tenant_approved_review
+      - datalake_inspections.reviewer.ts_approved
     description: Date in timestamp format indicating when the tenant approved the review.
   ts_owner_approved_budget_approval:
     lineage:
-      - datalake_inspections.report_approvals.ts_owner_approved
+      - datalake_inspections.reviewer.ts_approved
     description: Date in timestamp format indicating when the owner approved the budget approval.
   ts_tenant_approved_budget_approval:
     lineage:
-      - datalake_inspections.report_approvals.ts_tenant_approved
+      - datalake_inspections.reviewer.ts_approved
     description: Date in timestamp format indicating when the tenant approved the budget approval.
   ts_owner_limit_revision:
     lineage:
-      - datalake_inspections.report_approvals.dt_owner_limit_revision
+      - datalake_inspection_services_clean.assessment.dt_owner_limit_revision
     description: Date in timestamp format indicating the deadline for review by the owner.
   ts_tenant_limit_revision:
     lineage:
-      - datalake_inspections.report_approvals.dt_tenant_limit_revision
+      - datalake_inspection_services_clean.assessment.dt_tenant_limit_revision
     description: Date in timestamp format indicating the deadline for review by the tenant.
   ts_owner_limit_revision_budget_approval:
     lineage:
-      - datalake_inspections.report_approvals.dt_owner_limit_revision
+      - datalake_inspection_services_clean.budget.dt_owner_dead_line
     description: Date in timestamp format indicating the deadline for budget approval review by the owner.
   ts_tenant_limit_revision_budget_approval:
     lineage:
-      - datalake_inspections.report_approvals.dt_tenant_limit_revision
+      - datalake_inspection_services_clean.budget.dt_tenant_dead_line
     description: Date in timestamp format indicating the deadline for budget approval review by the tenant.
   ts_load:
     description: Date and time when the data was loaded.
   year:
     lineage:
-      - datalake_amplitude_inspections.inspection_stages_access.day
+      - datalake_amplitude_inspections.inspection_stages_access.year
     description: Year of update date
   month:
     lineage:
-      - datalake_amplitude_inspections.inspection_stages_access.day
+      - datalake_amplitude_inspections.inspection_stages_access.month
     description: Month of update date
   day:
     lineage:
