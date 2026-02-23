@@ -38,25 +38,85 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.sex
   highest_education_level:
-    description: Highest level of education attained by the person, specific to the legal code.
+    description: Highest education level code.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.highest_education_level
-  nationality:
-    description: Nationality of the person based on the DDF category.
+  highest_education_level_description:
+    description: Highest education level description.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute16
+  citizenship_context:
+    description: "Citizenship context label. Values observed: 'Brasileira', 'Estrangeira', NULL."
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute_category
-  electoral_zone:
-    description: Electoral zone identifier for the person.
+  nationality:
+    description: Nationality reported in DFF. In Brazilian contexts, attribute1 may represent polling station.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute1
   polling_station:
-    description: Polling station identifier for the person.
+    description: Polling station identifier. In foreigner contexts, attribute1 may represent nationality.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute1
+  electoral_zone:
+    description: Electoral zone identifier. In foreigner contexts, attribute2 may represent entry classification.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute2
   vote_registration_number:
-    description: Voter registration number recorded in the legislative data.
+    description: Voter registration number. In foreigner contexts, attribute4 may represent Brazilian children flag.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute4
+  foreigner_entry_classification:
+    description: Foreigner entry classification. In Brazilian contexts, attribute2 may represent electoral zone.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute2
+  foreigner_residence_time:
+    description: Foreigner residence time in Brazil.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute28
+  ctps_number:
+    description: Brazilian work card (CTPS) number.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.per_information1
+  ctps_series:
+    description: Brazilian work card (CTPS) series.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.per_information2
+  issuing_state_ctps:
+    description: Brazilian work card (CTPS) issuing state.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.per_information_category
+  military_reservist_number:
+    description: Military reservist number. In foreigner contexts, attribute3 may represent married-to-Brazilian flag.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute3
+  github_username:
+    description: GitHub username or profile link.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute8
+  accessibility_need:
+    description: Accessibility need reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute27
+  iban:
+    description: IBAN reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute18
+  bank_name:
+    description: Bank name reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute25
+  health_insurance_current_plan:
+    description: Current health insurance plan reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute20
+  tax_residency_status:
+    description: Current tax residency status reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute21
+  rnh_program_application_status:
+    description: RNH program application status.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute24
   gender_identity:
     description: Self-declared gender identity.
     lineage:
@@ -66,7 +126,7 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute10
   neurodiversity:
-    description: Neurodiversity information for the person.
+    description: Neurodiversity information reported by the person.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute11
   housing_type:
@@ -74,41 +134,81 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute13
   quinto_andar_joining_method:
-    description: Reported method by which the person joined QuintoAndar.
+    description: Method by which the person joined QuintoAndar.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute14
   country_situation:
     description: Country situation reported by the person.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute15
-  disability_self_declaration_description:
-    description: Description of the disability self-declaration.
+  disability_answer:
+    description: Answer to disability declaration question.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute26
+  disability_type:
+    description: Disability type reported by the person.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute29
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.object_version_number
-  has_disability:
-    description: Indicates whether the person declared a disability (attribute6 = 'S').
+  is_foreigner_married_to_brazilian:
+    description: Foreigner married to a Brazilian flag. In Brazilian contexts, attribute3 may represent reservist number.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute3
+  has_foreigner_brazilian_children:
+    description: Foreigner has Brazilian children flag. In Brazilian contexts, attribute4 may represent voter registration number.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute4
+  has_hiring_bonus:
+    description: Hiring bonus flag.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute6
+  has_stock_option:
+    description: Stock option flag.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute7
+  has_relocation_bonus:
+    description: Relocation bonus flag.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute17
+  has_health_insurance_portability:
+    description: Health insurance portability flag.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute19
+  has_been_tax_resident_portugal_last_5_years:
+    description: Tax resident in Portugal during the last five years flag.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute22
+  has_benefited_rnh_program:
+    description: Has benefited from the RNH program flag.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute23
   has_salary_advance:
-    description: Indicates whether the person has a salary advance (attribute5 = 'S').
+    description: Salary advance request flag.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.attribute5
+  dt_foreigner_arrival:
+    description: Foreigner arrival date in Brazil.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.attribute_date1
+  dt_ctps_issued:
+    description: Brazilian work card (CTPS) issue date.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.per_information_date1
   dt_marital_status:
     description: Date when the current marital status became effective.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.marital_status_date
-  dt_effective_ended:
-    description: End date of the period for which this legislative person data is valid.
-    lineage:
-    - datalake_pin_core_raw.per_people_legislative_f.effective_end_date
   dt_effective_started:
     description: Start date of the period for which this legislative person data is valid.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.effective_start_date
+  dt_effective_ended:
+    description: End date of the period for which this legislative person data is valid.
+    lineage:
+    - datalake_pin_core_raw.per_people_legislative_f.effective_end_date
   ts_created:
     description: Timestamp of when the record was created.
     lineage:

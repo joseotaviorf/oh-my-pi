@@ -8,7 +8,139 @@ table_level_validations:
 column_level_validations:
   id_person_legislative:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
     custom:
+      # No duplicate records per person and effective start date.
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.people_legislative GROUP BY id_person_legislative, dt_effective_started HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
+  id_person:
+    is_complete:
+      severity_level: Error
+  dt_effective_started:
+    custom:
+      # Effective end date cannot be earlier than start date.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE dt_effective_started IS NOT NULL
+         AND dt_effective_ended IS NOT NULL
+         AND dt_effective_ended < dt_effective_started
+        ) = 0
+      severity_level: Warning
+  dt_foreigner_arrival:
+    custom:
+      # Foreigner arrival date should not be in the future.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE dt_foreigner_arrival > CURRENT_DATE()
+        ) = 0
+      severity_level: Warning
+  dt_ctps_issued:
+    custom:
+      # CTPS issued date should not be in the future.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE dt_ctps_issued > CURRENT_DATE()
+        ) = 0
+      severity_level: Warning
+  dt_marital_status:
+    custom:
+      # Marital status date should not be in the future.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE dt_marital_status > CURRENT_DATE()
+        ) = 0
+      severity_level: Warning
+  is_foreigner_married_to_brazilian:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE is_foreigner_married_to_brazilian IS NOT NULL
+         AND is_foreigner_married_to_brazilian NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_foreigner_brazilian_children:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_foreigner_brazilian_children IS NOT NULL
+         AND has_foreigner_brazilian_children NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_hiring_bonus:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_hiring_bonus IS NOT NULL
+         AND has_hiring_bonus NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_stock_option:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_stock_option IS NOT NULL
+         AND has_stock_option NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_relocation_bonus:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_relocation_bonus IS NOT NULL
+         AND has_relocation_bonus NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_health_insurance_portability:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_health_insurance_portability IS NOT NULL
+         AND has_health_insurance_portability NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_been_tax_resident_portugal_last_5_years:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_been_tax_resident_portugal_last_5_years IS NOT NULL
+         AND has_been_tax_resident_portugal_last_5_years NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_benefited_rnh_program:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_benefited_rnh_program IS NOT NULL
+         AND has_benefited_rnh_program NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_salary_advance:
+    custom:
+      # Boolean field must be TRUE/FALSE when not null.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.people_legislative
+         WHERE has_salary_advance IS NOT NULL
+         AND has_salary_advance NOT IN (TRUE, FALSE)
+        ) = 0
       severity_level: Warning
