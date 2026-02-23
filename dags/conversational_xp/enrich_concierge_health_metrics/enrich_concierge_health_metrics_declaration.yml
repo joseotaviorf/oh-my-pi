@@ -21,6 +21,8 @@ workflow:
       - concierge_messages
     concierge_direct_vb:
       - concierge_messages
+    concierge_indirect_vb:
+      - concierge_messages
   tables_customization:
     concierge_messages:
       partitions: [year, month, day]
