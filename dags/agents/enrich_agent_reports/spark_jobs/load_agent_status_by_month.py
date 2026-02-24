@@ -375,7 +375,8 @@ def validate_before_write(df: DataFrame) -> None:
 
 def save_df(spark_client: SparkClient, df: DataFrame, args: Namespace) -> None:
     """Write DataFrame to enrich layer as Delta. In dev mode uses a session temp view (no S3)."""
-
+    
+    run_mode = getattr(args, "run_mode", "dev")
     if run_mode == "dev":
         temp_view_name = f"dev_{args.table_name}"
         df.cache()
