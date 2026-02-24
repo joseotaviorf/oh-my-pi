@@ -1,0 +1,55 @@
+---
+database_name: datalake_for_sale_experiment
+table_name: exp_1_2_visits_boosting_agents_area_increased_to_800m
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  Experiment table for visits boosting agents with area increased to 800m (Visits XP Team).
+  This table tracks visitor participation in an A/B test designed to evaluate the impact
+  of expanding agent coverage area to 800 meters on visit conversion rates. Visitors are
+  randomly assigned to control or treatment groups using a hash-based randomization algorithm
+  based on their visitor ID, with the experiment focusing on rent and sale context visits
+  starting from January 6, 2026.
+columns:
+  identifier_bc:
+    description: Unique identifier of the visitor participating in the experiment by business_context.
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+      - datalake_ebdb_clean.visit.business_context
+  identifier:
+    description: Unique identifier of the visitor participating in the experiment.
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+  id_neotribe:
+    description: Identifier for the neotribe of For Sale line (fixed value 1).
+  id_experiment:
+    description: Unique identifier for this specific experiment (fixed value 2).
+  name_neotribe:
+    description: Name of the neotribe (VISITS XP).
+  name_experiment:
+    description: Name of the specific experiment (visits_boosting_agents_area_increased_to_800m).
+  identifier_type:
+    description: Type of identifier used for the experiment (VISITOR).
+  business_context:
+    description: Business context related to the experiment (RENT only).
+    lineage:
+      - datalake_ebdb_clean.visit.business_context
+  test_group:
+    description: Experiment group assignment based on visitor ID hash calculation. Uses formula ((id_visitor * 31 + 3 * 17) % 100) with 50% split threshold.
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+    categories:
+      CONTROL: Control group (hash result >= 50).
+      TREATMENT: Treatment group (hash result < 50).
+  documentation_link:
+    description: Link to experiment documentation (null for this experiment).
+  additional_information:
+    description: Additional context about the experiment methodology - TP/BP identification based on scheduled visits and division according to visitor identifier.
+  dt_identifier_started:
+    description: Earliest date when this specific visitor started participating in the experiment based on visit creation timestamp.
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+  dt_identifier_ended:
+    description: Latest date when this specific visitor participated in the experiment based on visit creation timestamp.
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created

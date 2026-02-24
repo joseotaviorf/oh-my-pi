@@ -1,6 +1,6 @@
 SELECT
-    id_neotribe || '_' || id_experiment || '_' || identifier AS sk_element_exp,
-    id_neotribe || '_' || id_experiment AS sk_neotribe_exp,
+    id_element_exp AS sk_element_exp,
+    CONCAT_WS('_', id_neotribe, id_experiment, business_context) AS sk_neotribe_exp,
     id_neotribe AS sk_neotribe,
     id_experiment AS sk_experiment,
     identifier AS sk_identifier,
@@ -8,4 +8,4 @@ SELECT
     test_group,
     dt_identifier_started
 FROM
-    datalake_for_sale_experiment.exp_1_1_visits_boosting_agents
+    datalake_for_sale_experiment.exp_visitor_identifier

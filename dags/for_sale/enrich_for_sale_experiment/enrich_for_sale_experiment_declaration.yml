@@ -9,6 +9,10 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    exp_visitor_identifier:
+      - exp_1_1_visits_boosting_agents
+      - exp_1_2_visits_boosting_agents_area_increased_to_800m
 cluster:
   type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new_env

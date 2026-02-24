@@ -10,6 +10,11 @@ description:
   based on the last two digits of their visitor ID, with the experiment focusing on rent
   context visits starting from November 14, 2025.
 columns:
+  identifier_bc:
+    description: Unique identifier of the visitor participating in the experiment by business_context.
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+      - datalake_ebdb_clean.visit.business_context
   identifier:
     description: Unique identifier of the visitor participating in the experiment (same as id_visitor).
     lineage:
@@ -40,11 +45,11 @@ columns:
     description: Link to experiment documentation.
   additional_information:
     description: Additional context about the experiment methodology and visitor segmentation logic.
-  dt_started:
-    description: Official start date of the experiment.
-  dt_ended:
-    description: End date of the experiment.
   dt_identifier_started:
     description: Earliest date when this specific visitor started participating in the experiment based on visit creation.
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+  dt_identifier_ended:
+    description: Latest date when this specific visitor participated in the experiment based on visit creation timestamp.
     lineage:
       - datalake_ebdb_clean.visit.ts_created
