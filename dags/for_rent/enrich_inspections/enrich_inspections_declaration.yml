@@ -82,6 +82,9 @@ workflow:
       partitions: [year, month, day]
       extraction_type: incremental
       merge_on: [id_reviewer]
+    automatic_discounts:
+      extraction_type: full
+      merge_on: [id_contract]
 
 cluster:
   type: custom_cluster

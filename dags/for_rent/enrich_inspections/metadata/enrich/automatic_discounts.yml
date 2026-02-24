@@ -1,0 +1,177 @@
+---
+database_name: datalake_inspections
+table_name: automatic_discounts
+description: |
+  Unified table containing discount evaluation and application data for inspections.
+  Combines legacy data from automatic_invoice (before 2025-12-05) with the new flow
+  using invoice_discount + automatic_invoice (from 2025-12-05 onwards). Each row
+  represents the most recent discount evaluation per contract.
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.id_contract
+      - datalake_inspection_services_clean.invoice_discount.id_contract
+    description: ID of the contract associated with the inspection discount.
+  id_checkpoint:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.id_checkpoint
+    description: |
+      The checkpoint ID identifies the customer journey step where the discount was informed/adopted.
+      Only available for data from the new flow (from 2025-12-05).
+    categories:
+      REVIEW: Discount applied at the 1st review stage due to disagreement.
+      REVIEW_COMPULSORY: Discount applied at the 1st review stage due to lack of response.
+      BUDGET_REVIEW: Discount applied at the 2nd review stage due to disagreement.
+      BUDGET_REVIEW_COMPULSORY: Discount applied at the 2nd review stage due to lack of response.
+      TENANT_AC_REVIEW: Discount applied at the 2nd review stage, offered type (interactive, subject to user approval).
+      BUDGET_REVIEW_SINGLE_CLEAR_JOURNEY: Discount applied at the 2nd review stage in the legacy non-priced AR journey.
+  model_discount_type:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.discount_type
+    description: Classification of the discount type.
+    categories:
+      OFFERED_DISCOUNT: Discounts offered to the user for approval.
+      AUTOMATIC_BANDAID: Discounts applied automatically by Bandaid ML.
+  discount_value_type:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.discount_value_type
+      - datalake_inspection_services_clean.automatic_invoice.tenant_cost
+    description: The type of discount value informed by Bandaid ML.
+    categories:
+      partial: Discount does not cover the total inspection cost or the disputed amount.
+      total: Discount covers the total inspection cost or the disputed amount.
+      error: Should never occur.
+  discount_stage:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.id_checkpoint
+    description: |
+      Human-readable description of the discount stage based on id_checkpoint.
+      Only available for data from the new flow (from 2025-12-05).
+    categories:
+      1st review - Compulsory: Discount applied at the 1st review stage due to lack of response (REVIEW_COMPULSORY).
+      1st review - Disagreement: Discount applied at the 1st review stage due to disagreement (REVIEW).
+      2nd review - Disagreement: Discount applied at the 2nd review stage due to disagreement (BUDGET_REVIEW, BUDGET_REVIEW_SINGLE_CLEAR_JOURNEY, TENANT_AC_REVIEW).
+      2nd review - Compulsory: Discount applied at the 2nd review stage due to lack of response (BUDGET_REVIEW_COMPULSORY).
+      error: Unknown or unmapped checkpoint value.
+  inspection_cost:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.inspection_cost
+    description: |
+      The sum of the cost of all repairs identified, budgeted, and non-exempted in the inspection.
+      Only available for data from the new flow (from 2025-12-05).
+  disputed_inspection_cost:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.disputed_inspection_cost
+    description: |
+      The sum of the cost of repairs identified, budgeted, non-exempted, and contested by the tenant,
+      therefore in dispute. Only available for data from the new flow (from 2025-12-05).
+  discount_value:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.discount_value
+      - datalake_inspection_services_clean.automatic_invoice.owner_cost
+      - datalake_inspection_services_clean.automatic_invoice.tenant_cost
+    description: |
+      The discount value. For legacy data (before 2025-12-05), calculated as
+      owner_cost - tenant_cost. For new flow, comes directly from invoice_discount.
+  discount_reviewed_value:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.discount_reviewed_value
+    description: |
+      The discount value after restriction evaluations calculated at persist/update time.
+      This is the final discount value. Only available for data from the new flow.
+  invoice_tenant_cost:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.tenant_cost
+    description: Amount to be paid by the tenant in the generated invoice.
+  invoice_owner_cost:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.owner_cost
+    description: Amount the owner will receive from the generated invoice.
+  has_discount_try:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.ts_created
+      - datalake_inspection_services_clean.invoice_discount.discount_type
+      - datalake_inspection_services_clean.invoice_discount.discount_reviewed_value
+    description: |
+      Indicates if there was a discount attempt. True when an automatic invoice was generated
+      or when an OFFERED_DISCOUNT has a positive reviewed value.
+  is_discount_accepted:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.is_discount_accepted
+    description: |
+      Indicates if the discount was accepted or refused by the user.
+      Only available for data from the new flow (from 2025-12-05).
+  has_applied_discount:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.ts_created
+    description: |
+      Indicates if the discount was effectively applied and an invoice was generated.
+      True when automatic_invoice.ts_created is not null.
+  has_tenant_approval:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.has_tenant_approval
+    description: |
+      Indicates if the tenant approved the inspection billed amount.
+      Only available for data from the new flow (from 2025-12-05).
+  has_landlord_approval:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.has_landlord_approval
+    description: |
+      Indicates if the landlord approved the inspection billed amount.
+      Only available for data from the new flow (from 2025-12-05).
+  has_landlord_repair_request:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.has_landlord_repair_request
+    description: |
+      Indicates if the landlord requested a repair.
+      Only available for data from the new flow (from 2025-12-05).
+  discount_is_eviction:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.is_eviction
+    description: |
+      Indicates if the inspection is an eviction.
+      Only available for data from the new flow (from 2025-12-05).
+  discount_is_spoc:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.is_spoc
+    description: |
+      Indicates if the context is SPOC.
+      Only available for data from the new flow (from 2025-12-05).
+  person_blocked:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.person_blocked
+    description: |
+      Indicates if the person is blocked from receiving discounts.
+      Only available for data from the new flow (from 2025-12-05).
+  db_source:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice
+      - datalake_inspection_services_clean.invoice_discount
+    description: Source table identifier for data traceability.
+    categories:
+      automatic_invoice: Legacy data sourced only from automatic_invoice (before 2025-12-05).
+      invoice_discount_and_automatic_invoice: New flow data sourced from invoice_discount joined with automatic_invoice (from 2025-12-05).
+  dt_discount_creation:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.ts_created
+      - datalake_inspection_services_clean.invoice_discount.ts_created
+    description: Date when the discount evaluation was created.
+  dt_discount_response:
+    lineage:
+      - datalake_inspection_services_clean.invoice_discount.dt_discount_accepted
+    description: |
+      Date when the discount was accepted or refused.
+      Only available for data from the new flow (from 2025-12-05).
+  dt_invoice_creation:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.ts_created
+    description: Date when the automatic invoice was created.
+  dt_bandaid:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.ts_created
+      - datalake_inspection_services_clean.invoice_discount.ts_created
+    description: |
+      Date reference for Bandaid ML dashboard charts. This column was re-added on 2026-01-14
+      for adjustments in the official Bandaid dashboard (Superset dashboard #3083).

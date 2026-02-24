@@ -2,50 +2,70 @@
 database_name: datalake_inspection_services_clean
 table_name: invoice_discount
 description: |
-  This table contains the discount evaluation details.
-owner: data-for-rent@quintoandar.com.br
+  This table contains the discount evaluation details. Each row represents an evaluation
+  on whether to apply a discount or not. Some discounts are applied automatically, while
+  others depend on user approval.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   uuid_discount:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_uuid
-    description: The discount uuid. It's the primary key.
+    description: The discount UUID. It's the primary key.
   id_contract:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.contract_id
-    description: The contract id.
+    description: The contract ID.
   uuid_inspection:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.inspection_uuid
-    description: The inspection uuid.
+    description: The inspection UUID.
   id_checkpoint:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.checkpoint_id
-    description: The checkpoint id identifies the customer journey step where the discount was informed/adopted.
+    description: |
+      The checkpoint ID identifies the customer journey step where the discount was informed/adopted.
+    categories:
+      REVIEW: Discount applied at the 1st review stage due to disagreement.
+      REVIEW_COMPULSORY: Discount applied at the 1st review stage due to lack of response.
+      BUDGET_REVIEW: Discount applied at the 2nd review stage due to disagreement.
+      BUDGET_REVIEW_COMPULSORY: Discount applied at the 2nd review stage due to lack of response.
+      TENANT_AC_REVIEW: Discount applied at the 2nd review stage, offered type (interactive, subject to user approval).
+      BUDGET_REVIEW_SINGLE_CLEAR_JOURNEY: Discount applied at the 2nd review stage in the legacy non-priced AR journey.
   discount_type:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_type
     description: Classification of the discount type.
+    categories:
+      OFFERED_DISCOUNT: Discounts offered to the user for approval.
+      AUTOMATIC_BANDAID: Discounts applied automatically.
   inspection_cost:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.inspection_cost
-    description: The inspection total cost.
+    description: |
+      The sum of the cost of all repairs identified, budgeted, and non-exempted in the inspection.
   disputed_inspection_cost:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.disputed_inspection_cost
-    description: The inspection cost disputed by the tenant.
+    description: |
+      The sum of the cost of repairs identified, budgeted, non-exempted, and contested by the tenant,
+      therefore in dispute.
   discount_value:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_value
-    description: The discount value.
+    description: The discount value calculated by the system.
   discount_hash:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_hash
-    description: The hash of the discount request – Bandaid ML Service request hash.
+    description: The hash of the discount request from Bandaid ML Service.
   discount_value_type:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_value_type
-    description: The type of the discount value informed by Bandaid ML (total, partial etc.).
+    description: The type of discount value informed by Bandaid ML.
+    categories:
+      partial: Discount does not cover the total inspection cost or the disputed amount.
+      total: Discount covers the total inspection cost or the disputed amount.
+      no_discount: Discount application was denied by the system.
   has_tenant_approval:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.tenant_approval
@@ -73,7 +93,9 @@ columns:
   discount_reviewed_value:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_reviewed_value
-    description: The discount value after restriction evaluations calculated at persist/update time.
+    description: |
+      The discount value after restriction evaluations calculated at persist/update time.
+      This is the final discount value.
   discount_acceptance_by:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_acceptance_by
@@ -101,7 +123,7 @@ columns:
   exempted_cost:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.exempted_cost
-    description: Discount value granted.
+    description: Discount value granted (exempted from payment).
   dt_discount_accepted:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_accepted_at
@@ -114,4 +136,3 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.updated_at
     description: The last update timestamp.
-

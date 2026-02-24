@@ -2689,10 +2689,12 @@ bietlejuice.enrich_inspections:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.inspection_services:load-clean-appointment:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-automatic-invoice:first-run-of-day
   - bietlejuice.inspection_services:load-clean-budget:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation-media:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation:first-run-of-day
   - bietlejuice.inspection_services:load-clean-inspection-aud:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-invoice-discount:first-run-of-day
   - bietlejuice.inspection_services:load-clean-issue-type:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-aud:first-run-of-day
   - bietlejuice.inspection_services:load-clean-item-group-aud:first-run-of-day
