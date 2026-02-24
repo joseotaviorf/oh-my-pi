@@ -338,7 +338,7 @@ vistorias AS (
     MAX(IF(di.inspection_type = 'onboarding', CAST(fi.ts_synced - INTERVAL 3 HOURS AS DATE), NULL)) AS onboarding_synced_insp_date,
     MAX(IF(di.inspection_type = 'offboarding', CAST(fi.ts_synced - INTERVAL 3 HOURS AS DATE), NULL)) AS offboarding_synced_insp_date,
     MAX(dt_entrance) as dt_entrance,
-    MAX(IF(di.inspection_type = 'offboarding' AND fi.ts_synced IS NOT NULL, fri.is_early_both_agree, NULL)) AS offboarding_early_both_agree
+    MAX(IF(di.inspection_type = 'offboarding' AND fi.ts_synced IS NOT NULL, fri.has_early_agreement, NULL)) AS offboarding_early_both_agree
   FROM
     dw_inspections.fact_inspection AS fi
   JOIN dw_inspections.dim_inspection AS di 
