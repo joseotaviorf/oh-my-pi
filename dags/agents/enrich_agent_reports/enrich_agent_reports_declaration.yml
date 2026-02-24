@@ -1,0 +1,31 @@
+dag:
+  name: enrich_agent_reports
+  schedule_start_date: 2025, 2, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich tables for agent reports: OKRs, KPIs and related end-user datasets.
+      Builds tables from clean sources via PySpark ETL (read, transform, validate, write to enrich layer).
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: agent_reports
+  tables_customization:
+    agent_status_by_month:
+      load_spark_job: load_agent_status_by_month
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "{{ data_interval_start | ds }}"
+        - "{{ data_interval_end | ds }}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
