@@ -4,33 +4,31 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
   Fact table containing historical and current compensation records for employees.
-  
   This table stores approved salary proposals with their associated adjustments,
-  positioning metrics (compa ratio, range position), and links to job and event dimensions.
-  
-  The grain is one row per approved salary record per validity period (SCD Type 2).
-  
+  positioning metrics (range position, range percentile), and links to job and event dimensions.
+  The grain is one row per approved salary record per job validity period (SCD Type 2),
+  created by intersecting salary periods with assignment job history.
   Key features:
   - Tracks salary changes over time with full history
-  - Links to dim_employee and dim_assignment for employee context
-  - Links to dim_job for job-level compensation targets
+  - Splits rows when assignment job changes, even without salary change
+  - Links to dim_employee and dim_assignment (contract) for employee context
+  - Links to dim_job for job-level compensation targets based on assignment job at date
   - Links to dim_event_definition for action/reason context
   - Calculates amount_total_cash including PLR targets (RVV and SOP to be included)
   - Identifies promotion movements based on action codes
-  
   Use cases:
   - Salary history analysis
   - Compensation benchmarking
   - Promotion and merit tracking
-  - Pay equity analysis
 
 columns:
   sk_compensation:
-    description: Surrogate key (MD5 hash of id_salary + dt_valid_from).
+    description: |
+      Surrogate key (MD5 hash of id_salary + dt_valid_from after job-splitting).
   sk_employee:
     description: Foreign key to dim_employee. References the employee (id_person).
-  sk_assignment:
-    description: Foreign key to dim_assignment. References the assignment (id_period_of_service).
+  sk_contract:
+    description: Foreign key to dim_assignment. References the contract/assignment (id_assignment).
   sk_job_version:
     description: Foreign key to dim_job. References the job version at the time of the salary record.
   sk_event_definition:
@@ -59,11 +57,12 @@ columns:
     description: Monetary amount of the salary adjustment (difference from previous salary).
   pct_adjustment:
     description: Percentage increase of the salary adjustment over the base salary value.
-  compa_ratio:
+  range_position:
     description: |
       Compensation ratio comparing actual salary to the midpoint of the pay range.
       Formula: salary / mid_value. Values around 1.0 indicate market alignment.
-  range_position:
+      Primary metric used by the business for compensation analysis.
+  range_percentile:
     description: |
       Position of salary within the pay range as a percentage.
       Formula: (salary - min) / (max - min). Can be negative (below min) or >100 (above max).
@@ -79,7 +78,6 @@ columns:
     description: End date of validity for this salary record. NULL if currently active.
   is_current:
     description: |
-      TRUE if this record represents the current salary for the assignment.
-      Based on dt_valid_from <= load_end_date AND (dt_valid_to IS NULL OR dt_valid_to > load_end_date).
+      TRUE if this record represents the current salary for the contract/assignment.
   ts_load:
     description: Timestamp recording when data was loaded into the table.

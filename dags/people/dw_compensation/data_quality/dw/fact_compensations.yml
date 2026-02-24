@@ -24,6 +24,9 @@ column_level_validations:
   person_number:
     is_complete:
       severity_level: Error
+  assignment_number:
+    is_complete:
+      severity_level: Error
   amount_salary:
     is_complete:
       severity_level: Error
@@ -45,6 +48,14 @@ column_level_validations:
       severity_level: Error
   dt_valid_from:
     is_complete:
+      severity_level: Error
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_compensations
+         WHERE dt_valid_to IS NOT NULL
+           AND dt_valid_from >= dt_valid_to
+        ) = 0
       severity_level: Error
   is_current:
     is_complete:

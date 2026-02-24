@@ -29,6 +29,113 @@ WITH salary_with_person AS (
         sal.is_salary_approved = TRUE
         AND sal.dt_started <= CURRENT_DATE
 ),
+assignment_history_base AS (
+    SELECT
+        id_assignment,
+        id_job,
+        dt_effective_started,
+        dt_effective_ended
+    FROM
+        datalake_pin_core_clean.all_assignments
+    WHERE
+        id_job IS NOT NULL
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                id_assignment,
+                dt_effective_started,
+                dt_effective_ended
+            ORDER BY
+                effective_sequence DESC,
+                object_version_number DESC
+        ) = 1
+),
+assignment_job_groups AS (
+    SELECT
+        id_assignment,
+        id_job,
+        dt_effective_started,
+        dt_effective_ended,
+        SUM(
+            CASE
+                WHEN LAG(id_job) OVER (
+                    PARTITION BY id_assignment
+                    ORDER BY dt_effective_started, dt_effective_ended
+                ) <> id_job
+                    OR LAG(id_job) OVER (
+                        PARTITION BY id_assignment
+                        ORDER BY dt_effective_started, dt_effective_ended
+                    ) IS NULL
+                    OR LAG(dt_effective_ended) OVER (
+                        PARTITION BY id_assignment
+                        ORDER BY dt_effective_started, dt_effective_ended
+                    ) < dt_effective_started
+                THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY id_assignment
+            ORDER BY dt_effective_started, dt_effective_ended
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS change_group
+    FROM
+        assignment_history_base
+),
+assignment_history AS (
+    SELECT
+        id_assignment,
+        id_job,
+        MIN(dt_effective_started) AS dt_effective_started,
+        MAX(dt_effective_ended) AS dt_effective_ended
+    FROM
+        assignment_job_groups
+    GROUP BY
+        id_assignment,
+        id_job,
+        change_group
+),
+salary_with_assignment_job AS (
+    -- Split salary periods by assignment job changes
+    SELECT
+        sal.id_salary,
+        sal.id_person,
+        sal.id_assignment,
+        sal.id_period_of_service,
+        sal.person_number,
+        sal.assignment_number,
+        sal.currency_code,
+        sal.salary_amount,
+        sal.annual_salary,
+        sal.adjustment_amount,
+        sal.adjustment_percent,
+        sal.compa_ratio,
+        sal.range_position,
+        sal.is_salary_approved,
+        sal.id_action,
+        sal.id_action_reason,
+        sal.id_action_occurrence,
+        COALESCE(assignment_history.id_job, sal.id_job) AS id_job,
+        CASE
+            WHEN assignment_history.id_job IS NULL
+            THEN sal.dt_started
+            ELSE GREATEST(sal.dt_started, assignment_history.dt_effective_started)
+        END AS dt_started,
+        CASE
+            WHEN assignment_history.id_job IS NULL
+            THEN sal.dt_ended
+            ELSE LEAST(
+                COALESCE(sal.dt_ended, DATE('4712-12-31')),
+                assignment_history.dt_effective_ended
+            )
+        END AS dt_ended
+    FROM
+        salary_with_person AS sal
+    LEFT JOIN
+        assignment_history AS assignment_history
+            ON assignment_history.id_assignment = sal.id_assignment
+            AND assignment_history.dt_effective_started <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND assignment_history.dt_effective_ended > sal.dt_started
+),
 salary_enriched AS (
     SELECT
         sal.id_salary,
@@ -50,29 +157,200 @@ salary_enriched AS (
         sal.dt_ended,
         ed.id_event_definition,
         ed.action_code,
-        dim_job.sk_job_version,
-        dim_job.target_plr,
-        dim_job.target_plr_salary_multiplier,
-        dim_job.target_rvv,
-        dim_job.target_sop,
-        dim_job.target_hiring_sop,
-        dim_job.target_exceptional_bonus,
-        CASE
-            WHEN ed.action_code = 'PROMOTION'
-            THEN TRUE
-            ELSE FALSE
-        END AS is_promotion_movement
+        dj.sk_job_version,
+        dj.target_plr,
+        dj.target_plr_salary_multiplier,
+        dj.target_rvv,
+        dj.target_sop,
+        dj.target_hiring_sop,
+        dj.target_exceptional_bonus
     FROM
-        salary_with_person AS sal
+        salary_with_assignment_job AS sal
     LEFT JOIN
         datalake_people_core.event_definition AS ed
             ON sal.id_action = ed.id_action
             AND sal.id_action_reason = ed.id_reason
     LEFT JOIN
-        dw_compensation.dim_job AS dim_job
-            ON sal.id_job = dim_job.id_job
-            AND dim_job.dt_valid_from <= sal.dt_started
-            AND (dim_job.dt_valid_to IS NULL OR dim_job.dt_valid_to > sal.dt_started)
+        dw_compensation.dim_job AS dj
+            ON sal.id_job = dj.id_job
+            AND dj.dt_valid_from <= sal.dt_started
+            AND (dj.dt_valid_to IS NULL OR dj.dt_valid_to > sal.dt_started)
+),
+salary_consolidation_base AS (
+    SELECT
+        id_salary,
+        id_person,
+        id_assignment,
+        id_period_of_service,
+        id_job,
+        person_number,
+        assignment_number,
+        currency_code,
+        salary_amount,
+        annual_salary,
+        adjustment_amount,
+        adjustment_percent,
+        compa_ratio AS range_position,
+        range_position AS range_percentile,
+        is_salary_approved,
+        dt_started,
+        COALESCE(dt_ended, DATE('4712-12-31')) AS dt_ended_normalized,
+        id_event_definition,
+        action_code,
+        sk_job_version,
+        target_plr,
+        target_plr_salary_multiplier,
+        target_rvv,
+        target_sop,
+        target_hiring_sop,
+        target_exceptional_bonus
+    FROM
+        salary_enriched
+),
+salary_consolidation_groups AS (
+    SELECT
+        *,
+        SUM(
+            CASE
+                WHEN LAG(id_person) OVER (
+                    PARTITION BY id_person, id_assignment, id_period_of_service
+                    ORDER BY dt_started, dt_ended_normalized
+                ) IS NULL
+                    OR NOT (LAG(id_job) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> id_job)
+                    OR NOT (LAG(currency_code) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> currency_code)
+                    OR NOT (LAG(salary_amount) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> salary_amount)
+                    OR NOT (LAG(annual_salary) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> annual_salary)
+                    OR NOT (LAG(adjustment_amount) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> adjustment_amount)
+                    OR NOT (LAG(adjustment_percent) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> adjustment_percent)
+                    OR NOT (LAG(range_position) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> range_position)
+                    OR NOT (LAG(range_percentile) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> range_percentile)
+                    OR NOT (LAG(is_salary_approved) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> is_salary_approved)
+                    OR NOT (LAG(id_event_definition) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> id_event_definition)
+                    OR NOT (LAG(sk_job_version) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> sk_job_version)
+                    OR NOT (LAG(target_plr) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_plr)
+                    OR NOT (LAG(target_plr_salary_multiplier) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_plr_salary_multiplier)
+                    OR NOT (LAG(target_rvv) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_rvv)
+                    OR NOT (LAG(target_sop) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_sop)
+                    OR NOT (LAG(target_hiring_sop) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_hiring_sop)
+                    OR NOT (LAG(target_exceptional_bonus) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_exceptional_bonus)
+                    OR LAG(dt_ended_normalized) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) < DATE_ADD(dt_started, -1)
+                THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY id_person, id_assignment, id_period_of_service
+            ORDER BY dt_started, dt_ended_normalized
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS change_group
+    FROM
+        salary_consolidation_base
+),
+salary_consolidated AS (
+    SELECT
+        MIN(id_salary) AS id_salary,
+        id_person,
+        id_assignment,
+        id_period_of_service,
+        id_job,
+        MAX(person_number) AS person_number,
+        MAX(assignment_number) AS assignment_number,
+        currency_code,
+        salary_amount,
+        annual_salary,
+        adjustment_amount,
+        adjustment_percent,
+        range_position,
+        range_percentile,
+        is_salary_approved,
+        MIN(dt_started) AS dt_started,
+        MAX(dt_ended_normalized) AS dt_ended_normalized,
+        id_event_definition,
+        MAX(action_code) AS action_code,
+        sk_job_version,
+        target_plr,
+        target_plr_salary_multiplier,
+        target_rvv,
+        target_sop,
+        target_hiring_sop,
+        target_exceptional_bonus
+    FROM
+        salary_consolidation_groups
+    GROUP BY
+        id_person,
+        id_assignment,
+        id_period_of_service,
+        id_job,
+        currency_code,
+        salary_amount,
+        annual_salary,
+        adjustment_amount,
+        adjustment_percent,
+        range_position,
+        range_percentile,
+        is_salary_approved,
+        id_event_definition,
+        sk_job_version,
+        target_plr,
+        target_plr_salary_multiplier,
+        target_rvv,
+        target_sop,
+        target_hiring_sop,
+        target_exceptional_bonus,
+        change_group
 )
 SELECT
     -- Priority 0: SKs
@@ -81,7 +359,7 @@ SELECT
         CAST(sal.dt_started AS STRING)
     )) AS sk_compensation,
     sal.id_person AS sk_employee,
-    sal.id_period_of_service AS sk_assignment,
+    sal.id_assignment AS sk_contract,
     sal.sk_job_version AS sk_job_version,
     sal.id_event_definition AS sk_event_definition,
     -- Non-SKs
@@ -100,25 +378,29 @@ SELECT
     sal.adjustment_amount AS amount_adjustment,
     sal.adjustment_percent AS pct_adjustment,
     -- Metrics - Salary positioning
-    sal.compa_ratio,
     sal.range_position,
+    sal.range_percentile,
     -- Metrics - Flags
     sal.is_salary_approved,
-    sal.is_promotion_movement,
+    CASE
+        WHEN sal.action_code = 'PROMOTION'
+        THEN TRUE
+        ELSE FALSE
+    END AS is_promotion_movement,
     -- SCD Type 2 fields
     sal.dt_started AS dt_valid_from,
     CASE
-        WHEN sal.dt_ended IS NULL OR sal.dt_ended >= DATE('4712-12-31')
+        WHEN sal.dt_ended_normalized >= DATE('4712-12-31')
         THEN NULL
-        ELSE sal.dt_ended
+        ELSE sal.dt_ended_normalized
     END AS dt_valid_to,
     CASE
         WHEN sal.dt_started <= CURRENT_DATE
-            AND (sal.dt_ended IS NULL OR sal.dt_ended >= DATE('4712-12-31') OR sal.dt_ended > CURRENT_DATE)
+            AND (sal.dt_ended_normalized >= DATE('4712-12-31') OR sal.dt_ended_normalized > CURRENT_DATE)
         THEN TRUE
         ELSE FALSE
     END AS is_current,
     -- Timestamp type
     NOW() AS ts_load
 FROM
-    salary_enriched AS sal
+    salary_consolidated AS sal
