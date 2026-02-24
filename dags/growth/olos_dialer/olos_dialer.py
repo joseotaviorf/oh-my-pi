@@ -22,7 +22,7 @@ from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 SOURCE = "olos_dialer"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "50 0,7-19 * * *"
 CLUSTER_DESCRIPTION = "databricks_16_4_med_general_cluster"
 
 config_service = ConfigurationService(SOURCE)
@@ -119,7 +119,7 @@ for table_name in TABLES_LIST:
         raw_spark_job_extra_args=[
             SOURCE,
             "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
-            "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}",
             table_name,
         ],
         has_hive_sync=False,
@@ -134,7 +134,7 @@ for table_name in TABLES_LIST:
         partitions=PARTITION_COLS,
         extra_query_template_params={
             "load_start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
-            "load_end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}",
         },
     )
 
