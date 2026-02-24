@@ -10,6 +10,12 @@ monopoly AS (
             WHEN ae.entry_type = 'brokerage' THEN '700013'
           ELSE NULL
         END AS account_number,
+        CASE
+            WHEN ae.entry_type = 'brokerage-executives' THEN 'Revenue Share - Brokarage - AGENT (For Sale)' 
+            WHEN ae.entry_type = 'brokerage-ciqs' THEN 'Revenue Share - Brokarage - CIQ (For Sale)'
+            WHEN ae.entry_type = 'brokerage' THEN 'Gross Revenue - Brokarage (For Sale)'
+          ELSE NULL
+        END AS accounting_name,
         'Monopoly' AS source_name,
         s.id_external_offer,
         st.id_external_sync AS id_feature,
@@ -119,12 +125,7 @@ errors_base AS (
     CAST(NULL AS STRING) AS version,
     m.source_name,
     m.account_number,
-    CASE
-      WHEN sl.account_number = '700013' THEN 'Gross Revenue - Brokarage (For Sale)'
-      WHEN sl.account_number = '700006' THEN 'Revenue Share - Brokarage - AGENT (For Sale)'
-      WHEN sl.account_number = '700007' THEN 'Revenue Share - Brokarage - CIQ (For Sale)'
-      ELSE CAST(NULL AS STRING)
-    END AS accounting_name,
+    m.accounting_name,
     DATE_FORMAT(m.dt_source_trigger, 'yyyyMM') AS accrual_year_month,
     MIN(CASE
       WHEN sl.id_finance_entity IS NOT NULL THEN 'success'
