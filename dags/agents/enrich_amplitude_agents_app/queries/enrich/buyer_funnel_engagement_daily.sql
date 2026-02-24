@@ -81,11 +81,11 @@ SELECT /*+ BROADCAST(utm) */
     evt.month,
     evt.day
 FROM
-    datalake_amplitude_agents_app.agents_search_events AS evt
+  datalake_amplitude_agents_app.agents_search_events AS evt
 LEFT JOIN
-    utms AS utm
-        ON utm.utm_source = evt.utm_source
-        AND utm.utm_medium = evt.utm_medium
+  utms utm
+    ON utm.utm_source = evt.utm_source
+    AND utm.utm_medium = evt.utm_medium
 WHERE
     MAKE_DATE(evt.year, evt.month, evt.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND evt.event_type IN (
