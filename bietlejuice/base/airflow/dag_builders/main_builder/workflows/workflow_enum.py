@@ -7,6 +7,7 @@ class WorkflowEnum(Enum):
     """
 
     ACCESS_WORKFLOW = "access"
+    API_INGESTION_WORKFLOW = "api_ingestion"
     CDC_WORKFLOW = "cdc"
     CORE_MODEL_WORKFLOW = "core_model"
     CUSTOM_INGESTION_WORKFLOW = "custom_ingestion"

@@ -11,6 +11,11 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
+    AuthenticationStrategyEnum,
+    PaginationStrategyEnum,
+    RateLimitingStrategyEnum,
+)
 
 
 class DAGDeclarationValidator(Validator):
@@ -135,6 +140,229 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "required": False,
                 },
+                "api_base_url": {
+                    "anyof": [
+                        {"type": "string", "empty": False},
+                        {"type": "dict", "empty": False},
+                    ],
+                    "required": False,
+                },
+                "authentication": {
+                    "type": "dict",
+                    "empty": False,
+                    "required": False,
+                    "schema": {
+                        "strategy": {
+                            "type": "string",
+                            "required": True,
+                            "empty": False,
+                            "allowed": AuthenticationStrategyEnum.get_available_enum_values(),
+                        },
+                        "secret_key": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "token_url": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "scopes": {"type": "list", "empty": False, "required": False},
+                        "client_id_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "client_secret_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "expires_at_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "fallback_token_expiration_seconds": {
+                            "type": "integer",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "token_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "api_key_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "location": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                            "allowed": ["header", "query_param"],
+                        },
+                        "header_name": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "query_param_name": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "username_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "password_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                    },
+                },
+                "api_policies": {
+                    "type": "dict",
+                    "empty": False,
+                    "required": False,
+                    "schema": {
+                        "rate_limiting": {
+                            "type": "dict",
+                            "empty": False,
+                            "required": False,
+                            "schema": {
+                                "strategy": {
+                                    "type": "string",
+                                    "required": True,
+                                    "empty": False,
+                                    "allowed": RateLimitingStrategyEnum.get_available_enum_values(),
+                                },
+                                "delay_seconds": {
+                                    "type": "float",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "retry_after_header": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                            },
+                        },
+                        "pagination": {
+                            "type": "dict",
+                            "empty": False,
+                            "required": False,
+                            "schema": {
+                                "strategy": {
+                                    "type": "string",
+                                    "required": True,
+                                    "empty": False,
+                                    "allowed": PaginationStrategyEnum.get_available_enum_values(),
+                                },
+                                "limit_param": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "page_size": {
+                                    "type": "integer",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "offset_param": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "cursor_param": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "cursor_response_path": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "context_param": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "context_response_path": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "page_size_param": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "results_response_path": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                            },
+                        },
+                        "error_handling": {
+                            "type": "dict",
+                            "empty": False,
+                            "required": False,
+                            "schema": {
+                                "non_fatal_status_codes": {
+                                    "type": "list",
+                                    "empty": False,
+                                    "required": False,
+                                },
+                                "retry_policy": {
+                                    "type": "dict",
+                                    "empty": False,
+                                    "required": False,
+                                    "schema": {
+                                        "retries": {
+                                            "type": "integer",
+                                            "required": False,
+                                        },
+                                        "delay": {"type": "integer", "required": False},
+                                        "backoff_factor": {
+                                            "type": "integer",
+                                            "required": False,
+                                        },
+                                        "status_forcelist": {
+                                            "type": "list",
+                                            "required": False,
+                                            "schema": {"type": "integer"},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                "date_format_mask": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
+                "payload_column_name": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
+                "alert_channel": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
                 "qube_specs": {"type": "dict", "empty": False},
                 "wonka_config": {
                     "type": "dict",
@@ -203,6 +431,22 @@ class DAGDeclarationValidator(Validator):
         super(DAGDeclarationValidator, self).__init__(*args, **kwargs)
 
     def validate(self, dag_declaration: dict) -> None:
+        """
+        Validates the DAG declaration YAML structure and enforces workflow-specific rules.
+
+        This method first validates the YAML structure against the schema, then applies
+        workflow-specific validation rules. For api_ingestion workflow, it ensures:
+        - load_spark_job is automatically set to "load_api_ingestion_raw" if not provided
+        - api_base_url is required and configured for at least one environment
+        - authentication is required
+        - Each table in tables_customization has endpoint_path defined
+
+        Args:
+            dag_declaration: The parsed DAG declaration dictionary
+
+        Raises:
+            AssertionError: If validation fails with detailed error messages
+        """
         super(DAGDeclarationValidator, self).validate(
             dag_declaration, schema=self.__VALIDATION_SCHEMA
         )
@@ -211,3 +455,81 @@ class DAGDeclarationValidator(Validator):
                 "m=validate, msg=One or more validation rules had errors:\n",
                 f"{json.dumps(self.errors, indent=2)}",
             )
+
+        workflow_type = dag_declaration.get("workflow", {}).get("type")
+        if workflow_type == WorkflowEnum.API_INGESTION_WORKFLOW.value:
+            self._validate_api_ingestion_workflow(dag_declaration)
+
+    def _validate_api_ingestion_workflow(self, dag_declaration: dict) -> None:
+        """
+        Validates specific requirements for api_ingestion workflow.
+
+        This method enforces that:
+        1. load_spark_job is set to "load_api_ingestion_raw" (or defined explicitly)
+        2. api_base_url is provided and contains at least one environment configuration
+        3. authentication configuration is provided
+        4. Each table in tables_customization has endpoint_path defined
+
+        Args:
+            dag_declaration: The parsed DAG declaration dictionary
+
+        Raises:
+            AssertionError: If api_ingestion-specific validation fails
+        """
+        workflow = dag_declaration.get("workflow", {})
+        tables_customization = workflow.get("tables_customization", {})
+
+        if not workflow.get("load_spark_job"):
+            workflow["load_spark_job"] = "load_api_ingestion_raw"
+
+        api_base_url = workflow.get("api_base_url")
+        if not api_base_url:
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                "msg='api_base_url' is required for api_ingestion workflow"
+            )
+
+        if isinstance(api_base_url, dict) and len(api_base_url) == 0:
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                "msg='api_base_url' dictionary must have at least one environment "
+                "(e.g., prod, forno)"
+            )
+
+        if not isinstance(api_base_url, (str, dict)):
+            raise AssertionError(
+                "m=_validate_api_ingestion_workflow, "
+                "msg='api_base_url' must be either a string (for all environments) "
+                "or a dictionary with environment keys (e.g., prod, forno)"
+            )
+
+        workflow_authentication = workflow.get("authentication")
+
+        if not workflow_authentication:
+            tables_without_auth = []
+            for table_name, table_config in tables_customization.items():
+                if not isinstance(table_config, dict):
+                    continue
+                table_authentication = table_config.get("authentication")
+                if not table_authentication:
+                    tables_without_auth.append(table_name)
+
+            if tables_without_auth:
+                raise AssertionError(
+                    "m=_validate_api_ingestion_workflow, "
+                    "msg='authentication' is required for api_ingestion workflow. "
+                    "It must be defined at workflow level or for each table in tables_customization. "
+                    f"Tables without authentication: {tables_without_auth}"
+                )
+
+        for table_name, table_config in tables_customization.items():
+            if not isinstance(table_config, dict):
+                continue
+
+            endpoint_path = table_config.get("endpoint_path")
+            if not endpoint_path:
+                raise AssertionError(
+                    f"m=_validate_api_ingestion_workflow, "
+                    f"msg='endpoint_path' is required for table '{table_name}' "
+                    f"in api_ingestion workflow"
+                )
