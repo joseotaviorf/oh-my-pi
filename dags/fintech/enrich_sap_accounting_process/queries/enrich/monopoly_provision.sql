@@ -6,6 +6,7 @@ monopoly AS (
     ae.id_sale_transaction,
     '420032' AS account_number,
     'Monopoly' AS source_name,
+    'Brokerage For Sale (Platform)' AS accounting_name,
     s.id_external_offer,
     st.id_external_sync AS id_feature,
     ne.error_type,
@@ -116,10 +117,7 @@ errors_base AS (
     CAST(NULL AS STRING) AS version,
     m.source_name,
     m.account_number,
-    CASE
-      WHEN sl.account_number = '420032' THEN 'Brokerage For Sale (Platform)'
-      ELSE CAST(NULL AS STRING)
-    END AS accounting_name,
+    m.accounting_name,
     DATE_FORMAT(m.dt_source_trigger, 'yyyyMM') AS accrual_year_month,
     MIN(CASE
       WHEN sl.id_finance_entity IS NOT NULL THEN 'success'

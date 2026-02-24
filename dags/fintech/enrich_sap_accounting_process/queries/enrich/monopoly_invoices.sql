@@ -9,6 +9,10 @@ monopoly AS (
             ELSE '420007'
         END AS account_number,
         CASE
+            WHEN sr.id_state_external = '11'  THEN 'Brokerage (Casa Mineira)'
+            ELSE 'Brokerage (Platform)'
+        END AS accounting_name,
+        CASE
             WHEN sr.id_state_external = '11' THEN 'Casa Mineira'
             ELSE 'Plataforma QuintoAndar'
         END AS source_name,
@@ -32,7 +36,7 @@ monopoly AS (
     WHERE
       sr.dt_notary_start >= '2025-01-01'
       AND st.id_external_sync IS NOT NULL
-     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 sap_gateway AS (
   SELECT
@@ -109,12 +113,7 @@ errors_base AS (
     CAST(NULL AS STRING) AS version,
     m.source_name,
     m.account_number,
-    CASE
-      WHEN sl.account_number = '420008' THEN 'Brokerage (Casa Mineira)'
-      WHEN sl.account_number = '420007' THEN 'Brokerage (Platform)'
-      WHEN sl.account_number = '420032' THEN 'Provision - Brokerage (Platform)'
-      ELSE CAST(NULL AS STRING)
-    END AS accounting_name,
+    m.accounting_name,
     DATE_FORMAT(m.dt_source_trigger, 'yyyyMM') AS accrual_year_month,
     MIN(CASE
       WHEN sl.id_finance_entity IS NOT NULL THEN 'success'
