@@ -13,7 +13,7 @@ workflow:
   short_circuit_customization:
     function: CHECK_IS_SPECIFIC_WEEKDAY
     function_params:
-      weekday: 0
+      weekday: 6
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   inner_dependencies:
