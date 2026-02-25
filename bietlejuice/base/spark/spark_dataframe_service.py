@@ -2,12 +2,14 @@ import re
 
 from pyspark.sql.functions import (
     col,
-    year,
-    month,
+    current_timestamp,
     dayofmonth,
-    to_json,
     lit,
+    month,
     spark_partition_id,
+    to_json,
+    to_timestamp,
+    year,
 )
 from pyspark.sql.types import StructType, ArrayType
 from quintoandar_logger import QuintoAndarLogger
@@ -17,6 +19,65 @@ from bietlejuice.base.spark import BaseSparkContext
 spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 logger = QuintoAndarLogger("DataFrameService")
+
+
+def insert_partitions(df, date_column_to_partition=None, datetime_format=None):
+    """
+    Adds partition columns (year, month, day) and ts_load to a DataFrame.
+
+    Partitions are derived from a specified date/timestamp column or, as a
+    fallback, from the current timestamp when the function is executed.
+
+    :param df: Input PySpark DataFrame
+    :param date_column_to_partition: Optional column name to extract date from
+    :param datetime_format: Optional format string for to_timestamp parsing
+    :return: DataFrame with year, month, day, ts_load columns, or None if df is None
+    """
+    if df is None:
+        logger.error("m=insert_partitions, msg=input df is None, returning None")
+        return None
+
+    df = df.withColumn("ts_load", current_timestamp())
+    source_for_timestamp = col("ts_load")
+
+    if date_column_to_partition and date_column_to_partition in df.columns:
+        logger.info(
+            "m=insert_partitions, msg=using column '{}' for partitioning".format(
+                date_column_to_partition
+            )
+        )
+        source_for_timestamp = (
+            to_timestamp(col(date_column_to_partition), datetime_format)
+            if datetime_format
+            else to_timestamp(col(date_column_to_partition))
+        )
+    elif date_column_to_partition:
+        logger.warning(
+            "m=insert_partitions, msg=partition column '{}' not found, "
+            "using ts_load as fallback".format(date_column_to_partition)
+        )
+
+    df = df.withColumn("year", year(source_for_timestamp))
+    df = df.withColumn("month", month(source_for_timestamp))
+    df = df.withColumn("day", dayofmonth(source_for_timestamp))
+
+    if date_column_to_partition and date_column_to_partition in df.columns:
+        null_partition_count = df.where(col("year").isNull()).count()
+        if null_partition_count > 0:
+            total_count = df.count()
+            logger.warning(
+                "m=insert_partitions, msg={} out of {} rows have null partitions "
+                "due to failed conversion on column '{}'".format(
+                    null_partition_count, total_count, date_column_to_partition
+                )
+            )
+            if null_partition_count == total_count:
+                raise ValueError(
+                    "m=insert_partitions, msg=all date conversions failed for "
+                    "column '{}', job halted".format(date_column_to_partition)
+                )
+
+    return df
 
 
 class SparkDataFrameService:
