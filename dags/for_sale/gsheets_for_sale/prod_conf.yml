@@ -348,3 +348,24 @@ sheets_info:
     clean_table_name: sv_bp_blacklist
     sheet_context: for_sale
     preload_time_in_seconds: 30
+
+  performance_fs_hc_faturado:
+    sheet_id: 1SZj9U48aTRShhMV-nnlnwEULF1WlGsleqcKO_GPkVT8
+    sheet_name: data
+    clean_table_name: performance_fs_hc_faturado
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
+
+  performance_fs_hc_realizado:
+    sheet_id: 1UyHdzykdt6whS5CI5jgrSVMKGpkLc_DXrCGt6DFMzpQ
+    sheet_name: data
+    clean_table_name: performance_fs_hc_realizado
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
+
+  performance_fs_targets:
+    sheet_id: 1kAl8ZQfScIucMwARshVA5PKO2GtYPVImAtEb9uxgkSw
+    sheet_name: data
+    clean_table_name: performance_fs_targets
+    sheet_context: for_sale
+    preload_time_in_seconds: 30
