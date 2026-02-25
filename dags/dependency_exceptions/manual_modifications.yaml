@@ -1193,3 +1193,7 @@ bietlejuice.dw_sale_closing_flows:
 bietlejuice.enrich_brokers_supply_processor:
   remove:
     - bietlejuice.brokers_supply_processor:load-clean-file:first-run-of-day
+bietlejuice.enrich_attribution:
+  add:
+    - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
+    - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day

@@ -1,0 +1,44 @@
+---
+table_name: datalake_attribution.tracking_by_device_id
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  device_id:
+    is_complete:
+      severity_level: Error
+  gclid:
+    is_complete:
+      severity_level: Warning
+  utm_term:
+    is_complete:
+      severity_level: Warning
+  utm_source:
+    is_complete:
+      severity_level: Warning
+  utm_medium:
+    is_complete:
+      severity_level: Warning
+  utm_content:
+    is_complete:
+      severity_level: Warning
+  utm_campaign:
+    is_complete:
+      severity_level: Warning
+  attribution_time:
+    is_complete:
+      severity_level: Warning
+  ts_event:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

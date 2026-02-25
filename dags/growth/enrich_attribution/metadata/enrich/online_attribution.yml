@@ -1,0 +1,62 @@
+---
+database_name: datalake_attribution
+table_name: online_attribution
+domain: Growth
+owner: "@data-growth"
+description: |
+  Enriched view that combines user tracking events from CDP with lead attribution data from René Descartes.
+  This view joins tracking events (from tb_user_tracking) with lead data (from house_lead and acquisition_misc_data)
+  based on device_id to provide a comprehensive view of online attribution for leads and user interactions.
+columns:
+  lead_id:
+    description: Lead identifier from house_lead table (id_lead_ebdb).
+    lineage:
+      - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
+  device_id:
+    description: Device identifier from tracking_by_device_id table, used to join tracking events with lead data.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.device_id
+  attribution_time:
+    description: Last attribution timestamp from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.attribution_time
+  gclid:
+    description: Google Click ID (GCLID) from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.gclid
+  utm_term:
+    description: UTM term parameter from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.utm_term
+  utm_source:
+    description: UTM source parameter from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.utm_source
+  utm_medium:
+    description: UTM medium parameter from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.utm_medium
+  utm_content:
+    description: UTM content parameter from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.utm_content
+  utm_campaign:
+    description: UTM campaign parameter from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.utm_campaign
+  ts_event:
+    description: Timestamp when the tracking event occurred, from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.ts_event
+  year:
+    description: Year column used for partitioning, from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.year
+  month:
+    description: Month column used for partitioning, from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.month
+  day:
+    description: Day column used for partitioning, from tracking_by_device_id table.
+    lineage:
+      - datalake_attribution.tracking_by_device_id.day

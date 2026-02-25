@@ -1473,6 +1473,9 @@ bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-partner-info:first-run-of-day
   - bietlejuice.atta:load-clean-proposal:first-run-of-day
   - bietlejuice.atta:load-clean-track-step-detail:first-run-of-day
+bietlejuice.enrich_attribution:
+  - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day
+  - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
 bietlejuice.enrich_b2b:
   - bietlejuice.ebdb_contract:load-clean-portability:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
