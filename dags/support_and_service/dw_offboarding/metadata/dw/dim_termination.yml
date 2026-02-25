@@ -89,23 +89,14 @@ columns:
     description: Classifies the type of repair when there is one in the Offboarding process.
     lineage:
       - datalake_terminator.termination.repair_resolution
-  has_mediation:
-    lineage:
-      - datalake_offboarding.mediations.has_mediation
-    description: |
-      Flag indicating if a mediation occurred.
-      This flag is true if the following scenarios are true:
-        - If the tenant has repairs and the type of BA is not Both Agreed
-        - If the tenant has early mediation
-        - If the tenant has unset repairs
   has_mediation_ticket:
     lineage:
       - datalake_offboarding.mediations.has_mediation_ticket
     description: Flag indicating the presence of a mediation ticket.
   has_ac_repairs:
     lineage:
-      - datalake_offboarding.mediations.has_ac_repairs
-    description: Flag indicating if absorbed repairs are associated with the termination.
+      - datalake_terminator.termination.total_tentant_repair_ac
+    description: Flag indicating if tenant had repairs in contestation analysis (total_tentant_repair_ac > 0).
   is_ticket_opened_via_terminator:
     lineage:
       - datalake_offboarding.mediations.is_ticket_opened_via_terminator

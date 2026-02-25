@@ -20,6 +20,7 @@ WITH terminations AS (
         repair_resolution,
         has_landlord_comment,
         has_repair_by_tenant_needed,
+        total_tentant_repair_ac > 0 AS has_ac_repairs,
         year,
         month,
         day
@@ -49,9 +50,8 @@ SELECT
     t.task_type,
     t.responsible_off_manager_email,
     t.repair_resolution,
-    m.has_mediation,
     m.has_mediation_ticket,
-    m.has_ac_repairs,
+    t.has_ac_repairs,
     m.is_ticket_opened_via_terminator,
     t.has_landlord_comment,
     t.has_repair_by_tenant_needed,
