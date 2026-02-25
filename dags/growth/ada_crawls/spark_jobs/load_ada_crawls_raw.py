@@ -14,6 +14,9 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.services.messaging_services.gchat_service import GChatService
+from bietlejuice.services.messaging_services.message import Message
 from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
 
@@ -181,7 +184,7 @@ def has_required_items(path: str) -> bool:
     except:
         return False
 
-def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date: str, load_end_date: str, folder_or_file_name: str) -> DataFrame:
+def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date: str, load_end_date: str, folder_or_file_name: str) -> Optional[DataFrame]:
     """
     Gets the issues, internal_all or issues_overview_report DataFrame for the most recent crawl based on the folder_or_file_name.
 
@@ -192,23 +195,18 @@ def get_dataframe_for_most_recent_crawl(crawl_bucket_path: str, load_start_date:
         folder_or_file_name (str): The name of the folder or file to get the DataFrame for.
 
       Returns:
-        DataFrame: The DataFrame for the most recent crawl.
+        DataFrame or None: The DataFrame for the most recent crawl, or None if no crawl in date range or no device folder.
     """
     most_recent_crawl = get_most_recent_crawl(crawl_bucket_path, load_start_date, load_end_date)
     if most_recent_crawl is None:
-        raise ValueError(f"""
-            m=get_dataframe_for_most_recent_crawl, msg=No crawl between {load_start_date} and {load_end_date} found 
-            for {folder_or_file_name} in the crawl bucket path {crawl_bucket_path}.
-            """)
-    
+        return None
+
     device_folders = [
         item for item in dbutils.fs.ls(most_recent_crawl.path)
         if item.isDir and not item.name.startswith('.') and has_required_items(item.path)
     ]
     if not device_folders:
-        raise FileNotFoundError(f"""
-            m=get_dataframe_for_most_recent_crawl, msg=No device folder found in the crawl bucket path {crawl_bucket_path}.
-            """)
+        return None
 
     most_recent_crawl_date = most_recent_crawl.name.strip('/')
     dfs = []
@@ -357,8 +355,39 @@ def main():
             m=main, msg=Failed to initialize dbutils or find its object.
             """)
 
+    webhook_key = (
+        GchatWebhooksEnum.AE_ALERTS_PROD
+        if environment == "prod"
+        else GchatWebhooksEnum.AE_ALERTS_FORNO
+    )
+    gchat_webhook = None
+    try:
+        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
+    except Exception as e:
+        logger.warning(
+            f"m=main, msg=Could not get GChat webhook for no-crawl notification; notifications will be skipped. error={e}"
+        )
+
     df = get_dataframe_for_most_recent_crawl(crawl_bucket_path, load_start_date, load_end_date, folder_or_file_name)
+    if df is None:
+        message_content = (
+            f"ADA Crawls: no crawl data available for this run "
+            f"(date range {load_start_date}–{load_end_date}, table {table_name}). "
+            f"No data loaded; run succeeded."
+        )
+        logger.warning(f"m=main, msg={message_content}")
+        if gchat_webhook:
+            try:
+                message = Message(content=message_content, destination=gchat_webhook)
+                GChatService.send_message(message)
+            except Exception as e:
+                logger.warning(
+                    f"m=main, msg=GChat notification was not sent. error={e}"
+                )
+        return
+
     load_dataframe_into_datalake(bucket, df, environment, table_name, dag_name)
+
 
 if __name__ == "__main__":
   main()
