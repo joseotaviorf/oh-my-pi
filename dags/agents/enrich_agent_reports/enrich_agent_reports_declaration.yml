@@ -1,6 +1,6 @@
 dag:
   name: enrich_agent_reports
-  schedule_start_date: 2025, 2, 1
+  schedule_start_date: 2026, 2, 24
   owner: Data Agents
   documentation:
     dag_purpose: |
@@ -10,17 +10,29 @@ workflow:
   type: query_delta
   layer: enrich
   custom_schema: agent_reports
+  inner_dependencies:
+    agent_support_tickets_by_month:
+      - agent_status_by_month
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "prod"
   tables_customization:
     agent_status_by_month:
       load_spark_job: load_agent_status_by_month
-      spark_job_arguments:
-        - "{environment}"
-        - "{bucket}"
-        - "{schema}"
-        - "{dag_name}"
-        - "{table_name}"
-        - "{{ data_interval_start | ds }}"
-        - "{{ data_interval_end | ds }}"
+    agent_support_tickets_by_month:
+      load_spark_job: load_agent_support_tickets_by_month
+      extra_spark_job_arguments:
+        - "18"
+
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new_env

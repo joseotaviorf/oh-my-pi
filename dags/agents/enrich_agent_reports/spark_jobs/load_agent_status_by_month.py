@@ -5,10 +5,10 @@
 # COMMAND ----------
 
 # DBTITLE 1,Import Libs
-import inspect
 import os
 from argparse import ArgumentParser, Namespace
 from datetime import date, timedelta
+from typing import Optional
 
 from pyspark.sql import Column, DataFrame, Window
 from pyspark.sql.types import (
@@ -55,66 +55,38 @@ logger = QuintoAndarLogger(JOB_NAME)
 # COMMAND ----------
 
 # DBTITLE 1,Argument Parsing (single source of truth: add new args here only)
-# Order must match DAG spark_job_arguments: environment, bucket, schema, dag_name, table_name, data_interval_start, data_interval_end.
-# (name, type, default_for_dev, help_text). Default can be a callable for runtime values (e.g. today).
 ARG_SPEC = [
     ("env", str, "forno", "Environment: forno/prod"),
     ("datalake_bucket", str, "5a-datalake-prod", "Datalake bucket"),
     ("database_base_name", str, "agent_reports", "Base name for database (schema)"),
     ("dag_name", str, "enrich_agent_reports", "DAG name (for alignment with Airflow)"),
     ("table_name", str, "agent_status_by_month", "Target enrich table name"),
-    ("data_interval_start", str, lambda: (date.today() - timedelta(days=7)).isoformat(), "Date interval start, format %Y-%m-%d"),
-    ("data_interval_end", str, lambda: date.today().isoformat(), "Date interval end, format %Y-%m-%d"),
+    ("load_start_date", str, lambda: (date.today() - timedelta(days=7)).isoformat(), "Date interval start, format %Y-%m-%d"),
+    ("load_end_date", str, lambda: date.today().isoformat(), "Date interval end, format %Y-%m-%d"),
+    ("run_mode", str, "dev", "Run mode: prod/dev"),
 ]
 
-
-def parse_args() -> Namespace:
-    """Parse arguments passed to the job (align with DAG spark_job_arguments)."""
-    parser = ArgumentParser(description=JOB_NAME)
-    for name, type_, _default, help_text in ARG_SPEC:
-        parser.add_argument(name, type=type_, help=help_text)
-    return parser.parse_args()
-
-def _resolve_defaults():
+def _defaults():
     return [d() if callable(d) else d for _, _, d, _ in ARG_SPEC]
 
-def get_args() -> Namespace:
-    """run_mode=prod → parse_args(). run_mode=dev → widgets or env/defaults from ARG_SPEC."""
-    run_mode = (os.environ.get("RUN_MODE") or "").strip().lower() or "dev"
-    if run_mode == "prod":
-        args = parse_args()
-        args.run_mode = "prod"
-        return args
-    if run_mode == "dev":
-        defaults = _resolve_defaults()
-        defaults_str = [str(d) for d in defaults]
-        dbutils = None
-        try:
-            f = inspect.currentframe()
-            if f and f.f_back:
-                dbutils = f.f_back.f_globals.get("dbutils")
-        except Exception:
-            pass
-        if dbutils:
-            for (name, _, _, _), default in zip(ARG_SPEC, defaults_str):
-                try:
-                    dbutils.widgets.drop(name)
-                except Exception:
-                    pass
-                dbutils.widgets.text(name, default, name.replace("_", " ").title())
-            values = {name: dbutils.widgets.get(name).strip() for name, _, _, _ in ARG_SPEC}
-        else:
-            values = dict(zip([name for name, _, _, _ in ARG_SPEC], defaults_str))
-        return Namespace(run_mode="dev", **values)
-    raise ValueError(f"RUN_MODE must be 'dev' or 'prod', got: {run_mode!r}")
+def parse_args() -> Namespace:
+    """Parse CLI args. Each positional is optional (nargs='?') so notebook runs with no args use defaults.
+    Uses parse_known_args() so kernel flags (e.g. -f) are ignored when run from Databricks notebook."""
+    parser = ArgumentParser(description=JOB_NAME)
+    default_values = _defaults()
+    for (name, type_, _default, help_text), default_val in zip(ARG_SPEC, default_values):
+        parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
+    namespace, _ = parser.parse_known_args()
+    return namespace
+
 
 # COMMAND ----------
 
 # DBTITLE 1,Expand dataframe by month
 def _expand_status_by_month(
     df: DataFrame,
-    data_interval_start: str,
-    data_interval_end: str,
+    load_start_date: str,
+    load_end_date: str,
     ts_start_col: str,
     ts_end_col: str,
     partition_by: list,
@@ -127,8 +99,8 @@ def _expand_status_by_month(
     end_expr = f"coalesce({ts_end_col}, last_day(current_date()))"
     filtered = df.filter(col(ts_start_col).isNotNull())
 
-    month_start = date_trunc("month", to_date(lit(data_interval_start)))
-    month_end = last_day(to_date(lit(data_interval_end)))
+    month_start = date_trunc("month", to_date(lit(load_start_date)))
+    month_end = last_day(to_date(lit(load_end_date)))
 
     expanded = (
         filtered
@@ -177,8 +149,8 @@ def _expand_status_by_month(
 
 # DBTITLE 1,CIQ by Month
 def _build_ciq_status_by_month(
-    data_interval_start: str,
-    data_interval_end: str,
+    load_start_date: str,
+    load_end_date: str,
 ) -> DataFrame:
     """CIQ path: ciq_users -> expand by month -> one row per (id_user, reference_month) with ciq_* columns."""
     ciq = (
@@ -187,8 +159,8 @@ def _build_ciq_status_by_month(
     )
     expanded = _expand_status_by_month(
         ciq,
-        data_interval_start,
-        data_interval_end,
+        load_start_date,
+        load_end_date,
         "ts_agent_status_start",
         "ts_agent_status_end",
         partition_by=["id_user", "month_ref"],
@@ -212,16 +184,16 @@ def _build_ciq_status_by_month(
 
 # DBTITLE 1,Agent by Month
 def _build_agents_status_by_month(
-    data_interval_start: str,
-    data_interval_end: str,
+    load_start_date: str,
+    load_end_date: str,
 ) -> DataFrame:
     """Agents (Demand) path: audit events -> status periods -> expand by month -> one row per (id_user, reference_month) with agent_* columns."""
     aud = spark.table("datalake_ebdb_clean.agent_data_aud")
     usr = spark.table("datalake_ebdb_user.user")
     ag = spark.table("datalake_ebdb_clean.agent_data")
     # Filter audit to months of interest (include previous month so status at window start is correct)
-    month_start = add_months(to_date(lit(data_interval_start)), -1)
-    month_end = last_day(to_date(lit(data_interval_end)))
+    month_start = add_months(to_date(lit(load_start_date)), -1)
+    month_end = last_day(to_date(lit(load_end_date)))
     events = (
         aud.alias("a")
         .join(usr.alias("u"), col("a.id") == col("u.id_agent"), "left")
@@ -269,8 +241,8 @@ def _build_agents_status_by_month(
     )
     expanded = _expand_status_by_month(
         status_changed,
-        data_interval_start,
-        data_interval_end,
+        load_start_date,
+        load_end_date,
         "ts_agent_status_start",
         "ts_agent_status_end",
         partition_by=["id_user", "month_ref"],
@@ -292,15 +264,15 @@ def _build_agents_status_by_month(
 
 # DBTITLE 1,Build all agent status
 def build_agents_status(
-    data_interval_start: str,
-    data_interval_end: str,
+    load_start_date: str,
+    load_end_date: str,
 ) -> DataFrame:
     """
     Build agents status by month: CIQ + agents status by month.
     Splits CIQ and agents expansion, then joins on (id_user, reference_month).
     """
-    ciq_monthly = _build_ciq_status_by_month(data_interval_start, data_interval_end)
-    agents_monthly = _build_agents_status_by_month(data_interval_start, data_interval_end)
+    ciq_monthly = _build_ciq_status_by_month(load_start_date, load_end_date)
+    agents_monthly = _build_agents_status_by_month(load_start_date, load_end_date)
     return ciq_monthly.alias("ciq").join(
               agents_monthly.alias("el"),
               (col("ciq.id_user") == col("el.id_user"))
@@ -358,8 +330,8 @@ def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
     return list(filter(None, (msg(n) for n in actual_by_name.keys() | expected_by_name.keys())))
 
 
-def validate_before_write(df: DataFrame) -> None:
-    """Small checks before persisting: not empty and full schema (columns + types). Raises if invalid."""
+def validate_before_write(df: DataFrame) -> int:
+    """Small checks before persisting: not empty and full schema (columns + types). Returns row count for logging."""
     row_count = df.count()
     if row_count == 0:
         raise ValueError("Dataset is empty; aborting write.")
@@ -369,72 +341,76 @@ def validate_before_write(df: DataFrame) -> None:
             f"Schema mismatch: {'; '.join(mismatches)}. Expected schema: {EXPECTED_SCHEMA.simpleString()}."
         )
     logger.info(f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks OK, schema match")
+    return row_count
 
 
 # COMMAND ----------
 
-def save_df(spark_client: SparkClient, df: DataFrame, args: Namespace) -> None:
-    """Write DataFrame to enrich layer as Delta. In dev mode uses a session temp view (no S3)."""
-    
-    run_mode = getattr(args, "run_mode", "dev")
-    if run_mode == "dev":
-        temp_view_name = f"dev_{args.table_name}"
-        df.cache()
-        row_count = df.count()
-        df.createOrReplaceTempView(temp_view_name)
-        logger.info(
-            f"Dev mode: Cached and registered temp view '{temp_view_name}' "
-            f"({row_count:,} rows). Query in this session with: SELECT * FROM {temp_view_name}"
-        )
-        return
-
-    loader = DeltaLoader()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+def _save_to_enrich(
+    spark_client: SparkClient, result_df: DataFrame, args: Namespace, row_count: int
+) -> None:
+    """Write DataFrame to enrich layer (Delta merge), refresh table, apply privileges."""
     db_info = DatalakeMetastoreService.get_db_info(
         args.env, args.database_base_name, args.datalake_bucket
     )
-
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    s3_path = database_location + args.table_name
     full_table_name = f"{database_name}.{args.table_name}"
+    s3_path = database_location + args.table_name
 
-    spark_metastore_service.create_database(database_name)
-
-    loader.load_table(
+    SparkMetastoreService(spark_client).create_database(database_name)
+    DeltaLoader().load_table(
         table_name=full_table_name,
         path=s3_path,
-        source_df=df,
+        source_df=result_df,
         partition_by=["reference_month"],
         merge_on=["id_user", "reference_month"],
     )
-    spark_metastore_service.refresh_table(database_name, args.table_name)
+    SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
+    priv = TablePrivileges.from_environment_default(full_table_name)
+    if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
+        priv.apply()
+    logger.info(f"m=save_df, table={full_table_name}, rows={row_count:,}")
 
-    table_privileges = TablePrivileges.from_environment_default(full_table_name)
-    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
-        table_privileges.apply()
 
-    logger.info(f"m=save_df, table={full_table_name}, rows={df.count():,}, msg=Write complete")
+def save_df(
+    spark_client: SparkClient, result_df: DataFrame, args: Namespace, row_count: Optional[int] = None
+) -> None:
+    """Dispatch to dev (temp view) or prod (Delta merge to enrich). row_count from validate_before_write avoids recount in prod."""
+    run_mode = getattr(args, "run_mode", "dev")
+    if run_mode == "dev":
+        view_name = f"dev_{args.table_name}"
+        result_df.cache()
+        dev_row_count = result_df.count()
+        result_df.createOrReplaceTempView(view_name)
+        logger.info(
+            f"Dev mode: Cached and registered temp view '{view_name}' ({dev_row_count:,} rows). "
+            f"Query in this session with: SELECT * FROM {view_name}"
+        )
+        return
+    if run_mode == "prod":
+        _save_to_enrich(spark_client, result_df, args, row_count if row_count is not None else result_df.count())
+        return
+    raise ValueError(f"Invalid run mode: {run_mode}")
 
 # COMMAND ----------
 
 def main(args: Namespace | None = None) -> None:
     """Orchestrate ETL: build -> validate (not empty + schema) -> write."""
     if args is None:
-        args = get_args()
+        args = parse_args()
     run_mode = getattr(args, "run_mode", "dev")
     logger.info(
         f"m=main, run_mode={run_mode}, env={args.env}, database_base_name={args.database_base_name}, "
-        f"table_name={args.table_name}, data_interval=[{args.data_interval_start}, {args.data_interval_end}], msg=Starting Spark job"
+        f"table_name={args.table_name}, data_interval=[{args.load_start_date}, {args.load_end_date}], msg=Starting Spark job"
     )
 
-    spark_client = SparkClient()
-    logger.info(f"m=build_agents_status, data_interval_start={args.data_interval_start}, data_interval_end={args.data_interval_end}, msg=Building CIQ + agents status by month")
+    logger.info(f"m=build_agents_status, load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, msg=Building CIQ + agents status by month")
     output_dataframe = build_agents_status(
-        args.data_interval_start, args.data_interval_end
+        args.load_start_date, args.load_end_date
     )
-    validate_before_write(output_dataframe)
-    save_df(spark_client, output_dataframe, args)
+    row_count = validate_before_write(output_dataframe)
+    save_df(SparkClient(), output_dataframe, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 # COMMAND ----------
