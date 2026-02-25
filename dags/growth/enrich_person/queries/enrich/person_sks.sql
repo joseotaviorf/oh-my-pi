@@ -17,7 +17,7 @@ contact_info_email_quintoandar AS (
     datalake_person_clean.contact_info AS ci
   WHERE
     ci.category = 'EMAIL'
-    AND ENDSWITH(ci.contact_info, '@quintoandar.com.br')
+    AND (ci.contact_info LIKE '%@quintoandar.com%' OR ci.contact_info LIKE '%@br.quintoandar%')
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
 ),

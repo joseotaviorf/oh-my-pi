@@ -68,10 +68,10 @@ columns:
       - datalake_person_clean.contact_info.id
     description: |
       Foreign key to the QuintoAndar domain email contact record for this person.
-      **Selection Logic**: Chooses the most recent email with @quintoandar.com.br domain when available
-      **Priority**: Used for id_user_email in dim_person; prioritizes QuintoAndar emails even when not the most recent
-      **Optional**: Null when person has no QuintoAndar domain email
-      **Usage**: Enables user identification via QuintoAndar corporate email for analytics and attribution.
+      **Selection Logic**: Selects the EMAIL contact_info whose value matches a QuintoAndar corporate domain (LIKE '%@quintoandar.com%' OR LIKE '%@br.quintoandar%') and has the latest ts_updated for the person.
+      **Optional**: Null when the person has no QuintoAndar domain email.
+      **Notes**: If a person has multiple QuintoAndar emails, this points to the most recently updated one (not necessarily the "primary" email).
+      **Usage**: Enables identification/segmentation of people that have a QuintoAndar corporate email in downstream analytics and models.
   id_contact_info_phone:
     lineage:
       - datalake_person_clean.contact_info.id
