@@ -35,6 +35,7 @@ workflow:
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
+
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
@@ -45,35 +46,29 @@ workflow:
     - "{extraction_type}"
     - "{load_start_date}"
     - "{load_end_date}"
+
   extra_query_template_params:
     load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
     load_end_date: "{{ data_interval_start | ds }}"
+  
+  raw_inner_dependencies:
+    pathway_details:
+      - pathways
+    skill_plan_details:
+      - skill_plans
+  
   tables_customization:
-    certificates:
-      extraction_type: incremental
-      merge_on: ["id"]
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "certificates:read"
-          base_filters:
-            "filter[start_date]": "load_start_date"
-            "filter[end_date]": "load_end_date"
-            "limit": "1000"
     completions:
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
         - scope: "completions:read"
           base_filters:
-            "filter[added_after]": "load_start_date"
-            "filter[added_before]": "load_end_date"
             "limit": "1000"
+    
     content:
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
@@ -81,30 +76,7 @@ workflow:
           base_filters:
             "filter[include_restricted]": "true"
             "limit": "100"
-            "filter[modified_before]": "load_start_date"
-            "filter[modified_after]": "load_end_date"
-    custom_attributes:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "custom_attribute:read"
-    degrees:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "degrees:read"
-          base_filters:
-            "limit": "1000"
-    experiences:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "experiences:read"
-          base_filters:
-            "limit": "1000"
+
     groups:
       extraction_type: full
       vacuum_retention_hours: 168
@@ -113,25 +85,7 @@ workflow:
         - scope: "groups:read"
           base_filters:
             "limit": "1000"
-    logins:
-      extraction_type: incremental
-      merge_on: ["id"]
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "logins:read"
-          base_filters:
-            "filter[start_date]": "load_start_date"
-            "filter[end_date]": "load_end_date"
-            "limit": "1000"
-    organization_skills:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "skill:read"
-          base_filters:
-            "limit": "1000"
+
     pathways:
       extraction_type: full
       vacuum_retention_hours: 168
@@ -140,14 +94,19 @@ workflow:
         - scope: "pathways:read"
           base_filters:
             "limit": "1000"
-    providers:
+
+    pathway_details:
       extraction_type: full
       vacuum_retention_hours: 168
       vacuum_lite: true
+      load_spark_job: load_degreed_raw_from_id_list
       extra_spark_job_arguments:
-        - scope: "providers:read"
-          base_filters:
-            "limit": "1000"
+        - scope: "pathways:read"
+          ids_source_database: "datalake_degreed_raw"
+          ids_source_table: "pathways"
+          id_column: "id"
+          endpoint_for_id_list: "pathways"
+
     skill_plans:
       extraction_type: full
       vacuum_retention_hours: 168
@@ -156,23 +115,19 @@ workflow:
         - scope: "skill_plans:read"
           base_filters:
             "limit": "1000"
-    skill_ratings:
+
+    skill_plan_details:
       extraction_type: full
       vacuum_retention_hours: 168
       vacuum_lite: true
+      load_spark_job: load_degreed_raw_from_id_list
       extra_spark_job_arguments:
-        - scope: "skill_ratings:read"
-          base_filters:
-            "filter[include_private_ratings]": "true"
-            "limit": "1000"
-    user_skills:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-      extra_spark_job_arguments:
-        - scope: "user_skills:read"
-          base_filters:
-            "limit": "1000"
+        - scope: "skill_plans:read"
+          ids_source_database: "datalake_degreed_raw"
+          ids_source_table: "skill_plans"
+          id_column: "id"
+          endpoint_for_id_list: "skill_plans"
+
     users:
       extraction_type: full
       vacuum_retention_hours: 168

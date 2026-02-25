@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import requests
 from requests.adapters import HTTPAdapter
@@ -27,6 +28,7 @@ class DegreedAPI:
     _REQUEST_DELAY_SECONDS = 0.5
     _MAX_RETRIES = 5
     _BACKOFF_FACTOR = 2
+    _SAFE_RESOURCE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 
     def __init__(self, job_args: dict):
         """
@@ -51,6 +53,9 @@ class DegreedAPI:
         self.load_start_date = job_args.get("load_start_date")
         self.load_end_date = job_args.get("load_end_date")
         self.base_filters = job_args.get("base_filters", {})
+        self.endpoint_for_id_list = (
+            job_args.get("endpoint_for_id_list") or self.endpoint
+        )
 
         self._client_id, self._client_secret = self._get_secrets()
         self._access_tokens = {}
@@ -264,6 +269,20 @@ class DegreedAPI:
 
         return results_for_params
 
+    def _get_auth_headers(self) -> dict:
+        """
+        Ensures token for the configured scope is cached and returns auth headers.
+
+        Assumes self.scope is set and valid. Callers must validate scope (and
+        endpoint if needed) before calling.
+        """
+        if self.scope not in self._access_tokens:
+            self._access_tokens[self.scope] = self._fetch_new_token(self.scope)
+        return {
+            "Authorization": f"Bearer {self._access_tokens[self.scope]}",
+            "Accept": "application/json",
+        }
+
     def get_all_paginated_results(self) -> list:
         """
         Fetches all results from the configured endpoint.
@@ -283,17 +302,80 @@ class DegreedAPI:
             )
 
         all_results = []
-        scope = self.scope
-        if scope not in self._access_tokens:
-            self._access_tokens[scope] = self._fetch_new_token(scope)
-
-        access_token = self._access_tokens[scope]
-        auth_headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Accept": "application/json",
-        }
-
+        auth_headers = self._get_auth_headers()
         params = self.base_filters.copy()
         all_results.extend(self._fetch_paginated_data_for_params(params, auth_headers))
 
         return all_results
+
+    def get_by_id(self, resource_id: str, index: int, total: int) -> dict | None:
+        """
+        Fetches a single resource by ID from the API.
+
+        Uses endpoint_for_id_list from job_args when present (e.g. "pathways" for
+        GET /pathways/{id}); otherwise uses the endpoint derived from table_name.
+
+        Args:
+            resource_id: The ID of the resource.
+            index: The index of the resource in the list.
+            total: The total number of resources in the list.
+        Returns:
+            The response payload (e.g. data key) or None if 404.
+        """
+        if not self.scope:
+            LOGGER.error("API scope is not defined in job arguments.")
+            raise ValueError(
+                "API scope is not defined. Please provide it in the job arguments."
+            )
+        if not isinstance(resource_id, str) or not resource_id.strip():
+            raise ValueError("resource_id must be a non-empty string.")
+        if not self._SAFE_RESOURCE_ID_PATTERN.match(resource_id):
+            raise ValueError(
+                "resource_id contains invalid characters; only alphanumeric, "
+                "hyphen and underscore are allowed to prevent SSRF."
+            )
+        auth_headers = self._get_auth_headers()
+        url = f"{self.base_url}{self.endpoint_for_id_list}/{resource_id}"
+        try:
+            LOGGER.info(
+                f"Fetching resource by id: {url} ({(index)}/{(total)}: {(index/total)*100:.2f}%)"
+            )
+            response = self._session.get(url, headers=auth_headers, timeout=60)
+            if response.status_code == 404:
+                LOGGER.warning(f"Resource not found for id={resource_id}, status=404")
+                return None
+            response.raise_for_status()
+            data = response.json()
+            return data.get("data", data)
+        except requests.exceptions.RequestException as e:
+            LOGGER.error(
+                f"Request error fetching resource id={resource_id}: {e}", exc_info=True
+            )
+            raise
+        except json.JSONDecodeError as e:
+            LOGGER.error(
+                f"Failed to decode JSON for resource id={resource_id}: {e}",
+                exc_info=True,
+            )
+            raise
+
+    def get_by_ids(self, resource_ids: list[str]) -> list:
+        """
+        Fetches one resource per ID; returns a list of payloads.
+        Uses a short delay between requests to reduce rate-limit risk.
+
+        Args:
+            resource_ids: List of resource IDs to fetch.
+
+        Returns:
+            List of payloads (skips None).
+        """
+        results = []
+        total_resources = len(resource_ids)
+        for i, rid in enumerate(resource_ids):
+            if i > 0:
+                time.sleep(self._REQUEST_DELAY_SECONDS)
+            payload = self.get_by_id(rid, i + 1, total_resources)
+            if payload is not None:
+                results.append(payload)
+        return results

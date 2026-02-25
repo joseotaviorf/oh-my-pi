@@ -1,0 +1,70 @@
+database_name: datalake_degreed_clean
+table_name: pathway_details
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per pathway with full detail from GET /pathways/{id}. Source raw schema: attributes (struct with title, summary, visibility, degreed_url, is_endorsed, sections array, created_at, modified_at, etc.), relationships (array of struct with collaborators, created_by.data.id). Sections contain lessons and resources.
+columns:
+  id:
+    description: Unique identifier for the pathway.
+    lineage:
+      - datalake_degreed_raw.pathway_details.id
+  resource_type:
+    description: API resource type (e.g. pathway).
+    lineage:
+      - datalake_degreed_raw.pathway_details.type
+  id_user_created_by:
+    description: User ID of the pathway creator from relationships[].created_by.data.id (second element when populated).
+    lineage:
+      - datalake_degreed_raw.pathway_details.relationships[].created_by.data.id
+  title:
+    description: Title of the pathway.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.title
+  summary:
+    description: Summary or description of the pathway.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.summary
+  visibility:
+    description: Visibility setting (e.g. Public, Author, Group).
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.visibility
+  url_degreed:
+    description: URL to the pathway in the Degreed UI.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.degreed_url
+  is_endorsed:
+    description: Whether the pathway is endorsed by the organization.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.is_endorsed
+  is_share_author_permission:
+    description: Whether the pathway author permissions can be shared.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.share_author_permission
+  is_duration_display_disabled:
+    description: Whether pathway duration is hidden in the UI.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.duration_display_disabled
+  is_header_image_disabled:
+    description: Whether the pathway header image is hidden.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.header_image_disabled
+  url_image:
+    description: URL of the pathway image when set.
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.image_url
+  sections:
+    description: Array of sections, each with lessons and resources (pathway structure).
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.sections
+  ts_created:
+    description: When the pathway was created in Degreed (UTC).
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.created_at
+  ts_modified:
+    description: When the pathway was last modified in Degreed (UTC).
+    lineage:
+      - datalake_degreed_raw.pathway_details.attributes.modified_at
+  ts_load:
+    description: When the row was loaded into the clean table.
+    lineage: []
