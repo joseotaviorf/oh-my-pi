@@ -175,9 +175,10 @@ columns:
       - datalake_terminator_clean.termination_characteristics.is_automatic_repair_analysis_opted_out
     description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
   has_bandaid:
-    description: Indicates whether the contract had a bandaid.
+    description: Indicates whether the contract had a bandaid (discount_reviewed_value > 0).
     lineage:
-      - datalake_inspection_services_clean.automatic_invoice.id_contract
+      - datalake_inspections.automatic_discounts.id_contract
+      - datalake_inspections.automatic_discounts.discount_reviewed_value
   has_landlord_comment:
     description: Indicates whether the landlord has provided any comments related to the negotiation.
     lineage:
@@ -185,9 +186,9 @@ columns:
   has_repairs:
     description: Indicates whether the termination had repairs.
       It will be true if
-      (1) it is not an eviction,
-      (2) has repairs and
-      (3) is not early both agree, nor had "Both Agreed" on budget approval or required band-aid. 
+      (1) the count of tenant repairs in AC is greater than 0,
+      (2) if AC repairs = 0 but there were tenant repairs in review and the termination had early mediation, early both agree, or bandaid,
+      or (3) there were unset repairs.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -209,25 +210,72 @@ columns:
     description: Numerical information that indicates the number of installments for the termination fee.
     lineage:
       - datalake_terminator_clean.termination_fee.tenant_payment_method
-  total_tentant_repair_ar:
-    description: Total repairs with tenant's responsibility in repair analysis.
+  total_repairs_requested:
+    description: Total number of repairs requested for the contract.
+    lineage:
+      - datalake_inspections.repair_request
+  repairs_added_by_5a_review:
+    description: Total repairs added by the 5A team (ADMIN or INSPECTIONS_SERVICE) in the review.
+    lineage:
+      - datalake_inspections.repair_request.requester_type
   repairs_added_by_owner_review:
     description: Total repairs added by owner for review.
+    lineage:
+      - datalake_inspections.repair_request.requester_type
+  total_unset_repairs:
+    description: Total repairs for which the responsibility was undefined (UNSET or UNDEFINED) and has a comment.
+    lineage:
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.comment
+  repairs_exempted_in_ar:
+    description: Total repairs exempted during repair analysis (AR).
+    lineage:
+      - datalake_inspections.repair_request.exempted_on_ar
   repairs_exempted_by_owner_review:
     description: Total repairs exempted by the owner in the review.
+    lineage:
+      - datalake_inspections.repair_request.is_exempted_by_owner
+  total_tentant_repair_ar:
+    description: Total repairs with tenant's responsibility in repair analysis. Excludes automatically identified repairs that were not accepted, and filters by valid responsibilities.
+    lineage:
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.exempted_on_ar
+      - datalake_inspections.repair_request.requester_type
   total_tentant_repair_review:
-    description: Total repairs under tenant's responsibility under review.
+    description: Total repairs under tenant's responsibility under review. Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
+      - datalake_inspections.repair_request.exempted_on_ar
+  total_tenant_contestation:
+    description: Total repairs that had tenant contestation (total_tenant_contestation <> 0).
+    lineage:
+      - datalake_inspections.repair_request.total_tenant_contestation
   repairs_exempted_ac:
     description: Total repairs exempted in the contestation analysis.
+    lineage:
+      - datalake_inspections.repair_request.is_finished
+      - datalake_inspections.repair_request.is_exempted
   repairs_absorbed_ac:
-    description: Total repairs absorbed in the contestation analysis.
+    description: Total repairs absorbed in the contestation analysis. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.is_exempted_by_owner
   total_tentant_repair_ac:
     description:
       Total repairs are the tenant's responsibility in the contestation analysis.
-      If the inspection has early mediation or early both agree, the value will be 0, because there's no AC step when one of them happens.
-  total_unset_repairs:
-    description:
-      Total repairs for which the responsibility was undefined. 
+      If the inspection has no contestation analysis step, the value will be 0.
+      Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
+    lineage:
+      - datalake_inspections.repair_request.has_automatically_identified
+      - datalake_inspections.repair_request.has_automatic_identification_accepted
+      - datalake_inspections.repair_request.responsibility
+      - datalake_inspections.repair_request.exempted_on_ar
+      - datalake_inspections.repair_request.is_exempted_by_owner
   repair_cost:
     description: Cost of Repair to be performed in the Offboarding process
     lineage:

@@ -79,32 +79,55 @@ columns:
     description: Numerical information that indicates the number of installments for the termination fee.
     lineage:
       - datalake_terminator.termination.fee_number_of_installments
-  total_tentant_repair_ar:
-    description: Total repairs with tenant's responsibility in repair analysis.
+  total_repairs_requested:
+    description: Total number of repairs requested for the contract.
     lineage:
-      - datalake_terminator.termination.total_tentant_repair_ar
+      - datalake_terminator.termination.total_repairs_requested
+  repairs_added_by_5a_review:
+    description: Total repairs added by the 5A team (ADMIN or INSPECTIONS_SERVICE) in the review.
+    lineage:
+      - datalake_terminator.termination.repairs_added_by_5a_review
   repairs_added_by_owner_review:
     description: Total repairs added by owner for review.
     lineage:
       - datalake_terminator.termination.repairs_added_by_owner_review
+  total_unset_repairs:
+    description: Total repairs for which the responsibility was undefined (UNSET or UNDEFINED) and has a comment.
+    lineage:
+      - datalake_terminator.termination.total_unset_repairs
+  repairs_exempted_in_ar:
+    description: Total repairs exempted during repair analysis (AR).
+    lineage:
+      - datalake_terminator.termination.repairs_exempted_in_ar
   repairs_exempted_by_owner_review:
     description: Total repairs exempted by the owner in the review.
     lineage:
       - datalake_terminator.termination.repairs_exempted_by_owner_review
+  total_tentant_repair_ar:
+    description: Total repairs with tenant's responsibility in repair analysis. Excludes automatically identified repairs that were not accepted, and filters by valid responsibilities.
+    lineage:
+      - datalake_terminator.termination.total_tentant_repair_ar
   total_tentant_repair_review:
-    description: Total repairs under tenant's responsibility under review.
+    description: Total repairs under tenant's responsibility under review. Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
     lineage:
       - datalake_terminator.termination.total_tentant_repair_review
+  total_tenant_contestation:
+    description: Total repairs that had tenant contestation.
+    lineage:
+      - datalake_terminator.termination.total_tenant_contestation
   repairs_exempted_ac:
     description: Total repairs exempted in the contestation analysis.
     lineage:
       - datalake_terminator.termination.repairs_exempted_ac
   repairs_absorbed_ac:
-    description: Total repairs absorbed in the contestation analysis.
+    description: Total repairs absorbed in the contestation analysis. NULL is_exempted_by_owner is treated as not exempted.
     lineage:
       - datalake_terminator.termination.repairs_absorbed_ac
   total_tentant_repair_ac:
-    description: Total repairs are the tenant's responsibility in the contestation analysis.
+    description:
+      Total repairs are the tenant's responsibility in the contestation analysis.
+      If the inspection has no contestation analysis step, the value will be 0.
+      Excludes automatically identified repairs that were not accepted. NULL is_exempted_by_owner is treated as not exempted.
     lineage:
       - datalake_terminator.termination.total_tentant_repair_ac
   repair_cost:
@@ -182,8 +205,9 @@ columns:
   has_repairs:
     description: Indicates whether the termination had repairs.
       It will be true if
-      (1) the count of tenant repairs in AC is greater than 0
-      or (2) if the count of tenant repairs in AC is 0 but there were tenant repairs in AR and the termination had early mediation or early both agree.  
+      (1) the count of tenant repairs in AC is greater than 0,
+      (2) if AC repairs = 0 but there were tenant repairs in review and the termination had early mediation, early both agree, or bandaid,
+      or (3) there were unset repairs.
     lineage:
       - datalake_terminator.termination.has_repairs
   ts_termination_request:

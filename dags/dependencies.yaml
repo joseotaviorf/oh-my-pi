@@ -3960,11 +3960,11 @@ bietlejuice.enrich_terminator:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-declined-relisting:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-automatic-discounts:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
-  - bietlejuice.enrich_inspections:load-enrich-report-approvals:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-reviewer:first-run-of-day
-  - bietlejuice.inspection_services:load-clean-automatic-invoice:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-budget:first-run-of-day
   - bietlejuice.terminator:load-clean-checklist-item:first-run-of-day
   - bietlejuice.terminator:load-clean-inspection-opted-out:first-run-of-day
   - bietlejuice.terminator:load-clean-negotiation:first-run-of-day

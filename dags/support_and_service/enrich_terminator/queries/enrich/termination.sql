@@ -133,82 +133,58 @@ contestation_analysis AS (
 repair_metrics AS (
     SELECT
         rr.id_contract,
-        MAX(ra.is_early_both_agree) AS is_early_both_agree,
-        MAX(ib.has_early_mediation) AS has_early_mediation,
-        COUNT(CASE
-          WHEN rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
-        END) AS total_tentant_repair_ar,
-        COUNT(CASE
-          WHEN rr.requester_type = 'OWNER' THEN 1
-        END) AS repairs_added_by_owner_review,
-        COUNT(CASE
-          WHEN rr.is_exempted_by_owner = true THEN 1
-        END) AS repairs_exempted_by_owner_review,
-        COUNT(CASE
-          WHEN rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
-        END) +
-          COUNT(CASE
-            WHEN rr.requester_type = 'OWNER' THEN 1
-          END) -
-            COUNT(CASE
-              WHEN rr.is_exempted_by_owner = true THEN 1
-            END) AS total_tentant_repair_review,
-        COUNT(CASE
-          WHEN rr.is_finished = true AND rr.is_exempted = true THEN 1
-        END) AS repairs_exempted_ac,
-        COUNT(
-          CASE
-            WHEN rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false THEN 1
-        END) AS repairs_absorbed_ac,
-        CASE 
-          WHEN COUNT(ca.id_inspection) > 0 THEN 
-            COUNT_IF( 
-              (rr.exempted_on_ar = false AND rr.requester_type IN ('ADMIN','INSPECTIONS_SERVICE')) OR (rr.requester_type = 'OWNER') 
-            ) - COUNT_IF( 
-              (rr.is_exempted_by_owner = true) OR (rr.is_finished = true AND rr.is_exempted = true) OR (rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner = false) 
-            ) 
-          ELSE 0 
-        END AS total_tentant_repair_ac
-    FROM
+        COUNT(*) AS total_repairs_requested,
+		COUNT_IF(rr.requester_type IN ('ADMIN', 'INSPECTIONS_SERVICE')) AS repairs_added_by_5a_review,
+        COUNT_IF(rr.requester_type = 'OWNER') AS repairs_added_by_owner_review,
+        COUNT_IF(rr.exempted_on_ar) AS repairs_exempted_in_ar,
+        COUNT_IF(rr.is_exempted_by_owner = TRUE) AS repairs_exempted_by_owner_review,
+        COUNT_IF(
+            NOT (rr.has_automatically_identified IS TRUE AND rr.has_automatic_identification_accepted IS FALSE)
+            AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
+            AND rr.exempted_on_ar = FALSE
+            AND rr.requester_type IN ('ADMIN', 'INSPECTIONS_SERVICE')
+        ) AS total_tentant_repair_ar,
+        COUNT_IF(
+            NOT (rr.has_automatically_identified IS TRUE AND rr.has_automatic_identification_accepted IS FALSE)
+            AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
+            AND rr.is_exempted_by_owner IS NOT TRUE
+            AND rr.exempted_on_ar = FALSE
+        ) AS total_tentant_repair_review,
+        COUNT_IF(rr.total_tenant_contestation <> 0) AS total_tenant_contestation,
+        COUNT_IF(rr.is_finished AND rr.is_exempted) AS repairs_exempted_ac,
+        COUNT_IF(rr.responsibility = 'ABSORBED_BY_COMPANY' AND rr.is_exempted_by_owner IS NOT TRUE) AS repairs_absorbed_ac,
+        CASE
+            WHEN COUNT(ca.id_inspection) > 0 THEN
+                COUNT_IF(
+                    NOT (rr.has_automatically_identified IS TRUE AND rr.has_automatic_identification_accepted IS FALSE)
+                    AND rr.responsibility IN ('TENANT', 'OWNER', 'EXEMPTED') -- ABSORBED_BY_COMPANY excluded as it is subtracted in the original logic
+                    AND rr.exempted_on_ar = FALSE
+                    AND rr.is_exempted_by_owner IS NOT TRUE
+                    AND NOT (rr.is_finished AND rr.is_exempted)
+                )
+            ELSE 0
+        END AS total_tentant_repair_ac,
+        COUNT_IF(rr.responsibility IN ('UNSET', 'UNDEFINED') AND rr.comment IS NOT NULL) AS total_unset_repairs     
+    FROM 
         datalake_inspections.repair_request AS rr
-    LEFT JOIN
-        datalake_inspections.report_approvals AS ra
-            ON rr.id_inspection = ra.id_inspection
-    LEFT JOIN
-        datalake_inspections.inspection_booking AS ib
-            ON rr.id_inspection = ib.id_inspection
     LEFT JOIN
         contestation_analysis AS ca
             ON rr.id_inspection = ca.id_inspection
-    WHERE
-        (
-        (rr.has_automatically_identified IS NULL AND rr.comment IS NOT NULL) -- proxy legacy rule
-        OR NOT rr.has_automatically_identified 
-        OR (rr.has_automatically_identified AND rr.has_automatic_identification_accepted) 
-        OR rr.has_automatic_identification_accepted IS NULL
-        )
-        AND rr.responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
-    GROUP BY
-          1
+    GROUP BY 
+        rr.id_contract
 ),
-bandaid AS (
+early_info AS (
     SELECT
-        id_contract
-    FROM
-        datalake_inspection_services_clean.automatic_invoice 
-    WHERE
-        tag = 'AUTOMATIC_BANDAID'
-        AND (owner_cost - tenant_cost) > 0
+        ib.id_contract,
+        ib.has_early_mediation,
+        b.is_early_both_agree
+    FROM 
+        datalake_inspections.inspection_booking AS ib
+    LEFT JOIN 
+        datalake_inspection_services_clean.budget AS b
+            ON ib.id_inspection = b.id_inspection
     QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created) = 1
-),
-unset_repairs AS (
-    SELECT
-        rr.id_contract,
-        COUNT_IF(rr.responsibility IN ('UNSET', 'UNDEFINED') AND rr.comment IS NOT NULL) AS total_unset_repairs
-    FROM
-        datalake_inspections.repair_request AS rr
-    GROUP BY ALL
+        ROW_NUMBER() OVER (PARTITION BY ib.id_contract ORDER BY ib.ts_created DESC) = 1
 )
 SELECT
     t.id AS id_termination,
@@ -258,11 +234,11 @@ SELECT
     tc.has_automatic_repair_analysis,
     tc.is_automatic_repair_analysis_opted_out,
     neg.has_landlord_comment,
-    b.id_contract IS NOT NULL AS has_bandaid,
+    ad.id_contract IS NOT NULL AS has_bandaid,
     CASE
         WHEN rm.total_tentant_repair_ac > 0
-            OR (rm.total_tentant_repair_ac = 0 AND rm.total_tentant_repair_review > 0 AND (rm.has_early_mediation OR rm.is_early_both_agree OR b.id_contract IS NOT NULL))
-            OR ur.total_unset_repairs > 0        
+            OR (rm.total_tentant_repair_ac = 0 AND rm.total_tentant_repair_review > 0 AND (ei.has_early_mediation OR ei.is_early_both_agree OR ad.id_contract IS NOT NULL))
+            OR rm.total_unset_repairs > 0        
         THEN TRUE
         ELSE FALSE
     END AS has_repairs,
@@ -271,14 +247,18 @@ SELECT
     ln.fee_discount_value,
     ln.fee_final_amount,
     ln.fee_number_of_installments,
-    rm.total_tentant_repair_ar,
+    rm.total_repairs_requested,
+    rm.repairs_added_by_5a_review,
     rm.repairs_added_by_owner_review,
+    rm.total_unset_repairs,
+    rm.repairs_exempted_in_ar,
+    rm.total_tentant_repair_ar,
     rm.repairs_exempted_by_owner_review,
     rm.total_tentant_repair_review,
+    rm.total_tenant_contestation,
     rm.repairs_exempted_ac,
     rm.repairs_absorbed_ac,
     rm.total_tentant_repair_ac,
-    ur.total_unset_repairs,
     neg.repair_cost,
     t.spoc_wave,
     t.dt_vacancy AS dt_termination,
@@ -334,20 +314,21 @@ LEFT JOIN
     repair_metrics AS rm
         ON t.id_contract = rm.id_contract
 LEFT JOIN
-    unset_repairs AS ur
-        ON t.id_contract = ur.id_contract
-LEFT JOIN
-    bandaid AS b
-        ON t.id_contract = b.id_contract
+    datalake_inspections.automatic_discounts AS ad
+        ON t.id_contract = ad.id_contract
+        AND ad.discount_reviewed_value > 0
 LEFT JOIN
     datalake_terminator_clean.inspection_opted_out AS ioo
-      ON t.id = ioo.id_termination
+        ON t.id = ioo.id_termination
 LEFT JOIN
     datalake_terminator_clean.termination_characteristics AS tc
         ON tc.id_termination = t.id
 LEFT JOIN
     first_td
-      ON t.id = first_td.id_termination
+        ON t.id = first_td.id_termination
+LEFT JOIN 
+    early_info AS ei
+        ON t.id_contract = ei.id_contract 
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
