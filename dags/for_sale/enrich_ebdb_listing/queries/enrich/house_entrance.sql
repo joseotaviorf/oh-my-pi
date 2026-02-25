@@ -52,6 +52,20 @@ last_contract_by_house AS (
         datalake_ebdb_clean.contract
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_created DESC) = 1
+),
+agent_events AS (
+    SELECT
+        id_house,
+        MAX(ts_entrance_started) FILTER (WHERE key_location != 'AGENT') AS last_not_agent,
+        MAX(ts_entrance_started) FILTER (WHERE key_location = 'AGENT' AND event_type = 'KEY_HOLDER_ALLOCATED') AS ts_last_agent_allocation,
+        IF(ts_last_agent_allocation >= COALESCE(last_not_agent, ts_last_agent_allocation), TRUE, FALSE) AS has_agent_allocated,
+        MAX(ts_entrance_started) FILTER (WHERE key_location = 'AGENT' AND event_type = 'KEY_HOLDER_VALIDATED') AS ts_last_agent_validated,
+        MAX(ts_entrance_started) FILTER (WHERE key_location = 'AGENT' AND event_type = 'KEY_HOLDER_DEALLOCATED') AS ts_last_agent_deallocation,
+        IF(has_agent_allocated AND ts_last_agent_validated >= ts_last_agent_allocation, TRUE, FALSE) AS has_agent_validated,
+        IF(has_agent_allocated AND ts_last_agent_deallocation >= ts_last_agent_allocation, TRUE, FALSE) AS has_agent_deallocated
+    FROM
+        datalake_ebdb_listing.house_entrance_history
+    GROUP BY 1
 )
 SELECT
     new.id_house,
@@ -66,6 +80,12 @@ SELECT
     new.location,
     new.holder_type,
     new.holder_identifier,
+    ae.has_agent_allocated,
+    ae.has_agent_validated,
+    ae.has_agent_deallocated,
+    IF(ae.has_agent_allocated, ts_last_agent_allocation, NULL) AS ts_last_agent_allocation,
+    IF(ae.has_agent_validated, ts_last_agent_validated, NULL) AS ts_last_agent_validated,
+    IF(ae.has_agent_deallocated, ts_last_agent_deallocation, NULL) AS ts_last_agent_deallocation,
     new.ts_created,
     new.ts_updated
 FROM
@@ -76,3 +96,7 @@ LEFT JOIN
 LEFT JOIN
     last_contract_by_house AS lc
         ON new.id_house = lc.id_house
+LEFT JOIN
+    agent_events AS ae
+        ON new.id_house = ae.id_house
+        AND new.key_location = 'AGENT'

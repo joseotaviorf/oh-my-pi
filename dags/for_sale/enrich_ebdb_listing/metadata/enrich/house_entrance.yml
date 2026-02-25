@@ -63,6 +63,30 @@ columns:
     lineage:
       - datalake_ebdb_clean.key_holder.holder_identifier
     description: ID of key holder.
+  has_agent_allocated:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.event_type
+    description: True if the agent with keys was allocated.
+  has_agent_validated:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.event_type
+    description: True if the agent with keys was validated (keys delivered to agent).
+  has_agent_deallocated:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.event_type
+    description: True if the agent with keys was deallocated.
+  ts_last_agent_allocation:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
+    description: Timestamp of the last agent allocation.
+  ts_last_agent_validated:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
+    description: Timestamp of the last agent validation.
+  ts_last_agent_deallocation:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
+    description: Timestamp of the last agent deallocation.
   ts_created:
     lineage:
       - datalake_ebdb_clean.entry_access.ts_created
