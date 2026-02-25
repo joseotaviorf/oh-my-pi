@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This pipeline processes health metrics relevant to Concierge. 
+This pipeline processes health metrics relevant to Concierge.
 
 <details>
   <summary><strong> DAG details (click to expand)</strong></summary>
@@ -21,5 +21,6 @@ This pipeline produces the following output table on enrich layer:
 - `concierge_direct_vb`
 - `concierge_indirect_vb`
 - `concierge_prospects_aux`
+- `concierge_demand`
 
 </details>

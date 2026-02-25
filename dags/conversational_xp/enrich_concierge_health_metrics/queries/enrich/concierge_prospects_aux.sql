@@ -30,10 +30,6 @@ SELECT
   p.operation_channel AS prospect_activation_channel,
   p.business_context,
   p.prospect_event_type,
-  CASE 
-    WHEN prospect_event_type = 'prospect_churn' THEN TRUE
-    ELSE FALSE 
-  END AS is_contact_prospect,
   c.ts_concierge_contact,
   c.ts_message_sent,
   p.ts_prospect_event,

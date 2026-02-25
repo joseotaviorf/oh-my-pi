@@ -23,6 +23,11 @@ workflow:
       - concierge_messages
     concierge_indirect_vb:
       - concierge_messages
+    concierge_demand:
+      - concierge_messages
+      - concierge_prospects_aux
+      - concierge_direct_vb
+      - concierge_indirect_vb
   tables_customization:
     concierge_messages:
       partitions: [year, month, day]
@@ -31,6 +36,8 @@ workflow:
     concierge_indirect_vb:
       partitions: [year, month, day]
     concierge_prospects_aux:
+      partitions: [year, month, day]
+    concierge_demand:
       partitions: [year, month, day]
 
 cluster:

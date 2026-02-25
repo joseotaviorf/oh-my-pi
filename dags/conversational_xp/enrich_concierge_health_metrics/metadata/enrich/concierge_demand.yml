@@ -1,0 +1,168 @@
+database_name: datalake_search
+table_name: concierge_demand
+owner: yiyi.ji@quintoandar.com
+domain: Conversational XP
+description: Table containing information about inbound and outbound messages sent to and received by concierge, visits scheduled through concierge (direct and indirectly) and whether the user is a prospect or not. Concierge is identified as Julia in WhatsApp. 
+columns:
+  id_user:
+    lineage:
+    - datalake_search.concierge_messages.id_user
+    - datalake_search.concierge_direct_vb.id_user
+    - datalake_search.concierge_indirect_vb.id_user
+    description: The id of the user who has interacted with concierge or has booked a visit through a listing page referred by concierge but didn't interact with concierge.
+  id_copilot_session:
+    lineage:
+    - datalake_search.concierge_messages.id_copilot_session
+    description: The id of the copilot session.
+  user_phone:
+    lineage:
+    - datalake_search.concierge_messages.user_phone
+    description: The phone number of the user who has interacted with concierge.
+  id_phone_session:
+    lineage:
+    - datalake_search.concierge_messages.id_phone_session
+    description: Concatenation of the user phone number and the copilot conversation session.
+  id_house_of_vb:
+    lineage:
+    - datalake_search.concierge_direct_vb.id_house
+    - datalake_search.concierge_indirect_vb.id_house
+    description: The id of the house of the visit booked or rescheduled through concierge (direct and indirect).
+  id_visit:
+    lineage:
+    - datalake_search.concierge_direct_vb.id_visit
+    - datalake_search.concierge_indirect_vb.id_visit
+    description: The id of the visit booked or rescheduled through concierge (direct and indirect).
+  visit_code:
+    lineage:
+    - datalake_search.concierge_direct_vb.visit_code
+    - datalake_search.concierge_indirect_vb.visit_code
+    description: The code of the visit booked or rescheduled through concierge (direct and indirect).
+  concierge_flow:
+    lineage:
+    - datalake_search.concierge_messages.concierge_flow
+    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc. 'Unknown' if the flow type is not known; it happens when a user booked through a listing page referred by concierge but have no existing chat records with the concierge.
+  concierge_flow_type:
+    lineage:
+    - datalake_search.concierge_messages.concierge_flow_type
+    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc. 'Unknown' if the flow type is not known; it happens when a user booked through a listing page referred by concierge but have no existing chat records with the concierge.
+  has_human_reply:
+    lineage:
+    - datalake_search.concierge_messages.has_human_reply
+    description: Whether the message has a human reply.
+  prospect_activation_channel:
+    lineage:
+    - datalake_search.concierge_prospect_aux.prospect_activation_channel
+    description: The channel from which the prospect was activated, e.g., 'WHATSAPP_CONCIERGE', 'SelfService', 'Agent'. 'SelfService' could also indicate that a prospect made an indirect visit booking through concierge, in this case the column "concierge_vb_type" will be 'indirect'.
+  prospect_event_type:
+    lineage:
+    - datalake_search.concierge_prospect_aux.prospect_event_type
+    description: The type of the prospect event. E.g. 'Activation', 'Churn', etc.
+  is_contact_prospect:
+    lineage:
+    - datalake_search.concierge_prospect_aux.prospect_event_type
+    - datalake_search.concierge_prospect_aux.ts_prospect_event
+    - datalake_search.concierge_messages.ts_message_sent
+    description: Whether the user is a contact prospect or not. If a user had contacted concierge and never had initiated a RENT/SALE flow, or had previously churned or initiated a RENT/SALE flow on the day of the concierge contact then this user is a contact prospect.
+  is_concierge_prospect:
+    lineage:
+    - datalake_search.concierge_prospect_aux.prospect_event_type
+    - datalake_search.concierge_prospect_aux.ts_prospect_event
+    - datalake_search.concierge_messages.ts_message_sent
+    - datalake_search.concierge_direct_vb.is_direct_visit_booked
+    - datalake_search.concierge_indirect_vb.is_indirect_visit_booked
+    description: Users who became a prospect by initiating a RENT/SALE flow by booking a visit through concierge (direct or indirect).
+  business_context:
+    lineage:
+    - datalake_search.concierge_direct_vb.business_context
+    - datalake_search.concierge_indirect_vb.business_context
+    - datalake_search.concierge_prospect_aux.business_context
+    description: The business context of the visit ('RENT' OR 'SALE'), or when not available the business context of the prospect's previous visit booking.
+  concierge_vb_type:
+    lineage:
+    - datalake_search.concierge_direct_vb.is_direct_visit_booked
+    - datalake_search.concierge_indirect_vb.is_indirect_visit_booked
+    description: The type of the visit booking through concierge (direct or indirect). Direct - a user books a visit directly by messaging concierge in WhatsApp. Indirect - a user books a visit through a listing page recommended by concierge.
+  visit_request_channel:
+    lineage:
+    - datalake_search.concierge_direct_vb.visit_request_channel
+    - datalake_search.concierge_indirect_vb.visit_request_channel
+    description: The channel from which the visit was requested, e.g., 'WHATSAPP_CONCIERGE', 'TENANT_NATIVE', 'TENANT_PWA'. As of Feb 2026, for indirect bookings, this channel is not expected to be 'WHATSAPP_CONCIERGE', as booking through a listing page categorizes as self service.
+  concierge_visit_event:
+    lineage:
+    - datalake_search.concierge_direct_vb.visit_event_type
+    description: The type of the event that created/changed the visit, i.e., 'VISIT_SCHEDULED' or 'VISIT_RESCHEDULED'. It applies only to direct visits.
+  is_visit_booked:
+    lineage:
+    - datalake_search.concierge_direct_vb.is_direct_visit_booked
+    - datalake_search.concierge_indirect_vb.is_indirect_visit_booked
+    description: Whether the visit was booked through concierge (direct or indirect).
+  is_visit_completed:
+    lineage:
+    - datalake_search.concierge_direct_vb.is_visit_completed
+    - datalake_search.concierge_indirect_vb.is_visit_completed
+    description: Whether the visit was completed.
+  is_offer_submitted:
+    lineage:
+    - datalake_search.concierge_direct_vb.is_offer_submitted
+    - datalake_search.concierge_indirect_vb.is_offer_submitted
+    description: Whether the offer was submitted.
+  is_offer_accepted:
+    lineage:
+    - datalake_search.concierge_direct_vb.is_offer_accepted
+    - datalake_search.concierge_indirect_vb.is_offer_accepted
+    description: Whether the offer was accepted.
+  is_contract_signed:
+    lineage:
+    - datalake_search.concierge_direct_vb.is_contract_signed
+    description: Whether the contract was signed.
+  days_msg2indirect_vb:
+    lineage:
+    - datalake_search.concierge_indirect_vb.days_msg2vb
+    description: The number of days between the concierge contact message and the visit booking through listing page recommended by concierge. It applies only to indirect visits.
+  ts_first_outbound_contact:
+    lineage:
+    - datalake_search.concierge_messages.ts_first_outbound_contact
+    description: The timestamp of the very first outbound message sent to the user.
+  ts_first_inbound_contact:
+    lineage:
+    - datalake_search.concierge_messages.ts_first_inbound_contact
+    description: The timestamp of the very first inbound message sent by the user.
+  ts_first_concierge_contact:
+    lineage:
+    - datalake_search.concierge_messages.ts_first_concierge_contact
+    description: The timestamp of the very first contact with the user (inbound or outbound).
+  ts_concierge_contact:
+    lineage:
+    - datalake_search.concierge_messages.ts_concierge_contact
+    description: The timestamp of the outbound contact or the start of a session in inbound contact.
+  ts_prospect_event:
+    lineage:
+    - datalake_search.concierge_prospect_aux.ts_prospect_event
+    description: The timestamp of the prospect event (activation or churn).
+  ts_concierge_visit_event:
+    lineage:
+    - datalake_search.concierge_direct_vb.ts_visit_event_created
+    description: The timestamp of the event that created/changed the visit, i.e., 'VISIT_SCHEDULED' or 'VISIT_RESCHEDULED'. It applies only to direct visits.
+  ts_visit_created:
+    lineage:
+    - datalake_search.concierge_direct_vb.ts_visit_created
+    - datalake_search.concierge_indirect_vb.ts_visit_created
+    description: The timestamp of the first visit creation. It can differ from the ts_concierge_visit_event if the it was a reschedule.
+  year:
+    lineage:
+    - datalake_search.concierge_messages.year
+    - datalake_search.concierge_direct_vb.ts_visit_created
+    - datalake_search.concierge_indirect_vb.ts_visit_created
+    description: The year of the contact with the user (inbound or outbound) or when not available, the year of the first visit creation. For database partition purposes.
+  month:
+    lineage:
+    - datalake_search.concierge_messages.month
+    - datalake_search.concierge_direct_vb.ts_visit_created
+    - datalake_search.concierge_indirect_vb.ts_visit_created
+    description: The month of the contact with the user (inbound or outbound) or when not available, the month of the first visit creation. For database partition purposes.
+  day:
+    lineage:
+    - datalake_search.concierge_messages.day
+    - datalake_search.concierge_direct_vb.ts_visit_created
+    - datalake_search.concierge_indirect_vb.ts_visit_created
+    description: The day of the contact with the user (inbound or outbound) or when not available, the day of the first visit creation. For database partition purposes.

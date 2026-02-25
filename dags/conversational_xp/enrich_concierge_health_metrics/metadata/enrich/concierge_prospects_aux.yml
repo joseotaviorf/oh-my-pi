@@ -32,10 +32,6 @@ columns:
     lineage:
     - dw_growth.fact_demand_prospect_events.event_name
     description: The type of the prospect event, e.g., 'new_prospect', 'recovered_prospect', 'prospect_churn'.
-  is_contact_prospect:
-    lineage:
-    - dw_growth.fact_demand_prospect_events.event_name
-    description: A Contact Prospect is a user contacted by the concierge who was not previously active. This includes users who had never initiated a flow (booked a visit or made a direct offer) and those who had previously churned.
   ts_concierge_contact:
     lineage:
     - datalake_search.concierge_messages.ts_concierge_contact
