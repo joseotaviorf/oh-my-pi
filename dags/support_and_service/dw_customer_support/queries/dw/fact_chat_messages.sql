@@ -287,3 +287,5 @@ SELECT
   NOW() AS ts_load
 FROM
   all_messages_with_tasks
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY id_message ORDER BY ts_created DESC) = 1
