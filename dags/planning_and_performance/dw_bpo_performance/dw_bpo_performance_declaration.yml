@@ -72,9 +72,6 @@ workflow:
     tickets_transferred:
       partitions: [year, month, day]
       extraction_type: full
-    tickets_contract:
-      partitions: [year, month, day]
-      extraction_type: full
     tmr:
       partitions: [year, month, day]
       extraction_type: full
