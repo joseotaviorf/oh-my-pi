@@ -124,6 +124,10 @@ columns:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.exempted_cost
     description: Discount value granted (exempted from payment).
+  person_blocked:
+    lineage:
+      - datalake_inspection_services_raw.invoice_discount.person_blocked
+    description: Indicates if the person is blocked from receiving discounts.
   dt_discount_accepted:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_accepted_at

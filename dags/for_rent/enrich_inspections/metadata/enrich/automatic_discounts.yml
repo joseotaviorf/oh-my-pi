@@ -14,6 +14,11 @@ columns:
       - datalake_inspection_services_clean.automatic_invoice.id_contract
       - datalake_inspection_services_clean.invoice_discount.id_contract
     description: ID of the contract associated with the inspection discount.
+  uuid_inspection:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.uuid_inspection
+      - datalake_inspection_services_clean.invoice_discount.uuid_inspection
+    description: Inspection unique identifier (UUID). Used to correlate discount data with inspection reports.
   id_checkpoint:
     lineage:
       - datalake_inspection_services_clean.invoice_discount.id_checkpoint

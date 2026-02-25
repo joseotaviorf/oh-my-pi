@@ -5,6 +5,7 @@
 WITH united_data AS (
     SELECT
         id_contract,
+        uuid_inspection,
         CAST(ts_created AS DATE) AS dt_discount_creation,
         NULL AS dt_discount_response,
         CAST(ts_created AS DATE) AS dt_invoice_creation,
@@ -46,6 +47,7 @@ WITH united_data AS (
 
     SELECT
         disc.id_contract,
+        disc.uuid_inspection,
         CAST(disc.ts_created AS DATE) AS dt_discount_creation,
         CAST(disc.dt_discount_accepted AS DATE) AS dt_discount_response,
         CAST(inv.ts_created AS DATE) AS dt_invoice_creation,
@@ -97,16 +99,17 @@ WITH united_data AS (
 )
 SELECT
     id_contract,
+    uuid_inspection,
     id_checkpoint,
     model_discount_type,
     discount_value_type,
     discount_stage,
-    inspection_cost,
-    disputed_inspection_cost,
-    discount_value,
-    discount_reviewed_value,
-    invoice_tenant_cost,
-    invoice_owner_cost,
+    CAST(inspection_cost AS DOUBLE) AS inspection_cost,
+    CAST(disputed_inspection_cost AS DOUBLE) AS disputed_inspection_cost,
+    CAST(discount_value AS DOUBLE) AS discount_value,
+    CAST(discount_reviewed_value AS DOUBLE) AS discount_reviewed_value,
+    CAST(invoice_tenant_cost AS DOUBLE) AS invoice_tenant_cost,
+    CAST(invoice_owner_cost AS DOUBLE) AS invoice_owner_cost,
     has_discount_try,
     is_discount_accepted,
     has_applied_discount,

@@ -695,6 +695,7 @@ bietlejuice.dw_hub_services:
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_amplitude_inspections:load-enrich-inspection-stages-access:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-appointment-inspection:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-automatic-discounts:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspection-status-change:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-inspector-reports:first-run-of-day
