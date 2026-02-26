@@ -1,0 +1,90 @@
+database_name: datalake_degreed_clean
+table_name: skill_plan_details
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per skill plan with full detail from GET /skill-plans/{id}. Source raw: attributes, sections, relationships (collaborators), included, links. See Skill Plan API https://developer.degreed.com/reference/skillplan.
+columns:
+  id:
+    description: Unique identifier for the skill plan within Degreed.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.id
+  id_external:
+    description: External identifier for the skill plan from another system.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.external_id
+  relationships:
+    description: Array of relationship structs (e.g. collaborators with data array of id, type).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.relationships
+  name:
+    description: Name or title of the skill plan.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.name
+  subtitle:
+    description: Subtitle or tagline for the skill plan.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.subtitle
+  description:
+    description: Detailed description of what the skill plan covers.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.description
+  type:
+    description: API resource type (e.g. skill-plan).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.type
+  plan_type:
+    description: Type of the skill plan (e.g. Role, Target).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.plan_type
+  visibility:
+    description: Visibility setting (e.g. Public, Group).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.visibility
+  url_degreed:
+    description: URL to access the skill plan in the Degreed platform.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.degreed_url
+  url_image:
+    description: URL for the skill plan cover image.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.image_url
+  is_collaborative:
+    description: Whether other users can be invited to collaborate on the skill plan.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.can_collaborate
+  is_followable:
+    description: Whether other users can follow this skill plan.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.can_follow
+  is_endorsed:
+    description: Whether the skill plan is officially endorsed by the organization.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.is_endorsed
+  collaborators:
+    description: Array of collaborator structs (employee_id, id, type).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.collaborators
+  sections:
+    description: Array of sections, each with resources (pathway structure).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.sections
+  included:
+    description: Array of included related resources (e.g. users) from the API response.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.included
+  links:
+    description: Struct with self link to the resource in the API.
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.links
+  ts_created:
+    description: When the skill plan was created in Degreed (UTC).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.created_at
+  ts_modified:
+    description: When the skill plan was last modified in Degreed (UTC).
+    lineage:
+      - datalake_degreed_raw.skill_plan_details.attributes.modified_at
+  ts_load:
+    description: When the row was loaded into the clean table.
+    lineage: []

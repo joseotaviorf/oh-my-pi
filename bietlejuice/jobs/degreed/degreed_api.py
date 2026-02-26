@@ -5,6 +5,8 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from pyspark.sql import SparkSession
+
 from bietlejuice.base.spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 
@@ -19,16 +21,19 @@ class DegreedAPI:
 
     _TOKEN_URLS = {
         "PROD": "https://degreed.com/oauth/token",
-        "FORNO": "https://betatest.degreed.com/oauth/token",
+        "FORNO": "https://degreed.com/oauth/token",
     }
     _API_BASE_URLS = {
         "PROD": "https://api.degreed.com/api/v2/",
-        "FORNO": "https://api.betatest.degreed.com/api/v2/",
+        "FORNO": "https://api.degreed.com/api/v2/",
     }
     _REQUEST_DELAY_SECONDS = 0.5
     _MAX_RETRIES = 5
     _BACKOFF_FACTOR = 2
     _SAFE_RESOURCE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
+    _IDS_SOURCE_DATABASE_KEY = "ids_source_database"
+    _IDS_SOURCE_TABLE_KEY = "ids_source_table"
+    _ID_COLUMN_KEY = "id_column"
 
     def __init__(self, job_args: dict):
         """
@@ -53,9 +58,8 @@ class DegreedAPI:
         self.load_start_date = job_args.get("load_start_date")
         self.load_end_date = job_args.get("load_end_date")
         self.base_filters = job_args.get("base_filters", {})
-        self.endpoint_for_id_list = (
-            job_args.get("endpoint_for_id_list") or self.endpoint
-        )
+        endpoint_path = job_args.get("endpoint_for_id_list") or self.endpoint
+        self.endpoint_for_id_list = (endpoint_path or "").replace("_", "-")
 
         self._client_id, self._client_secret = self._get_secrets()
         self._access_tokens = {}
@@ -379,3 +383,68 @@ class DegreedAPI:
             if payload is not None:
                 results.append(payload)
         return results
+
+    def get_all_from_id_list(self, spark: SparkSession, job_args: dict) -> list:
+        """
+        Fetches resources by ID list: reads IDs from a Spark table (from job_args),
+        validates and filters them for safe URL use, then calls get_by_ids.
+
+        Requires job_args to include ids_source_database, ids_source_table, and
+        optionally id_column (default "id").
+
+        Returns:
+            List of payloads from the API (one per valid ID).
+        """
+        self._validate_ids_source(job_args)
+        database = job_args[self._IDS_SOURCE_DATABASE_KEY]
+        table = job_args[self._IDS_SOURCE_TABLE_KEY]
+        id_column = job_args.get(self._ID_COLUMN_KEY, "id")
+        ids = self._get_ids_from_table(spark, database, table, id_column)
+        if not ids:
+            LOGGER.warning(
+                "No IDs returned from ids source table. No data will be loaded."
+            )
+            return []
+        LOGGER.info(f"Fetched {len(ids)} IDs from {database}.{table}")
+        ids_safe = self._filter_safe_resource_ids(ids)
+        if len(ids_safe) < len(ids):
+            LOGGER.warning(
+                "Dropped %s invalid ID(s) (allowed: alphanumeric, hyphen, underscore)",
+                len(ids) - len(ids_safe),
+            )
+        if not ids_safe:
+            LOGGER.warning("No valid IDs to fetch. No data will be loaded.")
+            return []
+        return self.get_by_ids(ids_safe)
+
+    def _validate_ids_source(self, job_args: dict) -> None:
+        if not job_args.get(self._IDS_SOURCE_DATABASE_KEY) or not job_args.get(
+            self._IDS_SOURCE_TABLE_KEY
+        ):
+            raise ValueError(
+                "From-id-list ingestion requires extra_details to include "
+                f"'{self._IDS_SOURCE_DATABASE_KEY}' and '{self._IDS_SOURCE_TABLE_KEY}'."
+            )
+
+    def _get_ids_from_table(
+        self, spark: SparkSession, database: str, table: str, id_column: str
+    ) -> list[str]:
+        full_table_name = f"{database}.{table}"
+        LOGGER.info(f"Reading IDs from {full_table_name}, column {id_column}")
+        df = spark.table(full_table_name).select(id_column).distinct()
+        rows = df.collect()
+        return [
+            str(getattr(row, id_column))
+            for row in rows
+            if getattr(row, id_column) is not None
+        ]
+
+    def _filter_safe_resource_ids(self, ids: list[str]) -> list[str]:
+        """Keep only IDs that are safe for URL path (SSRF mitigation)."""
+        return [
+            i
+            for i in ids
+            if isinstance(i, str)
+            and i.strip()
+            and self._SAFE_RESOURCE_ID_PATTERN.match(i)
+        ]
