@@ -18,8 +18,8 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.2xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     aws_attributes:
