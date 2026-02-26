@@ -5,6 +5,6 @@ column_level_validations:
   id_amplitude:
     is_complete:
       severity_level: Error
-  ts_updated:
+  ts_latest_activity:
     is_complete:
       severity_level: Error
