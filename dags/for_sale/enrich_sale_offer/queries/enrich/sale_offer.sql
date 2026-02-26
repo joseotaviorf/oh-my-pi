@@ -10,9 +10,10 @@ WITH business_unit_by_hub_id AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY bu.id ORDER BY bu.ts_updated DESC) = 1
 ),
-base_visits AS (      
+base_visits AS (
   SELECT 
-    b.id_schedule AS id,  
+    b.id_schedule AS id_booking,
+    b.id_visit,  
     b.id_house,
     b.id_visitor,
     b.id_agent,
@@ -26,6 +27,7 @@ base_visits AS (
     b.id_company_demand,
     v.partner_3p_demand AS partner_3p_demand,    
     v.visit_request_channel AS visit_channel, 
+    b.id_succeed_schedule,
     b.is_3p_supply,
     b.is_3p_demand,
     b.is_3p_lead_gen,
@@ -40,13 +42,66 @@ base_visits AS (
       ON b.id_visit = v.id_visit
   WHERE
       b.business_context = 'SALE'
-  AND b.is_completed = TRUE
 ),
-visit_offer AS (    
+salesflow_visit AS (
+  SELECT
+    sf.id AS id_sales_flow,
+    sf.id_visit_external AS id_visit,
+    vs.id_booking
+  FROM  
+    datalake_sales_flow_clean.sales_flow AS sf
+  LEFT JOIN
+    base_visits AS vs
+      ON vs.id_visit = sf.id_visit_external
+  WHERE 
+    vs.id_succeed_schedule IS NULL --PEGA O AGENDAMENTO ATIVO DA VISITA
+),
+last_visit AS (
+  SELECT    
+    eso.id_sales_flow,
+    bs.id_visit,
+    bs.id_booking    
+  FROM
+    datalake_sale_offer.core_sale_offer AS eso
+  LEFT JOIN
+    base_visits AS bs
+        ON bs.id_house = eso.id_house
+        AND bs.id_visitor = eso.id_buyer
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY
+          eso.id_offer
+      ORDER BY
+          bs.ts_visit
+      DESC
+    ) = 1  
+),
+union_visits AS (
+  SELECT 
+    sfv.id_sales_flow,
+    sfv.id_visit,
+    sfv.id_booking,
+    '1 - Sales Flow' as visit_link_type
+  FROM 
+    salesflow_visit AS sfv
+  
+  UNION ALL
+
+  SELECT
+    lv.id_sales_flow,
+    lv.id_visit,
+    lv.id_booking,
+    '2 - Last Visit' as visit_link_type
+  FROM 
+    last_visit AS lv  
+),
+visit_offer AS (
   SELECT
     eso.id_offer,
+    bs.id_visit,
     eso.id_buyer,
-    bs.id AS id_booking,
+    eso.id_sales_flow,
+    bs.id_booking,
     bs.id_agent,
     bs.id_user_secretariat_booking_creator,
     bs.id_company_supply,
@@ -55,6 +110,7 @@ visit_offer AS (
     bs.is_3p_supply,
     bs.is_3p_demand,
     bs.is_3p_lead_gen,
+    uv.visit_link_type,
     bs.has_3p_access_control,
     CASE
       WHEN bs.ts_booking_created < eso.ts_offer_created THEN TRUE
@@ -66,23 +122,24 @@ visit_offer AS (
     END AS flg_visit_completed_before_offer,
     (unix_timestamp(eso.ts_offer_created)-unix_timestamp(bs.ts_booking_created))/(3600) AS hours_booking_to_offer,
     (unix_timestamp(eso.ts_offer_created)-unix_timestamp(bs.ts_visit))/(3600) AS hours_visit_to_offer,    
-    bs.ts_booking_created ,
+    bs.ts_booking_created,
     bs.ts_visit,
     bs.visit_channel,
     eso.ts_offer_created
   FROM
     datalake_sale_offer.core_sale_offer AS eso
-  JOIN
+  LEFT JOIN
+    union_visits AS uv
+        ON eso.id_sales_flow = uv.id_sales_flow
+  LEFT JOIN
     base_visits AS bs
-        ON bs.id_house = eso.id_house
-        AND bs.id_visitor = eso.id_buyer
+        ON bs.id_visit = uv.id_visit
   QUALIFY
     ROW_NUMBER() OVER (
       PARTITION BY
-          eso.id_offer
+          eso.id_sales_flow
       ORDER BY
-          bs.ts_visit
-      DESC
+          uv.visit_link_type --ORDENA PARA PEGAR DO SALESFLOW PRIMEIRO
     ) = 1
 ),
 rank_offers AS (
@@ -212,7 +269,7 @@ rescue_flow AS (
     rescue_and_cancelation_status
 )
 
-SELECT    
+SELECT
   o.id_offer,
   o.id_sales_flow,
   o.id_buyer,
@@ -230,6 +287,7 @@ SELECT
   vo.is_3p_lead_gen,
   vo.has_3p_access_control,
   vo.id_user_secretariat_booking_creator,
+  vo.visit_link_type,
   o.flow_type,
   CASE
     WHEN o.flow_type = 'DEAL_MAKING'
@@ -258,8 +316,6 @@ SELECT
   o.drop_reason_responsible,    
   bu.hub_name AS business_unit,
   o.is_a_rescued_offer,
-  --slpc.price_segment,    
-  --bpt.id_buyer_prospect_type,    
   CAST(NULL AS STRING) AS price_segment,
   CAST(NULL AS BIGINT) AS id_buyer_prospect_type,
   sp.id_user_agent,
@@ -318,37 +374,30 @@ SELECT
       WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_accepted)
       THEN DATEDIFF(DATE(o.ts_offer_accepted), DATE(o.ts_offer_created))
   END AS days_offer_submitted_to_offer_accepted,
-
   CASE
       WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_created)
       THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
-  END AS days_offer_submitted_to_sale_agreement_created,
-  
+  END AS days_offer_submitted_to_sale_agreement_created,  
   CASE
       WHEN DATE(o.ts_offer_created) <= DATE(o.ts_offer_discarded)
       THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
   END AS days_offer_submitted_to_offer_dismissed,
-
   CASE
       WHEN DATE(o.ts_offer_created) <= DATE(o.ts_sale_agreement_signed)
       THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
   END AS days_offer_submitted_to_sale_agreement_signed,
-
   CASE
       WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_created)
       THEN DATEDIFF(DATE(o.ts_sale_agreement_created), DATE(o.ts_offer_created))
   END AS days_offer_accepted_to_sale_agreement_created,
-
   CASE
       WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_sale_agreement_signed)
       THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_offer_created))
   END AS days_offer_accepted_to_sale_agreement_signed,
-
   CASE
       WHEN DATE(o.ts_offer_accepted) <= DATE(o.ts_offer_discarded)
       THEN DATEDIFF(DATE(o.ts_offer_discarded), DATE(o.ts_offer_created))
-  END AS days_offer_accepted_to_offer_dismissed,
-  
+  END AS days_offer_accepted_to_offer_dismissed,  
   CASE
       WHEN DATE(o.ts_sale_agreement_created) <= DATE(o.ts_sale_agreement_signed)
       THEN DATEDIFF(DATE(o.ts_sale_agreement_signed), DATE(o.ts_sale_agreement_created))
@@ -383,17 +432,6 @@ LEFT JOIN
 LEFT JOIN 
   datalake_region.region AS r
   ON o.id_region = r.id
---LEFT JOIN
---  datalake_sale_listings.sale_listing_price_changes AS slpc
---  ON o.id_house = slpc.id_house
---  AND o.ts_offer_created >= slpc.ts_price_started 
---  AND o.ts_offer_created < COALESCE(slpc.ts_price_ended, NOW())
---LEFT JOIN
---  datalake_buyer_prospect.buyer_prospect_type AS bpt
---  ON o.id_buyer = bpt.id_prospect
---  AND r.city_group = bpt.city_group
---  AND o.ts_offer_created >= bpt.ts_activation 
---  AND o.ts_offer_created < COALESCE(bpt.ts_activation_end, NOW())
 LEFT JOIN
   datalake_sale_offer_flows.offer_specialists AS sp
   ON o.id_offer = sp.id_offer

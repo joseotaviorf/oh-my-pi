@@ -74,6 +74,8 @@ columns:
     lineage:
       - datalake_visit.visits.id_user_visit_request
     description: User identification key of the secretariat member who created the booking when different from the assigned agent.
+  visit_link_type:
+    description: Type of linkage between the visit and the offer. Returns '1 - Sales Flow' when the visit comes from the SalesFlow association, or '2 - Last Visit' when linked by the last completed visit for the house and buyer combination.
   flow_type:
     lineage:
       - datalake_sale_offer.core_sale_offer.flow_type
