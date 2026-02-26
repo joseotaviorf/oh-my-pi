@@ -14,7 +14,7 @@ workflow:
     exp_visit_identifier_metric:
       - exp_visit_cohort
 cluster:
-  type: databricks_16_4_med_memory_cluster
+  type: databricks_16_4_med_5_workers_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
