@@ -1830,6 +1830,8 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-credential-reference:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
+  - bietlejuice.enrich_search:load-enrich-amplitude-user-device:first-run-of-day
+  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
 bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day

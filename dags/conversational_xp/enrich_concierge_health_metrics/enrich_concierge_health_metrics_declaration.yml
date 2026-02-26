@@ -28,6 +28,8 @@ workflow:
       - concierge_prospects_aux
       - concierge_direct_vb
       - concierge_indirect_vb
+    tof_and_concierge_demand:
+      - concierge_demand
   tables_customization:
     concierge_messages:
       partitions: [year, month, day]
@@ -39,7 +41,8 @@ workflow:
       partitions: [year, month, day]
     concierge_demand:
       partitions: [year, month, day]
-
+    tof_and_concierge_demand:
+      partitions: [year, month, day]
 cluster:
     type: databricks_16_4_med_general_2_workers_cluster
     databricks_conn_id: databricks_new_env

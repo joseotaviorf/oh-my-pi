@@ -22,5 +22,6 @@ This pipeline produces the following output table on enrich layer:
 - `concierge_indirect_vb`
 - `concierge_prospects_aux`
 - `concierge_demand`
+- `tof_and_concierge_demand`
 
 </details>
