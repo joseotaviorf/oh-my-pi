@@ -1,18 +1,18 @@
-WITH 
+WITH
 universo_tickets AS (
-    SELECT 
+    SELECT
         TRY_CAST(bmt.sk_task AS BIGINT) AS sk_task,
         ft.sk_user,
-        bmt.sk_agent, 
+        bmt.sk_agent,
         tickets.sk_last_analyst,
         dd.department,
         NULLIF(ft.sk_contract, -1) AS sk_contract_ticket,
         bmt.status AS status_real,
         'BACKLOG_ATIVO' AS categoria_origem
     FROM dw_customer_support.fact_backlog_metrics_tasks bmt
-    INNER JOIN dw_customer_support.dim_department dd 
+    INNER JOIN dw_customer_support.dim_department dd
         ON bmt.sk_main_department = dd.sk_department
-    LEFT JOIN dw_customer_support.fact_tickets ft 
+    LEFT JOIN dw_customer_support.fact_tickets ft
         ON TRY_CAST(bmt.sk_task AS BIGINT) = ft.sk_ticket
     LEFT JOIN dw_customer_support.fact_tickets AS tickets
         ON bmt.sk_task = CAST(tickets.sk_ticket AS varchar(99))
@@ -24,24 +24,26 @@ universo_tickets AS (
       'CX Onboarding [BACK] [POS] [WH]',
       'Aditivos [POS] [BACK] [WH]',
       'CX Propostas Tarefas [PRE] [BACK]',
-      'Atendimento Escalado [OFF] [POS] [BACK]')
+      'Atendimento Escalado [OFF] [POS] [BACK]',
+      'Rescisão por Inadimplência [OFF][POS][BACK]',
+      'Offboarding Reparos [OFF] [POS] [BACK]')
 
     UNION ALL
 
-    SELECT 
+    SELECT
         TRY_CAST(bmt.sk_task AS BIGINT) AS sk_task,
         ft.sk_user,
-        bmt.sk_agent, 
+        bmt.sk_agent,
         ft.sk_last_analyst,
         dd.department,
         NULLIF(ft.sk_contract, -1) AS sk_contract_ticket,
         'solved' AS status_real,
         'RECEM_RESOLVIDO' AS categoria_origem
     FROM dw_customer_support.fact_backlog_metrics_tasks bmt
-    INNER JOIN dw_customer_support.dim_department dd 
+    INNER JOIN dw_customer_support.dim_department dd
         ON bmt.sk_main_department = dd.sk_department
-    INNER JOIN dw_customer_support.fact_tickets ft 
-        ON TRY_CAST(bmt.sk_task AS BIGINT) = ft.sk_ticket 
+    INNER JOIN dw_customer_support.fact_tickets ft
+        ON TRY_CAST(bmt.sk_task AS BIGINT) = ft.sk_ticket
         AND ft.ts_solved >= CURRENT_DATE - INTERVAL '3' DAY
     WHERE bmt.dt_metric_reference = CURRENT_DATE - INTERVAL '3' DAY
       AND bmt.origin = 'email'
@@ -51,50 +53,52 @@ universo_tickets AS (
       'CX Onboarding [BACK] [POS] [WH]',
       'Aditivos [POS] [BACK] [WH]',
       'CX Propostas Tarefas [PRE] [BACK]',
-      'Atendimento Escalado [OFF] [POS] [BACK]')
+      'Atendimento Escalado [OFF] [POS] [BACK]',
+      'Rescisão por Inadimplência [OFF][POS][BACK]',
+      'Offboarding Reparos [OFF] [POS] [BACK]')
 ),
 
 backlog_text_extract AS (
-    SELECT 
+    SELECT
         dit.sk_ticket AS sk_task,
         TRY_CAST(REGEXP_EXTRACT(dit.custom_fields, '"ID do ticket vinculado":"(\d+)"', 1) AS BIGINT) AS id_ticket_vinculado,
         TRY_CAST(REGEXP_EXTRACT(dit.custom_fields, 'Código do Imóvel.*?:.*?(\d+)', 1) AS BIGINT) AS id_house_texto
-    FROM 
+    FROM
         dw_customer_support.dim_ticket dit
-    WHERE 
+    WHERE
         dit.sk_ticket IN (SELECT sk_task FROM universo_tickets)
 ),
 lista_usuarios AS (
-    SELECT DISTINCT 
-        sk_user 
-    FROM 
-        universo_tickets 
-    WHERE 
+    SELECT DISTINCT
+        sk_user
+    FROM
+        universo_tickets
+    WHERE
         sk_user > 0
     ),
 lista_tickets_target AS (
-    SELECT DISTINCT 
-        id_ticket_vinculado 
-    FROM 
+    SELECT DISTINCT
+        id_ticket_vinculado
+    FROM
         backlog_text_extract bte
-    WHERE  
+    WHERE
         id_ticket_vinculado IS NOT NULL
     ),
 lista_houses_target AS (
     SELECT DISTINCT
-        id_house_texto 
-    FROM 
-        backlog_text_extract 
-    WHERE 
+        id_house_texto
+    FROM
+        backlog_text_extract
+    WHERE
         id_house_texto IS NOT NULL
     ),
 active_listings_roots AS (
-    SELECT 
+    SELECT
         sk_house_listing,
         CAST(sk_house_listing / 1000 AS BIGINT) AS root_key,
         sk_contract
     FROM dw_rent.fact_house_listings
-    WHERE sk_contract > 0 
+    WHERE sk_contract > 0
       AND CAST(sk_house_listing / 1000 AS BIGINT) IN (SELECT id_house_texto FROM lista_houses_target)
 ),
 flag_regra_1_5 AS (
@@ -124,19 +128,19 @@ flag_regra_3 AS (
       AND dc.status IN ('Ativo', 'Finalizado')
 ),
 tabela_base AS (
-    SELECT 
+    SELECT
         u.*,
         COALESCE(u.sk_contract_ticket, r15.sk_contract, r2.sk_contract, r25.sk_contract) AS contrato_prioritario,
-        CASE 
+        CASE
             WHEN u.sk_contract_ticket IS NOT NULL THEN '1. Regra 1: Contrato do Ticket'
             WHEN r15.sk_contract IS NOT NULL THEN '1.5. Regra 1.5: Ticket Vinculado'
             WHEN r2.sk_contract IS NOT NULL THEN '2. Regra 2: Owner (Vínculo Direto)'
             WHEN r25.sk_contract IS NOT NULL THEN '2.5. Regra 2.5: Fallback Texto'
-            ELSE NULL 
+            ELSE NULL
         END AS regra_prioritaria,
-        CASE 
-            WHEN COALESCE(u.sk_contract_ticket, r15.sk_contract, r2.sk_contract, r25.sk_contract) IS NULL 
-            THEN 1 ELSE 0 
+        CASE
+            WHEN COALESCE(u.sk_contract_ticket, r15.sk_contract, r2.sk_contract, r25.sk_contract) IS NULL
+            THEN 1 ELSE 0
         END AS flag_usar_regra_3
     FROM universo_tickets u
     LEFT JOIN backlog_text_extract bte ON u.sk_task = bte.sk_task
@@ -144,7 +148,7 @@ tabela_base AS (
     LEFT JOIN flag_regra_2 r2 ON u.sk_user = r2.sk_owner
     LEFT JOIN flag_regra_2_5 r25 ON u.sk_task = r25.sk_task
 )
-SELECT 
+SELECT
     tb.sk_task AS sk_task,
     tb.department AS department,
     da_last.email AS analyst_email,
@@ -159,37 +163,37 @@ SELECT
         WHEN da_last.agent_organization IS NULL THEN 'Ticket ainda não atribuído'
         ELSE da_last.agent_organization
     END AS agent_organization,
-    COALESCE(tb.regra_prioritaria, 
+    COALESCE(tb.regra_prioritaria,
              CASE WHEN r3.sk_contract IS NOT NULL THEN '3. Regra 3: Multi-Contrato' ELSE '4. Sem Contrato Identificado' END
     ) AS contract_identification_rule,
     COALESCE(tb.contrato_prioritario, r3.sk_contract) AS sk_contract,
     tb.sk_user,
-    CASE 
+    CASE
         WHEN fcp.contract_role = 'landlord' THEN 'PP'
         WHEN fcp.contract_role = 'tenant' THEN 'IQ'
         WHEN COALESCE(tb.contrato_prioritario, r3.sk_contract) IS NOT NULL THEN 'Outro'
-        ELSE NULL 
+        ELSE NULL
     END AS user_type,
-    CASE 
+    CASE
         WHEN tb.categoria_origem = 'RECEM_RESOLVIDO' THEN 'fechado + 3 dias'
         WHEN tb.status_real IN ('new', 'open') THEN 'aberto'
         WHEN tb.status_real = 'hold' THEN 'em espera'
         WHEN tb.status_real = 'pending' THEN 'pendente'
         WHEN tb.status_real = 'solved' THEN 'fechado'
-        ELSE tb.status_real 
+        ELSE tb.status_real
     END AS ticket_status,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
     NOW() AS ts_load
 FROM tabela_base tb
-LEFT JOIN flag_regra_3 r3 
-    ON tb.sk_user = r3.sk_user 
+LEFT JOIN flag_regra_3 r3
+    ON tb.sk_user = r3.sk_user
     AND tb.flag_usar_regra_3 = 1
-LEFT JOIN dw_customer_support.dim_analyst AS da_last 
+LEFT JOIN dw_customer_support.dim_analyst AS da_last
     ON da_last.sk_analyst = tb.sk_last_analyst
-LEFT JOIN dw_rent.fact_contract_people fcp 
-    ON COALESCE(tb.contrato_prioritario, r3.sk_contract) = fcp.sk_contract 
+LEFT JOIN dw_rent.fact_contract_people fcp
+    ON COALESCE(tb.contrato_prioritario, r3.sk_contract) = fcp.sk_contract
     AND tb.sk_user = fcp.sk_user
     AND fcp.is_user = true
-WHERE da_last.agent_organization IN ('webhelp', 'webhelpbr') 
+WHERE da_last.agent_organization IN ('webhelp', 'webhelpbr')
