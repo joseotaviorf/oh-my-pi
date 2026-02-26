@@ -352,6 +352,24 @@ last_secretariat as (
             ON b.id_visitor = bsc.id_external_lead
             AND bsc.is_last_responsible
 ),
+visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
+    SELECT
+        id_visit,
+        id_schedule,
+        CASE
+            WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
+            WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
+            WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
+        END AS visit_fup,
+        ts_created AS ts_visit_fup
+    FROM
+        datalake_ebdb_clean.visit_status_log
+    WHERE
+        ts_created::DATE >= '2025-01-01'
+        AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
+),
 base_booking AS (
     SELECT
         b.id,
@@ -390,7 +408,7 @@ base_booking AS (
         b.business_context AS visit_intent,
         b.buyer_intention,
         b.type,
-        b.visit_fup,
+        COALESCE(b.visit_fup, fup_vsl.visit_fup) AS visit_fup,
         v_cin.checkin_code,
         v_cin.checkin_status AS visit_checkin_status,
         v_cin.checkin_fail_reason,
@@ -498,7 +516,7 @@ base_booking AS (
         bha.contract_name AS hub_agent_region,
         vbm.partner_3p_demand,
         vbm.partner_3p_supply,
-        b.ts_visit_fup,
+        COALESCE(b.ts_visit_fup, fup_vsl.ts_visit_fup) AS ts_visit_fup,
         b.ts_created,
         b.ts_updated,
         IF(DATE(cd.ts_first_canceled) <= DATE(b.dt_booking),
@@ -511,7 +529,7 @@ base_booking AS (
           + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES
         AS ts_booking_local_tz,
         FROM_UTC_TIMESTAMP(b.ts_created, COALESCE(ct.default_timezone, 'UTC')) AS ts_created_local_tz,
-        FROM_UTC_TIMESTAMP(b.ts_visit_fup, COALESCE(ct.default_timezone, 'UTC')) AS ts_visit_follow_up_local_tz,
+        FROM_UTC_TIMESTAMP(COALESCE(b.ts_visit_fup, fup_vsl.ts_visit_fup), COALESCE(ct.default_timezone, 'UTC')) AS ts_visit_follow_up_local_tz,
         b.is_confirmed,
         b.is_closed,
         b.is_agent_fixed,
@@ -543,11 +561,11 @@ base_booking AS (
             CASE
                 -- Bookings migrated from Casa Mineira don't have a visit_fup
                 WHEN vou.first_update_source = 'MIGRACAOCASAMINEIRA' THEN (b.status = 'Realizado')
-                ELSE (b.visit_fup IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'))
+                ELSE (COALESCE(b.visit_fup, fup_vsl.visit_fup) IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'))
             END,
             FALSE
         ) AS is_visit_completed,
-        COALESCE(b.visit_fup IS NOT NULL AND vab.agent_absence_reason = 'Absent', FALSE) AS is_visit_performed,
+        COALESCE(COALESCE(b.visit_fup, fup_vsl.visit_fup) IS NOT NULL AND vab.agent_absence_reason = 'Absent', FALSE) AS is_visit_performed,
         -- is a reschedule from another booking
         (b.id_rescheduled_booking IS NOT NULL) AS is_via_reschedule,
         -- was rescheduled to another booking
@@ -564,6 +582,9 @@ base_booking AS (
         v_cin.ts_checkin
     FROM
         datalake_ebdb_clean.booking AS b
+    LEFT JOIN
+        visit_fup_vsl AS fup_vsl
+            ON b.id = fup_vsl.id_schedule
     LEFT JOIN
         visit_origin_unified AS vou
             ON b.id_visit = vou.id_visit

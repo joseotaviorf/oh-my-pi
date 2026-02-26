@@ -156,7 +156,8 @@ columns:
   visit_fup:
     lineage:
     - datalake_ebdb_clean.booking.visit_fup
-    description: Agent visit follow up answered on agent app
+    - datalake_ebdb_clean.visit_status_log.event_type
+    description: Agent visit follow up answered on agent app. If the visit_fup is not in the booking table, it is enriched from the visit_status_log table.
     categories:
       EntradaNaoAutorizada: ''
       ImovelAlugado: ''
@@ -456,7 +457,8 @@ columns:
   ts_visit_fup:
     lineage:
     - datalake_ebdb_clean.booking.ts_visit_fup
-    description: Date of visit follow up in Brazilian timezone
+    - datalake_ebdb_clean.visit_status_log.ts_created
+    description: Date of visit follow up in Brazilian timezone. If the visit_fup is not in the booking table, it is enriched from the visit_status_log table.
   ts_created:
     lineage:
     - datalake_ebdb_clean.booking.ts_created
@@ -485,7 +487,8 @@ columns:
   ts_visit_follow_up_local_tz:
     lineage:
     - datalake_ebdb_clean.booking.ts_visit_fup
-    description: Datetime of the agent fup on local timezone, based on the country of the booking.
+    - datalake_ebdb_clean.visit_status_log.ts_created
+    description: Datetime of the agent fup on local timezone, based on the country of the booking. If the visit_fup is not in the booking table, it is enriched from the visit_status_log table.
   is_confirmed:
     lineage:
     - datalake_ebdb_clean.booking.is_confirmed
@@ -537,6 +540,7 @@ columns:
   is_visit_performed:
     lineage:
     - datalake_ebdb_clean.booking.visit_fup
+    - datalake_ebdb_clean.visit_status_log.event_type
     - datalake_ebdb_clean.visitor.absence_reason
     description: Boolean column to identify if the agent filled the visit_fup but was absent at that visit.
   is_via_reschedule:
