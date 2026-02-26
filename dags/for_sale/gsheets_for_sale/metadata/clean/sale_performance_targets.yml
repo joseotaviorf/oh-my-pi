@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_performance_targets
+owner: hyran.teixeira@quintoandar.com.br
+domain: For Sale
+description: 'Performance targets for For Sale division across different metrics and periods.'
+columns:
+  period:
+    description: 'Time granularity or aggregation level for the target (e.g., "monthly", "quarterly", "yearly").'
+    lineage:
+    - datalake_gsheets_raw.sale_performance_targets.period
+  metric:
+    description: 'The specific performance indicator being measured (e.g., revenue, conversion rate, NBP count).'
+    lineage:
+    - datalake_gsheets_raw.sale_performance_targets.metric
+  division:
+    description: 'Business division or organizational unit to which the target applies (e.g., "For Sale SP", "For Sale RJ").'
+    lineage:
+    - datalake_gsheets_raw.sale_performance_targets.division
+  target_value_format:
+    description: 'Format or unit type of the target value (e.g., "percentage", "absolute", "currency").'
+    lineage:
+    - datalake_gsheets_raw.sale_performance_targets.value_format
+  target_value:
+    description: 'The numerical target goal for the specified metric, division, and period.'
+    lineage:
+    - datalake_gsheets_raw.sale_performance_targets.value
+  dt_reference:
+    description: 'Reference date for the target period (Format: YYYY-MM-DD).'
+    lineage:
+    - datalake_gsheets_raw.sale_performance_targets.date
