@@ -44,7 +44,6 @@ WITH
       fri.ts_budget_approval_started_by_owner,
       fri.ts_budget_approval_sent_to_tenant,
       fri.ts_budget_approval_started_by_tenant,
-      fri.dt_bandaid,
       fri.ts_reviewed,
       ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni
     FROM 
