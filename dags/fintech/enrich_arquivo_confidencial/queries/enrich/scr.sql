@@ -7,7 +7,7 @@ WITH scr_data AS (
             WHEN aud.attributes:analysis_output:scr.scr_data IS NULL THEN 0
             ELSE 1
         END AS has_scr_attributes,
-        explode_outer(FROM_JSON(attributes:analysis_output:scr.scr_data,
+        explode_outer(FROM_JSON(raw_data:analysis_output:scr.scr_data,
             'array<
             struct<
                 source:string,
