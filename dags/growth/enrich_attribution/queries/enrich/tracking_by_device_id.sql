@@ -15,3 +15,14 @@ FROM cdp_modeled_repo.tb_user_tracking
 WHERE
   event_name <> '$identify'
   AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY 
+    id_anonymous,
+    egw_gclid,
+    egw_utm_term,
+    egw_utm_source,
+    egw_utm_medium,
+    egw_utm_content,
+    egw_utm_campaign
+  ORDER BY egw_last_attribution_time DESC
+) = 1
