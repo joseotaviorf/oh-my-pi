@@ -285,6 +285,29 @@ FROM VALUES
                                 ),
            'running', True
         )
+    ),
+
+    -- Open search versus Elastic search
+    (
+        "ab_beakman_search_services_open_search_migration",
+        named_struct(
+            'begin_date', DATE('2026-02-25'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 
