@@ -6,6 +6,8 @@ description: |
   Combines legacy data from automatic_invoice (before 2025-12-05) with the new flow
   using invoice_discount + automatic_invoice (from 2025-12-05 onwards). Each row
   represents the most recent discount evaluation per contract.
+  Includes all rows (attempts, refusals, and applied discounts) to enable analysis
+  of discount try and refusal rates, not only effective applications.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
@@ -85,7 +87,15 @@ columns:
       - datalake_inspection_services_clean.invoice_discount.discount_reviewed_value
     description: |
       The discount value after restriction evaluations calculated at persist/update time.
-      This is the final discount value. Only available for data from the new flow.
+      This is the offered/reviewed value. Only available for data from the new flow.
+  invoice_discount_value:
+    lineage:
+      - datalake_inspection_services_clean.automatic_invoice.owner_cost
+      - datalake_inspection_services_clean.automatic_invoice.tenant_cost
+      - datalake_inspection_services_clean.invoice_discount.discount_value
+    description: |
+      The discount value actually applied (invoice generated). Legacy: owner_cost - tenant_cost.
+      New flow: owner_cost - tenant_cost from automatic_invoice when invoice exists. NULL when discount was refused.
   invoice_tenant_cost:
     lineage:
       - datalake_inspection_services_clean.automatic_invoice.tenant_cost
@@ -112,8 +122,9 @@ columns:
     lineage:
       - datalake_inspection_services_clean.automatic_invoice.ts_created
     description: |
-      Indicates if the discount was effectively applied and an invoice was generated.
-      True when automatic_invoice.ts_created is not null.
+      Indicates whether the offered discount value was accepted and applied (not merely value > 0).
+      Legacy: TRUE when automatic bandaid record exists. New flow: TRUE when invoice was generated
+      (automatic_invoice.ts_created IS NOT NULL), i.e. the offered value was accepted.
   has_tenant_approval:
     lineage:
       - datalake_inspection_services_clean.invoice_discount.has_tenant_approval
@@ -173,10 +184,3 @@ columns:
     lineage:
       - datalake_inspection_services_clean.automatic_invoice.ts_created
     description: Date when the automatic invoice was created.
-  dt_bandaid:
-    lineage:
-      - datalake_inspection_services_clean.automatic_invoice.ts_created
-      - datalake_inspection_services_clean.invoice_discount.ts_created
-    description: |
-      Date reference for Bandaid ML dashboard charts. This column was re-added on 2026-01-14
-      for adjustments in the official Bandaid dashboard (Superset dashboard #3083).

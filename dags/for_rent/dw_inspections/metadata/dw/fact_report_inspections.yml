@@ -31,12 +31,12 @@ columns:
     lineage:
       - datalake_inspection_services_clean.budget.tenant_amount_payment
     description: Tenant payment amount
-  discount_reviewed_value:
+  invoice_discount_value:
     lineage:
-      - datalake_inspections.automatic_discounts.discount_reviewed_value
+      - datalake_inspections.automatic_discounts.invoice_discount_value
     description: |
-      The final discount value after restriction evaluations calculated at persist/update time.
-      Sourced from the automatic_discounts enrich table. Only available for inspections with discount data.
+      The discount value actually applied (invoice generated). Sourced from automatic_discounts.
+      Only available for inspections with bandaid (has_applied_discount = TRUE).
   total_tenant_contestation:
     description: Total number of objections made by the tenant.
   total_owner_budget_approval_contestation:
@@ -81,10 +81,11 @@ columns:
     description: Boolean information indicating whether the owner and tenant agreed on the repair report only after the contestation analysis.
   has_discount_agreement:
     lineage:
-      - datalake_inspections.automatic_discounts.discount_reviewed_value
+      - datalake_inspections.automatic_discounts.has_applied_discount
     description: |
       Boolean indicating whether a discount agreement was reached for the inspection.
-      Derived from discount_reviewed_value > 0. Returns FALSE when no discount data is available.
+      Uses has_applied_discount (offered value accepted and applied). The JOIN with automatic_discounts
+      is restricted to bandaid cases only (has_applied_discount = TRUE).
   has_owner_approved_review:
     lineage:
       - datalake_inspections.reviewer.is_approved
@@ -249,12 +250,6 @@ columns:
     lineage:
       - datalake_inspection_services_clean.budget.dt_tenant_dead_line
     description: Date in timestamp format indicating the deadline for budget approval review by the tenant.
-  dt_bandaid:
-    lineage:
-      - datalake_inspections.automatic_discounts.dt_bandaid
-    description: |
-      Date reference for Bandaid ML dashboard charts.
-      Sourced from the automatic_discounts enrich table. Only available for inspections with discount data.
   ts_load:
     description: Date and time when the data was loaded.
   year:

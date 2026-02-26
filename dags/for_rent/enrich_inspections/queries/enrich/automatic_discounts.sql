@@ -9,7 +9,6 @@ WITH united_data AS (
         CAST(ts_created AS DATE) AS dt_discount_creation,
         NULL AS dt_discount_response,
         CAST(ts_created AS DATE) AS dt_invoice_creation,
-        CAST(ts_created AS DATE) AS dt_bandaid,
         TRUE AS has_discount_try,
         NULL AS is_discount_accepted,
         TRUE AS has_applied_discount,
@@ -25,6 +24,7 @@ WITH united_data AS (
         NULL AS disputed_inspection_cost,
         ROUND((owner_cost - tenant_cost), 2) AS discount_value,
         NULL AS discount_reviewed_value,
+        (owner_cost - tenant_cost) AS invoice_discount_value,
         tenant_cost AS invoice_tenant_cost,
         owner_cost AS invoice_owner_cost,
         NULL AS has_tenant_approval,
@@ -37,9 +37,8 @@ WITH united_data AS (
         ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) AS rn
     FROM
         datalake_inspection_services_clean.automatic_invoice
-    WHERE
+    WHERE 
         tag = 'AUTOMATIC_BANDAID'
-        AND (owner_cost - tenant_cost) > 0
         AND CAST(ts_created AS DATE) < DATE('2025-12-05')
         AND CAST(ts_created AS DATE) >= DATE('2025-01-01')
 
@@ -51,7 +50,6 @@ WITH united_data AS (
         CAST(disc.ts_created AS DATE) AS dt_discount_creation,
         CAST(disc.dt_discount_accepted AS DATE) AS dt_discount_response,
         CAST(inv.ts_created AS DATE) AS dt_invoice_creation,
-        CAST(disc.ts_created AS DATE) AS dt_bandaid,
         CASE
             WHEN inv.ts_created IS NOT NULL THEN TRUE
             WHEN disc.discount_type = 'OFFERED_DISCOUNT'
@@ -77,6 +75,7 @@ WITH united_data AS (
         disc.disputed_inspection_cost,
         ROUND(disc.discount_value, 2) AS discount_value,
         disc.discount_reviewed_value,
+        (inv.owner_cost - inv.tenant_cost) AS invoice_discount_value,
         inv.tenant_cost AS invoice_tenant_cost,
         inv.owner_cost AS invoice_owner_cost,
         disc.has_tenant_approval,
@@ -94,8 +93,7 @@ WITH united_data AS (
             ON disc.id_contract = inv.id_contract
             AND inv.tag IN ('AUTOMATIC_BANDAID', 'OFFERED_DISCOUNT')
     WHERE
-        disc.discount_value_type NOT IN ('no_discount')
-        AND CAST(disc.ts_created AS DATE) >= DATE('2025-12-05')
+        CAST(disc.ts_created AS DATE) >= DATE('2025-12-05')
 )
 SELECT
     id_contract,
@@ -108,6 +106,7 @@ SELECT
     CAST(disputed_inspection_cost AS DOUBLE) AS disputed_inspection_cost,
     CAST(discount_value AS DOUBLE) AS discount_value,
     CAST(discount_reviewed_value AS DOUBLE) AS discount_reviewed_value,
+    CAST(invoice_discount_value AS DOUBLE) AS invoice_discount_value,
     CAST(invoice_tenant_cost AS DOUBLE) AS invoice_tenant_cost,
     CAST(invoice_owner_cost AS DOUBLE) AS invoice_owner_cost,
     has_discount_try,
@@ -122,8 +121,7 @@ SELECT
     db_source,
     dt_discount_creation,
     dt_discount_response,
-    dt_invoice_creation,
-    dt_bandaid
+    dt_invoice_creation
 FROM
     united_data
 WHERE

@@ -133,7 +133,7 @@ SELECT
   da.total_cost,
   da.owner_amount_payment,
   da.tenant_amount_payment,
-  ad.discount_reviewed_value,
+  ad.invoice_discount_value,
   COUNT(rr.id_repair_request) FILTER(WHERE COALESCE(rr.total_tenant_contestation, 0) <> 0) AS total_tenant_contestation,
   COUNT(rr.id_repair_request) FILTER(WHERE COALESCE(rr.total_owner_budget_approval_contestation, 0) <> 0) AS total_owner_budget_approval_contestation,
   COUNT(rr.id_repair_request) FILTER(WHERE COALESCE(rr.total_tenant_budget_approval_contestation, 0) <> 0) AS total_tenant_budget_approval_contestation,
@@ -148,7 +148,7 @@ SELECT
   da.has_agreement,
   da.has_early_agreement,
   da.has_late_agreement,
-  ad.discount_reviewed_value > 0 AS has_discount_agreement,
+  ad.has_applied_discount AS has_discount_agreement,
   da.has_owner_approved_review,
   da.has_tenant_approved_review,
   da.has_owner_approved_budget_approval,
@@ -190,7 +190,6 @@ SELECT
   a.dt_tenant_limit_revision AS ts_tenant_limit_revision,
   da.dt_owner_dead_line AS ts_owner_limit_revision_budget_approval,
   da.dt_tenant_dead_line AS ts_tenant_limit_revision_budget_approval,
-  ad.dt_bandaid,
   NOW() AS ts_load,
   isa.year,
   isa.month,
@@ -212,5 +211,6 @@ LEFT JOIN
 LEFT JOIN 
   datalake_inspections.automatic_discounts AS ad
     ON isa.id_client_side = ad.uuid_inspection
+    AND ad.has_applied_discount = TRUE
 GROUP BY
   ALL
