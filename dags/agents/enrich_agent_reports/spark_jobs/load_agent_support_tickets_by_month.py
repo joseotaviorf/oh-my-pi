@@ -585,7 +585,7 @@ def _save_to_enrich(
         path=s3_path,
         source_df=result_df,
         partition_by=["reference_month"],
-        merge_on=["id_user", "id_agent", "reference_month"],
+        merge_on=["id_user", "reference_month"],
     )
     SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
     priv = TablePrivileges.from_environment_default(full_table_name)
