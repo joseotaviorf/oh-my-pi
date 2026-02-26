@@ -374,8 +374,8 @@ databricks_12_2_med_2xlarge_general_cluster:
 databricks_12_2_med_4xlarge_general_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.4xlarge
-    node_type_id: m5a.4xlarge
-    num_workers: 5
+    node_type_id: m5a.8xlarge
+    num_workers: 3
     spark_version: 12.2.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
