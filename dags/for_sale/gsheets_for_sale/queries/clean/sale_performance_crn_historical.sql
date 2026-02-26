@@ -20,8 +20,7 @@ SELECT
     dt_crn_first_contact,
     dt_bookkeeping_done,
     dt_cri_request,
-    dt_cri_done,
-    
+    dt_cri_done    
 FROM
     datalake_gsheets_raw.sale_performance_crn_historical
 
