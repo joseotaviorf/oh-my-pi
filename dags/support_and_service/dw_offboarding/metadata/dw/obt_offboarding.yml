@@ -1,0 +1,455 @@
+---
+database_name: dw_offboarding
+table_name: obt_offboarding
+description: |
+  One Big Table (OBT) that consolidates offboarding termination data with inspection,
+  mediation, and discount information. Each row represents a termination with its
+  associated exit inspection, repair metrics, and discount journey data.
+  Canceled terminations are excluded. For each termination, only the most recent
+  exit inspection is considered, since a termination can have multiple exit inspections
+  but only one completed successfully. Data is restricted to terminations from 2024
+  onwards (year >= 2024).
+  Use this table when you need a unified view of the offboarding journey
+  (termination, inspection, mediation, discounts) in a single place, instead of
+  joining multiple terminator or inspection service tables.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_contract:
+    description: Contract identification key.
+    lineage:
+      - dw_offboarding.fact_terminations.sk_contract
+  sk_house:
+    description: House identification key.
+    lineage:
+      - dw_offboarding.fact_terminations.sk_house
+  sk_termination:
+    description: Unique termination identification key.
+    lineage:
+      - dw_offboarding.fact_terminations.sk_termination
+  sk_inspection:
+    description: Exit inspection identification key.
+    lineage:
+      - dw_inspections.fact_inspection.sk_inspection
+  sk_assessment:
+    description: Assessment identification key.
+    lineage:
+      - dw_inspections.fact_inspection.sk_assessment
+  sk_client_side:
+    description: |
+      Inspection identifier in UUID format. Same as uuid_inspection; used to correlate
+      inspection data across tables (e.g., with annotation and automatic_discounts).
+    lineage:
+      - dw_inspections.fact_inspection.sk_client_side
+  is_spoc_contract:
+    description: Boolean indicating whether the termination is part of the SPOC control group.
+    lineage:
+      - dw_offboarding.fact_terminations.is_spoc_contract
+  is_eviction:
+    description: Boolean indicating whether the termination reason is eviction.
+    lineage:
+      - dw_offboarding.dim_termination.reason
+  is_high_value:
+    description: Boolean indicating if contract rent is >= 2500.
+    lineage:
+      - dw_rent.dim_contract.rent
+  is_exit_inspection_opt_out:
+    description: Boolean indicating whether the exit inspection was opted out.
+    lineage:
+      - dw_offboarding.fact_terminations.is_exit_inspection_opt_out
+  rent_value:
+    description: Contract rent value.
+    lineage:
+      - dw_rent.dim_contract.rent
+  fee_final_amount:
+    description: |
+      Final amount of the early termination fee (rescisão antecipada). This is the
+      penalty charged to the tenant for breaking the rental contract before its
+      natural end, after any negotiated discounts.
+    lineage:
+      - dw_offboarding.fact_terminations.fee_final_amount
+  final_tenant_inspection_cost:
+    description: Total inspection cost charged to the tenant.
+    lineage:
+      - dw_inspections.fact_report_inspections.total_cost
+  termination_category:
+    description: Termination category classification.
+    lineage:
+      - dw_offboarding.dim_termination.category
+    categories:
+      STANDARD: Standard termination flow.
+      NEGOTIATION_ATTENDANCE: Termination during negotiation attendance.
+      JOB_TRANSFER: Job transfer termination.
+      EVICTION: Eviction termination.
+      SOLD_TO_THIRD_PARTIES: Property sold to third parties.
+      NPS_REVERSION: NPS reversion termination.
+      EXECUTION: Execution termination.
+      ABANDONMENT: Abandonment termination.
+      BEFORE_RENTAL: Termination before rental started.
+      SOLD_TO_TENANT: Property sold to tenant.
+  termination_status:
+    description: Current termination status.
+    lineage:
+      - dw_offboarding.dim_termination.status
+    categories:
+      DONE: Termination completed.
+      INSPECTION_UNDER_REVIEW: Inspection under review.
+      INSPECTION_SCHEDULED: Inspection scheduled.
+      INSPECTION_CANCELED: Inspection canceled.
+      REQUESTED: Termination requested.
+      INSPECTION_OPTED_OUT: Exit inspection opted out.
+  termination_reason:
+    description: Reason for the termination.
+    lineage:
+      - dw_offboarding.dim_termination.reason
+    categories:
+      MOVING_OWN_HOUSE: Tenant moving to own house.
+      OTHER: Other reason.
+      NEEDS_CHANGE: Need for change.
+      MOVING_TO_FRIENDS_OR_FAMILY: Moving to friends or family.
+      RENT_INCREASED: Rent increased.
+      PROBLEMS_WITH_HOUSE: Problems with the house.
+      OWNER_MOVING_IN: Owner moving in.
+      DISLIKES_QUINTOANDAR: Dislikes QuintoAndar.
+      OWNER_SELLING_THIRD_PARTY: Owner selling to third party.
+  abc_variant:
+    description: ABC test variant from single-clear-journey annotation.
+    lineage:
+      - datalake_inspection_services_clean.annotation.value
+  inspection_status:
+    description: Status of the exit inspection.
+    lineage:
+      - dw_inspections.dim_inspection.status
+    categories:
+      cancelled: Inspection canceled.
+      reviewed: Review completed.
+      review_started: Review started.
+      sent_to_review: Sent to review.
+      pending_appointment: Pending appointment.
+      scheduled: Inspection scheduled.
+      sent_to_inspection_editing: Sent to inspection editing.
+      sent_to_contestation_analysis: Sent to contestation analysis.
+      sent_to_tenant_review: Sent to tenant review.
+      review_started_by_tenant: Review started by tenant.
+      review_started_by_owner: Review started by owner.
+      budget_approval_sent_to_tenant: Budget approval sent to tenant.
+      sent_to_repair_analysis: Sent to repair analysis.
+      sent_to_owner_review: Sent to owner review.
+      budget_approval_sent_to_owner: Budget approval sent to owner.
+      received: Inspection received.
+      contestation_analysis_finished: Contestation analysis finished.
+      ContratoCancelado: Contract canceled.
+      processing: Processing.
+  is_automated_ar:
+    description: |
+      Boolean indicating whether the termination was forwarded to Kirk (the agent that
+      automatically analyzes the inspection report). In other words, indicates if repair
+      analysis is automated.
+    lineage:
+      - dw_inspections.dim_inspection.repair_request_ai_flow
+  automation_group:
+    description: Automation control group for repair analysis.
+    lineage:
+      - dw_inspections.dim_inspection.ai_repair_analysis_control_group
+  mediation_squad:
+    description: Mediation squad based on ticket tags.
+    lineage:
+      - datalake_offboarding.mediations.squad
+  has_repairs:
+    description: Boolean indicating whether the termination had repairs.
+    lineage:
+      - dw_offboarding.fact_terminations.has_repairs
+  has_tenant_access_review:
+    description: Boolean indicating if tenant accessed the review.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_tenant_access_review
+  has_owner_access_review:
+    description: Boolean indicating if owner accessed the review.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_owner_access_review
+  has_tenant_approved_review:
+    description: |
+      Boolean indicating whether the tenant completed the review. Does not imply absence
+      of contestations; approval and contestation value > 0 can coexist in this case.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_tenant_approved_review
+  has_owner_approved_review:
+    description: |
+      Boolean indicating whether the owner completed the review. Does not imply absence
+      of contestations; approval and contestation value > 0 can coexist in this case.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_owner_approved_review
+  has_tenant_access_budget_approval:
+    description: Boolean indicating if tenant accessed budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_tenant_access_budget_approval
+  has_owner_access_budget_approval:
+    description: Boolean indicating if owner accessed budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_owner_access_budget_approval
+  has_tenant_approved_budget_approval:
+    description: Boolean indicating if tenant approved budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_tenant_approved_budget_approval
+  has_owner_approved_budget_approval:
+    description: Boolean indicating if owner approved budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_owner_approved_budget_approval
+  has_agreement:
+    description: Boolean indicating if there was an agreement (early both agree, budget approval, or discount).
+    lineage:
+      - dw_inspections.fact_report_inspections
+  has_early_agreement:
+    description: Boolean indicating early both-agree agreement.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_early_agreement
+  has_late_agreement:
+    description: Boolean indicating agreement via budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections
+  has_discount_agreement:
+    description: |
+      Boolean indicating whether an agreement was reached through the application of
+      automatic discounts.
+    lineage:
+      - dw_inspections.fact_report_inspections.has_discount_agreement
+  has_mediation_ticket:
+    description: Boolean indicating presence of mediation ticket.
+    lineage:
+      - dw_offboarding.dim_termination.has_mediation_ticket
+  has_early_mediation:
+    description: Boolean indicating if early mediation occurred.
+    lineage:
+      - dw_inspections.fact_inspection.has_early_mediation
+  total_repairs_requested:
+    description: Total number of repairs requested.
+    lineage:
+      - dw_offboarding.fact_terminations.total_repairs_requested
+  repairs_added_by_5a_review:
+    description: Repairs added by 5A team in review.
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_added_by_5a_review
+  repairs_added_by_owner_review:
+    description: Repairs added by owner in review.
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_added_by_owner_review
+  total_unset_repairs:
+    description: Total repairs with undefined responsibility.
+    lineage:
+      - dw_offboarding.fact_terminations.total_unset_repairs
+  repairs_exempted_in_ar:
+    description: |
+      Quantity of repairs exempted during repair analysis (AR).
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_exempted_in_ar
+  total_tentant_repair_ar:
+    description: |
+      Quantity of repairs under tenant responsibility before owner interaction with
+      the report.
+    lineage:
+      - dw_offboarding.fact_terminations.total_tentant_repair_ar
+  repairs_exempted_by_owner_review:
+    description: Repairs exempted by owner in review.
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_exempted_by_owner_review
+  total_tentant_repair_review:
+    description: |
+      Quantity of repairs under tenant responsibility after owner interaction with
+      the report. Represents the quantity of repairs the tenant actually receives in
+      the report at the first review stage.
+    lineage:
+      - dw_offboarding.fact_terminations.total_tentant_repair_review
+  total_tenant_contestation:
+    description: |
+      Total repairs with tenant contestation after the first review stage.
+    lineage:
+      - dw_offboarding.fact_terminations.total_tenant_contestation
+  repairs_exempted_ac:
+    description: Repairs exempted in contestation analysis.
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_exempted_ac
+  repairs_absorbed_ac:
+    description: Repairs absorbed in contestation analysis.
+    lineage:
+      - dw_offboarding.fact_terminations.repairs_absorbed_ac
+  total_tentant_repair_ac:
+    description: |
+      Quantity of repairs under tenant responsibility after contestation analysis is
+      completed. Represents the quantity of repairs the tenant actually receives in
+      the report at the second review stage.
+    lineage:
+      - dw_offboarding.fact_terminations.total_tentant_repair_ac
+  total_repairs_final_report:
+    description: |
+      Final quantity of repairs under tenant responsibility. Uses review stage when
+      early mediation or early agreement applies; otherwise uses contestation analysis.
+    lineage:
+      - dw_offboarding.fact_terminations
+  checkpoint_journey:
+    description: Checkpoint ID for discount journey stage.
+    lineage:
+      - datalake_inspections.automatic_discounts.id_checkpoint
+    categories:
+      REVIEW: First review stage.
+      BUDGET_REVIEW_COMPULSORY: Budget review compulsory.
+      REVIEW_COMPULSORY: Review compulsory.
+      BUDGET_REVIEW: Budget review stage.
+      TENANT_AC_REVIEW: Tenant contestation analysis review.
+      BUDGET_REVIEW_SINGLE_CLEAR_JOURNEY: Budget review single clear journey.
+  model_discount_type:
+    description: Discount type classification.
+    lineage:
+      - datalake_inspections.automatic_discounts.model_discount_type
+    categories:
+      OFFERED_DISCOUNT: Discount offered to user for approval.
+      AUTOMATIC_BANDAID: Discount applied automatically by Bandaid ML.
+  discount_value_type:
+    description: Type of discount value (partial/total).
+    lineage:
+      - datalake_inspections.automatic_discounts.discount_value_type
+  discount_stage:
+    description: Human-readable discount stage.
+    lineage:
+      - datalake_inspections.automatic_discounts.discount_stage
+    categories:
+      "1st review - Compulsory": Discount applied at 1st review due to lack of response.
+      "1st review - Disagreement": Discount applied at 1st review due to disagreement.
+      "2nd review - Disagreement": Discount applied at 2nd review due to disagreement.
+      "2nd review - Compulsory": Discount applied at 2nd review due to lack of response.
+  has_discount_try:
+    description: Boolean indicating if discount was attempted.
+    lineage:
+      - datalake_inspections.automatic_discounts.has_discount_try
+  is_discount_accepted:
+    description: Boolean indicating if discount was accepted.
+    lineage:
+      - datalake_inspections.automatic_discounts.is_discount_accepted
+  has_applied_discount:
+    description: Boolean indicating if discount was applied.
+    lineage:
+      - datalake_inspections.automatic_discounts.has_applied_discount
+  invoice_discount_value:
+    description: Discount value in the invoice.
+    lineage:
+      - datalake_inspections.automatic_discounts.invoice_discount_value
+  leadtime_total:
+    description: Days from termination date to termination finished.
+    lineage:
+      - dw_offboarding.fact_terminations
+  leadtime_vt:
+    description: Days from termination date to inspection.
+    lineage:
+      - dw_inspections.fact_inspection
+  leadtime_vt_to_ar:
+    description: Days from inspection to repair analysis.
+    lineage:
+      - dw_inspections.fact_report_inspections
+  leadtime_ar:
+    description: |
+      Days from repair analysis completion to review sent to owner.
+    lineage:
+      - dw_inspections.fact_report_inspections
+  leadtime_owner_tenant_review:
+    description: Days in owner/tenant review.
+    lineage:
+      - dw_inspections.fact_report_inspections
+  leadtime_ac:
+    description: Days in contestation analysis.
+    lineage:
+      - dw_inspections.fact_report_inspections
+  leadtime_budget_approval:
+    description: Days in budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections
+  leadtime_mediation:
+    description: Days from mediation start to termination finished.
+    lineage:
+      - datalake_offboarding.mediations
+  ts_termination_request:
+    description: Timestamp when termination was requested.
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_request
+  dt_ended_rental_confirmed:
+    description: |
+      Date when the rental contract ended (end of rental contract validity period).
+    lineage:
+      - dw_rent.dim_contract.dt_ended_rental_confirmed
+  ts_inspected:
+    description: Timestamp when inspection was performed.
+    lineage:
+      - dw_inspections.fact_inspection.ts_inspected
+  dt_termination:
+    description: |
+      Vacancy date; when the tenant leaves the property.
+    lineage:
+      - dw_public.dim_date.date
+  ts_automatic_repair_processing:
+    description: Timestamp when automatic repair processing started.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_automatic_repair_processing
+  ts_sent_to_repair_analysis:
+    description: Timestamp when sent to repair analysis.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_sent_to_repair_analysis
+  ts_sent_to_owner_review:
+    description: Timestamp when sent to owner review.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_sent_to_owner_review
+  ts_review_started_by_owner:
+    description: Timestamp when owner started review.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_review_started_by_owner
+  ts_sent_to_tenant_review:
+    description: Timestamp when sent to tenant review.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_sent_to_tenant_review
+  ts_review_started_by_tenant:
+    description: Timestamp when tenant started review.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_review_started_by_tenant
+  ts_sent_to_contestation_analysis:
+    description: Timestamp when sent to contestation analysis.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_sent_to_contestation_analysis
+  ts_contestation_analysis_finished:
+    description: Timestamp when contestation analysis finished.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_contestation_analysis_finished
+  ts_budget_approval:
+    description: |
+      Timestamp when the inspection entered the budget approval stage (second review
+      stage where owner and tenant approve the repair costs).
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_budget_approval
+  ts_budget_approval_sent_to_owner:
+    description: Timestamp when budget approval sent to owner.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_budget_approval_sent_to_owner
+  ts_budget_approval_started_by_owner:
+    description: Timestamp when owner started budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_budget_approval_started_by_owner
+  ts_budget_approval_sent_to_tenant:
+    description: Timestamp when budget approval sent to tenant.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_budget_approval_sent_to_tenant
+  ts_budget_approval_started_by_tenant:
+    description: Timestamp when tenant started budget approval.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_budget_approval_started_by_tenant
+  ts_reviewed:
+    description: Timestamp when review was completed.
+    lineage:
+      - dw_inspections.fact_report_inspections.ts_reviewed
+  dt_discount_invoice_creation:
+    description: Date when discount invoice was created.
+    lineage:
+      - datalake_inspections.automatic_discounts.dt_invoice_creation
+  dt_mediation_started:
+    description: Date when mediation started.
+    lineage:
+      - datalake_offboarding.mediations.dt_mediation
+  ts_termination_finished:
+    description: Timestamp when termination was completed.
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_finished
