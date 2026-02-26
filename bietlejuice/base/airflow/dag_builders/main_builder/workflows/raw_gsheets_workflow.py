@@ -274,13 +274,8 @@ class RawGsheetsWorkflow(BaseWorkflow):
             for lib_type, lib_name in custom_libraries.items()
         ]
 
-        access_control_list_from_yml = self.cluster_args["access_control_list"]
-        databricks_access_control_list = [
-            {
-                "group_name": access_control_list_from_yml["group_name"],
-                "permission_level": access_control_list_from_yml["permission_level"],
-            }
-        ]
+        acl = self.cluster_args["access_control_list"]
+        databricks_access_control_list = [acl] if isinstance(acl, dict) else acl
         return {
             "cluster_config": cluster_configuration,
             "libraries": default_libraries + custom_libraries,

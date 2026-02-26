@@ -23,6 +23,42 @@ class TestDAGDeclarationValidator:
             ),
             (
                 {
+                    "workflow": {"type": "query", "layer": "dw"},
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                    "cluster": {
+                        "type": "any_cluster_type",
+                        "access_control_list": [
+                            {
+                                "group_name": "admins",
+                                "permission_level": "CAN_MANAGE",
+                            },
+                        ],
+                    },
+                },
+                does_not_raise(),
+            ),
+            (
+                {
+                    "workflow": {"type": "query", "layer": "dw"},
+                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
+                    "cluster": {
+                        "type": "any_cluster_type",
+                        "access_control_list": [
+                            {
+                                "group_name": "admins",
+                                "permission_level": "CAN_MANAGE",
+                            },
+                            {
+                                "group_name": "analytics-engineers",
+                                "permission_level": "CAN_ATTACH_TO",
+                            },
+                        ],
+                    },
+                },
+                does_not_raise(),
+            ),
+            (
+                {
                     "workflow": {"type": "", "layer": ""},
                     "dag": {"name": "", "owner": ""},
                     "cluster": {

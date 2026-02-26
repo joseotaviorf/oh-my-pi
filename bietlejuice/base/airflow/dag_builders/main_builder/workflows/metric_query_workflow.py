@@ -108,13 +108,8 @@ class MetricQueryWorkflow(BaseWorkflow):
             self.cluster_args["type"]
         )
         default_libraries = self.config_service.get_config("default_libraries")
-        access_control_list_from_yml = self.cluster_args["access_control_list"]
-        databricks_access_control_list = [
-            {
-                "group_name": access_control_list_from_yml["group_name"],
-                "permission_level": access_control_list_from_yml["permission_level"],
-            }
-        ]
+        acl = self.cluster_args["access_control_list"]
+        databricks_access_control_list = [acl] if isinstance(acl, dict) else acl
         return {
             "cluster_config": cluster_configuration,
             "default_libraries": default_libraries,

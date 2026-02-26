@@ -407,20 +407,42 @@ class DAGDeclarationValidator(Validator):
                 },
                 "custom_libraries": {"type": "list", "required": False, "empty": False},
                 "access_control_list": {
-                    "type": "dict",
                     "empty": False,
-                    "schema": {
-                        "group_name": {
-                            "type": "string",
-                            "empty": False,
-                            "allowed": DatabricksGroupNameEnum.get_available_enum_values(),
+                    "anyof": [
+                        {
+                            "type": "dict",
+                            "schema": {
+                                "group_name": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "allowed": DatabricksGroupNameEnum.get_available_enum_values(),
+                                },
+                                "permission_level": {
+                                    "type": "string",
+                                    "empty": False,
+                                    "allowed": ClusterPermissionEnum.get_available_enum_values(),
+                                },
+                            },
                         },
-                        "permission_level": {
-                            "type": "string",
-                            "empty": False,
-                            "allowed": ClusterPermissionEnum.get_available_enum_values(),
+                        {
+                            "type": "list",
+                            "schema": {
+                                "type": "dict",
+                                "schema": {
+                                    "group_name": {
+                                        "type": "string",
+                                        "empty": False,
+                                        "allowed": DatabricksGroupNameEnum.get_available_enum_values(),
+                                    },
+                                    "permission_level": {
+                                        "type": "string",
+                                        "empty": False,
+                                        "allowed": ClusterPermissionEnum.get_available_enum_values(),
+                                    },
+                                },
+                            },
                         },
-                    },
+                    ],
                 },
                 "databricks_conn_id": {"type": "string", "empty": False},
             },

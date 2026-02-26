@@ -32,13 +32,13 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             )
 
     def __get_access_control_list(self) -> list:
-        # TODO: change access_control_list to be a list of dicts directly in the DAG declarations
-        return [
-            self.cluster_args.get(
-                "access_control_list",
-                self.config_service.get_config("default_access_control_list")[0],
-            )
-        ]
+        acl = self.cluster_args.get(
+            "access_control_list",
+            self.config_service.get_config("default_access_control_list")[0],
+        )
+        if isinstance(acl, dict):
+            return [acl]
+        return acl
 
     def __get_cluster_configuration(self) -> dict:
         cluster_type = self.cluster_args.get("type")
