@@ -34,7 +34,7 @@ ai_message_count AS (
 whatsapp_messages AS (
   SELECT DISTINCT
     ce.id AS id_message,
-    c.id_session AS id_sauron_session,
+    COALESCE(c.id_session, chat.id_session) AS id_sauron_session,
     REPLACE(ce.from_phone_number, 'whatsapp:', '') AS user_sender,
     ce.message_body AS message,
     ce.ts_created,
@@ -50,6 +50,10 @@ whatsapp_messages AS (
   LEFT JOIN
     datalake_quinto_messenger_clean.channel AS c
       ON c.id_channel = ce.id_channel
+  LEFT JOIN
+    datalake_quinto_messenger_clean.chat AS chat
+      ON ce.id_channel = chat.id_channel
+      AND ce.ts_created > "2026-02-23T14:00:00.000+00:00"
   WHERE
     MAKE_DATE(ce.year, ce.month, ce.day) >= '{load_start_date}'
 ),
