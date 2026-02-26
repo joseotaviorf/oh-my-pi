@@ -641,6 +641,8 @@ bietlejuice.dw_employee_test:
   - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.dw_evictions:
+  - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
+  - bietlejuice.cyber:load-clean-logs:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
