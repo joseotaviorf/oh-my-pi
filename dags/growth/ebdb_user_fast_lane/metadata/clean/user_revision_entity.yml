@@ -22,6 +22,15 @@ columns:
       - datalake_ebdb_raw.usuariorevisionentity.usuario_id
     description: Foreign key reference to the user who made the change. This field can be NULL when the change was made by an automatic
       process or system operation rather than a specific user action.
+  id_principal:
+    lineage:
+      - datalake_ebdb_raw.usuariorevisionentity.principalId
+    description: Foreign key reference to the principal who made the change. This field can be NULL when the change was made by an automatic
+      process or system operation rather than a specific user action.
+  principal_type:
+    lineage:
+      - datalake_ebdb_raw.usuariorevisionentity.principalType
+    description: Type of principal who made the change. This field can be NULL when the change was made by an automatic
   reason:
     lineage:
       - datalake_ebdb_raw.usuariorevisionentity.motivo

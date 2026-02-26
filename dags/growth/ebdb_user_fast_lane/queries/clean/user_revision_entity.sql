@@ -9,6 +9,8 @@ SELECT
     */
     IF(timestamp < 20000000000000, timestamp, UNIX_TIMESTAMP(timestamp::STRING, 'yyyyMMddHHmmss') * 1000) AS ts_revision,
     usuario_id AS id_user,
+    principalId AS id_principal,
+    principalType AS principal_type,
     motivo AS reason
 FROM
     datalake_ebdb_raw.`UsuarioRevisionEntity`
