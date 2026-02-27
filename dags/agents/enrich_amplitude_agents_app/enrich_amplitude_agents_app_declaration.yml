@@ -22,7 +22,7 @@ workflow:
     buyer_funnel_engagement_daily:
       z_order_by: [id_amplitude, dt_snapshot]      
     buyer_funnel_users:
-      z_order_by: [id_amplitude, ts_updated]
+      z_order_by: [id_amplitude, ts_latest_activity]
       load_spark_job: load_buyer_funnel_users
       spark_job_arguments:
         - "{environment}"
