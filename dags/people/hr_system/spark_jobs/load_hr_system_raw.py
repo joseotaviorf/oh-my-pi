@@ -1,6 +1,12 @@
 import json
 import argparse
 from multiprocessing import Pool
+
+try:
+    from importlib.metadata import version
+    HR_SYSTEM_CLIENT_VERSION = version("quintoandar-hr-system-api-client")
+except Exception:
+    HR_SYSTEM_CLIENT_VERSION = "unknown"
 from datetime import datetime, timedelta
 from pyspark.sql.types import StructType
 from pyspark.sql.functions import current_timestamp, date_format, col, lit
@@ -229,7 +235,8 @@ if __name__ == "__main__":
     ingestion = Ingestion(args, url, token)
     spark_client = SparkClient()
     logger.info(
-        f"m={JOB_NAME}, environment={ingestion.environment}, source={ingestion.source}, datalake_bucket={ingestion.datalake_bucket}, "
+        f"m={JOB_NAME}, hr_system_api_client_version={HR_SYSTEM_CLIENT_VERSION}, "
+        f"environment={ingestion.environment}, source={ingestion.source}, datalake_bucket={ingestion.datalake_bucket}, "
         f"table_name={ingestion.endpoint_id}, msg=Starting spark job..."
     )
     list_ingestion_tables = list()
@@ -237,7 +244,15 @@ if __name__ == "__main__":
         ingestion_table = IngestionTable(ingestion, offset)
         list_ingestion_tables.append(ingestion_table)
     json_data = ingestion.get_data_from_api(list_ingestion_tables)
+    for i, data in enumerate(json_data):
+        for dt_effective, records in data.items():
+            logger.info(
+                f"m={JOB_NAME}, msg=Fetched {len(records)} records from API for dt_effective={dt_effective}"
+            )
     dfs = ingestion.get_df(json_data)
+    for i, df in enumerate(dfs):
+        record_count = df.count()
+        logger.info(f"m={JOB_NAME}, msg=DataFrame {i} has {record_count} rows before load")
     ingestion.clear_directory("raw")
     for df in dfs:
         ingestion.load_raw(df, spark_client)

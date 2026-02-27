@@ -80,6 +80,7 @@ workflow:
     jobs:
       extra_spark_job_arguments:
         - deduplication_key: "JobId"
+          has_dt_effective: true
           params:
             onlyData: true
             orderBy: "JobId:asc"
@@ -90,6 +91,7 @@ workflow:
     organizations:
       extra_spark_job_arguments:
         - deduplication_key: "OrganizationId"
+          has_dt_effective: true
           params:
             onlyData: true
             orderBy: "OrganizationId:asc"
