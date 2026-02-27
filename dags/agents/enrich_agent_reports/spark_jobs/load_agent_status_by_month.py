@@ -153,6 +153,8 @@ def _build_ciq_status_by_month(
     load_end_date: str,
 ) -> DataFrame:
     """CIQ path: ciq_users -> expand by month -> one row per (id_user, reference_month) with ciq_* columns."""
+    month_start = add_months(to_date(lit(load_start_date)), -1)
+    month_end = last_day(to_date(lit(load_end_date)))
     ciq = (
         spark.table("datalake_ebdb_agents.ciq_users")
         .filter(col("ts_agent_status_start").isNotNull())
@@ -178,7 +180,10 @@ def _build_ciq_status_by_month(
             col("reference_month"),
             col("days_in_status").alias("ciq_days_in_status"),
         )
-    )
+    ).filter(
+        (col("reference_month") >= month_start)
+        & (col("reference_month") <= month_end)
+        )
 
 # COMMAND ----------
 
@@ -200,8 +205,6 @@ def _build_agents_status_by_month(
         .join(ag.alias("g"), col("a.id") == col("g.id"), "left")
         .filter(
             col("a.ts_database_transaction").isNotNull()
-            & (col("a.ts_database_transaction") >= month_start)
-            & (col("a.ts_database_transaction") <= month_end)
             & (col("g.agent_type") == "CORRETOR_5A")
             & (col("u.id") != -1)
         )
@@ -258,7 +261,10 @@ def _build_agents_status_by_month(
         col("ts_agent_status_end").alias("agent_status_end"),
         col("reference_month"),
         col("days_in_status").alias("agent_days_in_status"),
-    )
+    ).filter(
+        (col("reference_month") >= month_start)
+        & (col("reference_month") <= month_end)
+        )
 
 # COMMAND ----------
 
