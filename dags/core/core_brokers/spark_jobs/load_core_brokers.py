@@ -9,7 +9,7 @@ from pyspark.sql.functions import (
     when,
 )
 
-from dags.core.core_brokers.spark_jobs.core_brokers_base import (
+from bietlejuice.base.core_models.core_brokers_base import (
     CoreBrokersBaseSparkJob,
 )
 from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
