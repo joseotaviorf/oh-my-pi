@@ -64,10 +64,12 @@ columns:
   is_visit_completed:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
+      - datalake_ebdb_clean.visit_status_log.event_type
     description: "Boolean indicating if the visit was completed (visit_fup in ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez'))."
   is_visit_performed:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
+      - datalake_ebdb_clean.visit_status_log.event_type
     description: Boolean indicating if the visit was performed (has visit_fup and agent was present).
   dt_proposal_approved:
     lineage:
