@@ -16,13 +16,8 @@ workflow:
       - agents_search_events
     buyer_funnel_users:
       - agents_search_events
-  tables_customization:
-    agents_search_events:
-      z_order_by: [id_amplitude]
-    buyer_funnel_engagement_daily:
-      z_order_by: [id_amplitude, dt_snapshot]      
+  tables_customization: 
     buyer_funnel_users:
-      z_order_by: [id_amplitude, ts_latest_activity]
       load_spark_job: load_buyer_funnel_users
       spark_job_arguments:
         - "{environment}"
