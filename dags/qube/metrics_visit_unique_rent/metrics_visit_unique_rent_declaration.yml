@@ -23,8 +23,8 @@ workflow:
       card: single
       type: string
     measures:
-    - name: unique_visits
-    - name: rent_visits
+    - name: visit_unique
+    - name: visit_rent
     counters:
       type: long
     privacy:

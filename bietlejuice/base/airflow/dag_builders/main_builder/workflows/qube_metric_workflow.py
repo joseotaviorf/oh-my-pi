@@ -5,6 +5,9 @@ Builds QUBE metric tables from YAML specs, automatically handling
 dependencies on dimensions and measures.
 """
 
+from pathlib import Path
+
+import yaml
 from airflow.models import DAG
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
@@ -19,9 +22,51 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
-# Add project root to path for qube imports
-# sys.path.append(os.path.join(os.path.dirname(__file__), "../../../../../../.."))
-from bietlejuice.qube.jobs.common.specs_loader import load_spec
+# Repo root (= /usr/local/airflow/ in Airflow container, repo root locally).
+# parents[6]: workflows -> main_builder -> dag_builders -> airflow -> base -> bietlejuice -> repo_root
+_DAGS_ROOT = Path(__file__).resolve().parents[6]
+
+
+def _find_qube_declaration(entity_type: str, spec_name: str) -> dict:
+    """
+    Find a qube declaration file by scanning entity_type directories for
+    a matching workflow.qube_specs.name value, and return the qube_specs
+    content dict directly.
+
+    Scanning is necessary because declaration folder names don't always
+    match qube_specs.name (e.g. folder measures_visit_unique has
+    qube_specs.name=unique_visits).
+
+    The qube_specs content (entity, name, source, logic, …) is returned
+    directly so callers can pass it straight to task creators as the job
+    spec — avoiding the DAG-builder wrapper (dag/workflow/cluster keys)
+    that build_dimension / build_measure / build_metric do not expect.
+
+    Args:
+        entity_type: "dimensions" or "measures"
+        spec_name: The qube_specs.name value to search for
+
+    Returns:
+        The workflow.qube_specs dict from the matching declaration file
+
+    Raises:
+        FileNotFoundError: If no matching declaration is found
+    """
+    qube_dir = _DAGS_ROOT / "dags" / "qube"
+    for subdir in sorted(qube_dir.iterdir()):
+        if not subdir.is_dir() or not subdir.name.startswith(f"{entity_type}_"):
+            continue
+        decl_file = subdir / f"{subdir.name}_declaration.yml"
+        if not decl_file.exists():
+            continue
+        with open(decl_file) as f:
+            content = yaml.safe_load(f)
+        qube_specs = content.get("workflow", {}).get("qube_specs", {})
+        if qube_specs.get("name") == spec_name:
+            return qube_specs
+    raise FileNotFoundError(
+        f"No {entity_type} declaration found with qube_specs.name='{spec_name}' in {qube_dir}"
+    )
 
 
 class QubeMetricWorkflow(BaseWorkflow):
@@ -108,21 +153,14 @@ class QubeMetricWorkflow(BaseWorkflow):
         # Load metric spec to get dependencies
         metric_spec = self._load_metric_spec()
 
-        # For dependencies, we still need to load dimension/measure specs from files
-        # since they're in separate declaration files. We'll load from qube/specs.
         # Create dimension tasks
+        # _find_qube_declaration returns the qube_specs dict directly (entity,
+        # name, source, logic, …) — not the full DAG-builder declaration — so
+        # the Databricks job receives the flat spec it expects.
         dim_tasks = {}
         for dim_spec in metric_spec.get("dimensions", []):
             dim_name = dim_spec["name"]
-            # Load dimension spec from file for dependency tasks
-            try:
-                dim_full_spec = load_spec(
-                    f"dags/qube/dimensions_{dim_name}/dimensions_{dim_name}_declaration.yaml"
-                )
-            except FileNotFoundError:
-                # Fallback: try dags/qube/specs
-
-                dim_full_spec = load_spec(f"qube/specs/dimensions/{dim_name}.yaml")
+            dim_full_spec = _find_qube_declaration("dimensions", dim_name)
 
             table_attributes = TableAttributes(
                 self.dag_args,
@@ -141,13 +179,7 @@ class QubeMetricWorkflow(BaseWorkflow):
         meas_tasks = {}
         for meas_spec in metric_spec.get("measures", []):
             meas_name = meas_spec["name"]
-            # Load measure spec from file for dependency tasks
-            try:
-                meas_full_spec = load_spec(
-                    f"dags/qube/measures_{meas_name}/measures_{meas_name}_declaration.yaml"
-                )
-            except FileNotFoundError:
-                meas_full_spec = load_spec(f"qube/specs/measures/{meas_name}.yaml")
+            meas_full_spec = _find_qube_declaration("measures", meas_name)
 
             table_attributes = TableAttributes(
                 self.dag_args,

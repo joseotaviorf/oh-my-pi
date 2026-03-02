@@ -13,7 +13,7 @@ workflow:
   custom_schema: "measures"
   qube_specs:
     entity: visit
-    name: unique_visits
+    name: visit_unique
     source:
       date_expr: unix_timestamp(dt_visit, 'yyyy-MM-dd')
     logic:

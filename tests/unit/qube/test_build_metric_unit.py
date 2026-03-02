@@ -223,7 +223,7 @@ class TestBuildMeasureAggregation(unittest.TestCase):
         )
 
         self.assertEqual(out_col, "measure_purchased_7d_counter")
-        mock_col.assert_any_call("m__purchased")
+        mock_col.assert_any_call("m_purchased")
         mock_col.assert_any_call("visit_id")
         mock_when.assert_called_once()
         mock_count_distinct.assert_called_once()
@@ -249,7 +249,7 @@ class TestBuildMeasureAggregation(unittest.TestCase):
         )
 
         self.assertEqual(out_col, "measure_purchased_28d_counter_approx")
-        mock_col.assert_any_call("m__purchased")
+        mock_col.assert_any_call("m_purchased")
         mock_col.assert_any_call("visit_id")
         mock_when.assert_called_once()
         mock_approx_count.assert_called_once()

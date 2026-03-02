@@ -5,7 +5,7 @@ This module creates metrics by joining dimension and measure tables,
 aggregating counts, and applying k-anonymity privacy protections.
 """
 
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Optional, Tuple
 from argparse import Namespace
 from datetime import datetime
 from dataclasses import dataclass
@@ -201,7 +201,7 @@ def _determine_target_date(
         # Try to infer from first dimension table
         first_dim_spec = spec.get("dimensions", [])[0]
         check_win = windows[0]
-        first_dim_table = f"{entity}__{first_dim_spec['name']}__{check_win}d"
+        first_dim_table = f"{first_dim_spec['name']}_{check_win}d"
         first_dim_path = conf.get_table_path("dim", first_dim_table)
 
         logger.info(f"Attempting to infer date from: {first_dim_path}")
@@ -252,12 +252,15 @@ def _process_window(
     base_df, dim_cols_info, has_multi, entity_id_col = _load_and_join_dimensions(
         spark, metric_config.dim_specs, metric_config.entity, window_days, conf, env
     )
+    if base_df is None:
+        logger.warning(f"Window {window_days}d skipped: no dimension data available.")
+        return
     logger.info(f"Dimensions loaded, entity_id: {entity_id_col}")
     logger.info(f"Has multi-valued dimensions: {has_multi}")
 
     # Load and join measures
     logger.info(f"Loading {len(metric_config.meas_specs)} measures")
-    full_df, measure_output_cols = _load_and_join_measures(
+    full_df, measure_output_cols, loaded_meas_specs = _load_and_join_measures(
         spark,
         metric_config.meas_specs,
         base_df,
@@ -267,12 +270,19 @@ def _process_window(
         env,
         entity_id_col,
     )
+    if len(loaded_meas_specs) < len(metric_config.meas_specs):
+        skipped = [
+            s["name"] for s in metric_config.meas_specs if s not in loaded_meas_specs
+        ]
+        logger.warning(
+            f"Proceeding with {len(loaded_meas_specs)}/{len(metric_config.meas_specs)} measures. Skipped: {skipped}"
+        )
 
-    # Aggregate metrics
+    # Aggregate metrics — use only the measures that were actually loaded
     result_df = _aggregate_metrics(
         full_df,
         dim_cols_info,
-        metric_config.meas_specs,
+        loaded_meas_specs,
         entity_id_col,
         has_multi,
         window_days,
@@ -299,7 +309,7 @@ def _load_and_join_dimensions(
     conf: Config,
     env: str,
 ) -> Tuple[DataFrame, List[Tuple[str, str]], bool, str]:
-    """Load and join all dimension tables."""
+    """Load and join all dimension tables, skipping any that do not exist yet."""
     base_df = None
     dim_cols_info = []
     has_multi = False
@@ -311,8 +321,12 @@ def _load_and_join_dimensions(
         d_card = d_spec.get("card", "single")
         d_type = d_spec.get("type", "string")
 
-        # Load dimension
         d_df = _load_single_dimension(spark, entity, d_name, window_days, conf, env)
+        if d_df is None:
+            logger.warning(
+                f"Skipping dimension '{d_name}' for window {window_days}d: table not available"
+            )
+            continue
 
         # Identify entity_id column
         if entity_id_col is None:
@@ -339,7 +353,10 @@ def _load_and_join_dimensions(
             base_df = base_df.join(d_df, on=join_keys, how="inner")
 
     if base_df is None:
-        raise ValueError("No dimensions specified in metric spec")
+        logger.warning(
+            f"No dimension tables available for window {window_days}d — skipping window."
+        )
+        return None, [], False, None
 
     return base_df, dim_cols_info, has_multi, entity_id_col
 
@@ -353,17 +370,29 @@ def _load_and_join_measures(
     conf: Config,
     env: str,
     entity_id_col: str,
-) -> Tuple[DataFrame, List[str]]:
-    """Load and join all measure tables."""
+) -> Tuple[DataFrame, List[str], List[Dict[str, Any]]]:
+    """Load and join all measure tables, skipping any that do not exist yet.
+
+    Returns the joined DataFrame, output column names, and the subset of
+    measure specs that were actually loaded (so downstream aggregation only
+    references columns that exist in the DataFrame).
+    """
     full_df = base_df
     measure_output_cols = []
+    loaded_meas_specs = []
     join_keys = ["date", entity_id_col]
 
     for m_spec in meas_specs:
         m_name = m_spec["name"]
 
-        # Load measure
         m_df = _load_single_measure(spark, entity, m_name, window_days, conf, env)
+        if m_df is None:
+            logger.warning(
+                f"Skipping measure '{m_name}' for window {window_days}d: table not available"
+            )
+            continue
+
+        loaded_meas_specs.append(m_spec)
 
         # Add flag column
         m_df = _prepare_measure_flag_column(m_df, join_keys, m_name)
@@ -372,10 +401,10 @@ def _load_and_join_measures(
         full_df = full_df.join(m_df, on=join_keys, how="left")
 
         # Fill nulls
-        col_name = f"m__{m_name}"
+        col_name = f"m_{m_name}"
         full_df = full_df.withColumn(col_name, F.coalesce(F.col(col_name), F.lit(0)))
 
-    return full_df, measure_output_cols
+    return full_df, measure_output_cols, loaded_meas_specs
 
 
 def _aggregate_metrics(
@@ -439,7 +468,7 @@ def _write_metric_output(
     if name.startswith(f"{entity}_"):
         clean_name = name[len(entity) + 1 :]  # Remove "entity_" prefix
         logger.warning(
-            f"Metric name '{name}' already contains entity prefix '{entity}_'. "
+            f"Metric name '{name}' already contains entity prefix ''. "
             f"Using cleaned name: '{clean_name}'"
         )
         name = clean_name
@@ -551,31 +580,17 @@ def _load_single_dimension(
     window_days: int,
     conf: Config,
     env: str,
-) -> DataFrame:
-    """Load a single dimension table."""
-    table_name = f"{entity}__{dim_name}__{window_days}d"
+) -> Optional[DataFrame]:
+    """Load a single dimension table, returning None if it does not exist yet."""
+    table_name = f"{dim_name}_{window_days}d"
     path = conf.get_table_path("dim", table_name)
 
     logger.debug(f"Loading dimension: {table_name}")
     try:
         return load_table(spark, path, env=env)
     except Exception as e:
-        logger.error(
-            f"Failed to load dimension table: {path}\n"
-            f"Error: {e}\n\n"
-            f"Metrics require dimension and measure tables to exist first.\n"
-            f"Please build dependencies in this order:\n"
-            f"  1. Build dimension: python qube/jobs/dimensions/build_dimension.py \\\n"
-            f"       --spec qube/specs/dimensions/{dim_name}.yaml \\\n"
-            f"       --date <DATE> --env {env}\n"
-            f"  2. Build measures (see spec for required measures)\n"
-            f"  3. Build metric again\n\n"
-            f"Or use the build script: bash scripts/build_all.sh <DATE> {env}"
-        )
-        raise RuntimeError(
-            f"Missing required dimension table: {path}. "
-            f"Build dimension '{dim_name}' first or use scripts/build_all.sh"
-        ) from e
+        logger.warning(f"Dimension table not found, skipping: {path}\n" f"Error: {e}")
+        return None
 
 
 def _identify_entity_id_column(df: DataFrame) -> str:
@@ -613,28 +628,17 @@ def _load_single_measure(
     window_days: int,
     conf: Config,
     env: str,
-) -> DataFrame:
-    """Load a single measure table."""
-    table_name = f"{entity}__{meas_name}__{window_days}d"
+) -> Optional[DataFrame]:
+    """Load a single measure table, returning None if it does not exist yet."""
+    table_name = f"{meas_name}_{window_days}d"
     path = conf.get_table_path("meas", table_name)
 
     logger.debug(f"Loading measure: {table_name}")
     try:
         return load_table(spark, path, env=env)
     except Exception as e:
-        logger.error(
-            f"Failed to load measure table: {path}\n"
-            f"Error: {e}\n\n"
-            f"Metrics require dimension and measure tables to exist first.\n"
-            f"Please build measure: python qube/jobs/measures/build_measure.py \\\n"
-            f"  --spec qube/specs/measures/{meas_name}.yaml \\\n"
-            f"  --date <DATE> --env {env}\n\n"
-            f"Or use the build script: bash scripts/build_all.sh <DATE> {env}"
-        )
-        raise RuntimeError(
-            f"Missing required measure table: {path}. "
-            f"Build measure '{meas_name}' first or use scripts/build_all.sh"
-        ) from e
+        logger.warning(f"Measure table not found, skipping: {path}\n" f"Error: {e}")
+        return None
 
 
 def _prepare_measure_flag_column(
@@ -643,7 +647,7 @@ def _prepare_measure_flag_column(
     meas_name: str,
 ) -> DataFrame:
     """Add flag column to measure DataFrame."""
-    return df.select(*join_keys).withColumn(f"m__{meas_name}", F.lit(1))
+    return df.select(*join_keys).withColumn(f"m_{meas_name}", F.lit(1))
 
 
 def _build_agg_exprs(
@@ -676,7 +680,7 @@ def _build_measure_aggregation(
     counter_type: str,
 ) -> Tuple[F.Column, str]:
     """Build aggregation expression for a single measure."""
-    flag_col = f"m__{meas_name}"
+    flag_col = f"m_{meas_name}"
     target_id = F.when(F.col(flag_col) == 1, F.col(entity_id_col))
 
     use_approx = _determine_use_approx_counter(has_multi, counter_type)

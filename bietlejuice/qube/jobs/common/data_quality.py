@@ -60,7 +60,7 @@ def validate_output(
     Returns:
         DataQualityMetrics object with validation results
     """
-    table_name = f"{entity}__{name}__{window_days}d"
+    table_name = f"{entity}_{name}_{window_days}d"
     logger.info(f"Validating output: {table_name}")
 
     warnings = []
@@ -177,7 +177,7 @@ def log_processing_stats(
         name: Dimension/measure/metric name
         window_days: Window size in days
     """
-    table_name = f"{entity}__{name}__{window_days}d"
+    table_name = f"{entity}_{name}_{window_days}d"
 
     if input_count > 0:
         reduction_rate = (input_count - output_count) / input_count
