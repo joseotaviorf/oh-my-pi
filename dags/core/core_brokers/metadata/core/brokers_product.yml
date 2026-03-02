@@ -1,0 +1,191 @@
+database_name: core_brokers
+table_name: brokers_product
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+description: >
+  Brokers Product Core Model containing consolidated information about the
+  relationship between partner real estate brokers and their 3P products.
+  This table operates at the company-product level, providing product-specific
+  details such as revenue share, banking information, integrator partner, tier,
+  and operating regions. Only companies with at least one 3P product
+  (rent product 30 or sale product 27) are included.
+columns:
+  sk_broker_product:
+    lineage:
+      - datalake_company_clean.company.id
+      - datalake_company_clean.product.id
+    description: >
+      Surrogate key for the Brokers Product Core Model, derived from the
+      concatenation of the company id and the product id. This key must
+      always be unique and identifies a single broker-product relationship.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.company.id
+    description: >
+      Surrogate key referencing the Brokers Core Model, derived from the
+      company id. Links back to the brokers table for company-level details.
+  id_company:
+    lineage:
+      - datalake_company_clean.company.id
+    description: >
+      Internal identifier of the company from the Company database. Used as
+      the primary business key for the broker.
+  uuid_company:
+    lineage:
+      - datalake_company_clean.company.uuid_company
+    description: Universal unique identifier (UUID) for the company, used across systems.
+  broker_name:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: Official legal name of the broker company as registered in official documents.
+  broker_trade_name:
+    lineage:
+      - datalake_company_clean.company.trade_name
+    description: >
+      Commercial or trade name of the broker, which may differ from the legal name.
+      This is the name commonly used in business operations.
+  product_name:
+    lineage:
+      - datalake_company_clean.product.name
+    description: Name of the 3P product associated with the broker.
+  business_segment:
+    lineage:
+      - datalake_company_clean.product.business_segment
+    description: Business segment of the 3P product (e.g., rent, sale).
+  product_status:
+    lineage:
+      - datalake_company_clean.company_product.status
+    description: >
+      Current status of the company-product relationship (e.g., ACTIVE, INACTIVE).
+  integrator_partner:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: >
+      Name of the integrator partner company associated with this broker-product
+      relationship, resolved via the integratorPartnerUUId from product_settings.
+  integrator_partner_status:
+    lineage:
+      - datalake_company_clean.company.status
+    description: >
+      Current status of the integrator partner company (e.g., ACTIVE, INACTIVE).
+  commission:
+    lineage:
+      - datalake_company_clean.revenue_share.commission
+    description: >
+      Commission percentage defined in the revenue share agreement for this
+      broker-product relationship.
+  demand_fee:
+    lineage:
+      - datalake_company_clean.revenue_share.demand_fee
+    description: >
+      Demand fee defined in the revenue share agreement for this broker-product
+      relationship.
+  supply_fee:
+    lineage:
+      - datalake_company_clean.revenue_share.supply_fee
+    description: >
+      Supply fee defined in the revenue share agreement for this broker-product
+      relationship.
+  platform_fee:
+    lineage:
+      - datalake_company_clean.revenue_share.platform_fee
+    description: >
+      Platform fee defined in the revenue share agreement for this broker-product
+      relationship.
+  bank:
+    lineage:
+      - datalake_company_clean.banking_information.bank
+    description: >
+      Bank name from the banking information associated with this broker-product
+      relationship, resolved via the bankingInformationUUId from product_settings.
+  agency_number:
+    lineage:
+      - datalake_company_clean.banking_information.agency_number
+    description: Bank agency number for the broker-product banking information.
+  account_number:
+    lineage:
+      - datalake_company_clean.banking_information.account_number
+    description: Bank account number for the broker-product banking information.
+  account_type:
+    lineage:
+      - datalake_company_clean.banking_information.type
+    description: >
+      Bank account type (e.g., checking, savings) for the broker-product
+      banking information.
+  tier_name:
+    lineage:
+      - datalake_company_clean.tier.tier_name
+    description: >
+      Tier name assigned to this broker-product relationship via the
+      company_product_tier association.
+  is_3p_rent_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+    description: >
+      Boolean flag indicating if this row corresponds to the 3P rent product
+      (id_product = 30).
+  is_3p_sale_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+    description: >
+      Boolean flag indicating if this row corresponds to the 3P sale product
+      (id_product = 27).
+  is_3p_active_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Boolean flag indicating if this broker-product relationship is currently
+      active (id_product 27 or 30 with status ACTIVE).
+  is_3p_active_rent_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Boolean flag indicating if this is an active 3P rent product
+      (id_product = 30 with status ACTIVE).
+  is_3p_active_sale_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Boolean flag indicating if this is an active 3P sale product
+      (id_product = 27 with status ACTIVE).
+  has_opt_in_navent:
+    lineage:
+      - datalake_company_clean.company_product.product_settings
+    description: >
+      Opt-in flag for Navent integration, extracted from the optInNavent
+      field in the product_settings JSON column.
+  region_list:
+    lineage:
+      - datalake_company_clean.company_product_region.id_region
+    description: >
+      Array of distinct region IDs where this broker-product relationship
+      operates, aggregated from the company_product_region table.
+  ts_created:
+    lineage:
+      - datalake_company_clean.company.ts_created
+    description: Timestamp when the company record was initially created in the source system.
+  ts_updated:
+    lineage:
+      - datalake_company_clean.company.ts_updated
+    description: >
+      Timestamp when the company record was last updated. Used for incremental
+      loading and change tracking.
+  ts_load:
+    description: >
+      Timestamp when the Brokers Product Core Model was last loaded by the ETL
+      process. This is the processing timestamp, not the data timestamp.
+  year:
+    lineage:
+      - datalake_company_clean.company.ts_updated
+    description: Year partition column, derived from ts_updated.
+  month:
+    lineage:
+      - datalake_company_clean.company.ts_updated
+    description: Month partition column, derived from ts_updated.
+  day:
+    lineage:
+      - datalake_company_clean.company.ts_updated
+    description: Day partition column, derived from ts_updated.

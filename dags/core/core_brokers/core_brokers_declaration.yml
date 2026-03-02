@@ -1,0 +1,50 @@
+dag:
+  name: core_brokers
+  schedule_start_date: 2026, 1, 1
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: |
+      This is a DAG related to the Brokers Core Model.
+      It consolidates broker partner data from the 3P Partners operation,
+      serving as the source of truth for partner real estate broker information.
+workflow:
+  type: core_model
+  layer: core
+  default_extraction_type: incremental
+  load_spark_job: load_core_brokers
+  execution_timeout_hours: 1
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{schema}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  tables_customization:
+    brokers:
+      partitions: [year, month, day]
+      z_order_by: [sk_broker]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+    brokers_historical:
+      partitions: [year, month, day]
+      z_order_by: [sk_broker, ts_database_transaction]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+    brokers_product:
+      load_spark_job: load_core_brokers_product
+      partitions: [year, month, day]
+      z_order_by: [sk_broker_product]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+    brokers_product_historical:
+      load_spark_job: load_core_brokers_product
+      partitions: [year, month, day]
+      z_order_by: [sk_broker_product, ts_database_transaction]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

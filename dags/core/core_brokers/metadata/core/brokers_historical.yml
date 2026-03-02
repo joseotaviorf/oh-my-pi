@@ -1,0 +1,187 @@
+database_name: core_brokers
+table_name: brokers_historical
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+description: >
+  Historical tracking table for the Brokers Core Model. Each row represents a
+  single CDC transaction (insert, update or delete) captured from the Company
+  database transactional layer. Related entities (address, document, product) are
+  joined from the clean layer to provide the latest context for each transaction.
+  The composite key (sk_broker, ts_database_transaction) uniquely identifies each
+  change event.
+columns:
+  sk_broker:
+    lineage:
+      - datalake_company_transactional.company.id
+    description: >
+      Surrogate key for the Brokers Core Model, derived from the company id.
+      Combined with ts_database_transaction, uniquely identifies each historical
+      change event.
+  id_company:
+    lineage:
+      - datalake_company_transactional.company.id
+    description: >
+      Internal identifier of the company from the Company database. Used as the
+      primary business key for the broker.
+  uuid_company:
+    lineage:
+      - datalake_company_transactional.company.uuid_company
+    description: Universal unique identifier (UUID) for the company, used across systems.
+  broker_name:
+    lineage:
+      - datalake_company_transactional.company.company_name
+    description: Official legal name of the broker company as registered in official documents.
+  broker_trade_name:
+    lineage:
+      - datalake_company_transactional.company.trade_name
+    description: >
+      Commercial or trade name of the broker, which may differ from the legal name.
+      This is the name commonly used in business operations.
+  broker_status:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Derived 3P broker status at the time of the transaction. ACTIVE when the
+      company has at least one active 3P product (id_product 27 or 30 with status
+      ACTIVE), INACTIVE otherwise.
+  company_status:
+    lineage:
+      - datalake_company_transactional.company.status
+    description: >
+      Company status at the time of the transaction (e.g., ACTIVE, INACTIVE).
+      This reflects the overall company status, not the 3P-specific status.
+  broker_address:
+    lineage:
+      - datalake_company_clean.address.public_area
+    description: Street address or public area name where the broker is located.
+  broker_number:
+    lineage:
+      - datalake_company_clean.address.number
+    description: Street number of the broker's address.
+  broker_complement:
+    lineage:
+      - datalake_company_clean.address.complement
+    description: Additional address information such as apartment, suite, floor, or building.
+  broker_neighborhood:
+    lineage:
+      - datalake_company_clean.address.neighborhood
+    description: Neighborhood or district where the broker is located.
+  broker_city:
+    lineage:
+      - datalake_company_clean.address.city
+    description: City where the broker is located.
+  broker_state:
+    lineage:
+      - datalake_company_clean.address.state
+    description: State or province where the broker is located.
+  broker_country:
+    lineage:
+      - datalake_company_clean.address.country
+    description: Country where the broker is located.
+  broker_zip_code:
+    lineage:
+      - datalake_company_clean.address.zip_code
+    description: Postal code (zip code) of the broker's address.
+  creci:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: >
+      CRECI (Conselho Regional de Corretores de Imoveis) registration number.
+      Professional license number for real estate brokers in Brazil, containing
+      only numeric characters.
+  cnpj:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: >
+      CNPJ (Cadastro Nacional da Pessoa Juridica) number. Brazilian federal
+      tax ID for companies, containing only numeric characters.
+  rfc:
+    lineage:
+      - datalake_company_clean.document.identification_number
+    description: >
+      RFC (Registro Federal de Contribuyentes) number. Mexican federal tax ID
+      for companies, containing only numeric characters.
+  is_3p_rent_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+    description: >
+      Boolean flag indicating if the company has ever had the 3P rent product
+      (id_product = 30), regardless of current status.
+  is_3p_sale_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+    description: >
+      Boolean flag indicating if the company has ever had the 3P sale product
+      (id_product = 27), regardless of current status.
+  is_3p_active_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Boolean flag indicating if the company has at least one active 3P product
+      (id_product 27 or 30 with status ACTIVE) at the time of the transaction.
+  is_3p_active_rent_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Boolean flag indicating if the company has the 3P rent product
+      (id_product = 30) with status ACTIVE at the time of the transaction.
+  is_3p_active_sale_broker:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+      - datalake_company_clean.company_product.status
+    description: >
+      Boolean flag indicating if the company has the 3P sale product
+      (id_product = 27) with status ACTIVE at the time of the transaction.
+  ts_created:
+    lineage:
+      - datalake_company_transactional.company.ts_created
+    description: Timestamp when the company record was initially created in the source system.
+  ts_updated:
+    lineage:
+      - datalake_company_transactional.company.ts_updated
+    description: >
+      Timestamp when the company record was last updated at the time of this
+      transaction.
+  ts_load:
+    description: >
+      Timestamp when the Brokers Historical Core Model was last loaded by the
+      ETL process. This is the processing timestamp, not the data timestamp.
+  op_cdc:
+    lineage:
+      - datalake_company_transactional.company.op_cdc
+    description: >
+      CDC operation type captured by Debezium. Possible values: 'c' (create/insert),
+      'u' (update), 'd' (delete), 'r' (read/snapshot).
+  ts_database_transaction:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: >
+      Timestamp of when the change occurred in the source database. Combined with
+      sk_broker, forms the composite primary key for this table. Used for
+      partitioning (year/month/day).
+  ts_cdc_transaction:
+    lineage:
+      - datalake_company_transactional.company.ts_cdc_transaction
+    description: >
+      Timestamp of when Debezium captured the change from the source database
+      WAL/binlog. Used as the merge condition to resolve duplicate processing.
+  is_current:
+    description: >
+      Boolean flag indicating whether this row represents the most recent
+      transaction for the given broker (sk_broker). True for the row with the
+      latest ts_database_transaction per sk_broker, False for all others.
+  year:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Year partition column, derived from ts_database_transaction.
+  month:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Month partition column, derived from ts_database_transaction.
+  day:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Day partition column, derived from ts_database_transaction.

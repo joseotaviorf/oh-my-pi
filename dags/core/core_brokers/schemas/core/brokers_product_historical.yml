@@ -1,0 +1,172 @@
+# Schema validation file for core brokers_product_historical table
+# Path: dags/core/core_brokers/schemas/core/brokers_product_historical.yml
+
+columns:
+  # Surrogate keys
+  sk_broker_product:
+    type: string
+    required: true
+
+  sk_broker:
+    type: string
+    required: true
+
+  # Company identifiers
+  id_company:
+    type: bigint
+    required: true
+
+  uuid_company:
+    type: string
+    required: false
+
+  # Broker information
+  broker_name:
+    type: string
+    required: false
+
+  broker_trade_name:
+    type: string
+    required: false
+
+  # Product information
+  product_name:
+    type: string
+    required: false
+
+  business_segment:
+    type: string
+    required: false
+
+  product_status:
+    type: string
+    required: true
+
+  # Integrator partner
+  integrator_partner:
+    type: string
+    required: false
+
+  integrator_partner_status:
+    type: string
+    required: false
+
+  # Revenue share
+  commission:
+    type: double
+    required: false
+
+  demand_fee:
+    type: double
+    required: false
+
+  supply_fee:
+    type: double
+    required: false
+
+  platform_fee:
+    type: double
+    required: false
+
+  # Banking information
+  bank:
+    type: string
+    required: false
+
+  agency_number:
+    type: string
+    required: false
+
+  account_number:
+    type: string
+    required: false
+
+  account_type:
+    type: string
+    required: false
+
+  # Tier
+  tier_name:
+    type: string
+    required: false
+
+  # 3P product flags
+  is_3p_rent_broker:
+    type: boolean
+    required: true
+
+  is_3p_sale_broker:
+    type: boolean
+    required: true
+
+  is_3p_active_broker:
+    type: boolean
+    required: true
+
+  is_3p_active_rent_broker:
+    type: boolean
+    required: true
+
+  is_3p_active_sale_broker:
+    type: boolean
+    required: true
+
+  # Navent opt-in
+  has_opt_in_navent:
+    type: string
+    required: false
+
+  # Region list
+  region_list:
+    type: string
+    required: false
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: false
+
+  ts_updated:
+    type: timestamp
+    required: false
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # CDC metadata columns
+  op_cdc:
+    type: string
+    required: true
+
+  ts_database_transaction:
+    type: timestamp
+    required: true
+
+  ts_cdc_transaction:
+    type: timestamp
+    required: true
+
+  # Current state flag
+  is_current:
+    type: boolean
+    required: true
+
+  # Partitioning columns
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 37
+max_columns: 37
+strict: true

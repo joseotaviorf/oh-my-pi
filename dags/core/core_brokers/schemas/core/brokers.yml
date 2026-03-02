@@ -1,0 +1,133 @@
+# Schema validation file for core brokers table
+# Path: dags/core/core_brokers/schemas/core/brokers.yml
+
+columns:
+  # Surrogate key
+  sk_broker:
+    type: string
+    required: true
+
+  # Company identifiers
+  id_company:
+    type: bigint
+    required: true
+
+  uuid_company:
+    type: string
+    required: false
+
+  # Broker information
+  broker_name:
+    type: string
+    required: false
+
+  broker_trade_name:
+    type: string
+    required: false
+
+  broker_status:
+    type: string
+    required: true
+
+  company_status:
+    type: string
+    required: false
+
+  # Address information
+  broker_address:
+    type: string
+    required: false
+
+  broker_number:
+    type: string
+    required: false
+
+  broker_complement:
+    type: string
+    required: false
+
+  broker_neighborhood:
+    type: string
+    required: false
+
+  broker_city:
+    type: string
+    required: false
+
+  broker_state:
+    type: string
+    required: false
+
+  broker_country:
+    type: string
+    required: false
+
+  broker_zip_code:
+    type: string
+    required: false
+
+  # Document information
+  creci:
+    type: string
+    required: false
+
+  cnpj:
+    type: string
+    required: false
+
+  rfc:
+    type: string
+    required: false
+
+  # 3P product flags
+  is_3p_rent_broker:
+    type: boolean
+    required: true
+
+  is_3p_sale_broker:
+    type: boolean
+    required: true
+
+  is_3p_active_broker:
+    type: boolean
+    required: true
+
+  is_3p_active_rent_broker:
+    type: boolean
+    required: true
+
+  is_3p_active_sale_broker:
+    type: boolean
+    required: true
+
+  # Audit timestamps
+  ts_created:
+    type: timestamp
+    required: false
+
+  ts_updated:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 29
+max_columns: 29
+strict: true

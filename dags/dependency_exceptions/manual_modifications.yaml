@@ -1186,6 +1186,14 @@ bietlejuice.core_company:
     - bietlejuice.company:load-clean-tier
     - bietlejuice.company:load-clean-company-product-tier
     - bietlejuice.company:load-clean-company-product-region
+bietlejuice.core_brokers:
+  add:
+    - bietlejuice.company:load-clean-company
+    - bietlejuice.company:load-clean-company-address
+    - bietlejuice.company:load-clean-company-document
+    - bietlejuice.company:load-clean-document
+    - bietlejuice.company:load-clean-company-product
+    - bietlejuice.company:load-clean-address
 bietlejuice.dw_sale_closing_flows:
   add:
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day

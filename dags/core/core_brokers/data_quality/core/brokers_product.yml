@@ -1,0 +1,41 @@
+---
+table_name: core_brokers.brokers_product
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_broker_product:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  id_company:
+    is_complete:
+      severity_level: Error
+  uuid_company:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning
+  broker_name:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning
+  product_status:
+    is_complete:
+      severity_level: Error
+  is_3p_rent_broker:
+    is_complete:
+      severity_level: Error
+  is_3p_sale_broker:
+    is_complete:
+      severity_level: Error
+  is_3p_active_broker:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
