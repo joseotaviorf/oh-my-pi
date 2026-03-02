@@ -1,0 +1,247 @@
+database_name: dw_compensation
+table_name: fact_plr_monthly
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Fact table containing monthly PLR (Profit and Results Sharing) / Performance Bonus calculations.
+  One row per assignment per reference month per PLR year. Implements eligibility rules, IPA multipliers,
+  corporate goals, and target calculations for Brazil, Portugal, USA, and LATAM employees.
+  Key features:
+  - Eligibility: admitted by cutoff, 90+ days worked, no interns (core) or Band 9+ (LATAM), no just cause.
+  - IPA from Performa calibration; default 70% for terminated before evaluation.
+  - Time worked: 15+ days in month = full month; unpaid leave excluded; protected leave guarantees 100% IPA.
+  - Target: core countries use amount_salary * multiplier / 12; LATAM uses last_salary_in_position * multiplier / 12.
+  Use cases:
+  - PLR payment calculation and audit
+  - Eligibility and performance analysis
+
+columns:
+  sk_plr_monthly:
+    description: |
+      Surrogate key (MD5 hash of sk_period_of_service + sk_reference_month).
+      Uniquely identifies each row (one per assignment per reference month).
+    lineage:
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
+      - dw_public.dim_date.month_start
+  sk_period_of_service:
+    description: Foreign key to period of service (id_period_of_service). References the employment period.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.id_period_of_service
+  sk_contract:
+    description: Foreign key to contract/assignment (id_assignment). References the employment contract.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.id_assignment
+  sk_plr_parameters:
+    description: Foreign key to dim_plr_parameters. PLR reference year used for calculation.
+    lineage:
+      - dw_compensation.dim_plr_parameters.reference_year
+  sk_reference_month:
+    description: Reference month as date (first day of month). Month within the PLR year.
+    lineage:
+      - dw_public.dim_date.month_start
+  sk_job_version:
+    description: Foreign key to dim_job. Job version at the time of the salary record for the month.
+    lineage:
+      - dw_compensation.fact_compensations.sk_job_version
+  assignment_number:
+    description: Assignment number (business identifier).
+    lineage:
+      - datalake_employee_registration.identifier_mapping.assignment_number
+  person_number:
+    description: Employee person number (business identifier).
+    lineage:
+      - datalake_employee_registration.identifier_mapping.person_number
+  dismissal_type:
+    description: Type of dismissal when applicable (e.g., resignation, termination).
+    lineage:
+      - datalake_employment.employee_details.dismissal_type
+  dismissal_reason:
+    description: Reason for dismissal when applicable. Just cause dismissals are not PLR eligible.
+    lineage:
+      - datalake_employment.employee_details.dismissal_reason
+  performa_score:
+    description: Individual performance assessment score from Performa calibration (Outstanding, Above expectations, etc.).
+    lineage:
+      - dw_performance.fact_performance_calibrations.performa_score
+  country:
+    description: Country of the job (Brazil, Portugal, United States, or LATAM country).
+    lineage:
+      - dw_compensation.dim_job.country
+  band:
+    description: Salary/seniority band (e.g., 5, 6, 7, Estag1).
+    lineage:
+      - dw_compensation.dim_job.band
+  currency_code:
+    description: Currency code for salary amounts (e.g., BRL, USD, MXN).
+    lineage:
+      - dw_compensation.fact_compensations.currency_code
+  days_unpaid_leave:
+    description: Number of unpaid leave days in the month. Not counted as worked days.
+    lineage:
+      - dw_employee.fact_absence_requests.dt_absence_started
+      - dw_employee.fact_absence_requests.dt_absence_ended
+      - dw_employee.dim_absence_type.is_paid_leave
+  days_protected_leave:
+    description: Number of protected leave days in the month (maternity, INSS, health). IPA guaranteed at least 100%.
+    lineage:
+      - dw_employee.fact_absence_requests.dt_absence_started
+      - dw_employee.fact_absence_requests.dt_absence_ended
+      - dw_employee.dim_absence_type.is_performa_protected
+  total_unpaid_absence_days_in_the_year:
+    description: Total unpaid absence days in the reference year. Subtracted from days worked for eligibility.
+    lineage:
+      - dw_employee.fact_absence_requests.dt_absence_started
+      - dw_employee.fact_absence_requests.dt_absence_ended
+      - dw_employee.dim_absence_type.is_paid_leave
+  total_protected_absence_days_in_the_year:
+    description: Total protected absence days in the year. If >= 15, IPA is at least 100%.
+    lineage:
+      - dw_employee.fact_absence_requests.dt_absence_started
+      - dw_employee.fact_absence_requests.dt_absence_ended
+      - dw_employee.dim_absence_type.is_performa_protected
+  amount_salary:
+    description: Monthly salary amount for the month. Used for PLR target in core countries.
+    lineage:
+      - dw_compensation.fact_compensations.amount_salary
+  last_salary_in_position:
+    description: Last salary in the position. Used for PLR target in LATAM.
+    lineage:
+      - dw_compensation.fact_compensations.amount_salary
+  target_plr:
+    description: Fixed PLR target amount when not using salary multiplier.
+    lineage:
+      - dw_compensation.dim_job.target_plr
+  target_plr_salary_multiplier:
+    description: PLR salary multiplier for target calculation (e.g., 1.0 = 1 month salary).
+    lineage:
+      - dw_compensation.dim_job.target_plr_salary_multiplier
+  days_worked_in_month:
+    description: |
+      Days worked in the month minus unpaid leave.
+      Overlap of (hired, terminated) with month, minus days_unpaid_leave.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_started
+      - datalake_employee_registration.identifier_mapping.dt_actual_termination
+      - dw_employee.fact_absence_requests.dt_absence_started
+      - dw_employee.fact_absence_requests.dt_absence_ended
+      - dw_employee.dim_absence_type.is_paid_leave
+  days_worked_in_year:
+    description: |
+      Days worked in the reference year minus total unpaid absence.
+      Used for 90+ days eligibility check.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_started
+      - datalake_employee_registration.identifier_mapping.dt_actual_termination
+      - dw_employee.fact_absence_requests.dt_absence_started
+      - dw_employee.fact_absence_requests.dt_absence_ended
+      - dw_employee.dim_absence_type.is_paid_leave
+  performa_ipa:
+    description: |
+      IPA multiplier from Performa score. Outstanding 1.5, Above 1.2, Meets 1.0, Partially 0.7, Insufficient 0.0.
+    lineage:
+      - dw_performance.fact_performance_calibrations.performa_ipa
+  pct_default_corporate_goals_terminated:
+    description: Default corporate goals percentage for terminated before evaluation (e.g., 0.70).
+    lineage:
+      - dw_compensation.dim_plr_parameters.pct_default_corporate_goals_terminated
+  pct_default_ipa_terminated:
+    description: Default IPA percentage for terminated before evaluation (e.g., 0.70).
+    lineage:
+      - dw_compensation.dim_plr_parameters.pct_default_ipa_terminated
+  pct_min_protected_leave_ipa:
+    description: Minimum IPA for protected leave (e.g., 1.0 = 100%).
+    lineage:
+      - dw_compensation.dim_plr_parameters.pct_min_protected_leave_ipa
+  pct_corporate_goals:
+    description: Final corporate goals achievement percentage for the year.
+    lineage:
+      - dw_compensation.dim_plr_parameters.pct_corporate_goals
+  is_terminated_before_evaluation_cycle_started:
+    description: TRUE if employee left before evaluation cycle start date.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_actual_termination
+      - dw_compensation.dim_plr_parameters.dt_evaluation_cycle_started
+  is_eligible_by_hired_date:
+    description: TRUE if admitted by admission cutoff date.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_started
+      - dw_compensation.dim_plr_parameters.dt_admission_cutoff
+  is_eligible_by_dismissal_reason:
+    description: TRUE if not dismissed for just cause.
+    lineage:
+      - datalake_employment.employee_details.dismissal_reason
+  is_eligible_by_country_and_band:
+    description: "TRUE if eligible by country and band rules (core: non-intern; LATAM: Band 9+)."
+    lineage:
+      - dw_compensation.dim_job.country
+      - dw_compensation.dim_job.band
+  is_eligible_by_yearly_worked_days:
+    description: TRUE if days_worked_in_year >= min_days_worked_in_year_for_eligibility (e.g., 90).
+    lineage:
+      - dw_compensation.dim_plr_parameters.min_days_worked_in_year_for_eligibility
+  is_corporate_goal_met:
+    description: TRUE if pct_corporate_goals >= pct_min_corporate_goals.
+    lineage:
+      - dw_compensation.dim_plr_parameters.pct_min_corporate_goals
+  is_terminated_before_payment_cutoff:
+    description: TRUE if terminated before payment cutoff date.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_actual_termination
+      - dw_compensation.dim_plr_parameters.dt_payment_cutoff
+  is_month_eligible_by_worked_days:
+    description: TRUE if days_worked_in_month >= min_days_worked_in_month_to_count (e.g., 15).
+    lineage:
+      - dw_compensation.dim_plr_parameters.min_days_worked_in_month_to_count
+  is_month_protected_by_ipa:
+    description: TRUE if total_protected_absence_days_in_the_year >= 15 (IPA at least 100%).
+    lineage:
+      - dw_compensation.dim_plr_parameters.min_days_worked_in_month_to_count
+  multiplier_eligibility:
+    description: 1 if all eligibility conditions met, 0 otherwise.
+    lineage:
+      - dw_compensation.dim_plr_parameters.dt_admission_cutoff
+      - dw_compensation.dim_plr_parameters.min_days_worked_in_year_for_eligibility
+      - dw_compensation.dim_plr_parameters.min_days_worked_in_month_to_count
+  multiplier_ipa:
+    description: IPA multiplier used (from Performa, default for terminated, or protected leave minimum).
+    lineage:
+      - dw_performance.fact_performance_calibrations.performa_ipa
+      - dw_compensation.dim_plr_parameters.pct_default_ipa_terminated
+      - dw_compensation.dim_plr_parameters.pct_min_protected_leave_ipa
+  multiplier_corporate_goals:
+    description: Corporate goals multiplier (0 if below minimum, else pct_corporate_goals).
+    lineage:
+      - dw_compensation.dim_plr_parameters.pct_corporate_goals
+      - dw_compensation.dim_plr_parameters.pct_min_corporate_goals
+  multiplier_target_plr:
+    description: PLR target amount for the month (salary * mult / 12 or target_plr / 12).
+    lineage:
+      - dw_compensation.fact_compensations.amount_salary
+      - dw_compensation.dim_job.target_plr
+      - dw_compensation.dim_job.target_plr_salary_multiplier
+  amount_plr_monthly:
+    description: Final monthly PLR amount. Product of eligibility * IPA * corporate_goals * target.
+    lineage:
+      - dw_compensation.fact_compensations.amount_salary
+      - dw_compensation.dim_job.target_plr
+      - dw_compensation.dim_job.target_plr_salary_multiplier
+      - dw_performance.fact_performance_calibrations.performa_ipa
+      - dw_compensation.dim_plr_parameters.pct_corporate_goals
+  dt_hired:
+    description: Assignment start date.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_started
+  dt_terminated:
+    description: Actual termination date. 9999-12-31 if still active.
+    lineage:
+      - datalake_employee_registration.identifier_mapping.dt_actual_termination
+  dt_job_info_valid_from:
+    description: Start of job/salary validity period.
+    lineage:
+      - dw_compensation.fact_compensations.dt_valid_from
+  dt_job_info_valid_to:
+    description: End of job/salary validity period.
+    lineage:
+      - dw_compensation.fact_compensations.dt_valid_to
+  ts_load:
+    description: Timestamp when the record was loaded.

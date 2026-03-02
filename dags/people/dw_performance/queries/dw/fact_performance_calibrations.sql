@@ -80,6 +80,14 @@ SELECT
     WHEN cs.performa_score_numeric BETWEEN 110 AND 137 THEN 'Above expectations'
     WHEN cs.performa_score_numeric BETWEEN 138 AND 150 THEN 'Outstanding'
   END AS performa_score,
+  CASE
+    WHEN cs.performa_score_numeric < 70 THEN 0.00
+    WHEN cs.performa_score_numeric BETWEEN 70 AND 89 THEN 0.70
+    WHEN cs.performa_score_numeric BETWEEN 90 AND 109 THEN 1.00
+    WHEN cs.performa_score_numeric BETWEEN 110 AND 137 THEN 1.20
+    WHEN cs.performa_score_numeric BETWEEN 138 AND 150 THEN 1.50
+    ELSE NULL
+  END AS performa_ipa,
   NOW() AS ts_load
 FROM
   distinct_calibrations AS dc

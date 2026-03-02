@@ -99,6 +99,14 @@ columns:
     - dw_performance.dim_performance_calibration.calibrated_impact_numeric
     - dw_performance.dim_performance_calibration.calibrated_behavior_numeric
     - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
+  performa_ipa:
+    description: |
+      IPA (Individual Performance Assessment) multiplier derived from performa_score_numeric.
+      Outstanding=1.50, Above expectations=1.20, Meets expectations=1.00, Partially misses=0.70, Insufficient=0.00.
+    lineage:
+    - dw_performance.dim_performance_calibration.calibrated_impact_numeric
+    - dw_performance.dim_performance_calibration.calibrated_behavior_numeric
+    - dw_performance.dim_performance_calibration.calibrated_leadership_numeric
   performa_score:
     description: Categorical classification of the performance score based on numeric ranges.
     lineage:
