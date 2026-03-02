@@ -13,6 +13,8 @@ workflow:
   inner_dependencies:
     agent_support_tickets_by_month:
       - agent_status_by_month
+    agent_independent_campinas_metrics:
+      - agent_status_by_month
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -30,6 +32,10 @@ workflow:
       load_spark_job: load_agent_status_by_month
     agent_support_tickets_by_month:
       load_spark_job: load_agent_support_tickets_by_month
+      extra_spark_job_arguments:
+        - "18"
+    agent_independent_campinas_metrics:
+      load_spark_job: load_agent_independent_campinas_metrics
       extra_spark_job_arguments:
         - "18"
 
