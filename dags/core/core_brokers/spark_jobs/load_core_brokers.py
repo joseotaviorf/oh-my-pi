@@ -101,6 +101,11 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             transactional_table,
             args,
         )
+        company_df = (
+            company_df.withColumnRenamed("company_uuid", "uuid_company")
+            .withColumnRenamed("created_at", "ts_created")
+            .withColumnRenamed("updated_at", "ts_updated")
+        )
 
         company_address_df = self._load_data(
             spark, config["COMPANY_ADDRESS_TABLE"], args

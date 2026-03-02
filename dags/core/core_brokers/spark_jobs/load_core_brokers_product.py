@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import (
     array_distinct,
+    array_join,
     col,
     collect_list,
     concat,
@@ -39,13 +40,9 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
                 "COMPANY_PRODUCT_REGION_TABLE"
             ),
             "REVENUE_SHARE_TABLE": self.get_config("REVENUE_SHARE_TABLE"),
-            "BANKING_INFORMATION_TABLE": self.get_config(
-                "BANKING_INFORMATION_TABLE"
-            ),
+            "BANKING_INFORMATION_TABLE": self.get_config("BANKING_INFORMATION_TABLE"),
             "TIER_TABLE": self.get_config("TIER_TABLE"),
-            "COMPANY_PRODUCT_TIER_TABLE": self.get_config(
-                "COMPANY_PRODUCT_TIER_TABLE"
-            ),
+            "COMPANY_PRODUCT_TIER_TABLE": self.get_config("COMPANY_PRODUCT_TIER_TABLE"),
         }
 
     # ── create_core_model dispatch ──────────────────────────────────
@@ -58,9 +55,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
 
     # ── current-state model (brokers_product) ────────────────────────
 
-    def _create_current_state_model(
-        self, spark: SparkSession, args
-    ) -> DataFrame:
+    def _create_current_state_model(self, spark: SparkSession, args) -> DataFrame:
         """Create the current-state brokers product model from clean layer."""
         config = self.get_brokers_product_config()
 
@@ -74,9 +69,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
         company_product_region_df = self._load_data(
             spark, config["COMPANY_PRODUCT_REGION_TABLE"], args
         )
-        revenue_share_df = self._load_data(
-            spark, config["REVENUE_SHARE_TABLE"], args
-        )
+        revenue_share_df = self._load_data(spark, config["REVENUE_SHARE_TABLE"], args)
         banking_information_df = self._load_data(
             spark, config["BANKING_INFORMATION_TABLE"], args
         )
@@ -101,9 +94,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
 
     # ── historical model (brokers_product_historical) ────────────────
 
-    def _create_historical_model(
-        self, spark: SparkSession, args
-    ) -> DataFrame:
+    def _create_historical_model(self, spark: SparkSession, args) -> DataFrame:
         """Create the historical brokers product model.
 
         Company-product transactions come from the transactional layer (every
@@ -113,23 +104,22 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
         """
         config = self.get_brokers_product_config()
 
-        transactional_table = self.get_config(
-            "COMPANY_PRODUCT_TRANSACTIONAL_TABLE"
-        )
+        transactional_table = self.get_config("COMPANY_PRODUCT_TRANSACTIONAL_TABLE")
         company_product_df = HistoricalHelper.load_transactional_data(
             spark,
             transactional_table,
             args,
         )
+        company_product_df = company_product_df.withColumnRenamed(
+            "product_id", "id_product"
+        ).withColumnRenamed("company_id", "id_company")
 
         company_df = self._load_data(spark, config["COMPANY_TABLE"], args)
         product_df = self._load_data(spark, config["PRODUCT_TABLE"], args)
         company_product_region_df = self._load_data(
             spark, config["COMPANY_PRODUCT_REGION_TABLE"], args
         )
-        revenue_share_df = self._load_data(
-            spark, config["REVENUE_SHARE_TABLE"], args
-        )
+        revenue_share_df = self._load_data(spark, config["REVENUE_SHARE_TABLE"], args)
         banking_information_df = self._load_data(
             spark, config["BANKING_INFORMATION_TABLE"], args
         )
@@ -147,14 +137,11 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             banking_information_df,
             tier_df,
             company_product_tier_df,
+            include_cdc_columns=True,
         )
 
-        cdc_cols = HistoricalHelper.select_cdc_columns(
-            company_product_df, "cp"
-        )
-        result_df = self._select_final_columns(
-            result_df, extra_columns=cdc_cols
-        )
+        cdc_cols = HistoricalHelper.select_cdc_columns(company_product_df, "cp")
+        result_df = self._select_final_columns(result_df, extra_columns=cdc_cols)
         result_df = self._add_is_current(result_df, "sk_broker_product")
         return self._add_partition_columns(result_df, "ts_database_transaction")
 
@@ -170,13 +157,15 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
         banking_information_df,
         tier_df,
         company_product_tier_df,
+        include_cdc_columns=False,
     ) -> DataFrame:
         """Process sub-entities and join everything at the company-product level."""
         company_product_processed = self._process_company_product(
-            company_product_df
+            company_product_df,
+            include_cdc_columns=include_cdc_columns,
         )
-        company_product_region_processed = (
-            self._process_company_product_region(company_product_region_df)
+        company_product_region_processed = self._process_company_product_region(
+            company_product_region_df
         )
 
         return self._join_all_data(
@@ -190,51 +179,68 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             company_product_tier_df,
         )
 
-    def _process_company_product(self, company_product_df):
+    def _process_company_product(self, company_product_df, include_cdc_columns=False):
         """Extract JSON settings and compute boolean flags per company-product.
 
         Filters for 3P products (27=sale, 30=rent) and extracts banking,
         integrator partner, revenue share UUIDs and opt-in flag from the
         product_settings JSON column.
+
+        Args:
+            company_product_df: DataFrame with company-product data
+            include_cdc_columns: If True, preserve CDC metadata columns
+                (op_cdc, ts_database_transaction, ts_cdc_transaction)
+                needed by the historical table path
         """
         filtered = company_product_df.filter(col("id_product").isin([27, 30]))
 
-        return filtered.select(
+        columns = [
             col("id_company"),
             col("id_product"),
-            get_json_object(
-                col("product_settings"), "$.bankingInformationUUId"
-            ).alias("uuid_banking_information"),
-            get_json_object(
-                col("product_settings"), "$.integratorPartnerUUId"
-            ).alias("uuid_integrator_partner"),
-            get_json_object(
-                col("product_settings"), "$.revenueShareUUId"
-            ).alias("uuid_revenue_share"),
+            get_json_object(col("product_settings"), "$.bankingInformationUUId").alias(
+                "uuid_banking_information"
+            ),
+            get_json_object(col("product_settings"), "$.integratorPartnerUUId").alias(
+                "uuid_integrator_partner"
+            ),
+            get_json_object(col("product_settings"), "$.revenueShareUUId").alias(
+                "uuid_revenue_share"
+            ),
             col("status"),
             (col("id_product") == 30).alias("is_3p_rent_broker"),
             (col("id_product") == 27).alias("is_3p_sale_broker"),
-            (
-                col("id_product").isin([27, 30])
-                & (col("status") == "ACTIVE")
-            ).alias("is_3p_active_broker"),
-            (
-                (col("id_product") == 30) & (col("status") == "ACTIVE")
-            ).alias("is_3p_active_rent_broker"),
-            (
-                (col("id_product") == 27) & (col("status") == "ACTIVE")
-            ).alias("is_3p_active_sale_broker"),
-            get_json_object(
-                col("product_settings"), "$.optInNavent"
-            ).alias("has_opt_in_navent"),
-        )
+            (col("id_product").isin([27, 30]) & (col("status") == "ACTIVE")).alias(
+                "is_3p_active_broker"
+            ),
+            ((col("id_product") == 30) & (col("status") == "ACTIVE")).alias(
+                "is_3p_active_rent_broker"
+            ),
+            ((col("id_product") == 27) & (col("status") == "ACTIVE")).alias(
+                "is_3p_active_sale_broker"
+            ),
+            get_json_object(col("product_settings"), "$.optInNavent").alias(
+                "has_opt_in_navent"
+            ),
+        ]
+
+        if include_cdc_columns:
+            columns.extend(
+                [
+                    col("op_cdc"),
+                    col("ts_database_transaction"),
+                    col("ts_cdc_transaction"),
+                ]
+            )
+
+        return filtered.select(*columns)
 
     def _process_company_product_region(self, company_product_region_df):
-        """Aggregate regions into a distinct list per company-product pair."""
-        return company_product_region_df.groupBy(
-            "id_company", "id_product"
-        ).agg(
-            array_distinct(collect_list("id_region")).alias("region_list")
+        """Aggregate regions into a comma-separated string per company-product pair."""
+        return company_product_region_df.groupBy("id_company", "id_product").agg(
+            array_join(
+                array_distinct(collect_list(col("id_region").cast("string"))),
+                ",",
+            ).alias("region_list")
         )
 
     def _join_all_data(
@@ -295,8 +301,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
 
         result_df = result_df.join(
             banking_information_df.alias("bi"),
-            col("cp.uuid_banking_information")
-            == col("bi.uuid_banking_information"),
+            col("cp.uuid_banking_information") == col("bi.uuid_banking_information"),
             "left",
         )
 
@@ -359,9 +364,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
 
     # ── run_pipeline override ───────────────────────────────────────
 
-    def run_pipeline(
-        self, dataframe: DataFrame, args, spark: SparkSession
-    ) -> None:
+    def run_pipeline(self, dataframe: DataFrame, args, spark: SparkSession) -> None:
         """Override to use brokers_product-specific merge configs.
 
         Both current state and historical tables use dedicated merge keys
@@ -384,9 +387,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
                 args,
                 spark,
                 merge_on_key="merge_on_brokers_product",
-                update_condition_key=(
-                    "when_matched_update_condition_brokers_product"
-                ),
+                update_condition_key=("when_matched_update_condition_brokers_product"),
             )
 
 

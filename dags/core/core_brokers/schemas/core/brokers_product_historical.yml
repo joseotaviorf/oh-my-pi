@@ -53,19 +53,19 @@ columns:
 
   # Revenue share
   commission:
-    type: double
+    type: decimal
     required: false
 
   demand_fee:
-    type: double
+    type: decimal
     required: false
 
   supply_fee:
-    type: double
+    type: decimal
     required: false
 
   platform_fee:
-    type: double
+    type: decimal
     required: false
 
   # Banking information
