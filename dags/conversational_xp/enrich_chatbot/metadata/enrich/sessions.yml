@@ -43,6 +43,7 @@ columns:
       concierge: 'Concierge'
       copilot: 'Copilot'
       old bot: 'Old bot (Greenseer)'
+      vandinha: 'Vandinha'
       unknown: 'Unknown host'
     lineage:
     - datalake_copilot_service_clean.message.channel
