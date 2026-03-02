@@ -311,9 +311,9 @@ FROM VALUES
 
     -- Open search versus Elastic search
     (
-        "ab_beakman_search_services_open_search_migration",
+        "ab_beakman_search_services_open_search_find",
         named_struct(
-            'begin_date', DATE('2026-02-25'),
+            'begin_date', DATE('2026-02-26'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
