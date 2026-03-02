@@ -321,8 +321,11 @@ def fetch_from_s3(s3_service, proxy_path, start_timestamp, end_timestamp, table_
     logger.info(f"Found {len(valid_files)} files")
     
     if not valid_files:
-        logger.warning(f"No files found between {start_timestamp} and {end_timestamp}")
-        return None
+        raise RuntimeError(
+            "No data found in S3 bucket from Langfuse export. "
+            "Acces https://langfuse.apps.core-prd-green.habitat.zone/project/cma4b5v5l000f2n07551cc2v8/settings/integrations/blobstorage "
+            "and click run now or contact the Conversational Platform Team"
+        )
 
     df = spark.read.json(valid_files)
 
