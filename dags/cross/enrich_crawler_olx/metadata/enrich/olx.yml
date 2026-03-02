@@ -20,7 +20,7 @@ description: |
   Data is filtered by the specified load date range to ensure the correct source table is used for each time period.
 
   **Update Schedule:**
-  The table is updated weekly, every Friday, after the datalake_crawler_olx_clean.olx
+  The table is updated weekly, every Thursday, after the datalake_crawler_olx_clean.olx
   table is refreshed. This ensures data consistency and maintains the dependency chain.
 domain: Cross
 owner: mateus.aferreira@quintoandar.com.br

@@ -7,7 +7,7 @@ dag:
       This DAG is responsible for enriching the crawler_df_imoveis data.
       It split the original struct fields into multiple columns, and creates
       generic enriched fields for the listing domain.
-      It is weekly updated, every Friday, after the datalake_crawler_df_imoveis_clean.df_imoveis table
+      It is weekly updated, every Thursday, after the datalake_crawler_df_imoveis_clean.df_imoveis table
       is updated. It also creates a full table, df_imoveis_latest, with the latest data for the listing.
 workflow:
   layer: enrich

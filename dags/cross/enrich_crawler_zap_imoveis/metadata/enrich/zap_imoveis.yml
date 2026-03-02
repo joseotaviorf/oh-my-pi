@@ -20,10 +20,10 @@ description: |
   Data is filtered by the specified load date range to ensure the correct source table is used for each time period.
 
   **Update Schedule:**
-  The table is updated weekly, every Friday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis
+  The table is updated weekly, every Thursday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis
   table is refreshed. This ensures data consistency and maintains the dependency chain.
 domain: Cross
-owner: andre.melo@quintoandar.com.br
+owner: mateus.aferreira@quintoandar.com.br
 columns:
   id_house_platform:
     lineage:

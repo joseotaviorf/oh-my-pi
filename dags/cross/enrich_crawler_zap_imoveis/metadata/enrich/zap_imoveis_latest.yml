@@ -16,10 +16,10 @@ description: |
   providing a clean, point-in-time view of the latest available information for each listing.
 
   **Update Schedule:**
-  The table is updated weekly, every Friday, after the datalake_crawler_zap_imoveis.zap_imoveis
+  The table is updated weekly, every Thursday, after the datalake_crawler_zap_imoveis.zap_imoveis
   table is refreshed. This ensures data consistency and maintains the dependency chain.
 domain: Cross
-owner: andre.melo@quintoandar.com.br
+owner: mateus.aferreira@quintoandar.com.br
 columns:
   id_house_platform:
     lineage:

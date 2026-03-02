@@ -2,13 +2,13 @@ dag:
   name: crawler_df_imoveis
   owner: Data Growth
   schedule_start_date: 2025, 11, 17
-  schedule_interval: "0 0 * * 5" # Every Friday at 00:00 BRT
+  schedule_interval: "0 0 * * 4" # Every Thursday at 00:00 BRT
   documentation:
     dag_purpose: |
       This DAG ingests weekly data from the DF Imóveis crawler,
       with the source data stored in an S3 bucket.
-      It runs every Friday at 00:00 BRT, to update the data from the current week,
-      which is provided every Thursday by the crawler provider.
+      It runs every Thursday at 00:00 BRT, to update the data from the current week,
+      which is provided every Wednesday by the crawler provider.
 workflow:
   layer: raw
   type: custom_ingestion

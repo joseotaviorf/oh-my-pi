@@ -17,7 +17,7 @@ description: |
   - **2025 onwards:** Sources data from datalake_crawler_df_imoveis_clean.df_imoveis
 
   **Update Schedule:**
-  The table is updated weekly, every Friday, after the datalake_crawler_df_imoveis_clean.df_imoveis
+  The table is updated weekly, every Thursday, after the datalake_crawler_df_imoveis_clean.df_imoveis
   table is refreshed. This ensures data consistency and maintains the dependency chain.
 domain: Cross
 owner: mateus.aferreira@quintoandar.com.br

@@ -7,7 +7,7 @@ dag:
       This DAG is responsible for enriching the crawler_zap_imoveis data.
       It split the original struct fields into multiple columns, and creates
       generic enriched fields for the house domain.
-      It is weekly updated, every Friday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis table
+      It is weekly updated, every Thursday, after the datalake_crawler_zap_imoveis_clean.zap_imoveis table
       is updated. It also creates a full table, zap_imoveis_latest, with the latest data for the house.
 workflow:
   layer: enrich

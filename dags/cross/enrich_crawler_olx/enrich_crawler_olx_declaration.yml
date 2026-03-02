@@ -7,7 +7,7 @@ dag:
       This DAG is responsible for enriching the crawler_olx data.
       It split the original struct fields into multiple columns, and creates
       generic enriched fields for the price_m2.
-      It is weekly updated, every Friday, after the datalake_crawler_olx_clean.olx table
+      It is weekly updated, every Thursday, after the datalake_crawler_olx_clean.olx table
       is updated. It also creates a full table, olx_latest, with the latest data for each listing based on its ID.
 workflow:
   layer: enrich

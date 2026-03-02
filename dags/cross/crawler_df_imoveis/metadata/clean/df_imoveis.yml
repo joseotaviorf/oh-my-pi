@@ -5,8 +5,8 @@ description: |
   This table contains the data from the DF Imóveis crawler.
   Only the listings that have the city available are included in the table,
   following the same logic of the raw table.
-  It is updated weekly, every Friday at 00:00 BRT, to update the data from the current week,
-  which is provided every Thursday by the crawler provider.
+  It is updated weekly, every Thursday at 00:00 BRT, to update the data from the current week,
+  which is provided every Wednesday by the crawler provider.
 domain: Cross
 owner: mateus.aferreira@quintoandar.com.br
 columns:
