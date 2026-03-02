@@ -12,19 +12,6 @@ bietlejuice.core_brokers:
   - bietlejuice.company:load-clean-company-document
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-document
-bietlejuice.core_company:
-  - bietlejuice.company:load-clean-address
-  - bietlejuice.company:load-clean-banking-information
-  - bietlejuice.company:load-clean-company
-  - bietlejuice.company:load-clean-company-address
-  - bietlejuice.company:load-clean-company-document
-  - bietlejuice.company:load-clean-company-product
-  - bietlejuice.company:load-clean-company-product-region
-  - bietlejuice.company:load-clean-company-product-tier
-  - bietlejuice.company:load-clean-document
-  - bietlejuice.company:load-clean-product
-  - bietlejuice.company:load-clean-revenue-share
-  - bietlejuice.company:load-clean-tier
 bietlejuice.core_contract:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract
 bietlejuice.core_credit_evaluation:

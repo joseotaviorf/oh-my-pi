@@ -1172,20 +1172,6 @@ bietlejuice.enrich_atlas_db_quality_metrics:
 bietlejuice.enrich_billing:
   - bietlejuice.billing:load-clean-contract-revision
   - bietlejuice.billing:load-clean-contract
-bietlejuice.core_company:
-  add:
-    - bietlejuice.company:load-clean-company
-    - bietlejuice.company:load-clean-company-address
-    - bietlejuice.company:load-clean-company-document
-    - bietlejuice.company:load-clean-document
-    - bietlejuice.company:load-clean-company-product
-    - bietlejuice.company:load-clean-address
-    - bietlejuice.company:load-clean-product
-    - bietlejuice.company:load-clean-revenue-share
-    - bietlejuice.company:load-clean-banking-information
-    - bietlejuice.company:load-clean-tier
-    - bietlejuice.company:load-clean-company-product-tier
-    - bietlejuice.company:load-clean-company-product-region
 bietlejuice.core_brokers:
   add:
     - bietlejuice.company:load-clean-company
