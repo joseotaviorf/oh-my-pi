@@ -109,12 +109,17 @@ class BaseJobArgumentParser:
             if date_str:
                 try:
                     args_dict[date_field] = datetime.strptime(date_str, "%Y-%m-%d")
-                except ValueError as e:
-                    LOGGER.error(
-                        f"Invalid date format for {date_field}: '{date_str}'. "
-                        f"Expected YYYY-MM-DD. Error: {e}"
-                    )
-                    raise
+                except ValueError:
+                    try:
+                        args_dict[date_field] = datetime.fromisoformat(
+                            str(date_str).replace("Z", "+00:00")
+                        )
+                    except (ValueError, TypeError) as e:
+                        LOGGER.error(
+                            f"Invalid date format for {date_field}: '{date_str}'. "
+                            f"Expected YYYY-MM-DD or ISO-8601. Error: {e}"
+                        )
+                        raise
 
         if "params" in args_dict:
             args_dict["params"] = cls._process_dynamic_params(
