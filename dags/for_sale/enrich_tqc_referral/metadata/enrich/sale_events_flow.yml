@@ -59,6 +59,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
       - datalake_ebdb_clean.booking.status
+      - datalake_ebdb_clean.visit_status_log.event_type
     description: Gives the booking status, for exemple to show if the visit is canceled
       or not
   tqc_flow:
@@ -69,6 +70,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.booking.status
       - datalake_ebdb_clean.booking.visit_fup
+      - datalake_ebdb_clean.visit_status_log.event_type
     description: Boolean flag indicating if the visit was completed (visit_status = 'Realizado').
   id_tqc_flow:
     lineage:

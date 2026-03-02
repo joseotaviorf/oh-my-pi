@@ -32,6 +32,24 @@ first_booking_author AS (
   FROM
     new_source
 ),
+visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
+  SELECT
+    id_visit,
+    id_schedule,
+    CASE
+      WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
+      WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
+      WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
+    END AS visit_fup,
+    ts_created AS ts_visit_fup
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
+    ts_created::DATE >= '2025-01-01'
+    AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
+),
 base_booking AS (
 SELECT
     b.id_visit,
@@ -58,7 +76,7 @@ SELECT
     FROM_UTC_TIMESTAMP(b.ts_created, COALESCE(ct.default_timezone, 'UTC')) AS ts_created_local_tz,
     visit.code AS visit_code,
     CASE
-      WHEN b.status = 'Realizado' AND b.visit_fup IN ('EntradaNaoAutorizada','NaoCompareceu')
+      WHEN b.status = 'Realizado' AND COALESCE(b.visit_fup, fup_vsl.visit_fup) IN ('EntradaNaoAutorizada','NaoCompareceu')
         THEN 'Cancelado'
       ELSE b.status
     END AS visit_status,
@@ -70,6 +88,9 @@ SELECT
     b.ts_updated
   FROM
     datalake_ebdb_clean.booking AS b
+  LEFT JOIN
+    visit_fup_vsl AS fup_vsl
+      ON b.id = fup_vsl.id_schedule
   LEFT JOIN
     first_booking_author AS fba
       ON fba.id_booking = b.id
