@@ -4200,11 +4200,6 @@ bietlejuice.enrich_zendesk:
   - bietlejuice.zendesk:load-clean-ticket-fields:first-run-of-day
   - bietlejuice.zendesk:load-clean-ticket-metrics:first-run-of-day
   - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
-bietlejuice.metric_fintech__atta:
-  - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
-  - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
-  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows:first-run-of-day
-  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
 bietlejuice.metric_fintech__collections_segmentation:
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day

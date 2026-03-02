@@ -1,6 +1,0 @@
----
-table_name: metric_fintech.ca2ip
-alert_channel: FINTECH_INMETRO_ALERTS
-column_level_validations:
-  dt_credit_application_approval:
-    is_unique:

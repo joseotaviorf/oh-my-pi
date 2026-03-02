@@ -1,6 +1,0 @@
----
-table_name: metric_fintech.financed_deals
-alert_channel: FINTECH_INMETRO_ALERTS
-column_level_validations:
-  dt_financing_contract:
-    is_unique:

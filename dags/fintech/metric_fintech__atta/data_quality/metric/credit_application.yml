@@ -1,6 +1,0 @@
----
-table_name: metric_fintech.credit_application
-alert_channel: FINTECH_INMETRO_ALERTS
-column_level_validations:
-  dt_credit_started:
-    is_unique:

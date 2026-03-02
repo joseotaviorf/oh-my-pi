@@ -1,6 +1,0 @@
----
-table_name: metric_fintech.total_production_gmv
-alert_channel: FINTECH_INMETRO_ALERTS
-column_level_validations:
-  dt_financing_ended:
-    is_unique:
