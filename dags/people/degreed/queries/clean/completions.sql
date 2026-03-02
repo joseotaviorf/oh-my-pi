@@ -10,7 +10,5 @@ SELECT
     TO_DATE(attributes.completed_at) AS dt_completed,
     TO_TIMESTAMP(attributes.added_at) AS ts_added,
     NOW() AS ts_load
-FROM 
+FROM
     datalake_degreed_raw.completions
-WHERE 
-    DATE(attributes.added_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

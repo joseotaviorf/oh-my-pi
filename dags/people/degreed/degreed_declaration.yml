@@ -48,8 +48,8 @@ workflow:
     - "{load_end_date}"
 
   extra_query_template_params:
-    load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
-    load_end_date: "{{ data_interval_start | ds }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   
   raw_inner_dependencies:
     pathway_details:
@@ -59,11 +59,13 @@ workflow:
   
   tables_customization:
     completions:
-      extraction_type: full
+      extraction_type: incremental
+      merge_on: ["id"]
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
         - scope: "completions:read"
+          max_date_window_days: 7
           base_filters:
             "filter[added_after]": "load_start_date"
             "filter[added_before]": "load_end_date"

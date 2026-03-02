@@ -1,6 +1,8 @@
 import json
 import re
 import time
+from datetime import date, timedelta
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -58,12 +60,36 @@ class DegreedAPI:
         self.load_start_date = job_args.get("load_start_date")
         self.load_end_date = job_args.get("load_end_date")
         self.base_filters = job_args.get("base_filters", {})
+        raw_max_window = job_args.get("max_date_window_days")
+        if raw_max_window is not None:
+            self.max_date_window_days = int(raw_max_window) if raw_max_window else None
+        else:
+            self.max_date_window_days = None
         endpoint_path = job_args.get("endpoint_for_id_list") or self.endpoint
         self.endpoint_for_id_list = (endpoint_path or "").replace("_", "-")
 
         self._client_id, self._client_secret = self._get_secrets()
         self._access_tokens = {}
         self._session = self._create_session_with_retries()
+
+    @staticmethod
+    def _date_windows(
+        start_date: date, end_date: date, max_days: int
+    ) -> list[tuple[date, date]]:
+        """
+        Splits [start_date, end_date] into non-overlapping windows of at most max_days each.
+        """
+        if start_date > end_date:
+            return []
+        if max_days < 1:
+            return [(start_date, end_date)]
+        windows = []
+        current = start_date
+        while current <= end_date:
+            window_end = min(current + timedelta(days=max_days - 1), end_date)
+            windows.append((current, window_end))
+            current = window_end + timedelta(days=1)
+        return windows
 
     def _create_session_with_retries(self) -> requests.Session:
         """
@@ -148,7 +174,11 @@ class DegreedAPI:
             raise
 
     def _fetch_paginated_data_for_params(
-        self, params: dict, auth_headers: dict
+        self,
+        params: dict,
+        auth_headers: dict,
+        start_date_override: date | None = None,
+        end_date_override: date | None = None,
     ) -> list:
         """
         Fetches all paginated data for a given set of URL parameters.
@@ -158,25 +188,35 @@ class DegreedAPI:
             params (dict): The URL query parameters to be used for the request.
                            May contain the values "load_start_date" and "load_end_date".
             auth_headers (dict): The authentication headers containing the token.
+            start_date_override: Optional date to use instead of load_start_date.
+            end_date_override: Optional date to use instead of load_end_date.
 
         Returns:
             list: A list containing all results from all pages.
         """
         processed_params = params.copy()
+        start_date = (
+            start_date_override
+            if start_date_override is not None
+            else self.load_start_date
+        )
+        end_date = (
+            end_date_override if end_date_override is not None else self.load_end_date
+        )
 
         for key, value in processed_params.items():
             if value == "load_start_date":
                 processed_params[key] = (
-                    self.load_start_date.strftime("%Y-%m-%d")
-                    if self.load_start_date
-                    else None
+                    start_date.strftime("%Y-%m-%d")
+                    if start_date and hasattr(start_date, "strftime")
+                    else (start_date if start_date else None)
                 )
 
             elif value == "load_end_date":
                 processed_params[key] = (
-                    self.load_end_date.strftime("%Y-%m-%d")
-                    if self.load_end_date
-                    else None
+                    end_date.strftime("%Y-%m-%d")
+                    if end_date and hasattr(end_date, "strftime")
+                    else (end_date if end_date else None)
                 )
 
         results_for_params = []
@@ -290,6 +330,8 @@ class DegreedAPI:
     def get_all_paginated_results(self) -> list:
         """
         Fetches all results from the configured endpoint.
+        When max_date_window_days is set, splits the load date range into
+        non-overlapping windows and fetches each window in sequence.
 
         Returns:
             list: A list containing all results from all pages and all filter combinations.
@@ -308,8 +350,47 @@ class DegreedAPI:
         all_results = []
         auth_headers = self._get_auth_headers()
         params = self.base_filters.copy()
-        all_results.extend(self._fetch_paginated_data_for_params(params, auth_headers))
 
+        if not self.max_date_window_days:
+            all_results.extend(
+                self._fetch_paginated_data_for_params(params, auth_headers)
+            )
+            return all_results
+
+        if self.load_start_date is None or self.load_end_date is None:
+            raise ValueError(
+                "load_start_date and load_end_date are required when max_date_window_days is set."
+            )
+        start_d = (
+            self.load_start_date
+            if isinstance(self.load_start_date, date)
+            else date.fromisoformat(str(self.load_start_date))
+        )
+        end_d = (
+            self.load_end_date
+            if isinstance(self.load_end_date, date)
+            else date.fromisoformat(str(self.load_end_date))
+        )
+        windows = self._date_windows(start_d, end_d, self.max_date_window_days)
+        total_windows = len(windows)
+        LOGGER.info(
+            "Fetching %s date window(s) for range %s to %s",
+            total_windows,
+            start_d,
+            end_d,
+        )
+        for i, (w_start, w_end) in enumerate(windows, 1):
+            LOGGER.info(
+                "Fetching window %s/%s: %s to %s", i, total_windows, w_start, w_end
+            )
+            all_results.extend(
+                self._fetch_paginated_data_for_params(
+                    params.copy(),
+                    auth_headers,
+                    start_date_override=w_start,
+                    end_date_override=w_end,
+                )
+            )
         return all_results
 
     def get_by_id(self, resource_id: str, index: int, total: int) -> dict | None:
