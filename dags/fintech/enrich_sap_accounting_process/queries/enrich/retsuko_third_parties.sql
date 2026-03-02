@@ -17,7 +17,12 @@ WITH retsuko AS (
           'entry.bill-item/Iptu-defaulting',
           'entry.bill-item/iptu adjustment',
           'entry.bill-item/condominium reserves funds SA paid',
-          'entry.bill-item/condominium defaulting') THEN '113406'
+          'entry.bill-item/condominium defaulting',
+          'entry.bill-item/condominium-fine',
+          'entry.bill-item/condominium-defaulting',
+          'entry.bill-item/evictions-lawyers',
+          'entry.bill-item/condominium-reserves-funds-5A-paid',
+          'entry.bill-item/evictions-costs') THEN '113406'
     END AS account_number,
     CASE
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment', 'entry.bill-item/brokerage-quinto-andar') THEN 'Brokerage to be discounted - New Model'
@@ -32,7 +37,12 @@ WITH retsuko AS (
           'entry.bill-item/Iptu-defaulting',
           'entry.bill-item/iptu adjustment',
           'entry.bill-item/condominium reserves funds SA paid',
-          'entry.bill-item/condominium defaulting') THEN 'Advance Payments - New Model'
+          'entry.bill-item/condominium defaulting',
+          'entry.bill-item/condominium-fine',
+          'entry.bill-item/condominium-defaulting',
+          'entry.bill-item/evictions-lawyers',
+          'entry.bill-item/condominium-reserves-funds-5A-paid',
+          'entry.bill-item/evictions-costs') THEN 'Advance Payments - New Model'
     END AS accounting_name,
     i.accrual_year_month,
     DATE(e.ts_created) AS dt_source_trigger,
@@ -70,7 +80,12 @@ WITH retsuko AS (
       'entry.bill-item/Iptu-defaulting',
       'entry.bill-item/iptu adjustment',
       'entry.bill-item/condominium reserves funds SA paid',
-      'entry.bill-item/condominium defaulting'))
+      'entry.bill-item/condominium defaulting',
+      'entry.bill-item/condominium-fine',
+      'entry.bill-item/condominium-defaulting',
+      'entry.bill-item/evictions-lawyers',
+      'entry.bill-item/condominium-reserves-funds-5A-paid',
+      'entry.bill-item/evictions-costs'))
     )
     AND DATE(e.ts_created) >= '2025-01-01'
     AND af.type IN ('contract', 'tenant','landlord')

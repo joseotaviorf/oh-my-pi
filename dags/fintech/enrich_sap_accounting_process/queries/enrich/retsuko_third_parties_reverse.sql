@@ -1,5 +1,5 @@
 WITH retsuko AS (
-  SELECT DISTINCT
+SELECT DISTINCT
     ct.id_external AS id_business_entity,
     i.id_external AS id_finance_entity,
     e.id_external AS id_finance_entity_entry,
@@ -7,10 +7,42 @@ WITH retsuko AS (
     CASE
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment', 'entry.bill-item/brokerage-quinto-andar') THEN '211413'
       WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment', 'entry.bill-item/pro-guarantor-5A-installment-refund') THEN '211415'
+      WHEN e.bill_item IN ( 
+          'entry.bill-item/condominium-5A-paid',
+          'entry.bill-item/condominium-usage',
+          'entry.bill-item/repair-ongoing',
+          'entry.bill-item/residential-protection-5A-acquittance',
+          'entry.bill-item/utilities-defaulting',
+          'entry.bill-item/Iptu',
+          'entry.bill-item/Iptu-defaulting',
+          'entry.bill-item/iptu adjustment',
+          'entry.bill-item/condominium reserves funds SA paid',
+          'entry.bill-item/condominium defaulting',
+          'entry.bill-item/condominium-fine',
+          'entry.bill-item/condominium-defaulting',
+          'entry.bill-item/evictions-lawyers',
+          'entry.bill-item/condominium-reserves-funds-5A-paid',
+          'entry.bill-item/evictions-costs') THEN '113406'
     END AS account_number,
     CASE
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment', 'entry.bill-item/brokerage-quinto-andar') THEN 'Brokerage to be discounted - New Model'
       WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment', 'entry.bill-item/pro-guarantor-5A-installment-refund') THEN 'Revenue to be considered - Pro Guarantor'
+      WHEN e.bill_item IN ( 
+          'entry.bill-item/condominium-5A-paid',
+          'entry.bill-item/condominium-usage',
+          'entry.bill-item/repair-ongoing',
+          'entry.bill-item/residential-protection-5A-acquittance',
+          'entry.bill-item/utilities-defaulting',
+          'entry.bill-item/Iptu',
+          'entry.bill-item/Iptu-defaulting',
+          'entry.bill-item/iptu adjustment',
+          'entry.bill-item/condominium reserves funds SA paid',
+          'entry.bill-item/condominium defaulting',
+          'entry.bill-item/condominium-fine',
+          'entry.bill-item/condominium-defaulting',
+          'entry.bill-item/evictions-lawyers',
+          'entry.bill-item/condominium-reserves-funds-5A-paid',
+          'entry.bill-item/evictions-costs') THEN 'Advance Payments - New Model'
     END AS accounting_name,
     i.accrual_year_month,
     DATE(e.ts_created) AS dt_source_trigger,
@@ -36,8 +68,26 @@ WITH retsuko AS (
         'entry.bill-item/brokerage-installment',
         'entry.bill-item/pro-guarantor-5A-installment-refund')
         ) OR 
-    (e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') AND e.description NOT LIKE 'Taxa de corretagem - QuintoAndar%')
+    (e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') AND e.description NOT LIKE 'Taxa de corretagem - QuintoAndar%'
+        ) OR
+    (e.bill_item IN ( 
+      'entry.bill-item/condominium-5A-paid',
+      'entry.bill-item/condominium-usage',
+      'entry.bill-item/repair-ongoing',
+      'entry.bill-item/residential-protection-5A-acquittance',
+      'entry.bill-item/utilities-defaulting',
+      'entry.bill-item/Iptu',
+      'entry.bill-item/Iptu-defaulting',
+      'entry.bill-item/iptu adjustment',
+      'entry.bill-item/condominium reserves funds SA paid',
+      'entry.bill-item/condominium defaulting',
+      'entry.bill-item/condominium-fine',
+      'entry.bill-item/condominium-defaulting',
+      'entry.bill-item/evictions-lawyers',
+      'entry.bill-item/condominium-reserves-funds-5A-paid',
+      'entry.bill-item/evictions-costs'))
     )
+    AND DATE(e.ts_created) >= '2025-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
 ),
@@ -102,7 +152,7 @@ sap AS (
     datalake_pas.ledger
   WHERE
     TRUE
-    AND account_number IN ('211413', '211415')
+    AND account_number IN ('211413', '211415','113406')
     AND dt_reference >= '2025-01-01'
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
@@ -125,8 +175,8 @@ SELECT
         sl_hash.accrual_year_month,
         'reverse straw failure' AS accounting_process_status,
         CASE
-            WHEN sl_hash.source_client = 'rental-guarantee' THEN 'source-rental-guarantee'
             WHEN sl_hash.created_by NOT IN ('WF-BATCH','MIGRACIONES','ERP Gateway') OR sl_hash.source_client IS NULL THEN 'manual transaction'
+            WHEN sl_hash.source_client <> 'seubarriga' THEN CONCAT('source-',sl_hash.source_client)
             WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NULL THEN 'transaction missing in sap gateway'
             WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NULL AND sg.id_finance_entity IS NOT NULL THEN 'transaction missing in sap entity'
             WHEN r.id_finance_entity IS NULL AND se.id_sap_gateway_feature IS NOT NULL AND sg.id_finance_entity IS NOT NULL THEN 'wrong account number or postponed entry'
