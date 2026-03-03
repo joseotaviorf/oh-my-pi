@@ -2128,6 +2128,9 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-negotiation:first-run-of-day
   - bietlejuice.trato_feito:load-clean-payment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-segment:first-run-of-day
+bietlejuice.enrich_degreed:
+  - bietlejuice.degreed:load-clean-completions:first-run-of-day
+  - bietlejuice.degreed:load-clean-pathway-details:first-run-of-day
 bietlejuice.enrich_demand_consolidated_targets:
   - bietlejuice.gsheets_growth_targets:done-clean-mkt-cost-target:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-rental-prospect-target:first-run-of-day

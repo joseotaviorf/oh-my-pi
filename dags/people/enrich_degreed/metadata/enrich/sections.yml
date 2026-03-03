@@ -1,0 +1,40 @@
+database_name: datalake_degreed
+table_name: sections
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per section within a Pathway.
+  Sections are the first level of structure inside a Pathway (Pathway > Section > Lesson > Content).
+  Used for program structure reporting and to join with lessons and lesson_contents.
+  Learning Hub context: Pathways are curated collections of Content/Courses; completion of all mandatory items in a pathway drives pathway completion (0-100%).
+columns:
+  id_section:
+    description: Unique identifier for the section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.section_id
+  id_pathway:
+    description: Pathway this section belongs to.
+    lineage:
+    - datalake_degreed_clean.pathway_details.id
+  section_title:
+    description: Title of the section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.title
+  section_description:
+    description: Description of the section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.description
+  section_sequence:
+    description: Order of the section within the pathway.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.sequence
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.
+  lesson_ids:
+    description: Array of lesson IDs in this section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.lesson_id
+  content_ids:
+    description: Flattened array of content IDs referenced by all lessons in this section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.content_id

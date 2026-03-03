@@ -1,0 +1,55 @@
+database_name: datalake_degreed
+table_name: content_completions
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Enrich table of content completions with flattened and derived columns.
+  Learning Hub (Degreed) context: completions can be automatic (SCORM/Course, triggered by content logic) or manual (user marks complete; manual completion is not used for regulatory training to preserve audit integrity).
+  Completion records are historical; if a user changes role/band, prior completions remain for audit.
+columns:
+  id:
+    description: Unique identifier for the completion record.
+    lineage:
+    - datalake_degreed_clean.completions.id
+  id_content:
+    description: Degreed content identifier (from first element of included).
+    lineage:
+    - datalake_degreed_clean.completions.included
+  id_user:
+    description: User identifier from the user relationship.
+    lineage:
+    - datalake_degreed_clean.completions.relationships
+  person_number:
+    description: The internal employee identifier (PIN person_number). Populated when id_employee_internal is exactly 6 digits; otherwise null.
+    lineage:
+    - datalake_degreed_clean.completions.id_employee_internal
+  employee_email:
+    description: The internal employee identifier when it is not person_number (e.g. email, when id_employee_internal is not exactly 6 digits); otherwise null.
+    lineage:
+    - datalake_degreed_clean.completions.id_employee_internal
+  access_method:
+    description: How the completion was accessed (e.g. Windows Web).
+    lineage:
+    - datalake_degreed_clean.completions.attributes.access_method
+  points_earned:
+    description: Points earned for this completion.
+    lineage:
+    - datalake_degreed_clean.completions.points_earned
+  rating:
+    description: Rating given to the content.
+    lineage:
+    - datalake_degreed_clean.completions.rating
+  is_verified:
+    description: Whether the completion was verified.
+    lineage:
+    - datalake_degreed_clean.completions.is_verified
+  dt_completed:
+    description: Date when the content was completed.
+    lineage:
+    - datalake_degreed_clean.completions.dt_completed
+  ts_added:
+    description: Timestamp when the record was added to Degreed.
+    lineage:
+    - datalake_degreed_clean.completions.ts_added
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.

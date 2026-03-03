@@ -1,6 +1,6 @@
 SELECT
     id,
-    attributes.employee_id AS email_employee,
+    attributes.employee_id AS id_employee_internal,
     attributes,
     included,
     relationships,

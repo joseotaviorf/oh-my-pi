@@ -1,0 +1,40 @@
+database_name: datalake_degreed
+table_name: lessons
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per lesson within a pathway section.
+  Hierarchy: Pathway > Section > Lesson > Resource (Content).
+  Used to join sections to content and to analyze mandatory vs optional items.
+  Learning Hub context: Pathway completion is 100% only when all mandatory items are finished; optional items are excluded from that calculation.
+columns:
+  id_lesson:
+    description: Unique identifier for the lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.lesson_id
+  id_section:
+    description: Section this lesson belongs to.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.section_id
+  id_pathway:
+    description: Pathway this lesson belongs to.
+    lineage:
+    - datalake_degreed_clean.pathway_details.id
+  lesson_title:
+    description: Title of the lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.title
+  lesson_description:
+    description: Description of the lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.description
+  lesson_sequence:
+    description: Order of the lesson within the section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.sequence
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.
+  content_ids:
+    description: Array of content IDs (resources) in this lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.content_id

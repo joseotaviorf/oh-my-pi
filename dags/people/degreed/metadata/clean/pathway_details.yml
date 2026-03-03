@@ -67,4 +67,3 @@ columns:
       - datalake_degreed_raw.pathway_details.attributes.modified_at
   ts_load:
     description: When the row was loaded into the clean table.
-    lineage: []

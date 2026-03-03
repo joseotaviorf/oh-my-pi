@@ -156,6 +156,18 @@ class DegreedAPI:
 
         try:
             response = self._session.post(url, headers=headers, data=data)
+            if not response.ok:
+                try:
+                    error_body = response.json()
+                except Exception:
+                    error_body = response.text or "(empty)"
+                LOGGER.error(
+                    "OAuth token request failed: url=%s scope=%s status=%s body=%s",
+                    url,
+                    scope,
+                    response.status_code,
+                    error_body,
+                )
             response.raise_for_status()
             response_json = response.json()
             access_token = response_json.get("access_token")
@@ -167,10 +179,21 @@ class DegreedAPI:
 
             return access_token
         except requests.exceptions.RequestException as e:
-            LOGGER.error(
-                f"HTTP error while fetching token for scope '{scope}': {e}",
-                exc_info=True,
-            )
+            log_msg = f"HTTP error while fetching token for scope '{scope}': {e}"
+            if getattr(e, "response", None) is not None:
+                resp = e.response
+                try:
+                    err_body = resp.json()
+                except Exception:
+                    err_body = resp.text if resp.text else "(empty)"
+                LOGGER.error(
+                    "%s response_status=%s response_body=%s",
+                    log_msg,
+                    resp.status_code,
+                    err_body,
+                )
+            else:
+                LOGGER.error(log_msg, exc_info=True)
             raise
 
     def _fetch_paginated_data_for_params(

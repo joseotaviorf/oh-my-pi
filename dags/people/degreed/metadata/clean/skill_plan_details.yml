@@ -87,4 +87,3 @@ columns:
       - datalake_degreed_raw.skill_plan_details.attributes.modified_at
   ts_load:
     description: When the row was loaded into the clean table.
-    lineage: []

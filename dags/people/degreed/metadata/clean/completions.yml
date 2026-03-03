@@ -9,8 +9,8 @@ columns:
     description: Unique identifier for the completion record.
     lineage:
     - datalake_degreed_raw.completions.id
-  email_employee:
-    description: The employee ID, typically an email address, of the user who completed the content.
+  id_employee_internal:
+    description: Internal employee identifier from source; may be employee_email (contains @) or person_number (6-digit number).
     lineage:
     - datalake_degreed_raw.completions.attributes.employee_id
   attributes:

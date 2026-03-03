@@ -1,0 +1,50 @@
+database_name: datalake_degreed
+table_name: lesson_contents
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per content (resource) placement within a lesson.
+  Bridge table linking lessons to content with requirement and sequence.
+  Learning Hub context: Pathway completion (0-100%) is based only on mandatory (Required) items; optional items do not affect completion.
+  Use is_required for compliance and progress reporting.
+  Programs may be released in multiple language versions (e.g. PT-BR, EN, ES); each version has distinct content/pathway IDs but can share the same Plan for unified reporting.
+columns:
+  id_lesson_content:
+    description: Unique identifier for the lesson-resource association (lesson_resource_id).
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.lesson_resource_id
+  id_content:
+    description: Content (resource) identifier.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.content_id
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.id
+  id_lesson:
+    description: Lesson this resource belongs to.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.lesson_id
+  id_section:
+    description: Section of the lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.section_id
+  id_pathway:
+    description: Pathway of the section.
+    lineage:
+    - datalake_degreed_clean.pathway_details.id
+  requirement:
+    description: Requirement type (e.g. Required, Optional).
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.requirement
+  note:
+    description: Optional note for the resource in the lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.note
+  sequence:
+    description: Order of the resource within the lesson.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.sequence
+  is_required:
+    description: True when requirement = 'Required'; drives pathway completion logic.
+    lineage:
+    - datalake_degreed_clean.pathway_details.sections.lessons.resources.requirement
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.
