@@ -92,3 +92,7 @@ columns:
     description: Timestamp indicating when the multibanks form was completed.
     lineage:
       - datalake_atta_raw.consulta_score.FormCompletedAt
+  id_user_5a:
+    description: Identifier of the QuintoAndar user associated with the pre-analysis.
+    lineage:
+      - datalake_atta_raw.consulta_score.userId5a
