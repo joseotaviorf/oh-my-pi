@@ -2,7 +2,7 @@ SELECT
     id,
     pp_multi_user_id AS id_pp_multi_user,
     version,
-    adm_fee,
+    CAST(adm_fee AS DECIMAL(38, 10)) AS adm_fee,
     active AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated

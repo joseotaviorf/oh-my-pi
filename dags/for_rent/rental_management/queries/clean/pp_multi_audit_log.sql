@@ -8,8 +8,8 @@ SELECT
     description,
     previous_status,
     new_status,
-    previous_adm_fee,
-    new_adm_fee,
+    CAST(previous_adm_fee AS DECIMAL(38, 10)) AS previous_adm_fee,
+    CAST(new_adm_fee AS DECIMAL(38, 10)) AS new_adm_fee,
     previous_fee_active AS is_previous_fee_active,
     new_fee_active AS is_new_fee_active,
     created_at AS ts_created

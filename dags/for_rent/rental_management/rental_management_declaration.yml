@@ -40,8 +40,13 @@ workflow:
         contractual_penalty: "DECIMAL(38, 10)"
         amount: "DECIMAL(38, 10)"
     pp_multi_user: {}
-    pp_multi_fee: {}
-    pp_multi_audit_log: {}
+    pp_multi_fee:
+      transactional_datatype_overrides:
+        adm_fee: "DECIMAL(38, 10)"
+    pp_multi_audit_log:
+      transactional_datatype_overrides:
+        previous_adm_fee: "DECIMAL(38, 10)"
+        new_adm_fee: "DECIMAL(38, 10)"
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new
