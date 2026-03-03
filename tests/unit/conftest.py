@@ -3,6 +3,26 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 
+def pytest_collection_modifyitems(items):
+    """
+    Run raw_api_ingestion_workflow tests last to avoid test order sensitivity.
+
+    RawAPIIngestionWorkflow imports BaseWorkflow, TaskCreatorFactory, JiraOpsCallback,
+    ReprocessingGuardTaskCreator, and DatasetService. When those modules are loaded
+    before other tests run, patches in test_reprocessing_guard_task_creator,
+    test_jiraops_callback, and test_dataset_service fail because the modules
+    already hold references to the real implementations. Running the workflow
+    tests last ensures the other tests run with clean module state.
+    """
+    raw_api_items = [
+        i for i in items if "test_raw_api_ingestion_workflow" in str(i.path)
+    ]
+    if raw_api_items:
+        for i in raw_api_items:
+            items.remove(i)
+        items.extend(raw_api_items)
+
+
 # Mock external plugins that might not be installed locally
 sys.modules["databricks_plugin"] = MagicMock()
 sys.modules["extra_link_plugin"] = MagicMock()
