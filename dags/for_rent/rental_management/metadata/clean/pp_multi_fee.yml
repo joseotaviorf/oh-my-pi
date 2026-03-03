@@ -1,0 +1,36 @@
+---
+database_name: datalake_rental_management_clean
+table_name: pp_multi_fee
+description: |
+  This table contains the fee configurations associated with payment plan multi-user records.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: ID of the payment plan multi-fee record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.id
+  id_pp_multi_user:
+    description: ID of the payment plan multi-user record associated with this fee.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.pp_multi_user_id
+  version:
+    description: Version of the payment plan multi-fee record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.version
+  adm_fee:
+    description: Administration fee value for the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.adm_fee
+  is_active:
+    description: Indicates whether the fee configuration is currently active.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.active
+  ts_created:
+    description: Timestamp of the creation of the payment plan multi-fee record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.created_at
+  ts_updated:
+    description: Timestamp of the last update of the payment plan multi-fee record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_fee.updated_at

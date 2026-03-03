@@ -1,0 +1,64 @@
+---
+database_name: datalake_rental_management_clean
+table_name: pp_multi_audit_log
+description: |
+  This table contains the audit log of events and state transitions for payment plan multi-user records.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: ID of the payment plan multi audit log entry.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.id
+  id_pp_multi_user:
+    description: ID of the payment plan multi-user record associated with this audit log entry.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.pp_multi_user_id
+  id_triggered_by:
+    description: ID of the user or entity that triggered the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.triggered_by_id
+  id_pp_multi_fee:
+    description: ID of the payment plan multi-fee record associated with this audit log entry.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.pp_multi_fee_id
+  execution_type:
+    description: Type of execution that triggered the audit log entry.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.execution_type
+  event_log_type:
+    description: Type of event recorded in the audit log entry.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.event_log_type
+  description:
+    description: Human-readable description of the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.description
+  previous_status:
+    description: Status of the payment plan multi-user record before the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.previous_status
+  new_status:
+    description: Status of the payment plan multi-user record after the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.new_status
+  previous_adm_fee:
+    description: Administration fee value before the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.previous_adm_fee
+  new_adm_fee:
+    description: Administration fee value after the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.new_adm_fee
+  is_previous_fee_active:
+    description: Indicates whether the fee was active before the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.previous_fee_active
+  is_new_fee_active:
+    description: Indicates whether the fee is active after the audited event.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.new_fee_active
+  ts_created:
+    description: Timestamp of the creation of the audit log entry.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_audit_log.created_at

@@ -1,0 +1,40 @@
+---
+database_name: datalake_rental_management_clean
+table_name: pp_multi_user
+description: |
+  This table contains the payment plan multi-user records, representing users enrolled in multi-party payment plans.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: ID of the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.id
+  id_account_manager:
+    description: ID of the account manager responsible for the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.account_manager_id
+  pp_multi_uuid:
+    description: UUID of the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.pp_multi_uuid
+  person_uuid:
+    description: UUID of the person associated with the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.person_uuid
+  status:
+    description: Status of the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.status
+  version:
+    description: Version of the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.version
+  ts_created:
+    description: Timestamp of the creation of the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.created_at
+  ts_updated:
+    description: Timestamp of the last update of the payment plan multi-user record.
+    lineage:
+      - datalake_rental_management_raw.pp_multi_user.updated_at
