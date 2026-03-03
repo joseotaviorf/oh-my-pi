@@ -12,5 +12,11 @@ Available Strategies:
 from bietlejuice.base.api.pagination.base import BasePaginator
 from bietlejuice.base.api.pagination.cursor import CursorPaginator
 from bietlejuice.base.api.pagination.header_link import HeaderLinkPaginator
+from bietlejuice.base.api.pagination.offset_limit import OffsetLimitPaginator
 
-__all__ = ["BasePaginator", "CursorPaginator", "HeaderLinkPaginator"]
+__all__ = [
+    "BasePaginator",
+    "CursorPaginator",
+    "HeaderLinkPaginator",
+    "OffsetLimitPaginator",
+]
