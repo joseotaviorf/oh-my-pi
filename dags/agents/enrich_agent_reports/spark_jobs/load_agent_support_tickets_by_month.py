@@ -33,6 +33,7 @@ from pyspark.sql.functions import (
 from pyspark.sql.types import (
     ArrayType,
     BooleanType,
+    DateType,
     LongType,
     StringType,
     StructField,
