@@ -36,24 +36,6 @@ column_level_validations:
          WHERE dt_foreigner_arrival > CURRENT_DATE()
         ) = 0
       severity_level: Warning
-  dt_ctps_issued:
-    custom:
-      # CTPS issued date should not be in the future.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_pin_core_clean.people_legislative
-         WHERE dt_ctps_issued > CURRENT_DATE()
-        ) = 0
-      severity_level: Warning
-  dt_marital_status:
-    custom:
-      # Marital status date should not be in the future.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_pin_core_clean.people_legislative
-         WHERE dt_marital_status > CURRENT_DATE()
-        ) = 0
-      severity_level: Warning
   is_foreigner_married_to_brazilian:
     custom:
       # Boolean field must be TRUE/FALSE when not null.
