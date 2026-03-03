@@ -92,6 +92,8 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_telefonetratado'), '') AS consorcio_phone_number_formatted,
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_canal_origem'), '') AS consorcio_channel_origin,
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_deal_duplicado'), '') AS consorcio_deal_duplicado,
+    NULLIF(GET_JSON_OBJECT(properties, '$.cons_simulador_ia'), '') AS consorcio_simulador_ia,
+    NULLIF(GET_JSON_OBJECT(properties, '$.cons_transbordo_conrado'), '') AS consorcio_transbordo_conrado,
     is_archived,
     GET_JSON_OBJECT(properties, '$.closedate')::TIMESTAMP AS ts_closed,
     GET_JSON_OBJECT(properties, '$.engagements_last_meeting_booked')::TIMESTAMP AS ts_engagements_last_meeting_booked,

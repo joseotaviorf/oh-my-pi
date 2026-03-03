@@ -323,6 +323,14 @@ columns:
     lineage:
       - datalake_hubspot.deal_history.consorcio_deal_duplicado
     description: The automatic integration with hubspot can sometimes generate duplicated leads, so this columns informs if this lead is duplicated or not.
+  consorcio_simulador_ia:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_simulador_ia
+    description: Informs whether a simulation was made with Conrado Simulador or not.
+  consorcio_transbordo_conrado:
+    lineage:
+      - datalake_hubspot.deal_history.consorcio_transbordo_conrado
+    description: Informs when Conrado Simulador transfered the lead to a human analyst and whether it transferred due to user inactivity or not.
   is_archived:
     lineage:
       - datalake_hubspot.deal_history.is_archived

@@ -250,6 +250,8 @@ deal:
       - cons_template_last_sent
       - cons_utm_content
       - cons_utm_term
+      - cons_simulador_ia
+      - cons_transbordo_conrado
     propertiesWithHistory:
       - dealstage
       - pipeline

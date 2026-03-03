@@ -72,6 +72,8 @@ SELECT
     consorcio_phone_number_formatted,
     consorcio_channel_origin,
     consorcio_deal_duplicado,
+    consorcio_simulador_ia,
+    consorcio_transbordo_conrado,
     is_archived,
     ts_closed,
     ts_engagements_last_meeting_booked,
