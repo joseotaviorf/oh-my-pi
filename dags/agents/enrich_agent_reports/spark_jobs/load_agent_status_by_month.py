@@ -13,6 +13,7 @@ from typing import Optional
 from pyspark.sql import Column, DataFrame, Window
 from pyspark.sql.types import (
     BooleanType,
+    DateType,
     IntegerType,
     LongType,
     StringType,
@@ -132,8 +133,10 @@ def _expand_status_by_month(
     window = Window.partitionBy(*partition_by).orderBy(*order_by)
     ranked = expanded.withColumn("rn", row_number().over(window))
     selected = ranked.filter((col("rn") == 1) & (col("days_in_status") > 0))
-    result = selected.drop("rn", "_month_start", "_month_end").withColumnRenamed(
-        "month_ref", "reference_month"
+    result = (
+        selected.drop("rn", "_month_start", "_month_end")
+        .withColumn("reference_month", to_date(col("month_ref")))
+        .drop("month_ref")
     )
 
     partition_out = [p if p != "month_ref" else "reference_month" for p in partition_by]
@@ -307,7 +310,7 @@ EXPECTED_SCHEMA = StructType(
     [
         StructField("id_user", LongType(), True),
         StructField("id_agent", LongType(), True),
-        StructField("reference_month", TimestampType(), True),
+        StructField("reference_month", DateType(), True),
         StructField("ciq_status", StringType(), True),
         StructField("ciq_days_in_status", IntegerType(), True),
         StructField("ciq_status_start", TimestampType(), True),

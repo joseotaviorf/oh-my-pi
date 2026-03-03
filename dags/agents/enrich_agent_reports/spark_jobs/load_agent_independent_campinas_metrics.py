@@ -110,7 +110,7 @@ def _tqx_first_date_df(month_start: date, month_end: date) -> DataFrame:
     by_month = (
         offer.withColumn(
             "reference_month",
-            date_trunc("month", col("ts_agent_lead_referral_updated")),
+            to_date(date_trunc("month", col("ts_agent_lead_referral_updated"))),
         )
         .groupBy(col("id_user_agent").alias("id_user"), "reference_month")
         .agg(
@@ -129,8 +129,8 @@ def _tqx_first_date_df(month_start: date, month_end: date) -> DataFrame:
     return (
         first_activation
         .filter(
-            (to_date(col("reference_month")) >= lit(month_start))
-            & (to_date(col("reference_month")) <= lit(month_end))
+            (col("reference_month") >= lit(month_start))
+            & (col("reference_month") <= lit(month_end))
         )
     )
 
@@ -146,7 +146,7 @@ def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
         .filter(col("is_first_listing_valid") == True)
         .withColumn(
             "reference_month",
-            date_trunc("month", col("ts_original_first_listing")),
+            to_date(date_trunc("month", col("ts_original_first_listing"))),
         )
         .groupBy("id_agent", "id_user", "reference_month")
         .agg(
@@ -166,8 +166,8 @@ def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
     return (
         first_activation
         .filter(
-            (to_date(col("reference_month")) >= lit(month_start))
-            & (to_date(col("reference_month")) <= lit(month_end))
+            (col("reference_month") >= lit(month_start))
+            & (col("reference_month") <= lit(month_end))
         )
     )
 
@@ -380,8 +380,8 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
     status = (
         spark.table(TABLE_STATUS_BY_MONTH)
         .filter(
-            (to_date(col("reference_month")) >= lit(month_start))
-            & (to_date(col("reference_month")) <= lit(month_end))
+            (col("reference_month") >= lit(month_start))
+            & (col("reference_month") <= lit(month_end))
         )
     )
     tqx             = _tqx_first_date_df(month_start, month_end)

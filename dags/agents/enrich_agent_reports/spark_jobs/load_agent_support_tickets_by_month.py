@@ -27,6 +27,7 @@ from pyspark.sql.functions import (
     sequence,
     struct,
     sum as spark_sum,
+    to_date,
 )
 
 from pyspark.sql.types import (
@@ -173,7 +174,7 @@ def _qualified_active_ciqs_by_month(load_end_date: str, months_window: int = 18)
     )
     return (
         _filter_in_month_window(qualified_user_months, "month_ref", month_start, month_end)
-        .select(col("id_user"), col("month_ref").alias("reference_month"))
+        .select(col("id_user"), to_date(col("month_ref")).alias("reference_month"))
         .distinct()
     )
 
@@ -186,7 +187,7 @@ def _all_listings_by_month(load_end_date: str, months_window: int = 18) -> DataF
         .filter(col("ts_original_first_listing").isNotNull())
         .withColumn(
             "reference_month",
-            date_trunc("month", col("ts_original_first_listing")),
+            to_date(date_trunc("month", col("ts_original_first_listing"))),
         )
     )
     listings_in_window = _filter_in_month_window(
@@ -228,7 +229,8 @@ def _all_agents_visits_by_month(load_end_date: str, months_window: int = 18) -> 
         visits_with_reference_months
         .groupBy("id_agent", "month_ref")
         .agg(countDistinct("id").alias("total_visits_count"))
-        .withColumnRenamed("month_ref", "reference_month")
+        .withColumn("reference_month", to_date(col("month_ref")))
+        .drop("month_ref")
     )
 
 def _independent_agent_eligible() -> DataFrame:
@@ -325,7 +327,7 @@ def _tickets_by_user_monthly(load_end_date: str, months_window: int = 18) -> Dat
         col("fact_tickets.channel"),
         col("dim_taxonomy.step_tag"),
         col("dim_taxonomy.theme_detail"),
-        date_trunc("month", col("fact_tickets.ts_solved")).alias("reference_month"),
+        to_date(date_trunc("month", col("fact_tickets.ts_solved"))).alias("reference_month"),
     )
     tickets_by_channel_step_theme = (
         tickets_with_taxonomy.groupBy("sk_user", "reference_month", "channel", "step_tag", "theme_detail")
@@ -502,7 +504,7 @@ TICKET_BREAKDOWN_STRUCT = StructType([
 EXPECTED_SCHEMA = StructType([
     StructField("id_user", LongType(), True),
     StructField("id_agent", LongType(), True),
-    StructField("reference_month", TimestampType(), True),
+    StructField("reference_month", DateType(), True),
     StructField("total_listings_count", LongType(), False),
     StructField("total_visits_count", LongType(), False),
     StructField("is_sale_agent", BooleanType(), True),
