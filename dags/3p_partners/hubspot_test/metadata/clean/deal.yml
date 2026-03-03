@@ -1,0 +1,57 @@
+---
+database_name: datalake_hubspot_test_clean
+table_name: deal
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  HubSpot Deal objects represent potential sales opportunities and transactions. Deals track the sales pipeline
+  with stages, amounts, close dates, and associated contacts/companies. Critical for sales forecasting and revenue reporting.
+columns:
+  id_deal:
+    lineage:
+      - datalake_hubspot_test_raw.deal.id
+    description: 'Unique identifier for the deal record in HubSpot.'
+  properties:
+    lineage:
+      - datalake_hubspot_test_raw.deal.properties
+    description: 'JSON object containing all deal properties including deal name, amount, stage, close date, pipeline, and custom fields.'
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_test_raw.deal.properties_with_history
+    description: 'JSON object containing historical values of deal properties with timestamps. Tracks progression through sales stages and amount changes.'
+  associations:
+    lineage:
+      - datalake_hubspot_test_raw.deal.associations
+    description: 'JSON object containing associations to contacts, companies, line items, and activities.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_test_raw.deal.archived
+    description: 'Boolean flag indicating whether the deal record has been archived/deleted.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_test_raw.deal.archived_at
+    description: 'Timestamp when the deal record was archived. NULL for active deals.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_test_raw.deal.created_at
+    description: 'Timestamp when the deal was first created in HubSpot.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_test_raw.deal.updated_at
+    description: 'Timestamp of the most recent update to any deal property. Part of the composite merge key with id_deal.'
+  ts_load:
+    lineage:
+      - datalake_hubspot_test_raw.deal.ts_load
+    description: 'Timestamp when the record was last loaded into the data lake.'
+  year:
+    lineage:
+      - datalake_hubspot_test_raw.deal.updated_at
+    description: 'Partition column: Year derived from the record update timestamp (updated_at).'
+  month:
+    lineage:
+      - datalake_hubspot_test_raw.deal.updated_at
+    description: 'Partition column: Month derived from the record update timestamp (updated_at).'
+  day:
+    lineage:
+      - datalake_hubspot_test_raw.deal.updated_at
+    description: 'Partition column: Day derived from the record update timestamp (updated_at).'

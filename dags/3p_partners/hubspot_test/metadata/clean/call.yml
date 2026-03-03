@@ -1,0 +1,57 @@
+---
+database_name: datalake_hubspot_test_clean
+table_name: call
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  HubSpot Call objects represent phone call activities and interactions tracked in the CRM. Calls include
+  details like duration, outcome, notes, and recordings when available.
+columns:
+  id_call:
+    lineage:
+      - datalake_hubspot_test_raw.call.id
+    description: 'Unique identifier for the call activity record in HubSpot.'
+  properties:
+    lineage:
+      - datalake_hubspot_test_raw.call.properties
+    description: 'JSON object containing all call properties including duration, outcome, direction, notes, and custom fields.'
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_test_raw.call.properties_with_history
+    description: 'JSON object containing historical values of call properties with timestamps.'
+  associations:
+    lineage:
+      - datalake_hubspot_test_raw.call.associations
+    description: 'JSON object containing associations to contacts, companies, deals, and tickets.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_test_raw.call.archived
+    description: 'Boolean flag indicating whether the call record has been archived/deleted.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_test_raw.call.archived_at
+    description: 'Timestamp when the call record was archived. NULL for active calls.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_test_raw.call.created_at
+    description: 'Timestamp when the call activity was logged in HubSpot.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_test_raw.call.updated_at
+    description: 'Timestamp of the most recent update to any call property. Part of the composite merge key with id_call.'
+  ts_load:
+    lineage:
+      - datalake_hubspot_test_raw.call.ts_load
+    description: 'Timestamp when the record was last loaded into the data lake.'
+  year:
+    lineage:
+      - datalake_hubspot_test_raw.call.updated_at
+    description: 'Partition column: Year derived from the record update timestamp (updated_at).'
+  month:
+    lineage:
+      - datalake_hubspot_test_raw.call.updated_at
+    description: 'Partition column: Month derived from the record update timestamp (updated_at).'
+  day:
+    lineage:
+      - datalake_hubspot_test_raw.call.updated_at
+    description: 'Partition column: Day derived from the record update timestamp (updated_at).'

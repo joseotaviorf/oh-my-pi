@@ -1,0 +1,88 @@
+dag:
+  name: hubspot_test
+  schedule_start_date: 2020, 12, 21
+  schedule_interval: 0 0 * * *
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: |
+      Shadow DAG for validating the new full load + Delta merge/upsert strategy for HubSpot CRM data.
+      Writes to datalake_hubspot_test_raw / datalake_hubspot_test_clean.
+      The original hubspot DAG and downstream enrich_hubspot_crm remain untouched.
+
+      **Imported Objects:**
+      - **Companies**: Business organizations and their details (industry, revenue, employees, etc.)
+      - **Contacts**: Individual people and their contact information, lifecycle stages, and interactions
+      - **Deals**: Sales opportunities in the pipeline with stages, amounts, and close dates
+      - **Tickets**: Customer support cases and service requests for issue tracking
+      - **Owners**: HubSpot users who own and manage records
+      - **Activities**: Customer interactions including calls, meetings, and communications
+      - **Pipelines**: Deal and ticket workflow stages and configurations
+
+      **Data Strategy:**
+      - Full load from HubSpot API with Delta merge/upsert on raw layer (one row per record)
+      - Clean layer preserves historical snapshots with granularity of id + update date
+      - Full historical property changes captured in properties_with_history fields
+      - Associated records linked to maintain relationship integrity across objects
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: hubspot_test
+  load_spark_job: load_hubspot_test_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "hubspot_test"
+    - "{{ data_interval_start | ds }}"
+    - "{table_name}"
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    company:
+      merge_on: [id_company, ts_updated]
+      z_order_by: [ts_updated]
+    contact:
+      merge_on: [id_contact, ts_updated]
+      z_order_by: [ts_updated]
+    deal:
+      merge_on: [id_deal, ts_updated]
+      z_order_by: [ts_updated]
+    ticket:
+      merge_on: [id_ticket, ts_updated]
+      z_order_by: [ts_updated]
+    deal_pipeline:
+      merge_on: [id_pipeline, ts_updated]
+      z_order_by: [ts_updated]
+    ticket_pipeline:
+      merge_on: [id_pipeline, ts_updated]
+      z_order_by: [ts_updated]
+    owner:
+      merge_on: [id_owner, ts_updated]
+      z_order_by: [ts_updated]
+    call:
+      merge_on: [id_call, ts_updated]
+      z_order_by: [ts_updated]
+    communication:
+      merge_on: [id_communication, ts_updated]
+      z_order_by: [ts_updated]
+    meeting:
+      merge_on: [id_meeting, ts_updated]
+      z_order_by: [ts_updated]
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.3.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new

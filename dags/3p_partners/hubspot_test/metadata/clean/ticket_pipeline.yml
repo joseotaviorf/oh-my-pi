@@ -1,0 +1,57 @@
+---
+database_name: datalake_hubspot_test_clean
+table_name: ticket_pipeline
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: |
+  HubSpot Ticket Pipeline objects define the stages and workflow configuration for customer support cases.
+  Pipelines structure the support process with sequential stages that tickets progress through from creation to resolution.
+columns:
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.id
+    description: 'Unique identifier for the ticket pipeline configuration.'
+  label:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.label
+    description: 'Human-readable name of the ticket pipeline.'
+  stages:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.stages
+    description: 'JSON array containing all stages within the pipeline including stage IDs, names, and display order.'
+  display_order:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.display_order
+    description: 'Numeric order for displaying this pipeline in the HubSpot interface.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.archived
+    description: 'Boolean flag indicating whether the pipeline has been archived/deactivated.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.archived_at
+    description: 'Timestamp when the pipeline was archived. NULL for active pipelines.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.created_at
+    description: 'Timestamp when the pipeline configuration was created.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.updated_at
+    description: 'Timestamp of the most recent update to pipeline configuration. Part of the composite merge key with id_pipeline.'
+  ts_load:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.ts_load
+    description: 'Timestamp when the record was last loaded into the data lake.'
+  year:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.updated_at
+    description: 'Partition column: Year derived from the record update timestamp (updated_at).'
+  month:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.updated_at
+    description: 'Partition column: Month derived from the record update timestamp (updated_at).'
+  day:
+    lineage:
+      - datalake_hubspot_test_raw.ticket_pipeline.updated_at
+    description: 'Partition column: Day derived from the record update timestamp (updated_at).'
