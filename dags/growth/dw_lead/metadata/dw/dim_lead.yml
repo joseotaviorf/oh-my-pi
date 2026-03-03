@@ -314,7 +314,7 @@ columns:
   network:
     lineage:
     - datalake_lead.lead.utm_source
-    - datalake_static_files_raw.historical_lead_app_network.network
+    - datalake_static_files.historical_lead_app_network.network
     description: Lead's network source, it can be the UTM Source itself.
   usuario_que_indicou_id:
     lineage:

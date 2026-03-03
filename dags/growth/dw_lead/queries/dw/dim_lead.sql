@@ -108,7 +108,7 @@ LEFT JOIN datalake_lead_tracking.lead_first_event_tracking lfet
 	ON lfet.id_lead = l.id
 LEFT JOIN datalake_crm_lead.lead_score_factor lsf
     ON lsf.id_lead = l.id
-LEFT JOIN datalake_static_files_raw.historical_lead_app_network hlan
+LEFT JOIN datalake_static_files.historical_lead_app_network hlan
     ON l.id_user_has_indicated = hlan.user_id
 LEFT join lead_b2b
 	ON lead_b2b.id_lead = l.id
