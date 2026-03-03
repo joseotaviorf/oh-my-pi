@@ -23,7 +23,7 @@ WITH salary_with_person AS (
     FROM
         datalake_pin_compensation_clean.salary AS sal
     INNER JOIN
-        datalake_employee_registration.identifier_mapping AS im
+        datalake_people_core.identifier_mapping AS im
             ON sal.id_assignment = im.id_assignment
     WHERE
         sal.is_salary_approved = TRUE

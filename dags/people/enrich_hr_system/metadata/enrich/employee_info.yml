@@ -7,11 +7,11 @@ columns:
   id_person:
     description: Id of the person
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
   person_number:
     description: Person number
     lineage:
-    - datalake_employee_registration.identifier_mapping.person_number
+    - datalake_people_core.identifier_mapping.person_number
   first_name:
     description: First name of the employee
     lineage:

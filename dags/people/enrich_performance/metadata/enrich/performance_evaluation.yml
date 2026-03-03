@@ -8,7 +8,7 @@ columns:
   id_performance_evaluation:
     description: MD5 hash that uniquely identifies a performance evaluation. Generated from id_person, evaluation_type, cycle_name, and dt_evaluation_occurred.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
     - datalake_pin_performance_clean.evaluation_rating.role_type
     - datalake_pin_talent_clean.review_period_translation.review_period_name
     - datalake_pin_performance_clean.evaluation.dt_evaluation_occurred
@@ -19,7 +19,7 @@ columns:
   id_period_of_service:
     description: Unique identifier for an employee's period of service.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
   id_evaluation:
     description: Unique identifier for a specific performance evaluation. Acts as the grain of the table.
     lineage:
@@ -27,20 +27,20 @@ columns:
   id_person:
     description: Unique identifier for the person (employee).
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
   id_evaluator:
     description: Unique identifier for the person who performed the evaluation. For SELF evaluations, this is the employee's id_person. For MANAGER evaluations, this is the manager's id_person.
     lineage:
     - datalake_pin_performance_clean.evaluation.id_manager
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
   assignment_number:
     description: The assignment number associated with the employee.
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
   manager_assignment_number:
     description: The assignment number associated with the manager registered at evaluation.
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
     - datalake_pin_performance_clean.evaluation.id_manager_assignment
   id_impact_rating_level:
     description: Identifier of the rating level for the Impact section, assigned by the evaluation type (SELF or MANAGER).

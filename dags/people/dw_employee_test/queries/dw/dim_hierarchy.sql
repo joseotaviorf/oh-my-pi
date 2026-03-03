@@ -7,15 +7,19 @@ WITH filtered_managers_history /* Bring supervisor relationships and enrich them
     s.dt_effective_started,
     s.dt_effective_ended,
     s.id_manager_assignment
-  FROM datalake_employee_registration.identifier_mapping AS im
-  INNER JOIN datalake_pin_core_clean.assignment_supervisor AS s
-    ON im.id_assignment = s.id_assignment
-  LEFT JOIN datalake_employee_registration.identifier_mapping AS eim
-    ON eim.id_assignment = s.id_manager_assignment
-  LEFT JOIN datalake_pin_core_clean.person_name AS pnm
-    ON pnm.id_person = s.id_manager
-    AND pnm.name_type = 'GLOBAL'
-    AND pnm.dt_effective_ended = '4712-12-31' /* PIN's infinity date */
+  FROM 
+    datalake_people_core.identifier_mapping AS im
+  INNER JOIN 
+    datalake_pin_core_clean.assignment_supervisor AS s
+      ON im.id_assignment = s.id_assignment
+  LEFT JOIN 
+    datalake_people_core.identifier_mapping AS eim
+      ON eim.id_assignment = s.id_manager_assignment
+  LEFT JOIN 
+    datalake_pin_core_clean.person_name AS pnm
+      ON pnm.id_person = s.id_manager
+      AND pnm.name_type = 'GLOBAL'
+      AND pnm.dt_effective_ended = '4712-12-31' /* PIN's infinity date */
   WHERE
     s.is_primary
     AND s.manager_type = 'LINE_MANAGER'

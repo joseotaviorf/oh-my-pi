@@ -128,7 +128,7 @@ assignment_with_enrichment AS (
     person_info AS pi
       ON ab.id_person = pi.id_person
   LEFT JOIN
-    datalake_employee_registration.identifier_mapping AS im
+    datalake_people_core.identifier_mapping AS im
       ON ab.id_period_of_service = im.id_period_of_service
   LEFT JOIN
     union_info AS ui

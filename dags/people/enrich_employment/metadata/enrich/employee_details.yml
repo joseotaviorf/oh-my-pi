@@ -9,19 +9,19 @@ columns:
   id_period_of_service:
     description: Unique identifier for the employee's period of service.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
   id_assignment:
     description: Unique identifier for the work assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_assignment
+    - datalake_people_core.identifier_mapping.id_assignment
   assignment_number:
     description: The work assignment number.
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
   legacy_registration:
     description: Legacy employee registration number, if applicable.
     lineage:
-    - datalake_employee_registration.identifier_mapping.legacy_registration
+    - datalake_people_core.identifier_mapping.legacy_registration
   legislation_code:
     description: Legislation code applicable to the work assignment.
     lineage:
@@ -29,7 +29,7 @@ columns:
   assignment_type:
     description: Type of assignment (e.g., E for Employee, C for Contingent, P for Pending).
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_type
+    - datalake_people_core.identifier_mapping.assignment_type
   assignment_status_type:
     description: Current status of the work assignment (e.g., ACTIVE, INACTIVE).
     lineage:

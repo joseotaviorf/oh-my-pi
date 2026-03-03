@@ -50,7 +50,7 @@ SELECT
 FROM
   datalake_pin_core_clean.all_assignments aa
 LEFT JOIN
-  datalake_employee_registration.identifier_mapping im
+  datalake_people_core.identifier_mapping im
     ON (im.id_assignment = aa.id_assignment)
 LEFT JOIN
   datalake_pin_core_clean.people_extra_info pei

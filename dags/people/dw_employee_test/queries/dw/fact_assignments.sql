@@ -109,10 +109,10 @@ subordinates_by_period AS (
   FROM
     dw_employee_test.dim_hierarchy AS dh
   INNER JOIN
-    datalake_employee_registration.identifier_mapping AS im_subordinate
+    datalake_people_core.identifier_mapping AS im_subordinate
       ON im_subordinate.assignment_number = dh.assignment_number
   INNER JOIN
-    datalake_employee_registration.identifier_mapping AS im_manager
+    datalake_people_core.identifier_mapping AS im_manager
       ON im_manager.assignment_number IN (
         dh.assignment_number_l1, dh.assignment_number_l2, dh.assignment_number_l3,
         dh.assignment_number_l4, dh.assignment_number_l5, dh.assignment_number_l6,
@@ -211,7 +211,7 @@ fact_assignments_base AS (
   FROM 
     assignment_versions AS av
   INNER JOIN
-    datalake_employee_registration.identifier_mapping AS im
+    datalake_people_core.identifier_mapping AS im
       ON im.id_period_of_service = av.id_period_of_service
   LEFT JOIN
     datalake_pin_core_clean.periods_of_service AS ps

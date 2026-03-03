@@ -56,7 +56,7 @@ assignments_plr_eligibility AS (
         COALESCE(im.dt_actual_termination < plr_params.dt_payment_cutoff, FALSE) AS is_terminated_before_payment_cutoff,
         plr_params.reference_year
     FROM
-        datalake_employee_registration.identifier_mapping AS im
+        datalake_people_core.identifier_mapping AS im
     LEFT JOIN
         datalake_employment.employee_details AS ed
             ON ed.id_assignment = im.id_assignment

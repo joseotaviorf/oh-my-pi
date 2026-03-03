@@ -12,11 +12,11 @@ columns:
   sk_employee:
     description: Foreign key to the employee dimension, identifying the employee.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
   sk_assignment:
     description: Foreign key to the assignment dimension, identifying the period of service to which the vacation balance refers.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
   sk_accrual_started_date:
     description: Foreign key to the date dimension (format yyyyMMdd) for the start date of the vacation accrual period.
     lineage:

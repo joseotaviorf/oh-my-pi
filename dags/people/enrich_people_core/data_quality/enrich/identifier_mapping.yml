@@ -1,5 +1,5 @@
 ---
-table_name: datalake_employee_registration.identifier_mapping
+table_name: datalake_people_core.identifier_mapping
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -67,10 +67,9 @@ column_level_validations:
       severity_level: Warning
   dt_actual_termination:
     custom:
-      # Active employees should not have a past termination date
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_employee_registration.identifier_mapping
+         FROM datalake_people_core.identifier_mapping
          WHERE is_active = TRUE
             AND dt_actual_termination IS NOT NULL
             AND dt_actual_termination < CURRENT_DATE
@@ -78,10 +77,9 @@ column_level_validations:
       severity_level: Warning
   dt_notified_termination:
     custom:
-      # Active employees should not have a past termination notification date
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_employee_registration.identifier_mapping
+         FROM datalake_people_core.identifier_mapping
          WHERE is_active = TRUE
             AND dt_notified_termination IS NOT NULL
             AND dt_notified_termination < CURRENT_DATE

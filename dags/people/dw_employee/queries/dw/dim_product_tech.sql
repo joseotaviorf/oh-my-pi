@@ -18,5 +18,5 @@ SELECT
 FROM
     datalake_gsheets_people_clean.team_formation_product_tech AS tfpt
 INNER JOIN
-    datalake_employee_registration.identifier_mapping AS ei
+    datalake_people_core.identifier_mapping AS ei
         ON tfpt.assignment_number = ei.assignment_number

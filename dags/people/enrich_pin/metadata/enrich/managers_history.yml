@@ -24,19 +24,19 @@ columns:
   id_period_of_service:
     description: Foreign key referencing the period of service ID of the employee's assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping. id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
   id_manager_period_of_service:
     description: Foreign key referencing the period of service ID of the line manager's assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
   assignment_number:
     description: Unique code identifying the employee's assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
   manager_assignment_number:
     description: Unique code identifying the line manager's assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
   employee_name:
     description: Name of the employee.
     lineage:

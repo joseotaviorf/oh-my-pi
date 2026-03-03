@@ -14,16 +14,16 @@ columns:
   sk_assignment_version:
     description: Versioned surrogate key that uniquely identifies each version of an assignment record. Generated as MD5 hash of sk_assignment + dt_valid_from.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
     - datalake_pin_core_clean.all_assignments.dt_effective_started
   sk_assignment:
     description: Surrogate key for the assignment (period of service). Corresponds to id_period_of_service. Same value for all versions of the same assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_period_of_service
+    - datalake_people_core.identifier_mapping.id_period_of_service
   sk_employee:
     description: Surrogate key for the person (employee) associated with the assignment.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
   sk_demographic_information:
     description: Surrogate key for the employee's demographic information.
     lineage:
@@ -73,12 +73,12 @@ columns:
     - dw_employee_test.dim_hierarchy.assignment_number
     - dw_employee_test.dim_hierarchy.dt_valid_from
     - dw_employee_test.dim_hierarchy.dt_valid_to
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
     - datalake_pin_core_clean.all_assignments.dt_effective_started
   assignment_number:
     description: Employee's registration number in the source system (PIN).
     lineage:
-    - datalake_employee_registration.identifier_mapping.assignment_number
+    - datalake_people_core.identifier_mapping.assignment_number
   salary_currency_code:
     description: Currency code of the salary.
     lineage:
@@ -86,7 +86,7 @@ columns:
   is_last_valid_work_relationship:
     description: Flag (TRUE/FALSE) indicating if this is the most recent valid work relationship for the employee, prioritizing non-pending records, partitioned by person id.
     lineage:
-    - datalake_employee_registration.identifier_mapping.id_person
+    - datalake_people_core.identifier_mapping.id_person
     - datalake_employment.employee_details.assignment_type
     - datalake_pin_core_clean.periods_of_service.dt_started
   is_active:

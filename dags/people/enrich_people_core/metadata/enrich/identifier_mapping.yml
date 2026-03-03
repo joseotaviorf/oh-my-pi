@@ -1,4 +1,4 @@
-database_name: datalake_employee_registration
+database_name: datalake_people_core
 table_name: identifier_mapping
 owner: isabella.araujo@quintoandar.com.br
 domain: People

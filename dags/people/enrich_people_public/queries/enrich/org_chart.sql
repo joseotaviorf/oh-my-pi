@@ -44,7 +44,7 @@ assignment_cte AS (
     manager_cte AS m 
       ON m.id_assignment = md.id_assignment
   LEFT JOIN
-    datalake_employee_registration.identifier_mapping AS em
+    datalake_people_core.identifier_mapping AS em
       ON em.id_assignment = m.id_manager_assignment
   LEFT JOIN 
     datalake_hr_system_clean.jobs AS j
@@ -95,7 +95,7 @@ SELECT
   CASE WHEN e.dt_actual_termination < CURRENT_DATE THEN e.dt_actual_termination ELSE NULL END AS dt_terminated,
   NOW() AS ts_load
 FROM
-  datalake_employee_registration.identifier_mapping AS e
+  datalake_people_core.identifier_mapping AS e
 INNER JOIN
   assignment_cte AS a
     ON e.id_assignment = a.id_assignment

@@ -29,7 +29,7 @@ LEFT JOIN
     AND r.active_status = 'A'
     AND r.id_template IS NOT NULL
 LEFT JOIN 
-  datalake_employee_registration.identifier_mapping AS e 
+  datalake_people_core.identifier_mapping AS e 
     ON e.id_assignment = r.id_assignment
 WHERE
   o.classification_code = 'DEPARTMENT'

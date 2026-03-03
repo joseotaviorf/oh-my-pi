@@ -26,7 +26,7 @@ columns:
   legacy_registration:
     description: Registration number from a previous (legacy) HR system.
     lineage:
-    - datalake_employee_registration.identifier_mapping.legacy_registration
+    - datalake_people_core.identifier_mapping.legacy_registration
   legislation_code:
     description: |
       Code indicating the labor legislation/country to which the contract is subject.

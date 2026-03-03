@@ -24,9 +24,15 @@ workflow:
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   tables_customization:
     event_definition:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    identifier_mapping:
       vacuum_retention_hours: 168
       vacuum_lite: true
