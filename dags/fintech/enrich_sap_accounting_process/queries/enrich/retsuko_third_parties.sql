@@ -23,6 +23,7 @@ WITH retsuko AS (
           'entry.bill-item/evictions-lawyers',
           'entry.bill-item/condominium-reserves-funds-5A-paid',
           'entry.bill-item/evictions-costs') THEN '113406'
+    WHEN e.bill_item IN ('entry.bill-item/rental-anticipation','entry.bill-item/rental-anticipation-5A-paid') THEN '113411'
     END AS account_number,
     CASE
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment', 'entry.bill-item/brokerage-quinto-andar') THEN 'Brokerage to be discounted - New Model'
@@ -43,6 +44,7 @@ WITH retsuko AS (
           'entry.bill-item/evictions-lawyers',
           'entry.bill-item/condominium-reserves-funds-5A-paid',
           'entry.bill-item/evictions-costs') THEN 'Advance Payments - New Model'
+    WHEN e.bill_item IN ('entry.bill-item/rental-anticipation','entry.bill-item/rental-anticipation-5A-paid') THEN 'Rental Antecipation'
     END AS accounting_name,
     i.accrual_year_month,
     DATE(e.ts_created) AS dt_source_trigger,
@@ -62,15 +64,13 @@ WITH retsuko AS (
     datalake_retsuko_clean.contract ct
       ON ct.id = e.id_contract
   WHERE
-    (
-      (e.bill_item IN (
-        'entry.bill-item/pro-guarantor-5A-installment',
-        'entry.bill-item/brokerage-installment',
-        'entry.bill-item/pro-guarantor-5A-installment-refund')
-        ) OR 
+    ( 
     (e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') AND e.description NOT LIKE 'Taxa de corretagem - QuintoAndar%'
         ) OR
     (e.bill_item IN ( 
+      'entry.bill-item/pro-guarantor-5A-installment',
+      'entry.bill-item/brokerage-installment',
+      'entry.bill-item/pro-guarantor-5A-installment-refund',
       'entry.bill-item/condominium-5A-paid',
       'entry.bill-item/condominium-usage',
       'entry.bill-item/repair-ongoing',
@@ -85,7 +85,9 @@ WITH retsuko AS (
       'entry.bill-item/condominium-defaulting',
       'entry.bill-item/evictions-lawyers',
       'entry.bill-item/condominium-reserves-funds-5A-paid',
-      'entry.bill-item/evictions-costs'))
+      'entry.bill-item/evictions-costs',
+      'entry.bill-item/rental-anticipation',
+      'entry.bill-item/rental-anticipation-5A-paid'))
     )
     AND DATE(e.ts_created) >= '2025-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
@@ -146,7 +148,7 @@ sap AS (
     datalake_pas.ledger
   WHERE
     TRUE
-    AND account_number IN ('211413', '211415','113406')
+    AND account_number IN ('211413', '211415','113406','113411')
   GROUP BY 1, 2, 3, 4, 6, 7
 ),
 
