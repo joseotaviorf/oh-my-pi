@@ -43,7 +43,11 @@ columns:
   is_current:
     lineage:
     - datalake_ebdb_clean.agent_data_aud.rev
-    description: Boolean flag indicating if this is the current (most recent) version of the attribute. True when ts_end is null.
+    description: Boolean flag indicating if this is the current (most recent) version of the attribute. True when ts_end is null (i.e., not superseded by a newer version and not deleted).
+  is_deleted:
+    lineage:
+    - datalake_ebdb_clean.agent_data_aud.rev_type
+    description: Boolean flag indicating if this attribute version was closed due to agent deletion (rev_type = 2). True when the next event in the audit trail for this attribute is a deletion.
   ts_start:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
@@ -51,6 +55,6 @@ columns:
   ts_end:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: Timestamp when this attribute version was superseded by a newer version. Null for current versions. Formatted as 'yyyy-MM-dd HH:mm:ss.SSS+00:00'.
+    description: Timestamp when this attribute version was superseded by a newer version or when the agent was deleted. Null for current active versions. Formatted as 'yyyy-MM-dd HH:mm:ss.SSS+00:00'.
   ts_load:
     description: Timestamp of when the table was last processed.

@@ -85,44 +85,91 @@ changes_with_timestamp AS (
   SELECT
     uc.id,
     uc.rev,
-    uc.rev_type,
     uc.attribute_name,
     uc.attribute_value,
     ure.ts_revision,
-    ure.id_user AS id_user_change,
-    ure.reason AS change_reason
+    FALSE AS is_deletion
   FROM
     unpivoted_changes AS uc
   INNER JOIN
     datalake_ebdb_clean.user_revision_entity AS ure
       ON uc.rev = ure.id
 ),
+deletion_events AS (
+  SELECT
+    aud.id,
+    aud.rev,
+    ure.ts_revision
+  FROM
+    datalake_ebdb_clean.agent_data_aud AS aud
+  INNER JOIN
+    datalake_ebdb_clean.user_revision_entity AS ure
+      ON aud.rev = ure.id
+  WHERE
+    aud.rev_type = 2
+),
+-- Synthetic closing entries: one per attribute for each deletion event
+deletion_closing_entries AS (
+  SELECT DISTINCT
+    de.id,
+    de.rev,
+    cwt.attribute_name,
+    CAST(NULL AS STRING) AS attribute_value,
+    de.ts_revision,
+    TRUE AS is_deletion
+  FROM
+    deletion_events AS de
+  INNER JOIN
+    changes_with_timestamp AS cwt
+      ON cwt.id = de.id
+),
+all_events AS (
+  SELECT * FROM changes_with_timestamp
+  UNION ALL
+  SELECT * FROM deletion_closing_entries
+),
 changes_with_intervals AS (
   SELECT
-    cwt.id,
-    cwt.rev,
-    cwt.rev_type,
-    cwt.attribute_name,
-    cwt.attribute_value,
-    cwt.ts_revision AS ts_start,
-    LEAD(cwt.ts_revision) OVER (PARTITION BY cwt.id, cwt.attribute_name ORDER BY cwt.rev) AS ts_end,
-    ROW_NUMBER() OVER (PARTITION BY cwt.id, cwt.attribute_name ORDER BY cwt.rev) AS version_number
+    ae.id,
+    ae.rev,
+    ae.attribute_name,
+    ae.attribute_value,
+    ae.is_deletion,
+    ae.ts_revision AS ts_start,
+    LEAD(ae.ts_revision) OVER (PARTITION BY ae.id, ae.attribute_name ORDER BY ae.rev) AS ts_end,
+    COALESCE(LEAD(ae.is_deletion) OVER (PARTITION BY ae.id, ae.attribute_name ORDER BY ae.rev), FALSE) AS is_closed_by_deletion
   FROM
-    changes_with_timestamp AS cwt
+    all_events AS ae
+),
+versioned_changes AS (
+  SELECT
+    ci.id,
+    ci.rev,
+    ci.attribute_name,
+    ci.attribute_value,
+    ci.ts_start,
+    ci.ts_end,
+    ci.is_closed_by_deletion,
+    ROW_NUMBER() OVER (PARTITION BY ci.id, ci.attribute_name ORDER BY ci.rev) AS version_number
+  FROM
+    changes_with_intervals AS ci
+  WHERE
+    ci.is_deletion = FALSE
 )
 SELECT
-  XXHASH64(ci.id, ci.attribute_name, ci.version_number, ci.ts_start, COALESCE(ci.ts_end, 0)) AS sk_agent_update,
-  ci.id AS sk_agent,
+  XXHASH64(vc.id, vc.attribute_name, vc.version_number, vc.ts_start, COALESCE(vc.ts_end, 0)) AS sk_agent_update,
+  vc.id AS sk_agent,
   COALESCE(c.sk_company, -1) AS sk_company,
-  ci.attribute_name,
-  ci.attribute_value,
-  ci.version_number,
-  ci.ts_end IS NULL AS is_current,
-  DATE_FORMAT(TIMESTAMP_MILLIS(ci.ts_start), 'yyyy-MM-dd HH:mm:ss.SSS+00:00') AS ts_start,
-  DATE_FORMAT(TIMESTAMP_MILLIS(ci.ts_end), 'yyyy-MM-dd HH:mm:ss.SSS+00:00') AS ts_end,
+  vc.attribute_name,
+  vc.attribute_value,
+  vc.version_number,
+  vc.ts_end IS NULL AS is_current,
+  vc.is_closed_by_deletion AS is_deleted,
+  DATE_FORMAT(TIMESTAMP_MILLIS(vc.ts_start), 'yyyy-MM-dd HH:mm:ss.SSS+00:00') AS ts_start,
+  DATE_FORMAT(TIMESTAMP_MILLIS(vc.ts_end), 'yyyy-MM-dd HH:mm:ss.SSS+00:00') AS ts_end,
   NOW() AS ts_load
 FROM
-  changes_with_intervals AS ci
+  versioned_changes AS vc
 LEFT JOIN
   datalake_company.company_sks AS c
-    ON c.uuid_company = ci.attribute_value
+    ON c.uuid_company = vc.attribute_value
