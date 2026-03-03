@@ -191,11 +191,13 @@ bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-contract:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-entry:first-run-of-day
+  - bietlejuice.rental_guarantee_platform:load-clean-legacy-renewal-history:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-payment:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose-aud:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose-person:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-renewal:first-run-of-day
+  - bietlejuice.rental_guarantee_platform:load-clean-renewal-inconsistencies-corrected:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-feature:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-sync-sap-job:first-run-of-day

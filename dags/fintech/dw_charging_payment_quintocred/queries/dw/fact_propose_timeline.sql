@@ -52,10 +52,10 @@ all_renewal AS (
     propose AS sk_propose, 
     COALESCE( s.previous_monthly_amount, r.previous_monthly_amount ) AS previous_monthly_amount,
     COALESCE( s.updated_monthly_amount, r.updated_monthly_amount) AS updated_monthly_amount,
-    dt_due AS dt_renewal,
+    r.dt_due AS dt_renewal,
     step,
     COALESCE( s.price_index_type, r.price_index_type ) AS price_index_type,
-    DATE( date_trunc( 'MONTH', dt_due )) AS previous_month_renewal, 
+    DATE( date_trunc( 'MONTH', r.dt_due )) AS previous_month_renewal, 
     LEAD( DATE( date_trunc( 'MONTH', r.dt_due ))) OVER( 
       PARTITION BY 
         r.propose 
@@ -63,16 +63,16 @@ all_renewal AS (
       r.dt_due,
       r.ts_created ASC
     ) AS next_month_renewal,
-    ts_created,
+    r.ts_created,
     ROW_NUMBER() OVER( 
       PARTITION BY propose 
-      ORDER BY ts_created DESC 
+      ORDER BY r.ts_created DESC 
     ) AS rn  
   FROM 
     datalake_rental_guarantee_platform_clean.renewal r
   LEFT JOIN 
-    datalake_rental_guarantee_platform_raw.legacy_renewal_history s
-    ON r.id = s.renewal_id
+    datalake_rental_guarantee_platform_clean.legacy_renewal_history s
+    ON r.id = s.id_renewal
 ),
 renewal AS (
   SELECT 
@@ -112,24 +112,24 @@ first_renewal_value as (
 all_renewal_corrected AS (
     SELECT DISTINCT 
       r.id,
-      r.propose_id AS sk_propose, 
+      r.id_propose AS sk_propose, 
       r.previous_monthly_amount,
       r.updated_monthly_amount,
-      r.due_date AS dt_renewal,
-      r.created_at AS ts_created,
-      DATE( date_trunc( 'MONTH', r.due_date )) AS previous_month_renewal, 
-      LEAD( DATE( date_trunc('MONTH', r.due_date ))) OVER(
-        PARTITION BY r.propose_id 
-        ORDER BY r.due_date ASC
+      r.dt_due AS dt_renewal,
+      r.ts_created AS ts_created,
+      DATE( date_trunc( 'MONTH', r.dt_due )) AS previous_month_renewal, 
+      LEAD( DATE( date_trunc('MONTH', r.dt_due ))) OVER(
+        PARTITION BY r.id_propose 
+        ORDER BY r.dt_due ASC
       ) AS next_month_renewal,
       ROW_NUMBER() OVER(
-        PARTITION BY r.propose_id 
-        ORDER BY r.due_date DESC) AS rn,
+        PARTITION BY r.id_propose 
+        ORDER BY r.dt_due DESC) AS rn,
       CASE 
-        WHEN EXTRACT(YEAR FROM due_date) = 2024 
-          THEN add_months( date_trunc( 'MONTH', r.due_date ), 11) 
+        WHEN EXTRACT(YEAR FROM dt_due) = 2024 
+          THEN add_months( date_trunc( 'MONTH', r.dt_due ), 11) 
       END AS dt_final_renewal
-  FROM datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected r
+  FROM datalake_rental_guarantee_platform_clean.renewal_inconsistencies_corrected r
 ),
 renewal_corrected AS (
     SELECT 
@@ -237,9 +237,9 @@ first_propose_value AS (
 ),
 corrected_robot AS (
   SELECT DISTINCT
-    propose_id as sk_propose
+    id_propose as sk_propose
   FROM 
-    datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected
+    datalake_rental_guarantee_platform_clean.renewal_inconsistencies_corrected
 ),
 base_propose AS (
   SELECT
