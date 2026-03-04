@@ -1,5 +1,5 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
 # BI ETL Ejuice Project - Cursor Rules
 
@@ -48,15 +48,184 @@ workflow:
 
 ### cluster component (required)
 
+#### Named preset (68% of fleet)
+
+Use a named preset when the standard compute is sufficient. All presets below are defined in `bietlejuice/prod_conf.yml` (and `forno_conf.yml`). Choose based on workload size and compute type:
+
+**DBR 16.4 — General compute (m5a nodes)**
+
+| Preset | Node types | Workers | Notes |
+|--------|-----------|---------|-------|
+| `databricks_16_4_min_general_cluster` | m5a.large | 2 | Lightest, cheapest. Small tables. |
+| `databricks_16_4_min_general_2_workers_cluster` | m5d.large | 2 | Min with NVMe storage. |
+| `databricks_16_4_med_general_cluster` | m5a.xlarge | 3 | **Most common preset.** Standard enrich/DW. |
+| `databricks_16_4_med_general_2_workers_cluster` | m5a.xlarge | 2 | Like med_general but fewer workers. |
+| `databricks_16_4_med_general_driver_2_min_workers_cluster` | driver: m5a.xlarge, nodes: m5a.large | 2 | Large driver, light workers. |
+| `databricks_16_4_med_2xlarge_general_cluster` | m5a.2xlarge | 3 | Heavy compute, metric/DW jobs. |
+| `databricks_16_4_max_io-general_cluster` | driver: m5a.4xlarge, nodes: m5a.8xlarge | 4 | Maximum compute. |
+
+**DBR 16.4 — Memory compute (r5a nodes)**
+
+| Preset | Node types | Workers | Notes |
+|--------|-----------|---------|-------|
+| `databricks_16_4_xmin_memory_cluster` | r5a.large | 2 | Tiny memory-optimized. |
+| `databricks_16_4_min_memory_cluster` | r5a.xlarge | 3 | Light memory-intensive. |
+| `databricks_16_4_min_2xlarge_memory_cluster` | r5a.2xlarge | 3 | Mid-tier memory. |
+| `databricks_16_4_med_memory_cluster` | driver: r5a.2xlarge, nodes: m5a.2xlarge | 3 | Standard memory-optimized. |
+| `databricks_16_4_med_memory_2_workers_general_cluster` | r5a.xlarge | 2 | 2-worker memory. |
+| `databricks_16_4_med_5_workers_memory_cluster` | driver: m5a.2xlarge, nodes: r5a.2xlarge | 5 | Large memory with 5 workers. |
+| `databricks_16_4_high_mem_driver_high_mem_nodes` | r5a.4xlarge | 5 | Very large memory jobs. |
+| `databricks_16_4_high_mem_driver_high_mem_nodes_3_workers` | r5a.4xlarge | 3 | Large memory, fewer workers. |
+
+**DBR 16.4 — I/O optimized (m5a/r5a driver + larger nodes)**
+
+| Preset | Node types | Workers | Notes |
+|--------|-----------|---------|-------|
+| `databricks_16_4_min_io-general_cluster` | driver: m5a.large, nodes: m5a.xlarge | 2 | Small I/O-optimized. |
+| `databricks_16_4_med_io-general_cluster` | driver: m5a.2xlarge, nodes: m5a.4xlarge | 3 | **Standard metric layer preset.** |
+| `databricks_16_4_max_io-general_cluster` | driver: m5a.4xlarge, nodes: m5a.8xlarge | 4 | Max I/O-general. |
+| `databricks_16_4_min_io-memory_cluster` | driver: r5a.large, nodes: r5a.xlarge | 2 | Small I/O+memory. |
+| `databricks_16_4_med_io-memory_cluster` | driver: r5a.2xlarge, nodes: r5a.4xlarge | 3 | Mid I/O+memory. |
+| `databricks_16_4_max_io-memory_cluster` | driver: r5a.4xlarge, nodes: r5a.8xlarge | 4 | Max I/O+memory. |
+
+**DBR 16.4 — Photon (m5d/r5d NVMe nodes, vectorized)**
+
+| Preset | Node types | Workers | Notes |
+|--------|-----------|---------|-------|
+| `databricks_16_4_min_general_photon_cluster` | m5d.large | 2 | Smallest photon. |
+| `databricks_16_4_med_general_photon_cluster` | m5d.xlarge | 3 | Standard photon general. |
+| `databricks_16_4_med_2xlarge_general_photon_cluster` | r5d.2xlarge | 3 | Large photon general. |
+| `databricks_16_4_med_4xlarge_general_photon_cluster` | r5d.4xlarge | 3 | Largest photon general. |
+| `databricks_16_4_med_io-general_photon_cluster` | driver: m5d.2xlarge, nodes: m5d.4xlarge | 3 | Photon I/O-general. |
+| `databricks_16_4_min_io-memory_photon_cluster` | driver: r5d.large, nodes: r5d.xlarge | 2 | Small photon I/O+memory. |
+| `databricks_16_4_med_io-memory_photon_cluster` | driver: r5d.2xlarge, nodes: r5d.4xlarge | 3 | Medium photon I/O+memory. |
+| `databricks_16_4_max_io-memory_photon_cluster` | driver: r5d.4xlarge, nodes: r5d.8xlarge | 4 | Max photon I/O+memory. |
+| `databricks_16_4_min_io-general_photon_cluster` | r5d.xlarge | 3 | Small photon I/O-general. |
+| `databricks_16_4_med_mem_driver_min_memory_2_nodes_photon_cluster` | driver: r5d.2xlarge, nodes: r5d.xlarge | 2 | Photon with large driver. |
+| `databricks_16_4_xmin-io-memory_photon_cluster` | driver: r5d.xlarge, nodes: r5d.2xlarge | 3 | Extended-small photon I/O. |
+| `databricks_16_4_min_memory_photon_cluster` | r5d.2xlarge | 2 | Small photon memory. |
+
+**Instance pool clusters (no Spot risk — Qube layer only)**
+
+| Preset | Pool | Workers | Notes |
+|--------|------|---------|-------|
+| `databricks_16_4_rfleet_instance_cluster` | rfleet xlarge on-demand | 2 | **Qube default.** |
+| `databricks_16_4_rfleet_instance_cluster_3_workers` | rfleet xlarge on-demand | 3 | Larger Qube. |
+| `databricks_16_4_rfleet_instance_cluster_4_workers` | rfleet xlarge on-demand | 4 | — |
+| `databricks_16_4_rfleet_instance_cluster_5_workers` | rfleet xlarge on-demand | 5 | — |
+| `databricks_16_4_rfleet_instance_cluster_7_workers` | rfleet xlarge on-demand | 7 | — |
+
+**People team clusters (special IAM role — people domain only)**
+
+| Preset | Node types | Notes |
+|--------|-----------|-------|
+| `databricks_16_4_small_memory_people_cluster` | r5a.large | People domain, small. |
+| `databricks_16_4_medium_general_people_cluster` | m5a.xlarge | People domain, general. |
+| `databricks_16_4_medium_memory_people_cluster` | r5a.xlarge | People domain, memory. |
+
+**Quick selection guide:**
+- Default → `databricks_16_4_med_general_cluster`
+- Memory-heavy joins/aggregations → `databricks_16_4_med_memory_cluster`
+- Large dataset, high throughput (metric) → `databricks_16_4_med_io-general_cluster`
+- Vectorized / SQL-heavy → `databricks_16_4_med_general_photon_cluster`
+- Qube specs → `databricks_16_4_rfleet_instance_cluster`
+- People domain → use `*_people_cluster` variants
+- Non-standard node type or custom JARs → `custom_cluster` (see below)
+
 ```yaml
 cluster:
-    type: "databricks_16_4_med_general_photon_cluster"  # Required
+    type: "databricks_16_4_med_general_cluster"   # most common preset
+    databricks_conn_id: databricks_new_env         # see conn_id rules below
+    access_control_list:  # Optional — two accepted formats:
+        # Single entry (dict):
+        group_name: "analytics-engineers"
+        permission_level: "CAN_MANAGE"
+        # Multiple entries (list of dicts):
+        # - group_name: "analytics-engineers"
+        #   permission_level: "CAN_MANAGE"
+        # - group_name: "data-engineers"
+        #   permission_level: "CAN_VIEW"
+```
+
+#### `databricks_conn_id` by layer
+
+| Layers | `databricks_conn_id` |
+|--------|---------------------|
+| enrich, dw, raw (CDC/custom) | `databricks_new_env` |
+| metric, qube, reverse | `databricks_new` |
+
+#### `custom_cluster` (32% of fleet — required for non-standard nodes, Spot, or custom libraries)
+
+```yaml
+cluster:
+    type: custom_cluster
+    databricks_conn_id: databricks_new_env   # use databricks_new for metric/reverse
+    custom_configurations:
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
+        data_security_mode: SINGLE_USER       # use USER_ISOLATION for metric layer
+        driver_node_type_id: r5a.2xlarge
+        node_type_id: r5a.2xlarge
+        num_workers: 3
+        spark_version: 16.4.x-scala2.12
+        autotermination_minutes: 20           # prevents idle cluster cost
+        spark_conf:
+            spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+        aws_attributes:  # Optional — for Spot instance cost savings
+            availability: SPOT_WITH_FALLBACK
+            spot_bid_price_percent: 100
+            first_on_demand: 1
+            ebs_volume_size: 200
+    custom_libraries:  # Optional — for JDBC drivers, internal WHL packages, PyPI deps
+        - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
+        - whl: "{artifacts_bucket}/my-package/my_package-1.0.0-py3-none-any.whl"
+        - pypi:
+            package: "google-auth==2.23.0"
     access_control_list:  # Optional
         group_name: "analytics-engineers"
         permission_level: "CAN_MANAGE"
-    custom_configurations: {}  # Optional
-    custom_libraries: []  # Optional
 ```
+
+#### Metric layer cluster specifics
+
+Metric DAGs always use `USER_ISOLATION` (not `SINGLE_USER`) and `databricks_new`:
+```yaml
+cluster:
+    type: databricks_16_4_med_io-general_cluster   # or databricks_16_4_med_2xlarge_general_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+        group_name: analytics-engineers
+        permission_level: CAN_MANAGE
+    custom_configurations:
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
+        data_security_mode: USER_ISOLATION
+        spark_conf:
+            spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+```
+
+## DAG Naming Conventions
+
+DAG names follow layer-specific prefixes. Raw DAGs have **no prefix** — they are named after the source system.
+
+| Layer | Pattern | Examples |
+|-------|---------|---------|
+| enrich | `enrich_{domain}` | `enrich_collections_quintoandar`, `enrich_payments_platform` |
+| dw | `dw_{domain}` | `dw_losses`, `dw_credit_evers`, `dw_collections_segmentation` |
+| metric | `metric_{line}__{domain}` (double underscore) | `metric_rent__contracts`, `metric_fintech__velo` |
+| raw (CDC / custom) | source system name, no prefix | `retsuko`, `vans`, `ledger`, `greenhouse_v3` |
+| core | `core_{entity}` | `core_contract`, `core_listing`, `core_visit` |
+| reverse | `reverse_{domain}` or `reverse_{domain}_access` | `reverse_supply`, `reverse_supply_access` |
+
+## `custom_schema` Derivation Rules
+
+`custom_schema` defaults to the dag_name. Set it explicitly when:
+
+| Case | Rule | Example |
+|------|------|---------|
+| **DW** | Strip `dw_` prefix | `dw_losses` → `custom_schema: losses` |
+| **Metric** | Use the business line (before `__`) | `metric_rent__contracts` → `custom_schema: rent` |
+| **Multiple CDC DAGs, same source DB** | All share the source DB name | `ebdb_house`, `ebdb_agent` → both `custom_schema: ebdb` |
+| **Migration / test run** | Append `_test` or `_homolog` | `ebdb_condo_test` → `custom_schema: ebdb_test` |
+| **Qube** | Fixed per spec type | dimension → `"dimensions"`, measure → `"measures"`, metric → `"metrics"` |
 
 ## Workflow Types by Layer
 
@@ -64,35 +233,49 @@ cluster:
 
 | Workflow | Use Case | Status |
 |----------|----------|--------|
-| `cdc` | CDC ingestions (MySQL/Postgres) | ✅ Recommended |
+| `cdc` | CDC ingestions via Debezium/S3-Sink (MySQL/Postgres) | ✅ Recommended |
+| `database_pull_delta` | Pull-based DB ingestion with Delta storage (Postgres/Mongo) | ✅ Recommended |
+| `api_ingestion` | REST API ingestion with authentication and pagination | ✅ Active |
+| `custom_ingestion` | Custom Spark-job-based ingestions | ✅ Active |
 | `gsheets` | Google Sheets ingestion | ✅ Active |
-| `custom_ingestion` | API/custom ingestions | ✅ Active |
+| `dms_cdc` | DMS-based CDC (AWS Database Migration Service) | ✅ Active |
+| `database_pull` | Pull-based DB ingestion (non-Delta) | Deprecated, use `database_pull_delta` |
+
+### Clean Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `query_delta` | Query-based clean tables (Delta) | ✅ Active |
 
 ### Core Layer
 
 | Workflow | Use Case | Status |
 |----------|----------|--------|
-| `core_model` | Core model tables with custom Spark jobs | ✅ Active |
+| `core_model` | Core model tables with custom Spark jobs | ✅ Recommended |
+| `query_delta` | Query-based core tables (Delta) | ✅ Active |
 
 ### Enrich Layer
 
 | Workflow | Use Case | Status |
 |----------|----------|--------|
-| `query` | Query-based enrich tables | Deprecated, use `query_delta` |
 | `query_delta` | Query-based enrich tables (Delta) | ✅ Recommended |
+| `query_view` | View-based enrich tables (no materialization) | ✅ Active |
+| `query` | Query-based enrich tables | Deprecated, use `query_delta` |
 
 ### DW Layer
 
 | Workflow | Use Case | Status |
 |----------|----------|--------|
-| `query` | Query-based DW tables | Deprecated, use `query_delta` |
 | `query_delta` | Query-based DW tables (Delta) | ✅ Recommended |
+| `query_view` | View-based DW tables (no materialization) | ✅ Active |
+| `query` | Query-based DW tables | Deprecated, use `query_delta` |
 
 ### Metric Layer
 
 | Workflow | Use Case | Status |
 |----------|----------|--------|
-| `query` | Query-based metric tables | ✅ Active |
+| `query` | Query-based metric tables (interactive cluster) | ✅ Active |
+| `query_delta` | Query-based metric tables (Delta, job cluster) | ✅ Active |
 
 ### Reverse Layer
 
@@ -101,6 +284,12 @@ cluster:
 | `load` | Load data to reverse layer | ✅ Active |
 | `access` | Export data from reverse layer | ✅ Active |
 | `load_access` | Combined load and export | ✅ Active |
+
+### Wonka Layer
+
+| Workflow | Use Case | Status |
+|----------|----------|--------|
+| `wonka` | Wonka pipeline runner (internal framework) | ✅ Active |
 
 ## Common Workflow Parameters
 
@@ -174,28 +363,66 @@ workflow:
 
 ### Raw CDC
 
+#### `source_schema` vs `source_database` — set correctly per database type
+
+| Database type | `source_schema` | `source_database` |
+|---------------|----------------|-------------------|
+| **Postgres** | PostgreSQL schema name (usually `"public"`) | Database name (e.g. `"ebdb"`) |
+| **MySQL** | Database name (same as `source_database`) | Database name (e.g. `"retsuko"`) |
+
+Example — Postgres dag named `ebdb_condo`, tables in schema `public`:
+```yaml
+source_schema: "public"      # the PostgreSQL schema
+source_database: "ebdb"      # the database name
+custom_schema: "ebdb"        # destination schema in datalake (default: dag_name)
+```
+
+Example — MySQL dag named `retsuko`:
+```yaml
+source_schema: "retsuko"     # same as database name for MySQL
+source_database: "retsuko"
+```
+
+#### Full CDC declaration
+
 ```yaml
 workflow:
     layer: "raw"
     type: "cdc"
     database_type: "postgres"  # Required: "postgres" or "mysql"
-    custom_schema: "ebdb"  # Optional
-    source_database: "ebdb"  # Optional, default: custom_schema
-    source_schema: "public"  # Optional, default: "public"
-    lineage_product_database_name: "ebdb"  # Optional
-    has_hive_sync: true  # Optional
-    tables_customization:  # Required
-        table_name:
-            clean_table_name: "clean_table_name"  # Optional
-            raw_primary_keys: ["id"]  # Optional, auto-detected if not provided
-            clean_primary_keys: ["id"]  # Optional, from metadata
-            z_order_by: ["user_id"]  # Optional
-            transactional_datatype_overrides:  # Optional
+    custom_schema: "ebdb"      # Optional, default: dag_name. Use for migration DAGs (e.g. "ebdb_test")
+    source_database: "ebdb"    # Optional, default: custom_schema. Postgres DB name.
+    source_schema: "public"    # Optional, default: "public". Postgres schema or MySQL DB name.
+    dbutils_secret_key: "EBDB_DB"  # Optional. Default: <DESTINATION_SCHEMA>_DB (uppercase)
+    lineage_product_database_name: "ebdb"  # Optional. Populate for full column-level lineage.
+                                            # Leave empty for tag-level lineage only.
+    has_hive_sync: true        # Optional. Check if tables will be queried from Trino.
+    mysql_version: "8.0.30"    # Optional. MySQL connector version. Default: "8.0.30". MySQL only.
+    tables_customization:      # Required
+        table_name:            # CASE-SENSITIVE — must match source DB exactly
+            clean_table_name: "clean_table_name"   # Optional, default: raw table name
+            raw_primary_keys: ["id"]               # Optional, auto-detected by Spark job
+            clean_primary_keys: ["id"]             # Optional, auto-detected by Spark job
+            z_order_by: ["user_id"]                # Optional
+            transactional_datatype_overrides:      # Optional
                 column_name: "STRING"
-            database_column_alias:  # Optional
+            database_column_alias:                 # Optional
                 year: "year_column"
-            execution_timeout_hours: 3.0  # Optional
+            execution_timeout_hours: 3.0           # Optional
+            collect_metrics: false                 # Optional. Collects count/avg/max/min from
+                                                   # source DB. CAUTION: heavily impacts source DB.
 ```
+
+#### Critical CDC caveats
+
+- **Table names are case-sensitive**: `raw_table_name` keys in `tables_customization` must match the source database casing exactly (e.g. `Usuario`, not `usuario`).
+- **All source tables must have primary keys**: Tables without PKs cannot be replicated by Debezium.
+- **`debezium_signal` table**: Belongs in the Kafka connector config only — do NOT add it to `tables_customization` in the DAG declaration.
+- **Migration testing**: Use `_test` suffix on the dag_name (e.g. `ebdb_condo_test` with `custom_schema: "ebdb_test"`) to run the CDC DAG side-by-side with the existing ingestion before replacing it.
+- **CDC infrastructure is a prerequisite**: The Kafka Connect (Debezium) and S3-Sink connectors must already be deployed via Backstage before this DAG is created. Data must be visible in S3 `5a-datalake-incoming-{forno/prod}`.
+- **Forno test is mandatory**: After creating the declaration + queries + metadata files, the DAG must run successfully on Forno Airflow before merging the PR.
+- **`collect_metrics: true`**: Only enable if explicitly requested — it runs JDBC queries directly against the source database.
+- **Adding tables to an existing CDC DAG**: Update the Kafka connector via Backstage first (`kafka-connect-add-tables`), then update the DAG declaration.
 
 ### Raw Custom Ingestion
 
@@ -240,6 +467,50 @@ workflow:
 
 **Note**: Gsheets also requires `forno_conf.yml` and `prod_conf.yml` with sheet configurations.
 
+### Raw API Ingestion
+
+Ingests data from REST APIs with configurable authentication and pagination. The `load_spark_job` defaults to `"load_api_ingestion_raw"` if not specified.
+
+```yaml
+workflow:
+    layer: "raw"
+    type: "api_ingestion"
+    custom_schema: "my_api"          # Optional
+    has_hive_sync: true              # Optional
+    api_base_url: "https://api.example.com"   # Required — string (all envs) or dict per-env:
+    # api_base_url:
+    #   prod: "https://api.example.com"
+    #   forno: "https://staging.example.com"
+    authentication:                  # Required at workflow level OR per-table
+        strategy: "oauth2_client_credentials"  # from AuthenticationStrategyEnum
+        token_url: "https://auth.example.com/token"
+        secret_key: "MY_API_SECRET"
+        scopes: ["read"]             # Optional
+    api_policies:                    # Optional
+        rate_limiting:
+            strategy: "fixed_delay"  # from RateLimitingStrategyEnum
+            delay_seconds: 0.5
+        pagination:
+            strategy: "offset"       # from PaginationStrategyEnum
+            page_size: 100
+            limit_param: "limit"
+            offset_param: "offset"
+        error_handling:
+            non_fatal_status_codes: [404]
+            retry_policy:
+                retries: 3
+                delay: 5
+                backoff_factor: 2
+    tables_customization:            # Required
+        my_endpoint:
+            endpoint_path: "/v1/resources"   # Required per table
+            # authentication:              # Optional: override per-table authentication
+            #     strategy: "api_key"
+            #     api_key_field: "MY_KEY"
+            #     location: "header"
+            #     header_name: "X-API-Key"
+```
+
 ## DAG Folder Structure
 
 ```
@@ -265,6 +536,34 @@ dags/
         │   └── metric/
         └── spark_jobs/  # For custom Spark jobs
 ```
+
+## Data Quality File Schema
+
+Data quality files live at `data_quality/{layer}/{table_name}.yml`. They are optional but strongly encouraged for critical tables.
+
+```yaml
+table_name: schema_name.table_name   # fully qualified: schema.table
+alert_channel: "#alerts-de-airflow-dags"   # Slack channel for DQ alerts
+table_level_validations:
+  has_size:
+    greater_than: 0              # row count must exceed N
+    severity_level: Error        # Error = blocks pipeline; Warning = logs only
+column_level_validations:
+  primary_key_col:
+    is_complete:
+      severity_level: Error      # no nulls allowed
+    is_unique:
+      severity_level: Error      # no duplicates
+  important_col:
+    is_complete:
+      severity_level: Error
+  nullable_col:
+    has_completeness:
+      greater_than: 0.95         # fraction non-null (0.0–1.0); allows up to 5% nulls
+      severity_level: Warning
+```
+
+`severity_level: Error` fails the Airflow task and blocks downstream tasks. `Warning` logs the issue and allows the run to continue.
 
 ## Testing DAGs
 
@@ -313,6 +612,111 @@ make clean
 - **File extension**: Must use `.yml`, not `.yaml`
 - **No Python files**: Don't place custom Python files in DAG folder alongside declaration file
 
+## Advanced Parameters Reference
+
+### `get_table_metrics` (per-table)
+
+Runs JDBC count/max queries against the source to collect metadata. Different from `collect_metrics` (which is per-table). Defined inside `tables_customization`:
+
+```yaml
+tables_customization:
+  my_table:
+    get_table_metrics:
+      count_query: "SELECT COUNT(*) FROM my_table"
+      max_query: "SELECT MAX(updated_at) FROM my_table"
+```
+
+### `short_circuit_customization`
+
+Gates the entire DAG run on a Python callable result. When the function returns `False`, all downstream tasks are skipped. The `function` must be a valid `ShortCircuitFunctionEnum` value:
+
+```yaml
+workflow:
+  short_circuit_customization:
+    function: "CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH"  # from ShortCircuitFunctionEnum
+    function_params: {}      # Optional: additional params passed to the function
+    execution_date: "..."    # Optional: override the execution date
+```
+
+Available `function` values:
+- `CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH`
+- `CHECK_IS_SECOND_BUSINESS_DAY_OF_MONTH`
+- `CHECK_IS_LAST_BUSINESS_DAY_OF_MONTH`
+- `CHECK_IS_SPECIFIC_DAY_OF_MONTH`
+- `CHECK_IS_SPECIFIC_WEEKDAY`
+- `CHECK_IS_IN_RANGE_OF_DAYS`
+- `CHECK_IS_IN_RANGE_OF_WEEKDAYS`
+
+### `spark_session_configs.udfs`
+
+Registers pre-defined Spark UDFs that can be called directly in SQL query files. Values must be valid `UDFEnum` identifiers:
+
+```yaml
+workflow:
+  spark_session_configs:
+    udfs:
+      - SF_NORMALIZE_STRING        # available values from UDFEnum
+      - SF_REMOVE_ACCENTUATION
+      - SF_ALPHANUMERIC_SNAKE_CASE
+      - FINTECHOPS_WORK_MIN_SLA
+      - FINTECH_COLLECTIONS_RENEGOTIATION
+      - GET_PROFILING_DATA_QUALITY
+      - GROWTH_VESPUCIO_SCORE
+```
+
+**Note**: Only UDFs registered in `UDFEnum` are allowed. Arbitrary function paths are not supported here.
+
+### `when_matched_operation` / `when_not_matched_operation`
+
+Explicit column-level MERGE specs. Use when you need to exclude columns from the upsert (e.g. audit columns that must not be overwritten):
+
+```yaml
+tables_customization:
+  my_table:
+    merge_on: ["id"]
+    when_matched_operation:
+      update:
+        - col_a
+        - col_b           # only these columns are updated on match
+    when_not_matched_operation:
+      insert: all         # insert all columns on new rows
+```
+
+### `default_table_privileges` / per-table `table_privileges`
+
+Grants Databricks permissions on tables after load. Typically used in reverse/access DAGs:
+
+```yaml
+workflow:
+  default_table_privileges:
+    "prod-read-only": ["SELECT"]
+    "prod-read-write": ["SELECT", "MODIFY", "APPLY TAG"]
+  tables_customization:
+    sensitive_table:
+      table_privileges:   # overrides default for this table
+        "prod-read-only": []   # no access to this table
+```
+
+### Other miscellaneous parameters
+
+| Parameter | Section | Description |
+|-----------|---------|-------------|
+| `bucket_config_name` | `workflow` | Overrides default S3 bucket config for the ingestion job |
+| `callback_by_task: false` | **`dag`** | Disables per-task failure GChat callbacks; fires a single DAG-level callback instead (useful for high-task-count DAGs). Default: `true`. |
+| `has_hive_sync: true` | `workflow` | Enables Hive metastore sync so tables are queryable from Trino. Default: `true`. |
+| `vacuum_lite: true` | `workflow` (`query_delta`) | Uses lightweight vacuum (DBR 16.1+); faster but less thorough than full vacuum |
+
+**`callback_by_task` example** — must be under `dag:`, not `workflow:`:
+```yaml
+dag:
+  name: "my_dag"
+  owner: "Data Engineering"
+  callback_by_task: false    # ← correct placement (dag section)
+workflow:
+  layer: "dw"
+  type: "query_delta"
+```
+
 ---
 
 # AI Agent Instructions
@@ -330,6 +734,15 @@ make clean
 9. **Incremental loads**: Use `extra_query_template_params` with `get_date_param`
 10. **Delta features**: Use `merge_on` for upserts, `z_order_by` for optimization
 
+### CDC-specific rules
+
+- **Infrastructure first**: Kafka Connect + S3-Sink connectors must exist before creating the DAG. Confirm data is in S3 `5a-datalake-incoming-{env}`.
+- **Set `source_schema` correctly**: Postgres → PostgreSQL schema name (usually `"public"`). MySQL → database name.
+- **`dbutils_secret_key` default is uppercase**: `<DESTINATION_SCHEMA>_DB` (e.g. `EBDB_DB`). Only specify if it differs.
+- **Table name casing**: `tables_customization` keys must match source DB casing exactly.
+- **Forno test before merge**: After creating declaration + queries + metadata, the DAG must pass a Forno Airflow run before the PR is merged.
+- **Adding tables**: Update connector via Backstage `kafka-connect-add-tables` first, then update the DAG declaration.
+
 ## When Creating Credentials
 
 1. **Databricks secrets**: `{NAME}_DB`, `{NAME}_API`, `{NAME}_CRYPT`
@@ -346,3 +759,12 @@ make clean
 - [ ] Task count under 100 (if job cluster)
 - [ ] Delta workflow used (not deprecated)
 - [ ] Templates used correctly
+
+### CDC DAGs (additional)
+- [ ] Kafka Connect + S3-Sink connectors already deployed (data visible in S3)
+- [ ] `source_schema` set correctly for Postgres (`"public"`) vs MySQL (database name)
+- [ ] `tables_customization` keys match source DB casing exactly
+- [ ] All source tables have primary keys
+- [ ] `debezium_signal` NOT in `tables_customization`
+- [ ] `dbutils_secret_key` uses uppercase if specified (e.g. `EBDB_DB`)
+- [ ] DAG tested on Forno Airflow before merging PR

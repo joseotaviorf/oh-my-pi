@@ -1,0 +1,224 @@
+---
+alwaysApply: true
+---
+# Naming Conventions
+
+## General Naming Principles
+
+- **Language**: All names MUST be in English
+- **Format**: Use snake_case (elements separated by one underscore)
+- **Meaningful**: Names should be meaningful, distinct, and pronounceable
+- **Clarity**: Make variables and columns/tables clear from their name
+- **Avoid misleading**: Do not use names which could misguide data users
+
+---
+
+## Data Lake Terms
+
+| Term | Text Format | Snake Case Format |
+|------|-------------|-------------------|
+| Data lake | datalake | datalake |
+| Data lake layer | datalake layer | datalake_layer |
+| Layers | raw, clean, enrich | raw, clean, enrich |
+
+---
+
+## Database Column Naming Conventions
+
+### Data Lake Columns
+
+| Source Column Type | Convention | Examples |
+|-------------------|------------|----------|
+| id (table) | `id` | `id` (house) |
+| Foreign key | `id_{foreign_key_property}` | `usuario_id` → `id_user` |
+| Name property | `{property}_name` | `nome` (user) → `user_name` |
+| Timestamp | `ts_{property_in_past_tense}` | `created_at` → `ts_created` |
+| Date | `dt_{property_in_past_tense}` | `dataAssinado` → `dt_signed` |
+| Epoch (unix) | `epoch_{property_in_past_tense}` | `event_unix_timestamp` → `epoch_event` |
+| Boolean | `is_{property}` or `has_{property}` | `temImovel` → `has_house`<br>`ativo` → `is_active` |
+| Modified column | `mod_{clean_col_name}` | `is_penthouse_mod` → `mod_is_penthouse` |
+
+### Data Lake Column Arrangement Priority
+
+| Column Type | Priority |
+|-------------|----------|
+| IDs | 0 |
+| Non-IDs (e.g., external ids, natural keys) | 1 |
+| Non-metrics (e.g., properties) | 2 |
+| Metrics (e.g., SLA, booleans, MOD) | 3 |
+| Date, timestamp | 4 |
+| Partitions (e.g., year-month-day) | 5 |
+
+---
+
+## Data Warehouse Naming Conventions
+
+### Table Naming
+
+- **Dimensions**: Use singular nouns
+  - Examples: `dim_contract_person`, `dim_user`
+- **Facts**: Use plural nouns
+  - Examples: `fact_contract_people`, `fact_users`
+
+### Data Warehouse Columns
+
+| Source Column Type | Lake Convention | DW Convention | Examples |
+|-------------------|-----------------|---------------|----------|
+| id (table) | `id_{table}` | `sk_{table}` | `id` (house) → `id_house` (lake) → `sk_house` (dw) |
+| Foreign key | `id_{foreign_key_property}` | `sk_{foreign_key_property}` | `usuario_id` → `id_user` (lake) → `sk_user` (dw) |
+| Name property | `{property}_name` | `{property}_name` | `nome` (user) → `user_name` (lake and dw) |
+| Timestamp | `ts_{property_in_past_tense}` | `sk_{property_in_past_tense}_date` and `ts_{property_in_past_tense}` | `created_at` → `ts_created` (lake) → `sk_created_date` and `ts_created` (dw) |
+| Epoch (unix) | `epoch_{property_in_past_tense}` | `epoch_{property_in_past_tense}` | `event_unix_timestamp` → `epoch_event` |
+| Date | `dt_{property_in_past_tense}` | `sk_{property_in_past_tense}_date` and `dt_{property_in_past_tense}` | `dataAssinado` → `dt_signed` (lake) → `sk_signed_date` and `dt_signed` (dw) |
+| Boolean | `is_{property}` or `has_{property}` | `is_{property}` or `has_{property}` | `temImovel` → `has_house` (lake and dw) |
+| Modified column | `mod_{clean_col_name}` | `mod_{clean_col_name}` | `is_penthouse_mod` → `mod_is_penthouse` (lake and dw) |
+| SLA metric | `{granularity}_{from}_to_{to}` | `{granularity}_{from}_to_{to}` | Days between first listing and contract signed → `days_first_listing_to_contract_signed` |
+
+**Granularity options**: `days`, `minutes`, `seconds`, `hours`
+
+### Data Warehouse Column Arrangement Priority
+
+**Fact Table Example:**
+
+```sql
+SELECT
+    sk_dim0,                          -- Priority 0: SKs
+    sk_dim1,                          -- Priority 0: SKs
+    sk_date0_date,                    -- Priority 0: SKs
+    id_external,                      -- Priority 1: Non-SKs
+    property_name,                    -- Priority 2: Non-metrics
+    is_property0,                     -- Priority 3: Metrics
+    days_property0_property1,         -- Priority 3: Metrics
+    ts_load                           -- Priority 4: Load timestamp
+FROM
+    fact_table
+```
+
+**Dimension Table Example:**
+
+```sql
+SELECT
+    sk_dim,                           -- Priority 0: SKs
+    id_external,                      -- Priority 1: Non-SKs
+    property0,                        -- Priority 2: Non-metrics
+    is_property1,                     -- Priority 3: Metrics
+    days_property0_property1,         -- Priority 3: Metrics
+    ts_load                           -- Priority 4: Load timestamp
+FROM
+    dim_table
+```
+
+| Column Type | Priority |
+|-------------|----------|
+| SKs (e.g., primary/foreign keys) | 0 |
+| Non-SKs (e.g., other ids) | 1 |
+| Non-metrics (e.g., properties) | 2 |
+| Metrics (e.g., SLA) | 3 |
+| ts_load | 4 |
+| Partitions (e.g., year-month-day) | 5 |
+
+---
+
+## Schema Naming Conventions
+
+### Data Warehouse Schemas
+
+Choose schema placement based on context:
+
+1. **Public schema**: For QuintoAndar's main core topics without well-defined context
+   - Examples: `contract`, `offer`
+
+2. **Context schema**: For team-specific contexts with general naming
+   - Examples: `customer_experience`, `credit`
+   - May use multiple data sources
+
+3. **Tool naming schema**: For contexts well-defined by a specific tool
+   - Examples: `zendesk`, `chattermill`
+
+---
+
+## Database Metastore Naming
+
+### Metastore Patterns by Layer
+
+| Layer | Metastore | Pattern | Examples |
+|-------|-----------|---------|----------|
+| **Raw** | Spark | `datalake_{source}_raw` | `datalake_ebdb_raw` |
+| | Athena | `datalake_{source}_raw_prod` | `datalake_ebdb_raw_prod` |
+| **Clean** | Spark | `datalake_{source}_clean` | `datalake_ebdb_clean` |
+| | Athena | `datalake_{source}_clean_prod` | `datalake_ebdb_clean_prod` |
+| **Enrich** | Spark | `datalake_{source}_{context}` | `datalake_ebdb_booking`<br>`datalake_banking` |
+| | Athena | `datalake_{source}_{context}_prod` | `datalake_ebdb_booking_prod`<br>`datalake_banking_prod` |
+| **DW Staging** | Spark | `dw_{schema_name}_staging` | `dw_janus_staging` |
+| **DW Final** | Spark | `dw_{schema_name}` | `dw_janus` |
+
+**Notes:**
+- Use `{source}` in enrich layer only if it depends on one source
+- Database name in forno environment does not contain the `_prod` suffix
+- `source`: Source of extraction for the database
+- `context`: Meaningful name to group enriched tables or DW models
+- `schema_name`: Final schema name in DW
+
+---
+
+## DAG Naming Conventions
+
+### DAG Name Patterns by Layer
+
+| Layer | Pattern | Examples |
+|-------|---------|----------|
+| **Raw + Clean** | `bietlejuice.{source}` | `bietlejuice.ebdb`<br>`bietlejuice.amplitude` |
+| **Enrich** | `bietlejuice.enrich_{source}_{context}` | `bietlejuice.enrich_ebdb_booking`<br>`bietlejuice.enrich_wololo_lead`<br>`bietlejuice.enrich_banking`<br>`bietlejuice.enrich_lead_tracking` |
+| **DW** | `bietlejuice.dw_{context}` | `bietlejuice.dw_banking`<br>`bietlejuice.dw_visit`<br>`bietlejuice.dw_rent_flow` |
+| **Metric** | `bietlejuice.metric_{business_context}__{context}` | `bietlejuice.metric_rent__contracts`<br>`bietlejuice.metric_rent__demand_targets`<br>`bietlejuice.metric_growth__demand` |
+
+**Notes:**
+- Use `{source}` in enrich layer only if it depends on one source
+- `source`: Source of extraction for the DAG
+- `context`: Meaningful name to group enriched tables or DW models
+- `business_context`: High-level business area
+
+### DAG Job Name Patterns
+
+| Step | Pattern | Notes |
+|------|---------|-------|
+| **Create Raw + Clean** | `Load_{source}_{layer}.py` | Only when DAG Builder cannot be used |
+| **Export to External** | `Create_external_{load_type}_tables.py` | DEPRECATED |
+
+**Parameters:**
+- `load_type`: `'incremental'` or `''`
+- `stage`: `'raw'` or `'clean'`
+
+---
+
+## AI Agent Instructions — Naming
+
+When writing or reviewing code in this project:
+
+1. **Enforce English** for all names (columns, tables, variables)
+2. **Use snake_case** consistently
+3. **Apply correct prefixes**:
+   - Data Lake: `id_`, `ts_`, `dt_`, `is_`, `has_`, `mod_`, `epoch_`
+   - Data Warehouse: `sk_`, `ts_`, `dt_`, `is_`, `has_`, `mod_`, `epoch_`
+4. **Follow table naming**:
+   - Dimensions: singular nouns (`dim_user`)
+   - Facts: plural nouns (`fact_users`)
+5. **Apply correct metastore patterns** based on layer
+6. **Use proper DAG naming** based on layer and context
+7. **Follow credential patterns** for Databricks and Airflow
+
+### Column Arrangement
+
+1. **Data Lake**: IDs → Non-IDs → Non-metrics → Metrics → Date/Timestamp → Partitions
+2. **Data Warehouse**: SKs → Non-SKs → Non-metrics → Metrics → ts_load → Partitions
+
+## Naming Conventions Checklist
+
+- [ ] All names in English and snake_case
+- [ ] Correct column prefixes applied (id_, ts_, dt_, sk_, is_, has_, mod_, epoch_)
+- [ ] Table names follow dimension (singular) / fact (plural) convention
+- [ ] Column arrangement follows priority order
+- [ ] Metastore names follow layer patterns
+- [ ] DAG names follow layer and context patterns
+- [ ] Credentials follow naming patterns
+- [ ] SLA metrics use granularity_{from}_to_{to} format

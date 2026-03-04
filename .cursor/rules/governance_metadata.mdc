@@ -1,0 +1,136 @@
+---
+alwaysApply: true
+---
+# Governance Metadata Conventions
+
+## The Golden Rule
+Every `.sql` file in `queries/{layer}/` **must** have a matching `.yml` in `metadata/{layer}/` with the same base name. CI fails without it.
+
+## Common Required Fields (all layers)
+
+```yaml
+database_name: str          # e.g. "enrich_ebdb_proposal", "dw_rent", "metric_rent"
+table_name: str             # table name without prefix
+description: str            # min 10 characters
+domain: str                 # must match valid domain (see below)
+owner: str                  # email: user@quintoandar.com.br
+columns:
+  column_name:
+    description: str        # min 10 characters
+    personal_data_classification: str  # optional; required when column contains personal data
+                                       # values: "sensitive" | "highly_personal" | "personal"
+```
+
+**Valid domains:** `3P Partners`, `Agents`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `Primitives`, `QCX`, `Support and Service`, `Tech Platform`
+
+## Personal Data Classification
+
+All columns that contain data about identifiable natural persons **must** carry a `personal_data_classification` field. The three valid values map directly to the QuintoAndar Personal Data Catalog.
+
+### `sensitive` — Special-category data under LGPD Art. 11
+Requires explicit consent or a legal basis before processing. **Must never appear in metric/qube layer outputs or publicly-accessible schemas without documented LGPD approval.** The corresponding DAG declaration must set `table_privileges` to restrict access.
+
+Examples: racial or ethnic origin, political opinion, religion/religious beliefs, gender identity, sexual orientation, union membership, health information (health reports, ICD, neurodiversity, physical/mental/visual/auditory disability, pre-existing conditions, toxicological exams, body temperature, weight, height, DPS), biometric data (facial recognition, fingerprints, voice recognition).
+
+### `highly_personal` — Financially or legally sensitive data
+Not special-category under LGPD but carries high risk of harm if exposed. Downstream (enrich/dw) tables that carry these columns must set `table_privileges`. Prefer hashing or masking before promoting to enrich or dw layers.
+
+Examples: bank statement, credit history, credit score, income tax declaration (IRPF), INSS benefit statement, criminal background, personal/corporate credit or debit card numbers, photo of person with ID document.
+
+### `personal` — Standard personal data under LGPD Art. 5
+Must be labelled but has no mandatory access-control requirement beyond the default.
+
+Examples: full name, first name, last name, CPF, date of birth, personal/corporate email, personal/corporate phone number, residential/corporate address, neighborhood, city, state, RG, passport number, driver's license (CNH), PIS/PASEP, voter ID, geolocation, contract number, QuintoAndar account information, salary/compensation, age, marital status, nationality, device ID, IP address, browsing history, cookies, image in photo or video, service history.
+
+### Example — column with classification
+
+```yaml
+columns:
+  cpf:
+    lineage:
+      - ebdb_public.person.cpf
+    description: "Brazilian individual taxpayer identification number (CPF)."
+    personal_data_classification: personal
+  racial_origin:
+    lineage:
+      - ebdb_public.person.racial_origin
+    description: "Racial or ethnic origin self-declared by the person."
+    personal_data_classification: sensitive
+  credit_score:
+    lineage:
+      - bureau_clean.score.value
+    description: "Credit bureau score indicating likelihood of debt repayment."
+    personal_data_classification: highly_personal
+```
+
+### LGPD enforcement rules in metadata
+
+- Any column classified as `sensitive` in an enrich/dw table → the table's DAG declaration **must** include `table_privileges` restricting access to authorised groups only.
+- Any `sensitive` column in a metric or qube output requires `privacy.k_anonymity ≥ 5` in the qube metric declaration, and documented LGPD approval from the data owner.
+- `personal_data_classification` must be set consistently across all layers for the same logical column (raw → clean → enrich → dw).
+
+## Enrich & DW Columns — `lineage` required
+```yaml
+columns:
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id    # format: database.table.column
+    description: "Unique identifier for the contract."
+  amount:
+    lineage:
+      - datalake_ebdb_clean.contract.rent_amount
+    description: "Monthly rent amount in BRL."
+    categories:                            # optional: for categorical columns
+      ACTIVE: Currently active contract.
+      CANCELED: Contract was canceled.
+```
+
+## Metric Columns — `dimension` or `metric` block required
+Each metric column must be **either** a dimension or a metric, never plain:
+
+```yaml
+# Dimension column (used to slice/group the metric)
+week:
+  lineage:
+    - dw_public.dim_date.week_start
+  description: "Week start date."
+  dimension: true
+
+# Metric column (the measurable value)
+ongoing_contracts:
+  description: "Count of unique contracts active during the week."
+  metric:
+    name: Ongoing Contracts Weekly
+    description: "Count of unique contracts that were active each week."
+    acronym: OC
+    is_additive: false
+    business_stage: Demand          # e.g. Supply, Demand, Transaction, Retention
+    hierarchy: User analysis
+    approved_by: owner@quintoandar.com.br
+    link_to_metric: "https://quintoandar.sa.looker.com/looks/1234"  # optional
+```
+
+## Raw / Clean Metadata
+Raw and clean layer metadata have the same structure as enrich/dw but `lineage` points to the source database columns (e.g. `ebdb_public.contract.id`).
+
+## Validation Commands
+```bash
+# Check that every SQL file has a matching metadata file
+make validate-metadata-files-exist
+
+# Check that metadata content is valid against schema
+make validate-metadata-files-content
+
+# Check SQL lineage consistency with metadata
+make validate-lineage-consistency
+```
+
+## Common Mistakes
+- `description` shorter than 10 characters → CI fails.
+- `owner` not matching email regex → CI fails.
+- Missing `lineage` on an enrich/dw column → CI fails.
+- Metric column without `dimension: true` or `metric:` block → CI fails.
+- Metric SQL referencing raw/clean tables directly → lineage validation fails.
+- Column containing personal data with no `personal_data_classification` → governance review will flag it.
+- `sensitive` column promoted to enrich/dw without `table_privileges` in the declaration → LGPD violation risk.
+- `sensitive` column exposed in a metric/qube output without `k_anonymity ≥ 5` → LGPD violation risk.

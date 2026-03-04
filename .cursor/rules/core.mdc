@@ -1,0 +1,281 @@
+---
+alwaysApply: true
+---
+# bi-etl-ejuice — Core Repository Guide
+
+## What this repository is
+
+**bi-etl-ejuice** is QuintoAndar's central data engineering monorepo. It consolidates all batch data pipeline logic for the company — intraday and D-1 cadence — across ~771 Airflow DAGs. The primary Python package is `bietlejuice`.
+
+All pipeline logic lives here: raw ingestion from source databases and APIs, data lake transformations, Data Warehouse models, pre-aggregated metrics, and a semantic query layer called Qube. New pipelines are created by adding files to this repository — not by running ad-hoc scripts or configuring external tools directly.
+
+---
+
+## Technology Stack
+
+| Component | Technology | Purpose |
+|---|---|---|
+| Orchestration | Apache Airflow | DAG scheduling and task execution |
+| Compute / Runtime | Databricks (DBR 16.4, Delta Lake) | Spark job execution and Delta table storage |
+| Serving / Metastore | Trino (Hive-compatible) | SQL query interface for BI tools; enabled per-table with `has_hive_sync: true` |
+| Visualization | Apache Superset | Dashboards and ad-hoc SQL exploration |
+| Metadata Catalog | DataHub | Column-level lineage; fed from governance YAML `lineage:` fields |
+| Data Quality | Great Expectations ("Inmetro") | Row-count and column-level assertions defined in `data_quality/{layer}/{table}.yml` |
+| Local dev stack | Astro CLI + Docker | Local Airflow; `make run-local-environment` |
+| Staging environment | Forno | Pre-production Airflow + Databricks; mandatory test before merging any new DAG |
+
+---
+
+## Five-Layer Data Architecture
+
+Data flows from source systems through five successive layers. Each layer has strict rules about which layers it may reference:
+
+```
+Source DB / API
+      ↓
+   raw      ← CDC (Debezium → S3-Sink) or pull-based ingestion.
+              Mirrors source schema faithfully. No business logic.
+      ↓
+   clean    ← SQL transforms to conform naming conventions.
+              Fixes types, renames columns, applies snake_case.
+              No joins to other domains.
+      ↓
+   enrich   ← Business logic SQL. Domain-contextual tables.
+              May join clean tables from multiple sources.
+      ↓
+   dw       ← Kimball-style dim/fact tables. Consumer-ready.
+              Must use sk_person FK instead of raw PII columns.
+      ↓
+   metric   ← Pre-aggregated KPIs. Read by Superset dashboards.
+      ↓
+   qube     ← Semantic layer. Three-step pipeline:
+              dimensions → measures → metrics (all Spark jobs, no SQL files).
+```
+
+**Cross-layer join rule**: A query at layer N may only reference tables from layer N or below (e.g. an enrich query may read clean tables, but not dw or metric tables). Violations are detected by `make validate-cross-layer-joins`.
+
+### Metastore naming by layer
+
+| Layer | Spark metastore | Athena/Trino metastore |
+|---|---|---|
+| raw | `datalake_{source}_raw` | `datalake_{source}_raw_prod` |
+| clean | `datalake_{source}_clean` | `datalake_{source}_clean_prod` |
+| enrich | `datalake_{source}_{context}` | `datalake_{source}_{context}_prod` |
+| dw (staging) | `dw_{schema_name}_staging` | — |
+| dw (final) | `dw_{schema_name}` | — |
+
+---
+
+## The DAG Builder — Declarative Pipeline Pattern
+
+The DAG Builder is the core feature of this framework. Instead of writing Airflow Python files, every pipeline is declared as a YAML file. The framework reads the YAML and assembles the Airflow DAG automatically using one of ~28 workflow class implementations.
+
+### Declaration file anatomy
+
+Every DAG declaration is named `{dag_name}_declaration.yml` (always `.yml`, never `.yaml`) and has three required sections:
+
+```yaml
+dag:
+  name: my_dag_name        # Airflow DAG identifier (without "bietlejuice." prefix)
+  owner: Data ForRent      # From DAGOwnerEnum
+  schedule_interval: "0 6 * * *"
+  schedule_start_date: "2025, 1, 1"
+
+workflow:
+  layer: dw                # raw | clean | enrich | dw | metric | qube | reverse | core
+  type: query_delta        # See workflow types table below
+  custom_schema: my_schema # Destination schema; strip "dw_" prefix for DW layer
+
+cluster:
+  type: databricks_16_4_med_general_cluster   # Named preset (recommended)
+  databricks_conn_id: databricks_new_env      # See conn_id rules below
+```
+
+### Key DAG Builder rules
+
+- `{dag_name}_dag.py` is a thin boilerplate wrapper — never hand-code task logic there.
+- Generate Airflow Python files locally after editing declarations: `make create-dag-files` (or `make create-dag-files dag_name=<name>` for a single DAG).
+- Job cluster DAGs are capped at **100 tasks** per DAG (`query_delta`, `cdc`, `database_pull_delta`, `custom_ingestion`).
+- Interactive cluster DAGs have no task limit (`gsheets`, `metric query`).
+
+### `databricks_conn_id` by layer
+
+| Layers | `databricks_conn_id` |
+|---|---|
+| raw (CDC / custom), clean, enrich, dw | `databricks_new_env` |
+| metric, qube, reverse | `databricks_new` |
+
+### Workflow types by layer (recommended only)
+
+| Layer | Recommended workflow type | Notes |
+|---|---|---|
+| raw | `cdc` | Debezium/S3-Sink; requires Kafka connector deployed first |
+| raw | `database_pull_delta` | Pull-based for Postgres/Mongo |
+| raw | `api_ingestion` | REST APIs with auth and pagination |
+| clean | `query_delta` | Standard SQL-based clean table |
+| enrich | `query_delta` | SQL with business logic |
+| dw | `query_delta` | Kimball dim/fact SQL |
+| metric | `query` or `query_delta` | Aggregated KPIs |
+| qube | `qube_dimension` / `qube_measure` / `qube_metric` | Semantic layer Spark jobs |
+| reverse | `load` / `access` / `load_access` | Export to external systems |
+
+`query` (non-delta) and `database_pull` are deprecated — always use their `_delta` counterparts.
+
+### `custom_schema` derivation rules
+
+| Case | Rule | Example |
+|---|---|---|
+| DW layer | Strip `dw_` prefix | `dw_losses` → `custom_schema: losses` |
+| Metric layer | Use the business line (before `__`) | `metric_rent__contracts` → `custom_schema: rent` |
+| Qube | Fixed by spec type | `"dimensions"` / `"measures"` / `"metrics"` |
+| Multiple CDC DAGs, same source DB | All share source DB name | `ebdb_house`, `ebdb_agent` → both `custom_schema: ebdb` |
+
+---
+
+## Repository Folder Structure
+
+```
+bi-etl-ejuice/
+├── bietlejuice/                         # Core Python package
+│   ├── base/
+│   │   ├── airflow/dag_builders/        # DAG Builder engine (~28 workflow types)
+│   │   └── spark/                       # BaseCoreModelSparkJob base class
+│   ├── qube/jobs/                       # Qube dimension/measure/metric Spark jobs
+│   └── services/
+│       └── configuration_service.py     # Environment-aware config (single source of truth)
+├── dags/
+│   └── {domain}/                        # 24 business domains (for_rent, fintech, agents…)
+│       └── {dag_name}/
+│           ├── {dag_name}_declaration.yml   # DAG source of truth
+│           ├── queries/{layer}/*.sql        # One .sql per output table
+│           ├── metadata/{layer}/*.yml       # Governance YAML (CI-enforced, required)
+│           ├── data_quality/{layer}/*.yml   # Optional Great Expectations assertions
+│           └── spark_jobs/                  # Custom Spark jobs (core model DAGs only)
+└── tests/
+    └── unit/                            # Mirrors bietlejuice/ package path structure
+```
+
+**Business domains** (24 total): `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `primitives`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
+
+### Qube semantic layer sub-structure
+
+Qube DAGs live under `dags/qube/` and follow a strict three-step pipeline. Each step is a separate DAG:
+
+```
+dags/qube/
+├── dimensions_{entity}_{name}/    # Step 1 — schedule: 0 5 * * *
+├── measures_{entity}_{name}/      # Step 2 — schedule: 0 6 * * *
+└── metrics_{name}/                # Step 3 — schedule: 0 7 * * *
+```
+
+Qube DAGs have no `queries/` or `metadata/` folders. All logic lives in `bietlejuice/qube/jobs/`.
+
+### Core model DAGs
+
+`dags/core/` contains canonical entity models (contract, house, offer, visit, listing). These use custom Spark jobs (`spark_jobs/` subdirectory) and JSON schema files instead of SQL. They inherit from `BaseCoreModelSparkJob`.
+
+---
+
+## Governance and CI Enforcement
+
+Every `.sql` file in `queries/{layer}/` must have a matching `.yml` in `metadata/{layer}/` with the same base name. CI fails if the pair is missing or the metadata content is invalid.
+
+Key CI checks and their local equivalents:
+
+| CI step | Local command |
+|---|---|
+| Validate declaration YAMLs | `make validate-dag-declaration-files dag_name=<name>` |
+| Validate metadata content | `make validate-metadata-files-content` |
+| Validate SQL/metadata pairing | `make validate-metadata-files-exist` |
+| Validate lineage consistency | `make validate-lineage-consistency` |
+| Validate cross-layer joins | `make validate-cross-layer-joins` (warning only, exits 0) |
+| Lint Python | `make check-style` |
+| Run unit tests | `make unit-tests` |
+
+A Forno Airflow run is **mandatory** before merging any new DAG. There is no exception to this rule.
+
+---
+
+## ConfigurationService — Environment-Aware Config
+
+Never hardcode environment names (`"prod"`, `"forno"`), S3 bucket paths, secret keys, or database connection strings anywhere in the codebase. All environment-specific values are resolved at runtime through `ConfigurationService`:
+
+```python
+from bietlejuice.services.configuration_service import ConfigurationService
+
+config = ConfigurationService(environment="prod")
+bucket = config.get_bucket()          # resolves to the correct S3 path
+schema = config.get_schema("my_dag")  # resolves to the correct metastore schema
+```
+
+In SQL query files, use bracket-substituted template params (resolved by the Spark job at runtime):
+
+```sql
+WHERE dt_event >= '{load_start_date}'
+  AND dt_event < '{load_end_date}'
+```
+
+Never mix bracket params (`{load_start_date}`) with Jinja expressions (`{{ ds }}`) in the same expression — they are resolved at different times.
+
+---
+
+## Skills and Rules Quick Reference
+
+### Always-applied rules (injected into every prompt)
+
+| Rule file | Covers |
+|---|---|
+| `core.mdc` (this file) | Repo identity, architecture, DAG Builder overview, folder structure |
+| `naming_conventions.mdc` | Column/table/schema/DAG naming — `id_`, `ts_`, `dt_`, `sk_`, `is_`, snake_case, metastore patterns |
+| `sql_conventions.mdc` | SQL style, no `SELECT *`, partition filters, PII/Person Data Model |
+| `governance_metadata.mdc` | Metadata YAML schema, LGPD/PII classification (`personal`, `highly_personal`, `sensitive`) |
+| `python_conventions.mdc` | Black/Flake8, absolute imports, `QuintoAndarLogger`, ABCs, Pydantic v2, TDD |
+| `testing_conventions.mdc` | TDD Red→Green→Refactor, Pattern A (Qube `unittest.TestCase`) vs Pattern B (pytest class) |
+| `decision_making.mdc` | No assumptions, validate schemas, explicit error handling |
+
+### On-demand rules (loaded when topic matches)
+
+| Rule file | Covers |
+|---|---|
+| `dag_build.mdc` | Full DAG Builder reference: all cluster presets, complete workflow parameter schemas |
+| `databricks_conventions.mdc` | Databricks-specific SQL: Delta syntax, `{bracket}` vs `{{ Jinja }}` templating |
+| `qube_specs.mdc` | Qube dimension/measure/metric declaration schemas |
+| `pr_template.mdc` | PR description template |
+
+### Available skills (step-by-step playbooks)
+
+| Skill | Use when... |
+|---|---|
+| `create-dag` | Creating a new DAG (any layer) |
+| `create-qube-spec` | Adding a Qube dimension, measure, or metric |
+| `validate-dag` | Checking a DAG before pushing — runs all CI checks in parallel |
+| `impact-analysis` | Renaming or removing a table or column — traces all downstream consumers |
+| `review-pr` | Preparing a PR — full pre-push style, metadata, and LGPD review |
+| `generate-unit-test` | Writing unit tests for a `bietlejuice/` module |
+| `fix-ci-failure` | Diagnosing and fixing a Woodpecker CI failure |
+| `upload-to-forno` | Uploading changed artifacts (wheel, Spark jobs, Qube jobs) to the Forno S3 |
+| `setup-local-environment` | Setting up or restoring the local dev environment from scratch |
+
+### Domain subagents (adopted automatically by the AI for specialist judgment)
+
+| Subagent | Activates for... |
+|---|---|
+| Data Engineer Architect | Creating or reviewing DAGs on any layer (raw → core), workflow type selection, `custom_schema` derivation, cross-layer join rules, CDC prerequisites |
+| Reliability Engineer | Cluster sizing, Delta optimizations, execution timeouts, backfill strategies |
+| Governance Officer | Metadata review, LGPD/PII classification, SQL naming, Person Data Model enforcement |
+
+---
+
+## Common Mistakes to Avoid
+
+- Using `query` or `database_pull` workflow types — both are deprecated; use `_delta` variants.
+- Forgetting to run `make create-dag-files` after editing a declaration YAML — the Airflow `.py` file will be stale.
+- Using `.yaml` extension on declaration files — must be `.yml`.
+- Hardcoding `"prod"` or `"forno"` environment strings — use `ConfigurationService`.
+- Missing `has_hive_sync: true` on a table intended for Trino/Superset queries.
+- Merging a new DAG PR without a successful Forno Airflow run.
+- Exceeding 100 tasks in a job cluster DAG.
+- Creating a `.sql` file without a matching `.yml` metadata file in the same layer folder.
+- Placing raw PII columns (`name`, `email`, `cpf`, `phone`, `address`) in enrich or DW output tables — expose `sk_person` / `id_user` as a foreign key instead and join `dw_public.dim_person` at query time.
+- Using `logging.getLogger` instead of `QuintoAndarLogger` in Python modules.
+- Writing relative imports (`from .foo import bar`) instead of absolute imports (`from bietlejuice.foo import bar`).

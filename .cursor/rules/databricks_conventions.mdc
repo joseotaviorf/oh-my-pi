@@ -1,0 +1,49 @@
+---
+alwaysApply: false
+---
+# Databricks SQL Addendum
+
+SQL files in this project run on **Databricks (Spark SQL)**. The rules in `sql_conventions.mdc` and `naming_conventions.mdc` still apply, but the following Databricks-specific conventions also apply.
+
+## Template Syntax: `{bracket}` vs `{{ Jinja }}`
+
+Two different templating systems are active in `.sql` files. Mixing them up causes silent runtime errors.
+
+| Syntax | Resolved by | When | Examples |
+|--------|------------|------|---------|
+| `{bracket}` | Spark job at runtime | When the Spark job executes the SQL | `{load_start_date}`, `{load_end_date}`, `{table_name}`, `{environment}`, `{bucket}` |
+| `{{ Jinja }}` | Airflow scheduler at DAG parse time | When the DAG run is scheduled | `{{ data_interval_start \| ds }}`, `{{ var.value.environment }}`, `{{ macros.ds_add(...) }}` |
+
+```sql
+-- Correct: bracket for Spark job runtime params
+WHERE
+    dt_created >= '{load_start_date}'
+    AND dt_created < '{load_end_date}'
+
+-- Correct: Jinja for Airflow-resolved values
+WHERE
+    dt_created = '{{ data_interval_start | ds }}'
+```
+
+## MERGE, OPTIMIZE, and Z-ORDER are Abstracted
+
+**Never write `MERGE INTO`, `OPTIMIZE`, or `ZORDER BY` directly in `.sql` query files.** The DAG Builder generates these statements automatically from the declaration file keys. Writing them manually will cause duplicate operations or conflicts.
+
+| SQL Operation | Use this declaration key instead |
+|---------------|----------------------------------|
+| `MERGE INTO` | `merge_on: ["id", "date"]` in `tables_customization` |
+| `OPTIMIZE ... ZORDER BY` | `z_order_by: ["user_id", "date"]` in `tables_customization` |
+| `VACUUM` | `run_vacuum: true` + `vacuum_retention_hours: 48` (workflow level) |
+
+## Databricks-Specific SQL Constructs
+
+These are used throughout the codebase and are valid Databricks SQL but not standard ANSI SQL:
+
+| Construct | Use Case | Example |
+|-----------|---------|---------|
+| `GROUP BY ALL` | Groups by all non-aggregate columns without listing them | `SELECT a, b, SUM(c) FROM t GROUP BY ALL` |
+| `QUALIFY ROW_NUMBER() OVER(...) = 1` | Inline deduplication without a wrapping CTE | `SELECT id, status, ts_updated FROM t QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1` |
+| `COUNT_IF(condition)` | Conditional count; cleaner than `SUM(CASE WHEN ... THEN 1 ELSE 0 END)` | `COUNT_IF(is_active = true) AS total_active` |
+| `MAKE_DATE(year, month, day)` | Reconstruct a date from partition columns | `MAKE_DATE(year, month, day) AS dt_partition` |
+| `column:["key"]` or `column:key` | Semi-structured (variant/JSON) column access | `payload:["event_type"] AS event_type` |
+| `ADD_MONTHS(date, n)` | Date arithmetic by month | `ADD_MONTHS(dt_created, 1) AS dt_next_month` |

@@ -1,0 +1,111 @@
+---
+globs: dags/qube/*
+alwaysApply: false
+---
+# Qube Semantic Layer — Conventions
+
+## Folder Structure
+```
+dags/qube/
+  dimensions_{entity}_{name}/     # e.g. dimensions_contract_status/
+  measures_{entity}_{name}/       # e.g. measures_visit_total/
+  metrics_{entity}_{name}/        # e.g. metrics_contract_dashboard/
+```
+Each folder contains only a `{dag_name}_declaration.yml` (and the auto-generated `_dag.py`).
+
+## Cluster — always use this block
+```yaml
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
+```
+
+## Dimension Declaration (`qube_dimension`)
+```yaml
+dag:
+  name: qube_dimension_{entity}_{name}
+  schedule_interval: "0 5 * * *"
+  schedule_start_date: "2025, 1, 1"
+  owner: Data Engineering
+workflow:
+  type: qube_dimension
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "dimensions"
+  qube_specs:
+    entity: contract              # core entity name
+    name: contract_status         # dimension name
+    source:
+      date_expr: "unix_timestamp(ts_updated, \"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\")"
+      select:                     # columns to pull from source
+        - id_contract
+        - status
+        - ts_updated
+    logic:
+      card: single                # 'single' or 'multi'
+      type: string                # 'string', 'number', or 'boolean'
+      agg: last                   # aggregation: 'last', 'count', etc.
+      value_col: status           # column that holds the dimension value
+    order_by:
+      ts_col: ts_updated
+      nulls_last: true
+    defaults:
+      unknown_string: UNKNOWN
+```
+
+## Measure Declaration (`qube_measure`)
+```yaml
+workflow:
+  type: qube_measure
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "measures"
+  qube_specs:
+    entity: visit
+    name: visit_total
+    source:
+      date_expr: "unix_timestamp(dt_visit, 'yyyy-MM-dd')"
+      # omit 'select' to use all columns from the derived core table
+    logic:
+      filter_sql: "TRUE"          # required; SQL boolean to filter events
+    windows:
+      - 1
+      - 7
+      - 28
+```
+
+## Metric Declaration (`qube_metric`)
+```yaml
+workflow:
+  type: qube_metric
+  layer: qube
+  has_hive_sync: true
+  custom_schema: "metrics"
+  qube_specs:
+    entity: contract
+    name: contract_dashboard
+    dimensions:                   # reference pre-built dimension names
+      - name: contract_status
+        card: single
+        type: string
+    measures:                     # reference pre-built measure names
+      - name: contract_total
+    counters:
+      type: long                  # 'long' (exact) or 'approx' (HLL)
+    privacy:
+      k_anonymity: 1              # suppress groups smaller than k
+    windows:
+      - 1
+      - 7
+      - 28
+```
+
+## Key Rules
+- `entity` must match the corresponding core model entity (e.g. `contract`, `visit`, `listing`).
+- A metric must reference **existing** dimensions and measures — create them first.
+- `source.date_expr` is always a SQL expression returning a Unix timestamp (seconds).
+- `logic.filter_sql` is **required** for measures; must be a valid SQL boolean expression.
+- `logic.card` defaults to `single`; use `multi` only for dimensions that can have multiple simultaneous values per entity.
+- Metric `counters.type: approx` uses HyperLogLog and trades accuracy for speed at scale.
+- `privacy.k_anonymity` suppresses output rows where fewer than `k` distinct entity IDs exist in a group (GDPR/privacy compliance).
+- `schedule_interval` for metrics is typically 1 hour after their dependency dimensions/measures.

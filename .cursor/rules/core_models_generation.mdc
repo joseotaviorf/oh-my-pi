@@ -1,0 +1,358 @@
+---
+description: Triggered when creating or modifying Core Data Models (CDM) to ensure MDM alignment and WAP compliance.
+alwaysApply: false
+---
+# Core Model Generation Guide
+
+You are a Data Engineer specializing in QuintoAndar's Design Fundamentals. When asked to "create a new core model" or when working in `dags/core/`, enforce the following folder structure, code patterns, and testing conventions.
+
+---
+
+## 1. Mandatory File Structure
+
+For any new entity `{entity}`, generate **all** of these files:
+
+```
+dags/core/core_{entity}/
+├── core_{entity}_declaration.yml
+├── spark_jobs/
+│   ├── load_core_{entity}.py        # PySpark job
+│   ├── forno_conf.yml               # forno environment config
+│   └── prod_conf.yml                # prod environment config
+├── schemas/
+│   └── core/
+│       └── {entity}.yml             # schema validation (YAML, not JSON)
+├── metadata/
+│   └── core/
+│       └── {entity}.yml             # governance metadata (CI-required)
+└── data_quality/
+    └── core/
+        └── {entity}.yml             # Great Expectations assertions
+
+tests/core_model_dags/unit/core/core_{entity}/
+└── spark_jobs/
+    ├── conftest.py                   # session-scoped SparkSession + data fixtures + mock_configuration_service
+    └── test_load_core_{entity}.py   # unit tests (mandatory alongside implementation)
+```
+
+The test file **must be committed in the same diff** as the implementation. A PR that adds `spark_jobs/load_core_{entity}.py` without `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py` must be rejected.
+
+---
+
+## 2. Declaration Standards (`core_{entity}_declaration.yml`)
+
+```yaml
+dag:
+  name: core_{entity}
+  schedule_start_date: "YYYY, M, D"
+  owner: Data {Domain}           # from DAGOwnerEnum (e.g. Data ForRent, Data Engineering)
+  documentation:
+    dag_purpose: |
+      Creates the {Entity} Core Model. Provides the canonical reference table for {entity} data.
+
+workflow:
+  type: core_model               # always core_model for canonical entity models
+  layer: core
+  default_extraction_type: incremental   # use "full" for static reference tables (e.g. GSheets)
+  load_spark_job: load_core_{entity}
+  execution_timeout_hours: 1
+  tables_customization:
+    {entity}:
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{partitions}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+      partitions: [year, month, day]
+      z_order_by: [id_{entity}]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
+
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new
+```
+
+**Rules:**
+- `workflow.type` must always be `core_model`.
+- `databricks_conn_id` is always `databricks_new` for core layer.
+- Do **not** add `enable_schema_validation` or `strict_schema_enforcement` — those fields do not exist in the DAG Builder schema.
+- Use `default_extraction_type: full` for GSheets/static reference sources (no audit timestamp).
+
+---
+
+## 3. Conf Files (`spark_jobs/forno_conf.yml` and `spark_jobs/prod_conf.yml`)
+
+Both files are identical (forno and prod use the same table references):
+
+```yaml
+ENTITY_TYPE: "{ENTITY}"         # UPPERCASE entity type string used for surrogate key generation
+{ENTITY}_TABLE: "{metastore}.{table}"   # source table (e.g. datalake_ebdb_clean.contract)
+merge_on: ["sk_core_{entity}"]  # primary key for Delta MERGE
+```
+
+For incremental models, also add:
+
+```yaml
+when_matched_update_condition: "source.ts_updated > target.ts_updated"
+```
+
+---
+
+## 4. Implementation Logic (`spark_jobs/load_core_{entity}.py`)
+
+Always extend `BaseCoreModelSparkJob` from `bietlejuice.base.spark.base_core_model_spark_job`. **Never** use the non-existent `CoreModelWorkflow` class.
+
+```python
+from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.functions import col, current_timestamp, year, month, dayofmonth
+
+from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
+from bietlejuice.base.core_models.helpers.surrogate_keys import SurrogateKeysHelper
+
+JOB_NAME = "core_{entity}"
+
+
+class Core{Entity}SparkJob(BaseCoreModelSparkJob):
+
+    def __init__(self):
+        super().__init__(JOB_NAME)
+
+    def _get_{entity}_config(self) -> dict:
+        return {
+            "ENTITY_TYPE": self.get_config("ENTITY_TYPE"),
+            "{ENTITY}_TABLE": self.get_config("{ENTITY}_TABLE"),
+            # add additional config keys as needed
+        }
+
+    def create_core_model(self, spark: SparkSession, args) -> DataFrame:
+        config = self._get_{entity}_config()
+
+        source_df = self._load_{entity}_data(spark, config, args)
+
+        result_df = SurrogateKeysHelper.generate_surrogate_key(
+            source_df, config["ENTITY_TYPE"], id_column="id_{entity}"
+        )
+        result_df = result_df.withColumnRenamed("surrogate_key", "sk_core_{entity}")
+
+        # For incremental models, derive partitions from ts_updated.
+        # For full/GSheets models without a natural audit timestamp, use ts_load.
+        result_df = result_df.withColumn("ts_load", current_timestamp())
+        result_df = (
+            result_df
+            .withColumn("year", year(col("ts_load")))
+            .withColumn("month", month(col("ts_load")))
+            .withColumn("day", dayofmonth(col("ts_load")))
+        )
+        return result_df
+
+    def _load_{entity}_data(self, spark: SparkSession, config: dict, args=None) -> DataFrame:
+        return spark.table(config["{ENTITY}_TABLE"]).select(
+            col("id_{entity}"),
+            # enumerate all columns explicitly — never SELECT *
+        )
+
+
+if __name__ == "__main__":
+    job = Core{Entity}SparkJob()
+    job.run()
+```
+
+**Key rules:**
+- Implement `create_core_model(self, spark, args) -> DataFrame` — this is the only abstract method.
+- Call `SurrogateKeysHelper.generate_surrogate_key(df, ENTITY_TYPE, id_column="id_{entity}")` then rename `surrogate_key` → `sk_core_{entity}`.
+- Always add `ts_load`, `year`, `month`, `day` as the last columns before returning.
+- Never use `SELECT *` — enumerate all columns in `.select(...)`.
+- Use `self.logger` (from `BaseCoreModelSparkJob`) for all logging — never `logging.getLogger`.
+- The `run()` method (inherited) orchestrates: `parse_args → initialize_configuration → initialize_spark_session → create_core_model → validate_dataframe_schema → run_pipeline`. Do not override it.
+
+---
+
+## 5. Schema File (`schemas/core/{entity}.yml`)
+
+```yaml
+# Schema validation for core_{entity}.{entity}
+columns:
+  sk_core_{entity}:
+    type: string
+    required: true
+  id_{entity}:
+    type: string       # or bigint — match source type
+    required: true
+  # ... remaining business columns ...
+  ts_load:
+    type: timestamp
+    required: true
+  year:
+    type: int
+    required: true
+  month:
+    type: int
+    required: true
+  day:
+    type: int
+    required: true
+
+min_columns: N    # set to exact column count
+max_columns: N
+strict: true
+```
+
+---
+
+## 6. Testing (mandatory)
+
+Tests for core model Spark jobs live under `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/`, mirroring the `dags/core/` structure. They use a **session-scoped real SparkSession** (not `BaseSparkContext`) and import via the dotted `dags.*` namespace (the project root is on `sys.path` when pytest runs).
+
+### `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/conftest.py`
+
+```python
+"""Pytest fixtures for core_{entity} Spark job tests."""
+
+import pytest
+from unittest.mock import patch
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType
+
+
+@pytest.fixture(scope="session")
+def spark_session():
+    """Create a Spark session for testing."""
+    spark = (
+        SparkSession.builder.appName("Core{Entity}Test")
+        .config("spark.sql.warehouse.dir", "/tmp/spark-warehouse")
+        .config("spark.sql.adaptive.enabled", "false")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "false")
+        .getOrCreate()
+    )
+    yield spark
+    spark.stop()
+
+
+@pytest.fixture
+def {entity}_df(spark_session):
+    """Sample source DataFrame matching the shape of the ingestion table."""
+    schema = StructType([StructField("id_{entity}", StringType(), True)])
+    data = [("E1",), ("E2",)]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def empty_{entity}_df(spark_session):
+    """Empty DataFrame with the same schema, for edge-case testing."""
+    schema = StructType([StructField("id_{entity}", StringType(), True)])
+    return spark_session.createDataFrame([], schema)
+
+
+@pytest.fixture
+def mock_configuration_service():
+    """Mock get_config via the Core{Entity}SparkJob class."""
+    with patch(
+        "dags.core.core_{entity}.spark_jobs.load_core_{entity}.Core{Entity}SparkJob.get_config"
+    ) as mock_get_config:
+        mock_get_config.side_effect = lambda key, **_: {
+            "ENTITY_TYPE": "{ENTITY}",
+            "{ENTITY}_TABLE": "test_db.{entity}",
+        }.get(key)
+        yield mock_get_config
+```
+
+### `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py`
+
+```python
+"""Unit tests for Core{Entity}SparkJob."""
+
+import pytest
+from unittest.mock import patch
+from datetime import date
+from pyspark.sql.types import StructType, StructField, StringType
+
+from dags.core.core_{entity}.spark_jobs.load_core_{entity} import Core{Entity}SparkJob
+
+
+class TestCore{Entity}SparkJob:
+
+    def test_create_core_model_returns_expected_columns(
+        self, spark_session, {entity}_df, mock_configuration_service
+    ):
+        # arrange
+        job = Core{Entity}SparkJob()
+        with patch.object(job, "_load_{entity}_data", return_value={entity}_df):
+            # act
+            result_df = job.create_core_model(spark_session, args=None)
+        # assert
+        expected_cols = {"sk_core_{entity}", "id_{entity}", "ts_load", "year", "month", "day"}
+        assert expected_cols.issubset(set(result_df.columns))
+
+    def test_create_core_model_generates_non_null_surrogate_key(
+        self, spark_session, {entity}_df, mock_configuration_service
+    ):
+        # arrange
+        job = Core{Entity}SparkJob()
+        with patch.object(job, "_load_{entity}_data", return_value={entity}_df):
+            # act
+            result_df = job.create_core_model(spark_session, args=None)
+        # assert — SHA-256 hex digest is always exactly 64 characters
+        for row in result_df.select("sk_core_{entity}").collect():
+            assert row["sk_core_{entity}"] is not None
+            assert len(row["sk_core_{entity}"]) == 64
+
+    def test_create_core_model_partition_columns_match_current_date(
+        self, spark_session, {entity}_df, mock_configuration_service
+    ):
+        # arrange
+        job = Core{Entity}SparkJob()
+        with patch.object(job, "_load_{entity}_data", return_value={entity}_df):
+            # act
+            result_df = job.create_core_model(spark_session, args=None)
+        # assert
+        row = result_df.first()
+        today = date.today()
+        assert row["year"] == today.year
+        assert row["month"] == today.month
+        assert row["day"] == today.day
+
+    def test_create_core_model_with_empty_input_returns_empty_dataframe(
+        self, spark_session, empty_{entity}_df, mock_configuration_service
+    ):
+        # arrange
+        job = Core{Entity}SparkJob()
+        with patch.object(job, "_load_{entity}_data", return_value=empty_{entity}_df):
+            # act
+            result_df = job.create_core_model(spark_session, args=None)
+        # assert
+        assert result_df.count() == 0
+        assert "sk_core_{entity}" in result_df.columns
+
+    def test_get_{entity}_config_returns_expected_keys(self, mock_configuration_service):
+        # arrange / act
+        job = Core{Entity}SparkJob()
+        config = job._get_{entity}_config()
+        # assert
+        assert "ENTITY_TYPE" in config
+        assert "{ENTITY}_TABLE" in config
+
+    def test_load_{entity}_data_calls_spark_table_with_configured_name(
+        self, spark_session, {entity}_df, mock_configuration_service
+    ):
+        # arrange
+        job = Core{Entity}SparkJob()
+        config = {"ENTITY_TYPE": "{ENTITY}", "{ENTITY}_TABLE": "test_db.{entity}"}
+        with patch.object(spark_session, "table", return_value={entity}_df) as mock_table:
+            # act
+            job._load_{entity}_data(spark_session, config)
+        # assert
+        mock_table.assert_called_once_with("test_db.{entity}")
+```
+
+**Rules:**
+- Import via the dotted `dags.*` path (e.g. `from dags.core.core_{entity}.spark_jobs.load_core_{entity} import ...`). No `sys.path` manipulation needed — pytest runs from the project root.
+- Use a **session-scoped `spark_session` fixture** in `conftest.py`. Do not use `BaseSparkContext`.
+- Mock `get_config` via `patch("dags.core.core_{entity}.spark_jobs.load_core_{entity}.Core{Entity}SparkJob.get_config")` in `conftest.py`'s `mock_configuration_service` fixture.
+- Patch `_load_{entity}_data` with a real `spark_session.createDataFrame(...)` to isolate `create_core_model` from I/O — do not mock PySpark functions.
+- Test at minimum: happy path columns, surrogate key format (64-char SHA-256 hex), partition integers match today's date, empty input edge case, config keys, `spark.table` called with correct table name.
+- Run with: `pytest tests/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py -v`.

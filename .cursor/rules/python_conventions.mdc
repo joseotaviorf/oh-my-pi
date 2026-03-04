@@ -1,0 +1,93 @@
+---
+alwaysApply: true
+description: Python coding conventions for the bietlejuice project — imports, logging, ABCs, enums, Pydantic v2, and Spark job patterns.
+---
+
+# Python Conventions — bietlejuice
+
+## Formatting & Tooling
+- **Black** line length: **88**. **Flake8** for linting. **Python 3.8.12** (pyenv).
+- Run `make check-style` to lint before committing.
+
+## Imports
+- Always use **absolute imports** from `bietlejuice.*`. Never relative imports.
+- PySpark: `from pyspark.sql import SparkSession, DataFrame` and `from pyspark.sql import functions as F`.
+- No wildcard imports (`from x import *`).
+
+## Logging
+- Use `QuintoAndarLogger` everywhere — **not** stdlib `logging.getLogger`:
+```python
+# ✅ GOOD
+from quintoandar_logger import QuintoAndarLogger
+self.logger = QuintoAndarLogger("my_job_name")
+
+# ❌ BAD
+import logging
+logger = logging.getLogger(__name__)
+```
+- In Qube jobs, use the module-level `get_logger` wrapper from `bietlejuice.qube.jobs.common`.
+
+## Abstract Base Classes
+- Inherit from `abc.ABC` and decorate abstract methods with `@abstractmethod`. Do **not** use bare `raise NotImplementedError()` as a substitute for `@abstractmethod`.
+```python
+from abc import ABC, abstractmethod
+
+class MyBase(ABC):
+    @abstractmethod
+    def execute(self) -> None: ...
+```
+
+## Enums
+- Always add a `get_available_enum_values()` classmethod:
+```python
+from enum import Enum
+
+class LayerEnum(Enum):
+    RAW = "raw"
+    ENRICH = "enrich"
+
+    @classmethod
+    def get_available_enum_values(cls):
+        return [member.value for member in cls]
+```
+
+## Pydantic Models (v2)
+- Use Pydantic v2 APIs: `field_validator` (not `validator`), `model_dump()` (not `.dict()`), `model_validate()` (not `parse_obj()`).
+```python
+from pydantic import BaseModel, Field, field_validator
+
+class MyModel(BaseModel):
+    name: str = Field(..., description="...")
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        return v.strip()
+```
+
+## Spark Jobs
+- Inherit from `BaseCoreModelSparkJob` (`bietlejuice.base.spark.base_core_model_spark_job`).
+- Use `parse_args()` with the standard argument order: `environment`, `bucket`, `dag_name`, `schema`, `table_name`, `partitions`, `load_start_date`, `load_end_date`.
+- Use `ConfigurationService` for environment-aware config; never hard-code bucket paths or environment strings.
+
+## Design Patterns & Modularity
+- Prefer **factory** or **strategy** patterns when behaviour varies by configuration or environment. Avoid long `if/elif` chains that encode business rules directly in pipeline logic.
+- Keep each module focused on a single responsibility. A Spark job should not also handle configuration loading, secret resolution, and output writing in the same class.
+- When AI-generated code is used, always review for: (a) unnecessary complexity, (b) hardcoded values that should be config-driven, (c) missing error handling.
+- Prefer `ConfigurationService` for all environment-specific values. Never hard-code bucket paths, environment names, or secret keys.
+- Code reviews are mandatory before merging. Reviewers must check: naming conventions, test presence, no raw-layer SQL in upper layers, no hardcoded credentials.
+
+## Test-Driven Development (TDD) — Mandatory for AI-Generated Code
+
+AI must follow Red → Green → Refactor for every new module or function:
+
+1. **Write the test stub first.** Before writing any implementation, produce the test file with stubs marked `@pytest.mark.xfail(reason="not yet implemented", strict=True)`. This documents the contract before the code exists.
+2. **Write the minimum implementation** to make the failing test pass. Do not add logic that is not covered by a test.
+3. **Refactor** once green — clean up naming, extract helpers, remove duplication — while keeping all tests passing.
+
+**Hard rules:**
+- A new `.py` module in `bietlejuice/` must have a corresponding test file in `tests/unit/` committed in the **same diff**. Submitting implementation without tests is not acceptable.
+- No new public function or class may be introduced without at least one happy-path test and one error/edge-case test.
+- Changing an existing public function signature requires updating tests for every call site before the change lands.
+- When a bug is fixed, add a regression test that reproduces the original broken input as a `@pytest.mark.parametrize` case so the bug cannot silently reappear.
+- AI-generated code is not trusted until it has a test that fails without it. "It looks right" is not a substitute for a passing test.

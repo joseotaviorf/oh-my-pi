@@ -1,0 +1,131 @@
+---
+name: review-pr
+description: Run a full pre-push code review against all CI checks in parallel. Catches style, DAG declaration, metadata, and Python convention issues before they fail in Woodpecker. Use when the user asks to review changes, prepare a PR, or check if code is ready to push.
+---
+
+# Pre-Push PR Review
+
+## When to use
+
+Before opening a PR, or when asked to verify that staged/changed files will pass CI. The 10-step Woodpecker pipeline is the ground truth — this skill replicates its key checks locally in parallel.
+
+## Step 1 — Get the changed files
+
+Run `git diff --name-only origin/master...HEAD` (or against `HEAD` if not yet committed) to get the exact list of changed files. Categorize them:
+
+- `.py` files → Python convention check
+- `*_declaration.yml` → DAG declaration validation
+- `queries/**/*.sql` → SQL + metadata pair check
+- `metadata/**/*.yml` → Metadata content check
+- `bietlejuice/**/*.py` → Style check
+
+## Step 2 — Launch four subagents in parallel
+
+Use the Task tool for all seven simultaneously.
+
+**Subagent A — Style check (shell):**
+```bash
+make check-style
+```
+Return: exit code, any lines with `E[0-9]+` (flake8 codes) or `would reformat` (black).
+
+**Subagent B — DAG declaration validation (shell):**
+
+For each changed `*_declaration.yml`, extract the `dag_name` from the folder name and run:
+```bash
+make validate-dag-declaration-files dag_name={dag_name}
+```
+Return: exit code and any error lines per DAG.
+
+**Subagent C — SQL/metadata pair check (explore):**
+
+For every changed `.sql` file, verify that a matching `.yml` exists in `metadata/{layer}/` with the same base name. Also check:
+- `description:` field is present and ≥ 10 chars
+- All columns have `lineage:` (enrich/dw) or `dimension:`/`metric:` block (metric layer)
+
+Return: list of missing or incomplete metadata files.
+
+**Subagent D — Python convention check (explore):**
+
+For every changed `.py` file in `bietlejuice/`, verify:
+- Uses `QuintoAndarLogger`, not `logging.getLogger`
+- No wildcard imports (`from x import *`)
+- No bare `raise NotImplementedError()` (use `@abstractmethod` instead)
+- Pydantic: `model_dump()` not `.dict()`, `field_validator` not `validator`
+
+Return: file path + line number for each violation found.
+
+**Subagent E — Personal data classification check (explore):**
+
+For every changed metadata `.yml` file, scan each column entry and check:
+1. If the column name or description matches a known personal data pattern — any of: `cpf`, `nome`, `name`, `email`, `telefone`, `phone`, `endereco`, `address`, `data_nascimento`, `birth`, `rg`, `passaporte`, `passport`, `cnh`, `pis`, `pasep`, `geolocation`, `latitude`, `longitude`, `salary`, `salario`, `credito`, `credit`, `debito`, `debit`, `score`, `criminal`, `health`, `saude`, `biometric`, `facial`, `fingerprint`, `racial`, `etnia`, `genero`, `gender`, `religiao`, `religion`, `politico`, `political`, `sexual`, `sindicato`, `union` — and `personal_data_classification` is **missing** → flag as **non-blocking warning**.
+2. If `personal_data_classification: sensitive` is present but the corresponding `*_declaration.yml` does **not** contain a `table_privileges` block → flag as **blocking**.
+3. If `personal_data_classification: sensitive` is present and the table feeds a metric or qube layer output, check that the relevant qube metric declaration contains `privacy.k_anonymity` ≥ 5 → if missing, flag as **blocking**.
+
+Return: per-file list of columns with issues, their classification (if any), and the exact fix required.
+
+**Subagent F — Test coverage check (explore):**
+
+For every new `.py` file added in `bietlejuice/` (not an `__init__.py`), check whether a corresponding test file exists under `tests/unit/` mirroring the source path (see `testing_conventions.mdc` for the mirroring rule).
+
+Return: list of new source files with no matching test file. Classify as **non-blocking** if the file is a config/constants module; **blocking** if it contains a class or function with business logic.
+
+**Subagent G — Lint check (shell):**
+```bash
+make lint
+```
+Return: exit code, all warning/error lines. Classify as **blocking** if exit code is non-zero.
+
+## Step 3 — Synthesize findings
+
+Group all issues by severity:
+
+**Blocking (will fail CI or is a LGPD violation):**
+- Style errors (black/flake8)
+- Lint errors (`make lint`)
+- Missing metadata files
+- DAG declaration schema errors
+- `sensitive` column in enrich/dw without `table_privileges` in the declaration
+- `sensitive` column exposed in a metric/qube output without `privacy.k_anonymity ≥ 5`
+
+**Non-blocking but should fix:**
+- Python convention violations
+- Incomplete metadata (short descriptions, missing lineage)
+- Column matching a personal data pattern but missing `personal_data_classification`
+- New `bietlejuice/` module with no matching unit test file (config/constants modules exempt)
+
+For each issue: file path, line (if available), what is wrong, exact fix.
+
+## Step 4 — Generate PR description draft
+
+If all checks pass (or after fixes are applied), draft the PR description using this template:
+
+```markdown
+### Why?
+[Brief explanation of the motivation for this change]
+
+### What?
+[What was changed — list the DAGs, tables, or modules modified]
+- [Change 1]
+- [Change 2]
+
+### How everything was tested?
+[Describe how the change was validated]
+- make validate-dag-declaration-files dag_name={dag_name} ✅
+- make validate-metadata-files-content ✅
+- make check-style ✅
+- make lint ✅
+- [Screenshot of DAG run if applicable]
+
+### !Attention Points!
+[Any reviewers need to be aware of — schema changes, downstream impact, etc.]
+
+### Checklist before opening the PR!
+- [ ] Code follows style guidelines and name conventions
+- [ ] Corresponding metadata/documentation changes made
+- [ ] Tests added or updated
+```
+
+## Step 5 — Final check
+
+If any blocking issues were found, do NOT generate the PR description yet. Fix the issues first (or guide the user to fix them), then re-run only the failing subagents to confirm.

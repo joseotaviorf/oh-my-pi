@@ -1,0 +1,155 @@
+---
+alwaysApply: true
+description: Testing conventions for bietlejuice — TDD workflow, two distinct patterns (Qube vs DAG builder), Spark session fixture, sys.modules mocking, and file mirroring. Always applied when writing or reviewing Python code.
+---
+
+# Testing Conventions — bietlejuice
+
+## TDD Workflow — Tests First, Always
+
+Every new Python module or function must follow Red → Green → Refactor before the implementation is considered complete:
+
+1. **Red** — Write a failing test that precisely specifies the expected behaviour. Commit it. The implementation does not exist yet; use `@pytest.mark.xfail(reason="not yet implemented", strict=True)` to mark stubs so CI stays green while work is in progress.
+2. **Green** — Write the minimum implementation needed to make the test pass. Do not over-engineer.
+3. **Refactor** — Clean up the implementation and tests while keeping all assertions green.
+
+**AI-generated code rules (non-negotiable):**
+- The test file for a new module must be created **before or in the same commit** as the implementation. A PR that adds `bietlejuice/foo/bar.py` without `tests/unit/foo/test_bar.py` must be rejected.
+- If a test file does not yet exist for a module being changed, create or update it before touching the implementation.
+- Every bug fix requires a regression test that pins the broken input as a parametrized case — no exceptions.
+- When reviewing AI-generated code, verify the companion test was committed in the same diff, not as a follow-up.
+
+## Breaking-Change Guard
+
+AI-generated code frequently introduces silent regressions in adjacent modules. To prevent this:
+- Before modifying any public function or class signature, search for all call sites and add or update tests for each affected module.
+- Use the `impact-analysis` skill to trace downstream consumers before renaming or removing any public interface.
+- Parametrize edge cases (`None`, empty list, boundary values) so that schema drift or logic changes cause an immediate test failure rather than a silent data error.
+
+## Testing Pyramid — When to Write Each Type
+
+| Type | When | Tool | Location |
+|------|------|------|----------|
+| Unit | For every public function/class in `bietlejuice/` | pytest / unittest | `tests/unit/` |
+| Regression | After every bug fix — pin the broken input as a test case | pytest | `tests/unit/` same file |
+| Integration | For Spark jobs that touch real I/O (S3, Delta) | pytest + real SparkSession | `tests/integration/` |
+| Smoke | After each Forno Airflow run — assert row count > 0 and key columns non-null | Data quality file | `data_quality/{layer}/` |
+| E2E | For full pipeline runs validated on Forno before merging | Manual / Forno Airflow | Forno run required |
+
+**Mandatory minimums:**
+- Every new `.py` module in `bietlejuice/` must ship with at least unit tests (happy path + one error/edge case).
+- Every bug fix must include a regression test pinning the broken input.
+- Forno Airflow smoke run is required before merging any new DAG (apply to all workflow types, not just CDC).
+
+## Two Patterns — do NOT mix them
+
+### Pattern A: Qube jobs (`tests/unit/qube/`)
+Use `unittest.TestCase` with `@patch` decorators. PySpark `F.*` functions are mocked — no real Spark computation.
+
+```python
+import unittest
+from unittest.mock import MagicMock, patch
+
+class TestMyQubeFunction(unittest.TestCase):
+
+    @patch("bietlejuice.qube.jobs.metrics.build_metric.F.col")
+    @patch("bietlejuice.qube.jobs.metrics.build_metric.F.countDistinct")
+    def test_something(self, mock_count_distinct, mock_col):
+        mock_col.return_value = MagicMock()
+        mock_count_distinct.return_value.alias.return_value = MagicMock()
+
+        # arrange
+        ...
+        # act
+        result = my_function(...)
+        # assert
+        mock_col.assert_any_call("expected_column")
+        self.assertEqual(result, expected_value)
+```
+
+Mock the full module path: `"bietlejuice.qube.jobs.{module}.F.{function}"`.
+
+### Pattern B: DAG builders, services, pipelines (`tests/unit/base/`, `tests/unit/services/`, etc.)
+Use pytest classes with fixtures. Use `@mock.patch.object` for method-level mocking.
+
+```python
+from unittest import mock
+import pytest
+
+class TestMyClass:
+    @mock.patch("bietlejuice.base.some.module.ExternalDep")
+    @mock.patch.object(SomeService, "some_method")
+    def test_something(self, mock_method, mock_dep, my_fixture):
+        # arrange
+        mock_method.return_value = {"key": "value"}
+        # act
+        result = my_fixture.do_thing()
+        # assert
+        assert result == expected
+        mock_method.assert_called_once_with("arg")
+```
+
+## Top-Level `conftest.py` — required sys.modules mocking
+`tests/unit/conftest.py` must mock Airflow and Databricks plugins **before** any imports:
+
+```python
+import sys
+from unittest.mock import MagicMock
+import pytest
+
+sys.modules["databricks_plugin"] = MagicMock()
+sys.modules["extra_link_plugin"] = MagicMock()
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_airflow_hooks():
+    with patch.dict("sys.modules", {
+        "airflow.hooks.filesystem": MagicMock(FSHook=MagicMock()),
+        "airflow.hooks.package_index": MagicMock(PackageIndexHook=MagicMock()),
+    }):
+        yield
+```
+
+## Spark Session Fixture (Qube tests only)
+In `tests/unit/qube/conftest.py` — session-scoped real Spark, not a mock:
+
+```python
+import pytest
+from pyspark.sql import SparkSession
+
+@pytest.fixture(scope="session")
+def spark():
+    spark = (
+        SparkSession.builder.appName("QubeTest")
+        .config("spark.sql.warehouse.dir", "/tmp/spark-warehouse")
+        .config("spark.sql.adaptive.enabled", "false")
+        .config("spark.ui.enabled", "false")
+        .getOrCreate()
+    )
+    yield spark
+    spark.stop()
+```
+
+## File Structure — mirror the source
+```
+bietlejuice/qube/jobs/metrics/build_metric.py
+→ tests/unit/qube/test_build_metric_unit.py
+
+bietlejuice/base/airflow/dag_builders/main_builder/dag_yaml_parser.py
+→ tests/unit/base/airflow/dag_builders/main_builder/test_dag_yaml_parser.py
+```
+
+## General Rules
+- Use **Arrange / Act / Assert** comment structure inside each test method.
+- Use `@pytest.mark.parametrize` for table-driven valid/invalid cases.
+- Combine `contextlib.nullcontext()` and `pytest.raises()` in parametrize for error-path testing.
+- Run tests: `make unit-tests` or `pytest tests/unit/path/to/test_file.py -v`.
+
+## TDD Checklist (run before every PR)
+
+- [ ] Test file exists and mirrors the source path under `tests/unit/`
+- [ ] Test file was committed before or alongside the implementation (not as a follow-up)
+- [ ] Every public function/method has at least a happy-path test and one error/edge-case test
+- [ ] All `@pytest.mark.xfail(strict=True)` stubs have been converted to real assertions before merge
+- [ ] Every bug fix has a regression test with the broken input pinned as a parametrized case
+- [ ] Public interface changes are covered by updated tests for all affected call sites
+- [ ] `make unit-tests` passes locally before pushing
