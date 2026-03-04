@@ -1,0 +1,91 @@
+---
+database_name: datalake_pin_core_clean
+table_name: national_identifiers
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Stores government-issued IDs for each person (CPF, RG, PIS, etc.) across different countries and identifier types.
+  One person can have multiple records, one per identifier type.
+columns:
+  id_national_identifier:
+    description: Unique identifier for each national identifier record.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.national_identifier_id
+  id_person:
+    description: Person who owns this identifier. Links to the person table.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.person_id
+  id_business_group:
+    description: Company or business unit this record belongs to.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.business_group_id
+  legislation_code:
+    description: Country or region code for the legislation (e.g., BR for Brazil).
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.legislation_code
+  national_identifier_type:
+    description: Type of document. Common values are CPF, RG, and PIS.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.national_identifier_type
+  national_identifier_number:
+    description: The document number itself (e.g., CPF number, RG number).
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.national_identifier_number
+  place_of_issue:
+    description: City or location where the document was issued (e.g., São Paulo).
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.place_of_issue
+  dt_issue:
+    description: Date when the document was issued.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.issue_date
+  dt_expiration:
+    description: Date when the document expires.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.expiration_date
+  attribute_category:
+    description: Internal code that defines which set of extra fields apply to this record.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.attribute_category
+  issuing_state:
+    description: Brazilian state where the document was issued (e.g., SP, MG, RS). Used mainly for RG.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.attribute1
+  issuing_authority:
+    description: Authority that issued the document (e.g., SSP for state police, OE for other entities). Used mainly for RG.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.attribute2
+  created_by:
+    description: User or system that created the record.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.created_by
+  updated_by:
+    description: User or system that last modified the record.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.last_updated_by
+  object_version_number:
+    description: Version number used to detect if the record was changed by another process.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.object_version_number
+  ts_created:
+    description: When the record was created in the source system.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.creation_date
+  ts_updated:
+    description: When the record was last modified in the source system.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.last_update_date
+  ts_load:
+    description: When the data was loaded into this table.
+  year:
+    description: Year used for data partitioning.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.year
+  month:
+    description: Month used for data partitioning.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.month
+  day:
+    description: Day used for data partitioning.
+    lineage:
+      - datalake_pin_core_raw.per_national_identifiers.day

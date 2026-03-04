@@ -409,6 +409,13 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_national_identifiers:
+      clean_table_name: national_identifiers
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     xle_entity_profiles:
       clean_table_name: entity_profile
       vacuum_retention_hours: 168
