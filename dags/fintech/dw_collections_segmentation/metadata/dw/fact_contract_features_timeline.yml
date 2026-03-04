@@ -460,3 +460,47 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
   ts_load:
     description: Timestamp when the record was loaded into the table
+  flag_broken_installment_deal:
+    description: Flag indicating if an active deal is broken specifically because an installment (deal invoice) is overdue (T1 > 0).
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
+  flag_broken_deal_by_new_original_debt:
+    description: Flag indicating if an active deal is broken because a new original debt (non-deal invoice) is overdue (T1 > 0).
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+  flag_broken_global_deal:
+    description: Flag indicating if an active deal is globally broken, either by a delayed installment or a new original debt.
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_deal_invoices_t1
+  macro_segmentation:
+    description: High-level classification of the contract state (e.g., active-current, active-stock-pre-evictions, ended-stock-roll1) based on status, delay ranges, and deal flags, evaluated before payment probabilities are applied.
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
+  next_macro_segmentation:
+    description: The macro_segmentation classification for the contract on the next chronological reference date (LEAD value).
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+  last_macro_segmentation:
+    description: The macro_segmentation classification for the contract on the previous chronological reference date (LAG value).
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+  flag_first_day_new_macro_segment:
+    description: Boolean flag indicating if the current reference date is the first day the contract entered its current macro_segmentation state.
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+      - dw_collections_segmentation.fact_contract_features_timeline.last_macro_segmentation
+  flag_last_day_macro_segment:
+    description: Boolean flag indicating if the current reference date is the last day the contract will remain in its current macro_segmentation state before transitioning.
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+      - dw_collections_segmentation.fact_contract_features_timeline.next_macro_segmentation
