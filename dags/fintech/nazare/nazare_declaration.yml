@@ -45,7 +45,7 @@ workflow:
     partner: {}
     revenue_share_by_offer: {}
     revenue_share_by_participant:
-      clean_table: revenue_share_by_participant_test
+      clean_table_name: revenue_share_by_participant_test
     revenue_share_file: {}
     tier_bonus: {}
     tier_bonus_revision:
