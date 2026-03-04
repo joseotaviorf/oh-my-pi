@@ -1,0 +1,61 @@
+database_name: datalake_betopera_clean
+table_name: api_audit_log
+domain: Fintech
+description: "Clean audit log of API requests and responses from Betopera."
+columns:
+  id:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.id
+    description: "Unique identifier of the API audit log record."
+  http_method:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.http_method
+    description: "HTTP method used in the API request."
+  endpoint_path:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.endpoint_path
+    description: "Endpoint path accessed by the API request."
+  id_certificate:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.certificate_id
+    description: "Identifier of the certificate associated with the request."
+  flow_type:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.flow_type
+    description: "Type of flow associated with the API call."
+  request_body:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.request_body
+    description: "Payload sent in the API request body."
+  response_status_code:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.response_status_code
+    description: "HTTP status code returned by the API response."
+  response_body:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.response_body
+    description: "Payload returned in the API response body."
+  ts_created:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.created_at
+    description: "Timestamp when the audit log record was created."
+  ts_request:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.request_timestamp
+    description: "Timestamp when the API request was made."
+  ts_response:
+    lineage:
+      - datalake_betopera_raw.api_audit_log.response_timestamp
+    description: "Timestamp when the API response was returned."
+  year:
+    lineage:
+      - datalake_betopera_raw.insurance.year
+    description: "Partition year of the source record."
+  month:
+    lineage:
+      - datalake_betopera_raw.insurance.month
+    description: "Partition month of the source record."
+  day:
+    lineage:
+      - datalake_betopera_raw.insurance.day
+    description: "Partition day of the source record."

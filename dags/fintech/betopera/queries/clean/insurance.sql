@@ -4,6 +4,8 @@ SELECT
     source_type_code,
     status,
     version,
+    contract_version,
+    contract_guarantee,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
     year,
