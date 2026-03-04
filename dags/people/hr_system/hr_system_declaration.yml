@@ -49,13 +49,6 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
-    action_reasons_lov:
-      extra_spark_job_arguments:
-        - deduplication_key: "ActionReasonId"
-          params:
-            onlyData: true
-            orderBy: "ActionReasonId:asc"
-            limit: 100
     actions_lov:
       extra_spark_job_arguments:
         - deduplication_key: "ActionId"
