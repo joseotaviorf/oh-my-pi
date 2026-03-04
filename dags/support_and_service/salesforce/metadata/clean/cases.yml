@@ -196,10 +196,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.ClosedDate
     description: Timestamp of when the case was closed.
-  ts_last_activity:
-    lineage:
-      - datalake_salesforce_raw.case.LastActivityDate
-    description: Timestamp of the last activity in the case.
   ts_last_viewed:
     lineage:
       - datalake_salesforce_raw.case.LastViewedDate
@@ -208,3 +204,327 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.LastReferencedDate
     description: Timestamp of when the case was last referenced.
+  account_name:
+    lineage:
+      - datalake_salesforce_raw.case.AccountName__c
+    description: Account name associated with the case.
+  agent_republished_with_pp:
+    lineage:
+      - datalake_salesforce_raw.case.AgentRepublishedWithPP__c
+    description: Flag indicating if republished with PP.
+  buyer_current_onboarding_contact:
+    lineage:
+      - datalake_salesforce_raw.case.BYCurrentOnboardingContact__c
+    description: Buyer current onboarding contact.
+  comments:
+    lineage:
+      - datalake_salesforce_raw.case.Comments
+    description: Comments on the case.
+  contact_success:
+    lineage:
+      - datalake_salesforce_raw.case.ContactSuccess__c
+    description: Contact success indicator.
+  contestation_reponsability_valid:
+    lineage:
+      - datalake_salesforce_raw.case.ContestationResponsabilityValid__c
+    description: Contestation responsibility validation.
+  criticality:
+    lineage:
+      - datalake_salesforce_raw.case.criticality__c
+    description: Case criticality level.
+  day:
+    lineage:
+      - datalake_salesforce_raw.case.LastModifiedDate
+    description: Partition day for the case load.
+  dt_fs_buyer_key_delivery:
+    lineage:
+      - datalake_salesforce_raw.case.FS_BY_KeyDeliveryDate__c
+    description: FS buyer key delivery date.
+  dt_fs_buyer_next_contact:
+    lineage:
+      - datalake_salesforce_raw.case.FS_BYNextContactDate__c
+    description: FS buyer next contact date.
+  dt_fs_dd_accepted_date:
+    lineage:
+      - datalake_salesforce_raw.case.FS_DDAcceptedDate__c
+    description: FS DD accepted date.
+  dt_fs_pds_subscription_scheduling:
+    lineage:
+      - datalake_salesforce_raw.case.FS_PDSL_SubscriptionSchedulingDate__c
+    description: FS PDS subscription scheduling date.
+  dt_fs_return_date:
+    lineage:
+      - datalake_salesforce_raw.case.FS_ReturnDate__c
+    description: FS return date.
+  dt_fs_seller_key_delivery:
+    lineage:
+      - datalake_salesforce_raw.case.FS_SL_KeyDeliveryDate__c
+    description: FS seller key delivery date.
+  dt_fs_seller_next_contact:
+    lineage:
+      - datalake_salesforce_raw.case.FS_SLNextContactDate__c
+    description: FS seller next contact date.
+  dt_key_delivery:
+    lineage:
+      - datalake_salesforce_raw.case.KeyDeliveryDate__c
+    description: Key delivery date.
+  flow_sub_type:
+    lineage:
+      - datalake_salesforce_raw.case.FlowSubType__c
+    description: Flow sub type.
+  follow_up_description:
+    lineage:
+      - datalake_salesforce_raw.case.followUpDescription__c
+    description: Follow-up description.
+  follow_up_status:
+    lineage:
+      - datalake_salesforce_raw.case.followUpStatus__c
+    description: Follow-up status.
+  for_sale_flow:
+    lineage:
+      - datalake_salesforce_raw.case.ForSaleFlow__c
+    description: For sale flow indicator.
+  fs_cri_have_demand_note:
+    lineage:
+      - datalake_salesforce_raw.case.FS_CRI_HaveDemandNote__c
+    description: FS CRI have demand note.
+  fs_cri_status:
+    lineage:
+      - datalake_salesforce_raw.case.FS_CRIStatus__c
+    description: FS CRI status.
+  fs_status_cri:
+    lineage:
+      - datalake_salesforce_raw.case.FS_StatusCRI__c
+    description: FS status CRI.
+  fs_subscription_model_buyer:
+    lineage:
+      - datalake_salesforce_raw.case.FS_SubscriptionModelBuyer__c
+    description: FS subscription model buyer.
+  fs_subscription_model_seller:
+    lineage:
+      - datalake_salesforce_raw.case.FS_SubscriptionModelSeller__c
+    description: FS subscription model seller.
+  id_customer:
+    lineage:
+      - datalake_salesforce_raw.case.customerId__c
+    description: Customer identification key.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.case.LastModifiedById
+    description: Identification key of the user who last modified the record.
+  id_purchase_sale_contract:
+    lineage:
+      - datalake_salesforce_raw.case.PurchaseSaleContract__c
+    description: Purchase sale contract identification key.
+  information_collected:
+    lineage:
+      - datalake_salesforce_raw.case.InformationCollected__c
+    description: Information collected for the case.
+  is_already_asked_for_approval:
+    lineage:
+      - datalake_salesforce_raw.case.AlreadyAskedForApproval__c
+    description: Flag indicating if already asked for approval.
+  is_already_contested:
+    lineage:
+      - datalake_salesforce_raw.case.AlreadyContested__c
+    description: Flag indicating if already contested.
+  is_buyer_contact_success:
+    lineage:
+      - datalake_salesforce_raw.case.BYContactSuccess__c
+    description: Flag indicating buyer contact success.
+  is_case_creation_start_milestone:
+    lineage:
+      - datalake_salesforce_raw.case.CaseCreationStartMilestone__c
+    description: Flag indicating case creation start milestone.
+  is_case_creation_start_milestone_closed:
+    lineage:
+      - datalake_salesforce_raw.case.CaseCreationStartMilestoneClosed__c
+    description: Flag indicating case creation start milestone closed.
+  is_closed_on_create:
+    lineage:
+      - datalake_salesforce_raw.case.IsClosedOnCreate
+    description: Flag indicating if the case was closed on create.
+  is_contest:
+    lineage:
+      - datalake_salesforce_raw.case.isContest__c
+    description: Flag indicating if the case is a contest.
+  is_fs_balance_payment_made:
+    lineage:
+      - datalake_salesforce_raw.case.FS_BalancePaymentMade__c
+    description: Flag indicating if FS balance payment was made.
+  is_fs_keys_received:
+    lineage:
+      - datalake_salesforce_raw.case.FS_KeysReceived__c
+    description: Flag indicating if FS keys were received.
+  is_fs_milestone_finish:
+    lineage:
+      - datalake_salesforce_raw.case.FS_MilestoneFinish__c
+    description: Flag indicating if FS milestone is finished.
+  is_ll_budget_approval_time_limit:
+    lineage:
+      - datalake_salesforce_raw.case.LLBudgetApprovalTimeLimit__c
+    description: Flag indicating LL budget approval time limit.
+  is_ms_tt_close_budget_review_iq:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Close_BudgetReviewIQ__c
+    description: Flag indicating MS TT close budget review IQ.
+  is_ms_tt_close_budget_review_pp:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Close_BudgetReviewPP__c
+    description: Flag indicating MS TT close budget review PP.
+  is_ms_tt_close_report_review_iq:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Close_ReportReviewIQ__c
+    description: Flag indicating MS TT close report review IQ.
+  is_ms_tt_close_report_review_pp:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Close_ReportReviewPP__c
+    description: Flag indicating MS TT close report review PP.
+  is_ms_tt_open_budget_review_iq:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Open_BudgetReviewIQ__c
+    description: Flag indicating MS TT open budget review IQ.
+  is_ms_tt_open_budget_review_pp:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Open_BudgetReviewPP__c
+    description: Flag indicating MS TT open budget review PP.
+  is_ms_tt_open_report_review_iq:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Open_ReportReviewIQ__c
+    description: Flag indicating MS TT open report review IQ.
+  is_ms_tt_open_report_review_pp:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Open_ReportReviewPP__c
+    description: Flag indicating MS TT open report review PP.
+  is_past_due_date_simulation:
+    lineage:
+      - datalake_salesforce_raw.case.PastDueDateSimulation__c
+    description: Flag indicating past due date simulation.
+  is_requested_help_time_limit:
+    lineage:
+      - datalake_salesforce_raw.case.RequestedHelpTimeLimit__c
+    description: Flag indicating requested help time limit.
+  is_simulation_iq_budget_time_limit:
+    lineage:
+      - datalake_salesforce_raw.case.SimulationTenantBudgetTimeLimit__c
+    description: Flag indicating simulation IQ budget time limit.
+  is_sl_contact_success:
+    lineage:
+      - datalake_salesforce_raw.case.SLContactSuccess__c
+    description: Flag indicating seller contact success.
+  is_stopped:
+    lineage:
+      - datalake_salesforce_raw.case.IsStopped
+    description: Flag indicating if the case is stopped.
+  ll_service_concluded:
+    lineage:
+      - datalake_salesforce_raw.case.LLServiceConcluded__c
+    description: LL service concluded indicator.
+  month:
+    lineage:
+      - datalake_salesforce_raw.case.LastModifiedDate
+    description: Partition month for the case load.
+  notary_office_status:
+    lineage:
+      - datalake_salesforce_raw.case.CRNStatus__c
+    description: Notary office status (CRN).
+  pp_accepted_doing_repair:
+    lineage:
+      - datalake_salesforce_raw.case.PPacceptedDoingRepair__c
+    description: PP accepted doing repair indicator.
+  pp_informed_service_provider:
+    lineage:
+      - datalake_salesforce_raw.case.LandlordInformedServiceProvider__c
+    description: PP informed service provider.
+  publication_occurred_on_property:
+    lineage:
+      - datalake_salesforce_raw.case.PublicationOccurredOnProperty__c
+    description: Publication occurred on property indicator.
+  seller_current_onboarding_contact:
+    lineage:
+      - datalake_salesforce_raw.case.SLCurrentOnboardingContact__c
+    description: Seller current onboarding contact.
+  service_provider_journey:
+    lineage:
+      - datalake_salesforce_raw.case.serviceProviderJourney__c
+    description: Service provider journey.
+  service_provider_name:
+    lineage:
+      - datalake_salesforce_raw.case.serviceProviderName__c
+    description: Service provider name.
+  service_provider_phone:
+    lineage:
+      - datalake_salesforce_raw.case.serviceProviderPhone__c
+    description: Service provider phone.
+  service_provider_type:
+    lineage:
+      - datalake_salesforce_raw.case.serviceProviderType__c
+    description: Service provider type.
+  ts_follow_up_expected_resolution:
+    lineage:
+      - datalake_salesforce_raw.case.followUpExpectedResolutionDate__c
+    description: Follow-up expected resolution timestamp.
+  ts_follow_up_reassign:
+    lineage:
+      - datalake_salesforce_raw.case.followUpReassignDate__c
+    description: Follow-up reassign timestamp.
+  ts_fs_ccv_signed:
+    lineage:
+      - datalake_salesforce_raw.case.FS_CCVSigned__c
+    description: FS CCV signed timestamp.
+  ts_ms_tt_budget_review_iq_created_td:
+    lineage:
+      - datalake_salesforce_raw.case.MS_TT_Date_BudgetReviewIQCreatedDateTD__c
+    description: MS TT budget review IQ created timestamp.
+  ts_sla_exit:
+    lineage:
+      - datalake_salesforce_raw.case.SlaExitDate
+    description: SLA exit timestamp.
+  ts_sla_start:
+    lineage:
+      - datalake_salesforce_raw.case.SlaStartDate
+    description: SLA start timestamp.
+  ts_stop_start:
+    lineage:
+      - datalake_salesforce_raw.case.StopStartDate
+    description: Stop start timestamp.
+  year:
+    lineage:
+      - datalake_salesforce_raw.case.LastModifiedDate
+    description: Partition year for the case load.
+  is_eviction:
+    lineage:
+      - datalake_salesforce_raw.case.isEviction__c
+    description: Indica se o caso é de despejo.
+  is_high_value:
+    lineage:
+      - datalake_salesforce_raw.case.isHighValue__c
+    description: Indica se é contrato high value.
+  is_pp_multi:
+    lineage:
+      - datalake_salesforce_raw.case.isPPMulti__c
+    description: Indica se é PP multi.
+  ts_last_agent_interaction:
+    lineage:
+      - datalake_salesforce_raw.case.LastAgentInteraction__c
+    description: Data/hora da última interação do agente.
+  ts_last_customer_interaction:
+    lineage:
+      - datalake_salesforce_raw.case.LastCustomerInteraction__c
+    description: Data/hora da última interação do cliente.
+  case_type_approval:
+    lineage:
+      - datalake_salesforce_raw.case.TypeApproval__c
+    description: Tipo de aprovação do caso.
+  case_comments_approval:
+    lineage:
+      - datalake_salesforce_raw.case.CommentsApproval__c
+    description: Comentários para aprovação.
+  case_omnichannel_queue:
+    lineage:
+      - datalake_salesforce_raw.case.OmniChannelQueue__c
+    description: Fila OmniChannel associada ao caso.
+  case_mediation:
+    lineage:
+      - datalake_salesforce_raw.case.Mediation__c
+    description: Mediação associada ao caso.
