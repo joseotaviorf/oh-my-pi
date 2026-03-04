@@ -8,96 +8,96 @@ columns:
   id_legal_batch:
     description: "Unique identifier of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLCODIGO
+      - datalake_cyber_legal_raw.legal_batch.LLCODIGO
   batch_type:
     description: "Type of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLTIPO
+      - datalake_cyber_legal_raw.legal_batch.LLTIPO
   batch_status:
     description: "Status of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLSTATUS
+      - datalake_cyber_legal_raw.legal_batch.LLSTATUS
   dt_creation:
     description: "Date and time when the legal batch was created"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATACRIACAO
+      - datalake_cyber_legal_raw.legal_batch.LLDATACRIACAO
   dt_closed:
     description: "Date and time when the legal batch was closed"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATAFECHAMENTO
+      - datalake_cyber_legal_raw.legal_batch.LLDATAFECHAMENTO
   dt_print:
     description: "Date and time when the legal batch was printed"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATAIMPRESSAO
+      - datalake_cyber_legal_raw.legal_batch.LLDATAIMPRESSAO
   dt_approval:
     description: "Date and time when the legal batch was approved"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATAAPROVACAO
+      - datalake_cyber_legal_raw.legal_batch.LLDATAAPROVACAO
   dt_payment:
     description: "Date and time when the legal batch was paid"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATAPAGAMENTO
+      - datalake_cyber_legal_raw.legal_batch.LLDATAPAGAMENTO
   dt_canceled:
     description: "Date and time when the legal batch was canceled"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATACANCELAMENTO
+      - datalake_cyber_legal_raw.legal_batch.LLDATACANCELAMENTO
   office:
     description: "Office where the legal batch was created"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLESCRITORIO
+      - datalake_cyber_legal_raw.legal_batch.LLESCRITORIO
   origin:
     description: "Origin of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLORIGEM
+      - datalake_cyber_legal_raw.legal_batch.LLORIGEM
   quantity:
     description: "Quantity of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLQTD
+      - datalake_cyber_legal_raw.legal_batch.LLQTD
   value:
     description: "Value of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLVALOR
+      - datalake_cyber_legal_raw.legal_batch.LLVALOR
   dt_rejected:
     description: "Date and time when the legal batch was rejected"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATAREJEICAO
+      - datalake_cyber_legal_raw.legal_batch.LLDATAREJEICAO
   invoice_number:
     description: "Number of the invoice"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLNOTAFISCAL
+      - datalake_cyber_legal_raw.legal_batch.LLNOTAFISCAL
   dt_issued:
     description: "Date and time when the legal batch was issued"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLDATAEMISSAO
+      - datalake_cyber_legal_raw.legal_batch.LLDATAEMISSAO
   conpag_programming:
     description: "Date and time when the legal batch was programmed for payment"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLPROGRAMACAOCONPAG
+      - datalake_cyber_legal_raw.legal_batch.LLPROGRAMACAOCONPAG
   bank:
     description: "Bank of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLBANCON
+      - datalake_cyber_legal_raw.legal_batch.LLBANCON
   user_created:
     description: "User who created the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOC
+      - datalake_cyber_legal_raw.legal_batch.LLUSUARIOC
   user_closed:
     description: "User who finalized the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOF
+      - datalake_cyber_legal_raw.legal_batch.LLUSUARIOF
   code_vw:
     description: "Code of the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLCODVW
+      - datalake_cyber_legal_raw.legal_batch.LLCODVW
   user_printed:
     description: "User who printed the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOI
+      - datalake_cyber_legal_raw.legal_batch.LLUSUARIOI
   user_approved:
     description: "User who approved the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOAP
+      - datalake_cyber_legal_raw.legal_batch.LLUSUARIOAP
   user_rejected:
     description: "User who rejected the legal batch"
     lineage:
-      - datalake_cyber_legal_homolog_raw.legal_batch.LLUSUARIOR
+      - datalake_cyber_legal_raw.legal_batch.LLUSUARIOR

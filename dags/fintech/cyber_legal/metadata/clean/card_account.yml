@@ -5,71 +5,70 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Contains information about required documentation (checklist) to send an account to CyberLegal through case creation process. Transfer is not completed until all documents are reviewed."
 columns:
-  account_number:
-    description: "Account number - Primary key"
+  id_request:
+    description: "Request identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAACCT
-  account_group:
+      - datalake_cyber_legal_raw.cardacct.CAREQID
+  id_document_sequence:
+    description: "Sequential document number"
+    lineage:
+      - datalake_cyber_legal_raw.cardacct.CADOCSEQ
+  id_contract_group:
     description: "Account group code"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAACCTG
-  cybercredit_review:
-    description: "Review flag for sending from CyberCredit (N=No, Y=Yes)"
+      - datalake_cyber_legal_raw.cardacct.CAACCTG
+  id_contract:
+    description: "Account number - Contract identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CACHEK
-  cyberlegal_review:
-    description: "Review flag in CyberLegal (N=No, Y=Yes)"
+      - datalake_cyber_legal_raw.cardacct.CAACCT
+  id_document:
+    description: "Document identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CACHEKJ
-  document_comment:
-    description: "Comment for the document"
+      - datalake_cyber_legal_raw.cardacct.CADOCID
+  id_receiving_attorney:
+    description: "Lawyer who received the document in CyberLegal"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CACOMENT
+      - datalake_cyber_legal_raw.cardacct.CARECCL
+  id_revising_attorney:
+    description: "Lawyer who performed the review in CyberLegal"
+    lineage:
+      - datalake_cyber_legal_raw.cardacct.CAREVCL
   document_description:
     description: "Description of the document"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CADESC
-  document_id:
-    description: "Document identifier"
+      - datalake_cyber_legal_raw.cardacct.CADESC
+  document_comment:
+    description: "Comment for the document"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CADOCID
-  document_sequence:
-    description: "Sequential document number"
+      - datalake_cyber_legal_raw.cardacct.CACOMENT
+  is_cybercredit_review_flag:
+    description: "Review flag for sending from CyberCredit (N=No, Y=Yes)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CADOCSEQ
-  dt_cybercredit_reviewed:
-    description: "Date of review for sending from CyberCredit"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CADT
-  dt_cyberlegal_received:
-    description: "Date of reception in CyberLegal"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CADTLGL
-  cyberlegal_reception:
-    description: "Reception flag in CyberLegal (N=No, Y=Yes)"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CALREVFL
-  cyberlegal_receiver_lawyer_id:
-    description: "Lawyer who received the document in CyberLegal"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CARECCL
-  is_required:
+      - datalake_cyber_legal_raw.cardacct.CACHEK
+  is_required_flag:
     description: "Indicates if required (Blank=No, *=Yes)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAREQ
-  request_id:
-    description: "Request identifier"
+      - datalake_cyber_legal_raw.cardacct.CAREQ
+  is_cyberlegal_received_flag:
+    description: "Reception flag in CyberLegal (N=No, Y=Yes)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAREQID
-  cyberlegal_reviewer_lawyer_id:
-    description: "Lawyer who performed the review in CyberLegal"
+      - datalake_cyber_legal_raw.cardacct.CALREVFL
+  is_reviewed_approved_flag:
+    description: "Review flag (Y=reviewed and approved, N=reviewed and not approved, NULL=not reviewed)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAREVCL
+      - datalake_cyber_legal_raw.cardacct.CAREVFLG
+  dt_cybercredit_review:
+    description: "Date of review for sending from CyberCredit"
+    lineage:
+      - datalake_cyber_legal_raw.cardacct.CADT
+  dt_cyberlegal_receipt:
+    description: "Date of reception in CyberLegal"
+    lineage:
+      - datalake_cyber_legal_raw.cardacct.CADTLGL
   dt_reviewed:
     description: "Review date"
     lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAREVDT
-  review:
-    description: "Review flag (Y=reviewed and approved, N=reviewed and not approved, NULL=not reviewed)"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.cardacct.CAREVFLG
+      - datalake_cyber_legal_raw.cardacct.CAREVDT
+  ts_load:
+    description: "Record load timestamp"
+    lineage: []

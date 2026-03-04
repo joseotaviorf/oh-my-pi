@@ -10,4 +10,4 @@ SELECT
      DOLSTDT AS dt_last_update,
      DOADDDT AS dt_document_added,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.document
+FROM datalake_cyber_legal_raw.document

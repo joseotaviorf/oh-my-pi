@@ -98,4 +98,4 @@ SELECT
     CELWYAGNREF AS dt_attorney_agency_assigned,
     CEDTUPD AS ts_updated,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.case
+FROM datalake_cyber_legal_raw.case

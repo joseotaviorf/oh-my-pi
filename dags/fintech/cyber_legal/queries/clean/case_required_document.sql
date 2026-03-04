@@ -5,4 +5,4 @@ SELECT
     CQDESC AS document_description,
     IF(CQREQFL = 'Y', TRUE, FALSE) AS is_required_flag,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.carqdoc
+FROM datalake_cyber_legal_raw.carqdoc

@@ -20,4 +20,4 @@ SELECT
     CADTLGL AS dt_cyberlegal_receipt,
     CAREVDT AS dt_reviewed,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.cardacct
+FROM datalake_cyber_legal_raw.cardacct

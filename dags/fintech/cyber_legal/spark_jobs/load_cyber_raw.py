@@ -78,7 +78,7 @@ if __name__ == "__main__":
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    source = f"{source}_homolog"
+    source = f"{source}"
 
     table_name = args.table_name
     load_start_date = args.load_start_date
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     excluded_fields = ast.literal_eval(args.excluded_fields)
 
     if environment == 'prod':
-        conn_var = DatabaseEnum.CYBER_HOMOLOG
+        conn_var = DatabaseEnum.CYBER
     else:
        conn_var = DatabaseEnum.CYBER
 

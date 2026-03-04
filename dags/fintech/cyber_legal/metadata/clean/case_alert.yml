@@ -8,50 +8,50 @@ columns:
   id_alert:
     description: "Alert identifier - Primary key"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALID
+      - datalake_cyber_legal_raw.caalert.ALID
   id_case:
     description: "Case number"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALCASENO
+      - datalake_cyber_legal_raw.caalert.ALCASENO
   id_generating_attorney:
     description: "Attorney who generated the alert"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALCOLLID
+      - datalake_cyber_legal_raw.caalert.ALCOLLID
   id_revising_attorney:
     description: "Attorney who reviewed the alert"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALREVCOL
+      - datalake_cyber_legal_raw.caalert.ALREVCOL
   alert_type_code:
     description: "Alert type code - Has LOV"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALALERTTP
+      - datalake_cyber_legal_raw.caalert.ALALERTTP
   alert_comment:
     description: "Reason why the alert was generated"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALDESC
+      - datalake_cyber_legal_raw.caalert.ALDESC
   alert_creator:
     description: "Attorney who created the alert"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALCREATOR
+      - datalake_cyber_legal_raw.caalert.ALCREATOR
   is_reviewed:
     description: "Alert review status (TRUE=Reviewed, FALSE=Not reviewed)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALSTATUS
+      - datalake_cyber_legal_raw.caalert.ALSTATUS
   dt_created:
     description: "Date the alert was generated"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALCREDT
+      - datalake_cyber_legal_raw.caalert.ALCREDT
   dt_reviewed:
     description: "Alert review date"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALREVDT
+      - datalake_cyber_legal_raw.caalert.ALREVDT
   dt_alert_expired:
     description: "Alert date"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALALERTDT
+      - datalake_cyber_legal_raw.caalert.ALALERTDT
   ts_updated:
     description: "Timestamp of the last update"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caalert.ALDTUPD
+      - datalake_cyber_legal_raw.caalert.ALDTUPD
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"

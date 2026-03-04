@@ -12,4 +12,4 @@ SELECT
     ALALERTDT AS dt_alert_expired,
     ALDTUPD AS ts_updated,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.caalert
+FROM datalake_cyber_legal_raw.caalert

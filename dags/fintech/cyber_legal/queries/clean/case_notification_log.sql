@@ -18,4 +18,4 @@ SELECT
     CNREQDT AS dt_request_approved,
     CNDTUPD AS ts_updated,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.cantfylg
+FROM datalake_cyber_legal_raw.cantfylg

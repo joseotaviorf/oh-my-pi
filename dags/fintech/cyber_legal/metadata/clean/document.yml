@@ -8,42 +8,42 @@ columns:
   id_document_uploader:
     description: "Identifier of the user or collector who uploaded the document"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOCOLLID
+      - datalake_cyber_legal_raw.document.DOCOLLID
   id_document:
     description: "Unique document identifier - Primary key"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOID
+      - datalake_cyber_legal_raw.document.DOID
   account:
     description: "Account number associated with the document"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOACCT
+      - datalake_cyber_legal_raw.document.DOACCT
   document_group:
     description: "Account group code associated with the document"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOACCTG
+      - datalake_cyber_legal_raw.document.DOACCTG
   document_description:
     description: "Textual description of the document"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DODESC
+      - datalake_cyber_legal_raw.document.DODESC
   file_blob:
     description: "Binary file content stored as blob"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOFILE
+      - datalake_cyber_legal_raw.document.DOFILE
   file_name:
     description: "Name of the uploaded file"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DONAFILE
+      - datalake_cyber_legal_raw.document.DONAFILE
   status:
     description: "Document status"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOSTATUS
+      - datalake_cyber_legal_raw.document.DOSTATUS
   dt_last_update:
     description: "Date of the last update to the document record"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOLSTDT
+      - datalake_cyber_legal_raw.document.DOLSTDT
   dt_document_added:
     description: "Date when the document was added to the system"
     lineage:
-      - datalake_cyber_legal_homolog_raw.document.DOADDDT
+      - datalake_cyber_legal_raw.document.DOADDDT
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"

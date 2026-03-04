@@ -4,4 +4,4 @@ SELECT
     CTDWFLOW AS default_workflow_code,
     IF(CTVSTG = 'Y', TRUE, FALSE) AS is_sequential_stage_validation,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.casetype
+FROM datalake_cyber_legal_raw.casetype

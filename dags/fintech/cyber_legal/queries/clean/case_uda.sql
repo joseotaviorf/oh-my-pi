@@ -16,4 +16,4 @@ SELECT
     CUREVGERAL AS dt_last_general_review,
     CUULTDT AS dt_last_movement,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.caseuda
+FROM datalake_cyber_legal_raw.caseuda

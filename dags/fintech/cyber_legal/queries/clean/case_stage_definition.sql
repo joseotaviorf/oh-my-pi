@@ -12,4 +12,4 @@ SELECT
     CDPOSDYS AS max_post_system_days,
     CDAMTUNIT AS unit_amount,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.castadf
+FROM datalake_cyber_legal_raw.castadf

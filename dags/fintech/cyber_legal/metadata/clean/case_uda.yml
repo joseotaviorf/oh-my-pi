@@ -8,66 +8,66 @@ columns:
   id_case:
     description: "Case number - Key to link with case table"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUCASENO
+      - datalake_cyber_legal_raw.caseuda.CUCASENO
   cause_loss_possibility_code:
     description: "Loss possibility assessment code"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPOSSIB
+      - datalake_cyber_legal_raw.caseuda.CUPOSSIB
   court_division_name:
     description: "Court division or vara name"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUVARA
+      - datalake_cyber_legal_raw.caseuda.CUVARA
   judicial_district_name:
     description: "Judicial district or comarca name"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUCOMARC
+      - datalake_cyber_legal_raw.caseuda.CUCOMARC
   process_subtype:
     description: "Case subtype identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUSUBTIP
+      - datalake_cyber_legal_raw.caseuda.CUSUBTIP
   reason:
     description: "Reason for the case"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUMOTTOMB
+      - datalake_cyber_legal_raw.caseuda.CUMOTTOMB
   lov_code:
     description: "List of values reference code"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CULOV
+      - datalake_cyber_legal_raw.caseuda.CULOV
   decimal_value:
     description: "Decimal value field"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUDECIMAL
+      - datalake_cyber_legal_raw.caseuda.CUDECIMAL
   provisioned_amount:
     description: "Provisioned recovery value amount"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUVALREC
+      - datalake_cyber_legal_raw.caseuda.CUVALREC
   updated_cause_value_amount:
     description: "Updated lawsuit value total amount"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUVLTTCAUSA
+      - datalake_cyber_legal_raw.caseuda.CUVLTTCAUSA
   procedural_fine_amount:
     description: "Procedural fine amount"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPEMULT
+      - datalake_cyber_legal_raw.caseuda.CUPEMULT
   contingency_fee_amount:
     description: "Contingency fee amount (honorários)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPEHONO
+      - datalake_cyber_legal_raw.caseuda.CUPEHONO
   dt_notified:
     description: "Notification date"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUDATE
+      - datalake_cyber_legal_raw.caseuda.CUDATE
   dt_last_general_review:
     description: "Date of last general review"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUREVGERAL
+      - datalake_cyber_legal_raw.caseuda.CUREVGERAL
   dt_last_movement:
     description: "Date of last case movement"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUULTDT
+      - datalake_cyber_legal_raw.caseuda.CUULTDT
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"
   id_court_case:
     description: "Court case identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseuda.CUPROJUD
+      - datalake_cyber_legal_raw.caseuda.CUPROJUD

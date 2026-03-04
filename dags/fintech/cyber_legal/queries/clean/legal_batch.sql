@@ -24,4 +24,4 @@ SELECT
     LLDATAREJEICAO AS dt_rejected,
     LLDATAEMISSAO AS dt_issued
 FROM
-    datalake_cyber_legal_homolog_raw.tb_lote_legal
+    datalake_cyber_legal_raw.tb_lote_legal

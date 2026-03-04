@@ -8,18 +8,18 @@ columns:
   id_case:
     description: "Legal case number - Primary key"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseacct.CCCASENO
+      - datalake_cyber_legal_raw.caseacct.CCCASENO
   id_contract_group:
     description: "Account group code"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseacct.CCACCTG
+      - datalake_cyber_legal_raw.caseacct.CCACCTG
   id_contract:
     description: "Account number that associates with the case"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseacct.CCACCT
+      - datalake_cyber_legal_raw.caseacct.CCACCT
   ts_updated:
     description: "Timestamp of the last update"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caseacct.CCDTUPD
+      - datalake_cyber_legal_raw.caseacct.CCDTUPD
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"

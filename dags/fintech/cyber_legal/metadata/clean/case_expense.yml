@@ -8,106 +8,106 @@ columns:
   id_case:
     description: "Legal case number - Primary key identifying the judicial process"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXCASENO
+      - datalake_cyber_legal_raw.caexpns.EXCASENO
   id_expense:
     description: "Sequential expense identifier within the procedural stage"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXID
+      - datalake_cyber_legal_raw.caexpns.EXID
   id_attorney:
     description: "Attorney or manager who registered the expense"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXCOLLID
+      - datalake_cyber_legal_raw.caexpns.EXCOLLID
   id_supervisor_attorney:
     description: "Supervisor attorney or manager who authorized the expense"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXCOLSUP
+      - datalake_cyber_legal_raw.caexpns.EXCOLSUP
   id_agency:
     description: "Agency or law firm office identifier responsible for the case"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXAGENCY
+      - datalake_cyber_legal_raw.caexpns.EXAGENCY
   id_stage:
     description: "Procedural stage identifier where expense is being registered"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXSTGID
+      - datalake_cyber_legal_raw.caexpns.EXSTGID
   id_lot:
     description: "Lot number for expense batch control and management"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXLOTE
+      - datalake_cyber_legal_raw.caexpns.EXLOTE
   id_invoice:
     description: "Invoice identifier code - Mandatory field provided by attorney"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXINVOICE
+      - datalake_cyber_legal_raw.caexpns.EXINVOICE
   case_type:
     description: "Legal case type classification"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXCSTYPE
+      - datalake_cyber_legal_raw.caexpns.EXCSTYPE
   case_subtype:
     description: "Legal case subtype classification"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXCSSUBTYPE
+      - datalake_cyber_legal_raw.caexpns.EXCSSUBTYPE
   expense_type:
     description: "Expense type as parameterized in CyberEngine and selected by attorney"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXTYPE
+      - datalake_cyber_legal_raw.caexpns.EXTYPE
   expense_subtype:
     description: "Expense subtype as parameterized in CyberEngine"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXSTYPE
+      - datalake_cyber_legal_raw.caexpns.EXSTYPE
   expense_description:
     description: "Free text expense description provided by attorney"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXDESC
+      - datalake_cyber_legal_raw.caexpns.EXDESC
   invoice_description:
     description: "Invoice description provided by attorney"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXIDESC
+      - datalake_cyber_legal_raw.caexpns.EXIDESC
   supplier_name:
     description: "Supplier or vendor identifier - Name of expense requester"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXSUPPLIER
+      - datalake_cyber_legal_raw.caexpns.EXSUPPLIER
   is_authorized:
     description: "Expense authorization flag (SIM/Y=authorized, NÃO/N=not authorized)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXAUTFLG
+      - datalake_cyber_legal_raw.caexpns.EXAUTFLG
   is_payment_made:
     description: "Payment made flag indicating if payment was realized (SIM/NÃO)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXPAYEXP
+      - datalake_cyber_legal_raw.caexpns.EXPAYEXP
   is_recovered:
     description: "Expense recovery status (0=Not recovered, 1=Recovered)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXSTATUS
+      - datalake_cyber_legal_raw.caexpns.EXSTATUS
   is_reimbursed:
     description: "Expense reimbursement status (0=Not reimbursed, 1=Reimbursed)"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXSTATUSAGN
+      - datalake_cyber_legal_raw.caexpns.EXSTATUSAGN
   expense_amount:
     description: "Expense amount value as reported by the attorney"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXAMT
+      - datalake_cyber_legal_raw.caexpns.EXAMT
   dt_authorized:
     description: "Date of expense authorization or rejection"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXAUTDT
+      - datalake_cyber_legal_raw.caexpns.EXAUTDT
   dt_captured:
     description: "Date when the expense was captured in the system"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXDT
+      - datalake_cyber_legal_raw.caexpns.EXDT
   dt_invoice:
     description: "Invoice date when expense was actually incurred - Mandatory field"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXINVOICEDT
+      - datalake_cyber_legal_raw.caexpns.EXINVOICEDT
   dt_recovered:
     description: "Date when expense was recovered from client"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXDTRELCLI
+      - datalake_cyber_legal_raw.caexpns.EXDTRELCLI
   dt_reimbursed:
     description: "Date when expense was reimbursed to agency"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXDTRELAGN
+      - datalake_cyber_legal_raw.caexpns.EXDTRELAGN
   ts_updated:
     description: "Timestamp of the last update"
     lineage:
-      - datalake_cyber_legal_homolog_raw.caexpns.EXDTUPD
+      - datalake_cyber_legal_raw.caexpns.EXDTUPD
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"

@@ -5,15 +5,22 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Catalog of all lawsuit types used in CyberLegal (civil, mortgage, criminal, etc.). Defines procedural stages for each type."
 columns:
+  id_case_type:
+    description: "Legal case type identifier - Primary key"
+    lineage:
+      - datalake_cyber_legal_raw.casetype.CTTYPE
   case_type_description:
     description: "Description of the case type"
     lineage:
-      - datalake_cyber_legal_homolog_raw.casetype.CTDESC
-  case_type_code:
-    description: "Legal case type identifier - Primary key"
+      - datalake_cyber_legal_raw.casetype.CTDESC
+  default_workflow_code:
+    description: "Default workflow code for the case type"
     lineage:
-      - datalake_cyber_legal_homolog_raw.casetype.CTTYPE
-  validate_consecutive_stages:
+      - datalake_cyber_legal_raw.casetype.CTDWFLOW
+  is_sequential_stage_validation:
     description: "Flag to validate consecutive order of procedural stages - Y = validates consecutive, N = does not validate"
     lineage:
-      - datalake_cyber_legal_homolog_raw.casetype.CTVSTG
+      - datalake_cyber_legal_raw.casetype.CTVSTG
+  ts_load:
+    description: "Record load timestamp"
+    lineage: []

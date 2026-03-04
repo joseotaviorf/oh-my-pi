@@ -8,52 +8,55 @@ columns:
   id_court:
     description: "Court identification - Primary key"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTCRTID
+      - datalake_cyber_legal_raw.court.CTCRTID
   court_name:
     description: "Court name"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTNAME
-  address_line_1:
+      - datalake_cyber_legal_raw.court.CTNAME
+  address_line1:
     description: "Court address - Street"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTADDR1
-  address_line_2:
+      - datalake_cyber_legal_raw.court.CTADDR1
+  address_line2:
     description: "Court address - District"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTADDR2
+      - datalake_cyber_legal_raw.court.CTADDR2
   city:
     description: "Court city location"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTCITY
+      - datalake_cyber_legal_raw.court.CTCITY
   state:
     description: "Court state location"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTSTATE
-  country:
-    description: "Court country location"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTCOUNTRY
+      - datalake_cyber_legal_raw.court.CTSTATE
   zip_code:
     description: "Court zip code address"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTZIP
+      - datalake_cyber_legal_raw.court.CTZIP
+  country:
+    description: "Court country location"
+    lineage:
+      - datalake_cyber_legal_raw.court.CTCOUNTRY
   contact_name:
     description: "Court contact name"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTCNTNAME
-  phone_1:
+      - datalake_cyber_legal_raw.court.CTCNTNAME
+  phone_number1:
     description: "Primary phone number"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTPHONE1
-  phone_2:
+      - datalake_cyber_legal_raw.court.CTPHONE1
+  phone_number2:
     description: "Secondary phone number"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTPHONE2
-  email:
+      - datalake_cyber_legal_raw.court.CTPHONE2
+  email_address:
     description: "Court email address"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTEMAIL
+      - datalake_cyber_legal_raw.court.CTEMAIL
   url:
     description: "Court website URL address"
     lineage:
-      - datalake_cyber_legal_homolog_raw.court.CTURL
+      - datalake_cyber_legal_raw.court.CTURL
+  ts_load:
+    description: "Record load timestamp"
+    lineage: []

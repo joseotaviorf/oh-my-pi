@@ -21,4 +21,4 @@ SELECT
     CSENDDT AS dt_stage_end,
     CSDTUPD AS ts_updated,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.casestag
+FROM datalake_cyber_legal_raw.casestag

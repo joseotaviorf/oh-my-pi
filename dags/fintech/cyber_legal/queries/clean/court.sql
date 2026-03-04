@@ -13,4 +13,4 @@ SELECT
     CTEMAIL AS email_address,
     CTURL AS url,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.court
+FROM datalake_cyber_legal_raw.court

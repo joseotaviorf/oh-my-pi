@@ -26,4 +26,4 @@ SELECT
     EXDTRELAGN AS dt_reimbursed,
     EXDTUPD AS ts_updated,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.caexpns
+FROM datalake_cyber_legal_raw.caexpns

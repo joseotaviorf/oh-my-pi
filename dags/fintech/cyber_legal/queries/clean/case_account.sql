@@ -4,4 +4,4 @@ SELECT
     CCACCT AS id_contract,
     CCDTUPD AS ts_updated,
     NOW() AS ts_load
-FROM datalake_cyber_legal_homolog_raw.caseacct
+FROM datalake_cyber_legal_raw.caseacct

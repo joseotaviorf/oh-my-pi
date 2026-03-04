@@ -5,23 +5,26 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description: "Contains information about required documentation when credits are transferred from CyberCredit to CyberLegal (document checklist)."
 columns:
-  contract_group:
+  id_contract_group:
     description: "Contract group identifier"
     lineage:
-      - datalake_cyber_legal_homolog_raw.carqdoc.CQACCTG
+      - datalake_cyber_legal_raw.carqdoc.CQACCTG
+  id_document_sequence:
+    description: "Document sequence number"
+    lineage:
+      - datalake_cyber_legal_raw.carqdoc.CQDOCSEQ
+  id_document:
+    description: "Document identifier"
+    lineage:
+      - datalake_cyber_legal_raw.carqdoc.CQDOCID
   document_description:
     description: "Document description"
     lineage:
-      - datalake_cyber_legal_homolog_raw.carqdoc.CQDESC
-  document_id:
-    description: "Document identifier"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.carqdoc.CQDOCID
-  document_sequence:
-    description: "Document sequence number"
-    lineage:
-      - datalake_cyber_legal_homolog_raw.carqdoc.CQDOCSEQ
-  is_required:
+      - datalake_cyber_legal_raw.carqdoc.CQDESC
+  is_required_flag:
     description: "Flag indicating if document is required or not"
     lineage:
-      - datalake_cyber_legal_homolog_raw.carqdoc.CQREQFL
+      - datalake_cyber_legal_raw.carqdoc.CQREQFL
+  ts_load:
+    description: "Record load timestamp"
+    lineage: []

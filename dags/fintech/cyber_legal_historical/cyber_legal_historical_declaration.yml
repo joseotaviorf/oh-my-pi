@@ -11,7 +11,7 @@ workflow:
   layer: raw
   type: custom_ingestion
   load_spark_job: load_cyber_raw
-  custom_schema: cyber_legal_historical_homolog
+  custom_schema: cyber_legal_historical
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
