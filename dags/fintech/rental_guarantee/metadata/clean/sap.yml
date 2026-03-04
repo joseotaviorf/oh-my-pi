@@ -79,6 +79,10 @@ columns:
     lineage:
     - datalake_rental_guarantee_raw.sap.trigger
     description: "Trigger that initiated the SAP transaction."
+  amount:
+    lineage:
+    - datalake_rental_guarantee_raw.sap.request
+    description: "Total amount aggregated from JSON request entries."
   dt_due_date:
     lineage:
     - datalake_rental_guarantee_raw.sap.request
