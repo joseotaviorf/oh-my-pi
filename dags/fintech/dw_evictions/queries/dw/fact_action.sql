@@ -1,6 +1,6 @@
 SELECT
     actfil.id_contract AS sk_contract,
-    b.id_anonymized AS id_case,
+    b.id_process AS id_case,
     b.office,
     b.last_stage,
     actfil.action,

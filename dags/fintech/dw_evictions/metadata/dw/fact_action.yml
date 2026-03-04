@@ -10,9 +10,9 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.contract
   id_case:
-    description: "Unique identifier for the anonymized legal case."
+    description: "Unique identifier for the process legal case."
     lineage:
-      - datalake_cyber_legal.evictions_base.id_anonymized
+      - datalake_cyber_legal.evictions_base.id_process
   office:
     description: "Office of the attorney assigned to the legal case."
     lineage:

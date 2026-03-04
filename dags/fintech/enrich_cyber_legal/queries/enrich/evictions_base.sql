@@ -116,9 +116,8 @@ get_stages_data AS (
 )
 
 SELECT DISTINCT
-    CAST(NULL AS INTEGER) AS id_process,
+    p.id_case AS id_process,
     p.id_court_case,
-    p.id_case AS id_anonymized,
     p.id_contract_cyber,
     p.id_contract AS contract,
     p.id_process AS process,

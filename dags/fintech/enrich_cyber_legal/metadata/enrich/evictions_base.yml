@@ -7,14 +7,12 @@ description: Comprehensive eviction cases data from the cyber legal system, enri
 columns:
   id_process:
     description: "Process identifier (currently set to NULL)."
+    lineage:
+      - datalake_cyber_legal.process.id_case
   id_court_case:
     description: "Court case identifier."
     lineage:
       - datalake_cyber_legal.process.id_court_case
-  id_anonymized:
-    description: "Unique identifier for the anonymized legal case."
-    lineage:
-      - datalake_cyber_legal.process.id_case
   id_contract_cyber:
     description: "Contract identifier in CyberCredit system associated with the legal case."
     lineage:
