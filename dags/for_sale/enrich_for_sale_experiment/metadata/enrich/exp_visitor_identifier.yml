@@ -20,58 +20,70 @@ columns:
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.identifier_bc
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.id_neotribe
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.id_experiment
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.identifier_bc
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.id_neotribe
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.id_experiment
   identifier:
     description: Unique identifier of the visitor participating in the experiment (same as id_visitor).
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.identifier
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.identifier
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.identifier
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.identifier
   id_neotribe:
     description: Identifier for the neotribe conducting the experiment (1 for VISITS XP).
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.id_neotribe
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.id_neotribe
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.id_neotribe
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.id_neotribe
   id_experiment:
     description: Unique identifier for the specific experiment (1 for visits_boosting_agents, 2 for area_increased_to_800m).
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.id_experiment
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.id_experiment
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.id_experiment
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.id_experiment
   name_neotribe:
     description: Name of the neotribe conducting the experiments (VISITS XP).
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.name_neotribe
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.name_neotribe
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.name_neotribe
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.name_neotribe
   name_experiment:
     description: Name of the specific experiment variant.
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.name_experiment
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.name_experiment
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.name_experiment
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.name_experiment
     categories:
       visits_boosting_agents: Original agent boosting experiment.
       visits_boosting_agents_area_increased_to_800m: Agent boosting with extended 800m coverage area.
       visits_confirmation_agent: Visits confirmation agent experiment.
+      visits_confirmation_agent_jan13th_onward: Visits confirmation agent experiment fixed on starting from January 13, 2026.
   identifier_type:
     description: Type of identifier used for the experiments (VISITOR).
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.identifier_type
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.identifier_type
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.identifier_type
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.identifier_type
   business_context:
     description: Business context for the experiments.
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.business_context
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.business_context
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.business_context
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.business_context
   test_group:
     description: Experiment group assignment for the visitor (CONTROL or TREATMENT). Assignment logic varies by experiment.
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.test_group
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.test_group
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.test_group
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.test_group
     categories:
       CONTROL: Control group participants.
       TREATMENT: Treatment group participants.
@@ -82,21 +94,25 @@ columns:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.documentation_link
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.documentation_link
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.documentation_link
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.documentation_link
   additional_information:
     description: Additional context about experiment methodology and visitor segmentation logic.
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.additional_information
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.additional_information
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.additional_information
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.additional_information
   dt_identifier_started:
     description: Earliest date when this specific visitor started participating in the experiment.
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.dt_identifier_started
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.dt_identifier_started
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.dt_identifier_started
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.dt_identifier_started
   dt_identifier_ended:
     description: Latest date when this specific visitor participated in the experiment.
     lineage:
       - datalake_for_sale_experiment.exp_1_1_visits_boosting_agents.dt_identifier_ended
       - datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m.dt_identifier_ended
       - datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent.dt_identifier_ended
+      - datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward.dt_identifier_ended

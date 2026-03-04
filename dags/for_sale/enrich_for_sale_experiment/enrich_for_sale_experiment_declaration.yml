@@ -14,6 +14,7 @@ workflow:
       - exp_1_1_visits_boosting_agents
       - exp_1_2_visits_boosting_agents_area_increased_to_800m
       - exp_1_3_visits_confirmation_agent
+      - exp_1_4_visits_confirmation_agent_jan13th_onward
 cluster:
   type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new_env
