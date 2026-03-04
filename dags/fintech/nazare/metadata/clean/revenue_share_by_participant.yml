@@ -104,7 +104,7 @@ columns:
     description: "quintoandar model partner brokerage fee from revenue share payload (quintoandar-model-partner-brokerage-fee)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
-  cancellation_date:
+  dt_cancellation_date:
     description: "cancellation date from revenue share payload (cancellation-date)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
