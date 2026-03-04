@@ -492,39 +492,19 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.LastModifiedDate
     description: Partition year for the case load.
-  is_eviction:
-    lineage:
-      - datalake_salesforce_raw.case.isEviction__c
-    description: Indica se o caso é de despejo.
-  is_high_value:
-    lineage:
-      - datalake_salesforce_raw.case.isHighValue__c
-    description: Indica se é contrato high value.
-  is_pp_multi:
-    lineage:
-      - datalake_salesforce_raw.case.isPPMulti__c
-    description: Indica se é PP multi.
   ts_last_agent_interaction:
     lineage:
       - datalake_salesforce_raw.case.LastAgentInteraction__c
-    description: Data/hora da última interação do agente.
+    description: Timestamp of the last agent interaction.
   ts_last_customer_interaction:
     lineage:
       - datalake_salesforce_raw.case.LastCustomerInteraction__c
-    description: Data/hora da última interação do cliente.
+    description: Timestamp of the last customer interaction.
   case_type_approval:
     lineage:
       - datalake_salesforce_raw.case.TypeApproval__c
-    description: Tipo de aprovação do caso.
+    description: Case type approval.
   case_comments_approval:
     lineage:
       - datalake_salesforce_raw.case.CommentsApproval__c
-    description: Comentários para aprovação.
-  case_omnichannel_queue:
-    lineage:
-      - datalake_salesforce_raw.case.OmniChannelQueue__c
-    description: Fila OmniChannel associada ao caso.
-  case_mediation:
-    lineage:
-      - datalake_salesforce_raw.case.Mediation__c
-    description: Mediação associada ao caso.
+    description: Case comments approval.

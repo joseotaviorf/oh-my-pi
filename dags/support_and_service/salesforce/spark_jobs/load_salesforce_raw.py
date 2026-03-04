@@ -401,15 +401,10 @@ def schema_define():
                             StructField("SLCurrentOnboardingContact__c", StringType()),
                             StructField("UnlistingReason__c", StringType()),
                             StructField("UnassignedReason__c", StringType()),
-                            StructField("isEviction__c", StringType()),
-                            StructField("isHighValue__c", StringType()),
-                            StructField("isPPMulti__c", StringType()),
                             StructField("LastAgentInteraction__c", StringType()),
                             StructField("LastCustomerInteraction__c", StringType()),
                             StructField("TypeApproval__c", StringType()),
                             StructField("CommentsApproval__c", StringType()),
-                            StructField("OmniChannelQueue__c", StringType()),
-                            StructField("Mediation__c", StringType()),
                         ]
                     )
             },
