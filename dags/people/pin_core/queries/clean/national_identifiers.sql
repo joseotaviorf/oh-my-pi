@@ -8,7 +8,6 @@ SELECT
   place_of_issue,
   attribute1 AS issuing_state,
   attribute2 AS issuing_authority,
-  attribute_category,
   created_by,
   last_updated_by AS updated_by,
   CAST(object_version_number AS INT) AS object_version_number,

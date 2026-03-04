@@ -43,10 +43,6 @@ columns:
     description: Date when the document expires.
     lineage:
       - datalake_pin_core_raw.per_national_identifiers.expiration_date
-  attribute_category:
-    description: Internal code that defines which set of extra fields apply to this record.
-    lineage:
-      - datalake_pin_core_raw.per_national_identifiers.attribute_category
   issuing_state:
     description: Brazilian state where the document was issued (e.g., SP, MG, RS). Used mainly for RG.
     lineage:
