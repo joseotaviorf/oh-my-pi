@@ -1,0 +1,787 @@
+"""
+Unit tests for APIConfigurationLoader.
+
+Tests the configuration loader that instantiates API components based on YAML configuration.
+"""
+
+import os
+import pytest
+from unittest.mock import Mock, patch
+
+from bietlejuice.base.api.configuration import APIConfigurationLoader
+from bietlejuice.base.api.common.client import BaseAPIClient
+from bietlejuice.base.api.pagination.cursor import CursorPaginator
+from bietlejuice.base.api.pagination.offset_limit import OffsetLimitPaginator
+
+
+class TestAPIConfigurationLoaderGetAPIBaseURL:
+    """Test suite for get_api_base_url method."""
+
+    def test_get_api_base_url_string(self):
+        """Test that string api_base_url is returned as-is."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        base_url = loader.get_api_base_url()
+
+        assert base_url == "https://api.example.com/"
+
+    def test_get_api_base_url_dict_with_environment(self):
+        """Test that dict api_base_url returns correct environment URL."""
+        workflow_config = {
+            "api_base_url": {
+                "forno": "https://api-forno.example.com/",
+                "prod": "https://api-prod.example.com/",
+            }
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with patch.dict(os.environ, {"ENVIRONMENT": "forno"}):
+            base_url = loader.get_api_base_url()
+
+            assert base_url == "https://api-forno.example.com/"
+
+    def test_get_api_base_url_dict_defaults_to_forno(self):
+        """Test that dict api_base_url defaults to 'forno' if ENVIRONMENT not set."""
+        workflow_config = {
+            "api_base_url": {
+                "forno": "https://api-forno.example.com/",
+                "prod": "https://api-prod.example.com/",
+            }
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with patch.dict(os.environ, {}, clear=True):
+            base_url = loader.get_api_base_url()
+
+            assert base_url == "https://api-forno.example.com/"
+
+    def test_get_api_base_url_missing_raises_error(self):
+        """Test that missing api_base_url raises ValueError."""
+        workflow_config = {}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(ValueError, match="'api_base_url' is required"):
+            loader.get_api_base_url()
+
+    def test_get_api_base_url_dict_invalid_environment_raises_error(self):
+        """Test that invalid environment in dict raises ValueError."""
+        workflow_config = {
+            "api_base_url": {
+                "forno": "https://api-forno.example.com/",
+                "prod": "https://api-prod.example.com/",
+            }
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with patch.dict(os.environ, {"ENVIRONMENT": "staging"}):
+            with pytest.raises(
+                ValueError, match="Base URL not found for environment 'staging'"
+            ):
+                loader.get_api_base_url()
+
+    def test_get_api_base_url_dict_empty_raises_error(self):
+        """Test that empty dict raises ValueError."""
+        workflow_config = {"api_base_url": {}}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(ValueError, match="Base URL not found for environment"):
+            loader.get_api_base_url()
+
+    def test_get_api_base_url_invalid_type_raises_error(self):
+        """Test that invalid type for api_base_url raises ValueError."""
+        workflow_config = {"api_base_url": 123}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(
+            ValueError, match="'api_base_url' must be either a string or a dictionary"
+        ):
+            loader.get_api_base_url()
+
+
+class TestAPIConfigurationLoaderCreateAPIClient:
+    """Test suite for create_api_client method."""
+
+    @patch("bietlejuice.base.api.configuration.loader.BasicAuthOAuth2ClientCredentials")
+    def test_create_api_client_with_oauth2_authentication(self, mock_auth_class):
+        """Test that OAuth2 authentication is applied correctly."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {
+                "strategy": "oauth2_client_credentials",
+                "secret_key": "TEST_SECRET",
+                "token_url": "https://api.example.com/token",
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        mock_auth_instance = Mock()
+        mock_auth_class.return_value = mock_auth_instance
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+        mock_auth_class.assert_called_once()
+        assert mock_auth_class.call_args.kwargs["expires_at_field"] == "expires_at"
+        mock_auth_instance.apply_auth.assert_called_once()
+
+    @patch("bietlejuice.base.api.configuration.loader.BasicAuthOAuth2ClientCredentials")
+    @patch.dict(os.environ, {"DATABRICKS_SECRET_SCOPE": "quintoandar"})
+    def test_oauth2_auth_uses_credentials_scope_from_workflow_config(
+        self, mock_auth_class
+    ):
+        """Workflow `credentials_scope` should override env for secret scope."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "credentials_scope": "people",
+            "authentication": {
+                "strategy": "oauth2_client_credentials",
+                "secret_key": "TEST_SECRET",
+                "token_url": "https://api.example.com/token",
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        mock_auth_instance = Mock()
+        mock_auth_class.return_value = mock_auth_instance
+
+        loader.create_api_client()
+
+        assert mock_auth_class.call_args.kwargs["databricks_scope"] == "people"
+
+    def test_create_api_client_without_authentication(self):
+        """Test that client is created without authentication when strategy is 'none'."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+
+    def test_create_api_client_with_retry_policy(self):
+        """Test that retry policy is configured correctly."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "none"},
+            "api_policies": {
+                "error_handling": {
+                    "retry_policy": {"retries": 3, "delay": 1, "backoff_factor": 2}
+                }
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+
+    @patch("bietlejuice.base.api.configuration.loader.APIKeyAuth")
+    @patch.dict(os.environ, {"DATABRICKS_SECRET_SCOPE": "quintoandar"})
+    def test_create_api_client_with_api_key_authentication(self, mock_api_key_auth):
+        """Test that API key authentication is applied correctly."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "api_key", "secret_key": "TEST_SECRET"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        mock_auth_instance = Mock()
+        mock_api_key_auth.return_value = mock_auth_instance
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+        mock_api_key_auth.assert_called_once()
+        mock_auth_instance.apply_auth.assert_called_once()
+
+    def test_create_api_client_with_custom_status_forcelist(self):
+        """Test that retry_policy with status_forcelist creates client (BaseAPIClient uses default status_forcelist)."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "none"},
+            "api_policies": {
+                "error_handling": {
+                    "retry_policy": {
+                        "retries": 3,
+                        "delay": 1,
+                        "backoff_factor": 2,
+                        "status_forcelist": [500, 503],
+                    }
+                }
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+        adapter = client.session.adapters["https://"]
+        assert adapter.max_retries.total == 3
+
+    def test_create_api_client_invalid_authentication_strategy_raises_error(self):
+        """Test that invalid authentication strategy raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "invalid_strategy"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(
+            ValueError, match="Authentication strategy 'invalid_strategy' not supported"
+        ):
+            loader.create_api_client()
+
+    def test_create_api_client_empty_authentication_raises_error(self):
+        """Test that empty authentication config raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(
+            ValueError, match="Authentication strategy is required and cannot be empty"
+        ):
+            loader.create_api_client()
+
+    def test_create_api_client_missing_secret_key_raises_error(self):
+        """Test that missing secret_key for OAuth2 raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {
+                "strategy": "oauth2_client_credentials",
+                "token_url": "https://api.example.com/token",
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(
+            ValueError, match="'secret_key' is required for oauth2_client_credentials"
+        ):
+            loader._apply_oauth2_authentication(
+                Mock(), workflow_config["authentication"]
+            )
+
+    def test_create_api_client_missing_token_url_raises_error(self):
+        """Test that missing token_url for OAuth2 raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {
+                "strategy": "oauth2_client_credentials",
+                "secret_key": "TEST_SECRET",
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(
+            ValueError, match="'token_url' is required for oauth2_client_credentials"
+        ):
+            loader._apply_oauth2_authentication(
+                Mock(), workflow_config["authentication"]
+            )
+
+    @patch("bietlejuice.base.api.configuration.loader.BasicAuth")
+    @patch.dict(os.environ, {"DATABRICKS_SECRET_SCOPE": "quintoandar"})
+    def test_create_api_client_with_basic_authentication(self, mock_basic_auth_class):
+        """Test that Basic authentication is applied correctly."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {
+                "strategy": "basic",
+                "secret_key": "HR_SYSTEM_API",
+                "token_field": "api_token",
+            },
+        }
+        table_config = {"endpoint_path": "workers"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        mock_auth_instance = Mock()
+        mock_basic_auth_class.return_value = mock_auth_instance
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+        mock_basic_auth_class.assert_called_once()
+        mock_auth_instance.apply_auth.assert_called_once()
+
+    @patch("bietlejuice.base.api.configuration.loader.BasicAuth")
+    @patch.dict(os.environ, {"DATABRICKS_SECRET_SCOPE": "quintoandar"})
+    def test_create_api_client_with_basic_auth_username_password(
+        self, mock_basic_auth_class
+    ):
+        """Test that Basic authentication with username/password works."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {
+                "strategy": "basic",
+                "secret_key": "TEST_SECRET",
+                "username_field": "username",
+                "password_field": "password",
+            },
+        }
+        table_config = {"endpoint_path": "workers"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        mock_auth_instance = Mock()
+        mock_basic_auth_class.return_value = mock_auth_instance
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        mock_basic_auth_class.assert_called_once()
+        call_kwargs = mock_basic_auth_class.call_args[1]
+        assert call_kwargs["username_field"] == "username"
+        assert call_kwargs["password_field"] == "password"
+
+    def test_create_api_client_missing_secret_key_basic_auth_raises_error(self):
+        """Test that missing secret_key for Basic Auth raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "basic"},
+        }
+        table_config = {"endpoint_path": "workers"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(
+            ValueError, match="'secret_key' is required for basic authentication"
+        ):
+            loader._apply_basic_authentication(
+                Mock(), workflow_config["authentication"]
+            )
+
+
+class TestAPIConfigurationLoaderCreatePaginator:
+    """Test suite for create_paginator method."""
+
+    def test_create_paginator_cursor_strategy(self):
+        """Test that cursor pagination creates CursorPaginator."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "cursor",
+                    "cursor_param": "cursor",
+                    "page_size": 100,
+                }
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "events", {})
+
+        assert isinstance(paginator, CursorPaginator)
+
+    def test_create_paginator_none_strategy(self):
+        """Test that 'none' pagination strategy returns None."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {"pagination": {"strategy": "none"}},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "events", {})
+
+        assert paginator is None
+
+    def test_create_paginator_no_config_returns_none(self):
+        """Test that missing pagination config returns None."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "events", {})
+
+        assert paginator is None
+
+    def test_create_paginator_table_level_overrides_workflow_level(self):
+        """Test that table-level pagination config overrides workflow-level."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {"pagination": {"strategy": "none"}},
+        }
+        table_config = {
+            "endpoint_path": "events",
+            "pagination": {
+                "strategy": "cursor",
+                "cursor_param": "cursor",
+                "page_size": 50,
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "events", {})
+
+        assert isinstance(paginator, CursorPaginator)
+        assert paginator.page_size == 50
+
+    def test_create_paginator_cursor_strategy_with_custom_results_field(self):
+        """Test that cursor pagination can use custom results_response_path."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "cursor",
+                    "cursor_param": "cursor",
+                    "page_size": 100,
+                    "results_response_path": "data",
+                }
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "events", {})
+
+        assert isinstance(paginator, CursorPaginator)
+        test_response = {"data": [{"id": 1}, {"id": 2}]}
+        results = paginator.extract_results(test_response)
+        assert results == [{"id": 1}, {"id": 2}]
+
+    def test_create_paginator_cursor_strategy_without_results_field_uses_default(self):
+        """Test that cursor pagination uses default extract_results when results_response_path is not specified."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "cursor",
+                    "cursor_param": "cursor",
+                    "page_size": 100,
+                }
+            },
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "events", {})
+
+        assert isinstance(paginator, CursorPaginator)
+        test_response = {"items": [{"id": 1}, {"id": 2}]}
+        results = paginator.extract_results(test_response)
+        assert results == [{"id": 1}, {"id": 2}]
+
+    def test_create_paginator_offset_limit_strategy(self):
+        """Test that offset_limit pagination creates OffsetLimitPaginator."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "offset_limit",
+                    "limit_param": "limit",
+                    "offset_param": "offset",
+                    "page_size": 100,
+                }
+            },
+        }
+        table_config = {"endpoint_path": "workers"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "workers", {})
+
+        assert isinstance(paginator, OffsetLimitPaginator)
+        assert paginator.limit_param == "limit"
+        assert paginator.offset_param == "offset"
+        assert paginator.page_size == 100
+
+    def test_create_paginator_offset_limit_table_level_override(self):
+        """Test that table-level offset_limit config overrides workflow-level."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "offset_limit",
+                    "limit_param": "limit",
+                    "offset_param": "offset",
+                    "page_size": 100,
+                }
+            },
+        }
+        table_config = {
+            "endpoint_path": "workers",
+            "pagination": {
+                "strategy": "offset_limit",
+                "limit_param": "count",
+                "offset_param": "start",
+                "page_size": 50,
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "workers", {})
+
+        assert isinstance(paginator, OffsetLimitPaginator)
+        assert paginator.limit_param == "count"
+        assert paginator.offset_param == "start"
+        assert paginator.page_size == 50
+
+    def test_create_paginator_invalid_strategy_raises_error(self):
+        """Test that invalid pagination strategy raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {"pagination": {"strategy": "invalid_strategy"}},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        with pytest.raises(
+            ValueError, match="Pagination strategy 'invalid_strategy' not supported"
+        ):
+            loader.create_paginator(client, "events", {})
+
+    def test_create_paginator_empty_config_raises_error(self):
+        """Test that empty pagination config raises ValueError."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {"pagination": {}},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        with pytest.raises(
+            ValueError, match="Pagination strategy is required and cannot be empty"
+        ):
+            loader.create_paginator(client, "events", {})
+
+
+class TestAPIConfigurationLoaderGetEndpointPath:
+    """Test suite for get_endpoint_path method."""
+
+    def test_get_endpoint_path(self):
+        """Test that endpoint_path is returned correctly."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        endpoint_path = loader.get_endpoint_path()
+
+        assert endpoint_path == "events"
+
+    def test_get_endpoint_path_missing_raises_error(self):
+        """Test that missing endpoint_path raises ValueError."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(ValueError, match="'endpoint_path' is required"):
+            loader.get_endpoint_path()
+
+
+class TestAPIConfigurationLoaderGetInitialParams:
+    """Test suite for get_initial_params method."""
+
+    def test_get_initial_params_with_date_placeholders(self):
+        """Test that date placeholders are replaced with formatted dates."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "events",
+            "params": {"after_time": "load_start_date", "before_time": "load_end_date"},
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        params = loader.get_initial_params("2025-01-01", "2025-01-31")
+
+        assert "after_time" in params
+        assert "before_time" in params
+        assert params["after_time"] == "2025-01-01T00:00:00.000Z"
+        assert params["before_time"] == "2025-01-31T23:59:59.999Z"
+        # paging parameter is no longer added automatically - must be explicitly configured
+        assert "paging" not in params
+
+    def test_get_initial_params_without_table_params_uses_defaults(self):
+        """Test that default params are added when table_params is empty."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        params = loader.get_initial_params("2025-01-01", "2025-01-31")
+
+        assert params["after_time"] == "2025-01-01T00:00:00.000Z"
+        assert params["before_time"] == "2025-01-31T23:59:59.999Z"
+        # paging parameter is no longer added automatically - must be explicitly configured
+        assert "paging" not in params
+
+    def test_get_initial_params_with_custom_date_format(self):
+        """Test that custom date_format is applied correctly."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "events",
+            "date_format": "%Y-%m-%dT%H:%M:%S",
+            "params": {"after_time": "load_start_date"},
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        params = loader.get_initial_params("2025-01-01", "2025-01-31")
+
+        assert params["after_time"] == "2025-01-01T00:00:00"
+
+    def test_get_initial_params_preserves_other_params(self):
+        """Test that non-date params are preserved."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "events",
+            "params": {
+                "after_time": "load_start_date",
+                "filter": "active",
+                "sort": "date",
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        params = loader.get_initial_params("2025-01-01", "2025-01-31")
+
+        assert params["filter"] == "active"
+        assert params["sort"] == "date"
+        assert params["after_time"] == "2025-01-01T00:00:00.000Z"
+
+    def test_get_initial_params_empty_date_format_raises_error(self):
+        """Test that empty string date_format raises ValueError."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events", "date_format": ""}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        with pytest.raises(ValueError, match="date_format cannot be an empty string"):
+            loader.get_initial_params("2025-01-01", "2025-01-31")
+
+
+class TestAPIConfigurationLoaderGetDateColumnForPartitioning:
+    """Test suite for get_date_column_for_partitioning method."""
+
+    def test_get_date_column_for_partitioning(self):
+        """Test that date_filter_column is returned when configured."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events", "date_filter_column": "created_at"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        date_column = loader.get_date_column_for_partitioning()
+
+        assert date_column == "created_at"
+
+    def test_get_date_column_for_partitioning_not_configured(self):
+        """Test that None is returned when date_column is not configured."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        date_column = loader.get_date_column_for_partitioning()
+
+        assert date_column is None
+
+
+class TestAPIConfigurationLoaderGetPayloadColumnName:
+    """Test suite for get_payload_column_name method."""
+
+    def test_get_payload_column_name_from_workflow_config(self):
+        """Test that payload_column_name from workflow_config is returned."""
+        workflow_config = {"payload_column_name": "raw_payload"}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        payload_column = loader.get_payload_column_name()
+
+        assert payload_column == "raw_payload"
+
+    def test_get_payload_column_name_from_table_config(self):
+        """Test that payload_column_name from table_config takes precedence."""
+        workflow_config = {"payload_column_name": "workflow_payload"}
+        table_config = {
+            "endpoint_path": "events",
+            "payload_column_name": "table_payload",
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        payload_column = loader.get_payload_column_name()
+
+        assert payload_column == "table_payload"
+
+    def test_get_payload_column_name_defaults_to_payload(self):
+        """Test that 'payload' is returned when not configured."""
+        workflow_config = {}
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        payload_column = loader.get_payload_column_name()
+
+        assert payload_column == "payload"
+
+    def test_get_payload_column_name_table_overrides_workflow(self):
+        """Test that table-level payload_column_name overrides workflow-level."""
+        workflow_config = {"payload_column_name": "workflow_payload"}
+        table_config = {
+            "endpoint_path": "events",
+            "payload_column_name": "table_payload",
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        payload_column = loader.get_payload_column_name()
+
+        assert payload_column == "table_payload"
+
+
+class TestAPIConfigurationLoaderAlertChannel:
+    """Test suite for alert_channel configuration in create_api_client method."""
+
+    def test_create_api_client_with_alert_channel(self):
+        """Test that client is created when alert_channel is configured (BaseAPIClient does not support it yet)."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "alert_channel": "PEOPLE_ALERTS",
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
+
+    def test_create_api_client_without_alert_channel(self):
+        """Test that client is created when alert_channel is not configured."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert isinstance(client, BaseAPIClient)
+        assert client.base_url == "https://api.example.com/"
