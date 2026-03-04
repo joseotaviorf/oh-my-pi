@@ -85,6 +85,9 @@ workflow:
     customer_segment_distribution_history: {}
     negotiation_option: {}
     audience_negotiation_option: {}
+    legal_process: {}
+    legal_process_document_generation: {}
+    legal_process_history: {}
 cluster:
   type: custom_cluster
   custom_configurations:

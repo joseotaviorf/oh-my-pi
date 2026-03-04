@@ -1,5 +1,5 @@
 ---
-database_name: datalake_cyber_legal_homolog_clean
+database_name: datalake_cyber_legal_clean
 table_name: document
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech

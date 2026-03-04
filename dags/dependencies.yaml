@@ -78,7 +78,7 @@ bietlejuice.dw_atta:
   - bietlejuice.atta:load-clean-proposal:first-run-of-day
   - bietlejuice.atta:load-clean-providers-info:first-run-of-day
   - bietlejuice.atta:load-clean-track-step-detail:first-run-of-day
-  - bietlejuice.atta:load-clean-users-info:first-run-of-day  
+  - bietlejuice.atta:load-clean-users-info:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers:first-run-of-day
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
@@ -2078,6 +2078,15 @@ bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber:load-clean-agency:first-run-of-day
   - bietlejuice.cyber:load-clean-contracts:first-run-of-day
   - bietlejuice.cyber_complement:load-clean-delinquent-master:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-account:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-alert:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-expense:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-notification-log:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-stage:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case-uda:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-case:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-court:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-values-list:first-run-of-day
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows:first-run-of-day
@@ -2455,8 +2464,6 @@ bietlejuice.enrich_employment:
   - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
-bietlejuice.enrich_evictions:
-  - bietlejuice.gsheets_fintech:done-clean-legal-process:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference:first-run-of-day
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day
