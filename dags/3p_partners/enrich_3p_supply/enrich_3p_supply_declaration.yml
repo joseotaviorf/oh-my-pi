@@ -1,0 +1,46 @@
+dag:
+  name: enrich_3p_supply
+  schedule_start_date: 2026, 3, 1
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: |
+      Enrich layer for 3P Supply data from the Brokers Supply Processor service.
+      Produces denormalized and pre-computed tables to support DW Supply data model.
+
+      Tables:
+      - lead_3p: Flattened lead data with all JSON columns (location, pricing, blueprint,
+        owner, access, brokers, details, owner_agent) exploded into individual columns.
+      - lead_3p_status_changes: Status change history per lead and business context,
+        with start/end timestamps and parsed status reasons (pending vs not-eligible).
+      - listing_draft_events: Lead-to-house mapping via EBDB, availability check/resolution
+        timestamps, first listing events, and CDI ownership tracking.
+workflow:
+  type: query_delta
+  layer: enrich
+  spark_job_arguments:
+  - '{environment}'
+  - '{bucket}'
+  - '{schema}'
+  - '{dag_name}'
+  - '{table_name}'
+  tables_customization:
+    lead_3p:
+      load_spark_job: load_lead_3p
+      partitions: ["year", "month", "day"]
+      z_order_by: ["id_lead_3p"]
+    lead_3p_status_changes:
+      load_spark_job: load_lead_3p_status_changes
+      partitions: ["year", "month", "day"]
+      z_order_by: ["id_lead_3p"]
+    listing_draft_events:
+      load_spark_job: load_listing_draft_events
+      partitions: ["year", "month", "day"]
+      z_order_by: ["id_lead_3p"]
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: USER_ISOLATION
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

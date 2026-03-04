@@ -1,0 +1,84 @@
+---
+SOURCE_TABLE: "datalake_brokers_supply_processor_clean.lead_3p"
+BUSINESS_CONTEXT_DETAIL_TABLE: "datalake_brokers_supply_processor_clean.business_context_detail"
+BUSINESS_CONTEXT_DETAIL_AUD_TABLE: "datalake_brokers_supply_processor_clean.business_context_detail_aud"
+REV_INFO_TABLE: "datalake_brokers_supply_processor_clean.rev_info"
+LISTING_BUSINESS_CONTEXT_TABLE: "datalake_ebdb_clean.listing_business_context"
+LISTING_BUSINESS_CONTEXT_AUD_TABLE: "datalake_ebdb_listing_clean.listing_business_context_aud"
+HOUSE_TABLE: "datalake_ebdb_clean.house"
+
+tables:
+  lead_3p:
+    merge_on: ["id_lead_3p"]
+    when_matched_update_condition: "source.ts_updated > target.ts_updated"
+  lead_3p_status_changes:
+    merge_on: ["id_lead_3p", "business_context", "ts_start"]
+  listing_draft_events:
+    merge_on: ["id_lead_3p", "business_context"]
+    when_matched_update_condition: "source.ts_updated > target.ts_updated"
+
+# JSON field extraction mapping for the lead_3p table.
+# Each top-level key corresponds to a JSON column in clean.lead_3p.
+# For each column, we list the output columns to create with:
+#   - path:  JSONPath expression to extract the value
+#   - cast:  (optional) Spark type to cast to; omit for string
+#
+# To add a new field, append an entry under the appropriate JSON column.
+# To remove a field, delete its entry here and from FINAL_COLUMNS in load_lead_3p.py.
+lead_3p_json_fields:
+  location:
+    address: {path: "$.address"}
+    number: {path: "$.number"}
+    floor: {path: "$.floor"}
+    complement: {path: "$.complement"}
+    neighborhood: {path: "$.neighborhood"}
+    city: {path: "$.city"}
+    state_acronym: {path: "$.stateAcronym"}
+    country: {path: "$.country"}
+    country_code: {path: "$.countryCode"}
+    zip_code: {path: "$.zipCode"}
+    lat: {path: "$.lat", cast: "double"}
+    lng: {path: "$.lng", cast: "double"}
+    region_id: {path: "$.regionId", cast: "long"}
+    region_slug: {path: "$.regionSlug"}
+    is_out_of_area: {path: "$.outOfArea", cast: "boolean"}
+    reference_point: {path: "$.referencePoint"}
+  pricing:
+    rent: {path: "$.rent", cast: "double"}
+    sale_price: {path: "$.salePrice", cast: "double"}
+    condo_price: {path: "$.condoPrice", cast: "double"}
+    is_iptu_not_paid: {path: "$.iptuNotPaid", cast: "boolean"}
+  blueprint:
+    total_area: {path: "$.totalArea", cast: "int"}
+    bedrooms: {path: "$.bedrooms", cast: "int"}
+    suites: {path: "$.suites", cast: "int"}
+    bathrooms: {path: "$.bathrooms", cast: "int"}
+    garages: {path: "$.garages", cast: "int"}
+    house_type: {path: "$.houseType"}
+  owner:
+    owner_email: {path: "$.email"}
+    owner_name: {path: "$.name"}
+    owner_phone: {path: "$.phone"}
+    owner_person_type: {path: "$.personType"}
+  owner_agent:
+    owner_agent_person_uuid: {path: "$.personUuid"}
+    owner_agent_external_id: {path: "$.externalId"}
+    owner_agent_name: {path: "$.name"}
+    owner_agent_email: {path: "$.email"}
+    owner_agent_phone: {path: "$.phone"}
+    owner_agent_relationship: {path: "$.relationship"}
+  access:
+    access_type: {path: "$.accessType"}
+    authorization_type: {path: "$.authorizationType"}
+    has_restriction: {path: "$.hasRestriction", cast: "boolean"}
+    occupant_type: {path: "$.occupantType"}
+  brokers:
+    condominium: {path: "$.condominium"}
+    has_balcony: {path: "$.balcony", cast: "boolean"}
+    is_furnished: {path: "$.furnished", cast: "boolean"}
+    is_habitat: {path: "$.habitat", cast: "boolean"}
+    construction_year: {path: "$.constructionYear"}
+    block: {path: "$.block"}
+    tower: {path: "$.tower"}
+    has_agency_key: {path: "$.agencyKey", cast: "boolean"}
+    has_concierge: {path: "$.concierge", cast: "boolean"}

@@ -1184,6 +1184,15 @@ bietlejuice.dw_sale_closing_flows:
   add:
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
     - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
+bietlejuice.enrich_3p_supply:
+  add:
+    - bietlejuice.brokers_supply_processor:load-clean-lead-3p:first-run-of-day
+    - bietlejuice.brokers_supply_processor:load-clean-business-context-detail:first-run-of-day
+    - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud:first-run-of-day
+    - bietlejuice.brokers_supply_processor:load-clean-rev-info:first-run-of-day
+    - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+    - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
+    - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
 bietlejuice.enrich_brokers_supply_processor:
   remove:
     - bietlejuice.brokers_supply_processor:load-clean-file:first-run-of-day

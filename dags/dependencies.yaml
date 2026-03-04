@@ -1279,6 +1279,14 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-status-events:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+bietlejuice.enrich_3p_supply:
+  - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud:first-run-of-day
+  - bietlejuice.brokers_supply_processor:load-clean-business-context-detail:first-run-of-day
+  - bietlejuice.brokers_supply_processor:load-clean-lead-3p:first-run-of-day
+  - bietlejuice.brokers_supply_processor:load-clean-rev-info:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
 bietlejuice.enrich_accounting_funnel:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
