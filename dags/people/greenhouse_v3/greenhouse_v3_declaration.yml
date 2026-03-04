@@ -30,6 +30,7 @@ workflow:
   layer: raw
   has_hive_sync: false
   type: custom_ingestion
+  execution_timeout_hours: 4
   bucket_config_name: people_bucket
   load_spark_job: load_greenhouse_v3_raw
   default_table_privileges:
