@@ -1,30 +1,19 @@
-WITH message_summary AS (
-  SELECT DISTINCT
+WITH tickets_session_as (
+  SELECT 
+    c.id_session,
     t.id_ticket,
-    'BR' AS country_code,
-    a.organization,
-    CAST(GET_JSON_OBJECT(evt.event_payload, '$.DateCreated') AS TIMESTAMP) AS ts_created_message,
-    cht.ts_created AS ts_ticket_started,
-    cht.ts_ended AS ts_ticket_ended,
-    REPLACE(GET_JSON_OBJECT(evt.event_payload, '$.Body'), ';', ',') AS message,
-    GET_JSON_OBJECT(evt.event_payload, '$.From') AS message_from
-  FROM
-    datalake_customer_support.chats AS cht
-  LEFT JOIN
-    datalake_customer_support.tickets AS t
-      ON t.id_session = cht.id_session
-      AND t.channel = 'chat'
-  INNER JOIN
-    datalake_quinto_messenger_clean.channel AS ch
-      ON cht.id_session = ch.id_session
-  INNER JOIN
-    datalake_quinto_messenger_clean.channel_event AS evt
-      ON evt.id_channel = ch.id_channel
-  LEFT JOIN
-    datalake_support_users.analysts AS a
-      ON cht.worker_email = a.email
+    c.worker_email,
+    t.ts_created AS ts_ticket_started,
+    c.ts_ended AS ts_ticket_ended,
+    a.organization
+  FROM datalake_customer_support.chats AS c
+  LEFT JOIN datalake_customer_support.tickets AS t
+    ON t.id_session = c.id_session
+    AND t.channel = 'chat'
+  LEFT JOIN datalake_support_users.analysts AS a
+      ON c.worker_email = a.email
   WHERE
-    cht.queue_name IN (
+    c.queue_name IN (
       'CX Visitas [FRONT] [PRE]',
       'CX Propostas [FRONT] [PRE]',
       'CX Mudança [FRONT] [POS]',
@@ -55,23 +44,53 @@ WITH message_summary AS (
       'PARTNERS/CIQ [FRONT] [PRE]',
       'ProOwners [FRONT] [PRE] [POS]'
       )
-    AND DATE(cht.ts_ended) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  AND DATE(c.ts_ended) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+), 
+whatsapp_messages AS (
+  SELECT DISTINCT
+    ce.id_channel,
+    ce.id AS id_message,
+    COALESCE(chat.id_session, c.id_session) AS id_sauron_session,
+    ce.from_phone_number AS user_sender,
+    ce.message_body AS message,
+    ce.ts_created,
+    CASE
+        WHEN from_phone_number = 'system' THEN 'Bot'
+        WHEN from_phone_number LIKE '%whatsapp%' THEN 'User'
+        WHEN REPLACE(REPLACE(from_phone_number,'_2E', '.'), '_40', '@')  LIKE '%@%' THEN 'Analyst'
+        WHEN from_phone_number LIKE '%@%' THEN 'Analyst'
+        ELSE NULL
+      END AS user_type
+  FROM
+    datalake_quinto_messenger_clean.channel_event AS ce
+  LEFT JOIN
+    datalake_quinto_messenger_clean.channel AS c
+      ON c.id_channel = ce.id_channel
+      AND ce.ts_created < "2026-02-23T14:00:00.000+00:00"
+  LEFT JOIN
+    -- The addition of this source and date validation was due to a migration by the engineering team.
+    -- In the future, we will no longer need the channel base as a source.
+    datalake_quinto_messenger_clean.chat AS chat
+      ON ce.id_channel = chat.id_channel
+      AND ce.ts_created > "2026-02-23T14:00:00.000+00:00"
 )
 SELECT
-  id_ticket, 
-  organization,
-  country_code,
-  ts_ticket_started,
-  ts_ticket_ended,
-  ts_created_message,
-  message,
+  t.id_ticket,
+  'BR' AS country_code,
+  t.organization,
+  m.message,
+  m.ts_created AS ts_created_message,
+  t.ts_ticket_started,
+  t.ts_ticket_ended,
   CASE
-    WHEN message_from LIKE '%whatsapp%' THEN 'client'
-    ELSE message_from
+    WHEN m.user_sender LIKE '%whatsapp%' THEN 'client'
+    ELSE m.user_sender
   END AS message_from,
   YEAR(CURRENT_DATE) AS year,
   MONTH(CURRENT_DATE) AS month,
   DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
-FROM
-  message_summary
+FROM 
+  tickets_session_as AS t
+LEFT JOIN whatsapp_messages AS m
+  ON t.id_session = m.id_sauron_session

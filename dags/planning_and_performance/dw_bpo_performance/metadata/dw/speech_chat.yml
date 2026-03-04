@@ -26,15 +26,15 @@ columns:
     description: Timestamp of the end of the ticket.
   ts_created_message:
     lineage:
-      - datalake_quinto_messenger_clean.channel_event.event_payload
+      - datalake_quinto_messenger_clean.channel_event.ts_created
     description: Timestamp of the creation of the message.
   message:
     lineage:
-      - datalake_quinto_messenger_clean.channel_event.event_payload
+      - datalake_quinto_messenger_clean.channel_event.message_body
     description: Content of the message.
   message_from:
     lineage:
-      - datalake_quinto_messenger_clean.channel_event.event_payload
+      - datalake_quinto_messenger_clean.channel_event.from_phone_number
     description: Phone number of the sender of the message.
   year:
     lineage:
