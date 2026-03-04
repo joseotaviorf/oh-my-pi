@@ -4,7 +4,7 @@ WITH whatsapp_messages AS
     ce.id_channel,
     ce.id AS id_message,
     COALESCE(chat.id_session, c.id_session) AS id_sauron_session,
-    REPLACE(ce.from_phone_number, 'whatsapp:', '') AS user_sender,
+    REPLACE(REPLACE(REPLACE(ce.from_phone_number, 'whatsapp:', ''), '_2E', '.'), '_40', '@') AS user_sender,
     ce.message_body AS message,
     ce.ts_created,
     CASE
@@ -82,6 +82,7 @@ messages_w_users AS (
     m.id_sauron_session,
     CASE
       WHEN m.user_sender = 'system' THEN -1
+      WHEN m.user_type = 'Analyst' THEN u1.id
       WHEN s.user_data:["user_id"] IS NOT NULL
         AND m.user_type = 'User' THEN s.user_data:["user_id"]
       WHEN u1.id IS NOT NULL THEN u1.id
