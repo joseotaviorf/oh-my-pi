@@ -1,3 +1,4 @@
+import inspect
 import os
 from argparse import ArgumentParser, Namespace
 
@@ -67,13 +68,37 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
+def _resolve_script_dir() -> str:
+    """Resolve the directory containing this script.
+
+    In Databricks shared clusters (USER_ISOLATION), scripts run via
+    ``exec(compile(...))`` where ``__file__`` is not defined.  We fall back
+    to ``inspect`` (code-object filename) and then ``os.getcwd()``.
+    """
+    try:
+        return os.path.dirname(os.path.abspath(__file__))
+    except NameError:
+        frame = inspect.currentframe()
+        if frame is not None:
+            co_file = inspect.getfile(frame)
+            candidate = os.path.dirname(os.path.abspath(co_file))
+            if candidate:
+                return candidate
+        return os.getcwd()
+
+
 def load_config(env: str) -> dict:
-    config_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        f"{env}_conf.yml",
+    config_name = f"{env}_conf.yml"
+    search_dirs = [_resolve_script_dir(), os.getcwd()]
+    for d in search_dirs:
+        config_path = os.path.join(d, config_name)
+        if os.path.isfile(config_path):
+            with open(config_path) as f:
+                return yaml.safe_load(f)
+    raise FileNotFoundError(
+        f"{config_name} not found. Searched: "
+        f"{[os.path.join(d, config_name) for d in search_dirs]}"
     )
-    with open(config_path) as f:
-        return yaml.safe_load(f)
 
 
 def load_source_data(config: dict) -> DataFrame:
