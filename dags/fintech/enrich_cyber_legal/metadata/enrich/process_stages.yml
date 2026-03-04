@@ -1,5 +1,5 @@
 ---
-database_name: datalake_cyber_legal_homolog
+database_name: datalake_cyber_legal
 table_name: process_stages
 owner: bianca.martins@quintoandar.com.br
 domain: Fintech
@@ -8,40 +8,40 @@ columns:
   id_case:
     description: "Número de Juízo (Case number), servindo como chave primária para identificação do caso legal."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.id_case
+      - datalake_cyber_legal_clean.case_stage.id_case
   stage_order:
     description: "Ordem de realização (sequencial) da etapa processual dentro do fluxo do juízo. Este valor é atualizado automaticamente ao inserir etapas."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.stage_order
+      - datalake_cyber_legal_clean.case_stage.stage_order
   stage_description:
     description: "Descrição da etapa processual em questão, usada para acompanhar o andamento do processo."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.stage_description
+      - datalake_cyber_legal_clean.case_stage.stage_description
   status:
     description: "Status da etapa, que pode indicar se está em andamento ('R' - Running), programada ('S' - Scheduled) ou concluída ('E' - Completed/End)."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.stage_status
+      - datalake_cyber_legal_clean.case_stage.stage_status
   dt_start:
     description: "Data em que a etapa processual foi iniciada."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.dt_stage_start
+      - datalake_cyber_legal_clean.case_stage.dt_stage_start
   dt_end:
     description: "Data em que a etapa processual foi concluída."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.dt_stage_end
+      - datalake_cyber_legal_clean.case_stage.dt_stage_end
   days_required:
     description: "Quantidade de dias requeridos para a realização da etapa do processo. Este valor é utilizado para gerar alertas quando o prazo está por vencer ou foi excedido."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.required_days_for_stage
+      - datalake_cyber_legal_clean.case_stage.required_days_for_stage
   authorized_amount:
     description: "Valor limite (máximo) de gastos pré-autorizados configurado para esta etapa do processo. Este valor é utilizado para validar se um gasto é autorizado ou não."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.authorized_expenses_amount
+      - datalake_cyber_legal_clean.case_stage.authorized_expenses_amount
   action:
     description: "Subtipo de juízo (caso) ao qual a etapa pertence. O subtipo pode variar dependendo do processo legal."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_stage.case_subtype
+      - datalake_cyber_legal_clean.case_stage.case_subtype
   expense_amount:
     description: "Valor do gasto incorrido e registrado em um juízo, associado a esta etapa processual."
     lineage:
-      - datalake_cyber_legal_homolog_clean.case_expense.expense_amount
+      - datalake_cyber_legal_clean.case_expense.expense_amount

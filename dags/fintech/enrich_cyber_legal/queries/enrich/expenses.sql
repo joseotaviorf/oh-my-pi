@@ -27,21 +27,21 @@ SELECT
   e.dt_authorized,
   e.dt_reimbursed,
   e.dt_recovered
-FROM datalake_cyber_legal_homolog_clean.case_expense AS e
+FROM datalake_cyber_legal_clean.case_expense AS e
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.case AS c
+    datalake_cyber_legal_clean.case AS c
       ON e.id_case = c.id_case
 LEFT JOIN
-  datalake_cyber_legal_homolog_clean.values_list AS v
+  datalake_cyber_legal_clean.values_list AS v
       ON e.expense_type = v.id_value
       AND e.expense_subtype = v.value_code
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.agency AS a
+    datalake_cyber_clean.agency AS a
       ON e.id_agency = a.id_agency
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.case_account AS cacct
+    datalake_cyber_legal_clean.case_account AS cacct
       ON cacct.id_case = c.id_case
 LEFT JOIN
-  datalake_cyber_legal_homolog_clean.case_stage AS cstg
+  datalake_cyber_legal_clean.case_stage AS cstg
       ON cstg.id_case = e.id_case
         AND cstg.id_stage = e.id_stage

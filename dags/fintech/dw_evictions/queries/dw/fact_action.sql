@@ -19,5 +19,5 @@ LEFT JOIN datalake_cyber_clean.logs_code_description r
 LEFT JOIN datalake_cyber_clean.logs_code_description c
     ON actfil.complement = c.code
     AND c.code_type = 'Carta'
-LEFT JOIN datalake_cyber_legal_homolog.evictions_base b
+LEFT JOIN datalake_cyber_legal.evictions_base b
     ON actfil.id_contract = b.contract

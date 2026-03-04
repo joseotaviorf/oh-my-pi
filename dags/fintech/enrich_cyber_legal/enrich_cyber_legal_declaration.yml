@@ -9,7 +9,7 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  custom_schema: cyber_legal_homolog
+  custom_schema: cyber_legal
   inner_dependencies:
     evictions_base:
       - process_stages

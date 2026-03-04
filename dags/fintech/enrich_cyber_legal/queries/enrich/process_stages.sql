@@ -4,7 +4,7 @@ expenses AS (
     id_case,
     id_stage,
     SUM(expense_amount) AS expense_amount
-  FROM datalake_cyber_legal_homolog_clean.case_expense
+  FROM datalake_cyber_legal_clean.case_expense
   WHERE is_authorized IS TRUE
     AND is_reimbursed IS TRUE
   GROUP BY 1,2
@@ -21,7 +21,7 @@ SELECT
     cstg.case_subtype AS action,
     COALESCE(cexp.expense_amount, 0) AS expense_amount
 FROM
-  datalake_cyber_legal_homolog_clean.case_stage AS cstg
+  datalake_cyber_legal_clean.case_stage AS cstg
 LEFT JOIN
     expenses AS cexp
         ON cstg.id_case = cexp.id_case

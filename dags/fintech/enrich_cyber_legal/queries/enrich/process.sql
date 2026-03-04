@@ -9,7 +9,7 @@ get_external_id_contract AS (
         eviction_law_firm,
         reason_eviction,
         ts_contract_end
-    FROM datalake_cyber_legal_homolog_clean.contracts
+    FROM datalake_cyber_clean.contracts
 ),
 get_last_delqmst_data AS (
     SELECT
@@ -23,7 +23,7 @@ get_last_delqmst_data AS (
         ts_last_update,
         ts_last_activity
         -- MAKE_DATE(year,month,day) AS partition
-    FROM datalake_cyber_legal_homolog_clean.delinquent_master
+    FROM datalake_cyber_clean.delinquent_master
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_last_update DESC) = 1
 )
 SELECT
@@ -89,18 +89,18 @@ SELECT
     ct.ts_contract_end,
     c.ts_updated
 FROM
-    datalake_cyber_legal_homolog_clean.case AS c
+    datalake_cyber_legal_clean.case AS c
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.values_list vl
+    datalake_cyber_legal_clean.values_list vl
         ON c.closure_result = vl.value_code
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.values_list vl1
+    datalake_cyber_legal_clean.values_list vl1
         ON c.closure_reason = vl1.value_code
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.case_uda AS cuda
+    datalake_cyber_legal_clean.case_uda AS cuda
         ON c.id_case = cuda.id_case
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.case_account AS cacct
+    datalake_cyber_legal_clean.case_account AS cacct
         ON cacct.id_case = c.id_case
 LEFT JOIN
     get_external_id_contract AS ct
@@ -109,20 +109,20 @@ LEFT JOIN
     get_last_delqmst_data AS dq
         ON cacct.id_contract = dq.id_contract
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.case_notification_log AS cntf
+    datalake_cyber_legal_clean.case_notification_log AS cntf
         ON c.id_case = cntf.id_case
         AND cacct.id_contract = cntf.id_contract
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.court AS crt
+    datalake_cyber_legal_clean.court AS crt
         ON c.id_court = crt.id_court
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.agency AS ag
+    datalake_cyber_clean.agency AS ag
         ON c.id_attorney_agency = ag.id_agency
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.agency AS ag2
+    datalake_cyber_clean.agency AS ag2
         ON dq.id_agency = ag2.id_agency
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.values_list vl2
+    datalake_cyber_legal_clean.values_list vl2
         ON cuda.reason = vl2.value_code
         AND vl2.id_value = 'LSTMOTO'
 GROUP BY ALL

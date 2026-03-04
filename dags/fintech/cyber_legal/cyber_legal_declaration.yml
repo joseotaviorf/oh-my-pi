@@ -146,48 +146,8 @@ workflow:
         - "[]"
         - False
         - "[]"
-    agency:
-      clean_table_name: agency
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
-        - False
-        - "[]"
-    delqmst:
-      clean_table_name: delinquent_master
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
-        - False
-        - "[]"
-    uda1:
-      clean_table_name: contracts
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
-        - False
-        - "[]"
     document:
       clean_table_name: document
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
-        - False
-        - "[]"
-    tb_historico_disponibilizacao:
-      clean_table_name: history_contract_distribution
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
-        - False
-        - "[]"
-    tb_grupo_agency:
-      clean_table_name: agency_group
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:

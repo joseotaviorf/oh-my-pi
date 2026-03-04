@@ -24,4 +24,4 @@ SELECT
     a.dt_reviewed,
     NOW() AS ts_load
 FROM
-    datalake_cyber_legal_homolog.alerts AS a
+    datalake_cyber_legal.alerts AS a

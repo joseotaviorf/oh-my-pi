@@ -8,40 +8,40 @@ columns:
   sk_contract:
     description: "Contract surrogate key - External contract identifier for the account under legal proceedings."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.contract
+      - datalake_cyber_legal.evictions_base.contract
   id_case:
     description: "Unique identifier for the anonymized legal case."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.id_anonymized
+      - datalake_cyber_legal.evictions_base.id_anonymized
   office:
     description: "Office of the attorney assigned to the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.office
+      - datalake_cyber_legal.evictions_base.office
   last_stage:
     description: "Last stage of the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.last_stage
+      - datalake_cyber_legal.evictions_base.last_stage
   action:
     description: "Action code identifier."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.action
+      - datalake_cyber_legal.evictions_base.action
   action_description:
     description: "Description of the action."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.action_description
+      - datalake_cyber_legal.evictions_base.action_description
   result:
     description: "Result code identifier."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.result
+      - datalake_cyber_legal.evictions_base.result
   result_description:
     description: "Description of the result."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.result_description
+      - datalake_cyber_legal.evictions_base.result_description
   complement:
     description: "Complement code identifier."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.complement
+      - datalake_cyber_legal.evictions_base.complement
   complement_description:
     description: "Description of the complement."
     lineage:
-      - datalake_cyber_legal_homolog.evictions_base.complement_description
+      - datalake_cyber_legal.evictions_base.complement_description

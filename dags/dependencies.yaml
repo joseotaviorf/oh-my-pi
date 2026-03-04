@@ -2067,20 +2067,9 @@ bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-users:first-run-of-day
   - bietlejuice.cyber_complement:load-clean-delinquent-master:first-run-of-day
 bietlejuice.enrich_cyber_legal:
-  - bietlejuice.cyber_legal:load-clean-agency-group:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-agency:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case-account:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case-alert:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case-expense:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case-notification-log:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case-stage:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case-uda:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-case:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-contracts:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-court:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-delinquent-master:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-history-contract-distribution:first-run-of-day
-  - bietlejuice.cyber_legal:load-clean-values-list:first-run-of-day
+  - bietlejuice.cyber:load-clean-agency:first-run-of-day
+  - bietlejuice.cyber:load-clean-contracts:first-run-of-day
+  - bietlejuice.cyber_complement:load-clean-delinquent-master:first-run-of-day
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows:first-run-of-day

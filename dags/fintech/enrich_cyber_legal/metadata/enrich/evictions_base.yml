@@ -1,5 +1,5 @@
 ---
-database_name: datalake_cyber_legal_homolog
+database_name: datalake_cyber_legal
 table_name: evictions_base
 owner: bianca.martins@quintoandar.com.br
 domain: Fintech
@@ -10,27 +10,27 @@ columns:
   id_court_case:
     description: "Court case identifier."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_court_case
+      - datalake_cyber_legal.process.id_court_case
   id_anonymized:
     description: "Unique identifier for the anonymized legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_case
+      - datalake_cyber_legal.process.id_case
   id_contract_cyber:
     description: "Contract identifier in CyberCredit system associated with the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_contract_cyber
+      - datalake_cyber_legal.process.id_contract_cyber
   contract:
     description: "External contract identifier for the account under legal proceedings."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_contract
+      - datalake_cyber_legal.process.id_contract
   process:
     description: "Legal process dossier identifier number."
     lineage:
-      - datalake_cyber_legal_homolog.process.id_process
+      - datalake_cyber_legal.process.id_process
   input_type:
     description: "Eviction label classification for the account."
     lineage:
-      - datalake_cyber_legal_homolog.process.evictions_label
+      - datalake_cyber_legal.process.evictions_label
   contract_category_at_registration:
     description: "Contract category at the time of registration, classified as: Adimplente, FPD, Acordo Ativo, Mensal, Demais Inadimplentes, or Outros."
     lineage:
@@ -38,115 +38,115 @@ columns:
   action_type:
     description: "Type of action classification (case subtype)."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_subtype
+      - datalake_cyber_legal.process.case_subtype
   action:
     description: "Type of legal process or case classification (original process type)."
     lineage:
-      - datalake_cyber_legal_homolog.process.original_process_type
+      - datalake_cyber_legal.process.original_process_type
   office:
     description: "Name of the attorney agency assigned to the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.agency_name
+      - datalake_cyber_legal.process.agency_name
   collection_agency:
     description: "Name of the collection agency assigned to the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.collection_agency_name
+      - datalake_cyber_legal.process.collection_agency_name
   chamber:
     description: "Name of the court where the legal case is being processed."
     lineage:
-      - datalake_cyber_legal_homolog.process.court_name
+      - datalake_cyber_legal.process.court_name
   region:
     description: "State where the case is being processed."
     lineage:
-      - datalake_cyber_legal_homolog.process.state
+      - datalake_cyber_legal.process.state
   city:
     description: "City where the case is being processed."
     lineage:
-      - datalake_cyber_legal_homolog.process.city
+      - datalake_cyber_legal.process.city
   contract_status:
     description: "Status of the contract."
     lineage:
-      - datalake_cyber_legal_homolog.process.contract_status
+      - datalake_cyber_legal.process.contract_status
   cyber_status:
     description: "Current status of the legal case (e.g., active, closed, pending)."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_status
+      - datalake_cyber_legal.process.case_status
   last_stage:
     description: "Description of the last process stage completed for the case."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.stage_description
+      - datalake_cyber_legal.process_stages.stage_description
   arbitral_distribution_expense_amount:
     description: "Total expense amount for the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   arbitral_citation_expense_amount:
     description: "Total expense amount for the Citação Arbitral (Arbitral Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   arbitral_sentence_expense_amount:
     description: "Total expense amount for the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   judiciary_distribution_expense_amount:
     description: "Total expense amount for the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   judicial_summons_decision_expense_amount:
     description: "Total expense amount for the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   judicial_summons_expense_amount:
     description: "Total expense amount for the Citação Judicial (Judicial Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   coercive_decision_expense_amount:
     description: "Total expense amount for the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   coercive_issuance_expense_amount:
     description: "Total expense amount for the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   judicial_petition_expense_amount:
     description: "Total expense amount for the Petição Judicial (Judicial Petition) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   possession_imission_decision_expense_amount:
     description: "Total expense amount for the Decisão Imissão na Posse (Possession Imission Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   possession_imission_issuance_expense_amount:
     description: "Total expense amount for the Emissão Imissão na Posse (Possession Imission Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   execution_requirement_expense_amount:
     description: "Total expense amount for the Requerimento da Execução (Execution Requirement) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   prejudgment_attachment_expense_amount:
     description: "Total expense amount for the Arresto Cautelar (Prejudgment Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   execution_citation_expense_amount:
     description: "Total expense amount for the Citação do Executado (Execution Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   asset_attachment_expense_amount:
     description: "Total expense amount for the Penhora (Asset Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   asset_evaluation_expense_amount:
     description: "Total expense amount for the Avaliação dos Bens (Asset Evaluation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   credit_satisfaction_expense_amount:
     description: "Total expense amount for the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.expense_amount
+      - datalake_cyber_legal.process_stages.expense_amount
   passage_status:
     description: "Status of passage between stages, classified as: Em finalização, Execução, Ativo, Quitado, Finalizado, or Encerrado."
     lineage:
-      - datalake_cyber_legal_homolog.process
+      - datalake_cyber_legal.process
   is_reincident:
     description: "Flag indicating if the contract has multiple legal cases (reincident)."
   procedure:
@@ -154,11 +154,11 @@ columns:
   consolidated_reason:
     description: "Consolidated reason description for the case result."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_result_description
+      - datalake_cyber_legal.process.case_result_description
   standardized_reason:
     description: "Standardized reason description for the case final status."
     lineage:
-      - datalake_cyber_legal_homolog.process.case_final_description
+      - datalake_cyber_legal.process.case_final_description
   result:
     description: "Result classification (set to 'not_in_cyber_legal')."
   succumbency_fee:
@@ -166,11 +166,11 @@ columns:
   total_package:
     description: "Total package value for the legal case."
     lineage:
-      - datalake_cyber_legal_homolog.process.total_package_amount
+      - datalake_cyber_legal.process.total_package_amount
   total_due_amount:
     description: "Total due amount (overdue amount) for the contract."
     lineage:
-      - datalake_cyber_legal_homolog.process.overdue_amount
+      - datalake_cyber_legal.process.overdue_amount
   overdue_days_at_registration:
     description: "Number of overdue days at registration (maximum delay of original invoices at T1)."
     lineage:
@@ -178,23 +178,23 @@ columns:
   ldt_stock:
     description: "Lead time to stock (number of days)."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_stock
+      - datalake_cyber_legal.process.ldt_stock
   stock_range:
     description: "Stock range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_stock
+      - datalake_cyber_legal.process.ldt_stock
   ldt_resolution:
     description: "Lead time to resolution (number of days)."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_resolution
+      - datalake_cyber_legal.process.ldt_resolution
   resolution_range:
     description: "Resolution range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
     lineage:
-      - datalake_cyber_legal_homolog.process.ldt_resolution
+      - datalake_cyber_legal.process.ldt_resolution
   real_ldt_resolution:
     description: "Real lead time to resolution calculated as the difference in days between case acceptance date and closure date (only when case is completed)."
     lineage:
-      - datalake_cyber_legal_homolog.process
+      - datalake_cyber_legal.process
   ldt_arbitral_distribution:
     description: "Lead time to arbitral distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
   ldt_arbitral_award:
@@ -240,154 +240,154 @@ columns:
   dt_registered:
     description: "Date when the case was accepted for legal proceedings."
     lineage:
-      - datalake_cyber_legal_homolog.process.dt_case_acceptance
+      - datalake_cyber_legal.process.dt_case_acceptance
   dt_arbitral_distribution_start:
     description: "Start date of the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_arbitral_distribution_end:
     description: "End date of the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_arbitral_citation_start:
     description: "Start date of the Citação Arbitral (Arbitral Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_arbitral_citation_end:
     description: "End date of the Citação Arbitral (Arbitral Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_arbitral_contestation:
     description: "Date of arbitral contestation (currently not populated)."
   dt_arbitral_sentence_start:
     description: "Start date of the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_arbitral_sentence_end:
     description: "End date of the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_judiciary_pre_registration:
     description: "Date of judiciary pre-registration (currently not populated)."
   dt_judiciary_distribution_start:
     description: "Start date of the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_judiciary_distribution_end:
     description: "End date of the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_judicial_summons_decision_start:
     description: "Start date of the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_judicial_summons_decision_end:
     description: "End date of the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_judicial_summons_start:
     description: "Start date of the Citação Judicial (Judicial Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_judicial_summons_end:
     description: "End date of the Citação Judicial (Judicial Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_judicial_defense:
     description: "Date of judicial defense (set to 'not_in_cyber_legal')."
   dt_coercive_decision_start:
     description: "Start date of the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_coercive_decision_end:
     description: "End date of the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_coercive_issuance_start:
     description: "Start date of the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_coercive_issuance_end:
     description: "End date of the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_judicial_petition_start:
     description: "Start date of the Petição Judicial (Judicial Petition) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_judicial_petition_end:
     description: "End date of the Petição Judicial (Judicial Petition) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_possession_imission_decision_start:
     description: "Start date of the Decisão Imissão na Posse (Possession Imission Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_possession_imission_decision_end:
     description: "End date of the Decisão Imissão na Posse (Possession Imission Decision) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_possession_imission_issuance_start:
     description: "Start date of the Emissão Imissão na Posse (Possession Imission Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_possession_imission_issuance_end:
     description: "End date of the Emissão Imissão na Posse (Possession Imission Issuance) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_execution_requirement_start:
     description: "Start date of the Requerimento da Execução (Execution Requirement) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_execution_requirement_end:
     description: "End date of the Requerimento da Execução (Execution Requirement) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_prejudgment_attachment_start:
     description: "Start date of the Arresto Cautelar (Prejudgment Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_prejudgment_attachment_end:
     description: "End date of the Arresto Cautelar (Prejudgment Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_execution_citation_start:
     description: "Start date of the Citação do Executado (Execution Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_execution_citation_end:
     description: "End date of the Citação do Executado (Execution Citation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_asset_attachment_start:
     description: "Start date of the Penhora (Asset Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_asset_attachment_end:
     description: "End date of the Penhora (Asset Attachment) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_asset_evaluation_start:
     description: "Start date of the Avaliação dos Bens (Asset Evaluation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_asset_evaluation_end:
     description: "End date of the Avaliação dos Bens (Asset Evaluation) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_credit_satisfaction_start:
     description: "Start date of the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_start
+      - datalake_cyber_legal.process_stages.dt_start
   dt_credit_satisfaction_end:
     description: "End date of the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
-      - datalake_cyber_legal_homolog.process_stages.dt_end
+      - datalake_cyber_legal.process_stages.dt_end
   dt_closure:
     description: "Date when the case was closed (only populated when case_status is 'Completed')."
     lineage:
-      - datalake_cyber_legal_homolog.process.dt_status_changed
+      - datalake_cyber_legal.process.dt_status_changed
   ts_updated:
     description: "Timestamp when the record was last updated."
     lineage:
-      - datalake_cyber_legal_homolog.process.ts_updated
+      - datalake_cyber_legal.process.ts_updated

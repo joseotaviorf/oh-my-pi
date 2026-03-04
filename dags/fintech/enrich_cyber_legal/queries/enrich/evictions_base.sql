@@ -6,13 +6,13 @@ get_process_stages AS (
         expense_amount,
         dt_start,
         dt_end
-    FROM datalake_cyber_legal_homolog.process_stages
+    FROM datalake_cyber_legal.process_stages
 ),
 get_last_process_stage AS (
     SELECT
         id_case,
         stage_description
-    FROM datalake_cyber_legal_homolog.process_stages
+    FROM datalake_cyber_legal.process_stages
     WHERE dt_start IS NOT NULL
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY stage_order DESC) = 1
 ),
@@ -226,7 +226,7 @@ SELECT DISTINCT
     IF(p.case_status = 'Completed', p.dt_status_changed, NULL) AS dt_closure,
     p.ts_updated
 FROM
-    datalake_cyber_legal_homolog.process AS p
+    datalake_cyber_legal.process AS p
 LEFT JOIN
     get_stages_data AS s
     ON p.id_case = s.id_case

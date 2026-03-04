@@ -13,15 +13,15 @@ WITH process_info AS (
         p.process_type,
         p.contract_status,
         p.agency_name
-    FROM datalake_cyber_legal_homolog.process AS p
-    LEFT JOIN datalake_cyber_legal_homolog_clean.contracts AS c
+    FROM datalake_cyber_legal.process AS p
+    LEFT JOIN datalake_cyber_clean.contracts AS c
         ON p.id_contract_cyber = c.id_contract
 ),
 get_last_process_stage AS (
     SELECT
         id_case,
         stage_description
-    FROM datalake_cyber_legal_homolog.process_stages
+    FROM datalake_cyber_legal.process_stages
     WHERE dt_start IS NOT NULL
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY stage_order DESC) = 1
 )
@@ -66,12 +66,12 @@ SELECT
     DATE(a.dt_alert_expired) AS dt_alert_expired,
     DATE(a.dt_reviewed) AS dt_reviewed
 FROM
-    datalake_cyber_legal_homolog_clean.case_alert AS a
+    datalake_cyber_legal_clean.case_alert AS a
 LEFT JOIN
     process_info AS pi
     ON a.id_case = pi.id_case
 LEFT JOIN
-    datalake_cyber_legal_homolog_clean.values_list AS vl
+    datalake_cyber_legal_clean.values_list AS vl
     ON a.alert_type_code = vl.value_code
     AND vl.id_value = 'L_ALERT'
 LEFT JOIN

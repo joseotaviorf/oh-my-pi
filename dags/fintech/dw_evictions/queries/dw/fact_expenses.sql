@@ -29,4 +29,4 @@ SELECT
   e.dt_recovered,
   NOW() AS ts_load
 FROM
-    datalake_cyber_legal_homolog.expenses AS e
+    datalake_cyber_legal.expenses AS e
