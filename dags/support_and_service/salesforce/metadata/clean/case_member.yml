@@ -1,0 +1,76 @@
+database_name: datalake_salesforce_clean
+table_name: case_member
+description: Clean table for ingesting case member data from the Sales Force tool.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_case_member:
+    lineage:
+      - datalake_salesforce_raw.case_member.Id
+    description: Unique identification key for case member in Sales Force.
+  id_owner:
+    lineage:
+      - datalake_salesforce_raw.case_member.OwnerId
+    description: Owner identification key in Salesforce.
+  id_case:
+    lineage:
+      - datalake_salesforce_raw.case_member.Case__c
+    description: Case identification key associated with the case member.
+  id_account:
+    lineage:
+      - datalake_salesforce_raw.case_member.Account__c
+    description: Account identification key linked to the case member.
+  id_external:
+    lineage:
+      - datalake_salesforce_raw.case_member.ExternalId__c
+    description: External identification key for case member source.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.case_member.CreatedById
+    description: Identification key of the user who created the record.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.case_member.LastModifiedById
+    description: Identification key of the user who last updated the record.
+  case_member_name:
+    lineage:
+      - datalake_salesforce_raw.case_member.Name
+    description: Name of the case member.
+  case_member_type:
+    lineage:
+      - datalake_salesforce_raw.case_member.Type__c
+    description: Type of case member.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.case_member.IsDeleted
+    description: Flag indicating whether the record is deleted.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.case_member.SystemModstamp
+    description: System modification timestamp.
+  dt_last_activity:
+    lineage:
+      - datalake_salesforce_raw.case_member.LastActivityDate
+    description: Date of the last activity related to the case member.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.case_member.CreatedDate
+    description: Timestamp of when the record was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.case_member.LastModifiedDate
+    description: Timestamp of the last modification.
+  year:
+    lineage:
+      - datalake_salesforce_raw.case_member.year
+    description: Year of the case member record.
+  month:
+    lineage:
+      - datalake_salesforce_raw.case_member.month
+    description: Month of the case member record.
+  day:
+    lineage:
+      - datalake_salesforce_raw.case_member.day
+    description: Day of the case member record.
+  ts_load:
+    description: Timestamp of the load.

@@ -97,6 +97,10 @@ workflow:
       extra_spark_job_arguments:
         - "SELECT Id,AccountId,LastModifiedDate,Amount,Agent__c,FS_ChosenMortgageApplication__c,FS_BankChosen__c,Budget_Confirmed__c,FS_CCVSigned__c,FS_ProceedWithQuintoAndar__c,CloseDate,ContractId,CreatedById,Description,Discovery_Completed__c,FS_CCVTerminationCreatedAt__c,FS_AgentEmail__c,FS_SellerEmail__c,FS_AccountPersonEmail__c,ExpectedRevenue,ForecastCategoryName,FS_isCreditFormFilled__c,OfferId__c,LastModifiedById,LeadSource,FS_CreditFormLink__c,iSolveLink__c,Loss_Reason__c,FS_paymentMethod__c,NextStep,FS_AccountName__c,FS_SellerName__c,FS_AcceptedAt__c,Name,OwnerId,RecordTypeId,PartnerAccountId,FS_CanUseFGTS__c,Pricebook2Id,CampaignId,Probability,Processo_Ativo__c,FS_CreditProposal__c,FS_ClientResponse__c,ROI_Analysis_Completed__c,FS_SourceEvent__c,StageName,SyncedQuoteId,FS_AccountPhone__c,FS_SellerPhone__c,Type,FS_mortgageIntentionUuid__c,FS_WillUseSavings__c,FS_downPaymentAmount__c,FS_HasUpdatedAmounts__c,Seller__c FROM opportunity"
         - "LastModifiedDate"
+    case_member:
+      extra_spark_job_arguments:
+        - "SELECT Id,OwnerId,IsDeleted,Name,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastActivityDate,Type__c,Account__c,Case__c,ExternalId__c FROM CaseMember__c"
+        - "LastModifiedDate"
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

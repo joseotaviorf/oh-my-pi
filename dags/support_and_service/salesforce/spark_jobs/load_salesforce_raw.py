@@ -986,7 +986,7 @@ def schema_define():
                         [
                         StructField("Id",StringType()),
                         StructField("AccountId",StringType()),
-                        StructField("LastModifiedDate",StringType()),									
+                        StructField("LastModifiedDate",StringType()),
                         StructField("Amount",StringType()),
                         StructField("Agent__c",StringType()),
                         StructField("FS_ChosenMortgageApplication__c",StringType()),
@@ -1019,7 +1019,7 @@ def schema_define():
                         StructField("FS_AcceptedAt__c",StringType()),
                         StructField("Name",StringType()),
                         StructField("OwnerId",StringType()),
-                        StructField("RecordTypeId",StringType()),									
+                        StructField("RecordTypeId",StringType()),
                         StructField("PartnerAccountId",StringType()),
                         StructField("FS_CanUseFGTS__c",StringType()),
                         StructField("Pricebook2Id",StringType()),
@@ -1039,7 +1039,29 @@ def schema_define():
                         StructField("FS_WillUseSavings__c",StringType()),
                         StructField("FS_downPaymentAmount__c",StringType()),
                         StructField("FS_HasUpdatedAmounts__c",StringType()),
-                        StructField("Seller__c",StringType()),	
+                        StructField("Seller__c",StringType()),
+                        ]
+                    )
+            },
+        'case_member':
+            {
+                'schema':
+                    StructType(
+                        [
+                            StructField("Id", StringType()),
+                            StructField("OwnerId", StringType()),
+                            StructField("IsDeleted", StringType()),
+                            StructField("Name", StringType()),
+                            StructField("CreatedDate", StringType()),
+                            StructField("CreatedById", StringType()),
+                            StructField("LastModifiedDate", StringType()),
+                            StructField("LastModifiedById", StringType()),
+                            StructField("SystemModstamp", StringType()),
+                            StructField("LastActivityDate", StringType()),
+                            StructField("Type__c", StringType()),
+                            StructField("Account__c", StringType()),
+                            StructField("Case__c", StringType()),
+                            StructField("ExternalId__c", StringType()),
                         ]
                     )
             },
