@@ -1,7 +1,8 @@
 import re
-from os.path import join
-from typing import Tuple, Union
+from os.path import join, isfile
+from typing import Optional, Tuple, Union
 
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
 
@@ -19,6 +20,25 @@ class BietlejuiceDependencyHelper:
         """Reads the dependencies file from the DAGs"""
 
         return FileService.get_dict_from_yaml_file(DAGS_CROSS_DEPENDENCIES_FILE_PATH)
+
+    @staticmethod
+    def _get_dw_schema_from_declaration(dag_name: str) -> Optional[str]:
+        """
+        Reads the DAG declaration YAML and returns workflow.custom_schema if present.
+        Used to strip schema prefix from DW task names that don't have fact-/dim- prefix.
+        """
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        if not dag_path:
+            return None
+        declaration_path = join(dag_path, f"{dag_name}_declaration.yml")
+        if not isfile(declaration_path):
+            return None
+        try:
+            declaration = FileService.get_dict_from_yaml_file(declaration_path)
+            workflow = declaration.get("workflow") or {}
+            return workflow.get("custom_schema")
+        except Exception:
+            return None
 
     @staticmethod
     def extract_dag_and_table_from_task_name(task_name: str) -> Tuple[str, str]:
@@ -70,11 +90,25 @@ class BietlejuiceDependencyHelper:
     @staticmethod
     def _get_table_name_from_dw_task(dag_name: str, layer: str, task: str) -> str:
         """
-        Clean the DW task in order to retrieve the table name being loaded
+        Clean the DW task in order to retrieve the table name being loaded.
+        For fact-/dim- prefixed tasks, extracts that substring. For other DW tables,
+        strips the DAG's custom_schema (from declaration) from the task so that
+        e.g. growth-obt-supply -> obt_supply.
         """
         if "fact-" in task or "dim-" in task:
             match = re.search("(fact-|dim-)(.*)", task)
             return (match.group(1) + match.group(2)).replace("-", "_")
+
+        if layer == "dw":
+            schema = BietlejuiceDependencyHelper._get_dw_schema_from_declaration(
+                dag_name
+            )
+            if schema:
+                slugified_schema = schema.replace("_", "-").lower()
+                prefix = slugified_schema + "-"
+                if task.startswith(prefix):
+                    table_part = task[len(prefix) :]
+                    return table_part.replace("-", "_")
 
         dag_context = dag_name.replace(f"{layer}_", "")
         table_name = task.replace("-", "_").replace(f"{dag_context}_", "")
