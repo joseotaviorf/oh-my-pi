@@ -44,7 +44,8 @@ workflow:
     offer_partner: {}
     partner: {}
     revenue_share_by_offer: {}
-    revenue_share_by_participant: {}
+    revenue_share_by_participant:
+      clean_table: revenue_share_by_participant_test
     revenue_share_file: {}
     tier_bonus: {}
     tier_bonus_revision:
@@ -55,4 +56,3 @@ workflow:
     supply_acquisition_share: {}
 cluster:
   type: databricks_16_4_med_2xlarge_general_cluster
-  
