@@ -6,6 +6,7 @@ dags_out_of_pattern:
         "amplitude",
         "amplitude_demand",
         "amplitude_supply",
+        "core_brokers",
         "core_contract",
         "core_credit_evaluation",
         "core_offer",

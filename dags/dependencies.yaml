@@ -196,8 +196,8 @@ bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-propose-aud:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose-person:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-renewal:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-renewal-inconsistencies-corrected:first-run-of-day
+  - bietlejuice.rental_guarantee_platform:load-clean-renewal:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-feature:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-sync-sap-job:first-run-of-day
@@ -1654,6 +1654,11 @@ bietlejuice.enrich_brokerage:
   - bietlejuice.nazare:load-clean-offer-agent:first-run-of-day
   - bietlejuice.nazare:load-clean-offer:first-run-of-day
   - bietlejuice.nazare:load-clean-revenue-share-by-participant:first-run-of-day
+bietlejuice.enrich_brokers:
+  - bietlejuice.core_brokers:load-core-brokers-product-historical:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
 bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p:first-run-of-day

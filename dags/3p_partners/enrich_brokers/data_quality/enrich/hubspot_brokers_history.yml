@@ -1,0 +1,14 @@
+---
+table_name: datalake_brokers.hubspot_brokers_history
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  broker_status:
+    is_complete:
+      severity_level: Error
