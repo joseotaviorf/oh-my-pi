@@ -1,8 +1,5 @@
-import inspect
-import os
 from argparse import ArgumentParser, Namespace
 
-import yaml
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     col,
@@ -26,6 +23,7 @@ from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_lead_3p_status_changes"
@@ -52,7 +50,7 @@ FINAL_COLUMNS = [
 
 def main():
     args = parse_args()
-    config = load_config(args.env)
+    config = ConfigurationService(args.relative_query_path)
     source_df = load_source_data(config)
     result_df = build_status_changes(source_df)
     save_df(result_df, args, config)
@@ -68,43 +66,10 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def _resolve_script_dir() -> str:
-    """Resolve the directory containing this script.
-
-    In Databricks shared clusters (USER_ISOLATION), scripts run via
-    ``exec(compile(...))`` where ``__file__`` is not defined.  We fall back
-    to ``inspect`` (code-object filename) and then ``os.getcwd()``.
-    """
-    try:
-        return os.path.dirname(os.path.abspath(__file__))
-    except NameError:
-        frame = inspect.currentframe()
-        if frame is not None:
-            co_file = inspect.getfile(frame)
-            candidate = os.path.dirname(os.path.abspath(co_file))
-            if candidate:
-                return candidate
-        return os.getcwd()
-
-
-def load_config(env: str) -> dict:
-    config_name = f"{env}_conf.yml"
-    search_dirs = [_resolve_script_dir(), os.getcwd()]
-    for d in search_dirs:
-        config_path = os.path.join(d, config_name)
-        if os.path.isfile(config_path):
-            with open(config_path) as f:
-                return yaml.safe_load(f)
-    raise FileNotFoundError(
-        f"{config_name} not found. Searched: "
-        f"{[os.path.join(d, config_name) for d in search_dirs]}"
-    )
-
-
-def load_source_data(config: dict) -> DataFrame:
-    bcda = spark.read.table(config["BUSINESS_CONTEXT_DETAIL_AUD_TABLE"])
-    bcd = spark.read.table(config["BUSINESS_CONTEXT_DETAIL_TABLE"])
-    ri = spark.read.table(config["REV_INFO_TABLE"])
+def load_source_data(config: ConfigurationService) -> DataFrame:
+    bcda = spark.read.table(config.get_config("BUSINESS_CONTEXT_DETAIL_AUD_TABLE"))
+    bcd = spark.read.table(config.get_config("BUSINESS_CONTEXT_DETAIL_TABLE"))
+    ri = spark.read.table(config.get_config("REV_INFO_TABLE"))
 
     return (
         bcda.alias("bcda")
@@ -199,7 +164,7 @@ def parse_status_reasons(df: DataFrame) -> DataFrame:
     return df
 
 
-def save_df(df: DataFrame, args: Namespace, config: dict) -> None:
+def save_df(df: DataFrame, args: Namespace, config: ConfigurationService) -> None:
     spark_client = SparkClient()
     loader = DeltaLoader()
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -214,7 +179,7 @@ def save_df(df: DataFrame, args: Namespace, config: dict) -> None:
     s3_path = database_location + args.table_name
     full_table_name = f"{database_name}.{args.table_name}"
 
-    table_config = config["tables"][args.table_name]
+    table_config = config.get_config("tables")[args.table_name]
     loader.load_table(
         table_name=full_table_name,
         path=s3_path,

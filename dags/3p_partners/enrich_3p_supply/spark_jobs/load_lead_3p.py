@@ -1,8 +1,5 @@
-import inspect
-import os
 from argparse import ArgumentParser, Namespace
 
-import yaml
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     col,
@@ -21,6 +18,7 @@ from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_lead_3p"
@@ -118,7 +116,7 @@ FINAL_COLUMNS = [
 
 def main():
     args = parse_args()
-    config = load_config(args.env)
+    config = ConfigurationService(args.relative_query_path)
     source_df = load_source_data(config)
     enriched_df = extract_json_fields(source_df, config)
     save_df(enriched_df, args, config)
@@ -134,46 +132,13 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def _resolve_script_dir() -> str:
-    """Resolve the directory containing this script.
-
-    In Databricks shared clusters (USER_ISOLATION), scripts run via
-    ``exec(compile(...))`` where ``__file__`` is not defined.  We fall back
-    to ``inspect`` (code-object filename) and then ``os.getcwd()``.
-    """
-    try:
-        return os.path.dirname(os.path.abspath(__file__))
-    except NameError:
-        frame = inspect.currentframe()
-        if frame is not None:
-            co_file = inspect.getfile(frame)
-            candidate = os.path.dirname(os.path.abspath(co_file))
-            if candidate:
-                return candidate
-        return os.getcwd()
-
-
-def load_config(env: str) -> dict:
-    config_name = f"{env}_conf.yml"
-    search_dirs = [_resolve_script_dir(), os.getcwd()]
-    for d in search_dirs:
-        config_path = os.path.join(d, config_name)
-        if os.path.isfile(config_path):
-            with open(config_path) as f:
-                return yaml.safe_load(f)
-    raise FileNotFoundError(
-        f"{config_name} not found. Searched: "
-        f"{[os.path.join(d, config_name) for d in search_dirs]}"
-    )
-
-
-def load_source_data(config: dict) -> DataFrame:
-    return spark.read.table(config["SOURCE_TABLE"]).select(
+def load_source_data(config: ConfigurationService) -> DataFrame:
+    return spark.read.table(config.get_config("SOURCE_TABLE")).select(
         [col(c) for c in SOURCE_COLUMNS]
     )
 
 
-def extract_json_fields(df: DataFrame, config: dict) -> DataFrame:
+def extract_json_fields(df: DataFrame, config: ConfigurationService) -> DataFrame:
     """Dynamically extract JSON fields based on YAML configuration.
 
     The source table stores structured data as JSON strings in columns like
@@ -185,7 +150,7 @@ def extract_json_fields(df: DataFrame, config: dict) -> DataFrame:
     To add, remove or rename an extracted field, edit the config file only —
     no changes to this script are needed.
     """
-    json_fields = config["lead_3p_json_fields"]
+    json_fields = config.get_config("lead_3p_json_fields")
 
     for json_col, fields in json_fields.items():
         for output_name, field_config in fields.items():
@@ -211,7 +176,7 @@ def extract_json_fields(df: DataFrame, config: dict) -> DataFrame:
     return df.select([col(c) for c in FINAL_COLUMNS])
 
 
-def save_df(df: DataFrame, args: Namespace, config: dict) -> None:
+def save_df(df: DataFrame, args: Namespace, config: ConfigurationService) -> None:
     spark_client = SparkClient()
     loader = DeltaLoader()
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -226,7 +191,7 @@ def save_df(df: DataFrame, args: Namespace, config: dict) -> None:
     s3_path = database_location + args.table_name
     full_table_name = f"{database_name}.{args.table_name}"
 
-    table_config = config["tables"][args.table_name]
+    table_config = config.get_config("tables")[args.table_name]
     loader.load_table(
         table_name=full_table_name,
         path=s3_path,

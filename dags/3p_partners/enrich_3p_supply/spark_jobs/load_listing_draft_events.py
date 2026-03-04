@@ -1,8 +1,5 @@
-import inspect
-import os
 from argparse import ArgumentParser, Namespace
 
-import yaml
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     coalesce,
@@ -25,6 +22,7 @@ from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_listing_draft_events"
@@ -32,7 +30,7 @@ JOB_NAME = "load_listing_draft_events"
 
 def main():
     args = parse_args()
-    config = load_config(args.env)
+    config = ConfigurationService(args.relative_query_path)
     bcd_df = load_business_context_detail(config)
     lbc_df = load_listing_business_context(config)
     lbc_aud_df = load_listing_business_context_aud(config)
@@ -52,42 +50,9 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def _resolve_script_dir() -> str:
-    """Resolve the directory containing this script.
-
-    In Databricks shared clusters (USER_ISOLATION), scripts run via
-    ``exec(compile(...))`` where ``__file__`` is not defined.  We fall back
-    to ``inspect`` (code-object filename) and then ``os.getcwd()``.
-    """
-    try:
-        return os.path.dirname(os.path.abspath(__file__))
-    except NameError:
-        frame = inspect.currentframe()
-        if frame is not None:
-            co_file = inspect.getfile(frame)
-            candidate = os.path.dirname(os.path.abspath(co_file))
-            if candidate:
-                return candidate
-        return os.getcwd()
-
-
-def load_config(env: str) -> dict:
-    config_name = f"{env}_conf.yml"
-    search_dirs = [_resolve_script_dir(), os.getcwd()]
-    for d in search_dirs:
-        config_path = os.path.join(d, config_name)
-        if os.path.isfile(config_path):
-            with open(config_path) as f:
-                return yaml.safe_load(f)
-    raise FileNotFoundError(
-        f"{config_name} not found. Searched: "
-        f"{[os.path.join(d, config_name) for d in search_dirs]}"
-    )
-
-
-def load_business_context_detail(config: dict) -> DataFrame:
+def load_business_context_detail(config: ConfigurationService) -> DataFrame:
     return (
-        spark.read.table(config["BUSINESS_CONTEXT_DETAIL_TABLE"])
+        spark.read.table(config.get_config("BUSINESS_CONTEXT_DETAIL_TABLE"))
         .filter(col("id_listing").isNotNull())
         .select(
             col("id_lead").alias("id_lead_3p"),
@@ -99,9 +64,9 @@ def load_business_context_detail(config: dict) -> DataFrame:
     )
 
 
-def load_listing_business_context(config: dict) -> DataFrame:
+def load_listing_business_context(config: ConfigurationService) -> DataFrame:
     return spark.read.table(
-        config["LISTING_BUSINESS_CONTEXT_TABLE"]
+        config.get_config("LISTING_BUSINESS_CONTEXT_TABLE")
     ).select(
         col("id"),
         col("id_house"),
@@ -114,9 +79,9 @@ def load_listing_business_context(config: dict) -> DataFrame:
     )
 
 
-def load_listing_business_context_aud(config: dict) -> DataFrame:
+def load_listing_business_context_aud(config: ConfigurationService) -> DataFrame:
     return spark.read.table(
-        config["LISTING_BUSINESS_CONTEXT_AUD_TABLE"]
+        config.get_config("LISTING_BUSINESS_CONTEXT_AUD_TABLE")
     ).select(
         col("id_listing_business_context"),
         col("id_house"),
@@ -128,9 +93,9 @@ def load_listing_business_context_aud(config: dict) -> DataFrame:
     )
 
 
-def load_house(config: dict) -> DataFrame:
+def load_house(config: ConfigurationService) -> DataFrame:
     return (
-        spark.read.table(config["HOUSE_TABLE"])
+        spark.read.table(config.get_config("HOUSE_TABLE"))
         .filter(col("has_3p_access_control"))
         .select(
             col("id").alias("id_house"),
@@ -300,7 +265,7 @@ def _build_cdi_ownership(
     )
 
 
-def save_df(df: DataFrame, args: Namespace, config: dict) -> None:
+def save_df(df: DataFrame, args: Namespace, config: ConfigurationService) -> None:
     spark_client = SparkClient()
     loader = DeltaLoader()
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -315,7 +280,7 @@ def save_df(df: DataFrame, args: Namespace, config: dict) -> None:
     s3_path = database_location + args.table_name
     full_table_name = f"{database_name}.{args.table_name}"
 
-    table_config = config["tables"][args.table_name]
+    table_config = config.get_config("tables")[args.table_name]
     loader.load_table(
         table_name=full_table_name,
         path=s3_path,
