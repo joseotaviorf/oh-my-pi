@@ -1,9 +1,22 @@
 database_name: datalake_docx_clean
 table_name: rev_info
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: Revision information table containing audit trail data for changes made in the DOCX system, tracking sequential revision numbers, user actions, and transaction traces.
 columns:
   rev:
     lineage:
       - datalake_docx_raw.revinfo.rev
+    description: Sequential revision number for tracking changes in the system.
+  id_user:
+    lineage:
+      - datalake_docx_raw.revinfo.user_id
+    description: User identification key of the person who made the change.
+  id_trace:
+    lineage:
+      - datalake_docx_raw.revinfo.trace_id
+    description: Transaction trace identification key for tracking the operation context.
   ts_rev:
     lineage:
       - datalake_docx_raw.revinfo.revtstmp
+    description: Timestamp when the revision was created.

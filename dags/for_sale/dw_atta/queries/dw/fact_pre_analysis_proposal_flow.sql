@@ -3,12 +3,12 @@ WITH
 rnm_offer_pre_analysis AS (
                             SELECT
                                 *,
-                                ROW_NUMBER() OVER (PARTITION BY opa.pre_analysis_id ORDER BY opa.pre_analysis_id, opa.updated_at DESC) AS num_linha
+                                ROW_NUMBER() OVER (PARTITION BY opa.id_pre_analysis ORDER BY opa.id_pre_analysis, opa.ts_updated DESC) AS num_linha
                             FROM
-                                datalake_risk_and_mortgage_raw.offer_pre_analysis AS opa
+                                datalake_risk_and_mortgage_clean.offer_pre_analysis AS opa
                             WHERE
-                                offer_id NOT LIKE '%-old'
-                                AND offer_id NOT LIKE '%-reproc'
+                                id_offer NOT LIKE '%-old'
+                                AND id_offer NOT LIKE '%-reproc'
                         ),
 doc_submission AS (
                     SELECT
@@ -54,7 +54,7 @@ pre_analysis_proposal_flow AS (
                             WHEN proposal_dates.ts_min_credit_application IS NOT NULL THEN DATEDIFF(DATE(proposal_dates.ts_min_credit_application),
                                     DATE(CASE
                                             WHEN DATE(COALESCE(cs.ts_registration, (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) >= DATE '2022-08-22'
-                                                THEN COALESCE(DATE(opa.created_at), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
+                                                THEN COALESCE(DATE(opa.ts_created), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                             WHEN DATE(COALESCE(cs.ts_registration, (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) < DATE '2022-08-22'
                                                 THEN COALESCE(cs.ts_registration, (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                          END
@@ -63,7 +63,7 @@ pre_analysis_proposal_flow AS (
                             WHEN proposal_dates.ts_min_credit_application IS NULL AND proposal_dates.ts_first_cancelation IS NOT NULL THEN DATEDIFF(DATE(proposal_dates.ts_first_cancelation),
                                     DATE(CASE
                                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) >= DATE '2022-08-22'
-                                                THEN COALESCE(DATE(opa.created_at), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
+                                                THEN COALESCE(DATE(opa.ts_created), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) < DATE '2022-08-22'
                                                 THEN COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                         END
@@ -77,7 +77,7 @@ pre_analysis_proposal_flow AS (
                             WHEN proposal_dates.ts_credit_ended IS NOT NULL THEN DATEDIFF(DATE(proposal_dates.ts_max_credit_application),
                                     DATE(CASE
                                             WHEN DATE(COALESCE(cs.ts_registration, (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) >= DATE '2022-08-22'
-                                                THEN COALESCE(DATE(opa.created_at), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
+                                                THEN COALESCE(DATE(opa.ts_created), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                             WHEN DATE(COALESCE(cs.ts_registration, (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) < DATE '2022-08-22'
                                                 THEN COALESCE(cs.ts_registration, (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                         END
@@ -86,7 +86,7 @@ pre_analysis_proposal_flow AS (
                             WHEN proposal_dates.ts_credit_ended IS NULL AND proposal_dates.ts_min_credit_application IS NOT NULL AND pp.id_proposal_situation IN (4, 5) THEN DATEDIFF(DATE(proposal_dates.ts_max_credit_application),
                                     DATE(CASE
                                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) >= DATE '2022-08-22'
-                                                THEN COALESCE(DATE(opa.created_at), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
+                                                THEN COALESCE(DATE(opa.ts_created), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) < DATE '2022-08-22'
                                                 THEN COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                         END
@@ -146,7 +146,7 @@ pre_analysis_proposal_flow AS (
                                     DATE(
                                         CASE
                                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) >= DATE '2022-08-22'
-                                                THEN COALESCE(DATE(opa.created_at), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
+                                                THEN COALESCE(DATE(opa.ts_created), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) < DATE '2022-08-22'
                                                 THEN COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                                         END
@@ -159,7 +159,7 @@ pre_analysis_proposal_flow AS (
                         NULLIF(COALESCE(fo.sk_offer_dismissed_date, fcf.sk_sale_agreement_cancelled_date), -1) AS dt_offer_canceled,
                         CASE
                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) >= DATE '2022-08-22'
-                                THEN COALESCE(DATE(opa.created_at), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
+                                THEN COALESCE(DATE(opa.ts_created), (cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                             WHEN DATE(COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)) < DATE '2022-08-22'
                                 THEN COALESCE((cs.ts_registration), (pp.ts_registration), proposal_dates.ts_min_pre_analysis)
                         END AS ts_registration,
@@ -196,7 +196,7 @@ pre_analysis_proposal_flow AS (
                     FULL OUTER JOIN
                         datalake_atta_clean.proposal AS pp ON pp.id_pre_analysis = cs.id_pre_analysis
                     LEFT JOIN
-                        rnm_offer_pre_analysis AS opa ON cs.id_pre_analysis = opa.pre_analysis_id AND opa.num_linha = 1
+                        rnm_offer_pre_analysis AS opa ON cs.id_pre_analysis = opa.id_pre_analysis AND opa.num_linha = 1
                     LEFT JOIN
                         datalake_atta_clean.product_info AS pr ON pp.id_product = pr.id_product
                     LEFT JOIN
