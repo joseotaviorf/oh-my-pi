@@ -611,6 +611,13 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_core:load-clean-rates:first-run-of-day
   - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
+bietlejuice.dw_employee_details:
+  - bietlejuice.enrich_people_core:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.pin_core:load-clean-address:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
+  - bietlejuice.pin_core:load-clean-people-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-phone:first-run-of-day
 bietlejuice.dw_employee_test:
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-disability:first-run-of-day

@@ -1,0 +1,106 @@
+database_name: dw_employee_details
+table_name: dim_contact
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Dimension table with contact information of employees.
+  SCD Type 2: tracks historical versions when email, phone, address or github changes.
+  Includes work/personal email, phone, github username, and mailing address.
+  sk_contact_version uniquely identifies each version (employee + valid from date).
+columns:
+  sk_contact_version:
+    description: Surrogate key for the contact version. Hash of id_person and dt_valid_from.
+    lineage:
+      - datalake_pin_core_clean.all_people.id_person
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  person_number:
+    description: Business key for the employee.
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  work_email:
+    description: Work email of the employee at this version.
+    lineage:
+      - datalake_pin_core_clean.email_address.email_address
+  personal_email:
+    description: Personal email of the employee at this version.
+    lineage:
+      - datalake_pin_core_clean.email_address.email_address
+  phone_country_code:
+    description: Country code of the employee phone at this version.
+    lineage:
+      - datalake_pin_core_clean.phone.country_code_number
+  phone_area_code:
+    description: Area code of the employee phone at this version.
+    lineage:
+      - datalake_pin_core_clean.phone.area_code
+  phone_number:
+    description: Phone number of the employee at this version.
+    lineage:
+      - datalake_pin_core_clean.phone.phone_number
+  full_phone_number:
+    description: Complete phone number unifying country code, area code and number.
+    lineage:
+      - datalake_pin_core_clean.phone.country_code_number
+      - datalake_pin_core_clean.phone.area_code
+      - datalake_pin_core_clean.phone.phone_number
+  github_username:
+    description: GitHub username or profile link of the employee.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.github_username
+  address_street:
+    description: Street name of the employee address.
+    lineage:
+      - datalake_pin_core_clean.address.street
+  address_number:
+    description: Address number.
+    lineage:
+      - datalake_pin_core_clean.address.number
+  address_complement:
+    description: Address complement.
+    lineage:
+      - datalake_pin_core_clean.address.complement
+  address_district:
+    description: Address district or neighborhood.
+    lineage:
+      - datalake_pin_core_clean.address.neighborhood
+  address_zip_code:
+    description: Postal code of the address.
+    lineage:
+      - datalake_pin_core_clean.address.postal_code
+  address_city:
+    description: City of the address.
+    lineage:
+      - datalake_pin_core_clean.address.town_or_city
+  address_state:
+    description: State of the address.
+    lineage:
+      - datalake_pin_core_clean.address.state
+  address_country:
+    description: Country code of the address.
+    lineage:
+      - datalake_pin_core_clean.address.country_code
+  full_address:
+    description: Complete address unifying street, number, complement, district, zip, city, state and country.
+    lineage:
+      - datalake_pin_core_clean.address.street
+      - datalake_pin_core_clean.address.number
+      - datalake_pin_core_clean.address.complement
+      - datalake_pin_core_clean.address.neighborhood
+      - datalake_pin_core_clean.address.postal_code
+      - datalake_pin_core_clean.address.town_or_city
+      - datalake_pin_core_clean.address.state
+      - datalake_pin_core_clean.address.country_code
+  dt_valid_from:
+    description: Start date of the validity period for this contact version.
+    lineage:
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  dt_valid_to:
+    description: End date of the validity period. 9999-12-31 for current version.
+    lineage:
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  is_current:
+    description: True when this is the current contact version for the employee.
+    lineage:
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  ts_load:
+    description: Timestamp when the record was loaded.
