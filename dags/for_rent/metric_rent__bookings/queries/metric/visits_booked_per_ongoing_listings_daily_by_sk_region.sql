@@ -27,9 +27,6 @@ visits_booked AS (
   FROM
     dw_rent.fact_listing_rent_flows AS rf
   JOIN
-    dw_public.dim_booking AS db
-      ON db.sk_booking = rf.sk_booking
-  JOIN
     dw_public.dim_date AS dd
       ON dd.sk_date = rf.sk_booking_created_date
   JOIN
