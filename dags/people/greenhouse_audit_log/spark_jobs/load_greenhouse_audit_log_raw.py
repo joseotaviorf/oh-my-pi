@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import List, Dict, Any, Optional
+from datetime import date, datetime, timedelta
+from typing import List, Dict, Any, Optional, Generator, Tuple
 
 from pyspark.sql import SparkSession
 
@@ -25,13 +26,40 @@ TOKEN_EXPIRES_FIELD = "expires"
 PAGE_SIZE = 500
 PAGINATION_RATE_LIMIT_DELAY = 10.5  # Seconds between pages (3 requests per 30s limit)
 
-DEFAULT_START_TIME = "T00:00:00.000Z"
-DEFAULT_END_TIME = "T00:00:00.000Z"
+GREENHOUSE_API_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+DEFAULT_START_TIME = "T00:00:00Z"
+DEFAULT_END_TIME = "T00:00:00Z"
 DEFAULT_PARTITION_COLUMN = "event_time"
 
 # Filter placeholder constants
 FILTER_PLACEHOLDER_START_DATE = "load_start_date"
 FILTER_PLACEHOLDER_END_DATE = "load_end_date"
+
+
+def _format_for_greenhouse_api(value: Any, time_suffix: str) -> str:
+    """
+    Formats a date value to Greenhouse API format: YYYY-MM-DDTHH:MM:SSZ.
+
+    The API rejects formats like +00:00Z or milliseconds. This helper
+    normalizes any date/datetime/str to the exact format required.
+
+    Args:
+        value: Date string (YYYY-MM-DD or ISO), datetime, or date.
+        time_suffix: Suffix for date-only strings (e.g. T00:00:00Z, T23:59:59Z).
+
+    Returns:
+        String in YYYY-MM-DDTHH:MM:SSZ format.
+    """
+    if isinstance(value, datetime):
+        return value.strftime(GREENHOUSE_API_DATE_FORMAT)
+    if isinstance(value, str):
+        if "T" in value or " " in value:
+            dt = datetime.fromisoformat(value.replace("Z", "+00:00").replace(" ", "T"))
+            return dt.strftime(GREENHOUSE_API_DATE_FORMAT)
+        return f"{value}{time_suffix}"
+    if isinstance(value, date):
+        return f"{value.strftime('%Y-%m-%d')}{time_suffix}"
+    raise ValueError(f"Cannot format {type(value)} for Greenhouse API: {value}")
 
 
 def format_search_after_cursor(cursor_value: Any) -> Optional[str]:
@@ -161,13 +189,13 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
 
         for key, value in self.base_filters.items():
             if value == FILTER_PLACEHOLDER_START_DATE and self.load_start_date:
-                timestamp = BaseAPIClient.format_iso_timestamp(
+                timestamp = _format_for_greenhouse_api(
                     self.load_start_date, DEFAULT_START_TIME
                 )
                 self.params[key] = timestamp
                 LOGGER.info("Filter '%s': %s", key, self.params[key])
             elif value == FILTER_PLACEHOLDER_END_DATE and self.load_end_date:
-                timestamp = BaseAPIClient.format_iso_timestamp(
+                timestamp = _format_for_greenhouse_api(
                     self.load_end_date, DEFAULT_END_TIME
                 )
                 self.params[key] = timestamp
@@ -277,25 +305,104 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
         return all_results
 
 
+def get_time_windows(
+    start_iso: str, end_iso: str, window_hours: int
+) -> Generator[Tuple[str, str], None, None]:
+    """
+    Yields (load_start, load_end) ISO strings for each N-hour window.
+
+    Args:
+        start_iso: Start of interval (ISO-8601 or YYYY-MM-DD).
+        end_iso: End of interval (ISO-8601 or YYYY-MM-DD).
+        window_hours: Size of each window in hours.
+
+    Yields:
+        Tuples of (window_start_iso, window_end_iso).
+    """
+    start = _parse_datetime(start_iso)
+    end = _parse_datetime(end_iso)
+    current = start
+    while current < end:
+        window_end = min(current + timedelta(hours=window_hours), end)
+        yield (
+            current.strftime(GREENHOUSE_API_DATE_FORMAT),
+            window_end.strftime(GREENHOUSE_API_DATE_FORMAT),
+        )
+        current = window_end
+
+
+def _parse_datetime(value: Any) -> datetime:
+    """Parse datetime from string or datetime object."""
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, str):
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    raise ValueError(f"Cannot parse datetime from {type(value)}: {value}")
+
+
+def _run_load_for_window(
+    spark: SparkSession,
+    spark_client: SparkClient,
+    job_args: Dict[str, Any],
+    load_start: str,
+    load_end: str,
+) -> int:
+    """
+    Fetches data for a single time window and loads to raw layer.
+
+    Returns:
+        Number of records loaded.
+    """
+    window_args = {**job_args, "load_start_date": load_start, "load_end_date": load_end}
+    api_client = GreenhouseAuditLogAPI(window_args)
+    api_data_list = api_client.get_all_paginated_results()
+
+    if not api_data_list:
+        return 0
+
+    df = json_to_dataframe(spark, api_data_list, raw_column_name="raw_payload")
+    date_column_to_partition = job_args.get(
+        "date_column_to_partition", DEFAULT_PARTITION_COLUMN
+    )
+    df = insert_partitions(df, date_column_to_partition)
+
+    raw_loader = RawLayerLoader(
+        spark_client=spark_client,
+        environment=job_args["environment"],
+        source=job_args["dag_name"],
+        datalake_bucket=job_args["datalake_bucket"],
+        table_name=job_args["table_name"],
+        partition_cols=job_args["partition_cols"],
+        extraction_type=job_args["extraction_type"],
+    )
+    raw_loader.load_to_raw(df)
+    return len(api_data_list)
+
+
+def _format_date_for_display(value: Any) -> str:
+    """Format load_start_date/load_end_date for logging."""
+    if isinstance(value, datetime):
+        return value.strftime(GREENHOUSE_API_DATE_FORMAT)
+    return str(value)
+
+
 def main():
     """
     Main entry point for the Greenhouse Audit Log raw layer ingestion job.
 
     This job:
     1. Parses job arguments (endpoint, filters, dates, partitions, etc.)
-    2. Initializes the Greenhouse Audit Log API client
-    3. Fetches all paginated data from the API
-    4. Converts JSON data to Spark DataFrame
-    5. Adds date-based partitions (year, month, day)
-    6. Writes data to the raw layer in S3/Databricks
-    7. Registers the table in Unity Catalog
+    2. Optionally splits the interval into N-hour windows (backfill_window_hours)
+    3. For each window: fetches from API, converts to DataFrame, loads to raw layer
 
     Expected Job Arguments:
         - table_name (str): Name of the table to create/update
         - endpoint (str): API endpoint (e.g., "events")
         - base_filters (dict/str): API query filters with placeholders
-        - load_start_date (str): Start date for data extraction (YYYY-MM-DD)
-        - load_end_date (str): End date for data extraction (YYYY-MM-DD)
+        - load_start_date (str): Start date for data extraction
+        - load_end_date (str): End date for data extraction
+        - backfill_window_hours (int, optional): When set, splits interval into
+          N-hour windows and processes each sequentially.
         - partitions (list): Partition columns (default: ["year", "month", "day"])
         - date_column_to_partition (str): Column to use for partitioning
           (default: "event_time")
@@ -306,57 +413,86 @@ def main():
     try:
         job_args = BaseJobArgumentParser.parse_args()
         LOGGER.info(
-            f"Running Greenhouse Audit Log job with the following arguments: "
-            f"{job_args}"
+            "Running Greenhouse Audit Log job with the following arguments: %s",
+            job_args,
         )
 
         spark_client = SparkClient()
         spark = SparkSession.builder.getOrCreate()
 
-        LOGGER.info("Fetching data for table: %s", job_args.get("table_name"))
-        api_client = GreenhouseAuditLogAPI(job_args)
-        api_data_list = api_client.get_all_paginated_results()
+        load_start = job_args.get("load_start_date")
+        load_end = job_args.get("load_end_date")
+        backfill_window_hours = job_args.get("backfill_window_hours") or 0
+        if isinstance(backfill_window_hours, str):
+            try:
+                backfill_window_hours = int(backfill_window_hours)
+            except ValueError:
+                backfill_window_hours = 0
 
-        if api_data_list:
-            LOGGER.info(
-                "Successfully fetched %d records from API. Converting to DataFrame...",
-                len(api_data_list),
+        if backfill_window_hours > 0:
+            windows = list(
+                get_time_windows(load_start, load_end, backfill_window_hours)
             )
-            df = json_to_dataframe(spark, api_data_list, raw_column_name="raw_payload")
+            total_windows = len(windows)
+            LOGGER.info(
+                "Splitting interval into %d-hour windows: %s to %s -> %d windows",
+                backfill_window_hours,
+                _format_date_for_display(load_start),
+                _format_date_for_display(load_end),
+                total_windows,
+            )
 
-            date_column_to_partition = job_args.get(
-                "date_column_to_partition", DEFAULT_PARTITION_COLUMN
-            )
-            LOGGER.info(
-                f"Adding partitions based on column: {date_column_to_partition}"
-            )
-            df = insert_partitions(df, date_column_to_partition)
+            total_records = 0
+            for i, (window_start, window_end) in enumerate(windows, start=1):
+                LOGGER.info(
+                    "Processing window %d/%d: %s to %s",
+                    i,
+                    total_windows,
+                    window_start,
+                    window_end,
+                )
+                records = _run_load_for_window(
+                    spark, spark_client, job_args, window_start, window_end
+                )
+                total_records += records
+                LOGGER.info(
+                    "Completed window %d/%d (%d records)",
+                    i,
+                    total_windows,
+                    records,
+                )
 
-            LOGGER.info("Loading data to raw layer...")
-            raw_loader = RawLayerLoader(
-                spark_client=spark_client,
-                environment=job_args["environment"],
-                source=job_args["dag_name"],
-                datalake_bucket=job_args["datalake_bucket"],
-                table_name=job_args["table_name"],
-                partition_cols=job_args["partition_cols"],
-                extraction_type=job_args["extraction_type"],
-            )
-            raw_loader.load_to_raw(df)
             LOGGER.info(
-                f"Successfully loaded {len(api_data_list)} records for table "
-                f"'{job_args.get('table_name')}' into the raw layer."
+                "Finished processing all %d windows. Total records loaded: %d",
+                total_windows,
+                total_records,
             )
         else:
-            LOGGER.warning(
-                f"No data returned from the Audit Log API for table: "
-                f"'{job_args.get('table_name')}'. "
-                "No data will be loaded in this execution."
+            load_start_str = _format_for_greenhouse_api(
+                load_start, DEFAULT_START_TIME
             )
+            load_end_str = _format_for_greenhouse_api(load_end, DEFAULT_END_TIME)
+            LOGGER.info("Fetching data for table: %s", job_args.get("table_name"))
+            records = _run_load_for_window(
+                spark, spark_client, job_args, load_start_str, load_end_str
+            )
+            if records > 0:
+                LOGGER.info(
+                    "Successfully loaded %d records for table '%s' into the raw layer.",
+                    records,
+                    job_args.get("table_name"),
+                )
+            else:
+                LOGGER.warning(
+                    "No data returned from the Audit Log API for table '%s'. "
+                    "No data will be loaded in this execution.",
+                    job_args.get("table_name"),
+                )
 
     except Exception as e:
         LOGGER.error(
-            f"An unhandled error occurred during the Audit Log job execution: {e}",
+            "An unhandled error occurred during the Audit Log job execution: %s",
+            e,
             exc_info=True,
         )
         raise

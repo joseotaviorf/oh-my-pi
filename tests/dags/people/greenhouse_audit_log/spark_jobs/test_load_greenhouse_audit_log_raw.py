@@ -320,11 +320,11 @@ class TestGreenhouseAuditLogAPIProcessFilters(unittest.TestCase):
 
         # Verify start date placeholder was replaced
         self.assertEqual(
-            api_client.params["occurred_at[gte]"], "2025-01-15T00:00:00.000Z"
+            api_client.params["occurred_at[gte]"], "2025-01-15T00:00:00Z"
         )
         # Verify end date placeholder was replaced
         self.assertEqual(
-            api_client.params["occurred_at[lte]"], "2025-01-20T00:00:00.000Z"
+            api_client.params["occurred_at[lte]"], "2025-01-20T00:00:00Z"
         )
         # Verify other params remain unchanged
         self.assertEqual(api_client.params["actor.user_id"], "123")
@@ -418,7 +418,7 @@ class TestGreenhouseAuditLogAPIProcessFilters(unittest.TestCase):
 
         # Verify start date was replaced
         self.assertEqual(
-            api_client.params["occurred_at[gte]"], "2025-01-15T00:00:00.000Z"
+            api_client.params["occurred_at[gte]"], "2025-01-15T00:00:00Z"
         )
         # Verify end date placeholder remained unchanged
         self.assertEqual(
@@ -447,7 +447,7 @@ class TestGreenhouseAuditLogAPIProcessFilters(unittest.TestCase):
         )
         # Verify end date was replaced
         self.assertEqual(
-            api_client.params["occurred_at[lte]"], "2025-01-31T00:00:00.000Z"
+            api_client.params["occurred_at[lte]"], "2025-01-31T00:00:00Z"
         )
 
 
@@ -627,8 +627,13 @@ class TestMainFunction(unittest.TestCase):
         # Execute
         main()
 
-        # Verify API client was created correctly
-        mock_api_class.assert_called_once_with(self.job_args)
+        # Verify API client was created correctly (dates are formatted for API)
+        expected_args = {
+            **self.job_args,
+            "load_start_date": "2025-01-01T00:00:00Z",
+            "load_end_date": "2025-01-31T00:00:00Z",
+        }
+        mock_api_class.assert_called_once_with(expected_args)
         mock_api_client.get_all_paginated_results.assert_called_once()
 
         # Verify DataFrame creation
