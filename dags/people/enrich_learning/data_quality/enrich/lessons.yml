@@ -1,25 +1,22 @@
 ---
-table_name: datalake_degreed.content_completions
+table_name: datalake_learning.lessons
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
     greater_than: 0
-    severity_level: Warning
+    severity_level: Error
 
 column_level_validations:
-  id:
+  id_lesson:
     is_complete:
       severity_level: Warning
     is_unique:
       severity_level: Warning
-  id_content:
+  id_section:
     is_complete:
       severity_level: Warning
-  id_user:
-    is_complete:
-      severity_level: Warning
-  dt_completed:
+  id_pathway:
     is_complete:
       severity_level: Warning
   ts_load:

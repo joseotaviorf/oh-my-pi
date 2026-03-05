@@ -1,5 +1,5 @@
 database_name: datalake_degreed_clean
-table_name: content
+table_name: contents
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-

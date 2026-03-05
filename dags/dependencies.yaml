@@ -2140,9 +2140,6 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-negotiation:first-run-of-day
   - bietlejuice.trato_feito:load-clean-payment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-segment:first-run-of-day
-bietlejuice.enrich_degreed:
-  - bietlejuice.degreed:load-clean-completions:first-run-of-day
-  - bietlejuice.degreed:load-clean-pathway-details:first-run-of-day
 bietlejuice.enrich_demand_consolidated_targets:
   - bietlejuice.gsheets_growth_targets:done-clean-mkt-cost-target:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-rental-prospect-target:first-run-of-day
@@ -2836,6 +2833,10 @@ bietlejuice.enrich_lead_tracking:
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
+bietlejuice.enrich_learning:
+  - bietlejuice.degreed:load-clean-completions:first-run-of-day
+  - bietlejuice.degreed:load-clean-pathway-details:first-run-of-day
+  - bietlejuice.degreed:load-clean-users:first-run-of-day
 bietlejuice.enrich_legaut:
   - bietlejuice.legaut:load-clean-crawlers-crawler:first-run-of-day
   - bietlejuice.legaut:load-clean-crawlers-crawlergroup:first-run-of-day

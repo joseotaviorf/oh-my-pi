@@ -1,11 +1,11 @@
 dag:
-  name: enrich_degreed
+  name: enrich_learning
   schedule_start_date: 2025, 9, 22
   owner: Data People
   documentation:
     dag_purpose: |-
-      Enrich Degreed (Learning Hub) data with flattened and derived columns.
-      Includes content_completions (flattened from clean), and pathway structure tables (sections, lessons, contents, lesson_contents) for program hierarchy and mandatory/optional reporting.
+      Enrich learning data with flattened and derived columns (mainly from Degreed/Learning Hub).
+      Includes content_completions (flattened from clean), and pathway structure tables (sections, lessons, lesson_contents) for program hierarchy and mandatory/optional reporting.
 cluster:
   type: databricks_16_4_small_memory_people_cluster
   access_control_list:
@@ -20,6 +20,7 @@ cluster:
 workflow:
   type: query_delta
   layer: enrich
+  custom_schema: "learning"
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket
@@ -28,11 +29,15 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    all_completions:
+      - content_completions
+      - lesson_contents
   tables_customization:
-    content_completions:
+    all_completions:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    contents:
+    content_completions:
       vacuum_retention_hours: 168
       vacuum_lite: true
     lesson_contents:

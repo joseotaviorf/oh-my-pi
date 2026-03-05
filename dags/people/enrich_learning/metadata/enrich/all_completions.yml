@@ -1,0 +1,87 @@
+database_name: datalake_learning
+table_name: all_completions
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per (user, learning object) with content counts and completion percentages; percentages use the smallest unit (contents) for counting.
+  Covers all users and all learning objects (pathway, section, lesson, content). Where there are no completions, completed_* = 0 and dt_completion = null.
+  Learning object types: (1) Pathway, (2) Section, (3) Lesson (aggregated), (4) Content. Each row carries the object or parent IDs.
+  Use: progress reporting and compliance (required vs optional completion).
+columns:
+  id_user:
+    description: Degreed user identifier.
+    lineage:
+    - datalake_degreed_clean.users.id
+    - datalake_learning.content_completions.id_user
+  id_learning_object:
+    description: Identifier of the learning object (pathway, section, lesson, or content).
+    lineage:
+    - datalake_learning.lesson_contents.id_pathway
+  id_lesson:
+    description: Lesson identifier; null for Pathway/Section; for Content the parent lesson (most specific).
+    lineage:
+    - datalake_learning.lesson_contents.id_lesson
+  id_section:
+    description: Section identifier; null for Pathway; for Content the parent section.
+    lineage:
+    - datalake_learning.lesson_contents.id_section
+  id_pathway:
+    description: Pathway identifier; for Pathway type equals id_learning_object; for Content the parent pathway (most general).
+    lineage:
+    - datalake_learning.lesson_contents.id_pathway
+  learning_object_type:
+    description: Type of the learning object.
+    categories:
+      Pathway: Learning path (top-level container); metrics aggregated over all its contents.
+      Section: Section within a pathway; metrics aggregated over contents in that section.
+      Lesson: Lesson within a section; metrics aggregated over contents in that lesson.
+      Content: Single content item (smallest unit); content_total = 1, completed is 0 or 1.
+  learning_object_order:
+    description: Ordinal of the object in the hierarchy; 1=Pathway, 2=Section, 3=Lesson, 4=Content.
+  content_required:
+    description: Number of required contents in the learning object.
+    lineage:
+    - datalake_learning.lesson_contents.is_required
+  content_optional:
+    description: Number of optional contents in the learning object.
+    lineage:
+    - datalake_learning.lesson_contents.is_required
+  content_total:
+    description: Total number of contents in the learning object.
+    lineage:
+    - datalake_learning.lesson_contents.id_content
+  completed_required:
+    description: Number of required contents completed by the user in this object.
+    lineage:
+    - datalake_learning.content_completions
+    - datalake_learning.lesson_contents.is_required
+  completed_optional:
+    description: Number of optional contents completed by the user in this object.
+    lineage:
+    - datalake_learning.content_completions
+    - datalake_learning.lesson_contents.is_required
+  completed_total:
+    description: Total number of contents completed by the user in this object.
+    lineage:
+    - datalake_learning.content_completions
+  pct_completed_required:
+    description: Percentage of required contents completed (0-100).
+    lineage:
+    - datalake_learning.content_completions
+    - datalake_learning.lesson_contents
+  pct_completed_optional:
+    description: Percentage of optional contents completed (0-100).
+    lineage:
+    - datalake_learning.content_completions
+    - datalake_learning.lesson_contents
+  pct_completed_total:
+    description: Percentage of all contents completed (0-100).
+    lineage:
+    - datalake_learning.content_completions
+    - datalake_learning.lesson_contents
+  dt_completion:
+    description: Date of the last completed content applicable to this learning object (user scope).
+    lineage:
+    - datalake_learning.content_completions.dt_completed
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.

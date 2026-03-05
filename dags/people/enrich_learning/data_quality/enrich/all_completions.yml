@@ -1,0 +1,30 @@
+---
+table_name: datalake_learning.all_completions
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Warning
+  id_learning_object:
+    is_complete:
+      severity_level: Warning
+  learning_object_type:
+    is_complete:
+      severity_level: Warning
+  learning_object_order:
+    is_complete:
+      severity_level: Warning
+  content_total:
+    is_complete:
+      severity_level: Warning
+  completed_total:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning

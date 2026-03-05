@@ -5,11 +5,11 @@ SELECT
         FILTER(relationships, r -> r IS NOT NULL AND r.user IS NOT NULL), 1
     ).user.data.id AS id_user,
     CASE
-        WHEN REGEXP_LIKE(id_employee_internal, '^[0-9]{6}$') THEN id_employee_internal
+        WHEN REGEXP_LIKE(id_employee_internal, '^[0-9]{{6}}$') THEN id_employee_internal
         ELSE NULL
     END AS person_number,
     CASE
-        WHEN NOT REGEXP_LIKE(id_employee_internal, '^[0-9]{6}$') THEN id_employee_internal
+        WHEN NOT REGEXP_LIKE(id_employee_internal, '^[0-9]{{6}}$') THEN id_employee_internal
         ELSE NULL
     END AS employee_email,
     attributes.access_method AS access_method,
