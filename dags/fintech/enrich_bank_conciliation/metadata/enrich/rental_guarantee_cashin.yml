@@ -1,0 +1,84 @@
+---
+database_name: datalake_bank_conciliation
+table_name: rental_guarantee_cashin
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: "Reconciles Rental Guarantee PIX cash-in across SAP, bank statements, Checkout, and SAP Gateway ledger."
+columns:
+  id:
+    description: "Primary key of the SAP entry record."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id
+  id_business_entity:
+    description: "Business entity identifier associated to the SAP entry (guarantee id)."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id_business_entity
+  id_finance_entity:
+    description: "Finance entity identifier associated to the SAP entry (charge id)."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id_finance_entity
+  id_feature:
+    description: "SAP feature identifier used for SAP Gateway sync correlation."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id_feature
+  id_transaction:
+    description: "Checkout transaction identifier from PIX linking SAP charge to checkout."
+    lineage:
+      - datalake_checkout_clean.pix.id_transaction
+  transaction_name:
+    description: "Transaction name from SAP request context."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.transaction_name
+  sap_status:
+    description: "Status returned by SAP for the request (e.g., SUCCESS)."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.sap_status
+  trigger:
+    description: "Event that triggered the SAP entry (e.g., PIX_PAYMENT_CONFIRMATION)."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.trigger
+  ts_created:
+    description: "Creation timestamp for the SAP record."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.ts_created
+  id_external_payment:
+    description: "External payment identifier present in the SAP payload."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.id_external_payment
+  description:
+    description: "Human-readable description from the SAP request."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.description
+  request:
+    description: "Raw SAP request payload for auditing."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.request
+  origin_identifier:
+    description: "Identifier from Itau statements linking to the bank payment."
+    lineage:
+      - datalake_itau_statements_clean.statement_879200429691.origin_identifier
+  literal_complete:
+    description: "Full literal description from the Itau bank statement entry."
+    lineage:
+      - datalake_itau_statements_clean.statement_879200429691.literal_complete
+  hash:
+    description: "Hash key used to correlate SAP Gateway sync and PAS ledger."
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.hash
+  rental_guarantee_amount:
+    description: "Amount recorded in SAP for the rental guarantee entry."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.amount
+  bank_amount:
+    description: "Amount from the Itau bank statement matched to the payment."
+    lineage:
+      - datalake_itau_statements_clean.statement_879200429691.amount_value
+  checkout_amount:
+    description: "Due amount from Vans Checkout charge tied to the payment."
+    lineage:
+      - datalake_checkout_clean.charge.due_amount
+  sap_amount:
+    description: "Debit/Credit value from PAS ledger correlated via SAP Gateway hash."
+    lineage:
+      - datalake_pas.ledger.debit_credit
+
