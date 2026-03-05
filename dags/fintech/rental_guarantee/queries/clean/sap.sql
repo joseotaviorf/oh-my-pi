@@ -29,13 +29,31 @@ SELECT
     get_json_object(request, '$.reference-year-month') AS reference_year_month,
     response,
     trigger,
-    aggregate(
-      from_json(
-        get_json_object(request, '$.entries'),
-        'array<struct<amount: double, payment: struct<flag: string, method: string, installments: int>, `transaction-type`: string, `finance-entity-entry-id`: string>>'
+    coalesce(
+      element_at(
+        transform(
+          filter(
+            from_json(
+              get_json_object(request, '$.entries'),
+              'array<struct<amount: double, payment: struct<flag: string, method: string, installments: int>, `transaction-type`: string, `finance-entity-entry-id`: string>>'
+            ),
+            x -> x.`transaction-type` NOT LIKE '%receita-a-reconhecer%'
+          ),
+          x -> x.amount
+        ),
+        1
       ),
-      CAST(0.0 AS DOUBLE),
-      (acc, x) -> acc + x.amount
+      element_at(
+        transform(
+          from_json(
+            get_json_object(request, '$.entries'),
+            'array<struct<amount: double, payment: struct<flag: string, method: string, installments: int>, `transaction-type`: string, `finance-entity-entry-id`: string>>'
+          ),
+          x -> x.amount
+        ),
+        1
+      ),
+      CAST(0.0 AS DOUBLE)
     ) AS amount,
     CAST(get_json_object(request, '$.due-date') AS DATE) AS dt_due_date,
     CAST(get_json_object(request, '$.event-date') AS DATE) AS dt_event_date,
