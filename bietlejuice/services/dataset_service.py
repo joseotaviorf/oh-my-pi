@@ -1,6 +1,10 @@
+import json
+import re
 import requests
-from typing import Union
+from typing import Any, Dict, List, Optional, Union
 from datetime import datetime
+
+import boto3
 
 from airflow.datasets import Dataset
 from airflow.utils.context import Context
@@ -298,6 +302,124 @@ class DatasetService:
         else:
             return DagRunTypeEnum.TEST_RUN
 
+    @staticmethod
+    def _build_dataset_event_payload(
+        context: Context,
+        dataset_name: str,
+        dataset_alias: str,
+        event_type: str,
+        extra: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Build a JSON-serializable dict for one dataset event (for S3 list-of-dicts)."""
+        ti = context.get("task_instance") or context.get("ti")
+        if ti is None:
+            return {}
+        dag_run = context.get("dag_run") or getattr(ti, "dag_run", None)
+        data_interval_start = None
+        data_interval_end = None
+        if (
+            dag_run
+            and hasattr(dag_run, "data_interval_start")
+            and dag_run.data_interval_start
+        ):
+            data_interval_start = dag_run.data_interval_start.isoformat()
+        if (
+            dag_run
+            and hasattr(dag_run, "data_interval_end")
+            and dag_run.data_interval_end
+        ):
+            data_interval_end = dag_run.data_interval_end.isoformat()
+        return {
+            "dag_id": ti.dag_id,
+            "task_id": ti.task_id,
+            "run_id": ti.run_id,
+            "dataset_name": dataset_name,
+            "dataset_alias": dataset_alias,
+            "event_type": event_type,
+            "ts": datetime.utcnow().isoformat() + "Z",
+            "data_interval_start": data_interval_start,
+            "data_interval_end": data_interval_end,
+            "extra": extra or {},
+        }
+
+    @staticmethod
+    def _get_boto3_session_for_dataset_events():
+        """
+        Return a boto3 session for S3/STS used by dataset events.
+        If Variable DATASET_EVENTS_ASSUME_ROLE_ARN is set, assumes that role and returns
+        a session with the assumed credentials; otherwise uses default credentials.
+        """
+        role_arn = Variable.get("DATASET_EVENTS_ASSUME_ROLE_ARN", None)
+        if not role_arn:
+            return boto3.Session()
+        sts = boto3.client("sts")
+        response = sts.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName="airflow-dataset-events",
+            DurationSeconds=3600,
+        )
+        creds = response["Credentials"]
+        return boto3.Session(
+            aws_access_key_id=creds["AccessKeyId"],
+            aws_secret_access_key=creds["SecretAccessKey"],
+            aws_session_token=creds["SessionToken"],
+        )
+
+    @staticmethod
+    def _write_dataset_events_to_s3(events: List[Dict[str, Any]]) -> None:
+        """
+        Write a list of dataset event dicts to S3 as one JSON array (Spark-friendly).
+        Bucket from Airflow Variable DATASET_EVENTS_S3_BUCKET (bucket name only, no s3:// prefix); if unset or events empty, no-op.
+        If Variable DATASET_EVENTS_ASSUME_ROLE_ARN is set, assumes that IAM role before calling S3/STS.
+        Path: airflow_datasets/dataset_events/year=YYYY/month=MM/day=DD/<run_id>_<dag_id>_<task_id>_<ts>.json
+        """
+        bucket = Variable.get("DATASET_EVENTS_S3_BUCKET", None)
+        if not bucket or not events:
+            print(
+                f"m=write_dataset_events_to_s3, msg=Skipping S3 write. bucket={bucket!r}, events_count={len(events)}"
+            )
+            return
+        object_key = None
+        try:
+            session = DatasetService._get_boto3_session_for_dataset_events()
+            sts = session.client("sts")
+            identity = sts.get_caller_identity()
+            print(
+                f"m=write_dataset_events_to_s3, msg=AWS caller identity (dataset post action): {identity}"
+            )
+            first = events[0]
+            ts = str(first.get("ts", datetime.utcnow().isoformat() + "Z"))
+            run_id = str(first.get("run_id", ""))
+            dag_id = str(first.get("dag_id", ""))
+            task_id = str(first.get("task_id", ""))
+            ts_safe = re.sub(r"[^\w\-.:]", "_", ts)[:26]
+            run_id_safe = re.sub(r"[^\w\-]", "_", run_id)[:64]
+            dag_id_safe = re.sub(r"[^\w\-]", "_", dag_id)[:64]
+            task_id_safe = re.sub(r"[^\w\-]", "_", task_id)[:64]
+            year, month, day = ts[:4], ts[5:7], ts[8:10]
+            object_key = (
+                f"airflow_datasets/dataset_events/year={year}/month={month}/day={day}"
+                f"/{run_id_safe}_{dag_id_safe}_{task_id_safe}_{ts_safe}.json"
+            )
+            print(
+                f"m=write_dataset_events_to_s3, msg=Writing dataset events to S3. bucket={bucket!r}, key={object_key!r}, events_count={len(events)}"
+            )
+            body = json.dumps(events, default=str)
+            client = session.client("s3")
+            client.put_object(
+                Bucket=bucket,
+                Key=object_key,
+                Body=body,
+                ContentType="application/json",
+            )
+            print(
+                f"m=write_dataset_events_to_s3, msg=Wrote dataset events to S3. bucket={bucket!r}, key={object_key!r}"
+            )
+        except Exception as e:
+            print(
+                f"m=write_dataset_events_to_s3, msg=Failed to write dataset events to S3. bucket={bucket!r}, key={object_key!r}, error={e}"
+            )
+
     @classmethod
     def update_datasets(cls, context: Context) -> None:
         """
@@ -322,6 +444,8 @@ class DatasetService:
                 dataset_alias=dataset_alias
             )
 
+            event_payloads: List[Dict[str, Any]] = []
+
             if DatasetService.is_reprocessing_run(context):
                 reprocessing_date = DatasetService.find_reprocessing_date(context)
                 if reprocessing_date < datetime.now().date().isoformat():
@@ -332,22 +456,37 @@ class DatasetService:
                     print(
                         "This is a reprocessing run, updating the dataset with ':reprocessing' suffix."
                     )
+                    extra_reprocessing = {
+                        # The downstream DAGs can use this to know which DAG initially triggered the reprocessing
+                        # This is useful to avoid triggering the same DAG multiple times, and for debugging purposes
+                        "reprocessing_source": DatasetService.find_reprocessing_source(
+                            context
+                        ),
+                        "reprocessing_date": reprocessing_date,
+                    }
                     context["outlet_events"][dataset_alias].add(
                         Dataset(f"{dataset_name}:reprocessing"),
-                        extra={
-                            # The downstream DAGs can use this to know which DAG initially triggered the reprocessing
-                            # This is useful to avoid triggering the same DAG multiple times, and for debugging purposes
-                            "reprocessing_source": DatasetService.find_reprocessing_source(
-                                context
-                            ),
-                            "reprocessing_date": reprocessing_date,
-                        },
+                        extra=extra_reprocessing,
+                    )
+                    event_payloads.append(
+                        cls._build_dataset_event_payload(
+                            context,
+                            f"{dataset_name}:reprocessing",
+                            dataset_alias,
+                            "reprocessing",
+                            extra_reprocessing,
+                        )
                     )
             elif DatasetService._is_impacting_downstream_dependents(context):
                 print(
                     "This run will impact downstream dependents, updating the dataset without a suffix."
                 )
                 context["outlet_events"][dataset_alias].add(Dataset(dataset_name))
+                event_payloads.append(
+                    cls._build_dataset_event_payload(
+                        context, dataset_name, dataset_alias, "normal", {}
+                    )
+                )
                 if is_first_run_of_date:
                     # Let's imagine we have a DAG A that is intraday,
                     # DAG B depends on DAG A, but DAG B only needs to run once (it is not intraday).
@@ -358,6 +497,20 @@ class DatasetService:
                     context["outlet_events"][dataset_alias].add(
                         Dataset(f"{dataset_name}:first-run-of-day")
                     )
+                    event_payloads.append(
+                        cls._build_dataset_event_payload(
+                            context,
+                            f"{dataset_name}:first-run-of-day",
+                            dataset_alias,
+                            "first_run_of_day",
+                            {},
+                        )
+                    )
+
+            try:
+                cls._write_dataset_events_to_s3(event_payloads)
+            except Exception:
+                pass
         except Exception as e:
             webhook_url = Variable.get("DLC_GCHAT_DATASET_EVENTS", None)
             payload = DatasetService.format_alert_message(context)

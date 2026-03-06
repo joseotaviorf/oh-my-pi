@@ -1,3 +1,4 @@
+import json
 import pytest
 import pendulum
 import datetime
@@ -306,6 +307,102 @@ class TestDatasetService:
         }
         DatasetService.update_datasets(mock_context)
         mock_context["outlet_events"]["dag:task:alias"].add.assert_not_called()
+
+    @mock.patch("bietlejuice.services.dataset_service.boto3")
+    @mock.patch("bietlejuice.services.dataset_service.Variable.get")
+    def test_update_datasets_should_not_call_s3_when_bucket_variable_unset(
+        self, mock_variable_get, mock_boto3, mock_is_first_run_of_date, mock_context
+    ):
+        mock_variable_get.return_value = None
+        s3_client = mock.MagicMock()
+        mock_boto3.client.return_value = s3_client
+        DatasetService.update_datasets(mock_context)
+        mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
+            [
+                mock.call(Dataset("dag:task")),
+                mock.call(Dataset("dag:task:first-run-of-day")),
+            ],
+            any_order=True,
+        )
+        # When bucket is unset we must not write to S3 (put_object not called)
+        s3_client.put_object.assert_not_called()
+
+    @mock.patch("bietlejuice.services.dataset_service.boto3")
+    @mock.patch("bietlejuice.services.dataset_service.Variable.get")
+    def test_update_datasets_should_write_list_of_dicts_to_s3_when_bucket_set(
+        self, mock_variable_get, mock_boto3, mock_is_first_run_of_date, mock_context
+    ):
+        def variable_get(key, default=None):
+            return (
+                "my-dataset-events-bucket"
+                if key == "DATASET_EVENTS_S3_BUCKET"
+                else default
+            )
+
+        mock_variable_get.side_effect = variable_get
+        s3_client = mock.MagicMock()
+        mock_session = mock.MagicMock()
+        mock_session.client.side_effect = lambda service: (
+            mock.MagicMock(get_caller_identity=mock.MagicMock(return_value={}))
+            if service == "sts"
+            else s3_client
+        )
+        mock_boto3.Session.return_value = mock_session
+        mock_context["ti"].dag_id = "dag"
+        mock_context["ti"].run_id = "dag_run_id"
+
+        DatasetService.update_datasets(mock_context)
+
+        s3_client.put_object.assert_called_once()
+        call_kw = s3_client.put_object.call_args[1]
+        assert call_kw["Bucket"] == "my-dataset-events-bucket"
+        assert call_kw["Key"].startswith("airflow_datasets/dataset_events/year=")
+        body = json.loads(call_kw["Body"])
+        assert isinstance(body, list)
+        assert len(body) == 2
+        event_types = {e["event_type"] for e in body}
+        assert "normal" in event_types
+        assert "first_run_of_day" in event_types
+        assert body[0]["dag_id"] == "dag"
+        assert body[0]["task_id"] == "task"
+        assert body[0]["dataset_alias"] == "dag:task:alias"
+
+    @mock.patch("bietlejuice.services.dataset_service.boto3")
+    @mock.patch("bietlejuice.services.dataset_service.Variable.get")
+    def test_update_datasets_should_write_reprocessing_list_to_s3_when_bucket_set(
+        self, mock_variable_get, mock_boto3, mock_is_first_run_of_date, mock_context
+    ):
+        def variable_get(key, default=None):
+            return (
+                "my-dataset-events-bucket"
+                if key == "DATASET_EVENTS_S3_BUCKET"
+                else default
+            )
+
+        mock_variable_get.side_effect = variable_get
+        s3_client = mock.MagicMock()
+        mock_session = mock.MagicMock()
+        mock_session.client.side_effect = lambda service: (
+            mock.MagicMock(get_caller_identity=mock.MagicMock(return_value={}))
+            if service == "sts"
+            else s3_client
+        )
+        mock_boto3.Session.return_value = mock_session
+        mock_context["params"]["run_type"] = "reprocessing_run"
+        mock_context["ti"].dag_id = "dag"
+        mock_context["ti"].run_id = "dag_run_id"
+
+        DatasetService.update_datasets(mock_context)
+
+        s3_client.put_object.assert_called_once()
+        call_kw = s3_client.put_object.call_args[1]
+        body = json.loads(call_kw["Body"])
+        assert isinstance(body, list)
+        assert len(body) == 1
+        assert body[0]["event_type"] == "reprocessing"
+        assert body[0]["dataset_name"] == "dag:task:reprocessing"
+        assert body[0]["extra"]["reprocessing_source"] == "dag"
+        assert body[0]["extra"]["reprocessing_date"] == FAKE_TIME.date().isoformat()
 
 
 def dataset_equals(d1: BaseDataset, d2: BaseDataset) -> bool:
