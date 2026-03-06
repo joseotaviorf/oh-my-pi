@@ -243,28 +243,6 @@ FROM VALUES
 
         -- HUE V3 Sale exp
     (
-        "ab_beakman_search_services_hue_v3_experiment_v2_sale",
-        named_struct(
-            'begin_date', DATE('2026-02-14'),
-            'end_date', DATE('2026-02-25'),
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'sale'",
-            'metrics', to_json(
-                                    named_struct(
-                                                    'default_metrics', true,
-                                                    'experiment_metrics', array()
-                                                )
-                                ),
-           'running', True
-        )
-    ),
-
-    (
         "ab_beakman_search_services_hue_v3_experiment_v3_sale",
         named_struct(
             'begin_date', DATE('2026-02-27'),
