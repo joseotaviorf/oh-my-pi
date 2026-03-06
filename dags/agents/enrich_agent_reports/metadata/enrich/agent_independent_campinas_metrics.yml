@@ -33,6 +33,14 @@ columns:
     lineage:
       - datalake_agent_reports.agent_status_by_month.is_passive_lead_receiver
     description: Whether the agent was a passive lead receiver. Null when no Demand record.
+  dt_independent_agent_registered:
+    lineage:
+      - datalake_agent_reports.agent_status_by_month.agent_status_start
+    description: >
+      Date of the last change from is_passive_lead_receiver true to false for this agent
+      (max agent_status_start over status rows where is_passive_lead_receiver = false).
+      When null (agent never observed as non-passive in the window), falls back to account
+      creation date (earlier of ts_agent_created and ts_ciq_created).
   ts_agent_created:
     lineage:
       - datalake_ebdb_clean.agent_data.ts_created

@@ -20,12 +20,14 @@ from pyspark.sql.functions import (
     datediff,
     least,
     lit,
+    max as spark_max,
     min as spark_min,
     to_date,
     when,
 )
 from pyspark.sql.types import (
     BooleanType,
+    DateType,
     LongType,
     StringType,
     StructField,
@@ -384,6 +386,17 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
             & (col("reference_month") <= lit(month_end))
         )
     )
+    # Last date per agent when is_passive_lead_receiver went from true to false (most recent registration as independent).
+    last_independent = (
+        status.filter(col("is_passive_lead_receiver") == False)
+        .groupBy("id_agent")
+        .agg(spark_max("agent_status_start").alias("ts_independent_agent_registered"))
+        .withColumn(
+            "dt_independent_agent_registered",
+            to_date(col("ts_independent_agent_registered")),
+        )
+        .select(col("id_agent").alias("fi_id_agent"), col("dt_independent_agent_registered"))
+    )
     tqx             = _tqx_first_date_df(month_start, month_end)
     first_listing   = _valid_first_listing_df(month_start, month_end)
     region_mapping  = _cities_region_mapping(ancestor_ids=[CAMPINAS_CITY_ID])
@@ -401,6 +414,7 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
     main = (
         status.alias("s")
         .join(campinas_agents.alias("ca"), col("s.id_agent") == col("ca.id_agent"), "inner")
+        .join(last_independent, col("s.id_agent") == col("fi_id_agent"), "left")
         .join(agent_data, col("s.id_agent") == col("ad_id"), "left")
         .join(
             partner_agent,
@@ -428,6 +442,10 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
         col("s.ciq_status"),
         col("s.agent_status"),
         col("s.is_passive_lead_receiver"),
+        coalesce(
+            col("dt_independent_agent_registered"),
+            to_date(least(col("ts_agent_created"), col("ts_ciq_created"))),
+        ).alias("dt_independent_agent_registered"),
         col("ts_agent_created"),
         col("ts_ciq_created"),
         col("tqx.ts_first_activation_TQX_referral"),
@@ -451,6 +469,9 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
     ).withColumn(
         "days_since_agent_created",
         datediff(col("reference_month"), least(col("ts_agent_created"), col("ts_ciq_created")))
+    ).withColumn(
+        "days_since_independent_agent_registered",
+        datediff(col("reference_month"), col("dt_independent_agent_registered"))
     )
 
     return result
