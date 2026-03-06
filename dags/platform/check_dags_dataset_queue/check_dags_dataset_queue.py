@@ -122,7 +122,7 @@ with DAG(
         "start_date": datetime(2025, 5, 16, 0, 0, 0, tzinfo=LOCAL_TZ),
     },
     description="Check if there are DAGs waiting on Dataset events and alert channels to avoid unexpected triggers.",
-    schedule_interval="0 16-19 * * *",
+    schedule_interval="*/10 20-21 * * *",
     catchup=False,
     tags=["monitoring", "dataset"],
 ) as dag:
