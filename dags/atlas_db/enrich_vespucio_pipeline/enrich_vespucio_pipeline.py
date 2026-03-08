@@ -198,6 +198,7 @@ class Tables:
     listings = "vespucio_prod_delta.listings"
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
+    classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
     classified_compounds = "vespucio_classifieds.classifieds_compound"
 
     # golden_set_condo_compounds = (
@@ -675,6 +676,14 @@ zordominium_tasks = [
 ]
 
 classifieds_tasks = [
+    create_task(
+        entry_point="plugins_classified_house_id",
+        parameters=[
+            f"--input_listing_compound={Tables.listings}",
+            f"--input_classifieds_house_id={Tables.classifieds_house_id}",
+            f"--output_classifieds_house_id={Tables.classifieds_house_id}",
+        ],
+    ),
     create_task(
         entry_point="plugins_classifieds",
         parameters=[
