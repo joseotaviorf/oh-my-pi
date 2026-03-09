@@ -16,6 +16,7 @@ current_assignments AS (
         id_period_of_service,
         id_person,
         assignment_number,
+        legislation_code,
         assignment_type,
         assignment_status_type,
         dt_projected_started
@@ -81,6 +82,7 @@ SELECT
     ca.id_person,
     COALESCE(wr.registration, lr.legacy_registration) AS legacy_registration,
     ca.assignment_number,
+    ca.legislation_code,
     cp.person_number,
     ca.assignment_type,
     ca.assignment_status_type,

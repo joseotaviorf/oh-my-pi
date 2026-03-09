@@ -27,6 +27,10 @@ columns:
     description: The assignment registration number.
     lineage:
     - datalake_pin_core_clean.all_assignments.assignment_number
+  legislation_code:
+    description: Legislation code applicable to the work assignment.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.legislation_code
   person_number:
     description: The person's identification number in the main HR system.
     lineage:

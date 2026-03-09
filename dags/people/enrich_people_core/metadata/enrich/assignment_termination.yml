@@ -1,0 +1,52 @@
+database_name: datalake_people_core
+table_name: assignment_termination
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Consolidated table with assignment termination and dismissal information. Contains
+  only employees already terminated or with scheduled termination (notice given).
+  Includes identifiers, hire/termination dates, action and reason codes, and dismissal type and reason.
+
+columns:
+  id_assignment:
+    description: Unique identifier for the work assignment.
+    lineage:
+    - datalake_people_core.identifier_mapping.id_assignment
+  person_number:
+    description: The person identification number in the main HR system.
+    lineage:
+    - datalake_people_core.identifier_mapping.person_number
+  assignment_number:
+    description: The assignment registration number (matrícula).
+    lineage:
+    - datalake_people_core.identifier_mapping.assignment_number
+  dt_hired:
+    description: Effective start date of the work assignment.
+    lineage:
+    - datalake_people_core.identifier_mapping.dt_started
+  dt_notified:
+    description: Date on which the termination was notified (aviso prévio).
+    lineage:
+    - datalake_people_core.identifier_mapping.dt_notified_termination
+  dt_terminated:
+    description: Actual termination date of the work assignment.
+    lineage:
+    - datalake_people_core.identifier_mapping.dt_actual_termination
+  action_code:
+    description: Code that identifies the termination action (e.g., TERMINATION, RESIGNATION).
+    lineage:
+    - datalake_pin_core_clean.all_assignments.action_code
+  reason_code:
+    description: Code that identifies the termination reason.
+    lineage:
+    - datalake_pin_core_clean.all_assignments.reason_code
+  dismissal_type:
+    description: Description of the employee dismissal type. Null if no dismissal.
+    lineage:
+    - datalake_hr_system_clean.actions_lov.description
+  dismissal_reason:
+    description: Reason for the employee dismissal. Null if no dismissal.
+    lineage:
+    - datalake_pin_core_clean.action_reason_translation.action_reason
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.

@@ -30,6 +30,8 @@ workflow:
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   inner_dependencies:
+    assignment_termination:
+      - identifier_mapping
     management_hierarchy:
       - identifier_mapping
   tables_customization:
@@ -37,6 +39,9 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     identifier_mapping:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    assignment_termination:
       vacuum_retention_hours: 168
       vacuum_lite: true
     management_hierarchy:
