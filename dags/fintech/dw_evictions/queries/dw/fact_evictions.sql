@@ -66,139 +66,37 @@ negotiation AS (
     WHERE fn.dt_down_payment IS NOT NULL
     AND fni.installment_number >= 2
 )
-SELECT
-    id_process AS sk_process,
-    contract AS sk_contract,
-    'elaw' AS source,
-    CAST(process AS VARCHAR(100)) AS process,
-    input_type,
-    CAST(action_type AS VARCHAR(100)) AS action_type,
-    action,
-    office,
-    collection_agency,
-    chamber,
-    region,
-    city,
-    contract_status,
-    elaw_status AS cyber_status,
-    last_stage,
-    CAST(NULL AS DECIMAL(10, 2)) AS arbitral_distribution_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS arbitral_citation_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS arbitral_sentence_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS judiciary_distribution_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS judicial_summons_decision_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS judicial_summons_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS coercive_decision_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS coercive_issuance_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS judicial_petition_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS possession_imission_decision_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS possession_imission_issuance_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS execution_requirement_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS prejudgment_attachment_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS execution_citation_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS asset_attachment_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS asset_evaluation_expense_amount,
-    CAST(NULL AS DECIMAL(10, 2)) AS credit_satisfaction_expense_amount,
-    passage_status,
-    procedure,
-    consolidated_reason,
-    standardized_reason,
-    result,
-    contract_category_at_registration,
-    overdue_days_at_registration,
-    succumbency_fee,
-    total_package,
-    total_due_amount,
-    ldt_stock,
-    stock_range,
-    ldt_resolution,
-    resolution_range,
-    ldt_coercive,
-    last_occurrence,
-    real_ldt_resolution,
-    ldt_arbitral_distribution,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_arbitral_citation,
-    ldt_arbitral_award,
-    ldt_judiciary_distribution,
-    ldt_judicial_summons_decision,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_judicial_summons,
-    ldt_coercive_decision,
-    ldt_coercive_order_issuance_decision,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_possesion_imission_decisions,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_possesion_imission_issuance,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_judicial_petition,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_execution_requirement_decision,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_prejudgment_attachment,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_executed_citation,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_asset_attachment,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_asset_evaluation,
-    CAST(NULL AS DECIMAL(10, 2)) AS ldt_redit_satisfaction,
-    has_arbitration_defense,
-    has_redistribution,
-    CAST(is_reincident AS BOOLEAN) AS is_reincident,
-    dt_registered,
-    dt_arbitral_distribution AS dt_arbitral_distribution_start,
-    CAST(NULL AS DATE) AS dt_arbitral_distribution_end,
-    dt_arbitral_citation AS dt_arbitral_citation_start,
-    CAST(NULL AS DATE) AS dt_arbitral_citation_end,
-    dt_arbitral_contestation,
-    dt_arbitral_sentence AS dt_arbitral_sentence_start,
-    CAST(NULL AS DATE) AS dt_arbitral_sentence_end,
-    dt_judiciary_pre_registration,
-    dt_judiciary_distribution AS dt_judiciary_distribution_start,
-    CAST(NULL AS DATE) AS dt_judiciary_distribution_end,
-    dt_judicial_summons_decision AS dt_judicial_summons_decision_start,
-    CAST(NULL AS DATE) AS dt_judicial_summons_decision_end,
-    dt_judicial_summons AS dt_judicial_summons_start,
-    CAST(NULL AS DATE) AS dt_judicial_summons_end,
-    dt_judicial_defense,
-    dt_coercive_decision AS dt_coercive_decision_start,
-    CAST(NULL AS DATE) AS dt_coercive_decision_end,
-    dt_coercive_issuance AS dt_coercive_issuance_start,
-    CAST(NULL AS DATE) AS dt_coercive_issuance_end,
-    CAST(NULL AS DATE) AS dt_judicial_petition_start,
-    CAST(NULL AS DATE) AS dt_judicial_petition_end,
-    CAST(NULL AS DATE) AS dt_possession_imission_decision_start,
-    CAST(NULL AS DATE) AS dt_possession_imission_decision_end,
-    CAST(NULL AS DATE) AS dt_possession_imission_issuance_start,
-    CAST(NULL AS DATE) AS dt_possession_imission_issuance_end,
-    CAST(NULL AS DATE) AS dt_execution_requirement_start,
-    CAST(NULL AS DATE) AS dt_execution_requirement_end,
-    CAST(NULL AS DATE) AS dt_prejudgment_attachment_start,
-    CAST(NULL AS DATE) AS dt_prejudgment_attachment_end,
-    CAST(NULL AS DATE) AS dt_execution_citation_start,
-    CAST(NULL AS DATE) AS dt_execution_citation_end,
-    dt_asset_attachment AS dt_asset_attachment_start,
-    CAST(NULL AS DATE) AS dt_asset_attachment_end,
-    CAST(NULL AS DATE) AS dt_asset_evaluation_start,
-    CAST(NULL AS DATE) AS dt_asset_evaluation_end,
-    CAST(NULL AS DATE) AS dt_credit_satisfaction_start,
-    CAST(NULL AS DATE) AS dt_credit_satisfaction_end,
-    dt_elaw_closure AS dt_closure,
-    CAST(NULL AS DATE) AS ts_updated,
-    NOW() AS ts_load
-FROM
-    datalake_gsheets_clean.evictions_base
-WHERE id_process NOT IN (SELECT id_process FROM datalake_cyber_legal.evictions_base)
-
-UNION ALL
-
 SELECT DISTINCT
-    e.id_process AS sk_process,
-    e.contract AS sk_contract,
-    'cyber_legal' AS source,
-    CAST(e.process AS VARCHAR(100)) AS process,
-    e.input_type,
-    CAST(e.action_type AS VARCHAR(100)) AS action_type,
-    e.action,
-    e.office,
-    e.collection_agency,
-    e.chamber,
-    e.region,
-    e.city,
-    e.contract_status,
-    e.cyber_status,
-    e.last_stage,
+    COALESCE(e.id_process, l.id_process) AS sk_process,
+    COALESCE(e.contract, l.contract) AS sk_contract,
+    CASE WHEN e.id_process IS NOT NULL THEN 'cyber_legal' ELSE 'elaw' END AS source,
+    COALESCE(e.process, l.process) AS process,
+    COALESCE(e.input_type, l.input_type) AS input_type,
+    COALESCE(CASE
+        WHEN o.open_amount IS NULL THEN 'Adimplente'
+        WHEN o.fpd_invoices > 0 THEN 'FPD'
+        WHEN EXISTS (
+                SELECT 1
+                FROM negotiation n
+                WHERE n.sk_contract = BIGINT(TRIM(e.contract))
+                  AND n.dt_down_payment <= DATE(e.dt_registered)
+                  AND (n.dt_paid > DATE(e.dt_registered) OR n.dt_paid IS NULL)
+              )
+            OR o.negotiation_invoices > 0 THEN 'Acordo Ativo'
+        WHEN o.monthly_invoices > 0 THEN 'Mensal'
+        WHEN o.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
+        ELSE 'Outros'
+    END, l.contract_category_at_registration) AS contract_category_at_registration,
+    COALESCE(e.action_type, l.action_type) AS action_type,
+    COALESCE(e.action, l.action) AS action,
+    COALESCE(e.office, l.office) AS office,
+    COALESCE(e.collection_agency, l.collection_agency) AS collection_agency,
+    COALESCE(e.chamber, l.chamber) AS chamber,
+    COALESCE(e.region, l.region) AS region,
+    COALESCE(e.city, l.city) AS city,
+    COALESCE(e.contract_status, l.contract_status) AS contract_status,
+    COALESCE(e.cyber_status, l.elaw_status) AS cyber_status,
+    COALESCE(e.last_stage, l.last_stage) AS last_stage,
     e.arbitral_distribution_expense_amount,
     e.arbitral_citation_expense_amount,
     e.arbitral_sentence_expense_amount,
@@ -216,37 +114,22 @@ SELECT DISTINCT
     e.asset_attachment_expense_amount,
     e.asset_evaluation_expense_amount,
     e.credit_satisfaction_expense_amount,
-    e.passage_status,
-    e.procedure,
-    e.consolidated_reason,
-    e.standardized_reason,
-    e.result,
-    CASE
-        WHEN o.open_amount IS NULL THEN 'Adimplente'
-        WHEN o.fpd_invoices > 0 THEN 'FPD'
-        WHEN EXISTS (
-                SELECT 1
-                FROM negotiation n
-                WHERE n.sk_contract = BIGINT(TRIM(e.contract))
-                  AND n.dt_down_payment <= DATE(e.dt_registered)
-                  AND (n.dt_paid > DATE(e.dt_registered) OR n.dt_paid IS NULL)
-              )
-            OR o.negotiation_invoices > 0 THEN 'Acordo Ativo'
-        WHEN o.monthly_invoices > 0 THEN 'Mensal'
-        WHEN o.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
-        ELSE 'Outros'
-    END AS contract_category_at_registration,
-    o.delay_days AS overdue_days_at_registration,
-    e.succumbency_fee,
-    COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0) AS total_package,
-    IF(e.dt_closure IS NOT NULL, o.open_amount, oa.open_amount) AS total_due_amount,
-    e.ldt_stock,
-    e.stock_range,
-    e.ldt_resolution,
-    e.resolution_range,
-    e.ldt_coercive,
-    e.last_occurrence,
-    DATE_DIFF(DAY, DATE(e.dt_registered), e.dt_closure) AS real_ldt_resolution,
+    COALESCE(e.passage_status, l.passage_status) AS passage_status,
+    COALESCE(e.procedure, l.procedure) AS procedure,
+    COALESCE(e.consolidated_reason, l.consolidated_reason) AS consolidated_reason,
+    COALESCE(e.standardized_reason, l.standardized_reason) AS standardized_reason,
+    COALESCE(e.result, l.result) AS result,
+    COALESCE(o.delay_days, l.overdue_days_at_registration) AS overdue_days_at_registration,
+    COALESCE(e.succumbency_fee, l.succumbency_fee) AS succumbency_fee,
+    COALESCE(COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0), l.total_package) AS total_package,
+    COALESCE(IF(e.dt_closure IS NOT NULL, o.open_amount, oa.open_amount), l.total_due_amount) AS total_due_amount,
+    COALESCE(e.ldt_stock, l.ldt_stock) AS ldt_stock,
+    COALESCE(e.stock_range, l.stock_range) AS stock_range,
+    COALESCE(e.ldt_resolution, l.ldt_resolution) AS ldt_resolution,
+    COALESCE(e.resolution_range, l.resolution_range) AS resolution_range,
+    COALESCE(e.ldt_coercive, l.ldt_coercive) AS ldt_coercive,
+    COALESCE(e.last_occurrence, l.last_occurrence) AS last_occurrence,
+    COALESCE(DATE_DIFF(DAY, DATE(e.dt_registered), e.dt_closure), l.real_ldt_resolution) AS real_ldt_resolution,
         --leadtimes despejo
     COUNT(DISTINCT
         CASE
@@ -386,28 +269,29 @@ SELECT DISTINCT
                   (DATE(e.dt_credit_satisfaction_start) IS NOT NULL AND DATE(e.dt_credit_satisfaction_start) >= d.date) OR
                   (DATE(e.dt_credit_satisfaction_start) IS NULL AND CURRENT_DATE() >= d.date)
                   ) THEN d.sk_date END) AS ldt_redit_satisfaction,
-    e.has_arbitration_defense,
-    e.has_redistribution,
-    e.is_reincident,
-    e.dt_registered,
-    e.dt_arbitral_distribution_start,
+    COALESCE(e.has_arbitration_defense, l.has_arbitration_defense) AS has_arbitration_defense,
+    COALESCE(e.has_redistribution, l.has_redistribution) AS has_redistribution,
+    COALESCE(e.is_reincident, CAST(l.is_reincident AS BOOLEAN)) AS is_reincident,
+    IF(e.id_process IS NOT NULL AND l.id_process IS NOT NULL, TRUE, FALSE) AS is_migrated,
+    COALESCE(e.dt_registered, l.dt_registered) AS dt_registered,
+    COALESCE(e.dt_arbitral_distribution_start, l.dt_arbitral_distribution) AS dt_arbitral_distribution_start,
     e.dt_arbitral_distribution_end,
-    e.dt_arbitral_citation_start,
+    COALESCE(e.dt_arbitral_citation_start, l.dt_arbitral_citation) AS dt_arbitral_citation_start,
     e.dt_arbitral_citation_end,
-    e.dt_arbitral_contestation,
-    e.dt_arbitral_sentence_start,
+    COALESCE(e.dt_arbitral_contestation, l.dt_arbitral_contestation) AS dt_arbitral_contestation,
+    COALESCE(e.dt_arbitral_sentence_start, l.dt_arbitral_sentence) AS dt_arbitral_sentence_start,
     e.dt_arbitral_sentence_end,
-    e.dt_judiciary_pre_registration,
-    e.dt_judiciary_distribution_start,
+    COALESCE(e.dt_judiciary_pre_registration, l.dt_judiciary_pre_registration) AS dt_judiciary_pre_registration,
+    COALESCE(e.dt_judiciary_distribution_start, dt_judiciary_distribution) AS dt_judiciary_distribution_start,
     e.dt_judiciary_distribution_end,
-    e.dt_judicial_summons_decision_start,
+    COALESCE(e.dt_judicial_summons_decision_start, l.dt_judicial_summons_decision) AS dt_judicial_summons_decision_start,
     e.dt_judicial_summons_decision_end,
-    e.dt_judicial_summons_start,
+    COALESCE(e.dt_judicial_summons_start, l.dt_judicial_summons) AS dt_judicial_summons_start,
     e.dt_judicial_summons_end,
-    e.dt_judicial_defense,
-    e.dt_coercive_decision_start,
+    COALESCE(e.dt_judicial_defense, l.dt_judicial_defense) AS dt_judicial_defense,
+    COALESCE(e.dt_coercive_decision_start, l.dt_coercive_decision) AS dt_coercive_decision_start,
     e.dt_coercive_decision_end,
-    e.dt_coercive_issuance_start,
+    COALESCE(e.dt_coercive_issuance_start, l.dt_coercive_issuance) AS dt_coercive_issuance_start,
     e.dt_coercive_issuance_end,
     e.dt_judicial_petition_start,
     e.dt_judicial_petition_end,
@@ -421,13 +305,13 @@ SELECT DISTINCT
     e.dt_prejudgment_attachment_end,
     e.dt_execution_citation_start,
     e.dt_execution_citation_end,
-    e.dt_asset_attachment_start,
+    COALESCE(e.dt_asset_attachment_start, l.dt_asset_attachment) AS dt_asset_attachment_start,
     e.dt_asset_attachment_end,
     e.dt_asset_evaluation_start,
     e.dt_asset_evaluation_end,
     e.dt_credit_satisfaction_start,
     e.dt_credit_satisfaction_end,
-    e.dt_closure,
+    COALESCE(e.dt_closure, l.dt_elaw_closure) AS dt_closure,
     e.ts_updated,
     NOW() AS ts_load
 FROM
@@ -445,4 +329,6 @@ LEFT JOIN
 LEFT JOIN
     dw_rent.dim_contract c
     ON e.contract = c.id_contract
+FULL OUTER JOIN datalake_gsheets_clean.evictions_base l
+    ON e.id_process = l.id_process
 GROUP BY ALL

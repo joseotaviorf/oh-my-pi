@@ -1,10 +1,11 @@
 SELECT
-    ACACCT AS id_contract,
+    ACACCT AS id_case,
     ACCIDNAM AS id_user,
     ACACCTG AS contract_group,
     CASE
         WHEN ACACCTG = "1" THEN "QuintoAndar"
         WHEN ACACCTG = "2" THEN "QuintoCred"
+        when ACACCTG = "j" then "CyberLegal"
         ELSE ACACCTG
     END AS creditor,
     ACARCOD AS region_code,
@@ -23,7 +24,7 @@ SELECT
     month,
     day,
     NOW() AS ts_load
-FROM datalake_cyber_raw.actfil
+FROM datalake_cyber_legal_raw.actfil
 WHERE
      MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-     AND ACACCTG != 'j'
+     AND ACACCTG = 'j'

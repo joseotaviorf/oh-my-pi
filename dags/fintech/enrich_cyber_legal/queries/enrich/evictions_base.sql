@@ -1,4 +1,12 @@
 WITH
+get_first_process_closure AS (
+    SELECT
+        id_case,
+        dt_status_changed AS dt_first_closure
+    FROM datalake_cyber_legal_historical_clean.historical_case_status
+    WHERE case_status = 'Completed'
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_case ORDER BY dt_status_changed) = 1
+),
 get_process_stages AS (
     SELECT DISTINCT
         id_case,
@@ -159,6 +167,7 @@ SELECT DISTINCT
         WHEN p.dt_status_changed IS NOT NULL AND p.case_status = 'Completed' THEN 'Encerrado'
     ELSE NULL END AS passage_status,
     CASE WHEN COUNT(*) OVER (PARTITION BY BIGINT(id_contract)) > 1 THEN TRUE ELSE FALSE END AS is_reincident,
+    IF(p.case_status = 'Active' AND fpc.dt_first_closure IS NOT NULL, TRUE, FALSE) AS is_reopened,
     'not_in_cyber_legal' AS procedure,
     p.case_result_description AS consolidated_reason,
     p.case_final_description AS standardized_reason,
@@ -222,7 +231,7 @@ SELECT DISTINCT
     s.stage_avaliacao_bens_dt_end AS dt_asset_evaluation_end,
     s.stage_satisfacao_credito_dt_start AS dt_credit_satisfaction_start,
     s.stage_satisfacao_credito_dt_end AS dt_credit_satisfaction_end,
-    IF(p.case_status = 'Completed', p.dt_status_changed, NULL) AS dt_closure,
+    fpc.dt_first_closure AS dt_closure,
     p.ts_updated
 FROM
     datalake_cyber_legal.process AS p
@@ -232,3 +241,6 @@ LEFT JOIN
 LEFT JOIN
     get_last_process_stage AS ps
     ON p.id_case = ps.id_case
+LEFT JOIN
+    get_first_process_closure AS fpc
+    ON p.id_case = fpc.id_case

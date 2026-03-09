@@ -650,7 +650,7 @@ bietlejuice.dw_employee_test:
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.dw_evictions:
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
-  - bietlejuice.cyber:load-clean-logs:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-logs-juridical:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
@@ -2105,6 +2105,7 @@ bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber_legal:load-clean-case:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-court:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-values-list:first-run-of-day
+  - bietlejuice.cyber_legal_historical:load-clean-historical-case-status:first-run-of-day
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house:first-run-of-day
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows:first-run-of-day

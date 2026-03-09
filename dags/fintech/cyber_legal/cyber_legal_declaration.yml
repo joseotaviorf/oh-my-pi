@@ -138,22 +138,30 @@ workflow:
         - "[]"
         - False
         - "[]"
-    # tb_lote_legal:
-    #   clean_table_name: legal_batch
-    #   extraction_type: full
-    #   partitions: []
-    #   extra_spark_job_arguments:
-    #     - "[]"
-    #     - False
-    #     - "[]"
-    # document:
-    #   clean_table_name: document
-    #   extraction_type: full
-    #   partitions: []
-    #   extra_spark_job_arguments:
-    #     - "[]"
-    #     - False
-    #     - "[]"
+    actfil:
+      clean_table_name: logs_juridical
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['ACENTDTE', 'ACACTDTE']"
+        - True
+        - "[]"
+    tb_lote_legal:
+      clean_table_name: legal_batch
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
+    document:
+      clean_table_name: document
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+        - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:

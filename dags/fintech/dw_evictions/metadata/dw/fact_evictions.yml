@@ -291,6 +291,8 @@ columns:
     description: "Flag indicating if there is arbitration defense (set to 'not_in_cyber_legal')."
     lineage:
       - datalake_cyber_legal.evictions_base.has_arbitration_defense
+  is_migrated:
+    description: "Flag indicating if the case was migrated from elaw to cyber legal."
   has_redistribution:
     description: "Flag indicating if there is redistribution (set to 'not_in_cyber_legal')."
     lineage:

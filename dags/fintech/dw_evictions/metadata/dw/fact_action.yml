@@ -5,14 +5,14 @@ description: Fact table containing action information from CyberLegal system, in
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
-  sk_contract:
-    description: "Contract surrogate key - External contract identifier for the account under legal proceedings."
+  sk_case:
+    description: "Unique surrogate key for the legal case."
+    lineage:
+      - datalake_cyber_legal_clean.logs_juridical.id_case
+  contract:
+    description: "External contract identifier for the account under legal proceedings."
     lineage:
       - datalake_cyber_legal.evictions_base.contract
-  id_case:
-    description: "Unique identifier for the process legal case."
-    lineage:
-      - datalake_cyber_legal.evictions_base.id_process
   office:
     description: "Office of the attorney assigned to the legal case."
     lineage:
@@ -45,3 +45,11 @@ columns:
     description: "Description of the complement."
     lineage:
       - datalake_cyber_legal.evictions_base.complement_description
+  comment:
+    description: "Comment registered for the legal action."
+    lineage:
+      - datalake_cyber_legal_clean.logs_juridical.comment
+  ts_activity:
+    description: "Timestamp when the legal activity occurred."
+    lineage:
+      - datalake_cyber_legal_clean.logs_juridical.ts_activity

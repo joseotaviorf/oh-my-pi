@@ -1,0 +1,89 @@
+---
+database_name: datalake_cyber_legal_clean
+table_name: logs_juridical
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: |
+  Table that stores all activities, actions taken, results obtained and comments from managers in the CyberLegal system. Contains a record for each activity carried out.
+  This table is historical, records are always inserted and never overwritten.
+columns:
+  id_case:
+    description: "ID case = ID Case (TF: case.external-id)"
+    lineage:
+      - datalake_cyber_legal_raw.actfil.ACACCT
+  id_user:
+    description: "Identifies the operator who performed the action/log. For more details such as operator name and email, see the 'users' table (original name: COLLID) based on the id_user"
+    lineage:
+      - datalake_cyber_raw.actfil.ACCIDNAM
+  contract_group:
+    description: "Group identifier for the contract (1=QuintoAndar, 2=QuintoCred)"
+    lineage:
+      - datalake_cyber_raw.actfil.ACACCTG
+  creditor:
+    description: "Creditor name derived from contract group (1=QuintoAndar, 2=QuintoCred)"
+    lineage:
+      - datalake_cyber_raw.actfil.ACACCTG
+  region_code:
+    description: "Region code associated with the contract activity"
+    lineage:
+      - datalake_cyber_raw.actfil.ACARCOD
+  action:
+    description: "Action performed in the contract."
+    lineage:
+      - datalake_cyber_raw.actfil.ACACCODE
+  result:
+    description: "Result realized in the contract"
+    lineage:
+      - datalake_cyber_raw.actfil.ACRCCODE
+  complement:
+    description: "Complement code or letter code for the action"
+    lineage:
+      - datalake_cyber_raw.actfil.ACLCCODE
+  sequence_number:
+    description: "Sequence number of the activity record"
+    lineage:
+      - datalake_cyber_raw.actfil.ACSEQNUM
+  comment:
+    description: "Comments or notes added by the manager regarding the activity"
+    lineage:
+      - datalake_cyber_raw.actfil.ACCOMM
+  phone_number:
+    description: "Phone number triggered/contacted by the operator during the collection process"
+    lineage:
+      - datalake_cyber_raw.actfil.ACPHONE
+  phone_extension:
+    description: "Phone extension of the phone number triggered/contacted by the operator during the collection process"
+    lineage:
+      - datalake_cyber_raw.actfil.ACEXT
+  latitude:
+    description: "Latitude coordinate of where the activity took place"
+    lineage:
+      - datalake_cyber_raw.actfil.ACLAT
+  longitude:
+    description: "Longitude coordinate of where the activity took place"
+    lineage:
+      - datalake_cyber_raw.actfil.ACLNG
+  ts_activity:
+    description: "Timestamp when the activity occurred"
+    lineage:
+      - datalake_cyber_raw.actfil.ACACTDTE
+  ts_load_cyber:
+    description: "This field is used for batch loads. For inserted records, the correct field is ts_activity (original name: ACACTDTE)."
+    lineage:
+      - datalake_cyber_raw.actfil.ACENTDTE
+  year:
+    description: "Partition column year"
+    lineage:
+      - datalake_cyber_raw.actfil.year
+  month:
+    description: "Partition column month"
+    lineage:
+      - datalake_cyber_raw.actfil.month
+  day:
+    description: "Partition column day"
+    lineage:
+      - datalake_cyber_raw.actfil.day
+  ts_load:
+    description: "Timestamp when the record was loaded into the table"
+    lineage:
+      - datalake_cyber_raw.actfil.NOW()
