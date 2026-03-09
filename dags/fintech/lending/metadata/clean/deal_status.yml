@@ -9,14 +9,14 @@ columns:
     lineage:
       - datalake_lending_raw.deal_status.id
     description: Primary key of the deal status.
-  status:
-    lineage:
-      - datalake_lending_raw.deal_status.status
-    description: Status of the deal.
   id_deal:
     lineage:
       - datalake_lending_raw.deal_status.deal_id
     description: ID of the deal.
+  status:
+    lineage:
+      - datalake_lending_raw.deal_status.status
+    description: Status of the deal.
   ts_created:
     lineage:
       - datalake_lending_raw.deal_status.created_at
