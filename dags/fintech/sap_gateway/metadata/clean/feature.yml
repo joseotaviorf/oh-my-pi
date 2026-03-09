@@ -2,86 +2,90 @@
 database_name: datalake_sap_gateway_clean
 table_name: feature
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
-description: null
+domain: Fintech
+description: Clean feature table for SAP Gateway sync and transaction data.
 columns:
   id_feature:
-    description: ''
+    description: Unique identifier of the feature record in the clean layer.
     lineage:
-    - datalake_sap_gateway_raw.feature.id
+      - datalake_sap_gateway_raw.feature.id
   id_source:
-    description: ''
+    description: Identifier of the source system or origin of the feature.
     lineage:
-    - datalake_sap_gateway_raw.feature.source_id
+      - datalake_sap_gateway_raw.feature.source_id
   id_business_entity:
-    description: ''
+    description: Identifier of the business entity associated with the feature.
     lineage:
-    - datalake_sap_gateway_raw.feature.business_entity_id
+      - datalake_sap_gateway_raw.feature.business_entity_id
   id_finance_entity:
-    description: ''
+    description: Identifier of the finance entity associated with the feature.
     lineage:
-    - datalake_sap_gateway_raw.feature.finance_entity_id
+      - datalake_sap_gateway_raw.feature.finance_entity_id
   id_external_payment:
-    description: ''
+    description: External payment identifier when applicable.
     lineage:
-    - datalake_sap_gateway_raw.feature.external_payment_id
+      - datalake_sap_gateway_raw.feature.external_payment_id
   uuid:
-    description: ''
+    description: Universally unique identifier for the feature record.
     lineage:
-    - datalake_sap_gateway_raw.feature.uuid
+      - datalake_sap_gateway_raw.feature.uuid
   source:
-    description: ''
+    description: Source system or channel that originated the feature.
     lineage:
-    - datalake_sap_gateway_raw.feature.source
+      - datalake_sap_gateway_raw.feature.source
   transaction_type:
-    description: ''
+    description: Type of transaction represented by the feature.
     lineage:
-    - datalake_sap_gateway_raw.feature.transaction_type
+      - datalake_sap_gateway_raw.feature.transaction_type
   metadata:
-    description: ''
+    description: Additional metadata associated with the feature record.
     lineage:
-    - datalake_sap_gateway_raw.feature.metadata
+      - datalake_sap_gateway_raw.feature.metadata
   request_payload:
-    description: ''
+    description: Raw request payload containing entries and amounts.
     lineage:
-    - datalake_sap_gateway_raw.feature.request_payload
+      - datalake_sap_gateway_raw.feature.request_payload
   sync_sap_status:
-    description: ''
+    description: Status of the synchronization with SAP system.
     lineage:
-    - datalake_sap_gateway_raw.feature.sync_sap_status
+      - datalake_sap_gateway_raw.feature.sync_sap_status
   source_client:
-    description: ''
+    description: Client or application that sent the request.
     lineage:
-    - datalake_sap_gateway_raw.feature.source_client
+      - datalake_sap_gateway_raw.feature.source_client
   user_type:
-    description: ''
+    description: Type or role of the user associated with the feature.
     lineage:
-    - datalake_sap_gateway_raw.feature.user_type
+      - datalake_sap_gateway_raw.feature.user_type
   finance_entity_type:
-    description: ''
+    description: Type of the finance entity (e.g. tenant, landlord).
     lineage:
-    - datalake_sap_gateway_raw.feature.finance_entity_type
+      - datalake_sap_gateway_raw.feature.finance_entity_type
+  entry_amount:
+    description: Amount from the first entry in the request payload, in BRL.
+    lineage:
+      - datalake_sap_gateway_raw.feature.request_payload
   ts_accrual:
-    description: ''
+    description: Timestamp when the transaction is accrued for accounting.
     lineage:
-    - datalake_sap_gateway_raw.feature.TIMESTAMP(accrual_date)
+      - datalake_sap_gateway_raw.feature.accrual_date
   ts_created:
-    description: ''
+    description: Timestamp when the feature record was created.
     lineage:
-    - datalake_sap_gateway_raw.feature.created_at
+      - datalake_sap_gateway_raw.feature.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the feature record was last updated.
     lineage:
-    - datalake_sap_gateway_raw.feature.updated_at
+      - datalake_sap_gateway_raw.feature.updated_at
   year:
-    description: ''
+    description: Partition year of the event for incremental processing.
     lineage:
-    - datalake_sap_gateway_raw.feature.year
+      - datalake_sap_gateway_raw.feature.year
   month:
-    description: ''
+    description: Partition month of the event for incremental processing.
     lineage:
-    - datalake_sap_gateway_raw.feature.month
+      - datalake_sap_gateway_raw.feature.month
   day:
-    description: ''
+    description: Partition day of the event for incremental processing.
     lineage:
-    - datalake_sap_gateway_raw.feature.day
+      - datalake_sap_gateway_raw.feature.day

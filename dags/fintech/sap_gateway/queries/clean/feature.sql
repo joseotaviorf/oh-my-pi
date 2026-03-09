@@ -13,6 +13,7 @@ SELECT
     source_client,
     user_type,
     finance_entity_type,
+    CAST(get_json_object(request_payload, '$.entries[0].amount') AS DECIMAL(10, 2)) AS entry_amount,
     TIMESTAMP(accrual_date) AS ts_accrual,
     created_at              AS ts_created,
     updated_at              AS ts_updated,
