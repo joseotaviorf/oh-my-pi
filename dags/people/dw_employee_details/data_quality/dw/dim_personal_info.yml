@@ -1,0 +1,55 @@
+---
+table_name: dw_employee_details.dim_personal_info
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_employee:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  person_number:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+    is_unique:
+      severity_level: Warning
+  display_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  highest_education_level:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  dt_birth:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+    custom:
+      # Birth date cannot be in the future; must be within reasonable range (after 1900).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_employee_details.dim_personal_info
+         WHERE dt_birth IS NOT NULL
+           AND (dt_birth > CURRENT_DATE() OR dt_birth < DATE('1900-01-01'))
+        ) = 0
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+    custom:
+      # Load timestamp cannot be in the future (detects clock skew or ingestion errors).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_employee_details.dim_personal_info
+         WHERE ts_load IS NOT NULL
+           AND ts_load > CURRENT_TIMESTAMP()
+        ) = 0
+      severity_level: Warning

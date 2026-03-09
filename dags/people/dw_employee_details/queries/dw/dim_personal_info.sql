@@ -1,0 +1,59 @@
+WITH
+employees AS (
+    SELECT
+        im.id_person,
+        im.person_number,
+        im.display_name,
+        im.full_name
+    FROM
+        datalake_people_core.identifier_mapping AS im
+    WHERE
+        NOT im.is_user_test
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                im.id_person
+            ORDER BY
+                im.assignment_number
+        ) = 1
+),
+current_education AS (
+    SELECT
+        pl.id_person,
+        flv.meaning AS highest_education_level
+    FROM
+        datalake_pin_core_clean.people_legislative AS pl
+    LEFT JOIN
+        datalake_pin_core_clean.foundation_lookup_value AS flv
+        ON CAST(pl.highest_education_level AS STRING) = flv.lookup_code
+        AND flv.lookup_type = 'PER_HIGHEST_EDUCATION_LEVEL'
+        AND flv.language = 'US'
+    WHERE
+        pl.legislation_code = 'BR'
+        AND (
+            pl.dt_effective_ended IS NULL
+            OR pl.dt_effective_ended >= CURRENT_DATE()
+        )
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                pl.id_person
+            ORDER BY
+                pl.dt_effective_started DESC
+        ) = 1
+)
+SELECT
+    emp.id_person AS sk_employee,
+    emp.person_number,
+    COALESCE(emp.display_name, emp.full_name) AS display_name,
+    ce.highest_education_level,
+    p.dt_of_birth AS dt_birth,
+    CURRENT_TIMESTAMP() AS ts_load
+FROM
+    employees AS emp
+LEFT JOIN
+    datalake_pin_core_clean.person AS p
+    ON emp.id_person = p.id_person
+LEFT JOIN
+    current_education AS ce
+    ON emp.id_person = ce.id_person

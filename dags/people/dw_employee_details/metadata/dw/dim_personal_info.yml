@@ -1,0 +1,46 @@
+---
+database_name: dw_employee_details
+table_name: dim_personal_info
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Dimension table for employee personal information. SCD Type 1 by design: all fields are always
+  current; historical values are not stored. This prevents accidental usage of dead names (nomes mortos).
+  Use display_name (nome social) for all communications and reports; legal_name in dim_documentation
+  is for legal and compliance purposes only.
+  Grain: one record per employee (always current).
+  Join to other dw_employee_details tables via person_number or sk_employee.
+columns:
+  sk_employee:
+    description: |
+      Surrogate key for the employee. Stable system identifier for the person.
+      Use to join to facts and other dimensions in dw_employee_details.
+    lineage:
+      - datalake_people_core.identifier_mapping.id_person
+  person_number:
+    description: |
+      Business key. Unique identifier for the employee in the HR system.
+      Use to join to other dw_employee_details tables (dim_contact, dim_documentation, etc.).
+    lineage:
+      - datalake_people_core.identifier_mapping.person_number
+  display_name:
+    description: |
+      Current display or preferred name (nome social). Use this name in all communications,
+      reports, and dashboards. Do not use legal_name from dim_documentation for display.
+    lineage:
+      - datalake_pin_core_clean.person_name.display_name
+      - datalake_pin_core_clean.person_name.full_name
+  highest_education_level:
+    description: |
+      Human-readable description of the highest education level attained by the employee
+      (e.g., Ensino Superior Completo). From foundation_lookup_value (PER_HIGHEST_EDUCATION_LEVEL)
+      joined to people_legislative.highest_education_level code, Brazilian legislation context.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.people_legislative.highest_education_level
+  dt_birth:
+    description: Date of birth of the employee.
+    lineage:
+      - datalake_pin_core_clean.person.dt_of_birth
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse.
