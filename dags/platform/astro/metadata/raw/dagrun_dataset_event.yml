@@ -1,0 +1,11 @@
+---
+database_name: datalake_astro_raw
+table_name: dagrun_dataset_event
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Ops & Governance 
+description: This table contains the events associated with a DAG run. This is an internal Airlfow metadata database table.
+columns:
+  dag_run_id:
+    description: The ID of the DAG run.
+  event_id:
+    description: The ID of the event associated with the DAG run.

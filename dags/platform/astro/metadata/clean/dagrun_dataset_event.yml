@@ -1,0 +1,15 @@
+---
+database_name: datalake_astro_clean
+table_name: dagrun_dataset_event
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Ops & Governance 
+description: This table contains the events associated with a DAG run.
+columns:
+  id_run:
+    description: The ID of the DAG run.
+    lineage:
+      - datalake_astro_raw.dagrun_dataset_event.dag_run_id
+  id_event:
+    description: The ID of the event associated with the DAG run.
+    lineage:
+      - datalake_astro_raw.dagrun_dataset_event.event_id

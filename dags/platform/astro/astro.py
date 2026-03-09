@@ -39,6 +39,7 @@ dag_declaration = {
             "task_instance": {"has_query": True},
             "task_instance_history": {"has_query": True},
             "serialized_dag": {"has_query": True},
+            "dagrun_dataset_event": {"has_query": True, "extraction_type": "full"},
             "dataset": {"has_query": True},
             "dataset_event": {"has_query": True},
         },
