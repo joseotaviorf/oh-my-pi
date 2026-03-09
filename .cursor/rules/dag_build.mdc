@@ -204,7 +204,7 @@ cluster:
 
 ## DAG Naming Conventions
 
-DAG names follow layer-specific prefixes. Raw DAGs have **no prefix** — they are named after the source system.
+DAG names follow layer-specific prefixes. Raw DAGs usually have **no prefix** (named after the source system), except `gsheets` workflows which must follow `gsheets_{business_context}`.
 
 | Layer | Pattern | Examples |
 |-------|---------|---------|
@@ -212,6 +212,7 @@ DAG names follow layer-specific prefixes. Raw DAGs have **no prefix** — they a
 | dw | `dw_{domain}` | `dw_losses`, `dw_credit_evers`, `dw_collections_segmentation` |
 | metric | `metric_{line}__{domain}` (double underscore) | `metric_rent__contracts`, `metric_fintech__velo` |
 | raw (CDC / custom) | source system name, no prefix | `retsuko`, `vans`, `ledger`, `greenhouse_v3` |
+| raw (`gsheets`) | `gsheets_{business_context}` | `gsheets_cross`, `gsheets_for_sale`, `gsheets_growth` |
 | core | `core_{entity}` | `core_contract`, `core_listing`, `core_visit` |
 | reverse | `reverse_{domain}` or `reverse_{domain}_access` | `reverse_supply`, `reverse_supply_access` |
 
@@ -221,8 +222,9 @@ DAG names follow layer-specific prefixes. Raw DAGs have **no prefix** — they a
 
 | Case | Rule | Example |
 |------|------|---------|
-| **DW** | Strip `dw_` prefix | `dw_losses` → `custom_schema: losses` |
+| **DW** | Strip `dw_` prefix. If user provides `dw_` in `custom_schema` (e.g. `dw_public`), normalize to `public`. | `dw_losses` → `custom_schema: losses`<br>`dw_listing` with user input `dw_public` → `custom_schema: public` |
 | **Metric** | Use the business line (before `__`) | `metric_rent__contracts` → `custom_schema: rent` |
+| **raw (`gsheets`)** | Always `gsheets` | `gsheets_cross` → `custom_schema: gsheets` |
 | **Multiple CDC DAGs, same source DB** | All share the source DB name | `ebdb_house`, `ebdb_agent` → both `custom_schema: ebdb` |
 | **Migration / test run** | Append `_test` or `_homolog` | `ebdb_condo_test` → `custom_schema: ebdb_test` |
 | **Qube** | Fixed per spec type | dimension → `"dimensions"`, measure → `"measures"`, metric → `"metrics"` |
@@ -284,6 +286,18 @@ DAG names follow layer-specific prefixes. Raw DAGs have **no prefix** — they a
 | `load` | Load data to reverse layer | ✅ Active |
 | `access` | Export data from reverse layer | ✅ Active |
 | `load_access` | Combined load and export | ✅ Active |
+
+## Query Source Layer Priority
+
+When authoring SQL for query-based DAGs, prefer the immediate upstream analytical layer:
+
+| Target layer | Preferred source layers | Avoid by default | Exception |
+|---|---|---|---|
+| **enrich** | `clean` and `enrich` | any direct `raw` read | No exception — `raw` is only for clean layer |
+| **dw** | **`enrich` first** | direct `raw` / `clean` reads | Other `dw` only for explicit datamart DAGs |
+| **metric** | **`dw` first** | datamart `dw` tables as primary source | Use non-datamart DW models as default inputs |
+
+This guidance complements the cross-layer rule ("layer N may read layer N or below") with stronger defaults to reduce coupling and preserve modeling boundaries. In practice, `raw` should be consumed only by clean-layer DAGs.
 
 ### Wonka Layer
 
@@ -464,6 +478,8 @@ workflow:
     has_hive_sync: true  # Optional
     credentials_scope: "quintoandar"  # Optional: quintoandar, people, mlops
 ```
+
+**Naming rule**: DAG name must follow `gsheets_{business_context}` (e.g., `gsheets_cross`, `gsheets_for_sale`, `gsheets_growth`).
 
 **Note**: Gsheets also requires `forno_conf.yml` and `prod_conf.yml` with sheet configurations.
 

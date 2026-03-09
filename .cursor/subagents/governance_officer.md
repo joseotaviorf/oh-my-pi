@@ -9,7 +9,7 @@ Specialist in data layer policy, SQL conventions, and governance metadata.
 ## SQL Naming Conventions (conventions.mdc)
 - **Lake column prefixes**: `id_` (primary/foreign keys), `ts_` (timestamps), `dt_` (dates), `is_`/`has_` (booleans), `mod_` (modified), `epoch_` (unix timestamps).
 - **DW column prefixes**: `sk_` replaces `id_` for surrogate/foreign keys in DW; all other lake prefixes carry over.
-- **Column arrangement order**: SKs → Non-SKs → Non-metrics → Metrics → Date/Timestamp → Partitions.
+- **Column arrangement order**: IDs/SKs → UUIDs → Non-SKs → Characteristics → Metrics → Boolean columns → Date/Timestamp → Partitions.
 - All SQL keywords and functions must be UPPERCASE; all column/table names in lowercase snake_case.
 - Use CTEs instead of subqueries; each column on its own row; no blank lines in SQL files.
 
