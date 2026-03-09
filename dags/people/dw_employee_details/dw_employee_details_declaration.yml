@@ -18,6 +18,7 @@ cluster:
 workflow:
   type: query_delta
   layer: dw
+  custom_schema: employee_details
   bucket_config_name: people_bucket
   has_hive_sync: false
   extra_query_template_params:

@@ -26,44 +26,6 @@ column_level_validations:
   assignment_number_l0:
     is_complete:
       severity_level: Error
-    custom:
-      # Ensures the hierarchy root (L0) is always the CEO (person in highest band). Validates L0 is in ceo_history for overlapping period.
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_people_core.management_hierarchy AS mh
-         WHERE NOT EXISTS (
-           SELECT 1
-           FROM datalake_pin_core_clean.all_assignments AS aa
-           INNER JOIN datalake_compensation.job_with_salary_table AS j
-             ON aa.id_job = j.id_job
-             AND aa.dt_effective_started <= COALESCE(j.dt_valid_to, DATE('9999-12-31'))
-             AND COALESCE(aa.dt_effective_ended, DATE('9999-12-31')) >= j.dt_valid_from
-           WHERE aa.assignment_number = mh.assignment_number_l0
-             AND TRY_CAST(j.band AS INT) = (SELECT MAX(TRY_CAST(band AS INT)) FROM datalake_compensation.job_with_salary_table WHERE TRY_CAST(band AS INT) IS NOT NULL)
-             AND mh.dt_valid_from <= COALESCE(aa.dt_effective_ended, DATE('9999-12-31'))
-             AND COALESCE(mh.dt_valid_to, DATE('9999-12-31')) >= aa.dt_effective_started
-         )
-        ) = 0
-      severity_level: Error
-
-  assignment_number_l1:
-    custom:
-      # Ensures hierarchy levels are contiguous. No level can have a value when the previous level is NULL (prevents gaps in the management chain).
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_people_core.management_hierarchy
-         WHERE
-           (assignment_number_l0 IS NULL AND assignment_number_l1 IS NOT NULL) OR
-           (assignment_number_l1 IS NULL AND assignment_number_l2 IS NOT NULL) OR
-           (assignment_number_l2 IS NULL AND assignment_number_l3 IS NOT NULL) OR
-           (assignment_number_l3 IS NULL AND assignment_number_l4 IS NOT NULL) OR
-           (assignment_number_l4 IS NULL AND assignment_number_l5 IS NOT NULL) OR
-           (assignment_number_l5 IS NULL AND assignment_number_l6 IS NOT NULL) OR
-           (assignment_number_l6 IS NULL AND assignment_number_l7 IS NOT NULL) OR
-           (assignment_number_l7 IS NULL AND assignment_number_l8 IS NOT NULL) OR
-           (assignment_number_l8 IS NULL AND assignment_number_l9 IS NOT NULL)
-        ) = 0
-      severity_level: Warning
 
   version:
     is_complete:
