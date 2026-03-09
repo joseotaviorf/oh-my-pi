@@ -13,3 +13,15 @@ columns:
     description: The ID of the event associated with the DAG run.
     lineage:
       - datalake_astro_raw.dagrun_dataset_event.event_id
+  year:
+    description: The year of the event.
+    lineage:
+      - datalake_astro_raw.dagrun_dataset_event.year
+  month:
+    description: The month of the event.
+    lineage:
+      - datalake_astro_raw.dagrun_dataset_event.month
+  day:
+    description: The day of the event.
+    lineage:
+      - datalake_astro_raw.dagrun_dataset_event.day
