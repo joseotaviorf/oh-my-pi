@@ -14,6 +14,7 @@ WITH rental_guarantee_and_bank AS (
     s.request,
     itau.origin_identifier,
     itau.literal_complete,
+    s.dt_event_date,
     s.amount AS rental_guarantee_amount,
     itau.amount_value AS bank_amount,
     checkout_charge.due_amount AS checkout_amount
@@ -94,6 +95,7 @@ SELECT
   rg.origin_identifier,
   rg.literal_complete,
   sg.hash,
+  rg.dt_event_date,
   rg.rental_guarantee_amount,
   rg.bank_amount,
   rg.checkout_amount,
@@ -107,4 +109,3 @@ LEFT JOIN
   sap_ledger AS sl 
     ON sg.hash = sl.hash
     AND rg.id_finance_entity = sl.id_finance_entity
-WHERE 1 = 1 

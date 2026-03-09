@@ -41,6 +41,10 @@ columns:
     description: "Creation timestamp for the SAP record."
     lineage:
       - datalake_rental_guarantee_clean.sap.ts_created
+  dt_event_date:
+    description: "Business event date of the rental guarantee transaction."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.dt_event_date
   id_external_payment:
     description: "External payment identifier present in the SAP payload."
     lineage:
