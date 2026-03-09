@@ -3162,6 +3162,7 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
 bietlejuice.enrich_people_core:
+  - bietlejuice.enrich_compensation:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-base:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
@@ -3170,6 +3171,7 @@ bietlejuice.enrich_people_core:
   - bietlejuice.pin_core:load-clean-action-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_core:load-clean-assignment-supervisor:first-run-of-day
   - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-external-application-identifier:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day

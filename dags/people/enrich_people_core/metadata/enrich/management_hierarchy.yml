@@ -1,0 +1,163 @@
+database_name: datalake_people_core
+table_name: management_hierarchy
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  This table outlines the reporting structure within the organization, detailing the hierarchical relationships between employees and their managers. Each hierarchy starts on the employee (L1 to L9 depending on depth), goes through their direct manager and upward chain, until it reaches the CEO at L0. The CEO is always L0; the employee themselves can be at any level from L1 to L9. The direct manager may appear at any L level (L1 through L9) depending on the employee's position in the org. For a given team and point in time, the same manager will always have the same L number across all employees in that team.
+  Grain: one record per assignment per hierarchy version (period when the chain is valid). Rows with identical hierarchy attributes and sequential validity dates are consolidated into a single record with merged date range.
+  The hierarchy shows up to 10 levels (L0 to L9), ordered from the CEO (L0) down to the employee (L1 to L9). Only hierarchies where the CEO (person in the highest band) is L0 are considered valid.
+columns:
+  sk_hierarchy_version:
+    description: Deterministic surrogate key for the hierarchy version. Generated as MD5 hash of assignment_number + dt_valid_from + dt_valid_to.
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_ended
+  assignment_number:
+    description: Assignment number (employee code) whose managerial chain is tracked in this record.
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  assignment_number_l0:
+    description: Assignment number of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l0:
+    description: Full name of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l0:
+    description: Work e-mail of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l1:
+    description: Assignment number of the manager L1 (Layer 1, one level below L0).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l1:
+    description: Full name of the manager L1 (Layer 1, one level below L0).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l1:
+    description: Work e-mail of the manager L1 (Layer 1, one level below L0).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l2:
+    description: Assignment number of the manager L2 (Layer 2, one level below L1).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l2:
+    description: Full name of the manager L2 (Layer 2, one level below L1).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l2:
+    description: Work e-mail of the manager L2 (Layer 2, one level below L1).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l3:
+    description: Assignment number of the manager L3 (Layer 3, one level below L2).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l3:
+    description: Full name of the manager L3 (Layer 3, one level below L2).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l3:
+    description: Work e-mail of the manager L3 (Layer 3, one level below L2).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l4:
+    description: Assignment number of the manager L4 (Layer 4, one level below L3).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l4:
+    description: Full name of the manager L4 (Layer 4, one level below L3).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l4:
+    description: Work e-mail of the manager L4 (Layer 4, one level below L3).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l5:
+    description: Assignment number of the manager L5 (Layer 5, one level below L4).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l5:
+    description: Full name of the manager L5 (Layer 5, one level below L4).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l5:
+    description: Work e-mail of the manager L5 (Layer 5, one level below L4).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l6:
+    description: Assignment number of the manager L6 (Layer 6, one level below L5).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l6:
+    description: Full name of the manager L6 (Layer 6, one level below L5).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l6:
+    description: Work e-mail of the manager L6 (Layer 6, one level below L5).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l7:
+    description: Assignment number of the manager L7 (Layer 7, one level below L6).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l7:
+    description: Full name of the manager L7 (Layer 7, one level below L6).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l7:
+    description: Work e-mail of the manager L7 (Layer 7, one level below L6).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l8:
+    description: Assignment number of the manager L8 (Layer 8, one level below L7).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l8:
+    description: Full name of the manager L8 (Layer 8, one level below L7).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l8:
+    description: Work e-mail of the manager L8 (Layer 8, one level below L7).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  assignment_number_l9:
+    description: Assignment number of the manager L9 (Layer 9, one level below L8).
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  name_l9:
+    description: Full name of the manager L9 (Layer 9, one level below L8).
+    lineage:
+      - datalake_people_core.identifier_mapping.display_name
+      - datalake_people_core.identifier_mapping.full_name
+  email_l9:
+    description: Work e-mail of the manager L9 (Layer 9, one level below L8).
+    lineage:
+      - datalake_people_core.identifier_mapping.work_email
+  version:
+    description: Sequential version number of the hierarchy for the assignment (increments when the chain changes).
+  is_current:
+    description: Indicates whether this hierarchy version is currently valid (TRUE) or historical (FALSE).
+  dt_valid_from:
+    description: Date when this hierarchy version became effective.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
+  dt_valid_to:
+    description: Date when this hierarchy version ended.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_ended
+  ts_load:
+    description: Timestamp when the record was loaded into the dimension.

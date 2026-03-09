@@ -29,10 +29,16 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    management_hierarchy:
+      - identifier_mapping
   tables_customization:
     event_definition:
       vacuum_retention_hours: 168
       vacuum_lite: true
     identifier_mapping:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    management_hierarchy:
       vacuum_retention_hours: 168
       vacuum_lite: true
