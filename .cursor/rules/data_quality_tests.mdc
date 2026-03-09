@@ -1,0 +1,242 @@
+---
+description: Inmetro data quality YAML conventions for DAG tables. Use when creating or editing data_quality/*.yml files.
+globs: "**/data_quality/**/*.yml"
+alwaysApply: false
+---
+
+# Data Quality Tests — Inmetro Validation Catalog
+
+Rules for creating and editing data quality YAML files that define Inmetro (PyDeequ/Great Expectations) validations for DAG tables.
+
+## File Location and Naming
+
+- **Path**: `dags/{domain}/{dag_name}/data_quality/{layer}/{table_name}.yml`
+- **Layer** must match the DAG layer: `raw`, `clean`, `enrich`, `dw`, `metric`, or `core`
+- **Table name** must match the output table (without database prefix)
+- Use `.yml` — never `.yaml`
+
+## Required Structure
+
+```yaml
+---
+table_name: {database}.{table}   # Fully qualified: schema.table
+alert_channel: {channel_keyword} # See alert channel mapping below
+
+table_level_validations: {}
+column_level_validations: {}
+```
+
+### `table_name` — Fully Qualified
+
+Format: `{database}.{table}`. Examples:
+
+- Raw/Clean: `datalake_{source}_raw.table_name` or `datalake_{source}_clean.table_name`
+- Enrich: `datalake_{source}_{context}.table_name` (e.g. `datalake_people_core.identifier_mapping`)
+- DW: `dw_{schema}.table_name` (e.g. `dw_compensation.dim_plr_parameters`)
+- Core: `core_{entity}.table_name` (e.g. `core_house.house`)
+
+### `alert_channel` — Routing DQ Failures
+
+Use a keyword that maps to a Google Chat webhook. Common values:
+
+| Domain / Context | `alert_channel` |
+|-----------------|-----------------|
+| People, HR, Compensation | `PEOPLE_ALERTS` |
+| Core models | `GCHAT_CORE_MODEL_SCHEMA_VALIDATION` |
+| 3P Partners | `#alerts-de-airflow-3p-partners` or `#alerts-de-airflow-dags` |
+| Default / generic | `#alerts-de-airflow-dags` |
+
+Aliases: `#alerts-de-airflow-dags`, `#alerts-data-quality`, `#data-alarms`, `#alerts-data-quality-agents`, `#alerts_big_agent` are resolved via `GchatWebhooksEnum`. Domain-specific enums (e.g. `PEOPLE_ALERTS`, `FINTECH_INMETRO_ALERTS`) are also supported.
+
+## Common Parameters
+
+- **Range parameters** (when applicable): `equal_to`, `less_than`, `greater_than`, `less_than_or_equal_to`, `greater_than_or_equal_to`
+- **`severity_level`** (optional): `Error` or `Warning` (case-insensitive)
+  - **Error**: Fails the Airflow task and blocks downstream tasks
+  - **Warning**: Logs the issue and allows the run to continue
+  - Note: Currently passed to PyDeequ but all validations are treated the same for notifications
+
+## Table-Level Validations
+
+Defined under `table_level_validations`:
+
+### `has_size`
+
+Ensure row count is within bounds.
+
+```yaml
+table_level_validations:
+  has_size:
+    greater_than: 0
+    less_than_or_equal_to: 500000
+    severity_level: Error
+```
+
+### `has_size_variation`
+
+Detect sudden size changes compared to history. Uses `datalake_data_quality.validations` by default; can override with `history_query`.
+
+```yaml
+table_level_validations:
+  has_size_variation:
+    variation_type: percentage   # or: absolute
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 10
+    severity_level: Warning
+```
+
+Limitation: Relies on historical row counts. Slow or missing `history_query` can cause false failures.
+
+## Column-Level Validations
+
+Defined under `column_level_validations` as `{column_name}: {validation_name}: {...}`.
+
+### Completeness and Uniqueness
+
+| Validation | Purpose | Parameters |
+|------------|---------|------------|
+| `is_complete` | No nulls allowed | `severity_level` only |
+| `is_unique` | Unique values | `severity_level` only |
+| `has_completeness` | Ratio of non-null ≥ threshold | Range params (e.g. `greater_than_or_equal_to: 0.95`) |
+| `has_null_count` | Cap number of nulls | Range params (e.g. `less_than_or_equal_to: 10`) |
+
+### Numeric Bounds
+
+| Validation | Purpose | Parameters |
+|------------|---------|------------|
+| `has_min_value` | Minimum numeric value | Range params |
+| `has_max_value` | Maximum numeric value | Range params |
+| `has_mean_value` | Mean within bounds | Range params |
+
+### String Bounds
+
+| Validation | Purpose | Parameters |
+|------------|---------|------------|
+| `has_min_length` | Minimum string length | Range params |
+| `has_max_length` | Maximum string length | Range params |
+
+### Value Constraints
+
+| Validation | Purpose | Parameters |
+|------------|---------|------------|
+| `is_contained_in` | Values in allowed set | `values: [A, B, C]` — nulls are **not** allowed |
+| `has_pattern` | Regex validation | `pattern: '^(active\|inactive)$'` |
+| `has_distinctness` | Ratio of distinct values | Range params |
+
+### `custom`
+
+Custom SQL/DSL constraint. Use for complex business rules.
+
+**Always add a comment** before the `custom` block explaining what the validation checks — this makes failures easier to diagnose and the intent clear to reviewers.
+
+```yaml
+column_level_validations:
+  reference_year:
+    custom:
+      # Ensure reference_year is within reasonable range (e.g., 2020-2100)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.dim_plr_parameters
+         WHERE reference_year < 2020
+            OR reference_year > 2100
+        ) = 0
+      severity_level: Error
+```
+
+## DW Dimension Tables — Unknown Row (-1)
+
+DW dimension tables automatically include an "unknown" row with `sk_* = -1` and all other columns null (Kimball pattern for missing/unknown dimension members). This affects which validations you can use:
+
+- **SK column only**: Use `is_complete` and `is_unique` — the -1 row has a valid SK value.
+- **All other columns**: Do **not** use `is_complete` (it would fail on the -1 row). Use `has_null_count` with `less_than_or_equal_to: 1` instead — allowing exactly one null (the -1 row).
+
+```yaml
+column_level_validations:
+  sk_plr_parameters:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  reference_year:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  pct_corporate_goals:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+```
+
+## Minimum Recommended Checks
+
+Per Governance Officer and Reliability Engineer conventions:
+
+1. **Table-level**: `has_size` with `greater_than: 0` and `severity_level: Error`
+2. **Primary key columns**: `is_complete` and `is_unique` with `severity_level: Error`
+3. **Critical business columns**: `is_complete` or `has_completeness` as appropriate
+4. **DW dimension tables**: SK column uses `is_complete`; all other columns use `has_null_count` with `less_than_or_equal_to: 1` (see section above)
+
+For DW/Enrich tables that feed dashboards, metrics, or reverse layer: data quality file is **strongly recommended**.
+
+## Examples
+
+### Minimal (smoke)
+
+```yaml
+---
+table_name: dw_compensation.dim_plr_parameters
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_plr_parameters:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+```
+
+### With size variation and categorical checks
+
+```yaml
+---
+table_name: datalake_people_core.identifier_mapping
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 10
+    severity_level: Warning
+
+column_level_validations:
+  assignment_type:
+    is_complete:
+      severity_level: Warning
+    is_contained_in:
+      values: ['E', 'C', 'P']
+      severity_level: Warning
+```
+
+## Not Yet Implemented
+
+- **`is_incremental`**: Defined in schema but pipeline does not use it. Do not rely on it for date filtering.
+
+## Checklist
+
+- [ ] File at `data_quality/{layer}/{table_name}.yml` (`.yml` not `.yaml`)
+- [ ] `table_name` fully qualified as `{database}.{table}`
+- [ ] `alert_channel` set to domain-appropriate keyword
+- [ ] `has_size` with `greater_than: 0` for non-empty expectation
+- [ ] Primary key columns have `is_complete` and `is_unique` with `severity_level: Error`
+- [ ] **DW dimensions**: Non-SK columns use `has_null_count` with `less_than_or_equal_to: 1` (not `is_complete`) due to the -1 unknown row
+- [ ] `custom` validations have a comment above explaining what is being validated
+- [ ] `is_contained_in` used only when nulls are not allowed (otherwise use `custom`)
