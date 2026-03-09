@@ -32,20 +32,12 @@ columns:
     description: "external offer id from revenue share payload (offer-external-id)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
-  tier_name:
-    description: "tier name from revenue share payload (tier-name)"
-    lineage:
-      - datalake_nazare_raw.revenue_share_by_participant.output
   offer_category:
     description: "offer category from revenue share payload (offer-category)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   participant_role:
     description: "participant role from revenue share payload (participant-role)"
-    lineage:
-      - datalake_nazare_raw.revenue_share_by_participant.output
-  business_unit_name:
-    description: "business unit name from revenue share payload (business-unit-name)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   cancellation_reason:
@@ -74,18 +66,6 @@ columns:
       - datalake_nazare_raw.revenue_share_by_participant.output
   campaign_bonus:
     description: "campaign bonus from revenue share payload (campaign-bonus)"
-    lineage:
-      - datalake_nazare_raw.revenue_share_by_participant.output
-  gross_remuneration:
-    description: "gross remuneration from revenue share payload (gross-remuneration)"
-    lineage:
-      - datalake_nazare_raw.revenue_share_by_participant.output
-  remuneration_bonus:
-    description: "remuneration bonus from revenue share payload (remuneration-bonus)"
-    lineage:
-      - datalake_nazare_raw.revenue_share_by_participant.output
-  remuneration_baseline:
-    description: "remuneration baseline from revenue share payload (remuneration-baseline)"
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   participant_paid_fee:
