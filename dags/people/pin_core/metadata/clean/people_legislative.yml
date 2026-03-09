@@ -81,10 +81,6 @@ columns:
     description: Brazilian work card (CTPS) series.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.per_information2
-  issuing_state_ctps:
-    description: Brazilian work card (CTPS) issuing state.
-    lineage:
-    - datalake_pin_core_raw.per_people_legislative_f.per_information_category
   military_reservist_number:
     description: Military reservist number. In foreigner contexts, attribute3 may represent married-to-Brazilian flag.
     lineage:

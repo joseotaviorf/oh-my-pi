@@ -617,8 +617,11 @@ bietlejuice.dw_employee_details:
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
   - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-foundation-lookup-value:first-run-of-day
+  - bietlejuice.pin_core:load-clean-national-identifiers:first-run-of-day
   - bietlejuice.pin_core:load-clean-people-extra-info:first-run-of-day
   - bietlejuice.pin_core:load-clean-people-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
+  - bietlejuice.pin_core:load-clean-person:first-run-of-day
   - bietlejuice.pin_core:load-clean-phone:first-run-of-day
 bietlejuice.dw_evictions:
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day

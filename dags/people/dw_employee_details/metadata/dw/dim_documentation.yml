@@ -1,0 +1,115 @@
+database_name: dw_employee_details
+table_name: dim_documentation
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  SCD Type 2 dimension tracking historical changes to employee identification documents.
+  Includes CPF, RG, PIS, CTPS, voter registration, legal name, mother/father names, and birth place.
+  Consecutive periods with identical values are merged.
+  Grain: One record per employee per period.
+  sk_documentation_version is derived from id_person and period start date.
+  Join to employee via person_number.
+  For communications and reports, use display_name from dim_personal_info;
+  legal_name is for legal/compliance purposes only.
+columns:
+  sk_documentation_version:
+    description: |
+      Surrogate key for the documentation period.
+      Hash of id_person and dt_valid_from.
+    lineage:
+      - datalake_pin_core_clean.all_people.id_person
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  person_number:
+    description: Business key uniquely identifying the employee.
+    lineage:
+      - datalake_pin_core_clean.all_people.person_number
+  marital_status:
+    description: |
+      Marital status of the employee at this period.
+      Human-readable meaning from foundation_lookup_value (MAR_STATUS, PTB).
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.people_legislative.marital_status
+  legal_name:
+    description: |
+      Legal name as it appears on this specific document.
+      May differ from display_name in dim_personal_info.
+      Use display_name for communications.
+    lineage:
+      - datalake_pin_core_clean.person_name.full_name
+  mother_name:
+    description: Mother name as it appears on official documents (e.g. RG, birth certificate).
+    lineage:
+      - datalake_pin_core_clean.person.mother_name
+  father_name:
+    description: Father name as it appears on official documents (e.g. RG, birth certificate).
+    lineage:
+      - datalake_pin_core_clean.person.father_name
+  birth_town:
+    description: Town or city of birth (naturalidade) as on official documents.
+    lineage:
+      - datalake_pin_core_clean.person.town_of_birth
+  birth_state:
+    description: State or region of birth as on official documents.
+    lineage:
+      - datalake_pin_core_clean.person.region_of_birth
+  birth_country:
+    description: Country of birth as on official documents.
+    lineage:
+      - datalake_pin_core_clean.person.country_of_birth
+  cpf:
+    description: Brazilian individual taxpayer identification number (CPF).
+    lineage:
+      - datalake_pin_core_clean.national_identifiers.national_identifier_number
+  rg:
+    description: National identity card number (RG).
+    lineage:
+      - datalake_pin_core_clean.national_identifiers.national_identifier_number
+  rg_issuing_state:
+    description: Brazilian state that issued the RG document.
+    lineage:
+      - datalake_pin_core_clean.national_identifiers.issuing_state
+  rg_issuing_authority:
+    description: Authority that issued the RG document (e.g., SSP).
+    lineage:
+      - datalake_pin_core_clean.national_identifiers.issuing_authority
+  pis:
+    description: Social Integration Program number (PIS).
+    lineage:
+      - datalake_pin_core_clean.national_identifiers.national_identifier_number
+  ctps_number:
+    description: Work and social security card number (CTPS).
+    lineage:
+      - datalake_pin_core_clean.people_legislative.ctps_number
+  ctps_series:
+    description: CTPS series number.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.ctps_series
+  electoral_registration_number:
+    description: Voter registration number (Título de Eleitor).
+    lineage:
+      - datalake_pin_core_clean.people_legislative.vote_registration_number
+  electoral_zone:
+    description: Electoral zone identifier.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.electoral_zone
+  electoral_polling_station:
+    description: Polling station number.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.polling_station
+  dt_valid_from:
+    description: Date from which this version becomes effective.
+    lineage:
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  dt_valid_to:
+    description: |
+      Date until which this version is valid.
+      9999-12-31 for current.
+    lineage:
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  is_current:
+    description: Flag indicating if this is the current version.
+    lineage:
+      - datalake_pin_core_clean.all_people.dt_effective_started
+  ts_load:
+    description: Timestamp when the record was loaded.

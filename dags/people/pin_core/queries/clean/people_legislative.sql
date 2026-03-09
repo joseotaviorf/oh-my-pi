@@ -18,7 +18,6 @@ SELECT
   attribute28 AS foreigner_residence_time,
   per_information1 AS ctps_number,
   per_information2 AS ctps_series,
-  per_information_category AS issuing_state_ctps,
   attribute3 AS military_reservist_number,
   attribute8 AS github_username,
   attribute27 AS accessibility_need,
