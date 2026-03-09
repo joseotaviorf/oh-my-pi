@@ -1,0 +1,61 @@
+---
+database_name: dw_employee_details
+table_name: dim_emergency_contact
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Who to contact when an employee has an emergency. Tracks historical changes when
+  the employee updates their emergency contact information. One record per employee
+  per emergency contact per version.
+columns:
+  sk_emergency_contact_version:
+    description: Unique identifier for each version of an emergency contact record.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_person_extra_info
+      - datalake_pin_core_clean.people_extra_info.dt_effective_started
+      - datalake_people_core.identifier_mapping.id_person
+  person_number:
+    description: Employee identifier (person number in HR systems).
+    lineage:
+      - datalake_people_core.identifier_mapping.person_number
+  contact_name:
+    description: Full name of the person to contact in case of emergency.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_meeting
+  contact_relationship:
+    description: Relationship of the emergency contact to the employee.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.contact_relationship
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+  phone_country_code:
+    description: Country code of the emergency contact phone.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_rating_impact
+  phone_area_code:
+    description: Area code of the emergency contact phone.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_rating_behavior
+  phone_number:
+    description: Phone number of the emergency contact.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_rating_leadership
+  full_phone_number:
+    description: Complete phone number for contacting in case of emergency.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_rating_impact
+      - datalake_pin_core_clean.people_extra_info.id_rating_behavior
+      - datalake_pin_core_clean.people_extra_info.id_rating_leadership
+  dt_valid_from:
+    description: Date when this version of the emergency contact became effective.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.dt_effective_started
+  dt_valid_to:
+    description: Date when this version was superseded. Use 9999-12-31 for current records.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.dt_effective_ended
+  is_current:
+    description: Whether this is the current emergency contact information.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.dt_effective_ended
+  ts_load:
+    description: When the record was loaded.

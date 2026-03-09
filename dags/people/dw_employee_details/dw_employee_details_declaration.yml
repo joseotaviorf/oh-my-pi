@@ -29,3 +29,6 @@ workflow:
     dim_contact:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    dim_emergency_contact:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

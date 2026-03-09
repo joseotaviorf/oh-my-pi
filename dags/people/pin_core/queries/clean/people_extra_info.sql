@@ -8,6 +8,10 @@ SELECT
   pei_information5 AS id_rating_leadership,
   information_type,
   pei_information_category AS information_category,
+  CASE
+    WHEN information_type = 'Contatos de Emergência' 
+    THEN pei_information2
+  END AS contact_relationship,
   category_code,
   created_by,
   last_updated_by AS updated_by,

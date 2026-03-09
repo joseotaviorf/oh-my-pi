@@ -46,6 +46,10 @@ columns:
     description: Category grouping for the extra information entry.
     lineage:
       - datalake_pin_core_raw.per_people_extra_info_f.pei_information_category
+  contact_relationship:
+    description: Relationship of the emergency contact to the employee (e.g. Outros, Cônjuge). Only populated when information_type is Contatos de Emergência.
+    lineage:
+      - datalake_pin_core_raw.per_people_extra_info_f.pei_information2
   category_code:
     description: Oracle category code that classifies the extra information record.
     lineage:

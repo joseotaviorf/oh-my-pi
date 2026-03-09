@@ -1,0 +1,27 @@
+---
+table_name: dw_employee_details.dim_emergency_contact
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  sk_emergency_contact_version:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Warning
+  person_number:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  contact_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
