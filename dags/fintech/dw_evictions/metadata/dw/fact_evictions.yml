@@ -149,6 +149,14 @@ columns:
     description: "Standardized reason description for the case final status."
     lineage:
       - datalake_cyber_legal.evictions_base.standardized_reason
+  first_consolidated_reason:
+    description: "First consolidated reason description for the case result (from cyber_legal source)."
+    lineage:
+      - datalake_cyber_legal.evictions_base.first_consolidated_reason
+  first_standardized_reason:
+    description: "First standardized reason description for the case final status (from cyber_legal source)."
+    lineage:
+      - datalake_cyber_legal.evictions_base.first_standardized_reason
   result:
     description: "Result classification (set to 'not_in_cyber_legal')."
     lineage:
@@ -232,6 +240,26 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date
+  ldt_judicial_petition_r:
+    description: "Lead time to judicial petition for reivindicatoria flow (number of business days from registration, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal.evictions_base
+      - DW_public.dim_date
+  ldt_judicial_summons_decision_r:
+    description: "Lead time to judicial summons decision for reivindicatoria flow (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal.evictions_base
+      - DW_public.dim_date
+  ldt_possesion_imission_decisions_r:
+    description: "Lead time to possession imission decisions for reivindicatoria flow (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal.evictions_base
+      - DW_public.dim_date
+  ldt_possesion_imission_issuance_r:
+    description: "Lead time to possession imission issuance for reivindicatoria flow (number of business days, excluding holidays, weekends, and arbitration recess)."
+    lineage:
+      - datalake_cyber_legal.evictions_base
+      - DW_public.dim_date
   ldt_coercive_decision:
     description: "Lead time to coercive decision (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
@@ -242,23 +270,8 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date
-  ldt_possesion_imission_decisions:
-    description: "Lead time to possession imission decisions (number of business days, excluding holidays, weekends, and arbitration recess)."
-    lineage:
-      - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
-  ldt_possesion_imission_issuance:
-    description: "Lead time to possession imission issuance (number of business days, excluding holidays, weekends, and arbitration recess)."
-    lineage:
-      - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
-  ldt_judicial_petition:
-    description: "Lead time to judicial petition (number of business days, excluding holidays, weekends, and arbitration recess)."
-    lineage:
-      - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
-  ldt_execution_requirement_decision:
-    description: "Lead time to execution requirement decision (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_execution_requirement:
+    description: "Lead time to execution requirement (number of business days from registration, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date
@@ -267,8 +280,8 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date
-  ldt_executed_citation:
-    description: "Lead time to executed citation (number of business days, excluding holidays, weekends, and arbitration recess)."
+  ldt_execution_citation:
+    description: "Lead time to execution citation (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date
@@ -282,8 +295,8 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date
-  ldt_redit_satisfaction:
-    description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess). Note: column name has a typo (redit instead of credit)."
+  ldt_credit_satisfaction:
+    description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
       - DW_public.dim_date

@@ -10,6 +10,8 @@ SELECT
         WHEN CESTATUS = 'C' THEN 'Completed'
         ELSE CESTATUS
     END AS case_status,
+    CEREASON AS closure_reason,
+    CERESULT AS closure_result,
     CESTATDT AS dt_status_changed,
     CEDTUPD AS ts_updated,
     year,

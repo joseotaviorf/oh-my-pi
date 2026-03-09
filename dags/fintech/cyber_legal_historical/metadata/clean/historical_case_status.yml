@@ -21,6 +21,14 @@ columns:
     description: "Legal process status (New, Active, Finalized, Pending, Completed)"
     lineage:
       - datalake_cyber_legal_historical_raw.case.CESTATUS
+  closure_reason:
+    description: "Reason for case closure when status is Finalized or Completed."
+    lineage:
+      - datalake_cyber_legal_historical_raw.case.CEREASON
+  closure_result:
+    description: "Result of the case closure when status is Finalized or Completed."
+    lineage:
+      - datalake_cyber_legal_historical_raw.case.CERESULT
   dt_status_changed:
     description: "Date when case status changed"
     lineage:

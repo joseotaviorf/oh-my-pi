@@ -2,6 +2,8 @@ WITH
 get_first_process_closure AS (
     SELECT
         id_case,
+        closure_reason,
+        closure_result,
         dt_status_changed AS dt_first_closure
     FROM datalake_cyber_legal_historical_clean.historical_case_status
     WHERE case_status = 'Completed'
@@ -171,6 +173,8 @@ SELECT DISTINCT
     'not_in_cyber_legal' AS procedure,
     p.case_result_description AS consolidated_reason,
     p.case_final_description AS standardized_reason,
+    FIRST(vl.value_description) AS first_consolidated_reason,
+    FIRST(vl1.value_description) AS first_standardized_reason,
     'not_in_cyber_legal' AS result,
     'not_in_cyber_legal' AS succumbency_fee,
     p.ldt_stock,
@@ -181,14 +185,10 @@ SELECT DISTINCT
         WHEN p.ldt_stock BETWEEN 361 AND 5000 THEN '>360D'
         ELSE NULL
     END AS stock_range,
-    p.ldt_resolution,
     CASE
-        WHEN p.ldt_resolution BETWEEN 0 AND 120 THEN '<120D'
-        WHEN p.ldt_resolution BETWEEN 121 AND 240 THEN '120-240D'
-        WHEN p.ldt_resolution BETWEEN 241 AND 360 THEN '240-360D'
-        WHEN p.ldt_resolution BETWEEN 361 AND 5000 THEN '>360D'
-        ELSE NULL
-    END AS resolution_range,
+        WHEN DATE(p.dt_case_acceptance) > DATE(fpc.dt_first_closure) THEN 0
+        WHEN fpc.dt_first_closure IS NOT NULL THEN DATEDIFF(LAST_DAY(ADD_MONTHS(fpc.dt_first_closure, 0)), p.dt_case_acceptance)
+    ELSE NULL END AS ldt_resolution,
     'not_in_cyber_legal' AS ldt_coercive,
     'not_in_cyber_legal' AS last_occurrence,
     'not_in_cyber_legal' AS has_arbitration_defense,
@@ -244,3 +244,10 @@ LEFT JOIN
 LEFT JOIN
     get_first_process_closure AS fpc
     ON p.id_case = fpc.id_case
+LEFT JOIN
+    datalake_cyber_legal_clean.values_list vl
+        ON fpc.closure_result = vl.value_code
+LEFT JOIN
+    datalake_cyber_legal_clean.values_list vl1
+        ON fpc.closure_reason = vl1.value_code
+GROUP BY ALL

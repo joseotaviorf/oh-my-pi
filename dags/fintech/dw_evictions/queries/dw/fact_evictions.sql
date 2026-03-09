@@ -118,6 +118,8 @@ SELECT DISTINCT
     COALESCE(e.procedure, l.procedure) AS procedure,
     COALESCE(e.consolidated_reason, l.consolidated_reason) AS consolidated_reason,
     COALESCE(e.standardized_reason, l.standardized_reason) AS standardized_reason,
+    e.first_consolidated_reason,
+    e.first_standardized_reason,
     COALESCE(e.result, l.result) AS result,
     COALESCE(o.delay_days, l.overdue_days_at_registration) AS overdue_days_at_registration,
     COALESCE(e.succumbency_fee, l.succumbency_fee) AS succumbency_fee,
@@ -126,7 +128,14 @@ SELECT DISTINCT
     COALESCE(e.ldt_stock, l.ldt_stock) AS ldt_stock,
     COALESCE(e.stock_range, l.stock_range) AS stock_range,
     COALESCE(e.ldt_resolution, l.ldt_resolution) AS ldt_resolution,
-    COALESCE(e.resolution_range, l.resolution_range) AS resolution_range,
+    COALESCE(
+    CASE
+        WHEN e.ldt_resolution BETWEEN 0 AND 120 THEN '<120D'
+        WHEN e.ldt_resolution BETWEEN 121 AND 240 THEN '120-240D'
+        WHEN e.ldt_resolution BETWEEN 241 AND 360 THEN '240-360D'
+        WHEN e.ldt_resolution BETWEEN 361 AND 5000 THEN '>360D'
+        ELSE NULL
+    END, l.resolution_range) AS resolution_range,
     COALESCE(e.ldt_coercive, l.ldt_coercive) AS ldt_coercive,
     COALESCE(e.last_occurrence, l.last_occurrence) AS last_occurrence,
     COALESCE(DATE_DIFF(DAY, DATE(e.dt_registered), e.dt_closure), l.real_ldt_resolution) AS real_ldt_resolution,
@@ -149,7 +158,7 @@ SELECT DISTINCT
                   ) THEN d.sk_date END) AS ldt_arbitral_citation,
     COUNT(DISTINCT
             CASE
-                WHEN DATE(e.dt_arbitral_distribution_start) <= d.date AND DATE(e.dt_arbitral_distribution_start) IS NOT NULL
+                WHEN DATE(e.dt_arbitral_citation_start) <= d.date AND DATE(e.dt_arbitral_citation_start) IS NOT NULL
                 AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
                 AND(
                   (DATE(e.dt_arbitral_sentence_start) IS NOT NULL AND DATE(e.dt_arbitral_sentence_start) >= d.date) OR
@@ -198,12 +207,28 @@ SELECT DISTINCT
     --leadtimes reivindicatoria
     COUNT(DISTINCT
             CASE
+                WHEN DATE(e.dt_registered) <= d.date AND DATE(e.dt_registered) IS NOT NULL
+                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
+                AND(
+                  (DATE(e.dt_judicial_petition_start) IS NOT NULL AND DATE(e.dt_judicial_petition_start) >= d.date) OR
+                  (DATE(e.dt_judicial_petition_start) IS NULL AND CURRENT_DATE() >= d.date)
+                  ) THEN d.sk_date END) AS ldt_judicial_petition_r,
+    COUNT(DISTINCT
+            CASE
+                WHEN DATE(e.dt_judicial_petition_start) <= d.date AND DATE(e.dt_judicial_petition_start) IS NOT NULL
+                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
+                AND(
+                  (DATE(e.dt_judicial_summons_decision_start) IS NOT NULL AND DATE(e.dt_judicial_summons_decision_start) >= d.date) OR
+                  (DATE(e.dt_judicial_summons_decision_start) IS NULL AND CURRENT_DATE() >= d.date)
+                  ) THEN d.sk_date END) AS ldt_judicial_summons_decision_r,
+    COUNT(DISTINCT
+            CASE
                 WHEN DATE(e.dt_judicial_summons_start) <= d.date AND DATE(e.dt_judicial_summons_start) IS NOT NULL
                 AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
                 AND(
                   (DATE(e.dt_possession_imission_decision_start) IS NOT NULL AND DATE(e.dt_possession_imission_decision_start) >= d.date) OR
                   (DATE(e.dt_possession_imission_decision_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_possesion_imission_decisions,
+                  ) THEN d.sk_date END) AS ldt_possesion_imission_decisions_r,
     COUNT(DISTINCT
             CASE
                 WHEN DATE(e.dt_possession_imission_decision_start) <= d.date AND DATE(e.dt_possession_imission_decision_start) IS NOT NULL
@@ -211,15 +236,7 @@ SELECT DISTINCT
                 AND(
                   (DATE(e.dt_possession_imission_issuance_start) IS NOT NULL AND DATE(e.dt_possession_imission_issuance_start) >= d.date) OR
                   (DATE(e.dt_possession_imission_issuance_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_possesion_imission_issuance,
-    COUNT(DISTINCT
-            CASE
-                WHEN DATE(e.dt_possession_imission_issuance_start) <= d.date AND DATE(e.dt_possession_imission_issuance_start) IS NOT NULL
-                AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
-                AND(
-                  (DATE(e.dt_judicial_petition_start) IS NOT NULL AND DATE(e.dt_judicial_petition_start) >= d.date) OR
-                  (DATE(e.dt_judicial_petition_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_judicial_petition,
+                  ) THEN d.sk_date END) AS ldt_possesion_imission_issuance_r,
     --leadtimes execucao
     COUNT(DISTINCT
             CASE
@@ -228,7 +245,7 @@ SELECT DISTINCT
                 AND(
                   (DATE(e.dt_execution_requirement_start) IS NOT NULL AND DATE(e.dt_execution_requirement_start) >= d.date) OR
                   (DATE(e.dt_execution_requirement_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_execution_requirement_decision,
+                  ) THEN d.sk_date END) AS ldt_execution_requirement,
     COUNT(DISTINCT
             CASE
                 WHEN DATE(e.dt_execution_requirement_start) <= d.date AND DATE(e.dt_execution_requirement_start) IS NOT NULL
@@ -244,7 +261,7 @@ SELECT DISTINCT
                 AND(
                   (DATE(e.dt_execution_citation_start) IS NOT NULL AND DATE(e.dt_execution_citation_start) >= d.date) OR
                   (DATE(e.dt_execution_citation_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_executed_citation,
+                  ) THEN d.sk_date END) AS ldt_execution_citation,
     COUNT(DISTINCT
             CASE
                 WHEN DATE(e.dt_execution_citation_start) <= d.date AND DATE(e.dt_execution_citation_start) IS NOT NULL
@@ -268,7 +285,7 @@ SELECT DISTINCT
                 AND(
                   (DATE(e.dt_credit_satisfaction_start) IS NOT NULL AND DATE(e.dt_credit_satisfaction_start) >= d.date) OR
                   (DATE(e.dt_credit_satisfaction_start) IS NULL AND CURRENT_DATE() >= d.date)
-                  ) THEN d.sk_date END) AS ldt_redit_satisfaction,
+                  ) THEN d.sk_date END) AS ldt_credit_satisfaction,
     COALESCE(e.has_arbitration_defense, l.has_arbitration_defense) AS has_arbitration_defense,
     COALESCE(e.has_redistribution, l.has_redistribution) AS has_redistribution,
     COALESCE(e.is_reincident, CAST(l.is_reincident AS BOOLEAN)) AS is_reincident,
