@@ -36,7 +36,7 @@ tickets AS (
                 REGEXP_REPLACE(
                     REGEXP_REPLACE(
                         custom_fields,
-                        '^\\\[|\\\{{([^\\\n\\\{{\\\}}\\\[\\\]](?!value":(?!null)))*\\\}}(,|)|\\\]$', ""
+                        '^\\\[|\\\{{([^\\\n\\\{{\\\}}\\\[\\\]](?!value":(?!null))(?!\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}))*\\\}}(,|)|\\\]$', ""
                     ),
                 ',$|\\\{{|\\\}}|"id":|,"value"|"', ""
                 )
@@ -46,7 +46,7 @@ tickets AS (
         REGEXP_REPLACE(
             REGEXP_REPLACE(
                 custom_fields,
-                '^\\\[|\\\{{([^\\\n\\\{{\\\}}\\\[\\\]](?!value":(?!null)))*\\\}}(,|)|\\\]$', ""
+                '^\\\[|\\\{{([^\\\n\\\{{\\\}}\\\[\\\]](?!value":(?!null))(?!\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}))*\\\}}(,|)|\\\]$', ""
             ),
         ',$|\\\{{|\\\}}|"id":|,"value"|"', ""
         ) AS cf_string,
@@ -84,8 +84,8 @@ splitted_cf AS (
     SELECT
         id_ticket,
         ts_updated,
-        SPLIT(cf, ":")[0] AS key,
-        SPLIT(cf, ":")[1] AS value
+        SPLIT(cf, ":", 2)[0] AS key,
+        SPLIT(cf, ":", 2)[1] AS value
     FROM
         exploded_cf
 ),

@@ -16,6 +16,15 @@ columns:
     description: ID of the user assigned to the ticket
     lineage:
       - datalake_zendesk_clean.tickets.id_assignee
+  id_submitter:
+    description: ID of the user who first submitted the ticket. If different from the id_requester, 
+      the submitter is the user who submitted the ticket, while the requester is the user who is asking for support through the ticket.
+    lineage:
+      - datalake_zendesk_clean.tickets.id_submitter
+  id_requester:
+    description: ID user who is asking for support through the ticket. Can be the same as the id_submitter.
+    lineage:
+      - datalake_zendesk_clean.tickets.id_requester
   id_group:
     description: ID of the group of the ticket
     lineage:
@@ -41,7 +50,7 @@ columns:
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
   id_job:
-    description: Job ID
+    description: Job ID from a specific custom_field related to the ticket.
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
   id_house_so:
@@ -201,7 +210,7 @@ columns:
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
   repair_reanalysis:
-    description:
+    description: Boolean indicating if the repair was reanalysed.
     lineage:
       - datalake_zendesk_clean.tickets.custom_fields
   repairs_sent_to_ll:
@@ -344,10 +353,10 @@ columns:
     description: If the ticket has public comments
     lineage:
       - datalake_zendesk_clean.tickets.is_public
-  ts_analysts_started:
+  ts_analyst_started:
     lineage:
       - datalake_support_users.analysts.ts_created
-    description: Timestamp that indicates when the analyst was first registered.
+    description: Timestamp that indicates when the analyst was first registered for the ticket.
   ts_created:
     description: Timestamp of ticket creation
     lineage:
