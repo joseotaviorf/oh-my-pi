@@ -1,0 +1,32 @@
+database_name: dw_employee_details
+table_name: dim_absence_type
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Dimension table that categorizes types of absence (e.g., vacation, sick absence, maternity absence), including information such as the maximum allowed duration.
+columns:
+  sk_absence_type:
+    description: Primary key that uniquely identifies the absence type.
+    lineage:
+      - datalake_pin_absence_clean.type.id_absence_type
+  absence_type:
+    description: Descriptive name of the absence type.
+    lineage:
+      - datalake_pin_absence_clean.type_translation.name
+  max_days_allowed:
+    description: Maximum number of days allowed for this specific absence type.
+    lineage:
+      - datalake_pin_absence_clean.type.maximum_duration
+  is_paid_leave:
+    description: |-
+      Indicates whether the absence type is paid (remunerated). TRUE when the employee is paid during the absence; FALSE otherwise.
+      The only exception is the type 'Licença Sem Vencimentos' (unpaid leave), which is the absence type used for non-remunerated leave and is set to FALSE.
+    lineage:
+      - datalake_pin_absence_clean.type_translation.name
+  is_performa_protected:
+    description: |-
+      TRUE for absence types that guarantee a minimum individual performance attainment (IPA) of 100% during the absence period. Applies to Afastamento Temporário por Acidente de Trabalho, Licença Parental, and Afastamento Temporário por Doença; FALSE otherwise.
+    lineage:
+      - datalake_pin_absence_clean.type_translation.name
+  ts_load:
+    description: Timestamp of when the record was loaded into the table.

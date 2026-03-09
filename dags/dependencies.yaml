@@ -613,6 +613,8 @@ bietlejuice.dw_employee:
   - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.dw_employee_details:
   - bietlejuice.enrich_people_core:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.pin_absence:load-clean-type-translation:first-run-of-day
+  - bietlejuice.pin_absence:load-clean-type:first-run-of-day
   - bietlejuice.pin_core:load-clean-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
   - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
