@@ -1,0 +1,69 @@
+---
+database_name: datalake_big_agent_clean
+table_name: revenue_share_condition_aud
+description: |
+  Audit view for revenue share condition with revision information and
+  modification flags, alongside condition fields and partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.id
+    description: Revenue share condition identifier.
+  rev:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.rev
+    description: Revision identifier for this change event.
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.revtype
+    description: Revision type (insert/update/delete semantics).
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.revend
+    description: End revision that supersedes the current record.
+  id_revenue_share:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.revenue_share_id
+    description: Identifier of the parent revenue share.
+  condition_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.condition_type
+    description: Type of condition evaluated by the revenue share.
+  value:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.value
+    description: Condition value (threshold, amount or percentage).
+  mod_id_revenue_share:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.revenue_share_id_mod
+    description: Modification flag/column for revenue_share_id.
+  mod_condition_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.condition_type_mod
+    description: Modification flag/column for condition_type.
+  mod_value:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.value_mod
+    description: Modification flag/column for value.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.created_at
+    description: Creation timestamp of the audit record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.updated_at
+    description: Update timestamp of the audit record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition_aud.day
+    description: Partition day.

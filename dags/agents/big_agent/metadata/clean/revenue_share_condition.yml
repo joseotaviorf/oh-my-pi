@@ -1,0 +1,37 @@
+---
+database_name: datalake_big_agent_clean
+table_name: revenue_share_condition
+description: |
+  Revenue share condition records defining conditional rules (type and value)
+  for revenue share configurations, with partitions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.id
+    description: Revenue share condition identifier.
+  id_revenue_share:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.revenue_share_id
+    description: Identifier of the revenue share to which this condition belongs.
+  condition_type:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.condition_type
+    description: Type of condition to evaluate within the revenue share logic.
+  value:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.value
+    description: Condition value (threshold, amount or percentage).
+  year:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_condition.day
+    description: Partition day.

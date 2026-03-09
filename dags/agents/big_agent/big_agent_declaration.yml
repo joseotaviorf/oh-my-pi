@@ -63,6 +63,8 @@ workflow:
     points_rule_aud: {}
     program: {}
     program_aud: {}
+    revenue_share_condition: {}
+    revenue_share_condition_aud: {}
     revenue_share: {}
     revenue_share_aud: {}
     score_rule: {}
