@@ -14,11 +14,15 @@ column_level_validations:
     is_unique:
       severity_level: Error
   work_email:
-    is_complete:
-      severity_level: Warning
+    # Max 0.5% nulls to cover cases such as external users to QA (e.g. users with email ending in @ext.quintoandar.com.br).
+    has_completeness:
+      greater_than: 0.995
+    severity_level: Warning
   person_number:
-    is_complete:
-      severity_level: Warning
+    # Max 0.5% nulls to cover cases such as external users to QA (e.g. users with email ending in @ext.quintoandar.com.br).
+    has_completeness:
+      greater_than: 0.995
+    severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning
