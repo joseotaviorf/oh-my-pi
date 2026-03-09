@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: |-
       Enrich learning data with flattened and derived columns (mainly from Degreed/Learning Hub).
-      Includes content_completions (flattened from clean), and pathway structure tables (sections, lessons, lesson_contents) for program hierarchy and mandatory/optional reporting.
+      Includes content_completions (flattened from clean), pathway structure tables (sections, lessons, lesson_contents), plan_pathways, plan_completions (plan completeness by pathways), and user_identifier_mapping (user_id, work_email, person_number).
 cluster:
   type: databricks_16_4_small_memory_people_cluster
   access_control_list:
@@ -33,6 +33,11 @@ workflow:
     all_completions:
       - content_completions
       - lesson_contents
+    plan_completions:
+      - plan_pathways
+      - all_completions
+    user_identifier_mapping:
+      - content_completions
   tables_customization:
     all_completions:
       vacuum_retention_hours: 168
@@ -47,5 +52,14 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     sections:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    plan_pathways:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    plan_completions:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    user_identifier_mapping:
       vacuum_retention_hours: 168
       vacuum_lite: true

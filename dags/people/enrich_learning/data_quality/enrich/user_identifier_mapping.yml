@@ -1,0 +1,24 @@
+---
+table_name: datalake_learning.user_identifier_mapping
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  work_email:
+    is_complete:
+      severity_level: Warning
+  person_number:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning

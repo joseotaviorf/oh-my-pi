@@ -1,0 +1,28 @@
+---
+table_name: datalake_learning.plan_completions
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Warning
+  id_plan:
+    is_complete:
+      severity_level: Warning
+  pathway_total:
+    is_complete:
+      severity_level: Warning
+  completed_pathways:
+    is_complete:
+      severity_level: Warning
+  is_plan_completed:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning

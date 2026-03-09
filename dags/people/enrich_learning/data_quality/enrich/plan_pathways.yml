@@ -1,0 +1,19 @@
+---
+table_name: datalake_learning.plan_pathways
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_plan:
+    is_complete:
+      severity_level: Warning
+  id_pathway:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning

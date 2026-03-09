@@ -1,0 +1,18 @@
+database_name: datalake_learning
+table_name: plan_pathways
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per (plan, pathway) from Skill Plans. Flatten of skill_plan_details.sections[].resources[] where type = Pathway.
+  Used by plan_completions to scope plans that have at least one pathway and to count pathway totals per plan.
+columns:
+  id_plan:
+    description: Skill plan identifier.
+    lineage:
+    - datalake_degreed_clean.skill_plan_details.id
+  id_pathway:
+    description: Pathway identifier associated to the plan (from sections[].resources[] where type = pathway).
+    lineage:
+    - datalake_degreed_clean.skill_plan_details.sections.resources.id
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.

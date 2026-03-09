@@ -1,0 +1,37 @@
+database_name: datalake_learning
+table_name: plan_completions
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per (user, plan) for plans that have at least one pathway.
+  Plan is completed when the user has completed at least one eligible pathway (all required contents of that pathway).
+  Pathway totals and completed_pathways drive is_plan_completed and dt_completion.
+columns:
+  id_user:
+    description: Degreed user identifier.
+    lineage:
+    - datalake_degreed_clean.users.id
+  id_plan:
+    description: Skill plan identifier.
+    lineage:
+    - datalake_learning.plan_pathways.id_plan
+  pathway_total:
+    description: Number of pathways associated to the plan.
+    lineage:
+    - datalake_learning.plan_pathways
+  completed_pathways:
+    description: Count of those pathways the user has completed (all required contents).
+    lineage:
+    - datalake_learning.all_completions
+    - datalake_learning.plan_pathways
+  is_plan_completed:
+    description: True when completed_pathways >= 1.
+    lineage:
+    - datalake_learning.all_completions
+    - datalake_learning.plan_pathways
+  dt_completion:
+    description: Earliest dt_completion among completed pathways for this user and plan; NULL if none.
+    lineage:
+    - datalake_learning.all_completions.dt_completion
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.

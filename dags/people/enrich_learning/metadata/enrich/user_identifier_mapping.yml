@@ -1,0 +1,24 @@
+database_name: datalake_learning
+table_name: user_identifier_mapping
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  One row per Degreed user with user_id, work_email and person_number.
+  Used to map Degreed users to internal person identifiers.
+  person_number is filled from content_completions (priority 1) or identifier_mapping by work_email (priority 2).
+columns:
+  id_user:
+    description: Degreed user identifier.
+    lineage:
+    - datalake_degreed_clean.users.id
+  work_email:
+    description: Corporate email (lowercase, trimmed for join stability).
+    lineage:
+    - datalake_degreed_clean.users.work_email
+  person_number:
+    description: Person number (6 digits); from content_completions or identifier_mapping by work_email.
+    lineage:
+    - datalake_learning.content_completions.person_number
+    - datalake_people_core.identifier_mapping.person_number
+  ts_load:
+    description: Timestamp when the record was loaded into the enrich layer.

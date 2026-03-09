@@ -29,8 +29,8 @@ columns:
     description: The users personal email address.
     lineage:
     - datalake_degreed_raw.users.attributes.personal_email
-  organization_email:
-    description: The users official email address within the organization.
+  work_email:
+    description: The user official email address within the organization.
     lineage:
     - datalake_degreed_raw.users.attributes.organization_email
   bio:

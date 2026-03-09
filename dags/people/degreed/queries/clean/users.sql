@@ -5,7 +5,7 @@ SELECT
     attributes.first_name AS first_name,
     attributes.last_name AS last_name,
     attributes.personal_email AS personal_email,
-    attributes.organization_email AS organization_email,
+    attributes.organization_email AS work_email,
     attributes.bio,
     attributes.location,
     attributes.permission_role AS permission_role,
