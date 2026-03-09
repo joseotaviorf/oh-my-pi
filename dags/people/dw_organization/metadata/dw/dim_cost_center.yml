@@ -1,0 +1,112 @@
+---
+database_name: dw_organization
+table_name: dim_cost_center
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Cost center dimension implemented as SCD Type 2: each row is one version of a cost center, with a validity interval (dt_valid_from, dt_valid_to).
+  A new version is created only when any attribute changes; consecutive periods with identical attributes are consolidated into a single row.
+  The table is an integrated history of cost center data from two origins: (1) PIN (HR): organization, cost_center_code, cost_center_name, is_active,
+  and HRBPs (assignment responsibility — the business partner responsible for the cost center per period); (2) Codex (enrich_gsheets_people):
+  business, product, brand, vertical, structure, team, chapter, line, owners, headcount_type. The validity interval is the intersection of
+  the cost center effective period (pin), the codex version period (codex_log), and the assignment responsibility period (pin); responsibility
+  is joined by period overlap so the HRBP valid in each interval is used historically. Use is_current = TRUE for the latest version.
+  Surrogate key: sk_cost_center_version (versioned).
+columns:
+  sk_cost_center_version:
+    description: Versioned surrogate key for the cost center version.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.id_organization
+      - datalake_gsheets_people.codex_log.dt_valid_from
+  sk_business_partner_assignment:
+    description: Assignment identifier of the HRBP responsible for the cost center in this version.
+    lineage:
+      - datalake_pin_core_clean.assignment_responsibility.id_assignment
+  sk_business_partner:
+    description: Person identifier of the HRBP responsible for the cost center in this version.
+    lineage:
+      - datalake_pin_core_clean.assignment_responsibility.id_person
+  id_organization:
+    description: Organization identifier (same value across all versions of the cost center).
+    lineage:
+      - datalake_pin_core_clean.hr_organization.id_organization
+  cost_center_code:
+    description: PIN code that identifies each cost center.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.cost_center_code
+  cost_center_name:
+    description: Cost center name.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.name
+  business:
+    description: Business to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people.codex_log.business
+  product:
+    description: Primary product associated with this cost center.
+    lineage:
+      - datalake_gsheets_people.codex_log.product
+  brand:
+    description: Brand to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people.codex_log.brand
+  vertical:
+    description: Derived business vertical based on the structure field.
+    lineage:
+      - datalake_gsheets_people.codex_log.vertical
+  structure:
+    description: Structure to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people.codex_log.structure
+  team:
+    description: Team to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people.codex_log.team
+  chapter:
+    description: Chapter to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people.codex_log.chapter
+  line:
+    description: Line to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people.codex_log.line
+  owner_l1_name:
+    description: Name of the manager L1 responsible for the cost center (L denotes the management hierarchy layer, L0 is CEO, L1 is directly below L0).
+    lineage:
+      - datalake_gsheets_people.codex_log.owner_l1_full_name
+  owner_l2_name:
+    description: Name of the manager L2 responsible for the cost center (below L1 in the management hierarchy).
+    lineage:
+      - datalake_gsheets_people.codex_log.owner_l2_full_name
+  owner_l3_name:
+    description: Name of the manager L3 responsible for the cost center (below L2 in the management hierarchy).
+    lineage:
+      - datalake_gsheets_people.codex_log.owner_l3_full_name
+  headcount_type:
+    description: Type of headcount present in the cost center (e.g. Capacity, Overhead).
+    lineage:
+      - datalake_gsheets_people.codex_log.headcount_type
+  is_active:
+    description: Boolean flag indicating if the cost center is active.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.status
+  dt_valid_from:
+    description: Start date of the validity interval for this version.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.dt_effective_started
+      - datalake_gsheets_people.codex_log.dt_valid_from
+      - datalake_pin_core_clean.assignment_responsibility.dt_started
+  dt_valid_to:
+    description: End date of the validity interval. NULL when the version is still current.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.dt_effective_ended
+      - datalake_gsheets_people.codex_log.dt_valid_to
+      - datalake_pin_core_clean.assignment_responsibility.dt_ended
+  is_current:
+    description: Boolean flag indicating if this is the latest version of the cost center.
+  ts_created:
+    description: Date and time when the record was created in the source system.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.ts_created
+  ts_load:
+    description: Date and time when the record was loaded.

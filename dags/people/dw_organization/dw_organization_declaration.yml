@@ -1,0 +1,36 @@
+dag:
+  name: dw_organization
+  owner: Data People
+  schedule_start_date: 2026, 2, 11
+  documentation:
+    dag_purpose: |
+      Data Warehouse layer for People organization structure.
+      Holds dimension tables that describe organizational entities (e.g. jobs, cost centers, business units).
+      dim_cost_center uses SCD Type 2 (dt_valid_from, dt_valid_to) for codex attributes; other tables may use SCD Type 1.
+      Tables are designed to join primarily to dw_people.fact_employee for reporting and analytics.
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  type: query_delta
+  layer: dw
+  bucket_config_name: people_bucket
+  custom_schema: organization
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  tables_customization:
+    dim_cost_center:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

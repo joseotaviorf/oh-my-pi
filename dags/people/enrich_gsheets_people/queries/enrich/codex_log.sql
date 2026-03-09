@@ -113,10 +113,12 @@ SELECT
   owner_l2_full_name,
   owner_l3_full_name,
   headcount_type,
-  dt_valid_from,
-  DATE_SUB(
-    LEAD(dt_valid_from) OVER (PARTITION BY cost_center_code ORDER BY version_num),
-    1
+  CAST(dt_valid_from AS DATE) AS dt_valid_from,
+  CAST(
+    DATE_SUB(
+      LEAD(dt_valid_from) OVER (PARTITION BY cost_center_code ORDER BY version_num),
+      1
+    ) AS DATE
   ) AS dt_valid_to,
   LEAD(dt_valid_from) OVER (PARTITION BY cost_center_code ORDER BY version_num) IS NULL AS is_current,
   NOW() AS ts_load

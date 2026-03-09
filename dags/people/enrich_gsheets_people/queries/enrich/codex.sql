@@ -98,9 +98,9 @@ SELECT
     emp_id1.person_number AS owner_l1_person_number,
     emp_id2.person_number AS owner_l2_person_number,
     emp_id3.person_number AS owner_l3_person_number,
-    COALESCE(emp_id1.full_name, '-') AS owner_l1_full_name,
-    COALESCE(emp_id2.full_name, '-') AS owner_l2_full_name,
-    COALESCE(emp_id3.full_name, '-') AS owner_l3_full_name,
+    emp_id1.full_name AS owner_l1_full_name,
+    emp_id2.full_name AS owner_l2_full_name,
+    emp_id3.full_name AS owner_l3_full_name,
     codex.owner_l1_email,
     codex.owner_l2_email,
     codex.owner_l3_email,
@@ -119,11 +119,11 @@ SELECT
         OR (codex.brand IS DISTINCT FROM org.brand)
         OR (codex.structure IS DISTINCT FROM org.structure)
         OR (codex.team IS DISTINCT FROM org.team)
-        OR (codex.chapter IS DISTINCT FROM org.chapter)
-        OR (codex.line IS DISTINCT FROM org.line)
-        OR (COALESCE(emp_id1.full_name, '-') IS DISTINCT FROM org.owner_leadership_layer_1_name)
-        OR (COALESCE(emp_id2.full_name, '-') IS DISTINCT FROM org.owner_leadership_layer_2_name)
-        OR (COALESCE(emp_id3.full_name, '-') IS DISTINCT FROM org.owner_leadership_layer_3_name)
+        OR (codex.chapter IS DISTINCT FROM NULLIF(org.chapter, '-'))
+        OR (codex.line IS DISTINCT FROM NULLIF(org.line, '-'))
+        OR (emp_id1.full_name IS DISTINCT FROM NULLIF(org.owner_leadership_layer_1_name, '-'))
+        OR (emp_id2.full_name IS DISTINCT FROM NULLIF(org.owner_leadership_layer_2_name, '-'))
+        OR (emp_id3.full_name IS DISTINCT FROM NULLIF(org.owner_leadership_layer_3_name, '-'))
         OR (codex.headcount_type IS DISTINCT FROM org.headcount_type)
         )
     END AS is_outdated_in_system,

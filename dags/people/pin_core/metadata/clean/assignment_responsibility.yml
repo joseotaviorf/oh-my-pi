@@ -53,6 +53,10 @@ columns:
     description: Status of the responsibility. Used to identify when responsibilities should be reassigned before end-dating.
     lineage:
     - datalake_pin_core_raw.per_asg_responsibilities.status
+  is_active:
+    description: Boolean flag indicating if the responsibility is active. True when status = 'Active'.
+    lineage:
+    - datalake_pin_core_raw.per_asg_responsibilities.status
   usage:
     description: Purpose or use case for which this responsibility is applied.
     lineage:

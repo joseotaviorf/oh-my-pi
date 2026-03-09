@@ -11,6 +11,7 @@ SELECT
     responsibility_name,
     responsibility_type,
     status,
+    status = 'Active' AS is_active,
     usage,
     work_contacts_flag = 'Y' AS is_work_contacts,
     auto_provision_flag = 'Y' AS is_auto_provision,
