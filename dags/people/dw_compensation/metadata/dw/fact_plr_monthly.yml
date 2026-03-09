@@ -7,7 +7,9 @@ description: |
   One row per assignment per reference month per PLR year. Implements eligibility rules, IPA multipliers,
   corporate goals, and target calculations for Brazil, Portugal, USA, and LATAM employees.
   Key features:
-  - Eligibility: admitted by cutoff, 90+ days worked, no interns (core) or Band 9+ (LATAM), no just cause.
+  - Eligibility: admitted by cutoff; 90+ days worked (only for hires in reference year; hires before
+    reference year are eligible regardless), no interns (core) or Band 9+ (LATAM), no just cause.
+  - Date calculation: first day of work counts (exit_date - admission_date + 1).
   - IPA from Performa calibration; default 70% for terminated before evaluation.
   - Time worked: 15+ days in month = full month; unpaid leave excluded; protected leave guarantees 100% IPA.
   - Target: core countries use amount_salary * multiplier / 12; LATAM uses last_salary_in_position * multiplier / 12.
@@ -128,7 +130,8 @@ columns:
   days_worked_in_year:
     description: |
       Days worked in the reference year minus total unpaid absence.
-      Used for 90+ days eligibility check.
+      First day of work counts (exit_date - admission_date + 1).
+      Used for 90+ days eligibility check (only for hires in reference year).
     lineage:
       - datalake_people_core.identifier_mapping.dt_started
       - datalake_people_core.identifier_mapping.dt_actual_termination
@@ -176,7 +179,9 @@ columns:
       - dw_compensation.dim_job.country
       - dw_compensation.dim_job.band
   is_eligible_by_yearly_worked_days:
-    description: TRUE if days_worked_in_year >= min_days_worked_in_year_for_eligibility (e.g., 90).
+    description: |
+      TRUE if hired before reference year (eligible regardless of days) OR
+      days_worked_in_year >= min_days_worked_in_year_for_eligibility (e.g., 90).
     lineage:
       - dw_compensation.dim_plr_parameters.min_days_worked_in_year_for_eligibility
   is_corporate_goal_met:

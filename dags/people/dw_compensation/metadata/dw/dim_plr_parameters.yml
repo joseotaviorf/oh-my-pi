@@ -55,7 +55,8 @@ columns:
     description: |
       Minimum number of days worked in the reference year to be eligible for PLR.
       Default value is 90 days.
-      Employees with fewer days worked in the year are not eligible for PLR.
+      Only applies to employees hired in the reference year. Employees hired before
+      the reference year are eligible for PLR regardless of days worked in the year.
       Applies to all countries (Brazil, Portugal, USA, LATAM).
   min_days_worked_in_month_to_count:
     description: |

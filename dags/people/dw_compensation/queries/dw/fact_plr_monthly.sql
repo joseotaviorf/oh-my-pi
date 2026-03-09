@@ -9,7 +9,9 @@ WITH params AS (
         reference_year <> -1
 ),
 assignments_plr_eligibility AS (
-    /* Base eligibility rules: hired by cutoff date, worked 90+ days in year, not terminated for just cause.
+    /* Base eligibility rules: hired by cutoff date, 90+ days in year (only for hires in reference year;
+       hires before reference year are eligible regardless of days worked), not terminated for just cause.
+       Date calculation: first day of work counts (exit_date - admission_date + 1).
        IPA comes from Performa calibration (meeting_year = reference_year + 1). */
     SELECT
         im.id_period_of_service AS sk_period_of_service,
@@ -209,6 +211,7 @@ base_calculations AS (
         ab.sk_period_of_service,
         ab.sk_contract,
         ab.reference_year AS sk_plr_parameters,
+        ab.reference_year,
         comp.dt_month_started AS sk_reference_month,
         comp.sk_job_version,
         ab.assignment_number,
@@ -302,9 +305,12 @@ SELECT
     is_eligible_by_hired_date,
     is_eligible_by_dismissal_reason,
     is_eligible_by_country_and_band,
-    /* Eligibility flags: 90+ days worked in year (after unpaid leave deduction), 15+ days in month counts as full month. */
-    (days_worked_in_year >= min_days_worked_in_year_for_eligibility)
-        AS is_eligible_by_yearly_worked_days,
+    /* Eligibility flags: 90+ days worked in year only for hires in reference year; hires before reference year
+       are eligible regardless. 15+ days in month counts as full month. */
+    (
+        YEAR(dt_hired) < reference_year
+        OR days_worked_in_year >= min_days_worked_in_year_for_eligibility
+    ) AS is_eligible_by_yearly_worked_days,
     (pct_corporate_goals >= pct_min_corporate_goals) AS is_corporate_goal_met,
     is_terminated_before_payment_cutoff,
     (days_worked_in_month >= min_days_worked_in_month_to_count)
@@ -318,7 +324,10 @@ SELECT
         WHEN is_eligible_by_hired_date
             AND is_eligible_by_dismissal_reason
             AND is_eligible_by_country_and_band
-            AND (days_worked_in_year >= min_days_worked_in_year_for_eligibility)
+            AND (
+                YEAR(dt_hired) < reference_year
+                OR days_worked_in_year >= min_days_worked_in_year_for_eligibility
+            )
             AND (days_worked_in_month >= min_days_worked_in_month_to_count)
         THEN 1
         ELSE 0
@@ -350,7 +359,10 @@ SELECT
             WHEN is_eligible_by_hired_date
                 AND is_eligible_by_dismissal_reason
                 AND is_eligible_by_country_and_band
-                AND (days_worked_in_year >= min_days_worked_in_year_for_eligibility)
+                AND (
+                    YEAR(dt_hired) < reference_year
+                    OR days_worked_in_year >= min_days_worked_in_year_for_eligibility
+                )
                 AND (days_worked_in_month >= min_days_worked_in_month_to_count)
             THEN 1
             ELSE 0
