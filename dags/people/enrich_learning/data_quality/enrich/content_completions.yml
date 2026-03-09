@@ -19,9 +19,6 @@ column_level_validations:
   id_user:
     is_complete:
       severity_level: Warning
-  dt_completed:
-    is_complete:
-      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning
