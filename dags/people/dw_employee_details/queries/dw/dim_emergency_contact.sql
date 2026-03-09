@@ -28,7 +28,7 @@ emergency_contacts AS (
             )
         ) AS contact_name,
         COALESCE(flv.meaning, pei.contact_relationship) AS contact_relationship,
-        TRIM(REGEXP_REPLACE(pei.id_rating_impact, '^[A-Za-z]{2,3} ', '')) AS phone_country_code,
+        TRIM(REGEXP_REPLACE(pei.id_rating_impact, '^[A-Za-z][A-Za-z][A-Za-z]? ', '')) AS phone_country_code,
         pei.id_rating_behavior AS phone_area_code,
         pei.id_rating_leadership AS phone_number,
         pei.dt_effective_started,
