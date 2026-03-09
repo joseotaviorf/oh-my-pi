@@ -25,6 +25,20 @@ WHERE
     dt_created = '{{ data_interval_start | ds }}'
 ```
 
+### Literal Braces — Use `{{` and `}}` to Escape
+
+The pipeline uses Python's `str.format(**params)` on SQL files. **Every** `{...}` is treated as a template placeholder. For literal braces (regex quantifiers, JSON, etc.), escape with double braces: `{{` → `{`, `}}` → `}`.
+
+```sql
+-- ❌ BAD: {2,3} causes KeyError in DAG (Python format looks for param "2,3")
+REGEXP_REPLACE(col, '^[A-Za-z]{2,3} ', '')
+
+-- ✅ GOOD: escape with double braces
+REGEXP_REPLACE(col, '^[A-Za-z]{{2,3}} ', '')
+```
+
+Examples in the repo: `content_completions.sql` (`{{6}}`), `enrich_survicate` (`{{15,18}}`). 
+
 ## MERGE, OPTIMIZE, and Z-ORDER are Abstracted
 
 **Never write `MERGE INTO`, `OPTIMIZE`, or `ZORDER BY` directly in `.sql` query files.** The DAG Builder generates these statements automatically from the declaration file keys. Writing them manually will cause duplicate operations or conflicts.
