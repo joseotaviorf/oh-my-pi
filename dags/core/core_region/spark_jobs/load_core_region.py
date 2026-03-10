@@ -136,8 +136,8 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             when(col("bc.has_sale_operation_cnt") == 1, True)
             .otherwise(False)
             .alias("has_sale_operation"),
-            col("r.ts_created").alias("ts_created"),
-            col("r.ts_updated").alias("ts_updated"),
+            col("r.ts_created").alias("ts_region_created"),
+            col("r.ts_updated").alias("ts_region_updated"),
         )
 
         # Surrogate key
@@ -147,13 +147,13 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             id_column="id_region",
         ).withColumnRenamed("surrogate_key", "sk_core_region")
 
-        # ts_load + partitions (based on ts_updated)
+        # ts_load + partitions (based on ts_region_updated)
         core_region_df = (
             core_region_df
             .withColumn("ts_load", current_timestamp())
-            .withColumn("year", year(col("ts_updated")))
-            .withColumn("month", month(col("ts_updated")))
-            .withColumn("day", dayofmonth(col("ts_updated")))
+            .withColumn("year", year(col("ts_region_updated")))
+            .withColumn("month", month(col("ts_region_updated")))
+            .withColumn("day", dayofmonth(col("ts_region_updated")))
         )
 
         self.logger.info("m=create_core_model, msg=Core region model created")

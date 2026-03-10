@@ -158,43 +158,42 @@ def state_df(spark_session):
 def country_df(spark_session):
     """Create a sample country DataFrame for testing.
 
-    Includes both 'code' (used in SELECT) and 'country_code' (used in the IS NOT NULL filter).
+    Matches datalake_ebdb_clean.country: has 'code' only. The job filters on c.code IS NOT NULL
+    and selects c.code AS country_code.
     """
     schema = StructType(
         [
             StructField("id", LongType(), True),
             StructField("code", StringType(), True),
-            StructField("country_code", StringType(), True),
             StructField("name", StringType(), True),
             StructField("default_timezone", StringType(), True),
         ]
     )
 
     data = [
-        (100, "BR", "BR", "Brasil", "America/Sao_Paulo"),
+        (100, "BR", "Brasil", "America/Sao_Paulo"),
     ]
     return spark_session.createDataFrame(data, schema)
 
 
 @pytest.fixture
 def country_df_with_null_code(spark_session):
-    """Country DataFrame that includes a row with null country_code.
+    """Country DataFrame that includes a row with null code.
 
-    Used to test that the IS NOT NULL filter removes unresolvable regions.
+    Used to test that the c.code IS NOT NULL filter removes unresolvable regions.
     """
     schema = StructType(
         [
             StructField("id", LongType(), True),
             StructField("code", StringType(), True),
-            StructField("country_code", StringType(), True),
             StructField("name", StringType(), True),
             StructField("default_timezone", StringType(), True),
         ]
     )
 
     data = [
-        (100, "BR", "BR", "Brasil", "America/Sao_Paulo"),
-        (200, None, None, "Unknown", "UTC"),
+        (100, "BR", "Brasil", "America/Sao_Paulo"),
+        (200, None, "Unknown", "UTC"),
     ]
     return spark_session.createDataFrame(data, schema)
 
@@ -222,7 +221,7 @@ def state_df_with_unknown(spark_session):
 def region_df_with_unknown_state(spark_session):
     """Region DataFrame that includes a Cidade linked to the unknown state.
 
-    The 'unknown city' row should be filtered out by the country_code IS NOT NULL check.
+    The 'unknown city' row should be filtered out by the c.code IS NOT NULL check.
     """
     schema = StructType(
         [

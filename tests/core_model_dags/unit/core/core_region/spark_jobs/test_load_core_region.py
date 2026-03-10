@@ -25,8 +25,8 @@ EXPECTED_OUTPUT_COLUMNS = {
     "hub_name",
     "has_rent_operation",
     "has_sale_operation",
-    "ts_created",
-    "ts_updated",
+    "ts_region_created",
+    "ts_region_updated",
     "ts_load",
     "year",
     "month",
@@ -224,10 +224,10 @@ class TestCreateCoreModelFilters:
             row["id_region"] for row in result_df.select("id_region").collect()
         ]
 
-        # 'Unknown City' (id_region=9) links to state 20 → country 200 → country_code=NULL
-        assert 9 not in result_ids, "Region with null country_code must be filtered out"
+        # 'Unknown City' (id_region=9) links to state 20 → country 200 → code=NULL
+        assert 9 not in result_ids, "Region with null code must be filtered out"
 
-        # Normal regions (id_region=1, 3, 5) link to state 10 → country 100 → country_code='BR'
+        # Normal regions (id_region=1, 3, 5) link to state 10 → country 100 → code='BR'
         assert 1 in result_ids, "Region 1 with valid country_code should be kept"
 
     def test_output_has_no_null_country_code(self, core_model_df):
@@ -400,10 +400,10 @@ class TestCreateCoreModelDateFilter:
 class TestCreateCoreModelPartitions:
     """Tests for the year/month/day partition columns."""
 
-    def test_year_month_day_derived_from_ts_updated(self, core_model_df):
-        """year, month, day columns must match the date parts of ts_updated for every row."""
+    def test_year_month_day_derived_from_ts_region_updated(self, core_model_df):
+        """year, month, day columns must match the date parts of ts_region_updated for every row."""
         for row in core_model_df.collect():
-            ts = row["ts_updated"]
+            ts = row["ts_region_updated"]
             assert (
                 row["year"] == ts.year
             ), f"Region {row['id_region']}: year={row['year']}, expected {ts.year}"
