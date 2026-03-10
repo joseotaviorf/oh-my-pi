@@ -242,6 +242,7 @@ columns:
   troublesome_entrance_problem:
     lineage:
     - datalake_ebdb_clean.entrance.problem
+    - datalake_ebdb_clean.visit_status_log.reason
     description: If it was not possible to enter the property to visit (succesful_entrance = 0), then this column lists the reason why it was not possible to enter.
     categories:
       Allowed: The visit was allowed
@@ -409,6 +410,7 @@ columns:
   owner_missing_reason:
     lineage:
     - datalake_ebdb_clean.entrance.problem
+    - datalake_ebdb_clean.visit_status_log.reason
     description: '[Deprecated] Describes the reason why owner did not show up (by agent app follow up).'
   reason_category:
     lineage:
@@ -515,7 +517,8 @@ columns:
     description: Boolean column to identify if the visit occurred virtually, i.e. visit_type = 'Video'
   is_entrance_successful:
     lineage:
-    - datalake_ebdb_clean.entrance.is_successful
+    - datalake_ebdb_clean.booking.visit_fup
+    - datalake_ebdb_clean.visit_status_log.event_type
     description: Boolean column to identify if the agent and tenant were able to enter the house
   is_canceled:
     lineage:
@@ -566,6 +569,7 @@ columns:
   has_owner_arrived:
     lineage:
     - datalake_ebdb_clean.entrance.problem
+    - datalake_ebdb_clean.visit_status_log.reason
     description: Boolean column to identify if the owner appeared at the visit where the rule is if the entrance problem <> 'LandlordNoShow then true
   is_first_booking_auto:
     lineage:

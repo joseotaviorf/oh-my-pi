@@ -102,7 +102,7 @@ visitor_attendance AS (
         v.id_booking,
         MAX(IF(v.type='Tenant', v.has_attended, NULL)) AS has_tenant_attended,
         MAX(IF(v.type='Agent', v.has_attended, NULL)) AS has_agent_attended,
-        MAX(IF(v.type='LandLord', v.has_attended, NULL)) AS has_landlord_attended
+        MAX(IF(v.type='Landlord', v.has_attended, NULL)) AS has_landlord_attended
     FROM
         datalake_ebdb_clean.visitor AS v
     GROUP BY v.id_booking
@@ -361,6 +361,7 @@ visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in t
             WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
             WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
         END AS visit_fup,
+        IF(reason = 'SUPPLY_DID_NOT_ATTEND_VISIT', 'LandlordNoShow', reason) AS reason,
         ts_created AS ts_visit_fup
     FROM
         datalake_ebdb_clean.visit_status_log
@@ -425,7 +426,7 @@ base_booking AS (
           AS tenant_absence_reason,
         vab.agent_absence_reason,
         vab.landlord_absence_reason,
-        e.problem AS troublesome_entrance_problem,
+        COALESCE(e.problem, fup_vsl.reason) AS troublesome_entrance_problem,
         IF(b.status = 'Cancelado', sc.reason_enum, NULL) AS cancellation_reason,
         CASE
           WHEN b.status = 'Cancelado' THEN
@@ -479,7 +480,7 @@ base_booking AS (
               ELSE 'Unknown'
             END
         END AS cancellation_reason_category,
-        IF(e.problem = 'LandlordNoShow', 'Absent', NULL) AS owner_missing_reason,
+        IF(COALESCE(e.problem, fup_vsl.reason) = 'LandlordNoShow', 'Absent', NULL) AS owner_missing_reason,
         COALESCE(
           NULLIF(
             COALESCE(
@@ -551,7 +552,7 @@ base_booking AS (
           ELSE FALSE
         END AS is_3p_supply_bh,
         IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
-        e.is_successful AS is_entrance_successful,
+        IF(COALESCE(b.visit_fup, fup_vsl.visit_fup) = 'VaiNegociar', TRUE, FALSE) AS is_entrance_successful,
         (b.status = 'Cancelado') AS is_canceled,
         (b.business_context = 'SALE') AS is_sale_visit,
         (b.type = 'Vistoria') AS is_inspection,
@@ -573,7 +574,7 @@ base_booking AS (
         va.has_tenant_attended,
         va.has_agent_attended,
         va.has_landlord_attended,
-        (e.problem <> 'LandlordNoShow') AS has_owner_arrived,
+        (COALESCE(e.problem, fup_vsl.reason) <> 'LandlordNoShow') AS has_owner_arrived,
         CASE
             WHEN fba.id_user_creation = 194233 THEN True
             ELSE False

@@ -193,7 +193,6 @@ SELECT
     lh.uuid_company AS uuid_company_supply,
     vbm.id_company_demand,
     -1 AS id_follow_up,
-    -1 AS id_entrance_type,
     vbh.id_first_associated_agent,
     vbh.id_last_associated_agent,
     visit_log.id_user_visit_request,

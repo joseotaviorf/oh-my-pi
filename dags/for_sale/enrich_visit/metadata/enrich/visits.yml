@@ -47,10 +47,6 @@ columns:
     description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data.
   id_follow_up:
     description: ID for visit's follow up
-  id_entrance_type:
-    lineage:
-      - datalake_ebdb_clean.entrance.id
-    description: ID to know how was the entrance.
   id_first_associated_agent:
     lineage:
       - datalake_ebdb_clean.visit_aud.id_agent
