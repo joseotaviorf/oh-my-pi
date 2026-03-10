@@ -2,7 +2,7 @@ ENTITY_TYPE: "REGION"
 REGION_TABLE: "datalake_ebdb_clean.region"
 STATE_TABLE: "datalake_ebdb_clean.state"
 COUNTRY_TABLE: "datalake_ebdb_clean.country"
-REGION_BUSINESS_CONTEXTS_TABLE: "datalake_ebdb_clean.region_business_context_served"
+REGION_BUSINESS_CONTEXTS_TABLE: "datalake_ebdb_clean.region_business_contexts_served"
 BUSINESS_UNIT_REGION_TABLE: "datalake_hub_services_clean.business_unit_region"
 BUSINESS_UNIT_TABLE: "datalake_hub_services_clean.business_unit" 
 
