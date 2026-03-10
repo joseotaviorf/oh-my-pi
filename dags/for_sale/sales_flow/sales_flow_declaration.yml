@@ -342,10 +342,26 @@ workflow:
       clean_table_name: sales_flow_users_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
+    screening:
+      clean_table_name: screening
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     screening_buyer:
       clean_table_name: screening_buyer
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
+    screening_house:
+      clean_table_name: screening_house
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    screening_negotiation:
+      clean_table_name: screening_negotiation
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]    
+    screening_note:
+      clean_table_name: screening_note
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]      
     screening_seller:
       clean_table_name: screening_seller
       raw_primary_keys: ["id"]
@@ -434,6 +450,10 @@ workflow:
       clean_table_name: users_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
+    user_test_segment:
+      clean_table_name: user_test_segment
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
 cluster:
   type: custom_cluster
   custom_configurations:

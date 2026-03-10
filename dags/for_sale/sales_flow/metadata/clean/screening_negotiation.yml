@@ -1,0 +1,54 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: screening_negotiation
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "The primary purpose of the screening_negotiation table is to 
+  store the status of the screening/validation form for negotiation, 
+  indicating whether the form is complete or pending, as well as capturing any 
+  outstanding data issues or missing information."
+columns:
+  id:
+    description: 'Id of the screening negotiation.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.id
+  id_screening:
+    description: 'Id of the screening.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.screening_id
+  id_negotiation:
+    description: 'Id of the negotiation.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.negotiation_id
+  status:
+    description: 'Status of the screening negotiation.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.status
+  proposal_validation_status:
+    description: 'Proposal validation status.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.proposal_validation_status
+  legal_pendency_note:
+    description: 'Legal pendency note.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.legal_pendency_note
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_sales_flow_raw.screening_negotiation.day
