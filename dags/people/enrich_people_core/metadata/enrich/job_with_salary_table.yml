@@ -1,4 +1,4 @@
-database_name: datalake_compensation
+database_name: datalake_people_core
 table_name: job_with_salary_table
 owner: isabella.araujo@quintoandar.com.br
 domain: People
@@ -6,11 +6,11 @@ description: |
   Enriched table containing job information with compensation targets and salary table details.
   Consolidates job attributes with salary ranges, bands, and compensation targets from multiple source tables.
   Provides enriched data for downstream data warehouse consumption.
-  
+
   Each row represents a job at a specific point in time with its associated salary table and band information.
   The table tracks temporal validity through dt_valid_from and dt_valid_to fields.
   Multiple rows can exist for the same job (id_job) when attributes change over time.
-  
+
   This table serves as the foundation for the dim_job dimension table in the data warehouse layer,
   which applies SCD Type 2 logic to consolidate consecutive periods with identical attributes.
 

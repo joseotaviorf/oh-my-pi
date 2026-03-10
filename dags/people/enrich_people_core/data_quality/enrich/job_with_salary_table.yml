@@ -1,5 +1,5 @@
 ---
-table_name: datalake_compensation.job_with_salary_table
+table_name: datalake_people_core.job_with_salary_table
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -28,7 +28,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE is_current = TRUE
            AND is_active = TRUE
            AND job_family IS NULL
@@ -38,7 +38,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE is_current = TRUE
            AND is_active = TRUE
            AND band IS NULL
@@ -48,7 +48,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE is_current = TRUE
            AND is_active = TRUE
            AND career_track IS NULL
@@ -73,12 +73,12 @@ column_level_validations:
       constraint: |-
         (SELECT COUNT(*)
          FROM (
-           SELECT 
+           SELECT
              id_job,
-             dt_valid_from, 
+             dt_valid_from,
              dt_valid_to,
              LAG(dt_valid_to) OVER (PARTITION BY id_job ORDER BY dt_valid_from) AS prev_dt_valid_to
-           FROM datalake_compensation.job_with_salary_table
+           FROM datalake_people_core.job_with_salary_table
          )
          WHERE prev_dt_valid_to IS NOT NULL
            AND dt_valid_from < prev_dt_valid_to
@@ -88,7 +88,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE dt_valid_to IS NOT NULL
            AND dt_valid_to < dt_valid_from
         ) = 0
@@ -99,7 +99,7 @@ column_level_validations:
         (SELECT COUNT(*)
          FROM (
            SELECT id_job, COUNT(DISTINCT target_plr) AS distinct_target_plr
-           FROM datalake_compensation.job_with_salary_table
+           FROM datalake_people_core.job_with_salary_table
            WHERE target_plr IS NOT NULL
            GROUP BY id_job
            HAVING COUNT(DISTINCT target_plr) > 1
@@ -111,7 +111,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE COALESCE(target_plr, 0) <> 0
            AND COALESCE(target_plr_salary_multiplier, 0) <> 0
         ) = 0
@@ -120,7 +120,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE salary_range_min IS NOT NULL
            AND salary_range_mid IS NOT NULL
            AND salary_range_max IS NOT NULL
@@ -135,7 +135,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE salary_range_mid IS NOT NULL
            AND salary_range_max IS NOT NULL
            AND salary_range_mid > salary_range_max
@@ -145,7 +145,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE salary_range_max IS NOT NULL
            AND salary_range_max < 0
         ) = 0
@@ -154,7 +154,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_compensation.job_with_salary_table
+         FROM datalake_people_core.job_with_salary_table
          WHERE annualization_factor IS NOT NULL
            AND annualization_factor <= 0
         ) = 0

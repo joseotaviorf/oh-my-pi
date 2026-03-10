@@ -9,14 +9,14 @@ WITH ceo_history AS (
     FROM
         datalake_pin_core_clean.all_assignments AS aa
     INNER JOIN
-        datalake_compensation.job_with_salary_table AS j
+        datalake_people_core.job_with_salary_table AS j
         ON aa.id_job = j.id_job
         AND aa.dt_effective_started <= COALESCE(j.dt_valid_to, DATE('9999-12-31'))
         AND COALESCE(aa.dt_effective_ended, DATE('9999-12-31')) >= j.dt_valid_from
     WHERE
         TRY_CAST(j.band AS INT) = (
             SELECT MAX(TRY_CAST(band AS INT))
-            FROM datalake_compensation.job_with_salary_table
+            FROM datalake_people_core.job_with_salary_table
             WHERE TRY_CAST(band AS INT) IS NOT NULL
         )
 ),

@@ -293,10 +293,10 @@ bietlejuice.dw_compensation:
   - bietlejuice.dw_employee:load-dw-employee-dim-absence-type:first-run-of-day
   - bietlejuice.dw_employee:load-dw-employee-fact-absence-requests:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
-  - bietlejuice.enrich_compensation:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
   - bietlejuice.enrich_people_core:load-enrich-event-definition:first-run-of-day
   - bietlejuice.enrich_people_core:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.enrich_people_core:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
 bietlejuice.dw_condo_monitoring:
@@ -1815,19 +1815,6 @@ bietlejuice.enrich_company:
   - bietlejuice.company:load-clean-document:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
-bietlejuice.enrich_compensation:
-  - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
-  - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-grade-ladder:first-run-of-day
-  - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
-  - bietlejuice.pin_core:load-clean-job:first-run-of-day
-  - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
-  - bietlejuice.pin_core:load-clean-rates:first-run-of-day
-  - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
-  - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
@@ -3140,9 +3127,9 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
 bietlejuice.enrich_people_core:
-  - bietlejuice.enrich_compensation:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.hr_system:load-clean-actions-lov:first-run-of-day
   - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-base:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day
@@ -3153,8 +3140,19 @@ bietlejuice.enrich_people_core:
   - bietlejuice.pin_core:load-clean-assignment-supervisor:first-run-of-day
   - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-external-application-identifier:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-ladder:first-run-of-day
+  - bietlejuice.pin_core:load-clean-grade-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-family-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job-translation:first-run-of-day
+  - bietlejuice.pin_core:load-clean-job:first-run-of-day
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
   - bietlejuice.pin_core:load-clean-person-name:first-run-of-day
+  - bietlejuice.pin_core:load-clean-rate-values:first-run-of-day
+  - bietlejuice.pin_core:load-clean-rates:first-run-of-day
+  - bietlejuice.pin_core:load-clean-set-identifiers:first-run-of-day
+  - bietlejuice.pin_core:load-clean-valid-grades:first-run-of-day
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_people_core:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_pin:load-enrich-managers-history:first-run-of-day

@@ -34,6 +34,7 @@ workflow:
       - identifier_mapping
     management_hierarchy:
       - identifier_mapping
+      - job_with_salary_table
   tables_customization:
     event_definition:
       vacuum_retention_hours: 168
@@ -45,5 +46,8 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     management_hierarchy:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    job_with_salary_table:
       vacuum_retention_hours: 168
       vacuum_lite: true
