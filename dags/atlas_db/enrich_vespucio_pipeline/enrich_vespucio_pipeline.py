@@ -677,7 +677,7 @@ zordominium_tasks = [
 
 classifieds_tasks = [
     create_task(
-        entry_point="plugins_classified_house_id",
+        entry_point="plugins_classifieds_house_id",
         parameters=[
             f"--input_listing_compound={Tables.listings}",
             f"--input_classifieds_house_id={Tables.classifieds_house_id}",
