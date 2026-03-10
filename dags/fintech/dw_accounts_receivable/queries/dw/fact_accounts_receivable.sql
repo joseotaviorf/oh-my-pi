@@ -77,6 +77,19 @@ SELECT DISTINCT
         ELSE ''
     END AS provisional_group,
     fd.delay_contamined_range,
+    CASE  WHEN fd.delay_contaminated_range_rule_E <= -1081 THEN 'L. 1081+' 
+          WHEN fd.delay_contaminated_range_rule_E <= -721 THEN 'K. 721-1080' 
+          WHEN fd.delay_contaminated_range_rule_E <= -541 THEN 'J. 541-720'
+          WHEN fd.delay_contaminated_range_rule_E <= -361 THEN 'I. 361-540'
+         WHEN fd.delay_contaminated_range_rule_E <= -181 THEN 'H. 181-360'
+         WHEN fd.delay_contaminated_range_rule_E <= -151 THEN 'G. 151-180'
+         WHEN fd.delay_contaminated_range_rule_E <= -121 THEN 'F. 121-150'
+         WHEN fd.delay_contaminated_range_rule_E <= -91 THEN 'E. 91-120'
+         WHEN fd.delay_contaminated_range_rule_E <= -61 THEN 'D. 61-90'
+         WHEN fd.delay_contaminated_range_rule_E <= -31 THEN 'C. 31-60'
+         WHEN fd.delay_contaminated_range_rule_E <= -1 THEN 'B. 1-30'
+         ELSE 'A. Current'
+    END AS delay_contamined_range_expanded,
     cr.is_agreement_invoice,
     fd.is_writtendown_in_dead_time,
     CASE
@@ -153,6 +166,7 @@ calculate_net_recovered AS (
         END AS is_canceled_invoice,
         provisional_group,
         delay_contamined_range,
+        delay_contamined_range_expanded,
         CASE
             WHEN overdue_payment_status <> 'open'
                 OR overdue_payment_status IS NOT NULL
@@ -196,6 +210,7 @@ SELECT
     is_canceled_invoice,
     provisional_group,
     delay_contamined_range,
+    delay_contamined_range_expanded,
     day_resolution,
     invoice_amount,
     CASE

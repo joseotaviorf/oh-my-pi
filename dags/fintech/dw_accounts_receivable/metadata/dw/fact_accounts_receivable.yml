@@ -1,7 +1,7 @@
 database_name: dw_losses
 table_name: fact_accounts_receivable
 owner: bianca.martins@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: Analytical table used to create the AR90 (accounts receivables) metric.
 columns:
   sk_invoice:
@@ -53,6 +53,10 @@ columns:
     description: "Range of delay calculated using the promise date and anchor invoice due date."
     lineage:
       - dw_losses.fact_delay.delay_contamined_range
+  delay_contamined_range_expanded:
+    description: "Range of delay expanded until 1081 days of dealy breakdown."
+    lineage:
+      - dw_losses.fact_delay.delay_contaminated_range_rule_E
   day_resolution:
     description: "Day of the month when the invoice was resolved or paid."
     lineage:
@@ -101,3 +105,7 @@ columns:
     description: "Invoice closing date (snapshot date)"
     lineage:
       - dw_losses.fact_delay.dt_closing
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."
+    lineage:
+      - dw_losses.fact_accounts_receivable.ts_load
