@@ -1,5 +1,5 @@
 dag:
-  name: enrich_people_core
+  name: enrich_people
   owner: Data People
   schedule_start_date: 2026, 1, 29
   documentation:

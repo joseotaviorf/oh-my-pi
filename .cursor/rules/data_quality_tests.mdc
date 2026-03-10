@@ -31,7 +31,7 @@ column_level_validations: {}
 Format: `{database}.{table}`. Examples:
 
 - Raw/Clean: `datalake_{source}_raw.table_name` or `datalake_{source}_clean.table_name`
-- Enrich: `datalake_{source}_{context}.table_name` (e.g. `datalake_people_core.identifier_mapping`)
+- Enrich: `datalake_{source}_{context}.table_name` (e.g. `datalake_people.identifier_mapping`)
 - DW: `dw_{schema}.table_name` (e.g. `dw_compensation.dim_plr_parameters`)
 - Core: `core_{entity}.table_name` (e.g. `core_house.house`)
 
@@ -204,7 +204,7 @@ column_level_validations:
 
 ```yaml
 ---
-table_name: datalake_people_core.identifier_mapping
+table_name: datalake_people.identifier_mapping
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:

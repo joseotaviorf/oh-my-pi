@@ -1,5 +1,5 @@
 ---
-table_name: datalake_people_core.management_hierarchy
+table_name: datalake_people.management_hierarchy
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -34,7 +34,7 @@ column_level_validations:
       # Ensures the minimum version number is at least 1. Data should have been processed at least once.
       constraint: |-
         (SELECT COALESCE(MIN(version), 0)
-         FROM datalake_people_core.management_hierarchy) >= 1
+         FROM datalake_people.management_hierarchy) >= 1
       severity_level: Warning
 
   is_current:
@@ -44,7 +44,7 @@ column_level_validations:
         (SELECT COUNT(*)
          FROM (
            SELECT assignment_number, COUNT(*) AS current_count
-           FROM datalake_people_core.management_hierarchy
+           FROM datalake_people.management_hierarchy
            WHERE is_current = TRUE
            GROUP BY assignment_number
            HAVING current_count > 1

@@ -11,144 +11,144 @@ columns:
   sk_hierarchy_version:
     description: Deterministic surrogate key for the hierarchy version. Generated as MD5 hash of assignment_number + dt_valid_from + dt_valid_to.
     lineage:
-      - datalake_people_core.management_hierarchy.sk_hierarchy_version
+      - datalake_people.management_hierarchy.sk_hierarchy_version
   assignment_number:
     description: Assignment number (employee code) whose managerial chain is tracked in this record.
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number
+      - datalake_people.management_hierarchy.assignment_number
   assignment_number_l0:
     description: Assignment number of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l0
+      - datalake_people.management_hierarchy.assignment_number_l0
   name_l0:
     description: Full name of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l0
+      - datalake_people.management_hierarchy.name_l0
   email_l0:
     description: Work e-mail of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l0
+      - datalake_people.management_hierarchy.email_l0
   assignment_number_l1:
     description: Assignment number of the manager L1 (Layer 1, one level below L0).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l1
+      - datalake_people.management_hierarchy.assignment_number_l1
   name_l1:
     description: Full name of the manager L1 (Layer 1, one level below L0).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l1
+      - datalake_people.management_hierarchy.name_l1
   email_l1:
     description: Work e-mail of the manager L1 (Layer 1, one level below L0).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l1
+      - datalake_people.management_hierarchy.email_l1
   assignment_number_l2:
     description: Assignment number of the manager L2 (Layer 2, one level below L1).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l2
+      - datalake_people.management_hierarchy.assignment_number_l2
   name_l2:
     description: Full name of the manager L2 (Layer 2, one level below L1).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l2
+      - datalake_people.management_hierarchy.name_l2
   email_l2:
     description: Work e-mail of the manager L2 (Layer 2, one level below L1).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l2
+      - datalake_people.management_hierarchy.email_l2
   assignment_number_l3:
     description: Assignment number of the manager L3 (Layer 3, one level below L2).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l3
+      - datalake_people.management_hierarchy.assignment_number_l3
   name_l3:
     description: Full name of the manager L3 (Layer 3, one level below L2).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l3
+      - datalake_people.management_hierarchy.name_l3
   email_l3:
     description: Work e-mail of the manager L3 (Layer 3, one level below L2).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l3
+      - datalake_people.management_hierarchy.email_l3
   assignment_number_l4:
     description: Assignment number of the manager L4 (Layer 4, one level below L3).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l4
+      - datalake_people.management_hierarchy.assignment_number_l4
   name_l4:
     description: Full name of the manager L4 (Layer 4, one level below L3).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l4
+      - datalake_people.management_hierarchy.name_l4
   email_l4:
     description: Work e-mail of the manager L4 (Layer 4, one level below L3).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l4
+      - datalake_people.management_hierarchy.email_l4
   assignment_number_l5:
     description: Assignment number of the manager L5 (Layer 5, one level below L4).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l5
+      - datalake_people.management_hierarchy.assignment_number_l5
   name_l5:
     description: Full name of the manager L5 (Layer 5, one level below L4).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l5
+      - datalake_people.management_hierarchy.name_l5
   email_l5:
     description: Work e-mail of the manager L5 (Layer 5, one level below L4).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l5
+      - datalake_people.management_hierarchy.email_l5
   assignment_number_l6:
     description: Assignment number of the manager L6 (Layer 6, one level below L5).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l6
+      - datalake_people.management_hierarchy.assignment_number_l6
   name_l6:
     description: Full name of the manager L6 (Layer 6, one level below L5).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l6
+      - datalake_people.management_hierarchy.name_l6
   email_l6:
     description: Work e-mail of the manager L6 (Layer 6, one level below L5).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l6
+      - datalake_people.management_hierarchy.email_l6
   assignment_number_l7:
     description: Assignment number of the manager L7 (Layer 7, one level below L6).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l7
+      - datalake_people.management_hierarchy.assignment_number_l7
   name_l7:
     description: Full name of the manager L7 (Layer 7, one level below L6).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l7
+      - datalake_people.management_hierarchy.name_l7
   email_l7:
     description: Work e-mail of the manager L7 (Layer 7, one level below L6).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l7
+      - datalake_people.management_hierarchy.email_l7
   assignment_number_l8:
     description: Assignment number of the manager L8 (Layer 8, one level below L7).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l8
+      - datalake_people.management_hierarchy.assignment_number_l8
   name_l8:
     description: Full name of the manager L8 (Layer 8, one level below L7).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l8
+      - datalake_people.management_hierarchy.name_l8
   email_l8:
     description: Work e-mail of the manager L8 (Layer 8, one level below L7).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l8
+      - datalake_people.management_hierarchy.email_l8
   assignment_number_l9:
     description: Assignment number of the manager L9 (Layer 9, one level below L8).
     lineage:
-      - datalake_people_core.management_hierarchy.assignment_number_l9
+      - datalake_people.management_hierarchy.assignment_number_l9
   name_l9:
     description: Full name of the manager L9 (Layer 9, one level below L8).
     lineage:
-      - datalake_people_core.management_hierarchy.name_l9
+      - datalake_people.management_hierarchy.name_l9
   email_l9:
     description: Work e-mail of the manager L9 (Layer 9, one level below L8).
     lineage:
-      - datalake_people_core.management_hierarchy.email_l9
+      - datalake_people.management_hierarchy.email_l9
   is_current:
     description: Indicates whether this hierarchy version is currently valid (TRUE) or historical (FALSE).
     lineage:
-      - datalake_people_core.management_hierarchy.is_current
+      - datalake_people.management_hierarchy.is_current
   dt_valid_from:
     description: Date when this hierarchy version became effective.
     lineage:
-      - datalake_people_core.management_hierarchy.dt_valid_from
+      - datalake_people.management_hierarchy.dt_valid_from
   dt_valid_to:
     description: Date when this hierarchy version ended. 9999-12-31 for current records per domain convention.
     lineage:
-      - datalake_people_core.management_hierarchy.dt_valid_to
+      - datalake_people.management_hierarchy.dt_valid_to
   ts_load:
     description: Timestamp when the record was loaded into the dimension.
     lineage:
-      - datalake_people_core.management_hierarchy.ts_load
+      - datalake_people.management_hierarchy.ts_load

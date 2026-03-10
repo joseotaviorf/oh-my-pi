@@ -8,7 +8,7 @@ columns:
   sk_assignment:
     description: Surrogate key for the assignment.
     lineage:
-    - datalake_people_core.identifier_mapping.id_period_of_service
+    - datalake_people.identifier_mapping.id_period_of_service
   line:
     description: Line of the employee
     lineage:

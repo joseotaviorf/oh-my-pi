@@ -1,4 +1,4 @@
-database_name: datalake_people_core
+database_name: datalake_people
 table_name: event_definition
 owner: isabella.araujo@quintoandar.com.br
 domain: People

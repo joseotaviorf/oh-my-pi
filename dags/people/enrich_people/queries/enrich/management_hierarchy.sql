@@ -9,14 +9,14 @@ WITH ceo_history AS (
     FROM
         datalake_pin_core_clean.all_assignments AS aa
     INNER JOIN
-        datalake_people_core.job_with_salary_table AS j
+        datalake_people.job_with_salary_table AS j
         ON aa.id_job = j.id_job
         AND aa.dt_effective_started <= COALESCE(j.dt_valid_to, DATE('9999-12-31'))
         AND COALESCE(aa.dt_effective_ended, DATE('9999-12-31')) >= j.dt_valid_from
     WHERE
         TRY_CAST(j.band AS INT) = (
             SELECT MAX(TRY_CAST(band AS INT))
-            FROM datalake_people_core.job_with_salary_table
+            FROM datalake_people.job_with_salary_table
             WHERE TRY_CAST(band AS INT) IS NOT NULL
         )
 ),
@@ -27,12 +27,12 @@ filtered_managers_history AS (
         supervisor.dt_effective_started,
         supervisor.dt_effective_ended
     FROM
-        datalake_people_core.identifier_mapping AS id_map_emp
+        datalake_people.identifier_mapping AS id_map_emp
     INNER JOIN
         datalake_pin_core_clean.assignment_supervisor AS supervisor
         ON id_map_emp.id_assignment = supervisor.id_assignment
     LEFT JOIN
-        datalake_people_core.identifier_mapping AS id_map_mgr
+        datalake_people.identifier_mapping AS id_map_mgr
         ON id_map_mgr.id_assignment = supervisor.id_manager_assignment
     WHERE
         supervisor.is_primary
@@ -557,7 +557,7 @@ assignment_lookup AS (
         COALESCE(display_name, full_name) AS name,
         work_email AS email
     FROM
-        datalake_people_core.identifier_mapping
+        datalake_people.identifier_mapping
     WHERE
         NOT is_user_test
     QUALIFY

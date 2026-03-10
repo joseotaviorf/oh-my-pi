@@ -22,7 +22,7 @@ person_from_mapping AS (
     work_email,
     MAX(person_number) AS person_number
   FROM
-    datalake_people_core.identifier_mapping
+    datalake_people.identifier_mapping
   WHERE
     work_email IS NOT NULL
     AND person_number IS NOT NULL

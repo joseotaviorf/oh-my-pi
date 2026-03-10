@@ -8,23 +8,23 @@ columns:
   assignment_number:
     description: Registration number of the worker.
     lineage:
-      - datalake_people_core.identifier_mapping.assignment_number
+      - datalake_people.identifier_mapping.assignment_number
   full_name:
     description: Full name of the worker, if has social name it is the same.
     lineage:
-      - datalake_people_core.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.full_name
   work_email:
     description: Corporate email of the employee.
     lineage:
-      - datalake_people_core.identifier_mapping.work_email
+      - datalake_people.identifier_mapping.work_email
   manager_name:
     description: Full name of the manager.
     lineage:
-      - datalake_people_core.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.full_name
   manager_email:
     description: Corporate email of the manager.
     lineage:
-      - datalake_people_core.identifier_mapping.work_email
+      - datalake_people.identifier_mapping.work_email
   assignment_name:
     description: Name of the job of the worker.
     lineage:
@@ -139,10 +139,10 @@ columns:
   dt_hired:
     description: Actual start date of the work relationship (hire date).
     lineage:
-      - datalake_people_core.identifier_mapping.dt_started
+      - datalake_people.identifier_mapping.dt_started
   dt_terminated:
     description: Actual termination date of the work relationship.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_actual_termination
+      - datalake_people.identifier_mapping.dt_actual_termination
   ts_load:
     description: Timestamp of when the record was loaded into this table.

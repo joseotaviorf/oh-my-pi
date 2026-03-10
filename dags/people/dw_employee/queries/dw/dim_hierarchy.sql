@@ -44,32 +44,32 @@ SELECT DISTINCT
 FROM
   datalake_hr_system.hierarchy_ids AS h
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi0
+  datalake_people.identifier_mapping AS wi0
     ON wi0.id_period_of_service = h.sk_assignment_leadership_order_0
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi1
+  datalake_people.identifier_mapping AS wi1
     ON wi1.id_period_of_service = h.sk_assignment_leadership_order_1
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi2
+  datalake_people.identifier_mapping AS wi2
     ON wi2.id_period_of_service = h.sk_assignment_leadership_order_2
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi3
+  datalake_people.identifier_mapping AS wi3
     ON wi3.id_period_of_service = h.sk_assignment_leadership_order_3
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi4
+  datalake_people.identifier_mapping AS wi4
     ON wi4.id_period_of_service = h.sk_assignment_leadership_order_4
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi5
+  datalake_people.identifier_mapping AS wi5
     ON wi5.id_period_of_service = h.sk_assignment_leadership_order_5
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi6
+  datalake_people.identifier_mapping AS wi6
     ON wi6.id_period_of_service = h.sk_assignment_leadership_order_6
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi7
+  datalake_people.identifier_mapping AS wi7
     ON wi7.id_period_of_service = h.sk_assignment_leadership_order_7
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi8
+  datalake_people.identifier_mapping AS wi8
     ON wi8.id_period_of_service = h.sk_assignment_leadership_order_8
 LEFT JOIN
-  datalake_people_core.identifier_mapping AS wi9
+  datalake_people.identifier_mapping AS wi9
     ON wi9.id_period_of_service = h.sk_assignment_leadership_order_9

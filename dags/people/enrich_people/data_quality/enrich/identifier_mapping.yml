@@ -1,5 +1,5 @@
 ---
-table_name: datalake_people_core.identifier_mapping
+table_name: datalake_people.identifier_mapping
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -69,7 +69,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_people_core.identifier_mapping
+         FROM datalake_people.identifier_mapping
          WHERE is_active = TRUE
             AND dt_actual_termination IS NOT NULL
             AND dt_actual_termination < CURRENT_DATE
@@ -79,7 +79,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_people_core.identifier_mapping
+         FROM datalake_people.identifier_mapping
          WHERE is_active = TRUE
             AND dt_notified_termination IS NOT NULL
             AND dt_notified_termination < CURRENT_DATE

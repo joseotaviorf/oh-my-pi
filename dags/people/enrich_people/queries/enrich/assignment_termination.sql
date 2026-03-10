@@ -48,7 +48,7 @@ SELECT
     t.dismissal_reason,
     NOW() AS ts_load
 FROM
-    datalake_people_core.identifier_mapping AS im
+    datalake_people.identifier_mapping AS im
 LEFT JOIN
     terminations AS t
     ON t.id_assignment = im.id_assignment

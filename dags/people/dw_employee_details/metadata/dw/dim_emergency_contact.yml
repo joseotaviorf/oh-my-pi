@@ -13,11 +13,11 @@ columns:
     lineage:
       - datalake_pin_core_clean.people_extra_info.id_person_extra_info
       - datalake_pin_core_clean.people_extra_info.dt_effective_started
-      - datalake_people_core.identifier_mapping.id_person
+      - datalake_people.identifier_mapping.id_person
   person_number:
     description: Employee identifier (person number in HR systems).
     lineage:
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
   contact_name:
     description: Full name of the person to contact in case of emergency.
     lineage:

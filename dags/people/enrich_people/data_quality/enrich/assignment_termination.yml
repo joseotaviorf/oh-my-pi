@@ -1,5 +1,5 @@
 ---
-table_name: datalake_people_core.assignment_termination
+table_name: datalake_people.assignment_termination
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -32,7 +32,7 @@ column_level_validations:
     custom:
       constraint: |-
         (SELECT COUNT(*)
-         FROM datalake_people_core.assignment_termination
+         FROM datalake_people.assignment_termination
          WHERE dt_terminated IS NULL
            AND dt_notified IS NULL
         ) = 0

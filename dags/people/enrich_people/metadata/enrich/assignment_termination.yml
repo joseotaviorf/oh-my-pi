@@ -1,4 +1,4 @@
-database_name: datalake_people_core
+database_name: datalake_people
 table_name: assignment_termination
 owner: isabella.araujo@quintoandar.com.br
 domain: People
@@ -11,27 +11,27 @@ columns:
   id_assignment:
     description: Unique identifier for the work assignment.
     lineage:
-    - datalake_people_core.identifier_mapping.id_assignment
+    - datalake_people.identifier_mapping.id_assignment
   person_number:
     description: The person identification number in the main HR system.
     lineage:
-    - datalake_people_core.identifier_mapping.person_number
+    - datalake_people.identifier_mapping.person_number
   assignment_number:
     description: The assignment registration number (matrícula).
     lineage:
-    - datalake_people_core.identifier_mapping.assignment_number
+    - datalake_people.identifier_mapping.assignment_number
   dt_hired:
     description: Effective start date of the work assignment.
     lineage:
-    - datalake_people_core.identifier_mapping.dt_started
+    - datalake_people.identifier_mapping.dt_started
   dt_notified:
     description: Date on which the termination was notified (aviso prévio).
     lineage:
-    - datalake_people_core.identifier_mapping.dt_notified_termination
+    - datalake_people.identifier_mapping.dt_notified_termination
   dt_terminated:
     description: Actual termination date of the work assignment.
     lineage:
-    - datalake_people_core.identifier_mapping.dt_actual_termination
+    - datalake_people.identifier_mapping.dt_actual_termination
   action_code:
     description: Code that identifies the termination action (e.g., TERMINATION, RESIGNATION).
     lineage:

@@ -42,7 +42,7 @@ Ask (or infer from context):
 | Layer | Prefix Pattern | User Input Examples | Normalized Name |
 |-------|---------------|---------------------|-----------------|
 | **dw** | `dw_<dag_name>` | `rent_contracts` → `dw_rent_contracts`<br>`dw_rent_contracts` → `dw_rent_contracts` (no change) | Always starts with `dw_` |
-| **enrich** | `enrich_<dag_name>` | `people_core` → `enrich_people_public`<br>`enrich_people_public` → `enrich_people_public` (no change) | Always starts with `enrich_` |
+| **enrich** | `enrich_<dag_name>` | `people` → `enrich_people`<br>`enrich_people` → `enrich_people` (no change) | Always starts with `enrich_` |
 | **core** | `core_<dag_name>` | `contract` → `core_contract`<br>`core_contract` → `core_contract` (no change) | Always starts with `core_` |
 | **metric** | `metric_<business_context>__<dag_name>` | `rent__contracts` → `metric_rent__contracts`<br>`metric_rent__contracts` → `metric_rent__contracts` (no change)<br>`rent contracts` → ask user for business_context | Always starts with `metric_` and uses `__` separator |
 | **reverse** | `reverse_<dag_name>` | `webhelp_access` → `reverse_webhelp_access`<br>`reverse_webhelp_access` → `reverse_webhelp_access` (no change) | Always starts with `reverse_` |
@@ -78,8 +78,8 @@ Ask (or infer from context):
 |-------------|-------|-----------------|-------|
 | "rent_contracts" | dw | `dw_rent_contracts` | Added `dw_` prefix |
 | "dw_rent_contracts" | dw | `dw_rent_contracts` | Already correct, no change |
-| "people_core" | enrich | `enrich_people_core` | Added `enrich_` prefix |
-| "enrich_people_core" | enrich | `enrich_people_core` | Already correct, no change |
+| "people" | enrich | `enrich_people` | Added `enrich_` prefix |
+| "enrich_people" | enrich | `enrich_people` | Already correct, no change |
 | "contract" | core | `core_contract` | Added `core_` prefix |
 | "core_contract" | core | `core_contract` | Already correct, no change |
 | "rent__contracts" | metric | `metric_rent__contracts` | Added `metric_` prefix |
@@ -166,7 +166,7 @@ If the user specifies a custom schema, normalize it using the rule above. Otherw
 | **Multiple CDC DAGs, same source DB** | All share the source DB name | `ebdb_house`, `ebdb_agent` → both `custom_schema: ebdb` |
 | **Migration / test** | Append `_test` | `ebdb_condo_test` → `custom_schema: ebdb_test` |
 | **gsheets** (raw/clean layers) | Always `gsheets` | `gsheets_cross` → `custom_schema: gsheets`<br>`gsheets_for_sale` → `custom_schema: gsheets` |
-| **Enrich** | Strip `enrich_` prefix from normalized name | `enrich_people_core` → `custom_schema: people_core` |
+| **Enrich** | Strip `enrich_` prefix from normalized name | `enrich_people` → `custom_schema: people` |
 | **Core** | Strip `core_` prefix from normalized name | `core_contract` → `custom_schema: contract` |
 | **Reverse** | Strip `reverse_` prefix from normalized name | `reverse_webhelp_access` → `custom_schema: webhelp_access` |
 | **Raw / clean** (excluding gsheets) | Same as normalized_dag_name (omit the key) | — |

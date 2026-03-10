@@ -23,16 +23,16 @@ columns:
       Surrogate key (MD5 hash of sk_period_of_service + sk_reference_month).
       Uniquely identifies each row (one per assignment per reference month).
     lineage:
-      - datalake_people_core.identifier_mapping.id_period_of_service
+      - datalake_people.identifier_mapping.id_period_of_service
       - dw_public.dim_date.month_start
   sk_period_of_service:
     description: Foreign key to period of service (id_period_of_service). References the employment period.
     lineage:
-      - datalake_people_core.identifier_mapping.id_period_of_service
+      - datalake_people.identifier_mapping.id_period_of_service
   sk_contract:
     description: Foreign key to contract/assignment (id_assignment). References the employment contract.
     lineage:
-      - datalake_people_core.identifier_mapping.id_assignment
+      - datalake_people.identifier_mapping.id_assignment
   sk_plr_parameters:
     description: Foreign key to dim_plr_parameters. PLR reference year used for calculation.
     lineage:
@@ -48,11 +48,11 @@ columns:
   assignment_number:
     description: Assignment number (business identifier).
     lineage:
-      - datalake_people_core.identifier_mapping.assignment_number
+      - datalake_people.identifier_mapping.assignment_number
   person_number:
     description: Employee person number (business identifier).
     lineage:
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
   dismissal_type:
     description: Type of dismissal when applicable (e.g., resignation, termination).
     lineage:
@@ -122,8 +122,8 @@ columns:
       Days worked in the month minus unpaid leave.
       Overlap of (hired, terminated) with month, minus days_unpaid_leave.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_started
-      - datalake_people_core.identifier_mapping.dt_actual_termination
+      - datalake_people.identifier_mapping.dt_started
+      - datalake_people.identifier_mapping.dt_actual_termination
       - dw_employee.fact_absence_requests.dt_absence_started
       - dw_employee.fact_absence_requests.dt_absence_ended
       - dw_employee.dim_absence_type.is_paid_leave
@@ -133,8 +133,8 @@ columns:
       First day of work counts (exit_date - admission_date + 1).
       Used for 90+ days eligibility check (only for hires in reference year).
     lineage:
-      - datalake_people_core.identifier_mapping.dt_started
-      - datalake_people_core.identifier_mapping.dt_actual_termination
+      - datalake_people.identifier_mapping.dt_started
+      - datalake_people.identifier_mapping.dt_actual_termination
       - dw_employee.fact_absence_requests.dt_absence_started
       - dw_employee.fact_absence_requests.dt_absence_ended
       - dw_employee.dim_absence_type.is_paid_leave
@@ -162,12 +162,12 @@ columns:
   is_terminated_before_evaluation_cycle_started:
     description: TRUE if employee left before evaluation cycle start date.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_actual_termination
+      - datalake_people.identifier_mapping.dt_actual_termination
       - dw_compensation.dim_plr_parameters.dt_evaluation_cycle_started
   is_eligible_by_hired_date:
     description: TRUE if admitted by admission cutoff date.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_started
+      - datalake_people.identifier_mapping.dt_started
       - dw_compensation.dim_plr_parameters.dt_admission_cutoff
   is_eligible_by_dismissal_reason:
     description: TRUE if not dismissed for just cause.
@@ -191,7 +191,7 @@ columns:
   is_terminated_before_payment_cutoff:
     description: TRUE if terminated before payment cutoff date.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_actual_termination
+      - datalake_people.identifier_mapping.dt_actual_termination
       - dw_compensation.dim_plr_parameters.dt_payment_cutoff
   is_month_eligible_by_worked_days:
     description: TRUE if days_worked_in_month >= min_days_worked_in_month_to_count (e.g., 15).
@@ -235,11 +235,11 @@ columns:
   dt_hired:
     description: Assignment start date.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_started
+      - datalake_people.identifier_mapping.dt_started
   dt_terminated:
     description: Actual termination date. 9999-12-31 if still active.
     lineage:
-      - datalake_people_core.identifier_mapping.dt_actual_termination
+      - datalake_people.identifier_mapping.dt_actual_termination
   dt_job_info_valid_from:
     description: Start of job/salary validity period.
     lineage:

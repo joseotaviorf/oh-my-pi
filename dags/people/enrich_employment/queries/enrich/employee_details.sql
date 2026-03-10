@@ -78,7 +78,7 @@ SELECT
   pp.dt_notified_termination,
   NOW() AS ts_load
 FROM 
-  datalake_people_core.identifier_mapping AS ids
+  datalake_people.identifier_mapping AS ids
 INNER JOIN
   current_assignments AS ca 
     ON ca.id_period_of_service = ids.id_period_of_service

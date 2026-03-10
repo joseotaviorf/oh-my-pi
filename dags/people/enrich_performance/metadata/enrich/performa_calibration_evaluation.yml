@@ -12,7 +12,7 @@ columns:
   person_number:
     description: Unique identifier for the person (employee) who was evaluated.
     lineage:
-    - datalake_people_core.identifier_mapping.person_number
+    - datalake_people.identifier_mapping.person_number
   id_meeting:
     description: Unique identifier for the calibration meeting where the evaluation was performed.
     lineage:

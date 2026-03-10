@@ -67,7 +67,7 @@ LEFT JOIN
   meeting_year
     ON meeting_year.id_meeting = m.id_meeting
 LEFT JOIN
-  datalake_people_core.identifier_mapping im
+  datalake_people.identifier_mapping im
     ON (im.id_assignment = d.id_assignment)
 LEFT JOIN
   datalake_pin_hr_review_clean.dashboard_template_translation dtl

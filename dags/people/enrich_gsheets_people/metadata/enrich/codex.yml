@@ -58,38 +58,38 @@ columns:
       hierarchy responsible for the cost center.
     lineage:
       - datalake_gsheets_people.codex_history_base.owner_l1_email
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
       - datalake_gsheets_people_clean.email_employee_mapping
   owner_l2_person_number:
     description: Person number (PIN id) of the third highest manager (L2) in the hierarchy
       responsible for the cost center.
     lineage:
       - datalake_gsheets_people.codex_history_base.owner_l2_email
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
       - datalake_gsheets_people_clean.email_employee_mapping
   owner_l3_person_number:
     description: Person number (PIN id) of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
       - datalake_gsheets_people.codex_history_base.owner_l3_email
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
       - datalake_gsheets_people_clean.email_employee_mapping
   owner_l1_full_name:
     description: Full name of the second highest manager (L1) in the hierarchy responsible for the cost center.
     lineage:
       - datalake_gsheets_people.codex_history_base.owner_l1_email
-      - datalake_people_core.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.full_name
       - datalake_gsheets_people_clean.email_employee_mapping
   owner_l2_full_name:
     description: Full name of the third highest manager (L2) in the hierarchy responsible for the cost center.
     lineage:
       - datalake_gsheets_people.codex_history_base.owner_l2_email
-      - datalake_people_core.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.full_name
       - datalake_gsheets_people_clean.email_employee_mapping
   owner_l3_full_name:
     description: Full name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
     lineage:
       - datalake_gsheets_people.codex_history_base.owner_l3_email
-      - datalake_people_core.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.full_name
       - datalake_gsheets_people_clean.email_employee_mapping
   owner_l1_email:
     description: Email of the second highest manager (L1) in the hierarchy responsible for the cost center.
@@ -125,7 +125,7 @@ columns:
       - datalake_gsheets_people.codex_history_base.chapter
       - datalake_gsheets_people.codex_history_base.headcount_type
       - datalake_gsheets_people.codex_history_base.line
-      - datalake_people_core.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.full_name
       - datalake_gsheets_people.codex_history_base.owner_l1_email
       - datalake_gsheets_people.codex_history_base.owner_l2_email
       - datalake_gsheets_people.codex_history_base.owner_l3_email

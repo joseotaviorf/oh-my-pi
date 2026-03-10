@@ -19,6 +19,6 @@ columns:
     description: Person number (6 digits); from content_completions or identifier_mapping by work_email.
     lineage:
     - datalake_learning.content_completions.person_number
-    - datalake_people_core.identifier_mapping.person_number
+    - datalake_people.identifier_mapping.person_number
   ts_load:
     description: Timestamp when the record was loaded into the enrich layer.

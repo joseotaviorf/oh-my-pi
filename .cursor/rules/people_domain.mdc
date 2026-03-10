@@ -147,7 +147,7 @@ When **filtering** source tables (clean/enrich) that still contain `4712-12-31`,
 - **`datalake_employment.employee_details`** — being deprecated
 - **Enrich DAGs** (see Enrich Layer table below): `enrich_employee`, `enrich_hr_system`, `enrich_hr_system_custom`, `enrich_product_tech`, `enrich_pin`
 
-Prefer `pin_core` clean tables and `datalake_people_core` enrich tables instead. For assignment and termination data, use `datalake_people_core.identifier_mapping` together with `datalake_people_core.assignment_termination` (for terminated assignments).
+Prefer `pin_core` clean tables and `datalake_people` enrich tables instead. For assignment and termination data, use `datalake_people.identifier_mapping` together with `datalake_people.assignment_termination` (for terminated assignments).
 
 **If the required data does not exist in `pin_*` DAGs**, inform the user so they can assess alternative sources or request the data to be added to the pin pipeline.
 
@@ -160,9 +160,9 @@ Enrich DAGs should be named by **domain**, not by source system. Avoid source-dr
 | Avoid | Prefer |
 |-------|--------|
 | `enrich_pin` | `enrich_compensation`, `enrich_demographics` |
-| `enrich_employee` | `enrich_people_core`, domain-specific enrich |
-| `enrich_hr_system` | `enrich_people_core`, `pin_core` clean |
-| `enrich_hr_system_custom` | `enrich_people_core`, domain-specific enrich |
+| `enrich_employee` | `enrich_people`, domain-specific enrich |
+| `enrich_hr_system` | `enrich_people`, `pin_core` clean |
+| `enrich_hr_system_custom` | `enrich_people`, domain-specific enrich |
 | `enrich_product_tech` | Domain-focused enrich (e.g., `enrich_compensation`) |
 
 Each enrich DAG focuses on a business domain (compensation, demographics, etc.), even when the underlying source is pin_core.

@@ -95,10 +95,10 @@ evaluations AS (
   FROM
     base_evaluations AS base
   INNER JOIN
-    datalake_people_core.identifier_mapping AS employees
+    datalake_people.identifier_mapping AS employees
       ON employees.id_assignment = base.id_assignment
   INNER JOIN
-    datalake_people_core.identifier_mapping AS managers
+    datalake_people.identifier_mapping AS managers
       ON managers.id_assignment = base.id_manager_assignment
   CROSS JOIN
     evaluation_types AS et

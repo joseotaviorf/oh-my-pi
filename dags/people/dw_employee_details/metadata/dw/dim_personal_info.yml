@@ -16,13 +16,13 @@ columns:
       Surrogate key for the employee. Stable system identifier for the person.
       Use to join to facts and other dimensions in dw_employee_details.
     lineage:
-      - datalake_people_core.identifier_mapping.id_person
+      - datalake_people.identifier_mapping.id_person
   person_number:
     description: |
       Business key. Unique identifier for the employee in the HR system.
       Use to join to other dw_employee_details tables (dim_contact, dim_documentation, etc.).
     lineage:
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
   display_name:
     description: |
       Current display or preferred name (nome social). Use this name in all communications,

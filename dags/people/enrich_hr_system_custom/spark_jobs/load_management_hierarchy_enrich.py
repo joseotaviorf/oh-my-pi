@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # Filter out test users (both employees and managers)
     test_users_query = """
         SELECT DISTINCT id_period_of_service
-        FROM datalake_people_core.identifier_mapping
+        FROM datalake_people.identifier_mapping
         WHERE is_user_test = true
     """
     df_test_users = spark_client.conn.sql(test_users_query)

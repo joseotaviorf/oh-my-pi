@@ -8,12 +8,12 @@ columns:
   sk_employee:
     description: Unique identifier for the person related to the assignment.
     lineage:
-    - datalake_people_core.identifier_mapping.id_person
+    - datalake_people.identifier_mapping.id_person
     - datalake_pin.movement_details.id_person
   sk_assignment:
     description: Unique identifier for the period of service related to the assignment.
     lineage:
-    - datalake_people_core.identifier_mapping.id_period_of_service
+    - datalake_people.identifier_mapping.id_period_of_service
     - datalake_pin.movement_details.id_period_of_service
   sk_started_date:
     description: Started date of the event.

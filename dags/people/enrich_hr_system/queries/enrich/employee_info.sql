@@ -55,7 +55,7 @@ SELECT DISTINCT
   p.country_of_birth AS birth_country,
   DATE(p.dt_of_birth) AS dt_birth
 FROM
-  datalake_people_core.identifier_mapping AS im
+  datalake_people.identifier_mapping AS im
 INNER JOIN
   datalake_pin_core_clean.person AS p
     ON p.id_person = im.id_person

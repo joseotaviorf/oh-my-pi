@@ -14,6 +14,6 @@ SELECT
     END AS is_career_progression,
     NOW() AS ts_load
 FROM
-    datalake_people_core.event_definition AS ed
+    datalake_people.event_definition AS ed
 WHERE
     ed.is_current = TRUE

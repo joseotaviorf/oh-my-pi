@@ -39,4 +39,4 @@ SELECT
     ) AS dt_valid_to,
     mh.ts_load
 FROM
-    datalake_people_core.management_hierarchy AS mh
+    datalake_people.management_hierarchy AS mh

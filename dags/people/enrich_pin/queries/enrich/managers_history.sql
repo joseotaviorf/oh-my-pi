@@ -50,10 +50,10 @@ LEFT JOIN
   datalake_pin_core_clean.person_name AS pnm
     ON pnm.id_person = s.id_manager
 LEFT JOIN 
-  datalake_people_core.identifier_mapping AS ei
+  datalake_people.identifier_mapping AS ei
     ON ei.id_assignment = s.id_assignment
 LEFT JOIN 
-  datalake_people_core.identifier_mapping AS eim
+  datalake_people.identifier_mapping AS eim
     ON eim.id_assignment = s.id_manager_assignment
 WHERE 
   s.is_primary

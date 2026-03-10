@@ -143,7 +143,7 @@ SELECT
   COALESCE(sa.adjustment_percent, 0) AS pct_last_salary_increase,
   NOW() AS ts_load
 FROM 
-  datalake_people_core.identifier_mapping AS im
+  datalake_people.identifier_mapping AS im
 INNER JOIN 
   datalake_employment.employee_details AS ed
     ON ed.id_period_of_service = im.id_period_of_service

@@ -3,7 +3,7 @@ employees AS (
     SELECT DISTINCT
         im.id_person
     FROM
-        datalake_people_core.identifier_mapping AS im
+        datalake_people.identifier_mapping AS im
     WHERE
         NOT im.is_user_test
 ),

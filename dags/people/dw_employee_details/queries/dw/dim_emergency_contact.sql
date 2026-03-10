@@ -7,7 +7,7 @@ employees AS (
         im.dt_started AS dt_assignment_started,
         im.dt_actual_termination AS dt_assignment_ended
     FROM
-        datalake_people_core.identifier_mapping AS im
+        datalake_people.identifier_mapping AS im
     WHERE
         im.is_user_test = FALSE
 ),

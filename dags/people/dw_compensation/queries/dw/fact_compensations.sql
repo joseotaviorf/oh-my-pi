@@ -23,7 +23,7 @@ WITH salary_with_person AS (
     FROM
         datalake_pin_compensation_clean.salary AS sal
     INNER JOIN
-        datalake_people_core.identifier_mapping AS im
+        datalake_people.identifier_mapping AS im
             ON sal.id_assignment = im.id_assignment
     WHERE
         sal.is_salary_approved = TRUE
@@ -167,7 +167,7 @@ salary_enriched AS (
     FROM
         salary_with_assignment_job AS sal
     LEFT JOIN
-        datalake_people_core.event_definition AS ed
+        datalake_people.event_definition AS ed
             ON sal.id_action = ed.id_action
             AND sal.id_action_reason = ed.id_reason
     LEFT JOIN

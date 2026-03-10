@@ -5,7 +5,7 @@ employee_ids AS (
     person_number,
     full_name
   FROM
-    datalake_people_core.identifier_mapping
+    datalake_people.identifier_mapping
   WHERE
     person_number IS NOT NULL
     AND assignment_type IN ('E', 'C')
