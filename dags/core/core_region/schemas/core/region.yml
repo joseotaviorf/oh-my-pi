@@ -1,0 +1,112 @@
+# Schema validation file for core region table
+# This file defines the expected schema for the core_region.region table
+# Path: dags/core/core_region/schemas/core/region.yml
+
+columns:
+  # Surrogate key - primary identifier
+  sk_core_region:
+    type: string
+    required: true
+
+  # Region identifier
+  id_region:
+    type: bigint
+    required: true
+  
+  # Parent region identifier
+  id_parent_region:
+    type: bigint
+    required: true
+
+  # Region name
+  region_name:
+    type: string
+    required: true
+
+  # Level
+  level:
+    type: string
+    required: true
+
+  # State identifier
+  id_state:
+    type: bigint
+    required: true
+  
+  # State name
+  state_name:
+    type: string
+    required: true
+
+  # State abbreviation
+  state_abbreviation:
+    type: string
+    required: true
+
+  # Country identifier
+  id_country:
+    type: bigint
+    required: true
+
+  # Country code
+  country_code:
+    type: string
+    required: true
+
+  # Country name
+  country_name:
+    type: string
+    required: true
+
+  # Country default timezone
+  country_default_timezone:
+    type: string
+    required: true
+
+  # Business unit hub name
+  business_unit_hub_name:
+    type: string
+    required: false
+
+  # Has rent operation
+  has_rent_operation:
+    type: boolean
+    required: true
+  
+  # Has sale operation
+  has_sale_operation:
+    type: boolean
+    required: true
+
+  # Region creation timestamp
+  ts_region_created:
+    type: timestamp
+    required: true
+
+  # Region update timestamp
+  ts_region_updated:
+    type: timestamp
+    required: true
+
+  # Load timestamp
+  ts_load:
+    type: timestamp
+    required: true
+
+  # Partitioning columns - required for performance
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+# Schema constraints
+min_columns: 21
+max_columns: 21
+strict: true

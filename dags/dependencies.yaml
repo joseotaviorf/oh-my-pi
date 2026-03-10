@@ -24,8 +24,15 @@ bietlejuice.core_listing:
   - bietlejuice.core_aux_listing:load-core-aux--house-listing-category
   - bietlejuice.core_aux_listing:load-core-aux--lbc-status-version-order
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
-bietlejuice.core_offer:
+bietlejuice.core_offer:   
   - bietlejuice.rental_transact_fast_lane:load-clean-offer
+bietlejuice.core_region:
+  - bietlejuice.ebdb_location:load-clean-country
+  - bietlejuice.ebdb_location:load-clean-region
+  - bietlejuice.ebdb_location:load-clean-region-business-contexts-served
+  - bietlejuice.ebdb_location:load-clean-state
+  - bietlejuice.hub_services:load-clean-business-unit
+  - bietlejuice.hub_services:load-clean-business-unit-region
 bietlejuice.core_visit:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
