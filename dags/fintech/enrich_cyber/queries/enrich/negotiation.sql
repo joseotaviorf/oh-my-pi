@@ -232,7 +232,7 @@ SELECT
       WHEN UPPER(a.id_user) = "PORTALQA" THEN "Portal Auto Negociação"
       WHEN UPPER(ag.agency_type) = "CYBER CREDIT" THEN "Operador Interno"
       WHEN UPPER(a.agreement_type) LIKE '%SERASA%' THEN "Serasa Digital"
-      WHEN UPPER(ag.agency_type) = "ASSESSORIA CONVENCIONAL" THEN "Assessoria"
+      WHEN UPPER(ag.agency_type) IN ("ASSESSORIA CONVENCIONAL", "ASSESSORIA JURÍDICA") THEN "Assessoria"
       WHEN UPPER(a.id_user) = "MIGRACAO" THEN "Migração"
       ELSE ag.agency_type
     END AS origin_agreement,

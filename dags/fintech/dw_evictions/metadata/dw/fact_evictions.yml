@@ -142,21 +142,15 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.procedure
   consolidated_reason:
-    description: "Consolidated reason description for the case result."
-    lineage:
-      - datalake_cyber_legal.evictions_base.consolidated_reason
-  standardized_reason:
-    description: "Standardized reason description for the case final status."
-    lineage:
-      - datalake_cyber_legal.evictions_base.standardized_reason
-  first_consolidated_reason:
-    description: "First consolidated reason description for the case result (from cyber_legal source)."
+    description: "Consolidated reason description for the case result (from cyber_legal first_consolidated_reason or elaw consolidated_reason)."
     lineage:
       - datalake_cyber_legal.evictions_base.first_consolidated_reason
-  first_standardized_reason:
-    description: "First standardized reason description for the case final status (from cyber_legal source)."
+      - datalake_gsheets_clean.evictions_base.consolidated_reason
+  standardized_reason:
+    description: "Standardized reason description for the case final status (from cyber_legal first_standardized_reason or elaw standardized_reason)."
     lineage:
       - datalake_cyber_legal.evictions_base.first_standardized_reason
+      - datalake_gsheets_clean.evictions_base.standardized_reason
   result:
     description: "Result classification (set to 'not_in_cyber_legal')."
     lineage:
@@ -314,6 +308,10 @@ columns:
     description: "Flag indicating if the contract has multiple legal cases (reincident)."
     lineage:
       - datalake_cyber_legal.evictions_base.is_reincident
+  is_reopened:
+    description: "Flag indicating if the legal case was reopened after a previous closure."
+    lineage:
+      - datalake_cyber_legal.evictions_base.is_reopened
   dt_registered:
     description: "Date when the case was accepted for legal proceedings."
     lineage:

@@ -8,14 +8,15 @@ columns:
     description: Unique identifier for the negotiation event.
     lineage:
       - datalake_cyber_clean.agreements.id_agreement
-  id_contract:
-    description: Internal contract identifier.
+  id_contract_cyber:
+    description: "Internal contract identifier from Cyber (datalake_cyber_clean)."
     lineage:
       - datalake_cyber_clean.contracts_agreements.id_contract
-  id_contract_external:
-    description: External contract identifier, used by source systems.
+  id_contract:
+    description: "Contract identifier; external ID when available, otherwise derived from id_contract_cyber."
     lineage:
       - datalake_cyber_clean.contracts.id_contract_external
+      - datalake_cyber_clean.contracts_agreements.id_contract
   id_customer:
     description: Customer identifier associated with the contract.
     lineage:
@@ -36,6 +37,11 @@ columns:
     description: Campaign identifier associated with the agreement.
     lineage:
       - datalake_cyber_clean.agreements.offer_number
+  id_agency:
+    description: "Agency identifier assigned to the agreement (from user or agreement)."
+    lineage:
+      - datalake_cyber_clean.users.id_agency
+      - datalake_cyber_clean.agreements.id_agency
   creditor:
     description: Name or code of the creditor related to the contract group.
     lineage:
@@ -48,6 +54,18 @@ columns:
     description: Description of the agreement type.
     lineage:
       - datalake_cyber_clean.agreements.agreement_type_description
+  agreement_type_min_delay_days:
+    description: "Minimum delay in days allowed for the agreement type."
+    lineage:
+      - datalake_cyber_clean.agreement_type.min_delay_days
+  agreement_type_max_delay_days:
+    description: "Maximum delay in days allowed for the agreement type."
+    lineage:
+      - datalake_cyber_clean.agreement_type.max_delay_days
+  agreement_type_payment_method:
+    description: "Payment method configured for the agreement type."
+    lineage:
+      - datalake_cyber_clean.agreement_type.payment_method
   payment_method:
     description: Payment method selected for the agreement (e.g., boleto, credit card).
     lineage:
@@ -56,6 +74,15 @@ columns:
     description: Payment method promised by the customer during negotiation.
     lineage:
       - datalake_cyber_clean.agreements.promisse_payment_method
+  frequency:
+    description: "Payment frequency of the agreement (from agreements or campaign)."
+    lineage:
+      - datalake_cyber_clean.agreements.frequency
+      - datalake_cyber_clean.campaign.frequency
+  agency_type:
+    description: "Type of agency (e.g. Portal, Assessoria) from agency dimension."
+    lineage:
+      - datalake_cyber_clean.agency.agency_type
   contact_type:
     description: "Type of contact made by the advisory/agency to create the negotiation"
     categories:
@@ -87,6 +114,19 @@ columns:
     description: Current status of the agreement (e.g., active, finished, broken).
     lineage:
       - datalake_cyber_clean.agreements.status
+  campaign_status:
+    description: "Status of the campaign when the agreement was created (e.g. Vencida)."
+    lineage:
+      - datalake_cyber_clean.agreements.campaign_status
+      - datalake_cyber_clean.campaign.campaign_status
+  description_broken_agreement:
+    description: "Description or reason when the agreement was broken (canceled after down payment)."
+    lineage:
+      - datalake_cyber_clean.agreements.description_broken_agreement
+  exception:
+    description: "Exception flag or code associated with the agreement."
+    lineage:
+      - datalake_cyber_clean.agreements.exception
   is_down_payment_paid:
     description: Indicates whether the down payment was paid.
     lineage:
@@ -99,6 +139,10 @@ columns:
     description: Number of installments that have been paid.
     lineage:
       - datalake_cyber_clean.agreements.paid_installments
+  total_invoices_negotiated:
+    description: "Total count of distinct invoices included in the negotiation."
+    lineage:
+      - datalake_cyber.debt_negotiation_mapping
   breached_installments:
     description: Number of installments that were breached.
     lineage:
@@ -115,6 +159,21 @@ columns:
     description: Interest fees charged on the contract before negotiation.
     lineage:
       - datalake_cyber_clean.agreements.contract_interest_fees_amount
+  type_interest_quota:
+    description: "Type of interest quota applied to the agreement (from agreements or campaign)."
+    lineage:
+      - datalake_cyber_clean.agreements.type_interest_quota
+      - datalake_cyber_clean.campaign.type_interest_quota
+  installment_interest_rate:
+    description: "Interest rate applied to installments (from agreements or campaign)."
+    lineage:
+      - datalake_cyber_clean.agreements.installment_interest_rate
+      - datalake_cyber_clean.campaign.installment_interest_rate
+  additional_interest_rate:
+    description: "Additional interest rate (e.g. grace period rate from campaign)."
+    lineage:
+      - datalake_cyber_clean.agreements.additional_interest_rate
+      - datalake_cyber_clean.campaign.grace_period_interest_rate
   installment_interest_fees_amount:
     description: Interest charged during installment generation.
     lineage:
@@ -128,10 +187,11 @@ columns:
     description: Legal and operational costs related to eviction proceedings.
     lineage:
       - datalake_cyber_clean.agreements.eviction_costs_amount
-  eviction_honorarium_amount:
-    description: Honorarium associated with eviction actions.
+  honorarium_amount:
+    description: "Honorarium amount associated with the agreement (from agreements or campaign)."
     lineage:
-      - datalake_cyber_clean.historical_agreements.eviction_honorarium_amount
+      - datalake_cyber_clean.agreements.honorarium_amount
+      - datalake_cyber_clean.campaign.honorarium_amount
   credit_card_fee_amount:
     description: Fee charged when payment is made via credit card.
     lineage:
@@ -164,6 +224,18 @@ columns:
     description: Discount applied to eviction-related costs.
     lineage:
       - datalake_cyber_clean.agreements.discount_to_eviction_costs
+  max_interest_discount_percentage:
+    description: "Maximum interest discount percentage allowed for the agreement type (Juros Acordo)."
+    lineage:
+      - datalake_cyber_clean.agreement_type_discount.max_discount_level_1
+  max_fine_discount_percentage:
+    description: "Maximum fine discount percentage allowed for the agreement type (Multa Acordo)."
+    lineage:
+      - datalake_cyber_clean.agreement_type_discount.max_discount_level_1
+  max_main_amount_discount_percantage:
+    description: "Maximum main amount discount percentage for the agreement type (Parcelas Vencidas). Note: typo 'percantage' matches source."
+    lineage:
+      - datalake_cyber_clean.agreement_type_discount.max_discount_level_1
   percentage_paid_agreement:
     description: Percentage of the total agreement amount that has been paid.
     lineage:
@@ -184,3 +256,25 @@ columns:
     description: Date when the down payment was made.
     lineage:
       - datalake_cyber_clean.agreements.dt_down_payment
+  dt_paid_all:
+    description: "Date when all installments were paid (agreement fully paid)."
+    lineage:
+      - datalake_cyber_clean.agreement_installments
+      - datalake_cyber_clean.payments
+  dt_expected_end:
+    description: "Expected end date of the agreement (last installment due date)."
+    lineage:
+      - datalake_cyber_clean.agreement_installments
+  dt_cancellation:
+    description: "Date when the agreement was canceled or broken."
+    lineage:
+      - datalake_cyber_clean.agreements.ts_agreement_breach
+      - datalake_cyber_clean.agreements.ts_canceled
+      - datalake_cyber_clean.campaign.ts_due_boletagem
+  ts_promisse:
+    description: "Timestamp when the promise/agreement was created (agreement or campaign)."
+    lineage:
+      - datalake_cyber_clean.agreements.ts_agreement_creation
+      - datalake_cyber_clean.campaign.ts_boletagem_sent
+  ts_load:
+    description: "Timestamp when the record was loaded into the enrich layer."
