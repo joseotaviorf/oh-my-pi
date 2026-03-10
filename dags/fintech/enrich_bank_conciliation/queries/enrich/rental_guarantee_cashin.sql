@@ -6,6 +6,7 @@ WITH rental_guarantee_and_bank AS (
     s.id_feature,
     p.id_transaction,
     s.id_external_payment,
+    c.id_guarantee,
     s.transaction_name,
     s.sap_status,
     s.trigger,
@@ -14,7 +15,8 @@ WITH rental_guarantee_and_bank AS (
     s.request,
     itau.origin_identifier,
     itau.literal_complete,
-    s.dt_event_date,
+    CAST(s.dt_event_date AS DATE) AS rental_guarantee_event_date,
+    CAST(itau.date_event AS DATE) AS bank_event_date,
     s.amount AS rental_guarantee_amount,
     itau.amount_value AS bank_amount,
     checkout_charge.due_amount AS checkout_amount
@@ -81,7 +83,7 @@ sap_ledger AS (
 )
 SELECT 
   rg.id,
-  rg.id_business_entity,
+  rg.id_business_entity AS id_guarantee,
   rg.id_finance_entity,
   rg.id_feature,
   rg.id_transaction,
@@ -95,7 +97,9 @@ SELECT
   rg.origin_identifier,
   rg.literal_complete,
   sg.hash,
-  rg.dt_event_date,
+  rg.rental_guarantee_event_date,
+  rg.bank_event_date,
+  CAST(sl.dt_created AS DATE) AS sap_event_date,
   rg.rental_guarantee_amount,
   rg.bank_amount,
   rg.checkout_amount,

@@ -9,8 +9,8 @@ columns:
     description: "Primary key of the SAP entry record."
     lineage:
       - datalake_rental_guarantee_clean.sap.id
-  id_business_entity:
-    description: "Business entity identifier associated to the SAP entry (guarantee id)."
+  id_guarantee:
+    description: "Guarantee identifier (business entity) associated to the SAP entry."
     lineage:
       - datalake_rental_guarantee_clean.sap.id_business_entity
   id_finance_entity:
@@ -41,10 +41,6 @@ columns:
     description: "Creation timestamp for the SAP record."
     lineage:
       - datalake_rental_guarantee_clean.sap.ts_created
-  dt_event_date:
-    description: "Business event date of the rental guarantee transaction."
-    lineage:
-      - datalake_rental_guarantee_clean.sap.dt_event_date
   id_external_payment:
     description: "External payment identifier present in the SAP payload."
     lineage:
@@ -65,6 +61,18 @@ columns:
     description: "Full literal description from the Itau bank statement entry."
     lineage:
       - datalake_itau_statements_clean.statement_879200429691.literal_complete
+  rental_guarantee_event_date:
+    description: "Business event date of the rental guarantee transaction (from SAP)."
+    lineage:
+      - datalake_rental_guarantee_clean.sap.dt_event_date
+  bank_event_date:
+    description: "Event date of the matching entry in the Itau bank statement."
+    lineage:
+      - datalake_itau_statements_clean.statement_879200429691.date_event
+  sap_event_date:
+    description: "Creation date of the PAS ledger entry (SAP posting date)."
+    lineage:
+      - datalake_pas.ledger.dt_created
   hash:
     description: "Hash key used to correlate SAP Gateway sync and PAS ledger."
     lineage:
