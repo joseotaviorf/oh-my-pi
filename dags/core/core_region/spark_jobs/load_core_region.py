@@ -113,8 +113,8 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             .join(bu, col("bu.id") == col("br.id_business_unit"), "left")
         )
 
-        # Apply WHERE c.country_code IS NOT NULL
-        filtered_df = joined_df.filter(col("c.country_code").isNotNull())
+        # Apply WHERE c.code IS NOT NULL
+        filtered_df = joined_df.filter(col("c.code").isNotNull())
 
         # Final projection & renaming to core conventions
         core_region_df = filtered_df.select(

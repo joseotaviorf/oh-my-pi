@@ -61,11 +61,11 @@ columns:
       MX: Mexico's country code.
   country_name:
     lineage:
-      - datalake_region.country.country_name
+      - datalake_ebdb_clean.country.name
     description: Region's country name. Currently Brasil and Mexico.
   country_default_timezone:
     lineage:
-      - datalake_region.country.default_timezone
+      - datalake_ebdb_clean.country.default_timezone
     description: Region's country default timezone.
   hub_name:
     lineage:
