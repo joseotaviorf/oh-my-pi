@@ -30,7 +30,7 @@ SELECT
     dt_identifier_started,
     dt_identifier_ended
 FROM
-    datalake_for_sale_experiment.exp_1_2_visits_boosting_agents_area_increased_to_800m
+    datalake_for_sale_experiment.exp_1_12_visits_boosting_agents_area_increased_to_800m
 UNION ALL
 SELECT
     CONCAT_WS('_', id_neotribe, id_experiment, identifier_bc) AS id_element_exp,
@@ -47,7 +47,7 @@ SELECT
     dt_identifier_started,
     dt_identifier_ended
 FROM
-    datalake_for_sale_experiment.exp_1_3_visits_confirmation_agent
+    datalake_for_sale_experiment.exp_1_11_visits_confirmation_agent
 UNION ALL
 SELECT
     CONCAT_WS('_', id_neotribe, id_experiment, identifier_bc) AS id_element_exp,
@@ -64,4 +64,4 @@ SELECT
     dt_identifier_started,
     dt_identifier_ended
 FROM
-    datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward
+    datalake_for_sale_experiment.exp_1_13_visits_confirmation_agent_jan13th_onward

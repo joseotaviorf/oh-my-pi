@@ -1,15 +1,13 @@
 ---
 database_name: datalake_for_sale_experiment
-table_name: exp_1_2_visits_boosting_agents_area_increased_to_800m
+table_name: exp_1_13_visits_confirmation_agent_jan13th_onward
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description:
-  Experiment table for visits boosting agents with area increased to 800m (Visits XP Team).
+  Experiment table for visits confirmation agent (Visits XP Team) fixed on starting from January 13, 2026.
   This table tracks visitor participation in an A/B test designed to evaluate the impact
-  of expanding agent coverage area to 800 meters on visit conversion rates. Visitors are
-  randomly assigned to control or treatment groups using a hash-based randomization algorithm
-  based on their visitor ID, with the experiment focusing on rent and sale context visits
-  starting from January 6, 2026.
+  of confirming the agent. Visitors are randomly assigned to control or treatment groups
+  based on their main phone number, with the experiment focusing on rent and sale.
 columns:
   identifier_bc:
     description: Unique identifier of the visitor participating in the experiment by business_context.
@@ -35,16 +33,16 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.business_context
   test_group:
-    description: Experiment group assignment based on visitor ID hash calculation. Uses formula ((id_visitor * 31 + 3 * 17) % 100) with 50% split threshold.
+    description: Experiment group assignment based on main phone number hash calculation.
     lineage:
-      - datalake_ebdb_clean.visit.id_visitor
+      - datalake_ebdb_clean.user.main_phone
     categories:
-      CONTROL: Control group (hash result >= 50).
-      TREATMENT: Treatment group (hash result < 50).
+      CONTROL: Control group (main phone number >= 500).
+      TREATMENT: Treatment group (main phone number <= 499).
   documentation_link:
     description: Link to experiment documentation (null for this experiment).
   additional_information:
-    description: Additional context about the experiment methodology - TP/BP identification based on scheduled visits and division according to visitor identifier.
+    description: Additional context about the experiment methodology - TP/BP identification based on main phone number and division according to visitor identifier.
   dt_identifier_started:
     description: Earliest date when this specific visitor started participating in the experiment based on visit creation timestamp.
     lineage:

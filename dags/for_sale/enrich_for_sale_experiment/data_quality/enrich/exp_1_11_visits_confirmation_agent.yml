@@ -1,5 +1,5 @@
 ---
-table_name: datalake_for_sale_experiment.exp_1_4_visits_confirmation_agent_jan13th_onward
+table_name: datalake_for_sale_experiment.exp_1_11_visits_confirmation_agent
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   identifier_bc:

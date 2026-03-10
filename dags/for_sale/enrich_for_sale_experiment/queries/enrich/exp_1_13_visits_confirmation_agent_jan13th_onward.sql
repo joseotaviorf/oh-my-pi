@@ -2,7 +2,7 @@ SELECT
     CONCAT_WS('_', v.id_visitor, v.business_context) AS identifier_bc,
     v.id_visitor AS identifier,
     1 AS id_neotribe,
-    4 AS id_experiment,
+    13 AS id_experiment,
     'VISITS XP' AS name_neotribe,
     'visits_confirmation_agent_jan13th_onward' as name_experiment,
     'VISITOR' as identifier_type,
@@ -22,8 +22,8 @@ LEFT JOIN
     datalake_ebdb_clean.user AS u
         ON v.id_visitor = u.id
 WHERE
-    DATE(v.ts_created) >= DATE('2026-01-13')
-    AND (
+    DATE(v.ts_created) >= DATE('2026-01-13') --Experiment start
+    AND ( --Rollout expansions
     (DATE(v.ts_created) >= DATE('2025-12-10')
     AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 950 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 049))
     OR
@@ -39,4 +39,8 @@ WHERE
     (DATE(v.ts_created) >= DATE('2026-02-04') AND v.business_context='RENT'
     AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 500 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 499))
     )
+    AND ( --Experiment end
+    (ts_created::DATE <= '2026-03-02' AND business_context = 'RENT')        
+        OR
+    (ts_created::DATE >= '2026-01-13' AND business_context = 'SALE'))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11

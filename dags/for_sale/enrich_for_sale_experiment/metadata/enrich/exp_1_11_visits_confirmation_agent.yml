@@ -1,6 +1,6 @@
 ---
 database_name: datalake_for_sale_experiment
-table_name: exp_1_3_visits_confirmation_agent
+table_name: exp_1_11_visits_confirmation_agent
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description:
