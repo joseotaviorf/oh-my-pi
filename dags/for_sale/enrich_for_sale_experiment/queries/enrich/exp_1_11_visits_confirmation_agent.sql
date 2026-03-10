@@ -23,7 +23,7 @@ LEFT JOIN
         ON v.id_visitor = u.id
 WHERE
     DATE(v.ts_created) >= DATE('2025-12-10') --Experiment start
-    AND 
+    AND
     ( --Rollout expansions
     (RIGHT(NULLIF(u.main_phone, ''), 3) >= 950 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 049)
     OR
@@ -43,8 +43,7 @@ WHERE
     AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 800 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 199))
     )
     AND ( --Experiment end
-    (ts_created::DATE <= '2026-03-02' AND business_context = 'RENT')        
+    (v.ts_created::DATE <= '2026-03-02' AND business_context = 'RENT')
         OR
-    (ts_created::DATE >= '2025-12-10' AND business_context = 'SALE'))
-    
+    (v.ts_created::DATE >= '2025-12-10' AND business_context = 'SALE'))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
