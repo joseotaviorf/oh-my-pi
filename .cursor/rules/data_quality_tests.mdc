@@ -1,6 +1,6 @@
 ---
 description: Inmetro data quality YAML conventions for DAG tables. Use when creating or editing data_quality/*.yml files.
-globs: "**/data_quality/**/*.yml"
+globs: dags/**/data_quality/**/*.yml
 alwaysApply: false
 ---
 

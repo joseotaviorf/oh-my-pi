@@ -1,0 +1,200 @@
+---
+description: People domain conventions for clean, enrich, and DW layers
+globs: dags/people/**/*
+alwaysApply: false
+---
+# People Domain Conventions
+
+Rules for pipelines in the People domain (`dags/people/`). These conventions complement the core repository rules and naming conventions. Aligned with the People Data Warehouse 2.0 architecture (domain-driven, SCD Type 2, schema-based governance).
+
+---
+
+## Target Schema Structure (DW 2.0)
+
+Data is organized by functional domain for schema-level governance and access control:
+
+| Schema | Scope |
+|--------|-------|
+| `dw_organization` | Cost centers, BUs, teams, job structure, Codex, business partners |
+| `dw_employee_details` | PII, lifecycle events (admissions/exits), documentation, vacation, leaves, dependents, education |
+| `dw_compensation` | Salary history, job level, pay-tables, merits/promotions, variable pay |
+| `dw_sociodemographics` | DE&I data |
+| `dw_performance` | Performance and talent cycles |
+| `dw_people` | Public profile (name, email, hierarchy, location, role) |
+| `dw_learning` | Learning & Development data |
+| `dw_payroll` | Data from Payroll provider |
+| `dw_hiring` | Talent Acquisition (TA) data |
+| `dw_equity` | Equity data |
+| `dw_survey` | Survey data |
+
+When adding new tables, place them in the schema that matches the business domain.
+
+---
+
+## Data Quality — Mandatory from Clean Layer
+
+Every table from the **clean** layer onwards must have a corresponding data quality file in `data_quality/{layer}/{table}.yml`.
+
+When creating or editing `data_quality/*.yml` files in the People domain, **always apply** `.cursor/rules/data_quality_tests.mdc`. Use `alert_channel: PEOPLE_ALERTS` and `table_name` fully qualified (e.g. `dw_employee_details.fact_absence_requests`). DW dimensions: use `has_null_count` for non-SK columns (not `is_complete`) due to the -1 unknown row.
+
+---
+
+## Git Workflow — Pull and Conflict Resolution
+
+Before pushing or opening a PR, run `git pull origin master` to sync with the default branch.
+
+If conflicts occur:
+
+1. **Identify** the conflicting files and the conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+2. **Explain** what each side changed and why the conflict arose
+3. **Suggest** the correct merge: keep the intended changes, remove conflict markers, and preserve both sides when both changes are valid
+4. **Verify** that the merged result compiles and passes validations (`make validate-*`, `make check-style`)
+
+Do not assume one side is always correct; consider the business intent of both changes.
+
+---
+
+## DAG Dependencies
+
+When adding new dependencies to a DAG (e.g., new source tables, new inner_dependencies), always run `make dependencies-file` to update the dependencies manifest. This ensures CI and deployment pipelines have the correct dependency graph.
+
+---
+
+## DW Layer — SCD Type 2 Dimensions
+
+### Prioritize SCD Type 2
+
+When modeling dimensions in the People domain, prefer **SCD Type 2** ( Slowly Changing Dimension) to track historical changes over time.
+
+### SK Naming for SCD2
+
+The surrogate key of an SCD Type 2 dimension must follow the pattern:
+
+```
+sk_{entity}_version
+```
+
+Examples: `sk_documentation_version`, `sk_contact_version`, `sk_personal_info_version`.
+
+### One SK per Dimension
+
+Each dimension table must have exactly **one** surrogate key as its primary identifier. Do not introduce multiple SKs for the same logical dimension.
+
+### Date and SK Columns
+
+SCD Type 2 dimensions must include:
+
+- **SK column**: `sk_{entity}_version` — surrogate key identifying the version (no separate `version` column)
+- **Date columns**: `dt_valid_from` and `dt_valid_to` — validity period of the version
+- **Current flag**: `is_current` — boolean indicating if this is the active version
+
+For the **current** record (`is_current = true`), `dt_valid_to` must be **`9999-12-31`** (no null dates in DW layer per team agreement). For historical records, `dt_valid_to` holds the actual end date.
+
+### Merge Consecutive Periods
+
+When building SCD Type 2 dimensions, **merge consecutive periods** with identical attribute values. Use gaps-and-islands logic so that only real changes create new versions.
+
+**Good**: Periods 2024-01-01 to 2024-03-15 and 2024-03-16 to 2024-06-30 with the same values → one merged period 2024-01-01 to 2024-06-30.
+
+**Bad**: Multiple version records for the same attribute values across consecutive periods.
+
+---
+
+## DW Layer — Fact Tables — Date Columns
+
+For date columns in fact tables, include **both**:
+
+- **`sk_{event}_date`**: Surrogate key for the date dimension (e.g. `REPLACE(dt_hired, '-', '')` → `sk_hired_date`)
+- **`dt_{event}`**: The date column itself (e.g. `dt_hired`)
+
+Example: `sk_hired_date` and `dt_hired`; `sk_termination_date` and `dt_termination`.
+
+### Foreign Keys — Only Existing DW 2.0 Tables
+
+In fact tables, add **foreign keys (sk_*)** only for dimensions that **already exist** in the DW 2.0 schemas (`dw_organization`, `dw_employee_details`, `dw_compensation`, etc.). Do not introduce sk_* references to tables that do not yet exist in the DW layer.
+
+If a dimension is missing, use business keys (`person_number`, `assignment_number`, etc.) or degenerate dimensions instead of creating new sk_* columns that would point to non-existent tables. This keeps fact tables consistent with the current DW 2.0 catalog and avoids orphan references.
+
+### Fact Flags — Clear, Non-Ambiguous Names
+
+Boolean flags in fact tables must reflect **business meaning**, not raw source status codes. Avoid names that conflate submission with execution.
+
+| Avoid | Prefer |
+|-------|--------|
+| `is_taken` when source only has `SUBMITTED` (could mean pending, denied, or future) | `is_effective` (approved and period started), `is_valid` (not withdrawn), `is_withdrawn` |
+| Single flag for multiple statuses | Separate flags per business state |
+
+When the source does not distinguish requested period vs actual period, use a **single date window** (`dt_started`, `dt_ended`) and avoid columns that imply a distinction the source cannot support.
+
+---
+
+## Source Systems
+
+### pin_ DAGs — Oracle HCM
+
+DAGs whose names start with `pin_` (e.g. `pin_core`) are based on Oracle database tables and views from HCM (Human Capital Management). Use Oracle HCM documentation as reference when mapping or interpreting source structures.
+
+### Oracle Date 4712-12-31 — No End Date
+
+In Oracle HCM, `4712-12-31` means "no end date expected" (indefinite). In the **DW layer**, normalize both NULL and `4712-12-31` to **`9999-12-31`** for "no end date" columns (e.g., `dt_valid_to`, `dt_terminated`, `dt_notified`). Use `COALESCE(NULLIF(col, DATE('4712-12-31')), DATE('9999-12-31'))` when reading from source.
+
+When **filtering** source tables (clean/enrich) that still contain `4712-12-31`, keep the filter on the source value (e.g., `dt_effective_ended = DATE('4712-12-31')`).
+
+### Deprecation — Avoid
+
+- **`hr_system` schema** and tables derived from it — being deprecated
+- **`dw_employee`** DAG — being deprecated
+- **`datalake_employment.employee_details`** — being deprecated
+- **Enrich DAGs** (see Enrich Layer table below): `enrich_employee`, `enrich_hr_system`, `enrich_hr_system_custom`, `enrich_product_tech`, `enrich_pin`
+
+Prefer `pin_core` clean tables and `datalake_people_core` enrich tables instead. For assignment and termination data, use `datalake_people_core.identifier_mapping` together with `datalake_people_core.assignment_termination` (for terminated assignments).
+
+**If the required data does not exist in `pin_*` DAGs**, inform the user so they can assess alternative sources or request the data to be added to the pin pipeline.
+
+---
+
+## Enrich Layer — Domain-Focused Naming
+
+Enrich DAGs should be named by **domain**, not by source system. Avoid source-driven or legacy enrich DAGs:
+
+| Avoid | Prefer |
+|-------|--------|
+| `enrich_pin` | `enrich_compensation`, `enrich_demographics` |
+| `enrich_employee` | `enrich_people_core`, domain-specific enrich |
+| `enrich_hr_system` | `enrich_people_core`, `pin_core` clean |
+| `enrich_hr_system_custom` | `enrich_people_core`, domain-specific enrich |
+| `enrich_product_tech` | Domain-focused enrich (e.g., `enrich_compensation`) |
+
+Each enrich DAG focuses on a business domain (compensation, demographics, etc.), even when the underlying source is pin_core.
+
+---
+
+## Domain-Driven Naming
+
+Column and concept names must reflect the **People domain** and business meaning, not the source system or tool.
+
+| Avoid (tool-driven) | Prefer (domain-driven) |
+|---------------------|------------------------|
+| `per_information_category` | `marital_status`, `rg_issuing_state` |
+| `vote_registration_number` | `electoral_registration_number` |
+| `polling_station` | `electoral_polling_station` |
+| `issuing_state_rg` | `rg_issuing_state` |
+
+Use terms that data consumers and HR stakeholders understand, independent of Oracle, Workday, or other source systems.
+
+---
+
+## Metadata — Business Rules Clarity
+
+Governance metadata (`metadata/{layer}/{table}.yml`) must clearly document **business rules**, not only column lineage.
+
+- **Table description**: Explain grain, SCD behavior, merge logic, and how to join or use the table
+- **Column descriptions**: Clarify business meaning, valid values, and usage (e.g., "use display_name for communications; legal_name for compliance only")
+- **Lineage**: Keep lineage accurate, but descriptions should focus on what the data represents for the business
+- **Column order**: Column order in metadata must match the SQL query order (helps consumers and lineage validation)
+
+### Calculated Columns — No Lineage
+
+Columns calculated in the query (e.g., `CURRENT_TIMESTAMP()`, `NOW()`, `CASE` expressions with no source reference) must **not** have a `lineage` block. Example: `ts_load` when defined as `NOW() AS ts_load`.
+
+The metadata is the primary documentation for data consumers; it must be self-explanatory without reading the SQL.
