@@ -1,0 +1,15 @@
+---
+description: User is asking for product database table schema, list of tables, or table structure (list_tables, describe_table, explain_query_simple). Prefer database MCP for schema lookups.
+alwaysApply: false
+---
+
+# Database schema and table lookups — prefer database MCP
+
+**When this rule applies:** The user is trying to access the database schema or list tables, including requests that would be answered by `list_tables`, `describe_table`, or `explain_query_simple`.
+
+**Behavior:**
+
+1. **Prioritize the database MCP** to satisfy the request. Use the database MCP tools (e.g. list_tables, describe_table, explain_query_simple) to return product database table schema, table lists, or query explanations.
+2. **If the MCP cannot help** (e.g. tool unavailable, error, or out of scope), **inform the user** that the MCP could not be used (and why, if known), then use other sources (codebase search, metadata files, SQL files, etc.) to answer the user.
+
+Do not skip the database MCP when the user is clearly asking for schema or table information that the MCP can provide. Do not fall back to other sources without telling the user that the MCP was unavailable or failed.
