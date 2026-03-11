@@ -48,6 +48,9 @@ workflow:
     dim_personal_info:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    fact_vacation_balances:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     fact_absence_requests:
       vacuum_retention_hours: 168
       vacuum_lite: true
