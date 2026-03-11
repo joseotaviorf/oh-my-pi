@@ -5,8 +5,9 @@ dag:
   documentation:
     dag_purpose: |
       Query Databricks for contracts count and send to CloudZero API for cost monitoring.
-      This DAG retrieves the number of ongoing rental contracts from Databricks and
-      sends this metric to CloudZero for unit cost analysis.
+      Also exports API request counts from Prometheus via Grafana datasource to CloudZero.
+      - Contracts: number of ongoing rental contracts from Databricks.
+      - API requests: quantity of requests per app from Grafana (Prometheus/Thanos), sent as dimensioned metric.
 workflow:
   type: load_access
   layer: reverse
@@ -18,6 +19,8 @@ workflow:
   execution_timeout_hours: 2
   tables_customization:
     contracts_count: {}
+    api_requests_count:
+      load_spark_job: load_api_requests_to_cloudzero
 cluster:
   type: databricks_13_3_min_general_cluster
   access_control_list:
