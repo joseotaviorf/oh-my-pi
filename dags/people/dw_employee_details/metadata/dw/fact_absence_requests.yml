@@ -1,0 +1,66 @@
+database_name: dw_employee_details
+table_name: fact_absence_requests
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Tracks all employee absence requests (vacation, sick leave, parental leave, etc.).
+  One row per request. Use person_number and assignment_number to link to employee data.
+  Join sk_absence_type to dim_absence_type for the absence category name (e.g. Vacation, Sick Leave).
+columns:
+  sk_absence_request:
+    description: Unique identifier for each absence request.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.id_per_absence_entry
+  sk_absence_started_date:
+    description: Absence start date in yyyyMMdd format. Join to dim_date for date attributes.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.dt_started
+  sk_absence_ended_date:
+    description: Absence end date in yyyyMMdd format. Join to dim_date for date attributes.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.dt_ended
+  sk_absence_type:
+    description: Absence category (vacation, sick leave, etc.). Join to dim_absence_type for the type name.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.id_absence_type
+  person_number:
+    description: Employee registration number. Use to link to other employee tables.
+    lineage:
+      - datalake_people_core.identifier_mapping.person_number
+  assignment_number:
+    description: Work contract or assignment code. Use to link to assignment-related tables.
+    lineage:
+      - datalake_people_core.identifier_mapping.assignment_number
+  days_requested:
+    description: Number of days the employee requested for the absence.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.days_duration
+  is_approved:
+    description: TRUE when the manager approved the request. FALSE if denied, pending, or withdrawn.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.approval_status_code
+      - datalake_pin_absence_clean.person_entry.absence_status_code
+  is_withdrawn:
+    description: TRUE when the requester withdrew the absence. Withdrawn invalidates the request above any approval status.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.absence_status_code
+  is_valid:
+    description: TRUE when the request is not withdrawn. Use to filter out requests that are no longer valid.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.absence_status_code
+  is_effective:
+    description: TRUE when the request is approved and the absence period has started (dt_absence_started <= today). Use for absences that are in effect.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.approval_status_code
+      - datalake_pin_absence_clean.person_entry.absence_status_code
+      - datalake_pin_absence_clean.person_entry.dt_started
+  dt_absence_started:
+    description: Date when the employee requested the absence to start.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.dt_started
+  dt_absence_ended:
+    description: Date when the employee requested the absence to end.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.dt_ended
+  ts_load:
+    description: When this record was last loaded into the data warehouse.
