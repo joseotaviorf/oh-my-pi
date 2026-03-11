@@ -15,6 +15,8 @@ workflow:
       clean_table_name: deal
     deal_collateral:
       clean_table_name: deal_collateral
+    deal_proponent:
+      clean_table_name: deal_proponent
     deal_financial_info:
       clean_table_name: deal_financial_info
     deal_status:
@@ -23,6 +25,8 @@ workflow:
       clean_table_name: installment_status
     installments:
       clean_table_name: installments
+    installment_charge:
+      clean_table_name: installment_charge
     offer_cohort:
       clean_table_name: offer_cohort
     offer_cohort_member:
@@ -31,5 +35,7 @@ workflow:
       clean_table_name: product
     user_consent:
       clean_table_name: user_consent
+    offer_term:
+      clean_table_name: offer_term
 cluster:
   type: databricks_16_4_med_general_cluster

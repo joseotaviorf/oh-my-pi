@@ -1,0 +1,31 @@
+---
+database_name: datalake_lending_clean
+table_name: installment_charge
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains charge information linked to installments.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.installment_charge.id
+    description: Primary key of the installment charge.
+  id_installment:
+    lineage:
+      - datalake_lending_raw.installment_charge.installment_id
+    description: Foreign key referencing the installment.
+  type:
+    lineage:
+      - datalake_lending_raw.installment_charge.type
+    description: Type of the charge applied to the installment.
+  charge_info:
+    lineage:
+      - datalake_lending_raw.installment_charge.charge_info
+    description: JSON payload with charge details (e.g. entry_id, manual_entry_id).
+  ts_created:
+    lineage:
+      - datalake_lending_raw.installment_charge.created_at
+    description: Timestamp when the installment charge was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.installment_charge.updated_at
+    description: Timestamp when the installment charge was last updated.

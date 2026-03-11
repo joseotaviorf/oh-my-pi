@@ -1,0 +1,35 @@
+---
+database_name: datalake_lending_clean
+table_name: offer_term
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains offer term conditions including interest rate and installments.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.offer_term.id
+    description: Primary key of the offer term.
+  uuid:
+    lineage:
+      - datalake_lending_raw.offer_term.uuid
+    description: UUID of the offer term.
+  id_sheet:
+    lineage:
+      - datalake_lending_raw.offer_term.sheet_id
+    description: ID of the offer term sheet this term belongs to.
+  base_value_multiplier:
+    lineage:
+      - datalake_lending_raw.offer_term.base_value_multiplier
+    description: Multiplier applied to the base value for the offer.
+  monthly_interest_rate:
+    lineage:
+      - datalake_lending_raw.offer_term.monthly_interest_rate
+    description: Monthly interest rate applied to the offer.
+  installments_number:
+    lineage:
+      - datalake_lending_raw.offer_term.installments_number
+    description: Number of installments for the offer.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.offer_term.created_at
+    description: Timestamp when the offer term was created.

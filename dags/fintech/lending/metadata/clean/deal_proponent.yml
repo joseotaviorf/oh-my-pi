@@ -1,0 +1,79 @@
+---
+database_name: datalake_lending_clean
+table_name: deal_proponent
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains proponent (person) information for lending deals.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.deal_proponent.id
+    description: Primary key of the deal proponent.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.deal_proponent.deal_id
+    description: ID of the deal associated with this proponent.
+  uuid_person:
+    lineage:
+      - datalake_lending_raw.deal_proponent.person_uuid
+    description: UUID of the person (proponent).
+  id_user:
+    lineage:
+      - datalake_lending_raw.deal_proponent.user_id
+    description: ID of the user when linked to a QuintoAndar account.
+  name:
+    lineage:
+      - datalake_lending_raw.deal_proponent.name
+    description: Full name of the proponent.
+  cpf:
+    lineage:
+      - datalake_lending_raw.deal_proponent.cpf
+    description: Brazilian individual taxpayer identification number (CPF).
+  dt_birth:
+    lineage:
+      - datalake_lending_raw.deal_proponent.birth_date
+    description: Date of birth of the proponent.
+  email:
+    lineage:
+      - datalake_lending_raw.deal_proponent.email
+    description: Email address of the proponent.
+  phone:
+    lineage:
+      - datalake_lending_raw.deal_proponent.phone
+    description: Phone number of the proponent.
+  address:
+    lineage:
+      - datalake_lending_raw.deal_proponent.address
+    description: Street address of the proponent.
+  address_number:
+    lineage:
+      - datalake_lending_raw.deal_proponent.address_number
+    description: Address number (building or house number).
+  complement:
+    lineage:
+      - datalake_lending_raw.deal_proponent.complement
+    description: Address complement (apartment, suite, etc.).
+  neighborhood:
+    lineage:
+      - datalake_lending_raw.deal_proponent.neighborhood
+    description: Neighborhood or district of the address.
+  city:
+    lineage:
+      - datalake_lending_raw.deal_proponent.city
+    description: City of the address.
+  state:
+    lineage:
+      - datalake_lending_raw.deal_proponent.state
+    description: State of the address.
+  cep:
+    lineage:
+      - datalake_lending_raw.deal_proponent.cep
+    description: Brazilian postal code (CEP).
+  ts_created:
+    lineage:
+      - datalake_lending_raw.deal_proponent.created_at
+    description: Timestamp when the deal proponent was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.deal_proponent.updated_at
+    description: Timestamp when the deal proponent was last updated.
