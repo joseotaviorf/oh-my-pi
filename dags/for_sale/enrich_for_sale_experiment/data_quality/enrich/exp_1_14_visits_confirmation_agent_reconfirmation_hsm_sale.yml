@@ -1,0 +1,33 @@
+---
+table_name: datalake_for_sale_experiment.exp_1_14_visits_confirmation_agent_reconfirmation_hsm_sale
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  identifier_bc:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  identifier:
+    is_complete:
+      severity_level: Error
+  id_neotribe:
+    is_complete:
+      severity_level: Error
+  id_experiment:
+    is_complete:
+      severity_level: Error
+  name_neotribe:
+    is_complete:
+      severity_level: Error
+  name_experiment:
+    is_complete:
+      severity_level: Error
+  identifier_type:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  test_group:
+    is_complete:
+      severity_level: Error

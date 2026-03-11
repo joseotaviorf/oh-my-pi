@@ -39,7 +39,7 @@ WHERE
     (DATE(v.ts_created) >= DATE('2026-02-04') AND v.business_context='RENT'
     AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 500 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 499))
     OR
-    (DATE(v.ts_created) >= DATE('2026-03-11') AND v.business_context='SALE'
+    (DATE(v.ts_created) >= DATE('2026-03-10') AND v.business_context='SALE'
     AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 800 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 199))
     )
     AND ( --Experiment end
