@@ -13,6 +13,21 @@ workflow:
       - exp_visit_cohort
     exp_visit_identifier_metric:
       - exp_visit_cohort
+    exp_visit_metric_unified:
+      - exp_visit_metric_conversion
+      - exp_visit_identifier_metric
+  tables_customization:
+    exp_visit_cohort_inc:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [sk_exp_visit_cohort]
+    exp_visit_metric_unified:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [sk_exp_visit_metric]
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
   type: databricks_16_4_med_5_workers_memory_cluster
   access_control_list:
