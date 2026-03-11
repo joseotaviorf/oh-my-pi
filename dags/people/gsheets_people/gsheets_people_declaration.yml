@@ -39,9 +39,6 @@ workflow:
     navent_convenia_like:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    performance_review:
-      vacuum_retention_hours: 168
-      vacuum_lite: true
     talent_review:
       vacuum_retention_hours: 168
       vacuum_lite: true

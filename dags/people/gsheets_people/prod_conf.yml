@@ -17,12 +17,6 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: navent_convenia_like
 
-  performance_review:
-    clean_table_name: performance_review
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: performance_review
-
   talent_review:
     clean_table_name: talent_review
     sheet_context: people
