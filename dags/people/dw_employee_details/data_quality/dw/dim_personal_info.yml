@@ -19,11 +19,15 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Warning
-  display_name:
+  name:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
   highest_education_level:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  generation:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning

@@ -9,7 +9,7 @@ description: |
   Grain: One record per employee per period.
   sk_documentation_version is derived from id_person and period start date.
   Join to employee via person_number.
-  For communications and reports, use display_name from dim_personal_info;
+  For communications and reports, use name from dim_personal_info;
   legal_name is for legal/compliance purposes only.
 columns:
   sk_documentation_version:
@@ -33,8 +33,8 @@ columns:
   legal_name:
     description: |
       Legal name as it appears on this specific document.
-      May differ from display_name in dim_personal_info.
-      Use display_name for communications.
+      May differ from name in dim_personal_info.
+      Use name for communications.
     lineage:
       - datalake_pin_core_clean.person_name.full_name
   mother_name:

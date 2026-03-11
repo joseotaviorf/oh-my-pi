@@ -6,7 +6,7 @@ domain: People
 description: |
   Dimension table for employee personal information. SCD Type 1 by design: all fields are always
   current; historical values are not stored. This prevents accidental usage of dead names (nomes mortos).
-  Use display_name (nome social) for all communications and reports; legal_name in dim_documentation
+  Use name (nome social) for all communications and reports; legal_name in dim_documentation
   is for legal and compliance purposes only.
   Grain: one record per employee (always current).
   Join to other dw_employee_details tables via person_number or sk_employee.
@@ -23,7 +23,7 @@ columns:
       Use to join to other dw_employee_details tables (dim_contact, dim_documentation, etc.).
     lineage:
       - datalake_people.identifier_mapping.person_number
-  display_name:
+  name:
     description: |
       Current display or preferred name (nome social). Use this name in all communications,
       reports, and dashboards. Do not use legal_name from dim_documentation for display.
@@ -38,6 +38,17 @@ columns:
     lineage:
       - datalake_pin_core_clean.foundation_lookup_value.meaning
       - datalake_pin_core_clean.people_legislative.highest_education_level
+  generation:
+    description: Birth generation cohort derived from year of birth. NULL when birth date is unknown or outside documented ranges.
+    categories:
+      "Silent Generation": 1928-1945
+      "Baby Boomers": 1946-1964
+      "Generation X": 1965-1980
+      "Millennials": 1981-1996
+      "Generation Z": 1997-2012
+      "Generation Alpha": 2013-2024
+    lineage:
+      - datalake_pin_core_clean.person.dt_of_birth
   dt_birth:
     description: Date of birth of the employee.
     lineage:

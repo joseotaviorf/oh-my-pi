@@ -45,8 +45,17 @@ current_education AS (
 SELECT
     emp.id_person AS sk_employee,
     emp.person_number,
-    COALESCE(emp.display_name, emp.full_name) AS display_name,
+    COALESCE(emp.display_name, emp.full_name) AS name,
     ce.highest_education_level,
+    CASE
+        WHEN p.dt_of_birth IS NULL THEN NULL
+        WHEN YEAR(p.dt_of_birth) BETWEEN 1928 AND 1945 THEN 'Silent Generation'
+        WHEN YEAR(p.dt_of_birth) BETWEEN 1946 AND 1964 THEN 'Baby Boomers'
+        WHEN YEAR(p.dt_of_birth) BETWEEN 1965 AND 1980 THEN 'Generation X'
+        WHEN YEAR(p.dt_of_birth) BETWEEN 1981 AND 1996 THEN 'Millennials'
+        WHEN YEAR(p.dt_of_birth) BETWEEN 1997 AND 2012 THEN 'Generation Z'
+        WHEN YEAR(p.dt_of_birth) BETWEEN 2013 AND 2024 THEN 'Generation Alpha'
+    END AS generation,
     p.dt_of_birth AS dt_birth,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
