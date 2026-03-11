@@ -7,7 +7,7 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   month:
     lineage:
-      - dw_public.dim_booking.dt_created
+      - dw_public.dim_date.date
     description: Month date when the users made their first booking.
     dimension: True
   country_code:

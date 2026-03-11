@@ -4242,7 +4242,6 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
 bietlejuice.metric_rent__bookings:
-  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
   - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
