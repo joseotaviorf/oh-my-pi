@@ -79,5 +79,5 @@ workflow:
       extraction_type: incremental
       partitions: [year, month, day]
 cluster:
-  type: databricks_16_4_medium_memory_cluster
+  type: databricks_16_4_min_2xlarge_memory_cluster_4_workers
   databricks_conn_id: databricks_new
