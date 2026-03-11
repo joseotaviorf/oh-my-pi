@@ -1,0 +1,120 @@
+import pyspark.sql.functions as F
+
+
+from bietlejuice.base.sst.core.observability.metrics import save_volume_metric
+from bietlejuice.base.sst.core.quality.checks import basic_quality_checks
+from bietlejuice.base.sst.core.utils.common import (
+    validate_and_write,
+)
+from bietlejuice.base.sst.core.utils.sensors import (
+    sensor_s3_file_exists,
+    partition_has_data,
+)
+
+from bietlejuice.base.sst.domains.salesforce.raw.io import read_sf_cdc_json
+from bietlejuice.base.sst.domains.salesforce.raw.transform import (
+    sf_cdc_mandatory_fields,
+)
+from datetime import datetime
+from quintoandar_logger import QuintoAndarLogger
+
+
+logger = QuintoAndarLogger("sst.pipelines.salesforce_raw")
+
+
+@logger(exclude_return=True)
+def salesforce_raw_pipeline(spark, cfg):
+    """
+    Since most Salesforce pipelines should follow a pattern, this serves as a template
+    It can be changed as needed, but let's try to keep it working as needed here
+    """
+    # Argument breaking logic
+
+    partition_path = "/".join(cfg.partition_date.split("-") + [cfg.partition_hour])
+    file_key = f"{cfg.event_path}/{partition_path}"
+    s3_file_path = f"s3://{cfg.bucket}/{file_key}"
+    target_table = f"{cfg.target_schema}.{cfg.target_table}"
+
+    # Due to how QuintoAndar executeCluster works, we need to check if the partition already exists in the target table
+    # If it does, we should skip the job to reduce reprocessing.
+    if partition_has_data(spark, target_table, cfg.partition_date, cfg.partition_hour):
+        logger.info(
+            f"m=salesforce_raw_pipeline, msg=Partition {cfg.partition_date} {cfg.partition_hour} already exists in {target_table}"
+        )
+        logger.info("m=salesforce_raw_pipeline, msg=Skipping pipeline")
+        return
+
+    # We're not sure we'll be using sensors now.
+    # We'll be passing through if we don't have data in S3 (bad practice)
+    # We'll keep an eye on pattern for this pipeline and adjust if needed
+
+    has_data = sensor_s3_file_exists(cfg.bucket, file_key, fail=False)
+
+    if not has_data:
+        logger.info(f"m=salesforce_raw_pipeline, msg=No data found for {s3_file_path}")
+        logger.info("m=salesforce_raw_pipeline, msg=Exiting pipeline")
+        return
+
+    logger.info(f"m=salesforce_raw_pipeline, msg=Data found for {s3_file_path}")
+    logger.info(
+        f"m=salesforce_raw_pipeline, msg=Reading Salesforce CDC JSON from {s3_file_path}"
+    )
+
+    raw_df = read_sf_cdc_json(spark, s3_file_path)
+    raw_df = sf_cdc_mandatory_fields(raw_df)
+    raw_final = (
+        raw_df.withColumn("source_file", F.input_file_name())
+        .withColumn("_created_at", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        .withColumn("partition_date", F.lit(cfg.partition_date))
+        .withColumn("partition_hour", F.lit(cfg.partition_hour))
+    )
+
+    # Quality checks
+    # TODO: Transform this into a metric as well
+    basic_quality_checks(
+        raw_final,
+        required_cols=[
+            "record_id",
+            "transaction_key",
+            "sequence_number",
+            "commit_number",
+        ],
+        unique_grain=["record_id", "transaction_key", "sequence_number"],
+        fail=True,
+    )
+    logger.info("m=salesforce_raw_pipeline, msg=Quality checks passed")
+    logger.info(
+        f"m=salesforce_raw_pipeline, msg=Metadata retrieved: {cfg.target_schema=}"
+    )
+
+    partition_filter = f"partition_date = '{cfg.partition_date}' AND partition_hour = '{cfg.partition_hour}'"
+    partition_cols = ["partition_date", "partition_hour"]
+    logger.info(f"m=salesforce_raw_pipeline, msg=Partition columns: {partition_cols}")
+
+    validate_and_write(
+        spark=spark,
+        df=raw_final,
+        target_table=target_table,
+        partition_filter=partition_filter,
+        partition_cols=partition_cols,
+        overwrite_schema=True,
+    )
+
+    _metric_grain = {
+        "events_volume": ["partition_date", "partition_hour"],
+        "events_type_volume": ["partition_date", "partition_hour", "event_type"],
+    }
+    for _metric, grain in _metric_grain.items():
+
+        logger.info(f"m=salesforce_raw_pipeline, msg=Saving {_metric} metric")
+        save_volume_metric(
+            spark=spark,
+            df=raw_final,
+            grain=grain,
+            metric_name=_metric,
+            table_name=target_table,
+            env=cfg.env,
+            layer="raw",
+            partition_cols=["partition_date", "partition_hour"],
+        )
+    logger.info("m=salesforce_raw_pipeline, msg=Pipeline completed")
