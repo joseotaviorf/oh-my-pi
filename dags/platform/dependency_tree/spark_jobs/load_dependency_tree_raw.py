@@ -1,19 +1,12 @@
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import *
+from pyspark.sql.functions import col, concat, lit, split, when
 
-import requests
-
-import pandas as pd
-import json
 import yaml
-from base64 import b64decode
 
-import logging
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
@@ -27,53 +20,52 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_dependency_tree_raw"
 
+DEPENDENCIES_S3_PATH = "astronomer/dags/dags/dependencies.yaml"
+
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def _fetch_dependencies_file(TOKEN):
+def _fetch_dependencies_file(dbutils, environment):
+    config_service = ConfigurationService(JOB_NAME)
+    artifacts_bucket = config_service.get_config("artifacts_bucket")
+    s3_path = f"{artifacts_bucket}/{DEPENDENCIES_S3_PATH}"
 
-    url = "https://api.github.com/repos/quintoandar/bi-etl-ejuice/contents/dags/dependencies.yaml"
+    logger.info(f"m=_fetch_dependencies_file, msg=Reading from {s3_path}")
+    content = dbutils.fs.head(s3_path, 1024 * 1024)
 
-    headers = {
-        "accept": "application/vnd.github.v3.raw",
-        "Authorization": f"Bearer {TOKEN}",
-        "branch": "master"
-    }
+    data = yaml.safe_load(content)
+    if not data:
+        return []
 
-    response = requests.get(url, headers=headers)
+    rows = []
+    for dependent, deps in data.items():
+        dep_list = deps if isinstance(deps, list) else [deps]
+        for dependency in dep_list:
+            rows.append((dependent, dependency))
 
-    # fetch dependencies file
-    if response.status_code == 200:
-        raw_data = response.text
-        data = yaml.safe_load(raw_data)
-
-        # transform to dataframe
-        dependencies_wide_df = pd.json_normalize(data)
-
-        return dependencies_wide_df
-
-    else:
-        print("Couldn't fetch 'dependencies.yaml' file.")
+    return rows
 
 
-def _transform_from_wide_to_long_dataframe(dependencies_wide_df):
+def _build_dependencies_spark_df(spark, dependency_rows):
+    if not dependency_rows:
+        return None
 
-    # transform from wide to long dataframe
-    dependencies_long_df = dependencies_wide_df.transpose()
-    dependencies_long_df.columns = ["dependency"]
-    dependencies_long_df['dependent'] = dependencies_long_df.index
-    dependencies_long_df = dependencies_long_df.reset_index(drop=True)
-    dependencies_long_df = dependencies_long_df.explode("dependency")
+    df = spark.createDataFrame(
+        dependency_rows,
+        schema="dependent:string, dependency:string",
+    )
 
-    # apply naming patters
-    dependencies_long_df['level_dag_dependency'] = [
-        row.split(":")[0] for row in dependencies_long_df["dependent"].values]
-    dependencies_long_df['up_level_task_dependency'] = [row.split(
-        ":")[1] if ":" in row else "terminate-cluster" for row in dependencies_long_df["dependency"].values]
-    dependencies_long_df['up_level_dag_dependency'] = [
-        row.split(":")[0] for row in dependencies_long_df["dependency"].values]
+    dep_split = split(col("dependency"), ":")
+    dep_col = split(col("dependent"), ":")
 
-    return dependencies_long_df
+    return df.select(
+        dep_col.getItem(0).alias("level_dag_dependency"),
+        dep_split.getItem(0).alias("up_level_dag_dependency"),
+        when(
+            dep_split.getItem(1).isNotNull(),
+            dep_split.getItem(1),
+        ).otherwise(lit("terminate-cluster")).alias("up_level_task_dependency"),
+    ).distinct()
 
 
 if __name__ == "__main__":
@@ -91,44 +83,30 @@ if __name__ == "__main__":
     source = args.source
     raw_table_name = args.raw_table_name
 
-    """
-    Fetch 'dependencies.yaml' data.
-    """
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
+    dbutils = BaseDBUtils().get_dbutils()
+    spark_client = SparkClient()
+    spark = spark_client.conn
 
-    credentials = json.loads(
-        dbutils.secrets.get('quintoandar', APIEnum.GITHUB)
-    )
+    logger.info("m=main, msg=Fetching dependencies.yaml from S3...")
+    dependency_rows = _fetch_dependencies_file(dbutils, environment)
 
-    TOKEN = credentials["token"]
-
-    dependencies_wide_df = _fetch_dependencies_file(TOKEN)
-    n_rows, n_cols = dependencies_wide_df.shape
-
-    if n_rows < 1 or n_cols < 1:
+    if len(dependency_rows) < 1:
         raise Exception(
-            "Some problem with dependencies.yaml file ingestion. Schema doesn't match.")
+            "Some problem with dependencies.yaml file ingestion. Schema doesn't match."
+        )
 
-    dependencies_long_df = _transform_from_wide_to_long_dataframe(
-        dependencies_wide_df)
-    n_rows, n_cols = dependencies_long_df.shape
-
-    if n_rows <= 1 or n_cols != 5:
+    dependencies = _build_dependencies_spark_df(spark, dependency_rows)
+    if dependencies is None:
         raise Exception(
-            "Some problem transforming wide to long dataframe. Schema doesn't match.")
+            "Some problem with dependencies.yaml file ingestion. No data parsed."
+        )
 
-    # final raw dataframe
-    dependencies_df = dependencies_long_df[
-        ["level_dag_dependency", "up_level_dag_dependency", "up_level_task_dependency"]
-    ].drop_duplicates()
-
-    # transform do spark dataframe
-    dependencies = spark.createDataFrame(
-        dependencies_df, 
-        schema="level_dag_dependency:string, up_level_dag_dependency:string, up_level_task_dependency:string"
-    )
+    n_rows = dependencies.count()
+    n_cols = len(dependencies.columns)
+    if n_rows <= 1 or n_cols != 3:
+        raise Exception(
+            "Some problem transforming dependencies. Schema doesn't match."
+        )
 
     # generate dependency tree
     dag_dependencies = dependencies \

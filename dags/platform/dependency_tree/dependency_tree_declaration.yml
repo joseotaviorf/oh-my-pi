@@ -20,7 +20,7 @@ workflow:
       extra_spark_job_arguments:
       - dependency_tree   # raw_table_name
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_16_4_min_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
