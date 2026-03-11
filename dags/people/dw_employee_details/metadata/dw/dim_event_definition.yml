@@ -1,0 +1,43 @@
+database_name: dw_employee_details
+table_name: dim_event_definition
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Lookup dimension for HR lifecycle events (employee movements).
+  Each row represents a unique combination of movement type (action) and its reason,
+  e.g., Termination + Resignation or Hire + Internal Transfer.
+  Use to enrich fact tables with human-readable labels for termination reasons,
+  admission types, and other assignment changes. Join via sk_event_definition from
+  fact_assignment_snapshots (sk_termination_event_definition) or similar facts.
+  Grain: one row per currently valid action-reason pair.
+columns:
+  sk_event_definition:
+    description: |
+      Surrogate key identifying the event definition. Use to join facts that store
+      termination, admission, or movement event codes.
+    lineage:
+      - datalake_people_core.event_definition.id_event_definition
+  action_name:
+    description: |
+      Type of HR movement in English (e.g., Hire, Termination, Transfer, Promotion).
+      Use for international reports and dashboards.
+    lineage:
+      - datalake_people_core.event_definition.action_name
+  reason_name:
+    description: |
+      Reason for the movement in English (e.g., Resignation, Dismissal, Internal Recruitment).
+      Explains why the action occurred; use for turnover and exit analysis.
+    lineage:
+      - datalake_people_core.event_definition.reason_name
+  action_name_ptb:
+    description: |
+      Type of HR movement in Portuguese. Prefer for local HR reports and Brazilian stakeholders.
+    lineage:
+      - datalake_people_core.event_definition.action_name_ptb
+  reason_name_ptb:
+    description: |
+      Reason for the movement in Portuguese. Prefer for local turnover and exit analysis.
+    lineage:
+      - datalake_people_core.event_definition.reason_name_ptb
+  ts_load:
+    description: ETL load timestamp. For technical use only.

@@ -27,6 +27,9 @@ workflow:
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   tables_customization:
+    dim_event_definition:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     dim_absence_type:
       vacuum_retention_hours: 168
       vacuum_lite: true

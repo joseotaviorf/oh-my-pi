@@ -1,0 +1,35 @@
+---
+table_name: dw_employee_details.dim_event_definition
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_event_definition:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  action_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  reason_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  action_name_ptb:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  reason_name_ptb:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  ts_load:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
