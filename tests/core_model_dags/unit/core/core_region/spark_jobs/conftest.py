@@ -36,11 +36,11 @@ def region_df(spark_session):
     """Create a sample region DataFrame for testing.
 
     Hierarchy:
-      Cidade (id=5, id_state=10) ← root, ts_updated=2025-01-01
-        MacroRegiao (id=3, id_parent_region=5) — ts_updated=2025-01-01
-          SubRegiao  (id=1, id_parent_region=3) — ts_updated=2025-01-15 (recent)
-          SubRegiao  (id=2, id_parent_region=3) — ts_updated=2025-01-20 (recent)
-          SubRegiao  (id=4, id_parent_region=3) — ts_updated=2022-12-25 (old, for date-filter test)
+      Cidade (id=5, id_state=10) ← root, ts_database_transaction=2025-01-01
+        MacroRegiao (id=3, id_parent_region=5) — ts_database_transaction=2025-01-01
+          SubRegiao  (id=1, id_parent_region=3) — ts_database_transaction=2025-01-15 (recent)
+          SubRegiao  (id=2, id_parent_region=3) — ts_database_transaction=2025-01-20 (recent)
+          SubRegiao  (id=4, id_parent_region=3) — ts_database_transaction=2022-12-25 (old, for date-filter test)
 
     Parent rows (ids 3 and 5) must stay within the same date window as the SubRegiao rows
     so that the self-join can resolve the hierarchy even during incremental (date-filtered) loads.
@@ -54,12 +54,13 @@ def region_df(spark_session):
             StructField("id_state", LongType(), True),
             StructField("ts_created", TimestampType(), True),
             StructField("ts_updated", TimestampType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
         ]
     )
 
     data = [
         # Cidade — root of the hierarchy, carries id_state
-        # ts_updated set to 2025-01-01 so it survives incremental date-filter tests
+        # ts_database_transaction set to 2025-01-01 so it survives incremental date-filter tests
         (
             5,
             None,
@@ -68,9 +69,10 @@ def region_df(spark_session):
             10,
             datetime(2025, 1, 1, 0, 0),
             datetime(2025, 1, 1, 0, 0),
+            datetime(2025, 1, 1, 0, 0),
         ),
         # MacroRegiao — parent of the subregions
-        # ts_updated set to 2025-01-01 so it survives incremental date-filter tests
+        # ts_database_transaction set to 2025-01-01 so it survives incremental date-filter tests
         (
             3,
             5,
@@ -79,8 +81,9 @@ def region_df(spark_session):
             None,
             datetime(2025, 1, 1, 0, 0),
             datetime(2025, 1, 1, 0, 0),
+            datetime(2025, 1, 1, 0, 0),
         ),
-        # SubRegiao — recent ts_updated (within typical date-filter window)
+        # SubRegiao — recent ts_database_transaction (within typical date-filter window)
         (
             1,
             3,
@@ -89,8 +92,9 @@ def region_df(spark_session):
             None,
             datetime(2025, 1, 1, 10, 0),
             datetime(2025, 1, 15, 11, 0),
+            datetime(2025, 1, 15, 11, 0),
         ),
-        # SubRegiao — recent ts_updated, has both RENT and SALE business contexts
+        # SubRegiao — recent ts_database_transaction, has both RENT and SALE business contexts
         (
             2,
             3,
@@ -99,8 +103,9 @@ def region_df(spark_session):
             None,
             datetime(2025, 1, 2, 10, 0),
             datetime(2025, 1, 20, 11, 0),
+            datetime(2025, 1, 20, 11, 0),
         ),
-        # SubRegiao — old ts_updated, used to assert date-filter exclusion
+        # SubRegiao — old ts_database_transaction, used to assert date-filter exclusion
         (
             4,
             3,
@@ -108,6 +113,7 @@ def region_df(spark_session):
             "SubRegiao",
             None,
             datetime(2022, 12, 25, 9, 0),
+            datetime(2022, 12, 25, 10, 0),
             datetime(2022, 12, 25, 10, 0),
         ),
     ]
@@ -232,6 +238,7 @@ def region_df_with_unknown_state(spark_session):
             StructField("id_state", LongType(), True),
             StructField("ts_created", TimestampType(), True),
             StructField("ts_updated", TimestampType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
         ]
     )
 
@@ -245,6 +252,7 @@ def region_df_with_unknown_state(spark_session):
             10,
             datetime(2020, 1, 1),
             datetime(2020, 1, 1),
+            datetime(2020, 1, 1),
         ),
         (
             3,
@@ -254,8 +262,18 @@ def region_df_with_unknown_state(spark_session):
             None,
             datetime(2020, 6, 1),
             datetime(2020, 6, 1),
+            datetime(2020, 6, 1),
         ),
-        (1, 3, "Moema", "SubRegiao", None, datetime(2025, 1, 1), datetime(2025, 1, 15)),
+        (
+            1,
+            3,
+            "Moema",
+            "SubRegiao",
+            None,
+            datetime(2025, 1, 1),
+            datetime(2025, 1, 15),
+            datetime(2025, 1, 15),
+        ),
         # Cidade pointing to a state with null country_code → should be filtered out
         (
             9,
@@ -263,6 +281,7 @@ def region_df_with_unknown_state(spark_session):
             "Unknown City",
             "Cidade",
             20,
+            datetime(2020, 1, 1),
             datetime(2020, 1, 1),
             datetime(2020, 1, 1),
         ),

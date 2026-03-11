@@ -43,10 +43,10 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             and args.load_end_date is not None
             and args.load_end_date != ""
         ):
-            # Incremental window on ts_updated
+            # Incremental window on ts_database_transaction
             region_df = region_df.filter(
-                (col("ts_updated").cast("date") >= args.load_start_date)
-                & (col("ts_updated").cast("date") <= args.load_end_date)
+                (col("ts_database_transaction").cast("date") >= args.load_start_date)
+                & (col("ts_database_transaction").cast("date") <= args.load_end_date)
             )
 
         return region_df

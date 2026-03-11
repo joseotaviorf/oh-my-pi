@@ -102,10 +102,10 @@ class TestLoadRegionData:
 
         assert result.count() == region_df.count()
 
-    def test_incremental_load_filters_by_ts_updated(
+    def test_incremental_load_filters_by_ts_database_transaction(
         self, spark_session, region_df, mock_configuration_service
     ):
-        """Incremental load must restrict rows to the given ts_updated window."""
+        """Incremental load must restrict rows to the given ts_database_transaction window."""
         job = CoreRegionSparkJob()
         config = job.get_region_config()
 
@@ -115,14 +115,18 @@ class TestLoadRegionData:
 
         result_ids = [row["id"] for row in result.select("id").collect()]
 
-        # Rows with ts_updated in 2025-01 should be included
-        assert 1 in result_ids, "Region 1 (ts_updated 2025-01-15) should be included"
-        assert 2 in result_ids, "Region 2 (ts_updated 2025-01-20) should be included"
+        # Rows with ts_database_transaction in 2025-01 should be included
+        assert (
+            1 in result_ids
+        ), "Region 1 (ts_database_transaction 2025-01-15) should be included"
+        assert (
+            2 in result_ids
+        ), "Region 2 (ts_database_transaction 2025-01-20) should be included"
 
-        # Row with ts_updated in 2022 should be excluded
+        # Row with ts_database_transaction in 2022 should be excluded
         assert (
             4 not in result_ids
-        ), "Region 4 (ts_updated 2022-12-25) should be excluded"
+        ), "Region 4 (ts_database_transaction 2022-12-25) should be excluded"
 
     def test_empty_string_dates_treated_as_full_load(
         self, spark_session, region_df, mock_configuration_service
@@ -337,7 +341,7 @@ class TestCreateCoreModelDateFilter:
         table_side_effect,
         mock_surrogate_keys_helper,
     ):
-        """Regions with ts_updated outside the load window must not appear in the output."""
+        """Regions with ts_database_transaction outside the load window must not appear in the output."""
         with patch.object(spark_session, "table", side_effect=table_side_effect):
             result_df = core_region_job.create_core_model(
                 spark_session,
@@ -350,7 +354,7 @@ class TestCreateCoreModelDateFilter:
 
         assert (
             4 not in result_ids
-        ), "Region 4 (ts_updated 2022-12-25) should be excluded by the date filter"
+        ), "Region 4 (ts_database_transaction 2022-12-25) should be excluded by the date filter"
 
     def test_date_filter_keeps_regions_in_window(
         self,
@@ -359,7 +363,7 @@ class TestCreateCoreModelDateFilter:
         table_side_effect,
         mock_surrogate_keys_helper,
     ):
-        """Regions with ts_updated inside the load window must be present in the output."""
+        """Regions with ts_database_transaction inside the load window must be present in the output."""
         with patch.object(spark_session, "table", side_effect=table_side_effect):
             result_df = core_region_job.create_core_model(
                 spark_session,
@@ -370,8 +374,12 @@ class TestCreateCoreModelDateFilter:
             row["id_region"] for row in result_df.select("id_region").collect()
         ]
 
-        assert 1 in result_ids, "Region 1 (ts_updated 2025-01-15) should be included"
-        assert 2 in result_ids, "Region 2 (ts_updated 2025-01-20) should be included"
+        assert (
+            1 in result_ids
+        ), "Region 1 (ts_database_transaction 2025-01-15) should be included"
+        assert (
+            2 in result_ids
+        ), "Region 2 (ts_database_transaction 2025-01-20) should be included"
 
     def test_full_load_includes_all_regions(
         self,
