@@ -1,40 +1,48 @@
 ---
 alwaysApply: false
+description: Follow this template for PR descriptions. Use when writing or editing a PR description or preparing a PR for review.
 ---
-When need to create  Pull Request on the repo follow this template for the description:
+When you need to create a Pull Request on the repo, follow this template for the description. Use the **exact section order** below. Generate a professional, concise description in **English** based on the code changes and user input.
 
 ### Why?
-_Replace me for a cool overview of why this PR is being created._
+Explain the **motivation** (business value or technical fix). Use user input or infer from code logic.
+
+_Replace me for a short overview of why this PR is being created._
 
 ### What?
+Describe **what** is being modified at a high level (e.g. new table, new column, new logic).
+
 _Replace me for a detailed explanation of what is being modified._
-_Want to add some awesome bullet points?_
 - _First changes;_
 - _Second changes;_
 - _..._
 
-_How about some cool checkboxes?_
+_How about some checkboxes?_
 - [X] _First changes;_
-- [X] _Second changes;_
-- [ ] _..._
+- [ ] _Second changes;_
+- _..._
 
 ### How everything was tested?
-_Please, describe the tests that you ran to verify your changes. Also, list any relevant details of your test configuration._
+Describe the tests and environment. **Standard practice:** all tests should pass through **Forno** (staging); this is the default and encouraged flow. If the change did **not** go through Forno, provide a **justification** (e.g. scope, urgency, or exception approved by the team).
 
-_If changes are related to table modifications, a simple **count**, **select** or statistics are suffice;_
+- **Table/SQL changes:** A simple **count**, **select** or statistics are sufficient.
+- **New DAG:** A successful run on Forno is a good proof to display.
+- **Other:** Add the information needed to show how well the change was tested.
 
-_If a new DAG is being created, a successful run image is a good proof to be displayed._
-
-_Else, make use of your creativity in order to add the necessary information on how well this request has been tested._ 
+_Please describe the tests you ran and any relevant details of your test configuration. If you did not run on Forno, explain why._
 
 #### Screenshots
-_Much appreciated images detailing the output of the requested change._
+Reserve space or reference images for run result, dashboard, or sample query result when applicable.
 
 
 ### !Attention Points!
-_Replace me for what the reviewer will need to pay attention to in the PR or just to cover any concerns after the merge._
+Call out what the reviewer should pay attention to or concerns after the merge (e.g. dependency order, backfill, breaking change, follow-up work).
+
+_Replace me for what the reviewer will need to pay attention to in the PR or to cover any concerns after the merge._
 
 ### Checklist before opening the PR!
+Use the **exact checklist** below. Leave items unchecked `[ ]` unless the user explicitly confirms they are done.
+
 - [ ] My code follows the style guidelines and [name conventions](https://docs.google.com/document/d/1mPPA716eoT3EZSqY0gA8a9ao4ObMyI9Y8QNd7CzlWWY) for DAGs, databases, columns, etc.
 - [ ] I have made corresponding changes to the documentation;
 - [ ] I have added tests that prove my fix is effective or that my feature works.

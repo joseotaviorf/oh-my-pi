@@ -79,9 +79,30 @@ alwaysApply: true
 6. **Boolean columns** — Boolean flags and modified columns, e.g., `is_active`, `has_house`, `mod_is_penthouse`
 7. **Date columns** — Date values, e.g., `dt_signed`
 8. **Timestamp columns** — Timestamp values, e.g., `ts_created`, `ts_updated`, `ts_load`
-9. **Partitions** — Partition columns, e.g., `year`, `month`, `day` (always last)
+9. **Array/struct/map columns** — Complex types, e.g. `custom_fields_json`, `tags`, `metadata_json`. Allowed in raw/clean (source fidelity); discouraged in enrich; **prohibited in DW** — flatten or extract to scalar columns before promoting.
+10. **Partitions** — Partition columns, e.g., `year`, `month`, `day` (always last)
 
-**Example (DW Fact Table — all priorities shown):**
+**Data Lake Example:**
+
+```sql
+SELECT
+    id_contract,                      -- Priority 1: IDs
+    id_user,                          -- Priority 1: IDs
+    uuid_person,                       -- Priority 2: UUIDs
+    contract_status,                   -- Priority 4: Characteristics
+    rent_amount,                       -- Priority 4: Characteristics
+    days_first_listing_to_contract_signed,  -- Priority 5: Metrics
+    is_active,                         -- Priority 6: Boolean columns
+    dt_signed,                         -- Priority 7: Date columns
+    ts_created,                        -- Priority 8: Timestamp columns
+    year,                              -- Priority 10: Partitions
+    month,
+    day
+FROM
+    datalake_ebdb_clean.contract
+```
+
+**Data Warehouse Fact Table Example:**
 
 ```sql
 SELECT
@@ -98,14 +119,34 @@ SELECT
     dt_signed,                         -- Priority 7: Date columns
     ts_created,                        -- Priority 8: Timestamp columns
     ts_load,                           -- Priority 8: Timestamp columns
-    year,                              -- Priority 9: Partitions
+    year,                              -- Priority 10: Partitions
     month,
     day
 FROM
     datalake_ebdb_contract.contract     -- Enrich DAG as source
 ```
 
-Data Lake tables follow the same priority but use `id_*` instead of `sk_*` prefixes.
+**Data Warehouse Dimension Table Example:**
+
+```sql
+SELECT
+    sk_user,                          -- Priority 1: IDs (SKs)
+    sk_birth_date,                    -- Priority 1: IDs (SKs)
+    uuid_person,                      -- Priority 2: UUIDs
+    id_external,                      -- Priority 3: Non-SKs
+    user_name,                        -- Priority 4: Characteristics
+    user_email,                       -- Priority 4: Characteristics
+    days_registration_to_first_contract,  -- Priority 5: Metrics
+    is_active,                        -- Priority 6: Boolean columns
+    dt_birth,                         -- Priority 7: Date columns
+    ts_created,                       -- Priority 8: Timestamp columns
+    ts_load,                          -- Priority 8: Timestamp columns
+    year,                             -- Priority 10: Partitions
+    month,
+    day
+FROM
+    datalake_ebdb_user.user    -- Enrich DAG as source
+```
 
 | Column Type | Priority | Notes |
 |-------------|----------|-------|
@@ -117,7 +158,8 @@ Data Lake tables follow the same priority but use `id_*` instead of `sk_*` prefi
 | Boolean columns | 6 | `is_*`, `has_*`, `mod_*` flags |
 | Date columns | 7 | `dt_*` |
 | Timestamp columns | 8 | `ts_*`, including `ts_load` |
-| Partitions | 9 | `event_name`, `year`, `month`, `day` (always last) |
+| Array/struct/map columns | 9 | e.g. `custom_fields_json`, `tags`, `metadata_json`. Allowed in raw/clean; discouraged in enrich; prohibited in DW. |
+| Partitions | 10 | `event_name`, `year`, `month`, `day` (always last) |
 
 ---
 

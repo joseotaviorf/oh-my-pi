@@ -31,7 +31,9 @@ globs: "**/*.sql"
 
 ### Column Arrangement Priority
 
-Follow column arrangement priority order: IDs → UUIDs → Non-SKs → Characteristics → Metrics → Booleans → Dates → Timestamps → Partitions. See `naming_conventions.mdc` for full definitions and examples.
+Follow column arrangement priority order: IDs → UUIDs → Non-SKs (DW only) → Characteristics → Metrics → Booleans → Dates → Timestamps → Array/struct/map → Partitions. See `naming_conventions.mdc` for the full definition and examples.
+
+> **Complex types** (array, struct, map): permitted in raw/clean layers to preserve source fidelity; discouraged in enrich — flatten where possible; **prohibited in DW** — always flatten or extract to scalar columns before promoting.
 
 ---
 
@@ -218,7 +220,44 @@ WHERE
 
 ---
 
-## 10. Commenting
+## 10. Long Expressions — Line Breaks
+
+Prioritise breaking long expressions into multiple lines so that statements stay readable and fit common line-length limits.
+
+### Rules
+
+- **When an expression is too long:** Split it into two or more lines rather than keeping a single long line.
+- **CASE WHEN:** Put the condition on one line; put `THEN`/`ELSE` and the result on the next (or on separate lines if still long).
+- **Nested functions:** Break so each function or logical part is on its own line — inner call first, then outer, with consistent indentation. Example: `ELEMENT_AT(FILTER(...), 1).user.data.id` should be split across lines by logical part.
+
+**Good Example (CASE WHEN):**
+
+```sql
+SELECT
+    CASE status
+        WHEN 'PENDING' THEN 'Awaiting approval'
+        WHEN 'APPROVED' THEN 'Active'
+        ELSE 'Other'
+    END AS status_label
+FROM
+    requests
+```
+
+**Good Example (Nested functions):**
+
+```sql
+SELECT
+    ELEMENT_AT(
+        FILTER(items, x -> x.is_valid = true),
+        1
+    ).user.data.id AS first_valid_user_id
+FROM
+    events
+```
+
+---
+
+## 11. Commenting
 
 ### Rules
 
@@ -259,7 +298,7 @@ WHERE
 
 ---
 
-## 11. No Wildcard Selects
+## 12. No Wildcard Selects
 
 ### Rule
 
@@ -318,7 +357,7 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY ts_created DESC) = 1
 
 ---
 
-## 12. Query Performance and Partition Filtering
+## 13. Query Performance and Partition Filtering
 
 ### Rules
 
@@ -450,7 +489,7 @@ WHERE
 
 ---
 
-## 13. Person Data Model — PII Centralisation
+## 14. Person Data Model — PII Centralisation
 
 ### Rule
 
@@ -533,7 +572,7 @@ LEFT JOIN
 
 ---
 
-## 14. Source Layer Policy by Target Layer
+## 15. Source Layer Policy by Target Layer
 
 ### Rule
 
@@ -591,6 +630,7 @@ FROM
 - [ ] Descriptive aliases with AS keyword
 - [ ] Joins formatted with proper line breaks
 - [ ] CASE-WHEN properly indented
+- [ ] Long expressions split across multiple lines (CASE condition/THEN/ELSE; nested functions broken by logical part)
 - [ ] Comments formatted correctly (no blank lines)
 - [ ] WHERE clause filters on partition/date columns for partitioned or large tables (enables partition pruning)
 - [ ] Incremental loads use `{load_start_date}` / `{load_end_date}` params — no unbounded full scans

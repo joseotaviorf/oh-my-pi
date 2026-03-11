@@ -1,11 +1,19 @@
 ---
-description: People domain conventions for clean, enrich, and DW layers
+description: Conventions for People domain DAGs (dags/people): schema layout, multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
 globs: dags/people/**/*
 alwaysApply: false
 ---
 # People Domain Conventions
 
-Rules for pipelines in the People domain (`dags/people/`). These conventions complement the core repository rules and naming conventions. Aligned with the People Data Warehouse 2.0 architecture (domain-driven, SCD Type 2, schema-based governance).
+Rules for pipelines in the People domain (`dags/people/`).
+Aligned with the People Data Warehouse 2.0 architecture (domain-driven, SCD Type 2, schema-based governance).
+These conventions complement the core repository rules and naming conventions.
+
+---
+
+## Multi-File Consistency
+
+If you update logic in `queries/**/*.sql`, you **must** automatically check and update the corresponding `metadata/**/*.yml` and `data_quality/**/*.yml` (layer folders: clean, enrich, dw, etc.).
 
 ---
 
@@ -132,7 +140,7 @@ When the source does not distinguish requested period vs actual period, use a **
 
 ### pin_ DAGs — Oracle HCM
 
-DAGs whose names start with `pin_` (e.g. `pin_core`) are based on Oracle database tables and views from HCM (Human Capital Management). Use Oracle HCM documentation as reference when mapping or interpreting source structures.
+DAGs whose names start with `pin_` (e.g. `pin_core`) are based on Oracle database tables and views from HCM (Human Capital Management). **Extracts:** `pin_*` DAGs. **Key Tables:** `per_all_people_f`, `per_all_assignments_m`. **Effective dating** (`effective_start_date` AND `effective_end_date`) is the core logic. Use Oracle HCM documentation as reference when mapping or interpreting source structures.
 
 ### Oracle Date 4712-12-31 — No End Date
 
@@ -142,6 +150,8 @@ When **filtering** source tables (clean/enrich) that still contain `4712-12-31`,
 
 ### Deprecation — Avoid
 
+- **Greenhouse v1** (`greenhouse` DAG) — being deprecated; prefer v3 (`greenhouse_v3`).
+- **Degreed** (current DAG/API) — being deprecated; prefer v3 when available.
 - **`hr_system` schema** and tables derived from it — being deprecated
 - **`dw_employee`** DAG — being deprecated
 - **`datalake_employment.employee_details`** — being deprecated
@@ -150,6 +160,11 @@ When **filtering** source tables (clean/enrich) that still contain `4712-12-31`,
 Prefer `pin_core` clean tables and `datalake_people` enrich tables instead. For assignment and termination data, use `datalake_people.identifier_mapping` together with `datalake_people.assignment_termination` (for terminated assignments).
 
 **If the required data does not exist in `pin_*` DAGs**, inform the user so they can assess alternative sources or request the data to be added to the pin pipeline.
+
+### Talent Acquisition (Greenhouse)
+
+- **APIs:** v1 (`greenhouse`) — **to be deprecated soon**; v3 (`greenhouse_v3`), Audit Log (`greenhouse_audit_log`).
+- **Pattern:** Heavily relies on Custom Fields which come as complex structs → apply `TO_JSON(column_name)` in Clean layer to preserve data without schema drift.
 
 ---
 
