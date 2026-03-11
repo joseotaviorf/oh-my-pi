@@ -356,7 +356,11 @@ SELECT
     -- Priority 0: SKs
     MD5(CONCAT_WS('|',
         CAST(sal.id_salary AS STRING),
-        CAST(sal.dt_started AS STRING)
+        CAST(sal.id_assignment AS STRING),
+        CAST(sal.id_period_of_service AS STRING),
+        COALESCE(CAST(sal.id_job AS STRING), ''),
+        CAST(sal.dt_started AS STRING),
+        CAST(sal.dt_ended_normalized AS STRING)
     )) AS sk_compensation,
     sal.id_person AS sk_employee,
     sal.id_assignment AS sk_contract,

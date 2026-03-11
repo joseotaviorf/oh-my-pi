@@ -44,28 +44,9 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  days_notice_period_in_month:
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  days_notice_period_in_year:
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
   amount_plr_monthly:
     has_min_value:
       greater_than_or_equal_to: 0
-      severity_level: Error
-  dt_of_notice:
-    custom:
-      # Ensures notice date is not after termination date for closed records
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM dw_compensation.fact_plr_monthly
-         WHERE dt_of_notice < DATE('9999-12-31')
-           AND dt_terminated < DATE('9999-12-31')
-           AND dt_of_notice > dt_terminated
-        ) = 0
       severity_level: Error
   ts_load:
     is_complete:

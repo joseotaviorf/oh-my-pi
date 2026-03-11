@@ -24,7 +24,10 @@ description: |
 columns:
   sk_compensation:
     description: |
-      Surrogate key (MD5 hash of id_salary + dt_valid_from after job-splitting).
+      Surrogate key. MD5 hash of (id_salary, id_assignment, id_period_of_service, id_job,
+      dt_valid_from, dt_valid_to) to uniquely identify each consolidated compensation record.
+      Includes full grain columns because salary consolidation can produce multiple rows with
+      the same id_salary and dt_started when splitting by job/assignment periods.
   sk_employee:
     description: Foreign key to dim_employee. References the employee (id_person).
   sk_contract:
