@@ -1,8 +1,7 @@
 ---
-alwaysApply: true
-description: Python coding conventions for the bietlejuice project — imports, logging, ABCs, enums, Pydantic v2, and Spark job patterns.
+globs: **/*.py
+alwaysApply: false
 ---
-
 # Python Conventions — bietlejuice
 
 ## Formatting & Tooling
@@ -77,17 +76,6 @@ class MyModel(BaseModel):
 - Prefer `ConfigurationService` for all environment-specific values. Never hard-code bucket paths, environment names, or secret keys.
 - Code reviews are mandatory before merging. Reviewers must check: naming conventions, test presence, no raw-layer SQL in upper layers, no hardcoded credentials.
 
-## Test-Driven Development (TDD) — Mandatory for AI-Generated Code
+## Test-Driven Development (TDD)
 
-AI must follow Red → Green → Refactor for every new module or function:
-
-1. **Write the test stub first.** Before writing any implementation, produce the test file with stubs marked `@pytest.mark.xfail(reason="not yet implemented", strict=True)`. This documents the contract before the code exists.
-2. **Write the minimum implementation** to make the failing test pass. Do not add logic that is not covered by a test.
-3. **Refactor** once green — clean up naming, extract helpers, remove duplication — while keeping all tests passing.
-
-**Hard rules:**
-- A new `.py` module in `bietlejuice/` must have a corresponding test file in `tests/unit/` committed in the **same diff**. Submitting implementation without tests is not acceptable.
-- No new public function or class may be introduced without at least one happy-path test and one error/edge-case test.
-- Changing an existing public function signature requires updating tests for every call site before the change lands.
-- When a bug is fixed, add a regression test that reproduces the original broken input as a `@pytest.mark.parametrize` case so the bug cannot silently reappear.
-- AI-generated code is not trusted until it has a test that fails without it. "It looks right" is not a substitute for a passing test.
+Follow Red → Green → Refactor for every new module or function. Every new `.py` module must ship with a companion test file in `tests/unit/` in the same diff. See `testing_conventions.mdc` for full TDD rules, patterns, and fixtures.

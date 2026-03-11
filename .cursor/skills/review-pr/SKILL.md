@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Run a full pre-push code review against all CI checks in parallel. Catches style, DAG declaration, metadata, and Python convention issues before they fail in Woodpecker. Use when the user asks to review changes, prepare a PR, or check if code is ready to push.
+description: Run a full pre-push code review against all CI checks in parallel. Catches style, DAG declaration, metadata, and Python convention issues before they fail in Woodpecker. Use when the user asks to review changes, prepare a PR, check if code is ready to push, validate a DAG, or check a DAG before pushing.
 ---
 
 # Pre-Push PR Review

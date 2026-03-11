@@ -1,6 +1,7 @@
 ---
-alwaysApply: true
-description: Testing conventions for bietlejuice — TDD workflow, two distinct patterns (Qube vs DAG builder), Spark session fixture, sys.modules mocking, and file mirroring. Always applied when writing or reviewing Python code.
+alwaysApply: false
+description: Testing conventions for bietlejuice — TDD workflow, two distinct patterns (Qube vs DAG builder), Spark session fixture, sys.modules mocking, and file mirroring.
+globs: "tests/**"
 ---
 
 # Testing Conventions — bietlejuice

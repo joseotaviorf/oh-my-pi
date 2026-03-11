@@ -77,19 +77,11 @@ Ask (or infer from context):
 | User Request | Layer | Normalized Name | Notes |
 |-------------|-------|-----------------|-------|
 | "rent_contracts" | dw | `dw_rent_contracts` | Added `dw_` prefix |
-| "dw_rent_contracts" | dw | `dw_rent_contracts` | Already correct, no change |
-| "people" | enrich | `enrich_people` | Added `enrich_` prefix |
-| "enrich_people" | enrich | `enrich_people` | Already correct, no change |
-| "contract" | core | `core_contract` | Added `core_` prefix |
-| "core_contract" | core | `core_contract` | Already correct, no change |
 | "rent__contracts" | metric | `metric_rent__contracts` | Added `metric_` prefix |
-| "metric_rent__contracts" | metric | `metric_rent__contracts` | Already correct, no change |
-| "webhelp_access" | reverse | `reverse_webhelp_access` | Added `reverse_` prefix |
-| "reverse_webhelp_access" | reverse | `reverse_webhelp_access` | Already correct, no change |
 | "pin_core" | raw/clean | `pin_core` | No normalization (raw/clean don't require layer prefix) |
 | "cross" | raw/clean (gsheets) | `gsheets_cross` | Added `gsheets_` prefix with business context |
-| "gsheets_for_sale" | raw/clean (gsheets) | `gsheets_for_sale` | Already correct, no change |
-| "for_rent" | raw/clean (gsheets) | `gsheets_for_rent` | Added `gsheets_` prefix with business context |
+
+The same pattern applies to all layers: if the name already has the correct prefix, use as-is; otherwise prepend it.
 
 **After normalization, use `normalized_dag_name` for all file paths and YAML fields.**
 
@@ -368,47 +360,13 @@ columns:
 
 ## Step 4b — Personal data classification
 
-For every column in every metadata YAML created in Step 4, assess whether it contains data about an identifiable natural person. If so, set `personal_data_classification` to the appropriate tier.
+For every column in every metadata YAML created in Step 4, assess whether it contains data about an identifiable natural person. If so, set `personal_data_classification` to the appropriate tier. For the full classification reference, follow the `governance_metadata` rule:
 
-### Quick classification reference
+- `sensitive`: LGPD Art. 11 (racial origin, health, biometric, political, religion, etc.) — requires `table_privileges` in the declaration
+- `highly_personal`: financial/legal (credit, bank, criminal) — recommend `table_privileges`
+- `personal`: standard PII (name, CPF, email, phone, address, birth date)
 
-| Tier | Key examples |
-|---|---|
-| `sensitive` | racial/ethnic origin, political opinion, religion, gender identity, sexual orientation, union membership, health data (ICD, neurodiversity, disability, pre-existing conditions, toxicological exams, DPS, body metrics), biometric data (facial recognition, fingerprints, voice recognition) |
-| `highly_personal` | bank statement, credit history, credit score, IRPF, INSS benefit statement, criminal background, personal/corporate credit or debit card number, photo with ID document |
-| `personal` | full name, CPF, date of birth, RG, passport, CNH, PIS/PASEP, voter ID, personal/corporate email, personal/corporate phone, residential/corporate address, geolocation, contract number, QuintoAndar account info, salary, age, marital status, device ID, IP address, browsing history, cookies, image/photo, service history |
-
-### Decision rules
-
-1. For each column, scan its name and description against the table above.
-2. If a column matches `sensitive`:
-   - **Warn the user** before proceeding. State which LGPD legal basis applies (e.g. explicit consent, legitimate interest for employment) or ask the user to confirm.
-   - Add `personal_data_classification: sensitive` to the metadata YAML.
-   - Add or recommend `table_privileges` in the DAG declaration to restrict access to authorised groups (e.g. `"prod-read-only": ["SELECT"]` for a named group only).
-   - If the table will feed a metric or qube output, confirm that `privacy.k_anonymity ≥ 5` will be set in the qube metric declaration.
-3. If a column matches `highly_personal`:
-   - Recommend adding `table_privileges` in the declaration and confirm with the user before proceeding.
-   - Add `personal_data_classification: highly_personal` to the metadata YAML.
-   - Suggest hashing or masking the column before promoting beyond the clean layer.
-4. If a column matches `personal`:
-   - Add `personal_data_classification: personal` to the metadata YAML. No extra access-control step required, but note the classification.
-5. Apply the same classification consistently across all layers for the same logical column (raw → clean → enrich → dw).
-
-### Example — metadata column with classification
-
-```yaml
-columns:
-  cpf:
-    lineage:
-      - datalake_person_clean.person.cpf
-    description: "Brazilian individual taxpayer identification number (CPF)."
-    personal_data_classification: personal
-  racial_origin:
-    lineage:
-      - datalake_person_clean.person.racial_origin
-    description: "Racial or ethnic origin self-declared by the person."
-    personal_data_classification: sensitive
-```
+Apply the same classification consistently across all layers for the same logical column (raw → clean → enrich → dw).
 
 ---
 

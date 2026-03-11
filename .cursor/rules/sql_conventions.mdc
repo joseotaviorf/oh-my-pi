@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.sql"
 ---
 # SQL Style Guide
 
@@ -30,36 +31,7 @@ alwaysApply: true
 
 ### Column Arrangement Priority
 
-Columns must be arranged in the following order:
-
-1. **IDs** (primary/foreign keys, `id_*`, `sk_*`, `sk_*_date`) - Priority 1
-2. **UUIDs** - Priority 2
-3. **Non-SKs** (DW only: external IDs, natural keys) - Priority 3
-4. **Characteristics** (non-metric properties) - Priority 4
-5. **Metrics** (SLA and calculated measures) - Priority 5
-6. **Boolean columns** (`is_`, `has_`, `mod_`) - Priority 6
-7. **Date columns** (`dt_*`) - Priority 7
-8. **Timestamp columns** (`ts_*`, including `ts_load`) - Priority 8
-9. **Partitions** (`year`, `month`, `day`) - Priority 9 (always last)
-
-**Example:**
-
-```sql
-SELECT
-    sk_user,              -- IDs (Priority 1)
-    uuid_person,          -- UUIDs (Priority 2)
-    id_external,          -- Non-SKs (Priority 3)
-    user_name,            -- Characteristics (Priority 4)
-    total_amount,         -- Metrics (Priority 5)
-    is_active,            -- Boolean columns (Priority 6)
-    dt_order,             -- Date columns (Priority 7)
-    ts_created,           -- Timestamp columns (Priority 8)
-    year,                 -- Partitions (Priority 9)
-    month,
-    day
-FROM
-    orders
-```
+Follow column arrangement priority order: IDs → UUIDs → Non-SKs → Characteristics → Metrics → Booleans → Dates → Timestamps → Partitions. See `naming_conventions.mdc` for full definitions and examples.
 
 ---
 
@@ -100,21 +72,18 @@ JOIN
 
 ---
 
-## 3. Reserved Words and Functions
+## 3. Formatting Rules
 
-### Rule
-
-Always use **UPPERCASE** for reserved keywords and functions.
-
-**Examples:**
-- `SELECT`, `FROM`, `WHERE`, `JOIN`, `AS`
-- `COUNT()`, `DATE()`, `CASE WHEN`, `SUM()`, `MAX()`, `MIN()`
-- `AND`, `OR`, `ON`, `IN`, `IS`, `NOT`, `NULL`
-
-**Good:**
+- **UPPERCASE** all reserved keywords and functions (`SELECT`, `FROM`, `WHERE`, `JOIN`, `AS`, `COUNT()`, `CASE WHEN`, `AND`, `OR`, `ON`, `IN`, `IS`, `NOT`, `NULL`)
+- **Spaces** before/after operators (`=`, `>`, `<`) and after commas
+- **New lines** before `AND`/`OR`/`ON`, after root keywords (`SELECT`/`FROM`/`WHERE`/`JOIN`), and after semicolons. Do not use blank lines (DBeaver incompatible).
+- **Indentation**: Keywords left-aligned; columns indented by TAB or 2/4 spaces
+- **Commas** at end-of-line (right comma)
+- **Each column** on its own row in `SELECT`. Never use `SELECT *`.
+- **DISTINCT** on the same row as `SELECT`
 
 ```sql
-SELECT
+SELECT DISTINCT
     COUNT(*) AS total_count,
     DATE(created_at) AS dt_created
 FROM
@@ -122,128 +91,6 @@ FROM
 WHERE
     status = 'active'
     AND created_at > '2024-01-01'
-```
-
-**Bad:**
-
-```sql
-select
-    count(*) as total_count,
-    date(created_at) as dt_created
-from
-    users
-where
-    status = 'active'
-    and created_at > '2024-01-01'
-```
-
----
-
-## 4. White Spaces
-
-### Rules
-
-- Add spaces before and after operators (e.g., `=`, `>`, `<`)
-- Add spaces after commas (`,`)
-- Add spaces surrounding apostrophes (`'`) where not within parentheses
-- Do not crowd code or remove natural language spaces
-
-**Good Example:**
-
-```sql
-SELECT
-    column_1,
-    column_2
-FROM
-    table_name
-WHERE
-    column_1 = 1
-    AND column_2 IN ('A', 'B')
-```
-
-**Bad Example:**
-
-```sql
-SELECT
-    column_1,
-    column_2
-FROM
-    table_name
-WHERE
-    column_1=1
-    AND column_2 IN('A','B')
-```
-
----
-
-## 5. Line Spacing
-
-### Rules
-
-Always include new lines:
-
-- **Before** `AND`, `OR`, `ON`
-- **After** root keywords (`SELECT`, `FROM`, `WHERE`, `JOIN`)
-- **After** semicolon (`;`) to separate queries
-- **After** comma when separating multiple columns into logical groups
-- **To separate** code into sections for readability
-
-**Important**: Do not use blank lines - they don't work in DBeaver and similar tools.
-
-**Good Example:**
-
-```sql
-SELECT
-    column_1,
-    column_2,
-    column_3
-FROM
-    table_1
-WHERE
-    column_1 = 1
-    AND column_2 = 2
-    OR column_3 = 3
-```
-
-**Bad Example:**
-
-```sql
-SELECT column_1, column_2, column_3 FROM table_1 WHERE column_1 = 1 AND column_2 = 2 OR column_3 = 3
-```
-
----
-
-## 6. Indentation
-
-### Rules
-
-- **Basic indentation**: Keywords aligned to the left side
-- **Indents**: Use TAB or 2/4 spaces from the basic part of a query
-- **Commas**: Place at end-of-line (EOL), as right comma
-- **SELECT columns**: Always give each column its own row. Never use `SELECT *`.
-- **DISTINCT**: Include on the same row as `SELECT`
-
-**Good Example:**
-
-```sql
-SELECT DISTINCT
-    id_client,
-    dt_submission
-FROM
-    main_summary
-WHERE
-    id_sample = '42'
-    AND dt_submission > '20180101'
-```
-
-**Bad Example:**
-
-```sql
-SELECT id_client
-    ,dt_submission
-  FROM main_summary
- WHERE id_sample = '42'
-   AND dt_submission > '20180101'
 ```
 
 ---
@@ -728,22 +575,6 @@ FROM
 ```
 
 ---
-
-## AI Agent Instructions — SQL
-
-When writing or reviewing SQL code in this project:
-
-1. **Always enforce** SQL style guidelines
-2. **Check column arrangement** follows the priority order (IDs → UUIDs → Non-SKs [DW only] → Characteristics → Metrics → Boolean columns → Date → Timestamp → Partitions last)
-3. **Verify** all reserved words and functions are UPPERCASE
-4. **Ensure** proper indentation and line spacing
-5. **Prefer CTEs** over subqueries
-6. **Use descriptive aliases** with the `AS` keyword
-7. **Format joins** with proper line breaks and indentation
-8. **Never write `SELECT *`** — always enumerate every column explicitly, including inside CTEs, subqueries, and `QUALIFY` windows
-9. **Always include a `WHERE` filter on partition or date columns** for partitioned or large tables to enable partition pruning; use `{load_start_date}` / `{load_end_date}` params for incremental loads and push filters into CTEs before joins
-10. **Enforce Person Data Model** — in enrich and DW query files, never select raw PII columns (`name`, `email`, `phone`, `cpf`, `rg`, `address`, `dt_birth`) as stored columns; expose `sk_person` / `id_person` / `uuid_person` / `id_user` as foreign keys instead; consumers join `dw_public.dim_person` for contact details; in reverse DAG queries, always add a `has_right_to_be_forgotten = false` filter via `dim_person` before exporting any personal data
-11. **Enforce source-layer policy** — `raw` is only for clean queries; enrich uses clean/enrich; DW prioritizes enrich and should avoid DW-to-DW reads except explicit datamarts; metric prioritizes DW and should avoid datamart DW tables as primary sources
 
 ## SQL Style Checklist
 

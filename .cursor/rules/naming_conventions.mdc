@@ -81,27 +81,7 @@ alwaysApply: true
 8. **Timestamp columns** — Timestamp values, e.g., `ts_created`, `ts_updated`, `ts_load`
 9. **Partitions** — Partition columns, e.g., `year`, `month`, `day` (always last)
 
-**Data Lake Example:**
-
-```sql
-SELECT
-    id_contract,                      -- Priority 1: IDs
-    id_user,                          -- Priority 1: IDs
-    uuid_person,                       -- Priority 2: UUIDs
-    contract_status,                   -- Priority 4: Characteristics
-    rent_amount,                       -- Priority 4: Characteristics
-    days_first_listing_to_contract_signed,  -- Priority 5: Metrics
-    is_active,                         -- Priority 6: Boolean columns
-    dt_signed,                         -- Priority 7: Date columns
-    ts_created,                        -- Priority 8: Timestamp columns
-    year,                              -- Priority 9: Partitions
-    month,
-    day
-FROM
-    datalake_ebdb_clean.contract
-```
-
-**Data Warehouse Fact Table Example:**
+**Example (DW Fact Table — all priorities shown):**
 
 ```sql
 SELECT
@@ -125,27 +105,7 @@ FROM
     datalake_ebdb_contract.contract     -- Enrich DAG as source
 ```
 
-**Data Warehouse Dimension Table Example:**
-
-```sql
-SELECT
-    sk_user,                          -- Priority 1: IDs (SKs)
-    sk_birth_date,                    -- Priority 1: IDs (SKs)
-    uuid_person,                      -- Priority 2: UUIDs
-    id_external,                      -- Priority 3: Non-SKs
-    user_name,                        -- Priority 4: Characteristics
-    user_email,                       -- Priority 4: Characteristics
-    days_registration_to_first_contract,  -- Priority 5: Metrics
-    is_active,                        -- Priority 6: Boolean columns
-    dt_birth,                         -- Priority 7: Date columns
-    ts_created,                       -- Priority 8: Timestamp columns
-    ts_load,                          -- Priority 8: Timestamp columns
-    year,                             -- Priority 9: Partitions
-    month,
-    day
-FROM
-    datalake_ebdb_user.user    -- Enrich DAG as source
-```
+Data Lake tables follow the same priority but use `id_*` instead of `sk_*` prefixes.
 
 | Column Type | Priority | Notes |
 |-------------|----------|-------|
@@ -278,23 +238,6 @@ For custom ingestion DAGs, configure Spark job arguments using:
 **Example:** See `dags/fintech/grb/grb_declaration.yml` for a complete custom ingestion DAG example.
 
 ---
-
-## AI Agent Instructions — Naming
-
-When writing or reviewing code in this project:
-
-1. **Enforce English** for all names (columns, tables, variables)
-2. **Use snake_case** consistently
-3. **Apply correct prefixes**:
-   - Data Lake: `id_`, `uuid_` (uuid columns), `ts_` (timestamp columns), `dt_` (date columns), `is_` or `has_` (bool columns), `mod_` (bool columns that identify column updates), `epoch_`
-   - Data Warehouse: `sk_` (surrogate keys), `ts_` (timestamp columns), `dt_` (date columns), `is_` or `has_` (bool columns), `mod_` (bool columns), `epoch_`
-4. **Follow table naming**:
-   - Dimensions: singular nouns (`dim_user`)
-   - Facts: plural nouns (`fact_users`)
-5. **Apply correct metastore patterns** based on layer
-6. **Use proper DAG naming** based on layer and context
-7. **Follow credential patterns** for Databricks and Airflow
-8. **Follow column arrangement priority** — See "Column Arrangement Priority" section above for the complete ordering rules and examples for Data Lake and Data Warehouse layers
 
 ## Naming Conventions Checklist
 
