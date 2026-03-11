@@ -71,6 +71,12 @@ sheets_info:
     clean_table_name: costs_targets
     sheet_context: growth
 
+  citygrowth_admfee_comms:
+    sheet_id: 1gNFvlv7aXfiWo-m8rnlS6Rhbcoyz7OnYUNGYI8o9_GA
+    sheet_name: forms_negociacao_taxas
+    clean_table_name: citygrowth_admfee_comms
+    sheet_context: growth
+
   demand_retention_ab_tests:
     sheet_id: 1l80txsBUzAAuCMalf6mfECgoULxbLHpw7J3z841aITw
     sheet_name: demand_retention_ab_tests
