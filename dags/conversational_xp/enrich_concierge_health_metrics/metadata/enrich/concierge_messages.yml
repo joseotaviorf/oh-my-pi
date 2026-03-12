@@ -42,7 +42,19 @@ columns:
   has_human_reply:  
     lineage:
       - datalake_copilot_service_clean.message.role
-    description: Whether in the conversation there was a message sent by a human. Applies to outbound messages. For inbound it always starts with a message from a Human.
+    description: Whether in the conversation there was a message sent by a human.
+  has_audio:
+    lineage:
+    - datalake_copilot_service_clean.message.media_type
+    description: Whether in the conversation there was an audio message sent by a human.
+  n_human_replies:
+    lineage:
+      - datalake_copilot_service_clean.message.role
+    description: The number of human replies in the conversation.
+  n_audio_replies:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.media_type
+    description: The number of audio replies in the conversation.
   ts_concierge_contact:
     lineage:
     - datalake_jaiminho_clean.user_notifications.ts_sent

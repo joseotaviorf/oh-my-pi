@@ -10,10 +10,23 @@ columns:
     - datalake_search.concierge_direct_vb.id_user
     - datalake_search.concierge_indirect_vb.id_user
     description: The id of the user who has interacted with concierge or has booked a visit through a listing page referred by concierge but didn't interact with concierge.
+  id_user_copilot:
+    lineage:
+    - datalake_search.concierge_messages.id_user
+    description: The id of the user in contact with concierge. Useful to check if the id_user differs from the id_user in visits.
+  id_user_visit:
+    lineage:
+    - datalake_search.concierge_direct_vb.id_user
+    - datalake_search.concierge_indirect_vb.id_user
+    description: The id of the user who booked a visit through concierge (direct or indirect). Useful to check if the id_user differs from the id_user in copilot.
   id_copilot_session:
     lineage:
     - datalake_search.concierge_messages.id_copilot_session
     description: The id of the copilot session.
+  id_langfuse_session:
+    lineage:
+    - datalake_search.concierge_messages.id_langfuse_session
+    description: The id of the langfuse session.
   user_phone:
     lineage:
     - datalake_search.concierge_messages.user_phone
@@ -49,6 +62,18 @@ columns:
     lineage:
     - datalake_search.concierge_messages.has_human_reply
     description: Whether the message has a human reply.
+  has_audio:
+    lineage:
+    - datalake_search.concierge_messages.has_audio
+    description: Whether the message has an audio message.
+  n_human_replies:
+    lineage:
+    - datalake_search.concierge_messages.n_human_replies
+    description: The number of human replies in the conversation.
+  n_audio_replies:
+    lineage:
+    - datalake_search.concierge_messages.n_audio_replies
+    description: The number of audio replies in the conversation.
   prospect_activation_channel:
     lineage:
     - datalake_search.concierge_prospect_aux.prospect_activation_channel
@@ -65,11 +90,12 @@ columns:
     description: Whether the user is a contact prospect or not. If a user had contacted concierge and never had initiated a RENT/SALE flow, or had previously churned or initiated a RENT/SALE flow on the day of the concierge contact then this user is a contact prospect.
   is_concierge_prospect:
     lineage:
-    - datalake_search.concierge_prospect_aux.prospect_event_type
-    - datalake_search.concierge_prospect_aux.ts_prospect_event
+    - dw_public.dim_booking.id_visit
     - datalake_search.concierge_messages.ts_message_sent
-    - datalake_search.concierge_direct_vb.is_direct_visit_booked
-    - datalake_search.concierge_indirect_vb.is_indirect_visit_booked
+    - datalake_search.concierge_direct_vb.id_visit
+    - datalake_search.concierge_direct_vb.visit_event_type
+    - datalake_search.concierge_indirect_vb.id_visit
+    - datalake_search.concierge_indirect_vb.days_msg2vb
     description: Users who became a prospect by initiating a RENT/SALE flow by booking a visit through concierge (direct or indirect).
   business_context:
     lineage:
@@ -77,6 +103,10 @@ columns:
     - datalake_search.concierge_indirect_vb.business_context
     - datalake_search.concierge_prospect_aux.business_context
     description: The business context of the visit ('RENT' OR 'SALE'), or when not available the business context of the prospect's previous visit booking.
+  previous_prospect_business_context:
+    lineage:
+    - datalake_search.concierge_prospect_aux.business_context
+    description: The business context of the prospect's previous activation.
   concierge_vb_type:
     lineage:
     - datalake_search.concierge_direct_vb.is_direct_visit_booked

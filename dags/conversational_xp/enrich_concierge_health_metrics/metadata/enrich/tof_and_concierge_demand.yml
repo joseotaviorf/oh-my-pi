@@ -49,6 +49,18 @@ columns:
     lineage:
     - datalake_search.concierge_demand.has_human_reply
     description: Whether the message has a human reply.
+  has_audio:
+    lineage:
+    - datalake_search.concierge_demand.has_audio
+    description: Whether the message has an audio message.
+  n_human_replies:
+    lineage:
+    - datalake_search.concierge_demand.n_human_replies
+    description: The number of human replies in the conversation.
+  n_audio_replies:
+    lineage:
+    - datalake_search.concierge_demand.n_audio_replies
+    description: The number of audio replies in the conversation.
   prospect_activation_channel:
     lineage:
     - datalake_search.concierge_demand.prospect_activation_channel
