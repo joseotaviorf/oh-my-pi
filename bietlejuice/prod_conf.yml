@@ -241,6 +241,7 @@ wonka_cluster:
         data_security_mode: SINGLE_USER
         spark_conf:
             spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+            spark.databricks.delta.schema.autoMerge.enabled: "true"
     spark_env_vars:
       PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"
       PREV_DATA_INTERVAL_END_SUCCESS: "{{ prev_data_interval_end_success }}"
