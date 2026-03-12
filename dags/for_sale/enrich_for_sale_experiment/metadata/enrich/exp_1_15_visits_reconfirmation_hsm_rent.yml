@@ -1,0 +1,53 @@
+---
+database_name: datalake_for_sale_experiment
+table_name: exp_1_15_visits_reconfirmation_hsm_rent
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  Experiment table for visits confirmation agent (Visits XP Team) fixed on starting from March 10, 2026.
+  This table tracks visit participation in an A/B test designed to evaluate the impact
+  of reconfirmation HSMs. Visits are randomly assigned to control or treatment groups
+  based on the visit ID, with the experiment focusing on rent.
+columns:
+  identifier_bc:
+    description: Unique identifier of the visit participating in the experiment.
+    lineage:
+      - datalake_ebdb_clean.visit.id
+      - datalake_ebdb_clean.visit.business_context
+  identifier:
+    description: Unique identifier of the visit participating in the experiment.
+    lineage:
+      - datalake_ebdb_clean.visit.id
+  id_neotribe:
+    description: Identifier for the neotribe of For Sale line.
+  id_experiment:
+    description: Unique identifier for this specific experiment.
+  name_neotribe:
+    description: Name of the neotribe (VISITS XP).
+  name_experiment:
+    description: Name of the specific experiment.
+  identifier_type:
+    description: Type of identifier used for the experiment (VISIT).
+  business_context:
+    description: Business context related to the experiment.
+    lineage:
+      - datalake_ebdb_clean.visit.business_context
+  test_group:
+    description: Experiment group assignment based on visit ID hash calculation.
+    lineage:
+      - datalake_ebdb_clean.visit.id
+    categories:
+      CONTROL: ((visit_id * 31 + 4 * 17) % 100) < 50.
+      TREATMENT: ((visit_id * 31 + 4 * 17) % 100) >= 50.
+  documentation_link:
+    description: Link to experiment documentation (null for this experiment).
+  additional_information:
+    description: Additional context about the experiment methodology.
+  dt_identifier_started:
+    description: Earliest date when this specific visit started participating in the experiment based on visit creation timestamp.
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+  dt_identifier_ended:
+    description: Latest date when this specific visit participated in the experiment based on visit creation timestamp.
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created

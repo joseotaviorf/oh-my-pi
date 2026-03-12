@@ -8,4 +8,4 @@ SELECT
     test_group,
     dt_identifier_started
 FROM
-    datalake_for_sale_experiment.exp_visitor_identifier
+    datalake_for_sale_experiment.exp_identifier_unified

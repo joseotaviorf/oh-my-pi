@@ -1,0 +1,81 @@
+---
+database_name: datalake_for_sale_experiment
+table_name: exp_identifier_unified
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  Consolidated experiment identifier table that combines all identifiers types (visitor, visit, agent).
+  Each identifier type appears with their respective experiment assignment and participation timeline
+  for comprehensive A/B testing analysis.
+columns:
+  id_element_exp:
+    description: Unique identifier of the experiment and identifier participating in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.id_element_exp
+      - datalake_for_sale_experiment.exp_visit_identifier.id_element_exp
+  identifier:
+    description: Unique identifier of the identifier participating in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.identifier
+      - datalake_for_sale_experiment.exp_visit_identifier.identifier
+  id_neotribe:
+    description: Identifier for the neotribe conducting the experiment (1 for VISITS XP).
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.id_neotribe
+      - datalake_for_sale_experiment.exp_visit_identifier.id_neotribe
+  id_experiment:
+    description: Unique identifier for the specific experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.id_experiment
+      - datalake_for_sale_experiment.exp_visit_identifier.id_experiment
+  name_neotribe:
+    description: Name of the neotribe conducting the experiments (VISITS XP).
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.name_neotribe
+      - datalake_for_sale_experiment.exp_visit_identifier.name_neotribe
+  name_experiment:
+    description: Name of the specific experiment variant.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.name_experiment
+      - datalake_for_sale_experiment.exp_visit_identifier.name_experiment
+    categories:
+      visits_reconfirmation_hsm_rent: Visits reconfirmation HSM rent experiment.
+  identifier_type:
+    description: Type of identifier used for the experiments (VISITOR, VISIT, AGENT).
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.identifier_type
+      - datalake_for_sale_experiment.exp_visit_identifier.identifier_type
+  business_context:
+    description: Business context for the experiments.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.business_context
+      - datalake_for_sale_experiment.exp_visit_identifier.business_context
+  test_group:
+    description: Experiment group assignment for the identifier (CONTROL or TREATMENT). Assignment logic varies by experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.test_group
+      - datalake_for_sale_experiment.exp_visit_identifier.test_group
+    categories:
+      CONTROL: Control group participants.
+      TREATMENT: Treatment group participants.
+      ERROR: Invalid or unmapped ID patterns
+  documentation_link:
+    description: Link to experiment documentation (may be null).
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.documentation_link
+      - datalake_for_sale_experiment.exp_visit_identifier.documentation_link
+  additional_information:
+    description: Additional context about experiment methodology and identifier segmentation logic.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.additional_information
+      - datalake_for_sale_experiment.exp_visit_identifier.additional_information
+  dt_identifier_started:
+    description: Earliest date when this specific identifier started participating in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.dt_identifier_started
+      - datalake_for_sale_experiment.exp_visit_identifier.dt_identifier_started
+  dt_identifier_ended:
+    description: Latest date when this specific identifier participated in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_visitor_identifier.dt_identifier_ended
+      - datalake_for_sale_experiment.exp_visit_identifier.dt_identifier_ended

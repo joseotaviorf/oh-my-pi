@@ -30,56 +30,91 @@ WITH visit AS (
             ON fv.sk_funnel_contract_signed = cs.sk_visit_funnel
 ),
 exp AS (
-SELECT
-    de.sk_neotribe_exp,
-    fe.sk_identifier,
-    de.name_neotribe,
-    de.name_experiment,
-    de.identifier_type,
-    de.business_context,
-    fe.test_group,
-    de.dt_started,
-    COALESCE(de.dt_ended, DATE(CURRENT_TIMESTAMP)) AS dt_ended
-FROM
-    dw_for_sale_experiment.fact_experiment AS fe
-JOIN
-    dw_for_sale_experiment.dim_experiment AS de
-        ON fe.sk_neotribe_exp = de.sk_neotribe_exp
+    SELECT
+        de.sk_neotribe_exp,
+        fe.sk_identifier,
+        de.sk_experiment,
+        de.name_neotribe,
+        de.name_experiment,
+        de.identifier_type,
+        de.business_context,
+        fe.test_group,
+        de.dt_started,
+        COALESCE(de.dt_ended, DATE(CURRENT_TIMESTAMP)) AS dt_ended
+    FROM
+        dw_for_sale_experiment.fact_experiment AS fe
+    JOIN
+        dw_for_sale_experiment.dim_experiment AS de
+            ON fe.sk_neotribe_exp = de.sk_neotribe_exp
 ),
 visit_exp AS (
-  WITH visit_by_visitor AS (
-    SELECT
-        exp.sk_neotribe_exp,
-        visit.sk_visit,
-        visit.sk_house,
-        visit.sk_visitor,
-        visit.sk_owner,
-        visit.sk_first_associated_agent,
-        exp.sk_identifier AS sk_exp_identifier,
-        visit.business_context,
-        exp.name_neotribe AS exp_name_neotribe,
-        exp.name_experiment AS exp_name_experiment,
-        exp.identifier_type AS exp_identifier_type,
-        exp.test_group AS exp_test_group,
-        visit.dt_created,
-        visit.ts_visit_first_confirmed,
-        visit.ts_visit_done,
-        visit.ts_visit_canceled,
-        visit.ts_visit_unsuccessful,
-        visit.ts_offer_submitted,
-        visit.ts_offer_accepted,
-        visit.ts_contract_signed,
-        exp.dt_started AS dt_exp_started,
-        exp.dt_ended AS dt_exp_ended
-    FROM
-      visit
-    JOIN
-      exp
-        ON exp.identifier_type = 'VISITOR'
-        AND visit.sk_visitor = exp.sk_identifier
-        AND visit.business_context = exp.business_context
-        AND visit.dt_created::DATE >= exp.dt_started
-        AND visit.dt_created::DATE <= exp.dt_ended
+    WITH visit_by_visitor AS (
+        SELECT
+            exp.sk_neotribe_exp,
+            visit.sk_visit,
+            visit.sk_house,
+            visit.sk_visitor,
+            visit.sk_owner,
+            visit.sk_first_associated_agent,
+            exp.sk_identifier AS sk_exp_identifier,
+            visit.business_context,
+            exp.name_neotribe AS exp_name_neotribe,
+            CONCAT(exp.sk_experiment,' | ',exp.name_experiment) AS exp_name_experiment,
+            exp.identifier_type AS exp_identifier_type,
+            exp.test_group AS exp_test_group,
+            visit.dt_created,
+            visit.ts_visit_first_confirmed,
+            visit.ts_visit_done,
+            visit.ts_visit_canceled,
+            visit.ts_visit_unsuccessful,
+            visit.ts_offer_submitted,
+            visit.ts_offer_accepted,
+            visit.ts_contract_signed,
+            exp.dt_started AS dt_exp_started,
+            exp.dt_ended AS dt_exp_ended
+        FROM
+            visit
+        JOIN
+            exp
+                ON exp.identifier_type = 'VISITOR'
+                AND visit.sk_visitor = exp.sk_identifier
+                AND visit.business_context = exp.business_context
+                AND visit.dt_created::DATE >= exp.dt_started
+                AND visit.dt_created::DATE <= exp.dt_ended
+    ),
+    visit_by_visit AS (
+        SELECT
+            exp.sk_neotribe_exp,
+            visit.sk_visit,
+            visit.sk_house,
+            visit.sk_visitor,
+            visit.sk_owner,
+            visit.sk_first_associated_agent,
+            exp.sk_identifier AS sk_exp_identifier,
+            visit.business_context,
+            exp.name_neotribe AS exp_name_neotribe,
+            CONCAT(exp.sk_experiment,' | ',exp.name_experiment) AS exp_name_experiment,
+            exp.identifier_type AS exp_identifier_type,
+            exp.test_group AS exp_test_group,
+            visit.dt_created,
+            visit.ts_visit_first_confirmed,
+            visit.ts_visit_done,
+            visit.ts_visit_canceled,
+            visit.ts_visit_unsuccessful,
+            visit.ts_offer_submitted,
+            visit.ts_offer_accepted,
+            visit.ts_contract_signed,
+            exp.dt_started AS dt_exp_started,
+            exp.dt_ended AS dt_exp_ended
+        FROM
+            visit
+        JOIN
+            exp
+                ON exp.identifier_type = 'VISIT'
+                AND visit.sk_visit = exp.sk_identifier
+                AND visit.business_context = exp.business_context
+                AND visit.dt_created::DATE >= exp.dt_started
+                AND visit.dt_created::DATE <= exp.dt_ended
     )
     SELECT
         sk_neotribe_exp,
@@ -106,6 +141,32 @@ visit_exp AS (
         dt_exp_ended
     FROM
         visit_by_visitor
+    UNION ALL
+    SELECT
+        sk_neotribe_exp,
+        sk_visit,
+        sk_house,
+        sk_visitor,
+        sk_owner,
+        sk_first_associated_agent,
+        sk_exp_identifier,
+        business_context,
+        exp_name_neotribe,
+        exp_name_experiment,
+        exp_identifier_type,
+        exp_test_group,
+        dt_created,
+        ts_visit_first_confirmed,
+        ts_visit_done,
+        ts_visit_canceled,
+        ts_visit_unsuccessful,
+        ts_offer_submitted,
+        ts_offer_accepted,
+        ts_contract_signed,
+        dt_exp_started,
+        dt_exp_ended
+    FROM
+        visit_by_visit
 ),
 exp_cohort AS (
     SELECT

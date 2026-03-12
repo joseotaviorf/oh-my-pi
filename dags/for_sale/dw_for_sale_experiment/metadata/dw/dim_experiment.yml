@@ -8,47 +8,47 @@ description: Dimension table containing experiment metadata for For Sale line ex
 columns:
   sk_neotribe_exp:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.id_neotribe
-      - datalake_for_sale_experiment.exp_visitor_identifier.id_experiment
-      - datalake_for_sale_experiment.exp_visitor_identifier.business_context
+      - datalake_for_sale_experiment.exp_identifier_unified.id_neotribe
+      - datalake_for_sale_experiment.exp_identifier_unified.id_experiment
+      - datalake_for_sale_experiment.exp_identifier_unified.business_context
     description: Key combining neotribe, experiment identifiers and business context for unique experiment identification.
   sk_neotribe:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.id_neotribe
+      - datalake_for_sale_experiment.exp_identifier_unified.id_neotribe
     description: Key for the neotribe conducting the experiment.
   sk_experiment:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.id_experiment
+      - datalake_for_sale_experiment.exp_identifier_unified.id_experiment
     description: Key for the specific experiment within the neotribe.
   name_neotribe:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.name_neotribe
+      - datalake_for_sale_experiment.exp_identifier_unified.name_neotribe
     description: Name of the neotribe responsible for the experiment.
   name_experiment:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.name_experiment
+      - datalake_for_sale_experiment.exp_identifier_unified.name_experiment
     description: Descriptive name of the experiment being conducted.
   identifier_type:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.identifier_type
+      - datalake_for_sale_experiment.exp_identifier_unified.identifier_type
     description: Type of identifier used for experiment participants (e.g. VISITOR, AGENT, HOUSE).
   business_context:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.business_context
+      - datalake_for_sale_experiment.exp_identifier_unified.business_context
     description: Business context in which the experiment is being conducted (e.g. RENT, SALE).
   documentation_link:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.documentation_link
+      - datalake_for_sale_experiment.exp_identifier_unified.documentation_link
     description: Link to detailed experiment documentation and specifications.
   additional_information:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.additional_information
+      - datalake_for_sale_experiment.exp_identifier_unified.additional_information
     description: Additional context and methodology information about the experiment design and implementation.
   dt_started:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.dt_started
+      - datalake_for_sale_experiment.exp_identifier_unified.dt_started
     description: Start date of the experiment.
   dt_ended:
     lineage:
-      - datalake_for_sale_experiment.exp_visitor_identifier.dt_ended
+      - datalake_for_sale_experiment.exp_identifier_unified.dt_ended
     description: End date of the experiment. or current date if the experiment is ongoing.
