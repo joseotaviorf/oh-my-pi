@@ -1,0 +1,34 @@
+---
+table_name: dw_3p_supply.dim_lead_3p
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_lead_3p:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  has_3p_access_control:
+    is_complete:
+      severity_level: Error
+  ts_lead_created:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

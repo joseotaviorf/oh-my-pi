@@ -38,6 +38,14 @@ bietlejuice.cyber_complement:
   - bietlejuice.cyber:load-raw-uda1:first-run-of-day
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:first-run-of-day
+bietlejuice.dw_3p_supply:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-first-lead-per-contract:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-lead-3p-status-changes:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-lead-3p:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-listing-draft-status:first-run-of-day
+  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day

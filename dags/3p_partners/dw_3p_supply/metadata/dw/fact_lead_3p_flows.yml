@@ -1,0 +1,146 @@
+---
+database_name: dw_3p_supply
+table_name: fact_lead_3p_flows
+description: Fact table for 3P Supply lead flows. One row per lead and business context (SALE/RENT) with surrogate keys, flags, and BSP/main timestamps for funnel analysis.
+domain: 3P Partners
+owner: patrick.nasser@quintoandar.com.br
+columns:
+  sk_lead_3p_flow:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_lead_3p
+      - datalake_3p_supply.lead_3p_status_changes.business_context
+    description: Primary key; lead flow surrogate (id_lead_3p * 10 for SALE, id_lead_3p * 10 + 1 for RENT).
+  sk_lead_3p:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_lead_3p
+    description: Surrogate key of the lead; join to dim_lead_3p.
+  sk_region:
+    lineage:
+      - datalake_3p_supply.lead_3p.region_id
+    description: Surrogate key for region; -1 when region_id is null.
+  sk_house:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_house
+    description: Surrogate key for house in EBDB; -1 when id_house is null.
+  sk_house_duplicated:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.id_duplicated_house
+    description: Surrogate key for duplicate house when lead was marked duplicate; -1 otherwise.
+  sk_person_owner_agent:
+    lineage:
+      - datalake_person.person_sks.sk_person
+    description: Surrogate key of the owner agent person; -1 when not linked.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+    description: Surrogate key of the broker; -1 when not linked.
+  sk_company:
+    lineage:
+      - datalake_company.company_sks.sk_company
+    description: Surrogate key of the company; -1 when not linked.
+  lead_hash:
+    lineage:
+      - datalake_3p_supply.lead_3p.lead_hash
+    description: Hash used for lead deduplication across submissions.
+  business_context:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.business_context
+    description: Business context of the flow (SALE or RENT).
+  is_valid_lead_occurrence:
+    lineage:
+      - datalake_3p_supply.first_lead_per_contract.is_valid_lead_occurrence
+    description: True when this lead is the first valid occurrence per contract.
+  is_opportunity:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_opportunity
+    description: True when lead is NOT_CONVERTED with eligible pendings and no not-eligible.
+  is_eligible_pending:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_eligible_pending
+    description: True when status has at least one eligible pending reason.
+  is_not_eligible_pending:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_not_eligible_pending
+    description: True when status has at least one not-eligible pending reason.
+  is_first_listing_published_through_portfolio_manager:
+    lineage:
+      - datalake_3p_supply.listing_draft_status.is_first_listing_published_through_portfolio_manager
+    description: True when first publication was via portfolio-manager-api.
+  has_lead_house_conflicts:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_lead_house_conflicts
+    description: True when the lead has house conflict flags.
+  has_3p_access_control:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_3p_access_control
+    description: Access control flag for 3P data; always true in this table.
+  ts_unpublished_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_unpublished_in_bsp
+    description: Timestamp when lead was unpublished in BSP.
+  ts_discarded_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_discarded_in_bsp
+    description: Timestamp when lead was discarded in BSP.
+  ts_suspended_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_suspended_in_bsp
+    description: Timestamp when lead was suspended in BSP.
+  ts_first_not_converted_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_first_not_converted_in_bsp
+    description: First timestamp when lead entered NOT_CONVERTED in BSP.
+  ts_last_not_converted_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_last_not_converted_in_bsp
+    description: Last timestamp when lead was NOT_CONVERTED in BSP.
+  ts_first_processing_photos_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_first_processing_photos_in_bsp
+    description: First timestamp when lead entered PROCESSING (photos) in BSP.
+  ts_last_processing_photos_in_bsp:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_last_processing_photos_in_bsp
+    description: Last timestamp when lead was in PROCESSING (photos) in BSP.
+  ts_first_registered_from_bsp_to_main:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_first_registered_from_bsp_to_main
+    description: First timestamp when lead was registered from BSP to main.
+  ts_availability_check_start:
+    lineage:
+      - datalake_3p_supply.listing_draft_status.ts_availability_start
+    description: Start of availability window (listing in EDITING/WAITING_CONFIRMATION).
+  ts_availability_check_end:
+    lineage:
+      - datalake_3p_supply.listing_draft_status.ts_availability_end
+    description: End of availability window for the listing draft.
+  ts_first_listing:
+    lineage:
+      - datalake_3p_supply.listing_draft_status.ts_first_listing
+    description: First publication timestamp of the listing in main.
+  ts_lead_created:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_lead_created
+    description: Timestamp when the lead was created.
+  ts_lead_updated:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_lead_updated
+    description: Timestamp when the lead was last updated.
+  ts_business_context_created:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_business_context_created
+    description: Timestamp when the business context was created for this lead.
+  ts_load:
+    description: Timestamp when the row was loaded by this DAG.
+  year:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_start
+    description: Partition year derived from ts_start.
+  month:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_start
+    description: Partition month derived from ts_start.
+  day:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.ts_start
+    description: Partition day derived from ts_start.

@@ -1,0 +1,197 @@
+---
+database_name: dw_3p_supply
+table_name: dim_lead_3p
+description: Dimension of 3P leads with property attributes, location, pricing, blueprint, owner and access info. One row per lead from datalake_3p_supply.lead_3p.
+domain: 3P Partners
+owner: patrick.nasser@quintoandar.com.br
+columns:
+  sk_lead_3p:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_lead_3p
+    description: Primary key; surrogate key of the lead.
+  sk_house:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_house
+    description: Surrogate key for house in EBDB; -1 when id_house is null.
+  cnpj:
+    lineage:
+      - datalake_3p_supply.lead_3p.cnpj
+    description: CNPJ of the partner company that submitted the lead.
+  address:
+    lineage:
+      - datalake_3p_supply.lead_3p.address
+    description: Street address of the property from lead location data.
+  number:
+    lineage:
+      - datalake_3p_supply.lead_3p.number
+    description: Street number of the property from lead location data.
+  floor:
+    lineage:
+      - datalake_3p_supply.lead_3p.floor
+    description: Floor number of the property from lead location data.
+  complement:
+    lineage:
+      - datalake_3p_supply.lead_3p.complement
+    description: Address complement (e.g. apartment) from lead location data.
+  neighborhood:
+    lineage:
+      - datalake_3p_supply.lead_3p.neighborhood
+    description: Neighborhood name of the property from lead location data.
+  city:
+    lineage:
+      - datalake_3p_supply.lead_3p.city
+    description: City name of the property from lead location data.
+  state_acronym:
+    lineage:
+      - datalake_3p_supply.lead_3p.state_acronym
+    description: State acronym (e.g. SP, RJ) of the property from lead location data.
+  country:
+    lineage:
+      - datalake_3p_supply.lead_3p.country
+    description: Country name of the property from lead location data.
+  country_code:
+    lineage:
+      - datalake_3p_supply.lead_3p.country_code
+    description: Country ISO code (e.g. BR) of the property from lead location data.
+  zip_code:
+    lineage:
+      - datalake_3p_supply.lead_3p.zip_code
+    description: Postal code (CEP) of the property from lead location data.
+  rent_price:
+    lineage:
+      - datalake_3p_supply.lead_3p.rent
+    description: Monthly rent value from lead pricing data.
+  sale_price:
+    lineage:
+      - datalake_3p_supply.lead_3p.sale_price
+    description: Sale price from lead pricing data.
+  condo_price:
+    lineage:
+      - datalake_3p_supply.lead_3p.condo_price
+    description: Condominium fee from lead pricing data.
+  total_area:
+    lineage:
+      - datalake_3p_supply.lead_3p.total_area
+    description: Total area of the property from lead blueprint data.
+  bedrooms:
+    lineage:
+      - datalake_3p_supply.lead_3p.bedrooms
+    description: Number of bedrooms from lead blueprint data.
+  suites:
+    lineage:
+      - datalake_3p_supply.lead_3p.suites
+    description: Number of suites from lead blueprint data.
+  bathrooms:
+    lineage:
+      - datalake_3p_supply.lead_3p.bathrooms
+    description: Number of bathrooms from lead blueprint data.
+  garages:
+    lineage:
+      - datalake_3p_supply.lead_3p.garages
+    description: Number of garages from lead blueprint data.
+  house_type:
+    lineage:
+      - datalake_3p_supply.lead_3p.house_type
+    description: Type of property (e.g. APARTAMENTO, CASA) from lead blueprint data.
+  owner_person_type:
+    lineage:
+      - datalake_3p_supply.lead_3p.owner_person_type
+    description: Person type of the lead owner (e.g. NATURAL_PERSON).
+  owner_agent_relationship:
+    lineage:
+      - datalake_3p_supply.lead_3p.owner_agent_relationship
+    description: Relationship between owner and agent from lead data.
+  access_type:
+    lineage:
+      - datalake_3p_supply.lead_3p.access_type
+    description: Access type of the property from lead access data.
+  authorization_type:
+    lineage:
+      - datalake_3p_supply.lead_3p.authorization_type
+    description: Authorization type (e.g. FRONT_DOOR) from lead access data.
+  occupant_type:
+    lineage:
+      - datalake_3p_supply.lead_3p.occupant_type
+    description: Occupant type (e.g. OWNER) from lead access data.
+  condominium:
+    lineage:
+      - datalake_3p_supply.lead_3p.condominium
+    description: Condominium name from lead brokers data.
+  construction_year:
+    lineage:
+      - datalake_3p_supply.lead_3p.construction_year
+    description: Year of construction from lead data.
+  block:
+    lineage:
+      - datalake_3p_supply.lead_3p.block
+    description: Block identifier from lead location data.
+  tower:
+    lineage:
+      - datalake_3p_supply.lead_3p.tower
+    description: Tower identifier from lead location data.
+  is_out_of_area:
+    lineage:
+      - datalake_3p_supply.lead_3p.is_out_of_area
+    description: True when the property is out of QuintoAndar operational area.
+  is_iptu_not_paid:
+    lineage:
+      - datalake_3p_supply.lead_3p.is_iptu_not_paid
+    description: True when IPTU is reported as not paid.
+  has_restriction:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_restriction
+    description: True when the property has restriction flags.
+  has_balcony:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_balcony
+    description: True when the property has a balcony.
+  is_furnished:
+    lineage:
+      - datalake_3p_supply.lead_3p.is_furnished
+    description: True when the property is furnished.
+  is_habitat:
+    lineage:
+      - datalake_3p_supply.lead_3p.is_habitat
+    description: True when the property is in the Habitat program.
+  has_agency_key:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_agency_key
+    description: True when the agency has a key to the property.
+  has_concierge:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_concierge
+    description: True when the property has concierge service.
+  has_3p_access_control:
+    lineage:
+      - datalake_3p_supply.lead_3p.has_3p_access_control
+    description: Access control flag for 3P data; always true in this table.
+  ts_lead_created:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_lead_created
+    description: Timestamp when the lead was created.
+  ts_lead_updated:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_lead_updated
+    description: Timestamp when the lead was last updated.
+  ts_sale_business_context_created:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_sale_business_context_created
+    description: Timestamp when the SALE business context was created for this lead.
+  ts_rent_business_context_created:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_rent_business_context_created
+    description: Timestamp when the RENT business context was created for this lead.
+  ts_load:
+    description: Timestamp when the row was loaded by this DAG.
+  year:
+    lineage:
+      - datalake_3p_supply.lead_3p.year
+    description: Partition year from source lead table.
+  month:
+    lineage:
+      - datalake_3p_supply.lead_3p.month
+    description: Partition month from source lead table.
+  day:
+    lineage:
+      - datalake_3p_supply.lead_3p.day
+    description: Partition day from source lead table.
