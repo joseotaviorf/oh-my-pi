@@ -1,0 +1,27 @@
+---
+table_name: datalake_3p_supply.first_lead_per_contract
+alert_channel: "#alerts-de-airflow-3p-partners"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 20
+    severity_level: Warning
+
+column_level_validations:
+  id_lead_3p:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ["SALE", "RENT", "SALE_PRIMARY_MARKET"]
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

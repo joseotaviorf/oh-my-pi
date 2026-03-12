@@ -1,6 +1,6 @@
 ---
-table_name: datalake_3p_supply.lead_3p_status_changes
-alert_channel: "#alerts-de-airflow-dags"
+table_name: datalake_3p_supply.listing_draft_status
+alert_channel: "#alerts-de-airflow-3p-partners"
 
 table_level_validations:
   has_size:
@@ -13,7 +13,7 @@ table_level_validations:
     severity_level: Warning
 
 column_level_validations:
-  id_lead_3p:
+  id_house:
     is_complete:
       severity_level: Error
   business_context:
@@ -22,21 +22,18 @@ column_level_validations:
     is_contained_in:
       values: ["SALE", "RENT", "SALE_PRIMARY_MARKET"]
       severity_level: Error
-  status:
-    is_complete:
-      severity_level: Error
-  reason_macro:
-    is_complete:
-      severity_level: Error
-    is_contained_in:
-      values: ["DUPLICATED", "NO_OPERATIONAL_INTEREST", "PHOTOS", "OWNER_INFO", "LISTING_INFO", "OTHER", "N/A"]
-      severity_level: Error
-  ts_start:
-    is_complete:
-      severity_level: Error
-  has_3p_access_control:
-    is_complete:
-      severity_level: Error
   ts_load:
     is_complete:
+      severity_level: Error
+  id_house_business_context_unique:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_house, business_context, COUNT(*) AS cnt
+           FROM datalake_3p_supply.listing_draft_status
+           GROUP BY id_house, business_context
+           HAVING cnt > 1
+         )
+        ) = 0
       severity_level: Error

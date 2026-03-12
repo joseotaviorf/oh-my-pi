@@ -1,0 +1,55 @@
+---
+database_name: datalake_3p_supply
+table_name: listing_draft_status
+owner: patrick.nasser@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Pre-computed house-level listing status for 3P leads. One row per (id_house, business_context)
+  with current main status, availability timestamps, and first listing publication tracking.
+
+  **Sources**:
+  - datalake_ebdb_clean.listing_business_context_aud (listing lifecycle audit)
+  - datalake_ebdb_clean.listing_business_context (ownership and current status)
+  - datalake_3p_supply.lead_3p (inner dependency: house filtering)
+  - datalake_ebdb_clean.user_revision_entity (portfolio manager detection)
+
+  **Key features**:
+  - Granularity: one row per (id_house, business_context)
+  - current_main_status / current_main_status_reason from listing_business_context
+  - Detects whether the listing was first published through portfolio-manager-api
+  - Availability start (EDITING + WAITING_CONFIRMATION) and end timestamps
+  - First publication timestamp for PUBLISHED listings
+
+columns:
+  id_house:
+    description: "House ID in EBDB (long)"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+  business_context:
+    description: "Business context (SALE, RENT)"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.business_context
+  current_main_status:
+    description: "Current listing status in main system (e.g. EDITING, PUBLISHED, OPTED_OUT)"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+  current_main_status_reason:
+    description: "Reason for current main status (e.g. WAITING_CONFIRMATION, REMOVED_FROM_CONTEXT_BEFORE_PUBLISHING)"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status_reason
+  is_first_listing_published_through_portfolio_manager:
+    description: "Whether the first publication was triggered by portfolio-manager-api service (boolean)"
+  ts_availability_start:
+    description: "Earliest timestamp when listing entered EDITING status with WAITING_CONFIRMATION reason"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_created
+  ts_availability_end:
+    description: "Earliest timestamp when listing left EDITING/PUBLISHED status (ts_last_status_changed or ts_first_publication)"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_last_status_changed
+  ts_first_listing:
+    description: "Earliest first publication timestamp for listings in PUBLISHED status"
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+  ts_load:
+    description: "Timestamp when the record was processed by this DAG"

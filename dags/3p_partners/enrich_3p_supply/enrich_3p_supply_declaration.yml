@@ -9,36 +9,43 @@ dag:
 
       Tables:
       - lead_3p: Flattened lead data with all JSON columns (location, pricing, blueprint,
-        owner, access, brokers, details, owner_agent) exploded into individual columns.
+        owner, access, brokers, details, owner_agent) exploded into individual columns,
+        joined with house and business context detail (SALE/RENT).
       - lead_3p_status_changes: Status change history per lead and business context,
-        with start/end timestamps and parsed status reasons (pending vs not-eligible).
-      - listing_draft_events: Lead-to-house mapping via EBDB, availability check/resolution
-        timestamps, first listing events, and CDI ownership tracking.
+        with start/end timestamps, parsed status reasons, macro reason classification,
+        is_opportunity flag, and BSP-stage timestamps (ts_first_registered_from_bsp_to_main, etc.).
+      - listing_draft_status: House-to-listing mapping via EBDB with current main status,
+        availability start/end timestamps, first listing events, and portfolio manager publishing.
+      - first_lead_per_contract: Maps each lead and business context to the most recent
+        active broker contract and flags the first valid lead occurrence per contract.
 workflow:
   type: query_delta
   layer: enrich
-  spark_job_arguments:
-  - '{environment}'
-  - '{bucket}'
-  - '{schema}'
-  - '{dag_name}'
-  - '{table_name}'
+  inner_dependencies:
+    listing_draft_status:
+      - lead_3p
+    first_lead_per_contract:
+      - lead_3p
+      - lead_3p_status_changes
   tables_customization:
     lead_3p:
-      load_spark_job: load_lead_3p
+      merge_on: ["id_lead_3p"]
+      when_matched_update_condition: "source.ts_lead_updated > target.ts_lead_updated"
       partitions: ["year", "month", "day"]
       z_order_by: ["id_lead_3p"]
     lead_3p_status_changes:
-      load_spark_job: load_lead_3p_status_changes
+      merge_on: ["id_lead_3p", "business_context", "ts_start"]
       partitions: ["year", "month", "day"]
       z_order_by: ["id_lead_3p"]
-    listing_draft_events:
-      load_spark_job: load_listing_draft_events
-      partitions: ["year", "month", "day"]
+    listing_draft_status:
+      merge_on: ["id_house", "business_context"]
+      z_order_by: ["id_house"]
+    first_lead_per_contract:
+      merge_on: ["id_lead_3p", "business_context"]
       z_order_by: ["id_lead_3p"]
 cluster:
   type: databricks_16_4_min_memory_cluster
-  databricks_conn_id: databricks_new
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: USER_ISOLATION

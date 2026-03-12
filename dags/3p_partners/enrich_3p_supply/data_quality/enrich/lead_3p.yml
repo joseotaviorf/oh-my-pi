@@ -40,10 +40,10 @@ column_level_validations:
   has_3p_access_control:
     is_complete:
       severity_level: Error
-  ts_created:
+  ts_lead_created:
     is_complete:
       severity_level: Error
-  ts_updated:
+  ts_lead_updated:
     is_complete:
       severity_level: Error
   ts_load:

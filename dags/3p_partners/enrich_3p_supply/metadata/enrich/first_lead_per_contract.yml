@@ -1,0 +1,49 @@
+---
+database_name: datalake_3p_supply
+table_name: first_lead_per_contract
+owner: patrick.nasser@quintoandar.com.br
+domain: 3P Partners
+description: |
+  Maps each 3P lead and business context to the most recent active broker contract
+  (from broker_status_history) and flags the first valid lead occurrence per
+  (lead_hash, uuid_company, business_context, contract start).
+
+  **Sources**:
+  - datalake_3p_supply.lead_3p (inner dependency)
+  - datalake_3p_supply.lead_3p_status_changes (inner dependency, current status only)
+  - datalake_brokers.broker_status_history (active broker periods)
+  - core_brokers.brokers (company-to-broker mapping via uuid_company)
+
+  **Key features**:
+  - One row per (id_lead_3p, business_context) with the latest matching active contract
+  - sk_broker and ts_partner_contract_start from broker_status_history
+  - is_valid_lead_occurrence: TRUE when this lead is the first post-contract for (lead_hash, uuid_company, business_context, ts_partner_contract_start)
+  - ts_first_valid_post_contract: earliest ts_business_context_created in that group
+
+columns:
+  id_lead_3p:
+    description: "Lead ID (long), references lead_3p.id_lead_3p"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
+  business_context:
+    description: "Business context (SALE, RENT)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.business_context
+  sk_broker:
+    description: "Surrogate key of the broker from core_brokers.brokers"
+    lineage:
+      - core_brokers.brokers.sk_broker
+  ts_partner_contract_start:
+    description: "Start timestamp of the active broker status period (contract start)"
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+  ts_business_context_created:
+    description: "Business context detail creation timestamp (America/Sao_Paulo timezone)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.ts_created
+  ts_first_valid_post_contract:
+    description: "Earliest ts_business_context_created for the same (lead_hash, uuid_company, business_context, ts_partner_contract_start)"
+  is_valid_lead_occurrence:
+    description: "TRUE when this lead is the first occurrence post-contract for that group (boolean)"
+  ts_load:
+    description: "Timestamp when the record was processed by this DAG"
