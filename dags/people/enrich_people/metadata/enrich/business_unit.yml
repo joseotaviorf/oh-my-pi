@@ -1,0 +1,78 @@
+---
+database_name: datalake_people
+table_name: business_unit
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Enriched SCD Type 2 history of business units.
+  In this context, business units are local branches within each country legal entity and are
+  the most used concept for official headcount allocation.
+  Each row represents one version of a business unit with validity interval
+  (dt_valid_from, dt_valid_to), recency order (version_order), and current-state flag (is_current).
+columns:
+  id_organization:
+    description: Unique identifier of the business unit.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.id_organization
+  id_legal_entity:
+    description: Identifier of the legal entity to which the business unit belongs.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.id_legal_entity
+  organization_code:
+    description: Business code identifying the organization.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.organization_code
+  business_unit_name:
+    description: Business unit name.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.name
+  legislation_code:
+    description: Legislation code associated with the legal entity context.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.legislation_code
+  organization_type:
+    description: Internal or external organization flag.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.organization_type
+  created_by:
+    description: User who created the source row.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.created_by
+  updated_by:
+    description: User who last updated the source row.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.updated_by
+  version_order:
+    description: Chronological order of versions by id_organization (1 = oldest version; higher values are more recent versions).
+    lineage:
+      - datalake_pin_core_clean.hr_organization.dt_effective_ended
+      - datalake_pin_core_clean.hr_organization.dt_effective_started
+      - datalake_pin_core_clean.hr_organization.id_organization
+  is_active:
+    description: Boolean flag indicating if the business unit is active.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.is_active
+  is_current:
+    description: Boolean flag for the current version, defined as the highest version_order whose dt_valid_from is not in the future.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.dt_effective_ended
+      - datalake_pin_core_clean.hr_organization.dt_effective_started
+      - datalake_pin_core_clean.hr_organization.id_organization
+  dt_valid_from:
+    description: Start date of the validity interval for this version.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.dt_effective_started
+  dt_valid_to:
+    description: End date of the validity interval; NULL for open-ended current version.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.dt_effective_ended
+  ts_created:
+    description: Source timestamp when the row was created.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.ts_created
+  ts_updated:
+    description: Source timestamp when the row was last updated.
+    lineage:
+      - datalake_pin_core_clean.hr_organization.ts_updated
+  ts_load:
+    description: Timestamp when the row was loaded into the enrich table.

@@ -116,7 +116,7 @@ SELECT
     headcount_type,
     is_active,
     MIN(dt_valid_from) AS dt_valid_from,
-    NULLIF(MAX(COALESCE(dt_valid_to, DATE '4712-12-31')), DATE '4712-12-31') AS dt_valid_to,
+    COALESCE(MAX(dt_valid_to), DATE '9999-12-31') AS dt_valid_to,
     BOOL_OR(dt_valid_to IS NULL) AS is_current,
     MIN(ts_created) AS ts_created,
     NOW() AS ts_load

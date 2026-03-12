@@ -1,0 +1,46 @@
+---
+table_name: datalake_people.business_unit
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  id_organization:
+    is_complete:
+      severity_level: Error
+  business_unit_name:
+    is_complete:
+      severity_level: Error
+  is_active:
+    is_complete:
+      severity_level: Warning
+  version_order:
+    is_complete:
+      severity_level: Warning
+  is_current:
+    is_complete:
+      severity_level: Warning
+  dt_valid_from:
+    is_complete:
+      severity_level: Error
+  dt_valid_to:
+    # SCD2 validity: when end date is set, it must be strictly after start date.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.business_unit
+         WHERE dt_valid_to IS NOT NULL
+           AND dt_valid_to <= dt_valid_from
+        ) = 0
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

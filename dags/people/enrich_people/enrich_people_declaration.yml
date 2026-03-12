@@ -51,3 +51,6 @@ workflow:
     job_with_salary_table:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    business_unit:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

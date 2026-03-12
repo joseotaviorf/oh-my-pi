@@ -1,0 +1,21 @@
+---
+database_name: dw_organization
+table_name: dim_business_unit
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Business unit dimension in DW organization schema.
+  In this context, business units are local branches within each country legal entity and are
+  the most used concept for official headcount allocation.
+  Contains one row per current business unit (SCD Type 1).
+columns:
+  sk_business_unit:
+    description: Surrogate key of the business unit (mapped from id_organization).
+    lineage:
+      - datalake_people.business_unit.id_organization
+  business_unit_name:
+    description: Business unit name.
+    lineage:
+      - datalake_people.business_unit.business_unit_name
+  ts_load:
+    description: Timestamp when the row was loaded into the DW dimension.

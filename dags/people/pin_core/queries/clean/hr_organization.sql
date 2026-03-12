@@ -14,6 +14,7 @@ SELECT
     last_updated_by AS updated_by,
     internal_external_flag AS organization_type,
     CAST(object_version_number AS INT) AS object_version_number,
+    status = 'A' AS is_active,
     TO_DATE(effective_start_date) AS dt_effective_started,
     TO_DATE(effective_end_date) AS dt_effective_ended,
     TO_TIMESTAMP(creation_date) AS ts_created,
