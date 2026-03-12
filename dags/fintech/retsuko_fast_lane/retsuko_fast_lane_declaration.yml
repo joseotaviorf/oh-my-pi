@@ -32,6 +32,10 @@ workflow:
       clean_primary_keys: [id]
       clean_table_name: invoice
       clean_z_order_by: [id_contract, ts_due]
+    entry_partitioned:
+      clean_primary_keys: [id]
+      clean_table_name: entry_partitioned
+      clean_z_order_by: [ts_created]
 cluster:
   type: databricks_16_4_rfleet_instance_cluster
   databricks_conn_id: databricks_new
