@@ -1,0 +1,36 @@
+---
+database_name: dw_organization
+table_name: dim_job
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Job dimension in the DW organization schema (SCD Type 1).
+  Contains one row per job, representing the most recent version of each job's attributes.
+  Use sk_job to join to fact tables such as dw_people.fact_employee.
+columns:
+  sk_job:
+    description: Surrogate key of the job (mapped from id_job in the source system).
+    lineage:
+      - datalake_people.job_with_salary_table.id_job
+  job_name:
+    description: Job name in English.
+    lineage:
+      - datalake_people.job_with_salary_table.job_name
+  job_family:
+    description: Job family to which the job belongs.
+    lineage:
+      - datalake_people.job_with_salary_table.job_family
+  career_track:
+    description: Career track of the job (contribution level in the source system).
+    lineage:
+      - datalake_people.job_with_salary_table.career_track
+  is_active:
+    description: Indicates whether the job is active in the source system.
+    lineage:
+      - datalake_people.job_with_salary_table.is_active
+  ts_updated:
+    description: Timestamp of the last attribute change for this job, derived from the start of the current valid period.
+    lineage:
+      - datalake_people.job_with_salary_table.dt_valid_from
+  ts_load:
+    description: Timestamp when the row was loaded into the DW dimension.

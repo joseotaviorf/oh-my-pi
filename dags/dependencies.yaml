@@ -823,6 +823,7 @@ bietlejuice.dw_offer:
 bietlejuice.dw_organization:
   - bietlejuice.enrich_gsheets_people:load-enrich-codex-log:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-business-unit:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-organization-units:first-run-of-day
   - bietlejuice.pin_core:load-clean-assignment-responsibility:first-run-of-day
   - bietlejuice.pin_core:load-clean-hr-organization:first-run-of-day
@@ -1830,7 +1831,9 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
+  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
@@ -1842,8 +1845,6 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-credential-reference:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
-  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
-  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
 bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
