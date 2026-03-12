@@ -22,7 +22,6 @@ EXPECTED_OUTPUT_COLUMNS = {
     "country_code",
     "country_name",
     "country_default_timezone",
-    "hub_name",
     "has_rent_operation",
     "has_sale_operation",
     "ts_region_created",
@@ -38,7 +37,7 @@ class TestCoreRegionSparkJobConfig:
     """Tests focused on job configuration and initialisation."""
 
     def test_get_region_config_returns_expected_keys(self, mock_configuration_service):
-        """get_region_config must return all 7 configuration keys."""
+        """get_region_config must return all 5 configuration keys."""
         job = CoreRegionSparkJob()
         config = job.get_region_config()
 
@@ -48,8 +47,6 @@ class TestCoreRegionSparkJobConfig:
             "REGION_BUSINESS_CONTEXTS_TABLE",
             "STATE_TABLE",
             "COUNTRY_TABLE",
-            "BUSINESS_UNIT_REGION_TABLE",
-            "BUSINESS_UNIT_TABLE",
         ]
         for key in expected_keys:
             assert key in config, f"Config should contain '{key}'"
@@ -166,7 +163,7 @@ class TestCreateCoreModelBasic:
         table_side_effect,
         mock_surrogate_keys_helper,
     ):
-        """create_core_model must read all 6 distinct source tables."""
+        """create_core_model must read all 4 distinct source tables."""
         read_tables = []
 
         def recording_side_effect(table_name):
@@ -183,8 +180,6 @@ class TestCreateCoreModelBasic:
             "test.region_business_context_served",
             "test.state",
             "test.country",
-            "test.business_unit_region",
-            "test.business_unit",
         }
         assert expected_tables == set(
             read_tables
@@ -202,8 +197,6 @@ class TestCreateCoreModelFilters:
         region_business_contexts_df,
         state_df_with_unknown,
         country_df_with_null_code,
-        business_unit_region_df,
-        business_unit_df,
         mock_surrogate_keys_helper,
     ):
         """Regions whose country_code resolves to NULL must be excluded from the output."""
@@ -214,8 +207,6 @@ class TestCreateCoreModelFilters:
                 "test.region_business_context_served": region_business_contexts_df,
                 "test.state": state_df_with_unknown,
                 "test.country": country_df_with_null_code,
-                "test.business_unit_region": business_unit_region_df,
-                "test.business_unit": business_unit_df,
             }
             return mapping[table_name]
 
@@ -283,7 +274,7 @@ class TestCreateCoreModelBusinessContext:
 
 
 class TestCreateCoreModelJoins:
-    """Tests for join correctness (state, country, hierarchy, hub)."""
+    """Tests for join correctness (state, country, hierarchy)."""
 
     def test_state_and_country_columns_populated(self, core_model_df):
         """State and country attributes must be populated for all output rows."""
@@ -310,18 +301,6 @@ class TestCreateCoreModelJoins:
         assert (
             row[0]["id_state"] == 10
         ), "SubRegiao should inherit id_state=10 from the Cidade ancestor"
-
-    def test_hub_name_populated_when_region_has_business_unit(self, core_model_df):
-        """hub_name must be populated for a region linked to a business unit."""
-        row = core_model_df.filter(core_model_df["id_region"] == 1).collect()
-        assert len(row) == 1
-        assert row[0]["hub_name"] == "Hub SP"
-
-    def test_hub_name_null_when_no_business_unit(self, core_model_df):
-        """hub_name must be NULL for regions not linked to any business unit."""
-        row = core_model_df.filter(core_model_df["id_region"] == 2).collect()
-        assert len(row) == 1
-        assert row[0]["hub_name"] is None
 
     def test_country_code_value(self, core_model_df):
         """country_code must match the value from the country table."""

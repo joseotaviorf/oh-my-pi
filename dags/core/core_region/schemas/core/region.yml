@@ -63,11 +63,6 @@ columns:
     type: string
     required: true
 
-  # Business unit hub name
-  hub_name:
-    type: string
-    required: false
-
   # Has rent operation
   has_rent_operation:
     type: boolean
@@ -107,6 +102,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 21
-max_columns: 21
+min_columns: 20
+max_columns: 20
 strict: true

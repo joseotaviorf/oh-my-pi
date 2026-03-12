@@ -4,9 +4,9 @@ dag:
   owner: Data Platform
   documentation:
     dag_purpose: |
-      Creates the Region Core Model by processing region data from Main's tables (EBDB) and adding hub
-      information collected from from hub_services tables.
-      This model unifies listing_business_context data with region tables to provide a consolidated view.
+      Creates the Region Core Model by processing region data from Main's tables (EBDB) and unifying
+      with region_business_contexts_served to provide a consolidated view of regions with business
+      context. It only contains regions that have country information associated with it.
 
 workflow:
   type: core_model

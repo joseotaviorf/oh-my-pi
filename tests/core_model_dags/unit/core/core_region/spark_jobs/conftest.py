@@ -290,42 +290,6 @@ def region_df_with_unknown_state(spark_session):
 
 
 @pytest.fixture
-def business_unit_region_df(spark_session):
-    """Create a sample business_unit_region DataFrame for testing.
-
-    Region 1 (Moema) is linked to business unit 1000 → hub_name='Hub SP'.
-    Region 2 (Ibirapuera) has no hub assignment → hub_name=null.
-    """
-    schema = StructType(
-        [
-            StructField("id_region", LongType(), True),
-            StructField("id_business_unit", LongType(), True),
-        ]
-    )
-
-    data = [
-        (1, 1000),
-    ]
-    return spark_session.createDataFrame(data, schema)
-
-
-@pytest.fixture
-def business_unit_df(spark_session):
-    """Create a sample business_unit DataFrame for testing."""
-    schema = StructType(
-        [
-            StructField("id", LongType(), True),
-            StructField("hub_name", StringType(), True),
-        ]
-    )
-
-    data = [
-        (1000, "Hub SP"),
-    ]
-    return spark_session.createDataFrame(data, schema)
-
-
-@pytest.fixture
 def mock_configuration_service():
     """Mock BaseCoreModelSparkJob.get_config to return core_region config values."""
     with patch(
@@ -337,8 +301,6 @@ def mock_configuration_service():
             "REGION_BUSINESS_CONTEXTS_TABLE": "test.region_business_context_served",
             "STATE_TABLE": "test.state",
             "COUNTRY_TABLE": "test.country",
-            "BUSINESS_UNIT_REGION_TABLE": "test.business_unit_region",
-            "BUSINESS_UNIT_TABLE": "test.business_unit",
             "merge_on": ["id_region"],
             "when_matched_update_condition": "source.ts_updated > target.ts_updated",
             "z_order_by": ["id_region"],
@@ -367,8 +329,6 @@ def table_side_effect(
     region_business_contexts_df,
     state_df,
     country_df,
-    business_unit_region_df,
-    business_unit_df,
 ):
     """Return a callable that maps table names to their test DataFrames."""
 
@@ -378,8 +338,6 @@ def table_side_effect(
             "test.region_business_context_served": region_business_contexts_df,
             "test.state": state_df,
             "test.country": country_df,
-            "test.business_unit_region": business_unit_region_df,
-            "test.business_unit": business_unit_df,
         }
         if table_name not in mapping:
             raise ValueError(f"Unknown table requested in test: {table_name}")

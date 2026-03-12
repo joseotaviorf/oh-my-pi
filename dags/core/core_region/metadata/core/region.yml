@@ -2,7 +2,7 @@ database_name: core_region
 table_name: region
 domain: Data Platform
 owner: gustavo.alencar@quintoandar.com.br
-description: Region Core Model that provides a consolidated view of regions with business context and hub information.
+description: Region Core Model that provides a consolidated view of regions with business context.
   It only contains regions that have country information associated with it.
  
 columns:
@@ -37,9 +37,8 @@ columns:
   level:
     lineage:
       - datalake_ebdb_clean.region.level
-    description: Either SubRegiao (sub-region), MacroRegiao (macro-region) or Cidade (city). 
-      If level is Cidade, id_parent_region and hub_name are null because they are not applicable.
-      If level is MacroRegiao, hub_name is null because it is not applicable.
+    description: Either SubRegiao (sub-region), MacroRegiao (macro-region) or Cidade (city).
+      If level is Cidade, id_parent_region is null because it is not applicable.
     categories:
       Cidade: The region is a city.
       MacroRegiao: The region is a macroregion.
@@ -67,10 +66,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.country.default_timezone
     description: Region's country default timezone.
-  hub_name:
-    lineage:
-      - datalake_hub_services_clean.business_unit
-    description: Identification name of each performance hub.
   has_rent_operation:
     description: Boolean indicating if QuintoAndar operates with ForRent context in the given region (a region 
       can be exclusive to Rent, exclusive to Sale or served by both contexts). If true, indicates that there 

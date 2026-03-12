@@ -29,8 +29,6 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             "REGION_BUSINESS_CONTEXTS_TABLE": self.get_config("REGION_BUSINESS_CONTEXTS_TABLE"),
             "STATE_TABLE": self.get_config("STATE_TABLE"),
             "COUNTRY_TABLE": self.get_config("COUNTRY_TABLE"),
-            "BUSINESS_UNIT_REGION_TABLE": self.get_config("BUSINESS_UNIT_REGION_TABLE"),
-            "BUSINESS_UNIT_TABLE": self.get_config("BUSINESS_UNIT_TABLE"),
         }
 
     def _load_region_data(self, spark: SparkSession, config, args) -> DataFrame:
@@ -60,8 +58,6 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
         region_business_contexts_df = spark.table(config["REGION_BUSINESS_CONTEXTS_TABLE"])
         state_df = spark.table(config["STATE_TABLE"])
         country_df = spark.table(config["COUNTRY_TABLE"])
-        business_unit_region_df = spark.table(config["BUSINESS_UNIT_REGION_TABLE"])
-        business_unit_df = spark.table(config["BUSINESS_UNIT_TABLE"])
 
         # CTE business_context:
         business_context_df = (
@@ -101,17 +97,10 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             .join(c, col("c.id") == col("s.id_country"), "left")
         )
 
-        # Business context and hub joins
+        # Business context join
         bc = business_context_df.alias("bc")
-        br = business_unit_region_df.alias("br")
-        bu = business_unit_df.alias("bu")
 
-        joined_df = (
-            joined_df
-            .join(bc, col("bc.id_region") == col("r.id"), "left")
-            .join(br, col("br.id_region") == col("r.id"), "left")
-            .join(bu, col("bu.id") == col("br.id_business_unit"), "left")
-        )
+        joined_df = joined_df.join(bc, col("bc.id_region") == col("r.id"), "left")
 
         # Apply WHERE c.code IS NOT NULL
         filtered_df = joined_df.filter(col("c.code").isNotNull())
@@ -129,7 +118,6 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             col("c.code").alias("country_code"),
             col("c.name").alias("country_name"),
             col("c.default_timezone").alias("country_default_timezone"),
-            col("bu.hub_name"),
             when(col("bc.has_rent_operation_cnt") == 1, True)
             .otherwise(False)
             .alias("has_rent_operation"),

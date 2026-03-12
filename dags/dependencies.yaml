@@ -31,8 +31,6 @@ bietlejuice.core_region:
   - bietlejuice.ebdb_location:load-clean-region
   - bietlejuice.ebdb_location:load-clean-region-business-contexts-served
   - bietlejuice.ebdb_location:load-clean-state
-  - bietlejuice.hub_services:load-clean-business-unit
-  - bietlejuice.hub_services:load-clean-business-unit-region
 bietlejuice.core_visit:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log
