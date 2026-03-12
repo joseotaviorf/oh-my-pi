@@ -1,5 +1,5 @@
 ---
-description: Conventions for People domain DAGs (dags/people): schema layout, multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
+description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
 globs: dags/people/**/*
 alwaysApply: false
 ---
@@ -65,6 +65,24 @@ Do not assume one side is always correct; consider the business intent of both c
 ## DAG Dependencies
 
 When adding new dependencies to a DAG (e.g., new source tables, new inner_dependencies), always run `make dependencies-file` to update the dependencies manifest. This ensures CI and deployment pipelines have the correct dependency graph.
+
+---
+
+## New DAGs in People — Configuration
+
+When creating new DAGs in `dags/people/`, use the following configuration patterns (derived from existing People DAGs):
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| `bucket_config_name` | `people_bucket` | All People DAGs use the people bucket |
+| Cluster (query_delta, enrich, dw) | `databricks_16_4_small_memory_people_cluster` | Standard for SQL workloads |
+| Cluster (gsheets) | `databricks_16_4_medium_general_people_cluster` | GSheets DAGs need general + gsheets library |
+| Cluster (heavier pin_*) | `databricks_16_4_medium_memory_people_cluster` | pin_talent, pin_performance (larger datasets) |
+| Cluster (custom_ingestion) | `custom_cluster` or `databricks_16_4_small_memory_people_cluster` | API DAGs (greenhouse, degreed) often use custom; pin_* use smaller preset |
+| `databricks_conn_id` | `databricks_new_env` | For raw, clean, enrich, dw layers |
+| `credentials_scope` | `people` | For gsheets DAGs |
+
+**Rule:** People domain DAGs must use `*_people_cluster` variants (see `.cursor/rules/dag_build.mdc`). Never use generic clusters outside the People IAM scope.
 
 ---
 
@@ -136,11 +154,78 @@ When the source does not distinguish requested period vs actual period, use a **
 
 ---
 
+## Source Systems — API Reference Links
+
+| Source | DAG(s) | API Documentation |
+|--------|--------|-------------------|
+| Degreed | `degreed` | https://developer.degreed.com/docs/getting-started-with-the-api |
+| Greenhouse v3 | `greenhouse_v3` | https://harvestdocs.greenhouse.io |
+| Greenhouse Audit Log | `greenhouse_audit_log` | https://support.greenhouse.io/hc/en-us/articles/15114161286043-Use-audit-log-with-API |
+| Oracle HCM Cloud | `pin_*` (pin_core, pin_compensation, pin_absence, etc.) | https://docs.oracle.com/en/cloud/saas/human-resources/oedmh/hcm-tables-and-views.html |
+
+**When data is missing from raw/clean:** If the user needs a field that does not exist in the current raw or clean layer, help them locate it in the API documentation above. Use the appropriate source link for the DAG in question (Degreed, Greenhouse, Oracle HCM) to identify endpoints, tables, or fields that may contain the required data.
+
+**When raw ingestion fails:** If there are ingestion errors in the raw layer, search the API documentation above (via web fetch or similar) to find possible causes and solutions. Use the source link that matches the failing DAG to check rate limits, authentication, pagination, schema changes, or known issues.
+
+---
+
 ## Source Systems
 
 ### pin_ DAGs — Oracle HCM
 
-DAGs whose names start with `pin_` (e.g. `pin_core`) are based on Oracle database tables and views from HCM (Human Capital Management). **Extracts:** `pin_*` DAGs. **Key Tables:** `per_all_people_f`, `per_all_assignments_m`. **Effective dating** (`effective_start_date` AND `effective_end_date`) is the core logic. Use Oracle HCM documentation as reference when mapping or interpreting source structures.
+DAGs whose names start with `pin_` (e.g. `pin_core`) are based on Oracle database tables and views from HCM (Human Capital Management). **Extracts:** `pin_*` DAGs. **Key Tables:** `per_all_people_f`, `per_all_assignments_m`. **Effective dating** (`effective_start_date` AND `effective_end_date`) is the core logic.
+
+**Reference:** https://docs.oracle.com/en/cloud/saas/human-resources/oedmh/hcm-tables-and-views.html
+
+#### Oracle HCM Table Prefixes (Module)
+
+| Prefix | Module | Examples |
+|--------|--------|----------|
+| `PER_` | Person | PER_ALL_PEOPLE_F, PER_PERSON_NAMES_F |
+| `PAY_` | Payroll | Payroll-related tables |
+| `BEN_` | Benefits | Benefits administration |
+| `CMP_` | Compensation | Compensation management |
+| `FND_` | Foundation | FND_CURRENCIES_VL, FND_TERRITORIES_VL |
+
+#### Oracle HCM Naming and pin_ Clean Layer
+
+**Table suffixes (data type):**
+
+| Suffix | Meaning | Notes |
+|--------|---------|-------|
+| `_F` | Date-tracked | Effective-start and end dates; e.g. PER_ALL_PEOPLE_F |
+| `_VL` | View Language | Combined view of base + translation |
+| `_TL` | Table Language | Translation table (multi-language) |
+| `_V` | View | Logical view on base tables |
+| `_ALL` | Multi-org | Contains ORG_ID; multiple organizations |
+| `_S` | Sequence | Generates primary keys |
+| `_B` | Base | Core, non-translated data |
+| `_DFV` / `_KFV` | Flexfield View | Descriptive or Key Flexfield concatenated values |
+
+**Column suffixes:** `_ID` (primary/foreign key), `_FLG` (flag), `_WID` (surrogate for BI). **Who columns:** Creation Date, Created By, Last Update Date, Last Updated By.
+
+**Schema division:** Each `pin_*` DAG writes to its own raw and clean schemas. The schema name encodes the module, so table names in clean drop the prefix.
+
+| DAG | Table prefix | Raw schema | Clean schema |
+|-----|--------------|------------|--------------|
+| pin_absence | anc_ | datalake_pin_absence_raw | datalake_pin_absence_clean |
+| pin_core | fnd_, hcm_, hr_, per_ | datalake_pin_core_raw | datalake_pin_core_clean |
+| pin_goal | hrg_ | datalake_pin_goal_raw | datalake_pin_goal_clean |
+| pin_hr_review | hrr_ | datalake_pin_hr_review_raw | datalake_pin_hr_review_clean |
+| pin_performance | hra_ | datalake_pin_performance_raw | datalake_pin_performance_clean |
+| pin_questionnaires | hrq_ | datalake_pin_questionnaires_raw | datalake_pin_questionnaires_clean |
+| pin_talent | hrt_ | datalake_pin_talent_raw | datalake_pin_talent_clean |
+
+**Table naming pattern** (via `clean_table_name` in `tables_customization`):
+
+| Rule | Example |
+|------|---------|
+| Remove prefix (schema already defines it) | `hrq_qstnr_participants` → `questionnaire_participant` |
+| Expand abbreviations | `qstnr` → `questionnaire`, `asg` → `assignment` |
+| Prefer singular | `questionnaire_participants` → `questionnaire_participant` |
+| Clear business meaning, similar to source | Keep recognizable link to Oracle table name |
+
+The clean table name should clearly indicate its content while remaining traceable to the source Oracle table.
 
 ### Oracle Date 4712-12-31 — No End Date
 
@@ -153,6 +238,7 @@ When **filtering** source tables (clean/enrich) that still contain `4712-12-31`,
 - **Greenhouse v1** (`greenhouse` DAG) — being deprecated; prefer v3 (`greenhouse_v3`).
 - **Degreed** (current DAG/API) — being deprecated; prefer v3 when available.
 - **`hr_system` schema** and tables derived from it — being deprecated
+- **`hr_system_custom`** — being deprecated
 - **`dw_employee`** DAG — being deprecated
 - **`datalake_employment.employee_details`** — being deprecated
 - **Enrich DAGs** (see Enrich Layer table below): `enrich_employee`, `enrich_hr_system`, `enrich_hr_system_custom`, `enrich_product_tech`, `enrich_pin`
