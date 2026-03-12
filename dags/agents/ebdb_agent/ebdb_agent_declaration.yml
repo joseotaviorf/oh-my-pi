@@ -51,8 +51,8 @@ workflow:
       clean_table_name: agent_region_data
     DadosAgente_Regiao_AUD:
       clean_table_name: agent_region_data_aud
-    # DemandVisitManagementCapabilitySettings:
-    #   clean_table_name: demand_visit_management_capability_settings
+    DemandVisitManagementCapabilitySettings:
+      clean_table_name: demand_visit_management_capability_settings
     PreferredFixedAgent:
       clean_table_name: preferred_fixed_agent
     PreferredFixedAgent_AUD:
