@@ -31,10 +31,19 @@ class WonkaWorkflow(BaseWorkflow):
         self.dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
 
         # We need to update the cluster configs with values that come from the DAG declaration file.
-        self._deep_update(
-            self.config_service._configs[self._WONKA_CLUSTER_CONFIG_KEY],
-            self.cluster_args,
+        wonka_cluster_config = self.config_service._configs[
+            self._WONKA_CLUSTER_CONFIG_KEY
+        ]
+
+        self._deep_update(wonka_cluster_config, self.cluster_args)
+
+        # Merge custom_configurations.spark_conf into top-level spark_conf so the
+        # Databricks Jobs API receives all spark configs (it only uses top-level spark_conf).
+        custom_spark_conf = wonka_cluster_config.get("custom_configurations", {}).get(
+            "spark_conf"
         )
+        if custom_spark_conf and isinstance(custom_spark_conf, dict):
+            self._deep_update(wonka_cluster_config, {"spark_conf": custom_spark_conf})
 
     def build_dag(self):
         dag = super().dag_instance()
@@ -72,7 +81,6 @@ class WonkaWorkflow(BaseWorkflow):
                 WonkaWorkflow._deep_update(base_dict[key], value)
             else:
                 base_dict[key] = value
-        return base_dict
 
     def _get_dag_documentation(self):
         # The original _get_dag_documentation method couples orchestration abstraction
