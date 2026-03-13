@@ -30,7 +30,9 @@ WITH base_outbound_notifications AS (
   WHERE un.channel = 'whatsapp'
     AND un.action ILIKE '%concierge%'
     AND un.action NOT ILIKE '%refinement%'
-    AND un.action NOT IN ('ConciergeCarousel_whatsapp_message', 'ConciergeCancelationReason_whatsapp_message', 'ConciergeOptOutConfirmation_whatsapp_message')
+    AND un.action NOT ILIKE '%carousel%'
+    AND un.action NOT ILIKE '%cancelation%'
+    AND un.action NOT ILIKE '%optout%'
     AND un.status IN ('delivered', 'read')
 )
 
