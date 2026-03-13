@@ -24,7 +24,9 @@ This DAG sends two kinds of metrics to CloudZero for cost monitoring:
 3. **GRAFANA_DATASOURCE_NAME** (optional): Grafana datasource name (Prometheus/Thanos). Default: `metrics-prod`. If set, the job resolves the UID via Grafana API (requires **GRAFANA_API_TOKEN**).
 4. **GRAFANA_DATASOURCE_UID** (optional): Grafana datasource UID. If set, used directly; otherwise UID is resolved from **GRAFANA_DATASOURCE_NAME**.
 5. **GRAFANA_API_TOKEN** (required for Grafana): **Grafana service account token** — used for datasource proxy and for resolving UID by name. Create a service account in Grafana (Configuration → Service accounts) and use its token.
-6. **PROMETHEUS_REQUESTS_DIMENSION_LABEL** (optional): Label used as CloudZero dimension (e.g. `app`, `api`, `uri`). Default: `app`
+6. **PROMETHEUS_REQUESTS_QUERY** (optional): PromQL for instant query (range query is built from auto step). Default: `sum(increase(http_server_requests_seconds_count[24h])) by (app)`
+7. **PROMETHEUS_REQUESTS_DIMENSION_LABEL** (optional): Label used as CloudZero dimension (e.g. `app`, `api`, `uri`). Default: `app`
+8. **CLOUDZERO_DIMENSION_KEY** (optional): CloudZero key in associated_cost (default: `custom:API`).
 
 The job runs a **range query** over the execution day (00:00–23:59) with **automatic step** (~110 points max); results are aggregated (sum) per app and sent to CloudZero as one value per app per day.
 
@@ -100,4 +102,4 @@ To filter or group by application in CloudZero:
 2. **CloudZero authentication error**: Check `CLOUDZERO_API_TOKEN` secret in Databricks
 3. **Query with no results**: Check if the SQL query is correct
 4. **API error**: Check logs for CloudZero response details
-5. **Grafana/Prometheus**: Ensure Grafana is reachable and the datasource (default name `metrics-prod`) points to Thanos/Prometheus. Use a **Grafana service account token** in `GRAFANA_API_TOKEN` for authentication. Adjust `PROMETHEUS_REQUESTS_DIMENSION_LABEL` if your label differs from `app`.
+5. **Grafana/Prometheus**: Ensure Grafana is reachable and the datasource (default name `metrics-prod`) points to Thanos/Prometheus. Use a **Grafana service account token** in `GRAFANA_API_TOKEN` for authentication. Adjust `PROMETHEUS_REQUESTS_QUERY` or `PROMETHEUS_REQUESTS_DIMENSION_LABEL` if your metric/labels differ.

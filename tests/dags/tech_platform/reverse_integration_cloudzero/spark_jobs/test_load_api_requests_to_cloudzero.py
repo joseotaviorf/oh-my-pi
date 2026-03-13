@@ -2,7 +2,7 @@
 Unit tests for load_api_requests_to_cloudzero Spark job.
 
 Tests pure helpers (auto_step_seconds, promql_duration_from_step_seconds),
-secret/config getters with mocked dbutils, and Grafana range query/CloudZero
+secret/config getters with mocked dbutils, and Grafana/Prometheus/CloudZero
 flows with mocked HTTP.
 """
 import json
@@ -146,6 +146,53 @@ class TestResolveDatasourceUidByName(unittest.TestCase):
         self.assertIn("uid", str(ctx.exception))
 
 
+class TestQueryPrometheusViaGrafana(unittest.TestCase):
+    """Tests for query_prometheus_via_grafana response parsing."""
+
+    @patch(f"{MODULE_UNDER_TEST}.requests")
+    def test_parses_instant_result(self, mock_requests):
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_response.json.return_value = {
+            "status": "success",
+            "data": {
+                "result": [
+                    {"metric": {"app": "service-a"}, "value": [12345, "100.5"]},
+                    {"metric": {"app": "service-b"}, "value": [12345, "200"]},
+                ]
+            },
+        }
+        mock_session = MagicMock()
+        mock_session.get.return_value = mock_response
+        mock_requests.Session.return_value = mock_session
+        result = job.query_prometheus_via_grafana(
+            "https://grafana.com",
+            "uid1",
+            "sum(rate(x[1h])) by (app)",
+            datetime(2025, 1, 15, 23, 59, 59),
+            api_token="",
+        )
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0][0], {"app": "service-a"})
+        self.assertEqual(result[0][1], 100.5)
+        self.assertEqual(result[1][0], {"app": "service-b"})
+        self.assertEqual(result[1][1], 200.0)
+
+    @patch(f"{MODULE_UNDER_TEST}.requests")
+    def test_raises_on_api_error_status(self, mock_requests):
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_response.json.return_value = {"status": "error", "error": "bad query"}
+        mock_session = MagicMock()
+        mock_session.get.return_value = mock_response
+        mock_requests.Session.return_value = mock_session
+        with self.assertRaises(RuntimeError) as ctx:
+            job.query_prometheus_via_grafana(
+                "https://grafana.com", "uid1", "invalid", datetime(2025, 1, 1)
+            )
+        self.assertIn("error", str(ctx.exception).lower())
+
+
 class TestQueryRangeViaGrafana(unittest.TestCase):
     """Tests for query_range_via_grafana and aggregation."""
 
@@ -210,6 +257,7 @@ class TestSendApiRequestsToCloudZero(unittest.TestCase):
             execution_date="2025-01-15",
             cloudzero_token="Bearer tok",
             dimension_label="app",
+            dimension_key="custom:API",
         )
         call_args = mock_requests.Session.return_value.post.call_args
         self.assertIn("cloudzero.com", call_args[0][0])
@@ -228,6 +276,7 @@ class TestSendApiRequestsToCloudZero(unittest.TestCase):
             execution_date="2025-01-15",
             cloudzero_token="Bearer tok",
             dimension_label="app",
+            dimension_key="custom:API",
         )
         mock_requests.Session.return_value.post.assert_not_called()
 
@@ -244,9 +293,29 @@ class TestSendApiRequestsToCloudZero(unittest.TestCase):
                 execution_date="2025-01-15",
                 cloudzero_token="Bearer tok",
                 dimension_label="app",
+                dimension_key="custom:API",
             )
             payload = mock_requests.Session.return_value.post.call_args[1]["json"]
             self.assertEqual(payload["records"][0]["associated_cost"]["custom:API"], "unknown")
+
+    @patch(f"{MODULE_UNDER_TEST}.requests")
+    def test_uses_k8s_workload_dimension_when_requested(self, mock_requests):
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_session = MagicMock()
+        mock_session.post.return_value = mock_response
+        mock_requests.Session.return_value = mock_session
+        job.send_api_requests_to_cloudzero(
+            records=[({"app": "listing-service"}, 50000)],
+            execution_date="2025-01-15",
+            cloudzero_token="Bearer tok",
+            dimension_label="app",
+            dimension_key="K8s:Workload",
+        )
+        payload = mock_requests.Session.return_value.post.call_args[1]["json"]
+        self.assertEqual(
+            payload["records"][0]["associated_cost"], {"K8s:Workload": "listing-service"}
+        )
 
 
 def _run_job_main():

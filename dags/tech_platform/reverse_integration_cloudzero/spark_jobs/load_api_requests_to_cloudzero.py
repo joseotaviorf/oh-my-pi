@@ -1,10 +1,8 @@
 """
-Spark job that queries Prometheus (via Grafana datasource proxy) for API request counts
-and sends them to CloudZero.
+Spark job that queries Prometheus (via Grafana datasource) for API request counts and sends them to CloudZero.
 
-Runs a PromQL range query over the execution day via Grafana's datasource proxy
-(backend can be Thanos or Prometheus). Fetches requests per app, then posts
-each series to CloudZero with dimension custom:API.
+Uses Grafana's datasource proxy to run a PromQL instant query (Grafana backend can be Thanos/Prometheus).
+Fetches the number of requests per app, then posts each series to CloudZero with a configurable dimension (default custom:API; create Custom Dimension "API" in CloudZero).
 """
 import json
 import logging
@@ -27,7 +25,13 @@ JOB_NAME = "load_api_requests_to_cloudzero"
 DEFAULT_GRAFANA_URL = "https://grafana.apps.shared-prd.habitat.zone"
 # Default Grafana datasource name (Prometheus/Thanos); auth is via Grafana service account
 DEFAULT_GRAFANA_DATASOURCE_NAME = "metrics-prod"
+# Default PromQL (instant): total requests in the last 24h grouped by label 'app'
+DEFAULT_PROMQL = 'sum(increase(http_server_requests_seconds_count[24h])) by (app)'
+# Query step for range queries: always automatic (~110 points max per day)
 DEFAULT_DIMENSION_LABEL = "app"
+# CloudZero dimension key in associated_cost. CZ:K8s:Workload is not accepted by Unit Cost Telemetry API in many accounts;
+# use custom:API (create Custom Dimension "API" in CloudZero) for reliable behavior.
+DEFAULT_CLOUDZERO_DIMENSION_KEY = "custom:API"
 CLOUDZERO_METRIC_NAME = "quintoandar_api_requests_count"
 # Max points for "auto" step (Prometheus-style)
 AUTO_STEP_MAX_POINTS = 110
@@ -103,6 +107,17 @@ def resolve_datasource_uid_by_name(
     return uid
 
 
+def get_promql_query(dbutils) -> str:
+    """PromQL for request count per API. From secret PROMETHEUS_REQUESTS_QUERY or default."""
+    try:
+        return dbutils.secrets.get(
+            scope=DATABRICKS_SCOPE, key="PROMETHEUS_REQUESTS_QUERY"
+        ).strip()
+    except Exception:
+        pass
+    return os.environ.get("PROMETHEUS_REQUESTS_QUERY", DEFAULT_PROMQL)
+
+
 def get_dimension_label(dbutils) -> str:
     """Label name used as dimension (e.g. app, api, uri). From secret or default."""
     try:
@@ -112,6 +127,19 @@ def get_dimension_label(dbutils) -> str:
     except Exception:
         pass
     return os.environ.get("PROMETHEUS_REQUESTS_DIMENSION_LABEL", DEFAULT_DIMENSION_LABEL)
+
+
+def get_cloudzero_dimension_key(dbutils) -> str:
+    """CloudZero dimension key in associated_cost (e.g. custom:API, K8s:Workload). From secret or default."""
+    try:
+        val = dbutils.secrets.get(
+            scope=DATABRICKS_SCOPE, key="CLOUDZERO_DIMENSION_KEY"
+        ).strip()
+        if val:
+            return val
+    except Exception:
+        pass
+    return os.environ.get("CLOUDZERO_DIMENSION_KEY", DEFAULT_CLOUDZERO_DIMENSION_KEY)
 
 
 def auto_step_seconds(range_seconds: int) -> int:
@@ -126,6 +154,70 @@ def promql_duration_from_step_seconds(step_sec: int) -> str:
     if step_sec >= 60:
         return f"{step_sec // 60}m"
     return f"{step_sec}s"
+
+
+def query_prometheus_via_grafana(
+    grafana_base_url: str,
+    datasource_uid: str,
+    query: str,
+    evaluation_ts: datetime,
+    api_token: str = "",
+    timeout_seconds: int = 60,
+) -> list:
+    """
+    Run a Prometheus instant query via Grafana datasource proxy.
+
+    Uses GET /api/datasources/proxy/uid/{uid}/api/v1/query (Grafana proxies to
+    the configured Prometheus/Thanos backend).
+
+    :param grafana_base_url: Grafana base URL (e.g. https://grafana.company.com)
+    :param datasource_uid: UID of the Prometheus/Thanos datasource in Grafana
+    :param query: PromQL expression
+    :param evaluation_ts: Time for the instant query (end of day recommended)
+    :param api_token: Optional Grafana API token for Authorization header
+    :param timeout_seconds: Request timeout
+    :return: List of (dict of labels, float value)
+    """
+    url = f"{grafana_base_url}/api/datasources/proxy/uid/{datasource_uid}/api/v1/query"
+    params = {
+        "query": query,
+        "time": int(evaluation_ts.timestamp()),
+        "timeout": f"{timeout_seconds}s",
+        "dedup": "true",
+        "partial_response": "false",
+    }
+    headers = {}
+    if api_token:
+        headers["Authorization"] = f"Bearer {api_token}"
+
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+    session.mount("http://", HTTPAdapter(max_retries=retries))
+
+    logger.info(f"m=query_prometheus_via_grafana, url={url}, query={query}")
+    response = session.get(
+        url, params=params, headers=headers or None, timeout=timeout_seconds
+    )
+    response.raise_for_status()
+    data = response.json()
+
+    if data.get("status") != "success":
+        raise RuntimeError(f"Prometheus API error: {data.get('error', data)}")
+
+    result = data.get("data", {}).get("result", [])
+    out = []
+    for item in result:
+        metric = item.get("metric", {})
+        raw = item.get("value")
+        if raw is None:
+            continue
+        try:
+            val = float(raw[1])
+        except (IndexError, TypeError, ValueError):
+            continue
+        out.append((dict(metric), val))
+    return out
 
 
 def query_range_via_grafana(
@@ -195,24 +287,31 @@ def send_api_requests_to_cloudzero(
     execution_date: str,
     cloudzero_token: str,
     dimension_label: str,
+    dimension_key: str,
 ) -> None:
     """
-    Send API request counts to CloudZero (one record per API dimension).
+    Send API request counts to CloudZero (one record per dimension value).
 
     :param records: List of (metric_labels_dict, value) from Prometheus
     :param execution_date: Date of the data (YYYY-MM-DD)
     :param cloudzero_token: CloudZero API token
-    :param dimension_label: Label to use as CloudZero dimension (e.g. app, api, uri)
+    :param dimension_label: Prometheus label for the dimension value (e.g. app, api, uri)
+    :param dimension_key: CloudZero key in associated_cost (e.g. custom:API, K8s:Workload)
     """
     # Build records with associated_cost for dimension
     payload_records = []
     for labels, value in records:
-        api_name = labels.get(dimension_label) or labels.get("app") or labels.get("uri") or "unknown"
+        elem = (
+            labels.get(dimension_label)
+            or labels.get("app")
+            or labels.get("uri")
+            or "unknown"
+        )
         payload_records.append({
             "granularity": "DAILY",
             "timestamp": execution_date,
             "value": int(round(value)),
-            "associated_cost": {"custom:API": str(api_name)},
+            "associated_cost": {dimension_key: str(elem)},
         })
 
     if not payload_records:
@@ -301,6 +400,7 @@ if __name__ == "__main__":
                 grafana_url, datasource_name, grafana_token
             )
         dimension_label = get_dimension_label(dbutils)
+        dimension_key = get_cloudzero_dimension_key(dbutils)
 
         # Day range in UTC so Prometheus/Thanos evaluate at the correct time
         start_ts = datetime.strptime(
@@ -331,7 +431,7 @@ if __name__ == "__main__":
         )
 
         send_api_requests_to_cloudzero(
-            records, execution_date, cloudzero_token, dimension_label
+            records, execution_date, cloudzero_token, dimension_label, dimension_key
         )
         logger.info(f"m=__main__, success, series_sent={len(records)}")
 

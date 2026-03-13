@@ -1,0 +1,11 @@
+timestamp,value,API
+2025-01-15,125000,listing-service
+2025-01-15,98000,search-api
+2025-01-15,45000,auth-service
+2025-01-15,32000,payment-gateway
+2025-01-15,18000,notification-service
+2025-01-16,130000,listing-service
+2025-01-16,101000,search-api
+2025-01-16,46000,auth-service
+2025-01-16,31000,payment-gateway
+2025-01-16,19000,notification-service
