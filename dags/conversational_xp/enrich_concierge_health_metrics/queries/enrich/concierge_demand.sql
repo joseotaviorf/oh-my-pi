@@ -131,7 +131,7 @@ SELECT DISTINCT
     COALESCE(m.day, v.day) AS day
 FROM datalake_search.concierge_messages m
 LEFT JOIN datalake_search.concierge_prospects_aux p
-    ON (m.id_user = p.id_user OR m.user_phone = p.user_phone)
+    ON (m.id_user = p.id_user OR m.user_phone = p.prospect_phone)
     AND m.ts_concierge_contact = p.ts_concierge_contact
 FULL JOIN visits v
     ON m.id_phone_session = v.id_phone_session
