@@ -45,5 +45,5 @@ WHERE
     AND ( --Experiment end
     (v.ts_created::DATE <= '2026-03-02' AND business_context = 'RENT')
         OR
-    (v.ts_created::DATE >= '2025-12-10' AND business_context = 'SALE'))
+    (v.ts_created::DATE <= '2026-03-09' AND business_context = 'SALE'))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
