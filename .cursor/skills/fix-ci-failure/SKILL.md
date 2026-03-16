@@ -79,6 +79,7 @@ git fetch --no-tags origin +refs/heads/master
 | `invalid domain` | `domain:` is not in the allowed list | Use a valid domain (see governance_metadata rule for the full list) |
 | `missing required field: lineage` | Enrich/DW column has no `lineage:` | Add `lineage: [database.table.column]` for each column |
 | `metric column missing dimension or metric block` | Metric-layer column has no `dimension: true` or `metric:` block | Add the appropriate block per the governance_metadata rule |
+| `mapping values are not allowed here` / `mapping values are not allowed in this context` (with `yaml.scanner.ScannerError` and line/column) | An unquoted colon (`:`) in the middle of a YAML string (e.g. in a `description:` line) is interpreted as a key-value separator | At the reported line/column, rephrase to remove the colon (e.g. use em dash "—"), or quote the string; e.g. "TODO in view: confirm" → "TODO in view — confirm" or `"TODO in view: confirm"` |
 
 ### Lineage failures (`validate-lineage-consistency`)
 
