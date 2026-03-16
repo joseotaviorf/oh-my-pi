@@ -1,35 +1,43 @@
 # syntax=docker/dockerfile:1
-FROM quay.io/astronomer/astro-runtime:13.0.0 AS stage1
+FROM quay.io/astronomer/astro-runtime:12.6.0-base AS builder
 
-LABEL maintainer="Astronomer <humans@astronomer.io>"
-ARG BUILD_NUMBER=-1
-LABEL io.astronomer.docker=true
-LABEL io.astronomer.docker.build.number=$BUILD_NUMBER
-LABEL io.astronomer.docker.airflow.onbuild=true
-# Install Python and OS-Level Packages
-
+# Switch to root for OS-level installs
 USER root
+WORKDIR /root
+
 COPY packages.txt .
-RUN apt-get update && cat packages.txt | xargs apt-get install -y
-
-FROM stage1 AS stage2
-
-RUN --mount=type=bind,target=. \
-  --mount=type=secret,id=GITHUB_TOKEN \
-  git config --global url.https://$(cat /run/secrets/GITHUB_TOKEN):@github.com/.insteadOf https://github.com/
-
-# Installing bi-etl-ejuice dependencies
-RUN pip install -qq -r ./custom_requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps
-
-ENV ENVIRONMENT=forno
-ENV AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
-ENV AIRFLOW__CORE__DAG_IGNORE_FILE_SYNTAX=glob
-ENV AIRFLOW__CORE__MAX_TEMPLATED_FIELD_LENGTH=16384
-ENV AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT=False
-ENV AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS=True
-
-RUN chmod -R 755 .
-COPY . .
-RUN chmod -R 755 .
+RUN apt-get update && \
+  cat packages.txt | xargs apt-get install -y --no-install-recommends --no-upgrade
 
 USER astro
+WORKDIR /home/astro
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+  PIP_DISABLE_PIP_VERSION_CHECK=1 \
+  DEBIAN_FRONTEND=noninteractive
+
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+COPY custom_requirements.txt .
+RUN --mount=type=secret,id=GITHUB_TOKEN,uid=50000,gid=0 \
+  export TOKEN=$(cat /run/secrets/GITHUB_TOKEN | tr -d '\n') && \
+  git config --global url.https://${TOKEN}:@github.com/.insteadOf https://github.com/ && \
+  pip install --user --no-cache-dir -r custom_requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+
+FROM quay.io/astronomer/astro-runtime:12.6.0-base AS runtime
+
+COPY --from=builder /home/astro/.local /home/astro/.local
+
+ENV PATH="/home/astro/.local/bin:${PATH}"
+
+ENV ENVIRONMENT=forno \
+  AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90 \
+  AIRFLOW__CORE__DAG_IGNORE_FILE_SYNTAX=glob \
+  AIRFLOW__CORE__MAX_TEMPLATED_FIELD_LENGTH=16384 \
+  AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT=False \
+  AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS=True
+
+COPY --chown=astro:0 . .
+
+WORKDIR /usr/local/airflow
