@@ -13,7 +13,7 @@ workflow:
     monopoly_invoice_issuance:
       - ledger
     cap_union_invoice:
-      - accounts_payable_partitioned
+      - accounts_payable
       - invoice_all
 cluster:
   type: custom_cluster
