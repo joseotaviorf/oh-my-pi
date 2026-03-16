@@ -24,6 +24,7 @@ workflow:
   tables_customization:
     segments_perspective: {}
     tickets_perspective: {}
+    backlog_metric: {}
 
 cluster:
   type: custom_cluster
