@@ -84,7 +84,7 @@ SELECT
   t.ts_ticket_ended,
   CASE
     WHEN m.user_sender LIKE '%whatsapp%' THEN 'client'
-    ELSE m.user_sender
+    ELSE REPLACE(REPLACE(m.user_sender,'_2E', '.'), '_40', '@')
   END AS message_from,
   YEAR(CURRENT_DATE) AS year,
   MONTH(CURRENT_DATE) AS month,
