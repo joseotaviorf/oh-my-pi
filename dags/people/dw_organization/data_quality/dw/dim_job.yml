@@ -23,12 +23,24 @@ column_level_validations:
       less_than_or_equal_to: 1
       severity_level: Warning
   job_family:
-    has_null_count:
-      less_than_or_equal_to: 1
+    custom:
+      # job_family must not be null for active jobs (is_active = true)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_organization.dim_job
+         WHERE is_active = true
+           AND job_family IS NULL
+        ) = 0
       severity_level: Warning
   career_track:
-    has_null_count:
-      less_than_or_equal_to: 1
+    custom:
+      # career_track must not be null for active jobs (is_active = true)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_organization.dim_job
+         WHERE is_active = true
+           AND career_track IS NULL
+        ) = 0
       severity_level: Warning
   is_active:
     has_null_count:
