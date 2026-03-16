@@ -1,0 +1,58 @@
+dag:
+  name: reverse_reports
+  owner: Data People
+  documentation:
+    dag_purpose: |
+      Generic reverse DAG for People domain. Exports data from the lake to multiple Google Sheets.
+
+      Each table in tables_customization defines a distinct export with its own sheet_id and sheet_tab.
+
+      To add a new export:
+        1. Create queries/reverse/{table_name}.sql
+        2. Add the table to tables_customization with extra_spark_job_arguments: [sheet_id, sheet_tab]
+
+      Share each target sheet (Editor permission) with:
+        gsheets-people-access@airflow-186119.iam.gserviceaccount.com
+
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+    - pypi:
+        package: "google-auth==2.23.0"
+    - pypi:
+        package: "google-api-python-client==2.55.0"
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+
+workflow:
+  type: load_access
+  layer: reverse
+  custom_schema: reports
+  bucket_config_name: people_bucket
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  load_spark_job: load_to_gsheet
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  spark_job_arguments:
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{environment}"
+
+  tables_customization:
+    salary_tables:
+      extra_spark_job_arguments:
+        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
+        - "salary_tables"
+    jobs:
+      extra_spark_job_arguments:
+        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
+        - "jobs"

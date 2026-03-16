@@ -4574,6 +4574,9 @@ bietlejuice.reverse_neighborhood_price_range_load:
   - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter:first-run-of-day
+bietlejuice.reverse_reports:
+  - bietlejuice.dw_compensation:load-dw-compensation-dim-job:first-run-of-day
+  - bietlejuice.dw_compensation:load-dw-compensation-fact-salary-table-targets:first-run-of-day
 bietlejuice.reverse_rent_listings_report_access:
   - bietlejuice.reverse_rent_listings_report_load:load-reverse-listing-similar-score:first-run-of-day
   - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent:first-run-of-day
