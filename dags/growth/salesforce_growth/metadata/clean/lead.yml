@@ -24,6 +24,10 @@ columns:
     lineage:
       - datalake_salesforce_growth_raw.lead.Calificado__c
     description: Boolean indicating if the lead has been qualified.
+  discard_reason:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.Motivo_no_convierte__c
+    description: Reason for discarding the lead.
   phone:
     lineage:
       - datalake_salesforce_growth_raw.lead.Phone
