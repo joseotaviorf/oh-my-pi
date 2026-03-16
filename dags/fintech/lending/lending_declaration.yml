@@ -37,8 +37,6 @@ workflow:
       clean_table_name: user_consent
     offer_term:
       clean_table_name: offer_term
-    offer_term_sheet:
-      clean_table_name: offer_term_sheet
     webhook_request:
       clean_table_name: webhook_request
 cluster:
