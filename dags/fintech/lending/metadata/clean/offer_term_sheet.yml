@@ -1,0 +1,19 @@
+---
+database_name: datalake_lending_clean
+table_name: offer_term_sheet
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains offer term sheet templates with names used for lending offers.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.offer_term_sheet.id
+    description: Primary key of the offer term sheet.
+  name:
+    lineage:
+      - datalake_lending_raw.offer_term_sheet.name
+    description: Name of the offer term sheet template.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.offer_term_sheet.created_at
+    description: Timestamp when the offer term sheet was created.

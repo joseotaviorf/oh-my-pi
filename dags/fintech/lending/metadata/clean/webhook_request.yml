@@ -1,0 +1,39 @@
+---
+database_name: datalake_lending_clean
+table_name: webhook_request
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains webhook requests sent or received for lending deals.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.webhook_request.id
+    description: Primary key of the webhook request.
+  uuid_deal:
+    lineage:
+      - datalake_lending_raw.webhook_request.deal_uuid
+    description: UUID of the deal associated with this webhook request.
+  payload:
+    lineage:
+      - datalake_lending_raw.webhook_request.payload
+    description: JSON payload of the webhook request.
+  status:
+    lineage:
+      - datalake_lending_raw.webhook_request.status
+    description: Status of the webhook request processing.
+  type:
+    lineage:
+      - datalake_lending_raw.webhook_request.type
+    description: Type of the webhook request.
+  source:
+    lineage:
+      - datalake_lending_raw.webhook_request.source
+    description: Source system that originated the webhook.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.webhook_request.created_at
+    description: Timestamp when the webhook request was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.webhook_request.updated_at
+    description: Timestamp when the webhook request was last updated.
