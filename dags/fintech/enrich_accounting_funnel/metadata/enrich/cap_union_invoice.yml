@@ -1,0 +1,369 @@
+---
+database_name: datalake_accounting_funnel
+table_name: cap_union_invoice
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: "Union of invoice entries (FullService) and CAP (Contas a Pagar) template invoices with accounting classification and enrichment"
+columns:
+  id_entry:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.id_entry
+      - datalake_accounting_funnel.accounts_payable.id_entry
+    description: "Invoice entry (credit or debit) registered in an invoice"
+  id_invoice:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.id_invoice
+      - datalake_accounting_funnel.accounts_payable.id_invoice
+    description: "Invoice registered in SeuBarriga"
+  sk_contract:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.sk_contract
+      - datalake_accounting_funnel.accounts_payable.sk_contract
+    description: "Contract related to an invoice"
+  sk_invoice_reversed_entry:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.sk_invoice_reversed_entry
+      - datalake_accounting_funnel.accounts_payable.sk_invoice_reversed_entry
+    description: "When an entry is created to cancel another entry, this field is filled with the Id of the canceled one"
+  version:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.version
+      - datalake_accounting_funnel.accounts_payable.version
+    description: "Contract version"
+  accounting_version:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.accounting_version
+      - datalake_accounting_funnel.accounts_payable.accounting_version
+    description: "Information about sync with ERP Gateway"
+  locale:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.locale
+      - datalake_accounting_funnel.accounts_payable.locale
+    description: "Name from the City"
+  localidade:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.localidade
+      - datalake_accounting_funnel.accounts_payable.localidade
+    description: "ID from the City"
+  guarantee:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.guarantee
+      - datalake_accounting_funnel.accounts_payable.guarantee
+    description: "Type/Insurer hired"
+  rental_administrator:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.rental_administrator
+      - datalake_accounting_funnel.accounts_payable.rental_administrator
+    description: "Type of administration of the property"
+  bill_item:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.accounts_payable.bill_item
+    description: "Bill item indication"
+  description:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.description
+      - datalake_accounting_funnel.accounts_payable.description
+    description: "Invoice entry title as shown in invoice"
+  purpose:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.purpose
+      - datalake_accounting_funnel.accounts_payable.purpose
+    description: "Invoice frequency type to be sent, such as monthly, extra or pos"
+  invoice_account_type:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_account_type
+      - datalake_accounting_funnel.accounts_payable.invoice_account_type
+    description: "Description of invoice account type"
+  from_account_type:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.from_account_type
+      - datalake_accounting_funnel.accounts_payable.from_account_type
+    description: "From account type in the invoice entry (contract or stakeholder)"
+  to_account_type:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.to_account_type
+      - datalake_accounting_funnel.accounts_payable.to_account_type
+    description: "To account type in the invoice entry (contract or stakeholder)"
+  account_type:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.account_type
+      - datalake_accounting_funnel.accounts_payable.account_type
+    description: "The account type: landlord, tenant or other"
+  account_classification:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.account_classification
+      - datalake_accounting_funnel.accounts_payable.account_classification
+    description: "Indicates the account classification based on bill item: receivable or payable"
+  status:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.status
+      - datalake_accounting_funnel.accounts_payable.status
+    description: "Description of payment status"
+  closing_mode:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.closing_mode
+      - datalake_accounting_funnel.accounts_payable.closing_mode
+    description: "Description that shows if closing is automatic or manual"
+  paid_via:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.paid_via
+      - datalake_accounting_funnel.accounts_payable.paid_via
+    description: "Description of how the invoice was paid"
+  entry_created_time:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.entry_created_date
+      - datalake_accounting_funnel.accounts_payable.entry_created_date
+    description: "Time portion of entry creation (HH:mm:ss)"
+  contract_status:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.contract_status
+      - datalake_accounting_funnel.accounts_payable.contract_status
+    description: "Contract status description"
+  conta_contabil:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.description
+      - datalake_accounting_funnel.invoice_all.accounting_version
+      - datalake_accounting_funnel.invoice_all.from_account_type
+      - datalake_accounting_funnel.invoice_all.to_account_type
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.description
+      - datalake_accounting_funnel.accounts_payable.accounting_version
+    description: "Accounting classification based on bill item and accounting version (e.g. ALUGUEL, Condomínio, IPTU)"
+  conta_contabil_secundaria:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.accounting_version
+      - datalake_accounting_funnel.invoice_all.description
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.accounting_version
+    description: "Secondary accounting classification for specific bill items (e.g. ALUGUEL, Corretagem a ser descontada)"
+  is_contract_b2b:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.is_contract_b2b
+      - datalake_accounting_funnel.accounts_payable.is_contract_b2b
+    description: "Flag indicating if the contract is shared with partners"
+  is_rental_paid_in_advance:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.is_rental_paid_in_advance
+      - datalake_accounting_funnel.accounts_payable.is_rental_paid_in_advance
+    description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
+  is_reversed:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.is_reversed
+      - datalake_accounting_funnel.accounts_payable.is_reversed
+    description: "Flag that indicates if an entry was created to reverse (cancel) another entry"
+  is_write_off:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.is_write_off
+      - datalake_accounting_funnel.accounts_payable.is_write_off
+    description: "Flag that indicates if an invoice was written off"
+  is_not_invoiceable_inconsiderable:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.is_not_invoiceable_inconsiderable
+      - datalake_accounting_funnel.accounts_payable.is_not_invoiceable_inconsiderable
+    description: "Flag that indicates, if true, that an entry is a not-invoiceable/reversed inconsiderable"
+  has_negotiation:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.has_negotiation
+      - datalake_accounting_funnel.accounts_payable.has_negotiation
+    description: "Indicates whether the invoice has an agreement (value 1) or not (value 0)"
+  has_installments:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.has_installments
+      - datalake_accounting_funnel.accounts_payable.has_installments
+    description: "Indicates whether the invoice has more than 1 installment (value 1) or not (value 0)"
+  due_amount:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.due_amount
+      - datalake_accounting_funnel.accounts_payable.due_amount
+    description: "Invoice entry due value, considering debit or credit related to the contract cash flow"
+  invoice_due_amount:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_due_amount
+      - datalake_accounting_funnel.accounts_payable.invoice_due_amount
+    description: "Invoice due value, considering debit or credit related to the contract cash flow"
+  invoice_paid_amount:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_paid_amount
+      - datalake_accounting_funnel.accounts_payable.invoice_paid_amount
+    description: "Invoice paid value"
+  accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.accrual_year_month
+    description: "Expense reference month"
+  entry_accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.entry_accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.entry_accrual_year_month
+    description: "Entry expense reference month"
+  entry_creation_accrual_year_month:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.entry_creation_accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.entry_creation_accrual_year_month
+    description: "Entry creation expense reference month"
+  ended_before_started:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.ended_before_started
+      - datalake_accounting_funnel.accounts_payable.ended_before_started
+      - datalake_ebdb_clean.contract.dt_termination
+    description: "If the contract annulment happened before the start"
+  pp_pays:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.version
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.version
+    description: "Flag indicating PP (Prorietário Parceiro) pays for this bill item"
+  entry_sort_ascend:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.sk_contract
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+      - datalake_accounting_funnel.invoice_all.id_invoice
+      - datalake_accounting_funnel.invoice_all.due_amount
+      - datalake_accounting_funnel.invoice_all.id_entry
+      - datalake_accounting_funnel.accounts_payable.sk_contract
+      - datalake_accounting_funnel.accounts_payable.accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.id_invoice
+      - datalake_accounting_funnel.accounts_payable.due_amount
+      - datalake_accounting_funnel.accounts_payable.id_entry
+    description: "Row number for sorting entries by ascending due amount within contract and accrual month"
+  entry_by_accrual_sort_ascend:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.sk_contract
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+      - datalake_accounting_funnel.invoice_all.id_entry
+      - datalake_accounting_funnel.accounts_payable.sk_contract
+      - datalake_accounting_funnel.accounts_payable.accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.id_entry
+    description: "Row number for sorting entries by ascending id_entry within contract and accrual month"
+  is_cap:
+    description: "Flag indicating if the register is from CAP (Contas a Pagar); FALSE for invoice, TRUE for CAP template"
+  only_one_sided:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.description
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.description
+    description: "Flag indicating if the bill item is only one-sided (e.g. brokerage, repair offboarding)"
+  post_divergence:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.status
+      - datalake_accounting_funnel.invoice_all.invoice_due_date
+      - datalake_accounting_funnel.invoice_all.account_classification
+      - datalake_accounting_funnel.invoice_all.account_type
+      - datalake_accounting_funnel.invoice_all.rental_administrator
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.status
+      - datalake_accounting_funnel.accounts_payable.invoice_due_date
+      - datalake_accounting_funnel.accounts_payable.account_classification
+      - datalake_accounting_funnel.accounts_payable.account_type
+      - datalake_accounting_funnel.accounts_payable.rental_administrator
+    description: "Flag indicating post-divergence conditions (e.g. open adm partner with past due, repair offboarding scenarios)"
+  conta_resultado:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.description
+      - datalake_accounting_funnel.invoice_all.accounting_version
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.description
+      - datalake_accounting_funnel.accounts_payable.accounting_version
+    description: "Flag indicating if the accounting classification is a result account type (e.g. Late Payment Fee, Multa Condomínio)"
+  has_paid_amount:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.sk_contract
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.sk_contract
+      - datalake_accounting_funnel.accounts_payable.accrual_year_month
+    description: "Flag indicating if there is at least one CAP entry for the contract/accrual/accounting classification"
+  has_receivable_amount:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.invoice_all.sk_contract
+      - datalake_accounting_funnel.invoice_all.accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.bill_item
+      - datalake_accounting_funnel.accounts_payable.sk_contract
+      - datalake_accounting_funnel.accounts_payable.accrual_year_month
+    description: "Flag indicating if there is at least one non-CAP entry for the contract/accrual/accounting classification"
+  is_not_invoiceable_inconsiderable_workaround:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.status
+      - datalake_accounting_funnel.invoice_all.entry_accrual_year_month
+      - datalake_accounting_funnel.invoice_all.to_account_type
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.accounts_payable.status
+      - datalake_accounting_funnel.accounts_payable.entry_accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.to_account_type
+      - datalake_accounting_funnel.accounts_payable.bill_item
+    description: "Workaround flag for not-invoiceable inconsiderable entries based on status and bill item rules"
+  is_not_invoiceable_inconsiderable_early_termination:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.status
+      - datalake_accounting_funnel.invoice_all.entry_accrual_year_month
+      - datalake_accounting_funnel.invoice_all.to_account_type
+      - datalake_accounting_funnel.invoice_all.bill_item
+      - datalake_accounting_funnel.accounts_payable.status
+      - datalake_accounting_funnel.accounts_payable.entry_accrual_year_month
+      - datalake_accounting_funnel.accounts_payable.to_account_type
+      - datalake_accounting_funnel.accounts_payable.bill_item
+    description: "Flag for early termination fee not-invoiceable inconsiderable exceptions (from 202506)"
+  entry_created_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.entry_created_date
+      - datalake_accounting_funnel.accounts_payable.entry_created_date
+    description: "Entry creation date"
+  invoice_created_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_created_date
+      - datalake_accounting_funnel.accounts_payable.invoice_created_date
+    description: "Invoice creation date"
+  invoice_due_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_due_date
+      - datalake_accounting_funnel.accounts_payable.invoice_due_date
+    description: "Invoice due date"
+  invoice_paid_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_paid_date
+      - datalake_accounting_funnel.accounts_payable.invoice_paid_date
+    description: "Date when the invoice was paid"
+  invoice_canceled_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_canceled_date
+      - datalake_accounting_funnel.accounts_payable.invoice_canceled_date
+    description: "Date when the invoice was canceled"
+  invoice_reversal_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_reversal_date
+      - datalake_accounting_funnel.accounts_payable.invoice_reversal_date
+    description: "Date when an entry was reversed (canceled) by another one"
+  invoice_write_off_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_write_off_date
+      - datalake_accounting_funnel.accounts_payable.invoice_write_off_date
+    description: "Date when the invoice was written off"
+  invoice_paid_date_next_business_day:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.invoice_paid_date_next_business_day
+      - datalake_accounting_funnel.accounts_payable.invoice_paid_date_next_business_day
+    description: "First business day after the invoice payment"
+  real_invoice_paid_date:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.real_invoice_paid_date
+      - datalake_accounting_funnel.accounts_payable.invoice_paid_date
+    description: "Real invoice paid date considering payment method (immediate for some, next business day for others)"
+  contract_start:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.contract_start
+      - datalake_accounting_funnel.accounts_payable.contract_start
+    description: "Beginning of contract date"
+  contract_annulment:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.contract_annulment
+      - datalake_accounting_funnel.accounts_payable.contract_annulment
+    description: "Annulment of contract date"

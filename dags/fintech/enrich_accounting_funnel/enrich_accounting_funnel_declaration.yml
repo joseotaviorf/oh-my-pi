@@ -12,6 +12,9 @@ workflow:
       - for_rent_contract_brokerage
     monopoly_invoice_issuance:
       - ledger
+    cap_union_invoice:
+      - accounts_payable_partitioned
+      - invoice_all
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new_env
