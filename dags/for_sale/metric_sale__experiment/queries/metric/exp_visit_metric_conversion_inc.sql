@@ -81,7 +81,10 @@ SELECT
     m.control_metric_error,
     m.treatment_metric_value,
     m.treatment_metric_error,
-    vm.dt_ref
+    vm.dt_ref,
+    YEAR(vm.dt_ref) AS year,
+    MONTH(vm.dt_ref) AS month,
+    DAY(vm.dt_ref) AS day
 FROM
     visit_metrics AS vm
 LATERAL VIEW

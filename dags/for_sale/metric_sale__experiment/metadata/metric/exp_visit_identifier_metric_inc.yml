@@ -157,3 +157,18 @@ columns:
       - metric_sale.exp_visit_cohort_inc.dt_ref
     description: Reference date for cohort calculation, representing the analysis date for time-based metrics.
     dimension: True
+  year:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.dt_ref
+    description: Year component of the reference date for partitioning.
+    dimension: True
+  month:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.dt_ref
+    description: Month component of the reference date for partitioning.
+    dimension: True
+  day:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.dt_ref
+    description: Day component of the reference date for partitioning.
+    dimension: True

@@ -171,7 +171,10 @@ SELECT
     m.control_metric_error,
     m.treatment_metric_value,
     m.treatment_metric_error,
-    vbi.dt_ref
+    vbi.dt_ref,
+    YEAR(vbi.dt_ref) AS year,
+    MONTH(vbi.dt_ref) AS month,
+    DAY(vbi.dt_ref) AS day
 FROM
     visit_by_identifier AS vbi
 LATERAL VIEW
