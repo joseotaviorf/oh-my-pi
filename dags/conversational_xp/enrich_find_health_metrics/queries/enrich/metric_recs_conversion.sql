@@ -18,6 +18,7 @@ WITH rent_sale_flow AS (
     AND (
       ts_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
       OR ts_direct_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+      OR ts_contract_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     )
   GROUP BY ALL
 
@@ -39,6 +40,7 @@ WITH rent_sale_flow AS (
     AND (
       ts_first_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
       OR ts_first_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+      OR dt_sale_agreement_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     )
   GROUP BY ALL
 )
@@ -60,7 +62,7 @@ WITH rent_sale_flow AS (
     GET_JSON_OBJECT(timestamps, '$.ts_contract_signed') AS ts_contract_signed
   FROM datalake_search.recs_impressions_processed
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_45}) AND DATE('{end_date}')
     AND GET_JSON_OBJECT(metrics, '$.click') = '1'
     AND (
       GET_JSON_OBJECT(metrics, '$.direct_offer') = '1'

@@ -13,6 +13,7 @@ workflow:
     "days_past_14": 14
     "days_past_21": 21
     "days_past_30": 30
+    "days_past_45": 45
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
