@@ -554,6 +554,7 @@ hierarchy_versioned AS (
 assignment_lookup AS (
     SELECT
         assignment_number,
+        person_number,
         COALESCE(display_name, full_name) AS name,
         work_email AS email
     FROM
@@ -565,35 +566,46 @@ assignment_lookup AS (
 )
 SELECT
     hv.sk_hierarchy_version,
-    hv.assignment_number,
-    hv.manager_struct_path[0].assignment_number AS assignment_number_l0,
+    COALESCE(CAST(hv.assignment_number AS STRING), '') AS assignment_number,
+    COALESCE(im_self.person_number, '') AS person_number,
+    COALESCE(CAST(hv.manager_struct_path[0].assignment_number AS STRING), '') AS assignment_number_l0,
+    COALESCE(im_l0.person_number, '') AS person_number_l0,
     COALESCE(im_l0.name, '') AS name_l0,
     COALESCE(im_l0.email, '') AS email_l0,
-    hv.manager_struct_path[1].assignment_number AS assignment_number_l1,
+    COALESCE(CAST(hv.manager_struct_path[1].assignment_number AS STRING), '') AS assignment_number_l1,
+    COALESCE(im_l1.person_number, '') AS person_number_l1,
     COALESCE(im_l1.name, '') AS name_l1,
     COALESCE(im_l1.email, '') AS email_l1,
-    hv.manager_struct_path[2].assignment_number AS assignment_number_l2,
+    COALESCE(CAST(hv.manager_struct_path[2].assignment_number AS STRING), '') AS assignment_number_l2,
+    COALESCE(im_l2.person_number, '') AS person_number_l2,
     COALESCE(im_l2.name, '') AS name_l2,
     COALESCE(im_l2.email, '') AS email_l2,
-    hv.manager_struct_path[3].assignment_number AS assignment_number_l3,
+    COALESCE(CAST(hv.manager_struct_path[3].assignment_number AS STRING), '') AS assignment_number_l3,
+    COALESCE(im_l3.person_number, '') AS person_number_l3,
     COALESCE(im_l3.name, '') AS name_l3,
     COALESCE(im_l3.email, '') AS email_l3,
-    hv.manager_struct_path[4].assignment_number AS assignment_number_l4,
+    COALESCE(CAST(hv.manager_struct_path[4].assignment_number AS STRING), '') AS assignment_number_l4,
+    COALESCE(im_l4.person_number, '') AS person_number_l4,
     COALESCE(im_l4.name, '') AS name_l4,
     COALESCE(im_l4.email, '') AS email_l4,
-    hv.manager_struct_path[5].assignment_number AS assignment_number_l5,
+    COALESCE(CAST(hv.manager_struct_path[5].assignment_number AS STRING), '') AS assignment_number_l5,
+    COALESCE(im_l5.person_number, '') AS person_number_l5,
     COALESCE(im_l5.name, '') AS name_l5,
     COALESCE(im_l5.email, '') AS email_l5,
-    hv.manager_struct_path[6].assignment_number AS assignment_number_l6,
+    COALESCE(CAST(hv.manager_struct_path[6].assignment_number AS STRING), '') AS assignment_number_l6,
+    COALESCE(im_l6.person_number, '') AS person_number_l6,
     COALESCE(im_l6.name, '') AS name_l6,
     COALESCE(im_l6.email, '') AS email_l6,
-    hv.manager_struct_path[7].assignment_number AS assignment_number_l7,
+    COALESCE(CAST(hv.manager_struct_path[7].assignment_number AS STRING), '') AS assignment_number_l7,
+    COALESCE(im_l7.person_number, '') AS person_number_l7,
     COALESCE(im_l7.name, '') AS name_l7,
     COALESCE(im_l7.email, '') AS email_l7,
-    hv.manager_struct_path[8].assignment_number AS assignment_number_l8,
+    COALESCE(CAST(hv.manager_struct_path[8].assignment_number AS STRING), '') AS assignment_number_l8,
+    COALESCE(im_l8.person_number, '') AS person_number_l8,
     COALESCE(im_l8.name, '') AS name_l8,
     COALESCE(im_l8.email, '') AS email_l8,
-    hv.manager_struct_path[9].assignment_number AS assignment_number_l9,
+    COALESCE(CAST(hv.manager_struct_path[9].assignment_number AS STRING), '') AS assignment_number_l9,
+    COALESCE(im_l9.person_number, '') AS person_number_l9,
     COALESCE(im_l9.name, '') AS name_l9,
     COALESCE(im_l9.email, '') AS email_l9,
     hv.hierarchy_version_seq AS version,
@@ -603,6 +615,9 @@ SELECT
     CURRENT_TIMESTAMP() AS ts_load
 FROM
     hierarchy_versioned AS hv
+LEFT JOIN
+    assignment_lookup AS im_self
+    ON im_self.assignment_number = hv.assignment_number
 LEFT JOIN
     assignment_lookup AS im_l0
     ON im_l0.assignment_number = hv.manager_struct_path[0].assignment_number

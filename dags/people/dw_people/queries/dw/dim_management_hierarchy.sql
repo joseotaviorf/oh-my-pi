@@ -1,0 +1,38 @@
+SELECT
+    sk_hierarchy_version AS sk_manager_hierarchy,
+    person_number,
+    person_number_l0,
+    name_l0,
+    email_l0,
+    person_number_l1,
+    name_l1,
+    email_l1,
+    person_number_l2,
+    name_l2,
+    email_l2,
+    person_number_l3,
+    name_l3,
+    email_l3,
+    person_number_l4,
+    name_l4,
+    email_l4,
+    person_number_l5,
+    name_l5,
+    email_l5,
+    person_number_l6,
+    name_l6,
+    email_l6,
+    person_number_l7,
+    name_l7,
+    email_l7,
+    person_number_l8,
+    name_l8,
+    email_l8,
+    person_number_l9,
+    name_l9,
+    email_l9,
+    CURRENT_TIMESTAMP() AS ts_load
+FROM
+    datalake_people.management_hierarchy
+WHERE
+    is_current = TRUE

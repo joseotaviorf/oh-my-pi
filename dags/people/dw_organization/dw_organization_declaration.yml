@@ -4,8 +4,10 @@ dag:
   schedule_start_date: 2026, 2, 11
   documentation:
     dag_purpose: |
-      Data Warehouse layer for People organization structure.
+      People DW layer for organization structure.
       Holds dimension tables that describe organizational entities (e.g. jobs, cost centers, business units).
+      No sensitive or PII data. Currently restricted to the people team; will be made available
+      to the entire QuintoAndar once the DW tables are validated.
       dim_cost_center uses SCD Type 2 (dt_valid_from, dt_valid_to) for codex attributes; other tables may use SCD Type 1.
       Tables are designed to join primarily to dw_people.fact_employee for reporting and analytics.
 cluster:
@@ -24,7 +26,7 @@ workflow:
   layer: dw
   bucket_config_name: people_bucket
   custom_schema: organization
-  has_hive_sync: false
+  has_hive_sync: true
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

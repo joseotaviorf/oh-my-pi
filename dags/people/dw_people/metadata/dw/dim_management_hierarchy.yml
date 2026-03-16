@@ -1,0 +1,141 @@
+database_name: dw_people
+table_name: dim_management_hierarchy
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Current snapshot of each employee's managerial chain. One row per employee.
+  The hierarchy starts at the CEO (L0) and descends to the employee, who can appear at any level from L1 to L9 depending on the org depth.
+  Columns expose the person_number, name, and email of the employee and of each manager in the chain (L0 to L9).
+  Use this table to filter, group, or join on any level of the reporting structure.
+  Grain: one row per person_number (SCD Type 1).
+columns:
+  sk_manager_hierarchy:
+    description: Surrogate key for the current manager hierarchy.
+    lineage:
+      - datalake_people.management_hierarchy.sk_hierarchy_version
+  person_number:
+    description: Person number (Oracle HCM person identifier) of the employee whose current managerial chain is represented in this record.
+    lineage:
+      - datalake_people.management_hierarchy.person_number
+  person_number_l0:
+    description: Person number of the manager L0 (top-level manager / CEO in the valid chain).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l0
+  name_l0:
+    description: Full name of the manager L0 (top-level manager / CEO in the valid chain).
+    lineage:
+      - datalake_people.management_hierarchy.name_l0
+  email_l0:
+    description: Work e-mail of the manager L0 (top-level manager / CEO in the valid chain).
+    lineage:
+      - datalake_people.management_hierarchy.email_l0
+  person_number_l1:
+    description: Person number of the manager L1 (one level below L0).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l1
+  name_l1:
+    description: Full name of the manager L1 (one level below L0).
+    lineage:
+      - datalake_people.management_hierarchy.name_l1
+  email_l1:
+    description: Work e-mail of the manager L1 (one level below L0).
+    lineage:
+      - datalake_people.management_hierarchy.email_l1
+  person_number_l2:
+    description: Person number of the manager L2 (one level below L1).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l2
+  name_l2:
+    description: Full name of the manager L2 (one level below L1).
+    lineage:
+      - datalake_people.management_hierarchy.name_l2
+  email_l2:
+    description: Work e-mail of the manager L2 (one level below L1).
+    lineage:
+      - datalake_people.management_hierarchy.email_l2
+  person_number_l3:
+    description: Person number of the manager L3 (one level below L2).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l3
+  name_l3:
+    description: Full name of the manager L3 (one level below L2).
+    lineage:
+      - datalake_people.management_hierarchy.name_l3
+  email_l3:
+    description: Work e-mail of the manager L3 (one level below L2).
+    lineage:
+      - datalake_people.management_hierarchy.email_l3
+  person_number_l4:
+    description: Person number of the manager L4 (one level below L3).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l4
+  name_l4:
+    description: Full name of the manager L4 (one level below L3).
+    lineage:
+      - datalake_people.management_hierarchy.name_l4
+  email_l4:
+    description: Work e-mail of the manager L4 (one level below L3).
+    lineage:
+      - datalake_people.management_hierarchy.email_l4
+  person_number_l5:
+    description: Person number of the manager L5 (one level below L4).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l5
+  name_l5:
+    description: Full name of the manager L5 (one level below L4).
+    lineage:
+      - datalake_people.management_hierarchy.name_l5
+  email_l5:
+    description: Work e-mail of the manager L5 (one level below L4).
+    lineage:
+      - datalake_people.management_hierarchy.email_l5
+  person_number_l6:
+    description: Person number of the manager L6 (one level below L5).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l6
+  name_l6:
+    description: Full name of the manager L6 (one level below L5).
+    lineage:
+      - datalake_people.management_hierarchy.name_l6
+  email_l6:
+    description: Work e-mail of the manager L6 (one level below L5).
+    lineage:
+      - datalake_people.management_hierarchy.email_l6
+  person_number_l7:
+    description: Person number of the manager L7 (one level below L6).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l7
+  name_l7:
+    description: Full name of the manager L7 (one level below L6).
+    lineage:
+      - datalake_people.management_hierarchy.name_l7
+  email_l7:
+    description: Work e-mail of the manager L7 (one level below L6).
+    lineage:
+      - datalake_people.management_hierarchy.email_l7
+  person_number_l8:
+    description: Person number of the manager L8 (one level below L7).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l8
+  name_l8:
+    description: Full name of the manager L8 (one level below L7).
+    lineage:
+      - datalake_people.management_hierarchy.name_l8
+  email_l8:
+    description: Work e-mail of the manager L8 (one level below L7).
+    lineage:
+      - datalake_people.management_hierarchy.email_l8
+  person_number_l9:
+    description: Person number of the manager L9 (one level below L8).
+    lineage:
+      - datalake_people.management_hierarchy.person_number_l9
+  name_l9:
+    description: Full name of the manager L9 (one level below L8).
+    lineage:
+      - datalake_people.management_hierarchy.name_l9
+  email_l9:
+    description: Work e-mail of the manager L9 (one level below L8).
+    lineage:
+      - datalake_people.management_hierarchy.email_l9
+  ts_load:
+    description: Timestamp when the record was loaded into the dimension.

@@ -839,6 +839,8 @@ bietlejuice.dw_organization:
 bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline:first-run-of-day
   - bietlejuice.enrich_payments_platform:load-enrich-payment:first-run-of-day
+bietlejuice.dw_people:
+  - bietlejuice.enrich_people:load-enrich-management-hierarchy:first-run-of-day
 bietlejuice.dw_performance:
   - bietlejuice.enrich_performance:load-enrich-performance-evaluation:first-run-of-day
   - bietlejuice.enrich_performance:load-enrich-talent-review:first-run-of-day

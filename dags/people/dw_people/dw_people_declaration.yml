@@ -1,0 +1,33 @@
+dag:
+  name: dw_people
+  owner: Data People
+  schedule_start_date: 2026, 3, 13
+  documentation:
+    dag_purpose: |
+      People DW layer: hierarchy, names, emails, and organizational structure.
+      No sensitive data. Currently restricted to the people team; will be made available
+      to the entire QuintoAndar once the DW tables are validated.
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: people
+  bucket_config_name: people_bucket
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  tables_customization:
+    dim_management_hierarchy:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
