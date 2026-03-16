@@ -31,11 +31,7 @@ clone-local-beethoven:
 setup-bietlejuice:
 	@echo "Setup bietlejuice at local airflow deployment"
 	@echo "=========="
-	@rm -fR ./local/astro/dags || true
-	@rm -fR ./local/astro/bietlejuice || true
 	@rm -fR ./local/astro/scripts || true
-	@cp -Rf ./dags/ ./local/astro/dags
-	@cp -Rf ./bietlejuice/ ./local/astro/bietlejuice
 	@cp -Rf ./scripts/ ./local/astro/scripts
 
 .PHONY: setup-local-variables

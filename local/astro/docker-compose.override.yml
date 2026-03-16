@@ -1,0 +1,14 @@
+version: "3.1"
+services:
+  scheduler:
+    volumes:
+      # Format is: ./local_path:/container_path
+      - ./bietlejuice:/usr/local/airflow/bietlejuice
+
+  webserver:
+    volumes:
+      - ./bietlejuice:/usr/local/airflow/bietlejuice
+
+  triggerer:
+    volumes:
+      - ./bietlejuice:/usr/local/airflow/bietlejuice
