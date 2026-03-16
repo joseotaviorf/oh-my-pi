@@ -42,7 +42,7 @@ def mock_airflow_variables():
 @pytest.fixture
 def mock_jiraops_client():
     with patch(
-        "bietlejuice.base.jiraops.jiraops_client.JiraOpsClient"
+        "bietlejuice.base.jiraops.jiraops_callback.JiraOpsClient"
     ) as mock_client_class:
         mock_client_instance = MagicMock()
         mock_response = MagicMock()
@@ -89,8 +89,19 @@ def mock_context():
 
 @pytest.fixture
 def jiraops_callback(mock_airflow_variables, patch_datetime_now):
-    with patch.dict(
-        "sys.modules", {"airflow.models": MagicMock(Variable=mock_airflow_variables)}
+    """Patch Variable and datetime at use-site so we never invoke real Airflow."""
+
+    class fake_datetime(datetime.datetime):
+        @classmethod
+        def now(cls):
+            return FAKE_TIME
+
+    with patch(
+        "bietlejuice.base.jiraops.jiraops_callback.Variable",
+        mock_airflow_variables,
+    ), patch(
+        "bietlejuice.base.jiraops.jiraops_callback.datetime",
+        fake_datetime,
     ):
         from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
