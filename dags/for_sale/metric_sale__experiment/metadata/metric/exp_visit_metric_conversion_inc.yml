@@ -1,0 +1,151 @@
+---
+database_name: metric_sale
+table_name: exp_visit_metric_conversion_inc
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description: Experiment conversion metrics table providing statistical analysis of funnel conversion rates
+  for A/B testing. This table aggregates visit cohort data to calculate conversion percentages
+  and confidence intervals for control vs treatment groups across different funnel stages.
+  Each row represents a specific conversion metric (vb2vc, vb2vcc, vb2vu, vb2os, vb2oa, vb2cs)
+  for each experiment, cohort period and reference date.
+  Each run of the DAG will process the data for the dt_ref based on the load_start_date and load_end_date
+  parameters and will merge the data with the existing data for the same dt_ref.
+columns:
+  sk_exp_visit_metric:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.sk_neotribe_exp
+      - metric_sale.exp_visit_cohort_inc.metric_cohort
+      - metric_sale.exp_visit_cohort_inc.dt_ref
+    description: Unique key combining experiment, cohort period, metric name and reference date.
+    dimension: True
+  exp_name_neotribe:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.exp_name_neotribe
+    description: Name of the neotribe conducting the experiment.
+    dimension: True
+  exp_name_experiment:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.exp_name_experiment
+    description: Name of the specific experiment being conducted.
+    dimension: True
+  exp_identifier_type:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.exp_identifier_type
+    description: Type of identifier used for experiment participants (e.g., VISITOR, HOUSE, AGENT).
+    dimension: True
+  business_context:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.business_context
+    description: Business context of the visit (RENT or SALE).
+    dimension: True
+  metric_cohort:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.metric_cohort
+    description: Cohort time window for metric calculation.
+    categories:
+      1d: 1-day cohort metrics.
+      3d: 3-day cohort metrics.
+      7d: 7-day cohort metrics.
+      14d: 14-day cohort metrics.
+      21d: 21-day cohort metrics.
+      28d: 28-day cohort metrics.
+    dimension: True
+  metric_name:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.num_vb
+      - metric_sale.exp_visit_cohort_inc.num_vc
+      - metric_sale.exp_visit_cohort_inc.num_vcc
+      - metric_sale.exp_visit_cohort_inc.num_vu
+      - metric_sale.exp_visit_cohort_inc.num_os
+      - metric_sale.exp_visit_cohort_inc.num_oa
+      - metric_sale.exp_visit_cohort_inc.num_cs
+    description: Name of the conversion metric being calculated.
+    categories:
+      vb2vc: Visit Booked to Visit Completed conversion rate.
+      vb2vcc: Visit Booked to Visit Canceled conversion rate.
+      vb2vu: Visit Booked to Visit Unsuccessful conversion rate.
+      vb2os: Visit Booked to Offer Submitted conversion rate.
+      vb2oa: Visit Booked to Offer Accepted conversion rate.
+      vb2cs: Visit Booked to Contract Signed conversion rate.
+    dimension: True
+  control_metric_value:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.num_vb
+      - metric_sale.exp_visit_cohort_inc.num_vc
+      - metric_sale.exp_visit_cohort_inc.num_vcc
+      - metric_sale.exp_visit_cohort_inc.num_vu
+      - metric_sale.exp_visit_cohort_inc.num_os
+      - metric_sale.exp_visit_cohort_inc.num_oa
+      - metric_sale.exp_visit_cohort_inc.num_cs
+    description: Conversion rate percentage for the control group.
+    metric:
+      name: Control Group Conversion Rate
+      description: Conversion rate percentage for participants in the control group.
+      acronym: Control
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ""
+  control_metric_error:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.num_vb
+      - metric_sale.exp_visit_cohort_inc.num_vc
+      - metric_sale.exp_visit_cohort_inc.num_vcc
+      - metric_sale.exp_visit_cohort_inc.num_vu
+      - metric_sale.exp_visit_cohort_inc.num_os
+      - metric_sale.exp_visit_cohort_inc.num_oa
+      - metric_sale.exp_visit_cohort_inc.num_cs
+    description: 95% confidence interval margin of error for control group conversion rate.
+    metric:
+      name: Control Group Error Margin
+      description: Statistical margin of error for control group conversion rate at 95% confidence level.
+      acronym: Control Error
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ""
+  treatment_metric_value:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.num_vb
+      - metric_sale.exp_visit_cohort_inc.num_vc
+      - metric_sale.exp_visit_cohort_inc.num_vcc
+      - metric_sale.exp_visit_cohort_inc.num_vu
+      - metric_sale.exp_visit_cohort_inc.num_os
+      - metric_sale.exp_visit_cohort_inc.num_oa
+      - metric_sale.exp_visit_cohort_inc.num_cs
+    description: Conversion rate percentage for the treatment group.
+    metric:
+      name: Treatment Group Conversion Rate
+      description: Conversion rate percentage for participants in the treatment group.
+      acronym: Treatment
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ""
+  treatment_metric_error:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.num_vb
+      - metric_sale.exp_visit_cohort_inc.num_vc
+      - metric_sale.exp_visit_cohort_inc.num_vcc
+      - metric_sale.exp_visit_cohort_inc.num_vu
+      - metric_sale.exp_visit_cohort_inc.num_os
+      - metric_sale.exp_visit_cohort_inc.num_oa
+      - metric_sale.exp_visit_cohort_inc.num_cs
+    description: 95% confidence interval margin of error for treatment group conversion rate (calculated using binomial proportion confidence interval).
+    metric:
+      name: Treatment Group Error Margin
+      description: Statistical margin of error for treatment group conversion rate at 95% confidence level.
+      acronym: Treatment Error
+      is_additive: False
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ""
+  dt_ref:
+    lineage:
+      - metric_sale.exp_visit_cohort_inc.dt_ref
+    description: Reference date for cohort calculation, representing the analysis date for time-based metrics.
+    dimension: True

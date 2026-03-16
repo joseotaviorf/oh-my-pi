@@ -10,38 +10,38 @@ description:
 columns:
   sk_exp_visit_metric:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.sk_exp_visit_metric
-      - metric_sale.exp_visit_identifier_metric.sk_exp_visit_metric
+      - metric_sale.exp_visit_metric_conversion_inc.sk_exp_visit_metric
+      - metric_sale.exp_visit_identifier_metric_inc.sk_exp_visit_metric
     description: Unique key combining experiment, cohort period, metric name, and reference date.
     dimension: True
   exp_name_neotribe:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.exp_name_neotribe
-      - metric_sale.exp_visit_identifier_metric.exp_name_neotribe
+      - metric_sale.exp_visit_metric_conversion_inc.exp_name_neotribe
+      - metric_sale.exp_visit_identifier_metric_inc.exp_name_neotribe
     description: Name of the neotribe conducting the experiment.
     dimension: True
   exp_name_experiment:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.exp_name_experiment
-      - metric_sale.exp_visit_identifier_metric.exp_name_experiment
+      - metric_sale.exp_visit_metric_conversion_inc.exp_name_experiment
+      - metric_sale.exp_visit_identifier_metric_inc.exp_name_experiment
     description: Name of the specific experiment being conducted.
     dimension: True
   exp_identifier_type:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.exp_identifier_type
-      - metric_sale.exp_visit_identifier_metric.exp_identifier_type
+      - metric_sale.exp_visit_metric_conversion_inc.exp_identifier_type
+      - metric_sale.exp_visit_identifier_metric_inc.exp_identifier_type
     description: Type of identifier used for experiment participants (e.g., VISITOR, HOUSE, AGENT).
     dimension: True
   business_context:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.business_context
-      - metric_sale.exp_visit_identifier_metric.business_context
+      - metric_sale.exp_visit_metric_conversion_inc.business_context
+      - metric_sale.exp_visit_identifier_metric_inc.business_context
     description: Business context of the experiment (RENT or SALE).
     dimension: True
   metric_cohort:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.metric_cohort
-      - metric_sale.exp_visit_identifier_metric.metric_cohort
+      - metric_sale.exp_visit_metric_conversion_inc.metric_cohort
+      - metric_sale.exp_visit_identifier_metric_inc.metric_cohort
     description: Cohort time window for metric calculation.
     categories:
       1d: 1-day cohort metrics.
@@ -53,14 +53,14 @@ columns:
     dimension: True
   metric_name:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.metric_name
-      - metric_sale.exp_visit_identifier_metric.metric_name
+      - metric_sale.exp_visit_metric_conversion_inc.metric_name
+      - metric_sale.exp_visit_identifier_metric_inc.metric_name
     description: Name of the specific metric being measured in the experiment.
     dimension: True
   control_metric_value:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.control_metric_value
-      - metric_sale.exp_visit_identifier_metric.control_metric_value
+      - metric_sale.exp_visit_metric_conversion_inc.control_metric_value
+      - metric_sale.exp_visit_identifier_metric_inc.control_metric_value
     description: Calculated metric value for the control group in the experiment.
     metric:
       name: Control Group Metric Value
@@ -73,8 +73,8 @@ columns:
       link_to_metric: ""
   control_metric_error:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.control_metric_error
-      - metric_sale.exp_visit_identifier_metric.control_metric_error
+      - metric_sale.exp_visit_metric_conversion_inc.control_metric_error
+      - metric_sale.exp_visit_identifier_metric_inc.control_metric_error
     description: Statistical error margin for the control group metric value using binomial proportion confidence interval.
     metric:
       name: Control Group Metric Error
@@ -87,8 +87,8 @@ columns:
       link_to_metric: ""
   treatment_metric_value:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.treatment_metric_value
-      - metric_sale.exp_visit_identifier_metric.treatment_metric_value
+      - metric_sale.exp_visit_metric_conversion_inc.treatment_metric_value
+      - metric_sale.exp_visit_identifier_metric_inc.treatment_metric_value
     description: Calculated metric value for the treatment group in the experiment.
     metric:
       name: Treatment Group Metric Value
@@ -101,8 +101,8 @@ columns:
       link_to_metric: ""
   treatment_metric_error:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.treatment_metric_error
-      - metric_sale.exp_visit_identifier_metric.treatment_metric_error
+      - metric_sale.exp_visit_metric_conversion_inc.treatment_metric_error
+      - metric_sale.exp_visit_identifier_metric_inc.treatment_metric_error
     description: Statistical error margin for the treatment group metric value using binomial proportion confidence interval.
     metric:
       name: Treatment Group Metric Error
@@ -115,25 +115,25 @@ columns:
       link_to_metric: ""
   dt_ref:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.dt_ref
-      - metric_sale.exp_visit_identifier_metric.dt_ref
+      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Reference date for metric calculation and incremental processing.
     dimension: True
   year:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.dt_ref
-      - metric_sale.exp_visit_identifier_metric.dt_ref
+      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Year component of the reference date for partitioning.
     dimension: True
   month:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.dt_ref
-      - metric_sale.exp_visit_identifier_metric.dt_ref
+      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Month component of the reference date for partitioning.
     dimension: True
   day:
     lineage:
-      - metric_sale.exp_visit_metric_conversion.dt_ref
-      - metric_sale.exp_visit_identifier_metric.dt_ref
+      - metric_sale.exp_visit_metric_conversion_inc.dt_ref
+      - metric_sale.exp_visit_identifier_metric_inc.dt_ref
     description: Day component of the reference date for partitioning.
     dimension: True

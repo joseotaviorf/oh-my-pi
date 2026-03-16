@@ -15,7 +15,7 @@ SELECT
     MONTH(dt_ref) AS month,
     DAY(dt_ref) AS day
 FROM
-    metric_sale.exp_visit_metric_conversion
+    metric_sale.exp_visit_metric_conversion_inc
 WHERE
     dt_ref BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
@@ -36,6 +36,6 @@ SELECT
     MONTH(dt_ref) AS month,
     DAY(dt_ref) AS day
 FROM
-    metric_sale.exp_visit_identifier_metric
+    metric_sale.exp_visit_identifier_metric_inc
 WHERE
     dt_ref BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

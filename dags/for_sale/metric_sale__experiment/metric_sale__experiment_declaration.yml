@@ -13,14 +13,26 @@ workflow:
       - exp_visit_cohort
     exp_visit_identifier_metric:
       - exp_visit_cohort
+    exp_visit_metric_conversion_inc:
+      - exp_visit_cohort_inc
+    exp_visit_identifier_metric_inc:
+      - exp_visit_cohort_inc
     exp_visit_metric_unified:
-      - exp_visit_metric_conversion
-      - exp_visit_identifier_metric
+      - exp_visit_metric_conversion_inc
+      - exp_visit_identifier_metric_inc
   tables_customization:
     exp_visit_cohort_inc:
       extraction_type: incremental
       partitions: [year, month, day]
       merge_on: [sk_exp_visit_cohort]
+    exp_visit_identifier_metric_inc:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [sk_exp_visit_metric]
+    exp_visit_metric_conversion_inc:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [sk_exp_visit_metric]
     exp_visit_metric_unified:
       extraction_type: incremental
       partitions: [year, month, day]
