@@ -94,6 +94,137 @@ assignment_history AS (
         id_job,
         change_group
 ),
+assignment_history_with_band AS (
+    SELECT
+        ah.id_assignment,
+        ah.id_job,
+        ah.dt_effective_started,
+        ah.dt_effective_ended,
+        dj.band
+    FROM
+        assignment_history AS ah
+    INNER JOIN
+        dw_compensation.dim_job AS dj
+            ON ah.id_job = dj.id_job
+            AND dj.dt_valid_from <= ah.dt_effective_started
+            AND (dj.dt_valid_to IS NULL OR dj.dt_valid_to > ah.dt_effective_started)
+    WHERE
+        dj.band IS NOT NULL
+),
+assignment_band_stint_groups AS (
+    SELECT
+        id_assignment,
+        band,
+        dt_effective_started,
+        dt_effective_ended,
+        SUM(
+            CASE
+                WHEN LAG(dt_effective_ended) OVER (
+                    PARTITION BY id_assignment, band
+                    ORDER BY dt_effective_started, dt_effective_ended
+                ) < DATE_ADD(dt_effective_started, -1)
+                    OR LAG(dt_effective_ended) OVER (
+                        PARTITION BY id_assignment, band
+                        ORDER BY dt_effective_started, dt_effective_ended
+                    ) IS NULL
+                THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY id_assignment, band
+            ORDER BY dt_effective_started, dt_effective_ended
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS stint_group
+    FROM
+        assignment_history_with_band
+),
+assignment_band_stints AS (
+    SELECT
+        id_assignment,
+        band,
+        MIN(dt_effective_started) AS dt_stint_start,
+        MAX(dt_effective_ended) AS dt_stint_ended
+    FROM
+        assignment_band_stint_groups
+    GROUP BY
+        id_assignment,
+        band,
+        stint_group
+),
+assignment_job_stint_groups AS (
+    SELECT
+        id_assignment,
+        id_job,
+        dt_effective_started,
+        dt_effective_ended,
+        SUM(
+            CASE
+                WHEN LAG(dt_effective_ended) OVER (
+                    PARTITION BY id_assignment, id_job
+                    ORDER BY dt_effective_started, dt_effective_ended
+                ) < DATE_ADD(dt_effective_started, -1)
+                    OR LAG(dt_effective_ended) OVER (
+                        PARTITION BY id_assignment, id_job
+                        ORDER BY dt_effective_started, dt_effective_ended
+                    ) IS NULL
+                THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY id_assignment, id_job
+            ORDER BY dt_effective_started, dt_effective_ended
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS stint_group
+    FROM
+        assignment_history
+),
+assignment_job_stints AS (
+    SELECT
+        id_assignment,
+        id_job,
+        MIN(dt_effective_started) AS dt_stint_start,
+        MAX(dt_effective_ended) AS dt_stint_ended
+    FROM
+        assignment_job_stint_groups
+    GROUP BY
+        id_assignment,
+        id_job,
+        stint_group
+),
+terminated_for_transfer AS (
+    SELECT
+        aa_next.id_period_of_service AS id_period_of_service_next,
+        ps_prev.dt_started AS previous_dt_started
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    INNER JOIN
+        datalake_pin_core_clean.all_assignments AS aa_next
+            ON aa_next.id_person = aa.id_person
+            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+    LEFT JOIN
+        datalake_pin_core_clean.periods_of_service AS ps_prev
+            ON ps_prev.id_period_of_service = aa.id_period_of_service
+    WHERE
+        aa.assignment_status_type = 'INACTIVE'
+        AND aa.action_code = 'GLB_TRANSFER'
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY aa.id_period_of_service
+            ORDER BY aa.dt_effective_started ASC
+        ) = 1
+),
+assignment_admission_started AS (
+    SELECT
+        im.id_assignment,
+        COALESCE(tft.previous_dt_started, im.dt_started) AS dt_admission_started
+    FROM
+        datalake_people.identifier_mapping AS im
+    LEFT JOIN
+        terminated_for_transfer AS tft
+            ON tft.id_period_of_service_next = im.id_period_of_service
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY im.id_assignment ORDER BY im.dt_started) = 1
+),
 salary_with_assignment_job AS (
     -- Split salary periods by assignment job changes
     SELECT
@@ -351,13 +482,22 @@ salary_consolidated AS (
         target_hiring_sop,
         target_exceptional_bonus,
         change_group
+),
+salary_with_reference AS (
+    SELECT
+        sal.*,
+        LEAST(
+            CURRENT_DATE,
+            COALESCE(NULLIF(sal.dt_ended_normalized, DATE('4712-12-31')), CURRENT_DATE)
+        ) AS dt_reference
+    FROM
+        salary_consolidated AS sal
 )
 SELECT
     -- Priority 0: SKs
     MD5(CONCAT_WS('|',
         CAST(sal.id_salary AS STRING),
         CAST(sal.id_assignment AS STRING),
-        CAST(sal.id_period_of_service AS STRING),
         COALESCE(CAST(sal.id_job AS STRING), ''),
         CAST(sal.dt_started AS STRING),
         CAST(sal.dt_ended_normalized AS STRING)
@@ -391,6 +531,13 @@ SELECT
         THEN TRUE
         ELSE FALSE
     END AS is_promotion_movement,
+    -- Metrics - Tenure (reference date = LEAST(CURRENT_DATE, dt_valid_to); current stint for band/job)
+    DATEDIFF(sal.dt_reference, pos.dt_admission_started) AS days_tenure_in_company,
+    DATEDIFF(sal.dt_reference, ajst.dt_stint_start) AS days_tenure_in_position,
+    DATEDIFF(sal.dt_reference, abst.dt_stint_start) AS days_tenure_in_band,
+    FLOOR(MONTHS_BETWEEN(sal.dt_reference, pos.dt_admission_started)) AS months_tenure_in_company,
+    FLOOR(MONTHS_BETWEEN(sal.dt_reference, ajst.dt_stint_start)) AS months_tenure_in_position,
+    FLOOR(MONTHS_BETWEEN(sal.dt_reference, abst.dt_stint_start)) AS months_tenure_in_band,
     -- SCD Type 2 fields
     sal.dt_started AS dt_valid_from,
     CASE
@@ -407,4 +554,22 @@ SELECT
     -- Timestamp type
     NOW() AS ts_load
 FROM
-    salary_consolidated AS sal
+    salary_with_reference AS sal
+LEFT JOIN
+    assignment_admission_started AS pos
+        ON sal.id_assignment = pos.id_assignment
+LEFT JOIN
+    dw_compensation.dim_job AS dj_band
+        ON sal.sk_job_version = dj_band.sk_job_version
+LEFT JOIN
+    assignment_job_stints AS ajst
+        ON sal.id_assignment = ajst.id_assignment
+        AND sal.id_job = ajst.id_job
+        AND sal.dt_reference >= ajst.dt_stint_start
+        AND sal.dt_reference <= ajst.dt_stint_ended
+LEFT JOIN
+    assignment_band_stints AS abst
+        ON sal.id_assignment = abst.id_assignment
+        AND dj_band.band = abst.band
+        AND sal.dt_reference >= abst.dt_stint_start
+        AND sal.dt_reference <= abst.dt_stint_ended

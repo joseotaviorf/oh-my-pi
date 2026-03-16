@@ -24,30 +24,53 @@ description: |
 columns:
   sk_compensation:
     description: |
-      Surrogate key. MD5 hash of (id_salary, id_assignment, id_period_of_service, id_job,
-      dt_valid_from, dt_valid_to) to uniquely identify each consolidated compensation record.
-      Includes full grain columns because salary consolidation can produce multiple rows with
-      the same id_salary and dt_started when splitting by job/assignment periods.
+      Surrogate key. MD5 hash of (id_salary, id_assignment, id_job, dt_valid_from, dt_valid_to)
+      to uniquely identify each consolidated compensation record.
+      id_assignment suffices for grain differentiation (1:1 with id_period_of_service).
+    lineage:
+      - datalake_pin_compensation_clean.salary.id_salary
+      - datalake_pin_compensation_clean.salary.id_assignment
+      - datalake_pin_compensation_clean.salary.id_job
+      - datalake_pin_compensation_clean.salary.dt_started
+      - datalake_pin_compensation_clean.salary.dt_ended
   sk_employee:
     description: Foreign key to dim_employee. References the employee (id_person).
+    lineage:
+      - datalake_pin_compensation_clean.salary.id_person
   sk_contract:
     description: Foreign key to dim_assignment. References the contract/assignment (id_assignment).
+    lineage:
+      - datalake_pin_compensation_clean.salary.id_assignment
   sk_job_version:
     description: Foreign key to dim_job. References the job version at the time of the salary record.
+    lineage:
+      - dw_compensation.dim_job.sk_job_version
   sk_event_definition:
     description: |
       Foreign key to dim_event_definition.
       Unified identifier for the action and reason that triggered this compensation change.
+    lineage:
+      - datalake_people.event_definition.id_event_definition
   person_number:
     description: Employee's person number (business identifier).
+    lineage:
+      - datalake_people.identifier_mapping.person_number
   assignment_number:
     description: Assignment number for the employee's position.
+    lineage:
+      - datalake_people.identifier_mapping.assignment_number
   currency_code:
     description: Currency code for salary amounts (e.g., BRL, USD, MXN).
+    lineage:
+      - datalake_pin_compensation_clean.salary.currency_code
   amount_salary:
     description: Salary amount based on the salary basis frequency (e.g., monthly salary).
+    lineage:
+      - datalake_pin_compensation_clean.salary.salary_amount
   amount_annual_salary:
     description: Calculated total annual salary based on salary amount and annualization factor.
+    lineage:
+      - datalake_pin_compensation_clean.salary.annual_salary
   amount_total_cash:
     description: |
       Total cash compensation including annual salary and PLR.
@@ -56,31 +79,101 @@ columns:
         + (salary_amount × target_plr_salary_multiplier) for LATAM
         + target_plr for Brasil
       Note: SOP, RVV and exceptional bonus are excluded for now.
+    lineage:
+      - datalake_pin_compensation_clean.salary.annual_salary
+      - datalake_pin_compensation_clean.salary.salary_amount
+      - dw_compensation.dim_job.target_plr
+      - dw_compensation.dim_job.target_plr_salary_multiplier
   amount_adjustment:
     description: Monetary amount of the salary adjustment (difference from previous salary).
+    lineage:
+      - datalake_pin_compensation_clean.salary.adjustment_amount
   pct_adjustment:
     description: Percentage increase of the salary adjustment over the base salary value.
+    lineage:
+      - datalake_pin_compensation_clean.salary.adjustment_percent
   range_position:
     description: |
       Compensation ratio comparing actual salary to the midpoint of the pay range.
       Formula: salary / mid_value. Values around 1.0 indicate market alignment.
       Primary metric used by the business for compensation analysis.
+    lineage:
+      - datalake_pin_compensation_clean.salary.compa_ratio
   range_percentile:
     description: |
       Position of salary within the pay range as a percentage.
       Formula: (salary - min) / (max - min). Can be negative (below min) or >100 (above max).
+    lineage:
+      - datalake_pin_compensation_clean.salary.range_position
   is_salary_approved:
     description: Boolean flag indicating if the salary proposal has been approved.
+    lineage:
+      - datalake_pin_compensation_clean.salary.is_salary_approved
   is_promotion_movement:
     description: |
       TRUE if this salary change is associated with a promotion event.
       Based on action_code = 'PROMOTION'.
+    lineage:
+      - datalake_people.event_definition.action_code
+  days_tenure_in_company:
+    description: |
+      Tenure in the company in days.
+      Reference date is LEAST(CURRENT_DATE, dt_valid_to) so historical records reflect the full period.
+      Uses transfer-adjusted admission (previous_dt_started when GLB_TRANSFER) from identifier_mapping.
+      NULL when identifier_mapping data is unavailable.
+    lineage:
+      - datalake_people.identifier_mapping.dt_started
+      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.all_assignments.action_code
+  days_tenure_in_position:
+    description: |
+      Tenure in the current job (position) in days.
+      Uses current stint (handles A->B->A returning to same job). Reference date LEAST(CURRENT_DATE, dt_valid_to).
+      NULL when job or assignment history is unavailable.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.dt_effective_started
+  days_tenure_in_band:
+    description: |
+      Tenure in the current band in days.
+      Uses current stint (handles A->B->A returning to same band). Reference date LEAST(CURRENT_DATE, dt_valid_to).
+      NULL when band or assignment history is unavailable.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.dt_effective_started
+      - dw_compensation.dim_job.band
+  months_tenure_in_company:
+    description: |
+      Tenure in the company in whole months.
+      Same logic as days_tenure_in_company (transfer-adjusted, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+    lineage:
+      - datalake_people.identifier_mapping.dt_started
+      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.all_assignments.action_code
+  months_tenure_in_position:
+    description: |
+      Tenure in the current job (position) in whole months.
+      Same logic as days_tenure_in_position (current stint, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+    lineage:
+      - datalake_pin_core_clean.all_assignments.dt_effective_started
+  months_tenure_in_band:
+    description: |
+      Tenure in the current band in whole months.
+      Same logic as days_tenure_in_band (current stint, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+    lineage:
+      - datalake_pin_core_clean.all_assignments.dt_effective_started
+      - dw_compensation.dim_job.band
   dt_valid_from:
     description: Start date of validity for this salary record (SCD Type 2).
+    lineage:
+      - datalake_pin_compensation_clean.salary.dt_started
   dt_valid_to:
     description: End date of validity for this salary record. NULL if currently active.
+    lineage:
+      - datalake_pin_compensation_clean.salary.dt_ended
   is_current:
     description: |
       TRUE if this record represents the current salary for the contract/assignment.
+    lineage:
+      - datalake_pin_compensation_clean.salary.dt_started
+      - datalake_pin_compensation_clean.salary.dt_ended
   ts_load:
     description: Timestamp recording when data was loaded into the table.

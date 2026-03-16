@@ -46,6 +46,42 @@ column_level_validations:
   is_promotion_movement:
     is_complete:
       severity_level: Error
+  days_tenure_in_company:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+    custom:
+      # Tenure hierarchy: company >= position and company >= band when all non-null
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_compensations
+         WHERE days_tenure_in_company IS NOT NULL
+           AND (
+             (days_tenure_in_position IS NOT NULL AND days_tenure_in_company < days_tenure_in_position)
+             OR (days_tenure_in_band IS NOT NULL AND days_tenure_in_company < days_tenure_in_band)
+           )
+        ) = 0
+      severity_level: Error
+  months_tenure_in_company:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  days_tenure_in_position:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  months_tenure_in_position:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  days_tenure_in_band:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  months_tenure_in_band:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
   dt_valid_from:
     is_complete:
       severity_level: Error
