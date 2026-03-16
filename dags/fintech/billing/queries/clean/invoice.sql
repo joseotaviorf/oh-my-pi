@@ -1,4 +1,4 @@
-WITH 
+WITH
 original_invoice_base AS (
 SELECT
   id,
@@ -6,20 +6,20 @@ SELECT
     regexp_replace(payload, '^"|"$', ''),
     '\\\\"', '"'
   ) AS unescaped_payload
-FROM 
+FROM
 	datalake_billing_raw.invoice
 ),
 original_invoice AS (
 SELECT
   id,
   get_json_object(unescaped_payload, '$.original-id') as id_original
-FROM 
+FROM
   original_invoice_base
 )
 SELECT
 	i.id,
 	account_id AS id_account,
-	contract_id AS id_contract, 
+	contract_id AS id_contract,
 	source_invoice_id AS id_source_invoice,
 	o.id_original,
 	account_type,
@@ -33,8 +33,10 @@ SELECT
 	due_date AS dt_due,
 	created_at AS ts_created,
 	updated_at AS ts_updated
-FROM 
-	datalake_billing_raw.invoice i 
+FROM
+	datalake_billing_raw.invoice i
 LEFT JOIN
   original_invoice o
   ON i.id = o.id
+-- This filter ensures that only records created after the billing cleanup are considered.
+WHERE i.created_at > '2026-01-21'

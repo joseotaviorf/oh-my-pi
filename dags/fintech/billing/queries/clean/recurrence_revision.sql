@@ -8,5 +8,7 @@ SELECT
 	metadata,
 	start_charge_date AS dt_start_charge,
 	created_at AS ts_createed
-FROM 
+FROM
 	datalake_billing_raw.recurrence_revision
+-- This filter ensures that only records created after the billing cleanup are considered.
+WHERE created_at > '2026-01-21'
