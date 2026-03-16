@@ -15,6 +15,28 @@ description: Run and monitor a specific DAG on the local Airflow environment via
 
 ---
 
+## Session activation (run at the start of every new terminal)
+
+All `make` commands in this skill (including `make create-dag-files`, `make upload-local-queries`, etc.) must run **locally in the `bi-etl-ejuice` pyenv virtualenv** — NOT inside Docker containers. The virtualenv has Apache Airflow and all dependencies installed.
+
+Activate the session before running any command:
+
+```bash
+source ~/.zshrc
+eval "$(pyenv init --path)" && eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
+pyenv activate bi-etl-ejuice
+```
+
+Verify it worked:
+```bash
+python --version   # should print Python 3.8.12
+python -c "import airflow; print(airflow.__version__)"  # should print 2.10.4
+```
+
+If the virtualenv does not exist or Airflow is not installed, run the `setup-local-environment` skill first.
+
+---
+
 ## Step 0 — Run unit tests (fastest feedback)
 
 Before starting Airflow, run the relevant unit tests. Identify test files by mirroring the source path:
@@ -62,7 +84,7 @@ If containers **are already running**, proceed to Step 2.
 
 ## Step 2 — Regenerate DAG file
 
-After any declaration YAML change, regenerate the DAG Python file:
+After any declaration YAML change, regenerate the DAG Python file. This runs **locally in the virtualenv** (requires Airflow installed — see Session activation above). Do NOT run this inside Docker containers.
 
 ```bash
 make create-dag-files dag_name={dag_name}
@@ -140,13 +162,38 @@ local_path = '/home/<BIETLEJUICE_FOLDER>/dist/bi_etl_ejuice-0.1.0-py3-none-any.w
 local_path = '/Users/your-username/Documents/projects/bi-etl-ejuice/dist/bi_etl_ejuice-0.1.0-py3-none-any.whl'
 ```
 
-**AWS credentials required**: All upload targets call `boto3` or `aws` CLI and need a valid AWS session. Verify before uploading:
+**AWS credentials required**: All upload targets call `boto3` or `aws` CLI and need a valid AWS session. QuintoAndar uses **Weep** (Netflix ConsoleMe) for AWS credential brokering, not AWS SSO.
+
+### Weep setup (one-time)
+
+Install Weep v0.3.31 from https://github.com/Netflix/weep/releases/tag/v0.3.31 and create `~/.weep/weep.yaml`:
+
+```yaml
+authentication_method: challenge
+challenge_settings:
+  user: your.email@quintoandar.com.br
+consoleme_url: https://consoleme.sre.quintoandar.com.br
+mtls_settings:
+  old_cert_message: mTLS certificate is too old, please refresh mtls certificate
+server:
+  http_timeout: 20
+  port: 9091
+```
+
+### Get AWS credentials before each upload
 
 ```bash
+# List available roles
+/usr/local/bin/weep list
+
+# Export credentials for Forno Stag Data (account 713278628093)
+eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalytics_Squad)
+
+# Verify
 aws sts get-caller-identity
-# If expired:
-aws sso login --profile forno
 ```
+
+Weep credentials are temporary (~1 hour). Re-run the `eval` command if they expire mid-session.
 
 ---
 
@@ -182,10 +229,10 @@ cp -Rf ./bietlejuice/ ./local/astro/bietlejuice
 cp -Rf ./scripts/ ./local/astro/scripts
 ```
 
-Then restart the Astro containers:
+Then restart the Astro containers (**`DOCKER_BUILDKIT=1` is required**):
 
 ```bash
-cd ./local/astro && astro dev restart --no-cache --build-secrets id=GITHUB_TOKEN
+cd ./local/astro && export DOCKER_BUILDKIT=1 && astro dev restart --no-cache --build-secrets id=GITHUB_TOKEN
 ```
 
 If the restart fails with a permission error on `local/astro/include`:
@@ -195,6 +242,21 @@ sudo chmod 755 ./local/astro/include
 Then retry the restart.
 
 A TTY error during variable import (`error adding variable DOC_MD_BASE_URL`) is **non-critical** — the containers still run.
+
+### Lightweight alternative: `docker cp` (no rebuild)
+
+When you only changed SQL queries or metadata (no Python code changes in `bietlejuice/`), you can skip the full Docker rebuild and copy files directly into the running containers:
+
+```bash
+# Copy the target DAG into both scheduler and webserver containers
+SCHED=$(docker ps --filter "name=scheduler" --format "{{.ID}}")
+WEB=$(docker ps --filter "name=webserver" --format "{{.ID}}")
+
+docker cp ./dags/{domain}/{dag_name}/ $SCHED:/usr/local/airflow/dags/{domain}/{dag_name}/
+docker cp ./dags/{domain}/{dag_name}/ $WEB:/usr/local/airflow/dags/{domain}/{dag_name}/
+```
+
+The scheduler will re-parse the DAG within 15–30 seconds. No restart needed. Use the full rebuild path (above) when `bietlejuice/` Python code or plugins changed.
 
 ---
 
@@ -315,7 +377,8 @@ Use `try_number=1` for the first attempt, `2` for the first retry, etc.
 | `DELTA_CREATE_TABLE_SCHEME_MISMATCH` | POC or schema change conflicts with existing Delta table on forno | Delete the old table: `aws s3 rm s3://5a-datalake-forno/{layer}/{schema}/{table}/ --recursive`, then re-trigger |
 | `DELTA_PATH_DOES_NOT_EXIST` after deleting a table | Metastore still references the old table but the S3 path was removed | The first run after deletion must create the table fresh; if the pipeline uses MERGE, it may fail. Drop the metastore entry via Databricks notebook: `spark.sql("DROP TABLE IF EXISTS {schema}.{table}")` before re-triggering |
 | Task succeeds but target table is empty | Date range in `load_start_date`/`load_end_date` does not match data available in forno | Check what dates exist in the source table first (query via Databricks or sample data CSV), then trigger with matching dates |
-| AWS credentials expire mid-session | Long cluster provisioning (5–12 min) + Spark execution can exceed session TTL | Run `aws sts get-caller-identity` before every upload step; renew if expired |
+| AWS credentials expire mid-session | Weep credentials last ~1 hour; long cluster provisioning can exceed TTL | Re-run `eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalytics_Squad)` before each upload step |
+| `unknown flag: --secret` during `astro dev restart` | `DOCKER_BUILDKIT` not set or `docker-buildx` not installed | `export DOCKER_BUILDKIT=1`; install buildx if missing (see setup-local-environment skill) |
 
 ---
 

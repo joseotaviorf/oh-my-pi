@@ -137,6 +137,55 @@ upload-local-package:
 	@python3 -m setup sdist bdist_wheel
 	@python3 local/upload_local_whl_to_s3.py
 
+.PHONY: upload-local-qube-jobs
+upload-local-qube-jobs:
+	@aws s3 sync bietlejuice/qube \
+		s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice/bietlejuice/qube \
+		--acl bucket-owner-full-control
+
+.PHONY: upload-local-queries
+upload-local-queries:
+	@pip install boto3==1.24.0 tqdm==4.64.1 -q
+	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
+		databricks.s3.forno.data.quintoandar.com.br queries
+
+.PHONY: upload-local-data-quality
+upload-local-data-quality:
+	@pip install boto3==1.24.0 tqdm==4.64.1 -q
+	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
+		databricks.s3.forno.data.quintoandar.com.br data_quality
+
+.PHONY: upload-local-schemas
+upload-local-schemas:
+	@pip install boto3==1.24.0 tqdm==4.64.1 -q
+	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
+		databricks.s3.forno.data.quintoandar.com.br schemas
+
+.PHONY: upload-local-init-scripts
+upload-local-init-scripts:
+	@aws s3 cp scripts/init_script.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh \
+		--acl bucket-owner-full-control
+	@aws s3 cp scripts/wonka/install_pex_generic.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/install_pex_generic.sh \
+		--acl bucket-owner-full-control
+	@aws s3 cp scripts/wonka/get_credentials_from_vault.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/get_credentials_from_vault.sh \
+		--acl bucket-owner-full-control
+	@aws s3 cp scripts/wonka/install_spark_metrics_plugin.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/install_spark_metrics_plugin.sh \
+		--acl bucket-owner-full-control
+
+.PHONY: upload-forno-release
+## Full local Forno release: builds wheel and uploads all artifacts to Forno S3 (mirrors release.yml forno steps).
+upload-forno-release:
+	@make upload-local-package
+	@make upload-local-queries
+	@make upload-local-data-quality
+	@make upload-local-schemas
+	@make upload-local-qube-jobs
+	@make upload-local-init-scripts
+
 ###############################################################################
 ###################### Local Python environment ###############################
 ###############################################################################
