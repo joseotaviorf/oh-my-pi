@@ -1,0 +1,47 @@
+---
+database_name: datalake_collections_score_batch_inference_clean
+table_name: collections_score_v3_output
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: "Collections score v3 batch inference output with contract, score and payment probability."
+columns:
+  id_contract:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: "Surrogate key of the contract from inference output (sk_contract in JSON)."
+  model_name:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.model_name
+    description: "Name of the model that produced the inference."
+  model_version:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.model_service
+    description: "Version of the model that produced the inference."
+  payment_probability:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: "Probability of payment from inference output (payment_probability in JSON)."
+  score:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: "Collections score from inference output (score in JSON)."
+  dt_reference:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: "Reference date of the inference from output (dt_reference in JSON)."
+  ts_inference:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.timestamp
+    description: "Timestamp when the inference was executed."
+  year:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.year
+    description: "Year partition of the inference data."
+  month:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.month
+    description: "Month partition of the inference data."
+  day:
+    lineage:
+      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.day
+    description: "Day partition of the inference data."

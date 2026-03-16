@@ -1,0 +1,10 @@
+---
+source_root_path: s3://data-science.s3.data.quintoandar.com.br/batch-prediction/data/
+format: parquet
+table_name: collections_score_v3_output
+model_name_filter: coll_score_v3
+partition_cols:
+  - year
+  - month
+  - day
+  - model_name

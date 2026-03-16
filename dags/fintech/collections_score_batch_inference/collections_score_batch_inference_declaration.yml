@@ -1,0 +1,42 @@
+dag:
+  name: collections_score_batch_inference
+  schedule_start_date: 2026, 3, 12
+  schedule_interval: 0 2 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: Loads batch inference collections data into our Data Lake.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_parquet_into_datalake
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  has_hive_sync: false
+  execution_timeout_hours: 5
+  default_extraction_type: incremental
+  tables_customization:
+    collections_score_v3_output:
+      clean_partitions:
+        - year
+        - month
+        - day
+
+cluster:
+  type: databricks_12_2_max_io-general_cluster
+  access_control_list:
+    group_name: mlops
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
