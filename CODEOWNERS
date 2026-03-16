@@ -14,6 +14,7 @@ bietlejuice/pipeline/**                                                 @quintoa
 dags/**/metric_*                                                        @quintoandar/bi-etl-ejuice-metric-layer-code-owners
 dags/platform/**                                                        @quintoandar/data-ingestion-code-owners
 dags/ops_poc/**                                                         @luisarodriguees @GabriellRodrigues @henriquedepaulo
+dags/planning_and_performance/**                                        @luisarodriguees @GabriellRodrigues
 scripts/ci_cd/**                                                        @quintoandar/data-ingestion-code-owners
 CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
 dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives
