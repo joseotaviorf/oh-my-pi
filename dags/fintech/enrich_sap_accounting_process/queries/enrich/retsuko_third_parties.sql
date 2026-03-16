@@ -3,6 +3,7 @@ WITH retsuko AS (
     ct.id_external AS id_business_entity,
     i.id_external AS id_finance_entity,
     e.id_external AS id_finance_entity_entry,
+    e.id_external AS id_sap_entity_key,
     'seu barriga' AS source_name,
     CASE
       WHEN e.bill_item IN ('entry.bill-item/brokerage-installment', 'entry.bill-item/brokerage-quinto-andar') THEN '211413'
@@ -92,6 +93,72 @@ WITH retsuko AS (
     AND DATE(e.ts_created) >= '2025-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
+
+UNION ALL
+
+  SELECT DISTINCT
+    ct.id_external AS id_business_entity,
+    i.id_external AS id_finance_entity,
+    e.id_external AS id_finance_entity_entry,
+    e.id_external AS id_sap_entity_key,
+    'seu barriga' AS source_name,
+    CASE WHEN e.bill_item IN ('entry.bill-item/debit-negotiation') THEN '113412' END AS account_number,
+    CASE WHEN e.bill_item IN ('entry.bill-item/debit-negotiation') THEN 'Debit Negotiation' END AS accounting_name,
+    i.accrual_year_month,
+    DATE(e.ts_created) AS dt_source_trigger,
+    CAST(amount AS DECIMAL(12,2)) AS source_amount
+  FROM
+    datalake_retsuko.entry  e
+  INNER JOIN
+    datalake_retsuko_clean.account AS af
+      ON e.id_from_account = af.id
+  INNER JOIN
+    datalake_retsuko_clean.account AS at
+      ON e.id_to_account = at.id
+  LEFT JOIN
+    datalake_retsuko.invoice i
+      ON e.id_invoice = i.id
+  LEFT JOIN
+    datalake_retsuko_clean.contract ct
+      ON ct.id = e.id_contract
+  WHERE
+    (e.bill_item IN ('entry.bill-item/debit-negotiation') AND i.is_write_off = false)
+    AND DATE(e.ts_created) >= '2025-01-01'
+    AND af.type IN ('contract', 'tenant','landlord')
+    AND at.type IN ('contract', 'tenant','landlord')
+
+UNION ALL
+
+  SELECT DISTINCT
+    ct.id_external AS id_business_entity,
+    i.id_external AS id_finance_entity,
+    NULL AS id_finance_entity_entry,
+    i.id_external AS id_sap_entity_key,
+    'seu barriga' AS source_name,
+    '113412' AS account_number,
+    'Debit Negotiation' AS accounting_name,
+    i.accrual_year_month,
+    DATE(i.ts_paid) AS dt_source_trigger,
+    CAST(i.paid_amount AS DECIMAL(12,2)) AS source_amount
+  FROM
+    datalake_retsuko.entry  e
+  INNER JOIN
+    datalake_retsuko_clean.account AS af
+      ON e.id_from_account = af.id
+  INNER JOIN
+    datalake_retsuko_clean.account AS at
+      ON e.id_to_account = at.id
+  LEFT JOIN
+    datalake_retsuko.invoice i
+      ON e.id_invoice = i.id
+  LEFT JOIN
+    datalake_retsuko_clean.contract ct
+      ON ct.id = e.id_contract
+  WHERE
+    i.status = 'written-down' AND i.is_write_off = false
+    AND DATE(i.ts_paid) >= '2025-01-01'
+    AND af.type IN ('contract', 'tenant','landlord')
+    AND at.type IN ('contract', 'tenant','landlord')
 ),
 
 sap_entity AS (
@@ -107,7 +174,7 @@ sap_entity AS (
     datalake_retsuko_clean.sap_entity
   WHERE
     id_finance_entity IS NOT NULL
-    AND event = 'new-accounting-entries'
+    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
   QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
 ),
 
@@ -148,7 +215,7 @@ sap AS (
     datalake_pas.ledger
   WHERE
     TRUE
-    AND account_number IN ('211413', '211415','113406','113411')
+    AND account_number IN ('211413', '211415', '113406', '113411', '113412')
   GROUP BY 1, 2, 3, 4, 6, 7
 ),
 
@@ -186,7 +253,7 @@ errors_base AS (
         retsuko AS r
     LEFT JOIN
         sap_entity AS se
-        ON r.id_finance_entity_entry = se.id_finance_entity
+        ON r.id_sap_entity_key = se.id_finance_entity
     LEFT JOIN
         sap_gateway AS sg
             ON se.id_sap_gateway_feature = sg.id_feature
