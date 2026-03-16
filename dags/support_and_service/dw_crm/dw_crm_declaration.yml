@@ -56,9 +56,6 @@ workflow:
     fact_ungrouped_manual_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-    fact_visit_tasks:
-      extraction_type: incremental
-      partitions: [year, month, day]
 
 cluster:
   type: custom_cluster

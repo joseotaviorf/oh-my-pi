@@ -396,7 +396,6 @@ bietlejuice.dw_crm:
   - bietlejuice.ebdb_proposal:load-clean-proposal:first-run-of-day
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow:first-run-of-day
   - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow:first-run-of-day
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions:first-run-of-day
