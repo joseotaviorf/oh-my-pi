@@ -14,7 +14,7 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsDatabricksCallback
 
 
 # ENV setup
@@ -48,7 +48,8 @@ raw_spark_job_path = (
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-cluster_description = config_service.get_config("databricks_16_4_med_general_cluster")
+cluster_type = "databricks_16_4_med_general_cluster"
+cluster_description = config_service.get_config(cluster_type)
 
 cluster_description["data_security_mode"] = "SINGLE_USER"
 cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
@@ -75,7 +76,20 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 DAG_OWNER = DAGOwnerEnum.DATA_SS
-jiraops_callback = JiraOpsCallback()
+jiraops_callback = JiraOpsDatabricksCallback(
+    dag_args={
+        "name": DAG_NAME,
+        "schedule_start_date": MAIN_START_DATE,
+        "schedule_interval": MAIN_SCHEDULE_INTERVAL,
+        "owner": DAG_OWNER,
+        "documentation": dag_documentation,
+    },
+    cluster_args={
+        "type": cluster_type,
+        "databricks_conn_id": "databricks_new",
+        "custom_configurations": cluster_description,
+    },
+)
 dag = DAG(
     dag_id=DAG_ID,
     default_args={

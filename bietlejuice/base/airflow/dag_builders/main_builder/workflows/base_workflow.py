@@ -69,7 +69,10 @@ class BaseWorkflow(BuilderInterface):
         doc_md = self._get_dag_documentation()
         user_defined_macros = {"get_date_param": self.get_date_param}
         user_defined_macros.update(kwargs.get("user_defined_macros", {}))
-        jiraops_callback = JiraOpsCallback()
+        jiraops_callback = JiraOpsCallback(
+            dag_args=self.dag_args,
+            cluster_args=self.cluster_args,
+        )
         callback_by_task = self.dag_args.get("callback_by_task", True)
 
         dag = DAG(

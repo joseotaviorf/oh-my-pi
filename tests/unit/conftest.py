@@ -30,6 +30,8 @@ def pytest_collection_modifyitems(items):
 
 # Mock external plugins that might not be installed locally
 sys.modules["databricks_plugin"] = MagicMock()
+sys.modules["databricks_plugin.hooks"] = MagicMock()
+sys.modules["databricks_plugin.hooks.databricks_hook"] = MagicMock()
 sys.modules["extra_link_plugin"] = MagicMock()
 
 
