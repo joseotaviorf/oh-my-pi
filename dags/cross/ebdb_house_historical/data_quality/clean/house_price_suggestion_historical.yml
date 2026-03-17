@@ -1,0 +1,48 @@
+---
+table_name: datalake_ebdb_clean.house_price_suggestion_historical
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+
+  id_house:
+    is_complete:
+      severity_level: Error
+
+  id_prediction:
+    is_complete:
+      severity_level: Warning
+
+  suggested_price:
+    is_complete:
+      severity_level: Warning
+
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ["RENT", "SALE"]
+      severity_level: Warning
+
+  ts_cdc_transaction:
+    is_complete:
+      severity_level: Error
+
+  year:
+    is_complete:
+      severity_level: Error
+
+  month:
+    is_complete:
+      severity_level: Error
+
+  day:
+    is_complete:
+      severity_level: Error
