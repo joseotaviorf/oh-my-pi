@@ -76,6 +76,8 @@ table_level_validations:
 
 Detect sudden size changes compared to history. Uses `datalake_data_quality.validations` by default; can override with `history_query`.
 
+This check flags **both** unexpected decreases (shrinkage) and unexpected explosions (sudden large increases) in table size compared to history.
+
 ```yaml
 table_level_validations:
   has_size_variation:
@@ -145,7 +147,7 @@ column_level_validations:
 
 ## DW Dimension Tables — Unknown Row (-1)
 
-DW dimension tables automatically include an "unknown" row with `sk_* = -1` and all other columns null (Kimball pattern for missing/unknown dimension members). This affects which validations you can use:
+**Rule:** DW dimension tables automatically include an "unknown" row with `sk_* = -1` and all other columns null (Kimball pattern for missing/unknown dimension members). For non-SK columns, use `has_null_count` (not `is_complete`) — `is_complete` would fail on the -1 row.
 
 - **SK column only**: Use `is_complete` and `is_unique` — the -1 row has a valid SK value.
 - **All other columns**: Do **not** use `is_complete` (it would fail on the -1 row). Use `has_null_count` with `less_than_or_equal_to: 1` instead — allowing exactly one null (the -1 row).

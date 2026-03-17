@@ -43,7 +43,23 @@ When adding new tables, place them in the schema that matches the business domai
 
 Every table from the **clean** layer onwards must have a corresponding data quality file in `data_quality/{layer}/{table}.yml`.
 
-When creating or editing `data_quality/*.yml` files in the People domain, **always apply** `.cursor/rules/data_quality_tests.mdc`. Use `alert_channel: PEOPLE_ALERTS` and `table_name` fully qualified (e.g. `dw_employee_details.fact_absence_requests`). DW dimensions: use `has_null_count` for non-SK columns (not `is_complete`) due to the -1 unknown row.
+When creating or editing `data_quality/*.yml` files in the People domain, **always apply** `.cursor/rules/data_quality_tests.mdc`. Use `alert_channel: PEOPLE_ALERTS` and `table_name` fully qualified (e.g. `dw_employee_details.fact_absence_requests`).
+
+### has_size_variation for People DW Tables
+
+For People DW tables that grow monotonically (facts, dimensions with history), add `has_size_variation` to detect unexpected decreases (shrinkage) and unexpected explosions (sudden large increases) in table size while allowing expected gradual growth.
+
+**Standard configuration** (growing tables):
+
+```yaml
+has_size_variation:
+  variation_type: percentage
+  greater_than_or_equal_to: 0
+  less_than_or_equal_to: 25
+  severity_level: Warning
+```
+
+**Stable reference tables** (e.g. `dim_job`, `dim_business_unit`): use `less_than_or_equal_to: 10` instead.
 
 ---
 
@@ -66,6 +82,16 @@ Do not assume one side is always correct; consider the business intent of both c
 
 When adding new dependencies to a DAG (e.g., new source tables, new inner_dependencies), always run `make dependencies-file` to update the dependencies manifest. This ensures CI and deployment pipelines have the correct dependency graph.
 
+### Execution Order — Raw → Enrich → DW
+
+People DAGs follow a strict dependency chain:
+
+1. **Raw** (pin_*, greenhouse_v3, degreed, etc.) — run first on schedule; pull from external sources (Oracle HCM, APIs).
+2. **Enrich** — run after raw; consume clean tables and produce domain-focused enrich tables (e.g. `datalake_people`).
+3. **DW** — run last; consume enrich and clean tables; produce Kimball-style dimensions and facts.
+
+DW DAGs must not run before their enrich sources (e.g. `dw_employee_details` depends on `enrich_people`). pin_* raw DAGs typically run between 0h and 3h30; enrich and DW DAGs are triggered by task dependencies.
+
 ---
 
 ## New DAGs in People — Configuration
@@ -83,6 +109,28 @@ When creating new DAGs in `dags/people/`, use the following configuration patter
 | `credentials_scope` | `people` | For gsheets DAGs |
 
 **Rule:** People domain DAGs must use `*_people_cluster` variants (see `.cursor/rules/dag_build.mdc`). Never use generic clusters outside the People IAM scope.
+
+### Mandatory Declaration for New People DAGs
+
+Every new People DAG declaration **must** include:
+
+- `bucket_config_name: people_bucket`
+- `databricks_conn_id: databricks_new_env` (for raw, clean, enrich, dw; use `databricks_new` only for reverse layer per core rules)
+- `has_hive_sync: false`
+- `access_control_list` with `group_name: people-analytics` and `permission_level: CAN_MANAGE`
+- `default_table_privileges: people-team: ["ALL PRIVILEGES"]` for tables with PII or sensitive data
+
+### Schedule — DAGs Triggered by Dependencies
+
+Enrich and DW DAGs are typically triggered by **Airflow task dependencies** (upstream raw/clean DAGs), not by a cron schedule. These DAGs do **not** need `schedule_interval` — they run when their upstream dependencies complete. Only raw DAGs (pin_*, greenhouse, degreed, etc.) that pull from external sources need an explicit `schedule_interval`.
+
+### Default Extraction Type — Full Ingestion
+
+People domain APIs use **hard delete** (records removed from source are not flagged). Use `default_extraction_type: full` by default. Full refresh ensures deleted records are correctly removed from the data lake.
+
+### Vacuum and Delta for People Tables
+
+People domain tables with PII or high churn should use `vacuum_retention_hours: 168` and `vacuum_lite: true` in `tables_customization` to balance retention and storage. Apply to dimension and fact tables in dw_employee_details, enrich_people, and other People DAGs with sensitive data.
 
 ---
 
@@ -246,6 +294,16 @@ When **filtering** source tables (clean/enrich) that still contain `4712-12-31`,
 Prefer `pin_core` clean tables and `datalake_people` enrich tables instead. For assignment and termination data, use `datalake_people.identifier_mapping` together with `datalake_people.assignment_termination` (for terminated assignments).
 
 **If the required data does not exist in `pin_*` DAGs**, inform the user so they can assess alternative sources or request the data to be added to the pin pipeline.
+
+### Deprecated Sources — Do Not Use in New Development
+
+**Rule:** When adding new queries or modifying existing ones in People DAGs, do **not** reference:
+
+- `datalake_hr_system`, `datalake_hr_system_clean`, `datalake_hr_system_custom`, `datalake_hr_system_custom_clean`
+- `datalake_employment`
+- `greenhouse` (v1) raw/clean — prefer `greenhouse_v3`
+
+**Prefer:** `datalake_pin_core_clean`, `datalake_people`, and other `pin_*` clean schemas.
 
 ### Talent Acquisition (Greenhouse)
 
