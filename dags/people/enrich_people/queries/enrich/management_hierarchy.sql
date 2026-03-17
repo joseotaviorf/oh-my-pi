@@ -250,6 +250,23 @@ hierarchy_union AS (
         level_1
     UNION ALL
     SELECT
+        ceo.assignment_number,
+        ceo.assignment_number AS manager_assignment_number_1,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        ceo.dt_from AS dt_valid_from,
+        ceo.dt_to AS dt_valid_to
+    FROM
+        ceo_history AS ceo
+    UNION ALL
+    SELECT
         assignment_number,
         manager_assignment_number_1,
         manager_assignment_number_2,
