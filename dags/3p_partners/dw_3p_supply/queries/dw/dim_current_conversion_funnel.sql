@@ -1,6 +1,8 @@
 WITH max_ts_value AS (
   SELECT
+    lsc.sk_lead_3p_flow,
     l.id_lead_3p,
+    COALESCE(lds.sk_listing_draft_status, -1) AS sk_listing_draft_status,
     lsc.business_context,
     l.id_house,
     lsc.status AS current_bsp_status,
@@ -9,8 +11,8 @@ WITH max_ts_value AS (
     lds.current_main_status_reason,
     lsc.is_opportunity,
     lsc.reason_macro,
-    lds.ts_availability_start,
-    lds.ts_availability_end,
+    lds.ts_availability_check_start,
+    lds.ts_availability_check_end,
     lds.ts_first_listing,
     GREATEST(
       lsc.ts_unpublished_in_bsp,
@@ -21,8 +23,8 @@ WITH max_ts_value AS (
       lsc.ts_last_processing_photos_in_bsp,
       lsc.ts_suspended_in_bsp,
       lsc.ts_first_registered_from_bsp_to_main,
-      lds.ts_availability_start,
-      lds.ts_availability_end,
+      lds.ts_availability_check_start,
+      lds.ts_availability_check_end,
       lds.ts_first_listing
     ) AS ts_max_value
   FROM
@@ -37,17 +39,15 @@ WITH max_ts_value AS (
     AND lsc.business_context = lds.business_context
 )
 SELECT
-  CASE
-    WHEN business_context = 'SALE' THEN id_lead_3p * 10
-    WHEN business_context = 'RENT' THEN id_lead_3p * 10 + 1
-  END AS sk_lead_3p_flow,
+  sk_lead_3p_flow,
   id_lead_3p AS sk_lead_3p,
+  sk_listing_draft_status,
   COALESCE(id_house, -1) AS sk_house,
   business_context,
   CASE
     WHEN ts_first_listing IS NOT NULL THEN 'FIRST_LISTING'
-    WHEN ts_max_value = ts_availability_start THEN 'AVAILABILITY_START'
-    WHEN ts_max_value = ts_availability_end THEN 'AVAILABILITY_END'
+    WHEN ts_max_value = ts_availability_check_start THEN 'AVAILABILITY_CHECK_START'
+    WHEN ts_max_value = ts_availability_check_end THEN 'AVAILABILITY_CHECK_END'
     WHEN current_bsp_status = 'PROCESSING' THEN 'PROCESSING_PHOTOS'
     WHEN current_bsp_status = 'NOT_CONVERTED' AND is_opportunity THEN 'OPPORTUNITY'
     WHEN current_bsp_status IN ('NOT_CONVERTED', 'UNPUBLISHED', 'REGISTERED', 'SUSPENDED', 'DISCARDED') THEN CONCAT(current_bsp_status, '_BSP')

@@ -40,7 +40,7 @@ bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:first-run-of-day
 bietlejuice.dw_3p_supply:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
-  - bietlejuice.enrich_3p_supply:load-enrich-first-lead-per-contract:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-broker-lead-relationship:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-lead-3p-status-changes:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-lead-3p:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-listing-draft-status:first-run-of-day

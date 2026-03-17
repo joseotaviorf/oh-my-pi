@@ -20,12 +20,21 @@ description: |
   - Duplicate house ID extracted when applicable
 
 columns:
+  id_status_changes:
+    description: "Revision ID from the Envers audit trail, uniquely identifies each status change event (long)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail_aud.rev
+  sk_lead_3p_flow:
+    description: "Surrogate key for the lead flow: id_lead_3p * 10 for SALE, id_lead_3p * 10 + 1 for RENT (long)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
+      - datalake_brokers_supply_processor_clean.business_context_detail.business_context
   id_lead_3p:
     description: "Lead ID (long), references lead_3p.id_lead_3p"
     lineage:
       - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
-  id_duplicated_house:
-    description: "ID of the duplicate house in EBDB when the lead was marked as duplicate (int, nullable)"
+  sk_house_duplicated:
+    description: "Surrogate key for the duplicate house in EBDB when the lead was marked as duplicate (int, nullable)"
   business_context:
     description: "Business context (SALE, RENT, SALE_PRIMARY_MARKET)"
     lineage:

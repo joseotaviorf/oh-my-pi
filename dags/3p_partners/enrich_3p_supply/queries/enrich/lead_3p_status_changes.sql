@@ -1,5 +1,6 @@
 WITH source_joined AS (
   SELECT
+    bcda.rev,
     bcd.id_lead AS id_lead_3p,
     bcd.business_context,
     bcda.status,
@@ -18,12 +19,17 @@ WITH source_joined AS (
 ),
 status_timeline AS (
   SELECT
+    sj.rev,
+    CASE
+      WHEN sj.business_context = 'SALE' THEN sj.id_lead_3p * 10
+      WHEN sj.business_context = 'RENT' THEN sj.id_lead_3p * 10 + 1
+    END AS sk_lead_3p_flow,
     sj.id_lead_3p,
     CASE
       WHEN CAST(NULLIF(GET_JSON_OBJECT(sj.status_reason, '$.duplicateId'), '') AS INT) != 0
         AND GET_JSON_OBJECT(sj.status_reason, '$.duplicateHouse') != 'false'
       THEN CAST(GET_JSON_OBJECT(sj.status_reason, '$.duplicateId') AS INT)
-    END AS id_duplicated_house,
+    END AS sk_house_duplicated,
     sj.business_context,
     sj.status,
     MAP_KEYS(MAP_FILTER(FROM_JSON(sj.status_reason, 'MAP<STRING, STRING>'), (k, v) -> v = 'true')) AS status_reason,
@@ -50,8 +56,10 @@ status_timeline AS (
     source_joined AS sj
 )
 SELECT
+  st.rev AS id_status_changes,
+  st.sk_lead_3p_flow,
   st.id_lead_3p,
-  st.id_duplicated_house,
+  st.sk_house_duplicated,
   st.business_context,
   st.status,
   st.status_reason,

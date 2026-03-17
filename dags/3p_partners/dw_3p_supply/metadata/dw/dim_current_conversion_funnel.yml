@@ -14,6 +14,10 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p.id_lead_3p
     description: Surrogate key of the lead; join to dim_lead_3p.
+  sk_listing_draft_status:
+    lineage:
+      - datalake_3p_supply.listing_draft_status.sk_listing_draft_status
+    description: Surrogate key for listing draft status (id_house * 10 for SALE, id_house * 10 + 1 for RENT); -1 when not linked.
   sk_house:
     lineage:
       - datalake_3p_supply.lead_3p.id_house
@@ -26,7 +30,7 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.status
       - datalake_3p_supply.listing_draft_status.ts_first_listing
-    description: Current funnel stage (FIRST_LISTING, AVAILABILITY_START, PROCESSING_PHOTOS, OPPORTUNITY, or *_BSP).
+    description: Current funnel stage (FIRST_LISTING, AVAILABILITY_CHECK_START, AVAILABILITY_CHECK_END, PROCESSING_PHOTOS, OPPORTUNITY, or *_BSP).
   reason_macro:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.reason_macro

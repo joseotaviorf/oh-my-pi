@@ -53,13 +53,17 @@ portfolio_manager_publishing_filtered AS (
     AND pm.rn = 1
 )
 SELECT
+  CASE
+    WHEN lbc.business_context = 'SALE' THEN lbc.id_house * 10
+    WHEN lbc.business_context = 'RENT' THEN lbc.id_house * 10 + 1
+  END AS sk_listing_draft_status,
   lbc.id_house,
   lbc.business_context,
   lbc.current_main_status,
   lbc.current_main_status_reason,
   pmf.id_house IS NOT NULL AS is_first_listing_published_through_portfolio_manager,
-  MIN(CASE WHEN lbc.status = 'EDITING' AND lbc.status_reason = 'WAITING_CONFIRMATION' THEN lbc.ts_created END) AS ts_availability_start,
-  MIN(CASE WHEN lbc.status <> 'EDITING' AND lbc.status <> 'PUBLISHED' THEN lbc.ts_last_status_changed WHEN lbc.status = 'PUBLISHED' THEN lbc.ts_first_publication END) AS ts_availability_end,
+  MIN(CASE WHEN lbc.status = 'EDITING' AND lbc.status_reason = 'WAITING_CONFIRMATION' THEN lbc.ts_created END) AS ts_availability_check_start,
+  MIN(CASE WHEN lbc.status <> 'EDITING' AND lbc.status <> 'PUBLISHED' THEN lbc.ts_last_status_changed WHEN lbc.status = 'PUBLISHED' THEN lbc.ts_first_publication END) AS ts_availability_check_end,
   MIN(CASE WHEN lbc.status = 'PUBLISHED' THEN lbc.ts_first_publication END) AS ts_first_listing,
   CURRENT_TIMESTAMP() AS ts_load
 FROM

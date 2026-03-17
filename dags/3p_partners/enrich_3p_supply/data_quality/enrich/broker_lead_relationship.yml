@@ -1,5 +1,5 @@
 ---
-table_name: datalake_3p_supply.first_lead_per_contract
+table_name: datalake_3p_supply.broker_lead_relationship
 alert_channel: "#alerts-de-airflow-3p-partners"
 
 table_level_validations:
@@ -13,8 +13,10 @@ table_level_validations:
     severity_level: Warning
 
 column_level_validations:
-  id_lead_3p:
+  sk_lead_3p_flow:
     is_complete:
+      severity_level: Error
+    is_unique:
       severity_level: Error
   business_context:
     is_complete:

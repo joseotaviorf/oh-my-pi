@@ -13,6 +13,7 @@ WITH partner AS (
 ),
 leads_matched_to_latest_contract AS (
   SELECT
+    lsc.sk_lead_3p_flow,
     l.id_lead_3p,
     l.lead_hash,
     l.uuid_company,
@@ -40,14 +41,25 @@ leads_matched_to_latest_contract AS (
       AND partner.ts_partner_contract_start <= lsc.ts_business_context_created
 )
 SELECT
+  lm.sk_lead_3p_flow,
   lm.id_lead_3p,
   lm.business_context,
   lm.sk_broker,
   lm.ts_partner_contract_start,
   lm.ts_business_context_created,
   MIN(lm.ts_business_context_created) OVER (
+    PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context
+  ) AS ts_valid_first_lead,
+  MIN(lm.ts_business_context_created) OVER (
     PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context, lm.ts_partner_contract_start
-  ) AS ts_first_valid_post_contract,
+  ) AS ts_current_valid_first_lead,
+  CASE
+    WHEN lm.ts_business_context_created = MIN(lm.ts_business_context_created) OVER (
+        PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context
+      )
+    THEN TRUE
+    ELSE FALSE
+  END AS is_valid_first_lead,
   CASE
     WHEN lm.ts_partner_contract_start IS NOT NULL
       AND lm.ts_business_context_created = MIN(lm.ts_business_context_created) OVER (
@@ -55,7 +67,7 @@ SELECT
       )
     THEN TRUE
     ELSE FALSE
-  END AS is_valid_lead_occurrence,
+  END AS is_current_valid_first_lead,
   CURRENT_TIMESTAMP() AS ts_load
 FROM
   leads_matched_to_latest_contract AS lm

@@ -14,6 +14,10 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p.id_lead_3p
     description: Surrogate key of the lead; join to dim_lead_3p.
+  sk_listing_draft_status:
+    lineage:
+      - datalake_3p_supply.listing_draft_status.sk_listing_draft_status
+    description: Surrogate key for listing draft status (id_house * 10 for SALE, id_house * 10 + 1 for RENT); -1 when not linked.
   sk_region:
     lineage:
       - datalake_3p_supply.lead_3p.region_id
@@ -24,7 +28,7 @@ columns:
     description: Surrogate key for house in EBDB; -1 when id_house is null.
   sk_house_duplicated:
     lineage:
-      - datalake_3p_supply.lead_3p_status_changes.id_duplicated_house
+      - datalake_3p_supply.lead_3p_status_changes.sk_house_duplicated
     description: Surrogate key for duplicate house when lead was marked duplicate; -1 otherwise.
   sk_person_owner_agent:
     lineage:
@@ -46,10 +50,6 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.business_context
     description: Business context of the flow (SALE or RENT).
-  is_valid_lead_occurrence:
-    lineage:
-      - datalake_3p_supply.first_lead_per_contract.is_valid_lead_occurrence
-    description: True when this lead is the first valid occurrence per contract.
   is_opportunity:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.is_opportunity
@@ -66,6 +66,14 @@ columns:
     lineage:
       - datalake_3p_supply.listing_draft_status.is_first_listing_published_through_portfolio_manager
     description: True when first publication was via portfolio-manager-api.
+  is_valid_first_lead:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.is_valid_first_lead
+    description: True when this lead is the first for (lead_hash, uuid_company, business_context).
+  is_current_valid_first_lead:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.is_current_valid_first_lead
+    description: True when this lead is the first post-contract for (lead_hash, uuid_company, business_context, ts_partner_contract_start).
   has_lead_house_conflicts:
     lineage:
       - datalake_3p_supply.lead_3p.has_lead_house_conflicts
@@ -108,16 +116,28 @@ columns:
     description: First timestamp when lead was registered from BSP to main.
   ts_availability_check_start:
     lineage:
-      - datalake_3p_supply.listing_draft_status.ts_availability_start
-    description: Start of availability window (listing in EDITING/WAITING_CONFIRMATION).
+      - datalake_3p_supply.listing_draft_status.ts_availability_check_start
+    description: Start of availability check window (listing in EDITING/WAITING_CONFIRMATION).
   ts_availability_check_end:
     lineage:
-      - datalake_3p_supply.listing_draft_status.ts_availability_end
-    description: End of availability window for the listing draft.
+      - datalake_3p_supply.listing_draft_status.ts_availability_check_end
+    description: End of availability check window for the listing draft.
   ts_first_listing:
     lineage:
       - datalake_3p_supply.listing_draft_status.ts_first_listing
     description: First publication timestamp of the listing in main.
+  ts_partner_contract_start:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.ts_partner_contract_start
+    description: Start timestamp of the active broker contract period.
+  ts_valid_first_lead:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.ts_valid_first_lead
+    description: Earliest ts_business_context_created for the same (lead_hash, uuid_company, business_context).
+  ts_current_valid_first_lead:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.ts_current_valid_first_lead
+    description: Earliest ts_business_context_created for the same (lead_hash, uuid_company, business_context, ts_partner_contract_start).
   ts_lead_created:
     lineage:
       - datalake_3p_supply.lead_3p.ts_lead_created
