@@ -1,0 +1,21 @@
+dag:
+  name: enrich_supply_staging
+  schedule_start_date: 2026, 2, 24
+  owner: Ops POC
+  documentation:
+    dag_purpose: |
+      This DAG enriches supply staging data: unique supply rules from the funnel,
+      lead cost allocation, and supply targets from QTS/OKR and unique target sources.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: supply_staging
+  default_extraction_type: full
+cluster:
+  type: databricks_16_4_min_general_photon_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

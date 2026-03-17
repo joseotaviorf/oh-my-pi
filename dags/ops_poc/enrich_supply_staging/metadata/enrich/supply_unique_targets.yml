@@ -1,0 +1,51 @@
+---
+database_name: datalake_supply_staging
+table_name: supply_unique_targets
+description: Unique supply funnel volume targets by date, city group, planning conversion, operation, cluster and company report origin.
+domain: Growth
+owner: data-ops-poc@quintoandar.com.br
+columns:
+  date:
+    description: Full date field for detailed temporal tracking.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.date
+  city_group:
+    description: A grouping of city or clusters of cities and neighborhoods.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.city_group
+  planning_conversion:
+    description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.planning_conversion
+  planning_operation:
+    description: Identifies the conversion operation type.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.planning_operation
+  planning_cluster:
+    description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.planning_cluster
+  company_report_origin:
+    description: Indicates the origin within the company that the report targets.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.company_report_origin
+  volumes_prospects_unique:
+    description: Metric related to unique volume of prospects across both For Rent and For Sale funnels.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.volumes_prospects_unique
+  volumes_qualifieds_unique:
+    description: Metric related to unique volume of qualified prospects across both funnels.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.volumes_qualifieds_unique
+  volumes_available_qualifieds_unique:
+    description: Metric related to unique volume of available qualified prospects across both funnels.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.volumes_available_qualifieds_unique
+  volumes_opportunities_unique:
+    description: Metric related to unique volume of opportunities across both funnels.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.volumes_opportunities_unique
+  volumes_first_listings_unique:
+    description: Metric related to unique volume of first listings across both funnels.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.volumes_first_listings_unique

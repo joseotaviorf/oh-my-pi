@@ -1,0 +1,86 @@
+---
+database_name: datalake_supply_staging
+table_name: supply_targets
+description: Supply funnel volume targets from QTS budget and OKR sources (rent and sale), unified by date, city group, planning dimensions and company report origin.
+domain: Growth
+owner: data-ops-poc@quintoandar.com.br
+columns:
+  date:
+    description: Budget date.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.date
+      - scalability_metrics.sale_supply_budget_2026.date
+      - scalability_metrics.rent_supply_okr_2026.date
+      - scalability_metrics.sale_supply_okr_2026.date
+  source:
+    description: Origin of the target (qts for budget, okr for OKR targets).
+  city_group:
+    description: A grouping of city or clusters of cities and neighborhoods.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.city_group
+      - scalability_metrics.sale_supply_budget_2026.city_group
+      - scalability_metrics.rent_supply_okr_2026.city_group
+      - scalability_metrics.sale_supply_okr_2026.city_group
+  planning_conversion:
+    description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.planning_conversion
+      - scalability_metrics.sale_supply_budget_2026.planning_conversion
+      - scalability_metrics.rent_supply_okr_2026.planning_conversion
+      - scalability_metrics.sale_supply_okr_2026.planning_conversion
+  planning_operation:
+    description: Identifies the conversion operation type.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.planning_operation
+      - scalability_metrics.sale_supply_budget_2026.planning_operation
+      - scalability_metrics.rent_supply_okr_2026.planning_operation
+      - scalability_metrics.sale_supply_okr_2026.planning_operation
+  planning_cluster:
+    description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.planning_cluster
+      - scalability_metrics.sale_supply_budget_2026.planning_cluster
+      - scalability_metrics.rent_supply_okr_2026.planning_cluster
+      - scalability_metrics.sale_supply_okr_2026.planning_cluster
+  company_report_origin:
+    description: Indicates the origin within the company that the report targets.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.company_report_origin
+      - scalability_metrics.sale_supply_budget_2026.company_report_origin
+      - scalability_metrics.rent_supply_okr_2026.company_report_origin
+      - scalability_metrics.sale_supply_okr_2026.company_report_origin
+  prospects:
+    description: Count of prospects.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.prospects
+      - scalability_metrics.sale_supply_budget_2026.prospects
+      - scalability_metrics.rent_supply_okr_2026.prospects
+      - scalability_metrics.sale_supply_okr_2026.prospects
+  qualifieds:
+    description: Count of qualified prospects.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.qualifieds
+      - scalability_metrics.sale_supply_budget_2026.qualifieds
+      - scalability_metrics.rent_supply_okr_2026.qualifieds
+      - scalability_metrics.sale_supply_okr_2026.qualifieds
+  available_qualifieds:
+    description: Count of available qualified prospects.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.available_qualifieds
+      - scalability_metrics.sale_supply_budget_2026.available_qualifieds
+      - scalability_metrics.rent_supply_okr_2026.available_qualifieds
+      - scalability_metrics.sale_supply_okr_2026.available_qualifieds
+  opportunities:
+    description: Count of opportunities.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.opportunities
+      - scalability_metrics.sale_supply_budget_2026.opportunities
+      - scalability_metrics.rent_supply_okr_2026.opportunities
+      - scalability_metrics.sale_supply_okr_2026.opportunities
+  first_listings:
+    description: Count of first listings.
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.first_listings
+      - scalability_metrics.sale_supply_budget_2026.first_listings
+      - scalability_metrics.rent_supply_okr_2026.first_listings
+      - scalability_metrics.sale_supply_okr_2026.first_listings

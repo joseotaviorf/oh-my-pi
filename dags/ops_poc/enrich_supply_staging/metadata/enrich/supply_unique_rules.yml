@@ -1,0 +1,17 @@
+---
+database_name: datalake_supply_staging
+table_name: supply_unique_rules
+description: Marks supply records as unique per house or supply key within business context, using funnel stage and opportunity conversion for ranking.
+domain: Growth
+owner: data-ops-poc@quintoandar.com.br
+columns:
+  sk_supply:
+    description: Surrogate key for the supply related to the lead.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  nm_business_context:
+    description: Describes the business context of the lead, indicating if this lead is for rent or for sale.
+    lineage:
+      - dw_growth.obt_supply.nm_business_context
+  fl_unique:
+    description: Flag indicating the record was selected as the unique representative (value 'Unique') for the house and business context.

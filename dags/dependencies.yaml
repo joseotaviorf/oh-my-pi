@@ -3949,6 +3949,12 @@ bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_wololo:load-enrich-prospect-calls:first-run-of-day
   - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
   - bietlejuice.wololo:load-clean-whatsapp:first-run-of-day
+bietlejuice.enrich_supply_staging:
+  - bietlejuice.dw_media_platform_metrics:load-dw-growth-fact-media-platform-metrics:first-run-of-day
+  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_supply:load-dw-growth-fact-supply-events:first-run-of-day
+  - bietlejuice.dw_supply:load-dw-growth-obt-supply:first-run-of-day
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
 bietlejuice.enrich_supply_taxonomy:
   - bietlejuice.bob:load-clean-registrar:first-run-of-day
   - bietlejuice.bob:load-clean-submission-progress:first-run-of-day

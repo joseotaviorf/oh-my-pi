@@ -305,6 +305,12 @@ sheets_info:
     clean_table_name: sale_nbp_source_targets
     sheet_context: growth
 
+  supply_campaign_cluster:
+    sheet_id: 1Cn0zDw-MeJ8HzgalAuajDHHYH6XcV6K9wnUidovOIiU
+    sheet_name: supply_campaign_cluster
+    clean_table_name: supply_campaign_cluster
+    sheet_context: growth
+  
   supply_listing_cross_historical:
     sheet_id: 1qmr2_MBz86YmvAxHzTs_oAktnbPBBqRaA9SOPsrj8NE
     sheet_name: listing_cruzado_historico
