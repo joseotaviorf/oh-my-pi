@@ -7,7 +7,7 @@ from bietlejuice.base.sst.core.utils.common import (
     validate_and_write,
 )
 from bietlejuice.base.sst.core.quality.checks import basic_quality_checks
-from bietlejuice.base.sst.core.utils.sensors import (
+from bietlejuice.base.sst.core.observability.sensors import (
     sensor_partition_hour,
     partition_has_data,
 )

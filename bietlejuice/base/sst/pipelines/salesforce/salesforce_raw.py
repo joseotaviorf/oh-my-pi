@@ -6,7 +6,7 @@ from bietlejuice.base.sst.core.quality.checks import basic_quality_checks
 from bietlejuice.base.sst.core.utils.common import (
     validate_and_write,
 )
-from bietlejuice.base.sst.core.utils.sensors import (
+from bietlejuice.base.sst.core.observability.sensors import (
     sensor_s3_file_exists,
     partition_has_data,
 )
