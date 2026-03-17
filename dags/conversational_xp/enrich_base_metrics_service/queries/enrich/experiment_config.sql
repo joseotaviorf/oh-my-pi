@@ -200,7 +200,7 @@ FROM VALUES
         "ab_beakman_search_services_p_click_experiment_sale_v7",
         named_struct(
             'begin_date', DATE('2026-01-21'),
-            'end_date', NULL,
+            'end_date', DATE('2026-03-17'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
