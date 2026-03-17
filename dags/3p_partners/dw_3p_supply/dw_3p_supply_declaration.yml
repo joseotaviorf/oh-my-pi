@@ -11,6 +11,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
+  custom_schema: 3p_supply
   tables_customization:
     fact_lead_3p_flows:
       partitions: [year, month, day]
