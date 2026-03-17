@@ -387,21 +387,21 @@ app_events_features AS (
 ),
 base_evictions AS (
     SELECT
-        id_process,
+        sk_process AS id_process,
         process,
-        CAST(contract AS BIGINT) AS id_contract,
+        CAST(sk_contract AS BIGINT) AS id_contract,
         DATE(dt_registered) AS dt_registered,
-        DATE(dt_arbitral_distribution) AS dt_arbitral_distribution,
-        DATE(dt_elaw_closure) AS dt_elaw_closure,
-        LEAST(DATE(dt_registered), DATE(dt_arbitral_distribution)) AS dt_begin
+        DATE(dt_arbitral_distribution_start) AS dt_arbitral_distribution,
+        DATE(dt_closure) AS dt_elaw_closure,
+        LEAST(DATE(dt_registered), DATE(dt_arbitral_distribution_start)) AS dt_begin
     FROM
-        datalake_gsheets_clean.evictions_base
+        dw_evictions.fact_evictions
     WHERE
         DATE(dt_registered) IS NOT NULL
         AND DATE(dt_registered) BETWEEN DATE('2023-01-01') AND DATE('{load_end_date}')
         AND (
-            DATE(dt_elaw_closure) > LEAST(DATE(dt_registered), DATE(dt_arbitral_distribution))
-            OR DATE(dt_elaw_closure) IS NULL
+            DATE(dt_closure) > LEAST(DATE(dt_registered), DATE(dt_arbitral_distribution_start))
+            OR DATE(dt_closure) IS NULL
         )
 ),
 evictions_with_date_array AS (
@@ -546,7 +546,7 @@ negotiations AS (
         base_negotiations
 ),
 contract_static_info AS (
-    SELECT 
+    SELECT
         dpdc.sk_contract,
         COALESCE(dpdc.rent, 0) AS rent,
         COALESCE(dpdc.condo, 0) AS condo,
@@ -567,7 +567,7 @@ contract_info AS (
     SELECT
         c.sk_contract,
         ROUND(SUM(p.monthly_income), 2) AS monthly_income
-    FROM 
+    FROM
         dw_rent.dim_contract c
     LEFT JOIN dw_rent.fact_listing_rent_flows f
         ON c.sk_contract = f.sk_contract
